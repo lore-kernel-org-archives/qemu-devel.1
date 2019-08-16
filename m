@@ -2,65 +2,86 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DEDC3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 20:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CBDC3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 20:41:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 073EA206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 20:34:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 073EA206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02E412077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 20:41:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YruAphYX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E412077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyivQ-0004ZE-2L
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 16:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54439)
+	id 1hyj2T-0006Rl-7G
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 16:41:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55353)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1hyiun-00044k-9y
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 16:33:38 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyj1S-0005mV-Hg
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 16:40:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1hyium-0005h7-8o
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 16:33:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54696)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1hyiuj-0005dP-6X; Fri, 16 Aug 2019 16:33:33 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EA41762E;
- Fri, 16 Aug 2019 20:33:31 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-124-60.rdu2.redhat.com
- [10.10.124.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 70F331001B08;
- Fri, 16 Aug 2019 20:33:28 +0000 (UTC)
-Date: Fri, 16 Aug 2019 16:33:26 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190816203326.GB20950@localhost.localdomain>
-References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563553816-148827-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <b7d55527-2a1a-c171-3a46-7723696d4aba@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyj1R-00023W-6z
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 16:40:30 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:34181)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hyj1O-00022U-3A; Fri, 16 Aug 2019 16:40:26 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id l12so5756806oil.1;
+ Fri, 16 Aug 2019 13:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=c9VsMHVCP4KfoSfL3VT11e66qBGPrsJnARN0azHYKUA=;
+ b=YruAphYXMraAMzob3smlwmxNmmkPlIQEgYTiRbIk8y2XT4dB3GTBiSveuZvvK7GWuN
+ +EcOnTH39Q1PWPlhz2u9aNGY2yi6zRAitbYyZPJA2RFL2jEYxIvi8Uq6U0pj1jrTUJCs
+ QhddWSsicrpvR7sXHu1GCux5lmllT98cLNM4/KLEUksn7fQu/paDujKtE9A7gmnSnXY7
+ W3BNXem2A4lEQmhO52nf5b2Uks1tCfMqRCo1jhiDaDqUu4GGZmVRN1iIrai9R71xNQvG
+ kIhAzZkJHAkpvJbbtV30zEpZAZHPaeD3j7DJ52IRyaeAk2xNlU/nr9aG7G5QTEA189Q9
+ Y68Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=c9VsMHVCP4KfoSfL3VT11e66qBGPrsJnARN0azHYKUA=;
+ b=iwUSkdyzQ9KR9KyyLssmwbM6NMXjQLCm/nAz6Y+Q4oOqwJ73iYMuyuzaHQR5s8g6ah
+ tpsUFYO72Gycg4bGYr9VFVPoKyrSDnxESmUzk5Cxm+ATRFfNf6O49MW70+LPTiZ3AuwQ
+ ezbYOOVs+nfBMe6dwWSv1AmyXFhzCgjzIvq+sPBWcMfzkX8Pxlu0TGL15jvrusZW5MsF
+ 7Gbz0Ngvmiwzk/7ecJ2n+VsK6HD5EZVKWqzlNEQ6kxtldTnyYebKIpRQcHqDaX4vgozQ
+ l1ulxdST/MGi6Dq5V6GL6RoEx7GvQR7x4kqCmW3CeYiTZUvMaxKmOF1B87iPEkv40zkU
+ 0zcg==
+X-Gm-Message-State: APjAAAVZtXxStQBGPu2Hv9MQENtJIELvwsMRrzBAZbAIO/bfT5SFP4I4
+ HIumkccCTGsRFI81XT8rEqn9IUL4aH3ZKpIZCwY=
+X-Google-Smtp-Source: APXvYqxaTWOAm/l1MOhvoSsoq5mkFcyhEntd6Wirl7CSo0Md0lq8qVQSRwbxOaJJ35Fn38tf0wvQ7v3r1wGxH8dokwo=
+X-Received: by 2002:a05:6808:8cd:: with SMTP id
+ k13mr6459721oij.136.1565988024958; 
+ Fri, 16 Aug 2019 13:40:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7d55527-2a1a-c171-3a46-7723696d4aba@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 16 Aug 2019 20:33:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 3/6] iotests: Add
- casenotrun report to bash tests
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 16 Aug 2019 13:40:24
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 16 Aug 2019 13:40:24
+ -0700 (PDT)
+In-Reply-To: <CAAgDR1NQSoO6d-OSB_YqbrPA6vxYnq7ZJE_=LoA=eLdmoc3Rsw@mail.gmail.com>
+References: <CAAgDR1NQSoO6d-OSB_YqbrPA6vxYnq7ZJE_=LoA=eLdmoc3Rsw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 16 Aug 2019 22:40:24 +0200
+Message-ID: <CAL1e-=gE94D+JXnje7e8+_-P7qBjRTmmX548fA+89Zx-Q-HfWQ@mail.gmail.com>
+To: Sebastian Rasmussen <sebras@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] Translation of qemu to Swedish...
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,66 +93,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 15, 2019 at 08:44:11PM -0400, John Snow wrote:
-> 
-> 
-> On 7/19/19 12:30 PM, Andrey Shinkevich wrote:
-> > The new function _casenotrun() is to be invoked if a test case cannot
-> > be run for some reason. The user will be notified by a message passed
-> > to the function.
-> > 
-> 
-> Oh, I assume this is a sub-test granularity; if we need to skip
-> individual items.
-> 
-> I'm good with this, but we should CC Cleber Rosa, who has struggled
-> against this in the past, too.
+16.08.2019. 22.20, "Sebastian Rasmussen" <sebras@gmail.com> =D1=98=D0=B5 =
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >
+> Hi!
+>
+> I noticed that a translation to Swedish was missing,
+> so I'd like to contribute that. Let me know if there is
+> some issue and I'll do my best to fix it. :)
+>
+>  / Sebastian
+>
+> From 9d8525b987e0db8309b6221a7e2a292fa5db9eec Mon Sep 17 00:00:00 2001
+> From: Sebastian Rasmussen <sebras@gmail.com>
+> Date: Fri, 16 Aug 2019 21:22:11 +0200
+> Subject: [PATCH] Added Swedish translation.
+>
+> Signed-off-by: Sebastian Rasmussen <sebras@gmail.com>
+> ---
 
-The discussion I was involved in was not that much about skipping
-tests per se, but about how to determine if a test should be skipped
-or not.  At that time, we proposed an integration with the build
-system, but the downside (and the reason for not pushing it forward)
-was the requirement to run the iotest outside of a build tree.
+Very kind of you, Sebastian!
 
-> > Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> > ---
-> >  tests/qemu-iotests/common.rc | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-> > index 6e461a1..1089050 100644
-> > --- a/tests/qemu-iotests/common.rc
-> > +++ b/tests/qemu-iotests/common.rc
-> > @@ -428,6 +428,13 @@ _notrun()
-> >      exit
-> >  }
-> >  
-> > +# bail out, setting up .casenotrun file
-> > +#
-> > +_casenotrun()
-> > +{
-> > +    echo "    [case not run] $*" >>"$OUTPUT_DIR/$seq.casenotrun"
-> > +}
-> > +
-> >  # just plain bail out
-> >  #
-> >  _fail()
-> > 
-> 
-> seems fine to me otherwise.
-> 
-> Reviewed-by: John Snow <jsnow@redhat.com>
+I don't have any computer at hand to check, do I am asking you, or anybody
+else, to check if there is no clash between hot keys: you used 'f' for both
+"_F=C3=A5nga inmatning" and "Visa _flika", 'a' for "_Avsluta" and "Zooma ti=
+ll
+_anpassad storlek", and 'h' for "_Helsk=C3=A4rm" and "F=C3=A5nga vid _hovri=
+ng". (If
+those hot keys are applicable at different situations, they are OK, but not
+in the same situation.)
 
-Yeah, this also LGTM.
+Tack ska du ha!
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Aleksandar
 
+>  po/sv.po | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 75 insertions(+)
+>  create mode 100644 po/sv.po
+>
+> diff --git a/po/sv.po b/po/sv.po
+> new file mode 100644
+> index 0000000000..e1ef3f7776
+> --- /dev/null
+> +++ b/po/sv.po
+> @@ -0,0 +1,75 @@
+> +# Swedish translation of qemu po-file.
+> +# This file is put in the public domain.
+> +# Sebastian Rasmussen <sebras@gmail.com>, 2019.
+> +#
+> +msgid ""
+> +msgstr ""
+> +"Project-Id-Version: QEMU 2.12.91\n"
+> +"Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
+> +"POT-Creation-Date: 2018-07-18 07:56+0200\n"
+> +"PO-Revision-Date: 2019-08-16 21:19+0200\n"
+> +"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>\n"
+> +"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+> +"Language: sv\n"
+> +"MIME-Version: 1.0\n"
+> +"Content-Type: text/plain; charset=3DUTF-8\n"
+> +"Content-Transfer-Encoding: 8bit\n"
+> +"Plural-Forms: nplurals=3D2; plural=3D(n !=3D 1);\n"
+> +"X-Generator: Poedit 2.2.3\n"
+> +
+> +msgid " - Press Ctrl+Alt+G to release grab"
+> +msgstr " - Tryck Ctrl+Alt+G f=C3=B6r att sluta f=C3=A5nga"
+> +
+> +msgid " [Paused]"
+> +msgstr " [Pausad]"
+> +
+> +msgid "_Pause"
+> +msgstr "_Paus"
+> +
+> +msgid "_Reset"
+> +msgstr "_Starta om"
+> +
+> +msgid "Power _Down"
+> +msgstr "St=C3=A4ng _ner"
+> +
+> +msgid "_Quit"
+> +msgstr "_Avsluta"
+> +
+> +msgid "_Fullscreen"
+> +msgstr "_Helsk=C3=A4rm"
+> +
+> +msgid "_Copy"
+> +msgstr "_Kopiera"
+> +
+> +msgid "Zoom _In"
+> +msgstr "Zooma _in"
+> +
+> +msgid "Zoom _Out"
+> +msgstr "Zooma _ut"
+> +
+> +msgid "Best _Fit"
+> +msgstr "Anpassad _storlek"
+> +
+> +msgid "Zoom To _Fit"
+> +msgstr "Zooma till _anpassad storlek"
+> +
+> +msgid "Grab On _Hover"
+> +msgstr "F=C3=A5nga vid _hovring"
+> +
+> +msgid "_Grab Input"
+> +msgstr "_F=C3=A5nga inmatning"
+> +
+> +msgid "Show _Tabs"
+> +msgstr "Visa _flika"
+> +
+> +msgid "Detach Tab"
+> +msgstr "Frig=C3=B6r flik"
+> +
+> +msgid "Show Menubar"
+> +msgstr "Visa menyrad"
+> +
+> +msgid "_Machine"
+> +msgstr "_Maskin"
+> +
+> +msgid "_View"
+> +msgstr "_Visa"
+> --
+> 2.23.0.rc1
+>
