@@ -2,62 +2,81 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66730C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 14:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECA3C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 14:09:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CA0C2086C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 14:08:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CA0C2086C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 070592086C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 14:09:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U84Eafsz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 070592086C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycu9-0002c6-MU
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 10:08:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42510)
+	id 1hycuy-0003s2-Pp
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 10:09:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41744)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1hycq9-0006jt-N8
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 10:04:28 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hyclO-0003b0-Mf
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:59:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hycq8-0007bb-6t
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 10:04:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47312)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hycq7-0007aZ-UN
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 10:04:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 958E2C08E2BD;
- Fri, 16 Aug 2019 14:04:22 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C91938F6D7;
- Fri, 16 Aug 2019 14:04:18 +0000 (UTC)
-Date: Fri, 16 Aug 2019 16:04:17 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190816160417.0d77f168@redhat.com>
-In-Reply-To: <20190815183803.13346-2-ehabkost@redhat.com>
-References: <20190815183803.13346-1-ehabkost@redhat.com>
- <20190815183803.13346-2-ehabkost@redhat.com>
+ (envelope-from <bmeng.cn@gmail.com>) id 1hyclM-0003jS-Te
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:59:30 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:42880)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1hyclM-0003i3-NZ; Fri, 16 Aug 2019 09:59:28 -0400
+Received: by mail-ed1-x542.google.com with SMTP id m44so5188054edd.9;
+ Fri, 16 Aug 2019 06:59:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rIwiC4qbY3bqYq0SjbeWTlEQKmrs5ap8J8fc9Sr7aPE=;
+ b=U84EafszFs9vz3Kry3Jv8LJ4o1qbzGaqAZRarL5J10+jjR/xFb7TFfQBrYwQ8Hk8BV
+ 6BcSYT2P4+wj1rqe99kOgPIfSqcbnFMVfWepav3PSZuPtJ0iWAOY9edWyH6Hc9jDSe8r
+ nVQIA+NpcDa03Lv4HtuC7QeQ52gIjZNvQ2w8FkT90hFjQ7qiVlCKotxdU5fgOI7nLLxm
+ Y4xNdJjL28cVRgjAOBd65YSTf8RbMLUxh2g5qgVcAg7iE583XWA2BmE83laIF9pBrWpJ
+ RyzPX0icEtnEmFAwFj8z1ZLhoFTyUbH4yEPaWOp1oVO0cyXVBF9/YVRUholt0tOKg7Ta
+ GxQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rIwiC4qbY3bqYq0SjbeWTlEQKmrs5ap8J8fc9Sr7aPE=;
+ b=lCq/GxNl4rattcHjwo/BOKdGXCeBV5ZL2yK2kI/tl4EUDRt8MpB3TjLvqTqT5VnZOy
+ nBUSptFpKsv0qJvZbhhFBbfl1pjKwnrPwI9ffp2sB9Kaf5H+rkHQpiSFxEiBjsZADgex
+ +KW29UZ4C3Tu5MqcB0/BJazyE0BvUD1WpVWcN+N60M055TIiiDhA0b8NCsU9Hp7mfU1k
+ 0X7JNvKV5uVg6ZcW3U7w3BQInqTUwFoGhUa2qD9MUDwV30sk80GTFNR2XsPRRr0L4rnA
+ iszP1sb+xVulKT80WhlPKslTo+FHmgrEIgxCNfN3h8ovsO8Wjee5T92ck2vGEBHgejQC
+ 1tKw==
+X-Gm-Message-State: APjAAAUKz8GMuf8flBlmF/C4KRjg4+D0BcRdKJj8/gEdi5II9dySe5Yy
+ f9mB5CzkWw8LwU65+0TuUYtSTrkSgaYrOot/svA=
+X-Google-Smtp-Source: APXvYqxNiNFkSJdUl4hFsGonGLqk8sYHnk3wtSoGcDKJqGUadHgP9DHtK1eepaPNYpJ3yUCt+Jgk5bwseBiVgttjEP0=
+X-Received: by 2002:a05:6402:128b:: with SMTP id
+ w11mr9331242edv.182.1565963966918; 
+ Fri, 16 Aug 2019 06:59:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 16 Aug 2019 14:04:22 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/3] pc: Fix error message on die-id
- validation
+References: <cover.1565904855.git.alistair.francis@wdc.com>
+ <59bed3d7342ef7513a60285e2711c162be5559fc.1565904855.git.alistair.francis@wdc.com>
+In-Reply-To: <59bed3d7342ef7513a60285e2711c162be5559fc.1565904855.git.alistair.francis@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Fri, 16 Aug 2019 21:59:15 +0800
+Message-ID: <CAEUhbmUZ8Vjaqc9mOE0O6KhsUF2-nGUM+YVymSnez6Dh449Fig@mail.gmail.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH v3 4/7] target/riscv: Update the Hypervisor
+ CSRs to v0.4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,51 +88,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>, Like Xu <like.xu@linux.intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair23@gmail.com>, Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 15 Aug 2019 15:38:01 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> The error message for die-id range validation is incorrect.  Example:
-> 
->   $ qemu-system-x86_64 -smp 1,sockets=6,maxcpus=6 \
->     -device qemu64-x86_64-cpu,socket-id=1,die-id=1,core-id=0,thread-id=0
->   qemu-system-x86_64: -device qemu64-x86_64-cpu,socket-id=1,die-id=1,core-id=0,thread-id=0: \
->     Invalid CPU die-id: 1 must be in range 0:5
-> 
-> The actual range for die-id in this example is 0:0.
-> 
-> Fix the error message to use smp_dies and print the correct range.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-PS:
-there is another unrelated bug, QEMU crashes if run like this:
-   qemu-system-x86_64 -smp 1,sockets=6,dies=0,maxcpus=6
-
+On Fri, Aug 16, 2019 at 5:41 AM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> Update the Hypervisor CSR addresses to match the v0.4 spec.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
 > ---
->  hw/i386/pc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 549c437050..24b03bb49c 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -2412,7 +2412,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->              return;
->          } else if (cpu->die_id > pcms->smp_dies - 1) {
->              error_setg(errp, "Invalid CPU die-id: %u must be in range 0:%u",
-> -                       cpu->die_id, max_socket);
-> +                       cpu->die_id, pcms->smp_dies - 1);
->              return;
->          }
->          if (cpu->core_id < 0) {
+>  target/riscv/cpu_bits.h | 35 ++++++++++++++++++-----------------
+>  1 file changed, 18 insertions(+), 17 deletions(-)
+>
 
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 
