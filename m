@@ -6,49 +6,50 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3493C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7145DC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:48:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ADDB20644
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:45:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ADDB20644
+	by mail.kernel.org (Postfix) with ESMTPS id 4A37320644
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:48:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A37320644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50881 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyWvp-00031o-4c
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:45:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37805)
+	id 1hyWyi-0006S0-W5
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:48:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWgP-0003Ts-7w
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:29:59 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWhm-00052u-GL
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWgL-0007HF-CC
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:29:57 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.236]:58121)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWhk-0007tW-Gj
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:31:22 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.77]:34134)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWg3-0007An-09; Fri, 16 Aug 2019 03:29:35 -0400
+ id 1hyWhO-0007ix-0g; Fri, 16 Aug 2019 03:30:58 -0400
+Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
+ BWP09926082.bt.com (10.36.82.113) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
+ Aug 2019 08:30:32 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- RDW083A009ED65.bt.com (10.187.98.35) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Fri, 16 Aug 2019 08:25:39 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:29:32 +0100
+ tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:30:52 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:29:32 +0100
+ 2019 08:30:53 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 08/42] hw/vfio: Access MemoryRegion with
- MemOp
-Thread-Index: AQHVVARYQjoJnYEllU6JebJurkOlMw==
-Date: Fri, 16 Aug 2019 07:29:32 +0000
-Message-ID: <1565940571577.86383@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v7 12/42] hw/s390x: Hard code size with
+ MO_{8|16|32|64}
+Thread-Index: AQHVVASIHvIgAu/PqkGPDWK31G+Lhw==
+Date: Fri, 16 Aug 2019 07:30:52 +0000
+Message-ID: <1565940651997.54048@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -59,14 +60,13 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.40]
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 62.239.224.236
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.77
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v7 08/42] hw/vfio: Access MemoryRegion with
- MemOp
+Subject: [Qemu-devel] [PATCH v7 12/42] hw/s390x: Hard code size with
+ MO_{8|16|32|64}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,59 +109,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The memory_region_dispatch_{read|write} operand "unsigned size" is
-being converted into a "MemOp op".
+Temporarily no-op size_memop was introduced to aid the conversion of
+memory_region_dispatch_{read|write} operand "unsigned size" into
+"MemOp op".
 
-Convert interfaces by using no-op size_memop.
-
-After all interfaces are converted, size_memop will be implemented
-and the memory_region_dispatch_{read|write} operand "unsigned size"
-will be converted into a "MemOp op".
-
-As size_memop is a no-op, this patch does not change any behaviour.
+Now size_memop is implemented, again hard coded size but with
+MO_{8|16|32|64}. This is more expressive and avoids size_memop calls.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/vfio/pci-quirks.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/s390x/s390-pci-inst.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index b35a640..fb3cc33 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -11,6 +11,7 @@
-  */
-
- #include "qemu/osdep.h"
-+#include "exec/memop.h"
- #include "qemu/units.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
-@@ -1071,7 +1072,7 @@ static void vfio_rtl8168_quirk_address_write(void *op=
-aque, hwaddr addr,
-
-                 /* Write to the proper guest MSI-X table instead */
-                 memory_region_dispatch_write(&vdev->pdev.msix_table_mmio,
--                                             offset, val, size,
-+                                             offset, val, size_memop(size)=
-,
-                                              MEMTXATTRS_UNSPECIFIED);
-             }
-             return; /* Do not write guest MSI-X data to hardware */
-@@ -1102,7 +1103,8 @@ static uint64_t vfio_rtl8168_quirk_data_read(void *op=
-aque,
-     if (rtl->enabled && (vdev->pdev.cap_present & QEMU_PCI_CAP_MSIX)) {
-         hwaddr offset =3D rtl->addr & 0xfff;
-         memory_region_dispatch_read(&vdev->pdev.msix_table_mmio, offset,
--                                    &data, size, MEMTXATTRS_UNSPECIFIED);
-+                                    &data, size_memop(size),
-+                                    MEMTXATTRS_UNSPECIFIED);
-         trace_vfio_quirk_rtl8168_msix_read(vdev->vbasedev.name, offset, da=
-ta);
-     }
-
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 0c958fc..0e92a37 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -782,8 +782,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8=
+_t r3, uint64_t gaddr,
+     for (i =3D 0; i < len / 8; i++) {
+         result =3D memory_region_dispatch_write(mr, offset + i * 8,
+                                               ldq_p(buffer + i * 8),
+-                                              size_memop(8),
+-                                              MEMTXATTRS_UNSPECIFIED);
++                                              MO_64, MEMTXATTRS_UNSPECIFIE=
+D);
+         if (result !=3D MEMTX_OK) {
+             s390_program_interrupt(env, PGM_OPERAND, 6, ra);
+             return 0;
 --
 1.8.3.1
 
