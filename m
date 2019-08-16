@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F26C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DE4C3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:35:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A79F421721
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:35:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 934C421721
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:35:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nuVVS+1g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79F421721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JcGt2eOV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 934C421721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycNt-0006GM-94
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:35:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35413)
+	id 1hycNv-0006I2-I9
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:35:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35431)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc72-0003W4-KT
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:49 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc73-0003Xt-Ob
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc71-0005js-DE
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:48 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46152)
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc72-0005lK-Pk
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:49 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:37991)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyc71-0005hb-72
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:47 -0400
-Received: by mail-wr1-x441.google.com with SMTP id z1so1504909wru.13
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:45 -0700 (PDT)
+ id 1hyc72-0005kV-Jy
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:48 -0400
+Received: by mail-wm1-x334.google.com with SMTP id m125so4047403wmm.3
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=dgkcpwUGH477Gg/fNptnjN0QOcMB45au6RquMB/K4P4=;
- b=nuVVS+1gnm9rroRAt+Od79+qa3sWRm+YkTgVO99ESs/L4Uuf/0TVn7vEmroNv7QIPt
- F10yq0RTNFlNt7X6rqpiebOcHcbiYl991I/+8zkLPmuUUj7juLGJyYY1/QSUfoi0XLEK
- G2TGi7sIKNUtSXN9txuv4cwVxxEQgCAsYdJ4bhjpYN0XS0ihgyVuVdgsYyl4onFu1nu8
- ouCV6P4A3NPVxUVZpUuYQhnrcGA4Wb+2OqZAxt5z668yJnYaJNjsRsnBfvdtVAYFWLEc
- 3ktlS3OuARVBxnZiEZZFZ2EKIpJ9ks2DnwrP/9l09r/q9DgDVD3RpnThfkUY2+EM2OsQ
- K7MQ==
+ bh=2z9eRXxGkGDLfMKepMdpB0DZoxXwzKF1DXZHdT7+7v4=;
+ b=JcGt2eOV0a+xUTT7te5LNFg+sF0Hbmz1RatopA65YqiCjcPARH5xKEaQV+uh+be/vt
+ suRNg6IoEabN4Ct8zZh2FQCBE2RGAJwvlsy9qYcYvD3JEjR1N4GcSWCYscL2oIPuXUWZ
+ +orwrP6ygI0WlzCL95hXT7K297rsEU8xcbJW9DbjvpKf+0NAqBvTKJAfxnUjf62bND2o
+ T9gk+g6xVNO5LX3sTVm1WjTYSOLW0pyLxmNKfvGk/SJcGJDYJHbQJuWBJjtctZsCvyLu
+ 0s03Y3euldlfJRcByfKuhgGjnyBgNYTvQ8zbTjhQ5feNBbQCqrJS4Db6+5L70G9WIyAW
+ n0Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dgkcpwUGH477Gg/fNptnjN0QOcMB45au6RquMB/K4P4=;
- b=iZG7a86NIYXr2QbS3xMCH8XUw+YysuLGvsE9ANZ1XQHvRZ673Sdh/82Tj7vqAxnNxn
- rKRpyVDIa42YWGOXbzo5uj/A1WlABF7M8tkZ/BkYyz887kCSBOHhHadzwKVWwrtveUAW
- nrNic24Bi+fn7OZQu5MjqFdRn+YTtIxUwn2nLJFT4g3LbxEpMvwJOWBQtQfGN+Lpr0T8
- T/A9Z1t5ZcEjH+C4u+QJp+DFKINTD+uBFnEYvhU+s/HbLVl6WLsDQzxEuoLzgq+qEPAH
- MSccXjPLIjZfQvSKlMejN7btw5QvBh85RUrkiE4XPaF13R9CWlxHfP/p8cAKWeM6xK7w
- +zBw==
-X-Gm-Message-State: APjAAAXkJ8ttXqiY+XX4DyFerKH/tYBVGS48TJWveXzRMRFslR0t0aGB
- pAjXIJzNLB1+qiBYoQLT9YUlt9s62zt7vg==
-X-Google-Smtp-Source: APXvYqxsX/Q+29MNF5iLNV4Vj5iBoCQzzNJS0aG38BBHcgyxBeYjAChMlzBa4B8yGzmH0sH2NmC9/Q==
-X-Received: by 2002:adf:ecc7:: with SMTP id s7mr11449675wro.215.1565961464199; 
- Fri, 16 Aug 2019 06:17:44 -0700 (PDT)
+ bh=2z9eRXxGkGDLfMKepMdpB0DZoxXwzKF1DXZHdT7+7v4=;
+ b=Cn/9bppDZtuPZQip0bI4XOg6iEovjA0HzGAjpbBx1Revpo6eOipLUGKTnDkhIRj07S
+ NecO9FHaSSkSRejldzPrpCsLyZknwYaIHVRwhBu5Aj/1vMZxMZNSVTgdYF0hYdGtd2xM
+ p6H/hvi6JnWhW8JqkO4UYJA8OlK8ZKLZ/bhUcNyXys0eg9qP6a4Fjoim7Gwbf6cbfM6M
+ E4akzn78TFcYCM8K+5uueH1rvBO2rwIq4tsjAMIZ7uRk9+anplOwYUG7h4Dj6L9BqL+k
+ E/FY6Sji7R76XcPTrZi8Lwn5o9GASh8lK1/vWoXVGfsHJn/vzGwbuq3pCE7Zr04roHkY
+ UdLg==
+X-Gm-Message-State: APjAAAVDly7suwGxcjFEP+85iuihma5Ag9rVRaYui7Pmg1rQBtVwDEn0
+ cNfWA4klVC/lp0YbcIda0/sMYkGgMyjMAw==
+X-Google-Smtp-Source: APXvYqz0uzCnfQ105gpJZOEg9x3b9P+zA3WpKeJ3Y1PIlaxjV4Qr+0XEnQaCY0mWttKXif/9+UVSSA==
+X-Received: by 2002:a1c:2302:: with SMTP id j2mr7184869wmj.174.1565961467468; 
+ Fri, 16 Aug 2019 06:17:47 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.43
+ by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.46
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Aug 2019 06:17:43 -0700 (PDT)
+ Fri, 16 Aug 2019 06:17:47 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 14:17:11 +0100
-Message-Id: <20190816131719.28244-22-peter.maydell@linaro.org>
+Date: Fri, 16 Aug 2019 14:17:13 +0100
+Message-Id: <20190816131719.28244-24-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190816131719.28244-1-peter.maydell@linaro.org>
 References: <20190816131719.28244-1-peter.maydell@linaro.org>
@@ -80,8 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PULL 21/29] target/arm/kvm64: Fix error returns
+X-Received-From: 2a00:1450:4864:20::334
+Subject: [Qemu-devel] [PULL 23/29] target/arm: Use tcg_gen_extract_i32 for
+ shifter_out_im
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,40 +98,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Jones <drjones@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-A couple return -EINVAL's forgot their '-'s.
+Extract is a compact combination of shift + and.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190808202616.13782-2-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/kvm64.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/arm/translate.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 3d91846beb8..ddde6268b9d 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -854,7 +854,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-     write_cpustate_to_list(cpu, true);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 34e65cd80c0..14d6b6d4d28 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -605,14 +605,7 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
  
-     if (!write_list_to_kvmstate(cpu, level)) {
--        return EINVAL;
-+        return -EINVAL;
-     }
+ static void shifter_out_im(TCGv_i32 var, int shift)
+ {
+-    if (shift == 0) {
+-        tcg_gen_andi_i32(cpu_CF, var, 1);
+-    } else {
+-        tcg_gen_shri_i32(cpu_CF, var, shift);
+-        if (shift != 31) {
+-            tcg_gen_andi_i32(cpu_CF, cpu_CF, 1);
+-        }
+-    }
++    tcg_gen_extract_i32(cpu_CF, var, shift, 1);
+ }
  
-     kvm_arm_sync_mpstate_to_kvm(cpu);
-@@ -995,7 +995,7 @@ int kvm_arch_get_registers(CPUState *cs)
-     }
- 
-     if (!write_kvmstate_to_list(cpu)) {
--        return EINVAL;
-+        return -EINVAL;
-     }
-     /* Note that it's OK to have registers which aren't in CPUState,
-      * so we can ignore a failure return here.
+ /* Shift by immediate.  Includes special handling for shift == 0.  */
 -- 
 2.20.1
 
