@@ -2,84 +2,140 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE61C3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 19:04:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 685E6C3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 19:12:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C3F5206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 19:04:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C3F5206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 359CD2077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 19:12:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359CD2077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyhWT-0008O1-5K
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 15:04:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42522)
+	id 1hyheR-0001f3-A1
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 15:12:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43383)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pc@us.ibm.com>) id 1hyhVl-0007rN-HI
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 15:03:42 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hyhdd-00019M-8k
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 15:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pc@us.ibm.com>) id 1hyhVj-0006z0-UC
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 15:03:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14590)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pc@us.ibm.com>)
- id 1hyhVe-0006uU-Px; Fri, 16 Aug 2019 15:03:34 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x7GIx3R6135991; Fri, 16 Aug 2019 15:03:28 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2udy92pc23-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 16 Aug 2019 15:03:27 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7GJ0Bb0022291;
- Fri, 16 Aug 2019 19:03:26 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com
- (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
- by ppma01wdc.us.ibm.com with ESMTP id 2u9nj7bgfd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 16 Aug 2019 19:03:26 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x7GJ3PfH47776186
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 16 Aug 2019 19:03:25 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2EA8D7805E;
- Fri, 16 Aug 2019 19:03:25 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D39D47805C;
- Fri, 16 Aug 2019 19:03:24 +0000 (GMT)
-Received: from localhost (unknown [9.85.198.236])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 16 Aug 2019 19:03:24 +0000 (GMT)
-From: "Paul A. Clarke" <pc@us.ibm.com>
-To: david@gibson.dropbear.id.au
-Date: Fri, 16 Aug 2019 14:03:23 -0500
-Message-Id: <1565982203-11048-1-git-send-email-pc@us.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-08-16_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=938 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908160194
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH v4] ppc: Add support for 'mffsl' instruction
+ (envelope-from <jsnow@redhat.com>) id 1hyhdb-0003PG-CM
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 15:11:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57636)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hyhdW-0003ME-Ma; Fri, 16 Aug 2019 15:11:42 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 941682CD811;
+ Fri, 16 Aug 2019 19:11:41 +0000 (UTC)
+Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8664E19C6A;
+ Fri, 16 Aug 2019 19:11:40 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <a018756a-fa67-49fb-a7db-622267b7d4e5@email.android.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <18cda58f-c7d2-3e6c-0bf0-c2b98acd66e7@redhat.com>
+Date: Fri, 16 Aug 2019 15:11:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <a018756a-fa67-49fb-a7db-622267b7d4e5@email.android.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 16 Aug 2019 19:11:41 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] backup: fix skipping unallocated
+ clusters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,199 +147,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Paul A. Clarke" <pc@us.ibm.com>
 
-ISA 3.0B added a set of Floating-Point Status and Control Register (FPSCR)
-instructions: mffsce, mffscdrn, mffscdrni, mffscrn, mffscrni, mffsl.
-This patch adds support for 'mffsl'.
 
-'mffsl' is identical to 'mffs', except it only returns mode, status, and enable
-bits from the FPSCR.
+On 8/14/19 12:54 PM, Vladimir Sementsov-Ogievskiy wrote:
+>=20
+>=20
+> 14 =D0=B0=D0=B2=D0=B3. 2019 =D0=B3. 17:43 =D0=BF=D0=BE=D0=BB=D1=8C=D0=B7=
+=D0=BE=D0=B2=D0=B0=D1=82=D0=B5=D0=BB=D1=8C Vladimir Sementsov-Ogievskiy
+> <vsementsov@virtuozzo.com> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BB:
+>=20
+>     Hi all!
+>=20
+>     There is a bug in not yet merged patch
+>     "block/backup: teach TOP to never copy unallocated regions"
+>     in https://github.com/jnsnow/qemu bitmaps. 04 fixes it. So, I propo=
+se
+>     to put 01-03 somewhere before
+>     "block/backup: teach TOP to never copy unallocated regions"
+>     and squash 04 into "block/backup: teach TOP to never copy
+>     unallocated regions"=C2=A0
+>=20
+>=20
+> Hmm, don't bother with it. Simpler is fix the bug in your commit by jus=
+t
+> use skip_bytes variable when initializing dirty_end.
+>=20
 
-On CPUs without support for 'mffsl' (below ISA 3.0), the 'mffsl' instruction
-will execute identically to 'mffs'.
+OK, just use Max's fix instead of this entire 4 patch series?
 
-Note: I renamed FPSCR_RN to FPSCR_RN0 so I could create an FPSCR_RN mask which
-is both bits of the FPSCR rounding mode, as defined in the ISA.
-
-I also fixed a typo in the definition of FPSCR_FR.
-
-Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
-
-v4:
-- nit: added some braces to resolve a checkpatch complaint.
-
-v3:
-- Changed tcg_gen_and_i64 to tcg_gen_andi_i64, eliminating the need for a
-  temporary, per review from Richard Henderson.
-
-v2:
-- I found that I copied too much of the 'mffs' implementation.
-  The 'Rc' condition code bits are not needed for 'mffsl'.  Removed.
-- I now free the (renamed) 'tmask' temporary.
-- I now bail early for older ISA to the original 'mffs' implementation.
-
----
- disas/ppc.c                        |  5 +++++
- target/ppc/cpu.h                   | 15 ++++++++++-----
- target/ppc/fpu_helper.c            |  4 ++--
- target/ppc/translate/fp-impl.inc.c | 22 ++++++++++++++++++++++
- target/ppc/translate/fp-ops.inc.c  |  4 +++-
- 5 files changed, 42 insertions(+), 8 deletions(-)
-
-diff --git a/disas/ppc.c b/disas/ppc.c
-index a545437..63e97cf 100644
---- a/disas/ppc.c
-+++ b/disas/ppc.c
-@@ -1765,6 +1765,9 @@ extract_tbr (unsigned long insn,
- /* An X_MASK with the RA and RB fields fixed.  */
- #define XRARB_MASK (X_MASK | RA_MASK | RB_MASK)
- 
-+/* An X form instruction with the RA field fixed.  */
-+#define XRA(op, xop, ra) (X((op), (xop)) | (((ra) << 16) & XRA_MASK))
-+
- /* An XRARB_MASK, but with the L bit clear.  */
- #define XRLARB_MASK (XRARB_MASK & ~((unsigned long) 1 << 16))
- 
-@@ -4998,6 +5001,8 @@ const struct powerpc_opcode powerpc_opcodes[] = {
- { "ddivq",   XRC(63,546,0), X_MASK,	POWER6,		{ FRT, FRA, FRB } },
- { "ddivq.",  XRC(63,546,1), X_MASK,	POWER6,		{ FRT, FRA, FRB } },
- 
-+{ "mffsl",   XRA(63,583,12), XRARB_MASK,	POWER9,	{ FRT } },
-+
- { "mffs",    XRC(63,583,0), XRARB_MASK,	COM,		{ FRT } },
- { "mffs.",   XRC(63,583,1), XRARB_MASK,	COM,		{ FRT } },
- 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index c9beba2..74e8da4 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -591,7 +591,7 @@ enum {
- #define FPSCR_XE     3  /* Floating-point inexact exception enable           */
- #define FPSCR_NI     2  /* Floating-point non-IEEE mode                      */
- #define FPSCR_RN1    1
--#define FPSCR_RN     0  /* Floating-point rounding control                   */
-+#define FPSCR_RN0    0  /* Floating-point rounding control                   */
- #define fpscr_fex    (((env->fpscr) >> FPSCR_FEX)    & 0x1)
- #define fpscr_vx     (((env->fpscr) >> FPSCR_VX)     & 0x1)
- #define fpscr_ox     (((env->fpscr) >> FPSCR_OX)     & 0x1)
-@@ -614,7 +614,7 @@ enum {
- #define fpscr_ze     (((env->fpscr) >> FPSCR_ZE)     & 0x1)
- #define fpscr_xe     (((env->fpscr) >> FPSCR_XE)     & 0x1)
- #define fpscr_ni     (((env->fpscr) >> FPSCR_NI)     & 0x1)
--#define fpscr_rn     (((env->fpscr) >> FPSCR_RN)     & 0x3)
-+#define fpscr_rn     (((env->fpscr) >> FPSCR_RN0)    & 0x3)
- /* Invalid operation exception summary */
- #define fpscr_ix ((env->fpscr) & ((1 << FPSCR_VXSNAN) | (1 << FPSCR_VXISI)  | \
-                                   (1 << FPSCR_VXIDI)  | (1 << FPSCR_VXZDZ)  | \
-@@ -640,7 +640,7 @@ enum {
- #define FP_VXZDZ        (1ull << FPSCR_VXZDZ)
- #define FP_VXIMZ        (1ull << FPSCR_VXIMZ)
- #define FP_VXVC         (1ull << FPSCR_VXVC)
--#define FP_FR           (1ull << FSPCR_FR)
-+#define FP_FR           (1ull << FPSCR_FR)
- #define FP_FI           (1ull << FPSCR_FI)
- #define FP_C            (1ull << FPSCR_C)
- #define FP_FL           (1ull << FPSCR_FL)
-@@ -648,7 +648,7 @@ enum {
- #define FP_FE           (1ull << FPSCR_FE)
- #define FP_FU           (1ull << FPSCR_FU)
- #define FP_FPCC         (FP_FL | FP_FG | FP_FE | FP_FU)
--#define FP_FPRF         (FP_C  | FP_FL | FP_FG | FP_FE | FP_FU)
-+#define FP_FPRF         (FP_C | FP_FPCC)
- #define FP_VXSOFT       (1ull << FPSCR_VXSOFT)
- #define FP_VXSQRT       (1ull << FPSCR_VXSQRT)
- #define FP_VXCVI        (1ull << FPSCR_VXCVI)
-@@ -659,7 +659,12 @@ enum {
- #define FP_XE           (1ull << FPSCR_XE)
- #define FP_NI           (1ull << FPSCR_NI)
- #define FP_RN1          (1ull << FPSCR_RN1)
--#define FP_RN           (1ull << FPSCR_RN)
-+#define FP_RN0          (1ull << FPSCR_RN0)
-+#define FP_RN           (FP_RN1 | FP_RN0)
-+
-+#define FP_MODE         FP_RN
-+#define FP_ENABLES      (FP_VE | FP_OE | FP_UE | FP_ZE | FP_XE)
-+#define FP_STATUS       (FP_FR | FP_FI | FP_FPRF)
- 
- /* the exception bits which can be cleared by mcrfs - includes FX */
- #define FP_EX_CLEAR_BITS (FP_FX     | FP_OX     | FP_UX     | FP_ZX     | \
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index f437c88..5611cf0 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -403,7 +403,7 @@ void helper_fpscr_clrbit(CPUPPCState *env, uint32_t bit)
-     if (prev == 1) {
-         switch (bit) {
-         case FPSCR_RN1:
--        case FPSCR_RN:
-+        case FPSCR_RN0:
-             fpscr_set_rounding_mode(env);
-             break;
-         case FPSCR_VXSNAN:
-@@ -557,7 +557,7 @@ void helper_fpscr_setbit(CPUPPCState *env, uint32_t bit)
-             }
-             break;
-         case FPSCR_RN1:
--        case FPSCR_RN:
-+        case FPSCR_RN0:
-             fpscr_set_rounding_mode(env);
-             break;
-         default:
-diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc.c
-index 9dcff94..7cd9d8d 100644
---- a/target/ppc/translate/fp-impl.inc.c
-+++ b/target/ppc/translate/fp-impl.inc.c
-@@ -617,6 +617,28 @@ static void gen_mffs(DisasContext *ctx)
-     tcg_temp_free_i64(t0);
- }
- 
-+/* mffsl */
-+static void gen_mffsl(DisasContext *ctx)
-+{
-+    TCGv_i64 t0;
-+
-+    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300))) {
-+        return gen_mffs(ctx);
-+    }
-+
-+    if (unlikely(!ctx->fpu_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_FPU);
-+        return;
-+    }
-+    t0 = tcg_temp_new_i64();
-+    gen_reset_fpstatus();
-+    tcg_gen_extu_tl_i64(t0, cpu_fpscr);
-+    /* Mask everything except mode, status, and enables.  */
-+    tcg_gen_andi_i64(t0, t0, FP_MODE | FP_STATUS | FP_ENABLES);
-+    set_fpr(rD(ctx->opcode), t0);
-+    tcg_temp_free_i64(t0);
-+}
-+
- /* mtfsb0 */
- static void gen_mtfsb0(DisasContext *ctx)
- {
-diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-ops.inc.c
-index 621f6bf..88ebc25 100644
---- a/target/ppc/translate/fp-ops.inc.c
-+++ b/target/ppc/translate/fp-ops.inc.c
-@@ -104,7 +104,9 @@ GEN_HANDLER_E(fcpsgn, 0x3F, 0x08, 0x00, 0x00000000, PPC_NONE, PPC2_ISA205),
- GEN_HANDLER_E(fmrgew, 0x3F, 0x06, 0x1E, 0x00000001, PPC_NONE, PPC2_VSX207),
- GEN_HANDLER_E(fmrgow, 0x3F, 0x06, 0x1A, 0x00000001, PPC_NONE, PPC2_VSX207),
- GEN_HANDLER(mcrfs, 0x3F, 0x00, 0x02, 0x0063F801, PPC_FLOAT),
--GEN_HANDLER(mffs, 0x3F, 0x07, 0x12, 0x001FF800, PPC_FLOAT),
-+GEN_HANDLER_E_2(mffs, 0x3F, 0x07, 0x12, 0x00, 0x00000000, PPC_FLOAT, PPC_NONE),
-+GEN_HANDLER_E_2(mffsl, 0x3F, 0x07, 0x12, 0x18, 0x00000000, PPC_FLOAT,
-+    PPC2_ISA300),
- GEN_HANDLER(mtfsb0, 0x3F, 0x06, 0x02, 0x001FF800, PPC_FLOAT),
- GEN_HANDLER(mtfsb1, 0x3F, 0x06, 0x01, 0x001FF800, PPC_FLOAT),
- GEN_HANDLER(mtfsf, 0x3F, 0x07, 0x16, 0x00000000, PPC_FLOAT),
--- 
-1.8.3.1
-
+--js
 
