@@ -2,84 +2,93 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3FFC3A589
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 01:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B931C3A589
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 02:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A346206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 01:52:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A346206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 677262086C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 02:10:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 677262086C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyRPV-0002qA-6K
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 21:52:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57986)
+	id 1hyRh2-00063a-Hm
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 22:10:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1hyROs-0002Q8-Jb
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 21:51:31 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hyRgB-0005ZV-HL
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 22:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1hyROq-0004te-ET
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 21:51:29 -0400
-Received: from mga12.intel.com ([192.55.52.136]:36285)
+ (envelope-from <mreitz@redhat.com>) id 1hyRgA-0003vv-A7
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 22:09:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45856)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1hyROq-0004ry-6Z
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 21:51:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 15 Aug 2019 18:51:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,391,1559545200"; d="scan'208";a="206097346"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by fmsmga002.fm.intel.com with ESMTP; 15 Aug 2019 18:51:23 -0700
-Received: from fmsmsx116.amr.corp.intel.com (10.18.116.20) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 15 Aug 2019 18:51:23 -0700
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- fmsmsx116.amr.corp.intel.com (10.18.116.20) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 15 Aug 2019 18:51:23 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.19]) by
- SHSMSX151.ccr.corp.intel.com ([169.254.3.250]) with mapi id 14.03.0439.000;
- Fri, 16 Aug 2019 09:51:20 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>, "Dr. David Alan Gilbert"
- <dgilbert@redhat.com>
-Thread-Topic: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
- replication
-Thread-Index: AQHVU5R7TpP312DWoEaTVPlBuIos5Kb8CVaAgAAOGQCAAONlQA==
-Date: Fri, 16 Aug 2019 01:51:20 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D780621F1B6@shsmsx102.ccr.corp.intel.com>
-References: <20190815200815.2cffc21b@luklap>	<20190815185737.GC2883@work-vm>
- <20190815214804.69e4334f@luklap>
-In-Reply-To: <20190815214804.69e4334f@luklap>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYzBlNjEyNzgtMTU0ZC00ZjBjLTllY2YtNjRkYjMwMjZhMTg2IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoic2RLT0VUMFdUcHZ5XC83NjFsVjFiNVdKK1JzK1U5bFk4YzM3TTFPOTdydk8yUHpNbXVOYWlxXC9CUnZQV0p5ajZtIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hyRg7-0003uW-Dm; Thu, 15 Aug 2019 22:09:19 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A43FF30821A1;
+ Fri, 16 Aug 2019 02:09:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-21.brq.redhat.com
+ [10.40.204.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F07FF17156;
+ Fri, 16 Aug 2019 02:09:16 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20190730172508.19911-1-mreitz@redhat.com>
+ <20190730172508.19911-3-mreitz@redhat.com>
+ <9f7db4bc-d66a-2069-9f9a-20da842829f3@redhat.com>
+ <60b73760-9ffd-aedf-afc0-9c58c804236c@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <10daecff-15b4-88f0-9fe8-f5c5547fde70@redhat.com>
+Date: Fri, 16 Aug 2019 04:09:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.136
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
- replication
+In-Reply-To: <60b73760-9ffd-aedf-afc0-9c58c804236c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="oOfEOPGoqtLVaIFcxkHnCe54g1Mkxs8yB"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Fri, 16 Aug 2019 02:09:18 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.2 02/13] qcow2: Keep unknown extra
+ snapshot data
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,79 +100,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oOfEOPGoqtLVaIFcxkHnCe54g1Mkxs8yB
+Content-Type: multipart/mixed; boundary="crjVhCdzBBWLu1FXZGCBCfN57WAUXsWtu";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <10daecff-15b4-88f0-9fe8-f5c5547fde70@redhat.com>
+Subject: Re: [PATCH for-4.2 02/13] qcow2: Keep unknown extra snapshot data
+References: <20190730172508.19911-1-mreitz@redhat.com>
+ <20190730172508.19911-3-mreitz@redhat.com>
+ <9f7db4bc-d66a-2069-9f9a-20da842829f3@redhat.com>
+ <60b73760-9ffd-aedf-afc0-9c58c804236c@redhat.com>
+In-Reply-To: <60b73760-9ffd-aedf-afc0-9c58c804236c@redhat.com>
+
+--crjVhCdzBBWLu1FXZGCBCfN57WAUXsWtu
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 31.07.19 10:54, Max Reitz wrote:
+> On 30.07.19 19:56, Eric Blake wrote:
+>> On 7/30/19 12:24 PM, Max Reitz wrote:
+
+[...]
+
+>>> +        if (sn->extra_data_size > sizeof(extra)) {
+>>> +            /* Store unknown extra data */
+>>> +            size_t unknown_extra_data_size =3D
+>>> +                sn->extra_data_size - sizeof(extra);
+>>> +
+>>> +            sn->unknown_extra_data =3D g_malloc(unknown_extra_data_s=
+ize);
+>>> +            ret =3D bdrv_pread(bs->file, offset, sn->unknown_extra_d=
+ata,
+>>> +                             unknown_extra_data_size);
+>>
+>> We're doing two separate bdrv_pread()s. Would it be better to do a
+>> single bdrv_preadv into a vector composed of &extra and
+>> &unknown_extra_data, for less I/O?  (Then again, this micro-optimizati=
+on
+>> is probably in the noise in the long run)
+>=20
+> Interesting idea, we could even add the ID and name string into that
+> vector.  But I=E2=80=99m not sure whether it=E2=80=99s really useful.
+>=20
+> (I=E2=80=99ll take a look anyway, because it sounds interesting.)
+
+I did, and it was actually really nice.  I liked it.  (I don=E2=80=99t hi=
+nk the
+performance is important, but it was actually just simpler.)
+
+But then it turned out that it won=E2=80=99t work with patch 8, because a=
+fter
+that we may want to skip parts of the unknown extra data =E2=80=93 and sk=
+ipping
+doesn=E2=80=99t work with bdrv_preadv()...
+
+(So all the simplicity is lost, and that=E2=80=99s what I was interested =
+in.)
+
+But it was indeed quite cool. :-/
+
+Max
 
 
-> -----Original Message-----
-> From: Lukas Straub [mailto:lukasstraub2@web.de]
-> Sent: Friday, August 16, 2019 3:48 AM
-> To: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: qemu-devel <qemu-devel@nongnu.org>; Zhang, Chen
-> <chen.zhang@intel.com>; Jason Wang <jasowang@redhat.com>; Xie
-> Changlong <xiechanglong.d@gmail.com>; Wen Congyang
-> <wencongyang2@huawei.com>
-> Subject: Re: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
-> replication
->=20
-> On Thu, 15 Aug 2019 19:57:37 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->=20
-> > * Lukas Straub (lukasstraub2@web.de) wrote:
-> > > Hello Everyone,
-> > > These Patches add support for continious replication to colo.
-> > > Please review.
-> >
-> >
-> > OK, for those who haven't followed COLO for so long; 'continuous
-> > replication' is when after the first primary fails, you can promote
-> > the original secondary to a new primary and start replicating again;
-> >
-> > i.e. current COLO gives you
-> >
-> > p<->s
-> >     <primary fails>
-> >     s
-> >
-> > with your patches you can do
-> >
-> >     s becomes p2
-> >     p2<->s2
-> >
-> > and you're back to being resilient again.
-> >
-> > Which is great; because that was always an important missing piece.
-> >
-> > Do you have some test scripts/setup for this - it would be great to
-> > automate some testing.
->=20
-> My Plan is to write a Pacemaker Resource Agent[1] for qemu-colo and then =
-do
-> some long-term testing in my small cluster here. Writing standalone tests=
- using
-> that Resource Agent should be easy, it just needs to be provided with the=
- right
-> arguments and environment Variables.
+--crjVhCdzBBWLu1FXZGCBCfN57WAUXsWtu--
 
-Thanks Dave's explanation.
-It looks good for me and I will test this series in my side.
+--oOfEOPGoqtLVaIFcxkHnCe54g1Mkxs8yB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Another question: Is "Pacemaker Resource Agent[1] "  like a heartbeat modul=
-e?   I have wrote an internal heartbeat module running on Qemu, it make COL=
-O can detect fail and trigger failover automatically, no need external APP =
-to call the QMP command "x-colo-lost-heartbeat". If you need it, I can send=
- a RFC version recently.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks
-Zhang Chen
->=20
-> Regards,
-> Lukas Straub
->=20
-> [1] https://github.com/ClusterLabs/resource-agents/blob/master/doc/dev-
-> guides/ra-dev-guide.asc#what-is-a-resource-agent
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1WEEoACgkQ9AfbAGHV
+z0AF7gf/ZGh5qy5yB7cNFE2I16nJR6Uc7C4aU6kl4mO9UiHnyUnLa4rMPuXDki58
+oq29udvNAbwbO94GVru2Bgf5lZaDSlmwaxhgEs62N0El+gBecVEBT9XpBZihSC4T
+piXa85Y6EsUudW1YUuWKoM0Oc83P5h5F/doVL9DlDcxWNhSmmC1pjJ5tbYcPpRqg
+/Zl/8LnrcD6YgpPMFafPBzsR7g1RDOHegmazkNmTGKBQ4UQs1p3ksWH6Dunbg+ye
+UcMw1I9oNBPf69SuCG7HcyY9WjSb/YfJ8LjcBTpNSCY6Qo7tU/qq5n5etHisBQYO
+pxr19C4JobuEub4W1+dtB1iUrRuQuw==
+=5fUC
+-----END PGP SIGNATURE-----
+
+--oOfEOPGoqtLVaIFcxkHnCe54g1Mkxs8yB--
 
