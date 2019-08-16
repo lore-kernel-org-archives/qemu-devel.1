@@ -2,79 +2,80 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5976AC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC39C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 10:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AB752133F
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:59:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB752133F
+	by mail.kernel.org (Postfix) with ESMTPS id 8BA17206C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 10:03:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA17206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyZ0t-0003OT-DA
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 05:59:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34184)
+	id 1hyZ4c-0005vj-Nw
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 06:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1hyYzs-0002HO-4v
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:58:13 -0400
+ (envelope-from <philmd@redhat.com>) id 1hyZ3Y-0005CN-Vb
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hyYzq-0006TF-Uy
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:58:12 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39524)
+ (envelope-from <philmd@redhat.com>) id 1hyZ3X-0000xP-PZ
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:02:00 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38787)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hyYzq-0006SK-Nh
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:58:10 -0400
-Received: by mail-wr1-f66.google.com with SMTP id t16so981493wra.6
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 02:58:10 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hyZ3X-0000wZ-Ft
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:01:59 -0400
+Received: by mail-wm1-f68.google.com with SMTP id m125so3590703wmm.3
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 03:01:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Foo7mqc4L4owvltcL+chmVAdJxdrnYoZDMnBcLnmc5c=;
- b=KsV4ucR/FlUCyMVNGLfIhr43p5efHTUT0SBsPLgqz2hIKSAhpgy04EM9IzzFwgafFj
- /kUnPhe1vI74hYuEWCGeCBcxFO0e/ckLWrSkKq2VtI6dOk1A/hjl0ZGr8nMzyL03B6S0
- KSVcWlCKPNzK8/BHjnhCTfE+/dD7RI4NjYNvOg9A2/uyxyYR4RqdRX0Eu9HfZmnDjjJO
- zkQkDfZ8ttAk9EseGNAAn/i6a9UiATq+C1KKjMBEzy2KLpWKnIHGo4a37FMxfb++kbOc
- Bbgh/WAwRgKVuHN8eiiJwGKM1fp3kIkFkPzj+QS5YuNyHb/3gHvP97cBYpC4RrbU+t6I
- J1Gg==
-X-Gm-Message-State: APjAAAU6apOKmVvM15VP0ggO//8s1BHzzGv3F2jM5HU0IydoBeLkFQuw
- an/Wk8cRRfNTDmMt0eexPt/MNQ==
-X-Google-Smtp-Source: APXvYqxEtH9z2rQcNW2PoiyLykUukmpcl5g1WXvMOKgN8N7tudUZZZ63JDl5GzOk7+ZQwUPBP9c8/A==
-X-Received: by 2002:adf:82d4:: with SMTP id 78mr9141289wrc.85.1565949489545;
- Fri, 16 Aug 2019 02:58:09 -0700 (PDT)
+ bh=GI/EzkhAlPTCaafFlruhK2NwuW2KBxYpRI4/Zpxnrmg=;
+ b=QklwhIoNaTo73owaqybyhN9QXnYyCwwTpI3XJsw791wI8p80DXTLwS51oU7lOGg/EV
+ cqqW2EeVyFf0lQnxXZPyEUfCtw5CjS3ROt+Po2nSjEwgaxqk4WyRIas1LpH2Ql2xi8K7
+ u/Ag3LT+roK692CcAHX83+FkIoG0vvSR0WOQRaM8WEG63vgc1n8QbIBf5NCK9FeKWdXj
+ o/zbuiog/zQ3u5YBHFglrDjlbnn7uGqDSwCWSEYBMLqAEtVIwPTc/6VkjaGttXx2IcNY
+ p0GqJH8gR/g86antEcnydKnbcAuBEJtCO5ECAOyuLHwUTh9xS+sESeqfzzKVzqIU0cqq
+ iwog==
+X-Gm-Message-State: APjAAAWT7J2vZ6FsOyxsQl5cV+AMGgHFkKworODV0NGZei77Mk+r1zV+
+ Zieuqu9w3sDcN0EwyBrAAosQdg==
+X-Google-Smtp-Source: APXvYqwS1oPGuh1MYBmNdnbpvSjSqeL7XZd0Nrcv421hxIx7FeNdlx5ElrSZzfLyl59b3tGv2uG/Mw==
+X-Received: by 2002:a7b:c4d5:: with SMTP id g21mr6485221wmk.149.1565949718440; 
+ Fri, 16 Aug 2019 03:01:58 -0700 (PDT)
 Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id z1sm5419150wrp.51.2019.08.16.02.58.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Aug 2019 02:58:08 -0700 (PDT)
+ by smtp.gmail.com with ESMTPSA id x6sm5463863wrt.63.2019.08.16.03.01.54
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 16 Aug 2019 03:01:57 -0700 (PDT)
 To: tony.nguyen@bt.com, qemu-devel@nongnu.org
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
+ <1565940869312.41180@bt.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <a7d6eede-b152-4c06-8945-9607c663b99c@redhat.com>
-Date: Fri, 16 Aug 2019 11:58:05 +0200
+Message-ID: <64d9f983-31e3-6921-4e0f-cd630581ec61@redhat.com>
+Date: Fri, 16 Aug 2019 12:01:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1565940869312.41180@bt.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v7 00/42] Invert Endian bit in SPARCv9 MMU
- TTE
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v7 24/42] hw/isa: Declare device little or
+ big endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,43 +118,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Tony,
-
-On 8/16/19 8:28 AM, tony.nguyen@bt.com wrote:
-> This patchset implements the IE (Invert Endian) bit in SPARCv9 MMU TTE.
-> 
-> v7:
-[...]
-> - Re-declared many native endian devices as little or big endian. This is why
->   v7 has +16 patches.
-
-Why are you doing that? What is the rational?
-
-Anyhow if this not required by your series, you should split it out of
-it, and send it on your principal changes are merged.
-I'm worried because this these new patches involve many subsystems (thus
-maintainers) and reviewing them will now take a fair amount of time.
-
+On 8/16/19 9:34 AM, tony.nguyen@bt.com wrote:
 > For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
 > targets from the set of target/hw/*/device.o.
->
+> 
 > If the set of targets are all little or all big endian, re-declare
 > the device endianness as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN
 > respectively.
-
-If only little endian targets use a device, that doesn't mean the device
-is designed in little endian...
-
-Then if a big endian target plan to use this device, it will require
-more work and you might have introduced regressions...
-
-I'm not sure this is a safe move.
-
+> 
 > This *naive* deduction may result in genuinely native endian devices
 > being incorrectly declared as little or big endian, but should not
 > introduce regressions for current targets.
+> 
+> These devices should be re-declared as DEVICE_NATIVE_ENDIAN if 1) it
+> has a new target with an opposite endian or 2) someone informed knows
+> better =)
+> 
+> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+> ---
+>  hw/isa/vt82c686.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+> index 12c460590..adf65d3 100644
+> --- a/hw/isa/vt82c686.c
+> +++ b/hw/isa/vt82c686.c
+> @@ -108,7 +108,7 @@ static uint64_t superio_ioport_readb(void *opaque,
+> hwaddr addr, unsigned size)
+>  static const MemoryRegionOps superio_ops = {
+>      .read = superio_ioport_readb,
+>      .write = superio_ioport_writeb,
+> -    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
 
-Regards,
+Being ioport, one is probably OK.
 
-Phil.
+>      .impl = {
+>          .min_access_size = 1,
+>          .max_access_size = 1,
+> -- 
+> 1.8.3.1
+> 
+> ​
+> 
 
