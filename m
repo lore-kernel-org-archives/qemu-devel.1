@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73BF7C3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E404C3A59F
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:36:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46F0D2077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:36:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F0D2077C
+	by mail.kernel.org (Postfix) with ESMTPS id 568122077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:36:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 568122077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyllH-00022H-0F
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:35:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46781)
+	id 1hyllI-00024c-19
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:36:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hylPq-0006hd-GN
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:51 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hylPs-0006lC-Bf
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hylPp-00068G-8f
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43836)
+ (envelope-from <jsnow@redhat.com>) id 1hylPq-00069j-Mt
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56398)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hylPl-0005zI-Tg; Fri, 16 Aug 2019 19:13:46 -0400
+ id 1hylPn-00060e-7B; Fri, 16 Aug 2019 19:13:47 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 07C44307D941;
+ by mx1.redhat.com (Postfix) with ESMTPS id D13517FDE9;
  Fri, 16 Aug 2019 23:13:44 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 53EBB19C6A;
- Fri, 16 Aug 2019 23:13:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 27C1D19C6A;
+ Fri, 16 Aug 2019 23:13:44 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 19:13:04 -0400
-Message-Id: <20190816231318.8650-23-jsnow@redhat.com>
+Date: Fri, 16 Aug 2019 19:13:05 -0400
+Message-Id: <20190816231318.8650-24-jsnow@redhat.com>
 In-Reply-To: <20190816231318.8650-1-jsnow@redhat.com>
 References: <20190816231318.8650-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 16 Aug 2019 23:13:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Fri, 16 Aug 2019 23:13:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 22/36] iotests/257: add Pattern class
+Subject: [Qemu-devel] [PULL 23/36] iotests/257: add EmulatedBitmap class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,116 +72,210 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just kidding, this is easier to manage with a full class instead of a
-namedtuple.
+Represent a bitmap with an object that we can mark and clear bits in.
+This makes it easier to manage partial writes when we don't write a
+full group's worth of patterns before an error.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190716000117.25219-2-jsnow@redhat.com
+Message-id: 20190716000117.25219-3-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/257 | 58 +++++++++++++++++++++++-------------------
- 1 file changed, 32 insertions(+), 26 deletions(-)
+ tests/qemu-iotests/257 | 124 +++++++++++++++++++++++++----------------
+ 1 file changed, 75 insertions(+), 49 deletions(-)
 
 diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index 39526837499..02f9ae06490 100755
+index 02f9ae06490..bc66ea03b24 100755
 --- a/tests/qemu-iotests/257
 +++ b/tests/qemu-iotests/257
-@@ -19,7 +19,6 @@
- #
- # owner=3Djsnow@redhat.com
-=20
--from collections import namedtuple
- import math
- import os
-=20
-@@ -29,10 +28,18 @@ from iotests import log, qemu_img
- SIZE =3D 64 * 1024 * 1024
- GRANULARITY =3D 64 * 1024
-=20
--Pattern =3D namedtuple('Pattern', ['byte', 'offset', 'size'])
--def mkpattern(byte, offset, size=3DGRANULARITY):
--    """Constructor for Pattern() with default size"""
--    return Pattern(byte, offset, size)
-+
-+class Pattern:
-+    def __init__(self, byte, offset, size=3DGRANULARITY):
-+        self.byte =3D byte
-+        self.offset =3D offset
-+        self.size =3D size
-+
-+    def bits(self, granularity):
-+        lower =3D self.offset // granularity
-+        upper =3D (self.offset + self.size - 1) // granularity
-+        return set(range(lower, upper + 1))
-+
-=20
- class PatternGroup:
-     """Grouping of Pattern objects. Initialize with an iterable of Patte=
-rns."""
-@@ -43,40 +50,39 @@ class PatternGroup:
-         """Calculate the unique bits dirtied by this pattern grouping"""
-         res =3D set()
-         for pattern in self.patterns:
--            lower =3D pattern.offset // granularity
--            upper =3D (pattern.offset + pattern.size - 1) // granularity
--            res =3D res | set(range(lower, upper + 1))
-+            res |=3D pattern.bits(granularity)
-         return res
-=20
-+
- GROUPS =3D [
-     PatternGroup([
-         # Batch 0: 4 clusters
--        mkpattern('0x49', 0x0000000),
--        mkpattern('0x6c', 0x0100000),   # 1M
--        mkpattern('0x6f', 0x2000000),   # 32M
--        mkpattern('0x76', 0x3ff0000)]), # 64M - 64K
-+        Pattern('0x49', 0x0000000),
-+        Pattern('0x6c', 0x0100000),   # 1M
-+        Pattern('0x6f', 0x2000000),   # 32M
-+        Pattern('0x76', 0x3ff0000)]), # 64M - 64K
-     PatternGroup([
-         # Batch 1: 6 clusters (3 new)
--        mkpattern('0x65', 0x0000000),   # Full overwrite
--        mkpattern('0x77', 0x00f8000),   # Partial-left (1M-32K)
--        mkpattern('0x72', 0x2008000),   # Partial-right (32M+32K)
--        mkpattern('0x69', 0x3fe0000)]), # Adjacent-left (64M - 128K)
-+        Pattern('0x65', 0x0000000),   # Full overwrite
-+        Pattern('0x77', 0x00f8000),   # Partial-left (1M-32K)
-+        Pattern('0x72', 0x2008000),   # Partial-right (32M+32K)
-+        Pattern('0x69', 0x3fe0000)]), # Adjacent-left (64M - 128K)
-     PatternGroup([
-         # Batch 2: 7 clusters (3 new)
--        mkpattern('0x74', 0x0010000),   # Adjacent-right
--        mkpattern('0x69', 0x00e8000),   # Partial-left  (1M-96K)
--        mkpattern('0x6e', 0x2018000),   # Partial-right (32M+96K)
--        mkpattern('0x67', 0x3fe0000,
--                  2*GRANULARITY)]),     # Overwrite [(64M-128K)-64M)
-+        Pattern('0x74', 0x0010000),   # Adjacent-right
-+        Pattern('0x69', 0x00e8000),   # Partial-left  (1M-96K)
-+        Pattern('0x6e', 0x2018000),   # Partial-right (32M+96K)
-+        Pattern('0x67', 0x3fe0000,
-+                2*GRANULARITY)]),     # Overwrite [(64M-128K)-64M)
-     PatternGroup([
-         # Batch 3: 8 clusters (5 new)
-         # Carefully chosen such that nothing re-dirties the one cluster
-         # that copies out successfully before failure in Group #1.
--        mkpattern('0xaa', 0x0010000,
--                  3*GRANULARITY),       # Overwrite and 2x Adjacent-righ=
-t
--        mkpattern('0xbb', 0x00d8000),   # Partial-left (1M-160K)
--        mkpattern('0xcc', 0x2028000),   # Partial-right (32M+160K)
--        mkpattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the righ=
-t
-+        Pattern('0xaa', 0x0010000,
-+                3*GRANULARITY),       # Overwrite and 2x Adjacent-right
-+        Pattern('0xbb', 0x00d8000),   # Partial-left (1M-160K)
-+        Pattern('0xcc', 0x2028000),   # Partial-right (32M+160K)
-+        Pattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the right
+@@ -85,6 +85,59 @@ GROUPS =3D [
+         Pattern('0xdd', 0x3fc0000)]), # New; leaving a gap to the right
  ]
 =20
++
++class EmulatedBitmap:
++    def __init__(self, granularity=3DGRANULARITY):
++        self._bits =3D set()
++        self.granularity =3D granularity
++
++    def dirty_bits(self, bits):
++        self._bits |=3D set(bits)
++
++    def dirty_group(self, n):
++        self.dirty_bits(GROUPS[n].bits(self.granularity))
++
++    def clear(self):
++        self._bits =3D set()
++
++    def clear_bits(self, bits):
++        self._bits -=3D set(bits)
++
++    def clear_bit(self, bit):
++        self.clear_bits({bit})
++
++    def clear_group(self, n):
++        self.clear_bits(GROUPS[n].bits(self.granularity))
++
++    @property
++    def first_bit(self):
++        return sorted(self.bits)[0]
++
++    @property
++    def bits(self):
++        return self._bits
++
++    @property
++    def count(self):
++        return len(self.bits)
++
++    def compare(self, qmp_bitmap):
++        """
++        Print a nice human-readable message checking that a bitmap as re=
+ported
++        by the QMP interface has as many bits set as we expect it to.
++        """
++
++        name =3D qmp_bitmap.get('name', '(anonymous)')
++        log("=3D Checking Bitmap {:s} =3D".format(name))
++
++        want =3D self.count
++        have =3D qmp_bitmap['count'] // qmp_bitmap['granularity']
++
++        log("expecting {:d} dirty sectors; have {:d}. {:s}".format(
++            want, have, "OK!" if want =3D=3D have else "ERROR!"))
++        log('')
++
++
  class Drive:
+     """Represents, vaguely, a drive attached to a VM.
+     Includes format, graph, and device information."""
+@@ -195,27 +248,6 @@ def perform_writes(drive, n):
+     log('')
+     return bitmaps
+=20
+-def calculate_bits(groups=3DNone):
+-    """Calculate how many bits we expect to see dirtied."""
+-    if groups:
+-        bits =3D set.union(*(GROUPS[group].bits(GRANULARITY) for group i=
+n groups))
+-        return len(bits)
+-    return 0
+-
+-def bitmap_comparison(bitmap, groups=3DNone, want=3D0):
+-    """
+-    Print a nice human-readable message checking that this bitmap has as
+-    many bits set as we expect it to.
+-    """
+-    log("=3D Checking Bitmap {:s} =3D".format(bitmap.get('name', '(anony=
+mous)')))
+-
+-    if groups:
+-        want =3D calculate_bits(groups)
+-    have =3D bitmap['count'] // bitmap['granularity']
+-
+-    log("expecting {:d} dirty sectors; have {:d}. {:s}".format(
+-        want, have, "OK!" if want =3D=3D have else "ERROR!"))
+-    log('')
+=20
+ def compare_images(image, reference, baseimg=3DNone, expected_match=3DTr=
+ue):
+     """
+@@ -321,12 +353,13 @@ def test_bitmap_sync(bsync_mode, failure=3DNone):
+         vm.qmp_log("block-dirty-bitmap-add", node=3Ddrive0.name,
+                    name=3D"bitmap0", granularity=3DGRANULARITY)
+         log('')
++        ebitmap =3D EmulatedBitmap()
+=20
+         # 1 - Writes and Reference Backup
+         bitmaps =3D perform_writes(drive0, 1)
+-        dirty_groups =3D {1}
++        ebitmap.dirty_group(1)
+         bitmap =3D get_bitmap(bitmaps, drive0.device, 'bitmap0')
+-        bitmap_comparison(bitmap, groups=3Ddirty_groups)
++        ebitmap.compare(bitmap)
+         reference_backup(drive0, 1, fbackup1)
+=20
+         # 1 - Bitmap Backup (Optional induced failure)
+@@ -342,54 +375,47 @@ def test_bitmap_sync(bsync_mode, failure=3DNone):
+             log('')
+             bitmaps =3D perform_writes(drive0, 2)
+             # Named bitmap (static, should be unchanged)
+-            bitmap_comparison(get_bitmap(bitmaps, drive0.device, 'bitmap=
+0'),
+-                              groups=3Ddirty_groups)
++            ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'=
+))
+             # Anonymous bitmap (dynamic, shows new writes)
+-            bitmap_comparison(get_bitmap(bitmaps, drive0.device, '',
+-                                         recording=3DTrue), groups=3D{2}=
+)
+-            dirty_groups.add(2)
++            anonymous =3D EmulatedBitmap()
++            anonymous.dirty_group(2)
++            anonymous.compare(get_bitmap(bitmaps, drive0.device, '',
++                                         recording=3DTrue))
++
++            # Simulate the order in which this will happen:
++            # group 1 gets cleared first, then group two gets written.
++            if ((bsync_mode =3D=3D 'on-success' and not failure) or
++                (bsync_mode =3D=3D 'always')):
++                ebitmap.clear_group(1)
++            ebitmap.dirty_group(2)
+=20
+         vm.run_job(job, auto_dismiss=3DTrue, auto_finalize=3DFalse,
+                    pre_finalize=3D_callback,
+                    cancel=3D(failure =3D=3D 'simulated'))
+         bitmaps =3D query_bitmaps(vm)
+-        bitmap =3D get_bitmap(bitmaps, drive0.device, 'bitmap0')
+         log(bitmaps, indent=3D2)
+         log('')
+=20
+-        if ((bsync_mode =3D=3D 'on-success' and not failure) or
+-                (bsync_mode =3D=3D 'always' and failure !=3D 'intermedia=
+te')):
+-            dirty_groups.remove(1)
+-
+         if bsync_mode =3D=3D 'always' and failure =3D=3D 'intermediate':
+             # We manage to copy one sector (one bit) before the error.
+-            bitmap_comparison(bitmap,
+-                              want=3Dcalculate_bits(groups=3Ddirty_group=
+s) - 1)
+-        else:
+-            bitmap_comparison(bitmap, groups=3Ddirty_groups)
++            ebitmap.clear_bit(ebitmap.first_bit)
++        ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'))
+=20
+         # 2 - Writes and Reference Backup
+         bitmaps =3D perform_writes(drive0, 3)
+-        dirty_groups.add(3)
+-        bitmap =3D get_bitmap(bitmaps, drive0.device, 'bitmap0')
+-        if bsync_mode =3D=3D 'always' and failure =3D=3D 'intermediate':
+-            # We're one bit short, still.
+-            bitmap_comparison(bitmap,
+-                              want=3Dcalculate_bits(groups=3Ddirty_group=
+s) - 1)
+-        else:
+-            bitmap_comparison(bitmap, groups=3Ddirty_groups)
++        ebitmap.dirty_group(3)
++        ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'))
+         reference_backup(drive0, 2, fbackup2)
+=20
+         # 2 - Bitmap Backup (In failure modes, this is a recovery.)
+         job =3D bitmap_backup(drive0, 2, bsync2, "bitmap0", bsync_mode)
+         vm.run_job(job, auto_dismiss=3DTrue, auto_finalize=3DFalse)
+         bitmaps =3D query_bitmaps(vm)
+-        bitmap =3D get_bitmap(bitmaps, drive0.device, 'bitmap0')
+         log(bitmaps, indent=3D2)
+         log('')
+-        bitmap_comparison(bitmap, groups=3D{}
+-                          if bsync_mode !=3D 'never'
+-                          else dirty_groups)
++        if bsync_mode !=3D 'never':
++            ebitmap.clear()
++        ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'))
+=20
+         log('--- Cleanup ---\n')
+         vm.qmp_log("block-dirty-bitmap-remove",
 --=20
 2.21.0
 
