@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13898C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67330C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D82B8206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D82B8206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 402C7206C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:57:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402C7206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyUIU-0007zD-RR
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 00:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47102)
+	id 1hyUIY-00083J-Aq
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 00:57:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hyUH1-0006ll-Rw
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:55:37 -0400
+ (envelope-from <bounces@canonical.com>) id 1hyUH5-0006lx-Bg
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hyUH0-0006rY-Js
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:55:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50816)
+ (envelope-from <bounces@canonical.com>) id 1hyUH3-0006tw-Vj
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:55:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50912)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hyUH0-0006qE-Di
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:55:34 -0400
+ id 1hyUH3-0006t6-C1
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:55:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hyUGz-0002We-O2
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 04:55:33 +0000
+ id 1hyUH2-0002Zt-J7
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 04:55:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B14502E80C8
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 04:55:33 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 4A4912E80C7
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 04:55:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Aug 2019 04:50:06 -0000
-From: Thomas Huth <1838475@bugs.launchpad.net>
+Date: Fri, 16 Aug 2019 04:48:02 -0000
+From: Thomas Huth <1831477@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm mprofile tcg testcase
+ assignee=lersek@redhat.com; 
+X-Launchpad-Bug-Tags: feature-request
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: buckfobb pmaydell th-huth
-X-Launchpad-Bug-Reporter: KD (buckfobb)
+X-Launchpad-Bug-Commenters: lersek
+X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156452233283.15483.3370838341008169030.malonedeb@wampee.canonical.com>
-Message-Id: <156593100621.26145.9553538068978042347.malone@soybean.canonical.com>
+References: <155958011528.16346.9132826883162987130.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156593088303.26528.13987146859333718754.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19022";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a258b60ea8448fb2d5a32d2d69bbbe7af785d9a0
+X-Launchpad-Hash: 82589c9f88422f5a1a2076f52979e0e640a56f13
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838475] Re: qemu-system-arm exits when cortex-m4
- floating point used and irq occurs
+Subject: [Qemu-devel] [Bug 1831477] Re: update edk2 submodule & binaries to
+ edk2-stable201905
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -78,12 +78,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838475 <1838475@bugs.launchpad.net>
+Reply-To: Bug 1831477 <1831477@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D02ac2f7f613b47f6a5b3
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -92,40 +90,23 @@ https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D02ac2f7f613b47f6a5b3
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838475
+https://bugs.launchpad.net/bugs/1831477
 
 Title:
-  qemu-system-arm exits when cortex-m4 floating point used and irq
-  occurs
+  update edk2 submodule & binaries to edk2-stable201905
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  qemu-system-arm exits with
+  The edk2 project will soon release edk2-stable201905. Update the edk2
+  submodule in QEMU, and the bundled edk2 binaries, accordingly.
 
-  "...Secure UsageFault with CFSR.NOCP because NSACR.CP10 prevents stacking=
- FP regs
-  ...taking pending nonsecure exception 3
-  Taking exception 7 [Breakpoint]
-  qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1)" =
-
-
-  when emulating Cortex-m4, executing at least 1 floating point
-  instruction, and then an irq (e.g. sys tick) occurring.
-
-  CPACR.CP10 and CPACR.CP11 are set to 0x3 respectively prior to
-  executing the fp instructions.
-
-  NOTE: NSACR does not appear to be a cortex m4 register.
-
-  Attached is a simplified elf to repro the issue.
-
-  The qemu command line is: "qemu-system-arm --gdb tcp::1234 -cpu
-  cortex-m4 -machine lm3s6965evb -nographic -semihosting-config
-  enable=3Don,target=3Dnative -kernel QemuExitWhenUsingFPAndIRQOccurs.elf -d
-  int"
+  https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Plan=
+ning#edk2-stable201905-tag-planning
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable201905 [upcomin=
+g link]
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838475/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1831477/+subscriptions
 
