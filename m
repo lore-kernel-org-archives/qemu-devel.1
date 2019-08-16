@@ -2,88 +2,70 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20374C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B03C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:37:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAD7D2086C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:36:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FiIDkBAg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD7D2086C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DBB082064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:37:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBB082064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56213 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycPB-0007fZ-EP
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:36:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35276)
+	id 1hycQQ-0001MJ-I9
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:37:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6t-0003PM-7p
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:40 -0400
+ (envelope-from <armbru@redhat.com>) id 1hycEF-0005Dn-1u
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6s-0005XB-3b
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:39 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36655)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyc6q-0005Ta-KT
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:36 -0400
-Received: by mail-wm1-x343.google.com with SMTP id g67so4054563wme.1
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=OdK5cWlQ5sk+G9iGDbydEQDvzmCjdBLAENCSI33Pl1s=;
- b=FiIDkBAgoB1ksl0H9z8nXQBjtdxBNxzRjPvvndOEGSg7YTrYbCXHICLXxOE69OTcsa
- WM9v8hdsZNs+HJUvxBjMwEKDaI2S1GJK9kKVSm12s+QINY7wIoRxGHdPTRo7BK/2lvvt
- z/CNsgcO/x0Fkv1P65tExLJ8uUxMKrbUqcQZCecl6gUE5x2WAajOdPvRD9oxQO8LzNJH
- BIVmXXtFFNN73P/jEn3yuQK0420BVMyEgk/4CP3Vio5slwxdy9tGV3M9598uh0fN7XY9
- B9xEpk0tTDeO6b/z8Rx/377rAroUmbJuvt2MhQ94MqpOKbJb/48y0y6DH+zYW5cGcN/p
- 6mDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=OdK5cWlQ5sk+G9iGDbydEQDvzmCjdBLAENCSI33Pl1s=;
- b=FAtuuCWrU+2nt2zwG7Bv7rUzLoyjYqdSlXtVnQ6bnxdiI6AqVwmz0VEkh6nNZsP5jS
- 0P2IuoZXYBQtNcAVrsXF7cpmrvYcV0l7w3pgECgD75CAH2UmyXynwb6elFADIYUXsXpE
- dXZPoJMPMBa1wKyk7u2c4gmSEXrJ6yle1zKPkU/nCXmdrwVzgv680noxfZizb/+hRZHB
- Zo6Wrlu9Y0X8cu4Tv3VZBHTBGchLlbrexPgxq1vHCsiyJb/g2kQhhoJcatSIoIsy2tDv
- z7dngLxuV3pP4nG55sRBKSNCvcmwF+n6kLW1I40S84NqlyUDfKbJ8LYjk/unaMurFRbs
- I0ig==
-X-Gm-Message-State: APjAAAUnVvuCA3LHASd86dJSqPxav8PW1IpKDSgOZ4eas1MAxCSx5TM1
- ajzAcfw6CF1U1B0o1uirDPllWLxGrL7Bag==
-X-Google-Smtp-Source: APXvYqypaDjSf1A/m3yROxm0xLSc4zESWij1J3vbP3QyNVVDYdFLC3vDFxH2kInZZWRCei6xHN2Uig==
-X-Received: by 2002:a7b:cb11:: with SMTP id u17mr7282400wmj.17.1565961454825; 
- Fri, 16 Aug 2019 06:17:34 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.33
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Aug 2019 06:17:34 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 14:17:03 +0100
-Message-Id: <20190816131719.28244-14-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190816131719.28244-1-peter.maydell@linaro.org>
-References: <20190816131719.28244-1-peter.maydell@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1hycED-0002NS-N4
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:25:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34780)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hycED-0002Md-BV
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:25:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D27C2A09CF;
+ Fri, 16 Aug 2019 13:25:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 98E817EBA6;
+ Fri, 16 Aug 2019 13:24:57 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1570610E6CCA; Fri, 16 Aug 2019 15:24:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190813154653.20568-1-armbru@redhat.com>
+ <CAFEAcA9L1yA==UV__H_bkC+HBKNB1vMtAXidQsbNwDGSt6Yokw@mail.gmail.com>
+ <7d6c5482-183e-5373-03ac-18aac5055572@redhat.com>
+ <80ed7df8-2dfc-4bb0-b3e4-3e58df9d0957@redhat.com>
+Date: Fri, 16 Aug 2019 15:24:45 +0200
+In-Reply-To: <80ed7df8-2dfc-4bb0-b3e4-3e58df9d0957@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri, 16 Aug 2019 14:39:06
+ +0200")
+Message-ID: <87v9uxmeea.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PULL 13/29] target/arm: Replace offset with pc in
- gen_exception_internal_insn
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Fri, 16 Aug 2019 13:25:12 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 00/29] Header cleanup patches for 2019-08-13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,95 +77,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-The offset is variable depending on the instruction set.
-Passing in the actual value is clearer in intent.
+> On 8/16/19 1:23 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 8/16/19 12:59 PM, Peter Maydell wrote:
+>>> On Tue, 13 Aug 2019 at 16:54, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>>>
+>>>> The following changes since commit 864ab314f1d924129d06ac7b571f105a2b7=
+6a4b2:
+>>>>
+>>>>   Update version for v4.1.0-rc4 release (2019-08-06 17:05:21 +0100)
+>>>>
+>>>> are available in the Git repository at:
+>>>>
+>>>>   git://repo.or.cz/qemu/armbru.git tags/pull-include-2019-08-13
+>>>>
+>>>> for you to fetch changes up to 8d111fd683b678d3826e192bc07ffcc349a118b=
+5:
+>>>>
+>>>>   sysemu: Split sysemu/runstate.h off sysemu/sysemu.h (2019-08-13 13:1=
+6:20 +0200)
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> Header cleanup patches for 2019-08-13
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> These patches are rather bothersome to rebase, so I'd like to get them
+>>>> into 4.2 early.
+>>>>
+>>>
+>>> Fails to build on OSX I'm afraid:
+>>> /Users/pm215/src/qemu-for-merges/ui/cocoa.m:1166:5: error: implicit
+>>> declaration of function 'qemu_system_shutdown_request' is invalid in
+>>> C99 [-Werror,-Wimplicit-function-declaration]
+>>>     qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
+>>>     ^
+>>=20
+>> Ah I reported this one while reviewing v2:
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg01150.html
+>>=20
+>> Then didn't take the time to test OSX on v4 :(
+>>=20
+>> BTW Travis should find this.
+>
+> Actually I did try v4 on Travis and it succeeded:
+> https://travis-ci.org/philmd/qemu/builds/570743079
+>
+> But Travis seems to have updated smth on their OSX images (or brew is
+> down?), now I get:
+>
+>   ERROR: glib-2.40 gthread-2.0 is required to compile QEMU
+>
+> Anyway, the culprit is:
+>
+> commit 8d111fd683b678d3826e192bc07ffcc349a118b5 (tag:
+> pull-include-2019-08-13)
+> Author: Markus Armbruster <armbru@redhat.com>
+> Date:   Mon Aug 12 07:23:59 2019 +0200
+>
+>     sysemu: Split sysemu/runstate.h off sysemu/sysemu.h
+>
+>     sysemu/sysemu.h is a rather unfocused dumping ground for stuff related
+>     to the system-emulator.  Evidence:
+>
+>     * It's included widely: in my "build everything" tree, changing
+>       sysemu/sysemu.h still triggers a recompile of some 1100 out of 6600
+>       objects (not counting tests and objects that don't depend on
+>       qemu/osdep.h, down from 5400 due to the previous two commits).
+>
+>     * It pulls in more than a dozen additional headers.
+>
+> ui/cocoa.m now needs to include "sysemu/runstate.h".
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190807045335.1361-9-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate-a64.c | 8 ++++----
- target/arm/translate.c     | 8 ++++----
- 2 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 70caf3becb1..2f8eea02e3b 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -253,9 +253,9 @@ static void gen_exception_internal(int excp)
-     tcg_temp_free_i32(tcg_excp);
- }
- 
--static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
-+static void gen_exception_internal_insn(DisasContext *s, uint64_t pc, int excp)
- {
--    gen_a64_set_pc_im(s->base.pc_next - offset);
-+    gen_a64_set_pc_im(pc);
-     gen_exception_internal(excp);
-     s->base.is_jmp = DISAS_NORETURN;
- }
-@@ -1924,7 +1924,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
-                 break;
-             }
- #endif
--            gen_exception_internal_insn(s, 0, EXCP_SEMIHOST);
-+            gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
-         } else {
-             unsupported_encoding(s, insn);
-         }
-@@ -14220,7 +14220,7 @@ static bool aarch64_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-         /* End the TB early; it likely won't be executed */
-         dc->base.is_jmp = DISAS_TOO_MANY;
-     } else {
--        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
-+        gen_exception_internal_insn(dc, dc->base.pc_next, EXCP_DEBUG);
-         /* The address covered by the breakpoint must be
-            included in [tb->pc, tb->pc + tb->size) in order
-            to for it to be properly cleared -- thus we
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 60f1b3998a1..c26d3376b3c 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1241,10 +1241,10 @@ static inline void gen_smc(DisasContext *s)
-     s->base.is_jmp = DISAS_SMC;
- }
- 
--static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
-+static void gen_exception_internal_insn(DisasContext *s, uint32_t pc, int excp)
- {
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->base.pc_next - offset);
-+    gen_set_pc_im(s, pc);
-     gen_exception_internal(excp);
-     s->base.is_jmp = DISAS_NORETURN;
- }
-@@ -1296,7 +1296,7 @@ static inline void gen_hlt(DisasContext *s, int imm)
-         s->current_el != 0 &&
- #endif
-         (imm == (s->thumb ? 0x3c : 0xf000))) {
--        gen_exception_internal_insn(s, 0, EXCP_SEMIHOST);
-+        gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
-         return;
-     }
- 
-@@ -11940,7 +11940,7 @@ static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-         /* End the TB early; it's likely not going to be executed */
-         dc->base.is_jmp = DISAS_TOO_MANY;
-     } else {
--        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
-+        gen_exception_internal_insn(dc, dc->base.pc_next, EXCP_DEBUG);
-         /* The address covered by the breakpoint must be
-            included in [tb->pc, tb->pc + tb->size) in order
-            to for it to be properly cleared -- thus we
--- 
-2.20.1
-
+v2 sent.  Thanks!
 
