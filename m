@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7145DC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FD5C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:49:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A37320644
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:48:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A37320644
+	by mail.kernel.org (Postfix) with ESMTPS id 6062820644
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:49:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6062820644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50881 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyWyi-0006S0-W5
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:48:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38315)
+	id 1hyWyy-0006og-4j
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:49:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWhm-00052u-GL
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:31:24 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWjv-0006sf-0X
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWhk-0007tW-Gj
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:31:22 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.77]:34134)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWjs-0000ON-KF
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:33:34 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.80]:56624)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWhO-0007ix-0g; Fri, 16 Aug 2019 03:30:58 -0400
+ id 1hyWjI-0008Uc-Og; Fri, 16 Aug 2019 03:32:58 -0400
 Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- BWP09926082.bt.com (10.36.82.113) with Microsoft SMTP Server (version=TLS1_2, 
+ BWP09926085.bt.com (10.36.82.116) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
- Aug 2019 08:30:32 +0100
+ Aug 2019 08:32:44 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
  tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:30:52 +0100
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:32:47 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:30:53 +0100
+ 2019 08:32:47 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 12/42] hw/s390x: Hard code size with
- MO_{8|16|32|64}
-Thread-Index: AQHVVASIHvIgAu/PqkGPDWK31G+Lhw==
-Date: Fri, 16 Aug 2019 07:30:52 +0000
-Message-ID: <1565940651997.54048@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v7 18/42] hw/display: Declare device little
+ or big endian
+Thread-Index: AQHVVATMm+Gw97XX1E69XWqXb5W1uQ==
+Date: Fri, 16 Aug 2019 07:32:47 +0000
+Message-ID: <1565940766250.74217@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -61,12 +61,12 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.40]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.77
+X-Received-From: 213.121.35.80
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v7 12/42] hw/s390x: Hard code size with
- MO_{8|16|32|64}
+Subject: [Qemu-devel] [PATCH v7 18/42] hw/display: Declare device little or
+ big endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,36 +109,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Temporarily no-op size_memop was introduced to aid the conversion of
-memory_region_dispatch_{read|write} operand "unsigned size" into
-"MemOp op".
+For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
+targets from the set of target/hw/*/device.o.
 
-Now size_memop is implemented, again hard coded size but with
-MO_{8|16|32|64}. This is more expressive and avoids size_memop calls.
+If the set of targets are all little or all big endian, re-declare
+the device endianness as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN
+respectively.
+
+This *naive* deduction may result in genuinely native endian devices
+being incorrectly declared as little or big endian, but should not
+introduce regressions for current targets.
+
+These devices should be re-declared as DEVICE_NATIVE_ENDIAN if 1) it
+has a new target with an opposite endian or 2) someone informed knows
+better =3D)
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-pci-inst.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ hw/display/pl110.c    | 2 +-
+ hw/display/tc6393xb.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 0c958fc..0e92a37 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -782,8 +782,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8=
-_t r3, uint64_t gaddr,
-     for (i =3D 0; i < len / 8; i++) {
-         result =3D memory_region_dispatch_write(mr, offset + i * 8,
-                                               ldq_p(buffer + i * 8),
--                                              size_memop(8),
--                                              MEMTXATTRS_UNSPECIFIED);
-+                                              MO_64, MEMTXATTRS_UNSPECIFIE=
-D);
-         if (result !=3D MEMTX_OK) {
-             s390_program_interrupt(env, PGM_OPERAND, 6, ra);
-             return 0;
+diff --git a/hw/display/pl110.c b/hw/display/pl110.c
+index 2bdfc3c..d0c6317 100644
+--- a/hw/display/pl110.c
++++ b/hw/display/pl110.c
+@@ -471,7 +471,7 @@ static void pl110_write(void *opaque, hwaddr offset,
+ static const MemoryRegionOps pl110_ops =3D {
+     .read =3D pl110_read,
+     .write =3D pl110_write,
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
+
+ static void pl110_mux_ctrl_set(void *opaque, int line, int level)
+diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
+index 0b7c59c..6bc3360 100644
+--- a/hw/display/tc6393xb.c
++++ b/hw/display/tc6393xb.c
+@@ -547,7 +547,7 @@ TC6393xbState *tc6393xb_init(MemoryRegion *sysmem, uint=
+32_t base, qemu_irq irq)
+     static const MemoryRegionOps tc6393xb_ops =3D {
+         .read =3D tc6393xb_readb,
+         .write =3D tc6393xb_writeb,
+-        .endianness =3D DEVICE_NATIVE_ENDIAN,
++        .endianness =3D DEVICE_LITTLE_ENDIAN,
+         .impl =3D {
+             .min_access_size =3D 1,
+             .max_access_size =3D 1,
 --
 1.8.3.1
 
