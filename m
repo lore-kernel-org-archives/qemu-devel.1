@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C538C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 10:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10011C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 10:06:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72384206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 10:05:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72384206C2
+	by mail.kernel.org (Postfix) with ESMTPS id DAFC92133F
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 10:06:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAFC92133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyZ6j-0007XU-Lp
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 06:05:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35141)
+	id 1hyZ8M-0000XQ-15
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 06:06:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1hyZ5t-0006WM-5F
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:04:26 -0400
+ (envelope-from <philmd@redhat.com>) id 1hyZ7a-0008Ap-1H
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hyZ5r-0002HP-In
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:04:25 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35185)
+ (envelope-from <philmd@redhat.com>) id 1hyZ7Y-0003CD-F9
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:06:09 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43729)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hyZ5r-0002G6-Be
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:04:23 -0400
-Received: by mail-wm1-f65.google.com with SMTP id l2so3603149wmg.0
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 03:04:22 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hyZ7Y-0003BH-8P
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 06:06:08 -0400
+Received: by mail-wr1-f65.google.com with SMTP id y8so995133wrn.10
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 03:06:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=aT2ZNqO8zTsrWM08AT1iJSt0ruEVkb9Rhd643qEZv5I=;
- b=HmKIC0XVU8EWblXbw98UmYgoREZmRqW0POrRKi6I0v9rJLxG2OmSFb1CV59qP3pIIV
- czMGtiJ9jh5NP3XKBYFVn7jcCUEtTw9WjD6MFYp41Z+cqMPMaakqcY4T4HTtEBwHA3nw
- N8uZ2lwVwXH0TmpS2DpQ0IgzutMV8wrh9NRfuUbQoW6W84ZiuT+s8UcjDJheapmpULNl
- o12uosr6fORy6vUN8tTtU159GQxKWI7yV8tbdcx7zCaGTZxuOABdiDo+9MFPYMRz2pnv
- TliuhcWRePcG0lP2T4fIFsOxmR/RE8a1tak2brMygehiEtqZJHaJaDQsat+xLBiIL8+U
- sMeQ==
-X-Gm-Message-State: APjAAAVfVFsQEkhs721POci3X6YQdKXZQ0p2WZTJxq31fBUoxz2tuNrH
- d0Fw/FcSIfiWYTlUPWCWW8Csmw==
-X-Google-Smtp-Source: APXvYqz9FADqlGfQPhtp/alJQ2mzQsnVjtWV9tZBB1zOh/6/Xv4Sb2y94Nz96D17mVSCds+06pXYRw==
-X-Received: by 2002:a1c:a101:: with SMTP id k1mr6684861wme.98.1565949861986;
- Fri, 16 Aug 2019 03:04:21 -0700 (PDT)
+ bh=4nmllPcEhYaEJs68tgHuQ5qqmn++ZDafoOXvJZcokHk=;
+ b=O+BrIonn3k3Q7UVx/JxfQdiqn9hpFNJMZqZfz6WG1e7gxh2HptNqvvlcW0OwhfTbNr
+ bIXw3uDJfp8BNlumnGe1fsU5LRrU8yi3MO1aFnDFF0fgVSLyJSQdCQw2MspQejyFIcZi
+ rvqZ4EKJyQA6tqVlsrKXUh+u8KxVUDZAlp6c6ztzBSWKcJiNo09F/gECir38yvzkWh3A
+ YAbd1/F7UJkXotKGvFb7vLyx3nQ+iG7JBWorR6gViM0zUpsbrPSKOLvxpcpcQG17TRbr
+ 6J3Z0lrEJQcQ5ToEMC2zDLsl1dC+tRYqkn1L1h30QY0ZWpOIqbG6bnUW83QADalxQLsI
+ +xMQ==
+X-Gm-Message-State: APjAAAVl0I0he3zR5LZ7mp0IcMpnyW7jiubRsgldE0L3md2JRcq06pG0
+ VsZL5X73SSeVbKWR76aNKUwRpA==
+X-Google-Smtp-Source: APXvYqz+oIj1oEb5S9Wcb1SdPyATJ1ItG3ZInp8JTtTW+nFG+aYKAl8f6PS/MrJCfAiBLINYgwP9ow==
+X-Received: by 2002:adf:dd01:: with SMTP id a1mr9597279wrm.12.1565949967319;
+ Fri, 16 Aug 2019 03:06:07 -0700 (PDT)
 Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id r190sm5336299wmf.0.2019.08.16.03.04.18
+ by smtp.gmail.com with ESMTPSA id u130sm8566224wmg.28.2019.08.16.03.06.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Aug 2019 03:04:21 -0700 (PDT)
+ Fri, 16 Aug 2019 03:06:06 -0700 (PDT)
 To: tony.nguyen@bt.com, qemu-devel@nongnu.org
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
- <1565940884636.2215@bt.com>
+ <1565940916012.8169@bt.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <989277a4-7f07-aaaf-f963-ee769e0efd00@redhat.com>
-Date: Fri, 16 Aug 2019 12:04:17 +0200
+Message-ID: <22d6f51c-c734-3976-2fc1-34c9c74a075e@redhat.com>
+Date: Fri, 16 Aug 2019 12:06:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1565940884636.2215@bt.com>
+In-Reply-To: <1565940916012.8169@bt.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v7 25/42] hw/misc: Declare device little or
- big endian
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v7 27/42] hw/pci-host: Declare device
+ little or big endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,7 +118,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/16/19 9:34 AM, tony.nguyen@bt.com wrote:
+On 8/16/19 9:35 AM, tony.nguyen@bt.com wrote:
 > For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
 > targets from the set of target/hw/*/device.o.
 > 
@@ -136,114 +136,58 @@ On 8/16/19 9:34 AM, tony.nguyen@bt.com wrote:
 > 
 > Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 > ---
->  hw/misc/a9scu.c    | 2 +-
->  hw/misc/applesmc.c | 6 +++---
->  hw/misc/arm11scu.c | 2 +-
->  hw/misc/arm_l2x0.c | 2 +-
->  hw/misc/puv3_pm.c  | 2 +-
->  5 files changed, 7 insertions(+), 7 deletions(-)
+>  hw/pci-host/q35.c       | 2 +-
+>  hw/pci-host/versatile.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/misc/a9scu.c b/hw/misc/a9scu.c
-> index 4307f00..3de8cd3 100644
-> --- a/hw/misc/a9scu.c
-> +++ b/hw/misc/a9scu.c
-> @@ -94,7 +94,7 @@ static void a9_scu_write(void *opaque, hwaddr offset,
->  static const MemoryRegionOps a9_scu_ops = {
->      .read = a9_scu_read,
->      .write = a9_scu_write,
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 0a010be..fd20f72 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -288,7 +288,7 @@ static void tseg_blackhole_write(void *opaque,
+> hwaddr addr, uint64_t val,
+>  static const MemoryRegionOps tseg_blackhole_ops = {
+>      .read = tseg_blackhole_read,
+>      .write = tseg_blackhole_write,
 > -    .endianness = DEVICE_NATIVE_ENDIAN,
 > +    .endianness = DEVICE_LITTLE_ENDIAN,
 
-Uh, I doubt that.
+OK.
 
->  };
->  
->  static void a9_scu_reset(DeviceState *dev)
-> diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
-> index 2d7eb3c..6c91f29 100644
-> --- a/hw/misc/applesmc.c
-> +++ b/hw/misc/applesmc.c
-> @@ -285,7 +285,7 @@ static void qdev_applesmc_isa_reset(DeviceState *dev)
->  static const MemoryRegionOps applesmc_data_io_ops = {
->      .write = applesmc_io_data_write,
->      .read = applesmc_io_data_read,
+>      .valid.min_access_size = 1,
+>      .valid.max_access_size = 4,
+>      .impl.min_access_size = 4,
+> diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
+> index 791b321..e7017f3 100644
+> --- a/hw/pci-host/versatile.c
+> +++ b/hw/pci-host/versatile.c
+> @@ -240,7 +240,7 @@ static uint64_t pci_vpb_reg_read(void *opaque,
+> hwaddr addr,
+>  static const MemoryRegionOps pci_vpb_reg_ops = {
+>      .read = pci_vpb_reg_read,
+>      .write = pci_vpb_reg_write,
 > -    .endianness = DEVICE_NATIVE_ENDIAN,
 > +    .endianness = DEVICE_LITTLE_ENDIAN,
->      .impl = {
->          .min_access_size = 1,
->          .max_access_size = 1,
-> @@ -295,7 +295,7 @@ static const MemoryRegionOps applesmc_data_io_ops = {
->  static const MemoryRegionOps applesmc_cmd_io_ops = {
->      .write = applesmc_io_cmd_write,
->      .read = applesmc_io_cmd_read,
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
->      .impl = {
->          .min_access_size = 1,
->          .max_access_size = 1,
-> @@ -305,7 +305,7 @@ static const MemoryRegionOps applesmc_cmd_io_ops = {
->  static const MemoryRegionOps applesmc_err_io_ops = {
->      .write = applesmc_io_err_write,
->      .read = applesmc_io_err_read,
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
->      .impl = {
->          .min_access_size = 1,
->          .max_access_size = 1,
-
-Being ioport, this one might be OK.
-
-> diff --git a/hw/misc/arm11scu.c b/hw/misc/arm11scu.c
-> index 84275df..59fd7c0 100644
-> --- a/hw/misc/arm11scu.c
-> +++ b/hw/misc/arm11scu.c
-> @@ -57,7 +57,7 @@ static void mpcore_scu_write(void *opaque, hwaddr offset,
->  static const MemoryRegionOps mpcore_scu_ops = {
->      .read = mpcore_scu_read,
->      .write = mpcore_scu_write,
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-
-I don't think so,
-
->  };
->  
->  static void arm11_scu_realize(DeviceState *dev, Error **errp)
-> diff --git a/hw/misc/arm_l2x0.c b/hw/misc/arm_l2x0.c
-> index b88f40a..72ecf46 100644
-> --- a/hw/misc/arm_l2x0.c
-> +++ b/hw/misc/arm_l2x0.c
-> @@ -157,7 +157,7 @@ static void l2x0_priv_reset(DeviceState *dev)
->  static const MemoryRegionOps l2x0_mem_ops = {
->      .read = l2x0_priv_read,
->      .write = l2x0_priv_write,
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-
-neither here, but Peter will confirm.
-
->   };
->  
->  static void l2x0_priv_init(Object *obj)
-> diff --git a/hw/misc/puv3_pm.c b/hw/misc/puv3_pm.c
-> index b538b4a..cd82b69 100644
-> --- a/hw/misc/puv3_pm.c
-> +++ b/hw/misc/puv3_pm.c
-> @@ -118,7 +118,7 @@ static const MemoryRegionOps puv3_pm_ops = {
+>      .valid = {
 >          .min_access_size = 4,
 >          .max_access_size = 4,
->      },
+> @@ -306,7 +306,7 @@ static uint64_t pci_vpb_config_read(void *opaque,
+> hwaddr addr,
+>  static const MemoryRegionOps pci_vpb_config_ops = {
+>      .read = pci_vpb_config_read,
+>      .write = pci_vpb_config_write,
 > -    .endianness = DEVICE_NATIVE_ENDIAN,
 > +    .endianness = DEVICE_LITTLE_ENDIAN,
 
-This one I can't tell.
+Eh hard to say, PCI is not clear about endianess...
 
 >  };
 >  
->  static void puv3_pm_realize(DeviceState *dev, Error **errp)
+>  static int pci_vpb_map_irq(PCIDevice *d, int irq_num)
 > -- 
 > 1.8.3.1
 > 
 > ​
+> 
 > 
 
