@@ -2,79 +2,65 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B05DC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 15:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19649C3A59E
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 16:04:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB5B5206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 15:44:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OhjMipA6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB5B5206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D850821726
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 16:04:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D850821726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyeOt-0006ez-W6
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 11:44:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60685)
+	id 1hyeia-0005nQ-2I
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 12:04:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36383)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyeOH-0006Eh-Gu
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:43:46 -0400
+ (envelope-from <clg@kaod.org>) id 1hyefq-000363-Lk
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 12:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyeOF-0004rJ-Qh
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:43:45 -0400
-Received: from mail-io1-xd2f.google.com ([2607:f8b0:4864:20::d2f]:34560)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyeOF-0004r1-Jr
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:43:43 -0400
-Received: by mail-io1-xd2f.google.com with SMTP id s21so7055342ioa.1
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 08:43:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hISUx8PJHwJ2iX1azq87dBfcLKnt4BoKvhI2mPMozCg=;
- b=OhjMipA6EUK+G0H7vHjhhzq25eek7QSwXH5+xfFXzTduVBp85LRYDC76XR8Kz+VuPm
- d+IrASwI8TR7NMEvL0VbURx251TC1wx2x+0bAcjNUktUZFf50Y5OR8rheC0lvKq2/eR/
- dS1I9wfMPX45fs4n0qtvq3YHu9CASe8o0yaiGnvw1RtiGytR4ByFM1RAzaOZ4HWBueH5
- SYxcbyyDQkJN7Rc0ik+wfL/O4sXNfT7dPH4uPXAovuSJ88DrE+KW8IpAKdTLdCRWQWzD
- bNiaFVtuZ1cC4NoQpncHccCP74UAC4Eae9skPK54T+oLGWJUDEzQ8dUEmqMs/4dnntQx
- 83Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hISUx8PJHwJ2iX1azq87dBfcLKnt4BoKvhI2mPMozCg=;
- b=GGlf9nqEsGFpW1Tg98bzCiidzNa/o6ZrXLZ9ZWNRQHQJ2jo3RSuG48PBhkax6m3F+Y
- +9e+rgFyl2DZ+mO2ynk2OvmaKMbt0Cb/TU7xx5WDFOjxiPNRgVcx2Nd1MYQ52eU927dd
- NlPgcEM3CvMF98rou4nmgxXS3VzhTeQ7m1/rnARY73fojxmqneTRKalnF+UZhTdKYJKM
- rF34v4/Q/3lgv5+dllwfMOedY18rggRObhnCMuasF1Vc9iLNI04hsu9E5ornHeAnFni3
- pPd1D51ejW+C0UhKlP2+HM2iBrkgDZWE6rmKNGNYDVSvzeSu2wuYXb3D45vheu7gTj7n
- c7ew==
-X-Gm-Message-State: APjAAAW5OD0B3reZpWWc9TFWhe88CSgEpjHWH9NpxHQfTMSCtLLzfH9O
- dL7fKYeFSUlIvCs1z/mV8FeY9jMcGky4oXgmpTMRzA==
-X-Google-Smtp-Source: APXvYqyhk6+tvdyHRZ825h4iQ7+2aDCTV8u+ppVR4h/i1316DlViTQoKD8s+4CD61jK93z9TvKUoKc4vZSYrXrGLBIw=
-X-Received: by 2002:a02:81c5:: with SMTP id r5mr7379806jag.143.1565970222701; 
- Fri, 16 Aug 2019 08:43:42 -0700 (PDT)
+ (envelope-from <clg@kaod.org>) id 1hyefo-0002o2-9C
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 12:01:54 -0400
+Received: from 2.mo69.mail-out.ovh.net ([178.33.251.80]:36082)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hyefo-0002m9-2n
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 12:01:52 -0400
+Received: from player726.ha.ovh.net (unknown [10.109.146.131])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 401F566C78
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 18:01:50 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player726.ha.ovh.net (Postfix) with ESMTPSA id 4F0B48D21C6F;
+ Fri, 16 Aug 2019 16:01:43 +0000 (UTC)
+To: Rashmica Gupta <rashmica.g@gmail.com>, peter.maydell@linaro.org,
+ qemu-arm@nongnu.org
+References: <20190816073229.22787-1-rashmica.g@gmail.com>
+ <20190816073229.22787-4-rashmica.g@gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <acb45c02-f43e-9813-37da-bab8b12520ba@kaod.org>
+Date: Fri, 16 Aug 2019 18:01:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190815183039.4264-1-eblake@redhat.com>
-In-Reply-To: <20190815183039.4264-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Aug 2019 16:43:31 +0100
-Message-ID: <CAFEAcA8E6WJd6qmfEYF59RckGtEZRK=M8NYWngY3TKTf7=SHKQ@mail.gmail.com>
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d2f
-Subject: Re: [Qemu-devel] [PULL 0/9] First batch of 4.2 NBD patches
+In-Reply-To: <20190816073229.22787-4-rashmica.g@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 15235114589709503477
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudeffedgledvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.251.80
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] hw/gpio: Add in AST2600 specific
+ implementation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,37 +72,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: andrew@aj.id.au, aik@ozlabs.ru, qemu-devel@nongnu.org, joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 15 Aug 2019 at 19:34, Eric Blake <eblake@redhat.com> wrote:
->
-> The following changes since commit 9e06029aea3b2eca1d5261352e695edc1e7d7b8b:
->
->   Update version for v4.1.0 release (2019-08-15 13:03:37 +0100)
->
-> are available in the Git repository at:
->
->   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-08-15
->
-> for you to fetch changes up to 8f071c9db506e03abcb1b76ec6d3d2f9488cc3b3:
->
->   block/nbd: refactor nbd connection parameters (2019-08-15 13:22:14 -0500)
->
-> ----------------------------------------------------------------
-> nbd patches for 2019-08-15
->
-> - Addition of InetSocketAddress keep-alive
-> - Addition of BDRV_REQ_PREFETCH for more efficient copy-on-read
-> - Initial refactoring in preparation of NBD reconnect
+On 16/08/2019 09:32, Rashmica Gupta wrote:
+> The AST2600 has the same sets of 3.6v gpios as the AST2400 plus an
+> addtional two sets of 1.8V gpios.
+>=20
+> Signed-off-by: Rashmica Gupta <rashmica.g@gmail.com>
 
+One minor comment below, but this is minor.
 
-Applied, thanks.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+Thanks,
 
--- PMM
+C.
+
+> ---
+>  hw/gpio/aspeed_gpio.c | 142 ++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 137 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
+> index d6a4c0c757..a3306a8f32 100644
+> --- a/hw/gpio/aspeed_gpio.c
+> +++ b/hw/gpio/aspeed_gpio.c
+> @@ -167,6 +167,48 @@
+>  #define GPIO_3_6V_MEM_SIZE         0x1F0
+>  #define GPIO_3_6V_REG_ARRAY_SIZE   (GPIO_3_6V_MEM_SIZE >> 2)
+> =20
+> +/* AST2600 only - 1.8V gpios */
+> +/*
+> + * The AST2600 has same 3.6V gpios as the AST2400 (memory offsets 0x0-=
+0x198)
+> + * and addtional 1.8V gpios (memory offsets 0x800-0x9D4).
+> + */
+> +#define GPIO_1_8V_REG_OFFSET          0x800
+> +#define GPIO_1_8V_ABCD_DATA_VALUE     ((0x800 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_DIRECTION      ((0x804 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_INT_ENABLE     ((0x808 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_INT_SENS_0     ((0x80C - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_INT_SENS_1     ((0x810 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_INT_SENS_2     ((0x814 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_INT_STATUS     ((0x818 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_RESET_TOLERANT ((0x81C - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_DATA_VALUE        ((0x820 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_DIRECTION         ((0x824 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_INT_ENABLE        ((0x828 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_INT_SENS_0        ((0x82C - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_INT_SENS_1        ((0x830 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_INT_SENS_2        ((0x834 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_INT_STATUS        ((0x838 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_RESET_TOLERANT    ((0x83C - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_DEBOUNCE_1     ((0x840 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_DEBOUNCE_2     ((0x844 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_DEBOUNCE_1        ((0x848 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_DEBOUNCE_2        ((0x84C - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_DEBOUNCE_TIME_1     ((0x850 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_DEBOUNCE_TIME_2     ((0x854 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_DEBOUNCE_TIME_3     ((0x858 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_COMMAND_SRC_0  ((0x860 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_COMMAND_SRC_1  ((0x864 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_COMMAND_SRC_0     ((0x868 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_COMMAND_SRC_1     ((0x86C - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_DATA_READ      ((0x8C0 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_DATA_READ         ((0x8C4 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_ABCD_INPUT_MASK     ((0x9D0 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_E_INPUT_MASK        ((0x9D4 - GPIO_1_8V_REG_OFFSET) =
+>> 2)
+> +#define GPIO_1_8V_MEM_SIZE            0x9D8
+> +#define GPIO_1_8V_REG_ARRAY_SIZE      ((GPIO_1_8V_MEM_SIZE - \
+> +                                      GPIO_1_8V_REG_OFFSET) >> 2)
+> +#define GPIO_MAX_MEM_SIZE           MAX(GPIO_3_6V_MEM_SIZE, GPIO_1_8V_=
+MEM_SIZE)
+> +
+>  static int aspeed_evaluate_irq(GPIOSets *regs, int gpio_prev_high, int=
+ gpio)
+>  {
+>      uint32_t falling_edge =3D 0, rising_edge =3D 0;
+> @@ -461,6 +503,39 @@ static const AspeedGPIOReg aspeed_3_6v_gpios[GPIO_=
+3_6V_REG_ARRAY_SIZE] =3D {
+>      [GPIO_AC_INPUT_MASK] =3D         { 7, gpio_reg_input_mask },
+>  };
+> =20
+> +static const AspeedGPIOReg aspeed_1_8v_gpios[GPIO_1_8V_REG_ARRAY_SIZE]=
+ =3D {
+> +    /* 1.8V Set ABCD */
+> +    [GPIO_1_8V_ABCD_DATA_VALUE] =3D     {0, gpio_reg_data_value},
+> +    [GPIO_1_8V_ABCD_DIRECTION] =3D      {0, gpio_reg_direction},
+> +    [GPIO_1_8V_ABCD_INT_ENABLE] =3D     {0, gpio_reg_int_enable},
+> +    [GPIO_1_8V_ABCD_INT_SENS_0] =3D     {0, gpio_reg_int_sens_0},
+> +    [GPIO_1_8V_ABCD_INT_SENS_1] =3D     {0, gpio_reg_int_sens_1},
+> +    [GPIO_1_8V_ABCD_INT_SENS_2] =3D     {0, gpio_reg_int_sens_2},
+> +    [GPIO_1_8V_ABCD_INT_STATUS] =3D     {0, gpio_reg_int_status},
+> +    [GPIO_1_8V_ABCD_RESET_TOLERANT] =3D {0, gpio_reg_reset_tolerant},
+> +    [GPIO_1_8V_ABCD_DEBOUNCE_1] =3D     {0, gpio_reg_debounce_1},
+> +    [GPIO_1_8V_ABCD_DEBOUNCE_2] =3D     {0, gpio_reg_debounce_2},
+> +    [GPIO_1_8V_ABCD_COMMAND_SRC_0] =3D  {0, gpio_reg_cmd_source_0},
+> +    [GPIO_1_8V_ABCD_COMMAND_SRC_1] =3D  {0, gpio_reg_cmd_source_1},
+> +    [GPIO_1_8V_ABCD_DATA_READ] =3D      {0, gpio_reg_data_read},
+> +    [GPIO_1_8V_ABCD_INPUT_MASK] =3D     {0, gpio_reg_input_mask},
+> +    /* 1.8V Set E */
+> +    [GPIO_1_8V_E_DATA_VALUE] =3D     {1, gpio_reg_data_value},
+> +    [GPIO_1_8V_E_DIRECTION] =3D      {1, gpio_reg_direction},
+> +    [GPIO_1_8V_E_INT_ENABLE] =3D     {1, gpio_reg_int_enable},
+> +    [GPIO_1_8V_E_INT_SENS_0] =3D     {1, gpio_reg_int_sens_0},
+> +    [GPIO_1_8V_E_INT_SENS_1] =3D     {1, gpio_reg_int_sens_1},
+> +    [GPIO_1_8V_E_INT_SENS_2] =3D     {1, gpio_reg_int_sens_2},
+> +    [GPIO_1_8V_E_INT_STATUS] =3D     {1, gpio_reg_int_status},
+> +    [GPIO_1_8V_E_RESET_TOLERANT] =3D {1, gpio_reg_reset_tolerant},
+> +    [GPIO_1_8V_E_DEBOUNCE_1] =3D     {1, gpio_reg_debounce_1},
+> +    [GPIO_1_8V_E_DEBOUNCE_2] =3D     {1, gpio_reg_debounce_2},
+> +    [GPIO_1_8V_E_COMMAND_SRC_0] =3D  {1, gpio_reg_cmd_source_0},
+> +    [GPIO_1_8V_E_COMMAND_SRC_1] =3D  {1, gpio_reg_cmd_source_1},
+> +    [GPIO_1_8V_E_DATA_READ] =3D      {1, gpio_reg_data_read},
+> +    [GPIO_1_8V_E_INPUT_MASK] =3D     {1, gpio_reg_input_mask},
+> +};
+> +
+>  static uint64_t aspeed_gpio_read(void *opaque, hwaddr offset, uint32_t=
+ size)
+>  {
+>      AspeedGPIOState *s =3D ASPEED_GPIO(opaque);
+> @@ -659,8 +734,11 @@ static void aspeed_gpio_get_pin(Object *obj, Visit=
+or *v, const char *name,
+>      int set_idx, group_idx =3D 0;
+> =20
+>      if (sscanf(name, "gpio%2[A-Z]%1d", group, &pin) !=3D 2) {
+> -        error_setg(errp, "%s: error reading %s", __func__, name);
+> -        return;
+> +        /* 1.8V gpio */
+> +        if (sscanf(name, "gpio%3s%1d", group, &pin) !=3D 2) {
+> +            error_setg(errp, "%s: error reading %s", __func__, name);
+> +            return;
+> +        }
+
+We could extend the GPIO class with this pattern instead.
+
+>      }
+>      set_idx =3D get_set_idx(s, group, &group_idx);
+>      if (set_idx =3D=3D -1) {
+> @@ -683,8 +761,11 @@ static void aspeed_gpio_set_pin(Object *obj, Visit=
+or *v, const char *name,
+> =20
+>      visit_type_bool(v, name, &level, &local_err);
+>      if (sscanf(name, "gpio%2[A-Z]%1d", group, &pin) !=3D 2) {
+> -        error_setg(errp, "%s: error reading %s", __func__, name);
+> -        return;
+> +        /* 1.8V gpio */
+> +        if (sscanf(name, "gpio%3s%1d", group, &pin) !=3D 2) {
+> +            error_setg(errp, "%s: error reading %s", __func__, name);
+> +            return;
+> +        }
+>      }
+>      set_idx =3D get_set_idx(s, group, &group_idx);
+>      if (set_idx =3D=3D -1) {
+> @@ -716,6 +797,21 @@ static const GPIOSetProperties ast2500_set_props[]=
+ =3D {
+>      [7] =3D {0x000000ff,  0x000000ff,  {"AC"} },
+>  };
+> =20
+> +static GPIOSetProperties ast2600_3_6v_set_props[] =3D {
+> +    [0] =3D {0xffffffff,  0xffffffff,  {"A", "B", "C", "D"} },
+> +    [1] =3D {0xffffffff,  0xffffffff,  {"E", "F", "G", "H"} },
+> +    [2] =3D {0xffffffff,  0xffffffff,  {"I", "J", "K", "L"} },
+> +    [3] =3D {0xffffffff,  0xffffffff,  {"M", "N", "O", "P"} },
+> +    [4] =3D {0xffffffff,  0xffffffff,  {"Q", "R", "S", "T"} },
+> +    [5] =3D {0xffffffff,  0x0000ffff,  {"U", "V", "W", "X"} },
+> +    [6] =3D {0xffff0000,  0x0fff0000,  {"Y", "Z", "", ""} },
+> +};
+> +
+> +static GPIOSetProperties ast2600_1_8v_set_props[] =3D {
+> +    [0] =3D {0xffffffff,  0xffffffff,  {"18A", "18B", "18C", "18D"} },
+> +    [1] =3D {0x0000000f,  0x0000000f,  {"18E"} },
+> +};
+> +
+>  static const MemoryRegionOps aspeed_gpio_ops =3D {
+>      .read       =3D aspeed_gpio_read,
+>      .write      =3D aspeed_gpio_write,
+> @@ -748,7 +844,7 @@ static void aspeed_gpio_realize(DeviceState *dev, E=
+rror **errp)
+>      }
+> =20
+>      memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_gpio_ops, s,
+> -            TYPE_ASPEED_GPIO, GPIO_3_6V_MEM_SIZE);
+> +            TYPE_ASPEED_GPIO, GPIO_MAX_MEM_SIZE);
+> =20
+>      sysbus_init_mmio(sbd, &s->iomem);
+>  }
+> @@ -841,6 +937,26 @@ static void aspeed_gpio_2500_class_init(ObjectClas=
+s *klass, void *data)
+>      agc->reg_table =3D aspeed_3_6v_gpios;
+>  }
+> =20
+> +static void aspeed_gpio_ast2600_3_6v_class_init(ObjectClass *klass, vo=
+id *data)
+> +{
+> +    AspeedGPIOClass *agc =3D ASPEED_GPIO_CLASS(klass);
+> +
+> +    agc->props =3D ast2600_3_6v_set_props;
+> +    agc->nr_gpio_pins =3D 208;
+> +    agc->nr_gpio_sets =3D 7;
+> +    agc->reg_table =3D aspeed_3_6v_gpios;
+> +}
+> +
+> +static void aspeed_gpio_ast2600_1_8v_class_init(ObjectClass *klass, vo=
+id *data)
+> +{
+> +    AspeedGPIOClass *agc =3D ASPEED_GPIO_CLASS(klass);
+> +
+> +    agc->props =3D ast2600_1_8v_set_props;
+> +    agc->nr_gpio_pins =3D 36;
+> +    agc->nr_gpio_sets =3D 2;
+> +    agc->reg_table =3D aspeed_1_8v_gpios;
+> +}
+> +
+>  static const TypeInfo aspeed_gpio_info =3D {
+>      .name           =3D TYPE_ASPEED_GPIO,
+>      .parent         =3D TYPE_SYS_BUS_DEVICE,
+> @@ -864,11 +980,27 @@ static const TypeInfo aspeed_gpio_ast2500_info =3D=
+ {
+>      .instance_init  =3D aspeed_gpio_init,
+>  };
+> =20
+> +static const TypeInfo aspeed_gpio_ast2600_3_6v_info =3D {
+> +    .name           =3D TYPE_ASPEED_GPIO "0-ast2600",
+> +    .parent         =3D TYPE_ASPEED_GPIO,
+> +    .class_init     =3D aspeed_gpio_ast2600_3_6v_class_init,
+> +    .instance_init  =3D aspeed_gpio_init,
+> +};
+> +
+> +static const TypeInfo aspeed_gpio_ast2600_1_8v_info =3D {
+> +    .name           =3D TYPE_ASPEED_GPIO "1-ast2600",
+> +    .parent         =3D TYPE_ASPEED_GPIO,
+> +    .class_init     =3D aspeed_gpio_ast2600_1_8v_class_init,
+> +    .instance_init  =3D aspeed_gpio_init,
+> +};
+> +
+>  static void aspeed_gpio_register_types(void)
+>  {
+>      type_register_static(&aspeed_gpio_info);
+>      type_register_static(&aspeed_gpio_ast2400_info);
+>      type_register_static(&aspeed_gpio_ast2500_info);
+> +    type_register_static(&aspeed_gpio_ast2600_3_6v_info);
+> +    type_register_static(&aspeed_gpio_ast2600_1_8v_info);
+>  }
+> =20
+>  type_init(aspeed_gpio_register_types);
+>=20
+
 
