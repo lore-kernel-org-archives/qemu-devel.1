@@ -2,75 +2,87 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F2FC3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 18:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B120C3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 18:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 828D5206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 18:18:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A4E22077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 18:23:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hhW7DnsS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 828D5206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="kM/MXhgb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A4E22077C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hygna-0006vR-IQ
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 14:18:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36953)
+	id 1hygt0-0008Ce-3D
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 14:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hygmj-0006S2-KY
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 14:17:10 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1hygq4-0007ei-Pk
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 14:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hygmh-0008JB-VX
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 14:17:09 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:38861)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hygmh-0008Is-PV
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 14:17:07 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id p124so5449049oig.5
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 11:17:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=ufR6XL4bF/TzAlBaApWvgRJSr8sN52C10wDxxE7df8A=;
- b=hhW7DnsSz2LXV7W90KdwWsXbuLtQJQa1prJ0+1JD/I/xCjNSbfB+CxCBOX5OEgM/Qs
- jyvSpzeVCa/J6685ib2lYjyzpalNsDUc7NQ67roJaEYLEN/GuVV3L14r4fkEBwf+UmJl
- os9NGl+FxA9POE1u5zD1uktZeSmPwG6VrOunKm0KdiwJLlKkRnB47j3ViaMymf+zJNa2
- lG0SyIJq+tMYPxz4HjAjjjx24FeQRJCbSmCo2lvNz9mDVSCdakATRMwzoNcUzr5DKgnN
- QUNTh7IpqxECV/XKKuX+53Umr8OGldFVrq0VOEbR830Ft7LQmThclDtmT5idpp7EtuoB
- ZWbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=ufR6XL4bF/TzAlBaApWvgRJSr8sN52C10wDxxE7df8A=;
- b=MG/NyNNJgRy4lOEjaSEwQ5YclNyg3sKPdldc3/WW5xvXao4BvvMxuHIpLyOul92uO6
- Ta85xbC6dg/G3QiFdRaEB0jopPbjily38jvB/TCLyrFWxrWcPhmvo19X9IRgt+0/b5Xh
- hkhF/q3OMdsUQZ0gGtbRbA5xdcYBaBBKwNjij/dkW+oYO0FgeO93GWfW4QTCOoiJcUEH
- ziP9X0jZD7NAyEN4VSLgXTTm9TIX6lY4PC10aB7zBXfMm6Wh129jZzQkmxYM6dM1hJOS
- cZKDuzLVcCZ96RjeAYmAIBRTU7jqhFqDHN3ttX/VFxjkH3DsoWdz5/ooQxZdFEKqiFCm
- 2fGw==
-X-Gm-Message-State: APjAAAUok+rtSSKORxkUKWViZeujjFeBE9+96svUaP+PhX37XSgvK0CD
- oWkIDCVtgRB6eZL5wLHAuHBQ8vHXhLEuao0QzsZAeGBW
-X-Google-Smtp-Source: APXvYqz+ofnKGRCVMhD9EO2IEB/xlvg2RxPeXLLA6x64Qw/pRCIINUUEET0oEV+xpC1L+ZEFUMqgLIzxumGKZjubpRQ=
-X-Received: by 2002:aca:6185:: with SMTP id v127mr5958831oib.163.1565979426389; 
- Fri, 16 Aug 2019 11:17:06 -0700 (PDT)
+ (envelope-from <lukasstraub2@web.de>) id 1hygq3-0001hZ-FM
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 14:20:36 -0400
+Received: from mout.web.de ([212.227.15.3]:44659)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hygq3-0001gL-3X
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 14:20:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1565979610;
+ bh=JDfhIzb9J58E6cI38r2EQYf4Qz2YFCr2E3z843HDURM=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=kM/MXhgbQcgQddhlCO/giTHsurhkVL8ycXbE8Q9Rqr0h7+GJm8214l6jM0eXKovCq
+ 9SUbcI0wJ3sdZY5Z4Pg9Zm8o1dIdAkKlXBy53VtiUy9Ionq0k0jfPTHzNPaYAX7HLR
+ kNyMHu3KOvH6E6lfnWYhwf3RDtmUhPI1fGcrOTv0=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.77]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0Lal0y-1iiitl2vWK-00kRhq; Fri, 16
+ Aug 2019 20:20:09 +0200
+Date: Fri, 16 Aug 2019 20:20:07 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: "Zhang, Chen" <chen.zhang@intel.com>
+Message-ID: <20190816202007.5577756b@luklap>
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D780621F1B6@shsmsx102.ccr.corp.intel.com>
+References: <20190815200815.2cffc21b@luklap> <20190815185737.GC2883@work-vm>
+ <20190815214804.69e4334f@luklap>
+ <9CFF81C0F6B98A43A459C9EDAD400D780621F1B6@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Aug 2019 19:16:55 +0100
-Message-ID: <CAFEAcA8kEKVcRu62+VGDkzRj2J87QPxzjg05dCHszeBC6X76pg@mail.gmail.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
-Subject: [Qemu-devel] more automated/public CI for QEMU pullreqs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:CnRsyoIO+p5p335u4c2tF5FAk3MCscL1Qp879B9yn110jEJKX7Q
+ f9hpN//VRK4IJUuv8wOou/ZDlUzAOU1KMg4zmWH5WvAiub2eZryYoEAXNZE9O6iT2jNQ8xq
+ vjb92DW45w5xTCeeCvZU0gY7R9EMH+Fc6s1jsrX5uAqpZkTh7UnsavBhDBEy5rhyfiejsNr
+ 57+dd6Ypv+pRRX45cl4mA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7KIcbYGv3+0=:C7hZXYjHh4viqBwUoYdzE1
+ D7NE0uQ6h0VIBJWRzEVxs2THpmezwXqO9vNtbHikBDJq0XzLfivprnbQV8+bFzUSD1ErE6aAl
+ ylYzPQeatIm8t7Pf/AZPJt/26lmqwd7xqSGplvNINwyDY+KA90I7RoDxj6h8oZpvwzNwelpBv
+ tlk2pY7tT/D1jX6a8I7GKeOtSirPhA7z101w0niCuFqddE03DU0QphoWGDuWnt1Rins4YanTn
+ Ypb66Unc7p+zKKKk7VEzuNw8ksXOu3AKtCEyCFi8a+ALuzx8IQQ6Heq31bltnCZWKzFgpl2lq
+ +EXA2dY4VWrygzYQVYK+4CqCceXsBOW2xJsndTK3WDhHtVnHMfxx4FW1YN9BFfOTjLjrlIq4J
+ dvhMGTXbKoKZSM1F2H8pl5gdWv4Krl+Ukkb6Kc0jQR2sdRXOPiE4J5sfuf3syldvWeE5rYE+3
+ NL3mv3SGD2fv/MSmfTdc2bUz7cisTnZS9MkRHHSr6lmR48ceA6FM7gp/hjQVP6fyYEvq6riLu
+ JiJW+69R/Gjpx36mGFXcn5YO43ngOQma/LCE41JYPDQy6xeCl7tPsQXAGZh87pCywkUCNcsxs
+ WGtuQvqAFBxYmKZHwPa4yEdr14zWRyQtXPuDFlReE5UPyMUfZYWeoXzsZFzGDTu18BabLxCEZ
+ hXxhZMA9k/BvVJKq7V3u5SH5vryme9EkXqjzOcZc5GcXsDOcNNBD/NwgTz+v3aFsOG2yEqok1
+ LjQI301Rfsoi0SBx0AZ1C9/4BhDjP+NdxO5uGeQOu0tcjzsQIxAvDBqmD4wWG6TqhjGVBgp3b
+ i5cDcSL4z99zizdVyf9d+OWblgVAEOE46UUb0r6+TKZoSafChihcE6Vm5xDiB46CxevH4XgCg
+ D39boeEl0p6GDYm9F6N4tO+1N6hia0o6dyznV2kBVeTlpw1LoEz7E1gLUBR6X1hbH/EnmRZnz
+ WFmRJgqnf5PUlpat7Czvh0jqs0Y1ycRLidasRF9t39n1iYrQgWpOoGfxC05K01Dt4rPKrugq8
+ FfvZR+w7NvyHXi3U/nxDfntlPx/4bvTv21iHi6EU1vptQThh1/7+wPR9S4lx3/vco6QEkRut4
+ YUkh8XAvV6gFReBpIcwqsfIdUz5RQ+tj1Pi0TzOOA4Wm9e7wK6fTKzkN5XQ2kPw/Wq4q3XnlN
+ EUewPMNzjf0lKPCJcceF4flDut2eAwVXDf1ytoMcaUS9+B3g==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.15.3
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
+ replication
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,104 +94,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Ortiz <sameo@linux.intel.com>,
- Kashyap Chamarthy <kchamart@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We had a conversation some months back about ways we might switch
-away from the current handling of pull requests which I do via some
-hand-curated scripts and personal access to machines, to a more
-automated system that could be operated by a wider range of people.
-Unfortunately that conversation took place off-list (largely my fault
-for forgetting a cc: at the beginning of the email chain), and in any
-case it sort of fizzled out.  So let's restart it, on the mailing
-list this time.
+On Fri, 16 Aug 2019 01:51:20 +0000
+"Zhang, Chen" <chen.zhang@intel.com> wrote:
 
-Here's a summary of stuff from the old thread and general
-explanation of the problem:
+> > -----Original Message-----
+> > From: Lukas Straub [mailto:lukasstraub2@web.de]
+> > Sent: Friday, August 16, 2019 3:48 AM
+> > To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Cc: qemu-devel <qemu-devel@nongnu.org>; Zhang, Chen
+> > <chen.zhang@intel.com>; Jason Wang <jasowang@redhat.com>; Xie
+> > Changlong <xiechanglong.d@gmail.com>; Wen Congyang
+> > <wencongyang2@huawei.com>
+> > Subject: Re: [Qemu-devel] [PATCH v2 0/3] colo: Add support for contini=
+ous
+> > replication
+> >
+> > On Thu, 15 Aug 2019 19:57:37 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >
+> > > * Lukas Straub (lukasstraub2@web.de) wrote:
+> > > > Hello Everyone,
+> > > > These Patches add support for continious replication to colo.
+> > > > Please review.
+> > >
+> > >
+> > > OK, for those who haven't followed COLO for so long; 'continuous
+> > > replication' is when after the first primary fails, you can promote
+> > > the original secondary to a new primary and start replicating again;
+> > >
+> > > i.e. current COLO gives you
+> > >
+> > > p<->s
+> > >     <primary fails>
+> > >     s
+> > >
+> > > with your patches you can do
+> > >
+> > >     s becomes p2
+> > >     p2<->s2
+> > >
+> > > and you're back to being resilient again.
+> > >
+> > > Which is great; because that was always an important missing piece.
+> > >
+> > > Do you have some test scripts/setup for this - it would be great to
+> > > automate some testing.
+> >
+> > My Plan is to write a Pacemaker Resource Agent[1] for qemu-colo and th=
+en do
+> > some long-term testing in my small cluster here. Writing standalone te=
+sts using
+> > that Resource Agent should be easy, it just needs to be provided with =
+the right
+> > arguments and environment Variables.
+>
+> Thanks Dave's explanation.
+> It looks good for me and I will test this series in my side.
+>
+> Another question: Is "Pacemaker Resource Agent[1] "  like a heartbeat mo=
+dule?
 
-My current setup is mostly just running the equivalent of
-"make && make check" on a bunch of machines and configs
-on the merge commit before I push it to master. I also do
-a 'make check-tcg' on one of the builds and run a variant
-of the 'linux-user-test' tarball of 'ls' binaries.
-The scripts do some simple initial checks which mostly are
-preventing problems seen in the past:
- * don't allow submodules to be updated unless I kick the
-   merge off with a command line option saying submodule updates
-   are OK here (this catches accidental misdriving of git by
-   a submaintainer folding a submodule change into a patch
-   during a rebase)
- * check we aren't trying to merge after tagging the final
-   release but before doing the 'reopen development tree'
-   commit that bumps the VERSION file
- * check for bogus "author is qemu-devel@nongnu.org" commits
- * check for UTF-8 mangling
- * check the gpg signature on the pullreq
-A human needs to also eyeball the commits and the diffstat
-for weird stuff (usually cursory for frequent pullreq submitters,
-and more carefully for new submaintainers).
+It's a bit more than that. Pacemaker itself is an Cluster Resource Manager=
+, you can think of it like sysvinit but for clusters. It controls where in=
+ the cluster Resources run, what state (master/slave) and what to do in ca=
+se of a Node or Resource failure. Now Resources can be anything like SQL-S=
+erver, Webserver, VM, etc. and Pacemaker itself doesn't directly control t=
+hem, that's the Job of the Resource Agents. So a Resource Agent is like an=
+ init-script, but cluster-aware with more actions like start, stop, monito=
+r, promote (to master) or migrate-to.
 
-I have this semi-automated with some hacky scripts.  The major thing we
-need for a replacement is the coverage of different host
-architectures and operating systems, which is a poor match to most of
-the cloud-CI services out there (including Travis).  We also want the
-tests to run in a reasonably short wall-clock time from being kicked
-off.
+> I have wrote an internal heartbeat module running on Qemu, it make COLO =
+can detect fail and trigger failover automatically, no need external APP t=
+o call the QMP command "x-colo-lost-heartbeat". If you need it, I can send=
+ a RFC version recently.
 
-Awkward bonus extra requirement: it would be useful to be
-able to do a merge CI run "privately", eg because the thing
-being tested is a fix for a security bug that's not yet
-public. But that's rare so we can probably do it by hand.
+Cool, this should be faster to failover than with Pacemaker.
+What is the plan with cases like Primary-failover, which need to issue mul=
+tiple commands?
 
-There are some other parts to this, like getting some kind of
-project-role-account access to machines where that's OK, or finding
-replacements where the machines really are my personal ones or
-otherwise not OK for project access.  But I think that should be
-fairly easy to resolve so let's keep this thread to the
-automating-the-CI part.
+> Thanks
+> Zhang Chen
+> >
+> > Regards,
+> > Lukas Straub
+> >
+> > [1] https://github.com/ClusterLabs/resource-agents/blob/master/doc/dev=
+-guides/ra-dev-guide.asc#what-is-a-resource-agent
 
-The two major contenders suggested were:
-
-(1) GitLab CI, which supports custom 'runners' which we can set
-up to run builds and tests on machines we have project access to
-
-(2) Patchew, which can handle running tests on multiple machines (eg
-we do s390 testing today for all patches on list), and which we could
-enhance to provide support for the release-manager to do their work
-
-Advantages of Gitlab CI:
- * somebody else is doing the development and maintainance of the
-   CI tool -- bigger 'bus factor' than patchew
- * already does (more or less) what we want without needing
-   extra coding work
-
-Advantages of Patchew:
- * we're already using it for patch submissions, so we know it's
-   not going to go away
- * it's very easy to deploy to a new host
- * no dependencies except Python, so works anywhere we expect
-   to be able to build QEMU (whereas gitlab CI's runner is
-   written in Go, and there seem to be ongoing issues with getting
-   it actually to compile for other architectures than x86)
-
-I don't have an opinion really, but I think it would be good to
-make a choice and start working forwards towards getting this
-a bit less hacky and a bit more offloadable to other people.
-
-Perhaps a good first step would be to keep the 'simple checks
-of broken commits' part done as a local script but have the
-CI done via "push proposed merge commit to $SOMEWHERE to
-kick off the CI".
-
-Input, opinions, recommendations, offers to do some of the work? :-)
-
-thanks
--- PMM
 
