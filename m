@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01FD0C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:22:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B449C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:22:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9B9421655
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:22:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 074C820578
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:22:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j6kpUeSE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B9421655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Temk+DzG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 074C820578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55977 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycBK-0000Iw-F3
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:22:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35228)
+	id 1hycBz-0001TE-UF
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:22:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6o-0003Lv-Cb
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:36 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6m-0005QZ-JF
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc6m-0003KF-DE
  for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:34 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:54855)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc6k-0005OS-EI
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:32 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36655)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyc6m-0005O9-9S
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:32 -0400
-Received: by mail-wm1-x335.google.com with SMTP id p74so4022923wme.4
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:30 -0700 (PDT)
+ id 1hyc6i-0005MP-FR
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:29 -0400
+Received: by mail-wm1-x344.google.com with SMTP id g67so4054221wme.1
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=C/JEEaZRwqLGuvRocz89/Usr+xyIhfyyDXXpmxVSBvI=;
- b=j6kpUeSE+0hpVOmsBWC56DSFLDS2Yki5H6ITbYDnoE+si+4EynVU/5Ca0e4ngDeOL7
- 5JiHHbMoDB4UH/2HETRmzLP5NJfFxDZIH5UaxHZ0e8qGh5xIY6EMtAyTiiDRjB5cdL5+
- hdseATFko0Dp0nbH5UXtNgxcu955Jo9InD43o9B1b10Zvk0pD291vz0RsJeDot+S7Ffg
- nZEeamC2K1iTSnQ+W08a/AsbiUI08KJm0Ztc4RoIZreWmly5asDhKrgylYowtKZKip5M
- 8q65WIC0GpMGIA19eDOCFsxG0b+Mjt9F0Xl5ryw+/jjUbAoV51rs/A01aF/XTwcKXVGi
- tAPA==
+ bh=76ecM/cWxU2pi1qdezlFa30IZV4ybXEykWFXG4uli2k=;
+ b=Temk+DzGTKIPpy9wvpuyzjyxDfdzQXCBLZxskC1vuP2nCe0vp5iwG+BTVzeegQ+Xdl
+ L3RXkJz+LOzk7IsGQZMs6K3Vzn3VQ4UDqMkXx/FUtOHRhbVS6luc6qa7Lbk1V19CQKOc
+ 3OW14efJie9VNJLny5qdzECE919LMGfPRG/j1ZsD6guZGFy5aITI80LOBSf1Kren6Qm/
+ qh0++P3/F/plmTFPqGKpiS2SunBXoLP/W0Zjlcn8sfDfs+96uOCsyXRdr2p73JIFN7x1
+ HsXGDlucPLrB4tonmFnJA1tanTCrDoULRkH6AW2mty90lz0srn1d2BrN1Dcujoi7ntIc
+ AvUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=C/JEEaZRwqLGuvRocz89/Usr+xyIhfyyDXXpmxVSBvI=;
- b=brNRWy5D1PfojFFMxvyNWgjv7003/FV9PHyaJhWO3By88Os37yicntTfEi5t9zIGI3
- 64hO9kTui50eL0NW+g5vJL73yBz9FmtXoZ7hUucGDHiW/wBzvH6tE2gPm39vz/NlMYcE
- StelV1JSdDAjWoPp7OEWTDEY4aGrqWW1a4LX41sX7QsZImLkelol9RVirdnb0SS4ZBUI
- zeDjwiZlF+pYAX3HY9HcPUwkdTePFzgmdWv6hlrGwSAxOGtWXv4z6iO2xqfFgFrnwYbN
- qUP6DuNSMhhNdJtAOjoEyoiOhdhCcRRFTjAVqI+I7JOTIJN53G+uY+vA9pnIOonQigko
- HejQ==
-X-Gm-Message-State: APjAAAVO5yrQ7KEIloYcPsQw/zA3wlWXYmqKeBUR9LMxrBVBPOmsgIem
- ImbDFVYPF5zIW3XGn/i4ezbC5CL1oaaXqQ==
-X-Google-Smtp-Source: APXvYqxZXJAL9dP6Hu33w+V8ifNV1p0DlCkdqNUv7uF8uIyHavx/Aq0k6hqanl1DI55d6k8mnMI/xQ==
-X-Received: by 2002:a1c:107:: with SMTP id 7mr7515583wmb.84.1565961449492;
- Fri, 16 Aug 2019 06:17:29 -0700 (PDT)
+ bh=76ecM/cWxU2pi1qdezlFa30IZV4ybXEykWFXG4uli2k=;
+ b=thdpiHq1j5tdMP2/skmcocjSu4k1+ESjDFBKQCkRptesXvL9nJ5cPzze0GoIZvu5gK
+ 1igaGb5nmCgscIyf4/HlkoCG8uOxXGHQ2YmFpa+zAHzY6ei4vlNolrGrDFDEUq17VY43
+ V9tCil7DvbJoLXWCNlbGIK85MRvP35lRsWaP0GZ7AeimloK1RxeqQMP7g+PdS/bc5qOC
+ hCXQrGHce7aSfhsbs6Mqjrzs4QRmkrnXx6ZKMChdTkaBCAugsLwps2lwADWr/YwhJXL2
+ Vn/XVgK8tLoabw/o6E/cyCrJcgkQpUURN94PnghFF5sppw475TzL4O/qkaJK48w82las
+ OUWg==
+X-Gm-Message-State: APjAAAUeNHpWpO0IjRvP9kOJa5e7DnPZfHulp5vDtPzfb15ukjTbSduV
+ iQwYIPxHbH5Io8E2CDm1M5fELHTaO1hZPg==
+X-Google-Smtp-Source: APXvYqz3ot4eNN3pe5h2DYzwXLyhX6CcDEdjWh+lxPiMVBukv74MjuCiW4zbDEGCr82hvwu3XCHSug==
+X-Received: by 2002:a1c:f916:: with SMTP id x22mr2647889wmh.156.1565961446675; 
+ Fri, 16 Aug 2019 06:17:26 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.28
+ by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.25
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Aug 2019 06:17:28 -0700 (PDT)
+ Fri, 16 Aug 2019 06:17:26 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 14:16:58 +0100
-Message-Id: <20190816131719.28244-9-peter.maydell@linaro.org>
+Date: Fri, 16 Aug 2019 14:16:55 +0100
+Message-Id: <20190816131719.28244-6-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190816131719.28244-1-peter.maydell@linaro.org>
 References: <20190816131719.28244-1-peter.maydell@linaro.org>
@@ -81,8 +81,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::335
-Subject: [Qemu-devel] [PULL 08/29] target/arm: Introduce read_pc
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PULL 05/29] target/arm: Fix routing of singlestep
+ exceptions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,217 +99,137 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+When generating an architectural single-step exception we were
+routing it to the "default exception level", which is to say
+the same exception level we execute at except that EL0 exceptions
+go to EL1. This is incorrect because the debug exception level
+can be configured by the guest for situations such as single
+stepping of EL0 and EL1 code by EL2.
 
-We currently have 3 different ways of computing the architectural
-value of "PC" as seen in the ARM ARM.
+We have to track the target debug exception level in the TB
+flags, because it is dependent on CPU state like HCR_EL2.TGE
+and MDCR_EL2.TDE. (That we were previously calling the
+arm_debug_target_el() function to determine dc->ss_same_el
+is itself a bug, though one that would only have manifested
+as incorrect syndrome information.) Since we are out of TB
+flag bits unless we want to expand into the cs_base field,
+we share some bits with the M-profile only HANDLER and
+STACKCHECK bits, since only A-profile has this singlestep.
 
-The value of s->pc has been incremented past the current insn,
-but that is all.  Thus for a32, PC = s->pc + 4; for t32, PC = s->pc;
-for t16, PC = s->pc + 2.  These differing computations make it
-impossible at present to unify the various code paths.
-
-With the newly introduced s->pc_curr, we can compute the correct
-value for all cases, using the formula given in the ARM ARM.
-
-This changes the behaviour for load_reg() and load_reg_var()
-when called with reg==15 from a 32-bit Thumb instruction:
-previously they would have returned the incorrect value
-of pc_curr + 6, and now they will return the architecturally
-correct value of PC, which is pc_curr + 4. This will not
-affect well-behaved guest software, because all of the places
-we call these functions from T32 code are instructions where
-using r15 is UNPREDICTABLE. Using the architectural PC value
-here is more consistent with the T16 and A32 behaviour.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190807045335.1361-4-richard.henderson@linaro.org
-[PMM: added commit message note about UNPREDICTABLE T32 cases]
+Fixes: https://bugs.launchpad.net/qemu/+bug/1838913
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20190805130952.4415-3-peter.maydell@linaro.org
 ---
- target/arm/translate.c | 59 ++++++++++++++++--------------------------
- 1 file changed, 23 insertions(+), 36 deletions(-)
+ target/arm/cpu.h           |  5 +++++
+ target/arm/translate.h     | 15 +++++++++++----
+ target/arm/helper.c        |  6 ++++++
+ target/arm/translate-a64.c |  2 +-
+ target/arm/translate.c     |  4 +++-
+ 5 files changed, 26 insertions(+), 6 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 67f2af0e169..d12c7460859 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3148,6 +3148,11 @@ FIELD(TBFLAG_ANY, PSTATE_SS, 26, 1)
+ /* Target EL if we take a floating-point-disabled exception */
+ FIELD(TBFLAG_ANY, FPEXC_EL, 24, 2)
+ FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
++/*
++ * For A-profile only, target EL for debug exceptions.
++ * Note that this overlaps with the M-profile-only HANDLER and STACKCHECK bits.
++ */
++FIELD(TBFLAG_ANY, DEBUG_TARGET_EL, 21, 2)
+ 
+ /* Bit usage when in AArch32 state: */
+ FIELD(TBFLAG_A32, THUMB, 0, 1)
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 45053190baa..b65954c669b 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -50,6 +50,8 @@ typedef struct DisasContext {
+     uint32_t svc_imm;
+     int aarch64;
+     int current_el;
++    /* Debug target exception level for single-step exceptions */
++    int debug_target_el;
+     GHashTable *cp_regs;
+     uint64_t features; /* CPU features bits */
+     /* Because unallocated encodings generate different exception syndrome
+@@ -70,8 +72,6 @@ typedef struct DisasContext {
+      * ie A64 LDX*, LDAX*, A32/T32 LDREX*, LDAEX*.
+      */
+     bool is_ldex;
+-    /* True if a single-step exception will be taken to the current EL */
+-    bool ss_same_el;
+     /* True if v8.3-PAuth is active.  */
+     bool pauth_active;
+     /* True with v8.5-BTI and SCTLR_ELx.BT* set.  */
+@@ -251,8 +251,15 @@ static inline void gen_exception(int excp, uint32_t syndrome,
+ /* Generate an architectural singlestep exception */
+ static inline void gen_swstep_exception(DisasContext *s, int isv, int ex)
+ {
+-    gen_exception(EXCP_UDEF, syn_swstep(s->ss_same_el, isv, ex),
+-                  default_exception_el(s));
++    bool same_el = (s->debug_target_el == s->current_el);
++
++    /*
++     * If singlestep is targeting a lower EL than the current one,
++     * then s->ss_active must be false and we can never get here.
++     */
++    assert(s->debug_target_el >= s->current_el);
++
++    gen_exception(EXCP_UDEF, syn_swstep(same_el, isv, ex), s->debug_target_el);
+ }
+ 
+ /*
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b74c23a9bc0..24806c16ca2 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11170,6 +11170,12 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         }
+     }
+ 
++    if (!arm_feature(env, ARM_FEATURE_M)) {
++        int target_el = arm_debug_target_el(env);
++
++        flags = FIELD_DP32(flags, TBFLAG_ANY, DEBUG_TARGET_EL, target_el);
++    }
++
+     *pflags = flags;
+     *cs_base = 0;
+ }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index f6729b96fd0..90850eadc1b 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -14180,7 +14180,7 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+     dc->ss_active = FIELD_EX32(tb_flags, TBFLAG_ANY, SS_ACTIVE);
+     dc->pstate_ss = FIELD_EX32(tb_flags, TBFLAG_ANY, PSTATE_SS);
+     dc->is_ldex = false;
+-    dc->ss_same_el = (arm_debug_target_el(env) == dc->current_el);
++    dc->debug_target_el = FIELD_EX32(tb_flags, TBFLAG_ANY, DEBUG_TARGET_EL);
+ 
+     /* Bound the number of insns to execute to those left on the page.  */
+     bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index fed08c63f81..41523c0241f 100644
+index 19b9d8f2725..b32508cd2f9 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -196,17 +196,17 @@ static inline void store_cpu_offset(TCGv_i32 var, int offset)
- #define store_cpu_field(var, name) \
-     store_cpu_offset(var, offsetof(CPUARMState, name))
+@@ -11882,7 +11882,9 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     dc->ss_active = FIELD_EX32(tb_flags, TBFLAG_ANY, SS_ACTIVE);
+     dc->pstate_ss = FIELD_EX32(tb_flags, TBFLAG_ANY, PSTATE_SS);
+     dc->is_ldex = false;
+-    dc->ss_same_el = false; /* Can't be true since EL_d must be AArch64 */
++    if (!arm_feature(env, ARM_FEATURE_M)) {
++        dc->debug_target_el = FIELD_EX32(tb_flags, TBFLAG_ANY, DEBUG_TARGET_EL);
++    }
  
-+/* The architectural value of PC.  */
-+static uint32_t read_pc(DisasContext *s)
-+{
-+    return s->pc_curr + (s->thumb ? 4 : 8);
-+}
-+
- /* Set a variable to the value of a CPU register.  */
- static void load_reg_var(DisasContext *s, TCGv_i32 var, int reg)
- {
-     if (reg == 15) {
--        uint32_t addr;
--        /* normally, since we updated PC, we need only to add one insn */
--        if (s->thumb)
--            addr = (long)s->pc + 2;
--        else
--            addr = (long)s->pc + 4;
--        tcg_gen_movi_i32(var, addr);
-+        tcg_gen_movi_i32(var, read_pc(s));
-     } else {
-         tcg_gen_mov_i32(var, cpu_R[reg]);
-     }
-@@ -7853,16 +7853,14 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             /* branch link and change to thumb (blx <offset>) */
-             int32_t offset;
+     dc->page_start = dc->base.pc_first & TARGET_PAGE_MASK;
  
--            val = (uint32_t)s->pc;
-             tmp = tcg_temp_new_i32();
--            tcg_gen_movi_i32(tmp, val);
-+            tcg_gen_movi_i32(tmp, s->pc);
-             store_reg(s, 14, tmp);
-             /* Sign-extend the 24-bit offset */
-             offset = (((int32_t)insn) << 8) >> 8;
-+            val = read_pc(s);
-             /* offset * 4 + bit24 * 2 + (thumb bit) */
-             val += (offset << 2) | ((insn >> 23) & 2) | 1;
--            /* pipeline offset */
--            val += 4;
-             /* protected by ARCH(5); above, near the start of uncond block */
-             gen_bx_im(s, val);
-             return;
-@@ -9138,10 +9136,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                         } else {
-                             /* store */
-                             if (i == 15) {
--                                /* special case: r15 = PC + 8 */
--                                val = (long)s->pc + 4;
-                                 tmp = tcg_temp_new_i32();
--                                tcg_gen_movi_i32(tmp, val);
-+                                tcg_gen_movi_i32(tmp, read_pc(s));
-                             } else if (user) {
-                                 tmp = tcg_temp_new_i32();
-                                 tmp2 = tcg_const_i32(i);
-@@ -9207,15 +9203,13 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 int32_t offset;
- 
-                 /* branch (and link) */
--                val = (int32_t)s->pc;
-                 if (insn & (1 << 24)) {
-                     tmp = tcg_temp_new_i32();
--                    tcg_gen_movi_i32(tmp, val);
-+                    tcg_gen_movi_i32(tmp, s->pc);
-                     store_reg(s, 14, tmp);
-                 }
-                 offset = sextract32(insn << 2, 0, 26);
--                val += offset + 4;
--                gen_jmp(s, val);
-+                gen_jmp(s, read_pc(s) + offset);
-             }
-             break;
-         case 0xc:
-@@ -9573,12 +9567,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 tcg_temp_free_i32(addr);
-             } else if ((insn & (7 << 5)) == 0) {
-                 /* Table Branch.  */
--                if (rn == 15) {
--                    addr = tcg_temp_new_i32();
--                    tcg_gen_movi_i32(addr, s->pc);
--                } else {
--                    addr = load_reg(s, rn);
--                }
-+                addr = load_reg(s, rn);
-                 tmp = load_reg(s, rm);
-                 tcg_gen_add_i32(addr, addr, tmp);
-                 if (insn & (1 << 4)) {
-@@ -9594,7 +9583,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 }
-                 tcg_temp_free_i32(addr);
-                 tcg_gen_shli_i32(tmp, tmp, 1);
--                tcg_gen_addi_i32(tmp, tmp, s->pc);
-+                tcg_gen_addi_i32(tmp, tmp, read_pc(s));
-                 store_reg(s, 15, tmp);
-             } else {
-                 bool is_lasr = false;
-@@ -10327,7 +10316,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                     tcg_gen_movi_i32(cpu_R[14], s->pc | 1);
-                 }
- 
--                offset += s->pc;
-+                offset += read_pc(s);
-                 if (insn & (1 << 12)) {
-                     /* b/bl */
-                     gen_jmp(s, offset);
-@@ -10568,7 +10557,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 offset |= (insn & (1 << 11)) << 8;
- 
-                 /* jump to the offset */
--                gen_jmp(s, s->pc + offset);
-+                gen_jmp(s, read_pc(s) + offset);
-             }
-         } else {
-             /*
-@@ -11062,7 +11051,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-         if (insn & (1 << 11)) {
-             rd = (insn >> 8) & 7;
-             /* load pc-relative.  Bit 1 of PC is ignored.  */
--            val = s->pc + 2 + ((insn & 0xff) * 4);
-+            val = read_pc(s) + ((insn & 0xff) * 4);
-             val &= ~(uint32_t)2;
-             addr = tcg_temp_new_i32();
-             tcg_gen_movi_i32(addr, val);
-@@ -11449,7 +11438,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-         } else {
-             /* PC. bit 1 is ignored.  */
-             tmp = tcg_temp_new_i32();
--            tcg_gen_movi_i32(tmp, (s->pc + 2) & ~(uint32_t)2);
-+            tcg_gen_movi_i32(tmp, read_pc(s) & ~(uint32_t)2);
-         }
-         val = (insn & 0xff) * 4;
-         tcg_gen_addi_i32(tmp, tmp, val);
-@@ -11569,9 +11558,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-                 tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, s->condlabel);
-             tcg_temp_free_i32(tmp);
-             offset = ((insn & 0xf8) >> 2) | (insn & 0x200) >> 3;
--            val = (uint32_t)s->pc + 2;
--            val += offset;
--            gen_jmp(s, val);
-+            gen_jmp(s, read_pc(s) + offset);
-             break;
- 
-         case 15: /* IT, nop-hint.  */
-@@ -11735,7 +11722,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-         arm_skip_unless(s, cond);
- 
-         /* jump to the offset */
--        val = (uint32_t)s->pc + 2;
-+        val = read_pc(s);
-         offset = ((int32_t)insn << 24) >> 24;
-         val += offset << 1;
-         gen_jmp(s, val);
-@@ -11761,9 +11748,9 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-             break;
-         }
-         /* unconditional branch */
--        val = (uint32_t)s->pc;
-+        val = read_pc(s);
-         offset = ((int32_t)insn << 21) >> 21;
--        val += (offset << 1) + 2;
-+        val += offset << 1;
-         gen_jmp(s, val);
-         break;
- 
-@@ -11787,7 +11774,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-             /* 0b1111_0xxx_xxxx_xxxx : BL/BLX prefix */
-             uint32_t uoffset = ((int32_t)insn << 21) >> 9;
- 
--            tcg_gen_movi_i32(cpu_R[14], s->pc + 2 + uoffset);
-+            tcg_gen_movi_i32(cpu_R[14], read_pc(s) + uoffset);
-         }
-         break;
-     }
 -- 
 2.20.1
 
