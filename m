@@ -2,74 +2,56 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F82C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AA7C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:43:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A09E32064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:28:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A09E32064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5266C206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 04:43:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5266C206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyTrA-0006Rz-Qv
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 00:28:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43965)
+	id 1hyU5S-00011o-FD
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 00:43:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1hyTqP-0005uA-F4
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:28:06 -0400
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1hyU4k-0000TP-Ji
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:42:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hyTqN-0000Fa-Et
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:28:05 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38222)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hyTqN-0000DG-92
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:28:03 -0400
-Received: by mail-pg1-f196.google.com with SMTP id e11so2299016pga.5
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 21:28:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=3u3ukdBsD3ecgQxpmyv7waCPQyX01dzxGzwo89XfmBI=;
- b=Q7njPaGmPK9kaiF0npu+pU7xOqonAEKAfaOqDhMM6mcrgj88q5eKQcKxfNkzV+4jin
- MBFCy1GJkESrgZK4PrqaA59EmlGRMKXAUU41A4qe9A8jorXLCcDdnrIVWU7WkWsyphBx
- KudZQRyldQp7S8C75bGzs2Xj6dFeym9kUyb/X5v+imJMeG0kDUUQJrl1bk8f86NumLuW
- URL0mzCQ608IncABXUFrhwi5ADImZMGYdc7uMbiE0wxctjPJdTovJPaXT4IGfWQZxIRt
- HKLzi7JzMZ6c7zHf5MNXlCGd5Er53V4TdzBCXHQKneo0ADLshOB3X8TuOFSUFutgM2dv
- 87ww==
-X-Gm-Message-State: APjAAAUxcS22W4HyRtzsPon3/mVoIlgFIfXIXTMSpmWYl5lAwog/aj3G
- Ytsl7pAQl4kIx/Xajs6V/prdrA==
-X-Google-Smtp-Source: APXvYqzLqstgZGdE3PBEFMpteBIGln9P0hlo9HoeaNR4xCUiQYFiO0uKbnNJcxGSuZnD9MxLOilR2w==
-X-Received: by 2002:a63:3281:: with SMTP id y123mr6015867pgy.72.1565929681989; 
- Thu, 15 Aug 2019 21:28:01 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id a15sm4924448pfg.102.2019.08.15.21.27.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Aug 2019 21:28:01 -0700 (PDT)
-Date: Fri, 16 Aug 2019 12:27:49 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Message-ID: <20190816042749.GC3114@xz-x1>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-8-eric.auger@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190730172137.23114-8-eric.auger@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.215.196
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 07/15] virtio-iommu: Implement
- attach/detach command
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1hyU4j-0004zr-Bh
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 00:42:54 -0400
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:6236)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <maozhongyi@cmss.chinamobile.com>)
+ id 1hyU4i-0004qT-5z; Fri, 16 Aug 2019 00:42:53 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.5]) by
+ rmmx-syy-dmz-app11-12011 (RichMail) with SMTP id 2eeb5d56342c64b-e1608;
+ Fri, 16 Aug 2019 12:42:20 +0800 (CST)
+X-RM-TRANSID: 2eeb5d56342c64b-e1608
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from maozy-host.mshome.net (unknown[112.25.154.149])
+ by rmsmtp-syy-appsvr03-12003 (RichMail) with SMTP id 2ee35d563424051-48588;
+ Fri, 16 Aug 2019 12:42:20 +0800 (CST)
+X-RM-TRANSID: 2ee35d563424051-48588
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+To: qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org
+Date: Fri, 16 Aug 2019 12:41:56 +0800
+Message-Id: <20190816044156.386502-1-maozhongyi@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 221.176.66.81
+Subject: [Qemu-devel] [PATCH] isa/pc87312: use
+ device_class_set_parent_realize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,101 +63,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, mst@redhat.com,
- tn@semihalf.com, qemu-devel@nongnu.org, alex.williamson@redhat.com,
- qemu-arm@nongnu.org, jean-philippe@linaro.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+Cc: hpoussin@reactos.org, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 30, 2019 at 07:21:29PM +0200, Eric Auger wrote:
-> This patch implements the endpoint attach/detach to/from
-> a domain.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> ---
->  hw/virtio/virtio-iommu.c | 40 ++++++++++++++++++++++++++++++++++------
->  1 file changed, 34 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> index 77dccecc0a..5ea0930cc2 100644
-> --- a/hw/virtio/virtio-iommu.c
-> +++ b/hw/virtio/virtio-iommu.c
-> @@ -80,8 +80,8 @@ static void virtio_iommu_detach_endpoint_from_domain(viommu_endpoint *ep)
->      ep->domain = NULL;
->  }
->  
-> -viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s, uint32_t ep_id);
-> -viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s, uint32_t ep_id)
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+---
+ hw/isa/pc87312.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-These lines were just introduced in previous patch, I wanted to ask
-why the definition was needed but I don't know whether it'll be used
-in follow up patches.  Looks like it wasn't really used.
-
-I would prefer patches like these to be squashed together not only to
-avoid the maintainance of diffs like this between patches, but also as
-a reviewer it'll be easier too when with all the contexts together.
-But I won't ask for it because it can be a personal preference only...
-
-> +static viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
-> +                                                  uint32_t ep_id)
->  {
->      viommu_endpoint *ep;
->  
-> @@ -110,8 +110,8 @@ static void virtio_iommu_put_endpoint(gpointer data)
->      g_free(ep);
->  }
->  
-> -viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s, uint32_t domain_id);
-> -viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s, uint32_t domain_id)
-> +static viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s,
-> +                                              uint32_t domain_id)
->  {
->      viommu_domain *domain;
->  
-> @@ -187,10 +187,27 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
->  {
->      uint32_t domain_id = le32_to_cpu(req->domain);
->      uint32_t ep_id = le32_to_cpu(req->endpoint);
-> +    viommu_domain *domain;
-> +    viommu_endpoint *ep;
->  
->      trace_virtio_iommu_attach(domain_id, ep_id);
->  
-> -    return VIRTIO_IOMMU_S_UNSUPP;
-> +    ep = virtio_iommu_get_endpoint(s, ep_id);
-> +    if (ep->domain) {
-> +        /*
-> +         * the device is already attached to a domain,
-> +         * detach it first
-> +         */
-> +        virtio_iommu_detach_endpoint_from_domain(ep);
-
-Hmm... so this can be called without virtio_iommu_put_endpoint().
-Then I think we'd better move:
-
-        g_tree_unref(ep->domain->mappings);
-
-From virtio_iommu_put_endpoint() to inside
-virtio_iommu_detach_endpoint_from_domain() otherwise domain refs might
-leak?
-
-> +    }
-> +
-> +    domain = virtio_iommu_get_domain(s, domain_id);
-> +    QLIST_INSERT_HEAD(&domain->endpoint_list, ep, next);
-> +
-> +    ep->domain = domain;
-> +    g_tree_ref(domain->mappings);
-> +
-> +    return VIRTIO_IOMMU_S_OK;
->  }
-
-Regards,
-
+diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
+index 85dbc94439..e95176c148 100644
+--- a/hw/isa/pc87312.c
++++ b/hw/isa/pc87312.c
+@@ -336,8 +336,8 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     ISASuperIOClass *sc = ISA_SUPERIO_CLASS(klass);
+ 
+-    sc->parent_realize = dc->realize;
+-    dc->realize = pc87312_realize;
++    device_class_set_parent_realize(dc, pc87312_realize,
++                                    &sc->parent_realize);
+     dc->reset = pc87312_reset;
+     dc->vmsd = &vmstate_pc87312;
+     dc->props = pc87312_properties;
 -- 
-Peter Xu
+2.17.1
+
+
+
 
