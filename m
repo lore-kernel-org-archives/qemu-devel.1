@@ -2,64 +2,63 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A95FC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BD7C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:19:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 175752086C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82D932086C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:19:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Wekzw6zx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 175752086C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ahhNc9Sj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D932086C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyazR-0005Gi-4u
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 08:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54249)
+	id 1hybCW-0007bX-8e
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 08:19:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1hyayd-0004Se-5d
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:05:04 -0400
+ (envelope-from <berto@igalia.com>) id 1hybBk-000779-Es
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hyayc-0004dJ-2Q
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:05:03 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45421 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hyayV-0004XL-9N; Fri, 16 Aug 2019 08:04:56 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46927M0thdz9sML; Fri, 16 Aug 2019 22:04:47 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1565957087;
- bh=1OQXK0o9OvoNPapWpbimPbhqPrE5Qa0PGQHKlRYcMkI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Wekzw6zxxq4IvC7+Zbnwqdia1xVqewDn7eX7Ht9Y83gQasjzBhjYu5PoAd/WiLpW0
- 0PKntAaqTZcpID4Z8EVVQ0BYFf4MjOJ+3toNPAxMyQTRRcgQcAbv4eU/EBfCSgFmWB
- Crykn4dJVY56dnF3V1Dz6Ofl/uRZ25H6HxZL3I/0=
-Date: Fri, 16 Aug 2019 21:43:05 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190816114305.GB2259@umbus.fritz.box>
-References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
- <a7d6eede-b152-4c06-8945-9607c663b99c@redhat.com>
+ (envelope-from <berto@igalia.com>) id 1hybBj-00030D-Am
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:18:36 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:59233)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1hybBi-0002tK-OL; Fri, 16 Aug 2019 08:18:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
+ bh=kMp+Z1h2lmxxg+9HRG11IvGXojEB99vDrhYJK/rqEWw=; 
+ b=ahhNc9SjxrHRK6P0mMuwnFo1UINCXJIYJ/r5KWYssg8Yi+1Wf4r44gXHgjcyb577NbjqiPBvM+PC4TRtmhDzfacdMWKfqye60qtf7IcDlCqtY0sF3eiNIY6CiraTSfNMZiDwdtGP+mNMx3D6CQLKMrJ21Ull1lM5JxQ4Bh4djV2hJctcZpCwar9kAAN1RYHxTIr5E0Lpdcd/AINXtWXoCX3tQCeOIMXHL5U21Ny+uCFxW6cnJbtA8+NbsudxufRiK2SpGz+0ynwUKp89Sayig2Th+KxMCIx+3V8b7rVE2lICzDe9I/5myrhPGNxWDl6V/C5oucbF0dSTbTpBt1e5jQ==;
+Received: from 82-181-154-206.bb.dnainternet.fi ([82.181.154.206]
+ helo=perseus.local) by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1hybBP-0004s4-0W; Fri, 16 Aug 2019 14:18:15 +0200
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1hybAz-0007iH-SS; Fri, 16 Aug 2019 15:17:49 +0300
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 16 Aug 2019 15:17:42 +0300
+Message-Id: <20190816121742.29607-1-berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="DKU6Jbt7q3WqK7+M"
-Content-Disposition: inline
-In-Reply-To: <a7d6eede-b152-4c06-8945-9607c663b99c@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v7 00/42] Invert Endian bit in SPARCv9 MMU
- TTE
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 91.117.99.155
+Subject: [Qemu-devel] [PATCH] qcow2: Fix the calculation of the maximum L2
+ cache size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,104 +70,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frederic.konrad@adacore.com, berto@igalia.com, qemu-block@nongnu.org,
- arikalo@wavecomp.com, pasic@linux.ibm.com, hpoussin@reactos.org,
- anthony.perard@citrix.com, xen-devel@lists.xenproject.org, jasowang@redhat.com,
- jiri@resnulli.us, ehabkost@redhat.com, b.galvani@gmail.com,
- eric.auger@redhat.com, alex.williamson@redhat.com, stefanha@redhat.com,
- jsnow@redhat.com, rth@twiddle.net, kwolf@redhat.com, andrew@aj.id.au,
- claudio.fontana@suse.com, crwulff@gmail.com, laurent@vivier.eu,
- sundeep.lkml@gmail.com, michael@walle.cc, qemu-ppc@nongnu.org,
- kbastian@mail.uni-paderborn.de, imammedo@redhat.com, fam@euphon.net,
- peter.maydell@linaro.org, david@redhat.com, palmer@sifive.com,
- keith.busch@intel.com, jcmvbkbc@gmail.com, hare@suse.com,
- sstabellini@kernel.org, andrew.smirnov@gmail.com, deller@gmx.de,
- magnus.damm@gmail.com, atar4qemu@gmail.com, minyard@acm.org, sw@weilnetz.de,
- yuval.shaia@oracle.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- peter.chubb@nicta.com.au, clg@kaod.org, shorne@gmail.com,
- qemu-riscv@nongnu.org, i.mitsyanko@gmail.com, cohuck@redhat.com,
- amarkovic@wavecomp.com, jan.kiszka@web.de, aurelien@aurel32.net,
- pburton@wavecomp.com, sagark@eecs.berkeley.edu, green@moxielogic.com,
- kraxel@redhat.com, edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn,
- robh@kernel.org, borntraeger@de.ibm.com, joel@jms.id.au,
- antonynpavlov@gmail.com, chouteau@adacore.com, lersek@redhat.com,
- Andrew.Baumann@microsoft.com, mreitz@redhat.com, walling@linux.ibm.com,
- dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
- qemu-devel@nongnu.org, jslaby@suse.cz, marex@denx.de, proljc@gmail.com,
- marcandre.lureau@redhat.com, alistair@alistair23.me, paul.durrant@citrix.com,
- tony.nguyen@bt.com, xiaoguangrong.eric@gmail.com, huth@tuxfamily.org,
- jcd@tribudubois.net, pbonzini@redhat.com, stefanb@linux.ibm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Leonid Bloch <lbloch@janustech.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The size of the qcow2 L2 cache defaults to 32 MB, which can be easily
+larger than the maximum amount of L2 metadata that the image can have.
+For example: with 64 KB clusters the user would need a qcow2 image
+with a virtual size of 256 GB in order to have 32 MB of L2 metadata.
 
---DKU6Jbt7q3WqK7+M
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Because of that, since commit b749562d9822d14ef69c9eaa5f85903010b86c30
+we forbid the L2 cache to become larger than the maximum amount of L2
+metadata for the image, calculated using this formula:
 
-On Fri, Aug 16, 2019 at 11:58:05AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Hi Tony,
->=20
-> On 8/16/19 8:28 AM, tony.nguyen@bt.com wrote:
-> > This patchset implements the IE (Invert Endian) bit in SPARCv9 MMU TTE.
-> >=20
-> > v7:
-> [...]
-> > - Re-declared many native endian devices as little or big endian. This =
-is why
-> >   v7 has +16 patches.
->=20
-> Why are you doing that? What is the rational?
->=20
-> Anyhow if this not required by your series, you should split it out of
-> it, and send it on your principal changes are merged.
-> I'm worried because this these new patches involve many subsystems (thus
-> maintainers) and reviewing them will now take a fair amount of time.
->=20
-> > For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
-> > targets from the set of target/hw/*/device.o.
-> >
-> > If the set of targets are all little or all big endian, re-declare
-> > the device endianness as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN
-> > respectively.
->=20
-> If only little endian targets use a device, that doesn't mean the device
-> is designed in little endian...
->=20
-> Then if a big endian target plan to use this device, it will require
-> more work and you might have introduced regressions...
+    uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
 
-Uh.. only if they make the version of the device on a big endian
-target big endian.  Which is a terrible idea - if you know a hardware
-designer planning to do this, please slap them.
+The problem with this formula is that the result should be rounded up
+to the cluster size because an L2 table on disk always takes one full
+cluster.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+For example, a 1280 MB qcow2 image with 64 KB clusters needs exactly
+160 KB of L2 metadata, but we need 192 KB on disk (3 clusters) even if
+the last 32 KB of those are not going to be used.
 
---DKU6Jbt7q3WqK7+M
-Content-Type: application/pgp-signature; name="signature.asc"
+However QEMU rounds the numbers down and only creates 2 cache tables
+(128 KB), which is not enough for the image.
 
------BEGIN PGP SIGNATURE-----
+A quick test doing 4KB random writes on a 1280 MB image gives me
+around 500 IOPS, while with the correct cache size I get 16K IOPS.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1WlskACgkQbDjKyiDZ
-s5K9oQ//Uuo9cWWmd396i/MdQyddqKELOko009vf2k8wlEaysKrMpuKkkj7EV4Lz
-x+MQYyqEBAZMLC5KoTeSRYHynyRTPSBOURxhQNkH4Nqj3Skxr9buvX4pqhNLhmLE
-A8tSn3paa4N5GKXbgt4fOiNwBXxnrcAQgmruCbyvO7NKXPmZyTSQxJkR8VHE/qxK
-LWKEgA/bjyloFI7OwpWW0rc0LdqmDljy4NKmfHsFxlZdc+TlcM2PgkYPBdRMf5SH
-Nlj3YvXrsxa1gfrGLou/tlS9WHyKxl7K1DSbh42ObtrBKtc6z9aPY9+mi1moAJLi
-/CpHM3SbdY4j1mGPk5/TZBul+m7spkoJfDB0A/mwb5pTLsZKO0fIOThUkjlCD32D
-It90f2Y2I+omAnGOs8nX52SOoNfUwB6vtA4ThBEXzKSOOepPuL5dgSmJ8sGUn1GY
-eckRx2z4Emap23L0WavytQ+oaQW8PrhfMFUBWS1DSh/uPVUs1m4Zcs2Q8siBRXZJ
-J70alEhGvbhch2+S5q69iYIvljVoMcA1DjHc06WTwZOatjUdjJAQpMLidpH03+UC
-AKeSvwpEA5yvuxCfLuThYD+6MeEGyVtH/IEKqSLE7IFVp2VBeqZ4tNKN41Fw/aQH
-t3Q5LKmwmLKiyzHZSFM5JmNuyjmdwG56N4INLGlLEAPy9F40PR0=
-=nw08
------END PGP SIGNATURE-----
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
---DKU6Jbt7q3WqK7+M--
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 039bdc2f7e..865839682c 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -826,7 +826,11 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+     bool l2_cache_entry_size_set;
+     int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+     uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+-    uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
++    uint64_t max_l2_entries = DIV_ROUND_UP(virtual_disk_size, s->cluster_size);
++    /* An L2 table is always one cluster in size so the max cache size
++     * should be a multiple of the cluster size. */
++    uint64_t max_l2_cache = ROUND_UP(max_l2_entries * sizeof(uint64_t),
++                                     s->cluster_size);
+ 
+     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
+     l2_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_SIZE);
+-- 
+2.20.1
+
 
