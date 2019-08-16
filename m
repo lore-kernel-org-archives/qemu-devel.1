@@ -2,65 +2,48 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB78C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 06:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDDCC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 06:21:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E7F3206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 06:15:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7F3206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 322D7205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 06:21:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 322D7205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyVWJ-0003yd-Ho
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 02:15:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55941)
+	id 1hyVcX-00073x-6U
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 02:21:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56285)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1hyVVd-0003S3-10
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 02:14:45 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1hyVYy-0005Oe-Tf
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 02:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hyVVc-0002F2-1J
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 02:14:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56298)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hyVVb-0002EP-SW
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 02:14:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 05C4D3078A23;
- Fri, 16 Aug 2019 06:14:43 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A59245D9DC;
- Fri, 16 Aug 2019 06:14:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 60C871136444; Fri, 16 Aug 2019 08:14:41 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-References: <cover.1565894837.git.lukasstraub2@web.de>
- <4a5ef4f67b6e40d65d71bbaa0e70796f0edea3a4.1565894837.git.lukasstraub2@web.de>
-Date: Fri, 16 Aug 2019 08:14:41 +0200
-In-Reply-To: <4a5ef4f67b6e40d65d71bbaa0e70796f0edea3a4.1565894837.git.lukasstraub2@web.de>
- (Lukas Straub's message of "Thu, 15 Aug 2019 20:49:04 +0200")
-Message-ID: <87lfvtskku.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 16 Aug 2019 06:14:43 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] Update Documentation
+ (envelope-from <aik@ozlabs.ru>) id 1hyVYx-00045e-3z
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 02:18:12 -0400
+Received: from ozlabs.ru ([107.173.13.209]:52610)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <aik@ozlabs.ru>)
+ id 1hyVYw-00043b-Ut; Fri, 16 Aug 2019 02:18:11 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+ by ozlabs.ru (Postfix) with ESMTP id A7A32AE8001D;
+ Fri, 16 Aug 2019 02:17:19 -0400 (EDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
+Date: Fri, 16 Aug 2019 16:17:33 +1000
+Message-Id: <20190816061733.53572-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 107.173.13.209
+Subject: [Qemu-devel] [PATCH qemu] target/ppc: Add Directed Privileged
+ Door-bell Exception State (DPDES) SPR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,16 +55,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Wen Congyang <wencongyang2@huawei.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paul Mackerras <paulus@samba.org>,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Subject "Update Documentation" is too vague, because (1) it lacks a
-subsystem prefix, and (2) it fails to hint at what it is updated for.
-Suggest something like "colo: Update documentation for FIXME", or maybe
-"docs/COLO-FT.txt: Update for FIXME", with a suitable replacement for
-FIXME.
+DPDES stores a status of a doorbell message and if it is lost in
+migration, the destination CPU won't receive it. This does not hit us
+much as IPIs complete too quick to catch a pending one and even if
+we missed one, broadcasts happen often enough to wake that CPU.
+
+This defines DPDES and registers with KVM for migration.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ target/ppc/cpu.h                |  1 +
+ target/ppc/translate_init.inc.c | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 64799386f9ab..f0521a435d2d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1466,6 +1466,7 @@ typedef PowerPCCPU ArchCPU;
+ #define SPR_MPC_ICTRL         (0x09E)
+ #define SPR_MPC_BAR           (0x09F)
+ #define SPR_PSPB              (0x09F)
++#define SPR_DPDES             (0x0B0)
+ #define SPR_DAWR              (0x0B4)
+ #define SPR_RPR               (0x0BA)
+ #define SPR_CIABR             (0x0BB)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index c9fcd87095f5..7e41ae145600 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8198,6 +8198,18 @@ static void gen_spr_power8_pspb(CPUPPCState *env)
+                      KVM_REG_PPC_PSPB, 0);
+ }
+ 
++static void gen_spr_power8_dpdes(CPUPPCState *env)
++{
++#if !defined(CONFIG_USER_ONLY)
++    /* Directed Privileged Door-bell Exception State, used for IPI */
++    spr_register_kvm_hv(env, SPR_DPDES, "DPDES",
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        &spr_read_generic, SPR_NOACCESS,
++                        &spr_read_generic, &spr_write_generic,
++                        KVM_REG_PPC_DPDES, 0x00000000);
++#endif
++}
++
+ static void gen_spr_power8_ic(CPUPPCState *env)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+@@ -8629,6 +8641,7 @@ static void init_proc_POWER8(CPUPPCState *env)
+     gen_spr_power8_pmu_user(env);
+     gen_spr_power8_tm(env);
+     gen_spr_power8_pspb(env);
++    gen_spr_power8_dpdes(env);
+     gen_spr_vtb(env);
+     gen_spr_power8_ic(env);
+     gen_spr_power8_book4(env);
+@@ -8817,6 +8830,7 @@ static void init_proc_POWER9(CPUPPCState *env)
+     gen_spr_power8_pmu_user(env);
+     gen_spr_power8_tm(env);
+     gen_spr_power8_pspb(env);
++    gen_spr_power8_dpdes(env);
+     gen_spr_vtb(env);
+     gen_spr_power8_ic(env);
+     gen_spr_power8_book4(env);
+-- 
+2.17.1
+
 
