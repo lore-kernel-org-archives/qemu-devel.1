@@ -2,50 +2,47 @@ Return-Path: <SRS0=glhp=WN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CABB5C3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 14:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECC7C3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 14:38:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 909CA20880
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 14:31:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 909CA20880
+	by mail.kernel.org (Postfix) with ESMTPS id EF7042133F
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 14:37:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF7042133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyzjk-0004ek-Lj
-	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 10:31:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54163)
+	id 1hyzqB-0006it-1I
+	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 10:37:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hyzis-00049B-3L
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 10:30:27 -0400
+ (envelope-from <eblake@redhat.com>) id 1hyzpL-0005rs-NV
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 10:37:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hyziq-0001HE-Ui
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 10:30:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36346)
+ (envelope-from <eblake@redhat.com>) id 1hyzpK-0004M6-Ph
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 10:37:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50752)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hyzio-0001FW-5P; Sat, 17 Aug 2019 10:30:22 -0400
+ id 1hyzpI-0004KW-5V; Sat, 17 Aug 2019 10:37:04 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 726617FDFD;
- Sat, 17 Aug 2019 14:30:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6C3608D070E;
+ Sat, 17 Aug 2019 14:37:03 +0000 (UTC)
 Received: from [10.3.116.18] (ovpn-116-18.phx2.redhat.com [10.3.116.18])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A859F18668;
- Sat, 17 Aug 2019 14:30:19 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190815185024.7010-1-eblake@redhat.com>
- <104559cd-a1dc-2b2c-8992-689cbdd0f827@virtuozzo.com>
- <22c4c265-91fc-3639-4a4e-2fffe426ce68@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EAC131CF;
+ Sat, 17 Aug 2019 14:37:02 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190816095528.16224-1-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,22 +69,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <3f1fa92e-af18-87f8-3149-7c11bd186e64@redhat.com>
-Date: Sat, 17 Aug 2019 09:30:18 -0500
+Message-ID: <8e1e2f19-aeb8-962c-ff44-5103aa663ed3@redhat.com>
+Date: Sat, 17 Aug 2019 09:37:02 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <22c4c265-91fc-3639-4a4e-2fffe426ce68@virtuozzo.com>
+In-Reply-To: <20190816095528.16224-1-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="NNgoYwPuQ9VugTANpmMEzzprXzHPI07Oe"
+ boundary="o5Dcqekfsei1ZrmtutqAodrn4e5rg0uFJ"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Sat, 17 Aug 2019 14:30:20 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Sat, 17 Aug 2019 14:37:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] nbd: Advertise multi-conn for shared
- read-only connections
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Fix has_write_zeroes after
+ NO_FALLBACK
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,83 +96,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NNgoYwPuQ9VugTANpmMEzzprXzHPI07Oe
-Content-Type: multipart/mixed; boundary="felVqLD1ZPADnr4SdNVTDwyzbvWyYnFXx";
+--o5Dcqekfsei1ZrmtutqAodrn4e5rg0uFJ
+Content-Type: multipart/mixed; boundary="lflP80z2eLZ5o6rcicCR52lbiAnRqLRrY";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "rjones@redhat.com" <rjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
-Message-ID: <3f1fa92e-af18-87f8-3149-7c11bd186e64@redhat.com>
-Subject: Re: [PATCH] nbd: Advertise multi-conn for shared read-only
- connections
-References: <20190815185024.7010-1-eblake@redhat.com>
- <104559cd-a1dc-2b2c-8992-689cbdd0f827@virtuozzo.com>
- <22c4c265-91fc-3639-4a4e-2fffe426ce68@virtuozzo.com>
-In-Reply-To: <22c4c265-91fc-3639-4a4e-2fffe426ce68@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <8e1e2f19-aeb8-962c-ff44-5103aa663ed3@redhat.com>
+Subject: Re: [PATCH] file-posix: Fix has_write_zeroes after NO_FALLBACK
+References: <20190816095528.16224-1-kwolf@redhat.com>
+In-Reply-To: <20190816095528.16224-1-kwolf@redhat.com>
 
---felVqLD1ZPADnr4SdNVTDwyzbvWyYnFXx
+--lflP80z2eLZ5o6rcicCR52lbiAnRqLRrY
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/16/19 5:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-
->>> +++ b/blockdev-nbd.c
->>> @@ -189,7 +189,7 @@ void qmp_nbd_server_add(const char *device, bool =
-has_name, const char *name,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exp =3D nbd_export_new(bs, 0, len, nam=
-e, NULL, bitmap,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- writable ? 0 : NBD_FLAG_READ_ONLY,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- writable ? 0 : NBD_FLAG_READ_ONLY, true,
->>
->> s/true/!writable ?
+On 8/16/19 4:55 AM, Kevin Wolf wrote:
+> If QEMU_AIO_NO_FALLBACK is given, we always return failure and don't
+> even try to use the BLKZEROOUT ioctl. In this failure case, we shouldn'=
+t
+> disable has_write_zeroes because we didn't learn anything about the
+> ioctl. The next request might not set QEMU_AIO_NO_FALLBACK and we can
+> still use the ioctl then.
 >=20
-> Oh, I see, John already noticed this, it's checked in nbd_export_new an=
-yway..
-
-Still, since two reviewers have caught it, I'm fixing it :)
-
-
->>> @@ -1486,6 +1486,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs,=
- uint64_t dev_offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 perm =3D BLK_PERM_CONSISTENT_READ;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if ((nbdflags & NBD_FLAG_READ_ONLY) =3D=
-=3D 0) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 perm |=3D BLK_=
-PERM_WRITE;
->>> +=C2=A0=C2=A0=C2=A0 } else if (shared) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nbdflags |=3D NBD_FLAG_CA=
-N_MULTI_CONN;
+> Reported-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/file-posix.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >=20
-> For me it looks a bit strange: we already have nbdflags parameter for n=
-bd_export_new(), why
-> to add a separate boolean to pass one of nbdflags flags?
 
-Because I want to get rid of the nbdflags in my next patch.
-
->=20
-> Also, for qemu-nbd, shouldn't we allow -e only together with -r ?
-
-I'm reluctant to; it might break whatever existing user is okay exposing
-it (although such users are questionable, so maybe we can argue they
-were already broken).  Maybe it's time to start a deprecation cycle?
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Fixes: 738301e1175
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -183,24 +142,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---felVqLD1ZPADnr4SdNVTDwyzbvWyYnFXx--
+--lflP80z2eLZ5o6rcicCR52lbiAnRqLRrY--
 
---NNgoYwPuQ9VugTANpmMEzzprXzHPI07Oe
+--o5Dcqekfsei1ZrmtutqAodrn4e5rg0uFJ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1YD3oACgkQp6FrSiUn
-Q2qSIQf/RIpeufBcZWgPGBnG0HvAN9+AS/JTSCc1uOGf19PXBzr7Dvka96zZ2IpV
-0o9ePK6E4M2cjktCI27BkFO7WM1YZa+R9MKN8lhSha1cU21DC6WZOITqLvvjurBg
-LAcI3YYatpOlS7gLD7N9zfpdjQ7lnr+NeLzz6Rzp89+JzXhLDUJm1qCTYZWjLJtO
-UyEY/7BGK6zBhhwYTv6wbzHzaZjpaOw9kZfYvnbaANURKTOtcu275Hrn5p8dw0JE
-ilzQNQN9Qvuua3VtWa9yK32orfv+dpMtFqZVsLW8TLituZ2RC2SRKegitzDLkw03
-GWbm+cvkzHLv9iVd7zCA6lnVA3rhPA==
-=5QFb
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1YEQ4ACgkQp6FrSiUn
+Q2oC5Af/UFaWTPn44/cuxm1GhZ9U1POMEMncJoyNlTZ4ZA23nDEQ3g4z2yTrFKe7
+NfpTEQ0jwvYmhi8VxEdkWkoXMm7OrsN4wyWGYxP9WWCF3mPhhAcGmK+Z7PId6LoL
+4OSX6BaexGQ2y+3GN4TQKbrvBWJKLh+S6wY9xjfkaSMeMR3+AEykaxW6b+ngXypC
+PnBZfY7ppLq8rdmoYyZifUPTS9+cgb9Y3Bt08yghefTDUI4POEufMX78jKKk3rO4
+UUnYoBDn1itbtMeJZhOPzRd+y5xL9+TQh6FVwzhs9U2ee6+j0v0ww+XOBmScTwU0
+lCyUnbh8boP/aF/NwLv8M+1V85G8IA==
+=gLvl
 -----END PGP SIGNATURE-----
 
---NNgoYwPuQ9VugTANpmMEzzprXzHPI07Oe--
+--o5Dcqekfsei1ZrmtutqAodrn4e5rg0uFJ--
 
