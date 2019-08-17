@@ -8,80 +8,79 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6DB3C3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 17:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47721C3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 21:23:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AEAE20880
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 17:54:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D55421019
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 21:23:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TI0pwoxA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AEAE20880
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VfMEiH+U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D55421019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hz2ub-0006HW-M6
-	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 13:54:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46442)
+	id 1hz6AR-0001lQ-Oi
+	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 17:23:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nirsof@gmail.com>) id 1hz2tx-0005ni-VB
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 13:54:07 -0400
+ (envelope-from <nirsof@gmail.com>) id 1hz68o-0000iZ-Vi
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 17:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nirsof@gmail.com>) id 1hz2tw-0008Dd-Ef
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 13:54:05 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36985)
+ (envelope-from <nirsof@gmail.com>) id 1hz68m-0005va-Ly
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 17:21:38 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33088)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nirsof@gmail.com>)
- id 1hz2tr-0008BN-OU; Sat, 17 Aug 2019 13:54:00 -0400
-Received: by mail-wr1-x443.google.com with SMTP id z11so4609254wrt.4;
- Sat, 17 Aug 2019 10:53:59 -0700 (PDT)
+ id 1hz68f-0005qf-4T; Sat, 17 Aug 2019 17:21:29 -0400
+Received: by mail-wr1-x442.google.com with SMTP id u16so4887736wrr.0;
+ Sat, 17 Aug 2019 14:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=IXUzcvfQJAG55Yt7JL4AzspwSYc7nyIKyLhl4baOQXA=;
- b=TI0pwoxA3f1mIwKWHAKuCpafMd0ZM8z/Cv5lWMx5i0B1150NREG46A/Hl8uP8GACjY
- nAw5j8q84o6C58bhaRuaCYtxnnAELK0zWT8LYuggLfuAWE+Zq7nEPG1iHLv8q1YC/kVq
- fGDHTjpzSBQfy872RMqjOLFH1+n7b9pakJCwfyYQkM2Uqf801hva1Y9qhN2WJj+ZOwex
- iZmuJMTpFeD/37lF0PiNqrXLKZJhw5SEUywgghfMLouVOLtFm7m9YvJ+t0btaDZELYUR
- blpayeZMKCeOQryODVQiYxF4NLJGOgX4Pf2avYDRmEPbgcwxDjofaWjaERCnnuWaGGJG
- XlKQ==
+ bh=+wSVH5McUUvVIG1OHesxwhqyk7C1/TTDGaomgkwHm4U=;
+ b=VfMEiH+UcVq8GdXDRrw8N+ZSy7WFPvqO/QrXjiUcvIFXKQWDxFc1GxtU1+qSokBxAv
+ rvzXXaAIwbmZUZs9hP0qDqKiTtvahtghL9U94JTh4H+hb1yRq3BsOUqFpM8Pv3RJ1CJ4
+ fdEe6bweopEuq6rQ1G/8CD6wN3UPGcVCX15B3GUWdNV4Z/n3GQI9HPXweWiHUJplivO6
+ IwRFXZElEBrwGMUCmitC4qtYJ2z0bqDfeTdC1QXi0XgFI1u/WOnEWTBl8CRBp44g+YB8
+ HfaoFf1A+gp9bZgRHdjc3F4KH8TgiXh1/m3NDfFtqPAgtXTR56x9ttqr28kUUYUy4305
+ kb6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=IXUzcvfQJAG55Yt7JL4AzspwSYc7nyIKyLhl4baOQXA=;
- b=pvffyT5lhIEurKeXHIrTB3GC9rQefli9W+PsVuopW9k2/VIwKnWnIBUBplVstyuAT7
- DethmcDrbdF60q+WO7J5/Jr40E3DBfZVXNOsgXJ9YJ+PycisovdTNjjUW1BNB4qWiUAM
- LCW3ijhFFAFrAW7Xz+CezYmW+UtZmru1PtSVZFZ1oWqV30HJfmAgNCvozxN8BFYmCGxz
- sh03y3rJW4dm5zfgpkQb4LaECpdMb6XWLL22csljFqglNSd1bKX2nEV4+wx583NreCms
- SN8ewc8a4GaiRT5UP5Nw01qJm93W4/x24d3YM6iMsh2I8ciLnXauNvAtubYkiglVTZ/u
- u0Xg==
-X-Gm-Message-State: APjAAAUVFvaLq7PHqTuml7sGkrw26uuBi8lX3F4tmtlnWhnYI8CrVvnA
- wkKAo7XDHc48x8IUeSMha1jtX25gs40AbQ==
-X-Google-Smtp-Source: APXvYqyDyK1+4chPY/x+cxOurgpvnia5F5GYOCbR5CeNd4FiMHPsAiuUF8Y3SfNd70kaPaKets3d/w==
-X-Received: by 2002:a5d:63d0:: with SMTP id c16mr17347093wrw.22.1566064437825; 
- Sat, 17 Aug 2019 10:53:57 -0700 (PDT)
+ bh=+wSVH5McUUvVIG1OHesxwhqyk7C1/TTDGaomgkwHm4U=;
+ b=DUJs9O5zSabMkGLzcywsEz8UHrLAvAP45Dyh1THGRKNLcGDCzrZTsFeBfia742wtnQ
+ plCayg/ApXyD1UQD2xcxszUakMTlQUoKt57HVr16wF4DNmpAnQ/wVl1mVpjjaiBdpljR
+ 02vSjBWDxMMyXhCecCXyqcIr1+ojXbLl3wLSxmIJCYhC0VgIpF7ORrImLfVEGw3V4S4J
+ 6tofBe/BJ/ZD7bEny+Hnt5bVkmmIGHjsVKXie1KFxoie5a/261KCKvgq66Wj268UIwsc
+ VpDUqM1HZC13iIZPAfx9sruOa30i5Cb1ITPPk62/uzw10iuHm7ud3F/tun3UIbC68cJF
+ PAUw==
+X-Gm-Message-State: APjAAAUnX1PzgOtTiqLzh0uWMETBn9P9XFv3zE2Dk4XIsxMOSHkYLvlo
+ 0cIGizEnl9jV5fxR/+KGEx7Hq4reZ1BIsA==
+X-Google-Smtp-Source: APXvYqxwFOMlTEyXPiRHB7nDh+ZJkQXSIQbJg/E2ajkCBP7P+sykUUR8x3DjrWxSdleLuT6tFUOPEg==
+X-Received: by 2002:adf:d1b4:: with SMTP id w20mr17862110wrc.301.1566076886637; 
+ Sat, 17 Aug 2019 14:21:26 -0700 (PDT)
 Received: from sparse-local.redhat.com (93-173-46-43.bb.netvision.net.il.
  [93.173.46.43])
- by smtp.gmail.com with ESMTPSA id f70sm15007759wme.22.2019.08.17.10.53.55
+ by smtp.gmail.com with ESMTPSA id z6sm31043535wre.76.2019.08.17.14.21.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Aug 2019 10:53:57 -0700 (PDT)
+ Sat, 17 Aug 2019 14:21:26 -0700 (PDT)
 From: Nir Soffer <nirsof@gmail.com>
 X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
 To: qemu-block@nongnu.org
-Date: Sat, 17 Aug 2019 20:53:46 +0300
-Message-Id: <20190817175346.12518-1-nsoffer@redhat.com>
+Date: Sun, 18 Aug 2019 00:21:11 +0300
+Message-Id: <20190817212111.13265-1-nsoffer@redhat.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH] block: Use QEMU_IS_ALIGNED instead of
- reinventing it
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH] block: gluster: Probe alignment limits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,164 +92,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+Cc: Kevin Wolf <kwolf@redhat.com>, integration@gluster.org,
  qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+ Nir Soffer <nsoffer@redhat.com>, Niels de Vos <ndevos@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace instances of:
+Implement alignment probing similar to file-posix, by reading from the
+first 4k of the image.
 
-    (n & (BDRV_SECTOR_SIZE - 1)) == 0)
+Before this change, provisioning a VM on storage with sector size of
+4096 bytes would fail when the installer try to create filesystems. Here
+is an example command that reproduces this issue:
 
-With:
+    $ qemu-system-x86_64 -accel kvm -m 2048 -smp 2 \
+        -drive file=gluster://gluster1/gv0/fedora29.raw,format=raw,cache=none \
+        -cdrom Fedora-Server-dvd-x86_64-29-1.2.iso
 
-    QEMU_IS_ALIGNED(n, BDRV_SECTOR_SIZE)
+The installer fails in few seconds when trying to create filesystem on
+/dev/mapper/fedora-root. In error report we can see that it failed with
+EINVAL (I could not extract the error from guest).
 
-Which reveals the intent of the code better, and makes it easier to
-locate the code checking alignment.
+Copying disk fails with EINVAL:
 
-QEMU_IS_ALIGNED is implemented using %, which may be less efficient but
-it is used only in assert() except one instance, so it should not
-matter.
+    $ qemu-img convert -p -f raw -O raw -t none -T none \
+        gluster://gluster1/gv0/fedora29.raw \
+        gluster://gluster1/gv0/fedora29-clone.raw
+    qemu-img: error while writing sector 4190208: Invalid argument
+
+This is a fix to same issue fixed in commit a6b257a08e3d (file-posix:
+Handle undetectable alignment) for gluster:// images.
+
+This fix has the same limit, that the first block of the image should be
+allocated, otherwise we cannot detect the alignment and fallback to a
+safe value (4096) even when using storage with sector size of 512 bytes.
 
 Signed-off-by: Nir Soffer <nsoffer@redhat.com>
 ---
- block/bochs.c | 4 ++--
- block/cloop.c | 4 ++--
- block/dmg.c   | 4 ++--
- block/io.c    | 8 ++++----
- block/qcow2.c | 4 ++--
- block/vvfat.c | 8 ++++----
- qemu-img.c    | 2 +-
- 7 files changed, 17 insertions(+), 17 deletions(-)
+ block/gluster.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/block/bochs.c b/block/bochs.c
-index 962f18592d..32bb83b268 100644
---- a/block/bochs.c
-+++ b/block/bochs.c
-@@ -248,8 +248,8 @@ bochs_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-     QEMUIOVector local_qiov;
+diff --git a/block/gluster.c b/block/gluster.c
+index f64dc5b01e..d936240b72 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -52,6 +52,9 @@
+ 
+ #define GERR_INDEX_HINT "hint: check in 'server' array index '%d'\n"
+ 
++/* The value is known only on the server side. */
++#define MAX_ALIGN 4096
++
+ typedef struct GlusterAIOCB {
+     int64_t size;
      int ret;
+@@ -902,8 +905,52 @@ out:
+     return ret;
+ }
  
--    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
++/*
++ * Check if read is allowed with given memory buffer and length.
++ *
++ * This function is used to check O_DIRECT request alignment.
++ */
++static bool gluster_is_io_aligned(struct glfs_fd *fd, void *buf, size_t len)
++{
++    ssize_t ret = glfs_pread(fd, buf, len, 0, 0, NULL);
++    return ret >= 0 || errno != EINVAL;
++}
++
++static void gluster_probe_alignment(BlockDriverState *bs, struct glfs_fd *fd,
++                                    Error **errp)
++{
++    char *buf;
++    size_t alignments[] = {1, 512, 1024, 2048, 4096};
++    size_t align;
++    int i;
++
++    buf = qemu_memalign(MAX_ALIGN, MAX_ALIGN);
++
++    for (i = 0; i < ARRAY_SIZE(alignments); i++) {
++        align = alignments[i];
++        if (gluster_is_io_aligned(fd, buf, align)) {
++            /* Fallback to safe value. */
++            bs->bl.request_alignment = (align != 1) ? align : MAX_ALIGN;
++            break;
++        }
++    }
++
++    qemu_vfree(buf);
++
++    if (!bs->bl.request_alignment) {
++        error_setg(errp, "Could not find working O_DIRECT alignment");
++        error_append_hint(errp, "Try cache.direct=off\n");
++    }
++}
++
+ static void qemu_gluster_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
++    BDRVGlusterState *s = bs->opaque;
++
++    gluster_probe_alignment(bs, s->fd, errp);
++
++    bs->bl.min_mem_alignment = bs->bl.request_alignment;
++    bs->bl.opt_mem_alignment = MAX(bs->bl.request_alignment, MAX_ALIGN);
+     bs->bl.max_transfer = GLUSTER_MAX_TRANSFER;
+ }
  
-     qemu_iovec_init(&local_qiov, qiov->niov);
-     qemu_co_mutex_lock(&s->lock);
-diff --git a/block/cloop.c b/block/cloop.c
-index 384c9735bb..4de94876d4 100644
---- a/block/cloop.c
-+++ b/block/cloop.c
-@@ -253,8 +253,8 @@ cloop_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-     int nb_sectors = bytes >> BDRV_SECTOR_BITS;
-     int ret, i;
- 
--    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
- 
-     qemu_co_mutex_lock(&s->lock);
- 
-diff --git a/block/dmg.c b/block/dmg.c
-index 45f6b28f17..4a045f2b3e 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -697,8 +697,8 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-     int nb_sectors = bytes >> BDRV_SECTOR_BITS;
-     int ret, i;
- 
--    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
- 
-     qemu_co_mutex_lock(&s->lock);
- 
-diff --git a/block/io.c b/block/io.c
-index 56bbf195bb..7508703ecd 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1080,8 +1080,8 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
-     sector_num = offset >> BDRV_SECTOR_BITS;
-     nb_sectors = bytes >> BDRV_SECTOR_BITS;
- 
--    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
-     assert(bytes <= BDRV_REQUEST_MAX_BYTES);
-     assert(drv->bdrv_co_readv);
- 
-@@ -1133,8 +1133,8 @@ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
-     sector_num = offset >> BDRV_SECTOR_BITS;
-     nb_sectors = bytes >> BDRV_SECTOR_BITS;
- 
--    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
-     assert(bytes <= BDRV_REQUEST_MAX_BYTES);
- 
-     assert(drv->bdrv_co_writev);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 59cff1d4cb..41cab70e1d 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2072,8 +2072,8 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-             }
-             if (bs->encrypted) {
-                 assert(s->crypto);
--                assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--                assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+                assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+                assert(QEMU_IS_ALIGNED(cur_bytes, BDRV_SECTOR_SIZE));
-                 if (qcow2_co_decrypt(bs, cluster_offset, offset,
-                                      cluster_data, cur_bytes) < 0) {
-                     ret = -EIO;
-diff --git a/block/vvfat.c b/block/vvfat.c
-index f6c28805dd..019b8f1341 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1547,8 +1547,8 @@ vvfat_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-     int nb_sectors = bytes >> BDRV_SECTOR_BITS;
-     void *buf;
- 
--    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
- 
-     buf = g_try_malloc(bytes);
-     if (bytes && buf == NULL) {
-@@ -3082,8 +3082,8 @@ vvfat_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-     int nb_sectors = bytes >> BDRV_SECTOR_BITS;
-     void *buf;
- 
--    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
- 
-     buf = g_try_malloc(bytes);
-     if (bytes && buf == NULL) {
-diff --git a/qemu-img.c b/qemu-img.c
-index c920e3564c..ca3af0c549 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2138,7 +2138,7 @@ static int img_convert(int argc, char **argv)
-             int64_t sval;
- 
-             sval = cvtnum(optarg);
--            if (sval < 0 || sval & (BDRV_SECTOR_SIZE - 1) ||
-+            if (sval < 0 || !QEMU_IS_ALIGNED(sval, BDRV_SECTOR_SIZE) ||
-                 sval / BDRV_SECTOR_SIZE > MAX_BUF_SECTORS) {
-                 error_report("Invalid buffer size for sparse output specified. "
-                     "Valid sizes are multiples of %llu up to %llu. Select "
 -- 
 2.20.1
 
