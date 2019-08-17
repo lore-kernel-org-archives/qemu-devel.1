@@ -2,60 +2,60 @@ Return-Path: <SRS0=glhp=WN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08137C3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A80C3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D04C52086C
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:24:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D04C52086C
+	by mail.kernel.org (Postfix) with ESMTPS id F2C0F2086C
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:26:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2C0F2086C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyvsg-0006mk-3s
-	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 06:24:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58228)
+	id 1hyvuO-0000Tr-2r
+	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 06:26:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hyvoc-00015I-CS
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:20:07 -0400
+ (envelope-from <thuth@redhat.com>) id 1hyvoR-0000om-Mi
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hyvob-0004iY-78
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:20:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46964)
+ (envelope-from <thuth@redhat.com>) id 1hyvoQ-0004Wh-M0
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46106)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hyvoY-0004fP-Mz; Sat, 17 Aug 2019 06:20:02 -0400
+ id 1hyvoO-0004Tm-H6; Sat, 17 Aug 2019 06:19:52 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E53A3301E13E;
- Sat, 17 Aug 2019 10:20:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 101683083394;
+ Sat, 17 Aug 2019 10:19:51 +0000 (UTC)
 Received: from thuth.com (ovpn-116-52.ams2.redhat.com [10.36.116.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BD6BD1E5;
- Sat, 17 Aug 2019 10:19:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BF21BD1E5;
+ Sat, 17 Aug 2019 10:19:48 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-Date: Sat, 17 Aug 2019 12:19:30 +0200
-Message-Id: <20190817101931.28386-8-thuth@redhat.com>
+Date: Sat, 17 Aug 2019 12:19:27 +0200
+Message-Id: <20190817101931.28386-5-thuth@redhat.com>
 In-Reply-To: <20190817101931.28386-1-thuth@redhat.com>
 References: <20190817101931.28386-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Sat, 17 Aug 2019 10:20:02 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Sat, 17 Aug 2019 10:19:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 7/8] hw/misc: Add a config switch for the
- "unimplemented" device
+Subject: [Qemu-devel] [PATCH v3 4/8] hw/core: Add a config switch for the
+ "register" device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,156 +75,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The device is only used by some few boards. Let's use a proper Kconfig
-switch so that we only compile this code if we really need it.
+The "register" device is only used by certain machines. Let's add
+a proper config switch for it so that it only gets compiled when we
+really need it.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/Kconfig        | 11 +++++++++++
- hw/microblaze/Kconfig |  1 +
- hw/misc/Kconfig       |  3 +++
- hw/misc/Makefile.objs |  2 +-
- hw/sparc64/Kconfig    |  1 +
- 5 files changed, 17 insertions(+), 1 deletion(-)
+ hw/Kconfig            | 1 +
+ hw/core/Kconfig       | 3 +++
+ hw/core/Makefile.objs | 2 +-
+ hw/dma/Kconfig        | 1 +
+ 4 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 6e24c73b54..76a2a6bcbf 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -82,6 +82,7 @@ config MUSCA
-     select PL011
-     select PL031
-     select SPLIT_IRQ
-+    select UNIMP
+diff --git a/hw/Kconfig b/hw/Kconfig
+index dbae1c0852..b45db3c813 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -76,3 +76,4 @@ config XILINX_AXI
  
- config MUSICPAL
+ config XLNX_ZYNQMP
      bool
-@@ -217,6 +218,7 @@ config STELLARIS
-     select SSI_SD
-     select STELLARIS_INPUT
-     select STELLARIS_ENET # ethernet
-+    select UNIMP
++    select REGISTER
+diff --git a/hw/core/Kconfig b/hw/core/Kconfig
+index c2a1ae8122..d11920fcb3 100644
+--- a/hw/core/Kconfig
++++ b/hw/core/Kconfig
+@@ -9,3 +9,6 @@ config FITLOADER
  
- config STRONGARM
+ config PLATFORM_BUS
      bool
-@@ -283,6 +285,7 @@ config ALLWINNER_A10
-     select ALLWINNER_A10_PIC
-     select ALLWINNER_EMAC
-     select SERIAL
-+    select UNIMP
- 
- config RASPI
-     bool
-@@ -320,6 +323,7 @@ config XLNX_VERSAL
-     select PL011
-     select CADENCE
-     select VIRTIO_MMIO
-+    select UNIMP
- 
- config FSL_IMX25
-     bool
-@@ -355,6 +359,7 @@ config ASPEED_SOC
-     select SSI_M25P80
-     select TMP105
-     select TMP421
-+    select UNIMP
- 
- config MPS2
-     bool
-@@ -366,6 +371,7 @@ config MPS2
-     select PL022    # Serial port
-     select PL080    # DMA controller
-     select SPLIT_IRQ
-+    select UNIMP
- 
- config FSL_IMX7
-     bool
-@@ -378,6 +384,7 @@ config FSL_IMX7
-     select IMX_I2C
-     select PCI_EXPRESS_DESIGNWARE
-     select SDHCI
-+    select UNIMP
- 
- config ARM_SMMUV3
-     bool
-@@ -389,6 +396,7 @@ config FSL_IMX6UL
-     select IMX_FEC
-     select IMX_I2C
-     select SDHCI
-+    select UNIMP
- 
- config MICROBIT
-     bool
-@@ -398,6 +406,7 @@ config NRF51_SOC
-     bool
-     select I2C
-     select ARM_V7M
-+    select UNIMP
- 
- config EMCRAFT_SF2
-     bool
-@@ -410,6 +419,7 @@ config MSF2
-     select PTIMER
-     select SERIAL
-     select SSI
-+    select UNIMP
- 
- config ZAURUS
-     bool
-@@ -448,6 +458,7 @@ config ARMSSE
-     select TZ_MPC
-     select TZ_MSC
-     select TZ_PPC
-+    select UNIMP
- 
- config ARMSSE_CPUID
-     bool
-diff --git a/hw/microblaze/Kconfig b/hw/microblaze/Kconfig
-index c4dc120973..e2697ced9c 100644
---- a/hw/microblaze/Kconfig
-+++ b/hw/microblaze/Kconfig
-@@ -4,6 +4,7 @@ config PETALOGIX_S3ADSP1800
-     select XILINX
-     select XILINX_AXI
-     select XILINX_ETHLITE
-+    select UNIMP
- 
- config PETALOGIX_ML605
-     bool
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 385e1b0cec..51754bb47c 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -117,4 +117,7 @@ config AUX
-     bool
-     select I2C
- 
-+config UNIMP
-+    bool
 +
- source macio/Kconfig
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index e9aab519a1..e4aad707fb 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -9,7 +9,7 @@ common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
- common-obj-$(CONFIG_EDU) += edu.o
- common-obj-$(CONFIG_PCA9552) += pca9552.o
++config REGISTER
++    bool
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index f8481d959f..d6cfb2a81b 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -17,7 +17,7 @@ common-obj-$(CONFIG_SOFTMMU) += machine.o
+ common-obj-$(CONFIG_SOFTMMU) += loader.o
+ common-obj-$(CONFIG_FITLOADER) += loader-fit.o
+ common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
+-common-obj-$(CONFIG_SOFTMMU) += register.o
++common-obj-$(CONFIG_REGISTER) += register.o
+ common-obj-$(CONFIG_SOFTMMU) += or-irq.o
+ common-obj-$(CONFIG_SOFTMMU) += split-irq.o
+ common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
+diff --git a/hw/dma/Kconfig b/hw/dma/Kconfig
+index 751dec5426..5c61b67bc0 100644
+--- a/hw/dma/Kconfig
++++ b/hw/dma/Kconfig
+@@ -16,6 +16,7 @@ config I8257
  
--common-obj-y += unimp.o
-+common-obj-$(CONFIG_UNIMP) += unimp.o
- common-obj-$(CONFIG_FW_CFG_DMA) += vmcoreinfo.o
- 
- # ARM devices
-diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
-index d4d76a89be..f9f8b0f73a 100644
---- a/hw/sparc64/Kconfig
-+++ b/hw/sparc64/Kconfig
-@@ -17,3 +17,4 @@ config NIAGARA
+ config ZYNQ_DEVCFG
      bool
-     select EMPTY_SLOT
-     select SUN4V_RTC
-+    select UNIMP
++    select REGISTER
+ 
+ config STP2000
+     bool
 -- 
 2.18.1
 
