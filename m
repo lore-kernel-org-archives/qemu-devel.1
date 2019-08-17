@@ -2,58 +2,86 @@ Return-Path: <SRS0=glhp=WN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCC3C3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 07:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A67DC3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 07:55:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91F5521743
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 07:53:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91F5521743
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 4400621743
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 07:55:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CYeGpuLq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4400621743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hytWf-0003IE-QJ
-	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 03:53:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41187)
+	id 1hytYI-0004Lj-BV
+	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 03:55:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42907)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hytGe-00074Y-Mv
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 03:36:53 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hytXK-0003oW-MY
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 03:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hytGd-0006kb-8i
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 03:36:52 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:47818)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hytGd-0006Xa-0a
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 03:36:51 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id A621F572A7;
- Sat, 17 Aug 2019 16:36:40 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 6035A240086;
- Sat, 17 Aug 2019 16:36:40 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Sat, 17 Aug 2019 16:36:26 +0900
-Message-Id: <20190817073628.94473-21-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190817073628.94473-1-ysato@users.sourceforge.jp>
-References: <20190817073628.94473-1-ysato@users.sourceforge.jp>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hytXJ-0000Tv-5i
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 03:54:06 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42163)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hytXF-0000Pj-W0; Sat, 17 Aug 2019 03:54:02 -0400
+Received: by mail-ot1-x343.google.com with SMTP id j7so11680634ota.9;
+ Sat, 17 Aug 2019 00:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=QducGt1kiXEU2n2Hi+Oiq8/yIY3AymjRQGsbtdusS8g=;
+ b=CYeGpuLqOsnHzMeNFyWdEJwt1ilREaSXAAISvi8UyQMDu/dKLnp/z5jpVtTEhzmv+f
+ 2pkwX0icHawGiSQYczgNPAgy52eOS0plp0BqDmh5ZDvlobqmTCMLd3Qoo84fRWxDG6nP
+ t4c7HcogNE8jMKgZxxiPQGzn41Ov+ccZ+iF3UkatbJay+Lc4sbRyXmL2BZ2rQHplc5JZ
+ M4H/FWjcEwFf02Cmt/PLMfJjyPDNEnhjK2ocn7/0+UQzyQf2WTiKVQKsMZvcBvfA8tQh
+ llL1FpaTdljf6wkRi7Ik1k0E1fw7/d0z8RM5e4vBg9V52Qz0UR6rdPkfQ3yVPrtX8EOb
+ Xnqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=QducGt1kiXEU2n2Hi+Oiq8/yIY3AymjRQGsbtdusS8g=;
+ b=TazlRvlB3vueBiq4jiT0NzLmaHZpMH1ddyq4sYTR7nNpn6puqcp8oE7zXwlhi2xvq/
+ KC8ZW0roXrSEcD7CFqXNig7d9sIPwRs94/Y6uAzUdZKb4dER2bWIUkBiJYfMo7UiVlxt
+ FAgcqQw11pWrXr9g8I5yfyEPmI/5W/nWIkSgAr5VTPh0NSmABBBRHJ9OP6TVEHweSxL7
+ pvvAICVa7G9y7ZKWrET8QxWAZ/L92zxVbhyz6gBDVvPRyif68J4kxmkeoZ0yRBe3HX0U
+ krqthp6Es++1rV4jzmEUpj8ZCYszUQEmgT7ZSmakvcmv4LAip68LvmPnEumgwBhAfntc
+ hpHw==
+X-Gm-Message-State: APjAAAUnasX9GY9Mh6zmpySwYPM2Dgvffwnsc2gkhDMuCDSmxEn9pBEw
+ w0nYqQ+XaK7Cth0dYZSlk9ZmFtJhaY1fWLdx/Zo4lQ==
+X-Google-Smtp-Source: APXvYqznTo9rcMBPmOismr5eGLQP28CaRRXpKCD86+08jPFPeod1+DtloQfbw2yUZClEgrcltZHXK2dDwlzlIiEllLU=
+X-Received: by 2002:a05:6830:1d75:: with SMTP id
+ l21mr9842611oti.121.1566028440281; 
+ Sat, 17 Aug 2019 00:54:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Sat, 17 Aug 2019 00:53:59
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Sat, 17 Aug 2019 00:53:59
+ -0700 (PDT)
+In-Reply-To: <CAL1e-=jy6vggskJ26rTc8dnaqtqCB0SdfpV9p-NvKdjoBk+Vkw@mail.gmail.com>
+References: <1565983669-6886-1-git-send-email-pc@us.ibm.com>
+ <CAL1e-=jy6vggskJ26rTc8dnaqtqCB0SdfpV9p-NvKdjoBk+Vkw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 17 Aug 2019 09:53:59 +0200
+Message-ID: <CAL1e-=hAcMMQMP4ecW_AW_3UM1yCjRE+P7QN3ytn2JaZeTFxUg@mail.gmail.com>
+To: "Paul A. Clarke" <pc@us.ibm.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.15
-Subject: [Qemu-devel] [PATCH v23 20/22] Add rx-softmmu
+X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] ppc: Three floating point fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,155 +93,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, imammedo@redhat.com, richard.henderson@linaro.org,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-17-ysato@users.sourceforge.jp>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-pick ed65c02993 target/rx: Add RX to SysEmuTarget
-pick 01372568ae tests: Add rx to machine-none-test.c
-[PMD: Squashed patches from Richard Henderson modifying
-      qapi/common.json and tests/machine-none-test.c]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+17.08.2019. 00.59, "Aleksandar Markovic" <aleksandar.m.mail@gmail.com> =D1=
+=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+>
+> 16.08.2019. 21.28, "Paul A. Clarke" <pc@us.ibm.com> =D1=98=D0=B5 =D0=BD=
+=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > From: "Paul A. Clarke" <pc@us.ibm.com>
+> >
+> > - target/ppc/fpu_helper.c:
+> >   - helper_todouble() was not properly converting INFINITY from 32 bit
+> >   float to 64 bit double.
+> >   - helper_todouble() was not properly converting any denormalized
+> >   32 bit float to 64 bit double.
+> >
+> > - GCC, as of version 8 or so, takes advantage of the hardware's
+> >   implementation of the xscvdpspn instruction to optimize the following
+> >   sequence:
+> >     xscvdpspn vs0,vs1
+> >     mffprwz   r8,f0
+> >   ISA 3.0B has xscvdpspn leaving its result in word 1 of the target
+register,
+> >   and mffprwz expecting its input to come from word 0 of the source
+register.
+> >   This sequence fails with QEMU, as a shift is required between those
+two
+> >   instructions.  However, the hardware splats the result to both word 0
+and
+> >   word 1 of its output register, so the shift is not necessary.
+> >   Expect a future revision of the ISA to specify this behavior.
+> >
+>
+> Hmmm... Isn't this a gcc bug (using undocumented hardware feature), given
+everything you said here?
+>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- configure                      | 8 ++++++++
- default-configs/rx-softmmu.mak | 3 +++
- qapi/common.json               | 3 ++-
- include/exec/poison.h          | 1 +
- include/sysemu/arch_init.h     | 1 +
- arch_init.c                    | 2 ++
- tests/machine-none-test.c      | 1 +
- hw/Kconfig                     | 1 +
- 8 files changed, 19 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/rx-softmmu.mak
+Paul, you are touching here a very sensitive area. If I were you, I would
+most likely propose a similar patch, given thr info you presented. However,
+in general, QEMU is a compiler-agnostic tool and should not depend on
+compiler features, let alone fix its bugs, and therefore I think you should
+more clearly spell out in your commit message that the code segment in
+question is a workaround for an outright GCC bug, and just a kind of
+"necessary evil" in given situation.
 
-diff --git a/configure b/configure
-index 714e7fb6a1..6df4a59467 100755
---- a/configure
-+++ b/configure
-@@ -7606,6 +7606,11 @@ case "$target_name" in
-     gdb_xml_files=3D"riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit=
--csr.xml"
-     target_compiler=3D$cross_cc_riscv64
-   ;;
-+  rx)
-+    TARGET_ARCH=3Drx
-+    bflt=3D"yes"
-+    target_compiler=3D$cross_cc_rx
-+  ;;
-   sh4|sh4eb)
-     TARGET_ARCH=3Dsh4
-     bflt=3D"yes"
-@@ -7826,6 +7831,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   riscv*)
-     disas_config "RISCV"
-   ;;
-+  rx)
-+    disas_config "RX"
-+  ;;
-   s390*)
-     disas_config "S390"
-   ;;
-diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.=
-mak
-new file mode 100644
-index 0000000000..a3eecefb11
---- /dev/null
-+++ b/default-configs/rx-softmmu.mak
-@@ -0,0 +1,3 @@
-+# Default configuration for rx-softmmu
-+
-+CONFIG_RX_VIRT=3Dy
-diff --git a/qapi/common.json b/qapi/common.json
-index 3d4e8de1e0..7af308187c 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -159,6 +159,7 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# rx: added in 4.1
- #
- # Since: 3.0
- ##
-@@ -166,6 +167,6 @@
-   'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
--             'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-+             'ppc64', 'riscv32', 'riscv64', 'rx', 's390x', 'sh4',
-              'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
-              'x86_64', 'xtensa', 'xtensaeb' ] }
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index b862320fa6..c17911d859 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -26,6 +26,7 @@
- #pragma GCC poison TARGET_PPC
- #pragma GCC poison TARGET_PPC64
- #pragma GCC poison TARGET_ABI32
-+#pragma GCC poison TARGET_RX
- #pragma GCC poison TARGET_S390X
- #pragma GCC poison TARGET_SH4
- #pragma GCC poison TARGET_SPARC
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 62c6fe4cf1..6c011acc52 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -24,6 +24,7 @@ enum {
-     QEMU_ARCH_NIOS2 =3D (1 << 17),
-     QEMU_ARCH_HPPA =3D (1 << 18),
-     QEMU_ARCH_RISCV =3D (1 << 19),
-+    QEMU_ARCH_RX =3D (1 << 20),
- };
-=20
- extern const uint32_t arch_type;
-diff --git a/arch_init.c b/arch_init.c
-index 74b0708634..48d9b4c86f 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -73,6 +73,8 @@ int graphic_depth =3D 32;
- #define QEMU_ARCH QEMU_ARCH_PPC
- #elif defined(TARGET_RISCV)
- #define QEMU_ARCH QEMU_ARCH_RISCV
-+#elif defined(TARGET_RX)
-+#define QEMU_ARCH QEMU_ARCH_RX
- #elif defined(TARGET_S390X)
- #define QEMU_ARCH QEMU_ARCH_S390X
- #elif defined(TARGET_SH4)
-diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index 5953d31755..8bb54a6360 100644
---- a/tests/machine-none-test.c
-+++ b/tests/machine-none-test.c
-@@ -56,6 +56,7 @@ static struct arch2cpu cpus_map[] =3D {
-     { "hppa", "hppa" },
-     { "riscv64", "rv64gcsu-v1.10.0" },
-     { "riscv32", "rv32gcsu-v1.9.1" },
-+    { "rx", "rx62n" },
- };
-=20
- static const char *get_cpu_model_by_arch(const char *arch)
-diff --git a/hw/Kconfig b/hw/Kconfig
-index 195f541e50..b0c7221240 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -54,6 +54,7 @@ source nios2/Kconfig
- source openrisc/Kconfig
- source ppc/Kconfig
- source riscv/Kconfig
-+source rx/Kconfig
- source s390x/Kconfig
- source sh4/Kconfig
- source sparc/Kconfig
---=20
-2.11.0
+Let us also wait for David possibly coming up with the final verdict wrt
+this issue.
 
+Also, this patch should be split into two or three (infinity conversions
+have nothing to do with xscvdpspn) - a patch deals with only one logical
+unit.
 
+Yours,
+Aleksandar
+
+> Sincerely,
+> Aleksandar
+>
+> > Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+> > ---
+> >  target/ppc/fpu_helper.c | 9 +++++++--
+> >  1 file changed, 7 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+> > index 5611cf0..82b5425 100644
+> > --- a/target/ppc/fpu_helper.c
+> > +++ b/target/ppc/fpu_helper.c
+> > @@ -62,13 +62,14 @@ uint64_t helper_todouble(uint32_t arg)
+> >          ret  =3D (uint64_t)extract32(arg, 30, 2) << 62;
+> >          ret |=3D ((extract32(arg, 30, 1) ^ 1) * (uint64_t)7) << 59;
+> >          ret |=3D (uint64_t)extract32(arg, 0, 30) << 29;
+> > +        ret |=3D (0x7ffULL * (extract32(arg, 23, 8) =3D=3D 0xff)) << 5=
+2;
+> >      } else {
+> >          /* Zero or Denormalized operand.  */
+> >          ret =3D (uint64_t)extract32(arg, 31, 1) << 63;
+> >          if (unlikely(abs_arg !=3D 0)) {
+> >              /* Denormalized operand.  */
+> >              int shift =3D clz32(abs_arg) - 9;
+> > -            int exp =3D -126 - shift + 1023;
+> > +            int exp =3D -127 - shift + 1023;
+> >              ret |=3D (uint64_t)exp << 52;
+> >              ret |=3D abs_arg << (shift + 29);
+> >          }
+> > @@ -2871,10 +2872,14 @@ void helper_xscvqpdp(CPUPPCState *env, uint32_t
+opcode,
+> >
+> >  uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
+> >  {
+> > +    uint64_t result;
+> > +
+> >      float_status tstat =3D env->fp_status;
+> >      set_float_exception_flags(0, &tstat);
+> >
+> > -    return (uint64_t)float64_to_float32(xb, &tstat) << 32;
+> > +    result =3D (uint64_t)float64_to_float32(xb, &tstat);
+> > +    /* hardware replicates result to both words of the doubleword
+result.  */
+> > +    return (result << 32) | result;
+> >  }
+> >
+> >  uint64_t helper_xscvspdpn(CPUPPCState *env, uint64_t xb)
+> > --
+> > 1.8.3.1
+> >
+> >
