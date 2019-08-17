@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1110BC3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E98C3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:23:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D891520880
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:22:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D891520880
+	by mail.kernel.org (Postfix) with ESMTPS id CBA332086C
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:23:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBA332086C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyvqX-0003Kt-Ki
-	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 06:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58117)
+	id 1hyvrv-0005vl-VU
+	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 06:23:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hyvoP-0000mz-JM
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:54 -0400
+ (envelope-from <thuth@redhat.com>) id 1hyvoJ-0000hd-2n
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hyvoO-0004Um-I8
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34102)
+ (envelope-from <thuth@redhat.com>) id 1hyvoI-0004Pc-4W
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43840)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hyvoM-0004RN-5w; Sat, 17 Aug 2019 06:19:50 -0400
+ id 1hyvoF-0004Mw-OR; Sat, 17 Aug 2019 06:19:43 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5E429C049D59;
- Sat, 17 Aug 2019 10:19:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1380B36955;
+ Sat, 17 Aug 2019 10:19:43 +0000 (UTC)
 Received: from thuth.com (ovpn-116-52.ams2.redhat.com [10.36.116.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1DF0FD1E5;
- Sat, 17 Aug 2019 10:19:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A996FD1E5;
+ Sat, 17 Aug 2019 10:19:40 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-Date: Sat, 17 Aug 2019 12:19:26 +0200
-Message-Id: <20190817101931.28386-4-thuth@redhat.com>
+Date: Sat, 17 Aug 2019 12:19:24 +0200
+Message-Id: <20190817101931.28386-2-thuth@redhat.com>
 In-Reply-To: <20190817101931.28386-1-thuth@redhat.com>
 References: <20190817101931.28386-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Sat, 17 Aug 2019 10:19:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Sat, 17 Aug 2019 10:19:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 3/8] hw/dma: Do not build the xlnx_dpdma
- device for the MicroBlaze machines
+Subject: [Qemu-devel] [PATCH v3 1/8] hw/Kconfig: Move the generic
+ XLNX_ZYNQMP to the root hw/Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,31 +80,43 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-The xlnx_dpdma device is only used by the ZynqMP AArch64 machine
-(not the MicroBlaze PMU). Remove it from the ZynqMP generic objects.
-(Note, this entry was duplicated for the AArch64).
+The XLNX_ZYNQMP config is used in multiple subdirectories
+(timer, intc). Move it to the root hw/Kconfig.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190427141459.19728-4-philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190427141459.19728-2-philmd@redhat.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/dma/Makefile.objs | 1 -
- 1 file changed, 1 deletion(-)
+ hw/Kconfig       | 3 +++
+ hw/timer/Kconfig | 3 ---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-index 8b39f9c600..b672e7a522 100644
---- a/hw/dma/Makefile.objs
-+++ b/hw/dma/Makefile.objs
-@@ -8,7 +8,6 @@ common-obj-$(CONFIG_XILINX_AXI) +=3D xilinx_axidma.o
- common-obj-$(CONFIG_ZYNQ_DEVCFG) +=3D xlnx-zynq-devcfg.o
- common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_dma.o
- common-obj-$(CONFIG_STP2000) +=3D sparc32_dma.o
--obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx_dpdma.o
- obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx_dpdma.o
- common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zdma.o
+diff --git a/hw/Kconfig b/hw/Kconfig
+index 195f541e50..dbae1c0852 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -73,3 +73,6 @@ config XILINX
+ config XILINX_AXI
+     bool
+     select PTIMER # for hw/dma/xilinx_axidma.c
++
++config XLNX_ZYNQMP
++    bool
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index 51921eb63f..eefc95f35e 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -34,9 +34,6 @@ config TWL92230
+     bool
+     depends on I2C
 =20
+-config XLNX_ZYNQMP
+-    bool
+-
+ config ALTERA_TIMER
+     bool
+     select PTIMER
 --=20
 2.18.1
 
