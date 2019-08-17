@@ -2,64 +2,70 @@ Return-Path: <SRS0=glhp=WN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9229AC3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 04:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FEA5C3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 05:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 514E72173B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 04:51:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cutcl55j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 514E72173B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id E09C72173B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 05:35:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E09C72173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyqgs-0000PU-3K
-	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 00:51:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54043)
+	id 1hyrNG-000679-4f
+	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 01:35:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57590)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1hyqg2-0008Na-6k
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 00:50:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1hyrMX-0005Yv-F3
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 01:34:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hyqfz-0004m2-QU
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 00:50:53 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:35297)
+ (envelope-from <armbru@redhat.com>) id 1hyrMV-0005hV-NR
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 01:34:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48740)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hyqfy-0004ka-6T; Sat, 17 Aug 2019 00:50:51 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 469SS41tbZz9sDB; Sat, 17 Aug 2019 14:50:43 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566017444;
- bh=A/Tqyy8V+EklIlgUSi5+1rSAnxHD9Tu/a0PMaNrEcYU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cutcl55jfp2ojSfCCN3Z7t2JamTlZVemekbk2hjsnYrrlE+7aslYw2z4wlmloVHlP
- DdO5nYJe00U3AoKILPYmBs/m0bfvrAWwFvx9oYc6fVO6iOV5N83AI5UTY2b3j5I5ws
- qNWiEGkxx0sUjbMiaTiFEA221pTiCaZHf5jwHmqo=
-Date: Sat, 17 Aug 2019 13:29:05 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <20190817032905.GC2259@umbus.fritz.box>
-References: <20190816061733.53572-1-aik@ozlabs.ru>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hyrMV-0005hC-GW
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 01:34:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 45509806CD;
+ Sat, 17 Aug 2019 05:34:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EFED90C41;
+ Sat, 17 Aug 2019 05:34:43 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id EA9B410E6CCA; Sat, 17 Aug 2019 07:34:41 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
+ <20190815183803.13346-4-ehabkost@redhat.com>
+ <87pnl5sks3.fsf@dusky.pond.sub.org>
+ <20190816074932.GK13569@beluga.usersys.redhat.com>
+ <87h86hpae5.fsf@dusky.pond.sub.org>
+ <20190816174241.GE3908@habkost.net>
+Date: Sat, 17 Aug 2019 07:34:41 +0200
+In-Reply-To: <20190816174241.GE3908@habkost.net> (Eduardo Habkost's message of
+ "Fri, 16 Aug 2019 14:42:41 -0300")
+Message-ID: <8736i0iccu.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bKyqfOwhbdpXa4YI"
-Content-Disposition: inline
-In-Reply-To: <20190816061733.53572-1-aik@ozlabs.ru>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH qemu] target/ppc: Add Directed Privileged
- Door-bell Exception State (DPDES) SPR
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Sat, 17 Aug 2019 05:34:46 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties
+ mandatory unless necessary
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,117 +77,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Mackerras <paulus@samba.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Yash Mankad <ymankad@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ Like Xu <like.xu@linux.intel.com>, Erik Skultety <eskultet@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Miroslav Rezanina <mrezanin@redhat.com>,
+ "Danilo C. L. de Paula" <ddepaula@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
---bKyqfOwhbdpXa4YI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Fri, Aug 16, 2019 at 02:22:58PM +0200, Markus Armbruster wrote:
+>> Erik Skultety <eskultet@redhat.com> writes:
+>> 
+>> > On Fri, Aug 16, 2019 at 08:10:20AM +0200, Markus Armbruster wrote:
+>> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> >>
+>> >> > We have this issue reported when using libvirt to hotplug CPUs:
+>> >> > https://bugzilla.redhat.com/show_bug.cgi?id=1741451
+>> >> >
+>> >> > Basically, libvirt is not copying die-id from
+>> >> > query-hotpluggable-cpus, but die-id is now mandatory.
+>> >>
+>> >> Uh-oh, "is now mandatory": making an optional property mandatory is an
+>> >> incompatible change.  When did we do that?  Commit hash, please.
+>> >>
+>> >> [...]
+>> >>
+>> >
+>> > I don't even see it as being optional ever - the property wasn't even
+>> > recognized before commit 176d2cda0de introduced it as mandatory.
+>> 
+>> Compatibility break.
+>> 
+>> Commit 176d2cda0de is in v4.1.0.  If I had learned about it a bit
+>> earlier, I would've argued for a last minute fix or a revert.  Now we
+>> have a regression in the release.
+>> 
+>> Eduardo, I think this fix should go into v4.1.1.  Please add cc:
+>> qemu-stable.
+>
+> I did it in v2.
+>
+>> 
+>> How can we best avoid such compatibility breaks to slip in undetected?
+>> 
+>> A static checker would be nice.  For vmstate, we have
+>> scripts/vmstate-static-checker.py.  Not sure it's used.
+>
+> I don't think this specific bug would be detected with a static
+> checker.  "die-id is mandatory" is not something that can be
+> extracted by looking at QOM data structures.  The new rule was
+> being enforced by the hotplug handler callbacks, and the hotplug
+> handler call tree is a bit complex (too complex for my taste, but
+> I digress).
 
-On Fri, Aug 16, 2019 at 04:17:33PM +1000, Alexey Kardashevskiy wrote:
-> DPDES stores a status of a doorbell message and if it is lost in
-> migration, the destination CPU won't receive it. This does not hit us
-> much as IPIs complete too quick to catch a pending one and even if
-> we missed one, broadcasts happen often enough to wake that CPU.
->=20
-> This defines DPDES and registers with KVM for migration.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+QOM does too much in code.  Turing tarpit.
 
-Ouch, I'm kind of surprised this hasn't bitten us before.
+> We could have detected this with a simple CPU hotplug automated
+> test case, though.  Or with a very simple -device test case like
+> the one I have submitted with this patch.
 
-Really we ought to also wire this up to the emulated doorbell
-instructions as well, but this certainly improves the behaviour so
-I've merged it to ppc-for-4.2.
+The external QOM interface is huge.  Even if we had an army of
+industrious gnomes writing simple test cases for all of it, we'd still
+need a fleet of machines to actually run them, and at least a batallion
+of gnomes to maintain them.
 
-> ---
->  target/ppc/cpu.h                |  1 +
->  target/ppc/translate_init.inc.c | 14 ++++++++++++++
->  2 files changed, 15 insertions(+)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 64799386f9ab..f0521a435d2d 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1466,6 +1466,7 @@ typedef PowerPCCPU ArchCPU;
->  #define SPR_MPC_ICTRL         (0x09E)
->  #define SPR_MPC_BAR           (0x09F)
->  #define SPR_PSPB              (0x09F)
-> +#define SPR_DPDES             (0x0B0)
->  #define SPR_DAWR              (0x0B4)
->  #define SPR_RPR               (0x0BA)
->  #define SPR_CIABR             (0x0BB)
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index c9fcd87095f5..7e41ae145600 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -8198,6 +8198,18 @@ static void gen_spr_power8_pspb(CPUPPCState *env)
->                       KVM_REG_PPC_PSPB, 0);
->  }
-> =20
-> +static void gen_spr_power8_dpdes(CPUPPCState *env)
-> +{
-> +#if !defined(CONFIG_USER_ONLY)
-> +    /* Directed Privileged Door-bell Exception State, used for IPI */
-> +    spr_register_kvm_hv(env, SPR_DPDES, "DPDES",
-> +                        SPR_NOACCESS, SPR_NOACCESS,
-> +                        &spr_read_generic, SPR_NOACCESS,
-> +                        &spr_read_generic, &spr_write_generic,
-> +                        KVM_REG_PPC_DPDES, 0x00000000);
-> +#endif
-> +}
-> +
->  static void gen_spr_power8_ic(CPUPPCState *env)
->  {
->  #if !defined(CONFIG_USER_ONLY)
-> @@ -8629,6 +8641,7 @@ static void init_proc_POWER8(CPUPPCState *env)
->      gen_spr_power8_pmu_user(env);
->      gen_spr_power8_tm(env);
->      gen_spr_power8_pspb(env);
-> +    gen_spr_power8_dpdes(env);
->      gen_spr_vtb(env);
->      gen_spr_power8_ic(env);
->      gen_spr_power8_book4(env);
-> @@ -8817,6 +8830,7 @@ static void init_proc_POWER9(CPUPPCState *env)
->      gen_spr_power8_pmu_user(env);
->      gen_spr_power8_tm(env);
->      gen_spr_power8_pspb(env);
-> +    gen_spr_power8_dpdes(env);
->      gen_spr_vtb(env);
->      gen_spr_power8_ic(env);
->      gen_spr_power8_book4(env);
+The extremely basic qom-test gobbles up a painful amount of CPU cycles
+already:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+$ time for i in `find bld/*-softmmu -maxdepth 1 -name qemu-system-\* -perm /u+x`; do QTEST_QEMU_BINARY=$i bld/tests/qom-test; done
+/aarch64/qom/versatileab: OK
+[260 lines of the form name/of/test: OK omitted...]
+/xtensaeb/qom/lx60: OK
 
---bKyqfOwhbdpXa4YI
-Content-Type: application/pgp-signature; name="signature.asc"
+real	3m33.001s
+user	2m18.081s
+sys	1m31.809s
 
------BEGIN PGP SIGNATURE-----
+> This was detected by libvirt automated test cases.  It would be
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1XdH8ACgkQbDjKyiDZ
-s5JhRA/+OQ13luMiOOJxqXTmE1uF59eWHf1PzfQjGV1TP9NZxjKyUeQAoz29pldp
-LaqZzlBBS0emvQ24P2lNQZcHS2m0i3xVOONSmTw5NDh355PBy8QXbbLgZCr101RO
-72qwNBUhkPXEKGCoO18lmos+kOeRMVFdR9q2HzPvFFNiugda61dSmcXYoN4ycz2C
-sylhK7ctNegn3OA7+KQAfr/1CMEkneDzLtRsBLaAAvp9sgjamaLCMCQQ9TYrf20W
-FRPbr+do7QfXrqZeS/oTIow/NkQZkhFECZRFDXOlSKnIyULN30a08OaEGVGk/6n0
-t/Bj7cqC7I2Wu9f9d4RxEAk+ygKWyUm6+vQzp3EF60OxnaYOQH/ZH8+f/JxF0nnI
-N6jgmUG1Yl3jI7KOwLeXOCYAsmFQaIvgAnbcBOhTUt4rVjKPdT3dEJlf9CJqowD6
-xLiWahnCYyIoh02b1APcJkdSqf9I7K3pWRpXvkmWWus6r2e5lAW7YAuSDH2QCDcA
-vGQlXbSxli0Rp9CgDH1MHa4K6y1Et44tyQ4KSLO0mZ+OUK/DSHtdt/Rk1CM1talx
-RGKyXSpV0q/qojphb8gHN330nNlBmaNURb4EkUFR1hOiZvdV/HeDOeCE0AIWGVOB
-5Rp76owwfolYhW8QjV+IMgLMzdAFu7PhVIP8Hm4QFx3ry+xeyAs=
-=cV7Q
------END PGP SIGNATURE-----
+Nice.
 
---bKyqfOwhbdpXa4YI--
+> nice if this was run during the -rc stage and not only after the
+> 4.1.0 release, though.
+
+We don't always get lucky.
+
+> I don't know details of the test job.  Danilo, Mirek, Yash: do
+> you know how this bug was detected, and what we could do to run
+> the same test jobs in upstream QEMU release candidates?
+
+Thinking about how to make the best use of the tests we have is in
+order.
 
