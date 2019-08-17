@@ -2,63 +2,63 @@ Return-Path: <SRS0=glhp=WN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E98C3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D3EC3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBA332086C
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:23:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBA332086C
+	by mail.kernel.org (Postfix) with ESMTPS id C9FCC2086C
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 10:24:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9FCC2086C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyvrv-0005vl-VU
-	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 06:23:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58045)
+	id 1hyvsS-0006SR-Ql
+	for qemu-devel@archiver.kernel.org; Sat, 17 Aug 2019 06:24:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hyvoJ-0000hd-2n
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:48 -0400
+ (envelope-from <thuth@redhat.com>) id 1hyvoZ-0000zp-AH
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:20:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hyvoI-0004Pc-4W
- for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:19:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43840)
+ (envelope-from <thuth@redhat.com>) id 1hyvoY-0004fS-7z
+ for qemu-devel@nongnu.org; Sat, 17 Aug 2019 06:20:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47520)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hyvoF-0004Mw-OR; Sat, 17 Aug 2019 06:19:43 -0400
+ id 1hyvoV-0004bl-VH; Sat, 17 Aug 2019 06:20:00 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1380B36955;
- Sat, 17 Aug 2019 10:19:43 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4091281F0F;
+ Sat, 17 Aug 2019 10:19:59 +0000 (UTC)
 Received: from thuth.com (ovpn-116-52.ams2.redhat.com [10.36.116.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A996FD1E5;
- Sat, 17 Aug 2019 10:19:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B5569D1E5;
+ Sat, 17 Aug 2019 10:19:53 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-Date: Sat, 17 Aug 2019 12:19:24 +0200
-Message-Id: <20190817101931.28386-2-thuth@redhat.com>
+Date: Sat, 17 Aug 2019 12:19:29 +0200
+Message-Id: <20190817101931.28386-7-thuth@redhat.com>
 In-Reply-To: <20190817101931.28386-1-thuth@redhat.com>
 References: <20190817101931.28386-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Sat, 17 Aug 2019 10:19:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Sat, 17 Aug 2019 10:19:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 1/8] hw/Kconfig: Move the generic
- XLNX_ZYNQMP to the root hw/Kconfig
+Subject: [Qemu-devel] [PATCH v3 6/8] hw/core: Add a config switch for the
+ "split-irq" device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,45 +78,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+The "split-irq" device is currently only used by machines that use
+CONFIG_ARMSSE. Let's add a proper CONFIG_SPLIT_IRQ switch for this
+so that it only gets compiled when we really need it.
 
-The XLNX_ZYNQMP config is used in multiple subdirectories
-(timer, intc). Move it to the root hw/Kconfig.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190427141459.19728-2-philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/Kconfig       | 3 +++
- hw/timer/Kconfig | 3 ---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ hw/arm/Kconfig        | 3 +++
+ hw/core/Kconfig       | 3 +++
+ hw/core/Makefile.objs | 2 +-
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/hw/Kconfig b/hw/Kconfig
-index 195f541e50..dbae1c0852 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -73,3 +73,6 @@ config XILINX
- config XILINX_AXI
-     bool
-     select PTIMER # for hw/dma/xilinx_axidma.c
-+
-+config XLNX_ZYNQMP
-+    bool
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 51921eb63f..eefc95f35e 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -34,9 +34,6 @@ config TWL92230
-     bool
-     depends on I2C
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 849195c3f6..6e24c73b54 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -81,6 +81,7 @@ config MUSCA
+     select ARMSSE
+     select PL011
+     select PL031
++    select SPLIT_IRQ
 =20
--config XLNX_ZYNQMP
--    bool
--
- config ALTERA_TIMER
+ config MUSICPAL
      bool
-     select PTIMER
+@@ -364,6 +365,7 @@ config MPS2
+     select OR_IRQ
+     select PL022    # Serial port
+     select PL080    # DMA controller
++    select SPLIT_IRQ
+=20
+ config FSL_IMX7
+     bool
+@@ -442,6 +444,7 @@ config ARMSSE
+     select IOTKIT_SYSCTL
+     select IOTKIT_SYSINFO
+     select OR_IRQ
++    select SPLIT_IRQ
+     select TZ_MPC
+     select TZ_MSC
+     select TZ_PPC
+diff --git a/hw/core/Kconfig b/hw/core/Kconfig
+index 984143456a..fffb3d62b2 100644
+--- a/hw/core/Kconfig
++++ b/hw/core/Kconfig
+@@ -15,3 +15,6 @@ config PLATFORM_BUS
+=20
+ config REGISTER
+     bool
++
++config SPLIT_IRQ
++    bool
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index ce337bd7c9..bb1afe422a 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -19,7 +19,7 @@ common-obj-$(CONFIG_FITLOADER) +=3D loader-fit.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
+ common-obj-$(CONFIG_REGISTER) +=3D register.o
+ common-obj-$(CONFIG_OR_IRQ) +=3D or-irq.o
+-common-obj-$(CONFIG_SOFTMMU) +=3D split-irq.o
++common-obj-$(CONFIG_SPLIT_IRQ) +=3D split-irq.o
+ common-obj-$(CONFIG_PLATFORM_BUS) +=3D platform-bus.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D generic-loader.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
 --=20
 2.18.1
 
