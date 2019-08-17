@@ -1,61 +1,81 @@
-Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=glhp=WN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53428C41514
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24C7C3A59D
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 00:05:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25CBF21726
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25CBF21726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B59020578
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Aug 2019 00:05:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="hAIQZDa0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B59020578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hylzN-0003e0-Cw
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:50:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47665)
+	id 1hymDn-0000HB-GN
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 20:05:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hylSG-0001hk-JZ
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:16:22 -0400
+ (envelope-from <scw@google.com>) id 1hymCi-0007sd-MJ
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 20:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hylSE-0007sx-Q5
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:16:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44118)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hylSE-0007sc-Ix; Fri, 16 Aug 2019 19:16:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E453F307D844;
- Fri, 16 Aug 2019 23:16:17 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E013F17BB9;
- Fri, 16 Aug 2019 23:16:13 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 19:16:09 -0400
-Message-Id: <20190816231609.9521-4-jsnow@redhat.com>
-In-Reply-To: <20190816231609.9521-1-jsnow@redhat.com>
-References: <20190816231609.9521-1-jsnow@redhat.com>
+ (envelope-from <scw@google.com>) id 1hymCh-0005TT-0z
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 20:04:20 -0400
+Received: from mail-io1-xd33.google.com ([2607:f8b0:4864:20::d33]:33469)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <scw@google.com>) id 1hymCg-0005T5-Ig
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 20:04:18 -0400
+Received: by mail-io1-xd33.google.com with SMTP id z3so9609835iog.0
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 17:04:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pyan4/kFojvqTolurfUXxXXfCYo1p+UJQiF8rp77EWQ=;
+ b=hAIQZDa00kCZ6IYwD2e1mQKrn/KVfyWoAdW36tPadCl7KTiEnJodeEFhb180mRlguy
+ efP+rORz1DwPFM73y3j7xG/lHoD1gbUKZUzHqOGtthTKdHU7QwmnMzNYvKgEA8qaLvtK
+ hPMQ2uZQez5fouVyeWv56cMoWVN0lKchvpX/eiMPVSihnz+i4qISpkbBuoK+KLi5fKqU
+ 65u0ZW64F7pLQprP3UNixK5cSJDu0n+V2Pz/tLNCy+I8Z7Er2UtItAl3fZxzqueZ36bL
+ OM4jZkDd/BQks2J/VYt0EOIT7H7wq0GU1F8BYI2V9Jo7GfFTtQNb/+C76fUwbrNCLSOi
+ aRnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pyan4/kFojvqTolurfUXxXXfCYo1p+UJQiF8rp77EWQ=;
+ b=FCOgjYUIOGfHlo7/nRV2fEZjq+M5eyQ6Bq7MpbafVGgR7i5Lc6KQN1gTDk58FHDgB0
+ YhJb7t8LuXLU4hP7yrQo2FJBDxydlVTiVzqVjIIlvfRZipbeox0vDiYXGESE7sTIxelq
+ BHJWymnXgM7GWQg8HIZz4F84XGhrIBTvKvdvVkluIwMhmSVIOf/ouMdm/O6hgVyP1x0r
+ ODxpR3aK5Lwi507R5PTBHvcIsKBPHAAtzC4GiqqhDZN3rZwpuuoyQ3ESRJcQil57pFJX
+ dWX/MQBaDsSrywwzU3qcRR6MQRW36GAU9+7+kOsRP+inQ8sfAWfTf5RP+M9dQ6bwxjY6
+ sHew==
+X-Gm-Message-State: APjAAAUvViAlUo0cdyPyi+CLt6kSXTBRrimFHxg6zLyklqkDNjTWNSHQ
+ BdLRT8QslcW25XSa5/+fjuFlCxAbhFUUMKSDzj4/nw==
+X-Google-Smtp-Source: APXvYqzRpcDtwCKPKE0LEd3nF3qo4fCOeDaog+gChQcoEYIMjwHt+Y9IMj9jhFQWC2yavaBOs0Vd0JXDN2v65gMVq04=
+X-Received: by 2002:a02:8663:: with SMTP id e90mr8085281jai.98.1566000256782; 
+ Fri, 16 Aug 2019 17:04:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 16 Aug 2019 23:16:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/3] hw/ide/atapi: Use the ldst API
+References: <20190816211356.59244-1-scw@google.com>
+ <CAL1e-=hMssOVfvGWsyWmUgPyG-1ovMva9W5-T+GJgoyn_29-VQ@mail.gmail.com>
+In-Reply-To: <CAL1e-=hMssOVfvGWsyWmUgPyG-1ovMva9W5-T+GJgoyn_29-VQ@mail.gmail.com>
+Date: Fri, 16 Aug 2019 17:04:04 -0700
+Message-ID: <CAF3nBxiu9i8=07+1QqHj2bWiBmHkwCGyg2Y+bK6eVrhhroiJzw@mail.gmail.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature";
+ micalg=sha-256; boundary="00000000000010f6b1059044d9f7"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d33
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] Add support for ethtool via
+ TARGET_SIOCETHTOOL ioctls.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,267 +87,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jsnow@redhat.com, qemu-stable@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+From: Shu-Chun Weng via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Shu-Chun Weng <scw@google.com>
+Cc: Arun Kalyanasundaram <arunkaly@google.com>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+--00000000000010f6b1059044d9f7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The big-endian load/store functions are already provided
-by "qemu/bswap.h".
-Avoid code duplication, use the generic API.
+Thank you Aleksandar,
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190808130454.9930-1-philmd@redhat.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/atapi.c | 80 ++++++++++++++++++--------------------------------
- 1 file changed, 28 insertions(+), 52 deletions(-)
+I've updated the patch description and will send out v2 soon.
 
-diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-index 1b0f66cc089..17a9d635d84 100644
---- a/hw/ide/atapi.c
-+++ b/hw/ide/atapi.c
-@@ -45,30 +45,6 @@ static void padstr8(uint8_t *buf, int buf_size, const =
-char *src)
-     }
- }
-=20
--static inline void cpu_to_ube16(uint8_t *buf, int val)
--{
--    buf[0] =3D val >> 8;
--    buf[1] =3D val & 0xff;
--}
--
--static inline void cpu_to_ube32(uint8_t *buf, unsigned int val)
--{
--    buf[0] =3D val >> 24;
--    buf[1] =3D val >> 16;
--    buf[2] =3D val >> 8;
--    buf[3] =3D val & 0xff;
--}
--
--static inline int ube16_to_cpu(const uint8_t *buf)
--{
--    return (buf[0] << 8) | buf[1];
--}
--
--static inline int ube32_to_cpu(const uint8_t *buf)
--{
--    return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
--}
--
- static void lba_to_msf(uint8_t *buf, int lba)
- {
-     lba +=3D 150;
-@@ -485,7 +461,7 @@ static inline uint8_t ide_atapi_set_profile(uint8_t *=
-buf, uint8_t *index,
-     uint8_t *buf_profile =3D buf + 12; /* start of profiles */
-=20
-     buf_profile +=3D ((*index) * 4); /* start of indexed profile */
--    cpu_to_ube16 (buf_profile, profile);
-+    stw_be_p(buf_profile, profile);
-     buf_profile[2] =3D ((buf_profile[0] =3D=3D buf[6]) && (buf_profile[1=
-] =3D=3D buf[7]));
-=20
-     /* each profile adds 4 bytes to the response */
-@@ -518,9 +494,9 @@ static int ide_dvd_read_structure(IDEState *s, int fo=
-rmat,
-                 buf[7] =3D 0;   /* default densities */
-=20
-                 /* FIXME: 0x30000 per spec? */
--                cpu_to_ube32(buf + 8, 0); /* start sector */
--                cpu_to_ube32(buf + 12, total_sectors - 1); /* end sector=
- */
--                cpu_to_ube32(buf + 16, total_sectors - 1); /* l0 end sec=
-tor */
-+                stl_be_p(buf + 8, 0); /* start sector */
-+                stl_be_p(buf + 12, total_sectors - 1); /* end sector */
-+                stl_be_p(buf + 16, total_sectors - 1); /* l0 end sector =
-*/
-=20
-                 /* Size of buffer, not including 2 byte size field */
-                 stw_be_p(buf, 2048 + 2);
-@@ -839,7 +815,7 @@ static void cmd_get_configuration(IDEState *s, uint8_=
-t *buf)
-     }
-=20
-     /* XXX: could result in alignment problems in some architectures */
--    max_len =3D ube16_to_cpu(buf + 7);
-+    max_len =3D lduw_be_p(buf + 7);
-=20
-     /*
-      * XXX: avoid overflow for io_buffer if max_len is bigger than
-@@ -859,16 +835,16 @@ static void cmd_get_configuration(IDEState *s, uint=
-8_t *buf)
-      * to use as current.  0 means there is no media
-      */
-     if (media_is_dvd(s)) {
--        cpu_to_ube16(buf + 6, MMC_PROFILE_DVD_ROM);
-+        stw_be_p(buf + 6, MMC_PROFILE_DVD_ROM);
-     } else if (media_is_cd(s)) {
--        cpu_to_ube16(buf + 6, MMC_PROFILE_CD_ROM);
-+        stw_be_p(buf + 6, MMC_PROFILE_CD_ROM);
-     }
-=20
-     buf[10] =3D 0x02 | 0x01; /* persistent and current */
-     len =3D 12; /* headers: 8 + 4 */
-     len +=3D ide_atapi_set_profile(buf, &index, MMC_PROFILE_DVD_ROM);
-     len +=3D ide_atapi_set_profile(buf, &index, MMC_PROFILE_CD_ROM);
--    cpu_to_ube32(buf, len - 4); /* data length */
-+    stl_be_p(buf, len - 4); /* data length */
-=20
-     ide_atapi_cmd_reply(s, len, max_len);
- }
-@@ -878,7 +854,7 @@ static void cmd_mode_sense(IDEState *s, uint8_t *buf)
-     int action, code;
-     int max_len;
-=20
--    max_len =3D ube16_to_cpu(buf + 7);
-+    max_len =3D lduw_be_p(buf + 7);
-     action =3D buf[2] >> 6;
-     code =3D buf[2] & 0x3f;
-=20
-@@ -886,7 +862,7 @@ static void cmd_mode_sense(IDEState *s, uint8_t *buf)
-     case 0: /* current values */
-         switch(code) {
-         case MODE_PAGE_R_W_ERROR: /* error recovery */
--            cpu_to_ube16(&buf[0], 16 - 2);
-+            stw_be_p(&buf[0], 16 - 2);
-             buf[2] =3D 0x70;
-             buf[3] =3D 0;
-             buf[4] =3D 0;
-@@ -905,7 +881,7 @@ static void cmd_mode_sense(IDEState *s, uint8_t *buf)
-             ide_atapi_cmd_reply(s, 16, max_len);
-             break;
-         case MODE_PAGE_AUDIO_CTL:
--            cpu_to_ube16(&buf[0], 24 - 2);
-+            stw_be_p(&buf[0], 24 - 2);
-             buf[2] =3D 0x70;
-             buf[3] =3D 0;
-             buf[4] =3D 0;
-@@ -924,7 +900,7 @@ static void cmd_mode_sense(IDEState *s, uint8_t *buf)
-             ide_atapi_cmd_reply(s, 24, max_len);
-             break;
-         case MODE_PAGE_CAPABILITIES:
--            cpu_to_ube16(&buf[0], 30 - 2);
-+            stw_be_p(&buf[0], 30 - 2);
-             buf[2] =3D 0x70;
-             buf[3] =3D 0;
-             buf[4] =3D 0;
-@@ -946,11 +922,11 @@ static void cmd_mode_sense(IDEState *s, uint8_t *bu=
-f)
-                 buf[14] |=3D 1 << 1;
-             }
-             buf[15] =3D 0x00; /* No volume & mute control, no changer */
--            cpu_to_ube16(&buf[16], 704); /* 4x read speed */
-+            stw_be_p(&buf[16], 704); /* 4x read speed */
-             buf[18] =3D 0; /* Two volume levels */
-             buf[19] =3D 2;
--            cpu_to_ube16(&buf[20], 512); /* 512k buffer */
--            cpu_to_ube16(&buf[22], 704); /* 4x read speed current */
-+            stw_be_p(&buf[20], 512); /* 512k buffer */
-+            stw_be_p(&buf[22], 704); /* 4x read speed current */
-             buf[24] =3D 0;
-             buf[25] =3D 0;
-             buf[26] =3D 0;
-@@ -998,12 +974,12 @@ static void cmd_read(IDEState *s, uint8_t* buf)
-     int nb_sectors, lba;
-=20
-     if (buf[0] =3D=3D GPCMD_READ_10) {
--        nb_sectors =3D ube16_to_cpu(buf + 7);
-+        nb_sectors =3D lduw_be_p(buf + 7);
-     } else {
--        nb_sectors =3D ube32_to_cpu(buf + 6);
-+        nb_sectors =3D ldl_be_p(buf + 6);
-     }
-=20
--    lba =3D ube32_to_cpu(buf + 2);
-+    lba =3D ldl_be_p(buf + 2);
-     if (nb_sectors =3D=3D 0) {
-         ide_atapi_cmd_ok(s);
-         return;
-@@ -1017,7 +993,7 @@ static void cmd_read_cd(IDEState *s, uint8_t* buf)
-     int nb_sectors, lba, transfer_request;
-=20
-     nb_sectors =3D (buf[6] << 16) | (buf[7] << 8) | buf[8];
--    lba =3D ube32_to_cpu(buf + 2);
-+    lba =3D ldl_be_p(buf + 2);
-=20
-     if (nb_sectors =3D=3D 0) {
-         ide_atapi_cmd_ok(s);
-@@ -1057,7 +1033,7 @@ static void cmd_seek(IDEState *s, uint8_t* buf)
-     unsigned int lba;
-     uint64_t total_sectors =3D s->nb_sectors >> 2;
-=20
--    lba =3D ube32_to_cpu(buf + 2);
-+    lba =3D ldl_be_p(buf + 2);
-     if (lba >=3D total_sectors) {
-         ide_atapi_cmd_error(s, ILLEGAL_REQUEST, ASC_LOGICAL_BLOCK_OOR);
-         return;
-@@ -1098,15 +1074,15 @@ static void cmd_start_stop_unit(IDEState *s, uint=
-8_t* buf)
-=20
- static void cmd_mechanism_status(IDEState *s, uint8_t* buf)
- {
--    int max_len =3D ube16_to_cpu(buf + 8);
-+    int max_len =3D lduw_be_p(buf + 8);
-=20
--    cpu_to_ube16(buf, 0);
-+    stw_be_p(buf, 0);
-     /* no current LBA */
-     buf[2] =3D 0;
-     buf[3] =3D 0;
-     buf[4] =3D 0;
-     buf[5] =3D 1;
--    cpu_to_ube16(buf + 6, 0);
-+    stw_be_p(buf + 6, 0);
-     ide_atapi_cmd_reply(s, 8, max_len);
- }
-=20
-@@ -1116,7 +1092,7 @@ static void cmd_read_toc_pma_atip(IDEState *s, uint=
-8_t* buf)
-     int max_len;
-     uint64_t total_sectors =3D s->nb_sectors >> 2;
-=20
--    max_len =3D ube16_to_cpu(buf + 7);
-+    max_len =3D lduw_be_p(buf + 7);
-     format =3D buf[9] >> 6;
-     msf =3D (buf[1] >> 1) & 1;
-     start_track =3D buf[6];
-@@ -1154,15 +1130,15 @@ static void cmd_read_cdvd_capacity(IDEState *s, u=
-int8_t* buf)
-     uint64_t total_sectors =3D s->nb_sectors >> 2;
-=20
-     /* NOTE: it is really the number of sectors minus 1 */
--    cpu_to_ube32(buf, total_sectors - 1);
--    cpu_to_ube32(buf + 4, 2048);
-+    stl_be_p(buf, total_sectors - 1);
-+    stl_be_p(buf + 4, 2048);
-     ide_atapi_cmd_reply(s, 8, 8);
- }
-=20
- static void cmd_read_disc_information(IDEState *s, uint8_t* buf)
- {
-     uint8_t type =3D buf[1] & 7;
--    uint32_t max_len =3D ube16_to_cpu(buf + 7);
-+    uint32_t max_len =3D lduw_be_p(buf + 7);
-=20
-     /* Types 1/2 are only defined for Blu-Ray.  */
-     if (type !=3D 0) {
-@@ -1196,7 +1172,7 @@ static void cmd_read_dvd_structure(IDEState *s, uin=
-t8_t* buf)
-     int format =3D buf[7];
-     int ret;
-=20
--    max_len =3D ube16_to_cpu(buf + 8);
-+    max_len =3D lduw_be_p(buf + 8);
-=20
-     if (format < 0xff) {
-         if (media_is_cd(s)) {
---=20
-2.21.0
+As for the length of the line: all lines in file syscall_defs.h are of
+length 81 with a fixed width comment at the end. I'm not sure if making the
+one line I add 80-character-wide is the right choice.
 
+Shu-Chun
+
+On Fri, Aug 16, 2019 at 3:37 PM Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
+
+>
+> 16.08.2019. 23.28, "Shu-Chun Weng via Qemu-devel" <qemu-devel@nongnu.org>
+> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > The ioctl numeric values are platform-independent and determined by
+> > the file include/uapi/linux/sockios.h in Linux kernel source code:
+> >
+> >   #define SIOCETHTOOL   0x8946
+> >
+> > These ioctls get (or set) the field ifr_data of type char* in the
+> > structure ifreq. Such functionality is achieved in QEMU by using
+> > MK_STRUCT() and MK_PTR() macros with an appropriate argument, as
+> > it was done for existing similar cases.
+> >
+> > Signed-off-by: Shu-Chun Weng <scw@google.com>
+> > ---
+>
+> Shu-Chun, hi, and welcome!
+>
+> Just a couple of cosmetic things:
+>
+>   - by convention, the title of this patch should start with
+> "linux-user:", since this patch affects linux user QEMU module;
+>
+>   - the patch title is too long (and has some minor mistakes) -
+> "linux-user: Add support for SIOCETHTOOL ioctl" should be good enough;
+>
+>   - the lenght of the code lines that you add or modify must not be
+> greater than 80.
+>
+> Sincerely,
+> Aleksandar
+>
+> >  linux-user/ioctls.h       | 1 +
+> >  linux-user/syscall_defs.h | 2 ++
+> >  2 files changed, 3 insertions(+)
+> >
+> > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+> > index 3281c97ca2..9d231df665 100644
+> > --- a/linux-user/ioctls.h
+> > +++ b/linux-user/ioctls.h
+> > @@ -208,6 +208,7 @@
+> >    IOCTL(SIOCGIFINDEX, IOC_W | IOC_R,
+> MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+> >    IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+> >    IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R,
+> MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+> > +  IOCTL(SIOCETHTOOL, IOC_R | IOC_W, MK_PTR(MK_STRUCT(STRUCT_ptr_ifreq)=
+))
+> >    IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
+> >    IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
+> >                  MK_PTR(MK_STRUCT(STRUCT_ifconf)))
+> > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> > index 0662270300..276f96039f 100644
+> > --- a/linux-user/syscall_defs.h
+> > +++ b/linux-user/syscall_defs.h
+> > @@ -819,6 +819,8 @@ struct target_pollfd {
+> >  #define TARGET_SIOCGIFTXQLEN   0x8942          /* Get the tx queue
+> length      */
+> >  #define TARGET_SIOCSIFTXQLEN   0x8943          /* Set the tx queue
+> length      */
+> >
+> > +#define TARGET_SIOCETHTOOL     0x8946          /* Ethtool interface
+>         */
+> > +
+> >  /* ARP cache control calls. */
+> >  #define TARGET_OLD_SIOCDARP    0x8950          /* old delete ARP table
+> entry   */
+> >  #define TARGET_OLD_SIOCGARP    0x8951          /* old get ARP table
+> entry      */
+> > --
+> > 2.23.0.rc1.153.gdeed80330f-goog
+> >
+> >
+>
+
+--00000000000010f6b1059044d9f7
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIS4QYJKoZIhvcNAQcCoIIS0jCCEs4CAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghBHMIIEXDCCA0SgAwIBAgIOSBtqDm4P/739RPqw/wcwDQYJKoZIhvcNAQELBQAwZDELMAkGA1UE
+BhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExOjA4BgNVBAMTMUdsb2JhbFNpZ24gUGVy
+c29uYWxTaWduIFBhcnRuZXJzIENBIC0gU0hBMjU2IC0gRzIwHhcNMTYwNjE1MDAwMDAwWhcNMjEw
+NjE1MDAwMDAwWjBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEiMCAG
+A1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBALR23lKtjlZW/17kthzYcMHHKFgywfc4vLIjfq42NmMWbXkNUabIgS8KX4PnIFsTlD6F
+GO2fqnsTygvYPFBSMX4OCFtJXoikP2CQlEvO7WooyE94tqmqD+w0YtyP2IB5j4KvOIeNv1Gbnnes
+BIUWLFxs1ERvYDhmk+OrvW7Vd8ZfpRJj71Rb+QQsUpkyTySaqALXnyztTDp1L5d1bABJN/bJbEU3
+Hf5FLrANmognIu+Npty6GrA6p3yKELzTsilOFmYNWg7L838NS2JbFOndl+ce89gM36CW7vyhszi6
+6LqqzJL8MsmkP53GGhf11YMP9EkmawYouMDP/PwQYhIiUO0CAwEAAaOCASIwggEeMA4GA1UdDwEB
+/wQEAwIBBjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEgYDVR0TAQH/BAgwBgEB/wIB
+ADAdBgNVHQ4EFgQUyzgSsMeZwHiSjLMhleb0JmLA4D8wHwYDVR0jBBgwFoAUJiSSix/TRK+xsBtt
+r+500ox4AAMwSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9ncy9n
+c3BlcnNvbmFsc2lnbnB0bnJzc2hhMmcyLmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIG
+CCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG
+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
+--00000000000010f6b1059044d9f7--
 
