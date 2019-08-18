@@ -2,86 +2,87 @@ Return-Path: <SRS0=DeAR=WO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2FBFC3A589
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 21:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF5DC3A589
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 21:39:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 963C22184E
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 21:00:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAG9h06i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 963C22184E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8908A21873
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 21:39:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8908A21873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzSHl-0005dg-NG
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 17:00:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35561)
+	id 1hzSti-00031z-Kc
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 17:39:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40135)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hzSGX-00052z-RB
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 16:59:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1hzSt7-0002cJ-NV
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 17:38:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hzSGW-0005mH-Iu
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 16:59:05 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44527)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hzSGW-0005lA-CD; Sun, 18 Aug 2019 16:59:04 -0400
-Received: by mail-ot1-x342.google.com with SMTP id w4so14143018ote.11;
- Sun, 18 Aug 2019 13:59:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=QGUQOX7DG/EeFOoGwh2nTaAPBL77V5yeXpq7T9XE2tU=;
- b=WAG9h06i2Uj/iUe8bJh07+MQOeI6iZYJkIHYJOwM0dKRuAYb1b1rB8lyihmZtZ3lBe
- XlgO+PeipCv8HtWl0QfEit4ZEhB7kwnmsxt/vq2RInf+MhqjyZpwArc1viFYwDe6/R+n
- CPL7CG/5gaKpUmoCfxVKppXO9O9RC+DVCNF8Y9B7V4zxGgZo+GAYGavyYPhZ1xm0DtQs
- Uhd6oPywQN6zgeBxRs0HJw5LmEI9aFJLOubr/y7y+Afp9RBIO9OR531k4KF02VXcStsJ
- fspLRKJbSRGcRW2UrCrnOXHmEpcnkIlqp7MsytpBrtO5gFnJDHMC6RZYvP+cHnE8ztEF
- QeiQ==
+ (envelope-from <philmd@redhat.com>) id 1hzSt6-0004Tt-7P
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 17:38:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40502)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hzSt6-0004Sl-2F
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 17:38:56 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 56E2283F3F
+ for <qemu-devel@nongnu.org>; Sun, 18 Aug 2019 21:38:54 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id b1so4208789wru.4
+ for <qemu-devel@nongnu.org>; Sun, 18 Aug 2019 14:38:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=QGUQOX7DG/EeFOoGwh2nTaAPBL77V5yeXpq7T9XE2tU=;
- b=g78gqKbP9eJYi5xuHlXHsR9Cgujmdp47UUI5FwjIBHUfqfxJjSpEDc8WsuFttYxv0h
- HpzcusNn2Js+/wtk17UW5xWlr4s/sr3b7hAKIlG1yvVFBMcJ+8h+Agqp2+ebD3XfY04H
- Yc0le60W06p/xPclD8lG4sOB/PeM/GElYE0/h0B4CSZFniwSGm1AQ2JcvQAGBvu601Vk
- HiQaVHsMJkV4WtO5pO9x1ovPVzlH/WxmAKwMqBQndtUlbBzVDQXVNdJyHRrq5xPVrVCI
- VXBFS72I26nJl4TnoEH8KshE3Jg6lrHa2Vbk+onLsgCgOx/atbLmBpxJCsa3igH5z1cN
- lfww==
-X-Gm-Message-State: APjAAAVzGeu8JY4YLWZ3XOE8zvChfydyugVyXufq4HHStzSk5FKreDyF
- gli0yVtBaKJZlo4pmtkodgCpiyrTIk8g7NIVz6A=
-X-Google-Smtp-Source: APXvYqxK2whlD69bq4n78HnPWENdN4IFgcW8tqkIcB1D1Bi6njEhmvXkcp9BbKLgPxaGx6n9/MT9Z/dSstd1UBQw2jo=
-X-Received: by 2002:a9d:1288:: with SMTP id g8mr13004663otg.306.1566161942590; 
- Sun, 18 Aug 2019 13:59:02 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MsDepduYHA9wcTZCJt5rjCyx3Lcj8gbH+sXh1CZtCwI=;
+ b=XC5vnh4lJY0FtbxLnn0/8o3Nl+TMwYysebYR1Ex7sN8jOJ466Acr9XGZY9/ooHUnOM
+ gRI+IRo2UTZAwALxJyNwoI8s9lLPZZ50qW8v3a+ex4o/Knki+/vcnAap7HOwoxv+PNSJ
+ qJ31FGuAj+rsXhcQVQZK3W8+YuXXPb7+KAmuTqwcWS6CY1JLPyhldAkk5XpaK1kakTis
+ P3MzUPjUSmiSLLET4xZ0R4GCUuCOGKIvK2WENjsnlSb/5v6ZQXMZL6fJCARpej89Lyi6
+ CBqOY3R00ez9ZdLbX9U4CwqB151l5tQvCokSZV78vWm38II12OfoavSYlshf1GJZk/qz
+ VQPw==
+X-Gm-Message-State: APjAAAUlb0KShQarB5d6F0XOdu/2r0u7Tcwev1uSIGgHV0S5OCpxP/lt
+ Thk4zSLP7hLxFqHK1Sutc3aQWvysoLCqF+qt5+KoNC84wzficHShQn01sk8HpDh1/Lr4sBbxaqB
+ a/4qRiStY0+aazc8=
+X-Received: by 2002:adf:de02:: with SMTP id b2mr23212741wrm.204.1566164333158; 
+ Sun, 18 Aug 2019 14:38:53 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxBz6lB3DCxSQkMUuM4I2X30ppTGqIstBhH9TOQ4q7kdsmA2/+XHS25rDT1MwYGrA6lQJaRrA==
+X-Received: by 2002:adf:de02:: with SMTP id b2mr23212735wrm.204.1566164333000; 
+ Sun, 18 Aug 2019 14:38:53 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id e11sm35221753wrc.4.2019.08.18.14.38.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 18 Aug 2019 14:38:51 -0700 (PDT)
+To: qemu-devel@nongnu.org
+References: <20190808143457.14111-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <20455728-aeee-7009-ec42-c3f5db7ff55a@redhat.com>
+Date: Sun, 18 Aug 2019 23:38:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Sun, 18 Aug 2019 13:59:01
- -0700 (PDT)
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Sun, 18 Aug 2019 13:59:01
- -0700 (PDT)
-In-Reply-To: <0cfddc22-92ef-3067-9275-8f4f22ca9805@linaro.org>
-References: <1565983669-6886-1-git-send-email-pc@us.ibm.com>
- <CAL1e-=jy6vggskJ26rTc8dnaqtqCB0SdfpV9p-NvKdjoBk+Vkw@mail.gmail.com>
- <0cfddc22-92ef-3067-9275-8f4f22ca9805@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sun, 18 Aug 2019 22:59:01 +0200
-Message-ID: <CAL1e-=h=Hzfm8KZ4ebwaBsS6U=KVcReXpOPT2-vy4OeBktjWkQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190808143457.14111-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH] ppc: Three floating point fixes
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/6] net/eth: Remove duplicated tcp/udp_hdr
+ structures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,53 +94,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Paul A. Clarke" <pc@us.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Li Zhijian <lizhijian@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-18.08.2019. 10.10, "Richard Henderson" <richard.henderson@linaro.org> =D1=
-=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On 8/16/19 11:59 PM, Aleksandar Markovic wrote:
-> >> From: "Paul A. Clarke" <pc@us.ibm.com>
-> ...
-> >>   ISA 3.0B has xscvdpspn leaving its result in word 1 of the target
-> > register,
-> >>   and mffprwz expecting its input to come from word 0 of the source
-> > register.
-> >>   This sequence fails with QEMU, as a shift is required between those
-two
-> >>   instructions.  However, the hardware splats the result to both word =
-0
-> > and
-> >>   word 1 of its output register, so the shift is not necessary.
-> >>   Expect a future revision of the ISA to specify this behavior.
-> >>
-> >
-> > Hmmm... Isn't this a gcc bug (using undocumented hardware feature),
-given
-> > everything you said here?
->
-> The key here is "expect a future revision of the ISA to specify this
-behavior".
->
-> It's clearly within IBM's purview to adjust the specification to document
-a
-> previously undocumented hardware feature.
->
+Hi Jason,
 
-By no means, yes, the key is in ISA documentation. But, the impression that
-full original commit message conveys is that the main reason for change is
-gcc behavior. If we accepted in general that gcc behavior determines QEMU
-behavior, I am afraid we would be on a very slippery slope - therefore I
-think the commit message (and possible code comment) should, in my opinion,
-mention ISA docs as the central reason for change. Paul, is there any
-tentative release date of the new ISA specification?
+On 8/8/19 4:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> This is a preparatory cleanup series.
+>=20
+> Commit 75020a70215 introduced 4 very equivalent structures:
+> - tcp_header and tcp_hdr,
+> - udp_header and udp_hdr.
+>=20
+> Choose the most widely use in the codebase, which happens to
+> provide convenient bitfields manipulation macros and is not
+> endian-specific.
+>=20
+> Philippe Mathieu-Daud=C3=A9 (6):
+>   hw/net/virtio-net: Use TCP_HEADER_FLAGS/TCP_HEADER_DATA_OFFSET macros
+>   net/colo-compare: Use the tcp_header structure
+>   net/filter-rewriter: Use the tcp_header structure
+>   hw/net/vmxnet3: Use the tcp_header structure
+>   net/eth: Remove the unused tcp_hdr structure
+>   net/eth: Remove the single use of udp_hdr structure
 
-Aleksandar
+Are you OK to take this series?
 
->
-> r~
+It got reviewed by Dmitry Fleytman.
+
+Thanks,
+
+Phil.
+
