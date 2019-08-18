@@ -2,50 +2,96 @@ Return-Path: <SRS0=DeAR=WO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA2AC3A589
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 13:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 708FBC3A589
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 13:22:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A8AB2054F
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 13:06:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A8AB2054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=haasn.xyz
+	by mail.kernel.org (Postfix) with ESMTPS id 357272087E
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 13:22:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AqOTAL+2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 357272087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzKtC-0004Ha-5H
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 09:06:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35529)
+	id 1hzL8v-0007Ai-B7
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 09:22:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nand@haasn.xyz>) id 1hzInJ-0001Lt-2K
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 06:52:20 -0400
+ (envelope-from <yuval.shaia@oracle.com>) id 1hzL7c-0006L4-0g
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 09:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nand@haasn.xyz>) id 1hzImA-0007D4-CJ
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 06:51:07 -0400
-Received: from haasn.xyz ([78.46.187.166]:43508)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <nand@haasn.xyz>) id 1hzImA-0007A3-48
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 06:51:06 -0400
-Received: from haasn.xyz (unknown [10.30.0.2])
- by haasn.xyz (Postfix) with ESMTP id C38AA401EE;
- Sun, 18 Aug 2019 12:50:59 +0200 (CEST)
-From: Niklas Haas <qemu@haasn.xyz>
-To: qemu-devel@nongnu.org
-Date: Sun, 18 Aug 2019 12:50:38 +0200
-Message-Id: <20190818105038.19520-1-qemu@haasn.xyz>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <yuval.shaia@oracle.com>) id 1hzL7a-00009m-Im
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 09:21:23 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36366)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+ id 1hzL7a-00009A-9u
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 09:21:22 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7IDIWiC027251;
+ Sun, 18 Aug 2019 13:21:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : subject :
+ date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=jK6soffQl8NuB4jPtSmOydQ9ZbMY37ZnslwYu4d3vqY=;
+ b=AqOTAL+2Jn/qv7JDucdgDzg/9ZFMJnm7o0oLtTGSM3x5UBaHxLYjiAlsed7tAjeAQ4Xp
+ mzMx3Dm4mqmzoKC8VHGIh5SXuVOExyONJpC/mWBibd3S00xjNTwvF3tiRWgVZA+el3ax
+ q+TsbnqeGfVSEgOJkTaqd/tuxVe6rTGaZQfqiGFK75l12vrv7djuWRFs4sy7iNo0s3v+
+ wR5/EhCKd0FPDnW9ByOym8wZRdwPFiO49L5NqeoPFXk+/vbBOe5R4/dyW4ShyVyPKjTp
+ D9vHGMlgYaJl1DX3Qo1aXW+1UfH9ircYb1yCN36tW8/G1U8HMn+QnMKpeN33kHXZICHe Sw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 2ue90t3mn6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 18 Aug 2019 13:21:20 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7IDIea0088234;
+ Sun, 18 Aug 2019 13:21:19 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 2uejxdamuk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 18 Aug 2019 13:21:19 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7IDLD2v020068;
+ Sun, 18 Aug 2019 13:21:14 GMT
+Received: from host4.lan (/77.138.183.59)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Sun, 18 Aug 2019 06:21:13 -0700
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: berrange@redhat.com, thuth@redhat.com, philmd@redhat.com,
+ pbonzini@redhat.com, laurent@vivier.eu, qemu-devel@nongnu.org,
+ yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com
+Date: Sun, 18 Aug 2019 16:21:05 +0300
+Message-Id: <20190818132107.18181-1-yuval.shaia@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 78.46.187.166
-X-Mailman-Approved-At: Sun, 18 Aug 2019 09:05:30 -0400
-Subject: [Qemu-devel] [PATCH] input-linux: add shift+shift as a grab toggle
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9352
+ signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=850
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908180148
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9352
+ signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=916 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908180148
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [PATCH 0/2] rdma: Utilize ibv_reg_mr_iova for memory
+ registration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,54 +103,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Haas <git@haasn.xyz>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Niklas Haas <git@haasn.xyz>
+The virtual address that is provided by the guest in post_send and
+post_recv operations is related to the guest address space. This
+address
+space is unknown to the HCA resides on host so extra step in these
+operations is needed to adjust the address to host virtual address.
 
-We have ctrl-ctrl and alt-alt; why not shift-shift? That's my preferred
-grab binding, personally.
+This step, which is done in data-path affects performances.
 
-Signed-off-by: Niklas Haas <git@haasn.xyz>
----
- qapi/ui.json     | 3 ++-
- ui/input-linux.c | 4 ++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+An enhanced verion of MR registration introduced here
+https://patchwork.kernel.org/patch/11044467/ can be used so that the
+guest virtual address space for this MR is known to the HCA in host.
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 59e412139a..e04525d8b4 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1025,7 +1025,8 @@
- #
- ##
- { 'enum': 'GrabToggleKeys',
--  'data': [ 'ctrl-ctrl', 'alt-alt', 'meta-meta', 'scrolllock', 'ctrl-scr=
-olllock' ] }
-+  'data': [ 'ctrl-ctrl', 'alt-alt', 'shift-shift','meta-meta', 'scrolllo=
-ck',
-+            'ctrl-scrolllock' ] }
-=20
- ##
- # @DisplayGTK:
-diff --git a/ui/input-linux.c b/ui/input-linux.c
-index 59456fe765..a7b280b25b 100644
---- a/ui/input-linux.c
-+++ b/ui/input-linux.c
-@@ -113,6 +113,10 @@ static bool input_linux_check_toggle(InputLinux *il)
-         return il->keydown[KEY_LEFTALT] &&
-             il->keydown[KEY_RIGHTALT];
-=20
-+    case GRAB_TOGGLE_KEYS_SHIFT_SHIFT:
-+        return il->keydown[KEY_LEFTSHIFT] &&
-+            il->keydown[KEY_RIGHTSHIFT];
-+
-     case GRAB_TOGGLE_KEYS_META_META:
-         return il->keydown[KEY_LEFTMETA] &&
-             il->keydown[KEY_RIGHTMETA];
---=20
-2.21.0
+This will save the data-path adjustment.
+
+patch #1 deals with what is needed to detect if the library installed in
+the host supports this function
+patch #2 enhance the data-path ops by utilizing the new function
+
+Yuval Shaia (2):
+  configure: Check if we can use ibv_reg_mr_iova
+  hw/rdma: Utilize ibv_reg_mr_iova for memory registration
+
+ configure                 | 28 ++++++++++++++++++++++++++++
+ hw/rdma/rdma_backend.c    | 13 +++++++++++++
+ hw/rdma/rdma_backend.h    |  5 +++++
+ hw/rdma/rdma_rm.c         |  5 +++++
+ hw/rdma/vmw/pvrdma_main.c |  6 ++++++
+ 5 files changed, 57 insertions(+)
+
+-- 
+2.20.1
 
 
