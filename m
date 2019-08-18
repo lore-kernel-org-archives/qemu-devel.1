@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62849C3A589
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 22:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 986DFC3A589
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 22:59:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 326842186A
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 22:59:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326842186A
+	by mail.kernel.org (Postfix) with ESMTPS id 2E85E2186A
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 22:59:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E85E2186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzU9H-0005vD-OH
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 18:59:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48494)
+	id 1hzU9L-000638-T3
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 18:59:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1hzU4z-0000mo-9G
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:18 -0400
+ (envelope-from <philmd@redhat.com>) id 1hzU5G-0001Dw-1D
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hzU4y-0008Eq-Cu
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40716)
+ (envelope-from <philmd@redhat.com>) id 1hzU5F-0008Md-0D
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54370)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hzU4y-0008EY-7X
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:16 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hzU5E-0008MI-RY
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:32 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 522D13082D9E;
- Sun, 18 Aug 2019 22:55:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2826191766;
+ Sun, 18 Aug 2019 22:55:32 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-33.brq.redhat.com [10.40.204.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C226D1C1;
- Sun, 18 Aug 2019 22:55:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 78AFE1C1;
+ Sun, 18 Aug 2019 22:55:23 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 00:54:05 +0200
-Message-Id: <20190818225414.22590-7-philmd@redhat.com>
+Date: Mon, 19 Aug 2019 00:54:07 +0200
+Message-Id: <20190818225414.22590-9-philmd@redhat.com>
 In-Reply-To: <20190818225414.22590-1-philmd@redhat.com>
 References: <20190818225414.22590-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Sun, 18 Aug 2019 22:55:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Sun, 18 Aug 2019 22:55:32 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 06/15] hw/i386/pc: Pass the apic_id_limit
- value by argument
+Subject: [Qemu-devel] [PATCH v4 08/15] hw/i386/pc: Remove unused
+ PCMachineState argument in fw_cfg_arch_create
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,39 +79,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pass the apic_id_limit value by argument, this will
-allow us to remove the PCMachineState argument later.
+In the previous commit we removed the last access to PCMachineState.
+It is now an unused argument, remove it from the function prototype.
 
-Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
+Suggested-by: Christophe de Dinechin <dinechin@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/i386/pc.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/i386/pc.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 4963551ee8..b97d1991cf 100644
+index d296b3c3e1..acd9641d05 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -934,7 +934,8 @@ static void pc_build_smbios(PCMachineState *pcms)
+@@ -933,8 +933,7 @@ static void pc_build_smbios(PCMachineState *pcms)
+     }
  }
 =20
- static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
--                                      uint16_t boot_cpus)
-+                                      uint16_t boot_cpus,
-+                                      uint16_t apic_id_limit)
+-static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
+-                                      const CPUArchIdList *cpus,
++static FWCfgState *fw_cfg_arch_create(const CPUArchIdList *cpus,
+                                       uint16_t boot_cpus,
+                                       uint16_t apic_id_limit)
  {
-     FWCfgState *fw_cfg;
-     uint64_t *numa_fw_cfg;
-@@ -1855,7 +1856,7 @@ void pc_memory_init(PCMachineState *pcms,
+@@ -1854,7 +1853,7 @@ void pc_memory_init(PCMachineState *pcms,
                                          option_rom_mr,
                                          1);
 =20
--    fw_cfg =3D fw_cfg_arch_create(pcms, pcms->boot_cpus);
-+    fw_cfg =3D fw_cfg_arch_create(pcms, pcms->boot_cpus, pcms->apic_id_l=
-imit);
+-    fw_cfg =3D fw_cfg_arch_create(pcms, mc->possible_cpu_arch_ids(machin=
+e),
++    fw_cfg =3D fw_cfg_arch_create(mc->possible_cpu_arch_ids(machine),
+                                 pcms->boot_cpus, pcms->apic_id_limit);
 =20
      rom_set_fw(fw_cfg);
-=20
 --=20
 2.20.1
 
