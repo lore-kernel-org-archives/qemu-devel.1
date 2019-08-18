@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06877C3A589
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:05:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DA3C3A589
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:06:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C72E32186A
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:05:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C72E32186A
+	by mail.kernel.org (Postfix) with ESMTPS id 764902186A
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:06:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 764902186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzUF3-0004DJ-Ka
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 19:05:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48578)
+	id 1hzUFw-000564-J6
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 19:06:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48668)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1hzU5b-0001od-Go
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1hzU5x-00027O-78
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hzU5a-0000Ah-Gn
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44222)
+ (envelope-from <philmd@redhat.com>) id 1hzU5w-0000Km-8X
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:56:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57980)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hzU5a-0000AP-Bv
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:55:54 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hzU5w-0000KO-2u
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 18:56:16 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A836E8980E2;
- Sun, 18 Aug 2019 22:55:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5882310C0213;
+ Sun, 18 Aug 2019 22:56:15 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-33.brq.redhat.com [10.40.204.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FD681D1;
- Sun, 18 Aug 2019 22:55:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F22E21C1;
+ Sun, 18 Aug 2019 22:56:06 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 00:54:10 +0200
-Message-Id: <20190818225414.22590-12-philmd@redhat.com>
+Date: Mon, 19 Aug 2019 00:54:13 +0200
+Message-Id: <20190818225414.22590-15-philmd@redhat.com>
 In-Reply-To: <20190818225414.22590-1-philmd@redhat.com>
 References: <20190818225414.22590-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Sun, 18 Aug 2019 22:55:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.65]); Sun, 18 Aug 2019 22:56:15 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 11/15] hw/i386/pc: Rename pc_build_smbios()
- as generic fw_cfg_build_smbios()
+Subject: [Qemu-devel] [PATCH v4 14/15] hw/i386/pc: Rename
+ pc_build_feature_control() as generic fw_cfg_build_*
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,40 +79,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that the pc_build_smbios() function has been refactored to not
-depend of PC specific types, rename it to a more generic name.
+Now that the pc_build_feature_control_file() function has been
+refactored to not depend of PC specific types, rename it to a
+more generic name.
 
 Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/i386/pc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/pc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0bd411de6e..e11ba7efce 100644
+index e57468a1a2..4413d3202f 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -891,7 +891,7 @@ static uint32_t x86_cpu_apic_id_from_index(PCMachineS=
-tate *pcms,
+@@ -1608,8 +1608,8 @@ void pc_cpus_init(PCMachineState *pcms)
      }
  }
 =20
--static void pc_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
-+static void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
+-static void pc_build_feature_control_file(MachineState *ms,
+-                                          FWCfgState *fw_cfg)
++static void fw_cfg_build_feature_control(MachineState *ms,
++                                         FWCfgState *fw_cfg)
  {
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-@@ -1679,7 +1679,7 @@ void pc_machine_done(Notifier *notifier, void *data=
+     X86CPU *cpu =3D X86_CPU(ms->possible_cpus->cpus[0].cpu);
+     CPUX86State *env =3D &cpu->env;
+@@ -1680,7 +1680,7 @@ void pc_machine_done(Notifier *notifier, void *data=
 )
-=20
      acpi_setup();
      if (pcms->fw_cfg) {
--        pc_build_smbios(MACHINE(pcms), pcms->fw_cfg);
-+        fw_cfg_build_smbios(MACHINE(pcms), pcms->fw_cfg);
-         pc_build_feature_control_file(pcms);
+         fw_cfg_build_smbios(MACHINE(pcms), pcms->fw_cfg);
+-        pc_build_feature_control_file(MACHINE(pcms), pcms->fw_cfg);
++        fw_cfg_build_feature_control(MACHINE(pcms), pcms->fw_cfg);
          /* update FW_CFG_NB_CPUS to account for -device added CPUs */
          fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus)=
 ;
+     }
 --=20
 2.20.1
 
