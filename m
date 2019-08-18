@@ -2,90 +2,93 @@ Return-Path: <SRS0=DeAR=WO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D54C3A589
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:10:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78139C3A589
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:13:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4202621852
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4079321852
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 23:13:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HG/m8IfQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4202621852
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UsuOOaXm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4079321852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43527 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzUK4-0001Rj-9o
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 19:10:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49648)
+	id 1hzUMB-0004Pf-1S
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 19:13:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hzUGO-0006LB-70
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 19:07:05 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1hzUGR-0006Rw-KB
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 19:07:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1hzUGN-0005FP-0V
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 19:07:04 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52755)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1hzUGQ-0005I5-G5
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 19:07:07 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56227)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1hzUGM-0005Ds-Qv
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 19:07:02 -0400
-Received: by mail-wm1-x344.google.com with SMTP id o4so9403wmh.2
- for <qemu-devel@nongnu.org>; Sun, 18 Aug 2019 16:07:01 -0700 (PDT)
+ id 1hzUGQ-0005HY-9w
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 19:07:06 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f72so3532wmf.5
+ for <qemu-devel@nongnu.org>; Sun, 18 Aug 2019 16:07:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KHcZ3fx/GcsjWy2sAyP2rYu1Fwyr0HOHzikvr8kGlrk=;
- b=HG/m8IfQ/JvGpOVVUj/BFINGhmpEeWnNV0cmIp7mPqjSdjVlguCD+lbBnObVcrRSGy
- Ufkps5E94fl2TW1H/PfV+/AmnrGoXf/BqEymCuM/qdPG6GalJnRLoEadUXILPk9MA+K7
- Zbxtl3EXAmAKKECcmbUrlgx52P51vMCdJPGypL+xAEN3VO8JXdUkBcqaxFlbBD8uOcpJ
- z3JIjwj9iC8kHo71l3B1IjKdjfoJAbznlyrAogifT4XYR5FoIgN705xhGZvEunx0O7eS
- 38fP8OgJ+exjKV7S9hUi08PZDptH5c96PTCzeNURpw1ZOyCZRo+4Oc/+VEP/UTTjlvpH
- aWtA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=MC5OBi2ZKOOmkFl5C2VVnsgxIzYWjfoInmdM2v3Cze8=;
+ b=UsuOOaXmTczy80F8wbUoqzhQiUICFu75SELHegUHSzSKOkm3Uxx5oAj15CvCUuQ9xn
+ 8wXRs3XmcijEPnzlA7R+Ktk/TE7e/y4kfwqPbKXqNxKHueqM7zwRVeL/EQbvehXZ2lF9
+ V8Jrzsh6jV8UtlXlJDl4ypnI8H/fRpBDbWZsBFetnEzij4RdnnayI+aie7aPsBEQQMT3
+ kdMSUG/diphhFFwM361wVmAQzU4fxybN0bm0X2oK9m7ejG8bZ/jWXsyqbr4Tv+U5phuQ
+ BP7M40x6XLjgjo17alSzc2isTc0zcUlAz71WX33Id7InXwmKi6u9ZxMFCsYsSSVPReyY
+ RPgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KHcZ3fx/GcsjWy2sAyP2rYu1Fwyr0HOHzikvr8kGlrk=;
- b=llSXUHbc4uz/Hnbcoce5VbgcHyG7agDbzabPd3flPUjPh5cS/Y0XpRcJLlPe/lXmEK
- G7c/XxUvbeq3P6L8pQYSCGbksU7q6Uk4xufw58xL/XLQhWHaCpuIAkUqSA9fZYNP7yRr
- iuoJYHJ4Bv668ZfwxCmSwWa4fafrykBv/Oxd6lOU53DFlVrCGSsalUep2JBtSik/9KTT
- APhfbo3/vEHAwdvtnm8cR+5oGy+3o2OZSPSdAyaY+LXRTbkYjOKX2mAj3dgRon4MjZie
- DYPFi0nn4hS0mF470/T2NG1+5/OpUdjw9H1lYlwwIVybz5/HzcvZnhvLKF5aHEkVC3ks
- 7DLA==
-X-Gm-Message-State: APjAAAXvxXhu/r288nQUovFTmT8f+yL348OLjLTm4U3WpETKKOnhT0Gd
- lgK2Sz/NWWDqZnAZybhsJyBUAR0p
-X-Google-Smtp-Source: APXvYqwOIWR96sLCk9JB74Q/tBnPtzk8TR2sC0559u7Hq9b4LyQDAVWKdnFOO6v1oAJIn4c4JBMyrA==
-X-Received: by 2002:a05:600c:2192:: with SMTP id
- e18mr16732742wme.83.1566169620465; 
- Sun, 18 Aug 2019 16:07:00 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=MC5OBi2ZKOOmkFl5C2VVnsgxIzYWjfoInmdM2v3Cze8=;
+ b=LmqSshWS/LFtjjVA4Y4OxuEoWa7dyiV8GwwAqZ3OVVq0W2uykDThKksEJf0SjaocEh
+ acYDsLe/VqphgzdPISdlUHofL3U+dPZdtTb0t9HhxJgo956Y0o1hmodTGNPXgken9W1d
+ fsVdXS+bh563e921wYBxyTKLUsbiJDr27W799yInz54FFNBR33yLxY5QNfOcCVXaelBv
+ W6lBGBQKKxbKKEWJ1In7JMeqARYARsWx4VSRh6KX8EXc769eqYz64OHAS5uIPycsftSs
+ Vu45lWVbDwFM4pR9JBzAfqESqESw5w7F9hD0MsnExrU/hbI4+4LYrQBMiJ0ig29+MkTj
+ fzPw==
+X-Gm-Message-State: APjAAAXtXLcRtZwJznSD98mmtV/CsuYmb2gKnXCazWqKFnLmZGUybokP
+ g0Is3/rAUzipgnfwQmTj8KLJy4ib
+X-Google-Smtp-Source: APXvYqzn2YOp7nH//zWfPOO/oGy0czHT7HY+tAkV12V+YD/enBcYLtAZCsUaWsbCT00vL+FmvvEtPw==
+X-Received: by 2002:a1c:a852:: with SMTP id r79mr16366961wme.36.1566169625207; 
+ Sun, 18 Aug 2019 16:07:05 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-49c9-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:49c9::5])
- by smtp.gmail.com with ESMTPSA id c15sm33657152wrb.80.2019.08.18.16.06.59
+ by smtp.gmail.com with ESMTPSA id c15sm33657152wrb.80.2019.08.18.16.07.04
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 18 Aug 2019 16:07:00 -0700 (PDT)
+ Sun, 18 Aug 2019 16:07:04 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 01:06:45 +0200
-Message-Id: <cover.1566168923.git.DirtY.iCE.hu@gmail.com>
+Date: Mon, 19 Aug 2019 01:06:51 +0200
+Message-Id: <9072b955acffda13976bca7b61f86d7f708c9269.1566168923.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <cover.1566168923.git.DirtY.iCE.hu@gmail.com>
+References: <cover.1566168923.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH v4 00/14] Multiple simultaneous audio backends
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v4 06/14] audio: audiodev= parameters no longer
+ optional when -audiodev present
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,72 +105,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+This means you should probably stop using -soundhw (as it doesn't allow
+you to specify any options) and add the device manually with -device.
+The exception is pcspk, it's currently not possible to manually add it.
+To use it with audiodev, use something like this:
 
-This is the v4 of my audio patches.  This is a compile-fix revision, hopefully
-fixing windows compile errors in "audio: use size_t where makes sense" and
-compile errors introduced by changes on master in "audio: add audiodev
-properties to frontends".
+    -audiodev id=foo,... -global isa-pcspk.audiodev=foo -soundhw pcspk
 
-Regards,
-Zoltan
+Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
+---
 
-Kővágó, Zoltán (14):
-  audio: reduce glob_audio_state usage
-  audio: basic support for multi backend audio
-  audio: add audiodev property to vnc and wav_capture
-  audio: add audiodev properties to frontends
-  paaudio: prepare for multiple audiodev
-  audio: audiodev= parameters no longer optional when -audiodev present
-  paaudio: do not move stream when sink/source name is specified
-  paaudio: properly disconnect streams in fini_*
-  audio: remove audio_MIN, audio_MAX
-  audio: do not run each backend in audio_run
-  paaudio: fix playback glitches
-  audio: remove read and write pcm_ops
-  audio: use size_t where makes sense
-  audio: fix memory leak reported by ASAN
+Notes:
+    Changes from v1:
+    
+    * Split off paaudio changes to a different commit.
 
- audio/audio.h                    |  37 ++-
- audio/audio_int.h                |  43 ++--
- audio/audio_template.h           |  62 +++--
- audio/mixeng.h                   |   9 +-
- audio/rate_template.h            |   2 +-
- include/hw/qdev-properties.h     |   3 +
- include/sysemu/replay.h          |   4 +-
- ui/vnc.h                         |   2 +
- audio/alsaaudio.c                |  49 ++--
- audio/audio.c                    | 345 ++++++++++++++-----------
- audio/coreaudio.c                |  18 +-
- audio/dsoundaudio.c              |  31 +--
- audio/noaudio.c                  |  39 +--
- audio/ossaudio.c                 |  75 +++---
- audio/paaudio.c                  | 421 ++++++++++++++++++-------------
- audio/sdlaudio.c                 |  30 +--
- audio/spiceaudio.c               |  34 +--
- audio/wavaudio.c                 |  18 +-
- audio/wavcapture.c               |   6 +-
- hw/audio/ac97.c                  |  11 +-
- hw/audio/adlib.c                 |   5 +-
- hw/audio/cs4231a.c               |   5 +-
- hw/audio/es1370.c                |  13 +-
- hw/audio/gus.c                   |   7 +-
- hw/audio/hda-codec.c             |  17 +-
- hw/audio/milkymist-ac97.c        |  14 +-
- hw/audio/pcspk.c                 |   3 +-
- hw/audio/pl041.c                 |   1 +
- hw/audio/sb16.c                  |   3 +-
- hw/audio/wm8750.c                |  10 +-
- hw/core/qdev-properties-system.c |  57 +++++
- hw/usb/dev-audio.c               |   1 +
- monitor/misc.c                   |  22 +-
- replay/replay-audio.c            |  16 +-
- replay/replay.c                  |   2 +-
- ui/vnc.c                         |  15 +-
- hmp-commands.hx                  |  11 +-
- qemu-options.hx                  |   6 +
- 38 files changed, 792 insertions(+), 655 deletions(-)
+ audio/audio.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
+diff --git a/audio/audio.c b/audio/audio.c
+index 8e9ccd0ac4..7267cab9d7 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -101,6 +101,8 @@ const struct mixeng_volume nominal_volume = {
+ #endif
+ };
+ 
++static bool legacy_config = true;
++
+ #ifdef AUDIO_IS_FLAWLESS_AND_NO_CHECKS_ARE_REQURIED
+ #error No its not
+ #else
+@@ -1392,7 +1394,7 @@ static AudiodevListEntry *audiodev_find(
+  * if dev == NULL => legacy implicit initialization, return the already created
+  *   state or create a new one
+  */
+-static AudioState *audio_init(Audiodev *dev)
++static AudioState *audio_init(Audiodev *dev, const char *name)
+ {
+     static bool atexit_registered;
+     size_t i;
+@@ -1406,12 +1408,13 @@ static AudioState *audio_init(Audiodev *dev)
+ 
+     if (dev) {
+         /* -audiodev option */
++        legacy_config = false;
+         drvname = AudiodevDriver_str(dev->driver);
+     } else if (!QTAILQ_EMPTY(&audio_states)) {
+-        /*
+-         * todo: check for -audiodev once we have normal audiodev selection
+-         * support
+-         */
++        if (!legacy_config) {
++            dolog("You must specify an audiodev= for the device %s\n", name);
++            exit(1);
++        }
+         return QTAILQ_FIRST(&audio_states);
+     } else {
+         /* legacy implicit initialization */
+@@ -1518,7 +1521,7 @@ void audio_free_audiodev_list(AudiodevListHead *head)
+ void AUD_register_card (const char *name, QEMUSoundCard *card)
+ {
+     if (!card->state) {
+-        card->state = audio_init(NULL);
++        card->state = audio_init(NULL, name);
+     }
+ 
+     card->name = g_strdup (name);
+@@ -1544,8 +1547,11 @@ CaptureVoiceOut *AUD_add_capture(
+     struct capture_callback *cb;
+ 
+     if (!s) {
+-        /* todo: remove when we have normal audiodev selection support */
+-        s = audio_init(NULL);
++        if (!legacy_config) {
++            dolog("You must specify audiodev when trying to capture\n");
++            return NULL;
++        }
++        s = audio_init(NULL, NULL);
+     }
+ 
+     if (audio_validate_settings (as)) {
+@@ -1776,7 +1782,7 @@ void audio_init_audiodevs(void)
+     AudiodevListEntry *e;
+ 
+     QSIMPLEQ_FOREACH(e, &audiodevs, next) {
+-        audio_init(e->dev);
++        audio_init(e->dev, NULL);
+     }
+ }
+ 
 -- 
 2.22.0
 
