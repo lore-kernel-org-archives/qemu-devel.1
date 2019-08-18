@@ -2,101 +2,91 @@ Return-Path: <SRS0=DeAR=WO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 209B9C3A589
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 12:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A606FC3A589
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 12:40:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE82A2087E
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 12:30:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FA432087E
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 12:40:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qFyd5xys"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE82A2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vH3nKXkl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA432087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzKK4-000426-QI
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 08:30:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44692)
+	id 1hzKUH-00086z-Kz
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 08:40:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia@oracle.com>) id 1hzKJ4-0003bD-AT
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 08:29:11 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hzKRq-0007AH-RQ
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 08:38:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia@oracle.com>) id 1hzKJ2-0002eh-SC
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 08:29:09 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:58486)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
- id 1hzKJ2-0002d2-Jl
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 08:29:08 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7ICQfEF028422;
- Sun, 18 Aug 2019 12:29:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=corp-2019-08-05;
- bh=P1ezYfSAZQ3MScrblYqF7Ne0pHoimEv5foakFs7eMYE=;
- b=qFyd5xysKUCKcLHDeZ7bi0moxmR+icI97cqwS9KOltjsjbX4xubPFit5EXd6OgkVdOOu
- t5r5un/2/jrlMNirshhqEeT/ntiHVImFhOZTsoVBy4bVqizluUs0rVPuPxFByFzbmg9s
- DD1avQLzdIWO4IXKwFIunuEQGGbdAsqtocYGGxyrCHhoZST4OuJgvbJlRitGzZkYmzqe
- iQFbJi9AfWecGuJTA/QbPIUHmpGtAatsq1cZUwQwrtv5j9Lk/rOLfEhLA8GH9EHqtBXA
- fUbiW607xm6+gaaKafNqGDiyPme+IfaiK8/QijOE6QaPxp8cXUT9o1KtzRHpcCm1NVTq 4Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2ue9hp3fa2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 18 Aug 2019 12:29:04 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7ICRsHM084613;
- Sun, 18 Aug 2019 12:29:04 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2ue7mwqju7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 18 Aug 2019 12:29:04 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7ICT2ck019721;
- Sun, 18 Aug 2019 12:29:02 GMT
-Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Sun, 18 Aug 2019 05:29:02 -0700
-Date: Sun, 18 Aug 2019 15:28:58 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-To: Stephen Kitt <steve@sk2.org>
-Message-ID: <20190818122858.GA1926@lap1>
-References: <20190811194247.9861-1-steve@sk2.org> <20190815105704.GA3018@lap1>
- <20190815141244.25a93a3a@heffalump.sk2.org>
+ (envelope-from <richard.henderson@linaro.org>) id 1hzKRp-0007Bp-LI
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 08:38:14 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38937)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hzKRm-00078d-AI
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 08:38:11 -0400
+Received: by mail-wr1-x444.google.com with SMTP id t16so5881224wra.6
+ for <qemu-devel@nongnu.org>; Sun, 18 Aug 2019 05:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Q2CECf3Z0VZS2vsykoHMilxYJWnJFnixOycIv/0VdAc=;
+ b=vH3nKXklQ3D6J2/DUV/Muhm5EQqjnOi1dOFDnoYkoWbFdHGdCTt0Q8H/PEx3US8HVr
+ BvUvT45unuUHziXG9CABuehFsnGiy92O9yPs6EM1DOjtOQOUOf5aNmusmYAtenEpKhZU
+ Pu6WIhMrgQs6oTjcv5/b9mcugffLmrQy+Ga3LvHGe4Cbic6u7Zp2AlmUwB1zher+kYK6
+ 3yBCSezj6lVnUja0g2Vxd3RILIf1CcZ6VnwhbaSkueQsZrX7Limpesb3ZKhlOXNae2KW
+ 7sCJeCoUVb6HYQGT38JuljsiR4FUcloY4PuupNMx8KAHk526GfDKtMT4X6DaoSdbTrHc
+ yG3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Q2CECf3Z0VZS2vsykoHMilxYJWnJFnixOycIv/0VdAc=;
+ b=r9zvs62BErD0J3EOulLK+70TKQgDzKBBYOhd+wJ+KfFMrTDitIaEi3+q7Aq05+eAJ/
+ /H6GYoddzVxc4xYHLRYUU7K7KlyjKVZKnPzk8nN0Xn/S39xfOEoBTVXE0WMZ5zQuDpy+
+ in3i10qLbNiwqETYbVZ2GFE4wR61P3+HoPtRhjDi63sJFAOIWhy3GvvjBQ9yLZa31vVi
+ NWPcK7udL649nwEdWDY8x24zQFsMHKJbUuiO2D89rKF8GfUAxzICgxM6CfPRNkDCP96f
+ gcs0XMbN3T7Xyr6oOLWDB9KPgSSPOJI5IG3+uIlMowEZR/dVTTsfwrISO5wBE7JT2T3Q
+ SvZA==
+X-Gm-Message-State: APjAAAVBnuZRAA7gS3QEEt/bobU1h2TBwoXTRV9EUeNMOn24TV8KeS1u
+ kH2FqkqDS2akfkqHptLMXRtj6Q==
+X-Google-Smtp-Source: APXvYqy8+V4wmFtUbhYj8pIGMMLehGXowLZiVAQJJkcV7DuCTxUQaFYSL+0IQlwYdqSdVJrbjHii/Q==
+X-Received: by 2002:adf:f710:: with SMTP id r16mr22248357wrp.81.1566131885195; 
+ Sun, 18 Aug 2019 05:38:05 -0700 (PDT)
+Received: from [172.16.53.135] ([82.3.55.76])
+ by smtp.gmail.com with ESMTPSA id r190sm12495818wmf.0.2019.08.18.05.37.54
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 18 Aug 2019 05:38:04 -0700 (PDT)
+To: tony.nguyen@bt.com, qemu-devel@nongnu.org
+References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
+ <1565941103483.3364@bt.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <078b4e19-2b1e-bc21-f419-1064e45e5173@linaro.org>
+Date: Sun, 18 Aug 2019 13:37:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <1565941103483.3364@bt.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190815141244.25a93a3a@heffalump.sk2.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9352
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908180138
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9352
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908180137
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- x7ICQfEF028422
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [PATCH] Fix hw/rdma/vmw/pvrdma_cmd.c build
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v7 37/42] cputlb: Replace size and endian
+ operands for MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,51 +98,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ cohuck@redhat.com, sagark@eecs.berkeley.edu, david@redhat.com,
+ jasowang@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
+ i.mitsyanko@gmail.com, keith.busch@intel.com, jcmvbkbc@gmail.com,
+ frederic.konrad@adacore.com, dmitry.fleytman@gmail.com, kraxel@redhat.com,
+ edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn, pburton@wavecomp.com,
+ xiaoguangrong.eric@gmail.com, peter.chubb@nicta.com.au, philmd@redhat.com,
+ robh@kernel.org, hare@suse.com, sstabellini@kernel.org, berto@igalia.com,
+ chouteau@adacore.com, qemu-block@nongnu.org, arikalo@wavecomp.com,
+ jslaby@suse.cz, deller@gmx.de, mst@redhat.com, magnus.damm@gmail.com,
+ jcd@tribudubois.net, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ mreitz@redhat.com, hpoussin@reactos.org, joel@jms.id.au,
+ anthony.perard@citrix.com, xen-devel@lists.xenproject.org,
+ david@gibson.dropbear.id.au, lersek@redhat.com, green@moxielogic.com,
+ atar4qemu@gmail.com, antonynpavlov@gmail.com, marex@denx.de, jiri@resnulli.us,
+ ehabkost@redhat.com, minyard@acm.org, qemu-s390x@nongnu.org, sw@weilnetz.de,
+ alistair@alistair23.me, yuval.shaia@oracle.com, b.galvani@gmail.com,
+ eric.auger@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ jan.kiszka@web.de, clg@kaod.org, stefanha@redhat.com,
+ marcandre.lureau@redhat.com, shorne@gmail.com, jsnow@redhat.com,
+ rth@twiddle.net, kwolf@redhat.com, qemu-riscv@nongnu.org, proljc@gmail.com,
+ pbonzini@redhat.com, andrew@aj.id.au, claudio.fontana@suse.com,
+ crwulff@gmail.com, laurent@vivier.eu, Andrew.Baumann@microsoft.com,
+ sundeep.lkml@gmail.com, andrew.smirnov@gmail.com, michael@walle.cc,
+ paul.durrant@citrix.com, qemu-ppc@nongnu.org, huth@tuxfamily.org,
+ amarkovic@wavecomp.com, kbastian@mail.uni-paderborn.de, imammedo@redhat.com,
+ aurelien@aurel32.net, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 15, 2019 at 02:12:44PM +0200, Stephen Kitt wrote:
-> On Thu, 15 Aug 2019 13:57:05 +0300, Yuval Shaia <yuval.shaia@oracle.com=
->
-> wrote:
->=20
-> > On Sun, Aug 11, 2019 at 09:42:47PM +0200, Stephen Kitt wrote:
-> > > This was broken by the cherry-pick in 41dd30f. Fix by handling erro=
-rs
-> > > as in the rest of the function: "goto out" instead of "return rc".
-> > >=20
-> > > Signed-off-by: Stephen Kitt <steve@sk2.org>
-> > > ---
-> > >  hw/rdma/vmw/pvrdma_cmd.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> > > index bb9a9f1cd1..a3a86d7c8e 100644
-> > > --- a/hw/rdma/vmw/pvrdma_cmd.c
-> > > +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> > > @@ -514,7 +514,7 @@ static int create_qp(PVRDMADev *dev, union
-> > > pvrdma_cmd_req *req, cmd->recv_cq_handle, rings, &resp->qpn);
-> > >      if (resp->hdr.err) {
-> > >          destroy_qp_rings(rings);
-> > > -        return rc;
-> > > +        goto out; =20
-> >=20
-> > This label was removed, can you please check master branch?
->=20
-> Sorry, it wasn=E2=80=99t clear from my message =E2=80=94 my patch is ag=
-ainst the stable-3.1
-> branch.
+On 8/16/19 8:38 AM, tony.nguyen@bt.com wrote:
+>  static uint64_t full_ldub_mmu(CPUArchState *env, target_ulong addr,
+>                                TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    return load_helper(env, addr, oi, retaddr, 1, false, false,
+> -                       full_ldub_mmu);
+> +    return load_helper(env, addr, oi, retaddr, MO_8, false, full_ldub_mmu);
+...
+>  void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
+>                          TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, 1, false);
+> +    store_helper(env, addr, val, oi, retaddr, MO_8);
+>  }
 
-I see, in that case fix make sense.
+MO_UB.
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-
->=20
-> Regards,
->=20
-> Stephen
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
+r~
 
