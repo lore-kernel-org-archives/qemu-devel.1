@@ -2,94 +2,83 @@ Return-Path: <SRS0=DeAR=WO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D43B6C3A589
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 06:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DEAC3A589
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 06:41:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95ADD2087E
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 06:24:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 797CA2146E
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Aug 2019 06:41:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BaQWdve/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95ADD2087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DTPMFj2A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 797CA2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzEbs-0002u7-OR
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 02:24:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34990)
+	id 1hzEsI-0006M6-Bo
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 02:41:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1hzEbA-0002OU-8J
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 02:23:29 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hzErF-00056I-2W
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 02:40:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hzEb9-0001Hd-3X
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 02:23:28 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35076)
+ (envelope-from <richard.henderson@linaro.org>) id 1hzErD-0000jq-TQ
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 02:40:04 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40181)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hzEb8-0001HA-Sc
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 02:23:27 -0400
-Received: by mail-wr1-x442.google.com with SMTP id k2so5401886wrq.2
- for <qemu-devel@nongnu.org>; Sat, 17 Aug 2019 23:23:26 -0700 (PDT)
+ id 1hzErD-0000jY-M5
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 02:40:03 -0400
+Received: by mail-wr1-x442.google.com with SMTP id c3so5420708wrd.7
+ for <qemu-devel@nongnu.org>; Sat, 17 Aug 2019 23:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=GgmdOZ8wyLcjx83w+lOaDNmfBK84m7wWuH+PGL8yXz8=;
- b=BaQWdve/rqUr7A87Lvj5CX5+HGZBwNaurPldYNzByL41kmcudD9m79B3QGrgt4u2XV
- z/aQnjudxxpVppn6GWNOdjdaH3UEDiRl/RuLEOh+srxnii7ix888fBcb+OpVmdZLvSz7
- cP0Slc4+Le+dQy8zfLxy+SWk+g2D6KfQEKly4GiLHCmRncaA70anXW2ed0uWFgtJgYZ3
- Fla37tUpQTr+QHGTl+7wGg+Wi30Rj767h3C67XOvxSTgM1RO1WLQc25zoCiqs2bDV9dl
- Q8OLYfz/9VtJ6/5QogyoC0b+kpJKTbFdgiRqoAWp5tuXrPC0RmL4m3aDOH4BiudukD8p
- L5JA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Cno2ECwsR7ktzkhE8ZG+zagDyVBGqxsGXUAhcQLNUik=;
+ b=DTPMFj2A+44bjtg2HVYU0cK2uixKl8WOdGJFpOc92WL7gIgQ647LlqbG17Rk/yJQlH
+ neYUOHhvvGQIMi5TKhRI0JNCSYGoENGY5x0jAgwQ6Hf9CxAhL9xermGe8g3H2PQIT9fy
+ fiY8+Y2udJZs9gvICiOWIfP1sJBwnCE71pEzKLjNIR0gnyybmvW6Nkj0Fb27C2oZwmDI
+ 4Fl+R92ipQMA//vgG8TZhhpB09d/EVbvoD8krLXfMcpeehna/otl0Ma2FG0FcQobyFYF
+ FxwyaRpugNBvPY7svzr8wQlAIID6Lur/alRz1tlUXzcnxddDJOx/97husV8MwkcSaHPs
+ 6CiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=GgmdOZ8wyLcjx83w+lOaDNmfBK84m7wWuH+PGL8yXz8=;
- b=iV286/n8a7JFnxAZH3PUDGj6fPgoMMCUWapIxfVXWUg9uDVB1sRExt5cbMqVSsUL0A
- J3uoKUV+WHubl/j4apUcsEPR+HNmblXUH/fgukIXIwo+ggBQPnX0LjLjRtzu5XxmFdsZ
- YCx2kOhlKNuftUCspJkt23+9bpFU4Qz1J64+e791SCpnjWM3Yw7MvoPLNIjBsyzpebJq
- Y1p2hG9JETwdKrZ5Sf3AGV92vHsrAUx/GEO4dqNU4/w89j0h/3Nc3c8bl/MnH2gXCvtb
- AYuJq1F7STHbYF+oO2pbo0dXTWp2vhSCtAds/hr+dA0nNzPTIePE6ZREVN0Xogtmres5
- zl7w==
-X-Gm-Message-State: APjAAAUJT2LXp+bmv0UzmmeJYxpEnrw6cMKNqApvQ1TAunUMhqprSjI5
- uInkwUzH27+IfeJ/e1r/BTHWnT8LDzU=
-X-Google-Smtp-Source: APXvYqycRAD/tPCBCp7QFkzyfk4da+CQI4RqHJikiqk9YUNpn56nLVGmvT1k4FPxqzLY+rN2hHXXBA==
-X-Received: by 2002:a5d:670d:: with SMTP id o13mr18676953wru.289.1566109405307; 
- Sat, 17 Aug 2019 23:23:25 -0700 (PDT)
-Received: from ?IPv6:2a02:c7f:a69:1700:8897:9507:94c2:b98d?
- ([2a02:c7f:a69:1700:8897:9507:94c2:b98d])
- by smtp.gmail.com with ESMTPSA id p13sm12246829wrw.90.2019.08.17.23.23.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 17 Aug 2019 23:23:24 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190816125802.25877-1-peter.maydell@linaro.org>
- <20190816125802.25877-3-peter.maydell@linaro.org>
+ bh=Cno2ECwsR7ktzkhE8ZG+zagDyVBGqxsGXUAhcQLNUik=;
+ b=YlA7vGWU5LIfAp7IUF0xSzU6ShwqaNofq9X/nOBTiI+Hce7kl8sXUO3zADOln2QUot
+ 8m9MCRcMMlJ58+JixG88Jz8CiDa81b3/xVHXtj0kH/2g79qR1Ak3NGaoBazu+r9q04R2
+ 2dw/1M4pRhR5I3AnG3PqW4+x+3ny/kYgjlagmMeB9mbKPqfBRbgJf86IPxBIBpGDN+MP
+ yHPe1ysK7PkFEtj1BuLaNm1Oqn3ztYCgExC8hWzCInvUrS/pVn2HmbKq4fdXoHsZlwuR
+ WXWAEcvqzLero1i6tz775oLixlmDq5iN1KmWkrb1NTocYLDlOipHIFiWZf44/qAV+jOT
+ ZXSg==
+X-Gm-Message-State: APjAAAUaUMPM/yEE7P9XxpewLksEbRWo/5k+U/jeR4B204Mrd0v6Xz7Q
+ ElsFjVV6cmdbuzjFhCOfql/3FDZD5MY=
+X-Google-Smtp-Source: APXvYqwGRMkAuOjYoyDrFwzxZyfjpTxiuCafEzdImlnPtDUvjX5wsCVWuOk5HUGaP2V8LEW20P0e8w==
+X-Received: by 2002:adf:f7ce:: with SMTP id a14mr7337741wrq.332.1566110402100; 
+ Sat, 17 Aug 2019 23:40:02 -0700 (PDT)
+Received: from cloudburst.Home ([2a02:c7f:a69:1700:8897:9507:94c2:b98d])
+ by smtp.gmail.com with ESMTPSA id r5sm9015435wmh.35.2019.08.17.23.40.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 17 Aug 2019 23:40:01 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <b7f30ef1-322e-e77c-29f7-84bf4370817f@linaro.org>
-Date: Sun, 18 Aug 2019 07:23:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To: qemu-devel@nongnu.org
+Date: Sun, 18 Aug 2019 07:39:56 +0100
+Message-Id: <20190818063959.14533-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20190816125802.25877-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: Take exceptions on ATS
- instructions when needed
+Subject: [Qemu-devel] [PATCH v2 0/3] decodetree improvements
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,30 +90,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/16/19 1:58 PM, Peter Maydell wrote:
-> The translation table walk for an ATS instruction can result in
-> various faults.  In general these are just reported back via the
-> PAR_EL1 fault status fields, but in some cases the architecture
-> requires that the fault is turned into an exception:
->  * synchronous stage 2 faults of any kind during AT S1E0* and
->    AT S1E1* instructions executed from NS EL1 fault to EL2 or EL3
->  * synchronous external aborts are taken as Data Abort exceptions
-> 
-> (This is documented in the v8A Arm ARM DDI0487A.e D5.2.11 and
-> G5.13.4.)
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/helper.c | 107 +++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 92 insertions(+), 15 deletions(-)
+Changes from v1:
+  * Drop unintended hunk from MultiField constructor.
+  * Typo fixed in ParameterField documentation.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Blurb from v1:
+  These are split out from my decodetree coversion of the AArch32
+  base instruction sets.
+
+  The first patch has been tidied per review from Peter.  I now
+  diagnose nonsense fields containing no bits.  I eliminated the
+  unused integer argument passed to the named function.  I improved
+  the documentation.
+
+  The second patch is new, a suggestion from Phillipe.  This then
+  enables the third patch, tidying up the existing usage in riscv.
 
 
 r~
+
+
+Richard Henderson (3):
+  decodetree: Allow !function with no input bits
+  decodetree: Suppress redundant declaration warnings
+  target/riscv: Remove redundant declaration pragmas
+
+ target/riscv/translate.c          | 19 +--------
+ docs/devel/decodetree.rst         |  8 +++-
+ scripts/decodetree.py             | 71 ++++++++++++++++++++++++++-----
+ tests/decode/err_field6.decode    |  5 +++
+ tests/decode/succ_function.decode |  6 +++
+ 5 files changed, 79 insertions(+), 30 deletions(-)
+ create mode 100644 tests/decode/err_field6.decode
+ create mode 100644 tests/decode/succ_function.decode
+
+-- 
+2.17.1
 
 
