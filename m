@@ -6,56 +6,62 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF51EC3A589
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:08:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B28B5C3A589
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:09:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C110C2087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:08:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C110C2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D6222087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:09:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D6222087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzY1b-0003JL-SQ
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 23:08:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47397)
+	id 1hzY30-0004IZ-K7
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 23:09:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hzY0x-0002sn-Gi
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:07:24 -0400
+ (envelope-from <jasowang@redhat.com>) id 1hzY2H-0003rP-16
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:08:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hzY0v-0003rV-JB
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:07:23 -0400
-Received: from mga07.intel.com ([134.134.136.100]:52628)
+ (envelope-from <jasowang@redhat.com>) id 1hzY2F-0004fj-LP
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:08:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hzY0v-0003qO-Br
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:07:21 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Aug 2019 20:07:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,403,1559545200"; d="scan'208";a="182747806"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga006.jf.intel.com with ESMTP; 18 Aug 2019 20:07:17 -0700
-Date: Mon, 19 Aug 2019 11:06:54 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190819030654.GA18468@richard>
-References: <20190321082555.21118-1-richardw.yang@linux.intel.com>
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hzY2F-0004eg-G5
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:08:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 70A26C049D62;
+ Mon, 19 Aug 2019 03:08:41 +0000 (UTC)
+Received: from [10.72.12.146] (ovpn-12-146.pek2.redhat.com [10.72.12.146])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0411582489;
+ Mon, 19 Aug 2019 03:08:34 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190808143457.14111-1-philmd@redhat.com>
+ <20455728-aeee-7009-ec42-c3f5db7ff55a@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a0a5ee9a-4729-0eb7-9eb1-508ca1d465f6@redhat.com>
+Date: Mon, 19 Aug 2019 11:08:33 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190321082555.21118-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
-Subject: Re: [Qemu-devel] [PATCH 0/6] Refine exec
+In-Reply-To: <20455728-aeee-7009-ec42-c3f5db7ff55a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 19 Aug 2019 03:08:41 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/6] net/eth: Remove duplicated tcp/udp_hdr
+ structures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,34 +73,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+Cc: Zhang Chen <chen.zhang@intel.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Li Zhijian <lizhijian@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 21, 2019 at 04:25:49PM +0800, Wei Yang wrote:
->This serial refine exec a little.
->
 
-Ping again.
-
->Wei Yang (6):
->  exec.c: replace hwaddr with uint64_t for better understanding
->  exec.c: remove an unnecessary assert on PHYS_MAP_NODE_NIL in
->    phys_map_node_alloc()
->  exec.c: get nodes_nb_alloc with one MAX calculation
->  exec.c: subpage->sub_section is already initialized to 0
->  exec.c: correct the maximum skip value during compact
->  exec.c: add a check between constants to see whether we could skip
+On 2019/8/19 =E4=B8=8A=E5=8D=885:38, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Jason,
 >
-> exec.c | 21 ++++++++++-----------
-> 1 file changed, 10 insertions(+), 11 deletions(-)
+> On 8/8/19 4:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> This is a preparatory cleanup series.
+>>
+>> Commit 75020a70215 introduced 4 very equivalent structures:
+>> - tcp_header and tcp_hdr,
+>> - udp_header and udp_hdr.
+>>
+>> Choose the most widely use in the codebase, which happens to
+>> provide convenient bitfields manipulation macros and is not
+>> endian-specific.
+>>
+>> Philippe Mathieu-Daud=C3=A9 (6):
+>>   hw/net/virtio-net: Use TCP_HEADER_FLAGS/TCP_HEADER_DATA_OFFSET macro=
+s
+>>   net/colo-compare: Use the tcp_header structure
+>>   net/filter-rewriter: Use the tcp_header structure
+>>   hw/net/vmxnet3: Use the tcp_header structure
+>>   net/eth: Remove the unused tcp_hdr structure
+>>   net/eth: Remove the single use of udp_hdr structure
+> Are you OK to take this series?
 >
->-- 
->2.19.1
+> It got reviewed by Dmitry Fleytman.
+>
+> Thanks,
+>
+> Phil.
 
--- 
-Wei Yang
-Help you, Help me
+
+Yes. Applied.
+
+Thanks
+
+
 
