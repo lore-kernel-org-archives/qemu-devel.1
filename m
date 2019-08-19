@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA5DC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 16:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF75C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 16:23:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 255D522CE3
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 16:23:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 255D522CE3
+	by mail.kernel.org (Postfix) with ESMTPS id 22E2622CE3
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 16:23:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22E2622CE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzkR8-00005X-VF
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 12:23:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35307)
+	id 1hzkRN-0000Wb-Vi
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 12:23:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hzkLn-0002ox-4p
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 12:17:44 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hzkM0-00037u-6a
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 12:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hzkLl-0006HO-Qr
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 12:17:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58724)
+ (envelope-from <mreitz@redhat.com>) id 1hzkLz-0006Pj-0v
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 12:17:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56548)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hzkLj-0006Fn-62; Mon, 19 Aug 2019 12:17:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hzkLw-0006Mo-MC; Mon, 19 Aug 2019 12:17:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7D386106E96E;
- Mon, 19 Aug 2019 16:17:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 00158190C10B;
+ Mon, 19 Aug 2019 16:17:51 +0000 (UTC)
 Received: from localhost (ovpn-204-64.brq.redhat.com [10.40.204.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1116F8CC0E;
- Mon, 19 Aug 2019 16:17:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C0581DE;
+ Mon, 19 Aug 2019 16:17:51 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 19 Aug 2019 18:17:10 +0200
-Message-Id: <20190819161723.7746-5-mreitz@redhat.com>
+Date: Mon, 19 Aug 2019 18:17:15 +0200
+Message-Id: <20190819161723.7746-10-mreitz@redhat.com>
 In-Reply-To: <20190819161723.7746-1-mreitz@redhat.com>
 References: <20190819161723.7746-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Mon, 19 Aug 2019 16:17:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Mon, 19 Aug 2019 16:17:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 04/17] block: Add bdrv_has_zero_init_truncate()
+Subject: [Qemu-devel] [PULL 09/17] vhdx: Fix .bdrv_has_zero_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,104 +72,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No .bdrv_has_zero_init() implementation returns 1 if growing the file
-would add non-zero areas (at least with PREALLOC_MODE_OFF), so using it
-in lieu of this new function was always safe.
+Fixed VHDX images cannot guarantee to be zero-initialized.  If the image
+has the "fixed" subformat, forward the call to the underlying storage
+node.
 
-But on the other hand, it is possible that growing an image that is not
-zero-initialized would still add a zero-initialized area, like when
-using nonpreallocating truncation on a preallocated image.  For callers
-that care only about truncation, not about creation with potential
-preallocation, this new function is useful.
-
-Alternatively, we could have added a PreallocMode parameter to
-bdrv_has_zero_init().  But the only user would have been qemu-img
-convert, which does not have a plain PreallocMode value right now -- it
-would have to parse the creation option to obtain it.  Therefore, the
-simpler solution is to let bdrv_has_zero_init() inquire the
-preallocation status and add the new bdrv_has_zero_init_truncate() that
-presupposes PREALLOC_MODE_OFF.
-
+Reported-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190724171239.8764-4-mreitz@redhat.com
+Message-id: 20190724171239.8764-9-mreitz@redhat.com
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h     |  1 +
- include/block/block_int.h |  7 +++++++
- block.c                   | 21 +++++++++++++++++++++
- 3 files changed, 29 insertions(+)
+ block/vhdx.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 89e40318cf..124ad40809 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -443,6 +443,7 @@ int bdrv_pdiscard(BdrvChild *child, int64_t offset, i=
-nt64_t bytes);
- int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
- int bdrv_has_zero_init_1(BlockDriverState *bs);
- int bdrv_has_zero_init(BlockDriverState *bs);
-+int bdrv_has_zero_init_truncate(BlockDriverState *bs);
- bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
- bool bdrv_can_write_zeroes_with_unmap(BlockDriverState *bs);
- int bdrv_block_status(BlockDriverState *bs, int64_t offset,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8fa011654a..ceec8c2f56 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -419,9 +419,16 @@ struct BlockDriver {
-     /*
-      * Returns 1 if newly created images are guaranteed to contain only
-      * zeros, 0 otherwise.
-+     * Must return 0 if .bdrv_has_zero_init_truncate() returns 0.
-      */
-     int (*bdrv_has_zero_init)(BlockDriverState *bs);
-=20
-+    /*
-+     * Returns 1 if new areas added by growing the image with
-+     * PREALLOC_MODE_OFF contain only zeros, 0 otherwise.
-+     */
-+    int (*bdrv_has_zero_init_truncate)(BlockDriverState *bs);
-+
-     /* Remove fd handlers, timers, and other event loop callbacks so the=
- event
-      * loop is no longer in use.  Called with no in-flight requests and =
-in
-      * depth-first traversal order with parents before child nodes.
-diff --git a/block.c b/block.c
-index 3e698e9cab..874a29a983 100644
---- a/block.c
-+++ b/block.c
-@@ -5078,6 +5078,27 @@ int bdrv_has_zero_init(BlockDriverState *bs)
+diff --git a/block/vhdx.c b/block/vhdx.c
+index a02d1c99a7..6a09d0a55c 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -2075,6 +2075,30 @@ static int coroutine_fn vhdx_co_check(BlockDriverS=
+tate *bs,
      return 0;
  }
 =20
-+int bdrv_has_zero_init_truncate(BlockDriverState *bs)
++static int vhdx_has_zero_init(BlockDriverState *bs)
 +{
-+    if (!bs->drv) {
-+        return 0;
++    BDRVVHDXState *s =3D bs->opaque;
++    int state;
++
++    /*
++     * Check the subformat: Fixed images have all BAT entries present,
++     * dynamic images have none (right after creation).  It is
++     * therefore enough to check the first BAT entry.
++     */
++    if (!s->bat_entries) {
++        return 1;
 +    }
 +
-+    if (bs->backing) {
-+        /* Depends on the backing image length, but better safe than sor=
-ry */
-+        return 0;
-+    }
-+    if (bs->drv->bdrv_has_zero_init_truncate) {
-+        return bs->drv->bdrv_has_zero_init_truncate(bs);
-+    }
-+    if (bs->file && bs->drv->is_filter) {
-+        return bdrv_has_zero_init_truncate(bs->file->bs);
++    state =3D s->bat[0] & VHDX_BAT_STATE_BIT_MASK;
++    if (state =3D=3D PAYLOAD_BLOCK_FULLY_PRESENT) {
++        /* Fixed subformat */
++        return bdrv_has_zero_init(bs->file->bs);
 +    }
 +
-+    /* safe default */
-+    return 0;
++    /* Dynamic subformat */
++    return 1;
 +}
 +
- bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs)
- {
-     BlockDriverInfo bdi;
+ static QemuOptsList vhdx_create_opts =3D {
+     .name =3D "vhdx-create-opts",
+     .head =3D QTAILQ_HEAD_INITIALIZER(vhdx_create_opts.head),
+@@ -2128,7 +2152,7 @@ static BlockDriver bdrv_vhdx =3D {
+     .bdrv_co_create_opts    =3D vhdx_co_create_opts,
+     .bdrv_get_info          =3D vhdx_get_info,
+     .bdrv_co_check          =3D vhdx_co_check,
+-    .bdrv_has_zero_init     =3D bdrv_has_zero_init_1,
++    .bdrv_has_zero_init     =3D vhdx_has_zero_init,
+=20
+     .create_opts            =3D &vhdx_create_opts,
+ };
 --=20
 2.21.0
 
