@@ -2,54 +2,48 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A519EC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 279EEC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:39:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7723622CE8
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:38:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7723622CE8
+	by mail.kernel.org (Postfix) with ESMTPS id EBE7622CEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:39:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBE7622CEB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzoQC-0001vp-Cx
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:38:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47529)
+	id 1hzoQr-00033f-QH
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:39:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46864)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hzoIo-0008VB-46
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:30:56 -0400
+ (envelope-from <eblake@redhat.com>) id 1hzoDi-0002XM-K5
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hzoIm-0000kL-SC
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:30:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23276)
+ (envelope-from <eblake@redhat.com>) id 1hzoDh-0006hw-Hy
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:25:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48058)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hzoIh-0000ew-5k; Mon, 19 Aug 2019 16:30:47 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hzoDf-0006h1-3U; Mon, 19 Aug 2019 16:25:35 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 988B319AD50A;
- Mon, 19 Aug 2019 20:30:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5802519AD50D;
+ Mon, 19 Aug 2019 20:25:34 +0000 (UTC)
 Received: from [10.3.117.3] (ovpn-117-3.phx2.redhat.com [10.3.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CDA1F1DE;
- Mon, 19 Aug 2019 20:30:41 +0000 (UTC)
-To: "Denis V. Lunev" <den@openvz.org>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1677e835-39a1-4af3-8f4f-e1600021a2ee@redhat.com>
- <fa4f4405-5a51-c7ec-f712-95e40ef6dd41@redhat.com>
- <5dc0231e-6fbc-3efc-8cc7-ff953651d0e9@redhat.com>
- <a7cfd04b-5185-e13c-2ced-7e689de05247@openvz.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3C4C1F8;
+ Mon, 19 Aug 2019 20:25:33 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190819185602.4267-1-mreitz@redhat.com>
+ <20190819185602.4267-17-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -76,21 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <71d406a0-d1a0-6feb-5768-6295d36e18fc@redhat.com>
-Date: Mon, 19 Aug 2019 15:30:40 -0500
+Message-ID: <ddba06a8-0ecd-639a-bd13-5fd98cde6e43@redhat.com>
+Date: Mon, 19 Aug 2019 15:25:28 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <a7cfd04b-5185-e13c-2ced-7e689de05247@openvz.org>
+In-Reply-To: <20190819185602.4267-17-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="UfpZbObvInp6K2q5HvnHN0mxgF1ria8A3"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Mon, 19 Aug 2019 20:30:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.63]); Mon, 19 Aug 2019 20:25:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] block/io.c: fix for the allocation failure
+Subject: Re: [Qemu-devel] [PATCH v2 16/16] iotests: Test qcow2's snapshot
+ table handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,73 +97,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UfpZbObvInp6K2q5HvnHN0mxgF1ria8A3
-Content-Type: multipart/mixed; boundary="YGPGWy4dLdgcxfl3qYaKvJlVKcrFyyN9h";
+--M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl
+Content-Type: multipart/mixed; boundary="dSYic9x3OVcTFakEICwl7fSKdg2R8RaRa";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
-Message-ID: <71d406a0-d1a0-6feb-5768-6295d36e18fc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/io.c: fix for the allocation failure
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1677e835-39a1-4af3-8f4f-e1600021a2ee@redhat.com>
- <fa4f4405-5a51-c7ec-f712-95e40ef6dd41@redhat.com>
- <5dc0231e-6fbc-3efc-8cc7-ff953651d0e9@redhat.com>
- <a7cfd04b-5185-e13c-2ced-7e689de05247@openvz.org>
-In-Reply-To: <a7cfd04b-5185-e13c-2ced-7e689de05247@openvz.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <ddba06a8-0ecd-639a-bd13-5fd98cde6e43@redhat.com>
+Subject: Re: [PATCH v2 16/16] iotests: Test qcow2's snapshot table handling
+References: <20190819185602.4267-1-mreitz@redhat.com>
+ <20190819185602.4267-17-mreitz@redhat.com>
+In-Reply-To: <20190819185602.4267-17-mreitz@redhat.com>
 
---YGPGWy4dLdgcxfl3qYaKvJlVKcrFyyN9h
+--dSYic9x3OVcTFakEICwl7fSKdg2R8RaRa
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/19/19 2:46 PM, Denis V. Lunev wrote:
-> On 8/17/19 5:56 PM, Eric Blake wrote:
->> On 8/17/19 9:49 AM, Eric Blake wrote:
->>
->>>> This change is a regression of sorts.  Now, you are unconditionally
->>>> attempting the fallback for ALL failures (such as EIO) and for all
->>>> drivers, even when that was not previously attempted and increases t=
-he
->>>> traffic.  I think we should revert this patch and instead fix the
->>>> fallocate() path to convert whatever ACTUAL errno you got from unali=
-gned
->>>> fallocate failure into ENOTSUP (that is, just the file-posix.c locat=
-ion
->>>> that failed), while leaving all other errors as immediately fatal.
->> Or even better, fix the call site of fallocate() to skip attempting an=
+On 8/19/19 1:56 PM, Max Reitz wrote:
+> Add a test how our qcow2 driver handles extra data in snapshot table
+> entries, and how it repairs overly long snapshot tables.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
 
->> unaligned fallocate(), and just directly return ENOTSUP, rather than
->> trying to diagnose EINVAL after the fact.
->>
-> No way. Single ENOTSUP will turn off fallocate() support on caller side=
+> +++ b/tests/qemu-iotests/261.out
+> @@ -0,0 +1,346 @@
+> +QA output created by 261
+> +
+> +=3D=3D=3D Create v2 template =3D=3D=3D
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT.v2.orig', fmt=3DIMGFMT size=3D67108864
+> +No errors were found on the image.
+> +Snapshots in TEST_DIR/t.IMGFMT.v2.orig:
+> +  [0]
+> +    ID: 1
+> +    Name: sn0
+> +    Extra data size: 0
+> +  [1]
+> +    ID: 2
+> +    Name: sn1
+> +    Extra data size: 42
+> +    VM state size: 0
+> +    Disk size: 67108864
+> +    Unknown extra data: very important data
 
-> while
-> aligned (99.99% of calls) works normally.
+Hmm - possibly one more patch to write - but when checking snapshots for
+accuracy, do we want to insist that the 32-bit truncated VM state size
+is either 0 or matches the low 32-bits of the 64-bit VM state size
+field?  Any mismatch between those fields (other than the 32-bit field
+being left 0 because we knew to use the 64-bit field) might be a hint of
+a possible corruption.  But there's no good way to correct it other than
+wiping the 32-bit field to 0; and for a v2 image, any change we make to
+the 32-bit field might actually make the snapshot unusable for an older
+client that doesn't know how to use the 64-bit field.  So maybe we just
+overlook that.
 
-I didn't mean skip fallocate() unconditionally, only when unaligned:
-
-if (request not aligned enough)
-   return -ENOTSUP;
-fallocate() ...
-
-so that the 99.99% requests that ARE aligned get to use fallocate()
-normally.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -176,24 +167,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---YGPGWy4dLdgcxfl3qYaKvJlVKcrFyyN9h--
+--dSYic9x3OVcTFakEICwl7fSKdg2R8RaRa--
 
---UfpZbObvInp6K2q5HvnHN0mxgF1ria8A3
+--M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1bBvAACgkQp6FrSiUn
-Q2rtoAf/XKenaQsNjLRp3HROKUFoUsMA3eqogphjbsg32uI8WF8LpTpQp5/zQSiT
-+2t22ShZj8iHodBWjwm1Iu305MtObpKx/tWNWRdMxPSgvQXWPHdJVz2x4g4o8m36
-jQLYoSzGHDhxqGqdxJG0rfxExOh2my2VQQlymVE0S0anuJ7DjJ0OLzPtA+wm9jVZ
-LShQ2uIPNDqyt1iggKcTHDuI+TeKlX4dcOWFv+ix/PFy07iAi30JTRlUQi3iHeiq
-lMWt8dO5z57ZAnPtjpkDwIrKrxUBaxjhizMVT7R+abj/+kqcx4406VaGbIJG3jWy
-zqSOsYFjaUcMP213mqSk1dQb03IqFQ==
-=fQas
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1bBbgACgkQp6FrSiUn
+Q2pVqgf/Yc8gs/ve+nChAeaa/7eiNEBRe0K6TY9bIvconTVghpp5kThPR5uvbAG1
+/vAEiJHWnJpx+gbBug1GHs0ojeWGc22rPhCeNSG7JPEprT1B3AB2yiu/Zj3R+zz4
+Y8j5JtnG4loYWfFSsZMA9OL+oL+3IBzGhmteQwosIibhsRJjFCXqdIK5LxD8hRqX
+NGhqwiPt/TiAvjznk1NeCzk8a+fS0BrCfUF0ivx09r5UnfjU4sZwKr31idI41nRt
+3m+WTWKLjRuqgnzKQlf+CY7Lyk57ZQ8aCx0X8os+v/idfPfiNzV7eJFdvPrvd0eA
+OQH+T7mSIp455NhWV4Ix+DTOm+uVGQ==
+=TNYM
 -----END PGP SIGNATURE-----
 
---UfpZbObvInp6K2q5HvnHN0mxgF1ria8A3--
+--M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl--
 
