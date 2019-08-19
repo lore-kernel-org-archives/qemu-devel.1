@@ -2,78 +2,84 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97089C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA01C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:15:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69FA920843
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:14:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69FA920843
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CAE3B20843
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:15:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XShN8zM0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE3B20843
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzhUf-0000rh-GO
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:14:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50002)
+	id 1hzhVM-0001tF-P7
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:15:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hzhR3-0006tA-SG
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:10:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hzhTy-0000Po-PB
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:13:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hzhR2-0000Os-AZ
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:10:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50664)
+ (envelope-from <peter.maydell@linaro.org>) id 1hzhTv-0001cI-Vp
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:13:57 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:43633)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hzhR0-0000MI-9v
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:10:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hzhQw-00052N-Ps
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 13:10:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BBC8A2E8070
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 13:10:50 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hzhTs-0001VA-1Y
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:13:54 -0400
+Received: by mail-ot1-x336.google.com with SMTP id e12so1580437otp.10
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 06:13:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=60JqoMGoIGS0wuoTg7tCXWkqHLgyT5zwk1k40i2w9oU=;
+ b=XShN8zM0FeycGd6J4Vue6KXBldbeZTOJ8mLuPMgS9j5tQ9WFOQ+zGHSYWL5czBzhLQ
+ KtwP9SYLBiK+9kDivXKtFHCXaMDjIP94si2HRtYTc7ZbCsWKFO1YcPPfwqojgbf1p1gV
+ ZaofQ/p4mY4mbrAl8O5kVaO3h56aldVkRy0n8kvEvPULQ4SHkHu3qDk8djKdWC1EYJw2
+ kN0NBMD4g5B44vVFw6K3be8WYhePg8FBZNg13FF//29bVCcb3m0XGDpG3Iz3O1boHdFm
+ WGclUZJZN+0EC9qizAUQzjxzmuANcLDLIN8al/Uw6j1Aga7LWSMv6ufyK3RCI9MG5a+A
+ 4f7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=60JqoMGoIGS0wuoTg7tCXWkqHLgyT5zwk1k40i2w9oU=;
+ b=sR8HLETJKgRSAkGgyslgHJAStZeUxX26VFbgfdI8J/RfmOpSwSd0p+ZZW95mIMVgNm
+ yvO2vJMqgBmzYKuLrGKaUWWB4MlU4G74ZJrPI5Iet5Ldv7Tu/QupJAbnOE9C+R1rcmgI
+ EZ+om6tNeFK5oQ/xoFa74H85G4TTNqYKrwfyQnqrWrRXKnvR77oqm249UAIkDhFvEQrp
+ 4GKh7FFOfzTCtscoquYx8RywlE807Dk1Tq1U1ofLkhhfeFTDPzD5bk8d6fbgqmI6qnK/
+ tJO5NBKqajhhvCHONhs8wHOhi6yLkoIpx9Dkbq9QogaI8Cziht7u2GcnR8n96lUZeAsl
+ uruA==
+X-Gm-Message-State: APjAAAXJ6mwMAmBZDorib1iuZv16CSdJmElhPFyK6/fRZ+QISoK03MqQ
+ HdtNGtcjvIBrbzuCNCZxwtw+oDJ1dLbaaBfGbR4RaA==
+X-Google-Smtp-Source: APXvYqzpLfenCwlHqpcVJFrMN3dph47k155IlVAJKCcYg+mmcGc9XQhSZWyZjWedNEBTEY/PjiRPgmXV5fVwE7WJt3c=
+X-Received: by 2002:a9d:4817:: with SMTP id c23mr16832112otf.97.1566220426047; 
+ Mon, 19 Aug 2019 06:13:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20190816231609.9521-1-jsnow@redhat.com>
+In-Reply-To: <20190816231609.9521-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Aug 2019 14:13:34 +0100
+Message-ID: <CAFEAcA_1c1aajeKhBKzGWRS6c=iC8zmXXb3en+sLo09TxG63-w@mail.gmail.com>
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Aug 2019 13:04:15 -0000
-From: Avi Eis <1834113@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=libvirt; component=main;
- status=Incomplete; importance=Low; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Incomplete; importance=Low; assignee=None; 
-X-Launchpad-Bug-Tags: amd64 apport-bug disco
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bryce ikes73 paelzer rafaeldtinoco
-X-Launchpad-Bug-Reporter: Avi Eis (ikes73)
-X-Launchpad-Bug-Modifier: Avi Eis (ikes73)
-References: <156142437029.30985.13623507391124028236.malonedeb@soybean.canonical.com>
-Message-Id: <156621985567.22174.9686439531006087595.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: bc8aae0a92dd7a47f75cc2ab8e4a5baeb622edb5
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1834113] Re: QEMU touchpad input erratic after
- wakeup from sleep
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::336
+Subject: Re: [Qemu-devel] [PULL 0/3] Ide patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,92 +88,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1834113 <1834113@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now it stopped happening, although I did see something briefly
-last week that fixed itself on a reboot.
+On Sat, 17 Aug 2019 at 00:16, John Snow <jsnow@redhat.com> wrote:
+>
+> The following changes since commit afd760539308a5524accf964107cdb1d54a059=
+e3:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+90816' into staging (2019-08-16 17:21:40 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
+>
+> for you to fetch changes up to 614ab7d127536655ef105d4153ea264c88e855c1:
+>
+>   hw/ide/atapi: Use the ldst API (2019-08-16 19:14:04 -0400)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> Stable notes: patches one and two can be considered
+>               for the next -stable release.
+>
+> ----------------------------------------------------------------
+>
+> John Snow (1):
+>   Revert "ide/ahci: Check for -ECANCELED in aio callbacks"
+>
+> Paolo Bonzini (1):
+>   dma-helpers: ensure AIO callback is invoked after cancellation
+>
+> Philippe Mathieu-Daud=C3=A9 (1):
+>   hw/ide/atapi: Use the ldst API
 
-If it happens again I'll check those details.
+Applied, thanks.
 
--- =
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1834113
-
-Title:
-  QEMU touchpad input erratic after wakeup from sleep
-
-Status in QEMU:
-  Incomplete
-Status in libvirt package in Ubuntu:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Using Ubuntu host and guest. Normally the touchpad works great. Within
-  the last few days, suddenly, apparently after a wake from sleep, the
-  touchpad will behave erratically. For example, it will take two clicks
-  to select something, and when moving the cursor it will act as though
-  it is dragging even with the button not clicked.
-
-  A reboot fixes the issue temporarily.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 19.04
-  Package: qemu 1:3.1+dfsg-2ubuntu3.1
-  Uname: Linux 5.1.14-050114-generic x86_64
-  ApportVersion: 2.20.10-0ubuntu27
-  Architecture: amd64
-  CurrentDesktop: ubuntu:GNOME
-  Date: Mon Jun 24 20:55:44 2019
-  Dependencies:
-   =
-
-  EcryptfsInUse: Yes
-  InstallationDate: Installed on 2019-02-20 (124 days ago)
-  InstallationMedia: Ubuntu 18.04 "Bionic" - Build amd64 LIVE Binary 201806=
-08-09:38
-  Lsusb:
-   Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-   Bus 001 Device 002: ID 8087:0025 Intel Corp. =
-
-   Bus 001 Device 003: ID 0c45:671d Microdia =
-
-   Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-  MachineType: Dell Inc. Precision 5530
-  ProcEnviron:
-   TERM=3Dxterm-256color
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.1.14-050114-generic root=
-=3DUUID=3D18e8777c-1764-41e4-a19f-62476055de23 ro mem_sleep_default=3Ddeep =
-mem_sleep_default=3Ddeep acpi_rev_override=3D1 scsi_mod.use_blk_mq=3D1 nouv=
-eau.modeset=3D0 nouveau.runpm=3D0 nouveau.blacklist=3D1 acpi_backlight=3Dno=
-ne acpi_osi=3DLinux acpi_osi=3D!
-  SourcePackage: qemu
-  UpgradeStatus: No upgrade log present (probably fresh install)
-  dmi.bios.date: 04/26/2019
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 1.10.1
-  dmi.board.name: 0FP2W2
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr1.10.1:bd04/26/2019:svnDellInc.:pnPrecis=
-ion5530:pvr:rvnDellInc.:rn0FP2W2:rvrA00:cvnDellInc.:ct10:cvr:
-  dmi.product.family: Precision
-  dmi.product.name: Precision 5530
-  dmi.product.sku: 087D
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1834113/+subscriptions
+-- PMM
 
