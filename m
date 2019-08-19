@@ -2,66 +2,85 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE753C3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 05:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E77C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:01:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C204A20851
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 05:41:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C204A20851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC06C2086C
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:01:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVWLikC+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC06C2086C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzaQN-0003KA-VK
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 01:41:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47372)
+	id 1hzajc-0007FK-Q2
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 02:01:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1hzaPW-0002Ta-3P
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 01:40:54 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hzai8-0006Re-DC
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:00:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1hzaPV-0000qA-36
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 01:40:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33106)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>)
- id 1hzaPR-0000na-TM; Mon, 19 Aug 2019 01:40:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A637D46660;
- Mon, 19 Aug 2019 05:40:48 +0000 (UTC)
-Received: from [10.72.12.146] (ovpn-12-146.pek2.redhat.com [10.72.12.146])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A10F74C;
- Mon, 19 Aug 2019 05:40:43 +0000 (UTC)
-To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis <alistair23@gmail.com>
-References: <1565335544-23584-1-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKOyTXgs5uZuukZjAEqQkTtf1U+vD=u9_470+OgsfaQdqQ@mail.gmail.com>
- <CAEUhbmW0sCEN7mzSfCvUBSqhAGD3v5JyeDj2iSqs0MQJv13bag@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <67e917c9-d080-5af1-22ea-ba6d9af4daee@redhat.com>
-Date: Mon, 19 Aug 2019 13:40:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bmeng.cn@gmail.com>) id 1hzai7-0001Qp-EC
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:00:08 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:41484)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1hzai7-0001Mj-6b; Mon, 19 Aug 2019 02:00:07 -0400
+Received: by mail-ed1-x541.google.com with SMTP id w5so525496edl.8;
+ Sun, 18 Aug 2019 23:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=7FV0L/iFSvlfwmjmAtqTerMajiBAcMMl2MayHrzyomg=;
+ b=eVWLikC+fP00fSmER2iprzf/YK9rXK15I3H2EgH/uke3zOoFQuzygk59tOAW4/Dtir
+ eVWgxnBv48ie8uL4gORfDu6i2hbMX2OVGFOsmDLb15iRioXUseDc7ppHkzmec8sMUND5
+ srJ8QfMI8un/nnaskRzR37NaQ74MY+iAkStMKh0JgeBD0oJKHNfWyFrq7LFVVqGoNOu/
+ yr6RvoMf94r8I+89lPudqzAUK07djyK2bacAVB7b8K2L1AV7ob1aMBIw09nolUhIx4cL
+ nd+Pc/PxNSLxOAok1xwJn+LAFTVDjWIKbY1PKO/eak+aIIygJwURCSFYyh9wOdbFZuvO
+ Am1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=7FV0L/iFSvlfwmjmAtqTerMajiBAcMMl2MayHrzyomg=;
+ b=hryUzN/rjnk8sxxlhbC95Is7j+DdPk3A2B2G+iuHO4vzkPvp6t/9n1IWChsgo3v10G
+ gRJgKE80aH/lx0lPkW/EXRalGruI4+aYaL2K70m9CJn+W5c0HpppXarju8ks4t7Zf/+D
+ R+zN5UTdl2qiyjdgOjhdL5u/XI5QmojrJDhqlH/NsztIUb9dgfQwqbP//LZm4M7RCBVE
+ Ztn3mXqjBmc+dfhxCMTENIkvApG7anhfHL+84Mv26yM5zGFneSZYzUnsqiNN3iatgYIp
+ +kyP2YkliN8HuYaj986k0Crmxt9M5CLiXVyaZwN1GjBywzSohg8jjVvMEJdeA/68ACR9
+ 9UTA==
+X-Gm-Message-State: APjAAAWsjQ7OeO0aNGvRwhn3yM+R6MNEiXV/5EeyrDIwOreTy+lgIazu
+ tqqjswItD0I1Gp8StBPe9XTp47q56tG6Ffy/LWo=
+X-Google-Smtp-Source: APXvYqwjPGd4ht2FWLFT7q1J2PQuWZ55JTOlwuo40nX/zFfSYjfHuU9J3Y3zCWj/t5F+3pxmzKVNja30UAxEvH6ZKBo=
+X-Received: by 2002:a05:6402:128b:: with SMTP id
+ w11mr21462026edv.182.1566194405719; 
+ Sun, 18 Aug 2019 23:00:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAEUhbmW0sCEN7mzSfCvUBSqhAGD3v5JyeDj2iSqs0MQJv13bag@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 19 Aug 2019 05:40:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] hw: net: cadence_gem: Fix build errors
- in DB_PRINT()
+References: <1565796812-25870-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1565796812-25870-1-git-send-email-bmeng.cn@gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 19 Aug 2019 13:59:54 +0800
+Message-ID: <CAEUhbmWacQtwTRYhCw6GwfGBabrWbe2Ss2JVCJ5XE7s3bVE-gA@mail.gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, 
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, 
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, 
+ QEMU devel <qemu-devel@nongnu.org>, QEMU riscv <qemu-riscv@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH v4] riscv: hmp: Add a command to show
+ virtual memory mappings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,40 +92,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2019/8/19 =E4=B8=8B=E5=8D=881:24, Bin Meng wrote:
-> On Sat, Aug 10, 2019 at 9:58 AM Alistair Francis <alistair23@gmail.com>=
- wrote:
->> On Fri, Aug 9, 2019 at 12:26 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->>> When CADENCE_GEM_ERR_DEBUG is turned on, there are several
->>> compilation errors in DB_PRINT(). Fix them.
->>>
->>> While we are here, update to use appropriate modifiers in
->>> the same DB_PRINT() call.
->>>
->>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->>
-> Ping?
+On Wed, Aug 14, 2019 at 11:33 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> What's the status of this patch?
+> This adds 'info mem' command for RISC-V, to show virtual memory
+> mappings that aids debugging.
 >
-> Regards,
-> Bin
+> Rather than showing every valid PTE, the command compacts the
+> output by merging all contiguous physical address mappings into
+> one block and only shows the merged block mapping details.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+>
+> ---
+>
+> Changes in v4:
+> - restore to v2, that does not print all harts's PTE, since we
+>   should switch to a cpu context via the 'cpu' command
+>
+> Changes in v3:
+> - print PTEs for all harts instead of just current hart
+>
+> Changes in v2:
+> - promote ppn to hwaddr when doing page table address calculation
+>
+>  hmp-commands-info.hx       |   2 +-
+>  target/riscv/Makefile.objs |   4 +
+>  target/riscv/monitor.c     | 229 +++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 234 insertions(+), 1 deletion(-)
+>  create mode 100644 target/riscv/monitor.c
+>
 
+Ping?
 
-Applied.
+What's the status of this patch?
 
-Thanks
-
+Regards,
+Bin
 
