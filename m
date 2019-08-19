@@ -5,77 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37580C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE2BC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00E5C206C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:12:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 167A9206C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:13:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lnQ/197V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E5C206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oys04Ya4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 167A9206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzo1G-00058f-3e
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:12:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44608)
+	id 1hzo1u-0006TT-93
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:13:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44759)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1hzo0D-0004Tg-Cb
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:11:42 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hzo1A-0005KC-2t
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hzo0C-0000O5-6Y
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:11:41 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:35961)
+ (envelope-from <alistair23@gmail.com>) id 1hzo19-0000ta-69
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:12:40 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:34562)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hzo0B-0000NP-Su; Mon, 19 Aug 2019 16:11:40 -0400
-Received: by mail-lf1-x142.google.com with SMTP id j17so2324485lfp.3;
- Mon, 19 Aug 2019 13:11:39 -0700 (PDT)
+ id 1hzo18-0000s8-V3; Mon, 19 Aug 2019 16:12:39 -0400
+Received: by mail-lj1-x243.google.com with SMTP id x18so2963902ljh.1;
+ Mon, 19 Aug 2019 13:12:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vz1QfNHZvV4l7jIAawaglagw5PWlIGcW8gQ+ud4/D50=;
- b=lnQ/197VkoJx2KGpOH7fpcQGB9E7gDeIlomPfNeRp6K6UQnPnjQYnhPtkoh9CWFs9z
- knLaO20VWAduOamo+UEhQgVEP+0QGuS3w9XMfrFi+2921Zp3lrcgWC/nAPpN2d7FkN/L
- U3g6Digh7G5h79ySh5X0S3g1HzBTr8EPWDQ3Y26PiHMlaRLncYwzhFRPik8ueax5f+kl
- xmmOaXyinY+7Q+pBAS63mYIJZXr84dyDNKQ4HECVhFuz3BNCRce8HwSLTjpjyGCaBkon
- CjIEvTEwZO1hbpaCYWiImHvN9Vnos6nSwh92bFYJuiXEVd1VKYeX7/XhGCWufcRYZG+8
- 4cLw==
+ :cc; bh=dMWi4Kl+LFYOvsH7VUL2TkzS7+FaZsWR+nLrdeAFAQM=;
+ b=oys04Ya4DQ6ImESpJK2QEfJ0uycDW0RazyL3RKd0QscAnBJQQunsW2TVwHyYhaWQjT
+ ww2pkNhTh4dzfPYyzG4SJoqLPn0+C167siYah5f8dvQ4hWr/TzQZVeUSoxc3p+b25Rc9
+ J3LTRuKBUCgEybFUZyzCJZ6IPHDNVdTZnE37JOQ14cPZGhmm2SGv8+mBFdQ/pD3lDNsw
+ L+Mu7kV4JmPMpOh1KGNd+kBsejy5BuX9OPBjJw13D5TpcV5n+RR7Y/1YCYowqh+gCXlY
+ ErDiRtOcuv/l+OINXq/lEntEGuV7Q1wftM9V1kzAG21Ki1hLQyYQuY7MKOJQieyD+I8V
+ Z9aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=vz1QfNHZvV4l7jIAawaglagw5PWlIGcW8gQ+ud4/D50=;
- b=Z5XtotDNz8yBStyDq+/zguRyAlGwVaxfb/g8jBm6n0v76bOqpEofunrYFWhzFpxNgv
- qT08FLr//QsMQto/pGNqXX1Ig+lg12XFSF69IqdcRLMPb4XnvX/Dyyrvhf+72xUidPKg
- kSJMsNlKUyVzOZi3zM3ZXZkTGttc0Wz1f+0gPleVY7XYmFDACzyF8r+PRnIDb5ZxThen
- NIosDavy6pbMy21ypwb09HIA1H9hnjhkOmi414hrZVF4U4GGbT7DP9cTxaK8ZtcbFVyo
- lfgzDnXBdaQzpO78Cz/JHn1Le0TQz1/GjV4zxp8ixvG0ggmCH+TyprBfjJGfomgmapDL
- fb+w==
-X-Gm-Message-State: APjAAAXiKwxjs/eu/IZyAU0svY5a7iqL0P8RSS67/sz/QL/cLli0DEb7
- vf7z160dqiTl3CVPQWz7EKzFjVME5btgOB0UHxg=
-X-Google-Smtp-Source: APXvYqy+mZfXQxiZdzQ/dRXbsP4e/8nkPJowQV80+QoT9Z/WB0B2zX3scAG6urEMeVGcKNPROWlmXifwAdj5U4k8nBQ=
-X-Received: by 2002:a19:ed11:: with SMTP id y17mr13061789lfy.141.1566245498446; 
- Mon, 19 Aug 2019 13:11:38 -0700 (PDT)
+ bh=dMWi4Kl+LFYOvsH7VUL2TkzS7+FaZsWR+nLrdeAFAQM=;
+ b=e2rXwn0IwRec2UMP8QP9fNWVHKLSdLvcTfjmtOYetNy7X4enn+aC31RFVg7dw01rgr
+ RSVVcC+x0LJvappKLRn39kKQozNVEP6dpACZXItd6weijid+xW6R8Jze5XUqLlefmsxe
+ 5YoRF/o4xmuVrx7+0g/dU+sde+h4PZqpS13LiIrOArMcl6cj/5LPoEkoa9zJvrj5n3yJ
+ VlB+3/0fOIgtgdknFia1HfbxkdoPzD/M3uNC7Urzj3iqe6exj3y4n/SD741bORwsorZt
+ yIk7Nw6/Te+TFB1QjsMGv//9tpFASF3RcJy3xPL53NfprVeq1L/J4EqGdm25y1G2ElNE
+ VQaQ==
+X-Gm-Message-State: APjAAAWWGLTjZSH/8mHW1+FO0aQKdClWmj+wtF52sHntOwuzqGrLh3n9
+ 6vczPH8sOUEnPmlI25kS7MWOOLKWlW9Ym34MnRs=
+X-Google-Smtp-Source: APXvYqzQ65fyIpOSl7qRmhDQssnvYCBTlC6arOqaGlFZg3BChn94LQzPxnw941my9LYOG+uFtGedRZ0vGFQcLpEx0Ss=
+X-Received: by 2002:a05:651c:c1:: with SMTP id
+ 1mr13805212ljr.119.1566245557733; 
+ Mon, 19 Aug 2019 13:12:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190817101931.28386-1-thuth@redhat.com>
- <20190817101931.28386-5-thuth@redhat.com>
-In-Reply-To: <20190817101931.28386-5-thuth@redhat.com>
+References: <1566191521-7820-1-git-send-email-bmeng.cn@gmail.com>
+ <1566191521-7820-6-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1566191521-7820-6-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 19 Aug 2019 13:07:37 -0700
-Message-ID: <CAKmqyKPY-JmZZmgYjbWgBggN+nE+uOgzBg8UE8_53ztO4+YsXg@mail.gmail.com>
-To: Thomas Huth <thuth@redhat.com>
+Date: Mon, 19 Aug 2019 13:08:37 -0700
+Message-ID: <CAKmqyKPu0r2WKxiMYpZrP1M86weKWJFAUO5kAws7yk_vW3NffQ@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] hw/core: Add a config switch for
- the "register" device
+X-Received-From: 2a00:1450:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v4 05/28] riscv: roms: Remove executable
+ attribute of opensbi images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,83 +89,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 17, 2019 at 3:24 AM Thomas Huth <thuth@redhat.com> wrote:
+On Sun, Aug 18, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> The "register" device is only used by certain machines. Let's add
-> a proper config switch for it so that it only gets compiled when we
-> really need it.
+> Like other binary files, the executable attribute of opensbi images
+> should not be set.
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+>
 > ---
->  hw/Kconfig            | 1 +
->  hw/core/Kconfig       | 3 +++
->  hw/core/Makefile.objs | 2 +-
->  hw/dma/Kconfig        | 1 +
->  4 files changed, 6 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/Kconfig b/hw/Kconfig
-> index dbae1c0852..b45db3c813 100644
-> --- a/hw/Kconfig
-> +++ b/hw/Kconfig
-> @@ -76,3 +76,4 @@ config XILINX_AXI
+> Changes in v4:
+> - new patch to remove executable attribute of opensbi images
 >
->  config XLNX_ZYNQMP
->      bool
-> +    select REGISTER
-> diff --git a/hw/core/Kconfig b/hw/core/Kconfig
-> index c2a1ae8122..d11920fcb3 100644
-> --- a/hw/core/Kconfig
-> +++ b/hw/core/Kconfig
-> @@ -9,3 +9,6 @@ config FITLOADER
+> Changes in v3: None
+> Changes in v2: None
 >
->  config PLATFORM_BUS
->      bool
-> +
-> +config REGISTER
-> +    bool
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index f8481d959f..d6cfb2a81b 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -17,7 +17,7 @@ common-obj-$(CONFIG_SOFTMMU) += machine.o
->  common-obj-$(CONFIG_SOFTMMU) += loader.o
->  common-obj-$(CONFIG_FITLOADER) += loader-fit.o
->  common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
-> -common-obj-$(CONFIG_SOFTMMU) += register.o
-> +common-obj-$(CONFIG_REGISTER) += register.o
->  common-obj-$(CONFIG_SOFTMMU) += or-irq.o
->  common-obj-$(CONFIG_SOFTMMU) += split-irq.o
->  common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
-> diff --git a/hw/dma/Kconfig b/hw/dma/Kconfig
-> index 751dec5426..5c61b67bc0 100644
-> --- a/hw/dma/Kconfig
-> +++ b/hw/dma/Kconfig
-> @@ -16,6 +16,7 @@ config I8257
+>  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin
+>  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin
+>  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin
+>  3 files changed, 0 insertions(+), 0 deletions(-)
+>  mode change 100755 => 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
+>  mode change 100755 => 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
+>  mode change 100755 => 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
 >
->  config ZYNQ_DEVCFG
->      bool
-> +    select REGISTER
->
->  config STP2000
->      bool
+> diff --git a/pc-bios/opensbi-riscv32-virt-fw_jump.bin b/pc-bios/opensbi-riscv32-virt-fw_jump.bin
+> old mode 100755
+> new mode 100644
+> diff --git a/pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin b/pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
+> old mode 100755
+> new mode 100644
+> diff --git a/pc-bios/opensbi-riscv64-virt-fw_jump.bin b/pc-bios/opensbi-riscv64-virt-fw_jump.bin
+> old mode 100755
+> new mode 100644
 > --
-> 2.18.1
+> 2.7.4
 >
 >
 
