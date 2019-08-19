@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B12C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E426C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:34:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3C3020843
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:34:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3C3020843
+	by mail.kernel.org (Postfix) with ESMTPS id 476EE20843
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:34:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 476EE20843
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzgrz-0001YJ-62
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:34:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36294)
+	id 1hzgs0-0001iF-Sf
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:34:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTo-00029F-AX
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:46 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTy-0002Nr-Fc
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTm-0002kC-Cl
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:44 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57999 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTw-0002sc-EE
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:53 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59121 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hzgTl-0002ak-UN
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:42 -0400
+ id 1hzgTw-0002j0-2r
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:52 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 0196C1A21BB;
- Mon, 19 Aug 2019 14:08:25 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 21A321A208C;
+ Mon, 19 Aug 2019 14:08:26 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 80B971A2136;
- Mon, 19 Aug 2019 14:08:24 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 2F79D1A2136;
+ Mon, 19 Aug 2019 14:08:25 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:07:56 +0200
-Message-Id: <1566216496-17375-18-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 19 Aug 2019 14:08:12 +0200
+Message-Id: <1566216496-17375-34-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v8 17/37] target/mips: Clean up handling of CP0
- register 0
+Subject: [Qemu-devel] [PATCH v8 33/37] target/mips: Clean up handling of CP0
+ register 26
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,160 +70,67 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up handling of CP0 register 0.
+Clean up handling of CP0 register 26.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  3 +++
- target/mips/translate.c | 40 ++++++++++++++++++++--------------------
- 2 files changed, 23 insertions(+), 20 deletions(-)
+ target/mips/cpu.h       | 2 +-
+ target/mips/translate.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index eda8350..e2f6844 100644
+index 64dddd0..ef40552 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -279,6 +279,9 @@ typedef struct mips_def_t mips_def_t;
- 
- /* CP0 Register 00 */
- #define CP0_REG00__INDEX           0
-+#define CP0_REG00__MVPCONTROL      1
-+#define CP0_REG00__MVPCONF0        2
-+#define CP0_REG00__MVPCONF1        3
- #define CP0_REG00__VPCONTROL       4
- /* CP0 Register 01 */
- /* CP0 Register 02 */
+@@ -411,7 +411,7 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG25__PERFCTL3        6
+ #define CP0_REG25__PERFCNT3        7
+ /* CP0 Register 26 */
+-#define CP0_REG00__ERRCTL          0
++#define CP0_REG26__ERRCTL          0
+ /* CP0 Register 27 */
+ #define CP0_REG27__CACHERR         0
+ /* CP0 Register 28 */
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index fe4a05c..06a1646 100644
+index a3a9d34..9025a50 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -6853,26 +6853,26 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     switch (reg) {
-     case CP0_REGISTER_00:
+@@ -7503,7 +7503,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_26:
          switch (sel) {
 -        case 0:
-+        case CP0_REG00__INDEX:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Index));
-             register_name = "Index";
++        case CP0_REG26__ERRCTL:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_ErrCtl));
+             register_name = "ErrCtl";
              break;
--        case 1:
-+        case CP0_REG00__MVPCONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mfc0_mvpcontrol(arg, cpu_env);
-             register_name = "MVPControl";
-             break;
--        case 2:
-+        case CP0_REG00__MVPCONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mfc0_mvpconf0(arg, cpu_env);
-             register_name = "MVPConf0";
-             break;
--        case 3:
-+        case CP0_REG00__MVPCONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mfc0_mvpconf1(arg, cpu_env);
-             register_name = "MVPConf1";
-             break;
--        case 4:
-+        case CP0_REG00__VPCONTROL:
-             CP0_CHECK(ctx->vp);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPControl));
-             register_name = "VPControl";
-@@ -7621,26 +7621,26 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     switch (reg) {
-     case CP0_REGISTER_00:
+@@ -8264,7 +8264,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+        break;
+     case CP0_REGISTER_26:
          switch (sel) {
 -        case 0:
-+        case CP0_REG00__INDEX:
-             gen_helper_mtc0_index(cpu_env, arg);
-             register_name = "Index";
-             break;
--        case 1:
-+        case CP0_REG00__MVPCONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_mvpcontrol(cpu_env, arg);
-             register_name = "MVPControl";
-             break;
--        case 2:
-+        case CP0_REG00__MVPCONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             /* ignored */
-             register_name = "MVPConf0";
-             break;
--        case 3:
-+        case CP0_REG00__MVPCONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             /* ignored */
-             register_name = "MVPConf1";
-             break;
--        case 4:
-+        case CP0_REG00__VPCONTROL:
-             CP0_CHECK(ctx->vp);
-             /* ignored */
-             register_name = "VPControl";
-@@ -8373,26 +8373,26 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     switch (reg) {
-     case CP0_REGISTER_00:
++        case CP0_REG26__ERRCTL:
+             gen_helper_mtc0_errctl(cpu_env, arg);
+             ctx->base.is_jmp = DISAS_STOP;
+             register_name = "ErrCtl";
+@@ -9003,7 +9003,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_26:
          switch (sel) {
 -        case 0:
-+        case CP0_REG00__INDEX:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Index));
-             register_name = "Index";
++        case CP0_REG26__ERRCTL:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_ErrCtl));
+             register_name = "ErrCtl";
              break;
--        case 1:
-+        case CP0_REG00__MVPCONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mfc0_mvpcontrol(arg, cpu_env);
-             register_name = "MVPControl";
-             break;
--        case 2:
-+        case CP0_REG00__MVPCONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mfc0_mvpconf0(arg, cpu_env);
-             register_name = "MVPConf0";
-             break;
--        case 3:
-+        case CP0_REG00__MVPCONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mfc0_mvpconf1(arg, cpu_env);
-             register_name = "MVPConf1";
-             break;
--        case 4:
-+        case CP0_REG00__VPCONTROL:
-             CP0_CHECK(ctx->vp);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPControl));
-             register_name = "VPControl";
-@@ -9095,26 +9095,26 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     switch (reg) {
-     case CP0_REGISTER_00:
+@@ -9746,7 +9746,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_26:
          switch (sel) {
 -        case 0:
-+        case CP0_REG00__INDEX:
-             gen_helper_mtc0_index(cpu_env, arg);
-             register_name = "Index";
-             break;
--        case 1:
-+        case CP0_REG00__MVPCONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_mvpcontrol(cpu_env, arg);
-             register_name = "MVPControl";
-             break;
--        case 2:
-+        case CP0_REG00__MVPCONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             /* ignored */
-             register_name = "MVPConf0";
-             break;
--        case 3:
-+        case CP0_REG00__MVPCONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             /* ignored */
-             register_name = "MVPConf1";
-             break;
--        case 4:
-+        case CP0_REG00__VPCONTROL:
-             CP0_CHECK(ctx->vp);
-             /* ignored */
-             register_name = "VPControl";
++        case CP0_REG26__ERRCTL:
+             gen_helper_mtc0_errctl(cpu_env, arg);
+             ctx->base.is_jmp = DISAS_STOP;
+             register_name = "ErrCtl";
 -- 
 2.7.4
 
