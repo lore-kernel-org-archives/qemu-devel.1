@@ -2,66 +2,56 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B28B5C3A589
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A11C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:29:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D6222087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:09:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D6222087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 662BF206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 03:29:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 662BF206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzY30-0004IZ-K7
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 23:09:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47468)
+	id 1hzYM7-0007Ql-Ij
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 23:29:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1hzY2H-0003rP-16
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:08:45 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hzYLQ-00072G-Pe
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:28:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1hzY2F-0004fj-LP
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:08:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57470)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hzYLP-0008IL-K6
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:28:32 -0400
+Received: from mga12.intel.com ([192.55.52.136]:19984)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hzY2F-0004eg-G5
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:08:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 70A26C049D62;
- Mon, 19 Aug 2019 03:08:41 +0000 (UTC)
-Received: from [10.72.12.146] (ovpn-12-146.pek2.redhat.com [10.72.12.146])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0411582489;
- Mon, 19 Aug 2019 03:08:34 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190808143457.14111-1-philmd@redhat.com>
- <20455728-aeee-7009-ec42-c3f5db7ff55a@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a0a5ee9a-4729-0eb7-9eb1-508ca1d465f6@redhat.com>
-Date: Mon, 19 Aug 2019 11:08:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20455728-aeee-7009-ec42-c3f5db7ff55a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 19 Aug 2019 03:08:41 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/6] net/eth: Remove duplicated tcp/udp_hdr
- structures
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hzYLP-0008H3-Ch
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 23:28:31 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Aug 2019 20:28:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,403,1559545200"; d="scan'208";a="378057779"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga006.fm.intel.com with ESMTP; 18 Aug 2019 20:28:28 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 19 Aug 2019 11:28:04 +0800
+Message-Id: <20190819032804.8579-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.136
+Subject: [Qemu-devel] [PATCH v2] migration: cleanup check on ops in
+ savevm.handlers iterations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,48 +63,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+During migration, there are several places to iterate on
+savevm.handlers. And on each iteration, we need to check its ops and
+related callbacks before invoke it.
 
-On 2019/8/19 =E4=B8=8A=E5=8D=885:38, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Jason,
->
-> On 8/8/19 4:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> This is a preparatory cleanup series.
->>
->> Commit 75020a70215 introduced 4 very equivalent structures:
->> - tcp_header and tcp_hdr,
->> - udp_header and udp_hdr.
->>
->> Choose the most widely use in the codebase, which happens to
->> provide convenient bitfields manipulation macros and is not
->> endian-specific.
->>
->> Philippe Mathieu-Daud=C3=A9 (6):
->>   hw/net/virtio-net: Use TCP_HEADER_FLAGS/TCP_HEADER_DATA_OFFSET macro=
-s
->>   net/colo-compare: Use the tcp_header structure
->>   net/filter-rewriter: Use the tcp_header structure
->>   hw/net/vmxnet3: Use the tcp_header structure
->>   net/eth: Remove the unused tcp_hdr structure
->>   net/eth: Remove the single use of udp_hdr structure
-> Are you OK to take this series?
->
-> It got reviewed by Dmitry Fleytman.
->
-> Thanks,
->
-> Phil.
+Generally, ops is the first element to check, and it is only necessary
+to check it once.
 
+This patch clean all the related part in savevm.c to check ops only once
+in those iterations.
 
-Yes. Applied.
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
-Thanks
+---
+v2: rebase on latest upstream
+---
+ migration/savevm.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 4a86128ac4..35426d1db8 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1100,7 +1100,7 @@ void qemu_savevm_state_setup(QEMUFile *f)
+         if (!se->ops || !se->ops->save_setup) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1131,7 +1131,7 @@ int qemu_savevm_state_resume_prepare(MigrationState *s)
+         if (!se->ops || !se->ops->resume_prepare) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1227,7 +1227,7 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
+         if (!se->ops || !se->ops->save_live_complete_postcopy) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1264,7 +1264,7 @@ int qemu_savevm_state_complete_precopy_iterable(QEMUFile *f, bool in_postcopy)
+             continue;
+         }
+ 
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1413,7 +1413,7 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
+         if (!se->ops || !se->ops->save_live_pending) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -2334,7 +2334,7 @@ static int qemu_loadvm_state_setup(QEMUFile *f)
+         if (!se->ops || !se->ops->load_setup) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+-- 
+2.17.1
 
 
