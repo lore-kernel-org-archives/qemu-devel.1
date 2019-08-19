@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 810A9C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 437E8C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B8F4214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:38:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8F4214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 1D8C7214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:41:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D8C7214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hznUW-00027V-Gr
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:38:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38517)
+	id 1hznWa-0003EB-73
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:41:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38691)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hznTh-0001L2-GH
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:38:06 -0400
+ (envelope-from <eblake@redhat.com>) id 1hznVh-0002ds-AJ
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:40:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hznTg-0007Ca-Ic
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:38:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60361)
+ (envelope-from <eblake@redhat.com>) id 1hznVg-0007nv-CY
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:40:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34004)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hznTe-0007BX-6f; Mon, 19 Aug 2019 15:38:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hznVd-0007mt-RO; Mon, 19 Aug 2019 15:40:06 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A94761FAA70;
- Mon, 19 Aug 2019 19:38:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E21AB189DAE1;
+ Mon, 19 Aug 2019 19:40:04 +0000 (UTC)
 Received: from [10.3.117.3] (ovpn-117-3.phx2.redhat.com [10.3.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 434AB1DA;
- Mon, 19 Aug 2019 19:38:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8942460BE2;
+ Mon, 19 Aug 2019 19:40:04 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-11-mreitz@redhat.com>
+ <20190819185602.4267-12-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <6dbb0e2f-8745-fc05-1a88-8047def4d88f@redhat.com>
-Date: Mon, 19 Aug 2019 14:37:59 -0500
+Message-ID: <0a4c7066-604c-591d-4b66-0b854a98893b@redhat.com>
+Date: Mon, 19 Aug 2019 14:40:03 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190819185602.4267-11-mreitz@redhat.com>
+In-Reply-To: <20190819185602.4267-12-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="RFGQkEqFUiFilROsVFduzWcv3ExXrNj8i"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="KWhnRWqxcm189F84EHX6F7u6HRNujTSnq"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Mon, 19 Aug 2019 19:38:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.63]); Mon, 19 Aug 2019 19:40:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 10/16] qcow2: Fix broken snapshot table
- entries
+Subject: Re: [Qemu-devel] [PATCH v2 11/16] qcow2: Keep track of the snapshot
+ table length
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,45 +103,33 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RFGQkEqFUiFilROsVFduzWcv3ExXrNj8i
-Content-Type: multipart/mixed; boundary="YMFnLeIEjetFuw8pWu45juJYAx6cPQ0dc";
+--KWhnRWqxcm189F84EHX6F7u6HRNujTSnq
+Content-Type: multipart/mixed; boundary="VZswf96UHxo5KeoLzYHmIaJ8mzBEttTi9";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6dbb0e2f-8745-fc05-1a88-8047def4d88f@redhat.com>
-Subject: Re: [PATCH v2 10/16] qcow2: Fix broken snapshot table entries
+Message-ID: <0a4c7066-604c-591d-4b66-0b854a98893b@redhat.com>
+Subject: Re: [PATCH v2 11/16] qcow2: Keep track of the snapshot table length
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-11-mreitz@redhat.com>
-In-Reply-To: <20190819185602.4267-11-mreitz@redhat.com>
+ <20190819185602.4267-12-mreitz@redhat.com>
+In-Reply-To: <20190819185602.4267-12-mreitz@redhat.com>
 
---YMFnLeIEjetFuw8pWu45juJYAx6cPQ0dc
+--VZswf96UHxo5KeoLzYHmIaJ8mzBEttTi9
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 8/19/19 1:55 PM, Max Reitz wrote:
-> The only case where we currently reject snapshot table entries is when
-> they have too much extra data.  Fix them with qemu-img check -r all by
-> counting it as a corruption, reducing their extra_data_size, and then
-> letting qcow2_check_fix_snapshot_table() do the rest.
+> When repairing the snapshot table, we truncate entries that have too
+> much extra data.  This frees up space that we do not have to count
+> towards the snapshot table size.
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/qcow2-snapshot.c | 67 +++++++++++++++++++++++++++++++++++-------=
-
->  1 file changed, 56 insertions(+), 11 deletions(-)
+>  block/qcow2-snapshot.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 >=20
-
-> @@ -64,6 +80,8 @@ int qcow2_read_snapshots(BlockDriverState *bs, Error =
-**errp)
->      s->snapshots =3D g_new0(QCowSnapshot, s->nb_snapshots);
-> =20
->      for(i =3D 0; i < s->nb_snapshots; i++) {
-> +        bool truncate_unknown_extra_data =3D false;
-
-Worth adding space after 'for' while in the vicinity?
-
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -150,24 +138,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---YMFnLeIEjetFuw8pWu45juJYAx6cPQ0dc--
+--VZswf96UHxo5KeoLzYHmIaJ8mzBEttTi9--
 
---RFGQkEqFUiFilROsVFduzWcv3ExXrNj8i
+--KWhnRWqxcm189F84EHX6F7u6HRNujTSnq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1a+pcACgkQp6FrSiUn
-Q2qMMQf/eOzQb3hMKf3TMHMbAylgTVe7NMpuPAQfUzhRPPK52NC41f9nAAb01DiR
-S7BeB1+t2TktJtczOGKZLUqZE8qR3orCpV44gpj2TWtlssZ5UVW5Pv9tBBIAqY93
-qt3o8f/WaBuAFCGSt8qg5CtMLGrLZXdudhG3IPdh+SA7trTaCpgiX48mGnkopruw
-6jecc1nf0OrR30M4CXSpvYt+kujqb2bxW3bK8DBPHre3+XievPwe6NndZ6yYTJjh
-ldYxBm2Y93AWVYrgsbTkgi5IFaTBufYDR+QAxDDLZAdd9tUpQasRG0JZ7/k3Tpx8
-VYYhoutDa+zKuABHCPhjagfBdG/lWA==
-=GCfs
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1a+xMACgkQp6FrSiUn
+Q2qytQf/VlPhZoMh9xX75dhVGLOnAJ4s/I9ClU1p08t4eFy5tOfbJqf0oYKPAwwW
++l+AZuNAvs+2Ts2sPV+0BUALP2bfPuo0d33rGrNzDiVEO+biZKSnBmOqYVo5Lq1I
+ZpdeiWpSCK3FwgMEFo+RTza6/i197CIREmfVUKBZ+AR7FD7Z82R6X00Yva2sGxKQ
+uPwQESKqdsL3zq8a7V+E8OiyFAmwReeGNp205doPMuAKfo/vmrQZsyYw8o1/TLkV
+t8sIVbPmHUxxWm16OUJGvUkspG+Q9js9uQhtz7HyIDVEZv5Wpl0rB9RqUkgzw38B
+DjZtMmBsy707YkzZ91ssHn7p+2h07A==
+=S+fX
 -----END PGP SIGNATURE-----
 
---RFGQkEqFUiFilROsVFduzWcv3ExXrNj8i--
+--KWhnRWqxcm189F84EHX6F7u6HRNujTSnq--
 
