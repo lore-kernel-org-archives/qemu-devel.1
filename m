@@ -6,107 +6,119 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D40C3A59D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:02:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD54C3A59D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:03:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB31B2085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:02:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB31B2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C3E7D2085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:03:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3E7D2085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzgMl-0002sG-65
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:02:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34865)
+	id 1hzgNt-00041I-KL
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:03:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hzgLQ-0002Mk-PC
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:01:06 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hzgMt-00039Y-DG
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hzgLP-0006b4-HV
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:01:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51514)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hzgLP-0006as-A1; Mon, 19 Aug 2019 08:01:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3BC5E7F746;
- Mon, 19 Aug 2019 12:01:02 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-127.ams2.redhat.com [10.36.116.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CEBEE1DA;
- Mon, 19 Aug 2019 12:00:59 +0000 (UTC)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190805152947.28536-1-david@redhat.com>
- <20190805152947.28536-4-david@redhat.com>
- <a8b248fe-9f50-f388-1d44-c1eb6e011748@redhat.com>
- <eda96be0-d446-753e-6180-97e966309092@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1hzgMn-0007K9-Nd
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:02:35 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:46545)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1hzgMn-0007Je-9c; Mon, 19 Aug 2019 08:02:29 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MBll6-1i7P4Y401E-00CEaC; Mon, 19 Aug 2019 14:02:19 +0200
+To: David Hildenbrand <david@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <8fb538f3-dfdd-b427-727a-2e7c2120da09@gmail.com>
+ <20e800e8-846b-a9c3-f840-826238b0818f@redhat.com>
+ <f94cb9f0-32cb-9fad-dff1-5e3261d3bfb6@vivier.eu>
+ <1d5e9145-42d7-8ab3-cc9f-7ec4eb00758c@redhat.com>
+ <bd7bb802-c4fa-181b-c7d0-bf67a0f2bb31@vivier.eu>
+ <d1b63727-a718-4789-5ba7-be9ed2e94da6@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <7ae68b4d-6fa9-0e78-4f4e-3a84732d496a@redhat.com>
-Date: Mon, 19 Aug 2019 14:00:58 +0200
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b47e8742-c816-302f-6a7a-4f20f0c5fdc1@vivier.eu>
+Date: Mon, 19 Aug 2019 14:02:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <eda96be0-d446-753e-6180-97e966309092@redhat.com>
+In-Reply-To: <d1b63727-a718-4789-5ba7-be9ed2e94da6@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Mon, 19 Aug 2019 12:01:02 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:pGAEgiNajC7EjdZDCYET7zlanUfGMDLTtUWhhkLby8RCZpFcekr
+ Fd9fn+39RVR5NiIcr8fB470Gt4G1YCOdoBZ8KXOuSQJlds3r5OWDaY7NkHSCKHJFM7YWV3j
+ LOT6UiBi95qxuhAolZI/WelHXYCdtJr+GWWb/0cXu5nildsmNAUtqCao58U0aFUVUuxNJJu
+ 8+MeOsb65OFKnr3MDRxWQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:qg0MyJq/+rQ=:58KxbagXAHi1nS2Qgtp6pw
+ YWzG6hJ9Fm9hAFdKLfrpz34I2gNwL0KM12/vtm7QbpK2KUS1UG7QRne0rE0k/PNpNXNWP3CGU
+ yWSd9L/lg3eZYJ6LWPF8mxE7x9nIPf3M+Ie3I6N5NIUVzYEJw82xaJ0NqZkNW188EiD75Q9Pu
+ M0pkTV3jHhUSb9TVd0SpEhkG1GSx70+k1UAXNxk6hFw0LajAQZjhslMC2LM499zAzbnS5R9DI
+ GerdURWWDTwS8lOB0rCox13PL9j2jd7RYO32DS+BLXA1QsGqJh1ytgIF9A83kCJDA2HkqyCbz
+ VJol+AUKLOGBJfXgM0Fs4IajB7Eg9+ZGixh37K42KT1vhTWe+CrdBYzJtYZMuryaKBI/GoLbT
+ xj7Kxm/9dLK6zFcENfsP5NFyccSsJdNpRq/WzrMXCgh5Bu0pi3iG7AoQa4+EcsL6QXG6X5eoF
+ Md0l8EHahBr1AE3ban+O1bbNtfTjKVHhi9ZdssLoPjw5QlZBs3AYx1qvMBHcQZVYgN21d9Ih3
+ uPAL1Dr8ovyYA4mxoXrcGx4pNjZWEzKzvbc/vxOUA1QsCcSkLUMCrpQ+Pg+AF2QeolERKRbUo
+ v3mtZtfH0lnZjOSKDYngInz5zJHd+Zml2ITHPYLpj3Wa3VyftxL29rcUJgJdIlGn3R56OGYxs
+ JAFOsv9RjJjX5rvOGfspR4EG/pw+Z5/6dD+Ecdz9VPlth31d8nd0cz396nVPVpyGgpNU1Tsbr
+ Z1mw/zVcTlshEv4UsEBwpHyqonhhrN0Nf5lw+8+ZAnnErUGCDoUR5exL+QM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v1 3/9] s390x/mmu: DAT
- translation rewrite
+X-Received-From: 212.227.126.134
+Subject: Re: [Qemu-devel] [qemu-s390x] linux-user: s390x issue on Fedora 30
+ (dynamic library loader?)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,110 +130,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>, Ilya Leoshkevich <iii@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/19/19 1:58 PM, David Hildenbrand wrote:
-> On 19.08.19 13:40, Thomas Huth wrote:
->> On 8/5/19 5:29 PM, David Hildenbrand wrote:
->>> Let's rewrite the DAT translation in a non-recursive way, similar to
->>> arch/s390/kvm/gaccess.c:guest_translate() in KVM. This makes the
->>> code much easier to read, compare and maintain.
+Le 19/08/2019 à 13:55, David Hildenbrand a écrit :
+> On 19.08.19 12:32, Laurent Vivier wrote:
+>> Le 17/08/2019 à 18:51, David Hildenbrand a écrit :
+>>> On 17.08.19 18:22, Laurent Vivier wrote:
+>>>> Le 17/08/2019 à 18:14, David Hildenbrand a écrit :
+>>>>> On 17.08.19 17:59, David Hildenbrand wrote:
+>>>>>> Hi everybody,
+>>>>>>
+>>>>>> I was just trying to run qemu-s390x (linux-user) with a very simple
+>>>>>> binary (gzip + lib/ld64.so.1, compiled under Fedora 27). This used to
+>>>>>> work just fine a while ago (especially when I was working on vector
+>>>>>> instructions using QEMU v3.1). However, now I can't get past a SEGFAULT
+>>>>>> in the dynamic library loader (I assume it is trying to locate glibc). I
+>>>>>> tried a couple of other binaries that definitely used to work (from
+>>>>>> Fedora 30).
+>>>>>>
+>>>>>> I checked QEMU v4.1, v4.0 and v3.1. All are broken for me. Which is
+>>>>>> weird - because it used to work :/
+>>>>>>
+>>>>>> I remember that I was running Fedora 29 the last time I had it running,
+>>>>>> so my gut feeling is that this is related to some other system library
+>>>>>> (but which?). I am running on an up-to-date Fedora 30 x86-64 now.
+>>>>>>
+>>>>>> Any ideas? Has this been reported already? (not sure if this is a Fedora
+>>>>>> 30 issue)
+>>>>>>
+>>>>>> LANG=C ~/git/qemu/s390x-linux-user/qemu-s390x -d in_asm -L . gzip --help
+>>>>>>
+>>>>>> ----------------
+>>>>>> IN: _dl_load_cache_lookup
+>>>>>> 0x00000040008854c2:  larl       %r1,0x4000895030
+>>>>>> 0x00000040008854c8:  lg %r8,264(%r11)
+>>>>>> 0x00000040008854ce:  mvghi      0(%r1),-1
+>>>>>> 0x00000040008854d4:  la %r3,0(%r3,%r8)
+>>>>>> 0x00000040008854d8:  l  %r7,12(%r8)
+>>>>>> 0x00000040008854dc:  llgfr      %r2,%r7
+>>>>>> 0x00000040008854e0:  sllg       %r1,%r2,1
+>>>>>> 0x00000040008854e6:  agr        %r1,%r2
+>>>>>> 0x00000040008854ea:  sllg       %r1,%r1,2
+>>>>>> 0x00000040008854f0:  la %r6,16(%r1,%r8)
+>>>>>> 0x00000040008854f4:  sgr        %r3,%r6
+>>>>>> 0x00000040008854f8:  stg        %r3,256(%r11)
+>>>>>> 0x00000040008854fe:  ahi        %r7,-1
+>>>>>> 0x0000004000885502:  jl 0x40008850f0
+>>>>>>
+>>>>>> ----------------
+>>>>>> IN: _dl_load_cache_lookup
+>>>>>> 0x0000004000885506:  srak       %r10,%r7,1
+>>>>>> 0x000000400088550c:  lgfr       %r2,%r10
+>>>>>> 0x0000004000885510:  sllg       %r1,%r2,1
+>>>>>> 0x0000004000885516:  agr        %r1,%r2
+>>>>>> 0x000000400088551a:  sllg       %r1,%r1,2
+>>>>>> 0x0000004000885520:  l  %r1,20(%r1,%r8)
+>>>>>> 0x0000004000885524:  clrjhe     %r1,%r3,0x40008850f0
+>>>>>>
+>>>>>> Segmentation fault (Speicherabzug geschrieben)
+>>>>>>
+>>>>>>
+>>>>>> Core was generated by
+>>>>>> `/home/dhildenb/git/qemu/s390x-linux-user/qemu-s390x -d in_asm -L . gzip
+>>>>>> --help'.
+>>>>>> Program terminated with signal SIGSEGV, Segmentation fault.
+>>>>>> #0  0x00007fdc5d7c3232 in sigsuspend () from /lib64/libc.so.6
+>>>>>> [Current thread is 1 (Thread 0x7fdc5d7127c0 (LWP 31072))]
+>>>>>> Missing separate debuginfos, use: dnf debuginfo-install
+>>>>>> glib2-2.60.6-1.fc30.x86_64 glibc-2.29-15.fc30.x86_64
+>>>>>> libgcc-9.1.1-1.fc30.x86_64 libstdc++-9.1.1-1.fc30.x86_64
+>>>>>> pcre-8.43-2.fc30.x86_64 zlib-1.2.11-16.fc30.x86_64
+>>>>>> (gdb) bt
+>>>>>> #0  0x00007fdc5d7c3232 in sigsuspend () from /lib64/libc.so.6
+>>>>>> #1  0x000055f826135a9c in dump_core_and_abort
+>>>>>> (target_sig=target_sig@entry=11)
+>>>>>>     at /home/dhildenb/git/qemu/linux-user/signal.c:613
+>>>>>> #2  0x000055f826135e37 in handle_pending_signal
+>>>>>> (cpu_env=cpu_env@entry=0x55f8292cec48, sig=sig@entry=11,
+>>>>>>     k=k@entry=0x55f8292d7df0) at
+>>>>>> /home/dhildenb/git/qemu/linux-user/signal.c:877
+>>>>>> #3  0x000055f826136edd in process_pending_signals
+>>>>>> (cpu_env=cpu_env@entry=0x55f8292cec48)
+>>>>>>     at /home/dhildenb/git/qemu/linux-user/signal.c:953
+>>>>>> #4  0x000055f82613a13a in cpu_loop (env=0x55f8292cec48) at
+>>>>>> /home/dhildenb/git/qemu/linux-user/s390x/cpu_loop.c:150
+>>>>>> #5  0x000055f8260ce2ba in main (argc=<optimized out>,
+>>>>>> argv=0x7fff587a69d8, envp=<optimized out>)
+>>>>>>     at /home/dhildenb/git/qemu/linux-user/main.c:819
+>>>>>>
+>>>>>> Thanks!
+>>>>>>
+>>>>>
+>>>>> CCing QEMU-devel + use my proper dev mail address (I need more coffee :))
+>>>>>
+>>>>
+>>>> I generally test qemu-s390x before my PR. Last time, I have tested with
+>>>> Fedora 30 x86_64 but my target are always debian.
+>>>
+>>> What puzzles me is that it used to work just fine about 3-4 months ago.
+>>> I still have the binaries/libs lying around that I used back then (when
+>>> debugging a vector instruction-related issue). Whatever binary/QEMU
+>>> version I try now, it keeps segfaulting.
+>>>
+>>> Via qemu-system-s390x, inside a Fedora guest, the binaries work
+>>> perfectly fine. So I really suspect that this has to do with my host system.
+>>>
+>>>>
+>>>> So I guess the problem is with the target.
+>>>>
+>>>> I will have a look on Monday.
+>>>
 >>
->> Ok, I just had another look at this patch, and even if I don't like th=
-e
->> complete rewrite just for the sake of it, the new code looks ok to me.
+>> I'm not able to reproduce it. In a chroot or using "-L" with only
+>> /bin/gzip, /lib64/ld64.so.1 and /lib/libc.so.6 in the directory.
 >>
->> [...]
->>> +    switch (asce & ASCE_TYPE_MASK) {
->>> +    case ASCE_TYPE_REGION1:
->>> +        if (read_table_entry(gaddr, &entry)) {
->>> +            return PGM_ADDRESSING;
->>> +        }
->>> +        if (entry & REGION_ENTRY_I) {
->>> +            return PGM_REG_FIRST_TRANS;
->>> +        }
->>> +        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION1) =
-{
->>> +            return PGM_TRANS_SPEC;
->>> +        }
->>> +        if (VADDR_REGION2_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6=
- ||
->>> +            VADDR_REGION2_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
->>> +            return PGM_REG_SEC_TRANS;
->>> +        }
->>> +        if (edat1 && (entry & REGION_ENTRY_P)) {
->>> +            *flags &=3D ~PAGE_WRITE;
->>> +        }
->>> +        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION2_TX(v=
-addr) * 8;
->>> +        /* FALL THROUGH */
->>> +    case ASCE_TYPE_REGION2:
->>> +        if (read_table_entry(gaddr, &entry)) {
->>> +            return PGM_ADDRESSING;
->>> +        }
->>> +        if (entry & REGION_ENTRY_I) {
->>> +            return PGM_REG_SEC_TRANS;
->>> +        }
->>> +        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION2) =
-{
->>> +            return PGM_TRANS_SPEC;
->>> +        }
->>> +        if (VADDR_REGION3_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6=
- ||
->>> +            VADDR_REGION3_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
->>> +            return PGM_REG_THIRD_TRANS;
->>> +        }
->>> +        if (edat1 && (entry & REGION_ENTRY_P)) {
->>> +            *flags &=3D ~PAGE_WRITE;
->>> +        }
->>> +        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION3_TX(v=
-addr) * 8;
->>> +        /* FALL THROUGH */
->>> +    case ASCE_TYPE_REGION3:
->>> +        if (read_table_entry(gaddr, &entry)) {
->>> +            return PGM_ADDRESSING;
->>> +        }
->>> +        if (entry & REGION_ENTRY_I) {
->>> +            return PGM_REG_THIRD_TRANS;
->>> +        }
->>> +        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION3) =
-{
->>> +            return PGM_TRANS_SPEC;
->>> +        }
->>> +        if (edat1 && (entry & REGION_ENTRY_P)) {
->>> +            *flags &=3D ~PAGE_WRITE;
->>> +        }
->>> +        if (VADDR_SEGMENT_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6=
- ||
->>> +            VADDR_SEGMENT_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
->>> +            return PGM_SEGMENT_TRANS;
->>> +        }
->>> +        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_SEGMENT_TX(v=
-addr) * 8;
->>> +        /* FALL THROUGH */
+>> My host is Fedora 30 (updated today) and the target directory is Fedora
+>> 30 too (from
+>> https://download-ib01.fedoraproject.org/pub/fedora-secondary/releases/30/Container/s390x/images/Fedora-Container-Minimal-Base-30-1.2.s390x.tar.xz)
 >>
->> If you don't like recursion, maybe you could at least use a for-loop f=
-or
->> the region tables? ... the code is really quite repetitive here... jus=
-t
->> my 0.02 =E2=82=AC.
->=20
-> I'll split this patch further up once I have time. With the unrolling I
-> am not yet quite sure - the tables tend to get more different with ever=
-y
-> new HW release (especially, see the other patches in this series, like
-> edat2 and IEP) and we want our branch predictor to produce sane
-> predictions (especially when processing consecutive pages).
+>> Do you have more details?
+> 
+> Thanks for having a look!
+> 
+> I just tried with the Fedora 30 target files they seem to work just fine
+> indeed (chroot and -L after manually copying the two lib files).
+> 
+> Now, I took the same files from RHEL8 (everything is built with
+> z13/vector instruction support enforced under RHEL8). (I copied them
+> from a running guest using scp) - rhel-guest-image-8.0-1854.s390x.qcow2.
+> 
+> 
+> Trying to run them results in the reported issue.
+> 
+> ~/git/qemu/s390x-linux-user/qemu-s390x  -L . gzip
+> Segmentation fault (Speicherabzug geschrieben)
+> 
+> I can spot one main difference:
+> 
+> /lib64/libc-2.28.so: ELF 64-bit MSB shared object, IBM S/390, version 1
+> (GNU/Linux), dynamically linked, interpreter /lib/ld64.so.1,
+> BuildID[sha1]=f2ed86061df0bad28270244424e58eb95f60c00c, for GNU/Linux
+> 3.2.0, not stripped, too many notes (256)
+> 
+> /lib64/ld-2.28.so: ELF 64-bit MSB shared object, IBM S/390, version 1
+> (SYSV), dynamically linked,
+> BuildID[sha1]=6a58fd6ea86ec36455655ff718509ee4320cefc2, not stripped,
+> too many notes (256)
+> 
+> The libraries are not completely stripped. But even when stripping, I
+> get the same issue when trying to load them.
+> 
+> The binaries/libraries work perfectly fine within qemu-system-s390x.
+> 
 
-Ok, I just also saw in the next patch that region 3 already needs some
-special handling for EDAT-2, so never mind, it's likely best to keep it
-unrolled.
+It looks like a problem with the linux-user ELF loader.
+Perhaps readelf can help to see the differences between them.
 
- Thomas
+Thanks,
+Laurent
 
