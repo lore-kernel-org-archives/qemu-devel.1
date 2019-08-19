@@ -2,83 +2,84 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F086C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 182B0C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:18:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A2CA206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:17:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D496D206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:18:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MfNrJqun"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A2CA206BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RFuZtKWF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D496D206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59763 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzpxx-00034U-66
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 18:17:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60014)
+	id 1hzpys-0004jF-Hi
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 18:18:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpMu-0002ru-Kz
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:39:13 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpMX-0002Nl-Bc
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpMt-0006tq-AC
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:39:12 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36037)
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpMU-0006VU-G0
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:49 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37829)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hzpMt-0006tS-4r
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:39:11 -0400
-Received: by mail-pf1-x444.google.com with SMTP id w2so1951750pfi.3
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:39:11 -0700 (PDT)
+ id 1hzpMT-0006Ub-QG
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:46 -0400
+Received: by mail-pg1-x542.google.com with SMTP id d1so1933526pgp.4
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:38:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=MSRdVhU7JG8W/BPDMD9yM4+AFvL57yq4+jCtr5it5qs=;
- b=MfNrJqun3vCG68VZiO/VjFAj/jU5TdGWWHXIdVS8Wq/oDPKHyJLY6bsLOppK/2WW9x
- kp5/IbXli5q5HiorX6yS0OXGRtm6rPC49cJNXXnut18PlEmx3HAM4LZow9dr7nv/5f/T
- aFwFecjkaYaxQMH5fLopbSrqPQYr2jpoJDvXpS7YkRBqVUBIDOFyTBF/aUBF6lNNg/Ki
- kGuaqALxGeZB/1QMRtr7kUwfS89PPA9e2LITrTcLquaD+ft585s00N4AiO0HwBl1nGLn
- TWlcJiS00icTVhV5nMtd6/FWDMmo0z6WAodEVNJbW/ncuFsfC00J+fEaHr7WF7+ewVBO
- mAXA==
+ bh=AfObyYVf+TtUvkYatWrX5oVYyhEhA7Z+ZbkDEmf7ZT8=;
+ b=RFuZtKWFqnZO0ojoGmbmoV+jl/jaVkvAC9l8GHZG0Sy3J5rXnNMMp8S3ITVP1X95tU
+ GM+1qmUS7we6nFCdoBPGu+vSpi73vT67ty7s7RmJXOE9kNxl14bpsAz1V+tPE/oCOX3w
+ ltPuhuBXHYVCG5EkKZ+Av8L7KahVXtIMSUll+5nRwd8CqtVYalAUuq1kVLL67GiK9iFY
+ G/7xRKkwHdLBK01/ABYGcJ/HJ7IzVlnyJiks/wszSXiP8BLnzehWwNZcHhDlp8hEsynd
+ AWuznA/tpXZ0I14XRkzsfpBDPYMElty8M0gwagZBpFwRnpDR2dLee8r+UBoXOJGBiclm
+ l6bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=MSRdVhU7JG8W/BPDMD9yM4+AFvL57yq4+jCtr5it5qs=;
- b=W3kFa0R0flGQi9BMANJRxxlJrRfJHIju6bZWKvETVdpjOn7pljOjKh6aobVN1bWoTo
- AuX/x+jpxY74Sl2LO+WdH/4UYz0MYJyBpTxCOwfqMuyoJibaT5nXH7CKPJTYNyALpjJa
- RtIyTNsFBEAW5QuQjpDvPo4mHI/EmARwCvBSrtO0XFDQAOzSOd0RahSRvVDPyH8v8DFE
- z10g0rTjE3S59LFkv4Nu777owCgu/VUeil0lBi0mtNYsPu2fDE5i10Q6u7d1D5iFT2eV
- A/L+ZhF/SiswUe6nkwmB5VLH9WMQnNtUVuNEHzaZZ+Oo2mBa6iNcxBfHd/eifU0shlYE
- 1IiA==
-X-Gm-Message-State: APjAAAVg18RUesZ+ISD7W9QVl08RASS76UqKBVIq+6iLemTvkMBWg/w6
- FbiLhgXsazC5ivKd2eALgpyS9hKUaR8=
-X-Google-Smtp-Source: APXvYqwnIyLJCqAR0QAYUg3jfsCbZ0h0uBs29QNy6dJeAh/ALB8lrUVmJEv882e7wH6srL3Ryd18Hw==
-X-Received: by 2002:a63:20a:: with SMTP id 10mr21611744pgc.226.1566250749834; 
- Mon, 19 Aug 2019 14:39:09 -0700 (PDT)
+ bh=AfObyYVf+TtUvkYatWrX5oVYyhEhA7Z+ZbkDEmf7ZT8=;
+ b=N8/ZFVlTr7USlEXB9v0SG3oRghuCH1ZNkUSpS63n8gjqzyfvPtgw+ofXExzsMJxPfl
+ bbLQIqzA+Ostrg8mgMZOYJHphxhrfs1fCmmNwqn9kbXGQHrrk5nGiWLoywGOIa946X3v
+ WjbBEMPICl95yASFX9PiYXokeqzHHhBQa4Yy3I9216xMjbyntDlmQmm8pE4lX7o4nctK
+ WdiKwQxpYXb7c0daEVjKqpynk6mcQT2NHQ66OFOle9HzVqlJYouprsxpFSU36Q7KFc4x
+ IvIY4Ml0j6YqDFt6amRkIkSvL3PxgaW8x6YZs6y6XTaRZDUQMN8Nr4gAFhLHwQFcvtb0
+ KOJw==
+X-Gm-Message-State: APjAAAWCT6WJ2BfC2OHncYScdw/LIyfKdlMxVkz/f4EFnOC7IXsAenCF
+ HY35GZ3lK6uPz2bD/3AkA03+i82bDkY=
+X-Google-Smtp-Source: APXvYqzcthnbyj0e9K9F/2YDSHWCQnAiyPIRkUbZjESB4/XwtrOMfs90if1GYAuCsI4IoeEXrdepxA==
+X-Received: by 2002:a62:8745:: with SMTP id i66mr26021455pfe.259.1566250724045; 
+ Mon, 19 Aug 2019 14:38:44 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.39.08
+ by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.38.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 14:39:09 -0700 (PDT)
+ Mon, 19 Aug 2019 14:38:43 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:37:46 -0700
-Message-Id: <20190819213755.26175-60-richard.henderson@linaro.org>
+Date: Mon, 19 Aug 2019 14:37:25 -0700
+Message-Id: <20190819213755.26175-39-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190819213755.26175-1-richard.henderson@linaro.org>
 References: <20190819213755.26175-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v2 59/68] target/arm: Split gen_nop_hint
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v2 38/68] target/arm: Convert Unallocated
+ memory hint
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,109 +96,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that there all callers pass a constant value, split the switch
-statement into the individual trans_* functions.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 67 +++++++++++++++---------------------------
- 1 file changed, 24 insertions(+), 43 deletions(-)
+ target/arm/translate.c       | 8 --------
+ target/arm/a32-uncond.decode | 8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 67f0202d29..9e0345adf7 100644
+index a30a9bb4e0..9ec6b25c03 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3045,46 +3045,6 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
-     gen_rfe(s, pc, load_cpu_field(spsr));
- }
- 
--/*
-- * For WFI we will halt the vCPU until an IRQ. For WFE and YIELD we
-- * only call the helper when running single threaded TCG code to ensure
-- * the next round-robin scheduled vCPU gets a crack. In MTTCG mode we
-- * just skip this instruction. Currently the SEV/SEVL instructions
-- * which are *one* of many ways to wake the CPU from WFE are not
-- * implemented so we can't sleep like WFI does.
-- */
--static void gen_nop_hint(DisasContext *s, int val)
--{
--    switch (val) {
--        /* When running in MTTCG we don't generate jumps to the yield and
--         * WFE helpers as it won't affect the scheduling of other vCPUs.
--         * If we wanted to more completely model WFE/SEV so we don't busy
--         * spin unnecessarily we would need to do something more involved.
--         */
--    case 1: /* yield */
--        if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
--            gen_set_pc_im(s, s->base.pc_next);
--            s->base.is_jmp = DISAS_YIELD;
+@@ -10216,14 +10216,6 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             }
+             return;
+         }
+-        if (((insn & 0x0f700000) == 0x04100000) ||
+-            ((insn & 0x0f700010) == 0x06100000)) {
+-            if (!arm_dc_feature(s, ARM_FEATURE_V7MP)) {
+-                goto illegal_op;
+-            }
+-            return; /* v7MP: Unallocated memory hint: must NOP */
 -        }
--        break;
--    case 3: /* wfi */
--        gen_set_pc_im(s, s->base.pc_next);
--        s->base.is_jmp = DISAS_WFI;
--        break;
--    case 2: /* wfe */
--        if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
--            gen_set_pc_im(s, s->base.pc_next);
--            s->base.is_jmp = DISAS_WFE;
--        }
--        break;
--    case 4: /* sev */
--    case 5: /* sevl */
--        /* TODO: Implement SEV, SEVL and WFE.  May help SMP performance.  */
--    default: /* nop */
--        break;
--    }
--}
 -
- #define CPU_V001 cpu_V0, cpu_V0, cpu_V1
- 
- static inline void gen_neon_add(int size, TCGv_i32 t0, TCGv_i32 t1)
-@@ -8165,19 +8125,40 @@ DO_SMLAWX(SMLAWT, 1, 1)
- 
- static bool trans_YIELD(DisasContext *s, arg_YIELD *a)
- {
--    gen_nop_hint(s, 1);
-+    /*
-+     * When running single-threaded TCG code, use the helper to ensure that
-+     * the next round-robin scheduled vCPU gets a crack.  When running in
-+     * MTTCG we don't generate jumps to the helper as it won't affect the
-+     * scheduling of other vCPUs.
-+     */
-+    if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
-+        gen_set_pc_im(s, s->base.pc_next);
-+        s->base.is_jmp = DISAS_YIELD;
-+    }
-     return true;
- }
- 
- static bool trans_WFE(DisasContext *s, arg_WFE *a)
- {
--    gen_nop_hint(s, 2);
-+    /*
-+     * When running single-threaded TCG code, use the helper to ensure that
-+     * the next round-robin scheduled vCPU gets a crack.  In MTTCG mode we
-+     * just skip this instruction.  Currently the SEV/SEVL instructions,
-+     * which are *one* of many ways to wake the CPU from WFE, are not
-+     * implemented so we can't sleep like WFI does.
-+     */
-+    if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
-+        gen_set_pc_im(s, s->base.pc_next);
-+        s->base.is_jmp = DISAS_WFE;
-+    }
-     return true;
- }
- 
- static bool trans_WFI(DisasContext *s, arg_WFI *a)
- {
--    gen_nop_hint(s, 3);
-+    /* For WFI, halt the vCPU until an IRQ. */
-+    gen_set_pc_im(s, s->base.pc_next);
-+    s->base.is_jmp = DISAS_WFI;
-     return true;
- }
- 
+         if ((insn & 0x0e000f00) == 0x0c000100) {
+             if (arm_dc_feature(s, ARM_FEATURE_IWMMXT)) {
+                 /* iWMMXt register transfer.  */
+diff --git a/target/arm/a32-uncond.decode b/target/arm/a32-uncond.decode
+index aed381cb8e..afa95bf7aa 100644
+--- a/target/arm/a32-uncond.decode
++++ b/target/arm/a32-uncond.decode
+@@ -64,3 +64,11 @@ PLI              1111 0100 -101 ---- 1111 ---- ---- ----    # (imm, lit) 7
+ PLD              1111 0111 -101 ---- 1111 ----- -- 0 ----   # (register) 5te
+ PLDW             1111 0111 -001 ---- 1111 ----- -- 0 ----   # (register) 7mp
+ PLI              1111 0110 -101 ---- 1111 ----- -- 0 ----   # (register) 7
++
++# Unallocated memory hints
++#
++# Since these are v7MP nops, and PLDW is v7MP and implemented as nop,
++# (ab)use the PLDW helper.
++
++PLDW             1111 0100 -001 ---- ---- ---- ---- ----
++PLDW             1111 0110 -001 ---- ---- ---- ---0 ----
 -- 
 2.17.1
 
