@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 603B6C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E59C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:05:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 296D8206DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:05:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3655214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:05:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yJtSnyCn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 296D8206DF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fzr8/0vm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3655214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzpm8-0002ro-Ra
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 18:05:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59264)
+	id 1hzpmi-0003ua-KD
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 18:05:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59513)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpMN-0002At-AK
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:40 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpMb-0002Px-9w
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpMM-0006Pw-92
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:39 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44547)
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpMX-0006Yu-F3
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:53 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46332)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hzpMM-0006PR-49
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:38 -0400
-Received: by mail-pf1-x444.google.com with SMTP id c81so1936604pfc.11
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:38:38 -0700 (PDT)
+ id 1hzpMX-0006W0-7m
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:49 -0400
+Received: by mail-pf1-x443.google.com with SMTP id q139so1933662pfc.13
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PQ+LqO+lz8aRvDtiE1Qc+qi0l6DF2tSTKskus1LdpN4=;
- b=yJtSnyCnzFgS8dO+gi9fsUmsemw5RartDZNEsx/CN9M9gFxSZQ8iCboaDsqo9BgcP9
- VJ/8frTOBPA+8HbkZjVnWcEXc6NpkWmXIPMDDmZs08/YYHslBtRn0OTfk28/aWqrXgiE
- QYavLQyrS38/iX8xsNsvGxsHKUOpg3leK08WVsFof2PoET7tmmU1EpDSIBdfmUIjwydf
- sUGBw/ZDM+irk9IgZmsoZGKHan0CYmFzqmKs0YrQPsiNA5V16BrpX+yIDtCHcy6lC3MD
- rrzhXllmvOdl4vo44T41AMF88Rjs5K7ibHMVeKQmcHTNfSYt3YUTE6cPx+hYt7GZOSdl
- CPWw==
+ bh=wLniY7IH5XOVstT1ZURU/Pqp4JvYW6tk9V3WWoNomaw=;
+ b=Fzr8/0vmfS6tSszW7ZllixzfRjddneCkY3yTW+m9YASnALE0+/I7xJV/rXV2NlepPR
+ l7fvYZFPWDJL4lkV5FoRQLS2oyKNOCjBasxe7Hy6SFdbHARbFNwLcaGGdqyyz0tPi3a8
+ cG5BPLHtvUaf9yk6KZgXd7IWYlPTbyuXchEl0ZaMsxJpDU6rjB1cKu79L0ZCv49UG5dt
+ MhasRf1cTv4f3KH2ZUvuF6HuvbZHRgrKqfTxu9533K1jNkvSMtnqF7jO6Ky2mWlkh8o/
+ eTdvgsbPzhgo2hX1QvhOE5VDz0vzv/HbIczzBC90C4q1HZyhPqLphzwnEqY82AgH015a
+ rTrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=PQ+LqO+lz8aRvDtiE1Qc+qi0l6DF2tSTKskus1LdpN4=;
- b=l/GFF4/aipSS3pJmJMFUt4qER80q/Y3upb5K5f0so0T+IMnQO+KbpWfP0rFps1JaeM
- iWACBi6JdqrjogYYSkwc9gRR70xn8La0miqY6nA2FEYVq/uDgS/a81GdDzIEAcwOFBlc
- BcON38jnUdNHTNDjMsGIoCWAKcUPvWb1RPPuxiioBxJxDyZ2suj5GYGls9N4T+sRRXeL
- sEqszov3mh48eaUNBhEEj8XIkdScOA7k6hnYobpgX9LWUcOEWqnJnCpTJxCWo6ItXroE
- UDrrPjiWsaSOaeTQ7d2YMRCHgeOXb640q0beFfj6i76+IYrXJL6eS4KMBeuJFJyPcN38
- INew==
-X-Gm-Message-State: APjAAAVDto9q23ozBkmSfCWIAji4Nqrw5XmGKXskJSO24xEK3J+RXSlg
- 4Cs137Jov3n/5umprHT2traPasoPob4=
-X-Google-Smtp-Source: APXvYqwRJeYrQsnSE9U4nHrRpTKk0mLzwlMNxxtTHtzv6iOAvmq6/+VtKSbu9lsJyKIFSOeXz4hnDQ==
-X-Received: by 2002:aa7:925a:: with SMTP id 26mr26490232pfp.198.1566250716944; 
- Mon, 19 Aug 2019 14:38:36 -0700 (PDT)
+ bh=wLniY7IH5XOVstT1ZURU/Pqp4JvYW6tk9V3WWoNomaw=;
+ b=LZxl+3tunOJvda6koIuZWd33iR/h48GSAIgf+o/ej5Wgd2G2o6JDLyaevqIacBeoad
+ SJI2y7aZi4IceKzI8tSfNAjhoZwraMglHLm2+KqjFcOgJbC0D+3IeXds7OycB4a1Maqo
+ vkK7LfQfyAgl6q21mJtFALF790D1WHQoT7T0tQqqQjIkmBk5vHfbEe9qtobVLT2RzESx
+ 0kh0DDnhLavXul7m8f2LiX9rur8motXcax7/DavOmCYTiFZrKJlH6QOHEjuQhY4e6Y3W
+ DkfPUX9sBDtCIFG3b+ORx/hz3fxvqM0NggsYhASNQCB4/GUsC9rbSlTs7BXq6TjlJ+gu
+ cGpQ==
+X-Gm-Message-State: APjAAAUz0Ips9zw0Ecjh+HYzRPQMS/eYKmXZdlJFhEeQTwZHkTtQ9Y3N
+ 4yZ9dd5OqfbnsGz+1hEBxUWxlKMDbOc=
+X-Google-Smtp-Source: APXvYqx8KCW+nrN2cD+a0gmjz2UlXqpJ5QkZDzVHodaw9BoHuge5eQPGsicGc4GCCsuoXHw1Og74nQ==
+X-Received: by 2002:a62:2603:: with SMTP id m3mr27356125pfm.163.1566250726092; 
+ Mon, 19 Aug 2019 14:38:46 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.38.36
+ by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.38.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 14:38:36 -0700 (PDT)
+ Mon, 19 Aug 2019 14:38:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:37:19 -0700
-Message-Id: <20190819213755.26175-33-richard.henderson@linaro.org>
+Date: Mon, 19 Aug 2019 14:37:27 -0700
+Message-Id: <20190819213755.26175-41-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190819213755.26175-1-richard.henderson@linaro.org>
 References: <20190819213755.26175-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v2 32/68] target/arm: Convert SVC
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v2 40/68] target/arm: Convert SG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,66 +97,95 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 19 +++++++++++++------
- target/arm/a32.decode  |  4 ++++
- 2 files changed, 17 insertions(+), 6 deletions(-)
+ target/arm/translate.c | 51 ++++++++++++++++++++++++------------------
+ target/arm/t32.decode  |  5 ++++-
+ 2 files changed, 33 insertions(+), 23 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 6b7b3df685..b6d8b7be8c 100644
+index 7c05e7006e..9a8864e8ff 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -9968,6 +9968,18 @@ static bool trans_BLX_i(DisasContext *s, arg_BLX_i *a)
+@@ -8426,6 +8426,34 @@ static bool trans_SMC(DisasContext *s, arg_SMC *a)
      return true;
  }
  
-+/*
-+ * Supervisor call
-+ */
-+
-+static bool trans_SVC(DisasContext *s, arg_SVC *a)
++static bool trans_SG(DisasContext *s, arg_SG *a)
 +{
-+    gen_set_pc_im(s, s->base.pc_next);
-+    s->svc_imm = a->imm;
-+    s->base.is_jmp = DISAS_SWI;
++    if (!arm_dc_feature(s, ARM_FEATURE_M) ||
++        !arm_dc_feature(s, ARM_FEATURE_V8)) {
++        return false;
++    }
++    /*
++     * SG (v8M only)
++     * The bulk of the behaviour for this instruction is implemented
++     * in v7m_handle_execute_nsc(), which deals with the insn when
++     * it is executed by a CPU in non-secure state from memory
++     * which is Secure & NonSecure-Callable.
++     * Here we only need to handle the remaining cases:
++     *  * in NS memory (including the "security extension not
++     *    implemented" case) : NOP
++     *  * in S memory but CPU already secure (clear IT bits)
++     * We know that the attribute for the memory this insn is
++     * in must match the current CPU state, because otherwise
++     * get_phys_addr_pmsav8 would have generated an exception.
++     */
++    if (s->v8m_secure) {
++        /* Like the IT insn, we don't need to generate any code */
++        s->condexec_cond = 0;
++        s->condexec_mask = 0;
++    }
 +    return true;
 +}
 +
  /*
-  * Legacy decoder.
+  * Load/store register index
   */
-@@ -10235,6 +10247,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-         case 0x09:
-         case 0xa:
-         case 0xb:
-+        case 0xf:
-             /* All done in decodetree.  Reach here for illegal ops.  */
-             goto illegal_op;
-         case 0xc:
-@@ -10250,12 +10263,6 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+@@ -10437,28 +10465,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+              * - load/store doubleword, load/store exclusive, ldacq/strel,
+              *   table branch, TT.
+              */
+-            if (insn == 0xe97fe97f && arm_dc_feature(s, ARM_FEATURE_M) &&
+-                arm_dc_feature(s, ARM_FEATURE_V8)) {
+-                /* 0b1110_1001_0111_1111_1110_1001_0111_111
+-                 *  - SG (v8M only)
+-                 * The bulk of the behaviour for this instruction is implemented
+-                 * in v7m_handle_execute_nsc(), which deals with the insn when
+-                 * it is executed by a CPU in non-secure state from memory
+-                 * which is Secure & NonSecure-Callable.
+-                 * Here we only need to handle the remaining cases:
+-                 *  * in NS memory (including the "security extension not
+-                 *    implemented" case) : NOP
+-                 *  * in S memory but CPU already secure (clear IT bits)
+-                 * We know that the attribute for the memory this insn is
+-                 * in must match the current CPU state, because otherwise
+-                 * get_phys_addr_pmsav8 would have generated an exception.
+-                 */
+-                if (s->v8m_secure) {
+-                    /* Like the IT insn, we don't need to generate any code */
+-                    s->condexec_cond = 0;
+-                    s->condexec_mask = 0;
+-                }
+-            } else if (insn & 0x01200000) {
++            if (insn & 0x01200000) {
+                 /* load/store dual, in decodetree */
                  goto illegal_op;
-             }
-             break;
--        case 0xf:
--            /* swi */
--            gen_set_pc_im(s, s->base.pc_next);
--            s->svc_imm = extract32(insn, 0, 24);
--            s->base.is_jmp = DISAS_SWI;
--            break;
-         default:
-         illegal_op:
-             unallocated_encoding(s);
-diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index 62c6f8562e..0bd952c069 100644
---- a/target/arm/a32.decode
-+++ b/target/arm/a32.decode
-@@ -528,3 +528,7 @@ LDM_a32          ---- 100 b:1 i:1 u:1 w:1 1 rn:4 list:16   &ldst_block
+             } else if ((insn & (1 << 23)) == 0) {
+diff --git a/target/arm/t32.decode b/target/arm/t32.decode
+index 0cc0808c05..ce46650446 100644
+--- a/target/arm/t32.decode
++++ b/target/arm/t32.decode
+@@ -485,7 +485,10 @@ STRD_ri_t32      1110 1001 .100 .... .... .... ........    @ldstd_ri8 w=0 p=1
+ LDRD_ri_t32      1110 1001 .101 .... .... .... ........    @ldstd_ri8 w=0 p=1
  
- B                .... 1010 ........................           @branch
- BL               .... 1011 ........................           @branch
-+
-+# Supervisor call
-+
-+SVC              ---- 1111 imm:24                             &i
+ STRD_ri_t32      1110 1001 .110 .... .... .... ........    @ldstd_ri8 w=1 p=1
+-LDRD_ri_t32      1110 1001 .111 .... .... .... ........    @ldstd_ri8 w=1 p=1
++{
++  SG             1110 1001 0111 1111 1110 1001 01111111
++  LDRD_ri_t32    1110 1001 .111 .... .... .... ........    @ldstd_ri8 w=1 p=1
++}
+ 
+ # Load/Store Exclusive, Load-Acquire/Store-Release, and Table Branch
+ 
 -- 
 2.17.1
 
