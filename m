@@ -2,65 +2,89 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DC4C3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE74C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:46:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A54F2086C
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:44:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A54F2086C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9E10C2086C
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:46:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VR6Ka+ua"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E10C2086C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45377 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzbOo-0004gQ-Gh
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 02:44:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54387)
+	id 1hzbQk-0006Lk-Qh
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 02:46:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54617)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1hzbNl-0003r6-1Z
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:43:10 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hzbPd-0005W7-94
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hzbNk-0007pz-2i
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:43:08 -0400
-Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:46168)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hzbNj-0007p4-U1
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:43:08 -0400
-Received: from player737.ha.ovh.net (unknown [10.108.42.168])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 44894116F64
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 08:43:05 +0200 (CEST)
-Received: from kaod.org (lfbn-ren-1-123-36.w83-205.abo.wanadoo.fr
- [83.205.208.36]) (Authenticated sender: clg@kaod.org)
- by player737.ha.ovh.net (Postfix) with ESMTPSA id D6CBD9083C3D;
- Mon, 19 Aug 2019 06:42:58 +0000 (UTC)
-To: Eddie James <eajames@linux.ibm.com>, qemu-devel@nongnu.org
-References: <1565814456-1264-1-git-send-email-eajames@linux.ibm.com>
- <ca560d31-25ca-5d48-a16a-4fdf74f4779b@kaod.org>
- <24e21dd0-55b8-a5df-57da-2d68bee204a0@linux.ibm.com>
- <cb2d52b2-65ef-41d6-0e3f-6aefb78f4d34@linux.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e93c7ced-ad33-fbca-427b-8996bb4860fe@kaod.org>
-Date: Mon, 19 Aug 2019 08:42:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hzbPb-0000Fk-AB
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:45:05 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45485)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hzbPY-0000Bl-7i; Mon, 19 Aug 2019 02:45:00 -0400
+Received: by mail-ot1-x344.google.com with SMTP id m24so681298otp.12;
+ Sun, 18 Aug 2019 23:45:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=/aTP8g+19vLIwV8ybJBObPx+sZ/gn9UWAOsVgyiAfEQ=;
+ b=VR6Ka+uaKYhh16qQODx9p9AwmGc91mFUhftrNVTFV/QjJe8CznKpdsQc1iATSMgCKc
+ jVvQ0cQe8a2NmvmT8plxyrV+pqaLUsGD1AS9yQDlW3jQBWLSDfuyCnWPo8yMtYrCwxgQ
+ yVr8Bcq9qz1CFHsMnOIgsm4d4JzOyGhBYMPRt8TdgZuJf58HmU3Z2PpPBb44fJrBdr60
+ NzOSggUApM9/sHgyk5QHLlAlp1lbh0mAogY7O+Gb0qr65EJUUmwTbdgZsM96awtCCuI2
+ +1eWRMbaimcW3T8d0IKgNb3afNUc/DH2c73MUyQB7JIo7asr9MRGfGl7NTJ50QiDWlHY
+ LSgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=/aTP8g+19vLIwV8ybJBObPx+sZ/gn9UWAOsVgyiAfEQ=;
+ b=bP/boyIuOD+zZwq8/zo28IjvveG7kH6tVe/0oh29BGHZrEcpeJPAo88WTw9hezu+WH
+ RzI/tjvdbultKzO3xcr+X2rmpofUxgUdAPwSZAt5DXFQ5L7Qyu0xi6tAUILCcX7lW2ed
+ bjwygEPFt9vWHhIN79T303//dEr96scD/ugWO5LmuC6f1pMKvKkDzelN+VNwjLASc3Ha
+ a/U/A/ebHjAIx7W0iGDnFIEo9dRVZzdjKbpZ/WdKkVxaOczS1sPD9ES3Nme2eAQnmUFT
+ vFUbjWbUam6VKeWDKzmi3ynDw8N5XyAc8gc3xgD6k3MeCktgrZgf2+9LHd52oOMZFz3L
+ fHvw==
+X-Gm-Message-State: APjAAAWwmjrm6pFAvNKgCPt/uilS3bUs2wGr3V9YLZIHaviQ253shnIT
+ SggoM6tEFVyIBTEth+ghqXSEjyV/PbGIWbnaRms=
+X-Google-Smtp-Source: APXvYqyZoIjxLBJUJ2CxN0g76Gq6hVkd4xW/Lucz5HLrDYQJqSPEHnruib9YtjDxJm7YTwkaHuXLQhAYu3Otn/P6/Xc=
+X-Received: by 2002:a05:6830:1d75:: with SMTP id
+ l21mr15952680oti.121.1566197099390; 
+ Sun, 18 Aug 2019 23:44:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <cb2d52b2-65ef-41d6-0e3f-6aefb78f4d34@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 4969722188967086865
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudefkedguddutdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Sun, 18 Aug 2019 23:44:58
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Sun, 18 Aug 2019 23:44:58
+ -0700 (PDT)
+In-Reply-To: <20190819062817.GA24503@umbus.fritz.box>
+References: <1565983669-6886-1-git-send-email-pc@us.ibm.com>
+ <CAL1e-=jy6vggskJ26rTc8dnaqtqCB0SdfpV9p-NvKdjoBk+Vkw@mail.gmail.com>
+ <0cfddc22-92ef-3067-9275-8f4f22ca9805@linaro.org>
+ <CAL1e-=h=Hzfm8KZ4ebwaBsS6U=KVcReXpOPT2-vy4OeBktjWkQ@mail.gmail.com>
+ <20190819062817.GA24503@umbus.fritz.box>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 19 Aug 2019 08:44:58 +0200
+Message-ID: <CAL1e-=j0w=OasHidP4W4ND-R3p6Ui7MS0iaj7Wk+c1tVyR09+A@mail.gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.111.180
-Subject: Re: [Qemu-devel] [RFC v2] hw/sd/aspeed_sdhci: New device
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] ppc: Three floating point fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,69 +96,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: andrew@aj.id.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- joel@jms.id.au
+Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ "Paul A. Clarke" <pc@us.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/08/2019 22:21, Eddie James wrote:
->=20
-> On 8/15/19 3:13 PM, Eddie James wrote:
->>
->> On 8/15/19 3:05 AM, C=C3=A9dric Le Goater wrote:
->>> Hello Eddie,
->>>
->>> On 14/08/2019 22:27, Eddie James wrote:
->>>>
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sdhci->slots[0].capareg =
-=3D (uint64_t)(uint32_t)val;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>> +=C2=A0=C2=A0=C2=A0 case ASPEED_SDHCI_SDIO_148:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sdhci->slots[0].maxcurr =
-=3D (uint64_t)(uint32_t)val;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>> +=C2=A0=C2=A0=C2=A0 case ASPEED_SDHCI_SDIO_240:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sdhci->slots[1].capareg =
-=3D (uint64_t)(uint32_t)val;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>>> +=C2=A0=C2=A0=C2=A0 case ASPEED_SDHCI_SDIO_248:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sdhci->slots[1].maxcurr =
-=3D (uint64_t)(uint32_t)val;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>> I think these regs are readonly.
->>
->>
->> Well the actual regs at slot + 0x40/0x48 are indeed, but not the Aspee=
-d-specific ones that mirror there. I think the idea is that Aspeed-specif=
-ic code can set it's capabilities differently if desired. This may preven=
-t the use of alias regions here.
->=20
->=20
-> Actually I could be wrong after reading the specs again. It's a little =
-confusing. I'm fine with making it read-only anyway, I doubt there will b=
-e any code that needs to write it.
+19.08.2019. 08.30, "David Gibson" <david@gibson.dropbear.id.au> =D1=98=D0=
+=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On Sun, Aug 18, 2019 at 10:59:01PM +0200, Aleksandar Markovic wrote:
+> > 18.08.2019. 10.10, "Richard Henderson" <richard.henderson@linaro.org> =
+=D1=98=D0=B5
+> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> > >
+> > > On 8/16/19 11:59 PM, Aleksandar Markovic wrote:
+> > > >> From: "Paul A. Clarke" <pc@us.ibm.com>
+> > > ...
+> > > >>   ISA 3.0B has xscvdpspn leaving its result in word 1 of the targe=
+t
+> > > > register,
+> > > >>   and mffprwz expecting its input to come from word 0 of the sourc=
+e
+> > > > register.
+> > > >>   This sequence fails with QEMU, as a shift is required between
+those
+> > two
+> > > >>   instructions.  However, the hardware splats the result to both
+word 0
+> > > > and
+> > > >>   word 1 of its output register, so the shift is not necessary.
+> > > >>   Expect a future revision of the ISA to specify this behavior.
+> > > >>
+> > > >
+> > > > Hmmm... Isn't this a gcc bug (using undocumented hardware feature),
+> > given
+> > > > everything you said here?
+> > >
+> > > The key here is "expect a future revision of the ISA to specify this
+> > behavior".
+> > >
+> > > It's clearly within IBM's purview to adjust the specification to
+document
+> > a
+> > > previously undocumented hardware feature.
+> > >
+> >
+> > By no means, yes, the key is in ISA documentation. But, the impression
+that
+> > full original commit message conveys is that the main reason for change
+is
+> > gcc behavior. If we accepted in general that gcc behavior determines
+QEMU
+> > behavior, I am afraid we would be on a very slippery slope - therefore =
+I
+> > think the commit message (and possible code comment) should, in my
+opinion,
+> > mention ISA docs as the central reason for change. Paul, is there any
+> > tentative release date of the new ISA specification?
+>
+> It's not really a question of gcc behaviour, it's a question of actual
+> cpu behaviour versus ISA document.  Which one qemu should follow is
+> somewhat debatable, but it sounds here like the ISA will be updated to
+> match the cpu, which weights it heavily in favour of mimicing the
+> actual cpu.
+>
 
-Let's ask Aspeed what was the intent. It is a bit weird indeed.=20
+This sounds right to me.
 
->=20
->=20
->>
->>
->>>
->>>> +=C2=A0=C2=A0=C2=A0 default:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (addr < ASPEED_SDHCI_=
-REG_SIZE) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-sdhci->regs[TO_REG(addr)] =3D (uint32_t)val;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> +=C2=A0=C2=A0=C2=A0 }
->>>> +}
->>>> +
->>>> +static const MemoryRegionOps aspeed_sdhci_ops =3D {
->>>> +=C2=A0=C2=A0=C2=A0 .read =3D aspeed_sdhci_read,
->>>> +=C2=A0=C2=A0=C2=A0 .write =3D aspeed_sdhci_write,
->>>> +=C2=A0=C2=A0=C2=A0 .endianness =3D DEVICE_NATIVE_ENDIAN,
->>>> +=C2=A0=C2=A0=C2=A0 .valid.min_access_size =3D 4,=20
+Aleksandar
 
-
+> --
+> David Gibson                    | I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_
+_other_
+>                                 | _way_ _around_!
+> http://www.ozlabs.org/~dgibson
