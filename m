@@ -2,87 +2,59 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C6EC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CCDC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:32:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07877214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:29:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OF/uwU0L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07877214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTPS id 07376214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:32:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07376214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzoHM-0006ub-4I
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:29:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45510)
+	id 1hzoK5-0001JJ-Oe
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:32:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45821)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tcminyard@gmail.com>) id 1hzo5n-0007gO-Sc
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hzo7S-0001F4-1I
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1hzo5f-0003De-MK
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:27 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:47089)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1hzo5f-0003CI-HW
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:19 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t24so2309550oij.13
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 13:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=5IGB425rPWZv6PIAxxgYjNsziWO2Aym53s828C6B59k=;
- b=OF/uwU0LaCw324pFQiZ6uos9fVMs/qFL2HKTzwzIyYsBtNTq5tZGQmGJgMSiRvEDL3
- Vm80KH8k5cd2JIbm+mMqn0/S/vkaWeWnNcp2Dis9KchLqNF9GY0IAnpH3Uo/koSxwPif
- fEwIV8Log9Gh4r5bSz6dUfJVPDoKD3SowwhTf5LoCPHRfSyL6Zj4EyLCb1B0e/Y+uixq
- aFwIN3uWHnKMEPHXW12SU7W8LaQfdFlyRlP1Oe+tgiLOULVVIubHICj3OLl+4DrdxFj+
- JfjbKnpL1J9UlfjqG/SHOVMj/p2ZifeBrmgXOkoKf+T8x4+EwFe82quA+dwbS0zjMqew
- Fpyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=5IGB425rPWZv6PIAxxgYjNsziWO2Aym53s828C6B59k=;
- b=qeL6v/xHTJhxv/mUf3HNnoMfI9nsCDnWI1hBfKLKf5QdGAZHhizDA5MK2JLJIqPPqg
- RNV0zYrQdVQlBupUAxHQoB04TJZBJlTa5OVEMOk5fhdjZKiFlDb19G1Wa9IyDbfRUInz
- 45GAdmDEBvwtmNzTPwXMsBDVCwTkPENirnRnp6UgT53Sevg4n43fFba0LOQO6eeMjchc
- OZVPMyIfs0A3tH6SJf7c9HNFxlMWAlyK7bKwhlyPys6mMCpgG5Zw6Pakg2hyyC02TfPC
- ieTHAC3SK5vQMKhS9XwVODeC6l3Je/k4mh8vhA0Ap2PZq2ouOqUv7tv5FVgMqnHe34Sr
- dwfQ==
-X-Gm-Message-State: APjAAAV3ul42nLH8nY6whfKixeh/RbNkoJI1CwF80ogvcP3P1S7G+9p0
- 2TUehBmvLAXxqi8CBg+5tg==
-X-Google-Smtp-Source: APXvYqwRm2zgXmr3ibwCvPlnpHRgRM0Z8EY1Ba8Pl1uvEfL8HZLl7OkAiVDx8gX07S/Fy+PmV09TWw==
-X-Received: by 2002:a05:6808:342:: with SMTP id
- j2mr15128760oie.34.1566245837999; 
- Mon, 19 Aug 2019 13:17:17 -0700 (PDT)
-Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
- by smtp.gmail.com with ESMTPSA id w139sm4940407oiw.0.2019.08.19.13.17.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 13:17:17 -0700 (PDT)
-Received: from t430.minyard.net (t430m.minyard.net [192.168.27.3])
- by serve.minyard.net (Postfix) with ESMTPA id 6B5711800D5;
- Mon, 19 Aug 2019 20:17:16 +0000 (UTC)
-Received: by t430.minyard.net (Postfix, from userid 1000)
- id 2C956301220; Mon, 19 Aug 2019 15:17:15 -0500 (CDT)
-From: minyard@acm.org
-To: QEMU Developers <qemu-devel@nongnu.org>
-Date: Mon, 19 Aug 2019 15:16:52 -0500
-Message-Id: <20190819201705.31633-3-minyard@acm.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190819201705.31633-1-minyard@acm.org>
-References: <20190819201705.31633-1-minyard@acm.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: [Qemu-devel] [PATCH 02/15] ipmi: Fix the get watchdog command
+ (envelope-from <mreitz@redhat.com>) id 1hzo7R-0004Oi-05
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44036)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hzo7O-0004L1-PW; Mon, 19 Aug 2019 16:19:06 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 12FDD1FAA66;
+ Mon, 19 Aug 2019 20:19:06 +0000 (UTC)
+Received: from localhost (ovpn-204-64.brq.redhat.com [10.40.204.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A6E5452B;
+ Mon, 19 Aug 2019 20:19:02 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon, 19 Aug 2019 22:18:45 +0200
+Message-Id: <20190819201851.24418-3-mreitz@redhat.com>
+In-Reply-To: <20190819201851.24418-1-mreitz@redhat.com>
+References: <20190819201851.24418-1-mreitz@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Mon, 19 Aug 2019 20:19:06 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 2/8] iotests: Prefer null-co over null-aio
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,34 +66,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
+We use null-co basically everywhere in the iotests.  Unless we want to
+test null-aio specifically, we should use it instead (for consistency).
 
-It wasn't returning the set timeout like it should have been.
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- hw/ipmi/ipmi_bmc_sim.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/qemu-iotests/093 | 7 +++----
+ tests/qemu-iotests/245 | 2 +-
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index 8f63bb7181..afb99e33d7 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -1228,6 +1228,8 @@ static void get_watchdog_timer(IPMIBmcSim *ibs,
-     rsp_buffer_push(rsp, ibs->watchdog_action);
-     rsp_buffer_push(rsp, ibs->watchdog_pretimeout);
-     rsp_buffer_push(rsp, ibs->watchdog_expired);
-+    rsp_buffer_push(rsp, ibs->watchdog_timeout & 0xff);
-+    rsp_buffer_push(rsp, (ibs->watchdog_timeout >> 8) & 0xff);
-     if (ibs->watchdog_running) {
-         long timeout;
-         timeout = ((ibs->watchdog_expiry - ipmi_getmonotime() + 50000000)
--- 
-2.17.1
+diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+index 3c4f5173ce..50c1e7f2ec 100755
+--- a/tests/qemu-iotests/093
++++ b/tests/qemu-iotests/093
+@@ -267,13 +267,12 @@ class ThrottleTestCoroutine(ThrottleTestCase):
+     test_img =3D "null-co://"
+=20
+ class ThrottleTestGroupNames(iotests.QMPTestCase):
+-    test_img =3D "null-aio://"
+     max_drives =3D 3
+=20
+     def setUp(self):
+         self.vm =3D iotests.VM()
+         for i in range(0, self.max_drives):
+-            self.vm.add_drive(self.test_img,
++            self.vm.add_drive("null-co://",
+                               "throttling.iops-total=3D100,file.read-zer=
+oes=3Don")
+         self.vm.launch()
+=20
+@@ -376,10 +375,10 @@ class ThrottleTestRemovableMedia(iotests.QMPTestCas=
+e):
+=20
+     def test_removable_media(self):
+         # Add a couple of dummy nodes named cd0 and cd1
+-        result =3D self.vm.qmp("blockdev-add", driver=3D"null-aio",
++        result =3D self.vm.qmp("blockdev-add", driver=3D"null-co",
+                              read_zeroes=3DTrue, node_name=3D"cd0")
+         self.assert_qmp(result, 'return', {})
+-        result =3D self.vm.qmp("blockdev-add", driver=3D"null-aio",
++        result =3D self.vm.qmp("blockdev-add", driver=3D"null-co",
+                              read_zeroes=3DTrue, node_name=3D"cd1")
+         self.assert_qmp(result, 'return', {})
+=20
+diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+index bc1ceb9792..ae169778b0 100644
+--- a/tests/qemu-iotests/245
++++ b/tests/qemu-iotests/245
+@@ -598,7 +598,7 @@ class TestBlockdevReopen(iotests.QMPTestCase):
+         ##################
+         ###### null ######
+         ##################
+-        opts =3D {'driver': 'null-aio', 'node-name': 'root', 'size': 102=
+4}
++        opts =3D {'driver': 'null-co', 'node-name': 'root', 'size': 1024=
+}
+=20
+         result =3D self.vm.qmp('blockdev-add', conv_keys =3D False, **op=
+ts)
+         self.assert_qmp(result, 'return', {})
+--=20
+2.21.0
 
 
