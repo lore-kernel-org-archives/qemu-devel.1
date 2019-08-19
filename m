@@ -2,59 +2,56 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E070C41514
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5775AC3A59D
 	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35F972085A
+	by mail.kernel.org (Postfix) with ESMTPS id 2BE2420851
 	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:14:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F972085A
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE2420851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzgY4-0007YZ-3n
+	id 1hzgY4-0007Yk-5U
 	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36172)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTd-0001tH-Qj
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:35 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTa-0001rH-Rt
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTb-0002bC-2j
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:33 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57771 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTZ-0002YX-Cg
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:30 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56479 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hzgTa-0002ZX-Ir
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:30 -0400
+ id 1hzgTZ-0001et-6B
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:29 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 5C3371A2089;
+ by mail.rt-rk.com (Postfix) with ESMTP id 19A631A2083;
  Mon, 19 Aug 2019 14:08:24 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 05AEC1A208C;
- Mon, 19 Aug 2019 14:08:24 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id BB23F1A2061;
+ Mon, 19 Aug 2019 14:08:23 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:07:47 +0200
-Message-Id: <1566216496-17375-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 19 Aug 2019 14:07:42 +0200
+Message-Id: <1566216496-17375-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v8 08/37] target/mips: Style improvements in
- internal.h
+Subject: [Qemu-devel] [PATCH v8 03/37] target/mips: Amend CP0 MemoryMapID
+ register implementation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,136 +68,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
+Add migration support and fix preprocessor constant name for
+MemoryMapID register.
 
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/mips/internal.h | 57 +++++++++++++++++++++++++++++++-------------=
-------
- 1 file changed, 35 insertions(+), 22 deletions(-)
+ target/mips/cpu.h     | 2 +-
+ target/mips/machine.c | 7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index d9216fb..836de7a 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -1,4 +1,5 @@
--/* mips internal definitions and helpers
-+/*
-+ * MIPS internal definitions and helpers
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-  * See the COPYING file in the top-level directory.
-@@ -8,8 +9,10 @@
- #define MIPS_INTERNAL_H
-=20
-=20
--/* MMU types, the first four entries have the same layout as the
--   CP0C0_MT field.  */
-+/*
-+ * MMU types, the first four entries have the same layout as the
-+ * CP0C0_MT field.
-+ */
- enum mips_mmu_types {
-     MMU_TYPE_NONE,
-     MMU_TYPE_R4000,
-@@ -159,9 +162,11 @@ static inline bool cpu_mips_hw_interrupts_enabled(CP=
-UMIPSState *env)
-         !(env->CP0_Status & (1 << CP0St_EXL)) &&
-         !(env->CP0_Status & (1 << CP0St_ERL)) &&
-         !(env->hflags & MIPS_HFLAG_DM) &&
--        /* Note that the TCStatus IXMT field is initialized to zero,
--           and only MT capable cores can set it to one. So we don't
--           need to check for MT capabilities here.  */
-+        /*
-+         * Note that the TCStatus IXMT field is initialized to zero,
-+         * and only MT capable cores can set it to one. So we don't
-+         * need to check for MT capabilities here.
-+         */
-         !(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_IXMT));
- }
-=20
-@@ -176,14 +181,18 @@ static inline bool cpu_mips_hw_interrupts_pending(C=
-PUMIPSState *env)
-     status =3D env->CP0_Status & CP0Ca_IP_mask;
-=20
-     if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
--        /* A MIPS configured with a vectorizing external interrupt contr=
-oller
--           will feed a vector into the Cause pending lines. The core tre=
-ats
--           the status lines as a vector level, not as indiviual masks.  =
-*/
-+        /*
-+         * A MIPS configured with a vectorizing external interrupt contr=
-oller
-+         * will feed a vector into the Cause pending lines. The core tre=
-ats
-+         * the status lines as a vector level, not as indiviual masks.
-+         */
-         r =3D pending > status;
-     } else {
--        /* A MIPS configured with compatibility or VInt (Vectored Interr=
-upts)
--           treats the pending lines as individual interrupt lines, the s=
-tatus
--           lines are individual masks.  */
-+        /*
-+         * A MIPS configured with compatibility or VInt (Vectored Interr=
-upts)
-+         * treats the pending lines as individual interrupt lines, the s=
-tatus
-+         * lines are individual masks.
-+         */
-         r =3D (pending & status) !=3D 0;
-     }
-     return r;
-@@ -268,12 +277,14 @@ static inline int mips_vpe_active(CPUMIPSState *env=
-)
-         active =3D 0;
-     }
-=20
--    /* Now verify that there are active thread contexts in the VPE.
--
--       This assumes the CPU model will internally reschedule threads
--       if the active one goes to sleep. If there are no threads availabl=
-e
--       the active one will be in a sleeping state, and we can turn off
--       the entire VPE.  */
-+    /*
-+     * Now verify that there are active thread contexts in the VPE.
-+     *
-+     * This assumes the CPU model will internally reschedule threads
-+     * if the active one goes to sleep. If there are no threads availabl=
-e
-+     * the active one will be in a sleeping state, and we can turn off
-+     * the entire VPE.
-+     */
-     if (!(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_A))) {
-         /* TC is not activated.  */
-         active =3D 0;
-@@ -396,10 +407,12 @@ static inline void compute_hflags(CPUMIPSState *env=
-)
-             env->hflags |=3D MIPS_HFLAG_COP1X;
-         }
-     } else if (env->insn_flags & ISA_MIPS4) {
--        /* All supported MIPS IV CPUs use the XX (CU3) to enable
--           and disable the MIPS IV extensions to the MIPS III ISA.
--           Some other MIPS IV CPUs ignore the bit, so the check here
--           would be too restrictive for them.  */
-+        /*
-+         * All supported MIPS IV CPUs use the XX (CU3) to enable
-+         * and disable the MIPS IV extensions to the MIPS III ISA.
-+         * Some other MIPS IV CPUs ignore the bit, so the check here
-+         * would be too restrictive for them.
-+         */
-         if (env->CP0_Status & (1U << CP0St_CU3)) {
-             env->hflags |=3D MIPS_HFLAG_COP1X;
-         }
---=20
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 6406ba8..eda8350 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -290,7 +290,7 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG04__CONTEXT         0
+ #define CP0_REG04__USERLOCAL       2
+ #define CP0_REG04__DBGCONTEXTID    4
+-#define CP0_REG00__MMID            5
++#define CP0_REG04__MEMORYMAPID     5
+ /* CP0 Register 05 */
+ #define CP0_REG05__PAGEMASK        0
+ #define CP0_REG05__PAGEGRAIN       1
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index c3e52f8..e23b767 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -137,6 +137,7 @@ static int get_tlb(QEMUFile *f, void *pv, size_t size,
+     qemu_get_betls(f, &v->VPN);
+     qemu_get_be32s(f, &v->PageMask);
+     qemu_get_be16s(f, &v->ASID);
++    qemu_get_be32s(f, &v->MMID);
+     qemu_get_be16s(f, &flags);
+     v->G = (flags >> 10) & 1;
+     v->C0 = (flags >> 7) & 3;
+@@ -162,6 +163,7 @@ static int put_tlb(QEMUFile *f, void *pv, size_t size,
+     r4k_tlb_t *v = pv;
+ 
+     uint16_t asid = v->ASID;
++    uint32_t mmid = v->MMID;
+     uint16_t flags = ((v->EHINV << 15) |
+                       (v->RI1 << 14) |
+                       (v->RI0 << 13) |
+@@ -178,6 +180,7 @@ static int put_tlb(QEMUFile *f, void *pv, size_t size,
+     qemu_put_betls(f, &v->VPN);
+     qemu_put_be32s(f, &v->PageMask);
+     qemu_put_be16s(f, &asid);
++    qemu_put_be32s(f, &mmid);
+     qemu_put_be16s(f, &flags);
+     qemu_put_be64s(f, &v->PFN[0]);
+     qemu_put_be64s(f, &v->PFN[1]);
+@@ -199,8 +202,8 @@ const VMStateInfo vmstate_info_tlb = {
+ 
+ const VMStateDescription vmstate_tlb = {
+     .name = "cpu/tlb",
+-    .version_id = 2,
+-    .minimum_version_id = 2,
++    .version_id = 3,
++    .minimum_version_id = 3,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(nb_tlb, CPUMIPSTLBContext),
+         VMSTATE_UINT32(tlb_in_use, CPUMIPSTLBContext),
+-- 
 2.7.4
 
 
