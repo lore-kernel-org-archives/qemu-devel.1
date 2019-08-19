@@ -2,115 +2,78 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 247CCC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97089C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:14:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBA6E20843
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:13:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBA6E20843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69FA920843
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:14:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69FA920843
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzhTE-00084y-2j
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:13:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40323)
+	id 1hzhUf-0000rh-GO
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:14:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hzgo4-0007qq-Rt
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:30:44 -0400
+ (envelope-from <bounces@canonical.com>) id 1hzhR3-0006tA-SG
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:10:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hzgny-0004Hw-Qu
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:30:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42086)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hzgnr-0004BH-4n; Mon, 19 Aug 2019 08:30:29 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AC3F5C01DDF1;
- Mon, 19 Aug 2019 12:30:22 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-127.ams2.redhat.com [10.36.116.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9A33B831A4;
- Mon, 19 Aug 2019 12:30:13 +0000 (UTC)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190805152947.28536-1-david@redhat.com>
- <20190805152947.28536-6-david@redhat.com>
- <41ecb40c-25e6-c209-48f9-e63fc309ed5a@redhat.com>
- <5bd53f3f-b2cd-9ab4-9185-310b9778cc8e@redhat.com>
- <c9d4ee70-5819-722f-f404-697622ee5ce5@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
- aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
- QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
- EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
- 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
- eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
- ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
- zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
- tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
- WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
- UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
- BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
- 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
- +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
- 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
- gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
- WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
- VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
- knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
- cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
- X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
- AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
- ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
- fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
- 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
- cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
- ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
- Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
- oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
- IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
- yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-Organization: Red Hat
-Message-ID: <701fa06a-35e7-8903-5d07-125afb11938c@redhat.com>
-Date: Mon, 19 Aug 2019 14:30:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bounces@canonical.com>) id 1hzhR2-0000Os-AZ
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:10:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50664)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hzhR0-0000MI-9v
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:10:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hzhQw-00052N-Ps
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 13:10:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BBC8A2E8070
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 13:10:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <c9d4ee70-5819-722f-f404-697622ee5ce5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 19 Aug 2019 12:30:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 19 Aug 2019 13:04:15 -0000
+From: Avi Eis <1834113@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=libvirt; component=main;
+ status=Incomplete; importance=Low; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Low; assignee=None; 
+X-Launchpad-Bug-Tags: amd64 apport-bug disco
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bryce ikes73 paelzer rafaeldtinoco
+X-Launchpad-Bug-Reporter: Avi Eis (ikes73)
+X-Launchpad-Bug-Modifier: Avi Eis (ikes73)
+References: <156142437029.30985.13623507391124028236.malonedeb@soybean.canonical.com>
+Message-Id: <156621985567.22174.9686439531006087595.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19022";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: bc8aae0a92dd7a47f75cc2ab8e4a5baeb622edb5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v1 5/9] s390x/mmu:
- Implement access-exception-fetch/store-indication facility
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1834113] Re: QEMU touchpad input erratic after
+ wakeup from sleep
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -119,46 +82,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>, Ilya Leoshkevich <iii@linux.ibm.com>
+Reply-To: Bug 1834113 <1834113@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/19/19 2:26 PM, David Hildenbrand wrote:
-> On 19.08.19 14:22, Thomas Huth wrote:
->> On 8/19/19 2:16 PM, Thomas Huth wrote:
->>> On 8/5/19 5:29 PM, David Hildenbrand wrote:
->>>> We always have to indicate whether it is a fetch or a store for all access
->>>> exceptions. This is only missing for LAP exceptions.
->>>
->>> Do we really need this for LAP, too? If I get figure 3-5 "Enhanced
->>> Suppression-on-Protection Results" right, these bits are not set for LAP
->>> exceptions...? Do I miss something?
->>
->> I was looking at an older version of the PoP ... the table that I mean
->> is "Figure 3-8. Enhanced Suppression-on-Protection Facility 2 Results"
->> in SA22-7832-11.
->>
->>  Thomas
->>
-> 
-> I think that table only states that if 56==60==61==0, then we might have
-> either KCP or LAP ("Presented if TEID details are not available" - but
-> as we have TEID information available, we can just set 56=1 and 60=61=0
-> (== LAP), or am I missing something?
+Right now it stopped happening, although I did see something briefly
+last week that fixed itself on a reboot.
 
-Oh, well, I was looking at the older version of the PoP first, and it
-was not specified there yet, and when I started looking the the new
-version, I only saw the first LAP line and stopped reading properly
-afterwards... of course you're right, there is another LAP line in the
-table where they say that the address is correclty specified.
+If it happens again I'll check those details.
 
-Please mentioned the "Enhanced Suppression-on-Protection
-Facility 2" (which introduced this new behavior) in the patch
-description to make this clear, then your patch is fine.
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1834113
+
+Title:
+  QEMU touchpad input erratic after wakeup from sleep
+
+Status in QEMU:
+  Incomplete
+Status in libvirt package in Ubuntu:
+  Incomplete
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Using Ubuntu host and guest. Normally the touchpad works great. Within
+  the last few days, suddenly, apparently after a wake from sleep, the
+  touchpad will behave erratically. For example, it will take two clicks
+  to select something, and when moving the cursor it will act as though
+  it is dragging even with the button not clicked.
+
+  A reboot fixes the issue temporarily.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 19.04
+  Package: qemu 1:3.1+dfsg-2ubuntu3.1
+  Uname: Linux 5.1.14-050114-generic x86_64
+  ApportVersion: 2.20.10-0ubuntu27
+  Architecture: amd64
+  CurrentDesktop: ubuntu:GNOME
+  Date: Mon Jun 24 20:55:44 2019
+  Dependencies:
+   =
+
+  EcryptfsInUse: Yes
+  InstallationDate: Installed on 2019-02-20 (124 days ago)
+  InstallationMedia: Ubuntu 18.04 "Bionic" - Build amd64 LIVE Binary 201806=
+08-09:38
+  Lsusb:
+   Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+   Bus 001 Device 002: ID 8087:0025 Intel Corp. =
+
+   Bus 001 Device 003: ID 0c45:671d Microdia =
+
+   Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+  MachineType: Dell Inc. Precision 5530
+  ProcEnviron:
+   TERM=3Dxterm-256color
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.1.14-050114-generic root=
+=3DUUID=3D18e8777c-1764-41e4-a19f-62476055de23 ro mem_sleep_default=3Ddeep =
+mem_sleep_default=3Ddeep acpi_rev_override=3D1 scsi_mod.use_blk_mq=3D1 nouv=
+eau.modeset=3D0 nouveau.runpm=3D0 nouveau.blacklist=3D1 acpi_backlight=3Dno=
+ne acpi_osi=3DLinux acpi_osi=3D!
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 04/26/2019
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 1.10.1
+  dmi.board.name: 0FP2W2
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr1.10.1:bd04/26/2019:svnDellInc.:pnPrecis=
+ion5530:pvr:rvnDellInc.:rn0FP2W2:rvrA00:cvnDellInc.:ct10:cvr:
+  dmi.product.family: Precision
+  dmi.product.name: Precision 5530
+  dmi.product.sku: 087D
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1834113/+subscriptions
 
