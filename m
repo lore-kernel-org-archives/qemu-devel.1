@@ -2,90 +2,80 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33233C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A9BFC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:20:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5BAE2087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:14:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BAE2087E
+	by mail.kernel.org (Postfix) with ESMTPS id 2301A2087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:20:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2301A2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzn72-00075l-MF
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:14:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35455)
+	id 1hznCz-00012Q-8s
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:20:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36222)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hzn62-0006YY-NY
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:13:39 -0400
+ (envelope-from <mst@redhat.com>) id 1hznC7-0008MU-Pd
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hzn61-0001vf-It
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:13:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59674)
+ (envelope-from <mst@redhat.com>) id 1hznC6-0006ST-Nr
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:19:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43148)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hzn5y-0001sp-PR; Mon, 19 Aug 2019 15:13:35 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hznC6-0006Rd-Fj
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:19:54 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D9833091782;
- Mon, 19 Aug 2019 19:13:34 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-64.brq.redhat.com
- [10.40.204.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DC625C1D6;
- Mon, 19 Aug 2019 19:13:32 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
-References: <20190819092118.18920-1-thuth@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <763f15ee-a1ca-ba06-fc70-fdff9427ebf7@redhat.com>
-Date: Mon, 19 Aug 2019 21:13:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 9F03919CF92
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 19:19:52 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id d64so130694wmc.7
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 12:19:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=+8CfRmMceytjIZ7oTu4LtTIymvuNqSeFpkAlGw45ZEI=;
+ b=bKW0tBh56rtEwZiPOkn8tWBfjFnSGNfJk6LX3iugk12JHmmbzOx1TUltZItqset0oe
+ a/xJ/0qQu6HoKFwTcENFODv5aTcd9UZ0LMceVe8tih/kfMeDmdoTzQg18kSjl+hvyhiJ
+ h1Az1EQDKMw22P8+6lKncc+9Rb0Xq4r70YCctqzNh9PC2O29/7CyUOe2Y8Ob9wj3aK2R
+ h4Y8kOactKVujTuxvpbaf6VvQUBadDm0MEQajJmLwkgS9QDoQqAgRMy4HTPkjelBB1lh
+ QByZ7t+vRcMque4V7G4UMY/R4UyqpSph6BAHZMd45BDALqssrnfc5yLmqzcwiFPfLQu7
+ ViSw==
+X-Gm-Message-State: APjAAAVboXNJwJwMUkSC6mRQ6Cr0BBFKqz11Oy2dfIE5+TTcbGGZB1cb
+ YMOsq3jAep56hW1hsj61Lw43wEA0Pm428lukFDc7Xd3rBeJXrtyrzKy9emGzX4vm3etggOI5bMU
+ 783PrDEWqZmhHV5Y=
+X-Received: by 2002:a5d:45cb:: with SMTP id b11mr30658103wrs.117.1566242391366; 
+ Mon, 19 Aug 2019 12:19:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxuW/NiWuNs8XJpTDgHxo+9pwCMSQYVNkzRHqDXH57xlHC+GrjNAio8gQ5/bTDsAErJ4bo0+w==
+X-Received: by 2002:a5d:45cb:: with SMTP id b11mr30658087wrs.117.1566242391167; 
+ Mon, 19 Aug 2019 12:19:51 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-62-110.red.bezeqint.net. [79.180.62.110])
+ by smtp.gmail.com with ESMTPSA id r23sm11306509wmc.38.2019.08.19.12.19.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Aug 2019 12:19:50 -0700 (PDT)
+Date: Mon, 19 Aug 2019 15:19:46 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190819151913-mutt-send-email-mst@kernel.org>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190819092118.18920-1-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 19 Aug 2019 19:13:34 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190815183803.13346-1-ehabkost@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] iotests: Add more "skip_if_unsupported"
- statements to the python tests
+Subject: Re: [Qemu-devel] [PATCH 0/3] pc: Fix die-id validation and
+ compatibility with libvirt
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,97 +87,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Peter Krempa <pkrempa@redhat.com>, Like Xu <like.xu@linux.intel.com>,
+ qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX
-Content-Type: multipart/mixed; boundary="3SWOLKnOJTbuAxhplT4nJxQzB02NiEq23";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <763f15ee-a1ca-ba06-fc70-fdff9427ebf7@redhat.com>
-Subject: Re: [PATCH] iotests: Add more "skip_if_unsupported" statements to the
- python tests
-References: <20190819092118.18920-1-thuth@redhat.com>
-In-Reply-To: <20190819092118.18920-1-thuth@redhat.com>
+On Thu, Aug 15, 2019 at 03:38:00PM -0300, Eduardo Habkost wrote:
+> Currently, if die-id is omitted on -device for CPUs, we get a
+> very confusing error message:
+> 
+>   $ qemu-system-x86_64 -smp 1,sockets=6,maxcpus=6 \
+>     -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0
+>   qemu-system-x86_64: -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0: \
+>     Invalid CPU die-id: 4294967295 must be in range 0:5
+> 
+> This has 3 problems
+> 
+> 1) The actual range for die-id is 0:0.
+>    This is fixed by patch 1/3.
+> 2) The user didn't specify die-id=4294967295.
+>    This is fixed by patch 2/3.
+> 3) It breaks compatibility with libvirt because die-id was not
+>    mandatory before.
+>    This is addressed by patch 3/3.
+> 
+> Issues #1 and #2 were reported at:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1741151
+> 
+> Issue #3 was reported at:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1741451
+> 
+> Cc: Like Xu <like.xu@linux.intel.com>
+> Cc: Peter Krempa <pkrempa@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
 
---3SWOLKnOJTbuAxhplT4nJxQzB02NiEq23
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Looks good
 
-On 19.08.19 11:21, Thomas Huth wrote:
-> The python code already contains a possibility to skip tests if the
-> corresponding driver is not available in the qemu binary - use it
-> in more spots to avoid that the tests are failing if the driver has
-> been disabled.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/qemu-iotests/030 |  3 +++
->  tests/qemu-iotests/040 |  2 ++
->  tests/qemu-iotests/041 | 14 +++++++++++++-
->  tests/qemu-iotests/245 |  2 ++
->  4 files changed, 20 insertions(+), 1 deletion(-)
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-[...]
-
-> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-> index 26bf1701eb..f45d20fbe0 100755
-> --- a/tests/qemu-iotests/041
-> +++ b/tests/qemu-iotests/041
-> @@ -817,6 +817,7 @@ class TestRepairQuorum(iotests.QMPTestCase):
->      image_len =3D 1 * 1024 * 1024 # MB
->      IMAGES =3D [ quorum_img1, quorum_img2, quorum_img3 ]
-> =20
-> +    @iotests.skip_if_unsupported(['quorum'])
->      def setUp(self):
->          self.vm =3D iotests.VM()
-
-It=E2=80=99s clear that none of these tests can run if there is no quorum=
-
-support, because setUp() creates a quorum node.  I think it would be
-nice if it would suffice to just skip everything automatically if
-setUp() is skipped and not have to bother about each of the test cases.
-
-Coincidentally (:-)), I have a patch to do that, namely =E2=80=9Ciotests:=
- Allow
-skipping test cases=E2=80=9D in my =E2=80=9Ciotests: Selfish patches=E2=80=
-=9D series:
-
-https://lists.nongnu.org/archive/html/qemu-block/2019-06/msg01106.html
-
-Yes, that means you cannot use an annotation because it needs @self to
-be able to skip the test.  Hm... But I think I can make that work by
-simply s/case_notrun/args[0].case_skip/ in skip_if_unsupported()?
-
-Max
+I'm traveling and can't test this properly.
+Anyone else can merge this? Eduardo?
 
 
---3SWOLKnOJTbuAxhplT4nJxQzB02NiEq23--
-
---dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1a9NoACgkQ9AfbAGHV
-z0A4/wgAt3CgMh8oDXNWclWf1ccyVq+H5rWuNABPdIuIkBaAETEMNWQiW2a0rMBH
-yMmWYTupPRN2cJH0B6QYxInbNuDN9NHdMp/Nnd8tS63tClYDTvflAbkiAqtEdEmB
-Sl8/am+0CIvmBaF9mnTZU9a3QvZZOy3kyIIADRJk/KOcoEq1sdbW8kgdpvL4rj+U
-w4sdTwEfqXZ7BYGJlaMFWnldNgyj3mf5sI69bv2b1PvPtnvaHAQmw3PZUTCE+TDD
-65PeoaGIQLMw67ean9gSv5hxBA7uVWSHxTtWvYf4q9zZCunY3oSz7qgjY4y9rBF5
-jKpfX2kvfet8PIjpJyvGlFBtjvcljA==
-=TsQ2
------END PGP SIGNATURE-----
-
---dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX--
+> Eduardo Habkost (3):
+>   pc: Fix error message on die-id validation
+>   pc: Improve error message when die-id is omitted
+>   pc: Don't make CPU properties mandatory unless necessary
+> 
+>  hw/i386/pc.c                             | 23 ++++++++-
+>  tests/acceptance/pc_cpu_hotplug_props.py | 59 ++++++++++++++++++++++++
+>  2 files changed, 81 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/acceptance/pc_cpu_hotplug_props.py
+> 
+> -- 
+> 2.21.0
 
