@@ -3,47 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2B5C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEC1C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3D06214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:44:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3D06214DA
+	by mail.kernel.org (Postfix) with ESMTPS id D0B97214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:47:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0B97214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hznZz-0004ml-To
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:44:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39035)
+	id 1hzncv-0006Xm-OF
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39366)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hznZ8-00041v-6y
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:43:43 -0400
+ (envelope-from <eblake@redhat.com>) id 1hznbE-0005Xk-CN
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hznZ7-0001Sb-9c
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:43:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46148)
+ (envelope-from <eblake@redhat.com>) id 1hznbD-0002yA-GM
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:45:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41924)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hznZ2-0001Kz-Dw; Mon, 19 Aug 2019 15:43:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hznbB-0002xN-DP; Mon, 19 Aug 2019 15:45:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DE8C3C08E2B8;
- Mon, 19 Aug 2019 19:43:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B64B44FCC9;
+ Mon, 19 Aug 2019 19:45:48 +0000 (UTC)
 Received: from [10.3.117.3] (ovpn-117-3.phx2.redhat.com [10.3.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3152C5DC1B;
- Mon, 19 Aug 2019 19:43:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C94B5C22C;
+ Mon, 19 Aug 2019 19:45:48 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-13-mreitz@redhat.com>
+ <20190819185602.4267-14-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <272cbeba-2053-9aa6-7ceb-e1b3827de540@redhat.com>
-Date: Mon, 19 Aug 2019 14:43:30 -0500
+Message-ID: <f56ce7e1-e41d-d861-3c32-eb6e22dfc936@redhat.com>
+Date: Mon, 19 Aug 2019 14:45:47 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190819185602.4267-13-mreitz@redhat.com>
+In-Reply-To: <20190819185602.4267-14-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="FFzN3Rm2uOWZOI1opAQxxiFurDhY92GPd"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="uWPjrdeI4BIjVjQM8qt1x0qExdi52V7Ic"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 19 Aug 2019 19:43:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Mon, 19 Aug 2019 19:45:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 12/16] qcow2: Fix overly long snapshot
- tables
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] qcow2: Repair snapshot table with
+ too many entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,41 +103,33 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FFzN3Rm2uOWZOI1opAQxxiFurDhY92GPd
-Content-Type: multipart/mixed; boundary="wG891ny1Gc90OmVik4zfeCEEZNAvhBxgj";
+--uWPjrdeI4BIjVjQM8qt1x0qExdi52V7Ic
+Content-Type: multipart/mixed; boundary="YGSei3OtX760BiqXsKV1oHv0T0cLPfTsW";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <272cbeba-2053-9aa6-7ceb-e1b3827de540@redhat.com>
-Subject: Re: [PATCH v2 12/16] qcow2: Fix overly long snapshot tables
+Message-ID: <f56ce7e1-e41d-d861-3c32-eb6e22dfc936@redhat.com>
+Subject: Re: [PATCH v2 13/16] qcow2: Repair snapshot table with too many
+ entries
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-13-mreitz@redhat.com>
-In-Reply-To: <20190819185602.4267-13-mreitz@redhat.com>
+ <20190819185602.4267-14-mreitz@redhat.com>
+In-Reply-To: <20190819185602.4267-14-mreitz@redhat.com>
 
---wG891ny1Gc90OmVik4zfeCEEZNAvhBxgj
+--YGSei3OtX760BiqXsKV1oHv0T0cLPfTsW
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 8/19/19 1:55 PM, Max Reitz wrote:
-> We currently refuse to open qcow2 images with overly long snapshot
-> tables.  This patch makes qemu-img check -r all drop all offending
-> entries past what we deem acceptable.
->=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/qcow2-snapshot.c | 88 +++++++++++++++++++++++++++++++++++++-----=
 
->  1 file changed, 78 insertions(+), 10 deletions(-)
-
-I know I was reluctant in v1, but you also managed to convince me that
-it really takes a LOT of effort to get a table with that many entries.
-And a user has to opt-in to 'qemu-img -r' (it may discard a snapshot
-they value, but that beats not being able to use the image under qemu at
-all, and we don't erase it for plain 'qemu-img check').  So I'm okay
-with this going in.  Maybe the commit message can state this sort of
-reasoning.
+Short on the reasoning why this isn't a problem in practice.  (Again,
+because we only do it via opt-in qemu-img -r; you can already learn if
+qemu-img will have problem with your file created externally without
+destroying the image, and elect to not have qemu-img clean it if you
+don't like the algorithm qemu-img will use).
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -147,24 +139,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---wG891ny1Gc90OmVik4zfeCEEZNAvhBxgj--
+--YGSei3OtX760BiqXsKV1oHv0T0cLPfTsW--
 
---FFzN3Rm2uOWZOI1opAQxxiFurDhY92GPd
+--uWPjrdeI4BIjVjQM8qt1x0qExdi52V7Ic
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1a++IACgkQp6FrSiUn
-Q2q+/QgAnF0rC8yrYNxsFppSZGsEaa+5q59/Y9DcBOXegtjkXD5iUJhzGsVuQ5dt
-101z46HARFqHJsCzEpHU7+bOwbJcPUShPLHavJNFqvY8LNK079NORstnw+cjm96v
-8GgynkTCkL0Keb4YDy8yVtGDMjX011i97nWpkw6+R/RhM2lKPCIlAhi0WT4PhYVL
-dc2pPPNigibJquCLbJn1a0JmqmQwQr48GLdUp++RRD0ChXzPQv2AdWGs6v9P4veV
-oEMHeQrPwYRqHDJd4gE9t5kDXuOVsz4H3WLLaKJAYrKsz/yGQdxfMqk2iy/x9ea4
-J3+VxE0k5cpLjWPmuapBZzUqsNeIkA==
-=UgdB
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1a/GsACgkQp6FrSiUn
+Q2p1iggAmUyLvoeSvHs62Nh7NyXs0zTYN8N0mtcy2MvZxCapnpkp4uJ3hGO+tZeM
+cAPohelVWAi8QqVpFRn/0bh5u0bHQ2eeXUBBSCm1HPOn5YVw/oCULhAcVWosJheR
+CRvgDcZZOV9JDv61CafciTRpTOQZqUm/R+9hdz7H4U8HZeCZkUuUB/jYPspFqZq1
+J+ji0wQ43/Zv5Dk0U/RXiarx3tcJjKTBmh3SKiVsrZEkQZkt6S/KqIa1MID+mFQo
+OQm4Trgec0f6A+AXRsV8m+c0Oa9ONMYxhP8BgxxAIZ6+WnSsREkrvhxP5h2YWeqM
+P9i3L3HiBJelAVTqPqnQytdtFg9kIg==
+=fZH7
 -----END PGP SIGNATURE-----
 
---FFzN3Rm2uOWZOI1opAQxxiFurDhY92GPd--
+--uWPjrdeI4BIjVjQM8qt1x0qExdi52V7Ic--
 
