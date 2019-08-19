@@ -2,60 +2,62 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8116EC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65BBC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:51:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54A202082C
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:48:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A202082C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 88C042082C
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:51:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C042082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzi0y-0004qE-IY
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:48:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57234)
+	id 1hzi4N-0006KQ-Oa
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:51:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1hzhxH-0001WR-2Z
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:44:16 -0400
+ (envelope-from <quintela@redhat.com>) id 1hzi3d-0005sS-UD
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1hzhxF-0002jt-Cq
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:44:14 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43833)
+ (envelope-from <quintela@redhat.com>) id 1hzi3c-0005SF-T2
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:50:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55304)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1hzhxF-0002N0-19; Mon, 19 Aug 2019 09:44:13 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06474514|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.0746243-0.00383168-0.921544; FP=0|0|0|0|0|-1|-1|-1;
- HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=7; RT=7; SR=0;
- TI=SMTPD_---.FEfjRoa_1566222239; 
-Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.FEfjRoa_1566222239)
- by smtp.aliyun-inc.com(10.147.42.16); Mon, 19 Aug 2019 21:44:02 +0800
-From: liuzhiwei <zhiwei_liu@c-sky.com>
-To: Alistair Francis <alistair23@gmail.com>
-References: <0141541d-43ff-98d8-e9d4-4a2fdcfdcf36@c-sky.com>
- <CAKmqyKPr0V6acB2-Y+N1-aoj-5LSofwi=Jz=u6KFJN1fPUWjzA@mail.gmail.com>
-Message-ID: <2b741fb0-0f12-0f07-a516-9cc23abc0b6e@c-sky.com>
-Date: Mon, 19 Aug 2019 21:39:11 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hzi3c-0005S5-MB
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:50:48 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B7BCE3001AB7;
+ Mon, 19 Aug 2019 13:50:47 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 33D8A857BC;
+ Mon, 19 Aug 2019 13:50:47 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+In-Reply-To: <20190819032804.8579-1-richardw.yang@linux.intel.com> (Wei Yang's
+ message of "Mon, 19 Aug 2019 11:28:04 +0800")
+References: <20190819032804.8579-1-richardw.yang@linux.intel.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Mon, 19 Aug 2019 15:50:44 +0200
+Message-ID: <87d0h12rij.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPr0V6acB2-Y+N1-aoj-5LSofwi=Jz=u6KFJN1fPUWjzA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 121.197.200.217
-Subject: Re: [Qemu-devel] RISCV: when will the CLIC be ready?
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 19 Aug 2019 13:50:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] migration: cleanup check on ops in
+ savevm.handlers iterations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,82 +69,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Reply-To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2019/8/17 上午1:29, Alistair Francis wrote:
-> On Thu, Aug 15, 2019 at 8:39 PM liuzhiwei<zhiwei_liu@c-sky.com>  wrote:
->> Hi, Palmer
->>
->> When Michael Clark still was the maintainer of RISCV QEMU, he wrote in the mail list, "the CLIC interrupt controller is under testing,
->> and will be included in QEMU 3.1 or 3.2". It is pity that the CLIC is not in
->> included even in QEMU 4.1.0.
-> I see that there is a CLIC branch available here:
-> https://github.com/riscv/riscv-qemu/pull/157
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+> During migration, there are several places to iterate on
+> savevm.handlers. And on each iteration, we need to check its ops and
+> related callbacks before invoke it.
 >
-> It looks like all of the work is in a single commit
-> (https://github.com/riscv/riscv-qemu/pull/157/commits/206d9ac339feb9ef2c325402a00f0f45f453d019)
-> and that most of the other commits in the PR have already made it into
-> master.
+> Generally, ops is the first element to check, and it is only necessary
+> to check it once.
 >
-> Although the CLIC commit is very large it doesn't seem impossible to
-> manually pull out the CLIC bits and apply it onto master.
+> This patch clean all the related part in savevm.c to check ops only once
+> in those iterations.
 >
-> Do you know the state of the CLIC model? If it's working it shouldn't
-> be too hard to rebase the work and get the code into mainline.
->
-> Alistair
->
-Hi,  Alistair
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
-In my opinion, the CLIC code almost works.
-  
-Last year when my workmate ported an RTOS, I once read the CLIC specification and used the CLIC model code. It worked through  all the tests after fixed two bugs. I also had sent the patch to Michael, but without response(maybe a wrong email address).
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 7bf6cbc..95d80ab 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -505,6 +505,9 @@ static target_ulong riscv_intr_pc(CPURISCVState *env,
-      if (!(async || clic)) {
-          return tvec & ~0b11;
-      }
-+    if (clic) {
-+        cause &= 0x3ff;
-+    }
-  
-      /* bits [1:0] encode mode; 0 = direct, 1 = vectored, 2 >= reserved */
-      switch (mode1) {
-@@ -645,6 +648,9 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-          riscv_cpu_set_mode(env, PRV_M);
-      }
-  
-+    if (clic) {
-+        env->exccode = 0;
-+    }
-      /* NOTE: it is not necessary to yield load reservations here. It is only
-         necessary for an SC from "another hart" to cause a load reservation
-         to be yielded. Refer to the memory consistency model section of the
-
-After that, the specification has updated and the code may changed. I didn't pull new code again.
-
-If the CLIC model may merged into the mainline, and no body maintain the code, I'd like to work on it, fixing the bugs and updating the code according to latest specification.
-
-Best Regards,
-Zhiwei
-
->> As we have cpus using CLIC, I have to use the out of tree qemu code in SIFIVE
->> a long time. Could you tell me when it will be upstreamed?
->>
->> Best Regards
->> Zhiwei
->>
+Nice cleanup.
 
