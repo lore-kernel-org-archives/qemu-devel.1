@@ -2,91 +2,106 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A4FBC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 17:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F3EC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 17:18:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0079E2087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 17:12:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0079E2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AADE52087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 17:18:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AADE52087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzlCd-0005W6-42
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 13:12:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45458)
+	id 1hzlIx-0001hb-Qj
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 13:18:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46010)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1hzlC1-00056F-7b
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 13:11:42 -0400
+ (envelope-from <pc@us.ibm.com>) id 1hzlE9-0006hJ-C4
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 13:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hzlBz-0002mX-V0
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 13:11:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34274)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hzlBz-0002mF-NC
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 13:11:39 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B16378125C
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 17:11:38 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id f9so5561016wrq.14
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 10:11:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=S+gPQdpjHg1nC1ohM0yJPgqVs8t1VA5su8rnANAtoLI=;
- b=LkfQUCBDg++VlmJDccmtz3Ckxe0iQaJdjij+0DjotOARjkwNTYh5aM4eXSrnaXTjHI
- 5kVE+j+k6mYfhfEktQLR1eQ489YFzCLvAm64xwJqCSvpa23wHN8qldb9J7IvHqAvipwi
- DRQbqrbQgWtkjJxHhhHYXBneZnUhicLkVFJtYQWw5qxLv7G3QBYzjqDfYagVz+6RPTYD
- MH5kKES5aTklT1yH+HjpPSNwAAA0m1ifsPTXmSOwHnS8jGNZxeOY093oeISD8rtQwhlf
- wNtp66ReEkG7ZqXVASxpc8xX7R4/BAflyNtQ5Tb3d/jobhAjwti5mkTdjFp+ubgCu3Ug
- Bs6Q==
-X-Gm-Message-State: APjAAAV0BfM9Phv9stq2j6q6jhFXHtXusuCLQ5CUMmXfB0CuTyoHaPop
- WhMiSNZvPMN6fSe9gPXu2rgH7mMq84q6b8KhK56vGJiate9RttQ6kJa9Yo7fxlX7yzQEJtt3p+3
- owQ9vpuPsNhOkTgA=
-X-Received: by 2002:adf:f04d:: with SMTP id t13mr28666369wro.133.1566234697254; 
- Mon, 19 Aug 2019 10:11:37 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzWDUFamJ6CPwvgPV0lsCHdIqt3xLAow4f128YKsYRhCIgY3+5hME476Zjn290KYEsloaYTLg==
-X-Received: by 2002:adf:f04d:: with SMTP id t13mr28666348wro.133.1566234696949; 
- Mon, 19 Aug 2019 10:11:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:399c:411e:1ccb:f240?
- ([2001:b07:6468:f312:399c:411e:1ccb:f240])
- by smtp.gmail.com with ESMTPSA id g15sm18068537wrp.29.2019.08.19.10.11.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 19 Aug 2019 10:11:36 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>
-References: <20190723134215.25095-1-yury-kotov@yandex-team.ru>
- <2013231565163716@vla1-1374b6242101.qloud-c.yandex.net>
- <3137561565860372@sas1-fc7737ec834f.qloud-c.yandex.net>
- <82eb0ad0-d4ee-bfc8-0087-d8910f6cf504@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <6193fef9-244a-fbd7-5506-160d841145fa@redhat.com>
-Date: Mon, 19 Aug 2019 19:11:40 +0200
+ (envelope-from <pc@us.ibm.com>) id 1hzlE5-0003k8-F1
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 13:13:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30050)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pc@us.ibm.com>)
+ id 1hzlE4-0003iG-FZ; Mon, 19 Aug 2019 13:13:49 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7JHB4ob004023; Mon, 19 Aug 2019 13:13:39 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ufwgwxsak-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 19 Aug 2019 13:13:39 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x7JHBON5006072;
+ Mon, 19 Aug 2019 13:13:39 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ufwgwxs9q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 19 Aug 2019 13:13:39 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7JH8hwN002308;
+ Mon, 19 Aug 2019 17:13:37 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com
+ (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+ by ppma05wdc.us.ibm.com with ESMTP id 2ue975stut-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 19 Aug 2019 17:13:37 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x7JHDajH47186352
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 19 Aug 2019 17:13:37 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DF4386A057;
+ Mon, 19 Aug 2019 17:13:36 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 212386A051;
+ Mon, 19 Aug 2019 17:13:36 +0000 (GMT)
+Received: from oc3272150783.ibm.com (unknown [9.80.202.43])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Mon, 19 Aug 2019 17:13:35 +0000 (GMT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <1565983669-6886-1-git-send-email-pc@us.ibm.com>
+ <CAL1e-=jy6vggskJ26rTc8dnaqtqCB0SdfpV9p-NvKdjoBk+Vkw@mail.gmail.com>
+ <0cfddc22-92ef-3067-9275-8f4f22ca9805@linaro.org>
+ <CAL1e-=h=Hzfm8KZ4ebwaBsS6U=KVcReXpOPT2-vy4OeBktjWkQ@mail.gmail.com>
+ <20190819062817.GA24503@umbus.fritz.box>
+ <CAL1e-=j0w=OasHidP4W4ND-R3p6Ui7MS0iaj7Wk+c1tVyR09+A@mail.gmail.com>
+From: Paul Clarke <pc@us.ibm.com>
+Message-ID: <1b486ed4-512f-e5b3-bcd7-9385b689b1cb@us.ibm.com>
+Date: Mon, 19 Aug 2019 12:13:34 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <82eb0ad0-d4ee-bfc8-0087-d8910f6cf504@redhat.com>
+In-Reply-To: <CAL1e-=j0w=OasHidP4W4ND-R3p6Ui7MS0iaj7Wk+c1tVyR09+A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] High downtime with 95+ throttle pct
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-19_03:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908190181
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x7JHB4ob004023
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc: Three floating point fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,72 +113,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:Overall" <qemu-devel@nongnu.org>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/08/19 18:39, Paolo Bonzini wrote:
-> On 15/08/19 11:13, Yury Kotov wrote:
->> Ping ping
-> 
-> Hi,
-> 
-> sorry for the delay, I was waiting for the 4.1 release.
-> 
-> I would like to make a small change so that preemption of QEMU does not
-> result in overly long sleeps.  The following patch on top of yours computes
-> the throttle-end time just once.  Of course you can still be unlucky if
-> you are preempted at the wrong time, but the window becomes much smaller.
+On 8/19/19 1:44 AM, Aleksandar Markovic wrote:
+> 19.08.2019. 08.30, "David Gibson" <david@gibson.dropbear.id.au> =D1=98=D0=
+=B5
+> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>>
+>> On Sun, Aug 18, 2019 at 10:59:01PM +0200, Aleksandar Markovic wrote:
+>>> 18.08.2019. 10.10, "Richard Henderson" <richard.henderson@linaro.org>=
+ =D1=98=D0=B5
+>>> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>>>>
+>>>> On 8/16/19 11:59 PM, Aleksandar Markovic wrote:
+>>>>>> From: "Paul A. Clarke" <pc@us.ibm.com>
+>>>> ...
+>>>>>>   ISA 3.0B has xscvdpspn leaving its result in word 1 of the targe=
+t
+>>>>> register,
+>>>>>>   and mffprwz expecting its input to come from word 0 of the sourc=
+e
+>>>>> register.
+>>>>>>   This sequence fails with QEMU, as a shift is required between
+> those
+>>> two
+>>>>>>   instructions.  However, the hardware splats the result to both
+> word 0
+>>>>> and
+>>>>>>   word 1 of its output register, so the shift is not necessary.
+>>>>>>   Expect a future revision of the ISA to specify this behavior.
+>>>>>>
+>>>>>
+>>>>> Hmmm... Isn't this a gcc bug (using undocumented hardware feature),
+>>> given
+>>>>> everything you said here?
+>>>>
+>>>> The key here is "expect a future revision of the ISA to specify this
+>>> behavior".
+>>>>
+>>>> It's clearly within IBM's purview to adjust the specification to
+> document
+>>> a
+>>>> previously undocumented hardware feature.
+>>>>
+>>>
+>>> By no means, yes, the key is in ISA documentation. But, the impressio=
+n
+> that
+>>> full original commit message conveys is that the main reason for chan=
+ge
+> is
+>>> gcc behavior. If we accepted in general that gcc behavior determines
+> QEMU
+>>> behavior, I am afraid we would be on a very slippery slope - therefor=
+e I
+>>> think the commit message (and possible code comment) should, in my
+> opinion,
+>>> mention ISA docs as the central reason for change. Paul, is there any
+>>> tentative release date of the new ISA specification?
+>>
+>> It's not really a question of gcc behaviour, it's a question of actual
+>> cpu behaviour versus ISA document.  Which one qemu should follow is
+>> somewhat debatable, but it sounds here like the ISA will be updated to
+>> match the cpu, which weights it heavily in favour of mimicing the
+>> actual cpu.
+>>
+>=20
+> This sounds right to me.
 
-The new unit test is hanging for me on aarch64-softmmu.
+Thanks for the reviews and great discussion.
 
-Paolo
+While not yet part of a published version of the ISA, I did find the beha=
+vior documented in the User's Manuals for the POWER8 and POWER9 processor=
+s:
 
-> diff --git a/cpus.c b/cpus.c
-> index d091dbd..d7e2145 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -781,7 +781,7 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
->  {
->      double pct;
->      double throttle_ratio;
-> -    int64_t sleeptime_ns;
-> +    int64_t sleeptime_ns, end;
->  
->      if (!cpu_throttle_get_percentage()) {
->          return;
-> @@ -792,18 +792,17 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
->      /* Add 1ns to fix double's rounding error (like 0.9999999...) */
->      sleeptime_ns = (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS + 1);
->  
-> -    while (sleeptime_ns >= SCALE_MS && !cpu->stop) {
-> -        int64_t start, end;
-> -        start = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> -        qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
-> -                            sleeptime_ns / SCALE_MS);
-> -        end = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> -        sleeptime_ns -= end - start;
-> -    }
-> -    if (sleeptime_ns >= SCALE_US && !cpu->stop) {
-> -        qemu_mutex_unlock_iothread();
-> -        g_usleep(sleeptime_ns / SCALE_US);
-> -        qemu_mutex_lock_iothread();
-> +    end = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + sleeptime_ns;
-> +    while (sleeptime_ns > 0 && !cpu->stop) {
-> +        if (sleeptime_ns > SCALE_MS) {
-> +            qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
-> +                                sleeptime_ns / SCALE_MS);
-> +        } else {
-> +            qemu_mutex_unlock_iothread();
-> +            g_usleep(sleeptime_ns / SCALE_US);
-> +            qemu_mutex_lock_iothread();
-> +        }
-> +        sleeptime_ns = end - qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->      }
->      atomic_set(&cpu->throttle_thread_scheduled, 0);
->  }
-> 
+https://www-355.ibm.com/systems/power/openpower/
+"Public Documents"
+- "POWER9 Processor User's Manual"
+- "POWER8 Processor User's Manual for the SCM"
 
+POWER9 Processor User's Manual=20
+4. Power Architecture Compliance
+4.3 Floating-Point Processor (FP, VMX, and VSX)
+4.3.7 Floating-Point Invalid Forms and Undefined Conditions
+
+POWER8 Processor User's Manual for the Single-Chip Module
+3. Power Architecture Compliance
+3.2 Floating-Point Processor (FP, VMX, and VSX)
+3.2.9 Floating-Point Invalid Forms and Undefined Conditions
+
+In a bullet:
+- VSX scalar convert from double-precision to single-precision (xscvdpsp,=
+ xscvdpspn).
+VSR[32:63] is set to VSR[0:31].
+
+I have not confirmed when the new revision of the ISA will be published, =
+but it's on somebody's "to do" list.
+
+I will respin the patch as 3 independent patches, and include a reference=
+ to the above documents for the change under discussion here.  (The other=
+ two changes may take a bit more time, because like David, I find the FPU=
+ emulation code cryptic.  :-/  )
+
+These issues were found while running Glibc's test suite for "math", and =
+there are still a *LOT* of QEMU-only FAILs, so I may be back again with s=
+uggested fixes or questions.  :-)
+
+PC
 
