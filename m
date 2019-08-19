@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD145C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 23:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66903C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 23:27:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A03C120679
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 23:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A03C120679
+	by mail.kernel.org (Postfix) with ESMTPS id 38A9720679
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 23:27:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38A9720679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzr2i-00033j-QP
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 19:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47569)
+	id 1hzr3g-0003xC-FA
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 19:27:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hzr1u-0002bj-M2
+ (envelope-from <bounces@canonical.com>) id 1hzr1u-0002bh-N2
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 19:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hzr1t-0005s2-K1
+ (envelope-from <bounces@canonical.com>) id 1hzr1t-0005rs-HY
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 19:25:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59772)
+Received: from indium.canonical.com ([91.189.90.7]:59782)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hzr1t-0005ql-E3
+ id 1hzr1t-0005rA-Bw
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 19:25:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hzr1r-00027E-VT
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 23:25:35 +0000
+ id 1hzr1s-00027s-M6
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 23:25:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E6A792E80C8
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 23:25:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id A2F702E804E
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 23:25:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Aug 2019 23:15:09 -0000
+Date: Mon, 19 Aug 2019 23:16:36 -0000
 From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1840719@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,16 +57,17 @@ X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
-Message-Id: <156625651066.23088.12772675524876649281.malonedeb@chaenomeles.canonical.com>
+References: <156625651066.23088.12772675524876649281.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156625659644.22883.7424574144332167350.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19022";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2a1f877ae1b7e980796abbeb23f5b280a84d0b09
+X-Launchpad-Hash: e7f6cb401878d2ac8fc5bb1d8e46c53489bb09b8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1840719] [NEW] win98se floppy fails to boot with
+Subject: [Qemu-devel] [Bug 1840719] Re: win98se floppy fails to boot with
  isapc machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,24 +84,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Bisected following note from http://gunkies.org/wiki/I386-softmmu:
 
-QEMU emulator version 4.1.50 (commit 50d69ee0d)
+the isapc configuration no longer works... So legacy systems must resort
+to Qemu 0.9.0 or Qemu 0.10.0
 
-floppy image from:
-https://winworldpc.com/download/417d71c2-ae18-c39a-11c3-a4e284a2c3a5
+I get:
 
-$ qemu-system-i386 -M isapc -fda Windows\ 98\ Second\ Edition\ Boot.img
-SeaBIOS (version rel-1.12.1-0...)
-Booting from Floppy...
-Boot failed: could not read the boot disk
+fd646122418ecefcde228d43821d07da79dd99bb is the first bad commit
+commit fd646122418ecefcde228d43821d07da79dd99bb
+Author: Anthony Liguori <aliguori@us.ibm.com>
+Date:   Fri Oct 30 09:06:09 2009 -0500
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+    Switch pc bios from pc-bios to seabios
+    =
 
-
-** Tags: bios floppy x86
+    SeaBIOS is a port of pc-bios to GCC.  Besides using a more modern tool =
+chain,
+    SeaBIOS introduces a number of new features including PMM support, bett=
+er
+    BEV and BCV support, and better PnP support.
 
 -- =
 
