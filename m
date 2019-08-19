@@ -6,61 +6,105 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2A9C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A1CC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:59:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EEB82082A
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:54:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EEB82082A
+	by mail.kernel.org (Postfix) with ESMTPS id 73C062082A
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:59:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73C062082A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzj2z-0003j3-Ds
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:54:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40123)
+	id 1hzj8D-0006OJ-LS
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:59:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40845)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1hzj1s-00035I-4H
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:53:05 -0400
+ (envelope-from <thuth@redhat.com>) id 1hzj7U-0005s1-Rl
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1hzj1q-0003Hj-Tz
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:53:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:61473)
+ (envelope-from <thuth@redhat.com>) id 1hzj7T-0005z0-Bx
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:58:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42936)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hzj1q-0003HQ-On
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:53:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hzj7T-0005yl-3S; Mon, 19 Aug 2019 10:58:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E7BAD3091782;
- Mon, 19 Aug 2019 14:53:01 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-124-60.rdu2.redhat.com
- [10.10.124.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11A881D9;
- Mon, 19 Aug 2019 14:52:55 +0000 (UTC)
-Date: Mon, 19 Aug 2019 10:52:53 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190819145253.GA7887@localhost.localdomain>
-References: <20190818231827.27573-1-philmd@redhat.com>
- <20190818231827.27573-2-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5BB1E8980F9;
+ Mon, 19 Aug 2019 14:58:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-217.ams2.redhat.com [10.36.116.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5811B1001959;
+ Mon, 19 Aug 2019 14:58:45 +0000 (UTC)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190805152947.28536-1-david@redhat.com>
+ <20190805152947.28536-7-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <92832679-d994-9697-4a47-dd8af9cd8b96@redhat.com>
+Date: Mon, 19 Aug 2019 16:58:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190818231827.27573-2-philmd@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 19 Aug 2019 14:53:02 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190805152947.28536-7-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Mon, 19 Aug 2019 14:58:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] tests/docker: Use one package per line
- to improve readability
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v1 6/9] s390x/mmu:
+ Implement enhanced suppression-on-protection facility 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,54 +116,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>, Ilya Leoshkevich <iii@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 19, 2019 at 01:18:24AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Use one package per line to improve readability. This also
-> helps while reviewing patches.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+On 8/5/19 5:29 PM, David Hildenbrand wrote:
+> We already implement ESOP-1. For ESOP-2, we only have to indicate all
+> protection exceptions properly. Due to EDAT-1, we already indicate DAT
+> exceptions properly. We don't trigger KCP/ALCP/IEP exceptions yet.
+> 
+> So all we have to do is set the TEID (TEC) to the right values
+> (bit 56, 60, 61) in case of LAP.
+> 
+> We don't have any side-effects (e.g., no guarded-storage facility),
+> therefore, bit 64 of the TEID (TEC) is always 0.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  tests/docker/dockerfiles/travis.docker | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dock=
-erfiles/travis.docker
-> index e72dc85ca7..35714664a1 100644
-> --- a/tests/docker/dockerfiles/travis.docker
-> +++ b/tests/docker/dockerfiles/travis.docker
-> @@ -5,7 +5,15 @@ ENV LC_ALL en_US.UTF-8
->  RUN sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list
->  RUN apt-get update
->  RUN apt-get -y build-dep qemu
-> -RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-a=
-utoreconf gdb strace lsof net-tools gcovr
-> +RUN apt-get -y install \
-> +    device-tree-compiler \
-> +    dh-autoreconf \
-> +    gcovr \
-> +    gdb strace \
+>  target/s390x/mmu_helper.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index f3e988e4fd..631cc29c28 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -333,6 +333,8 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+>          *flags |= PAGE_WRITE_INV;
+>          if (is_low_address(vaddr) && rw == MMU_DATA_STORE) {
+>              if (exc) {
+> +                /* LAP sets bit 56 */
+> +                tec |= 0x80;
+>                  trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
+>              }
+>              return -EACCES;
+> @@ -520,6 +522,8 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
+>          /* see comment in mmu_translate() how this works */
+>          *flags |= PAGE_WRITE_INV;
+>          if (is_low_address(raddr) && rw == MMU_DATA_STORE) {
+> +            /* LAP sets bit 56 */
+> +            tec |= 0x80;
+>              trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec);
+>              return -EACCES;
+>          }
 
-Two in a single line here.
+I'd suggest to merge this with the previous patch since the other bits
+are only valid if bit 56 is enabled.
 
-> +    lsof \
-> +    net-tools \
-> +    python2.7 \
-> +    python-yaml
->  # Travis tools require PhantomJS / Neo4j / Maven accessible
->  # in their PATH (QEMU build won't access them).
->  ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4=
-j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/lo=
-cal/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb=
-in:/bin
-> --=20
-> 2.20.1
->=20
->=20
+ Thomas
+
 
 
