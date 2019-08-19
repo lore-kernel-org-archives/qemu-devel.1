@@ -2,65 +2,70 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C26B1C3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7EBC3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:37:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C8D020851
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:33:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MA94Kmqj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8D020851
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 0437A2086C
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:37:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0437A2086C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzbE9-0000ju-Pl
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 02:33:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52754)
+	id 1hzbIg-0002Dx-6w
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 02:37:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1hzbBP-0007Sg-Os
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:30:25 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hzbI0-0001no-Bq
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hzbBO-0001WQ-BN
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:30:23 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:45491)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hzbHz-0004zZ-49
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:37:12 -0400
+Received: from mga11.intel.com ([192.55.52.93]:10618)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hzbBN-0001Rs-0z; Mon, 19 Aug 2019 02:30:22 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46BkYw36xfz9sNf; Mon, 19 Aug 2019 16:30:12 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566196212;
- bh=pE08KvxbI3PfuFhC3C3i/kZ/fwc+iIOZT6VGDi5pG7Q=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MA94Kmqjj0ODVCX3vto30cgIzkl+viH6gZSzZZoKN5iutJw60rAgzqwNM8rNFs1m4
- +fi+t+i2imuVTe62tiW7gI3OKjnHm8SUaJ6JmkAzn18DWdapTBHiHPLlN2nJxTlOEU
- ttamtELCPcmkPrX4lg+0r5dcCXi+P5zrhuzQtQwE=
-Date: Mon, 19 Aug 2019 16:28:17 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Message-ID: <20190819062817.GA24503@umbus.fritz.box>
-References: <1565983669-6886-1-git-send-email-pc@us.ibm.com>
- <CAL1e-=jy6vggskJ26rTc8dnaqtqCB0SdfpV9p-NvKdjoBk+Vkw@mail.gmail.com>
- <0cfddc22-92ef-3067-9275-8f4f22ca9805@linaro.org>
- <CAL1e-=h=Hzfm8KZ4ebwaBsS6U=KVcReXpOPT2-vy4OeBktjWkQ@mail.gmail.com>
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hzbHy-0004yE-SU
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:37:11 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Aug 2019 23:37:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,403,1559545200"; d="scan'208";a="179329883"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga007.fm.intel.com with ESMTP; 18 Aug 2019 23:37:06 -0700
+Date: Mon, 19 Aug 2019 14:36:43 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Zeng, Star" <star.zeng@intel.com>
+Message-ID: <20190819063643.GA28772@richard>
+References: <20190730003740.20694-1-richardw.yang@linux.intel.com>
+ <20190730003740.20694-2-richardw.yang@linux.intel.com>
+ <0C09AFA07DD0434D9E2A0C6AEB0483104038F59D@shsmsx102.ccr.corp.intel.com>
+ <20190808021329.GC26938@richard>
+ <0C09AFA07DD0434D9E2A0C6AEB0483104038F61B@shsmsx102.ccr.corp.intel.com>
+ <20190808023802.GD26938@richard>
+ <a73f638c-e33d-c3d8-0b4a-0fa78943a30d@redhat.com>
+ <20190819023855.GC6368@richard>
+ <0C09AFA07DD0434D9E2A0C6AEB0483104039E3A1@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="W/nzBZO5zC0uMSeA"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL1e-=h=Hzfm8KZ4ebwaBsS6U=KVcReXpOPT2-vy4OeBktjWkQ@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <0C09AFA07DD0434D9E2A0C6AEB0483104039E3A1@shsmsx102.ccr.corp.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH] ppc: Three floating point fixes
+X-Received-From: 192.55.52.93
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to use
+ goto for the last check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,93 +77,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, "Paul A. Clarke" <pc@us.ibm.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Aug 19, 2019 at 05:32:14AM +0000, Zeng, Star wrote:
+>
+>
+>> -----Original Message-----
+>> From: Wei Yang [mailto:richardw.yang@linux.intel.com]
+>> Sent: Monday, August 19, 2019 10:39 AM
+>> To: David Hildenbrand <david@redhat.com>
+>> Cc: Wei Yang <richardw.yang@linux.intel.com>; Zeng, Star
+>> <star.zeng@intel.com>; imammedo@redhat.com; qemu-devel@nongnu.org;
+>> mst@redhat.com
+>> Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to
+>> use goto for the last check
+>> 
+>> On Thu, Aug 08, 2019 at 09:06:21AM +0200, David Hildenbrand wrote:
+>> >On 08.08.19 04:38, Wei Yang wrote:
+>> >> On Thu, Aug 08, 2019 at 02:30:02AM +0000, Zeng, Star wrote:
+>> >>>> -----Original Message-----
+>> >>>> From: Wei Yang [mailto:richardw.yang@linux.intel.com]
+>> >>>> Sent: Thursday, August 8, 2019 10:13 AM
+>> >>>> To: Zeng, Star <star.zeng@intel.com>
+>> >>>> Cc: Wei Yang <richardw.yang@linux.intel.com>;
+>> >>>> qemu-devel@nongnu.org; imammedo@redhat.com;
+>> david@redhat.com;
+>> >>>> mst@redhat.com
+>> >>>> Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not
+>> >>>> necessary to use goto for the last check
+>> >>>>
+>> >>>> On Thu, Aug 08, 2019 at 01:42:14AM +0000, Zeng, Star wrote:
+>> >>>>>> -----Original Message-----
+>> >>>>>> From: Qemu-devel [mailto:qemu-devel-
+>> >>>>>> bounces+star.zeng=intel.com@nongnu.org] On Behalf Of Wei Yang
+>> >>>>>> Sent: Tuesday, July 30, 2019 8:38 AM
+>> >>>>>> To: qemu-devel@nongnu.org
+>> >>>>>> Cc: imammedo@redhat.com; david@redhat.com; Wei Yang
+>> >>>>>> <richardw.yang@linux.intel.com>; mst@redhat.com
+>> >>>>>> Subject: [Qemu-devel] [PATCH v2 1/2] memory-device: not
+>> necessary
+>> >>>>>> to use goto for the last check
+>> >>>>>>
+>> >>>>>> We are already at the last condition check.
+>> >>>>>>
+>> >>>>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> >>>>>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> >>>>>> Reviewed-by: David Hildenbrand <david@redhat.com>
+>> >>>>>> ---
+>> >>>>>>  hw/mem/memory-device.c | 1 -
+>> >>>>>>  1 file changed, 1 deletion(-)
+>> >>>>>>
+>> >>>>>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-
+>> device.c
+>> >>>> index
+>> >>>>>> 5f2c408036..df3261b32a 100644
+>> >>>>>> --- a/hw/mem/memory-device.c
+>> >>>>>> +++ b/hw/mem/memory-device.c
+>> >>>>>> @@ -186,7 +186,6 @@ static uint64_t
+>> >>>>>> memory_device_get_free_addr(MachineState *ms,
+>> >>>>>>      if (!range_contains_range(&as, &new)) {
+>> >>>>>>          error_setg(errp, "could not find position in guest address space
+>> for "
+>> >>>>>>                     "memory device - memory fragmented due to
+>> alignments");
+>> >>>>>> -        goto out;
+>> >>>>>
+>> >>>>> Is it better to return 0 (or set new_addr to 0) for this error
+>> >>>>> path and another
+>> >>>> remaining "goto out" path?
+>> >>>>>
+>> >>>>
+>> >>>> I may not get your point.
+>> >>>>
+>> >>>> We set errp which is handled in its caller. By doing so, the error is
+>> propagated.
+>> >>>>
+>> >>>> Do I miss something?
+>> >>>
+>> >>> Yes, you are right. Currently, the caller is checking errp, but not the
+>> returned address, so there should be no issue.
+>> >>> But when you see other error paths, you will find they all return 0.
+>> >>> To be aligned (return 0 when error), so just suggest also returning
+>> >>> 0 for these two "goto out" error path. :)
+>> >>>
+>> >>
+>> >> You may have some point.
+>> >>
+>> >> Let's see whether others have the same taste, or we can refine it
+>> separately.
+>> >>
+>> >
+>> >I don't think that's necessary (callers really should check for errors
+>> >before using the return values), but I would also not object to that change.
+>> >
+>> 
+>> In case there is no strong requirement to refactor the code. I would leave it
+>> here.
+>
+>It was just my suggestion. I am fine with any preference you and other experts have.
+>
 
---W/nzBZO5zC0uMSeA
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks
 
-On Sun, Aug 18, 2019 at 10:59:01PM +0200, Aleksandar Markovic wrote:
-> 18.08.2019. 10.10, "Richard Henderson" <richard.henderson@linaro.org> =D1=
-=98=D0=B5
-> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >
-> > On 8/16/19 11:59 PM, Aleksandar Markovic wrote:
-> > >> From: "Paul A. Clarke" <pc@us.ibm.com>
-> > ...
-> > >>   ISA 3.0B has xscvdpspn leaving its result in word 1 of the target
-> > > register,
-> > >>   and mffprwz expecting its input to come from word 0 of the source
-> > > register.
-> > >>   This sequence fails with QEMU, as a shift is required between those
-> two
-> > >>   instructions.  However, the hardware splats the result to both wor=
-d 0
-> > > and
-> > >>   word 1 of its output register, so the shift is not necessary.
-> > >>   Expect a future revision of the ISA to specify this behavior.
-> > >>
-> > >
-> > > Hmmm... Isn't this a gcc bug (using undocumented hardware feature),
-> given
-> > > everything you said here?
-> >
-> > The key here is "expect a future revision of the ISA to specify this
-> behavior".
-> >
-> > It's clearly within IBM's purview to adjust the specification to docume=
-nt
-> a
-> > previously undocumented hardware feature.
-> >
->=20
-> By no means, yes, the key is in ISA documentation. But, the impression th=
-at
-> full original commit message conveys is that the main reason for change is
-> gcc behavior. If we accepted in general that gcc behavior determines QEMU
-> behavior, I am afraid we would be on a very slippery slope - therefore I
-> think the commit message (and possible code comment) should, in my opinio=
-n,
-> mention ISA docs as the central reason for change. Paul, is there any
-> tentative release date of the new ISA specification?
+>Thanks,
+>Star
+>
+>> 
+>> >--
+>> >
+>> >Thanks,
+>> >
+>> >David / dhildenb
+>> 
+>> --
+>> Wei Yang
+>> Help you, Help me
 
-It's not really a question of gcc behaviour, it's a question of actual
-cpu behaviour versus ISA document.  Which one qemu should follow is
-somewhat debatable, but it sounds here like the ISA will be updated to
-match the cpu, which weights it heavily in favour of mimicing the
-actual cpu.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---W/nzBZO5zC0uMSeA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1aQX4ACgkQbDjKyiDZ
-s5Jg4RAAmchIl8LU+qcrSA8B1VHE6H3f979+v7YYInT9NgUPWUtFKlvcjG22nGSv
-t2NPzoMGmHRDcZ6mDYYMUChslAX6ATtIm7cBu4gc6hJJpyIMUTa8Fy8WBgs67pAZ
-rcOmxNCej8AvgeQpCW5i2A7qNSINSMp9db3R7F9RcbUmjX3fXLJqfb6mfkMR2BzK
-gR7f257DRO0DReny9MgSZxAw4B+XUYkPmqJIBsYN5PEUjg1JRyT0oMZPuTgcXjwu
-5UesfmLuL+NNEp+UN9nlTWAkEzZBaJG37GIfG0jdim57ziiF+vHHbb8ekdn2aDme
-ZJHuvAnpi+Sx9G4QgougRZ7JGHetsUMPnawRudkjMkf99+GzuAzbFZPHBASPcp63
-m7PYYGfl13Lqwa0iblOiPH7SsxqflcaL8WAr84wBFh8ZZYY1s7jHT7hG6mF33FG4
-Q5uPAZie1r4zqbXjrQUZnt8SR6QZNW6Pmad4+cUYPsipLXXZBhmLdaiu1/G+upwk
-gMs8r8tVwVMMqWuNvdfkKKV6kyAQ8sW2Y+sBUOQ80RxYfsc+8Jo19Zt4s9KRNQEn
-XYP2FAPHlf2vVdWJ0t6/pmibUQ/3jcHL9BCTawQDbF381efDLe+oW6/BzhwRlVqL
-fQR9JXJ6mFZWZHubmRglEv94hU8X96EGIrNUNc3AaXw6H2rZAAs=
-=iRKw
------END PGP SIGNATURE-----
-
---W/nzBZO5zC0uMSeA--
+-- 
+Wei Yang
+Help you, Help me
 
