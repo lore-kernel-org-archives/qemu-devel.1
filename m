@@ -2,48 +2,48 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C25B7C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 950C8C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:13:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 959222087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:11:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 959222087E
+	by mail.kernel.org (Postfix) with ESMTPS id 6B3642087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:13:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B3642087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzn4I-0004Tg-Dx
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:11:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35021)
+	id 1hzn5X-0005yO-LF
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:13:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hzn2I-0002iA-Nx
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:09:47 -0400
+ (envelope-from <eblake@redhat.com>) id 1hzmzQ-0006ga-3z
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hzn2H-00087O-IK
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:09:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55146)
+ (envelope-from <eblake@redhat.com>) id 1hzmzP-0006sZ-6z
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:06:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46116)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hzn2F-000864-CX; Mon, 19 Aug 2019 15:09:43 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hzmzM-0006pN-NX; Mon, 19 Aug 2019 15:06:44 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B1EB4300413C;
- Mon, 19 Aug 2019 19:09:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 272EF307D95F;
+ Mon, 19 Aug 2019 19:06:43 +0000 (UTC)
 Received: from [10.3.117.3] (ovpn-117-3.phx2.redhat.com [10.3.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C1335C205;
- Mon, 19 Aug 2019 19:09:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AD90F50;
+ Mon, 19 Aug 2019 19:06:42 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-3-mreitz@redhat.com>
+ <20190819185602.4267-2-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,21 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <a09d7e2d-a923-be88-38f8-579a27df2b8c@redhat.com>
-Date: Mon, 19 Aug 2019 14:09:41 -0500
+Message-ID: <e622a4e2-5f75-7592-436e-ecd8447d9063@redhat.com>
+Date: Mon, 19 Aug 2019 14:06:41 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190819185602.4267-3-mreitz@redhat.com>
+In-Reply-To: <20190819185602.4267-2-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="SPco1XndZ4qJ6fS5I1egTl5vKqeWUB00q"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 19 Aug 2019 19:09:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Mon, 19 Aug 2019 19:06:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 02/16] qcow2: Use endof()
+Subject: Re: [Qemu-devel] [PATCH v2 01/16] include: Move endof() up from
+ hw/virtio/virtio.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,54 +103,52 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SPco1XndZ4qJ6fS5I1egTl5vKqeWUB00q
-Content-Type: multipart/mixed; boundary="ZvE31YYBiZEQl2phsVn5370epgMk5vkzL";
+--uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx
+Content-Type: multipart/mixed; boundary="3D3wYujFGyT7E0AaZRWBHK6mkrzHc4B3s";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <a09d7e2d-a923-be88-38f8-579a27df2b8c@redhat.com>
-Subject: Re: [PATCH v2 02/16] qcow2: Use endof()
+Message-ID: <e622a4e2-5f75-7592-436e-ecd8447d9063@redhat.com>
+Subject: Re: [PATCH v2 01/16] include: Move endof() up from hw/virtio/virtio.h
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-3-mreitz@redhat.com>
-In-Reply-To: <20190819185602.4267-3-mreitz@redhat.com>
+ <20190819185602.4267-2-mreitz@redhat.com>
+In-Reply-To: <20190819185602.4267-2-mreitz@redhat.com>
 
---ZvE31YYBiZEQl2phsVn5370epgMk5vkzL
+--3D3wYujFGyT7E0AaZRWBHK6mkrzHc4B3s
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 8/19/19 1:55 PM, Max Reitz wrote:
+> endof() is a useful macro, we can make use of it outside of virtio.
+>=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/qcow2-snapshot.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-
-What, the file got larger in spite of using a helper macro for ease of
-readability?  Good thing that 'lines of code' is not the only metric of
-goodness ;)
-
+>  include/hw/virtio/virtio.h |  7 -------
+>  include/qemu/compiler.h    |  7 +++++++
+>  hw/block/virtio-blk.c      |  4 ++--
+>  hw/net/virtio-net.c        | 10 +++++-----
+>  4 files changed, 14 insertions(+), 14 deletions(-)
 >=20
-> diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-> index d0e7fa9311..752883e5c3 100644
-> --- a/block/qcow2-snapshot.c
-> +++ b/block/qcow2-snapshot.c
-> @@ -92,11 +92,12 @@ int qcow2_read_snapshots(BlockDriverState *bs)
->          }
->          offset +=3D extra_data_size;
-> =20
-> -        if (extra_data_size >=3D 8) {
-> +        if (extra_data_size >=3D endof(QCowSnapshotExtraData,
-> +                                     vm_state_size_large)) {
->              sn->vm_state_size =3D be64_to_cpu(extra.vm_state_size_larg=
-e);
->          }
-> =20
-> -        if (extra_data_size >=3D 16) {
-> +        if (extra_data_size >=3D endof(QCowSnapshotExtraData, disk_siz=
-e)) {
 
-Yes, that is nicer.
+> +++ b/include/qemu/compiler.h
+> @@ -60,6 +60,13 @@
+> =20
+>  #define sizeof_field(type, field) sizeof(((type *)0)->field)
+> =20
+> +/*
+> + * Calculate the number of bytes up to and including the given 'field'=
+ of
+> + * 'container'.
+> + */
+> +#define endof(container, field) \
+> +    (offsetof(container, field) + sizeof_field(container, field))
+
+Bike-shedding: I might have done s/container/type/ as part of the
+motion, to match the above definition of sizeof_field (and in C, we tend
+to refer to 'type's, not 'container's).  But doesn't affect correctness
+of the patch.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -159,24 +158,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---ZvE31YYBiZEQl2phsVn5370epgMk5vkzL--
+--3D3wYujFGyT7E0AaZRWBHK6mkrzHc4B3s--
 
---SPco1XndZ4qJ6fS5I1egTl5vKqeWUB00q
+--uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1a8/UACgkQp6FrSiUn
-Q2q6Bwf/YGeqz2Jfm/qENz23Q+9jw6JsguXtjuVTCKUUif7QmI/PSVdg5gl6faJy
-Qytu15GGmMxQQaBD9GqJ61khnMjRHHNOuK1/VVhkZl8/R1R3+0vj3a/CAd2C3Bxx
-zchBmD69LsS8SbzB0/QVsDO8qladdMYexVry3Fc/p6HZkyOwj5XKDENdNcTL1JmZ
-/RecXnzy/KoVlmQaxq79fF7VYT0/2p+IXY6ZWhWrZg3hI1Gg367Fzmpm93krfqbI
-MxFwwduLea6f4Wf+unXq6UHyR/c9oqxaRVYKFGcb/S2ZZQTjnHoG/0iLmwl6zRrX
-rxCt99erz6RffZJ1vutiIJgz75SCdA==
-=JijD
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1a80EACgkQp6FrSiUn
+Q2rODwf+JF6YHgdDfBE64tZ1ZftY16DkbT4vobq9S4J23HeeeREQzMzU/73qYLYn
+uh5bh6YtB/aSMagqMFTwdR8WG7lLp9GTCQou5rcOAUKMV5HxiUMJ/y55uWS64tnM
+p8peeW/PsnYzRbl/1QKLpEoxrvCiH7tYsq+XFkh0gdr83J8aUWp9yIk60UtZj+l0
+iW/sO+AgmxA3WEfOugh7PmfGOYSnAq8vDkfF7IVbpsxMClO5BhT16JKlQcOQtj57
+JZ9a7DPolo8FHF3/3YUavy0i4GW2E05VPbGd2CUR+HUOrgEJ966AgRScUqixd3e5
+qZXnW3XRDVm/j15nioqL20IOkpHopQ==
+=/fa5
 -----END PGP SIGNATURE-----
 
---SPco1XndZ4qJ6fS5I1egTl5vKqeWUB00q--
+--uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx--
 
