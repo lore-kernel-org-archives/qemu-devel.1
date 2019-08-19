@@ -2,90 +2,59 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 279EEC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9012C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:39:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBE7622CEB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:39:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBE7622CEB
+	by mail.kernel.org (Postfix) with ESMTPS id BDE0622CEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:39:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE0622CEB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzoQr-00033f-QH
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:39:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46864)
+	id 1hzoRY-0004F2-0C
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hzoDi-0002XM-K5
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:25:39 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hzo7m-0001n8-AQ
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hzoDh-0006hw-Hy
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:25:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48058)
+ (envelope-from <mreitz@redhat.com>) id 1hzo7l-0004e8-7D
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50650)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hzoDf-0006h1-3U; Mon, 19 Aug 2019 16:25:35 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hzo7j-0004cr-03; Mon, 19 Aug 2019 16:19:27 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5802519AD50D;
- Mon, 19 Aug 2019 20:25:34 +0000 (UTC)
-Received: from [10.3.117.3] (ovpn-117-3.phx2.redhat.com [10.3.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E3C4C1F8;
- Mon, 19 Aug 2019 20:25:33 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-17-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <ddba06a8-0ecd-639a-bd13-5fd98cde6e43@redhat.com>
-Date: Mon, 19 Aug 2019 15:25:28 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 54907182316C;
+ Mon, 19 Aug 2019 20:19:26 +0000 (UTC)
+Received: from localhost (ovpn-204-64.brq.redhat.com [10.40.204.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8EA8F1001925;
+ Mon, 19 Aug 2019 20:19:23 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon, 19 Aug 2019 22:18:50 +0200
+Message-Id: <20190819201851.24418-8-mreitz@redhat.com>
+In-Reply-To: <20190819201851.24418-1-mreitz@redhat.com>
+References: <20190819201851.24418-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190819185602.4267-17-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Mon, 19 Aug 2019 20:25:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Mon, 19 Aug 2019 20:19:26 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] iotests: Test qcow2's snapshot
- table handling
+Subject: [Qemu-devel] [PATCH v3 7/8] iotests: Test driver whitelisting in 136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,94 +66,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl
-Content-Type: multipart/mixed; boundary="dSYic9x3OVcTFakEICwl7fSKdg2R8RaRa";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <ddba06a8-0ecd-639a-bd13-5fd98cde6e43@redhat.com>
-Subject: Re: [PATCH v2 16/16] iotests: Test qcow2's snapshot table handling
-References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-17-mreitz@redhat.com>
-In-Reply-To: <20190819185602.4267-17-mreitz@redhat.com>
+null-aio may not be whitelisted.  Skip all test cases that require it.
 
---dSYic9x3OVcTFakEICwl7fSKdg2R8RaRa
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/136 | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-On 8/19/19 1:56 PM, Max Reitz wrote:
-> Add a test how our qcow2 driver handles extra data in snapshot table
-> entries, and how it repairs overly long snapshot tables.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-
-> +++ b/tests/qemu-iotests/261.out
-> @@ -0,0 +1,346 @@
-> +QA output created by 261
-> +
-> +=3D=3D=3D Create v2 template =3D=3D=3D
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT.v2.orig', fmt=3DIMGFMT size=3D67108864
-> +No errors were found on the image.
-> +Snapshots in TEST_DIR/t.IMGFMT.v2.orig:
-> +  [0]
-> +    ID: 1
-> +    Name: sn0
-> +    Extra data size: 0
-> +  [1]
-> +    ID: 2
-> +    Name: sn1
-> +    Extra data size: 42
-> +    VM state size: 0
-> +    Disk size: 67108864
-> +    Unknown extra data: very important data
-
-Hmm - possibly one more patch to write - but when checking snapshots for
-accuracy, do we want to insist that the 32-bit truncated VM state size
-is either 0 or matches the low 32-bits of the 64-bit VM state size
-field?  Any mismatch between those fields (other than the 32-bit field
-being left 0 because we knew to use the 64-bit field) might be a hint of
-a possible corruption.  But there's no good way to correct it other than
-wiping the 32-bit field to 0; and for a v2 image, any change we make to
-the 32-bit field might actually make the snapshot unusable for an older
-client that doesn't know how to use the 64-bit field.  So maybe we just
-overlook that.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+index a46a7b7630..012ea111ac 100755
+--- a/tests/qemu-iotests/136
++++ b/tests/qemu-iotests/136
+@@ -30,7 +30,7 @@ bad_offset =3D bad_sector * 512
+ blkdebug_file =3D os.path.join(iotests.test_dir, 'blkdebug.conf')
+=20
+ class BlockDeviceStatsTestCase(iotests.QMPTestCase):
+-    test_img =3D "null-aio://"
++    test_driver =3D "null-aio"
+     total_rd_bytes =3D 0
+     total_rd_ops =3D 0
+     total_wr_bytes =3D 0
+@@ -67,6 +67,10 @@ sector =3D "%d"
+ ''' % (bad_sector, bad_sector))
+         file.close()
+=20
++    def required_drivers(self):
++        return [self.test_driver]
++
++    @iotests.skip_if_unsupported(required_drivers)
+     def setUp(self):
+         drive_args =3D []
+         drive_args.append("stats-intervals.0=3D%d" % interval_length)
+@@ -76,8 +80,8 @@ sector =3D "%d"
+                           (self.account_failed and "on" or "off"))
+         drive_args.append("file.image.read-zeroes=3Don")
+         self.create_blkdebug_file()
+-        self.vm =3D iotests.VM().add_drive('blkdebug:%s:%s' %
+-                                         (blkdebug_file, self.test_img),
++        self.vm =3D iotests.VM().add_drive('blkdebug:%s:%s://' %
++                                         (blkdebug_file, self.test_drive=
+r),
+                                          ','.join(drive_args))
+         self.vm.launch()
+         # Set an initial value for the clock
+@@ -337,7 +341,9 @@ class BlockDeviceStatsTestAccountBoth(BlockDeviceStat=
+sTestCase):
+     account_failed =3D True
+=20
+ class BlockDeviceStatsTestCoroutine(BlockDeviceStatsTestCase):
+-    test_img =3D "null-co://"
++    test_driver =3D "null-co"
+=20
+ if __name__ =3D=3D '__main__':
++    if 'null-co' not in iotests.supported_formats():
++        iotests.notrun('null-co driver support missing')
+     iotests.main(supported_fmts=3D["raw"])
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.21.0
 
-
---dSYic9x3OVcTFakEICwl7fSKdg2R8RaRa--
-
---M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1bBbgACgkQp6FrSiUn
-Q2pVqgf/Yc8gs/ve+nChAeaa/7eiNEBRe0K6TY9bIvconTVghpp5kThPR5uvbAG1
-/vAEiJHWnJpx+gbBug1GHs0ojeWGc22rPhCeNSG7JPEprT1B3AB2yiu/Zj3R+zz4
-Y8j5JtnG4loYWfFSsZMA9OL+oL+3IBzGhmteQwosIibhsRJjFCXqdIK5LxD8hRqX
-NGhqwiPt/TiAvjznk1NeCzk8a+fS0BrCfUF0ivx09r5UnfjU4sZwKr31idI41nRt
-3m+WTWKLjRuqgnzKQlf+CY7Lyk57ZQ8aCx0X8os+v/idfPfiNzV7eJFdvPrvd0eA
-OQH+T7mSIp455NhWV4Ix+DTOm+uVGQ==
-=TNYM
------END PGP SIGNATURE-----
-
---M0cYeFfzkUKxnQPlyM8XA3BaL7NyWTUpl--
 
