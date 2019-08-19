@@ -2,53 +2,56 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3E9C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35ECDC3A59D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 517F520851
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:11:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 517F520851
+	by mail.kernel.org (Postfix) with ESMTPS id 0DFCF20851
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:11:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DFCF20851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzgVV-0003ke-5d
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:11:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36084)
+	id 1hzgVY-0003sG-Qu
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:11:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTb-0001rl-3v
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTb-0001sK-OA
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTZ-0002Yj-HM
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:30 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56367 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTZ-0002Yv-In
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:31 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56504 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hzgTZ-0001cg-5r
+ id 1hzgTZ-0001ey-7N
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:29 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id C9ED51A206C;
- Mon, 19 Aug 2019 14:08:23 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 282CA1A205D;
+ Mon, 19 Aug 2019 14:08:24 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 9E2B61A203D;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id D2B161A2077;
  Mon, 19 Aug 2019 14:08:23 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:07:39 +0200
-Message-Id: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 19 Aug 2019 14:07:44 +0200
+Message-Id: <1566216496-17375-6-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v8 00/37] target/mips: Misc patches for 4.2
+Subject: [Qemu-devel] [PATCH v8 05/37] target/mips: Add support for
+ emulation of CRC32 group of instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,133 +68,174 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-This series includes misc MIPS patches intended to be integrated after
-4.1 release.
+Add emulation of MIPS' CRC32 (Cyclic Redundancy Check) instructions.
+Reuse zlib crc32() and Linux crc32c(). Note that, at the time being,
+there is no MIPS CPU that supports CRC32 instructions (they are an
+optional part of MIPS64/32 R6 anf nanoMIPS ISAs).
 
-v7->v8:
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ disas/mips.c            |  8 ++++++++
+ target/mips/helper.h    |  2 ++
+ target/mips/op_helper.c | 22 ++++++++++++++++++++++
+ target/mips/translate.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 73 insertions(+)
 
-  - added several more patches on CP0 cleanup
-  - added a patch on translate.c cleanup
-  - other minor improvements
-
-v6->v7:
-
-  - added four more patches on CP0 cleanup
-  - other minor improvements
-
-v5->v6:
-
-  - added five more patches on style improvements
-  - added five patches on CP0 cleanup
-  - other minor improvements
-
-v4->v5:
-
-  - fixed more build errors
-  - added five patches on style improvements
-  - added a patch on updating vmstate
-  - other minor improvements
-
-v3->v4:
-
-  - fixed build error
-
-v2->v3:
-
-  - corrected the patch on WatchHi to include "mi" field
-  - corrected the patch on WatchHi to bump VMStateDescription version
-
-v1->v2:
-
-  - fixed checkpatch warnings
-  - added four new patches on various topics
-
-
-Aleksandar Markovic (32):
-  target/mips: Style improvements in cp0_timer.c
-  target/mips: Style improvements in cpu.c
-  target/mips: Style improvements in internal.h
-  target/mips: Style improvements in machine.c
-  target/mips: Style improvements in helper.c
-  target/mips: Style improvements in translate.c
-  target/mips: Style improvements in cps.c
-  target/mips: Style improvements in mips_fulong2e.c
-  target/mips: Style improvements in mips_int.c
-  target/mips: Style improvements in mips_malta.c
-  target/mips: Style improvements in mips_mipssim.c
-  target/mips: Clean up handling of CP0 register 0
-  target/mips: Clean up handling of CP0 register 1
-  target/mips: Clean up handling of CP0 register 2
-  target/mips: Clean up handling of CP0 register 5
-  target/mips: Clean up handling of CP0 register 6
-  target/mips: Clean up handling of CP0 register 7
-  target/mips: Clean up handling of CP0 register 8
-  target/mips: Clean up handling of CP0 register 10
-  target/mips: Clean up handling of CP0 register 11
-  target/mips: Clean up handling of CP0 register 12
-  target/mips: Clean up handling of CP0 register 15
-  target/mips: Clean up handling of CP0 register 16
-  target/mips: Clean up handling of CP0 register 17
-  target/mips: Clean up handling of CP0 register 20
-  target/mips: Clean up handling of CP0 register 23
-  target/mips: Clean up handling of CP0 register 24
-  target/mips: Clean up handling of CP0 register 26
-  target/mips: Clean up handling of CP0 register 30
-  target/mips: Clean up handling of CP0 register 31
-  target/mips: tests/tcg: Add optional printing of more detailed failure
-    info
-  target/mips: tests/tcg: Fix target configurations for MSA tests
-
-Yongbok Kim (5):
-  target/mips: Add support for DSPRAM
-  target/mips: Amend CP0 WatchHi register implementation
-  target/mips: Amend CP0 MemoryMapID register implementation
-  target/mips: Add support for emulation of GINVT instruction
-  target/mips: Add support for emulation of CRC32 group of instructions
-
- disas/mips.c                                       |   10 +
- hw/mips/cps.c                                      |   35 +-
- hw/mips/mips_fulong2e.c                            |   96 +-
- hw/mips/mips_int.c                                 |    3 +-
- hw/mips/mips_malta.c                               |  216 +--
- hw/mips/mips_mipssim.c                             |   19 +-
- hw/misc/Makefile.objs                              |    1 +
- hw/misc/mips_dspram.c                              |  153 +++
- include/hw/mips/cps.h                              |    2 +
- include/hw/misc/mips_dspram.h                      |   46 +
- target/mips/cp0_timer.c                            |   42 +-
- target/mips/cpu.c                                  |   17 +-
- target/mips/cpu.h                                  |   62 +-
- target/mips/helper.c                               |  122 +-
- target/mips/helper.h                               |    7 +
- target/mips/internal.h                             |   61 +-
- target/mips/machine.c                              |   17 +-
- target/mips/op_helper.c                            |  185 ++-
- target/mips/translate.c                            | 1449 +++++++++++---------
- target/mips/translate_init.inc.c                   |    2 +
- tests/tcg/mips/include/test_utils_128.h            |   23 +-
- .../mips/user/ase/msa/test_msa_compile_32r5eb.sh   |  917 +++++++++++++
- .../mips/user/ase/msa/test_msa_compile_32r5el.sh   |  917 +++++++++++++
- .../mips/user/ase/msa/test_msa_compile_32r6eb.sh   |  643 ---------
- .../mips/user/ase/msa/test_msa_compile_32r6el.sh   |  643 ---------
- tests/tcg/mips/user/ase/msa/test_msa_run_32r5eb.sh |  371 +++++
- tests/tcg/mips/user/ase/msa/test_msa_run_32r5el.sh |  371 +++++
- tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh |  371 -----
- tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh |  371 -----
- 29 files changed, 4250 insertions(+), 2922 deletions(-)
- create mode 100644 hw/misc/mips_dspram.c
- create mode 100644 include/hw/misc/mips_dspram.h
- create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r5eb.sh
- create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r5el.sh
- delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh
- delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh
- create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r5eb.sh
- create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r5el.sh
- delete mode 100644 tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh
- delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh
-
+diff --git a/disas/mips.c b/disas/mips.c
+index c3a3059..b9a5204 100644
+--- a/disas/mips.c
++++ b/disas/mips.c
+@@ -1411,6 +1411,14 @@ const struct mips_opcode mips_builtin_opcodes[] =
+ {"evp",        "t",     0x41600004, 0xffe0ffff, TRAP|WR_t,            0, I32R6},
+ {"ginvi",      "v",     0x7c00003d, 0xfc1ffcff, TRAP | INSN_TLB,      0, I32R6},
+ {"ginvt",      "v",     0x7c0000bd, 0xfc1ffcff, TRAP | INSN_TLB,      0, I32R6},
++{"crc32b",     "t,v,t", 0x7c00000f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
++{"crc32h",     "t,v,t", 0x7c00004f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
++{"crc32w",     "t,v,t", 0x7c00008f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
++{"crc32d",     "t,v,t", 0x7c0000cf, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I64R6},
++{"crc32cb",    "t,v,t", 0x7c00010f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
++{"crc32ch",    "t,v,t", 0x7c00014f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
++{"crc32cw",    "t,v,t", 0x7c00018f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
++{"crc32cd",    "t,v,t", 0x7c0001cf, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I64R6},
+ 
+ /* MSA */
+ {"sll.b",   "+d,+e,+f", 0x7800000d, 0xffe0003f, WR_VD|RD_VS|RD_VT,  0, MSA},
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index c7d35bd..0e61043 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -40,6 +40,8 @@ DEF_HELPER_FLAGS_1(bitswap, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_1(dbitswap, TCG_CALL_NO_RWG_SE, tl, tl)
+ #endif
+ 
++DEF_HELPER_3(crc32, tl, tl, tl, i32)
++DEF_HELPER_3(crc32c, tl, tl, tl, i32)
+ DEF_HELPER_FLAGS_4(rotx, TCG_CALL_NO_RWG_SE, tl, tl, i32, i32, i32)
+ 
+ #ifndef CONFIG_USER_ONLY
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 3104904..5874029 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -25,6 +25,8 @@
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
+ #include "sysemu/kvm.h"
++#include "qemu/crc32c.h"
++#include <zlib.h>
+ 
+ /*****************************************************************************/
+ /* Exceptions processing helpers */
+@@ -343,6 +345,26 @@ target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
+     return (int64_t)(int32_t)(uint32_t)tmp5;
+ }
+ 
++/* these crc32 functions are based on target/arm/helper-a64.c */
++target_ulong helper_crc32(target_ulong val, target_ulong m, uint32_t sz)
++{
++    uint8_t buf[8];
++    target_ulong mask = ((sz * 8) == 64) ? -1ULL : ((1ULL << (sz * 8)) - 1);
++
++    m &= mask;
++    stq_le_p(buf, m);
++    return (int32_t) (crc32(val ^ 0xffffffff, buf, sz) ^ 0xffffffff);
++}
++
++target_ulong helper_crc32c(target_ulong val, target_ulong m, uint32_t sz)
++{
++    uint8_t buf[8];
++    target_ulong mask = ((sz * 8) == 64) ? -1ULL : ((1ULL << (sz * 8)) - 1);
++    m &= mask;
++    stq_le_p(buf, m);
++    return (int32_t) (crc32c(val, buf, sz) ^ 0xffffffff);
++}
++
+ #ifndef CONFIG_USER_ONLY
+ 
+ static inline hwaddr do_translate_address(CPUMIPSState *env,
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 3f73be0..3f9f113 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -452,6 +452,7 @@ enum {
+     OPC_LWE            = 0x2F | OPC_SPECIAL3,
+ 
+     /* R6 */
++    OPC_CRC32          = 0x0F | OPC_SPECIAL3,
+     R6_OPC_PREF        = 0x35 | OPC_SPECIAL3,
+     R6_OPC_CACHE       = 0x25 | OPC_SPECIAL3,
+     R6_OPC_LL          = 0x36 | OPC_SPECIAL3,
+@@ -2550,6 +2551,7 @@ typedef struct DisasContext {
+     bool saar;
+     bool mi;
+     int gi;
++    bool crcp;
+ } DisasContext;
+ 
+ #define DISAS_STOP       DISAS_TARGET_0
+@@ -27041,6 +27043,33 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     }
+ }
+ 
++static void gen_crc32(DisasContext *ctx, int rd, int rs, int rt, int sz,
++                      int crc32c)
++{
++    TCGv t0;
++    TCGv t1;
++    TCGv_i32 tsz = tcg_const_i32(1 << sz);
++    if (rd == 0) {
++        /* Treat as NOP. */
++        return;
++    }
++    t0 = tcg_temp_new();
++    t1 = tcg_temp_new();
++
++    gen_load_gpr(t0, rt);
++    gen_load_gpr(t1, rs);
++
++    if (crc32c) {
++        gen_helper_crc32c(cpu_gpr[rd], t0, t1, tsz);
++    } else {
++        gen_helper_crc32(cpu_gpr[rd], t0, t1, tsz);
++    }
++
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free_i32(tsz);
++}
++
+ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
+ {
+     int rs, rt, rd, sa;
+@@ -27055,6 +27084,17 @@ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
+ 
+     op1 = MASK_SPECIAL3(ctx->opcode);
+     switch (op1) {
++    case OPC_CRC32:
++        if (unlikely(!ctx->crcp) ||
++            unlikely((extract32(ctx->opcode, 6, 2) == 3) &&
++                     (!(ctx->hflags & MIPS_HFLAG_64))) ||
++            unlikely((extract32(ctx->opcode, 8, 3) >= 2))) {
++            generate_exception_end(ctx, EXCP_RI);
++        }
++        gen_crc32(ctx, rt, rs, rt,
++                  extract32(ctx->opcode, 6, 2),
++                  extract32(ctx->opcode, 8, 3));
++        break;
+     case R6_OPC_PREF:
+         if (rt >= 24) {
+             /* hint codes 24-31 are reserved and signal RI */
+@@ -30049,6 +30089,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
+     ctx->mi = (env->CP0_Config5 >> CP0C5_MI) & 1;
+     ctx->gi = (env->CP0_Config5 >> CP0C5_GI) & 3;
++    ctx->crcp = (env->CP0_Config5 >> CP0C5_CRCP) & 1;
+     restore_cpu_state(env, ctx);
+ #ifdef CONFIG_USER_ONLY
+         ctx->mem_idx = MIPS_HFLAG_UM;
 -- 
 2.7.4
 
