@@ -2,91 +2,87 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A8CC3A59D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 11:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD65C3A59D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 11:11:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FDCA20844
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 11:07:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jrgTYMJK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDCA20844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D3E512082A
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 11:11:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E512082A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzfVJ-0006ih-LF
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 07:07:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53139)
+	id 1hzfZS-0000Kr-Kj
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 07:11:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53909)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1hzfUV-0005pJ-HF
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 07:06:24 -0400
+ (envelope-from <philmd@redhat.com>) id 1hzfYV-0007vd-BC
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 07:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hzfUU-0006eg-AH
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 07:06:23 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39527)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hzfUU-0006e7-4P
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 07:06:22 -0400
-Received: by mail-wr1-x442.google.com with SMTP id t16so8255683wra.6
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 04:06:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=mAUlxeD1WBkr5V8kTgX7/msjr9puDT0Dp+edzLE5IPc=;
- b=jrgTYMJKLkFeH5QjBXET6Lb1uAS6YGNmmRP8TjhEezOSNIhhODZvmCfEwni5WeSTkz
- yU8WbN8xtpZvXuXTyOoxOUW/nOfq4XRBtZJaOd771SD9NLbXAuDQ6aOX70LulAYgdYsj
- ltACObZ3cvIzgtB8GEqvEN1yCCSjYhIb0Fx9ao4NCWBqrOlMJ5DSM9I+U3iZp7NPO5V3
- n+cB81Qn1DQn30nbFHq77fTQuVnsIdKtouiO2BoQ/KOD6ytfqsHNzGJu+DVPCQfqKaOK
- fLE0Vb+eSFDMOYR5pjHqTdpL5aTVnGCJiR3DON5e+uLDaZPvtW7+vigMk6th95kVGlak
- ZY8Q==
+ (envelope-from <philmd@redhat.com>) id 1hzfYU-0003OH-5t
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 07:10:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53042)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hzfYT-0003Mz-UO
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 07:10:30 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 04AE0806A2
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 11:10:29 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id v4so204163wmh.9
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 04:10:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=mAUlxeD1WBkr5V8kTgX7/msjr9puDT0Dp+edzLE5IPc=;
- b=e/+A+MFR00ynHmfewAGcQz35vGczcdlNV7fV1HSO879X+6HCSSH9XIGj248Or6nRv3
- 2TVfnBXXZ0veXfsh6CEbrCEr081BUUdcvEU7VRGSsDIGXPLKpcPKXlaG29DgpBmpxtZ0
- 2Zoo/vO8wmro1Bq8JHfE2RFJaPaQ04A+hjB5THSF1dJt/mre+aVVRulSi9F5E3kOq4iy
- trFOov0MAvbRWlzKmHKHtWFJ5Eiw2aYkv9E20TMUcWT+mAMy5UHnJ59R9FHgwA4C+w+W
- cVYTcSIH6RJa+TdjTYx330ugoyDayLydPFiZI9qTsWxKCbIwerkRqSt7nBZr/iw+9Hlt
- n2qw==
-X-Gm-Message-State: APjAAAWhQYoOwysWiG3QBUsO+CsoOKUAMGVorq3BduD9xk2FIu7KcbL9
- LFyXDJrLA7uN4JfK1WCEu8W6ZQ==
-X-Google-Smtp-Source: APXvYqxldQlvUO/1+CzT/Aem9vrZl4jkO4faWK2Ou4AtMwLZswH5t47ba+a0Bg7al9wQn0MyfUjLNg==
-X-Received: by 2002:a05:6000:4d:: with SMTP id
- k13mr26869871wrx.196.1566212780564; 
- Mon, 19 Aug 2019 04:06:20 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id u8sm11642226wmj.3.2019.08.19.04.06.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 04:06:19 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 90F6E1FF87;
- Mon, 19 Aug 2019 12:06:19 +0100 (BST)
-References: <20190816084708.602-1-david@redhat.com>
- <20190816084708.602-5-david@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: David Hildenbrand <david@redhat.com>
-In-reply-to: <20190816084708.602-5-david@redhat.com>
-Date: Mon, 19 Aug 2019 12:06:19 +0100
-Message-ID: <87k1b9h0t0.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=egN/j+cH2uBQNnoCV91ZPXSSeFRS5kuMq2reQFBBCwQ=;
+ b=rctqNk8HoNDXuQEGu9tuYsHaBSpChZpcOFb3Ej3sPhffCPoaD5/kptmrlhPapfHZwF
+ lZcGBPKozV4/FwjXLQvwDiNBWPSEKEPwO6SC1tvXN4f8sL/Ar/w9dhIG10G4lQzvZbDU
+ 4/7OSqc3QtRR4wGSc7xA2xqOQMUsvdKIY9ftE/+gUhnMlHNCRf6uk9vchxBKYrzaFi5Y
+ 20TU43NOwauTJQH4u77c2rrQ3xEG221CyTo4LAIJajJEhT7xOEWjjGrgl4oCwKDBWEth
+ 9sCTs+3q2W7NS++s6VDx2sPZLePxa1Yj/rR7FKPxNxZzZQVSrQUsYqDoWSSWZW2SmqOq
+ DrRg==
+X-Gm-Message-State: APjAAAWWoqDLPS/rp3DSklEuFH/Ik5ShZbA9zGa028TaW0KIWMi2xvfh
+ 8dp7nn9sxUuP7YxqfTO5w8UYicjOwb03MG987gZmmFeNT2PKalRGsiJ2gia9YB6Rosh6uOdIQZk
+ qA43XGgYOHN33fvo=
+X-Received: by 2002:adf:ea89:: with SMTP id s9mr27843291wrm.76.1566213027717; 
+ Mon, 19 Aug 2019 04:10:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx4YM+AQmTACZPmB83lOZnChv2cjjvj+BGSQHbwk7eH5w+JQ4+RwKdwLh1T1BUjja8GqQCxRg==
+X-Received: by 2002:adf:ea89:: with SMTP id s9mr27843266wrm.76.1566213027531; 
+ Mon, 19 Aug 2019 04:10:27 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id y7sm10459801wmm.19.2019.08.19.04.10.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 19 Aug 2019 04:10:26 -0700 (PDT)
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+References: <20190814020218.1868-1-quintela@redhat.com>
+ <20190814020218.1868-6-quintela@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <99a8c83e-7ddf-1452-ac98-7bb495e8ef88@redhat.com>
+Date: Mon, 19 Aug 2019 13:10:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190814020218.1868-6-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] s390x/tcg: Flush the TLB of all
- CPUs on SSKE and RRBE
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/6] migration: add some multifd traces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,70 +94,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-David Hildenbrand <david@redhat.com> writes:
-
-> Whenever we modify a storage key, we should flush the TLBs of all CPUs,
-> so the MMU fault handling code can properly consider the changed storage
-> key (to e.g., properly set the reference and change bit on the next
-> accesses).
->
-> These functions are barely used in modern Linux guests, so the performance
-> implications are neglectable for now.
->
-> This is a preparation for better reference and change bit handling for
-> TCG, which will require more MMU changes.
->
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 8/14/19 4:02 AM, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  target/s390x/mem_helper.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 29d9eaa5b7..91ba2e03d9 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -1815,6 +1815,11 @@ void HELPER(sske)(CPUS390XState *env, uint64_t r1,=
- uint64_t r2)
->
->      key =3D (uint8_t) r1;
->      skeyclass->set_skeys(ss, addr / TARGET_PAGE_SIZE, 1, &key);
-> +   /*
-> +    * As we can only flush by virtual address and not all the entries
-> +    * that point to a physical address we have to flush the whole TLB.
-> +    */
-> +    tlb_flush_all_cpus_synced(env_cpu(env));
->  }
->
->  /* reset reference bit extended */
-> @@ -1843,6 +1848,11 @@ uint32_t HELPER(rrbe)(CPUS390XState *env, uint64_t=
- r2)
->      if (skeyclass->set_skeys(ss, r2 / TARGET_PAGE_SIZE, 1, &key)) {
->          return 0;
+>  migration/ram.c        | 3 +++
+>  migration/trace-events | 4 ++++
+>  2 files changed, 7 insertions(+)
+>=20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f1aec95f83..25a211c3fb 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1173,6 +1173,7 @@ static void *multifd_send_thread(void *opaque)
+> =20
+>  out:
+>      if (local_err) {
+> +        trace_multifd_send_error(p->id);
+>          multifd_send_terminate_threads(local_err);
 >      }
-> +   /*
-> +    * As we can only flush by virtual address and not all the entries
-> +    * that point to a physical address we have to flush the whole TLB.
-> +    */
-> +    tlb_flush_all_cpus_synced(env_cpu(env));
->
->      /*
->       * cc
+> =20
+> @@ -1203,6 +1204,7 @@ static void multifd_new_send_channel_async(QIOTas=
+k *task, gpointer opaque)
+>      QIOChannel *sioc =3D QIO_CHANNEL(qio_task_get_source(task));
+>      Error *local_err =3D NULL;
+> =20
+> +    trace_multifd_new_send_channel_async(p->id);
+>      if (qio_task_propagate_error(task, &local_err)) {
+>          migrate_set_error(migrate_get_current(), local_err);
+>          multifd_save_cleanup();
+> @@ -1496,6 +1498,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Er=
+ror **errp)
+>                                  atomic_read(&multifd_recv_state->count=
+));
+>          return false;
+>      }
+> +    trace_multifd_recv_new_channel(id);
+> =20
+>      p =3D &multifd_recv_state->params[id];
+>      if (p->c !=3D NULL) {
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 9fbef614ab..5d85f8bf83 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -81,7 +81,9 @@ migration_bitmap_sync_start(void) ""
+>  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+>  migration_bitmap_clear_dirty(char *str, uint64_t start, uint64_t size,=
+ unsigned long page) "rb %s start 0x%"PRIx64" size 0x%"PRIx64" page 0x%lx=
+"
+>  migration_throttle(void) ""
+> +multifd_new_send_channel_async(uint8_t id) "channel %d"
+>  multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t =
+flags, uint32_t next_packet_size) "channel %d packet_num %" PRIu64 " page=
+s %d flags 0x%x next packet size %d"
+> +multifd_recv_new_channel(uint8_t id) "channel %d"
+>  multifd_recv_sync_main(long packet_num) "packet num %ld"
+>  multifd_recv_sync_main_signal(uint8_t id) "channel %d"
+>  multifd_recv_sync_main_wait(uint8_t id) "channel %d"
+> @@ -89,7 +91,9 @@ multifd_recv_terminate_threads(bool error) "error %d"
+>  multifd_recv_thread_can_start(uint8_t id) "channel %d"
+>  multifd_recv_thread_end(uint8_t id, uint64_t packets, uint64_t pages) =
+"channel %d packets %" PRIu64 " pages %" PRIu64
+>  multifd_recv_thread_start(uint8_t id) "%d"
+> +multifd_save_setup_wait(uint8_t id) "%d"
 
+This one is not used.
 
---
-Alex Benn=C3=A9e
+For the rest:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+>  multifd_send(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t =
+flags, uint32_t next_packet_size) "channel %d packet_num %" PRIu64 " page=
+s %d flags 0x%x next packet size %d"
+> +multifd_send_error(uint8_t id) "channel %d"
+>  multifd_send_sync_main(long packet_num) "packet num %ld"
+>  multifd_send_sync_main_signal(uint8_t id) "channel %d"
+>  multifd_send_sync_main_wait(uint8_t id) "channel %d"
+>=20
 
