@@ -2,97 +2,80 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F32C1C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E790C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:40:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6001206C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:30:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6001206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CBB382087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:40:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T+fYGM2c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB382087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzpEJ-00070u-0U
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 17:30:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57242)
+	id 1hzpNo-0003VR-Sy
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 17:40:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58404)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hzpDO-0006Vq-KH
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:29:23 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpLk-00019p-DJ
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hzpDN-0003Zq-9J
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:29:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38738)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hzpDK-0003Z5-KG; Mon, 19 Aug 2019 17:29:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 73C48190C10B;
- Mon, 19 Aug 2019 21:29:17 +0000 (UTC)
-Received: from [10.3.117.3] (ovpn-117-3.phx2.redhat.com [10.3.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D86460C18;
- Mon, 19 Aug 2019 21:29:13 +0000 (UTC)
-To: "Denis V. Lunev" <den@openvz.org>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1677e835-39a1-4af3-8f4f-e1600021a2ee@redhat.com>
- <fa4f4405-5a51-c7ec-f712-95e40ef6dd41@redhat.com>
- <5dc0231e-6fbc-3efc-8cc7-ff953651d0e9@redhat.com>
- <a7cfd04b-5185-e13c-2ced-7e689de05247@openvz.org>
- <71d406a0-d1a0-6feb-5768-6295d36e18fc@redhat.com>
- <c5936c33-5488-ff74-b7de-bb4802c70f2d@openvz.org>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <b2df3650-1a43-3980-39df-30285a9ad666@redhat.com>
-Date: Mon, 19 Aug 2019 16:29:13 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <c5936c33-5488-ff74-b7de-bb4802c70f2d@openvz.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="RGZCfeSROLa7Or2GlDPXIWhAtUEyZ6FnG"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Mon, 19 Aug 2019 21:29:17 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] block/io.c: fix for the allocation failure
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpLj-0005w4-4H
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:00 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38537)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hzpLi-0005vU-VL
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:37:59 -0400
+Received: by mail-pf1-x444.google.com with SMTP id o70so1947654pfg.5
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:37:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=UAuI24ypugSOADw/ZQRUxs1qwCQQ7Fi3EwXHwPu9388=;
+ b=T+fYGM2c7huxQqMYjJE4FCDtBu1AjZR8/FPJa3mwgqc2uxzV6kOtA6SqJzFt0zij9W
+ XKOPKbIgZMoV69o155ysDGSrU2XjesEz0IyUeuz1LGp2Y+2s+g0sHuWtQMM0CjJjbFMy
+ mRCC37toz03sOpxGrq7qqsuL1+aDjEp6/iMTIc37Sr2FPwh/gnJoSLxDt7X9b1GfchuU
+ uqeYTg469JA1vkgDZII5JbUKm+5j3cvEuAA8ihoSRuniD8gz5tWn5a+HU7otemnhkQEd
+ gpgfnpyRd9Z9yv9lKumrUMbLfsICZiKW0dFWtJ2EGr/RwKvMmjHZ0/vs0IsATuyxVGN1
+ EGDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=UAuI24ypugSOADw/ZQRUxs1qwCQQ7Fi3EwXHwPu9388=;
+ b=J7LOR1MobfJGcIL8utWA2ncYnICNZ4IZLHujqUwNEYt9ry7+mogiUi0OvKquhgMeGZ
+ a+jmH+C3LhcIu/+PTVOM/pBpu3JHAVWEGCyCptHBtMu8UJiEe8IsQXcjm2YtjEJCGlB+
+ FZtSnFmYUwNkPIrTsSTIt8cEYnk7qW7aHyj5wKw9rfsxmvOndO1paC87xmpfZ6Gv3yOC
+ U1+tsE0tBJCtdIuv4xK3Gxh3t8ddkq0hbnlSZUsebe3fh1InOOGcjFuJVPF0uH1sBe9C
+ mznVfH/QY5TPHOkipOD9UEKyHNTOz7Q/uY3CVMnzo57uYFiA/YzjlDUJ9OvMuYk7JzaY
+ /U/Q==
+X-Gm-Message-State: APjAAAV6PMhdDcmfUSKDf2N/xH5F6bM03Dwzc9CDQ5qgzwJ3b0ZBQW9e
+ +V+tptlP2Up25Ta3r6uVZVegOmm5oos=
+X-Google-Smtp-Source: APXvYqz1PZ/J9ZaqMeNxYmPJ7XZrol5EjlOSeyELr66N4pqBMyZD1lv7NOIQF9MuJl+FRw8859qffQ==
+X-Received: by 2002:a63:9e43:: with SMTP id r3mr22269709pgo.148.1566250677506; 
+ Mon, 19 Aug 2019 14:37:57 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.37.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Aug 2019 14:37:56 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon, 19 Aug 2019 14:36:47 -0700
+Message-Id: <20190819213755.26175-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v2 00/68] target/arm: Convert aa32 base isa to
+ decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,125 +87,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RGZCfeSROLa7Or2GlDPXIWhAtUEyZ6FnG
-Content-Type: multipart/mixed; boundary="g26emo8y6VBNxwJJ7y16IiqSE43shGnGT";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
-Message-ID: <b2df3650-1a43-3980-39df-30285a9ad666@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/io.c: fix for the allocation failure
-References: <1554474244-553661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1677e835-39a1-4af3-8f4f-e1600021a2ee@redhat.com>
- <fa4f4405-5a51-c7ec-f712-95e40ef6dd41@redhat.com>
- <5dc0231e-6fbc-3efc-8cc7-ff953651d0e9@redhat.com>
- <a7cfd04b-5185-e13c-2ced-7e689de05247@openvz.org>
- <71d406a0-d1a0-6feb-5768-6295d36e18fc@redhat.com>
- <c5936c33-5488-ff74-b7de-bb4802c70f2d@openvz.org>
-In-Reply-To: <c5936c33-5488-ff74-b7de-bb4802c70f2d@openvz.org>
+This unifies the implementation of the actual instructions for
+a32, t32, and t16.
 
---g26emo8y6VBNxwJJ7y16IiqSE43shGnGT
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This has been tested by running the debian 9 armhf installer,
+which does a far amount of switching between arm and thumb modes.
+I've also run Peter's ARM TFM image, and all of the existing
+RISU tests that we have.  (Our RISU test cases are nowhere near
+complete for 32-bit mode, but it did find 3 bugs, so not useless.)
 
-On 8/19/19 3:53 PM, Denis V. Lunev wrote:
+Based-on: 20190819151743.17267-1-richard.henderson@linaro.org
+"[PULL 0/3] decodetree improvements"
 
->>>> Or even better, fix the call site of fallocate() to skip attempting =
-an
->>>> unaligned fallocate(), and just directly return ENOTSUP, rather than=
-
->>>> trying to diagnose EINVAL after the fact.
->>>>
->>> No way. Single ENOTSUP will turn off fallocate() support on caller si=
-de
->>> while
->>> aligned (99.99% of calls) works normally.
->> I didn't mean skip fallocate() unconditionally, only when unaligned:
->>
->> if (request not aligned enough)
->>    return -ENOTSUP;
->> fallocate() ...
->>
->> so that the 99.99% requests that ARE aligned get to use fallocate()
->> normally.
->>
-> static int handle_aiocb_write_zeroes(void *opaque)
-> {
-> ...
-> #ifdef CONFIG_FALLOCATE_ZERO_RANGE
-> =C2=A0=C2=A0=C2=A0 if (s->has_write_zeroes) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D do_fallocate(s->=
-fd, FALLOC_FL_ZERO_RANGE,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aiocb->aio_offset, aiocb->aio_nbytes);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret =3D=3D 0 || ret !=3D=
- -ENOTSUP) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn ret;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->has_write_zeroes =3D fals=
-e;
-> =C2=A0=C2=A0=C2=A0 }
-> #endif
->=20
-> thus, right now, single ENOTSUP disables fallocate
-> functionality completely setting s->has_write_zeroes
-> to false and that is pretty much correct.
->=20
-> ENOTSUP is "static" error code which returns persistent
-> ENOTSUP under any consequences.
-
-Not always true. And the block layer doesn't expect it to be true. It is
-perfectly fine for one invocation to return ENOTSUP ('I can't handle
-this request, so fall back to pwrite for me) and the next to just work
-('this one was aligned, so I handled it just fine).  It just means that
-you have to be more careful with the logic: never set
-s->has_write_zeroes=3Dfalse if you skipped the fallocate, or if the
-fallocate failed due to EINVAL rather than ENOTSUP (but still report
-ENOTSUP to the block layer, to document that you want the EINVAL for
-unaligned request to be turned into a fallback to pwrite).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Changes from v1:
+  * Lots of prep patches merged.
+  * Lots of patches split into smaller bits.
+    Which is why this patch set is larger than v1 despite the merge.
+  * Do not use STREG_EXC_RET in Hyp mode (patch 3).
+  * Map more UNPREDICTABLE to UNDEF in LDM/STM (patches 28-30).
+  * Split gen_nop_hint (patch 59).
+  * Do not move single-step check to gen_goto_tb, but do simplify
+    gen_jmp by inlining gen_bx_im (patch 68).
 
 
---g26emo8y6VBNxwJJ7y16IiqSE43shGnGT--
+r~
 
---RGZCfeSROLa7Or2GlDPXIWhAtUEyZ6FnG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+Richard Henderson (68):
+  target/arm: Use store_reg_from_load in thumb2 code
+  target/arm: Add stubs for aa32 decodetree
+  target/arm: Convert Data Processing (register)
+  target/arm: Convert Data Processing (reg-shifted-reg)
+  target/arm: Convert Data Processing (immediate)
+  target/arm: Convert multiply and multiply accumulate
+  target/arm: Simplify UMAAL
+  target/arm: Convert Saturating addition and subtraction
+  target/arm: Convert Halfword multiply and multiply accumulate
+  target/arm: Simplify op_smlaxxx for SMLAL*
+  target/arm: Simplify op_smlawx for SMLAW*
+  target/arm: Convert MSR (immediate) and hints
+  target/arm: Convert MRS/MSR (banked, register)
+  target/arm: Convert Cyclic Redundancy Check
+  target/arm: Convert BX, BXJ, BLX (register)
+  target/arm: Convert CLZ
+  target/arm: Convert ERET
+  target/arm: Convert the rest of A32 Miscelaneous instructions
+  target/arm: Convert T32 ADDW/SUBW
+  target/arm: Convert load/store (register, immediate, literal)
+  target/arm: Convert Synchronization primitives
+  target/arm: Convert USAD8, USADA8, SBFX, UBFX, BFC, BFI, UDF
+  target/arm: Convert Parallel addition and subtraction
+  target/arm: Convert Packing, unpacking, saturation, and reversal
+  target/arm: Convert Signed multiply, signed and unsigned divide
+  target/arm: Convert MOVW, MOVT
+  target/arm: Convert LDM, STM
+  target/arm: Diagnose writeback register in list for LDM for v7
+  target/arm: Diagnose too few registers in list for LDM/STM
+  target/arm: Diagnose base == pc for LDM/STM
+  target/arm: Convert B, BL, BLX (immediate)
+  target/arm: Convert SVC
+  target/arm: Convert RFE and SRS
+  target/arm: Convert Clear-Exclusive, Barriers
+  target/arm: Convert CPS (privileged)
+  target/arm: Convert SETEND
+  target/arm: Convert PLI, PLD, PLDW
+  target/arm: Convert Unallocated memory hint
+  target/arm: Convert Table Branch
+  target/arm: Convert SG
+  target/arm: Convert TT
+  target/arm: Simplify disas_thumb2_insn
+  target/arm: Simplify disas_arm_insn
+  target/arm: Add skeleton for T16 decodetree
+  target/arm: Convert T16 data-processing (two low regs)
+  target/arm: Convert T16 load/store (register offset)
+  target/arm: Convert T16 load/store (immediate offset)
+  target/arm: Convert T16 add pc/sp (immediate)
+  target/arm: Convert T16 load/store multiple
+  target/arm: Convert T16 add/sub (3 low, 2 low and imm)
+  target/arm: Convert T16 one low register and immediate
+  target/arm: Convert T16 branch and exchange
+  target/arm: Convert T16 add, compare, move (two high registers)
+  target/arm: Convert T16 adjust sp (immediate)
+  target/arm: Convert T16, extract
+  target/arm: Convert T16, Change processor state
+  target/arm: Convert T16, Reverse bytes
+  target/arm: Convert T16, nop hints
+  target/arm: Split gen_nop_hint
+  target/arm: Convert T16, push and pop
+  target/arm: Convert T16, Conditional branches, Supervisor call
+  target/arm: Convert T16, Miscellaneous 16-bit instructions
+  target/arm: Convert T16, shift immediate
+  target/arm: Convert T16, load (literal)
+  target/arm: Convert T16, Unconditional branch
+  target/arm: Convert T16, long branches
+  target/arm: Clean up disas_thumb_insn
+  target/arm: Inline gen_bx_im into callers
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1bFKkACgkQp6FrSiUn
-Q2pmqQf/R9PlOIxsjELenLWQ8roKEvr54P/vEKvLj10r4T54lZMvMuo5U3WnX8Op
-ZZhutuKXi5D4A9WQjaM0nU+TmVRE8rVT0vY4wTI5oLxIMBxqCHX3owiNt6phpXIk
-1OlMSFqThYz6njBiytFIUQxg0HZBk339TZ7Nyrazs0amwfyPNA3oEmGEmhxhCwgd
-viCMePOWdc6Jdu31E/ujSCHHSWJRtYUI/kH4ULfQNqYx/8/6kAX/fw/Olmr7q+kE
-UPbVgOXj7jwfPYYBNsK0sXLVAHp7MHO2Loq27nq4w5aYLwGnWb/fGzFzyd8VKZJA
-uVWZoCD4BqWt/PNRAIrQH37M5D6ayQ==
-=zy7B
------END PGP SIGNATURE-----
+ target/arm/translate.c       | 7068 ++++++++++++++--------------------
+ target/arm/Makefile.objs     |   24 +
+ target/arm/a32-uncond.decode |   74 +
+ target/arm/a32.decode        |  534 +++
+ target/arm/t16.decode        |  279 ++
+ target/arm/t32.decode        |  629 +++
+ 6 files changed, 4536 insertions(+), 4072 deletions(-)
+ create mode 100644 target/arm/a32-uncond.decode
+ create mode 100644 target/arm/a32.decode
+ create mode 100644 target/arm/t16.decode
+ create mode 100644 target/arm/t32.decode
 
---RGZCfeSROLa7Or2GlDPXIWhAtUEyZ6FnG--
+-- 
+2.17.1
+
 
