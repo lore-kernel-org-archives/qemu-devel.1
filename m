@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 701EDC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F45FC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:08:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 468D322CF5
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:08:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 468D322CF5
+	by mail.kernel.org (Postfix) with ESMTPS id 747432087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:08:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747432087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzn1P-0000f6-3E
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:08:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32925)
+	id 1hzn1W-0000wv-FU
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:08:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hzmpn-0002WD-Ik
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 14:56:52 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hzmpf-0002Hg-7b
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 14:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hzmpm-0002Fl-FL
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 14:56:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58656)
+ (envelope-from <mreitz@redhat.com>) id 1hzmpd-0002B0-Po
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 14:56:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58074)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hzmpk-0002EF-4y; Mon, 19 Aug 2019 14:56:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hzmpa-00028V-8m; Mon, 19 Aug 2019 14:56:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7D2DD106E973;
- Mon, 19 Aug 2019 18:56:47 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9635630860C6;
+ Mon, 19 Aug 2019 18:56:37 +0000 (UTC)
 Received: from localhost (ovpn-204-64.brq.redhat.com [10.40.204.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A8E81EA;
- Mon, 19 Aug 2019 18:56:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B5FC88B1A;
+ Mon, 19 Aug 2019 18:56:36 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 19 Aug 2019 20:56:00 +0200
-Message-Id: <20190819185602.4267-15-mreitz@redhat.com>
+Date: Mon, 19 Aug 2019 20:55:56 +0200
+Message-Id: <20190819185602.4267-11-mreitz@redhat.com>
 In-Reply-To: <20190819185602.4267-1-mreitz@redhat.com>
 References: <20190819185602.4267-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Mon, 19 Aug 2019 18:56:47 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Mon, 19 Aug 2019 18:56:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 14/16] qcow2: Fix v3 snapshot table entry
- compliancy
+Subject: [Qemu-devel] [PATCH v2 10/16] qcow2: Fix broken snapshot table
+ entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,47 +73,166 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qcow2 v3 images require every snapshot table entry to have at least 16
-bytes of extra data.  If they do not, let qemu-img check -r all fix it.
+The only case where we currently reject snapshot table entries is when
+they have too much extra data.  Fix them with qemu-img check -r all by
+counting it as a corruption, reducing their extra_data_size, and then
+letting qcow2_check_fix_snapshot_table() do the rest.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-snapshot.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ block/qcow2-snapshot.c | 67 +++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 56 insertions(+), 11 deletions(-)
 
 diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index dac8a778e4..5ab64da1ec 100644
+index b526a8f819..53dc1635ec 100644
 --- a/block/qcow2-snapshot.c
 +++ b/block/qcow2-snapshot.c
-@@ -516,6 +516,24 @@ int coroutine_fn qcow2_check_read_snapshot_table(Blo=
-ckDriverState *bs,
-         result->corruptions -=3D nb_clusters_reduced;
-     }
-=20
-+    /*
-+     * All of v3 images' snapshot table entries need to have at least
-+     * 16 bytes of extra data.
-+     */
-+    if (s->qcow_version >=3D 3) {
-+        int i;
-+        for (i =3D 0; i < s->nb_snapshots; i++) {
-+            if (s->snapshots[i].extra_data_size <
-+                sizeof_field(QCowSnapshotExtraData, vm_state_size_large)=
- +
-+                sizeof_field(QCowSnapshotExtraData, disk_size))
-+            {
-+                result->corruptions++;
-+                fprintf(stderr, "%s snapshot table entry %i is incomplet=
-e\n",
-+                        fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR", i=
-);
-+            }
-+        }
-+    }
-+
-     return 0;
+@@ -44,7 +44,23 @@ void qcow2_free_snapshots(BlockDriverState *bs)
+     s->nb_snapshots =3D 0;
  }
 =20
+-int qcow2_read_snapshots(BlockDriverState *bs, Error **errp)
++/*
++ * If @repair is true, try to repair a broken snapshot table instead
++ * of just returning an error:
++ *
++ * - If there were snapshots with too much extra metadata, increment
++ *   *extra_data_dropped for each.
++ *   This requires the caller to eventually rewrite the whole snapshot
++ *   table, which requires cluster allocation.  Therefore, this should
++ *   be done only after qcow2_check_refcounts() made sure the refcount
++ *   structures are valid.
++ *   (In the meantime, the image is still valid because
++ *   qcow2_check_refcounts() does not do anything with snapshots'
++ *   extra data.)
++ */
++static int qcow2_do_read_snapshots(BlockDriverState *bs, bool repair,
++                                   int *extra_data_dropped,
++                                   Error **errp)
+ {
+     BDRVQcow2State *s =3D bs->opaque;
+     QCowSnapshotHeader h;
+@@ -64,6 +80,8 @@ int qcow2_read_snapshots(BlockDriverState *bs, Error **=
+errp)
+     s->snapshots =3D g_new0(QCowSnapshot, s->nb_snapshots);
+=20
+     for(i =3D 0; i < s->nb_snapshots; i++) {
++        bool truncate_unknown_extra_data =3D false;
++
+         /* Read statically sized part of the snapshot header */
+         offset =3D ROUND_UP(offset, 8);
+         ret =3D bdrv_pread(bs->file, offset, &h, sizeof(h));
+@@ -86,10 +104,21 @@ int qcow2_read_snapshots(BlockDriverState *bs, Error=
+ **errp)
+         name_size =3D be16_to_cpu(h.name_size);
+=20
+         if (sn->extra_data_size > QCOW_MAX_SNAPSHOT_EXTRA_DATA) {
+-            ret =3D -EFBIG;
+-            error_setg(errp, "Too much extra metadata in snapshot table =
+"
+-                       "entry %i", i);
+-            goto fail;
++            if (!repair) {
++                ret =3D -EFBIG;
++                error_setg(errp, "Too much extra metadata in snapshot ta=
+ble "
++                           "entry %i", i);
++                error_append_hint(errp, "You can force-remove this extra=
+ "
++                                  "metadata with qemu-img check -r all\n=
+");
++                goto fail;
++            }
++
++            fprintf(stderr, "Discarding too much extra metadata in snaps=
+hot "
++                    "table entry %i (%" PRIu32 " > %u)\n",
++                    i, sn->extra_data_size, QCOW_MAX_SNAPSHOT_EXTRA_DATA=
+);
++
++            (*extra_data_dropped)++;
++            truncate_unknown_extra_data =3D true;
+         }
+=20
+         /* Read known extra data */
+@@ -113,18 +142,26 @@ int qcow2_read_snapshots(BlockDriverState *bs, Erro=
+r **errp)
+         }
+=20
+         if (sn->extra_data_size > sizeof(extra)) {
+-            /* Store unknown extra data */
+-            size_t unknown_extra_data_size =3D
+-                sn->extra_data_size - sizeof(extra);
++            uint64_t extra_data_end;
++            size_t unknown_extra_data_size;
++
++            extra_data_end =3D offset + sn->extra_data_size - sizeof(ext=
+ra);
+=20
++            if (truncate_unknown_extra_data) {
++                sn->extra_data_size =3D QCOW_MAX_SNAPSHOT_EXTRA_DATA;
++            }
++
++            /* Store unknown extra data */
++            unknown_extra_data_size =3D sn->extra_data_size - sizeof(ext=
+ra);
+             sn->unknown_extra_data =3D g_malloc(unknown_extra_data_size)=
+;
+             ret =3D bdrv_pread(bs->file, offset, sn->unknown_extra_data,
+                              unknown_extra_data_size);
+             if (ret < 0) {
+-                error_setg_errno(errp, -ret, "Failed to read snapshot ta=
+ble");
++                error_setg_errno(errp, -ret,
++                                 "Failed to read snapshot table");
+                 goto fail;
+             }
+-            offset +=3D unknown_extra_data_size;
++            offset =3D extra_data_end;
+         }
+=20
+         /* Read snapshot ID */
+@@ -163,6 +200,11 @@ fail:
+     return ret;
+ }
+=20
++int qcow2_read_snapshots(BlockDriverState *bs, Error **errp)
++{
++    return qcow2_do_read_snapshots(bs, false, NULL, errp);
++}
++
+ /* add at the end of the file a new list of snapshots */
+ int qcow2_write_snapshots(BlockDriverState *bs)
+ {
+@@ -328,6 +370,7 @@ int coroutine_fn qcow2_check_read_snapshot_table(Bloc=
+kDriverState *bs,
+ {
+     BDRVQcow2State *s =3D bs->opaque;
+     Error *local_err =3D NULL;
++    int extra_data_dropped =3D 0;
+     int ret;
+     struct {
+         uint32_t nb_snapshots;
+@@ -363,7 +406,8 @@ int coroutine_fn qcow2_check_read_snapshot_table(Bloc=
+kDriverState *bs,
+     }
+=20
+     qemu_co_mutex_unlock(&s->lock);
+-    ret =3D qcow2_read_snapshots(bs, &local_err);
++    ret =3D qcow2_do_read_snapshots(bs, fix & BDRV_FIX_ERRORS,
++                                  &extra_data_dropped, &local_err);
+     qemu_co_mutex_lock(&s->lock);
+     if (ret < 0) {
+         result->check_errors++;
+@@ -376,6 +420,7 @@ int coroutine_fn qcow2_check_read_snapshot_table(Bloc=
+kDriverState *bs,
+=20
+         return ret;
+     }
++    result->corruptions +=3D extra_data_dropped;
+=20
+     return 0;
+ }
 --=20
 2.21.0
 
