@@ -2,59 +2,59 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CCDC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D6CC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:32:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07376214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:32:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07376214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 9E49F214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:32:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E49F214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzoK5-0001JJ-Oe
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:32:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45821)
+	id 1hzoK7-0001K8-FI
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:32:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46028)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hzo7S-0001F4-1I
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:10 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hzo7o-0001qj-BX
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hzo7R-0004Oi-05
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44036)
+ (envelope-from <mreitz@redhat.com>) id 1hzo7n-0004f4-Dt
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:19:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hzo7O-0004L1-PW; Mon, 19 Aug 2019 16:19:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hzo7l-0004e0-A1; Mon, 19 Aug 2019 16:19:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 12FDD1FAA66;
- Mon, 19 Aug 2019 20:19:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9BC05C057E16;
+ Mon, 19 Aug 2019 20:19:28 +0000 (UTC)
 Received: from localhost (ovpn-204-64.brq.redhat.com [10.40.204.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A6E5452B;
- Mon, 19 Aug 2019 20:19:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 365591D0;
+ Mon, 19 Aug 2019 20:19:28 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 19 Aug 2019 22:18:45 +0200
-Message-Id: <20190819201851.24418-3-mreitz@redhat.com>
+Date: Mon, 19 Aug 2019 22:18:51 +0200
+Message-Id: <20190819201851.24418-9-mreitz@redhat.com>
 In-Reply-To: <20190819201851.24418-1-mreitz@redhat.com>
 References: <20190819201851.24418-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Mon, 19 Aug 2019 20:19:06 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 19 Aug 2019 20:19:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 2/8] iotests: Prefer null-co over null-aio
+Subject: [Qemu-devel] [PATCH v3 8/8] iotests: Cache supported_formats()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,66 +73,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We use null-co basically everywhere in the iotests.  Unless we want to
-test null-aio specifically, we should use it instead (for consistency).
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/093 | 7 +++----
- tests/qemu-iotests/245 | 2 +-
- 2 files changed, 4 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/iotests.py | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-index 3c4f5173ce..50c1e7f2ec 100755
---- a/tests/qemu-iotests/093
-+++ b/tests/qemu-iotests/093
-@@ -267,13 +267,12 @@ class ThrottleTestCoroutine(ThrottleTestCase):
-     test_img =3D "null-co://"
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 8f315538e9..f6492b355f 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -884,9 +884,17 @@ def qemu_pipe(*args):
+ def supported_formats(read_only=3DFalse):
+     '''Set 'read_only' to True to check ro-whitelist
+        Otherwise, rw-whitelist is checked'''
+-    format_message =3D qemu_pipe("-drive", "format=3Dhelp")
+-    line =3D 1 if read_only else 0
+-    return format_message.splitlines()[line].split(":")[1].split()
++
++    if not hasattr(supported_formats, "formats"):
++        supported_formats.formats =3D {}
++
++    if read_only not in supported_formats.formats:
++        format_message =3D qemu_pipe("-drive", "format=3Dhelp")
++        line =3D 1 if read_only else 0
++        supported_formats.formats[read_only] =3D \
++            format_message.splitlines()[line].split(":")[1].split()
++
++    return supported_formats.formats[read_only]
 =20
- class ThrottleTestGroupNames(iotests.QMPTestCase):
--    test_img =3D "null-aio://"
-     max_drives =3D 3
-=20
-     def setUp(self):
-         self.vm =3D iotests.VM()
-         for i in range(0, self.max_drives):
--            self.vm.add_drive(self.test_img,
-+            self.vm.add_drive("null-co://",
-                               "throttling.iops-total=3D100,file.read-zer=
-oes=3Don")
-         self.vm.launch()
-=20
-@@ -376,10 +375,10 @@ class ThrottleTestRemovableMedia(iotests.QMPTestCas=
-e):
-=20
-     def test_removable_media(self):
-         # Add a couple of dummy nodes named cd0 and cd1
--        result =3D self.vm.qmp("blockdev-add", driver=3D"null-aio",
-+        result =3D self.vm.qmp("blockdev-add", driver=3D"null-co",
-                              read_zeroes=3DTrue, node_name=3D"cd0")
-         self.assert_qmp(result, 'return', {})
--        result =3D self.vm.qmp("blockdev-add", driver=3D"null-aio",
-+        result =3D self.vm.qmp("blockdev-add", driver=3D"null-co",
-                              read_zeroes=3DTrue, node_name=3D"cd1")
-         self.assert_qmp(result, 'return', {})
-=20
-diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-index bc1ceb9792..ae169778b0 100644
---- a/tests/qemu-iotests/245
-+++ b/tests/qemu-iotests/245
-@@ -598,7 +598,7 @@ class TestBlockdevReopen(iotests.QMPTestCase):
-         ##################
-         ###### null ######
-         ##################
--        opts =3D {'driver': 'null-aio', 'node-name': 'root', 'size': 102=
-4}
-+        opts =3D {'driver': 'null-co', 'node-name': 'root', 'size': 1024=
-}
-=20
-         result =3D self.vm.qmp('blockdev-add', conv_keys =3D False, **op=
-ts)
-         self.assert_qmp(result, 'return', {})
+ def skip_if_unsupported(required_formats=3D[], read_only=3DFalse):
+     '''Skip Test Decorator
 --=20
 2.21.0
 
