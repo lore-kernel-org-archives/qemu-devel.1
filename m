@@ -2,82 +2,93 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF0CC3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 08:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1986C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 08:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9075A2082C
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 08:25:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9075A2082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 919732082C
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 08:29:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 919732082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzcyb-0001VY-P1
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 04:25:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46072)
+	id 1hzd2P-0002wN-Ov
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 04:29:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46982)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1hzcxy-0000zk-Bb
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 04:24:39 -0400
+ (envelope-from <sathnaga@linux.vnet.ibm.com>) id 1hzd1O-0002Dm-0k
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 04:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hzcxw-0005au-VY
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 04:24:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19312)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hzcxw-0005aQ-NS
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 04:24:36 -0400
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E2EBF3CA21
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 08:24:35 +0000 (UTC)
-Received: by mail-pf1-f200.google.com with SMTP id r130so2062619pfc.0
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 01:24:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=V8Qq6gIj/7UHNtF3Q/nrDQz402eJnQlcpzE+48iOFgs=;
- b=t48C0MHPFY37VRturSEPDhEr+KgA+DCRhJ8jsNh5ub1Dh1wUvgE2G/xIh7caUhYGc4
- lhUaNhpcFQe83lA0sVnq7N2RsIFT6XXkWdGzZOHSa3vVnrldRmNm3yFB5plHMJiTQMAx
- AljZr61dO9ufa/rJ6SeA4oXmO2mOa2r5NQeajjYXIDwL3oBM41vmJDtsfT+2nuaThTF2
- P4+i2b56dZoNN4DDAedbjbaWq1e+HmAJ1WF5Fby2ET8aJT5FoHGHXB4HcDEoDnL02zmN
- IaF98goAO+ecT3eJGl+gscuMJF4/SaQ0bi6C2ZNaSrBTh5ys9Uoknto/i1eAYNYtnrav
- F+Qw==
-X-Gm-Message-State: APjAAAWhA5MWCPewjXSMdrHvZmySk/0SD6XZPWxtrMMah5SdWnc6ckIw
- OPcYuBOPhddzXOQ5Lkbo/add7c3PTRX+94NPSjhGJVnUMcKye8DDVqZvDij8JsJE8ISGrrVpMEh
- FunLzG3TzBPL80zU=
-X-Received: by 2002:a63:221f:: with SMTP id i31mr19194646pgi.251.1566203075340; 
- Mon, 19 Aug 2019 01:24:35 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyh/Bmh+mw5AoOXm8i9cZ4p+ZihA7kT2RLpoc7gDgK9w9qspecm3LHXn97N9Vm3lpgNihaU+g==
-X-Received: by 2002:a63:221f:: with SMTP id i31mr19194625pgi.251.1566203075064; 
- Mon, 19 Aug 2019 01:24:35 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id 136sm20597897pfz.123.2019.08.19.01.24.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 01:24:34 -0700 (PDT)
-Date: Mon, 19 Aug 2019 16:24:24 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Message-ID: <20190819082424.GB13560@xz-x1>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-10-eric.auger@redhat.com>
+ (envelope-from <sathnaga@linux.vnet.ibm.com>) id 1hzd1M-00080D-Ln
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 04:28:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14358
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sathnaga@linux.vnet.ibm.com>)
+ id 1hzd1M-0007yV-GY
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 04:28:08 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7J8RFtk097009
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 04:28:06 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2ufn61ew3x-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 04:28:05 -0400
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <sathnaga@linux.vnet.ibm.com>;
+ Mon, 19 Aug 2019 09:28:03 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 19 Aug 2019 09:28:00 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x7J8RxCN40436114
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 19 Aug 2019 08:28:00 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E2AD8A405C;
+ Mon, 19 Aug 2019 08:27:59 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 25F62A4054;
+ Mon, 19 Aug 2019 08:27:58 +0000 (GMT)
+Received: from sathnaga86.in.ibm.com (unknown [9.193.110.61])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 19 Aug 2019 08:27:57 +0000 (GMT)
+From: sathnaga@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Date: Mon, 19 Aug 2019 13:57:50 +0530
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190730172137.23114-10-eric.auger@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 09/15] virtio-iommu: Implement
- translate
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19081908-0012-0000-0000-00000340476C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19081908-0013-0000-0000-0000217A6663
+Message-Id: <20190819082750.14748-1-sathnaga@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-19_02:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=679 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908190098
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH V2 0/2] Add support for powerpc acceptance test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,103 +100,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, mst@redhat.com,
- tn@semihalf.com, qemu-devel@nongnu.org, alex.williamson@redhat.com,
- qemu-arm@nongnu.org, jean-philippe@linaro.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+Cc: ehabkost@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ crosa@redhat.com, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 30, 2019 at 07:21:31PM +0200, Eric Auger wrote:
-> @@ -464,19 +464,75 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
->                                              int iommu_idx)
->  {
->      IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-> +    VirtIOIOMMU *s = sdev->viommu;
->      uint32_t sid;
-> +    viommu_endpoint *ep;
-> +    viommu_mapping *mapping;
-> +    viommu_interval interval;
-> +    bool bypass_allowed;
-> +
-> +    interval.low = addr;
-> +    interval.high = addr + 1;
->  
->      IOMMUTLBEntry entry = {
->          .target_as = &address_space_memory,
->          .iova = addr,
->          .translated_addr = addr,
-> -        .addr_mask = ~(hwaddr)0,
-> +        .addr_mask = (1 << ctz32(s->config.page_size_mask)) - 1,
->          .perm = IOMMU_NONE,
->      };
->  
-> +    bypass_allowed = virtio_has_feature(s->acked_features,
-> +                                        VIRTIO_IOMMU_F_BYPASS);
-> +
->      sid = virtio_iommu_get_sid(sdev);
->  
->      trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
-> +    qemu_mutex_lock(&s->mutex);
-> +
-> +    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(sid));
-> +    if (!ep) {
-> +        if (!bypass_allowed) {
-> +            error_report("%s sid=%d is not known!!", __func__, sid);
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-Maybe use error_report_once() to avoid DOS attack?  Also would it be
-good to unify the debug prints?  I see both error_report() and
-qemu_log_mask() are used in the whole patchset.  Or is that attempted?
+This series attempt to add support for avocado acceptance
+test for powerpc and adds linux console boot test.
 
-> +        } else {
-> +            entry.perm = flag;
-> +        }
-> +        goto unlock;
-> +    }
-> +
-> +    if (!ep->domain) {
-> +        if (!bypass_allowed) {
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          "%s %02x:%02x.%01x not attached to any domain\n",
-> +                          __func__, PCI_BUS_NUM(sid),
-> +                          PCI_SLOT(sid), PCI_FUNC(sid));
-> +        } else {
-> +            entry.perm = flag;
-> +        }
-> +        goto unlock;
-> +    }
-> +
-> +    mapping = g_tree_lookup(ep->domain->mappings, (gpointer)(&interval));
-> +    if (!mapping) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s no mapping for 0x%"PRIx64" for sid=%d\n",
-> +                      __func__, addr, sid);
-> +        goto unlock;
-> +    }
-> +
-> +    if (((flag & IOMMU_RO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
-> +        ((flag & IOMMU_WO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "Permission error on 0x%"PRIx64"(%d): allowed=%d\n",
-> +                      addr, flag, mapping->flags);
-> +        goto unlock;
-> +    }
-> +    entry.translated_addr = addr - mapping->virt_addr + mapping->phys_addr;
-> +    entry.perm = flag;
-> +    trace_virtio_iommu_translate_out(addr, entry.translated_addr, sid);
-> +
-> +unlock:
-> +    qemu_mutex_unlock(&s->mutex);
->      return entry;
->  }
->  
-> -- 
-> 2.20.1
-> 
+avocado run boot_linux_console.py:BootLinuxConsole.test_ppc64le_pseries version.py vnc.py
+JOB ID     : ec1e09d8259bc0c79eacdb4353df6223be369b84
+JOB LOG    : /home/sath/tests/results/job-2019-08-19T02.33-ec1e09d/job.log
+ (1/6) boot_linux_console.py:BootLinuxConsole.test_ppc64le_pseries: PASS (4.52 s)
+ (2/6) version.py:Version.test_qmp_human_info_version: PASS (0.15 s)
+ (3/6) vnc.py:Vnc.test_no_vnc: PASS (0.13 s)
+ (4/6) vnc.py:Vnc.test_no_vnc_change_password: PASS (0.14 s)
+ (5/6) vnc.py:Vnc.test_vnc_change_password_requires_a_password: PASS (0.15 s)
+ (6/6) vnc.py:Vnc.test_vnc_change_password: PASS (0.14 s)
+RESULTS    : PASS 6 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+JOB TIME   : 6.14 s
 
-Regards,
+
+Changes since V1:
+Review comments incorporated.
+patch1: commit msg change, extra space remove suggested by Greg.
+
+Satheesh Rajendran (2):
+  tests.acceptance.avocado_qemu: Add support for powerpc
+  tests.acceptance.boot_linux_console: Add pseries linux boot console
+    test
+
+ tests/acceptance/avocado_qemu/__init__.py |  3 +++
+ tests/acceptance/boot_linux_console.py    | 20 ++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
 -- 
-Peter Xu
+2.21.0
+
 
