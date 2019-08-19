@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FD4C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85164C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:17:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B77F0206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A4C1206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 22:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YbWqlQ1F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77F0206BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rwPNNUYq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A4C1206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzpx4-0001vT-KM
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 18:16:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59594)
+	id 1hzpxn-0002pc-VO
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 18:17:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpMf-0002SB-DG
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:59 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpMr-0002lI-2s
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpMd-0006dE-BY
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:57 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35170)
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpMp-0006qw-Mz
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:39:08 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42603)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hzpMb-0006Zb-8t
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:55 -0400
-Received: by mail-pl1-x643.google.com with SMTP id gn20so1589900plb.2
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:38:51 -0700 (PDT)
+ id 1hzpMp-0006pz-H4
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:39:07 -0400
+Received: by mail-pg1-x543.google.com with SMTP id p3so1925427pgb.9
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:39:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=BfxhiN9KVAYzZaSCSHTjQwUy5qzA5PRPe+BsdkgEMbc=;
- b=YbWqlQ1FUre1zS50UU5iFqvHcfv/hidgQU2q+eCjx+H5GQoVPigDyYNImUtMo7qeiP
- hMs+geXRTiCY+ia4a+J+BylzQXYdF/OU3VJgUKxdqQd1UO+xK0O8aVh6bl6iFGnjHERG
- Za7xa5ltWcUupTh/YLjw7TpMgO8ifjM4p8cR52gyxKa//FSlTQLdFN3DQGeZvjM9hkUP
- 8uDw6emDiSiKK/SA/39lwgXKegAgzhefeShGmMNabU+12NBCUIY3xBuWT8JeL6QXexGl
- pTVIZQeexKcTeaUw5jiYeykQiJcrE8IOm4FPYch8ZxydXQTpH0b9t+lvxuJIOr4vVmtc
- ZYlg==
+ bh=mDWM/Osv7r5Ybg7vyJ1eX9OFfB4jiv5oRDsEzB095y0=;
+ b=rwPNNUYqAr6ROe53LH13bsnwtZvO7sqGWIuDuiJzbccjgf8ozzGbwZeBTHhqJMwhNG
+ vvampvlbbuTnrI8sOrfsab79guqG06xUlVnXeGDZchNQ26uptm2uedtsGQ1KsW4xHqZf
+ mO0dElKyymHr40HN3QewdFJ3itP9mbLwpvgN3aeEmghbVB6Ihqy5jiS8xSNEZ9y3o3Zy
+ I5MabClIC8D3DxMjlXEvtbsIol7MQChqoAVfD8KrFTLpciEhnstjFUITU6JgEiz02Cw7
+ pRtEIxwq+H7Jt2nKZVxD5yyxuKbo+9ve4asxJmLbnPei7sGErDE1WWPpglIm2x+lvc4G
+ ZJCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=BfxhiN9KVAYzZaSCSHTjQwUy5qzA5PRPe+BsdkgEMbc=;
- b=PF1bZpYacAgpiFywGLi/K9JmYjtMr4+Cb2aWRqd+lY6mxKJB6EIo4h+eRkK1JWHnfE
- M2TIpOki6UzeFn3LXLvAH2irjOgs/0+LLuarqKd7hM+oAZKv2VevrchT1GFQMNBd+2zJ
- bAFYfVIHO5kIv/ixJhH/hZZEJeWvK8n5+pohsQ5evZCGkig+cLWeiBb/PVIcTE/nxjEt
- jX9E27rqSc20wuke0RsozuVzHYKrbcJvW66UeIXqqYFsCxw04kNVC0tCIUbcn63IHHz3
- HKOtk+RD3ZZhSoaoSBxD9AbjoNa7Ww7yVsDPDkb2Y7RhwrsIFWZ8a2wP0FO1zdpYFfeH
- 9JZw==
-X-Gm-Message-State: APjAAAWTYAmv+pxnyBkNgsy6SaMKVTuptzGfkRBQnVgWNzrIlskBdy93
- Pi289Xj5Y+OI+3BTX+g0bcbidGXGekQ=
-X-Google-Smtp-Source: APXvYqzOMPpw2ICebjUfqMZ2W9I2ozG+hTftPhaEv0s8IRN9p0aN33/+20XkkMY0+Sk536/km1FOZg==
-X-Received: by 2002:a17:902:6bc7:: with SMTP id
- m7mr25197711plt.60.1566250730808; 
- Mon, 19 Aug 2019 14:38:50 -0700 (PDT)
+ bh=mDWM/Osv7r5Ybg7vyJ1eX9OFfB4jiv5oRDsEzB095y0=;
+ b=gfIdqfasWsAVQXRZ/RBCWaGh0s6OcEOMpuv2JhHSkc0kJa2lTo53d4nJIE7nzb/FNO
+ aL7SPT9SsIKVXp4zaHNmFl2hRPsg7b9Iq+laxDJN4Ai3dL9zlqL1BPm7mMgBdPZ+Z3GA
+ 6Y0xQHjKvHQD2US1K2z8tPvFH0tcSEMDPTtPIGPaQHnonmmPoXzwH/OzEpejoH9CacCe
+ q0S5nJXwd8jt8YQ+a307HF9sg8wca34LdaUpV9dra3s0zXUXdIFswn6ry8IYnThBeu+j
+ pMFdG0AmTw8FphSzL6kQu/VzaRvaMozhkNTf06dZBE+DTrvpIM6UF0D56W7NnQ3J0LHk
+ dodQ==
+X-Gm-Message-State: APjAAAUjd/ARD27wkblewVVvJcnvQjVsqqb6hdVSWhW18DQ/nDSX5BJN
+ ZYwPBBm6EoLw+0n1lkk9wjPzbVdYiME=
+X-Google-Smtp-Source: APXvYqyWcvfNCQA/nzYxi4OuaT5ELmueLDK/OVobiGCocBVgbHN3prZrOb7eOJx8n0u9TbHB3Z2waw==
+X-Received: by 2002:a17:90a:a40f:: with SMTP id
+ y15mr21067641pjp.69.1566250746122; 
+ Mon, 19 Aug 2019 14:39:06 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.38.49
+ by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.39.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 14:38:50 -0700 (PDT)
+ Mon, 19 Aug 2019 14:39:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:37:31 -0700
-Message-Id: <20190819213755.26175-45-richard.henderson@linaro.org>
+Date: Mon, 19 Aug 2019 14:37:43 -0700
+Message-Id: <20190819213755.26175-57-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190819213755.26175-1-richard.henderson@linaro.org>
 References: <20190819213755.26175-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PATCH v2 44/68] target/arm: Add skeleton for T16
- decodetree
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH v2 56/68] target/arm: Convert T16,
+ Change processor state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,85 +99,154 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c   |  6 ++++++
- target/arm/Makefile.objs |  6 ++++++
- target/arm/t16.decode    | 20 ++++++++++++++++++++
- 3 files changed, 32 insertions(+)
- create mode 100644 target/arm/t16.decode
+ target/arm/translate.c | 85 ++++++++++++++++++++----------------------
+ target/arm/t16.decode  | 12 ++++++
+ 2 files changed, 52 insertions(+), 45 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 49bab7d863..90d608a2d2 100644
+index 414c562fb3..368f0ab147 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -7538,6 +7538,7 @@ static int t32_branch24(DisasContext *s, int x)
- #include "decode-a32.inc.c"
- #include "decode-a32-uncond.inc.c"
- #include "decode-t32.inc.c"
-+#include "decode-t16.inc.c"
+@@ -7474,6 +7474,11 @@ static int negate(DisasContext *s, int x)
+     return -x;
+ }
  
- /* Helpers to swap operands for reverse-subtract.  */
- static void gen_rsb(TCGv_i32 dst, TCGv_i32 a, TCGv_i32 b)
-@@ -10550,6 +10551,11 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-     TCGv_i32 tmp2;
-     TCGv_i32 addr;
++static int plus_2(DisasContext *s, int x)
++{
++    return x + 2;
++}
++
+ static int times_2(DisasContext *s, int x)
+ {
+     return x * 2;
+@@ -10152,6 +10157,9 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
+ {
+     uint32_t mask, val;
  
-+    if (disas_t16(s, insn)) {
-+        return;
++    if (ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
 +    }
-+    /* fall back to legacy decoder */
+     if (IS_USER(s)) {
+         /* Implemented as NOP in user mode.  */
+         return true;
+@@ -10182,6 +10190,36 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
+     return true;
+ }
+ 
++static bool trans_CPS_v6m(DisasContext *s, arg_CPS_v6m *a)
++{
++    TCGv_i32 tmp, addr;
 +
-     switch (insn >> 12) {
-     case 0: case 1:
- 
-diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
-index 7806b4dac0..cf26c16f5f 100644
---- a/target/arm/Makefile.objs
-+++ b/target/arm/Makefile.objs
-@@ -43,12 +43,18 @@ target/arm/decode-t32.inc.c: $(SRC_PATH)/target/arm/t32.decode $(DECODETREE)
- 	  $(PYTHON) $(DECODETREE) --static-decode disas_t32 -o $@ $<,\
- 	  "GEN", $(TARGET_DIR)$@)
- 
-+target/arm/decode-t16.inc.c: $(SRC_PATH)/target/arm/t16.decode $(DECODETREE)
-+	$(call quiet-command,\
-+	  $(PYTHON) $(DECODETREE) -w 16 --static-decode disas_t16 -o $@ $<,\
-+	  "GEN", $(TARGET_DIR)$@)
++    if (!(ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M))) {
++        return false;
++    }
++    if (IS_USER(s)) {
++        /* Implemented as NOP in user mode.  */
++        return true;
++    }
 +
- target/arm/translate-sve.o: target/arm/decode-sve.inc.c
- target/arm/translate.o: target/arm/decode-vfp.inc.c
- target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
- target/arm/translate.o: target/arm/decode-a32.inc.c
- target/arm/translate.o: target/arm/decode-a32-uncond.inc.c
- target/arm/translate.o: target/arm/decode-t32.inc.c
-+target/arm/translate.o: target/arm/decode-t16.inc.c
++    tmp = tcg_const_i32(a->im);
++    /* FAULTMASK */
++    if (a->F) {
++        addr = tcg_const_i32(19);
++        gen_helper_v7m_msr(cpu_env, addr, tmp);
++        tcg_temp_free_i32(addr);
++    }
++    /* PRIMASK */
++    if (a->I) {
++        addr = tcg_const_i32(16);
++        gen_helper_v7m_msr(cpu_env, addr, tmp);
++        tcg_temp_free_i32(addr);
++    }
++    tcg_temp_free_i32(tmp);
++    gen_lookup_tb(s);
++    return true;
++}
++
+ /*
+  * Clear-Exclusive, Barriers
+  */
+@@ -10783,51 +10821,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+             break;
+         }
  
- obj-y += tlb_helper.o debug_helper.o
- obj-y += translate.o op_helper.o
+-        case 6:
+-            switch ((insn >> 5) & 7) {
+-            case 2:
+-                /* setend */
+-                ARCH(6);
+-                if (((insn >> 3) & 1) != !!(s->be_data == MO_BE)) {
+-                    gen_helper_setend(cpu_env);
+-                    s->base.is_jmp = DISAS_UPDATE;
+-                }
+-                break;
+-            case 3:
+-                /* cps */
+-                ARCH(6);
+-                if (IS_USER(s)) {
+-                    break;
+-                }
+-                if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-                    tmp = tcg_const_i32((insn & (1 << 4)) != 0);
+-                    /* FAULTMASK */
+-                    if (insn & 1) {
+-                        addr = tcg_const_i32(19);
+-                        gen_helper_v7m_msr(cpu_env, addr, tmp);
+-                        tcg_temp_free_i32(addr);
+-                    }
+-                    /* PRIMASK */
+-                    if (insn & 2) {
+-                        addr = tcg_const_i32(16);
+-                        gen_helper_v7m_msr(cpu_env, addr, tmp);
+-                        tcg_temp_free_i32(addr);
+-                    }
+-                    tcg_temp_free_i32(tmp);
+-                    gen_lookup_tb(s);
+-                } else {
+-                    if (insn & (1 << 4)) {
+-                        shift = CPSR_A | CPSR_I | CPSR_F;
+-                    } else {
+-                        shift = 0;
+-                    }
+-                    gen_set_psr_im(s, ((insn & 7) << 6), 0, shift);
+-                }
+-                break;
+-            default:
+-                goto undef;
+-            }
+-            break;
++        case 6: /* setend, cps; in decodetree */
++            goto illegal_op;
+ 
+         default:
+             goto undef;
 diff --git a/target/arm/t16.decode b/target/arm/t16.decode
-new file mode 100644
-index 0000000000..e954f61fe4
---- /dev/null
+index b5b5086e8a..3bf1a31731 100644
+--- a/target/arm/t16.decode
 +++ b/target/arm/t16.decode
-@@ -0,0 +1,20 @@
-+# Thumb1 instructions
-+#
-+#  Copyright (c) 2019 Linaro, Ltd
-+#
-+# This library is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU Lesser General Public
-+# License as published by the Free Software Foundation; either
-+# version 2 of the License, or (at your option) any later version.
-+#
-+# This library is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+# Lesser General Public License for more details.
-+#
-+# You should have received a copy of the GNU Lesser General Public
-+# License along with this library; if not, see <http://www.gnu.org/licenses/>.
+@@ -29,6 +29,8 @@
+ &ldst_rr         !extern p w u rn rt rm shimm shtype
+ &ldst_ri         !extern p w u rn rt imm
+ &ldst_block      !extern rn i b u w list
++&setend          !extern E
++&cps             !extern mode imod M A I F
+ 
+ # Set S if the instruction is outside of an IT block.
+ %s               !function=t16_setflags
+@@ -183,3 +185,13 @@ SXTAH           1011 0010 00 ... ...            @extend
+ SXTAB           1011 0010 01 ... ...            @extend
+ UXTAH           1011 0010 10 ... ...            @extend
+ UXTAB           1011 0010 11 ... ...            @extend
 +
-+#
-+# This file is processed by scripts/decodetree.py
-+#
++# Change processor state
++
++%imod           4:1 !function=plus_2
++
++SETEND          1011 0110 010 1 E:1 000         &setend
++{
++  CPS_v6m       1011 0110 011 im:1 00 I:1 F:1
++  CPS           1011 0110 011 . 0 A:1 I:1 F:1   &cps mode=0 M=0 %imod
++}
 -- 
 2.17.1
 
