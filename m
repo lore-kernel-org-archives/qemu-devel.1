@@ -2,81 +2,66 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA01C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4DDC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:16:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAE3B20843
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:15:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XShN8zM0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE3B20843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1B3E920843
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:16:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B3E920843
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzhVM-0001tF-P7
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:15:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50690)
+	id 1hzhW5-0002O2-KW
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:16:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hzhTy-0000Po-PB
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:13:59 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hzgt9-0004Qb-85
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:35:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hzhTv-0001cI-Vp
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:13:57 -0400
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:43633)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hzhTs-0001VA-1Y
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:13:54 -0400
-Received: by mail-ot1-x336.google.com with SMTP id e12so1580437otp.10
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 06:13:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=60JqoMGoIGS0wuoTg7tCXWkqHLgyT5zwk1k40i2w9oU=;
- b=XShN8zM0FeycGd6J4Vue6KXBldbeZTOJ8mLuPMgS9j5tQ9WFOQ+zGHSYWL5czBzhLQ
- KtwP9SYLBiK+9kDivXKtFHCXaMDjIP94si2HRtYTc7ZbCsWKFO1YcPPfwqojgbf1p1gV
- ZaofQ/p4mY4mbrAl8O5kVaO3h56aldVkRy0n8kvEvPULQ4SHkHu3qDk8djKdWC1EYJw2
- kN0NBMD4g5B44vVFw6K3be8WYhePg8FBZNg13FF//29bVCcb3m0XGDpG3Iz3O1boHdFm
- WGclUZJZN+0EC9qizAUQzjxzmuANcLDLIN8al/Uw6j1Aga7LWSMv6ufyK3RCI9MG5a+A
- 4f7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=60JqoMGoIGS0wuoTg7tCXWkqHLgyT5zwk1k40i2w9oU=;
- b=sR8HLETJKgRSAkGgyslgHJAStZeUxX26VFbgfdI8J/RfmOpSwSd0p+ZZW95mIMVgNm
- yvO2vJMqgBmzYKuLrGKaUWWB4MlU4G74ZJrPI5Iet5Ldv7Tu/QupJAbnOE9C+R1rcmgI
- EZ+om6tNeFK5oQ/xoFa74H85G4TTNqYKrwfyQnqrWrRXKnvR77oqm249UAIkDhFvEQrp
- 4GKh7FFOfzTCtscoquYx8RywlE807Dk1Tq1U1ofLkhhfeFTDPzD5bk8d6fbgqmI6qnK/
- tJO5NBKqajhhvCHONhs8wHOhi6yLkoIpx9Dkbq9QogaI8Cziht7u2GcnR8n96lUZeAsl
- uruA==
-X-Gm-Message-State: APjAAAXJ6mwMAmBZDorib1iuZv16CSdJmElhPFyK6/fRZ+QISoK03MqQ
- HdtNGtcjvIBrbzuCNCZxwtw+oDJ1dLbaaBfGbR4RaA==
-X-Google-Smtp-Source: APXvYqzpLfenCwlHqpcVJFrMN3dph47k155IlVAJKCcYg+mmcGc9XQhSZWyZjWedNEBTEY/PjiRPgmXV5fVwE7WJt3c=
-X-Received: by 2002:a9d:4817:: with SMTP id c23mr16832112otf.97.1566220426047; 
- Mon, 19 Aug 2019 06:13:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190816231609.9521-1-jsnow@redhat.com>
-In-Reply-To: <20190816231609.9521-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Aug 2019 14:13:34 +0100
-Message-ID: <CAFEAcA_1c1aajeKhBKzGWRS6c=iC8zmXXb3en+sLo09TxG63-w@mail.gmail.com>
-To: John Snow <jsnow@redhat.com>
+ (envelope-from <mlevitsk@redhat.com>) id 1hzgt8-0006cE-0m
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:35:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52156)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hzgt5-0006ZG-9c; Mon, 19 Aug 2019 08:35:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id ED88D30089A1;
+ Mon, 19 Aug 2019 12:35:49 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4AC00859CE;
+ Mon, 19 Aug 2019 12:35:45 +0000 (UTC)
+Message-ID: <ba8e9afd066d65099a897b5c515a73ab2c64625d.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, 
+ Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 19 Aug 2019 15:35:44 +0300
+In-Reply-To: <414e8dab-b19b-fd47-52eb-db43ae75ec07@redhat.com>
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
+ <20190815091039.GA7415@linux.fritz.box> <87y2zuy0k7.fsf@dusky.pond.sub.org>
+ <2561ace5297c93cee597c776230dcb8f457a8561.camel@redhat.com>
+ <414e8dab-b19b-fd47-52eb-db43ae75ec07@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::336
-Subject: Re: [Qemu-devel] [PULL 0/3] Ide patches
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Mon, 19 Aug 2019 12:35:50 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 00/13] RFC: luks/encrypted qcow2 key
+ management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,49 +73,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ Daniel =?ISO-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 17 Aug 2019 at 00:16, John Snow <jsnow@redhat.com> wrote:
->
-> The following changes since commit afd760539308a5524accf964107cdb1d54a059=
-e3:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-90816' into staging (2019-08-16 17:21:40 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to 614ab7d127536655ef105d4153ea264c88e855c1:
->
->   hw/ide/atapi: Use the ldst API (2019-08-16 19:14:04 -0400)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> Stable notes: patches one and two can be considered
->               for the next -stable release.
->
-> ----------------------------------------------------------------
->
-> John Snow (1):
->   Revert "ide/ahci: Check for -ECANCELED in aio callbacks"
->
-> Paolo Bonzini (1):
->   dma-helpers: ensure AIO callback is invoked after cancellation
->
-> Philippe Mathieu-Daud=C3=A9 (1):
->   hw/ide/atapi: Use the ldst API
+On Thu, 2019-08-15 at 10:00 -0500, Eric Blake wrote:
+> On 8/15/19 9:44 AM, Maxim Levitsky wrote:
+> 
+> > > > > Does the idea of a union type with a default value for the discriminator
+> > > > > help?  Maybe we have a discriminator which defaults to 'auto', and add a
+> > > > > union branch 'auto':'any'.  During creation, if the "driver":"auto"
+> > > > > branch is selected (usually implicitly by omitting "driver", but also
+> > > > > possible explicitly), the creation attempt is rejected as invalid
+> > > > > regardless of the contents of the remaining 'any'.  But during amend
+> > > > > usage, if the 'auto' branch is selected, we then add in the proper
+> > > > > "driver":"xyz" and reparse the QAPI object to determine if the remaining
+> > > > > fields in 'any' still meet the specification for the required driver branch.
+> > > > > 
+> > > > > This idea may still require some tweaks to the QAPI generator, but it's
+> > > > > the best I can come up with for a way to parse an arbitrary JSON object
+> > > > > with unknown validation, then reparse it again after adding more
+> > > > > information that would constrain the parse differently.
+> > > > 
+> > > > Feels like this would be a lot of code just to allow the client to omit
+> > > > passing a value that it knows anyway. If this were a human interface, I
+> > > > could understand the desire to make commands less verbose, but for QMP I
+> > > > honestly don't see the point when it's not trivial.
+> > > 
+> > > Seconded.
+> > 
+> > 
+> > But what about my suggestion of adding something like:
+> > 
+> > { 'union': 'BlockdevAmendOptions',
+> > 
+> >   'base': {
+> >       'node-name':         'str' },
+> > 
+> >   'discriminator': { 'get_block_driver(node-name)' } ,
+> 
+> Not worth it. It makes the QAPI generator more complex (to invoke
+> arbitrary code instead of a fixed name) just to avoid a little bit of
+> complexity in the caller (which is assumed to be a computer, and thus
+> shouldn't have a hard time providing a sane 'driver' unconditionally).
+> An HMP wrapper around the QMP command can do whatever magic it needs to
+> omit driver, but making driver mandatory for QMP is just fine.
 
-Applied, thanks.
+All right! I kind of not agree with that, since I think even though QMP is a machine language,
+it still should be consistent since humans still use it, even if this is humans that code some
+tool that use it.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+I won't argue with you though, let it be like that.
 
--- PMM
+Best regards,
+	Maxim Levitsky
+
+> 
+
+
 
