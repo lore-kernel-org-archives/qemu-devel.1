@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE42C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54E2C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 062132070D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:51:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF4F22070D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="raXBUJcN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062132070D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="Mxc5glrE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF4F22070D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzizu-000894-Br
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:51:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39234)
+	id 1hzj0T-0000rf-G6
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:51:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39557)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <arikalo@wavecomp.com>) id 1hzivk-0003ZH-QB
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:46:45 -0400
+ (envelope-from <arikalo@wavecomp.com>) id 1hziy8-00067K-W4
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:49:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <arikalo@wavecomp.com>) id 1hzivj-0000Qy-Iw
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:46:44 -0400
-Received: from mail-eopbgr710114.outbound.protection.outlook.com
- ([40.107.71.114]:39428 helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+ (envelope-from <arikalo@wavecomp.com>) id 1hziy7-0001Q1-J4
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:49:12 -0400
+Received: from mail-eopbgr720096.outbound.protection.outlook.com
+ ([40.107.72.96]:22016 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
- id 1hzivj-0000Qe-Bi
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:46:43 -0400
+ id 1hziy6-0001PK-Vv
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:49:11 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KuT+ocrnjl4QLVCwS99s014XXM7VlUgIr+/OvsSxGnB5/pU/a+blRBt8s3jqrkjQKrBV+YQOPYDO4YM4DzQ0sA+CiQq6kHkWMIcHvGCxaz+wAPHHDxyFHu1WUMNDYk/zcMUcoBjqz2LXI35WK7E/CXH36n0nmvZmkFiNYR7tmKqBqxxQdvDCfGNrhlnvg53vI9vKVn99NTEOB78zc0A5gl1IBrvTGm5RNmvx43jgVc4NOiJV04ntgaevF/aqrOA/llBHLN5LcggBYy2fztBjV3Z2yCLsrYQigX0iOMyp4j/DjeD973LSIhGkX9Z4XpJe4cTJTnC7eLUz/alqbnnFTQ==
+ b=nI3k6aqpPaJ5fqLyUNd2wwAgUl7nLcPwVX8tpLqQE3vO8kfD6w+Ck6w2CVaqib+UyhV73OjzXky0Vt99gU4c4M+9CuEKV6mCQ3aBnJ5jFgTY8KshF7FjT9FheQv+UojIEKX76/6b4ixGNCwQ8pJMCK5sdn6L+A0pNb8xIPknvGlpcRInsNbuKO8HP3qsbmTjkuDv27t5jYFkC9uFVrfc+0EmO9mR2nDOjaeWxCto1TDqxE/bKoFdpTqSokWStmPjHHsrk18eRBv1Y/0SWu7xg0hEXmDHMHBme1jvPGXNJWLb+P1PS+9lM1hhxM2BScdIFTH6vQbKB7v81oLJKg0K1w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e5oaZn/RZAa2BF3UoCzs+Eo2bj0o5eg8gBVPeyp+ABo=;
- b=cz9jlTnfTEUxdE/J0Cocc02HuFXdqbGWAHQ5k38esWSQnEQMf3wjs2FkhTymgBplbjA2pD2wC/el9R4xnRzIsz7wgOsYJatjrgZkdDmGqgk1fhHcMk3DX1dwnFqbwjvDuBcDaIbS0l2ihLnc/+fGojKv1BPweiAzA1S4J4kOQbwUD4cSN+mtSrmTWAZERlpGBpaMKhBIZdDlnEYKZIMqVTfCNv0OdMKdqFB2naXzbG00mP2ltibNcGo92Cm9oOBd/v2Iij2+sp9SkNC9BoB/6WhW7oMRekKPHWe6HN27Ka5aop5BlniOHRsr3TKISJsSZwEH8DBsraMHjcXr+U/87A==
+ bh=Y0AS2O+xs6nZh/h75VRWXC9zRWT9GKszbF8+F0gqW4E=;
+ b=fmCxS27GKeTvuibprcWlB+OAKZVMCJskOcS5uzetAIy411kBKzw6Mp8n8JMWW8YTIMG+UypGYFMzPPhV4xEOCbpSUR30p7/fPiwvNSbp6lU0EiZBZ/8vTKPMFavtnUHiByX3CAgKyQi/mvb7BGlWrC+psCYpNNUDnhwllTY9MGnVIunEccuN0OftdG3NDnlFgigrCmAK6A/6tmJqMoG/3fBlX8u5Rh53Q/XZrD9hJ88kMOhpUeGV3rQbUO/g1wgsLYP6eTzP6NoLc5M1bCbJeIsUqT0lBqGZM0wIdvfkKjYP9OSpUotOYBbtvdFURivRjjkJjWz0bqlIgzXnzmfNRQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
  dkim=pass header.d=wavecomp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e5oaZn/RZAa2BF3UoCzs+Eo2bj0o5eg8gBVPeyp+ABo=;
- b=raXBUJcN2vvf0MlyBqst4vmpg6oIBfuCN5LXNKXPVwJltxqtTeV3fzqHAFSoelmPaZBJpcL2c7fFj2/V1CyCi6uUd+DvF08dvzPPDE8UGv1FZRScDMw05Fa1/+txj4BgbLpFWfC1fLQfGHpt8wqIRHdjw6ZS44/IOkFyyvfX/KA=
+ bh=Y0AS2O+xs6nZh/h75VRWXC9zRWT9GKszbF8+F0gqW4E=;
+ b=Mxc5glrERt/ujkgLFyk65C79h9xFNIp9lnAcIvMhA+E/YgFLL2Z5E/hQv8+o6tiPA/+jh5ryjN8ns0izoJm+ol6z0yHpScWaZylGFAKaUSCmrDDtH4nldZy6P2jWcRf9DUVfQKdEq2gEQf0Rv2uLGp3oFJbaJ+QUieJ2az8w+IM=
 Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
- DM5PR22MB0684.namprd22.prod.outlook.com (10.172.191.23) with Microsoft SMTP
+ DM5PR22MB0683.namprd22.prod.outlook.com (10.172.190.23) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.18; Mon, 19 Aug 2019 14:46:41 +0000
+ 15.20.2178.18; Mon, 19 Aug 2019 14:49:09 +0000
 Received: from DM5PR22MB1658.namprd22.prod.outlook.com
  ([fe80::ed69:1c9f:bdff:2197]) by DM5PR22MB1658.namprd22.prod.outlook.com
  ([fe80::ed69:1c9f:bdff:2197%5]) with mapi id 15.20.2178.018; Mon, 19 Aug 2019
- 14:46:41 +0000
+ 14:49:09 +0000
 From: Aleksandar Rikalo <arikalo@wavecomp.com>
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [EXTERNAL][PATCH v8 14/37] target/mips: Style improvements in
- mips_int.c
-Thread-Index: AQHVVobVr2dQLJEYSEeya2ssmW29G6cCjKRF
-Date: Mon, 19 Aug 2019 14:46:41 +0000
-Message-ID: <DM5PR22MB1658FA857725FD2A0E1AAF35D2A80@DM5PR22MB1658.namprd22.prod.outlook.com>
+Thread-Topic: [EXTERNAL][PATCH v8 36/37] target/mips: tests/tcg: Add optional
+ printing of more detailed failure info
+Thread-Index: AQHVVobVFkuqG8u43Ue30JVR1gbssacCjVTI
+Date: Mon, 19 Aug 2019 14:49:09 +0000
+Message-ID: <DM5PR22MB1658A66A26A98AC8EDA83E45D2A80@DM5PR22MB1658.namprd22.prod.outlook.com>
 References: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>,
- <1566216496-17375-15-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1566216496-17375-15-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1566216496-17375-37-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1566216496-17375-37-git-send-email-aleksandar.markovic@rt-rk.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -79,40 +79,40 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=arikalo@wavecomp.com; 
 x-originating-ip: [82.117.201.26]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7bdef606-8a84-4057-68f1-08d724b40c75
+x-ms-office365-filtering-correlation-id: 510f2be0-433d-49d9-9af2-08d724b4646c
 x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DM5PR22MB0684; 
-x-ms-traffictypediagnostic: DM5PR22MB0684:
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DM5PR22MB0683; 
+x-ms-traffictypediagnostic: DM5PR22MB0683:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR22MB068443F8449FB4CB8E240ABED2A80@DM5PR22MB0684.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2887;
+x-microsoft-antispam-prvs: <DM5PR22MB068361427DCBE22EC17C4015D2A80@DM5PR22MB0683.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3383;
 x-forefront-prvs: 0134AD334F
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(396003)(346002)(136003)(366004)(39840400004)(189003)(199004)(76176011)(7696005)(76116006)(110136005)(316002)(6606003)(2501003)(74316002)(446003)(229853002)(91956017)(55016002)(54896002)(66476007)(64756008)(52536014)(66556008)(99286004)(66946007)(66066001)(86362001)(6436002)(54906003)(66446008)(9686003)(53546011)(256004)(107886003)(6246003)(3846002)(6116002)(19627405001)(102836004)(33656002)(14444005)(8676002)(6506007)(55236004)(186003)(53936002)(5660300002)(81156014)(81166006)(14454004)(26005)(4326008)(71200400001)(8936002)(478600001)(71190400001)(7736002)(11346002)(25786009)(476003)(2906002)(486006);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0684;
+ SFS:(10019020)(376002)(136003)(346002)(396003)(39840400004)(366004)(199004)(189003)(186003)(66066001)(9686003)(81166006)(102836004)(4326008)(81156014)(107886003)(5660300002)(54906003)(6436002)(54896002)(19627405001)(110136005)(26005)(6116002)(86362001)(3846002)(2501003)(55016002)(486006)(52536014)(476003)(8676002)(316002)(256004)(6606003)(6506007)(53546011)(11346002)(53936002)(55236004)(14454004)(66446008)(64756008)(71200400001)(7736002)(6246003)(33656002)(99286004)(71190400001)(91956017)(76116006)(66556008)(66946007)(229853002)(74316002)(66476007)(446003)(2906002)(25786009)(76176011)(7696005)(14444005)(478600001)(8936002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0683;
  H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
+ PTR:InfoNoRecords; A:1; MX:1; 
 received-spf: None (protection.outlook.com: wavecomp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: RIrby3wkxXm9FhYlKkUQdbzVbPMvVJv5dZT1/02ToNc4q/jJsXjr3e36BQEEM7hEKx8PREsjGuhfeQxlm+welM2DQPBcASvTG1T6YNGzfuqreUFcWoAaYgh6dqH4XI42ax5v3mcWDT19b/7iS0Q/8GxmXhCbAidB8egspJPKX8xyXlT4+pvDdaOVrlssUJ7U1a1ZPixlwRnOtdn6eCcnfedbiGwr4Og0XfpKjsxzpFYPXi8xeVlbWhoA7fhEvih27sqpCT8S4FcY/VIuTCuXA2Ly7MKVFLFetX8UwI/CYbB0HKpDRStIP5CKVGc4PoQoteIeLyJtc8suEYhzY8eABtDy0CpVCJuva8DRypyTlZL/UtZUjLd1Lrdiug0BYYQTy50I1JNDFnwW/7WWggqNHoMkBC9GQSAxBCUH9CqfUdA=
+x-microsoft-antispam-message-info: OrHczmviFKhtHKRopkn8TWu4K9VD7dnw8leNiM7BzGI/eIgjerMuniDNkB1nm+QFcYpuwTXFmylCJBGz/lDm17DCBTQXn+RO6rsG4oVaFVYpVTDmLxNWVSq3Ti1QwRQ9BZCwW9X2Gx7UF9y3wQvPVxUuhjv1/fIj6nwCSSzlnKo4j2B0w0ytdrhBrtYi5rC+WUl2JojULNanY23wEmlQbqmtyTLGZ1YhJYNs+R4jQLVmYuhVt8e/b7DLtv1jSingyOZa80xjxqIswLgtmHgA98QpvSJYQAZTFTkM9clZBYzRXNV2EhvWC3b6JX/16lSlLUw01OhS+WK7CtYjBlC75LCkVlD/4Dk1dTpGf9XflNuwK0p+0d8iNtIaPw6m/4ALSbxQ/k9oF4iI91CNbnlOt4QT1boTMTW8f4knaPbM41w=
 MIME-Version: 1.0
 X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bdef606-8a84-4057-68f1-08d724b40c75
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2019 14:46:41.7379 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 510f2be0-433d-49d9-9af2-08d724b4646c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2019 14:49:09.2947 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Y6bNbzZm6b4+zQpgJknPBQLQVgxaImqZ6YwUSalMaIZ2Y/JcLUS4GyHwuj6yAmoIy/+x5MQjtVWRKRBYOy7y+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0684
+X-MS-Exchange-CrossTenant-userprincipalname: Y/jmhJEht3hlpJIkhBrtq4TZxJrIg7nuUZvuyitpNHIObhLNL3kz31J3iwr1vN88EJDTc5OL/qy6KDygf4BiVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0683
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.71.114
+X-Received-From: 40.107.72.96
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [EXTERNAL][PATCH v8 14/37] target/mips: Style
- improvements in mips_int.c
+Subject: Re: [Qemu-devel] [EXTERNAL][PATCH v8 36/37] target/mips: tests/tcg:
+ Add optional printing of more detailed failure info
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,43 +130,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Monday, August 19, 2019 2:07 PM
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, August 19, 2019 2:08 PM
 > To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
 > Cc: philmd@redhat.com <philmd@redhat.com>; Aleksandar Markovic <amarkovic=
 @wavecomp.com>; Aleksandar Rikalo <arikalo@wavecomp.com>
-> Subject: [EXTERNAL][PATCH v8 14/37] target/mips: Style improvements in mi=
-ps_int.c
+> Subject: [EXTERNAL][PATCH v8 36/37] target/mips: tests/tcg: Add optional =
+printing of more detailed failure info
 >
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 >
-> Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
+> There is a need for printing input and output data for failure cases,
+> for debugging purpose. This is achieved by this patch, and only if a
+> preprocessor constant is manually set to 1. (Assumption is that the
+> need for such printout is relatively rare.)
 >
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  hw/mips/mips_int.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  tests/tcg/mips/include/test_utils_128.h | 23 ++++++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-> index f899f6c..4c731ab 100644
-> --- a/hw/mips/mips_int.c
-> +++ b/hw/mips/mips_int.c
-> @@ -35,8 +35,9 @@ static void cpu_mips_irq_request(void *opaque, int irq,=
- int level)
->      CPUState *cs =3D CPU(cpu);
->      bool locked =3D false;
+> diff --git a/tests/tcg/mips/include/test_utils_128.h b/tests/tcg/mips/inc=
+lude/test_utils_128.h
+> index 2fea610..0dd3868 100644
+> --- a/tests/tcg/mips/include/test_utils_128.h
+> +++ b/tests/tcg/mips/include/test_utils_128.h
+> @@ -27,7 +27,8 @@
+>  #include <inttypes.h>
+>  #include <string.h>
 >
-> -    if (irq < 0 || irq > 7)
-> +    if (irq < 0 || irq > 7) {
->          return;
-> +    }
+> -#define PRINT_RESULTS 0
+> +#define PRINT_RESULTS    0
+> +#define PRINT_FAILURES   0
 >
->      /* Make sure locking works even if BQL is already held by the caller=
- */
->      if (!qemu_mutex_iothread_locked()) {
+>
+>  static inline int32_t check_results_128(const char *isa_ase_name,
+> @@ -65,6 +66,26 @@ static inline int32_t check_results_128(const char *is=
+a_ase_name,
+>              (b128_result[2 * i + 1] =3D=3D b128_expect[2 * i + 1])) {
+>              pass_count++;
+>          } else {
+> +#if PRINT_FAILURES
+> +            uint32_t ii;
+> +            uint64_t a, b;
+> +
+> +            printf("\n");
+> +
+> +            printf("FAILURE for test case %d!\n", i);
+> +
+> +            memcpy(&a, (b128_expect + 2 * i), 8);
+> +            memcpy(&b, (b128_expect + 2 * i + 1), 8);
+> +            printf("Expected result : { 0x%016llxULL, 0x%016llxULL, },\n=
+",
+> +                   a, b);
+> +
+> +            memcpy(&a, (b128_result + 2 * i), 8);
+> +            memcpy(&b, (b128_result + 2 * i + 1), 8);
+> +            printf("Actual result   : { 0x%016llxULL, 0x%016llxULL, },\n=
+",
+> +                   a, b);
+> +
+> +            printf("\n");
+> +#endif
+>              fail_count++;
+>          }
+>      }
 > --
 > 2.7.4
->
 
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 
