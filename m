@@ -2,90 +2,114 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEA7C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3382CC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:00:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A83852086C
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:58:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dphg+eyp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A83852086C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0529F205C9
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:00:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0529F205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzhFO-0003aF-KF
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:58:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37859)
+	id 1hzhGo-0005hx-Gh
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:00:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41215)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1hzgbG-00038D-JB
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:17:28 -0400
+ (envelope-from <david@redhat.com>) id 1hzgss-0003s2-Rf
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hzgbE-0007EB-2f
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:17:26 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:40661)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hzgb6-00077J-L7
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:17:19 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id c3so8493872wrd.7
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 05:17:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=x7wHfawCjsVF1Gi5t5yCk6URAAid1imk9lHZgcaTxXU=;
- b=Dphg+eyp48GJg2nJCUQ4FgjBFs4pMDSr2w9yKHXJIyfMhDyJSSbXFtRbx9MXxAvsPf
- alVSPsdTPcmJghhKl8/bFjBNS3j0SxZOUyIhfrQQ3Ud+MiehFTZorQDTdlzuZY3ETZiA
- Zp8KzLqrlROQR4ETFcJ1pxeumRQJdrUneckg+RMDtV4V9hbB90CTQcvimn2/HUk5itxR
- MCy8iQ11all9dwtcDmCNdwJbfr20HKh2hHRckl95Sx3Z1XXXyTlTmXPq7SOiyeJxpZt/
- uQV3nfXjVcNqOZcjww5EDZPmAcW+BrDGHQXGcDA4YHIm9mLyddLsoJ7XqrcMnu7f6hsw
- 0dGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=x7wHfawCjsVF1Gi5t5yCk6URAAid1imk9lHZgcaTxXU=;
- b=nRmbj1afP03A9xSgLaGk44AzqEhzWFEJ33qY3DyGoD+4NJvBLldj39BCVvVsFSAp8W
- JkgxMtHuGrPLV/Vi9GWIhBrNUrI7iBHR+rerUAGQ+deAs/9y/Rv7IVuCUPzeSTNSdnat
- V6hcul/srGdEfiUsQLrQ8herD0fPG+C3fMH9aUgAkStPb2LX3kMRufpcNgmxoHm1VUQD
- IcOVvatS81NJfAsWuZWI6TbwDCQQ3MKQMHSBHZYG4BOKXr5FgJviYLTeb4fDVK4NQrd3
- nrMo3YptKwlP3JIfJk74zIHcQsi8OrsBg6eQwnthYejvPjogIufKTuolsNbILNlUFcHA
- eafQ==
-X-Gm-Message-State: APjAAAWcAauhbxEVCXOKQNCz3LlKir60/+XznSemXZw/aC2WW/IysAc1
- pH4suSBaXPvUIy0G/5bIUJHQ2w==
-X-Google-Smtp-Source: APXvYqzpfnrMhOgqdbe7R0i8isZG9xWbPG4QKjznQ7/aHiKFZwKnYm6ph0xuoJy35LPMYtePO9CqKg==
-X-Received: by 2002:adf:fdcc:: with SMTP id i12mr28155918wrs.88.1566217031406; 
- Mon, 19 Aug 2019 05:17:11 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id h9sm12348347wrt.53.2019.08.19.05.17.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 05:17:10 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 04EE31FF8C;
- Mon, 19 Aug 2019 13:17:10 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Mon, 19 Aug 2019 13:16:58 +0100
-Message-Id: <20190819121709.31597-2-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190819121709.31597-1-alex.bennee@linaro.org>
-References: <20190819121709.31597-1-alex.bennee@linaro.org>
+ (envelope-from <david@redhat.com>) id 1hzgsr-0006Rx-NX
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:35:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50678)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1hzgsr-0006Qk-EL; Mon, 19 Aug 2019 08:35:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9A069106E970;
+ Mon, 19 Aug 2019 12:35:36 +0000 (UTC)
+Received: from [10.36.117.56] (ovpn-117-56.ams2.redhat.com [10.36.117.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AC6B21CF;
+ Mon, 19 Aug 2019 12:35:32 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190805152947.28536-1-david@redhat.com>
+ <20190805152947.28536-6-david@redhat.com>
+ <41ecb40c-25e6-c209-48f9-e63fc309ed5a@redhat.com>
+ <5bd53f3f-b2cd-9ab4-9185-310b9778cc8e@redhat.com>
+ <c9d4ee70-5819-722f-f404-697622ee5ce5@redhat.com>
+ <701fa06a-35e7-8903-5d07-125afb11938c@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <6067a11e-4db3-043c-48cb-976a64221b4b@redhat.com>
+Date: Mon, 19 Aug 2019 14:35:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
-Subject: [Qemu-devel] [PULL 01/12] fpu: replace LIT64 usage with UINT64_C
- for specialize constants
+In-Reply-To: <701fa06a-35e7-8903-5d07-125afb11938c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Mon, 19 Aug 2019 12:35:36 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v1 5/9] s390x/mmu:
+ Implement access-exception-fetch/store-indication facility
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,131 +121,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>, Ilya Leoshkevich <iii@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have a wrapper that does the right thing from stdint.h so lets use
-it for our constants in softfloat-specialize.h
+On 19.08.19 14:30, Thomas Huth wrote:
+> On 8/19/19 2:26 PM, David Hildenbrand wrote:
+>> On 19.08.19 14:22, Thomas Huth wrote:
+>>> On 8/19/19 2:16 PM, Thomas Huth wrote:
+>>>> On 8/5/19 5:29 PM, David Hildenbrand wrote:
+>>>>> We always have to indicate whether it is a fetch or a store for all access
+>>>>> exceptions. This is only missing for LAP exceptions.
+>>>>
+>>>> Do we really need this for LAP, too? If I get figure 3-5 "Enhanced
+>>>> Suppression-on-Protection Results" right, these bits are not set for LAP
+>>>> exceptions...? Do I miss something?
+>>>
+>>> I was looking at an older version of the PoP ... the table that I mean
+>>> is "Figure 3-8. Enhanced Suppression-on-Protection Facility 2 Results"
+>>> in SA22-7832-11.
+>>>
+>>>  Thomas
+>>>
+>>
+>> I think that table only states that if 56==60==61==0, then we might have
+>> either KCP or LAP ("Presented if TEID details are not available" - but
+>> as we have TEID information available, we can just set 56=1 and 60=61=0
+>> (== LAP), or am I missing something?
+> 
+> Oh, well, I was looking at the older version of the PoP first, and it
+> was not specified there yet, and when I started looking the the new
+> version, I only saw the first LAP line and stopped reading properly
+> afterwards... of course you're right, there is another LAP line in the
+> table where they say that the address is correclty specified.
+> 
+> Please mentioned the "Enhanced Suppression-on-Protection
+> Facility 2" (which introduced this new behavior) in the patch
+> description to make this clear, then your patch is fine.
+> 
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Ah, right, that comes in the next patch. Might make sense to reshuffle
+both patches. Will have a look.
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 7b8895726c5..5ab2fa19415 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -196,11 +196,11 @@ floatx80 floatx80_default_nan(float_status *status)
-     /* None of the targets that have snan_bit_is_one use floatx80.  */
-     assert(!snan_bit_is_one(status));
- #if defined(TARGET_M68K)
--    r.low = LIT64(0xFFFFFFFFFFFFFFFF);
-+    r.low = UINT64_C(0xFFFFFFFFFFFFFFFF);
-     r.high = 0x7FFF;
- #else
-     /* X86 */
--    r.low = LIT64(0xC000000000000000);
-+    r.low = UINT64_C(0xC000000000000000);
-     r.high = 0xFFFF;
- #endif
-     return r;
-@@ -212,9 +212,9 @@ floatx80 floatx80_default_nan(float_status *status)
- 
- #define floatx80_infinity_high 0x7FFF
- #if defined(TARGET_M68K)
--#define floatx80_infinity_low  LIT64(0x0000000000000000)
-+#define floatx80_infinity_low  UINT64_C(0x0000000000000000)
- #else
--#define floatx80_infinity_low  LIT64(0x8000000000000000)
-+#define floatx80_infinity_low  UINT64_C(0x8000000000000000)
- #endif
- 
- const floatx80 floatx80_infinity
-@@ -667,7 +667,7 @@ int float64_is_signaling_nan(float64 a_, float_status *status)
-         return ((a << 1) >= 0xFFF0000000000000ULL);
-     } else {
-         return (((a >> 51) & 0xFFF) == 0xFFE)
--            && (a & LIT64(0x0007FFFFFFFFFFFF));
-+            && (a & UINT64_C(0x0007FFFFFFFFFFFF));
-     }
- #endif
- }
-@@ -707,7 +707,7 @@ static float64 commonNaNToFloat64(commonNaNT a, float_status *status)
-     if (mantissa) {
-         return make_float64(
-               (((uint64_t) a.sign) << 63)
--            | LIT64(0x7FF0000000000000)
-+            | UINT64_C(0x7FF0000000000000)
-             | (a.high >> 12));
-     } else {
-         return float64_default_nan(status);
-@@ -790,7 +790,7 @@ int floatx80_is_quiet_nan(floatx80 a, float_status *status)
-             && (a.low == aLow);
-     } else {
-         return ((a.high & 0x7FFF) == 0x7FFF)
--            && (LIT64(0x8000000000000000) <= ((uint64_t)(a.low << 1)));
-+            && (UINT64_C(0x8000000000000000) <= ((uint64_t)(a.low << 1)));
-     }
- #endif
- }
-@@ -812,7 +812,7 @@ int floatx80_is_signaling_nan(floatx80 a, float_status *status)
-     } else {
-         uint64_t aLow;
- 
--        aLow = a.low & ~LIT64(0x4000000000000000);
-+        aLow = a.low & ~UINT64_C(0x4000000000000000);
-         return ((a.high & 0x7FFF) == 0x7FFF)
-             && (uint64_t)(aLow << 1)
-             && (a.low == aLow);
-@@ -829,7 +829,7 @@ floatx80 floatx80_silence_nan(floatx80 a, float_status *status)
- {
-     /* None of the targets that have snan_bit_is_one use floatx80.  */
-     assert(!snan_bit_is_one(status));
--    a.low |= LIT64(0xC000000000000000);
-+    a.low |= UINT64_C(0xC000000000000000);
-     return a;
- }
- 
-@@ -874,7 +874,7 @@ static floatx80 commonNaNToFloatx80(commonNaNT a, float_status *status)
-     }
- 
-     if (a.high >> 1) {
--        z.low = LIT64(0x8000000000000000) | a.high >> 1;
-+        z.low = UINT64_C(0x8000000000000000) | a.high >> 1;
-         z.high = (((uint16_t)a.sign) << 15) | 0x7FFF;
-     } else {
-         z = floatx80_default_nan(status);
-@@ -969,7 +969,7 @@ int float128_is_signaling_nan(float128 a, float_status *status)
-             && (a.low || (a.high & 0x0000FFFFFFFFFFFFULL));
-     } else {
-         return (((a.high >> 47) & 0xFFFF) == 0xFFFE)
--            && (a.low || (a.high & LIT64(0x00007FFFFFFFFFFF)));
-+            && (a.low || (a.high & UINT64_C(0x00007FFFFFFFFFFF)));
-     }
- #endif
- }
-@@ -987,7 +987,7 @@ float128 float128_silence_nan(float128 a, float_status *status)
-     if (snan_bit_is_one(status)) {
-         return float128_default_nan(status);
-     } else {
--        a.high |= LIT64(0x0000800000000000);
-+        a.high |= UINT64_C(0x0000800000000000);
-         return a;
-     }
- #endif
-@@ -1025,7 +1025,7 @@ static float128 commonNaNToFloat128(commonNaNT a, float_status *status)
-     }
- 
-     shift128Right(a.high, a.low, 16, &z.high, &z.low);
--    z.high |= (((uint64_t)a.sign) << 63) | LIT64(0x7FFF000000000000);
-+    z.high |= (((uint64_t)a.sign) << 63) | UINT64_C(0x7FFF000000000000);
-     return z;
- }
- 
+Thanks!
+
+>  Thomas
+> 
+
+
 -- 
-2.20.1
 
+Thanks,
+
+David / dhildenb
 
