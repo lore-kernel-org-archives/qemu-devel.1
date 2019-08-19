@@ -2,86 +2,81 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9629BC3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 05:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF250C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 05:35:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E8FB2087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 05:34:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tWzHd/c1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E8FB2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 92FC62087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 05:35:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92FC62087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzaIs-0006IB-J8
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 01:34:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43884)
+	id 1hzaKA-0007wp-N8
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 01:35:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1hzZy9-0005Ko-WD
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 01:12:39 -0400
+ (envelope-from <star.zeng@intel.com>) id 1hzaHH-0004EJ-Ds
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 01:32:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hzZy8-00005I-Hy
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 01:12:37 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43223)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hzZy8-0008U2-BC; Mon, 19 Aug 2019 01:12:36 -0400
-Received: by mail-pg1-x542.google.com with SMTP id k3so466335pgb.10;
- Sun, 18 Aug 2019 22:12:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id:in-reply-to:references;
- bh=wsS1LqiP2/iroNuW+mAa8PZ1+kbXeYHRRa6gdWfpo28=;
- b=tWzHd/c1Z1nt/M/p0btgjo30P6nDCXWX1Um5wiSWBZlNmzZdf87rpSdhLZTrRCbkgP
- of8zngFEMWQqyxRomejzkknd5r2x5Cclt27fUIFegezGRlP1tJB9KafO0GqiszRoyUBF
- 4J5Uko+iFn7n8GUGDl+xEmmJDswkmqzLW8Ho3itnuaDjDstu//miluvYjySEVbxFDb6w
- sMAG4hZ/9hZOGHMhJk4MFyRb3Fe7lfG2bKk9enCYkXKYAFXkQ8KNzFhUnrqU1IWNBbs/
- qEF5tyyG0KWZQh+4XgczkTkfLTkyI4glPtuvg76szIXPYKrB4ABzIIzEkzwkf6Ow1WPn
- nK5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references;
- bh=wsS1LqiP2/iroNuW+mAa8PZ1+kbXeYHRRa6gdWfpo28=;
- b=lGsU0BMPkMnsvNEaoFXxsaYVawdoNDLVk80j27PgG17oTUdeJ/fB1B8jgnt+fE+8Ez
- rWd6sIsPaHJycsGNPD62Zbsq7Mrkgk08nNhQEtqtlBmJAicdW1TUJkqzU0XGDgjqTjvL
- qoyMmEkaCC+M4Jb6Nmztk8mNlwvSP3x1x6hsSmmTc9Kf3tTM3hRbHRPF8+Qk9jSZ+dzW
- PpTY9Hj0jojIo8GF8yLfEdWP2ejp16yxZZ0o9/BTel6hha28HHiqpcxIwgMTwUEUMgl3
- rUuPhmYQnxHIm0EI4U3B8IwMh0QuuI04iZI1nEuQaXv46rNElWaUTm6ko3f/WQMQDups
- P7CA==
-X-Gm-Message-State: APjAAAWvPgBgVtk5r3+fkjrubQ0I/tqJjbK9CfG6XK86lnzPExIdZpq1
- QsTZgUHVIM3QjU0lvNWMqsU=
-X-Google-Smtp-Source: APXvYqz9/YgQgTIYLf/Ule25eIegUKJIjdw4veUSPkIlyQoZT22ZbZmIq9StllqiDi8iprzo7oBbUg==
-X-Received: by 2002:a63:d84e:: with SMTP id k14mr18333586pgj.234.1566191555472; 
- Sun, 18 Aug 2019 22:12:35 -0700 (PDT)
-Received: from localhost.localdomain (unknown-224-80.windriver.com.
- [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id q13sm15464986pfl.124.2019.08.18.22.12.34
- (version=TLS1 cipher=AES128-SHA bits=128/128);
- Sun, 18 Aug 2019 22:12:34 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Date: Sun, 18 Aug 2019 22:11:59 -0700
-Message-Id: <1566191521-7820-27-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1566191521-7820-1-git-send-email-bmeng.cn@gmail.com>
-References: <1566191521-7820-1-git-send-email-bmeng.cn@gmail.com>
+ (envelope-from <star.zeng@intel.com>) id 1hzaHF-00058Y-DK
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 01:32:22 -0400
+Received: from mga03.intel.com ([134.134.136.65]:52443)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <star.zeng@intel.com>) id 1hzaHF-00055g-3l
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 01:32:21 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Aug 2019 22:32:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,403,1559545200"; d="scan'208";a="206895690"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2019 22:32:16 -0700
+Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 18 Aug 2019 22:32:16 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.19]) by
+ SHSMSX103.ccr.corp.intel.com ([169.254.4.139]) with mapi id 14.03.0439.000;
+ Mon, 19 Aug 2019 13:32:14 +0800
+From: "Zeng, Star" <star.zeng@intel.com>
+To: Wei Yang <richardw.yang@linux.intel.com>, David Hildenbrand
+ <david@redhat.com>
+Thread-Topic: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to
+ use goto for the last check
+Thread-Index: AQHVRm8sI9RcDIduCkeWmeFT3LDTHabwhy4g//+DlICAAIksAP//fbAAgABK94CAEP7tgIAAtkoQ
+Date: Mon, 19 Aug 2019 05:32:14 +0000
+Message-ID: <0C09AFA07DD0434D9E2A0C6AEB0483104039E3A1@shsmsx102.ccr.corp.intel.com>
+References: <20190730003740.20694-1-richardw.yang@linux.intel.com>
+ <20190730003740.20694-2-richardw.yang@linux.intel.com>
+ <0C09AFA07DD0434D9E2A0C6AEB0483104038F59D@shsmsx102.ccr.corp.intel.com>
+ <20190808021329.GC26938@richard>
+ <0C09AFA07DD0434D9E2A0C6AEB0483104038F61B@shsmsx102.ccr.corp.intel.com>
+ <20190808023802.GD26938@richard>
+ <a73f638c-e33d-c3d8-0b4a-0fa78943a30d@redhat.com>
+ <20190819023855.GC6368@richard>
+In-Reply-To: <20190819023855.GC6368@richard>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [PATCH v4 26/28] riscv: sifive_u: Fix broken GEM
- support
+X-Received-From: 134.134.136.65
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to use
+ goto for the last check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,144 +88,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "imammedo@redhat.com" <imammedo@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Zeng,
+ Star" <star.zeng@intel.com>, "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At present the GEM support in sifive_u machine is seriously broken.
-The GEM block register base was set to a weird number (0x100900FC),
-which for no way could work with the cadence_gem model in QEMU.
 
-Not like other GEM variants, the FU540-specific GEM has a management
-block to control 10/100/1000Mbps link speed changes, that is mapped
-to 0x100a0000. We can simply map it into MMIO space without special
-handling using create_unimplemented_device().
 
-Update the GEM node compatible string to use the official name used
-by the upstream Linux kernel, and add the management block reg base
-& size to the <reg> property encoding.
+> -----Original Message-----
+> From: Wei Yang [mailto:richardw.yang@linux.intel.com]
+> Sent: Monday, August 19, 2019 10:39 AM
+> To: David Hildenbrand <david@redhat.com>
+> Cc: Wei Yang <richardw.yang@linux.intel.com>; Zeng, Star
+> <star.zeng@intel.com>; imammedo@redhat.com; qemu-devel@nongnu.org;
+> mst@redhat.com
+> Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to
+> use goto for the last check
+>=20
+> On Thu, Aug 08, 2019 at 09:06:21AM +0200, David Hildenbrand wrote:
+> >On 08.08.19 04:38, Wei Yang wrote:
+> >> On Thu, Aug 08, 2019 at 02:30:02AM +0000, Zeng, Star wrote:
+> >>>> -----Original Message-----
+> >>>> From: Wei Yang [mailto:richardw.yang@linux.intel.com]
+> >>>> Sent: Thursday, August 8, 2019 10:13 AM
+> >>>> To: Zeng, Star <star.zeng@intel.com>
+> >>>> Cc: Wei Yang <richardw.yang@linux.intel.com>;
+> >>>> qemu-devel@nongnu.org; imammedo@redhat.com;
+> david@redhat.com;
+> >>>> mst@redhat.com
+> >>>> Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not
+> >>>> necessary to use goto for the last check
+> >>>>
+> >>>> On Thu, Aug 08, 2019 at 01:42:14AM +0000, Zeng, Star wrote:
+> >>>>>> -----Original Message-----
+> >>>>>> From: Qemu-devel [mailto:qemu-devel-
+> >>>>>> bounces+star.zeng=3Dintel.com@nongnu.org] On Behalf Of Wei Yang
+> >>>>>> Sent: Tuesday, July 30, 2019 8:38 AM
+> >>>>>> To: qemu-devel@nongnu.org
+> >>>>>> Cc: imammedo@redhat.com; david@redhat.com; Wei Yang
+> >>>>>> <richardw.yang@linux.intel.com>; mst@redhat.com
+> >>>>>> Subject: [Qemu-devel] [PATCH v2 1/2] memory-device: not
+> necessary
+> >>>>>> to use goto for the last check
+> >>>>>>
+> >>>>>> We are already at the last condition check.
+> >>>>>>
+> >>>>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >>>>>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> >>>>>> Reviewed-by: David Hildenbrand <david@redhat.com>
+> >>>>>> ---
+> >>>>>>  hw/mem/memory-device.c | 1 -
+> >>>>>>  1 file changed, 1 deletion(-)
+> >>>>>>
+> >>>>>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-
+> device.c
+> >>>> index
+> >>>>>> 5f2c408036..df3261b32a 100644
+> >>>>>> --- a/hw/mem/memory-device.c
+> >>>>>> +++ b/hw/mem/memory-device.c
+> >>>>>> @@ -186,7 +186,6 @@ static uint64_t
+> >>>>>> memory_device_get_free_addr(MachineState *ms,
+> >>>>>>      if (!range_contains_range(&as, &new)) {
+> >>>>>>          error_setg(errp, "could not find position in guest addres=
+s space
+> for "
+> >>>>>>                     "memory device - memory fragmented due to
+> alignments");
+> >>>>>> -        goto out;
+> >>>>>
+> >>>>> Is it better to return 0 (or set new_addr to 0) for this error
+> >>>>> path and another
+> >>>> remaining "goto out" path?
+> >>>>>
+> >>>>
+> >>>> I may not get your point.
+> >>>>
+> >>>> We set errp which is handled in its caller. By doing so, the error i=
+s
+> propagated.
+> >>>>
+> >>>> Do I miss something?
+> >>>
+> >>> Yes, you are right. Currently, the caller is checking errp, but not t=
+he
+> returned address, so there should be no issue.
+> >>> But when you see other error paths, you will find they all return 0.
+> >>> To be aligned (return 0 when error), so just suggest also returning
+> >>> 0 for these two "goto out" error path. :)
+> >>>
+> >>
+> >> You may have some point.
+> >>
+> >> Let's see whether others have the same taste, or we can refine it
+> separately.
+> >>
+> >
+> >I don't think that's necessary (callers really should check for errors
+> >before using the return values), but I would also not object to that cha=
+nge.
+> >
+>=20
+> In case there is no strong requirement to refactor the code. I would leav=
+e it
+> here.
 
-Tested with upstream U-Boot and Linux kernel MACB drivers.
+It was just my suggestion. I am fine with any preference you and other expe=
+rts have.
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Thanks,
+Star
 
----
-
-Changes in v4: None
-Changes in v3: None
-Changes in v2:
-- use create_unimplemented_device() to create the GEM management
-  block instead of sifive_mmio_emulate()
-- add "phy-handle" property to the ethernet node
-
- hw/riscv/sifive_u.c         | 21 +++++++++++++++++----
- include/hw/riscv/sifive_u.h |  3 ++-
- 2 files changed, 19 insertions(+), 5 deletions(-)
-
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index d66a7e8..7a370e9 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -3,6 +3,7 @@
-  *
-  * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
-  * Copyright (c) 2017 SiFive, Inc.
-+ * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
-  *
-  * Provides a board compatible with the SiFive Freedom U SDK:
-  *
-@@ -11,6 +12,7 @@
-  * 2) PLIC (Platform Level Interrupt Controller)
-  * 3) PRCI (Power, Reset, Clock, Interrupt)
-  * 4) OTP (One-Time Programmable) memory with stored serial number
-+ * 5) GEM (Gigabit Ethernet Controller) and management block
-  *
-  * This board currently generates devicetree dynamically that indicates at least
-  * two harts and up to five harts.
-@@ -39,6 +41,7 @@
- #include "hw/sysbus.h"
- #include "hw/char/serial.h"
- #include "hw/cpu/cluster.h"
-+#include "hw/misc/unimp.h"
- #include "target/riscv/cpu.h"
- #include "hw/riscv/riscv_hart.h"
- #include "hw/riscv/sifive_plic.h"
-@@ -70,7 +73,8 @@ static const struct MemmapEntry {
-     [SIFIVE_U_UART1] =    { 0x10011000,     0x1000 },
-     [SIFIVE_U_OTP] =      { 0x10070000,     0x1000 },
-     [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
--    [SIFIVE_U_GEM] =      { 0x100900FC,     0x2000 },
-+    [SIFIVE_U_GEM] =      { 0x10090000,     0x2000 },
-+    [SIFIVE_U_GEM_MGMT] = { 0x100a0000,     0x1000 },
- };
- 
- #define SIFIVE_OTP_SERIAL   1
-@@ -87,7 +91,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     char ethclk_names[] = "pclk\0hclk";
-     uint32_t plic_phandle, prci_phandle, ethclk_phandle, phandle = 1;
-     uint32_t uartclk_phandle;
--    uint32_t hfclk_phandle, rtcclk_phandle;
-+    uint32_t hfclk_phandle, rtcclk_phandle, phy_phandle;
- 
-     fdt = s->fdt = create_device_tree(&s->fdt_size);
-     if (!fdt) {
-@@ -257,15 +261,20 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     ethclk_phandle = qemu_fdt_get_phandle(fdt, nodename);
-     g_free(nodename);
- 
-+    phy_phandle = phandle++;
-     nodename = g_strdup_printf("/soc/ethernet@%lx",
-         (long)memmap[SIFIVE_U_GEM].base);
-     qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_string(fdt, nodename, "compatible", "cdns,macb");
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-+        "sifive,fu540-c000-gem");
-     qemu_fdt_setprop_cells(fdt, nodename, "reg",
-         0x0, memmap[SIFIVE_U_GEM].base,
--        0x0, memmap[SIFIVE_U_GEM].size);
-+        0x0, memmap[SIFIVE_U_GEM].size,
-+        0x0, memmap[SIFIVE_U_GEM_MGMT].base,
-+        0x0, memmap[SIFIVE_U_GEM_MGMT].size);
-     qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-     qemu_fdt_setprop_string(fdt, nodename, "phy-mode", "gmii");
-+    qemu_fdt_setprop_cell(fdt, nodename, "phy-handle", phy_phandle);
-     qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-     qemu_fdt_setprop_cell(fdt, nodename, "interrupts", SIFIVE_U_GEM_IRQ);
-     qemu_fdt_setprop_cells(fdt, nodename, "clocks",
-@@ -279,6 +288,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     nodename = g_strdup_printf("/soc/ethernet@%lx/ethernet-phy@0",
-         (long)memmap[SIFIVE_U_GEM].base);
-     qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cell(fdt, nodename, "phandle", phy_phandle);
-     qemu_fdt_setprop_cell(fdt, nodename, "reg", 0x0);
-     g_free(nodename);
- 
-@@ -527,6 +537,9 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].base);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
-                        plic_gpios[SIFIVE_U_GEM_IRQ]);
-+
-+    create_unimplemented_device("riscv.sifive.u.gem-mgmt",
-+        memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
- }
- 
- static void riscv_sifive_u_machine_init(MachineClass *mc)
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index 0362121..cba29e1 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -59,7 +59,8 @@ enum {
-     SIFIVE_U_UART1,
-     SIFIVE_U_OTP,
-     SIFIVE_U_DRAM,
--    SIFIVE_U_GEM
-+    SIFIVE_U_GEM,
-+    SIFIVE_U_GEM_MGMT
- };
- 
- enum {
--- 
-2.7.4
-
+>=20
+> >--
+> >
+> >Thanks,
+> >
+> >David / dhildenb
+>=20
+> --
+> Wei Yang
+> Help you, Help me
 
