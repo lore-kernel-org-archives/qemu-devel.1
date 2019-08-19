@@ -2,64 +2,62 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D83B2C3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0322BC3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:31:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC0A220851
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:26:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC0A220851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C058420851
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 06:31:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="A0SuZRNV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C058420851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzb7n-0006dp-OJ
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 02:26:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52254)
+	id 1hzbCI-00088z-SH
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 02:31:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52753)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1hzb6L-00067F-9G
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:25:10 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hzbBP-0007Sf-OO
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:30:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hzb6J-0006RO-Mb
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:25:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59142)
+ (envelope-from <dgibson@ozlabs.org>) id 1hzbBO-0001WL-B6
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:30:23 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58673 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hzb6J-0006Qv-HR
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 02:25:07 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6B9A788FFF8;
- Mon, 19 Aug 2019 06:25:05 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-60.ams2.redhat.com
- [10.36.116.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D354558C9C;
- Mon, 19 Aug 2019 06:25:04 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 0AC1616E08; Mon, 19 Aug 2019 08:15:46 +0200 (CEST)
-Date: Mon, 19 Aug 2019 08:15:45 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Message-ID: <20190819061545.7qeiyonvvqe3s6up@sirius.home.kraxel.org>
-References: <alpine.BSF.2.21.9999.1908190208150.57965@zero.eik.bme.hu>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hzbBN-0001Rq-0x; Mon, 19 Aug 2019 02:30:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46BkYw4cWNz9sNF; Mon, 19 Aug 2019 16:30:12 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1566196212;
+ bh=qncahDD/zDfQatmm5dmG4qskxPt8N0CvVbI8Ipq5D68=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=A0SuZRNVLLsBTRV+LeIKXeK/Fj9CZ9g03VsKtaw31yIGfWeaOBD/WBTmTBhTdOoLu
+ nquiPC6Ax/TylJ6qb+hu4G0wZ8NJGVUoVS6HfKs1apteXe8hhkV1PlILqLtv+am0Fo
+ P/zwOt+l3Qf2gEY6a+NfoTFvcfrA2UBjCpvAiAuA=
+Date: Mon, 19 Aug 2019 16:30:03 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: "Paul A. Clarke" <pc@us.ibm.com>
+Message-ID: <20190819063003.GB24503@umbus.fritz.box>
+References: <1565983669-6886-1-git-send-email-pc@us.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="MfFXiAuoTsnnDAfZ"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1908190208150.57965@zero.eik.bme.hu>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Mon, 19 Aug 2019 06:25:05 +0000 (UTC)
+In-Reply-To: <1565983669-6886-1-git-send-email-pc@us.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Machine specific option ROMs
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH] ppc: Three floating point fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,31 +69,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 19, 2019 at 02:38:09AM +0200, BALATON Zoltan wrote:
-> Hello,
-> 
-> I know about the possibility to set the option ROM of a PCIDevice with the
-> romfile property (that we can set on command line or in a device's init
-> method) but is there a way to set it depending on the machine that uses the
-> device? If this is not currently possible what would be needed to allow
-> this?
 
-Should work with compat properties.  That is a list of device, property
-and value which a specific machine type should use.  Typically they are
-used to make versioned machine types behave simliar to older qemu
-versions (this is where the name comes from).  Using them to use
-non-default properties on ppc platform should work too.
+--MfFXiAuoTsnnDAfZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-For example in qemu 1.5 the nic roms got EFI support and there is a
-compat property which switches the pc-i440fx-1.4 (and older) machine
-types to the non-efi versions.  Grep for pxe-e1000.rom to find the code.
+On Fri, Aug 16, 2019 at 02:27:49PM -0500, Paul A. Clarke wrote:
+> From: "Paul A. Clarke" <pc@us.ibm.com>
+>=20
+> - target/ppc/fpu_helper.c:
+>   - helper_todouble() was not properly converting INFINITY from 32 bit
+>   float to 64 bit double.
+>   - helper_todouble() was not properly converting any denormalized
+>   32 bit float to 64 bit double.
+>=20
+> - GCC, as of version 8 or so, takes advantage of the hardware's
+>   implementation of the xscvdpspn instruction to optimize the following
+>   sequence:
+>     xscvdpspn vs0,vs1
+>     mffprwz   r8,f0
+>   ISA 3.0B has xscvdpspn leaving its result in word 1 of the target regis=
+ter,
+>   and mffprwz expecting its input to come from word 0 of the source regis=
+ter.
+>   This sequence fails with QEMU, as a shift is required between those two
+>   instructions.  However, the hardware splats the result to both word 0 a=
+nd
+>   word 1 of its output register, so the shift is not necessary.
+>   Expect a future revision of the ISA to specify this behavior.
 
-HTH,
-  Gerd
+As well as addressing Richard's comments, I'd prefer to see each of
+the 3 fixes here in separate patches.  The code changes may be tiny,
+but I find the fpu emulation code cryptic at the best of times, and
+making it clear which change is addressing which bug would help.
 
+> Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+> ---
+>  target/ppc/fpu_helper.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+> index 5611cf0..82b5425 100644
+> --- a/target/ppc/fpu_helper.c
+> +++ b/target/ppc/fpu_helper.c
+> @@ -62,13 +62,14 @@ uint64_t helper_todouble(uint32_t arg)
+>          ret  =3D (uint64_t)extract32(arg, 30, 2) << 62;
+>          ret |=3D ((extract32(arg, 30, 1) ^ 1) * (uint64_t)7) << 59;
+>          ret |=3D (uint64_t)extract32(arg, 0, 30) << 29;
+> +        ret |=3D (0x7ffULL * (extract32(arg, 23, 8) =3D=3D 0xff)) << 52;
+>      } else {
+>          /* Zero or Denormalized operand.  */
+>          ret =3D (uint64_t)extract32(arg, 31, 1) << 63;
+>          if (unlikely(abs_arg !=3D 0)) {
+>              /* Denormalized operand.  */
+>              int shift =3D clz32(abs_arg) - 9;
+> -            int exp =3D -126 - shift + 1023;
+> +            int exp =3D -127 - shift + 1023;
+>              ret |=3D (uint64_t)exp << 52;
+>              ret |=3D abs_arg << (shift + 29);
+>          }
+> @@ -2871,10 +2872,14 @@ void helper_xscvqpdp(CPUPPCState *env, uint32_t o=
+pcode,
+> =20
+>  uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
+>  {
+> +    uint64_t result;
+> +
+>      float_status tstat =3D env->fp_status;
+>      set_float_exception_flags(0, &tstat);
+> =20
+> -    return (uint64_t)float64_to_float32(xb, &tstat) << 32;
+> +    result =3D (uint64_t)float64_to_float32(xb, &tstat);
+> +    /* hardware replicates result to both words of the doubleword result=
+=2E  */
+> +    return (result << 32) | result;
+>  }
+> =20
+>  uint64_t helper_xscvspdpn(CPUPPCState *env, uint64_t xb)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--MfFXiAuoTsnnDAfZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1aQeoACgkQbDjKyiDZ
+s5L7Zw/+JiCGfGBRadMSAq+D5vtWNMxIWfUCvDUuL9XWBtdUh3cFp5jnta8f7jFj
+CRg6I4bompechW1/2cQy8XHwl09lLMDi+TRH9izE3Wp1L49cplkE5F7WJb7fsHtj
+LTFpOxST301GfLeVCHI2Z7PEddI21Aj89dL1GRTZqyzlB3nwXivbmnZXXaPOjYMo
+p/HP+IWGwkQa5CJhOs4HK7fbvQZJuqUSyGOn+3yAacIkBgvmK5m47Z6Feve9+I0P
+1HqagxUl85oOTOYplo2mRXLIVSJ6SKGPtcs706kkjbVQ0X3lu+P4ZNqJbM4lypxw
+ZBGDulL/uDmlM1PYo5926K9jAeVfDBTAk+Ctz8v5ORfJFjV+0uOKWtLSoYxFTx+v
+Aldc+XSMq500n3Jj632XVltVVqVUzy3CQVuX6decA/2pQNK1wZcYpAOGK29jtjKL
+y7sTvMD64DJJLAd/gbYNiFEcjkbADIS9wh9hvxCBlvwpekzptCZgfC+MsbCQIoGI
+W2XtTRi/ck87tHrXc5Mdb1wdrH01Z8xTb/1BT6IRInXWTCrYLJZ/GzUEWwhWdlK7
+VLwq5Mt/uuNtZB97eVmcmV+74pndELYjLko02zZzvTY6RueOYXAUyinMxrdadEtd
+R1H851kbgZ/um3yAEUAfNij+qOW6asPV+0O8uLk1Zu585lyPgEs=
+=sI1V
+-----END PGP SIGNATURE-----
+
+--MfFXiAuoTsnnDAfZ--
 
