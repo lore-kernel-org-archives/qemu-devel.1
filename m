@@ -2,56 +2,81 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 280A7C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46DDAC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:43:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF8CE2085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:41:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF8CE2085A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 100DF2085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 12:43:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xPj5hUUH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100DF2085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzgyj-00010u-IO
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:41:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36365)
+	id 1hzgzz-0002eR-K9
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 08:43:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36810)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTq-0002By-54
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hzgVm-0004ny-6j
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzgTm-0002l8-LP
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:45 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58067 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hzgTm-0002bs-6l
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:09:42 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id E463F1A2230;
- Mon, 19 Aug 2019 14:08:25 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id EBEEB1A20A0;
- Mon, 19 Aug 2019 14:08:24 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:08:07 +0200
-Message-Id: <1566216496-17375-29-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v8 28/37] target/mips: Clean up handling of CP0
- register 16
+ (envelope-from <peter.maydell@linaro.org>) id 1hzgVk-0003uN-PD
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:11:45 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40125)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hzgVk-0003tw-He
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:11:44 -0400
+Received: by mail-ot1-x341.google.com with SMTP id c34so1416100otb.7
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 05:11:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=kraGL6AAogDI5tKiZZ9eP3rLlWrkCtki3pPE+hk2RN4=;
+ b=xPj5hUUHVGfEzo+VlkGpNXmXxCao44BvJw0f8A6SbSGm3Q0TnFRusSv9S+9ahEtczZ
+ ZHgjp/jzve2kYWvB+905lF5X6LnlQKEYE0sXKBd/MfYfzfKif0UBJB5+LmoPNqC+68kb
+ LivjwXH+mNjbth9c3wR3T3CmXPB01arzhbSOT49yq7LWnjz/B38NEX+j9uqRvJbDFE6v
+ wb+SGrEIoY26jQrkYhi8dFefr3822UTsPg/7Wdgob6sSYhct8eVvFuBsWSWMyClVAlPY
+ dzIxahplK5eQb24BkUUX4Tq9Ok8o2BkACboJjx5I5sDfL7CO5rzAt3M+qxRejFAJY5YQ
+ CNOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=kraGL6AAogDI5tKiZZ9eP3rLlWrkCtki3pPE+hk2RN4=;
+ b=rOGG4bm2pEFckhUnb9OVxdRc0xhN0lCagOqB8z1oqbOueo6rkmDCpodLRD9KRsB5hq
+ 71T8LdRvK36UdQ+bktdoWX5JZJN2yq2bAPp4UeYzuwUT5Up94okDeLde4TdwJOqdEORF
+ Gxu35tkoJzd1ggKK4IIqeeg/PHkqgxFYutWjDebYtUargKaLu0jYg1fTQMs+Va0J5TwU
+ HrK7X7HcNydvoupztDkVvb+xDiro9EwGaRcFzqHMX6xoCzlPxGZNzZg7rQp0qrWWMdpU
+ LkrBBt5odsubgCyBeY3OGg7unfSG7NS347+EDstsQxfIAwNHykdD35bSq+tAvF82/1we
+ +5nw==
+X-Gm-Message-State: APjAAAVpEWe2wQu81Nz5FaysiGtkSRsQQ5lI/t/D/Uv2J/DkCRNYTxxO
+ vCR9bbS0hDh5BxL5Qm+VZ0HYoG0mgm0ede5koRbGgQ==
+X-Google-Smtp-Source: APXvYqyx4G8pWxl1jbYqUIMTQaPJi3SCmGVhcA22CZIbRmu+1rQv4x75Q4bUTeVjQgI+xawIsXTHSKEs1KSonaaxHWk=
+X-Received: by 2002:a05:6830:2103:: with SMTP id
+ i3mr18382989otc.135.1566216703618; 
+ Mon, 19 Aug 2019 05:11:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <8fb538f3-dfdd-b427-727a-2e7c2120da09@gmail.com>
+ <20e800e8-846b-a9c3-f840-826238b0818f@redhat.com>
+In-Reply-To: <20e800e8-846b-a9c3-f840-826238b0818f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Aug 2019 13:11:32 +0100
+Message-ID: <CAFEAcA9xbPGSezS60cg6WzqpDR1u38aE0bXL_6pLs+H1TK3Ddw@mail.gmail.com>
+To: David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [qemu-s390x] linux-user: s390x issue on Fedora 30
+ (dynamic library loader?)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,224 +88,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, philmd@redhat.com, amarkovic@wavecomp.com
+Cc: Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-s390x <qemu-s390x@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Sat, 17 Aug 2019 at 17:14, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 17.08.19 17:59, David Hildenbrand wrote:
+> > Hi everybody,
+> >
+> > I was just trying to run qemu-s390x (linux-user) with a very simple
+> > binary (gzip + lib/ld64.so.1, compiled under Fedora 27). This used to
+> > work just fine a while ago (especially when I was working on vector
+> > instructions using QEMU v3.1). However, now I can't get past a SEGFAULT
+> > in the dynamic library loader (I assume it is trying to locate glibc). I
+> > tried a couple of other binaries that definitely used to work (from
+> > Fedora 30).
+> >
+> > I checked QEMU v4.1, v4.0 and v3.1. All are broken for me. Which is
+> > weird - because it used to work :/
+> >
+> > I remember that I was running Fedora 29 the last time I had it running,
+> > so my gut feeling is that this is related to some other system library
+> > (but which?). I am running on an up-to-date Fedora 30 x86-64 now.
+> >
+> > Any ideas? Has this been reported already? (not sure if this is a Fedora
+> > 30 issue)
 
-Clean up handling of CP0 register 16.
+I'm pretty sure the problem you've run into is a long standing
+bug in the glibc dynamic loader. It cannot cope with the ld.so.cache
+being for the wrong endianness. (Correct endianness but incorrect
+architecture it correctly detects and ignores). The result is that
+running a linux-user QEMU dynamic binary for big-endian on little-endian
+like this will crash in the dynamic loader unless you arrange that it can't
+find the host's ld.so.cache somehow, eg:
+ (a) run inside a chroot
+ (b) create an empty /etc/ld.so.cache file inside the -L directory
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/cpu.h       |  3 ++-
- target/mips/translate.c | 60 ++++++++++++++++++++++++-------------------------
- 2 files changed, 32 insertions(+), 31 deletions(-)
+The ideal fix would be if somebody cared enough to track down
+and fix the ld.so bug.
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 3a8c560..625d364 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -371,7 +371,8 @@ typedef struct mips_def_t mips_def_t;
- #define CP0_REG16__CONFIG3         3
- #define CP0_REG16__CONFIG4         4
- #define CP0_REG16__CONFIG5         5
--#define CP0_REG00__CONFIG7         7
-+#define CP0_REG16__CONFIG6         6
-+#define CP0_REG16__CONFIG7         7
- /* CP0 Register 17 */
- #define CP0_REG17__LLADDR          0
- #define CP0_REG17__MAAR            1
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 9d3996d..729b84d 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -7293,36 +7293,36 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_16:
-         switch (sel) {
--        case 0:
-+        case CP0_REG16__CONFIG:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config0));
-             register_name = "Config";
-             break;
--        case 1:
-+        case CP0_REG16__CONFIG1:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config1));
-             register_name = "Config1";
-             break;
--        case 2:
-+        case CP0_REG16__CONFIG2:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config2));
-             register_name = "Config2";
-             break;
--        case 3:
-+        case CP0_REG16__CONFIG3:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config3));
-             register_name = "Config3";
-             break;
--        case 4:
-+        case CP0_REG16__CONFIG4:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config4));
-             register_name = "Config4";
-             break;
--        case 5:
-+        case CP0_REG16__CONFIG5:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config5));
-             register_name = "Config5";
-             break;
-         /* 6,7 are implementation dependent */
--        case 6:
-+        case CP0_REG16__CONFIG6:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config6));
-             register_name = "Config6";
-             break;
--        case 7:
-+        case CP0_REG16__CONFIG7:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config7));
-             register_name = "Config7";
-             break;
-@@ -8022,45 +8022,45 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_16:
-         switch (sel) {
--        case 0:
-+        case CP0_REG16__CONFIG:
-             gen_helper_mtc0_config0(cpu_env, arg);
-             register_name = "Config";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 1:
-+        case CP0_REG16__CONFIG1:
-             /* ignored, read only */
-             register_name = "Config1";
-             break;
--        case 2:
-+        case CP0_REG16__CONFIG2:
-             gen_helper_mtc0_config2(cpu_env, arg);
-             register_name = "Config2";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 3:
-+        case CP0_REG16__CONFIG3:
-             gen_helper_mtc0_config3(cpu_env, arg);
-             register_name = "Config3";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 4:
-+        case CP0_REG16__CONFIG4:
-             gen_helper_mtc0_config4(cpu_env, arg);
-             register_name = "Config4";
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 5:
-+        case CP0_REG16__CONFIG5:
-             gen_helper_mtc0_config5(cpu_env, arg);
-             register_name = "Config5";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
-         /* 6,7 are implementation dependent */
--        case 6:
-+        case CP0_REG16__CONFIG6:
-             /* ignored */
-             register_name = "Config6";
-             break;
--        case 7:
-+        case CP0_REG16__CONFIG7:
-             /* ignored */
-             register_name = "Config7";
-             break;
-@@ -8777,36 +8777,36 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_16:
-         switch (sel) {
--        case 0:
-+        case CP0_REG16__CONFIG:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config0));
-             register_name = "Config";
-             break;
--        case 1:
-+        case CP0_REG16__CONFIG1:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config1));
-             register_name = "Config1";
-             break;
--        case 2:
-+        case CP0_REG16__CONFIG2:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config2));
-             register_name = "Config2";
-             break;
--        case 3:
-+        case CP0_REG16__CONFIG3:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config3));
-             register_name = "Config3";
-             break;
--        case 4:
-+        case CP0_REG16__CONFIG4:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config4));
-             register_name = "Config4";
-             break;
--        case 5:
-+        case CP0_REG16__CONFIG5:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config5));
-             register_name = "Config5";
-             break;
-        /* 6,7 are implementation dependent */
--        case 6:
-+        case CP0_REG16__CONFIG6:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config6));
-             register_name = "Config6";
-             break;
--        case 7:
-+        case CP0_REG16__CONFIG7:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config7));
-             register_name = "Config7";
-             break;
-@@ -9497,33 +9497,33 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_16:
-         switch (sel) {
--        case 0:
-+        case CP0_REG16__CONFIG:
-             gen_helper_mtc0_config0(cpu_env, arg);
-             register_name = "Config";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 1:
-+        case CP0_REG16__CONFIG1:
-             /* ignored, read only */
-             register_name = "Config1";
-             break;
--        case 2:
-+        case CP0_REG16__CONFIG2:
-             gen_helper_mtc0_config2(cpu_env, arg);
-             register_name = "Config2";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 3:
-+        case CP0_REG16__CONFIG3:
-             gen_helper_mtc0_config3(cpu_env, arg);
-             register_name = "Config3";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 4:
-+        case CP0_REG16__CONFIG4:
-             /* currently ignored */
-             register_name = "Config4";
-             break;
--        case 5:
-+        case CP0_REG16__CONFIG5:
-             gen_helper_mtc0_config5(cpu_env, arg);
-             register_name = "Config5";
-             /* Stop translation as we may have switched the execution mode */
--- 
-2.7.4
+Compare:
+https://bugs.launchpad.net/qemu/+bug/1701798
+https://bugs.launchpad.net/qemu/+bug/1835693
 
+thanks
+-- PMM
 
