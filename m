@@ -7,79 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA20C41514
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EF3C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:20:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A451020651
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:20:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 899F920651
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:20:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YabwG0qD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A451020651
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oOzgaKQv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 899F920651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzjSF-0004By-I9
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 11:20:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53024)
+	id 1hzjSJ-0004Jv-Cp
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 11:20:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1hzjPy-0002Uw-4F
+ (envelope-from <richard.henderson@linaro.org>) id 1hzjPy-0002Uv-45
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 11:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hzjPw-0002Wl-Pm
+ (envelope-from <richard.henderson@linaro.org>) id 1hzjPw-0002WZ-P6
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 11:17:58 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:37084)
+Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:33699)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hzjPw-0002Qi-FP
+ id 1hzjPw-0002RC-HE
  for qemu-devel@nongnu.org; Mon, 19 Aug 2019 11:17:56 -0400
-Received: by mail-pf1-x431.google.com with SMTP id 129so1347046pfa.4
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 08:17:47 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id go14so1115905plb.0
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 08:17:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=aAsgcvP1KNeiO2DyuHvEBM+1rf528V/HzEzeINYjmQQ=;
- b=YabwG0qDHJQ3zR8wemiC7oSISh8CtnYF2SufRC1eX5C2WRTHZXnzd9i9BpHaVhS1i2
- iMpwDXxZyGK0mj7EFqUf4gTB5rBTvRs7Gms8/fdIafSscK8JrEB3fZ/hcAH1d3hCmgmI
- VIjqJ2I0cTnhmh93LAaTEqQQCJYxPtOq79Ur7XKtgZ0OUAUpbKS789Hv3uIW+l83H+Hi
- JQ/OCi6ydmFemLzC99zLwQf2UEktbvSWQk6afWkEBDKiJdn0NfgfKLNv7cAH0dvAbrIL
- K3DA+5FAOHfFf4cFUqqcL+91XRSSLWV+unSq+e3tJxzTpY0BZcfvDsKl0Gx54J33hdB8
- HALw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=kcQQwhe8tbvIkqlEv04wiqdNqDeAeBEJXEVRAMnwP74=;
+ b=oOzgaKQvX9pX/pHo6fX2nRrnGGPWGfe1iUDvPjg+1Kl2hE2p834EWd1J4syElgmY3h
+ qk7LBj12kFb9hxgtpBcwF9agEJ6jut9pECh4IjyKszOsLrpDSEZnmnz9krH0ngRrT85c
+ dlgsyh5nxj44XprDhOUtGuMoByKVvVkM1P59b3SIuHQE0SgJNnusCC5MImBMOoc4Dnr9
+ ihiYft2gltHWjaZJfarlh0WukArNCt9nBNbnP9iyuePd3G9wMMwZAULX/retuIhLyIBq
+ caEna1GOpggAFfh5ker2q+7iA9imJY7XONJ8PXD/NDEkTdbVUufbkRSmUwJM1zmcHWm4
+ lhDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=aAsgcvP1KNeiO2DyuHvEBM+1rf528V/HzEzeINYjmQQ=;
- b=mJvN5E+d+t4rFVcgcY251/fo2MzdbjMcfWphC3FLGhNzcnoEVkbxpWAol36xnFJBs5
- jtvIKtJX4pCkkRRzwxewGDT1gWbGxYBlKx2Isg+R0pD4GPaJZJFL+icRtRRaUIoruhxU
- UUhm39zTCC7qb4lwDv3VjQGPd0pWSlYKNbDWQV3KHyVfAPzwwSOsdH7qr8pJfA/jpcHu
- uc7VYXfbw7Gthi7sA3crfeECSlenMwBtZJJMDng3VD9g4XqGR/CeowaIDyNRDCQgAQSz
- Nl3++CcvFHXduiiQ3hrIcXmaG2rMWC7aD8Qz369n1w8nOVI4gwYrww8Wh1AizprQxd6N
- lpRA==
-X-Gm-Message-State: APjAAAUVK4TANPsx4VbWysRVz4U6gDQ+hxCbOkjuLL1K1GcBxejSQiB8
- q2PGaacfZrmr1keAc9zjCpZ2XX5Q8ck=
-X-Google-Smtp-Source: APXvYqzOb3flQFpF/coP68QsC0S0Rp+nwTy6EsLIlNSvOA5qc00fB/LgSUjQkCy+4DF+sB+Ie8k9XQ==
-X-Received: by 2002:a65:690f:: with SMTP id s15mr19835734pgq.432.1566227866271; 
- Mon, 19 Aug 2019 08:17:46 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=kcQQwhe8tbvIkqlEv04wiqdNqDeAeBEJXEVRAMnwP74=;
+ b=iX8Ux+BoR8H0ZzQ+v0Xjwu3t3s70LsX1S1xCJK0fIStU8QHHVepLAtcAvpNrgW4GYa
+ FBXCHX1RqRmunOwOUkXMebYXXFpYEJ42Q1Qet90MUdBcrO3Iths7+gYB9fwJ+hPG0K6D
+ /eAzmDSGv+Jx58BahHh84fw/gnQhZf9naDJjvcQrxjp+v0IYJOLFOn8W+P0VUELSxDWL
+ xyTqitOn7CbpBE0JLDV5SSX8BaZ4qYS8Piq1Idm9qqM3pxQMOwE23cg0DquOJxRU+yWb
+ ePfm/npwvHtozWalqEwB8i799d1+LTyoaVPdPYzwIztjLtShqkGdMtA5mYVYYox8h/7N
+ 8XoA==
+X-Gm-Message-State: APjAAAVFFwHK60xEeP72uCbmQZ80kfB4YyVbfXlUf7xdQya2wCU9wM7a
+ 9LUZeBXAeXV46E5wZBJTxiJhXBloFSc=
+X-Google-Smtp-Source: APXvYqxE5d0ADpu/eSkXXYOzafnaMOkWbBBlmp+8buJkgUqAOUMRP++wc00Fa+V8H/Rct6mIuSicOg==
+X-Received: by 2002:a17:902:834c:: with SMTP id
+ z12mr9134007pln.8.1566227867525; 
+ Mon, 19 Aug 2019 08:17:47 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id r27sm21020406pgn.25.2019.08.19.08.17.45
+ by smtp.gmail.com with ESMTPSA id r27sm21020406pgn.25.2019.08.19.08.17.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 08:17:45 -0700 (PDT)
+ Mon, 19 Aug 2019 08:17:46 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 08:17:41 -0700
-Message-Id: <20190819151743.17267-2-richard.henderson@linaro.org>
+Date: Mon, 19 Aug 2019 08:17:42 -0700
+Message-Id: <20190819151743.17267-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190819151743.17267-1-richard.henderson@linaro.org>
 References: <20190819151743.17267-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::431
-Subject: [Qemu-devel] [PULL 1/3] decodetree: Allow !function with no input
- bits
+X-Received-From: 2607:f8b0:4864:20::629
+Subject: [Qemu-devel] [PULL 2/3] decodetree: Suppress redundant declaration
+ warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,144 +101,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Call this form a "parameter", returning a value extracted
-from the DisasContext.
+We can tell that a decodetree input file is "secondary" when it
+uses an argument set marked "!extern".  This indicates that at
+least one of the insn translation functions will have already
+been declared by the "primary" input file, but given only the
+secondary we cannot tell which.
 
-Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
+Avoid redundant declaration warnings by suppressing them with pragmas.
+
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- docs/devel/decodetree.rst         |  8 ++++-
- scripts/decodetree.py             | 49 ++++++++++++++++++++++++-------
- tests/decode/err_field6.decode    |  5 ++++
- tests/decode/succ_function.decode |  6 ++++
- 4 files changed, 56 insertions(+), 12 deletions(-)
- create mode 100644 tests/decode/err_field6.decode
- create mode 100644 tests/decode/succ_function.decode
+ scripts/decodetree.py | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/docs/devel/decodetree.rst b/docs/devel/decodetree.rst
-index 44ac621ea8..ce7f52308f 100644
---- a/docs/devel/decodetree.rst
-+++ b/docs/devel/decodetree.rst
-@@ -23,7 +23,7 @@ Fields
- 
- Syntax::
- 
--  field_def     := '%' identifier ( unnamed_field )+ ( !function=identifier )?
-+  field_def     := '%' identifier ( unnamed_field )* ( !function=identifier )?
-   unnamed_field := number ':' ( 's' ) number
- 
- For *unnamed_field*, the first number is the least-significant bit position
-@@ -34,6 +34,12 @@ present, they are concatenated.  In this way one can define disjoint fields.
- If ``!function`` is specified, the concatenated result is passed through the
- named function, taking and returning an integral value.
- 
-+One may use ``!function`` with zero ``unnamed_fields``.  This case is called
-+a *parameter*, and the named function is only passed the ``DisasContext``
-+and returns an integral value extracted from there.
-+
-+A field with no ``unnamed_fields`` and no ``!function`` is in error.
-+
- FIXME: the fields of the structure into which this result will be stored
- is restricted to ``int``.  Which means that we cannot expand 64-bit items.
- 
 diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index d7a59d63ac..f6f7368774 100755
+index f6f7368774..d8c59cab60 100755
 --- a/scripts/decodetree.py
 +++ b/scripts/decodetree.py
-@@ -245,7 +245,7 @@ class ConstField:
+@@ -33,6 +33,7 @@ arguments = {}
+ formats = {}
+ patterns = []
+ allpatterns = []
++anyextern = False
  
+ translate_prefix = 'trans'
+ translate_scope = 'static '
+@@ -482,12 +483,14 @@ def parse_arguments(lineno, name, toks):
+     """Parse one argument set from TOKS at LINENO"""
+     global arguments
+     global re_ident
++    global anyextern
  
- class FunctionField:
--    """Class representing a field passed through an expander"""
-+    """Class representing a field passed through a function"""
-     def __init__(self, func, base):
-         self.mask = base.mask
-         self.sign = base.sign
-@@ -266,6 +266,27 @@ class FunctionField:
- # end FunctionField
+     flds = []
+     extern = False
+     for t in toks:
+         if re_fullmatch('!extern', t):
+             extern = True
++            anyextern = True
+             continue
+         if not re_fullmatch(re_ident, t):
+             error(lineno, 'invalid argument set token "{0}"'.format(t))
+@@ -1188,6 +1191,7 @@ def main():
+     global insnmask
+     global decode_function
+     global variablewidth
++    global anyextern
  
+     decode_scope = 'static '
  
-+class ParameterField:
-+    """Class representing a pseudo-field read from a function"""
-+    def __init__(self, func):
-+        self.mask = 0
-+        self.sign = 0
-+        self.func = func
+@@ -1248,6 +1252,19 @@ def main():
+     # A single translate function can be invoked for different patterns.
+     # Make sure that the argument sets are the same, and declare the
+     # function only once.
++    #
++    # If we're sharing formats, we're likely also sharing trans_* functions,
++    # but we can't tell which ones.  Prevent issues from the compiler by
++    # suppressing redundant declaration warnings.
++    if anyextern:
++        output("#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE\n",
++               "# pragma GCC diagnostic push\n",
++               "# pragma GCC diagnostic ignored \"-Wredundant-decls\"\n",
++               "# ifdef __clang__\n"
++               "#  pragma GCC diagnostic ignored \"-Wtypedef-redefinition\"\n",
++               "# endif\n",
++               "#endif\n\n")
 +
-+    def __str__(self):
-+        return self.func
-+
-+    def str_extract(self):
-+        return self.func + '(ctx)'
-+
-+    def __eq__(self, other):
-+        return self.func == other.func
-+
-+    def __ne__(self, other):
-+        return not self.__eq__(other)
-+# end ParameterField
-+
-+
- class Arguments:
-     """Class representing the extracted fields of a format"""
-     def __init__(self, nm, flds, extern):
-@@ -433,17 +454,23 @@ def parse_field(lineno, name, toks):
+     out_pats = {}
+     for i in allpatterns:
+         if i.name in out_pats:
+@@ -1259,6 +1276,11 @@ def main():
+             out_pats[i.name] = i
+     output('\n')
  
-     if width > insnwidth:
-         error(lineno, 'field too large')
--    if len(subs) == 1:
--        f = subs[0]
-+    if len(subs) == 0:
-+        if func:
-+            f = ParameterField(func)
-+        else:
-+            error(lineno, 'field with no value')
-     else:
--        mask = 0
--        for s in subs:
--            if mask & s.mask:
--                error(lineno, 'field components overlap')
--            mask |= s.mask
--        f = MultiField(subs, mask)
--    if func:
--        f = FunctionField(func, f)
-+        if len(subs) == 1:
-+            f = subs[0]
-+        else:
-+            mask = 0
-+            for s in subs:
-+                if mask & s.mask:
-+                    error(lineno, 'field components overlap')
-+                mask |= s.mask
-+            f = MultiField(subs, mask)
-+        if func:
-+            f = FunctionField(func, f)
- 
-     if name in fields:
-         error(lineno, 'duplicate field', name)
-diff --git a/tests/decode/err_field6.decode b/tests/decode/err_field6.decode
-new file mode 100644
-index 0000000000..a719884572
---- /dev/null
-+++ b/tests/decode/err_field6.decode
-@@ -0,0 +1,5 @@
-+# This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+# See the COPYING.LIB file in the top-level directory.
++    if anyextern:
++        output("#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE\n",
++               "# pragma GCC diagnostic pop\n",
++               "#endif\n\n")
 +
-+# Diagnose no bits in field
-+%field
-diff --git a/tests/decode/succ_function.decode b/tests/decode/succ_function.decode
-new file mode 100644
-index 0000000000..7751b1784e
---- /dev/null
-+++ b/tests/decode/succ_function.decode
-@@ -0,0 +1,6 @@
-+# This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+# See the COPYING.LIB file in the top-level directory.
-+
-+# "Field" as parameter pulled from DisasContext.
-+%foo  !function=foo
-+foo   00000000000000000000000000000000 %foo
+     for n in sorted(formats.keys()):
+         f = formats[n]
+         f.output_extract()
 -- 
 2.17.1
 
