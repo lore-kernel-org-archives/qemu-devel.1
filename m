@@ -6,52 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF53C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C75A6C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D73A72085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D73A72085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ucloud.cn
+	by mail.kernel.org (Postfix) with ESMTPS id A032E2085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:28:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A032E2085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzhh5-0003aR-W5
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:27:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41826)
+	id 1hzhi8-0004WQ-Rh
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <owen.si@ucloud.cn>) id 1hzeiw-0007YZ-ST
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 06:17:15 -0400
+ (envelope-from <hck-ci@localhost>) id 1hzhbS-0006xR-8v
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <owen.si@ucloud.cn>) id 1hzeit-0006g0-WC
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 06:17:13 -0400
-Received: from m9785.mail.qiye.163.com ([220.181.97.85]:10558)
+ (envelope-from <hck-ci@localhost>) id 1hzhbP-0005bV-Tx
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:21:41 -0400
+Received: from [141.226.163.173] (port=51533 helo=groan)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <owen.si@ucloud.cn>) id 1hzeit-0006d7-Lx
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 06:17:11 -0400
-Received: from localhost.localdomain (unknown [120.132.1.230])
- by m9785.mail.qiye.163.com (Hmail) with ESMTPA id 526C15C19D2
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 18:11:41 +0800 (CST)
-From: Bingsong Si <owen.si@ucloud.cn>
-To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 18:09:24 +0800
-Message-Id: <20190819100924.14968-1-owen.si@ucloud.cn>
-X-Mailer: git-send-email 2.22.0
-MIME-Version: 1.0
-X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZT1VPTkpCQkJNTU9IS01NT1lXWShZQU
- lCN1dZLVlBSVdZCQ4XHghZQVk1NCk2OjckKS43PlkG
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6MxA6Shw5KTg*CzgeMAoaGjwv
- PxwwCxNVSlVKTk1NSUtCTktKTkxLVTMWGhIXVRQMHhVVCBI7DhgXFA4fVRgVRVlXWRILWUFZSklL
- VUpISVVKVUlIS1lXWQgBWUFKTkNONwY+
-X-HM-Tid: 0a6ca95c68b52087kuqy526c15c19d2
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.181.97.85
-X-Mailman-Approved-At: Mon, 19 Aug 2019 09:23:44 -0400
-Subject: [Qemu-devel] [PATCH] Revert "i386: correct cpu_x86_cpuid(0xd)"
+ (envelope-from <hck-ci@localhost>) id 1hzhbD-0005UO-PR
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 09:21:36 -0400
+Received: by groan (Postfix, from userid 1000)
+ id 88EC5208531AE; Mon, 19 Aug 2019 16:16:20 +0300 (IDT)
+From: Bishara AbuHattoum <bishara@daynix.com>
+To: qemu-devel@nongnu.org,
+	Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Mon, 19 Aug 2019 16:16:20 +0300
+Message-Id: <20190819131620.1302-2-bishara@daynix.com>
+X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20190819131620.1302-1-bishara@daynix.com>
+References: <20190819131620.1302-1-bishara@daynix.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 141.226.163.173
+Subject: [Qemu-devel] [PATCH 1/1] qga-win: network-get-interfaces command
+ name field bug fix
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,38 +57,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Yan Vugenfirer <yan@daynix.com>, Basil Salman <basil@daynix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit de2e68c902f7b6e438b0fa3cfedd74a06a20704f.
+Network interface name is fetched as an encoded WCHAR array, (wide
+character), then it is decoded using the guest's CP_ACP Windows code
+page, which is the default code page as configure in the guest's
+Windows, then it is returned as a byte array, (char array).
 
-Initial value of env->xcr0 =3D=3D 0, then CPUID(EAX=3D0xd,ECX=3D0).EBX =3D=
-=3D 0, after kvm
-upstream commit 412a3c41, It is ok.
-On host before commit 412a3c41, some legacy guest, i.e. CentOS 6, get
-xstate_size =3D=3D 0, will crash the guest.
+As stated in the BZ#1733165, when renaming a network interface to a
+Chinese name and invoking this command, the returned name field has
+the (\ufffd) value for each Chinese character the name had, this
+value is an indication that the code page does not have the decoding
+information for the given character.
 
-Signed-off-by: Bingsong Si <owen.si@ucloud.cn>
+This bug is a result of using the CP_ACP code page for decoding which
+is an interchangeable code page, instead CP_UTF8 code page should be
+used for decoding the network interface's name.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1733165
+
+Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
 ---
- target/i386/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qga/commands-win32.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ff65e11008..69562e21ed 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4416,7 +4416,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index=
-, uint32_t count,
-             *ecx =3D xsave_area_size(x86_cpu_xsave_components(cpu));
-             *eax =3D env->features[FEAT_XSAVE_COMP_LO];
-             *edx =3D env->features[FEAT_XSAVE_COMP_HI];
--            *ebx =3D xsave_area_size(env->xcr0);
-+            *ebx =3D *ecx;
-         } else if (count =3D=3D 1) {
-             *eax =3D env->features[FEAT_XSAVE];
-         } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
---=20
-2.22.0
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 6b67f16faf..64b1c754b0 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -1387,12 +1387,12 @@ static IP_ADAPTER_ADDRESSES *guest_get_adapters_addresses(Error **errp)
+ static char *guest_wctomb_dup(WCHAR *wstr)
+ {
+     char *str;
+-    size_t i;
++    size_t str_size;
+ 
+-    i = wcslen(wstr) + 1;
+-    str = g_malloc(i);
+-    WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK,
+-                        wstr, -1, str, i, NULL, NULL);
++    str_size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
++    /* add 1 to str_size for NULL terminator */
++    str = g_malloc(str_size + 1);
++    WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, str_size, NULL, NULL);
+     return str;
+ }
+ 
+-- 
+2.17.2
 
 
