@@ -2,90 +2,90 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 950C8C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33233C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:14:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B3642087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:13:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B3642087E
+	by mail.kernel.org (Postfix) with ESMTPS id B5BAE2087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:14:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BAE2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzn5X-0005yO-LF
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:13:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34659)
+	id 1hzn72-00075l-MF
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:14:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hzmzQ-0006ga-3z
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:06:49 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hzn62-0006YY-NY
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hzmzP-0006sZ-6z
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:06:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46116)
+ (envelope-from <mreitz@redhat.com>) id 1hzn61-0001vf-It
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:13:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59674)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hzmzM-0006pN-NX; Mon, 19 Aug 2019 15:06:44 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hzn5y-0001sp-PR; Mon, 19 Aug 2019 15:13:35 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 272EF307D95F;
- Mon, 19 Aug 2019 19:06:43 +0000 (UTC)
-Received: from [10.3.117.3] (ovpn-117-3.phx2.redhat.com [10.3.117.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AD90F50;
- Mon, 19 Aug 2019 19:06:42 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 1D9833091782;
+ Mon, 19 Aug 2019 19:13:34 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-64.brq.redhat.com
+ [10.40.204.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DC625C1D6;
+ Mon, 19 Aug 2019 19:13:32 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+References: <20190819092118.18920-1-thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <e622a4e2-5f75-7592-436e-ecd8447d9063@redhat.com>
-Date: Mon, 19 Aug 2019 14:06:41 -0500
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <763f15ee-a1ca-ba06-fc70-fdff9427ebf7@redhat.com>
+Date: Mon, 19 Aug 2019 21:13:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190819185602.4267-2-mreitz@redhat.com>
+In-Reply-To: <20190819092118.18920-1-thuth@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Mon, 19 Aug 2019 19:06:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Mon, 19 Aug 2019 19:13:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/16] include: Move endof() up from
- hw/virtio/virtio.h
+Subject: Re: [Qemu-devel] [PATCH] iotests: Add more "skip_if_unsupported"
+ statements to the python tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,85 +97,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx
-Content-Type: multipart/mixed; boundary="3D3wYujFGyT7E0AaZRWBHK6mkrzHc4B3s";
+--dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX
+Content-Type: multipart/mixed; boundary="3SWOLKnOJTbuAxhplT4nJxQzB02NiEq23";
  protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <e622a4e2-5f75-7592-436e-ecd8447d9063@redhat.com>
-Subject: Re: [PATCH v2 01/16] include: Move endof() up from hw/virtio/virtio.h
-References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-2-mreitz@redhat.com>
-In-Reply-To: <20190819185602.4267-2-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <763f15ee-a1ca-ba06-fc70-fdff9427ebf7@redhat.com>
+Subject: Re: [PATCH] iotests: Add more "skip_if_unsupported" statements to the
+ python tests
+References: <20190819092118.18920-1-thuth@redhat.com>
+In-Reply-To: <20190819092118.18920-1-thuth@redhat.com>
 
---3D3wYujFGyT7E0AaZRWBHK6mkrzHc4B3s
+--3SWOLKnOJTbuAxhplT4nJxQzB02NiEq23
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/19/19 1:55 PM, Max Reitz wrote:
-> endof() is a useful macro, we can make use of it outside of virtio.
+On 19.08.19 11:21, Thomas Huth wrote:
+> The python code already contains a possibility to skip tests if the
+> corresponding driver is not available in the qemu binary - use it
+> in more spots to avoid that the tests are failing if the driver has
+> been disabled.
 >=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  include/hw/virtio/virtio.h |  7 -------
->  include/qemu/compiler.h    |  7 +++++++
->  hw/block/virtio-blk.c      |  4 ++--
->  hw/net/virtio-net.c        | 10 +++++-----
->  4 files changed, 14 insertions(+), 14 deletions(-)
->=20
+>  tests/qemu-iotests/030 |  3 +++
+>  tests/qemu-iotests/040 |  2 ++
+>  tests/qemu-iotests/041 | 14 +++++++++++++-
+>  tests/qemu-iotests/245 |  2 ++
+>  4 files changed, 20 insertions(+), 1 deletion(-)
 
-> +++ b/include/qemu/compiler.h
-> @@ -60,6 +60,13 @@
+[...]
+
+> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+> index 26bf1701eb..f45d20fbe0 100755
+> --- a/tests/qemu-iotests/041
+> +++ b/tests/qemu-iotests/041
+> @@ -817,6 +817,7 @@ class TestRepairQuorum(iotests.QMPTestCase):
+>      image_len =3D 1 * 1024 * 1024 # MB
+>      IMAGES =3D [ quorum_img1, quorum_img2, quorum_img3 ]
 > =20
->  #define sizeof_field(type, field) sizeof(((type *)0)->field)
-> =20
-> +/*
-> + * Calculate the number of bytes up to and including the given 'field'=
- of
-> + * 'container'.
-> + */
-> +#define endof(container, field) \
-> +    (offsetof(container, field) + sizeof_field(container, field))
+> +    @iotests.skip_if_unsupported(['quorum'])
+>      def setUp(self):
+>          self.vm =3D iotests.VM()
 
-Bike-shedding: I might have done s/container/type/ as part of the
-motion, to match the above definition of sizeof_field (and in C, we tend
-to refer to 'type's, not 'container's).  But doesn't affect correctness
-of the patch.
+It=E2=80=99s clear that none of these tests can run if there is no quorum=
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+support, because setUp() creates a quorum node.  I think it would be
+nice if it would suffice to just skip everything automatically if
+setUp() is skipped and not have to bother about each of the test cases.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Coincidentally (:-)), I have a patch to do that, namely =E2=80=9Ciotests:=
+ Allow
+skipping test cases=E2=80=9D in my =E2=80=9Ciotests: Selfish patches=E2=80=
+=9D series:
+
+https://lists.nongnu.org/archive/html/qemu-block/2019-06/msg01106.html
+
+Yes, that means you cannot use an annotation because it needs @self to
+be able to skip the test.  Hm... But I think I can make that work by
+simply s/case_notrun/args[0].case_skip/ in skip_if_unsupported()?
+
+Max
 
 
---3D3wYujFGyT7E0AaZRWBHK6mkrzHc4B3s--
+--3SWOLKnOJTbuAxhplT4nJxQzB02NiEq23--
 
---uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx
+--dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1a80EACgkQp6FrSiUn
-Q2rODwf+JF6YHgdDfBE64tZ1ZftY16DkbT4vobq9S4J23HeeeREQzMzU/73qYLYn
-uh5bh6YtB/aSMagqMFTwdR8WG7lLp9GTCQou5rcOAUKMV5HxiUMJ/y55uWS64tnM
-p8peeW/PsnYzRbl/1QKLpEoxrvCiH7tYsq+XFkh0gdr83J8aUWp9yIk60UtZj+l0
-iW/sO+AgmxA3WEfOugh7PmfGOYSnAq8vDkfF7IVbpsxMClO5BhT16JKlQcOQtj57
-JZ9a7DPolo8FHF3/3YUavy0i4GW2E05VPbGd2CUR+HUOrgEJ966AgRScUqixd3e5
-qZXnW3XRDVm/j15nioqL20IOkpHopQ==
-=/fa5
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1a9NoACgkQ9AfbAGHV
+z0A4/wgAt3CgMh8oDXNWclWf1ccyVq+H5rWuNABPdIuIkBaAETEMNWQiW2a0rMBH
+yMmWYTupPRN2cJH0B6QYxInbNuDN9NHdMp/Nnd8tS63tClYDTvflAbkiAqtEdEmB
+Sl8/am+0CIvmBaF9mnTZU9a3QvZZOy3kyIIADRJk/KOcoEq1sdbW8kgdpvL4rj+U
+w4sdTwEfqXZ7BYGJlaMFWnldNgyj3mf5sI69bv2b1PvPtnvaHAQmw3PZUTCE+TDD
+65PeoaGIQLMw67ean9gSv5hxBA7uVWSHxTtWvYf4q9zZCunY3oSz7qgjY4y9rBF5
+jKpfX2kvfet8PIjpJyvGlFBtjvcljA==
+=TsQ2
 -----END PGP SIGNATURE-----
 
---uOb7wIOy9cepJajaU2fQeKSUQpicCXCBx--
+--dVWDaxw1xSAmVNetSK4dbONLwzm0QxgKX--
 
