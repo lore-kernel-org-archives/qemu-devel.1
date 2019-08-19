@@ -2,98 +2,86 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60650C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C86EC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:12:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30E9F206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:11:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E9F206BB
+	by mail.kernel.org (Postfix) with ESMTPS id E1541206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:12:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1541206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hziNY-0005xw-Cz
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:11:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33908)
+	id 1hziOa-0006sJ-4e
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:12:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34100)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1hziMu-0005UY-Mi
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:10:45 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hziNx-0006QX-T3
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hziMt-0006Cm-B3
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:10:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28678)
+ (envelope-from <pbonzini@redhat.com>) id 1hziNw-0006fq-9I
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:11:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57720)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hziMt-0006CW-3O
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:10:43 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hziNw-0006fg-1l
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:11:48 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E931164043
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:10:41 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id h3so5312739wrw.7
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 07:10:41 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id CDA487BDAC
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:11:46 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id k15so5300181wrw.18
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 07:11:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=I2zyjHD2ke/DcDnodzJT7UVFnr3rQjHxfcTBA/cAirU=;
- b=ntg38MXMvidMAopHhaQBKJAaMFItLPsRVwet9uij9dCzRDbb6lzRJwtmxV85227D/0
- BLONM25DL59lAWVbGeJZKJUGo0L7ZFPudRtoiObtBiINUcQpYg42U6ynryq5R0HNU4wU
- mUCLHHM/oCbd4oCj2KVZgjTKPD2R/mJoxo/KOLJ5CC9mXe0b57yRAAcqiPMF1xddyDhQ
- ojcctT7VJ+SeTbfYlj2HRDmvizV/HaLebRbwKYoboKMx0sa3qlk/rrHghZZyi7sHbrKX
- Y12rwK87TJ+4pQT9v7wBm1IJpDVG0ZKuk8BYc6zDHkE6BbT8PzI2wAAUkgRKu1i+0G2B
- Tsnw==
-X-Gm-Message-State: APjAAAWOqqVz8PtKTbKL2NJwdBNJeGUzcnpwJzCAYBPIPJpSpvwSX6BD
- uXbKsgKr9B0M3OR5MkQqvGRaG/kcGFlqErKXGJZCqS1n2+ociIhIqyfBJDbbVwl8NI7gwLOgrA+
- W4+R9C30jToWNvgM=
-X-Received: by 2002:adf:8004:: with SMTP id 4mr19857755wrk.341.1566223840498; 
- Mon, 19 Aug 2019 07:10:40 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy1+iXEK+s0t+/gwGtW+6iKHeKAiWoHR786oRIFNLoQY5otuKoTwXxum9khbhnWWOB4D4t0fw==
-X-Received: by 2002:adf:8004:: with SMTP id 4mr19857719wrk.341.1566223840193; 
- Mon, 19 Aug 2019 07:10:40 -0700 (PDT)
+ bh=3R88i+yf5FQjNa+oTkPQ5znUAbdfpBXYb6Dgk/ZH3Y8=;
+ b=uim8g7jEnyA0aGWZti5BfkcB6X82ZczCQa4FufH8pB2WBG+q3VIbLC5oldlEwis/F1
+ paAsSm/qXKRJNoziLjH257GGzs+roclMKdOIgwNs5/ihWL++YMZcI8YnnAzDx78DhrIk
+ FkI30LDOiZfjonxBpaIpQCskYzWkeMH7Xm9m6kH68lmmpPb05DEyovJpRS1m2HUfVE2D
+ ywZjtrw/BEpNpv0zvApusBChVOt4m93LiU+f/nowbTAldReivVcUBXbwCr04UmhsyJ56
+ qrZ+rhF2Wv+f5djg7kX8Afc/5AIXuoxTY4PPdWVQeZcpGsF9fSkfepETsIbotRneVzn7
+ 7H9w==
+X-Gm-Message-State: APjAAAUtcdHNNXDsiuaM1NZ/bN0D/q/lVlHOI6lQkgfldhvDldTSJ9ba
+ iwDY5j3synNEcBHCyWxYhT79ChmndNOMSTHAea4Eme46EjZQ/7Na1gTQyy4nsj1yb+vHXSGqTiY
+ fyMhwtsW0OBEXJfw=
+X-Received: by 2002:a1c:9a95:: with SMTP id c143mr20632333wme.2.1566223905375; 
+ Mon, 19 Aug 2019 07:11:45 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxGZBDmYQdiihWAREVKz//vWck4IREGONzr15GzrW9lIIiSKiSNvmpu/x1PhVmA891tkltHDg==
+X-Received: by 2002:a1c:9a95:: with SMTP id c143mr20632302wme.2.1566223905026; 
+ Mon, 19 Aug 2019 07:11:45 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f?
  ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
- by smtp.gmail.com with ESMTPSA id c15sm40715342wrb.80.2019.08.19.07.10.38
+ by smtp.gmail.com with ESMTPSA id b136sm31874212wme.18.2019.08.19.07.11.44
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 19 Aug 2019 07:10:39 -0700 (PDT)
-To: "Yao, Jiewen" <jiewen.yao@intel.com>
-References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
- <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
- <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
- <99219f81-33a3-f447-95f8-f10341d70084@redhat.com>
- <6f8b9507-58d0-5fbd-b827-c7194b3b2948@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
- <7cb458ea-956e-c1df-33f7-025e4f0f22df@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F7600B9@shsmsx102.ccr.corp.intel.com>
- <bb6fdbe0-2a3b-e586-e9a5-93e1ac0803ec@redhat.com>
- <20190816161933.7d30a881@x1.home>
- <74D8A39837DF1E4DA445A8C0B3885C503F761B96@shsmsx102.ccr.corp.intel.com>
- <35396800-32d2-c25f-b0d0-2d7cd8438687@redhat.com>
- <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
+ Mon, 19 Aug 2019 07:11:44 -0700 (PDT)
+To: Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
+References: <1564035256-11828-1-git-send-email-jing2.liu@linux.intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <4afa24cb-1ab7-b085-ba84-70271712d62e@redhat.com>
-Date: Mon, 19 Aug 2019 16:10:43 +0200
+Message-ID: <e958ffd2-bba6-ce68-4bd8-ba67f83dcb0c@redhat.com>
+Date: Mon, 19 Aug 2019 16:11:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
-Content-Type: text/plain; charset=iso-2022-jp
+In-Reply-To: <1564035256-11828-1-git-send-email-jing2.liu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [edk2-devel] CPU hotplug using SMM with QEMU+OVMF
+Subject: Re: [Qemu-devel] [PATCH v2] x86: Intel AVX512_BF16 feature enabling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,37 +93,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
- "devel@edk2.groups.io" <devel@edk2.groups.io>,
- Phillip Goerl <phillip.goerl@oracle.com>,
- qemu devel list <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>, "Nakajima,
- Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- edk2-rfc-groups-io <rfc@edk2.groups.io>, Laszlo Ersek <lersek@redhat.com>,
- Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/08/19 01:00, Yao, Jiewen wrote:
-> in real world, we deprecate AB-seg usage because they are vulnerable
-> to smm cache poison attack. I assume cache poison is out of scope in
-> the virtual world, or there is a way to prevent ABseg cache poison.
+On 25/07/19 08:14, Jing Liu wrote:
+> Intel CooperLake cpu adds AVX512_BF16 instruction, defining as
+> CPUID.(EAX=7,ECX=1):EAX[bit 05].
+> 
+> The patch adds a property for setting the subleaf of CPUID leaf 7 in
+> case that people would like to specify it.
+> 
+> The release spec link as follows,
+> https://software.intel.com/sites/default/files/managed/c5/15/\
+> architecture-instruction-set-extensions-programming-reference.pdf
+> 
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+> ---
+>  target/i386/cpu.c | 39 ++++++++++++++++++++++++++++++++++++++-
+>  target/i386/cpu.h |  7 +++++++
+>  target/i386/kvm.c |  3 ++-
+>  3 files changed, 47 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 805ce95..517dedb 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -770,6 +770,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+>            /* CPUID_7_0_ECX_OSPKE is dynamic */ \
+>            CPUID_7_0_ECX_LA57)
+>  #define TCG_7_0_EDX_FEATURES 0
+> +#define TCG_7_1_EAX_FEATURES 0
+>  #define TCG_APM_FEATURES 0
+>  #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
+>  #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
+> @@ -1095,6 +1096,25 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          },
+>          .tcg_features = TCG_7_0_EDX_FEATURES,
+>      },
+> +    [FEAT_7_1_EAX] = {
+> +        .type = CPUID_FEATURE_WORD,
+> +        .feat_names = {
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, "avx512-bf16", NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +        },
+> +        .cpuid = {
+> +            .eax = 7,
+> +            .needs_ecx = true, .ecx = 1,
+> +            .reg = R_EAX,
+> +        },
+> +        .tcg_features = TCG_7_1_EAX_FEATURES,
+> +    },
+>      [FEAT_8000_0007_EDX] = {
+>          .type = CPUID_FEATURE_WORD,
+>          .feat_names = {
+> @@ -4293,13 +4313,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>      case 7:
+>          /* Structured Extended Feature Flags Enumeration Leaf */
+>          if (count == 0) {
+> -            *eax = 0; /* Maximum ECX value for sub-leaves */
+> +            /* Maximum ECX value for sub-leaves */
+> +            *eax = env->cpuid_level_func7;
+>              *ebx = env->features[FEAT_7_0_EBX]; /* Feature flags */
+>              *ecx = env->features[FEAT_7_0_ECX]; /* Feature flags */
+>              if ((*ecx & CPUID_7_0_ECX_PKU) && env->cr[4] & CR4_PKE_MASK) {
+>                  *ecx |= CPUID_7_0_ECX_OSPKE;
+>              }
+>              *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
+> +        } else if (count == 1) {
+> +            *eax = env->features[FEAT_7_1_EAX];
+> +            *ebx = 0;
+> +            *ecx = 0;
+> +            *edx = 0;
+>          } else {
+>              *eax = 0;
+>              *ebx = 0;
+> @@ -4949,6 +4975,11 @@ static void x86_cpu_adjust_feat_level(X86CPU *cpu, FeatureWord w)
+>          x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel2, eax);
+>      break;
+>      }
+> +
+> +    if (eax == 7) {
+> +        x86_cpu_adjust_level(cpu, &env->cpuid_min_level_func7,
+> +                             fi->cpuid.ecx);
+> +    }
+>  }
+>  
+>  /* Calculate XSAVE components based on the configured CPU feature flags */
+> @@ -5067,6 +5098,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>          x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
+> +        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
+>          x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
+> @@ -5098,6 +5130,9 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>      }
+>  
+>      /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
+> +    if (env->cpuid_level_func7 == UINT32_MAX) {
+> +        env->cpuid_level_func7 = env->cpuid_min_level_func7;
+> +    }
+>      if (env->cpuid_level == UINT32_MAX) {
+>          env->cpuid_level = env->cpuid_min_level;
+>      }
+> @@ -5869,6 +5904,8 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
+>      DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU, host_phys_bits_limit, 0),
+>      DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
+> +    DEFINE_PROP_UINT32("level-func7", X86CPU, env.cpuid_level_func7,
+> +                       UINT32_MAX),
+>      DEFINE_PROP_UINT32("level", X86CPU, env.cpuid_level, UINT32_MAX),
+>      DEFINE_PROP_UINT32("xlevel", X86CPU, env.cpuid_xlevel, UINT32_MAX),
+>      DEFINE_PROP_UINT32("xlevel2", X86CPU, env.cpuid_xlevel2, UINT32_MAX),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 05393cf..df9106f 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -479,6 +479,7 @@ typedef enum FeatureWord {
+>      FEAT_7_0_EBX,       /* CPUID[EAX=7,ECX=0].EBX */
+>      FEAT_7_0_ECX,       /* CPUID[EAX=7,ECX=0].ECX */
+>      FEAT_7_0_EDX,       /* CPUID[EAX=7,ECX=0].EDX */
+> +    FEAT_7_1_EAX,       /* CPUID[EAX=7,ECX=1].EAX */
+>      FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
+>      FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
+>      FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
+> @@ -692,6 +693,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_EDX_CORE_CAPABILITY   (1U << 30)  /*Core Capability*/
+>  #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+>  
+> +#define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
+> +
+>  #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
+>                                                                               do not invalidate cache */
+>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+> @@ -1322,6 +1325,10 @@ typedef struct CPUX86State {
+>      /* Fields after this point are preserved across CPU reset. */
+>  
+>      /* processor features (e.g. for CPUID insn) */
+> +    /* Minimum cpuid leaf 7 value */
+> +    uint32_t cpuid_level_func7;
+> +    /* Actual cpuid leaf 7 value */
+> +    uint32_t cpuid_min_level_func7;
+>      /* Minimum level/xlevel/xlevel2, based on CPU model + features */
+>      uint32_t cpuid_min_level, cpuid_min_xlevel, cpuid_min_xlevel2;
+>      /* Maximum level/xlevel/xlevel2 value for auto-assignment: */
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index ec7870c..fd0a447 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1493,6 +1493,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>                  c = &cpuid_data.entries[cpuid_i++];
+>              }
+>              break;
+> +        case 0x7:
+>          case 0x14: {
+>              uint32_t times;
+>  
+> @@ -1505,7 +1506,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>              for (j = 1; j <= times; ++j) {
+>                  if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
+>                      fprintf(stderr, "cpuid_data is full, no space for "
+> -                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
+> +                                "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
+>                      abort();
+>                  }
+>                  c = &cpuid_data.entries[cpuid_i++];
+> 
 
-Indeed the SMRR would not cover the A-seg on real hardware.  However, if
-the chipset allowed aliasing A-seg SMRAM to 0x30000, it would only be
-used for SMBASE relocation of hotplugged CPU.  The firmware would still
-keep low SMRAM disabled, *except around SMBASE relocation of hotplugged
-CPUs*.  To avoid cache poisoning attacks, you only have to issue a
-WBINVD before enabling low SMRAM and before disabling it.  Hotplug SMI
-is not a performance-sensitive path, so it's not a big deal.
-
-So I guess you agree that PCI DMA attacks are a potential vector also on
-real hardware.  As Alex pointed out, VT-d is not a solution because
-there could be legitimate DMA happening during CPU hotplug.  For OVMF
-we'll probably go with Igor's idea, it would be nice if Intel chipsets
-supported it too. :)
+Queued, thanks (I was waiting for QEMU 4.1 to be released).
 
 Paolo
 
