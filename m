@@ -2,113 +2,63 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6275C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7316CC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:22:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F102206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:14:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="VhdocU0L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F102206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3988B20651
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:22:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3988B20651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hziQw-00082Z-QV
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:14:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34407)
+	id 1hziY7-0002Hw-5b
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:22:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <arikalo@wavecomp.com>) id 1hziQD-0007bz-N6
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:14:11 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hziXM-0001Wi-DF
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:21:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <arikalo@wavecomp.com>) id 1hziQA-0007be-R0
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:14:08 -0400
-Received: from mail-eopbgr680138.outbound.protection.outlook.com
- ([40.107.68.138]:24243 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
- id 1hziQA-0007bK-GU
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:14:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E/v/i3lkFOZJbDfBi8DTHhH41q/zuhi4Zu7t+lBLZaKmnTV4eDERNOAW6kjDjuKflLqzGvXJk/jhWKRxtrtSCBpzeJSeDCzcg0ELlZ+2lkzmaEfK3Xu+IFw119cKGjObM0YSPkqmqCGRoNdZPNsLC2C4YD0tWiWrXTQfpAtyW2epGRoddhpm54JCILGjv/NP/Jo9rcG/p8In0jWSfZbwfPyLbNbOa9vsk14yhszJwjPubr/nj6Cr1+/G+n1WBXLOgnZcIPsW6pxDZ1i6y74mDN60N9xetYqZyswjJUH66YfTUoyc8sDlHvTlBqbjlJsZ0ROgWCl1yYKWXynoHe/SJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uf8xGm9/fsubMWsPT0O4w06WCQSgPh80I3upr7xyCn4=;
- b=gdbUDBi/1Df0bpqwhEWpAj56RzGu2OKxfL/Yj9AsQavApawj8Y5eKy+9406PCe0+clKNBPKBZAlrA/7L5sU0qi4NaU2U7JPf/FL2iumfXJ8frcEP26YEe2wOPy4UvzVzQb8dG6l04zCmYXSYfWxv4fAoL/XDGcNXFMe1z1xtY+nV4jiZ22UuNPfFZsx4yvAYRliVOT3NZ4RQJVgD0CXCLLJWQh9GRMLJ6YOcmyJuAEfvkycdjdkZ/jNnsGVr9GgqqKiyP0CDQrcO7uqPSwk/2smCifcRU9bSIAzVTJS2hFqc1SjLb1W8iORJuI78CdFtJELnBpz+Sco+QJBlbaxIXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
- dkim=pass header.d=wavecomp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uf8xGm9/fsubMWsPT0O4w06WCQSgPh80I3upr7xyCn4=;
- b=VhdocU0LA07EfvBzpF9Zy9E1ZJBKWBTHsLSWDVsgkaitwnoJwgfAoErUVsp7qrQVHR1YUY4ZNGdd2CwasAryxcRKugcSRJ+aYOWXSsCYunv822wbgsgqLQLdTgSSrUXL2/19e7GbXHd4xsC8dydFhhplj+AeTq391Dayd3MsUnQ=
-Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
- DM5PR22MB0969.namprd22.prod.outlook.com (10.171.160.136) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.18; Mon, 19 Aug 2019 14:14:03 +0000
-Received: from DM5PR22MB1658.namprd22.prod.outlook.com
- ([fe80::ed69:1c9f:bdff:2197]) by DM5PR22MB1658.namprd22.prod.outlook.com
- ([fe80::ed69:1c9f:bdff:2197%5]) with mapi id 15.20.2178.018; Mon, 19 Aug 2019
- 14:14:03 +0000
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [EXTERNAL][PATCH v8 02/37] target/mips: Amend CP0 WatchHi
- register implementation
-Thread-Index: AQHVVphajK9WGL0IF0C1ssg0Wy0PYA==
-Date: Mon, 19 Aug 2019 14:14:03 +0000
-Message-ID: <DM5PR22MB16589E0534B19469B3E0E78FD2A80@DM5PR22MB1658.namprd22.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=arikalo@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4b5060e7-f5f1-4251-70aa-08d724af7d2e
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DM5PR22MB0969; 
-x-ms-traffictypediagnostic: DM5PR22MB0969:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR22MB096996BDFBD740C8BD475451D2A80@DM5PR22MB0969.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3044;
-x-forefront-prvs: 0134AD334F
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(136003)(396003)(376002)(346002)(366004)(189003)(199004)(81166006)(55236004)(53546011)(102836004)(99286004)(186003)(2906002)(14444005)(256004)(33656002)(26005)(229853002)(71190400001)(6506007)(71200400001)(6246003)(478600001)(107886003)(53936002)(7736002)(4326008)(74316002)(2501003)(19627405001)(110136005)(25786009)(14454004)(54906003)(476003)(316002)(66066001)(6606003)(9686003)(6436002)(55016002)(7696005)(86362001)(52536014)(54896002)(66946007)(8936002)(8676002)(81156014)(91956017)(76116006)(66556008)(6116002)(3846002)(486006)(66446008)(64756008)(5660300002)(66476007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0969;
- H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: /X60NmkO9nsA5AToapzyez7Ln+XI/TTUl8/wxoy4ehSOV0lReVi4zAe4B6YW3iCRAe2mAC04J0HnJFfmNKI+vdW8V2oFxEKBhklzr1ilOKcORyybFlioLvn4N2WpM8FJ+cU6UH7A7y/WxouzgForSdb7AgvQ7byzATvR5I/YisLv68m/k0XWduCpXULfagaBW8n0jwJCMoNdmiW0DZQOtsnpr4ZQ1UFEv/6qIkmaTxctOyCj7uJa4vGjRFoK0ghocfA4pMbw/6pcLbwJGriBQNSiKexqO8/pIMqT39aN1t3gO50BZtMUWcJQJRMwz0s6pPn32Y9Rp80G9jY7JKLVzyVpnGx3d+aSMDaVBB+AbFtcIv3BZoI7beJsJs5usAkGPSzeh6r3qQYP31ryNKQN/llPIr52hT8ifngreFW/4Gs=
-MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b5060e7-f5f1-4251-70aa-08d724af7d2e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2019 14:14:03.3777 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RJl/4U9mQu7xI3xmmqrmwJ55/EneTzxsgpb+iz/YqfyVtsNpVtUj/o4/bmIAX7pmdKR/Fw7i+hLXJoFEoRq6Yg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0969
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.68.138
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [EXTERNAL][PATCH v8 02/37] target/mips: Amend CP0
- WatchHi register implementation
+ (envelope-from <mlevitsk@redhat.com>) id 1hziXJ-0003HA-Rb
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:21:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60766)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1hziXE-0003DJ-It; Mon, 19 Aug 2019 10:21:24 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A7454C08EC01;
+ Mon, 19 Aug 2019 14:21:23 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 094CA58CB2;
+ Mon, 19 Aug 2019 14:21:20 +0000 (UTC)
+Message-ID: <0000ce26b107930e8ed4f9eac7810026cda9f866.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Date: Mon, 19 Aug 2019 17:21:19 +0300
+In-Reply-To: <6b9b4bf7-5765-400b-7452-e37ec797eed1@redhat.com>
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <20190814202219.1870-3-mlevitsk@redhat.com>
+ <6b9b4bf7-5765-400b-7452-e37ec797eed1@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 19 Aug 2019 14:21:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 02/13] qcrypto-luks: misc
+ refactoring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,249 +70,548 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "philmd@redhat.com" <philmd@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Monday, August 19, 2019 2:07 PM
-> To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
-> Cc: philmd@redhat.com <philmd@redhat.com>; Aleksandar Markovic <amarkovic=
-@wavecomp.com>; Aleksandar Rikalo <arikalo@wavecomp.com>
-> Subject: [EXTERNAL][PATCH v8 02/37] target/mips: Amend CP0 WatchHi regist=
-er implementation
->
-> From: Yongbok Kim <yongbok.kim@mips.com>
->
-> WatchHi is extended by the field MemoryMapID with the GINVT instruction.
-> The field is accessible by MTHC0/MFHC0 in 32-bit architectures and DMTC0/
-> DMFC0 in 64-bit architectures.
->
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  target/mips/cpu.h       |  2 +-
->  target/mips/helper.h    |  3 +++
->  target/mips/machine.c   |  6 +++---
->  target/mips/op_helper.c | 23 +++++++++++++++++++++--
->  target/mips/translate.c | 42 +++++++++++++++++++++++++++++++++++++++++-
->  5 files changed, 69 insertions(+), 7 deletions(-)
->
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 90a2ed8..6406ba8 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -898,7 +898,7 @@ struct CPUMIPSState {
->  /*
->   * CP0 Register 19
->   */
-> -    int32_t CP0_WatchHi[8];
-> +    uint64_t CP0_WatchHi[8];
->  #define CP0WH_ASID 16
->  /*
->   * CP0 Register 20
-> diff --git a/target/mips/helper.h b/target/mips/helper.h
-> index 51f0e1c..aad0951 100644
-> --- a/target/mips/helper.h
-> +++ b/target/mips/helper.h
-> @@ -78,6 +78,7 @@ DEF_HELPER_1(mfc0_maar, tl, env)
->  DEF_HELPER_1(mfhc0_maar, tl, env)
->  DEF_HELPER_2(mfc0_watchlo, tl, env, i32)
->  DEF_HELPER_2(mfc0_watchhi, tl, env, i32)
-> +DEF_HELPER_2(mfhc0_watchhi, tl, env, i32)
->  DEF_HELPER_1(mfc0_debug, tl, env)
->  DEF_HELPER_1(mftc0_debug, tl, env)
->  #ifdef TARGET_MIPS64
-> @@ -89,6 +90,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
->  DEF_HELPER_1(dmfc0_lladdr, tl, env)
->  DEF_HELPER_1(dmfc0_maar, tl, env)
->  DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
-> +DEF_HELPER_2(dmfc0_watchhi, tl, env, i32)
->  DEF_HELPER_1(dmfc0_saar, tl, env)
->  #endif /* TARGET_MIPS64 */
->
-> @@ -159,6 +161,7 @@ DEF_HELPER_2(mthc0_maar, void, env, tl)
->  DEF_HELPER_2(mtc0_maari, void, env, tl)
->  DEF_HELPER_3(mtc0_watchlo, void, env, tl, i32)
->  DEF_HELPER_3(mtc0_watchhi, void, env, tl, i32)
-> +DEF_HELPER_3(mthc0_watchhi, void, env, tl, i32)
->  DEF_HELPER_2(mtc0_xcontext, void, env, tl)
->  DEF_HELPER_2(mtc0_framemask, void, env, tl)
->  DEF_HELPER_2(mtc0_debug, void, env, tl)
-> diff --git a/target/mips/machine.c b/target/mips/machine.c
-> index eb2d970..c3e52f8 100644
-> --- a/target/mips/machine.c
-> +++ b/target/mips/machine.c
-> @@ -213,8 +213,8 @@ const VMStateDescription vmstate_tlb =3D {
->
->  const VMStateDescription vmstate_mips_cpu =3D {
->      .name =3D "cpu",
-> -    .version_id =3D 18,
-> -    .minimum_version_id =3D 18,
-> +    .version_id =3D 19,
-> +    .minimum_version_id =3D 19,
->      .post_load =3D cpu_post_load,
->      .fields =3D (VMStateField[]) {
->          /* Active TC */
-> @@ -297,7 +297,7 @@ const VMStateDescription vmstate_mips_cpu =3D {
->          VMSTATE_INT32(env.CP0_MAARI, MIPSCPU),
->          VMSTATE_UINTTL(env.lladdr, MIPSCPU),
->          VMSTATE_UINTTL_ARRAY(env.CP0_WatchLo, MIPSCPU, 8),
-> -        VMSTATE_INT32_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
-> +        VMSTATE_UINT64_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
->          VMSTATE_UINTTL(env.CP0_XContext, MIPSCPU),
->          VMSTATE_INT32(env.CP0_Framemask, MIPSCPU),
->          VMSTATE_INT32(env.CP0_Debug, MIPSCPU),
-> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> index 628da45..279b800 100644
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -979,7 +979,12 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env, =
-uint32_t sel)
->
->  target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
->  {
-> -    return env->CP0_WatchHi[sel];
-> +    return (int32_t) env->CP0_WatchHi[sel];
-> +}
-> +
-> +target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
-> +{
-> +    return env->CP0_WatchHi[sel] >> 32;
->  }
->
->  target_ulong helper_mfc0_debug(CPUMIPSState *env)
-> @@ -1055,6 +1060,11 @@ target_ulong helper_dmfc0_saar(CPUMIPSState *env)
->      }
->      return 0;
->  }
-> +
-> +target_ulong helper_dmfc0_watchhi(CPUMIPSState *env, uint32_t sel)
-> +{
-> +    return env->CP0_WatchHi[sel];
-> +}
->  #endif /* TARGET_MIPS64 */
->
->  void helper_mtc0_index(CPUMIPSState *env, target_ulong arg1)
-> @@ -1896,11 +1906,20 @@ void helper_mtc0_watchlo(CPUMIPSState *env, targe=
-t_ulong arg1, uint32_t sel)
->
->  void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t =
-sel)
->  {
-> -    int mask =3D 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID)=
-;
-> +    uint64_t mask =3D 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_=
-ASID);
-> +    if ((env->CP0_Config5 >> CP0C5_MI) & 1) {
-> +        mask |=3D 0xFFFFFFFF00000000ULL; /* MMID */
-> +    }
->      env->CP0_WatchHi[sel] =3D arg1 & mask;
->      env->CP0_WatchHi[sel] &=3D ~(env->CP0_WatchHi[sel] & arg1 & 0x7);
->  }
->
-> +void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t=
- sel)
-> +{
-> +    env->CP0_WatchHi[sel] =3D ((uint64_t) (arg1) << 32) |
-> +                            (env->CP0_WatchHi[sel] & 0x00000000ffffffffU=
-LL);
-> +}
-> +
->  void helper_mtc0_xcontext(CPUMIPSState *env, target_ulong arg1)
->  {
->      target_ulong mask =3D (1ULL << (env->SEGBITS - 7)) - 1;
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 4ebeabe..b40468d 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -2547,6 +2547,7 @@ typedef struct DisasContext {
->      bool nan2008;
->      bool abs2008;
->      bool saar;
-> +    bool mi;
->  } DisasContext;
->
->  #define DISAS_STOP       DISAS_TARGET_0
-> @@ -6680,6 +6681,25 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
->              goto cp0_unimplemented;
->          }
->          break;
-> +    case CP0_REGISTER_19:
-> +        switch (sel) {
-> +        case 0:
-> +        case 1:
-> +        case 2:
-> +        case 3:
-> +        case 4:
-> +        case 5:
-> +        case 6:
-> +        case 7:
-> +            /* upper 32 bits are only available when Config5MI !=3D 0 */
-> +            CP0_CHECK(ctx->mi);
-> +            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, CP0_WatchHi[sel=
-]), 0);
-> +            register_name =3D "WatchHi";
-> +            break;
-> +        default:
-> +            goto cp0_unimplemented;
-> +        }
-> +        break;
->      case CP0_REGISTER_28:
->          switch (sel) {
->          case 0:
-> @@ -6766,6 +6786,25 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg,=
- int reg, int sel)
->              goto cp0_unimplemented;
->          }
->          break;
-> +    case CP0_REGISTER_19:
-> +        switch (sel) {
-> +        case 0:
-> +        case 1:
-> +        case 2:
-> +        case 3:
-> +        case 4:
-> +        case 5:
-> +        case 6:
-> +        case 7:
-> +            /* upper 32 bits are only available when Config5MI !=3D 0 */
-> +            CP0_CHECK(ctx->mi);
-> +            gen_helper_0e1i(mthc0_watchhi, arg, sel);
-> +            register_name =3D "WatchHi";
-> +            break;
-> +        default:
-> +            goto cp0_unimplemented;
-> +        }
-> +        break;
->      case CP0_REGISTER_28:
->          switch (sel) {
->          case 0:
-> @@ -8805,7 +8844,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, =
-int reg, int sel)
->          case 6:
->          case 7:
->              CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
-> -            gen_helper_1e0i(mfc0_watchhi, arg, sel);
-> +            gen_helper_1e0i(dmfc0_watchhi, arg, sel);
->              register_name =3D "WatchHi";
->              break;
->          default:
-> @@ -29965,6 +30004,7 @@ static void mips_tr_init_disas_context(DisasConte=
-xtBase *dcbase, CPUState *cs)
->      ctx->mrp =3D (env->CP0_Config5 >> CP0C5_MRP) & 1;
->      ctx->nan2008 =3D (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
->      ctx->abs2008 =3D (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
-> +    ctx->mi =3D (env->CP0_Config5 >> CP0C5_MI) & 1;
->      restore_cpu_state(env, ctx);
->  #ifdef CONFIG_USER_ONLY
->          ctx->mem_idx =3D MIPS_HFLAG_UM;
-> --
-> 2.7.4
+On Thu, 2019-08-15 at 17:40 -0400, John Snow wrote:
+> 
+> On 8/14/19 4:22 PM, Maxim Levitsky wrote:
+> > This is also a preparation for key read/write/erase functions
+> > 
+> 
+> This is a matter of taste and I am not usually reviewing LUKS patches
+> (So don't take me too seriously), but I would prefer not to have "misc"
+> patches and instead split things out by individual changes along with a
+> nice commit message for each change.
+> 
+> > * use master key len from the header
+> 
+> This touches enough lines that you could make it its own patch, I think.
+> 
+> > * prefer to use crypto params in the QCryptoBlockLUKS
+> >   over passing them as function arguments
+> 
+> I think the same is true here, and highlighting which variables you are
+> sticking into state instead of leaving as functional parameters would be
+> nice to see without all the other changes.
+> 
+> > * define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME
+> 
+> This can likely be squashed with whichever patch of yours first needs to
+> use it, because it's so short.
+> 
+> > * Add comments to various crypto parameters in the QCryptoBlockLUKS
+> > 
+> 
+> Can probably be squashed with item #2.
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+I mostly agree with you! I usually write everything as one big patch,
+and then split it. 
+It takes time but this has the benefit of
+much less overhead during the development, and it forces kind of self
+review on me while doing the split.
+
+This patch I probably didn't split enough, and I'll do it later when I send the next
+revision. 
+
+I only had split things to the extent that all the patches are readable and reviewable to avoid wasting time,
+on stuff that I will have to probably rewrite anyway.
+
+Thanks a lot for the feedback,
+
+Best regards,
+	Maxim Levitsky
+
+
+
+
+> 
+> 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  crypto/block-luks.c | 213 ++++++++++++++++++++++----------------------
+> >  1 file changed, 105 insertions(+), 108 deletions(-)
+> > 
+> > diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+> > index 409ab50f20..48213abde7 100644
+> > --- a/crypto/block-luks.c
+> > +++ b/crypto/block-luks.c
+> > @@ -70,6 +70,8 @@ typedef struct QCryptoBlockLUKSKeySlot QCryptoBlockLUKSKeySlot;
+> >  
+> >  #define QCRYPTO_BLOCK_LUKS_SECTOR_SIZE 512LL
+> >  
+> > +#define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME 2000
+> > +
+> >  static const char qcrypto_block_luks_magic[QCRYPTO_BLOCK_LUKS_MAGIC_LEN] = {
+> >      'L', 'U', 'K', 'S', 0xBA, 0xBE
+> >  };
+> > @@ -199,13 +201,25 @@ QEMU_BUILD_BUG_ON(sizeof(struct QCryptoBlockLUKSHeader) != 592);
+> >  struct QCryptoBlockLUKS {
+> >      QCryptoBlockLUKSHeader header;
+> >  
+> > -    /* Cache parsed versions of what's in header fields,
+> > -     * as we can't rely on QCryptoBlock.cipher being
+> > -     * non-NULL */
+> > +    /* Main encryption algorithm used for encryption*/
+> >      QCryptoCipherAlgorithm cipher_alg;
+> > +
+> > +    /* Mode of encryption for the selected encryption algorithm */
+> >      QCryptoCipherMode cipher_mode;
+> > +
+> > +    /* Initialization vector generation algorithm */
+> >      QCryptoIVGenAlgorithm ivgen_alg;
+> > +
+> > +    /* Hash algorithm used for IV generation*/
+> >      QCryptoHashAlgorithm ivgen_hash_alg;
+> > +
+> > +    /*
+> > +     * Encryption algorithm used for IV generation.
+> > +     * Usually the same as main encryption algorithm
+> > +     */
+> > +    QCryptoCipherAlgorithm ivgen_cipher_alg;
+> > +
+> > +    /* Hash algorithm used in pbkdf2 function */
+> >      QCryptoHashAlgorithm hash_alg;
+> >  };
+> >  
+> > @@ -397,6 +411,12 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgorithm cipher,
+> >      }
+> >  }
+> >  
+> > +static int masterkeylen(QCryptoBlockLUKS *luks)
+> > +{
+> > +    return luks->header.key_bytes;
+> > +}
+> > +
+> > +
+> 
+> generally QEMU uses snake_case_names; please spell as "master_key_len".
+> 
+> >  /*
+> >   * Given a key slot, and user password, this will attempt to unlock
+> >   * the master encryption key from the key slot.
+> > @@ -410,21 +430,15 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgorithm cipher,
+> >   */
+> >  static int
+> >  qcrypto_block_luks_load_key(QCryptoBlock *block,
+> > -                            QCryptoBlockLUKSKeySlot *slot,
+> > +                            uint slot_idx,
+> >                              const char *password,
+> > -                            QCryptoCipherAlgorithm cipheralg,
+> > -                            QCryptoCipherMode ciphermode,
+> > -                            QCryptoHashAlgorithm hash,
+> > -                            QCryptoIVGenAlgorithm ivalg,
+> > -                            QCryptoCipherAlgorithm ivcipheralg,
+> > -                            QCryptoHashAlgorithm ivhash,
+> >                              uint8_t *masterkey,
+> > -                            size_t masterkeylen,
+> >                              QCryptoBlockReadFunc readfunc,
+> >                              void *opaque,
+> >                              Error **errp)
+> >  {
+> >      QCryptoBlockLUKS *luks = block->opaque;
+> > +    QCryptoBlockLUKSKeySlot *slot = &luks->header.key_slots[slot_idx];
+> >      uint8_t *splitkey;
+> >      size_t splitkeylen;
+> >      uint8_t *possiblekey;
+> > @@ -439,9 +453,9 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+> >          return 0;
+> >      }
+> >  
+> > -    splitkeylen = masterkeylen * slot->stripes;
+> > +    splitkeylen = masterkeylen(luks) * slot->stripes;
+> >      splitkey = g_new0(uint8_t, splitkeylen);
+> > -    possiblekey = g_new0(uint8_t, masterkeylen);
+> > +    possiblekey = g_new0(uint8_t, masterkeylen(luks));
+> >  
+> >      /*
+> >       * The user password is used to generate a (possible)
+> > @@ -450,11 +464,11 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+> >       * the key is correct and validate the results of
+> >       * decryption later.
+> >       */
+> > -    if (qcrypto_pbkdf2(hash,
+> > +    if (qcrypto_pbkdf2(luks->hash_alg,
+> >                         (const uint8_t *)password, strlen(password),
+> >                         slot->salt, QCRYPTO_BLOCK_LUKS_SALT_LEN,
+> >                         slot->iterations,
+> > -                       possiblekey, masterkeylen,
+> > +                       possiblekey, masterkeylen(luks),
+> >                         errp) < 0) {
+> >          goto cleanup;
+> >      }
+> > @@ -478,19 +492,19 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+> >  
+> >      /* Setup the cipher/ivgen that we'll use to try to decrypt
+> >       * the split master key material */
+> > -    cipher = qcrypto_cipher_new(cipheralg, ciphermode,
+> > -                                possiblekey, masterkeylen,
+> > +    cipher = qcrypto_cipher_new(luks->cipher_alg, luks->cipher_mode,
+> > +                                possiblekey, masterkeylen(luks),
+> >                                  errp);
+> >      if (!cipher) {
+> >          goto cleanup;
+> >      }
+> >  
+> > -    niv = qcrypto_cipher_get_iv_len(cipheralg,
+> > -                                    ciphermode);
+> > -    ivgen = qcrypto_ivgen_new(ivalg,
+> > -                              ivcipheralg,
+> > -                              ivhash,
+> > -                              possiblekey, masterkeylen,
+> > +    niv = qcrypto_cipher_get_iv_len(luks->cipher_alg,
+> > +                                    luks->cipher_mode);
+> > +    ivgen = qcrypto_ivgen_new(luks->ivgen_alg,
+> > +                              luks->ivgen_cipher_alg,
+> > +                              luks->ivgen_hash_alg,
+> > +                              possiblekey, masterkeylen(luks),
+> >                                errp);
+> >      if (!ivgen) {
+> >          goto cleanup;
+> > @@ -519,8 +533,8 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+> >       * Now we've decrypted the split master key, join
+> >       * it back together to get the actual master key.
+> >       */
+> > -    if (qcrypto_afsplit_decode(hash,
+> > -                               masterkeylen,
+> > +    if (qcrypto_afsplit_decode(luks->hash_alg,
+> > +                               masterkeylen(luks),
+> >                                 slot->stripes,
+> >                                 splitkey,
+> >                                 masterkey,
+> > @@ -537,8 +551,8 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+> >       * then comparing that to the hash stored in the key slot
+> >       * header
+> >       */
+> > -    if (qcrypto_pbkdf2(hash,
+> > -                       masterkey, masterkeylen,
+> > +    if (qcrypto_pbkdf2(luks->hash_alg,
+> > +                       masterkey, masterkeylen(luks),
+> >                         luks->header.master_key_salt,
+> >                         QCRYPTO_BLOCK_LUKS_SALT_LEN,
+> >                         luks->header.master_key_iterations,
+> > @@ -577,37 +591,19 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+> >  static int
+> >  qcrypto_block_luks_find_key(QCryptoBlock *block,
+> >                              const char *password,
+> > -                            QCryptoCipherAlgorithm cipheralg,
+> > -                            QCryptoCipherMode ciphermode,
+> > -                            QCryptoHashAlgorithm hash,
+> > -                            QCryptoIVGenAlgorithm ivalg,
+> > -                            QCryptoCipherAlgorithm ivcipheralg,
+> > -                            QCryptoHashAlgorithm ivhash,
+> > -                            uint8_t **masterkey,
+> > -                            size_t *masterkeylen,
+> > +                            uint8_t *masterkey,
+> >                              QCryptoBlockReadFunc readfunc,
+> >                              void *opaque,
+> >                              Error **errp)
+> >  {
+> > -    QCryptoBlockLUKS *luks = block->opaque;
+> >      size_t i;
+> >      int rv;
+> >  
+> > -    *masterkey = g_new0(uint8_t, luks->header.key_bytes);
+> > -    *masterkeylen = luks->header.key_bytes;
+> > -
+> >      for (i = 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
+> >          rv = qcrypto_block_luks_load_key(block,
+> > -                                         &luks->header.key_slots[i],
+> > +                                         i,
+> >                                           password,
+> > -                                         cipheralg,
+> > -                                         ciphermode,
+> > -                                         hash,
+> > -                                         ivalg,
+> > -                                         ivcipheralg,
+> > -                                         ivhash,
+> > -                                         *masterkey,
+> > -                                         *masterkeylen,
+> > +                                         masterkey,
+> >                                           readfunc,
+> >                                           opaque,
+> >                                           errp);
+> > @@ -620,11 +616,7 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
+> >      }
+> >  
+> >      error_setg(errp, "Invalid password, cannot unlock any keyslot");
+> > -
+> >   error:
+> > -    g_free(*masterkey);
+> > -    *masterkey = NULL;
+> > -    *masterkeylen = 0;
+> >      return -1;
+> >  }
+> >  
+> > @@ -639,21 +631,15 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >                          size_t n_threads,
+> >                          Error **errp)
+> >  {
+> > -    QCryptoBlockLUKS *luks;
+> > +    QCryptoBlockLUKS *luks = NULL;
+> >      Error *local_err = NULL;
+> >      int ret = 0;
+> >      size_t i;
+> >      ssize_t rv;
+> >      uint8_t *masterkey = NULL;
+> > -    size_t masterkeylen;
+> >      char *ivgen_name, *ivhash_name;
+> > -    QCryptoCipherMode ciphermode;
+> > -    QCryptoCipherAlgorithm cipheralg;
+> > -    QCryptoIVGenAlgorithm ivalg;
+> > -    QCryptoCipherAlgorithm ivcipheralg;
+> > -    QCryptoHashAlgorithm hash;
+> > -    QCryptoHashAlgorithm ivhash;
+> >      char *password = NULL;
+> > +    char *cipher_mode = NULL;
+> >  
+> >      if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
+> >          if (!options->u.luks.key_secret) {
+> > @@ -710,6 +696,8 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >          goto fail;
+> >      }
+> >  
+> > +    cipher_mode = g_strdup(luks->header.cipher_mode);
+> > +
+> >      /*
+> >       * The cipher_mode header contains a string that we have
+> >       * to further parse, of the format
+> > @@ -718,7 +706,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >       *
+> >       * eg  cbc-essiv:sha256, cbc-plain64
+> >       */
+> > -    ivgen_name = strchr(luks->header.cipher_mode, '-');
+> > +    ivgen_name = strchr(cipher_mode, '-');
+> >      if (!ivgen_name) {
+> >          ret = -EINVAL;
+> >          error_setg(errp, "Unexpected cipher mode string format %s",
+> > @@ -730,13 +718,13 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >  
+> >      ivhash_name = strchr(ivgen_name, ':');
+> >      if (!ivhash_name) {
+> > -        ivhash = 0;
+> > +        luks->ivgen_hash_alg = 0;
+> >      } else {
+> >          *ivhash_name = '\0';
+> >          ivhash_name++;
+> >  
+> > -        ivhash = qcrypto_block_luks_hash_name_lookup(ivhash_name,
+> > -                                                     &local_err);
+> > +        luks->ivgen_hash_alg = qcrypto_block_luks_hash_name_lookup(ivhash_name,
+> > +                                                                   &local_err);
+> >          if (local_err) {
+> >              ret = -ENOTSUP;
+> >              error_propagate(errp, local_err);
+> > @@ -744,25 +732,27 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >          }
+> >      }
+> >  
+> > -    ciphermode = qcrypto_block_luks_cipher_mode_lookup(luks->header.cipher_mode,
+> > -                                                       &local_err);
+> > +    luks->cipher_mode = qcrypto_block_luks_cipher_mode_lookup(cipher_mode,
+> > +                                                              &local_err);
+> >      if (local_err) {
+> >          ret = -ENOTSUP;
+> >          error_propagate(errp, local_err);
+> >          goto fail;
+> >      }
+> >  
+> > -    cipheralg = qcrypto_block_luks_cipher_name_lookup(luks->header.cipher_name,
+> > -                                                      ciphermode,
+> > -                                                      luks->header.key_bytes,
+> > -                                                      &local_err);
+> > +    luks->cipher_alg =
+> > +            qcrypto_block_luks_cipher_name_lookup(luks->header.cipher_name,
+> > +                                                  luks->cipher_mode,
+> > +                                                  luks->header.key_bytes,
+> > +                                                  &local_err);
+> >      if (local_err) {
+> >          ret = -ENOTSUP;
+> >          error_propagate(errp, local_err);
+> >          goto fail;
+> >      }
+> >  
+> > -    hash = qcrypto_block_luks_hash_name_lookup(luks->header.hash_spec,
+> > +    luks->hash_alg =
+> > +            qcrypto_block_luks_hash_name_lookup(luks->header.hash_spec,
+> >                                                 &local_err);
+> >      if (local_err) {
+> >          ret = -ENOTSUP;
+> > @@ -770,23 +760,24 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >          goto fail;
+> >      }
+> >  
+> > -    ivalg = qcrypto_block_luks_ivgen_name_lookup(ivgen_name,
+> > -                                                 &local_err);
+> > +    luks->ivgen_alg = qcrypto_block_luks_ivgen_name_lookup(ivgen_name,
+> > +                                                           &local_err);
+> >      if (local_err) {
+> >          ret = -ENOTSUP;
+> >          error_propagate(errp, local_err);
+> >          goto fail;
+> >      }
+> >  
+> > -    if (ivalg == QCRYPTO_IVGEN_ALG_ESSIV) {
+> > +    if (luks->ivgen_alg == QCRYPTO_IVGEN_ALG_ESSIV) {
+> >          if (!ivhash_name) {
+> >              ret = -EINVAL;
+> >              error_setg(errp, "Missing IV generator hash specification");
+> >              goto fail;
+> >          }
+> > -        ivcipheralg = qcrypto_block_luks_essiv_cipher(cipheralg,
+> > -                                                      ivhash,
+> > -                                                      &local_err);
+> > +        luks->ivgen_cipher_alg =
+> > +                qcrypto_block_luks_essiv_cipher(luks->cipher_alg,
+> > +                                                luks->ivgen_hash_alg,
+> > +                                                &local_err);
+> >          if (local_err) {
+> >              ret = -ENOTSUP;
+> >              error_propagate(errp, local_err);
+> > @@ -800,21 +791,25 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >           * ignore hash names with these ivgens rather than report
+> >           * an error about the invalid usage
+> >           */
+> > -        ivcipheralg = cipheralg;
+> > +        luks->ivgen_cipher_alg = luks->cipher_alg;
+> >      }
+> >  
+> > +
+> > +    g_free(cipher_mode);
+> > +    cipher_mode = NULL;
+> > +    ivgen_name = NULL;
+> > +    ivhash_name = NULL;
+> > +
+> >      if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
+> >          /* Try to find which key slot our password is valid for
+> >           * and unlock the master key from that slot.
+> >           */
+> > +
+> > +        masterkey = g_new0(uint8_t, masterkeylen(luks));
+> > +
+> >          if (qcrypto_block_luks_find_key(block,
+> >                                          password,
+> > -                                        cipheralg, ciphermode,
+> > -                                        hash,
+> > -                                        ivalg,
+> > -                                        ivcipheralg,
+> > -                                        ivhash,
+> > -                                        &masterkey, &masterkeylen,
+> > +                                        masterkey,
+> >                                          readfunc, opaque,
+> >                                          errp) < 0) {
+> >              ret = -EACCES;
+> > @@ -824,21 +819,24 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >          /* We have a valid master key now, so can setup the
+> >           * block device payload decryption objects
+> >           */
+> > -        block->kdfhash = hash;
+> > -        block->niv = qcrypto_cipher_get_iv_len(cipheralg,
+> > -                                               ciphermode);
+> > -        block->ivgen = qcrypto_ivgen_new(ivalg,
+> > -                                         ivcipheralg,
+> > -                                         ivhash,
+> > -                                         masterkey, masterkeylen,
+> > +        block->kdfhash = luks->hash_alg;
+> > +        block->niv = qcrypto_cipher_get_iv_len(luks->cipher_alg,
+> > +                                               luks->cipher_mode);
+> > +
+> > +        block->ivgen = qcrypto_ivgen_new(luks->ivgen_alg,
+> > +                                         luks->ivgen_cipher_alg,
+> > +                                         luks->ivgen_hash_alg,
+> > +                                         masterkey, masterkeylen(luks),
+> >                                           errp);
+> >          if (!block->ivgen) {
+> >              ret = -ENOTSUP;
+> >              goto fail;
+> >          }
+> >  
+> > -        ret = qcrypto_block_init_cipher(block, cipheralg, ciphermode,
+> > -                                        masterkey, masterkeylen, n_threads,
+> > +        ret = qcrypto_block_init_cipher(block, luks->cipher_alg,
+> > +                                        luks->cipher_mode,
+> > +                                        masterkey, masterkeylen(luks),
+> > +                                        n_threads,
+> >                                          errp);
+> >          if (ret < 0) {
+> >              ret = -ENOTSUP;
+> > @@ -850,12 +848,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+> >      block->payload_offset = luks->header.payload_offset *
+> >          block->sector_size;
+> >  
+> > -    luks->cipher_alg = cipheralg;
+> > -    luks->cipher_mode = ciphermode;
+> > -    luks->ivgen_alg = ivalg;
+> > -    luks->ivgen_hash_alg = ivhash;
+> > -    luks->hash_alg = hash;
+> > -
+> >      g_free(masterkey);
+> >      g_free(password);
+> >  
+> > @@ -910,7 +902,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+> >  
+> >      memcpy(&luks_opts, &options->u.luks, sizeof(luks_opts));
+> >      if (!luks_opts.has_iter_time) {
+> > -        luks_opts.iter_time = 2000;
+> > +        luks_opts.iter_time = QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME;
+> >      }
+> >      if (!luks_opts.has_cipher_alg) {
+> >          luks_opts.cipher_alg = QCRYPTO_CIPHER_ALG_AES_256;
+> > @@ -930,6 +922,17 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+> >              luks_opts.has_ivgen_hash_alg = true;
+> >          }
+> >      }
+> > +
+> > +    luks = g_new0(QCryptoBlockLUKS, 1);
+> > +    block->opaque = luks;
+> > +
+> > +    luks->cipher_alg = luks_opts.cipher_alg;
+> > +    luks->cipher_mode = luks_opts.cipher_mode;
+> > +    luks->ivgen_alg = luks_opts.ivgen_alg;
+> > +    luks->ivgen_hash_alg = luks_opts.ivgen_hash_alg;
+> > +    luks->hash_alg = luks_opts.hash_alg;
+> > +
+> > +
+> >      /* Note we're allowing ivgen_hash_alg to be set even for
+> >       * non-essiv iv generators that don't need a hash. It will
+> >       * be silently ignored, for compatibility with dm-crypt */
+> > @@ -944,8 +947,6 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+> >          return -1;
+> >      }
+> >  
+> > -    luks = g_new0(QCryptoBlockLUKS, 1);
+> > -    block->opaque = luks;
+> >  
+> >      memcpy(luks->header.magic, qcrypto_block_luks_magic,
+> >             QCRYPTO_BLOCK_LUKS_MAGIC_LEN);
+> > @@ -1003,6 +1004,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+> >          ivcipheralg = luks_opts.cipher_alg;
+> >      }
+> >  
+> > +    luks->ivgen_cipher_alg = ivcipheralg;
+> > +
+> >      strcpy(luks->header.cipher_name, cipher_alg);
+> >      strcpy(luks->header.cipher_mode, cipher_mode_spec);
+> >      strcpy(luks->header.hash_spec, hash_alg);
+> > @@ -1304,12 +1307,6 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+> >          goto error;
+> >      }
+> >  
+> > -    luks->cipher_alg = luks_opts.cipher_alg;
+> > -    luks->cipher_mode = luks_opts.cipher_mode;
+> > -    luks->ivgen_alg = luks_opts.ivgen_alg;
+> > -    luks->ivgen_hash_alg = luks_opts.ivgen_hash_alg;
+> > -    luks->hash_alg = luks_opts.hash_alg;
+> > -
+> >      memset(masterkey, 0, luks->header.key_bytes);
+> >      g_free(masterkey);
+> >      memset(slotkey, 0, luks->header.key_bytes);
+> > 
+
 
 
