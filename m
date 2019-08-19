@@ -2,66 +2,82 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4DDC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E88C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:18:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B3E920843
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:16:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B3E920843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F04B20843
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 13:18:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PW84igl1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F04B20843
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzhW5-0002O2-KW
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:16:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41300)
+	id 1hzhYF-0004vx-HD
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 09:18:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41465)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1hzgt9-0004Qb-85
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:35:56 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hzgte-0005QA-FS
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:36:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hzgt8-0006cE-0m
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:35:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52156)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hzgt5-0006ZG-9c; Mon, 19 Aug 2019 08:35:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ED88D30089A1;
- Mon, 19 Aug 2019 12:35:49 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4AC00859CE;
- Mon, 19 Aug 2019 12:35:45 +0000 (UTC)
-Message-ID: <ba8e9afd066d65099a897b5c515a73ab2c64625d.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, 
- Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 19 Aug 2019 15:35:44 +0300
-In-Reply-To: <414e8dab-b19b-fd47-52eb-db43ae75ec07@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
- <20190815091039.GA7415@linux.fritz.box> <87y2zuy0k7.fsf@dusky.pond.sub.org>
- <2561ace5297c93cee597c776230dcb8f457a8561.camel@redhat.com>
- <414e8dab-b19b-fd47-52eb-db43ae75ec07@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hzgtd-0006qh-1n
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:36:26 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44918)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hzgtc-0006qL-Pi
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 08:36:24 -0400
+Received: by mail-oi1-x241.google.com with SMTP id k22so1142047oiw.11
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 05:36:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=io9mEUl7oyr4CMzVlw+cXp2/8mVhIjioh9NVE1TLqUs=;
+ b=PW84igl1Qv5mq1rBFJkAWvhW+3c0DGxjrEKPfEjZu28Aq0tOXaayqE+L9UCxmDkEw1
+ SK0UUp1VpHI8A3oBU75n+xWUa8Twlrsssbxf8assMbCPMXsjv0GWrmHioKDMiE7a3I57
+ tGJdTlOlci+pIwgLiQICdRjC61VwmBAgvQxVE8TDyYJ4ZQV35fkV4Bz6SrXJbrHwc2C2
+ ST4/U0mBstFzehno2uAYT2uxPR6z+nLsGQPT15G+fooxpIW6WaWSOvJ2/9FtP+Gc4f+P
+ dnPQdloRajz9MdmBNS6AEb/e0GgHs69kI8AKLc6Mpqt08XTmPb/lqfQfZV8pt2vQCWxK
+ 0l2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=io9mEUl7oyr4CMzVlw+cXp2/8mVhIjioh9NVE1TLqUs=;
+ b=PmCtRtGeLGDSUGJ376sNJcEJK++h5m8wfnw6XCgcheZnHhBNNtTsyAWztLIywZ0Wy9
+ 05YbUPQx+A6JKbAo0fIiR6iAneCnj2RcHYl6qNg2cpvpL0aTPzoP1g6zElMj0+1ZOxH8
+ TjlOkXyAJPOldce42wMi4G18HZlYeHb2fdavhoHAF+NVXIvsrfwh5GZn2X9XkreRThEp
+ gwS+RRaMS/cm6SPb7ouU5vMLaboz7u2jXoNwjojXNV2qjw6mW9apYwGYj4SF9tm562+H
+ QLL0SDHYTtYQqzbT7ZZNX000SRTdNTIQ15yKMrCa/GsenIexmMKvE5gDYT9m6oLXIhM7
+ R9Cw==
+X-Gm-Message-State: APjAAAVTYC5I0lLXjaNCR82CJNqAgOq5mtKs0vGCWEpfZERAZn9NEtK9
+ 7BZMzyj+PCSfyu10zo0chI5h351FIxcj5FFZUBc9wA==
+X-Google-Smtp-Source: APXvYqxyVZGS8Y1/u33q8TN/1J6c6GLiu+/mjZHuFO4UyG34x/K4NkOroI64TCKaZ7Ukyve7cAABmglGHctidd2WtQ4=
+X-Received: by 2002:aca:4b86:: with SMTP id y128mr3574201oia.163.1566218183839; 
+ Mon, 19 Aug 2019 05:36:23 -0700 (PDT)
+MIME-Version: 1.0
+References: <8fb538f3-dfdd-b427-727a-2e7c2120da09@gmail.com>
+ <20e800e8-846b-a9c3-f840-826238b0818f@redhat.com>
+ <CAFEAcA9xbPGSezS60cg6WzqpDR1u38aE0bXL_6pLs+H1TK3Ddw@mail.gmail.com>
+ <dff44ac1-10e7-285e-467d-8dfe8c7a469b@redhat.com>
+In-Reply-To: <dff44ac1-10e7-285e-467d-8dfe8c7a469b@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Aug 2019 13:36:12 +0100
+Message-ID: <CAFEAcA_FZrXNgmOFY4c8C=Xw9V-Ei4SNWvprAp_1rEt7P20hCA@mail.gmail.com>
+To: David Hildenbrand <david@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 19 Aug 2019 12:35:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] RFC: luks/encrypted qcow2 key
- management
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [qemu-s390x] linux-user: s390x issue on Fedora 30
+ (dynamic library loader?)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,66 +89,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Daniel =?ISO-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-s390x <qemu-s390x@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-08-15 at 10:00 -0500, Eric Blake wrote:
-> On 8/15/19 9:44 AM, Maxim Levitsky wrote:
-> 
-> > > > > Does the idea of a union type with a default value for the discriminator
-> > > > > help?  Maybe we have a discriminator which defaults to 'auto', and add a
-> > > > > union branch 'auto':'any'.  During creation, if the "driver":"auto"
-> > > > > branch is selected (usually implicitly by omitting "driver", but also
-> > > > > possible explicitly), the creation attempt is rejected as invalid
-> > > > > regardless of the contents of the remaining 'any'.  But during amend
-> > > > > usage, if the 'auto' branch is selected, we then add in the proper
-> > > > > "driver":"xyz" and reparse the QAPI object to determine if the remaining
-> > > > > fields in 'any' still meet the specification for the required driver branch.
-> > > > > 
-> > > > > This idea may still require some tweaks to the QAPI generator, but it's
-> > > > > the best I can come up with for a way to parse an arbitrary JSON object
-> > > > > with unknown validation, then reparse it again after adding more
-> > > > > information that would constrain the parse differently.
-> > > > 
-> > > > Feels like this would be a lot of code just to allow the client to omit
-> > > > passing a value that it knows anyway. If this were a human interface, I
-> > > > could understand the desire to make commands less verbose, but for QMP I
-> > > > honestly don't see the point when it's not trivial.
-> > > 
-> > > Seconded.
-> > 
-> > 
-> > But what about my suggestion of adding something like:
-> > 
-> > { 'union': 'BlockdevAmendOptions',
-> > 
-> >   'base': {
-> >       'node-name':         'str' },
-> > 
-> >   'discriminator': { 'get_block_driver(node-name)' } ,
-> 
-> Not worth it. It makes the QAPI generator more complex (to invoke
-> arbitrary code instead of a fixed name) just to avoid a little bit of
-> complexity in the caller (which is assumed to be a computer, and thus
-> shouldn't have a hard time providing a sane 'driver' unconditionally).
-> An HMP wrapper around the QMP command can do whatever magic it needs to
-> omit driver, but making driver mandatory for QMP is just fine.
+On Mon, 19 Aug 2019 at 13:22, David Hildenbrand <david@redhat.com> wrote:
+> Thanks, running
+>
+> "ldconfig -c etc/ld.so.cache -r ."
+>
+> Seems to fix the issue for me. So you are sure the bug resides in glic
+> and not in the qemu-user pieces of the library loader?
 
-All right! I kind of not agree with that, since I think even though QMP is a machine language,
-it still should be consistent since humans still use it, even if this is humans that code some
-tool that use it.
+Pretty sure, yes. QEMU doesn't implement any of the dynamic loader:
+it just loads the elf interpreter (ld.so) and the binary into
+memory, and all dynamic loading is ld.so running as guest code
+doing syscall. The problem IIRC is that ld.so just mmap()s
+the ld.so.cache file in and wades through it:
+https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/dl-cache.c;h=d8d1e2344e612d98689cf7d7ad965822d0ab6ed1;hb=HEAD
 
-I won't argue with you though, let it be like that.
+and the magic-number checks are memcmp(), so the magic number
+is the same for both big and little endian but the data structures
+in the file are not endian-independent.
 
-Best regards,
-	Maxim Levitsky
-
-> 
-
-
+thanks
+-- PMM
 
