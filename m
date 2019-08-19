@@ -2,60 +2,67 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F45FC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E38C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:09:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 747432087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:08:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747432087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0164D2087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 19:09:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0164D2087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzn1W-0000wv-FU
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32817)
+	id 1hzn1m-0001dx-Si
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 15:09:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hzmpf-0002Hg-7b
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 14:56:44 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hzmzl-0007Fe-1O
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:07:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hzmpd-0002B0-Po
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 14:56:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58074)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hzmpa-00028V-8m; Mon, 19 Aug 2019 14:56:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9635630860C6;
- Mon, 19 Aug 2019 18:56:37 +0000 (UTC)
-Received: from localhost (ovpn-204-64.brq.redhat.com [10.40.204.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B5FC88B1A;
- Mon, 19 Aug 2019 18:56:36 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Mon, 19 Aug 2019 20:55:56 +0200
-Message-Id: <20190819185602.4267-11-mreitz@redhat.com>
-In-Reply-To: <20190819185602.4267-1-mreitz@redhat.com>
-References: <20190819185602.4267-1-mreitz@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1hzmzi-00072C-UT
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:07:08 -0400
+Resent-Date: Mon, 19 Aug 2019 15:07:08 -0400
+Resent-Message-Id: <E1hzmzi-00072C-UT@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21411)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hzmzi-00071W-MJ
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 15:07:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1566241606; cv=none; d=zoho.com; s=zohoarc; 
+ b=oFMWUkKvQ9Kfs51cEgi1I8jvzSTHAuQouZR9GhZvLhhuNVCitvEmanvsseVndHlqIKVOotwyzDeBG9bX/u/QyOm4zCwBYQAsZvJ9x7pa/ymNQPn8UYxoTKXblkg/3fc8AMc4nIMa8kvwR8sOqldZUC2UmZzPU+IYA/l05vVyx8E=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1566241606;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=2ScoBVB79kLFPQs+KPQarqW6sFEBSswbJ2SKiuj/ovY=; 
+ b=KejgfzaeGkB6oGKDuGXaUTgIeCIFseWsZPtR8/6bWgxHKLlPGKbDaW3N5BEkYZ/WxSB2PWoy4kaZ45QW/b6WWi/k7twq5/LK5Y2Fw26ULowBJXvrlr57qH0UW3rRUdOmNY3UQ1vQdSeknngtuSjOTc69Si2GGsZotSSU6IURVJM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156624160467554.06052244036539;
+ Mon, 19 Aug 2019 12:06:44 -0700 (PDT)
+In-Reply-To: <20190819185348.221825-1-scw@google.com>
+Message-ID: <156624160358.10709.12216629519561886436@5dec9699b7de>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 19 Aug 2019 18:56:37 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: qemu-devel@nongnu.org
+Date: Mon, 19 Aug 2019 12:06:44 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 10/16] qcow2: Fix broken snapshot table
- entries
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] linux-user: erroneous fd_trans_unregister
+ call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,173 +74,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: scw@google.com, riku.voipio@iki.fi, laurent@vivier.eu,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only case where we currently reject snapshot table entries is when
-they have too much extra data.  Fix them with qemu-img check -r all by
-counting it as a corruption, reducing their extra_data_size, and then
-letting qcow2_check_fix_snapshot_table() do the rest.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2-snapshot.c | 67 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 56 insertions(+), 11 deletions(-)
-
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index b526a8f819..53dc1635ec 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -44,7 +44,23 @@ void qcow2_free_snapshots(BlockDriverState *bs)
-     s->nb_snapshots =3D 0;
- }
-=20
--int qcow2_read_snapshots(BlockDriverState *bs, Error **errp)
-+/*
-+ * If @repair is true, try to repair a broken snapshot table instead
-+ * of just returning an error:
-+ *
-+ * - If there were snapshots with too much extra metadata, increment
-+ *   *extra_data_dropped for each.
-+ *   This requires the caller to eventually rewrite the whole snapshot
-+ *   table, which requires cluster allocation.  Therefore, this should
-+ *   be done only after qcow2_check_refcounts() made sure the refcount
-+ *   structures are valid.
-+ *   (In the meantime, the image is still valid because
-+ *   qcow2_check_refcounts() does not do anything with snapshots'
-+ *   extra data.)
-+ */
-+static int qcow2_do_read_snapshots(BlockDriverState *bs, bool repair,
-+                                   int *extra_data_dropped,
-+                                   Error **errp)
- {
-     BDRVQcow2State *s =3D bs->opaque;
-     QCowSnapshotHeader h;
-@@ -64,6 +80,8 @@ int qcow2_read_snapshots(BlockDriverState *bs, Error **=
-errp)
-     s->snapshots =3D g_new0(QCowSnapshot, s->nb_snapshots);
-=20
-     for(i =3D 0; i < s->nb_snapshots; i++) {
-+        bool truncate_unknown_extra_data =3D false;
-+
-         /* Read statically sized part of the snapshot header */
-         offset =3D ROUND_UP(offset, 8);
-         ret =3D bdrv_pread(bs->file, offset, &h, sizeof(h));
-@@ -86,10 +104,21 @@ int qcow2_read_snapshots(BlockDriverState *bs, Error=
- **errp)
-         name_size =3D be16_to_cpu(h.name_size);
-=20
-         if (sn->extra_data_size > QCOW_MAX_SNAPSHOT_EXTRA_DATA) {
--            ret =3D -EFBIG;
--            error_setg(errp, "Too much extra metadata in snapshot table =
-"
--                       "entry %i", i);
--            goto fail;
-+            if (!repair) {
-+                ret =3D -EFBIG;
-+                error_setg(errp, "Too much extra metadata in snapshot ta=
-ble "
-+                           "entry %i", i);
-+                error_append_hint(errp, "You can force-remove this extra=
- "
-+                                  "metadata with qemu-img check -r all\n=
-");
-+                goto fail;
-+            }
-+
-+            fprintf(stderr, "Discarding too much extra metadata in snaps=
-hot "
-+                    "table entry %i (%" PRIu32 " > %u)\n",
-+                    i, sn->extra_data_size, QCOW_MAX_SNAPSHOT_EXTRA_DATA=
-);
-+
-+            (*extra_data_dropped)++;
-+            truncate_unknown_extra_data =3D true;
-         }
-=20
-         /* Read known extra data */
-@@ -113,18 +142,26 @@ int qcow2_read_snapshots(BlockDriverState *bs, Erro=
-r **errp)
-         }
-=20
-         if (sn->extra_data_size > sizeof(extra)) {
--            /* Store unknown extra data */
--            size_t unknown_extra_data_size =3D
--                sn->extra_data_size - sizeof(extra);
-+            uint64_t extra_data_end;
-+            size_t unknown_extra_data_size;
-+
-+            extra_data_end =3D offset + sn->extra_data_size - sizeof(ext=
-ra);
-=20
-+            if (truncate_unknown_extra_data) {
-+                sn->extra_data_size =3D QCOW_MAX_SNAPSHOT_EXTRA_DATA;
-+            }
-+
-+            /* Store unknown extra data */
-+            unknown_extra_data_size =3D sn->extra_data_size - sizeof(ext=
-ra);
-             sn->unknown_extra_data =3D g_malloc(unknown_extra_data_size)=
-;
-             ret =3D bdrv_pread(bs->file, offset, sn->unknown_extra_data,
-                              unknown_extra_data_size);
-             if (ret < 0) {
--                error_setg_errno(errp, -ret, "Failed to read snapshot ta=
-ble");
-+                error_setg_errno(errp, -ret,
-+                                 "Failed to read snapshot table");
-                 goto fail;
-             }
--            offset +=3D unknown_extra_data_size;
-+            offset =3D extra_data_end;
-         }
-=20
-         /* Read snapshot ID */
-@@ -163,6 +200,11 @@ fail:
-     return ret;
- }
-=20
-+int qcow2_read_snapshots(BlockDriverState *bs, Error **errp)
-+{
-+    return qcow2_do_read_snapshots(bs, false, NULL, errp);
-+}
-+
- /* add at the end of the file a new list of snapshots */
- int qcow2_write_snapshots(BlockDriverState *bs)
- {
-@@ -328,6 +370,7 @@ int coroutine_fn qcow2_check_read_snapshot_table(Bloc=
-kDriverState *bs,
- {
-     BDRVQcow2State *s =3D bs->opaque;
-     Error *local_err =3D NULL;
-+    int extra_data_dropped =3D 0;
-     int ret;
-     struct {
-         uint32_t nb_snapshots;
-@@ -363,7 +406,8 @@ int coroutine_fn qcow2_check_read_snapshot_table(Bloc=
-kDriverState *bs,
-     }
-=20
-     qemu_co_mutex_unlock(&s->lock);
--    ret =3D qcow2_read_snapshots(bs, &local_err);
-+    ret =3D qcow2_do_read_snapshots(bs, fix & BDRV_FIX_ERRORS,
-+                                  &extra_data_dropped, &local_err);
-     qemu_co_mutex_lock(&s->lock);
-     if (ret < 0) {
-         result->check_errors++;
-@@ -376,6 +420,7 @@ int coroutine_fn qcow2_check_read_snapshot_table(Bloc=
-kDriverState *bs,
-=20
-         return ret;
-     }
-+    result->corruptions +=3D extra_data_dropped;
-=20
-     return 0;
- }
---=20
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgxOTE4NTM0OC4yMjE4
+MjUtMS1zY3dAZ29vZ2xlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGxpbnV4
+LXVzZXI6IGVycm9uZW91cyBmZF90cmFuc191bnJlZ2lzdGVyIGNhbGwKTWVzc2FnZS1pZDogMjAx
+OTA4MTkxODUzNDguMjIxODI1LTEtc2N3QGdvb2dsZS5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJ
+TiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
+dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
+IFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxOTA4MTkxODUzNDguMjIxODI1LTEtc2N3QGdv
+b2dsZS5jb20gLT4gcGF0Y2hldy8yMDE5MDgxOTE4NTM0OC4yMjE4MjUtMS1zY3dAZ29vZ2xlLmNv
+bQpTdWJtb2R1bGUgJ2NhcHN0b25lJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2NhcHN0b25l
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnY2Fwc3RvbmUnClN1Ym1vZHVsZSAnZHRjJyAoaHR0
+cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycK
+U3VibW9kdWxlICdyb21zL1FlbXVNYWNEcml2ZXJzJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
+L1FlbXVNYWNEcml2ZXJzLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9RZW11TWFjRHJp
+dmVycycKU3VibW9kdWxlICdyb21zL1NMT0YnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvU0xP
+Ri5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvU0xPRicKU3VibW9kdWxlICdyb21zL2Vk
+azInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvZWRrMi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
+dGggJ3JvbXMvZWRrMicKU3VibW9kdWxlICdyb21zL2lweGUnIChodHRwczovL2dpdC5xZW11Lm9y
+Zy9naXQvaXB4ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvaXB4ZScKU3VibW9kdWxl
+ICdyb21zL29wZW5iaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5iaW9zLmdpdCkg
+cmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuYmlvcycKU3VibW9kdWxlICdyb21zL29wZW5o
+YWNrd2FyZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuaGFja3dhcmUuZ2l0KSByZWdp
+c3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5oYWNrd2FyZScKU3VibW9kdWxlICdyb21zL29wZW5z
+YmknIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbnNiaS5naXQpIHJlZ2lzdGVyZWQgZm9y
+IHBhdGggJ3JvbXMvb3BlbnNiaScKU3VibW9kdWxlICdyb21zL3FlbXUtcGFsY29kZScgKGh0dHBz
+Oi8vZ2l0LnFlbXUub3JnL2dpdC9xZW11LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICdyb21zL3FlbXUtcGFsY29kZScKU3VibW9kdWxlICdyb21zL3NlYWJpb3MnIChodHRwczovL2dp
+dC5xZW11Lm9yZy9naXQvc2VhYmlvcy5naXQvKSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3Nl
+YWJpb3MnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zLWhwcGEnIChodHRwczovL2dpdC5xZW11Lm9y
+Zy9naXQvc2VhYmlvcy1ocHBhLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9z
+LWhwcGEnClN1Ym1vZHVsZSAncm9tcy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
+L3NnYWJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVs
+ZSAncm9tcy9za2lib290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0KSBy
+ZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3Qn
+IChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
+aCAncm9tcy91LWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIChodHRwczov
+L2dpdC5xZW11Lm9yZy9naXQvdS1ib290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
+aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnClN1Ym1vZHVsZSAnc2xpcnAnIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQvbGlic2xpcnAuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdzbGlycCcKU3Vi
+bW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnL2dpdC9iZXJrZWxleS1zb2Z0ZmxvYXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rl
+c3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5
+LXRlc3RmbG9hdC0zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2JlcmtlbGV5LXRlc3RmbG9h
+dC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0
+LTMnClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
+L2tleWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNvZGVtYXBkYicK
+Q2xvbmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0b25lJzogY2hl
+Y2tlZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2YmYnCkNsb25p
+bmcgaW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzg4ZjE4
+OTA5ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50byAncm9tcy9R
+ZW11TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnOiBj
+aGVja2VkIG91dCAnOTBjNDg4ZDVmNGE0MDczNDIyNDdiOWVhODY5ZGYxYzJkOWM4ZTI2NicKQ2xv
+bmluZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NMT0YnOiBjaGVj
+a2VkIG91dCAnYmExYWIzNjBlZWJlNjMzOGJiOGQ3ZDgzYTkyMjBjY2Y3ZTIxM2FmMycKQ2xvbmlu
+ZyBpbnRvICdyb21zL2VkazInLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazInOiBjaGVja2Vk
+IG91dCAnMjBkMmU1YTEyNWUzNGZjODUwMTAyNjYxM2E3MTU0OWIyYTFhM2U1NCcKU3VibW9kdWxl
+ICdTb2Z0RmxvYXQnIChodHRwczovL2dpdGh1Yi5jb20vdWNiLWJhci9iZXJrZWxleS1zb2Z0Zmxv
+YXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ0FybVBrZy9MaWJyYXJ5L0FybVNvZnRGbG9h
+dExpYi9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICdDcnlwdG9Qa2cvTGlicmFyeS9P
+cGVuc3NsTGliL29wZW5zc2wnIChodHRwczovL2dpdGh1Yi5jb20vb3BlbnNzbC9vcGVuc3NsKSBy
+ZWdpc3RlcmVkIGZvciBwYXRoICdDcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wn
+CkNsb25pbmcgaW50byAnQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNv
+ZnRmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0FybVBrZy9MaWJyYXJ5L0Fy
+bVNvZnRGbG9hdExpYi9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdiNjRhZjQx
+YzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8gJ0NyeXB0b1Br
+Zy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRr
+Mi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wnOiBjaGVja2VkIG91dCAnNTBl
+YWFjOWYzMzM3NjY3MjU5ZGU3MjU0NTFmMjAxZTc4NDU5OTY4NycKU3VibW9kdWxlICdib3Jpbmdz
+c2wnIChodHRwczovL2JvcmluZ3NzbC5nb29nbGVzb3VyY2UuY29tL2JvcmluZ3NzbCkgcmVnaXN0
+ZXJlZCBmb3IgcGF0aCAnYm9yaW5nc3NsJwpTdWJtb2R1bGUgJ2tyYjUnIChodHRwczovL2dpdGh1
+Yi5jb20va3JiNS9rcmI1KSByZWdpc3RlcmVkIGZvciBwYXRoICdrcmI1JwpTdWJtb2R1bGUgJ3B5
+Y2EuY3J5cHRvZ3JhcGh5JyAoaHR0cHM6Ly9naXRodWIuY29tL3B5Y2EvY3J5cHRvZ3JhcGh5Lmdp
+dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncHljYS1jcnlwdG9ncmFwaHknCkNsb25pbmcgaW50byAn
+Ym9yaW5nc3NsJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5
+L09wZW5zc2xMaWIvb3BlbnNzbC9ib3Jpbmdzc2wnOiBjaGVja2VkIG91dCAnMjA3MGY4YWQ5MTUx
+ZGM4ZjNhNzNiZmZhYTE0NmI1ZTY5MzdhNTgzZicKQ2xvbmluZyBpbnRvICdrcmI1Jy4uLgpTdWJt
+b2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNz
+bC9rcmI1JzogY2hlY2tlZCBvdXQgJ2I5YWQ2YzQ5NTA1Yzk2YTA4ODMyNmI2MmE1MjU2OGUzNDg0
+ZjIxNjgnCkNsb25pbmcgaW50byAncHljYS1jcnlwdG9ncmFwaHknLi4uClN1Ym1vZHVsZSBwYXRo
+ICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL3B5Y2EtY3J5
+cHRvZ3JhcGh5JzogY2hlY2tlZCBvdXQgJzA5NDAzMTAwZGUyZjZmMWNkZDBkNDg0ZGNiOGU2MjBm
+MWMzMzVjOGYnCkNsb25pbmcgaW50byAncm9tcy9pcHhlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9t
+cy9pcHhlJzogY2hlY2tlZCBvdXQgJ2RlNDU2NWNiZTc2ZWE5Zjc5MTNhMDFmMzMxYmUzZWU5MDFi
+YjZlMTcnCkNsb25pbmcgaW50byAncm9tcy9vcGVuYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3Jv
+bXMvb3BlbmJpb3MnOiBjaGVja2VkIG91dCAnYzc5ZTBlY2I4NGY0ZjFlZTNmNzNmNTIxNjIyZTI2
+NGVkZDFiZjE3NCcKQ2xvbmluZyBpbnRvICdyb21zL29wZW5oYWNrd2FyZScuLi4KU3VibW9kdWxl
+IHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJzogY2hlY2tlZCBvdXQgJ2M1NTlkYTdjOGVlYzVlNDVl
+ZjFmNjc5Nzg4MjdhZjZmMGI5NTQ2ZjUnCkNsb25pbmcgaW50byAncm9tcy9vcGVuc2JpJy4uLgpT
+dWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuc2JpJzogY2hlY2tlZCBvdXQgJ2NlMjI4ZWUwOTE5ZGVi
+OTk1NzE5MmQ3MjNlZWNjOGFhYWUyNjk3YzYnCkNsb25pbmcgaW50byAncm9tcy9xZW11LXBhbGNv
+ZGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3FlbXUtcGFsY29kZSc6IGNoZWNrZWQgb3V0ICdi
+ZjBlMTM2OTg4NzI0NTAxNjRmYTcwNDBkYTM2YTk1ZDJkNGIzMjZmJwpDbG9uaW5nIGludG8gJ3Jv
+bXMvc2VhYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcyc6IGNoZWNrZWQgb3V0
+ICdhNWNhYjU4ZTlhM2ZiNmUxNjhhYmE5MTljNTY2OWJlYTQwNjU3M2I0JwpDbG9uaW5nIGludG8g
+J3JvbXMvc2VhYmlvcy1ocHBhJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEn
+OiBjaGVja2VkIG91dCAnMGY0ZmU4NDY1ODE2NWU5NmNlMzU4NzBmZDE5ZmM2MzRlMTgyZTc3YicK
+Q2xvbmluZyBpbnRvICdyb21zL3NnYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NnYWJp
+b3MnOiBjaGVja2VkIG91dCAnY2JhZWU1MjI4N2U1ZjMyMzczMTgxY2ZmNTBhMDBiNmM0YWM5MDE1
+YScKQ2xvbmluZyBpbnRvICdyb21zL3NraWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3Nr
+aWJvb3QnOiBjaGVja2VkIG91dCAnMjYxY2E4ZTc3OWU1MTM4ODY5YTQ1ZjE3NGNhYTQ5YmU2YTI3
+NDUwMScKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
+dS1ib290JzogY2hlY2tlZCBvdXQgJ2QzNjg5MjY3ZjkyYzU5NTZlMDljYzdkMWJhYTQ3MDAxNDE2
+NjJiZmYnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3Qtc2FtNDYwZXgnLi4uClN1Ym1vZHVsZSBw
+YXRoICdyb21zL3UtYm9vdC1zYW00NjBleCc6IGNoZWNrZWQgb3V0ICc2MGIzOTE2ZjMzZTYxN2E4
+MTU5NzNjNWE2ZGY3NzA1NWIyZTNhNTg4JwpDbG9uaW5nIGludG8gJ3NsaXJwJy4uLgpTdWJtb2R1
+bGUgcGF0aCAnc2xpcnAnOiBjaGVja2VkIG91dCAnMTI2YzA0YWNiYWJkN2FkMzJjMmIwMThmZTEw
+ZGZhYzJhM2JjMTIxMCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQt
+MycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzogY2hl
+Y2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNsb25p
+bmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRo
+ICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICc1YTU5ZGNlYzE5
+MzI3Mzk2YTAxMWExN2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9uaW5nIGludG8gJ3VpL2tleWNvZGVt
+YXBkYicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNrZWQgb3V0ICc2
+YjNkNzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwpTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCjQ2N2I2NWIgbGludXgtdXNlcjogZXJyb25lb3VzIGZkX3RyYW5zX3Vu
+cmVnaXN0ZXIgY2FsbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IEF1dGhvciBlbWFpbCBh
+ZGRyZXNzIGlzIG1hbmdsZWQgYnkgdGhlIG1haWxpbmcgbGlzdAojMjogCkF1dGhvcjogU2h1LUNo
+dW4gV2VuZyB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPgoKdG90YWw6IDEg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCA3IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA0NjdiNjViYTYyYzgg
+KGxpbnV4LXVzZXI6IGVycm9uZW91cyBmZF90cmFuc191bnJlZ2lzdGVyIGNhbGwpIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzIwMTkwODE5MTg1MzQ4LjIyMTgyNS0xLXNjd0Bnb29nbGUuY29tL3Rlc3Rp
+bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
