@@ -2,86 +2,113 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C86EC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6275C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1541206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:12:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1541206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F102206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:14:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="VhdocU0L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F102206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hziOa-0006sJ-4e
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:12:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34100)
+	id 1hziQw-00082Z-QV
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:14:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1hziNx-0006QX-T3
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:11:51 -0400
+ (envelope-from <arikalo@wavecomp.com>) id 1hziQD-0007bz-N6
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:14:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hziNw-0006fq-9I
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:11:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57720)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hziNw-0006fg-1l
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:11:48 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CDA487BDAC
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:11:46 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id k15so5300181wrw.18
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 07:11:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3R88i+yf5FQjNa+oTkPQ5znUAbdfpBXYb6Dgk/ZH3Y8=;
- b=uim8g7jEnyA0aGWZti5BfkcB6X82ZczCQa4FufH8pB2WBG+q3VIbLC5oldlEwis/F1
- paAsSm/qXKRJNoziLjH257GGzs+roclMKdOIgwNs5/ihWL++YMZcI8YnnAzDx78DhrIk
- FkI30LDOiZfjonxBpaIpQCskYzWkeMH7Xm9m6kH68lmmpPb05DEyovJpRS1m2HUfVE2D
- ywZjtrw/BEpNpv0zvApusBChVOt4m93LiU+f/nowbTAldReivVcUBXbwCr04UmhsyJ56
- qrZ+rhF2Wv+f5djg7kX8Afc/5AIXuoxTY4PPdWVQeZcpGsF9fSkfepETsIbotRneVzn7
- 7H9w==
-X-Gm-Message-State: APjAAAUtcdHNNXDsiuaM1NZ/bN0D/q/lVlHOI6lQkgfldhvDldTSJ9ba
- iwDY5j3synNEcBHCyWxYhT79ChmndNOMSTHAea4Eme46EjZQ/7Na1gTQyy4nsj1yb+vHXSGqTiY
- fyMhwtsW0OBEXJfw=
-X-Received: by 2002:a1c:9a95:: with SMTP id c143mr20632333wme.2.1566223905375; 
- Mon, 19 Aug 2019 07:11:45 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxGZBDmYQdiihWAREVKz//vWck4IREGONzr15GzrW9lIIiSKiSNvmpu/x1PhVmA891tkltHDg==
-X-Received: by 2002:a1c:9a95:: with SMTP id c143mr20632302wme.2.1566223905026; 
- Mon, 19 Aug 2019 07:11:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f?
- ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
- by smtp.gmail.com with ESMTPSA id b136sm31874212wme.18.2019.08.19.07.11.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 19 Aug 2019 07:11:44 -0700 (PDT)
-To: Jing Liu <jing2.liu@linux.intel.com>, qemu-devel@nongnu.org
-References: <1564035256-11828-1-git-send-email-jing2.liu@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e958ffd2-bba6-ce68-4bd8-ba67f83dcb0c@redhat.com>
-Date: Mon, 19 Aug 2019 16:11:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <1564035256-11828-1-git-send-email-jing2.liu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <arikalo@wavecomp.com>) id 1hziQA-0007be-R0
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:14:08 -0400
+Received: from mail-eopbgr680138.outbound.protection.outlook.com
+ ([40.107.68.138]:24243 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+ id 1hziQA-0007bK-GU
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:14:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E/v/i3lkFOZJbDfBi8DTHhH41q/zuhi4Zu7t+lBLZaKmnTV4eDERNOAW6kjDjuKflLqzGvXJk/jhWKRxtrtSCBpzeJSeDCzcg0ELlZ+2lkzmaEfK3Xu+IFw119cKGjObM0YSPkqmqCGRoNdZPNsLC2C4YD0tWiWrXTQfpAtyW2epGRoddhpm54JCILGjv/NP/Jo9rcG/p8In0jWSfZbwfPyLbNbOa9vsk14yhszJwjPubr/nj6Cr1+/G+n1WBXLOgnZcIPsW6pxDZ1i6y74mDN60N9xetYqZyswjJUH66YfTUoyc8sDlHvTlBqbjlJsZ0ROgWCl1yYKWXynoHe/SJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uf8xGm9/fsubMWsPT0O4w06WCQSgPh80I3upr7xyCn4=;
+ b=gdbUDBi/1Df0bpqwhEWpAj56RzGu2OKxfL/Yj9AsQavApawj8Y5eKy+9406PCe0+clKNBPKBZAlrA/7L5sU0qi4NaU2U7JPf/FL2iumfXJ8frcEP26YEe2wOPy4UvzVzQb8dG6l04zCmYXSYfWxv4fAoL/XDGcNXFMe1z1xtY+nV4jiZ22UuNPfFZsx4yvAYRliVOT3NZ4RQJVgD0CXCLLJWQh9GRMLJ6YOcmyJuAEfvkycdjdkZ/jNnsGVr9GgqqKiyP0CDQrcO7uqPSwk/2smCifcRU9bSIAzVTJS2hFqc1SjLb1W8iORJuI78CdFtJELnBpz+Sco+QJBlbaxIXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
+ dkim=pass header.d=wavecomp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uf8xGm9/fsubMWsPT0O4w06WCQSgPh80I3upr7xyCn4=;
+ b=VhdocU0LA07EfvBzpF9Zy9E1ZJBKWBTHsLSWDVsgkaitwnoJwgfAoErUVsp7qrQVHR1YUY4ZNGdd2CwasAryxcRKugcSRJ+aYOWXSsCYunv822wbgsgqLQLdTgSSrUXL2/19e7GbXHd4xsC8dydFhhplj+AeTq391Dayd3MsUnQ=
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
+ DM5PR22MB0969.namprd22.prod.outlook.com (10.171.160.136) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2178.18; Mon, 19 Aug 2019 14:14:03 +0000
+Received: from DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::ed69:1c9f:bdff:2197]) by DM5PR22MB1658.namprd22.prod.outlook.com
+ ([fe80::ed69:1c9f:bdff:2197%5]) with mapi id 15.20.2178.018; Mon, 19 Aug 2019
+ 14:14:03 +0000
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [EXTERNAL][PATCH v8 02/37] target/mips: Amend CP0 WatchHi
+ register implementation
+Thread-Index: AQHVVphajK9WGL0IF0C1ssg0Wy0PYA==
+Date: Mon, 19 Aug 2019 14:14:03 +0000
+Message-ID: <DM5PR22MB16589E0534B19469B3E0E78FD2A80@DM5PR22MB1658.namprd22.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] x86: Intel AVX512_BF16 feature enabling
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=arikalo@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4b5060e7-f5f1-4251-70aa-08d724af7d2e
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DM5PR22MB0969; 
+x-ms-traffictypediagnostic: DM5PR22MB0969:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM5PR22MB096996BDFBD740C8BD475451D2A80@DM5PR22MB0969.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3044;
+x-forefront-prvs: 0134AD334F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39840400004)(136003)(396003)(376002)(346002)(366004)(189003)(199004)(81166006)(55236004)(53546011)(102836004)(99286004)(186003)(2906002)(14444005)(256004)(33656002)(26005)(229853002)(71190400001)(6506007)(71200400001)(6246003)(478600001)(107886003)(53936002)(7736002)(4326008)(74316002)(2501003)(19627405001)(110136005)(25786009)(14454004)(54906003)(476003)(316002)(66066001)(6606003)(9686003)(6436002)(55016002)(7696005)(86362001)(52536014)(54896002)(66946007)(8936002)(8676002)(81156014)(91956017)(76116006)(66556008)(6116002)(3846002)(486006)(66446008)(64756008)(5660300002)(66476007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0969;
+ H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: /X60NmkO9nsA5AToapzyez7Ln+XI/TTUl8/wxoy4ehSOV0lReVi4zAe4B6YW3iCRAe2mAC04J0HnJFfmNKI+vdW8V2oFxEKBhklzr1ilOKcORyybFlioLvn4N2WpM8FJ+cU6UH7A7y/WxouzgForSdb7AgvQ7byzATvR5I/YisLv68m/k0XWduCpXULfagaBW8n0jwJCMoNdmiW0DZQOtsnpr4ZQ1UFEv/6qIkmaTxctOyCj7uJa4vGjRFoK0ghocfA4pMbw/6pcLbwJGriBQNSiKexqO8/pIMqT39aN1t3gO50BZtMUWcJQJRMwz0s6pPn32Y9Rp80G9jY7JKLVzyVpnGx3d+aSMDaVBB+AbFtcIv3BZoI7beJsJs5usAkGPSzeh6r3qQYP31ryNKQN/llPIr52hT8ifngreFW/4Gs=
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b5060e7-f5f1-4251-70aa-08d724af7d2e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2019 14:14:03.3777 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RJl/4U9mQu7xI3xmmqrmwJ55/EneTzxsgpb+iz/YqfyVtsNpVtUj/o4/bmIAX7pmdKR/Fw7i+hLXJoFEoRq6Yg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0969
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.68.138
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [EXTERNAL][PATCH v8 02/37] target/mips: Amend CP0
+ WatchHi register implementation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,182 +120,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "philmd@redhat.com" <philmd@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/07/19 08:14, Jing Liu wrote:
-> Intel CooperLake cpu adds AVX512_BF16 instruction, defining as
-> CPUID.(EAX=7,ECX=1):EAX[bit 05].
-> 
-> The patch adds a property for setting the subleaf of CPUID leaf 7 in
-> case that people would like to specify it.
-> 
-> The release spec link as follows,
-> https://software.intel.com/sites/default/files/managed/c5/15/\
-> architecture-instruction-set-extensions-programming-reference.pdf
-> 
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, August 19, 2019 2:07 PM
+> To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
+> Cc: philmd@redhat.com <philmd@redhat.com>; Aleksandar Markovic <amarkovic=
+@wavecomp.com>; Aleksandar Rikalo <arikalo@wavecomp.com>
+> Subject: [EXTERNAL][PATCH v8 02/37] target/mips: Amend CP0 WatchHi regist=
+er implementation
+>
+> From: Yongbok Kim <yongbok.kim@mips.com>
+>
+> WatchHi is extended by the field MemoryMapID with the GINVT instruction.
+> The field is accessible by MTHC0/MFHC0 in 32-bit architectures and DMTC0/
+> DMFC0 in 64-bit architectures.
+>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  target/i386/cpu.c | 39 ++++++++++++++++++++++++++++++++++++++-
->  target/i386/cpu.h |  7 +++++++
->  target/i386/kvm.c |  3 ++-
->  3 files changed, 47 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 805ce95..517dedb 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -770,6 +770,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
->            /* CPUID_7_0_ECX_OSPKE is dynamic */ \
->            CPUID_7_0_ECX_LA57)
->  #define TCG_7_0_EDX_FEATURES 0
-> +#define TCG_7_1_EAX_FEATURES 0
->  #define TCG_APM_FEATURES 0
->  #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
->  #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
-> @@ -1095,6 +1096,25 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->          },
->          .tcg_features = TCG_7_0_EDX_FEATURES,
->      },
-> +    [FEAT_7_1_EAX] = {
-> +        .type = CPUID_FEATURE_WORD,
-> +        .feat_names = {
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, "avx512-bf16", NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +        },
-> +        .cpuid = {
-> +            .eax = 7,
-> +            .needs_ecx = true, .ecx = 1,
-> +            .reg = R_EAX,
-> +        },
-> +        .tcg_features = TCG_7_1_EAX_FEATURES,
-> +    },
->      [FEAT_8000_0007_EDX] = {
->          .type = CPUID_FEATURE_WORD,
->          .feat_names = {
-> @@ -4293,13 +4313,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->      case 7:
->          /* Structured Extended Feature Flags Enumeration Leaf */
->          if (count == 0) {
-> -            *eax = 0; /* Maximum ECX value for sub-leaves */
-> +            /* Maximum ECX value for sub-leaves */
-> +            *eax = env->cpuid_level_func7;
->              *ebx = env->features[FEAT_7_0_EBX]; /* Feature flags */
->              *ecx = env->features[FEAT_7_0_ECX]; /* Feature flags */
->              if ((*ecx & CPUID_7_0_ECX_PKU) && env->cr[4] & CR4_PKE_MASK) {
->                  *ecx |= CPUID_7_0_ECX_OSPKE;
->              }
->              *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
-> +        } else if (count == 1) {
-> +            *eax = env->features[FEAT_7_1_EAX];
-> +            *ebx = 0;
-> +            *ecx = 0;
-> +            *edx = 0;
->          } else {
->              *eax = 0;
->              *ebx = 0;
-> @@ -4949,6 +4975,11 @@ static void x86_cpu_adjust_feat_level(X86CPU *cpu, FeatureWord w)
->          x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel2, eax);
->      break;
->      }
+>  target/mips/cpu.h       |  2 +-
+>  target/mips/helper.h    |  3 +++
+>  target/mips/machine.c   |  6 +++---
+>  target/mips/op_helper.c | 23 +++++++++++++++++++++--
+>  target/mips/translate.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+>  5 files changed, 69 insertions(+), 7 deletions(-)
+>
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 90a2ed8..6406ba8 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -898,7 +898,7 @@ struct CPUMIPSState {
+>  /*
+>   * CP0 Register 19
+>   */
+> -    int32_t CP0_WatchHi[8];
+> +    uint64_t CP0_WatchHi[8];
+>  #define CP0WH_ASID 16
+>  /*
+>   * CP0 Register 20
+> diff --git a/target/mips/helper.h b/target/mips/helper.h
+> index 51f0e1c..aad0951 100644
+> --- a/target/mips/helper.h
+> +++ b/target/mips/helper.h
+> @@ -78,6 +78,7 @@ DEF_HELPER_1(mfc0_maar, tl, env)
+>  DEF_HELPER_1(mfhc0_maar, tl, env)
+>  DEF_HELPER_2(mfc0_watchlo, tl, env, i32)
+>  DEF_HELPER_2(mfc0_watchhi, tl, env, i32)
+> +DEF_HELPER_2(mfhc0_watchhi, tl, env, i32)
+>  DEF_HELPER_1(mfc0_debug, tl, env)
+>  DEF_HELPER_1(mftc0_debug, tl, env)
+>  #ifdef TARGET_MIPS64
+> @@ -89,6 +90,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
+>  DEF_HELPER_1(dmfc0_lladdr, tl, env)
+>  DEF_HELPER_1(dmfc0_maar, tl, env)
+>  DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
+> +DEF_HELPER_2(dmfc0_watchhi, tl, env, i32)
+>  DEF_HELPER_1(dmfc0_saar, tl, env)
+>  #endif /* TARGET_MIPS64 */
+>
+> @@ -159,6 +161,7 @@ DEF_HELPER_2(mthc0_maar, void, env, tl)
+>  DEF_HELPER_2(mtc0_maari, void, env, tl)
+>  DEF_HELPER_3(mtc0_watchlo, void, env, tl, i32)
+>  DEF_HELPER_3(mtc0_watchhi, void, env, tl, i32)
+> +DEF_HELPER_3(mthc0_watchhi, void, env, tl, i32)
+>  DEF_HELPER_2(mtc0_xcontext, void, env, tl)
+>  DEF_HELPER_2(mtc0_framemask, void, env, tl)
+>  DEF_HELPER_2(mtc0_debug, void, env, tl)
+> diff --git a/target/mips/machine.c b/target/mips/machine.c
+> index eb2d970..c3e52f8 100644
+> --- a/target/mips/machine.c
+> +++ b/target/mips/machine.c
+> @@ -213,8 +213,8 @@ const VMStateDescription vmstate_tlb =3D {
+>
+>  const VMStateDescription vmstate_mips_cpu =3D {
+>      .name =3D "cpu",
+> -    .version_id =3D 18,
+> -    .minimum_version_id =3D 18,
+> +    .version_id =3D 19,
+> +    .minimum_version_id =3D 19,
+>      .post_load =3D cpu_post_load,
+>      .fields =3D (VMStateField[]) {
+>          /* Active TC */
+> @@ -297,7 +297,7 @@ const VMStateDescription vmstate_mips_cpu =3D {
+>          VMSTATE_INT32(env.CP0_MAARI, MIPSCPU),
+>          VMSTATE_UINTTL(env.lladdr, MIPSCPU),
+>          VMSTATE_UINTTL_ARRAY(env.CP0_WatchLo, MIPSCPU, 8),
+> -        VMSTATE_INT32_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
+> +        VMSTATE_UINT64_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
+>          VMSTATE_UINTTL(env.CP0_XContext, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Framemask, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Debug, MIPSCPU),
+> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+> index 628da45..279b800 100644
+> --- a/target/mips/op_helper.c
+> +++ b/target/mips/op_helper.c
+> @@ -979,7 +979,12 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env, =
+uint32_t sel)
+>
+>  target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
+>  {
+> -    return env->CP0_WatchHi[sel];
+> +    return (int32_t) env->CP0_WatchHi[sel];
+> +}
 > +
-> +    if (eax == 7) {
-> +        x86_cpu_adjust_level(cpu, &env->cpuid_min_level_func7,
-> +                             fi->cpuid.ecx);
-> +    }
+> +target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
+> +{
+> +    return env->CP0_WatchHi[sel] >> 32;
 >  }
->  
->  /* Calculate XSAVE components based on the configured CPU feature flags */
-> @@ -5067,6 +5098,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->          x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
-> +        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
->          x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
-> @@ -5098,6 +5130,9 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+>
+>  target_ulong helper_mfc0_debug(CPUMIPSState *env)
+> @@ -1055,6 +1060,11 @@ target_ulong helper_dmfc0_saar(CPUMIPSState *env)
 >      }
->  
->      /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
-> +    if (env->cpuid_level_func7 == UINT32_MAX) {
-> +        env->cpuid_level_func7 = env->cpuid_min_level_func7;
-> +    }
->      if (env->cpuid_level == UINT32_MAX) {
->          env->cpuid_level = env->cpuid_min_level;
->      }
-> @@ -5869,6 +5904,8 @@ static Property x86_cpu_properties[] = {
->      DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
->      DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU, host_phys_bits_limit, 0),
->      DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
-> +    DEFINE_PROP_UINT32("level-func7", X86CPU, env.cpuid_level_func7,
-> +                       UINT32_MAX),
->      DEFINE_PROP_UINT32("level", X86CPU, env.cpuid_level, UINT32_MAX),
->      DEFINE_PROP_UINT32("xlevel", X86CPU, env.cpuid_xlevel, UINT32_MAX),
->      DEFINE_PROP_UINT32("xlevel2", X86CPU, env.cpuid_xlevel2, UINT32_MAX),
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 05393cf..df9106f 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -479,6 +479,7 @@ typedef enum FeatureWord {
->      FEAT_7_0_EBX,       /* CPUID[EAX=7,ECX=0].EBX */
->      FEAT_7_0_ECX,       /* CPUID[EAX=7,ECX=0].ECX */
->      FEAT_7_0_EDX,       /* CPUID[EAX=7,ECX=0].EDX */
-> +    FEAT_7_1_EAX,       /* CPUID[EAX=7,ECX=1].EAX */
->      FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
->      FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
->      FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
-> @@ -692,6 +693,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EDX_CORE_CAPABILITY   (1U << 30)  /*Core Capability*/
->  #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
->  
-> +#define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
+>      return 0;
+>  }
 > +
->  #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
->                                                                               do not invalidate cache */
->  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
-> @@ -1322,6 +1325,10 @@ typedef struct CPUX86State {
->      /* Fields after this point are preserved across CPU reset. */
->  
->      /* processor features (e.g. for CPUID insn) */
-> +    /* Minimum cpuid leaf 7 value */
-> +    uint32_t cpuid_level_func7;
-> +    /* Actual cpuid leaf 7 value */
-> +    uint32_t cpuid_min_level_func7;
->      /* Minimum level/xlevel/xlevel2, based on CPU model + features */
->      uint32_t cpuid_min_level, cpuid_min_xlevel, cpuid_min_xlevel2;
->      /* Maximum level/xlevel/xlevel2 value for auto-assignment: */
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index ec7870c..fd0a447 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1493,6 +1493,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                  c = &cpuid_data.entries[cpuid_i++];
->              }
+> +target_ulong helper_dmfc0_watchhi(CPUMIPSState *env, uint32_t sel)
+> +{
+> +    return env->CP0_WatchHi[sel];
+> +}
+>  #endif /* TARGET_MIPS64 */
+>
+>  void helper_mtc0_index(CPUMIPSState *env, target_ulong arg1)
+> @@ -1896,11 +1906,20 @@ void helper_mtc0_watchlo(CPUMIPSState *env, targe=
+t_ulong arg1, uint32_t sel)
+>
+>  void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t =
+sel)
+>  {
+> -    int mask =3D 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID)=
+;
+> +    uint64_t mask =3D 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_=
+ASID);
+> +    if ((env->CP0_Config5 >> CP0C5_MI) & 1) {
+> +        mask |=3D 0xFFFFFFFF00000000ULL; /* MMID */
+> +    }
+>      env->CP0_WatchHi[sel] =3D arg1 & mask;
+>      env->CP0_WatchHi[sel] &=3D ~(env->CP0_WatchHi[sel] & arg1 & 0x7);
+>  }
+>
+> +void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t=
+ sel)
+> +{
+> +    env->CP0_WatchHi[sel] =3D ((uint64_t) (arg1) << 32) |
+> +                            (env->CP0_WatchHi[sel] & 0x00000000ffffffffU=
+LL);
+> +}
+> +
+>  void helper_mtc0_xcontext(CPUMIPSState *env, target_ulong arg1)
+>  {
+>      target_ulong mask =3D (1ULL << (env->SEGBITS - 7)) - 1;
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 4ebeabe..b40468d 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -2547,6 +2547,7 @@ typedef struct DisasContext {
+>      bool nan2008;
+>      bool abs2008;
+>      bool saar;
+> +    bool mi;
+>  } DisasContext;
+>
+>  #define DISAS_STOP       DISAS_TARGET_0
+> @@ -6680,6 +6681,25 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+>              goto cp0_unimplemented;
+>          }
+>          break;
+> +    case CP0_REGISTER_19:
+> +        switch (sel) {
+> +        case 0:
+> +        case 1:
+> +        case 2:
+> +        case 3:
+> +        case 4:
+> +        case 5:
+> +        case 6:
+> +        case 7:
+> +            /* upper 32 bits are only available when Config5MI !=3D 0 */
+> +            CP0_CHECK(ctx->mi);
+> +            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, CP0_WatchHi[sel=
+]), 0);
+> +            register_name =3D "WatchHi";
+> +            break;
+> +        default:
+> +            goto cp0_unimplemented;
+> +        }
+> +        break;
+>      case CP0_REGISTER_28:
+>          switch (sel) {
+>          case 0:
+> @@ -6766,6 +6786,25 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg,=
+ int reg, int sel)
+>              goto cp0_unimplemented;
+>          }
+>          break;
+> +    case CP0_REGISTER_19:
+> +        switch (sel) {
+> +        case 0:
+> +        case 1:
+> +        case 2:
+> +        case 3:
+> +        case 4:
+> +        case 5:
+> +        case 6:
+> +        case 7:
+> +            /* upper 32 bits are only available when Config5MI !=3D 0 */
+> +            CP0_CHECK(ctx->mi);
+> +            gen_helper_0e1i(mthc0_watchhi, arg, sel);
+> +            register_name =3D "WatchHi";
+> +            break;
+> +        default:
+> +            goto cp0_unimplemented;
+> +        }
+> +        break;
+>      case CP0_REGISTER_28:
+>          switch (sel) {
+>          case 0:
+> @@ -8805,7 +8844,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+>          case 6:
+>          case 7:
+>              CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+> -            gen_helper_1e0i(mfc0_watchhi, arg, sel);
+> +            gen_helper_1e0i(dmfc0_watchhi, arg, sel);
+>              register_name =3D "WatchHi";
 >              break;
-> +        case 0x7:
->          case 0x14: {
->              uint32_t times;
->  
-> @@ -1505,7 +1506,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->              for (j = 1; j <= times; ++j) {
->                  if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
->                      fprintf(stderr, "cpuid_data is full, no space for "
-> -                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
-> +                                "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
->                      abort();
->                  }
->                  c = &cpuid_data.entries[cpuid_i++];
-> 
+>          default:
+> @@ -29965,6 +30004,7 @@ static void mips_tr_init_disas_context(DisasConte=
+xtBase *dcbase, CPUState *cs)
+>      ctx->mrp =3D (env->CP0_Config5 >> CP0C5_MRP) & 1;
+>      ctx->nan2008 =3D (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
+>      ctx->abs2008 =3D (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
+> +    ctx->mi =3D (env->CP0_Config5 >> CP0C5_MI) & 1;
+>      restore_cpu_state(env, ctx);
+>  #ifdef CONFIG_USER_ONLY
+>          ctx->mem_idx =3D MIPS_HFLAG_UM;
+> --
+> 2.7.4
 
-Queued, thanks (I was waiting for QEMU 4.1 to be released).
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Paolo
 
