@@ -2,91 +2,81 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F41C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 448CFC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:42:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ADB222CEB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:40:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ADB222CEB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E4E822CEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:42:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+qOJned"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E4E822CEB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzoST-0005I0-D6
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:40:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46330)
+	id 1hzoTp-0006K8-QN
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:42:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hzoAs-00072W-QI
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:22:43 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hzoF3-0004LC-3p
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:27:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hzoAq-0005cY-L9
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:22:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52126)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hzoAW-0005Zk-8G; Mon, 19 Aug 2019 16:22:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E69836887;
- Mon, 19 Aug 2019 20:22:19 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-64.brq.redhat.com
- [10.40.204.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E2D515C686;
- Mon, 19 Aug 2019 20:22:15 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-3-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ca574f30-157c-88ef-db73-f96e16846f11@redhat.com>
-Date: Mon, 19 Aug 2019 22:22:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alistair23@gmail.com>) id 1hzoF1-000762-NN
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:27:01 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:41417)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hzoF1-00075V-G8; Mon, 19 Aug 2019 16:26:59 -0400
+Received: by mail-lj1-x243.google.com with SMTP id m24so2987426ljg.8;
+ Mon, 19 Aug 2019 13:26:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2tHNO/2YKUjne/eJzPQiDdmnwhtdEyOWxg+vIIKrmiU=;
+ b=h+qOJnedymDCFRkXHbSBUcKRjlBCfxwQ+1OgDC4O6V3URkVhTUhaiT2X7EgbrED8xx
+ +8wsYyFWBjwOxLS6kTvhfNt5wvktdiEh09pNlM6efHWpaUtxVmu/CfOMpbj3AkLXz4+4
+ sdEMRbIwA6dUWmnhF9hjcOTee6+L26wgnyH4yk//U8mQjbiL/vB+psvJSBaM67E3/eqL
+ MTCc3wpwpiMzIdLDlDSTYHVN7QXzmYhnxtagYQ+Riu/wsgcks7uqhe6tPLiCPLxkoPpE
+ ZTudqB6H6PsLObNYozRnWr4+zt72Qm+h/fKZad7NoFTJBET45FXbWaXaohzordxCluNj
+ 4zhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2tHNO/2YKUjne/eJzPQiDdmnwhtdEyOWxg+vIIKrmiU=;
+ b=GEUgzasR8GxIyUoXsxiKt99bt/Mq+cF/hosAxyMzWNP84KA/07oivFTcdp+ospu/Qq
+ fTrG11SLjcsK7IBOP/INTDHHnDRuNGgkni2yude5d17/0PySpPz4ysoXk9cuOd7ny9PJ
+ Kh6WsiQE2pDj8fiM/0qdv5YLUB3VLNb3nZ7WP75Iuh2LyKv9yaNSsUJVEhpNwlsykAlO
+ VJHvAFcXoKHpsvbTiUrRIsuMURdmWkZutx5BOSu3Qk2eF5PRZJXbTbwFyjbvnFtZ07FI
+ td7Brpr3Koitv9guXUz4J2Yr8TwzuUkkN2JVmenYWYVV/AruufqjoR6AxxNsNWM9k3eC
+ LFxg==
+X-Gm-Message-State: APjAAAWRgjyjU1xETZtpfck2fHEQPnBDujpzFt44BSpyIlelKdP0uhR4
+ uojsvrztjfhG3ffFUgf0r0hof8zWg3xBXlo+lql7u0dF
+X-Google-Smtp-Source: APXvYqwMM8H9nwYDKsmsiYIQLimupad8z1NumoibTiI9icIsS6Ebb752Dqeipum+Oy+fW7dEpLh4/jG4V0NQUe1awMo=
+X-Received: by 2002:a05:651c:1023:: with SMTP id
+ w3mr12949411ljm.94.1566246418221; 
+ Mon, 19 Aug 2019 13:26:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190819201851.24418-3-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="hwdNeyiRroGeZKSPelsnGMWC5nV84Ulxj"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 19 Aug 2019 20:22:19 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 2/8] iotests: Prefer null-co over
- null-aio
+References: <1566191521-7820-1-git-send-email-bmeng.cn@gmail.com>
+ <1566191521-7820-19-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1566191521-7820-19-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 19 Aug 2019 13:22:57 -0700
+Message-ID: <CAKmqyKNoxtymAE84qdvKG-wsXcEF9oiWfYhvjrRPMtn2Gbwa=Q@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v4 18/28] riscv: sifive_u: Generate hfclk
+ and rtcclk nodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,124 +88,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hwdNeyiRroGeZKSPelsnGMWC5nV84Ulxj
-Content-Type: multipart/mixed; boundary="X1YydFFVwv1gPEYlyZQo9W7KMDdx24lEi";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <ca574f30-157c-88ef-db73-f96e16846f11@redhat.com>
-Subject: Re: [PATCH v3 2/8] iotests: Prefer null-co over null-aio
-References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-3-mreitz@redhat.com>
-In-Reply-To: <20190819201851.24418-3-mreitz@redhat.com>
+On Sun, Aug 18, 2019 at 10:29 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> To keep in sync with Linux kernel device tree, generate hfclk and
+> rtcclk nodes in the device tree, to be referenced by PRCI node.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
---X1YydFFVwv1gPEYlyZQo9W7KMDdx24lEi
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-On 19.08.19 22:18, Max Reitz wrote:
-> We use null-co basically everywhere in the iotests.  Unless we want to
-> test null-aio specifically, we should use it instead (for consistency).=
-
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-
-Hm, sorry, I just noticed that I probably should have dropped this R-b. :=
--/
-
-(I mean, apart from the rebase conflict, nothing has changed, but still.)=
-
-
-Max
+Alistair
 
 > ---
->  tests/qemu-iotests/093 | 7 +++----
->  tests/qemu-iotests/245 | 2 +-
->  2 files changed, 4 insertions(+), 5 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-> index 3c4f5173ce..50c1e7f2ec 100755
-> --- a/tests/qemu-iotests/093
-> +++ b/tests/qemu-iotests/093
-> @@ -267,13 +267,12 @@ class ThrottleTestCoroutine(ThrottleTestCase):
->      test_img =3D "null-co://"
-> =20
->  class ThrottleTestGroupNames(iotests.QMPTestCase):
-> -    test_img =3D "null-aio://"
->      max_drives =3D 3
-> =20
->      def setUp(self):
->          self.vm =3D iotests.VM()
->          for i in range(0, self.max_drives):
-> -            self.vm.add_drive(self.test_img,
-> +            self.vm.add_drive("null-co://",
->                                "throttling.iops-total=3D100,file.read-z=
-eroes=3Don")
->          self.vm.launch()
-> =20
-> @@ -376,10 +375,10 @@ class ThrottleTestRemovableMedia(iotests.QMPTestC=
-ase):
-> =20
->      def test_removable_media(self):
->          # Add a couple of dummy nodes named cd0 and cd1
-> -        result =3D self.vm.qmp("blockdev-add", driver=3D"null-aio",
-> +        result =3D self.vm.qmp("blockdev-add", driver=3D"null-co",
->                               read_zeroes=3DTrue, node_name=3D"cd0")
->          self.assert_qmp(result, 'return', {})
-> -        result =3D self.vm.qmp("blockdev-add", driver=3D"null-aio",
-> +        result =3D self.vm.qmp("blockdev-add", driver=3D"null-co",
->                               read_zeroes=3DTrue, node_name=3D"cd1")
->          self.assert_qmp(result, 'return', {})
-> =20
-> diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-> index bc1ceb9792..ae169778b0 100644
-> --- a/tests/qemu-iotests/245
-> +++ b/tests/qemu-iotests/245
-> @@ -598,7 +598,7 @@ class TestBlockdevReopen(iotests.QMPTestCase):
->          ##################
->          ###### null ######
->          ##################
-> -        opts =3D {'driver': 'null-aio', 'node-name': 'root', 'size': 1=
-024}
-> +        opts =3D {'driver': 'null-co', 'node-name': 'root', 'size': 10=
-24}
-> =20
->          result =3D self.vm.qmp('blockdev-add', conv_keys =3D False, **=
-opts)
->          self.assert_qmp(result, 'return', {})
->=20
-
-
-
---X1YydFFVwv1gPEYlyZQo9W7KMDdx24lEi--
-
---hwdNeyiRroGeZKSPelsnGMWC5nV84Ulxj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1bBPYACgkQ9AfbAGHV
-z0BuKQf9EeAprQ5Q90R5NSSgVBw0yuucY3MtYgEXT35cxJy4ln3ZGuCbERdRNpDM
-zaqpZB1QV+UqUfbM4mTePcuImkd4LRsshP/Affg5Ug6RfHVW423jGF7h2dmDVHJ2
-zV8vPnlsL2wd5Db++/1YUhUUeXdURBVuOByzwskjwLbiUADG7VnQ0hw6How52b/w
-qn/5Snb0EYrJu3JQ6BsdhC1WkCUDAQOUDz6YSdUYRNU43Qtw4sp4dfEBxeVGxen0
-7n9DyBtKYzdJ6PhzGynogy8C1qIrkbEoCOIo9s2RVyzoQVzTeuqL9VGiIMNSb0Dc
-HznZ7ocMSR4Get0pen6/CLQkamS9zA==
-=teGj
------END PGP SIGNATURE-----
-
---hwdNeyiRroGeZKSPelsnGMWC5nV84Ulxj--
+>
+> Changes in v4: None
+> Changes in v3: None
+> Changes in v2: None
+>
+>  hw/riscv/sifive_u.c         | 23 +++++++++++++++++++++++
+>  include/hw/riscv/sifive_u.h |  2 ++
+>  2 files changed, 25 insertions(+)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 284f7a5..08db741 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -80,6 +80,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      char ethclk_names[] = "pclk\0hclk\0tx_clk";
+>      uint32_t plic_phandle, ethclk_phandle, phandle = 1;
+>      uint32_t uartclk_phandle;
+> +    uint32_t hfclk_phandle, rtcclk_phandle;
+>
+>      fdt = s->fdt = create_device_tree(&s->fdt_size);
+>      if (!fdt) {
+> @@ -98,6 +99,28 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
+>      qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
+>
+> +    hfclk_phandle = phandle++;
+> +    nodename = g_strdup_printf("/hfclk");
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", hfclk_phandle);
+> +    qemu_fdt_setprop_string(fdt, nodename, "clock-output-names", "hfclk");
+> +    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +        SIFIVE_U_HFCLK_FREQ);
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "fixed-clock");
+> +    qemu_fdt_setprop_cell(fdt, nodename, "#clock-cells", 0x0);
+> +    g_free(nodename);
+> +
+> +    rtcclk_phandle = phandle++;
+> +    nodename = g_strdup_printf("/rtcclk");
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", rtcclk_phandle);
+> +    qemu_fdt_setprop_string(fdt, nodename, "clock-output-names", "rtcclk");
+> +    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +        SIFIVE_U_RTCCLK_FREQ);
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "fixed-clock");
+> +    qemu_fdt_setprop_cell(fdt, nodename, "#clock-cells", 0x0);
+> +    g_free(nodename);
+> +
+>      nodename = g_strdup_printf("/memory@%lx",
+>          (long)memmap[SIFIVE_U_DRAM].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 7a1a4f3..debbf28 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -68,6 +68,8 @@ enum {
+>
+>  enum {
+>      SIFIVE_U_CLOCK_FREQ = 1000000000,
+> +    SIFIVE_U_HFCLK_FREQ = 33333333,
+> +    SIFIVE_U_RTCCLK_FREQ = 1000000,
+>      SIFIVE_U_GEM_CLOCK_FREQ = 125000000
+>  };
+>
+> --
+> 2.7.4
+>
+>
 
