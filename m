@@ -2,109 +2,51 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED24C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B82C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:07:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 509522063F
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:06:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 509522063F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 277B2206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 15:07:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 277B2206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzjEy-0003nG-Qz
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 11:06:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43379)
+	id 1hzjFR-0004HE-Qn
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 11:07:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hzjCS-0001jK-UU
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 11:04:01 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1hzj9i-0007IX-KS
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 11:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hzjCR-0000aV-MZ
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 11:04:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36448)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1hzj9d-00071U-83
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 11:01:07 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44680)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hzjCP-0000ZO-OY; Mon, 19 Aug 2019 11:03:59 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CF43383F45;
- Mon, 19 Aug 2019 15:03:56 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-217.ams2.redhat.com [10.36.116.217])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C53BD11C9AB;
- Mon, 19 Aug 2019 15:03:49 +0000 (UTC)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190805152947.28536-1-david@redhat.com>
- <20190805152947.28536-8-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <615b6a01-e389-d6b9-301c-41cc0f176b1a@redhat.com>
-Date: Mon, 19 Aug 2019 17:03:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190805152947.28536-8-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 19 Aug 2019 15:03:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v1 7/9] s390x/mmu:
- Implement Instruction-Execution-Protection Facility
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1hzj9b-0006xx-0x; Mon, 19 Aug 2019 11:01:03 -0400
+Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1hzj9U-0001Wf-Tb; Mon, 19 Aug 2019 18:00:56 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 19 Aug 2019 18:00:48 +0300
+Message-Id: <20190819150049.28997-3-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20190819150049.28997-1-dplotnikov@virtuozzo.com>
+References: <20190819150049.28997-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v3 2/3] qcow2: rework the cluster compression
+ routine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,28 +58,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>, Ilya Leoshkevich <iii@linux.ibm.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/5/19 5:29 PM, David Hildenbrand wrote:
-> IEP support in the mmu is fairly easy. Set the right permissions for TLB
-> entries and properly report an exception.
-> 
-> Make sure to handle EDAT-2 by setting bit 56/60/61 of the TEID (TEC) to
-> the right values.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h        |  1 +
->  target/s390x/mmu_helper.c | 21 +++++++++++++++++++++
->  2 files changed, 22 insertions(+)
+The patch allow to process image compression type defined
+in the image header and choose an appropriate method for
+image clusters (de)compression.
 
-LGTM!
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block/qcow2-threads.c | 78 +++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 64 insertions(+), 14 deletions(-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index 3b1e63fe41..14b5bd76fb 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -73,8 +73,11 @@ typedef struct Qcow2CompressData {
+     Qcow2CompressFunc func;
+ } Qcow2CompressData;
+ 
++
+ /*
+- * qcow2_compress()
++ * qcow2_zlib_compress()
++ *
++ * Compress @src_size bytes of data using zlib compression method
+  *
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+@@ -83,8 +86,8 @@ typedef struct Qcow2CompressData {
+  *          -ENOMEM destination buffer is not enough to store compressed data
+  *          -EIO    on any other error
+  */
+-static ssize_t qcow2_compress(void *dest, size_t dest_size,
+-                              const void *src, size_t src_size)
++static ssize_t qcow2_zlib_compress(void *dest, size_t dest_size,
++                                   const void *src, size_t src_size)
+ {
+     ssize_t ret;
+     z_stream strm;
+@@ -119,19 +122,19 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
+ }
+ 
+ /*
+- * qcow2_decompress()
++ * qcow2_zlib_decompress()
+  *
+  * Decompress some data (not more than @src_size bytes) to produce exactly
+- * @dest_size bytes.
++ * @dest_size bytes using zlib compression method
+  *
+  * @dest - destination buffer, @dest_size bytes
+  * @src - source buffer, @src_size bytes
+  *
+  * Returns: 0 on success
+- *          -1 on fail
++ *          -EIO on fail
+  */
+-static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+-                                const void *src, size_t src_size)
++static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size)
+ {
+     int ret = 0;
+     z_stream strm;
+@@ -144,7 +147,7 @@ static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+ 
+     ret = inflateInit2(&strm, -12);
+     if (ret != Z_OK) {
+-        return -1;
++        return -EIO;
+     }
+ 
+     ret = inflate(&strm, Z_FINISH);
+@@ -154,7 +157,7 @@ static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+          * @src buffer may be processed partly (because in qcow2 we know size of
+          * compressed data with precision of one sector)
+          */
+-        ret = -1;
++        ret = -EIO;
+     }
+ 
+     inflateEnd(&strm);
+@@ -189,20 +192,67 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+     return arg.ret;
+ }
+ 
++/*
++ * qcow2_co_compress()
++ *
++ * Compress @src_size bytes of data using the compression
++ * method defined by the image compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          a negative error code on fail
++ */
+ ssize_t coroutine_fn
+ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+                   const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_compress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_compress;
++        break;
++
++    default:
++        return -ENOTSUP;
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
++/*
++ * qcow2_co_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes using the compression method defined by the image
++ * compression type
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          a negative error code on fail
++ */
+ ssize_t coroutine_fn
+ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+                     const void *src, size_t src_size)
+ {
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_decompress);
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2CompressFunc fn;
++
++    switch (s->compression_type) {
++    case QCOW2_COMPRESSION_TYPE_ZLIB:
++        fn = qcow2_zlib_decompress;
++        break;
++
++    default:
++        return -ENOTSUP;
++    }
++
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
+ }
+ 
+ 
+-- 
+2.17.0
+
 
