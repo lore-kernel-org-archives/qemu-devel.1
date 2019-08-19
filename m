@@ -2,85 +2,85 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B235C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8792C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:48:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A70A12087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:48:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B41A22087E
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 21:48:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oRigrk3o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A70A12087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YZ0YyngK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B41A22087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzpVd-0004kp-2E
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 17:48:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58606)
+	id 1hzpVn-0004v9-UI
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 17:48:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpLu-0001MQ-3P
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:11 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpLx-0001SK-Gi
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hzpLs-00062d-FM
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:09 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33448)
+ (envelope-from <richard.henderson@linaro.org>) id 1hzpLw-00065V-G1
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:13 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44256)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hzpLs-00061x-98
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:08 -0400
-Received: by mail-pl1-x644.google.com with SMTP id go14so1586048plb.0
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:38:08 -0700 (PDT)
+ id 1hzpLw-00064r-AQ
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 17:38:12 -0400
+Received: by mail-pl1-x644.google.com with SMTP id t14so1574161plr.11
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:38:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=4Nawwn1CWQIrW/uHwTKLseXI15oBdHOjRF/v0JlzLb8=;
- b=oRigrk3owLUYDN0e9JS3SZYVzI3H3b3EZczrFC0wYeRZlcxirqZQhM1nkoGvs4wsQI
- pD2eH2Ej6Ek7FhRj2I58TTszcKI75RUSnXJw+yIIVbo873ZVhhDG62Oqdsu2gqU/JfBy
- RKgNjAIFLx10TT4y8nhVaYLL45ej/0j4qE8G0AFNVC35Ldpg1E4pDG1dFTHd/DpUYQ38
- 0SeiG1bweq+r/H1Vm7DV0ECY9nHDXeZMY4VupVvTOVC8NagFgo9RpgxwtGq4qR8r4ft2
- jFoNcz7Y0msWYq2gpwGE6CZ0rUq8ERJhCAcTfEIuoI29BmH3N+EiVo1glVSUdH/0isXO
- SA2g==
+ bh=z6bTZIJUuD2Rb2udZZO8tN325lpohcam+cQYkXY7q0k=;
+ b=YZ0YyngK2P7R9z4uAceUFNeutCFwqq8i7vHldiAteQsa2asCHVcg48IqB0ep869q68
+ WLkmJMH3d9AIM/6t3LdqVsLoNan6DkrZ5bP5w0oWMU9dNJPzn0NceZRiJkn4fA0W7t9O
+ VqGnq6tJFsJS8yAZTutn/9id0o2UvV7gLg5w24eEoXo/Jaw2B3RUlETz/b3mgkiUIkxg
+ Pv5V2nc0CJZfig4FPjVa19zF7nxIaNayil+c2ucKqFf2SsqmklGyNSqj/u31Vw2DtjFt
+ /YBMIXkSMJbhGIqqXP9cCMh7cdqcTG+K4swU2m2hb3JeyKUGvsFG18f0v96DbKCu8d0d
+ DOEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=4Nawwn1CWQIrW/uHwTKLseXI15oBdHOjRF/v0JlzLb8=;
- b=i9DXRIaetINmvBZWDSOQzwFLazKv2G1tqBesnMw1enXHIU0svuLJrehbjSFUpi4fAR
- pkydtEcJb4rLMMkZJDmfRJjVdXTTTYawr9vDxT7LlRyG/0bXxbMfFfF9YqDnKgAfLPvi
- +L7SkaH4H+y0KTXPdP3Oi40t3qDdiUA1XU359Vn8cmaSKVCUiyz44o4uJ3XZ8RGHOdE2
- 4xYMoebJJbrOw4+b660k9lJCLRpwPuRls32gzqsI5bP2aeNVA8ctydSCp6/XKGc9IIlb
- 2r4SoRw4ZGQQQtcLLfxwhY7BQAjzDgW2GACIpnNRRJOgn4r32hP16gmT/ZHgHMtgYlxn
- iY7g==
-X-Gm-Message-State: APjAAAXeRq1ndy9BZlsI2VFayrlQktTkDK38u8WVw9rLkTMpCX43QkAx
- 183HnA5ZtSEwchS+YcMZzq/Mitgxvik=
-X-Google-Smtp-Source: APXvYqxEjmCDx25t25J4uRLEFka37UjRZuEhFOgkzehQfQcX63NMoJrNb6XtvygkDMkDcgQuIBu6UA==
-X-Received: by 2002:a17:902:2d03:: with SMTP id
- o3mr18043863plb.96.1566250687019; 
- Mon, 19 Aug 2019 14:38:07 -0700 (PDT)
+ bh=z6bTZIJUuD2Rb2udZZO8tN325lpohcam+cQYkXY7q0k=;
+ b=pAdooXmFRoVzrJPCPA4k2IPzRX/os6veXer/mlCrVKRe1o0trvFtAZ5Ko3+rq5G1De
+ hpdpfCdGsi7A+7T0oGg3A9LqNcInL8yC87sNIvSgubxgbCz9DaEqprUyKvbZMfzyOAwe
+ rN2hD2uV596eeGCOhZ5EYJRy97sM65BdLGyV7Hl383WeXnRt8UzW2SXQHbkR/pcP4RLO
+ 6EUWxWB3fnMw4NNqhlEa3UHETf3ZWzx9MZaj7Hjtc/HRtIgGrPes9KWB/t7ZVZiIkSYW
+ CgIHY7cgyLwDAvDQ2/6UIR3A3a1p09a/tbWfj8G19uIjI8mO9RGx6DA7gkrxzUiv1IGS
+ ckzA==
+X-Gm-Message-State: APjAAAVGxeiyUXgQyOcdiqRRQHxh57ivTWK/BRBzNCx7NgbyVh2Q4XzU
+ B6Vj3dttotHbezY4P6W7bp0qAd2Zw/A=
+X-Google-Smtp-Source: APXvYqyTYPGYlGAlcPRyoPxB0CQOmFFZxh4s4C8Ae2V3wGwXug6GCI5bSU+JZSCR1Ghwu10OTGhz0w==
+X-Received: by 2002:a17:902:3003:: with SMTP id
+ u3mr10413251plb.161.1566250691131; 
+ Mon, 19 Aug 2019 14:38:11 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.38.05
+ by smtp.gmail.com with ESMTPSA id d2sm13446951pjs.21.2019.08.19.14.38.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 14:38:06 -0700 (PDT)
+ Mon, 19 Aug 2019 14:38:10 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 14:36:55 -0700
-Message-Id: <20190819213755.26175-9-richard.henderson@linaro.org>
+Date: Mon, 19 Aug 2019 14:36:58 -0700
+Message-Id: <20190819213755.26175-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190819213755.26175-1-richard.henderson@linaro.org>
 References: <20190819213755.26175-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PATCH v2 08/68] target/arm: Convert Saturating
- addition and subtraction
+Subject: [Qemu-devel] [PATCH v2 11/68] target/arm: Simplify op_smlawx for
+ SMLAW*
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,169 +97,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+By shifting the 16-bit input left by 16, we can align the desired
+portion of the 48-bit product and use tcg_gen_muls2_i32.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 75 +++++++++++++++++++++++++++---------------
- target/arm/a32.decode  | 10 ++++++
- target/arm/t32.decode  |  9 +++++
- 3 files changed, 67 insertions(+), 27 deletions(-)
+ target/arm/translate.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 82bd207799..b731e08fe4 100644
+index 8557ef831f..9a2fb7d3aa 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -8099,6 +8099,48 @@ static bool trans_UMAAL(DisasContext *s, arg_UMAAL *a)
-     return true;
- }
- 
-+/*
-+ * Saturating addition and subtraction
-+ */
-+
-+static bool op_qaddsub(DisasContext *s, arg_rrr *a, bool add, bool doub)
-+{
-+    TCGv_i32 t0, t1;
-+
-+    if (s->thumb
-+        ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
-+        : !ENABLE_ARCH_5TE) {
-+        return false;
-+    }
-+
-+    t0 = load_reg(s, a->rm);
-+    t1 = load_reg(s, a->rn);
-+    if (doub) {
-+        gen_helper_add_saturate(t1, cpu_env, t1, t1);
-+    }
-+    if (add) {
-+        gen_helper_add_saturate(t0, cpu_env, t0, t1);
-+    } else {
-+        gen_helper_sub_saturate(t0, cpu_env, t0, t1);
-+    }
-+    tcg_temp_free_i32(t1);
-+    store_reg(s, a->rd, t0);
-+    return true;
-+}
-+
-+#define DO_QADDSUB(NAME, ADD, DOUB) \
-+static bool trans_##NAME(DisasContext *s, arg_rrr *a)    \
-+{                                                        \
-+    return op_qaddsub(s, a, ADD, DOUB);                  \
-+}
-+
-+DO_QADDSUB(QADD, true, false)
-+DO_QADDSUB(QSUB, false, false)
-+DO_QADDSUB(QDADD, true, true)
-+DO_QADDSUB(QDSUB, false, true)
-+
-+#undef DO_QADDSUB
-+
- /*
-  * Legacy decoder.
-  */
-@@ -8508,21 +8550,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             store_reg(s, rd, tmp);
-             break;
-         }
--        case 0x5: /* saturating add/subtract */
--            ARCH(5TE);
--            rd = (insn >> 12) & 0xf;
--            rn = (insn >> 16) & 0xf;
--            tmp = load_reg(s, rm);
--            tmp2 = load_reg(s, rn);
--            if (op1 & 2)
--                gen_helper_add_saturate(tmp2, cpu_env, tmp2, tmp2);
--            if (op1 & 1)
--                gen_helper_sub_saturate(tmp, cpu_env, tmp, tmp2);
--            else
--                gen_helper_add_saturate(tmp, cpu_env, tmp, tmp2);
--            tcg_temp_free_i32(tmp2);
--            store_reg(s, rd, tmp);
--            break;
-+        case 0x5:
-+            /* Saturating addition and subtraction.  */
-+            /* All done in decodetree.  Reach here for illegal ops.  */
-+            goto illegal_op;
-         case 0x6: /* ERET */
-             if (op1 != 3) {
-                 goto illegal_op;
-@@ -9989,18 +10020,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-             op = ((insn >> 17) & 0x38) | ((insn >> 4) & 7);
-             if (op < 4) {
-                 /* Saturating add/subtract.  */
--                if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)) {
--                    goto illegal_op;
--                }
--                tmp = load_reg(s, rn);
--                tmp2 = load_reg(s, rm);
--                if (op & 1)
--                    gen_helper_add_saturate(tmp, cpu_env, tmp, tmp);
--                if (op & 2)
--                    gen_helper_sub_saturate(tmp, cpu_env, tmp2, tmp);
--                else
--                    gen_helper_add_saturate(tmp, cpu_env, tmp, tmp2);
--                tcg_temp_free_i32(tmp2);
-+                /* All done in decodetree.  Reach here for illegal ops.  */
-+                goto illegal_op;
-             } else {
-                 switch (op) {
-                 case 0x0a: /* rbit */
-diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index 87bbb2eec2..7791be5590 100644
---- a/target/arm/a32.decode
-+++ b/target/arm/a32.decode
-@@ -27,6 +27,7 @@
- &s_rri_rot       s rn rd imm rot
- &s_rrrr          s rd rn rm ra
- &rrrr            rd rn rm ra
-+&rrr             rd rn rm
- 
- # Data-processing (register)
- 
-@@ -122,3 +123,12 @@ UMULL            .... 0000 100 . .... .... .... 1001 ....     @s_rdamn
- UMLAL            .... 0000 101 . .... .... .... 1001 ....     @s_rdamn
- SMULL            .... 0000 110 . .... .... .... 1001 ....     @s_rdamn
- SMLAL            .... 0000 111 . .... .... .... 1001 ....     @s_rdamn
-+
-+# Saturating addition and subtraction
-+
-+@rndm            ---- .... .... rn:4 rd:4 .... .... rm:4      &rrr
-+
-+QADD             .... 0001 0000 .... .... 0000 0101 ....      @rndm
-+QSUB             .... 0001 0010 .... .... 0000 0101 ....      @rndm
-+QDADD            .... 0001 0100 .... .... 0000 0101 ....      @rndm
-+QDSUB            .... 0001 0110 .... .... 0000 0101 ....      @rndm
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index 40cc69aee3..7c6226e0af 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -24,6 +24,7 @@
- &s_rri_rot       !extern s rn rd imm rot
- &s_rrrr          !extern s rd rn rm ra
- &rrrr            !extern rd rn rm ra
-+&rrr             !extern rd rn rm
- 
- # Data-processing (register)
- 
-@@ -117,6 +118,7 @@ RSB_rri          1111 0.0 1110 . .... 0 ... .... ........     @s_rri_rot
- @s0_rnadm        .... .... .... rn:4 ra:4 rd:4 .... rm:4      &s_rrrr s=0
- @s0_rn0dm        .... .... .... rn:4 .... rd:4 .... rm:4      &s_rrrr ra=0 s=0
- @rnadm           .... .... .... rn:4 ra:4 rd:4 .... rm:4      &rrrr
-+@rndm            .... .... .... rn:4 .... rd:4 .... rm:4      &rrr
- 
+@@ -8213,7 +8213,6 @@ DO_SMLAX(SMLALTT, 2, 1, 1)
+ static bool op_smlawx(DisasContext *s, arg_rrrr *a, bool add, bool mt)
  {
-   MUL            1111 1011 0000 .... 1111 .... 0000 ....      @s0_rn0dm
-@@ -128,3 +130,10 @@ UMULL            1111 1011 1010 .... .... .... 0000 ....      @s0_rnadm
- SMLAL            1111 1011 1100 .... .... .... 0000 ....      @s0_rnadm
- UMLAL            1111 1011 1110 .... .... .... 0000 ....      @s0_rnadm
- UMAAL            1111 1011 1110 .... .... .... 0110 ....      @rnadm
-+
-+# Data-processing (two source registers)
-+
-+QADD             1111 1010 1000 .... 1111 .... 1000 ....      @rndm
-+QSUB             1111 1010 1000 .... 1111 .... 1010 ....      @rndm
-+QDADD            1111 1010 1000 .... 1111 .... 1001 ....      @rndm
-+QDSUB            1111 1010 1000 .... 1111 .... 1011 ....      @rndm
+     TCGv_i32 t0, t1;
+-    TCGv_i64 t64;
+ 
+     if (!ENABLE_ARCH_5TE) {
+         return false;
+@@ -8221,16 +8220,17 @@ static bool op_smlawx(DisasContext *s, arg_rrrr *a, bool add, bool mt)
+ 
+     t0 = load_reg(s, a->rn);
+     t1 = load_reg(s, a->rm);
++    /*
++     * Since the nominal result is product<47:16>, shift the 16-bit
++     * input up by 16 bits, so that the result is at product<63:32>.
++     */
+     if (mt) {
+-        tcg_gen_sari_i32(t1, t1, 16);
++        tcg_gen_andi_i32(t1, t1, 0xffff0000);
+     } else {
+-        gen_sxth(t1);
++        tcg_gen_shli_i32(t1, t1, 16);
+     }
+-    t64 = gen_muls_i64_i32(t0, t1);
+-    tcg_gen_shri_i64(t64, t64, 16);
+-    t1 = tcg_temp_new_i32();
+-    tcg_gen_extrl_i64_i32(t1, t64);
+-    tcg_temp_free_i64(t64);
++    tcg_gen_muls2_i32(t0, t1, t0, t1);
++    tcg_temp_free_i32(t0);
+     if (add) {
+         t0 = load_reg(s, a->ra);
+         gen_helper_add_setq(t1, cpu_env, t1, t0);
 -- 
 2.17.1
 
