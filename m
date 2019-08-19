@@ -2,87 +2,86 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FEBAC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73A8C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:24:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EC2D22CE8
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 917CD214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 20:24:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0olLEB8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EC2D22CE8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oJLYzIYd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 917CD214DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzoCJ-0008P0-48
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:24:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45534)
+	id 1hzoCm-0000DG-CS
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 16:24:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45547)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tcminyard@gmail.com>) id 1hzo5p-0007i9-QX
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:36 -0400
+ (envelope-from <tcminyard@gmail.com>) id 1hzo5r-0007jD-4p
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1hzo5i-0003LB-N4
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:29 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37923)
+ (envelope-from <tcminyard@gmail.com>) id 1hzo5j-0003NN-L0
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:30 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43660)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1hzo5i-0003KT-He
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:22 -0400
-Received: by mail-ot1-x344.google.com with SMTP id r20so2890090ota.5
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 13:17:22 -0700 (PDT)
+ (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1hzo5j-0003Mo-Ea
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 16:17:23 -0400
+Received: by mail-ot1-x343.google.com with SMTP id e12so2880991otp.10
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 13:17:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=FcIfcrqIGdpNZl0S22ugT9WUisJdVXVDfqKYhKlZSoQ=;
- b=e0olLEB8tJ0kShDTL0mQ+xOapVASbrWCE4FQKLqYFABiTtfaao7di+g1dRLmN8SObV
- TZKadJcYn3Amx6HUlT6WbqaEjlMsqYRrff1xbE8M6Ygr7W9khHo1xpXp53R2Hf6FSlcL
- DotYWm0Q4F2OsYksBAJKMj6PT7OrZTnVuc+NKhuoR17vW8DbFW68KBxbl5t1X8CWO+Hf
- UZT6Yfu+Gd0QGcIjLdBXIPhzi9mniYXu8eCclI7Wab+SFu7zavvmclQVsmg+vsmtTQcN
- UwmZELG+u8nMeodsAptVFj846vplQyiLJpIIBVWyNFXrPyCD0WV+TwbbZBQfwz/594WJ
- IjhA==
+ bh=HAO9jklM0LAfKmS8U9Hd9mmyxmn4OVgmHv+jleswvpA=;
+ b=oJLYzIYd5CjC/D+ZLuWj+bIIOBjP5YRELEg1qE4LkGcI4DlvkcXHAQhGeTZfsqXO+D
+ pB8wMjouOSyA5zK5jJ3kyV+FdfDQSG5S6wQ+n1QBe9FLOVnAxEvWUvpdgnIiTOAR5a6e
+ EUfpOONxxUZNcwpjwZXHdjDmJTLPEBWec3nPgDlb3iFHVGvqvAUjJUY4v1o6UO6koB4C
+ sTYKE/5Z150O636Q6Ht+ZTUcIhlnn9D+//GgnuDCNpn1dklPyfXutecso0NRKTixEtcx
+ XP8K0Yvbp3zlaNZlFMtR7nUH74o0C+8dWAfu4N0dDxrioYpu/HyKXFlTJeTI7GBHdRew
+ oXjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=FcIfcrqIGdpNZl0S22ugT9WUisJdVXVDfqKYhKlZSoQ=;
- b=aUbCNqx99as0ckUVaRLYWNW8UolXCCZrT47otfW/5A2f12giDI2Orh3mxkldFIDSuc
- NzLUAMxz9ho1RkaVjKc2B/UZY/HmqxptWd9w/udm726kF+gyGSsvoylIUSF1+39G+N6T
- 3b6mieQvay2oWBw+0+YHDikAPy9fmHtXguCab3fjp2TsXoW/8TOZblFTMNxuHZTK+Sod
- 60TMvYprktVFImO2A7iTZ8uzggaMVIQwNscc1s5svVNFq8CQATAms46qa/qqmNbwk7Ny
- SN+g8ZjhF9OCybQ8bxpEeb1IarPwnE9ebWxmNR0x8iwyZqz3j3gyIW3csljsLe3xt9ce
- K/mw==
-X-Gm-Message-State: APjAAAWP+3owP5IKwlvVwvrl5ukxRCUYCJCUkALr66p3UY+VoDY/YjyO
- 9dZE8W4k9Oz65rfllO+uLpHktug=
-X-Google-Smtp-Source: APXvYqyGNG/PZqTsM/XAGPkSNmAhLvJYvDCpyP/YKR0NLgxPK+lzKqzXH1avwwgH0ieBOfbAQrreCQ==
-X-Received: by 2002:a9d:7dc4:: with SMTP id k4mr13057026otn.171.1566245841747; 
- Mon, 19 Aug 2019 13:17:21 -0700 (PDT)
+ bh=HAO9jklM0LAfKmS8U9Hd9mmyxmn4OVgmHv+jleswvpA=;
+ b=qHa0iF/Qw+6lTB4I18YAm4YsykVXw2qifRlY7HchDSCCEjBtxxjUSrxw2KIzUT3FZ9
+ zJNeNkqeMPYQA48Mg0bwg2faoJqrBv95M/hiyIcCT5xGGvZ7tIeO8qgLSWfHTU25Cj1b
+ m9ydu+fPyeOSyh2N6bOnflCg5CFMRGqrtJ6YXgBw5Xy4foz402pUEN8qLppQSBtI4P56
+ q2CrYQiwdBES6kGkfm7i2DaKM3Q/oHXW0IX7UOnlvYk8ZMsc0e2RSRKmqbJZAc3nh9co
+ Q+J8TW21vPVq5Fmo/+Hp1DODGgJAOXZgWZrTLFwvwWHWxzUxS3kqcKFT8Dda13dgT9W5
+ oiaQ==
+X-Gm-Message-State: APjAAAXk7GCZDKigMvna8yfkxDvAmFOlXvw9e/jhQPcEfBoFxfNvcYse
+ BXYS6Q7fIQArf5rKWt7apg==
+X-Google-Smtp-Source: APXvYqzi73OG1doWpbVfthtbe87VpwWHvr6vIoJErPfku8NHWM7AL7OnZonRXkIfa8KAdESbzFjGfQ==
+X-Received: by 2002:a9d:7055:: with SMTP id x21mr19130070otj.137.1566245842605; 
+ Mon, 19 Aug 2019 13:17:22 -0700 (PDT)
 Received: from serve.minyard.net ([47.184.134.43])
- by smtp.gmail.com with ESMTPSA id i16sm5661752otc.65.2019.08.19.13.17.18
+ by smtp.gmail.com with ESMTPSA id r13sm3252607oic.56.2019.08.19.13.17.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 13:17:19 -0700 (PDT)
+ Mon, 19 Aug 2019 13:17:22 -0700 (PDT)
 Received: from t430.minyard.net (t430m.minyard.net [192.168.27.3])
- by serve.minyard.net (Postfix) with ESMTPA id AC8251805AC;
- Mon, 19 Aug 2019 20:17:17 +0000 (UTC)
+ by serve.minyard.net (Postfix) with ESMTPA id 48CE51805AE;
+ Mon, 19 Aug 2019 20:17:18 +0000 (UTC)
 Received: by t430.minyard.net (Postfix, from userid 1000)
- id 77A6130232A; Mon, 19 Aug 2019 15:17:17 -0500 (CDT)
+ id 2CDE130232A; Mon, 19 Aug 2019 15:17:17 -0500 (CDT)
 From: minyard@acm.org
 To: QEMU Developers <qemu-devel@nongnu.org>
-Date: Mon, 19 Aug 2019 15:16:59 -0500
-Message-Id: <20190819201705.31633-10-minyard@acm.org>
+Date: Mon, 19 Aug 2019 15:17:01 -0500
+Message-Id: <20190819201705.31633-12-minyard@acm.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190819201705.31633-1-minyard@acm.org>
 References: <20190819201705.31633-1-minyard@acm.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: [Qemu-devel] [PATCH 09/15] ipmi: Allow a size value to be passed
- for I/O space
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: [Qemu-devel] [PATCH 11/15] ipmi: Add PCI IPMI interfaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,234 +93,402 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-PCI device I/O must be >= 8 bytes in length or they don't work.
-Allow the size to be passed in, the default size of 2 or 3
-won't work.
+Pretty straightforward, just hook the current KCS and BT code into
+the PCI system with the proper configuration.
 
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/ipmi/ipmi_bt.c          | 19 +++++++++++++++----
- hw/ipmi/ipmi_kcs.c         | 23 +++++++++++++++++++----
- hw/ipmi/isa_ipmi_bt.c      |  2 +-
- hw/ipmi/isa_ipmi_kcs.c     |  2 +-
- include/hw/ipmi/ipmi.h     |  7 ++++++-
- include/hw/ipmi/ipmi_bt.h  |  1 +
- include/hw/ipmi/ipmi_kcs.h |  1 +
- 7 files changed, 44 insertions(+), 11 deletions(-)
+ default-configs/i386-softmmu.mak |   2 +
+ hw/i386/Kconfig                  |   2 +
+ hw/ipmi/Kconfig                  |  10 +++
+ hw/ipmi/Makefile.objs            |   2 +
+ hw/ipmi/pci_ipmi_bt.c            | 146 +++++++++++++++++++++++++++++++
+ hw/ipmi/pci_ipmi_kcs.c           | 146 +++++++++++++++++++++++++++++++
+ include/hw/pci/pci.h             |   1 +
+ 7 files changed, 309 insertions(+)
+ create mode 100644 hw/ipmi/pci_ipmi_bt.c
+ create mode 100644 hw/ipmi/pci_ipmi_kcs.c
 
-diff --git a/hw/ipmi/ipmi_bt.c b/hw/ipmi/ipmi_bt.c
-index e6765ca4f8..22f94fb98d 100644
---- a/hw/ipmi/ipmi_bt.c
-+++ b/hw/ipmi/ipmi_bt.c
-@@ -189,7 +189,7 @@ static uint64_t ipmi_bt_ioport_read(void *opaque, hwaddr addr, unsigned size)
-     IPMIBT *ib = iic->get_backend_data(ii);
-     uint32_t ret = 0xff;
- 
--    switch (addr & 3) {
-+    switch (addr & ib->size_mask) {
-     case 0:
-         ret = ib->control_reg;
-         break;
-@@ -208,6 +208,9 @@ static uint64_t ipmi_bt_ioport_read(void *opaque, hwaddr addr, unsigned size)
-     case 2:
-         ret = ib->mask_reg;
-         break;
-+    default:
-+        ret = 0xff;
-+        break;
-     }
-     return ret;
- }
-@@ -230,7 +233,7 @@ static void ipmi_bt_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-     IPMIInterfaceClass *iic = IPMI_INTERFACE_GET_CLASS(ii);
-     IPMIBT *ib = iic->get_backend_data(ii);
- 
--    switch (addr & 3) {
-+    switch (addr & ib->size_mask) {
-     case 0:
-         if (IPMI_BT_GET_CLR_WR(val)) {
-             ib->inlen = 0;
-@@ -285,6 +288,9 @@ static void ipmi_bt_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-             ipmi_bt_lower_irq(ib);
-         }
-         break;
-+    default:
-+        /* Ignore. */
-+        break;
-     }
- }
- 
-@@ -346,14 +352,19 @@ static void ipmi_bt_set_irq_enable(IPMIInterface *ii, int val)
-     ib->irqs_enabled = val;
- }
- 
--static void ipmi_bt_init(IPMIInterface *ii, Error **errp)
-+static void ipmi_bt_init(IPMIInterface *ii, unsigned int min_size, Error **errp)
- {
-     IPMIInterfaceClass *iic = IPMI_INTERFACE_GET_CLASS(ii);
-     IPMIBT *ib = iic->get_backend_data(ii);
- 
-+    if (min_size == 0) {
-+        min_size = 4;
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index cd5ea391e8..b819582d78 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -10,6 +10,8 @@
+ #CONFIG_ISA_DEBUG=n
+ #CONFIG_ISA_IPMI_BT=n
+ #CONFIG_ISA_IPMI_KCS=n
++#CONFIG_PCI_IPMI_KCS=n
++#CONFIG_PCI_IPMI_BT=n
+ #CONFIG_PCI_DEVICES=n
+ #CONFIG_PVPANIC=n
+ #CONFIG_QXL=n
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index 6350438036..b4efaa0818 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -8,6 +8,8 @@ config PC
+     imply HYPERV
+     imply ISA_IPMI_KCS
+     imply ISA_IPMI_BT
++    imply PCI_IPMI_KCS
++    imply PCI_IPMI_BT
+     imply ISA_DEBUG
+     imply PARALLEL
+     imply PCI_DEVICES
+diff --git a/hw/ipmi/Kconfig b/hw/ipmi/Kconfig
+index b944fae100..12db4e81ad 100644
+--- a/hw/ipmi/Kconfig
++++ b/hw/ipmi/Kconfig
+@@ -20,3 +20,13 @@ config ISA_IPMI_BT
+     bool
+     depends on ISA_BUS
+     select IPMI
++
++config PCI_IPMI_KCS
++    bool
++    depends on PCI
++    select IPMI
++
++config PCI_IPMI_BT
++    bool
++    depends on PCI
++    select IPMI
+diff --git a/hw/ipmi/Makefile.objs b/hw/ipmi/Makefile.objs
+index 4ffa45a66c..2d7f080a86 100644
+--- a/hw/ipmi/Makefile.objs
++++ b/hw/ipmi/Makefile.objs
+@@ -2,4 +2,6 @@ common-obj-$(CONFIG_IPMI) += ipmi.o ipmi_kcs.o ipmi_bt.o
+ common-obj-$(CONFIG_IPMI_LOCAL) += ipmi_bmc_sim.o
+ common-obj-$(CONFIG_IPMI_EXTERN) += ipmi_bmc_extern.o
+ common-obj-$(CONFIG_ISA_IPMI_KCS) += isa_ipmi_kcs.o
++common-obj-$(CONFIG_PCI_IPMI_KCS) += pci_ipmi_kcs.o
+ common-obj-$(CONFIG_ISA_IPMI_BT) += isa_ipmi_bt.o
++common-obj-$(CONFIG_PCI_IPMI_BT) += pci_ipmi_bt.o
+diff --git a/hw/ipmi/pci_ipmi_bt.c b/hw/ipmi/pci_ipmi_bt.c
+new file mode 100644
+index 0000000000..6ed925a665
+--- /dev/null
++++ b/hw/ipmi/pci_ipmi_bt.c
+@@ -0,0 +1,146 @@
++/*
++ * QEMU PCI IPMI BT emulation
++ *
++ * Copyright (c) 2017 Corey Minyard, MontaVista Software, LLC
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "migration/vmstate.h"
++#include "qapi/error.h"
++#include "hw/ipmi/ipmi_bt.h"
++#include "hw/pci/pci.h"
++
++#define TYPE_PCI_IPMI_BT "pci-ipmi-bt"
++#define PCI_IPMI_BT(obj) OBJECT_CHECK(PCIIPMIBTDevice, (obj), \
++                                       TYPE_PCI_IPMI_BT)
++
++typedef struct PCIIPMIBTDevice {
++    PCIDevice dev;
++    IPMIBT bt;
++    bool irq_enabled;
++    uint32_t uuid;
++} PCIIPMIBTDevice;
++
++static void pci_ipmi_raise_irq(IPMIBT *ik)
++{
++    PCIIPMIBTDevice *pik = ik->opaque;
++
++    pci_set_irq(&pik->dev, true);
++}
++
++static void pci_ipmi_lower_irq(IPMIBT *ik)
++{
++    PCIIPMIBTDevice *pik = ik->opaque;
++
++    pci_set_irq(&pik->dev, false);
++}
++
++static void pci_ipmi_bt_realize(PCIDevice *pd, Error **errp)
++{
++    PCIIPMIBTDevice *pik = PCI_IPMI_BT(pd);
++    IPMIInterface *ii = IPMI_INTERFACE(pd);
++    IPMIInterfaceClass *iic = IPMI_INTERFACE_GET_CLASS(ii);
++
++    if (!pik->bt.bmc) {
++        error_setg(errp, "IPMI device requires a bmc attribute to be set");
++        return;
 +    }
-+    ib->size_mask = min_size - 1;
-     ib->io_length = 3;
- 
--    memory_region_init_io(&ib->io, NULL, &ipmi_bt_io_ops, ii, "ipmi-bt", 3);
-+    memory_region_init_io(&ib->io, NULL, &ipmi_bt_io_ops, ii, "ipmi-bt",
-+                          min_size);
- }
- 
- int ipmi_bt_vmstate_post_load(void *opaque, int version)
-diff --git a/hw/ipmi/ipmi_kcs.c b/hw/ipmi/ipmi_kcs.c
-index dab1af8bc8..a77612946a 100644
---- a/hw/ipmi/ipmi_kcs.c
-+++ b/hw/ipmi/ipmi_kcs.c
-@@ -232,7 +232,7 @@ static uint64_t ipmi_kcs_ioport_read(void *opaque, hwaddr addr, unsigned size)
-     IPMIKCS *ik = iic->get_backend_data(ii);
-     uint32_t ret;
- 
--    switch (addr & 1) {
-+    switch (addr & ik->size_mask) {
-     case 0:
-         ret = ik->data_out_reg;
-         IPMI_KCS_SET_OBF(ik->status_reg, 0);
-@@ -243,6 +243,7 @@ static uint64_t ipmi_kcs_ioport_read(void *opaque, hwaddr addr, unsigned size)
-             }
-         }
-         break;
 +
-     case 1:
-         ret = ik->status_reg;
-         if (ik->atn_irq_set) {
-@@ -252,6 +253,9 @@ static uint64_t ipmi_kcs_ioport_read(void *opaque, hwaddr addr, unsigned size)
-             }
-         }
-         break;
++    pik->uuid = ipmi_next_uuid();
 +
-+    default:
-+        ret = 0xff;
-     }
-     return ret;
- }
-@@ -267,7 +271,7 @@ static void ipmi_kcs_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-         return;
-     }
- 
--    switch (addr & 1) {
-+    switch (addr & ik->size_mask) {
-     case 0:
-         ik->data_in_reg = val;
-         break;
-@@ -275,6 +279,10 @@ static void ipmi_kcs_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-     case 1:
-         ik->cmd_reg = val;
-         break;
++    pik->bt.bmc->intf = ii;
++    pik->bt.opaque = pik;
 +
-+    default:
-+        /* Ignore. */
-+        break;
-     }
-     IPMI_KCS_SET_IBF(ik->status_reg, 1);
-     ipmi_kcs_signal(ik, ii);
-@@ -321,13 +329,20 @@ static void ipmi_kcs_set_irq_enable(IPMIInterface *ii, int val)
-     ik->irqs_enabled = val;
- }
- 
--static void ipmi_kcs_init(IPMIInterface *ii, Error **errp)
-+/* min_size must be a power of 2. */
-+static void ipmi_kcs_init(IPMIInterface *ii, unsigned int min_size,
-+                          Error **errp)
- {
-     IPMIInterfaceClass *iic = IPMI_INTERFACE_GET_CLASS(ii);
-     IPMIKCS *ik = iic->get_backend_data(ii);
- 
-+    if (min_size == 0) {
-+        min_size = 2;
++    pci_config_set_prog_interface(pd->config, 0x02); /* BT */
++    pci_config_set_interrupt_pin(pd->config, 0x01);
++    pik->bt.use_irq = 1;
++    pik->bt.raise_irq = pci_ipmi_raise_irq;
++    pik->bt.lower_irq = pci_ipmi_lower_irq;
++
++    iic->init(ii, 8, errp);
++    if (*errp) {
++        return;
 +    }
-+    ik->size_mask = min_size - 1;
-     ik->io_length = 2;
--    memory_region_init_io(&ik->io, NULL, &ipmi_kcs_io_ops, ii, "ipmi-kcs", 2);
-+    memory_region_init_io(&ik->io, NULL, &ipmi_kcs_io_ops, ii, "ipmi-kcs",
-+                          min_size);
- }
++    pci_register_bar(pd, 0, PCI_BASE_ADDRESS_SPACE_IO, &pik->bt.io);
++}
++
++const VMStateDescription vmstate_PCIIPMIBTDevice = {
++    .name = TYPE_IPMI_INTERFACE_PREFIX "pci-bt",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(dev, PCIIPMIBTDevice),
++        VMSTATE_STRUCT(bt, PCIIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void pci_ipmi_bt_instance_init(Object *obj)
++{
++    PCIIPMIBTDevice *pik = PCI_IPMI_BT(obj);
++
++    ipmi_bmc_find_and_link(obj, (Object **) &pik->bt.bmc);
++}
++
++static void *pci_ipmi_bt_get_backend_data(IPMIInterface *ii)
++{
++    PCIIPMIBTDevice *pik = PCI_IPMI_BT(ii);
++
++    return &pik->bt;
++}
++
++static void pci_ipmi_bt_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++    PCIDeviceClass *pdc = PCI_DEVICE_CLASS(oc);
++    IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
++
++    pdc->vendor_id = PCI_VENDOR_ID_QEMU;
++    pdc->device_id = PCI_DEVICE_ID_QEMU_IPMI;
++    pdc->revision = 1;
++    pdc->class_id = PCI_CLASS_SERIAL_IPMI;
++
++    dc->vmsd = &vmstate_PCIIPMIBTDevice;
++    dc->desc = "PCI IPMI BT";
++    pdc->realize = pci_ipmi_bt_realize;
++
++    iic->get_backend_data = pci_ipmi_bt_get_backend_data;
++    ipmi_bt_class_init(iic);
++}
++
++static const TypeInfo pci_ipmi_bt_info = {
++    .name          = TYPE_PCI_IPMI_BT,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(PCIIPMIBTDevice),
++    .instance_init = pci_ipmi_bt_instance_init,
++    .class_init    = pci_ipmi_bt_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_IPMI_INTERFACE },
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { }
++    }
++};
++
++static void pci_ipmi_bt_register_types(void)
++{
++    type_register_static(&pci_ipmi_bt_info);
++}
++
++type_init(pci_ipmi_bt_register_types)
+diff --git a/hw/ipmi/pci_ipmi_kcs.c b/hw/ipmi/pci_ipmi_kcs.c
+new file mode 100644
+index 0000000000..eeba63baa4
+--- /dev/null
++++ b/hw/ipmi/pci_ipmi_kcs.c
+@@ -0,0 +1,146 @@
++/*
++ * QEMU PCI IPMI KCS emulation
++ *
++ * Copyright (c) 2017 Corey Minyard, MontaVista Software, LLC
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "migration/vmstate.h"
++#include "qapi/error.h"
++#include "hw/ipmi/ipmi_kcs.h"
++#include "hw/pci/pci.h"
++
++#define TYPE_PCI_IPMI_KCS "pci-ipmi-kcs"
++#define PCI_IPMI_KCS(obj) OBJECT_CHECK(PCIIPMIKCSDevice, (obj), \
++                                       TYPE_PCI_IPMI_KCS)
++
++typedef struct PCIIPMIKCSDevice {
++    PCIDevice dev;
++    IPMIKCS kcs;
++    bool irq_enabled;
++    uint32_t uuid;
++} PCIIPMIKCSDevice;
++
++static void pci_ipmi_raise_irq(IPMIKCS *ik)
++{
++    PCIIPMIKCSDevice *pik = ik->opaque;
++
++    pci_set_irq(&pik->dev, true);
++}
++
++static void pci_ipmi_lower_irq(IPMIKCS *ik)
++{
++    PCIIPMIKCSDevice *pik = ik->opaque;
++
++    pci_set_irq(&pik->dev, false);
++}
++
++static void pci_ipmi_kcs_realize(PCIDevice *pd, Error **errp)
++{
++    PCIIPMIKCSDevice *pik = PCI_IPMI_KCS(pd);
++    IPMIInterface *ii = IPMI_INTERFACE(pd);
++    IPMIInterfaceClass *iic = IPMI_INTERFACE_GET_CLASS(ii);
++
++    if (!pik->kcs.bmc) {
++        error_setg(errp, "IPMI device requires a bmc attribute to be set");
++        return;
++    }
++
++    pik->uuid = ipmi_next_uuid();
++
++    pik->kcs.bmc->intf = ii;
++    pik->kcs.opaque = pik;
++
++    pci_config_set_prog_interface(pd->config, 0x01); /* KCS */
++    pci_config_set_interrupt_pin(pd->config, 0x01);
++    pik->kcs.use_irq = 1;
++    pik->kcs.raise_irq = pci_ipmi_raise_irq;
++    pik->kcs.lower_irq = pci_ipmi_lower_irq;
++
++    iic->init(ii, 8, errp);
++    if (*errp) {
++        return;
++    }
++    pci_register_bar(pd, 0, PCI_BASE_ADDRESS_SPACE_IO, &pik->kcs.io);
++}
++
++const VMStateDescription vmstate_PCIIPMIKCSDevice = {
++    .name = TYPE_IPMI_INTERFACE_PREFIX "pci-kcs",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(dev, PCIIPMIKCSDevice),
++        VMSTATE_STRUCT(kcs, PCIIPMIKCSDevice, 1, vmstate_IPMIKCS, IPMIKCS),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void pci_ipmi_kcs_instance_init(Object *obj)
++{
++    PCIIPMIKCSDevice *pik = PCI_IPMI_KCS(obj);
++
++    ipmi_bmc_find_and_link(obj, (Object **) &pik->kcs.bmc);
++}
++
++static void *pci_ipmi_kcs_get_backend_data(IPMIInterface *ii)
++{
++    PCIIPMIKCSDevice *pik = PCI_IPMI_KCS(ii);
++
++    return &pik->kcs;
++}
++
++static void pci_ipmi_kcs_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++    PCIDeviceClass *pdc = PCI_DEVICE_CLASS(oc);
++    IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
++
++    pdc->vendor_id = PCI_VENDOR_ID_QEMU;
++    pdc->device_id = PCI_DEVICE_ID_QEMU_IPMI;
++    pdc->revision = 1;
++    pdc->class_id = PCI_CLASS_SERIAL_IPMI;
++
++    dc->vmsd = &vmstate_PCIIPMIKCSDevice;
++    dc->desc = "PCI IPMI KCS";
++    pdc->realize = pci_ipmi_kcs_realize;
++
++    iic->get_backend_data = pci_ipmi_kcs_get_backend_data;
++    ipmi_kcs_class_init(iic);
++}
++
++static const TypeInfo pci_ipmi_kcs_info = {
++    .name          = TYPE_PCI_IPMI_KCS,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(PCIIPMIKCSDevice),
++    .instance_init = pci_ipmi_kcs_instance_init,
++    .class_init    = pci_ipmi_kcs_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_IPMI_INTERFACE },
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { }
++    }
++};
++
++static void pci_ipmi_kcs_register_types(void)
++{
++    type_register_static(&pci_ipmi_kcs_info);
++}
++
++type_init(pci_ipmi_kcs_register_types)
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 1b840e61a2..f3f0ffd5fb 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -55,6 +55,7 @@ extern bool pci_available;
+ /* QEMU/Bochs VGA (0x1234) */
+ #define PCI_VENDOR_ID_QEMU               0x1234
+ #define PCI_DEVICE_ID_QEMU_VGA           0x1111
++#define PCI_DEVICE_ID_QEMU_IPMI          0x1112
  
- int ipmi_kcs_vmstate_post_load(void *opaque, int version)
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index c102778712..9a87ffd3f0 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -85,7 +85,7 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
-     iib->bt.bmc->intf = ii;
-     iib->bt.opaque = iib;
- 
--    iic->init(ii, errp);
-+    iic->init(ii, 0, errp);
-     if (*errp)
-         return;
- 
-diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
-index 8e32774f85..ca3ea36a3f 100644
---- a/hw/ipmi/isa_ipmi_kcs.c
-+++ b/hw/ipmi/isa_ipmi_kcs.c
-@@ -84,7 +84,7 @@ static void ipmi_isa_realize(DeviceState *dev, Error **errp)
-     iik->kcs.bmc->intf = ii;
-     iik->kcs.opaque = iik;
- 
--    iic->init(ii, errp);
-+    iic->init(ii, 0, errp);
-     if (*errp)
-         return;
- 
-diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
-index 70871da0a7..6f2413b39b 100644
---- a/include/hw/ipmi/ipmi.h
-+++ b/include/hw/ipmi/ipmi.h
-@@ -118,7 +118,12 @@ typedef struct IPMIInterface IPMIInterface;
- typedef struct IPMIInterfaceClass {
-     InterfaceClass parent;
- 
--    void (*init)(struct IPMIInterface *s, Error **errp);
-+    /*
-+     * min_size is the requested I/O size and must be a power of 2.
-+     * This is so PCI (or other busses) can request a bigger range.
-+     * Use 0 for the default.
-+     */
-+    void (*init)(struct IPMIInterface *s, unsigned int min_size, Error **errp);
- 
-     /*
-      * Perform various operations on the hardware.  If checkonly is
-diff --git a/include/hw/ipmi/ipmi_bt.h b/include/hw/ipmi/ipmi_bt.h
-index 9667aaa88a..8a4316ea7c 100644
---- a/include/hw/ipmi/ipmi_bt.h
-+++ b/include/hw/ipmi/ipmi_bt.h
-@@ -56,6 +56,7 @@ typedef struct IPMIBT {
-     uint32_t io_base;
-     unsigned long io_length;
-     MemoryRegion io;
-+    unsigned long size_mask;
- 
-     void (*raise_irq)(struct IPMIBT *ib);
-     void (*lower_irq)(struct IPMIBT *ib);
-diff --git a/include/hw/ipmi/ipmi_kcs.h b/include/hw/ipmi/ipmi_kcs.h
-index 91d76d08f4..6e6ef4c539 100644
---- a/include/hw/ipmi/ipmi_kcs.h
-+++ b/include/hw/ipmi/ipmi_kcs.h
-@@ -59,6 +59,7 @@ typedef struct IPMIKCS {
-     uint32_t io_base;
-     unsigned long io_length;
-     MemoryRegion io;
-+    unsigned long size_mask;
- 
-     void (*raise_irq)(struct IPMIKCS *ik);
-     void (*lower_irq)(struct IPMIKCS *ik);
+ /* VMWare (0x15ad) */
+ #define PCI_VENDOR_ID_VMWARE             0x15ad
 -- 
 2.17.1
 
