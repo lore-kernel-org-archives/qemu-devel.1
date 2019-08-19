@@ -2,54 +2,68 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DD8C3A589
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 00:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19823C3A589
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 00:55:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A0692087E
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 00:39:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0692087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id D98B521773
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 00:55:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98B521773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzVhp-0005ac-DB
-	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 20:39:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59811)
+	id 1hzVx2-0007vw-Vc
+	for qemu-devel@archiver.kernel.org; Sun, 18 Aug 2019 20:55:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1hzVgk-00059U-RP
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 20:38:23 -0400
+ (envelope-from <like.xu@linux.intel.com>) id 1hzVwG-0007SE-MA
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 20:54:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1hzVgj-00031Z-Al
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 20:38:22 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:25792)
+ (envelope-from <like.xu@linux.intel.com>) id 1hzVwF-0002Re-H4
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 20:54:24 -0400
+Received: from mga18.intel.com ([134.134.136.126]:36191)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hzVgj-0002yn-5D
- for qemu-devel@nongnu.org; Sun, 18 Aug 2019 20:38:21 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id CEC5F7456D6;
- Mon, 19 Aug 2019 02:38:09 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 3E8917456D5; Mon, 19 Aug 2019 02:38:09 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 2A5677456CB;
- Mon, 19 Aug 2019 02:38:09 +0200 (CEST)
-Date: Mon, 19 Aug 2019 02:38:09 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: qemu-devel@nongnu.org
-Message-ID: <alpine.BSF.2.21.9999.1908190208150.57965@zero.eik.bme.hu>
-User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
+ (Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
+ id 1hzVwF-0001ks-6z
+ for qemu-devel@nongnu.org; Sun, 18 Aug 2019 20:54:23 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Aug 2019 17:53:17 -0700
+X-IronPort-AV: E=Sophos;i="5.64,402,1559545200"; d="scan'208";a="195423281"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.239.196.83])
+ ([10.239.196.83])
+ by fmsmga001-auth.fm.intel.com with ESMTP/TLS/AES256-SHA;
+ 18 Aug 2019 17:53:16 -0700
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
+ <20190815183803.13346-2-ehabkost@redhat.com>
+ <107f312a-15cd-da33-f0d6-5777bbb53150@linux.intel.com>
+ <20190816134946.GZ3908@habkost.net>
+From: Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <ff46bbe4-7581-a77b-251a-32418f488e1d@linux.intel.com>
+Date: Mon, 19 Aug 2019 08:53:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
-Subject: [Qemu-devel] Machine specific option ROMs
+In-Reply-To: <20190816134946.GZ3908@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
+Subject: Re: [Qemu-devel] [PATCH 1/3] pc: Fix error message on die-id
+ validation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,37 +75,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+On 2019/8/16 21:49, Eduardo Habkost wrote:
+> On Fri, Aug 16, 2019 at 09:04:16AM +0800, Like Xu wrote:
+>> Hi,
+>>
+>> On 2019/8/16 2:38, Eduardo Habkost wrote:
+>>> The error message for die-id range validation is incorrect.  Example:
+>>>
+>>>     $ qemu-system-x86_64 -smp 1,sockets=6,maxcpus=6 \
+>>>       -device qemu64-x86_64-cpu,socket-id=1,die-id=1,core-id=0,thread-id=0
+>>>     qemu-system-x86_64: -device qemu64-x86_64-cpu,socket-id=1,die-id=1,core-id=0,thread-id=0: \
+>>>       Invalid CPU die-id: 1 must be in range 0:5
+>>>
+>>> The actual range for die-id in this example is 0:0.
+>>
+>> There is one die per socket by default.
+>>
+>> The case sockets=6 means there are 6 dies by default
+>> and the range for die-id is 0:5.
+>>
+> 
+> I don't understand why you say that.  die-id supposed to identify
+> a die inside a socket.  The code below is already checking for
+> (cpu->die_id > pcms->smp_dies - 1) because of that.
+> 
 
-I know about the possibility to set the option ROM of a PCIDevice with the 
-romfile property (that we can set on command line or in a device's init 
-method) but is there a way to set it depending on the machine that uses 
-the device? If this is not currently possible what would be needed to 
-allow this?
+You're right about this.
+Sorry to make a mess to support die topology.
 
-I'm asking because some cards may have different option ROMs on different 
-platforms: e.g. gfx cards need different ROM on Mac than on PC due to 
-using different firmware (and CPU arch). For Mac machines emulated by QEMU 
-OpenBIOS now patches in a driver that it downloads via FW_CFG but it could 
-use an FCode ROM (or the driver directly passed as the ROM image) instead 
-which would be a simpler solution and more like how real hardware works. 
-Also sam460ex firmware has a BIOS emulator for using PC option ROMs but 
-that can't run QEMU vgabios binaries (as these are i386 real mode and it 
-can only run x86 real mode) so we may need a way to specify a different 
-ROM if the card is used in sam460ex.
+> 
+>>>
+>>> Fix the error message to use smp_dies and print the correct range.
+>>>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> ---
+>>>    hw/i386/pc.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>> index 549c437050..24b03bb49c 100644
+>>> --- a/hw/i386/pc.c
+>>> +++ b/hw/i386/pc.c
+>>> @@ -2412,7 +2412,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>>>                return;
+>>>            } else if (cpu->die_id > pcms->smp_dies - 1) {
+>>>                error_setg(errp, "Invalid CPU die-id: %u must be in range 0:%u",
+>>> -                       cpu->die_id, max_socket);
+>>> +                       cpu->die_id, pcms->smp_dies - 1);
+>>>                return;
+>>>            }
+>>>            if (cpu->core_id < 0) {
+>>>
+>>
+> 
 
-So I'm looking for a way for board code to set romfile when the device is 
-added to the board. Should the normal way of setting a property work for 
-this or is that too late by then to change ROM of the device? (Also this 
-may need to work together with the -vga option to ensure card has the 
-right ROM on different machines even if added by -vga.)
-
-Regards,
-BALATON Zoltan
 
