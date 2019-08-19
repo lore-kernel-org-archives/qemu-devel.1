@@ -2,63 +2,87 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7316CC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEAEDC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:24:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3988B20651
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:22:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3988B20651
+	by mail.kernel.org (Postfix) with ESMTPS id 84F6420651
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:24:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84F6420651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hziY7-0002Hw-5b
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35910)
+	id 1hziaU-0003Hg-PV
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:24:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1hziXM-0001Wi-DF
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:21:34 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hziZt-0002ou-PY
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hziXJ-0003HA-Rb
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:21:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60766)
+ (envelope-from <pbonzini@redhat.com>) id 1hziZs-0005ID-IY
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:24:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56388)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hziXE-0003DJ-It; Mon, 19 Aug 2019 10:21:24 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hziZs-0005HW-An
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:24:08 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A7454C08EC01;
- Mon, 19 Aug 2019 14:21:23 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 094CA58CB2;
- Mon, 19 Aug 2019 14:21:20 +0000 (UTC)
-Message-ID: <0000ce26b107930e8ed4f9eac7810026cda9f866.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Date: Mon, 19 Aug 2019 17:21:19 +0300
-In-Reply-To: <6b9b4bf7-5765-400b-7452-e37ec797eed1@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-3-mlevitsk@redhat.com>
- <6b9b4bf7-5765-400b-7452-e37ec797eed1@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 32D8A3CA20
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 14:24:07 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id m25so588843wml.6
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 07:24:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UYoP4ap75BgV9gHM83kDJAvxCFDShHi9YtrlpePx6xk=;
+ b=Py/xwviCkFbnazQOtLw6Q0NwI0Nz5wii0NM64sDjjua60ZfPnBJnXENfJuulkMGs+k
+ 8Tk7FaE/mezmgadLIxrNDdFPR3XE4m9tJNpbAztCOhomH/NAIHFX7JSgcMDtLsxqWB1R
+ Nap5mQAvJL9ClLlFDMHg3F4dpGW1+rkVdQ5sjDsoSGTwPrW0Aa9F9uA+V+U2iI0M7TsN
+ QLNP7iduDOzFV43E32IHxcgZoWY6+ygXcFvnS/zx8v4y6s/T5C6XUsPUPXJs3lKn7nzc
+ Y2MCMCwIkphqMr8lQRqfsvPew72QxBHQqh3mwPD5dsVjF192i2xjHfoitvvLmEy3yX0c
+ pEww==
+X-Gm-Message-State: APjAAAXLFUdsxdw26fIGNbVrEG4YF1/A5FMl6QGztooanGA3hQ9H5bkT
+ wIcnz2j4gsVUWFRbJZSgIr9pIyiNA06POkJDK7SHNjcDiqaevg6xRT9RpnWR6DqG/cgjceqaJ3L
+ TFt9amh7FVmSe8rc=
+X-Received: by 2002:a7b:c928:: with SMTP id h8mr21494305wml.93.1566224645643; 
+ Mon, 19 Aug 2019 07:24:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyRE/emwS3anUAetRuK4cBHwbQG3EhReoIwljN4oyvpa28hFSPgGJc8VCunAUPi75hZ26rLPw==
+X-Received: by 2002:a7b:c928:: with SMTP id h8mr21494272wml.93.1566224645347; 
+ Mon, 19 Aug 2019 07:24:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f?
+ ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
+ by smtp.gmail.com with ESMTPSA id z8sm15150440wru.13.2019.08.19.07.24.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 19 Aug 2019 07:24:04 -0700 (PDT)
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+References: <20190817093237.27967-1-peterx@redhat.com>
+ <20190817093237.27967-3-peterx@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6469f348-b523-5a6f-f51f-d6a2ffd4c367@redhat.com>
+Date: Mon, 19 Aug 2019 16:24:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190817093237.27967-3-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 19 Aug 2019 14:21:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 02/13] qcrypto-luks: misc
- refactoring
+Subject: Re: [Qemu-devel] [PATCH 2/2] memory: Split zones when do
+ coalesced_io_del()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,548 +94,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-08-15 at 17:40 -0400, John Snow wrote:
+On 17/08/19 11:32, Peter Xu wrote:
+> It is a workaround of current KVM's KVM_UNREGISTER_COALESCED_MMIO
+> interface.  The kernel interface only allows to unregister an mmio
+> device with exactly the zone size when registered, or any smaller zone
+> that is included in the device mmio zone.  It does not support the
+> userspace to specify a very large zone to remove all the small mmio
+> devices within the zone covered.
 > 
-> On 8/14/19 4:22 PM, Maxim Levitsky wrote:
-> > This is also a preparation for key read/write/erase functions
-> > 
+> Logically speaking it would be nicer to fix this from KVM side, though
+> in all cases we still need to coop with old kernels so let's do this.
 > 
-> This is a matter of taste and I am not usually reviewing LUKS patches
-> (So don't take me too seriously), but I would prefer not to have "misc"
-> patches and instead split things out by individual changes along with a
-> nice commit message for each change.
+> This patch has nothing to do with 3ac7d43a6fbb5d4a3 because this is
+> probably broken from the very beginning when the
+> KVM_UNREGISTER_COALESCED_MMIO interface is introduced in kernel.
+> However to make the backport to stables easier, I'm still using the
+> commit 3ac7d43a6fbb5d4a3 to track this problem because this will
+> depend on that otherwise even additions of mmio devices won't work.
 > 
-> > * use master key len from the header
-> 
-> This touches enough lines that you could make it its own patch, I think.
-> 
-> > * prefer to use crypto params in the QCryptoBlockLUKS
-> >   over passing them as function arguments
-> 
-> I think the same is true here, and highlighting which variables you are
-> sticking into state instead of leaving as functional parameters would be
-> nice to see without all the other changes.
-> 
-> > * define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME
-> 
-> This can likely be squashed with whichever patch of yours first needs to
-> use it, because it's so short.
-> 
-> > * Add comments to various crypto parameters in the QCryptoBlockLUKS
-> > 
-> 
-> Can probably be squashed with item #2.
+> Fixes: 3ac7d43a6fbb5d4a3
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  memory.c | 30 +++++++++++++++++++++++++++---
+>  1 file changed, 27 insertions(+), 3 deletions(-)
 
-I mostly agree with you! I usually write everything as one big patch,
-and then split it. 
-It takes time but this has the benefit of
-much less overhead during the development, and it forces kind of self
-review on me while doing the split.
+This is still messy because memory_region_add_coalescing and
+memory_region_clear_coalescing modify fr->mr->colesced.
 
-This patch I probably didn't split enough, and I'll do it later when I send the next
-revision. 
+It's not hard to fix it, but not trivial either.  Probably it is
+sufficient to replace memory_region_update_coalesced_range and
+memory_region_update_coalesced_range_as with two pairs:
 
-I only had split things to the extent that all the patches are readable and reviewable to avoid wasting time,
-on stuff that I will have to probably rewrite anyway.
+- memory_region_add_coalesced_range and
+memory_region_add_coalesced_range_as, which call a new function
+flat_range_coalesced_io_add_one to call the listener only on the
+newly-added range (and set coalesced_mmio_add_done).
+memory_region_add_coalescing then can call
+memory_region_add_coalesced_range_as
 
-Thanks a lot for the feedback,
+- memory_region_clear_coalesced_ranges and
+memory_region_clear_coalesced_ranges_as, which call
+flat_range_coalesced_io_del.  Now memory_region_clear_coalescing can
+call memory_region_clear_coalesced_ranges *before* emptying the list, or
+exit immediately if it is empty.
 
-Best regards,
-	Maxim Levitsky
+Thanks,
 
+Paolo
 
-
-
+> diff --git a/memory.c b/memory.c
+> index 1a2b465a96..b24cdd13cf 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -864,6 +864,9 @@ static void address_space_update_ioeventfds(AddressSpace *as)
+>  
+>  static void flat_range_coalesced_io_del(FlatRange *fr, AddressSpace *as)
+>  {
+> +    CoalescedMemoryRange *cmr;
+> +    AddrRange tmp;
+> +
+>      if (QTAILQ_EMPTY(&fr->mr->coalesced)) {
+>          return;
+>      }
+> @@ -874,9 +877,30 @@ static void flat_range_coalesced_io_del(FlatRange *fr, AddressSpace *as)
+>  
+>      fr->coalesced_mmio_del_done = true;
+>  
+> -    MEMORY_LISTENER_UPDATE_REGION(fr, as, Reverse, coalesced_io_del,
+> -                                  int128_get64(fr->addr.start),
+> -                                  int128_get64(fr->addr.size));
+> +    /*
+> +     * We split the big region into smaller ones to satisfy KVM's
+> +     * KVM_UNREGISTER_COALESCED_MMIO interface, where it does not
+> +     * allow to specify a large region to unregister all the devices
+> +     * under that zone instead it only accepts exact zones or even a
+> +     * smaller zone of previously registered mmio device.  Logically
+> +     * speaking we should better fix KVM to allow the userspace to
+> +     * unregister multiple mmio devices within a large requested zone,
+> +     * but in all cases we'll still need to live with old kernels.  So
+> +     * let's simply break the zones into exactly the small pieces when
+> +     * we do coalesced_io_add().
+> +     */
+> +    QTAILQ_FOREACH(cmr, &fr->mr->coalesced, link) {
+> +        tmp = addrrange_shift(cmr->addr,
+> +                              int128_sub(fr->addr.start,
+> +                                         int128_make64(fr->offset_in_region)));
+> +        if (!addrrange_intersects(tmp, fr->addr)) {
+> +            continue;
+> +        }
+> +        tmp = addrrange_intersection(tmp, fr->addr);
+> +        MEMORY_LISTENER_UPDATE_REGION(fr, as, Reverse, coalesced_io_del,
+> +                                      int128_get64(tmp.start),
+> +                                      int128_get64(tmp.size));
+> +    }
+>  }
+>  
+>  static void flat_range_coalesced_io_add(FlatRange *fr, AddressSpace *as)
 > 
-> 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  crypto/block-luks.c | 213 ++++++++++++++++++++++----------------------
-> >  1 file changed, 105 insertions(+), 108 deletions(-)
-> > 
-> > diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> > index 409ab50f20..48213abde7 100644
-> > --- a/crypto/block-luks.c
-> > +++ b/crypto/block-luks.c
-> > @@ -70,6 +70,8 @@ typedef struct QCryptoBlockLUKSKeySlot QCryptoBlockLUKSKeySlot;
-> >  
-> >  #define QCRYPTO_BLOCK_LUKS_SECTOR_SIZE 512LL
-> >  
-> > +#define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME 2000
-> > +
-> >  static const char qcrypto_block_luks_magic[QCRYPTO_BLOCK_LUKS_MAGIC_LEN] = {
-> >      'L', 'U', 'K', 'S', 0xBA, 0xBE
-> >  };
-> > @@ -199,13 +201,25 @@ QEMU_BUILD_BUG_ON(sizeof(struct QCryptoBlockLUKSHeader) != 592);
-> >  struct QCryptoBlockLUKS {
-> >      QCryptoBlockLUKSHeader header;
-> >  
-> > -    /* Cache parsed versions of what's in header fields,
-> > -     * as we can't rely on QCryptoBlock.cipher being
-> > -     * non-NULL */
-> > +    /* Main encryption algorithm used for encryption*/
-> >      QCryptoCipherAlgorithm cipher_alg;
-> > +
-> > +    /* Mode of encryption for the selected encryption algorithm */
-> >      QCryptoCipherMode cipher_mode;
-> > +
-> > +    /* Initialization vector generation algorithm */
-> >      QCryptoIVGenAlgorithm ivgen_alg;
-> > +
-> > +    /* Hash algorithm used for IV generation*/
-> >      QCryptoHashAlgorithm ivgen_hash_alg;
-> > +
-> > +    /*
-> > +     * Encryption algorithm used for IV generation.
-> > +     * Usually the same as main encryption algorithm
-> > +     */
-> > +    QCryptoCipherAlgorithm ivgen_cipher_alg;
-> > +
-> > +    /* Hash algorithm used in pbkdf2 function */
-> >      QCryptoHashAlgorithm hash_alg;
-> >  };
-> >  
-> > @@ -397,6 +411,12 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgorithm cipher,
-> >      }
-> >  }
-> >  
-> > +static int masterkeylen(QCryptoBlockLUKS *luks)
-> > +{
-> > +    return luks->header.key_bytes;
-> > +}
-> > +
-> > +
-> 
-> generally QEMU uses snake_case_names; please spell as "master_key_len".
-> 
-> >  /*
-> >   * Given a key slot, and user password, this will attempt to unlock
-> >   * the master encryption key from the key slot.
-> > @@ -410,21 +430,15 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgorithm cipher,
-> >   */
-> >  static int
-> >  qcrypto_block_luks_load_key(QCryptoBlock *block,
-> > -                            QCryptoBlockLUKSKeySlot *slot,
-> > +                            uint slot_idx,
-> >                              const char *password,
-> > -                            QCryptoCipherAlgorithm cipheralg,
-> > -                            QCryptoCipherMode ciphermode,
-> > -                            QCryptoHashAlgorithm hash,
-> > -                            QCryptoIVGenAlgorithm ivalg,
-> > -                            QCryptoCipherAlgorithm ivcipheralg,
-> > -                            QCryptoHashAlgorithm ivhash,
-> >                              uint8_t *masterkey,
-> > -                            size_t masterkeylen,
-> >                              QCryptoBlockReadFunc readfunc,
-> >                              void *opaque,
-> >                              Error **errp)
-> >  {
-> >      QCryptoBlockLUKS *luks = block->opaque;
-> > +    QCryptoBlockLUKSKeySlot *slot = &luks->header.key_slots[slot_idx];
-> >      uint8_t *splitkey;
-> >      size_t splitkeylen;
-> >      uint8_t *possiblekey;
-> > @@ -439,9 +453,9 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-> >          return 0;
-> >      }
-> >  
-> > -    splitkeylen = masterkeylen * slot->stripes;
-> > +    splitkeylen = masterkeylen(luks) * slot->stripes;
-> >      splitkey = g_new0(uint8_t, splitkeylen);
-> > -    possiblekey = g_new0(uint8_t, masterkeylen);
-> > +    possiblekey = g_new0(uint8_t, masterkeylen(luks));
-> >  
-> >      /*
-> >       * The user password is used to generate a (possible)
-> > @@ -450,11 +464,11 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-> >       * the key is correct and validate the results of
-> >       * decryption later.
-> >       */
-> > -    if (qcrypto_pbkdf2(hash,
-> > +    if (qcrypto_pbkdf2(luks->hash_alg,
-> >                         (const uint8_t *)password, strlen(password),
-> >                         slot->salt, QCRYPTO_BLOCK_LUKS_SALT_LEN,
-> >                         slot->iterations,
-> > -                       possiblekey, masterkeylen,
-> > +                       possiblekey, masterkeylen(luks),
-> >                         errp) < 0) {
-> >          goto cleanup;
-> >      }
-> > @@ -478,19 +492,19 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-> >  
-> >      /* Setup the cipher/ivgen that we'll use to try to decrypt
-> >       * the split master key material */
-> > -    cipher = qcrypto_cipher_new(cipheralg, ciphermode,
-> > -                                possiblekey, masterkeylen,
-> > +    cipher = qcrypto_cipher_new(luks->cipher_alg, luks->cipher_mode,
-> > +                                possiblekey, masterkeylen(luks),
-> >                                  errp);
-> >      if (!cipher) {
-> >          goto cleanup;
-> >      }
-> >  
-> > -    niv = qcrypto_cipher_get_iv_len(cipheralg,
-> > -                                    ciphermode);
-> > -    ivgen = qcrypto_ivgen_new(ivalg,
-> > -                              ivcipheralg,
-> > -                              ivhash,
-> > -                              possiblekey, masterkeylen,
-> > +    niv = qcrypto_cipher_get_iv_len(luks->cipher_alg,
-> > +                                    luks->cipher_mode);
-> > +    ivgen = qcrypto_ivgen_new(luks->ivgen_alg,
-> > +                              luks->ivgen_cipher_alg,
-> > +                              luks->ivgen_hash_alg,
-> > +                              possiblekey, masterkeylen(luks),
-> >                                errp);
-> >      if (!ivgen) {
-> >          goto cleanup;
-> > @@ -519,8 +533,8 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-> >       * Now we've decrypted the split master key, join
-> >       * it back together to get the actual master key.
-> >       */
-> > -    if (qcrypto_afsplit_decode(hash,
-> > -                               masterkeylen,
-> > +    if (qcrypto_afsplit_decode(luks->hash_alg,
-> > +                               masterkeylen(luks),
-> >                                 slot->stripes,
-> >                                 splitkey,
-> >                                 masterkey,
-> > @@ -537,8 +551,8 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-> >       * then comparing that to the hash stored in the key slot
-> >       * header
-> >       */
-> > -    if (qcrypto_pbkdf2(hash,
-> > -                       masterkey, masterkeylen,
-> > +    if (qcrypto_pbkdf2(luks->hash_alg,
-> > +                       masterkey, masterkeylen(luks),
-> >                         luks->header.master_key_salt,
-> >                         QCRYPTO_BLOCK_LUKS_SALT_LEN,
-> >                         luks->header.master_key_iterations,
-> > @@ -577,37 +591,19 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-> >  static int
-> >  qcrypto_block_luks_find_key(QCryptoBlock *block,
-> >                              const char *password,
-> > -                            QCryptoCipherAlgorithm cipheralg,
-> > -                            QCryptoCipherMode ciphermode,
-> > -                            QCryptoHashAlgorithm hash,
-> > -                            QCryptoIVGenAlgorithm ivalg,
-> > -                            QCryptoCipherAlgorithm ivcipheralg,
-> > -                            QCryptoHashAlgorithm ivhash,
-> > -                            uint8_t **masterkey,
-> > -                            size_t *masterkeylen,
-> > +                            uint8_t *masterkey,
-> >                              QCryptoBlockReadFunc readfunc,
-> >                              void *opaque,
-> >                              Error **errp)
-> >  {
-> > -    QCryptoBlockLUKS *luks = block->opaque;
-> >      size_t i;
-> >      int rv;
-> >  
-> > -    *masterkey = g_new0(uint8_t, luks->header.key_bytes);
-> > -    *masterkeylen = luks->header.key_bytes;
-> > -
-> >      for (i = 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> >          rv = qcrypto_block_luks_load_key(block,
-> > -                                         &luks->header.key_slots[i],
-> > +                                         i,
-> >                                           password,
-> > -                                         cipheralg,
-> > -                                         ciphermode,
-> > -                                         hash,
-> > -                                         ivalg,
-> > -                                         ivcipheralg,
-> > -                                         ivhash,
-> > -                                         *masterkey,
-> > -                                         *masterkeylen,
-> > +                                         masterkey,
-> >                                           readfunc,
-> >                                           opaque,
-> >                                           errp);
-> > @@ -620,11 +616,7 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
-> >      }
-> >  
-> >      error_setg(errp, "Invalid password, cannot unlock any keyslot");
-> > -
-> >   error:
-> > -    g_free(*masterkey);
-> > -    *masterkey = NULL;
-> > -    *masterkeylen = 0;
-> >      return -1;
-> >  }
-> >  
-> > @@ -639,21 +631,15 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >                          size_t n_threads,
-> >                          Error **errp)
-> >  {
-> > -    QCryptoBlockLUKS *luks;
-> > +    QCryptoBlockLUKS *luks = NULL;
-> >      Error *local_err = NULL;
-> >      int ret = 0;
-> >      size_t i;
-> >      ssize_t rv;
-> >      uint8_t *masterkey = NULL;
-> > -    size_t masterkeylen;
-> >      char *ivgen_name, *ivhash_name;
-> > -    QCryptoCipherMode ciphermode;
-> > -    QCryptoCipherAlgorithm cipheralg;
-> > -    QCryptoIVGenAlgorithm ivalg;
-> > -    QCryptoCipherAlgorithm ivcipheralg;
-> > -    QCryptoHashAlgorithm hash;
-> > -    QCryptoHashAlgorithm ivhash;
-> >      char *password = NULL;
-> > +    char *cipher_mode = NULL;
-> >  
-> >      if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
-> >          if (!options->u.luks.key_secret) {
-> > @@ -710,6 +696,8 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >          goto fail;
-> >      }
-> >  
-> > +    cipher_mode = g_strdup(luks->header.cipher_mode);
-> > +
-> >      /*
-> >       * The cipher_mode header contains a string that we have
-> >       * to further parse, of the format
-> > @@ -718,7 +706,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >       *
-> >       * eg  cbc-essiv:sha256, cbc-plain64
-> >       */
-> > -    ivgen_name = strchr(luks->header.cipher_mode, '-');
-> > +    ivgen_name = strchr(cipher_mode, '-');
-> >      if (!ivgen_name) {
-> >          ret = -EINVAL;
-> >          error_setg(errp, "Unexpected cipher mode string format %s",
-> > @@ -730,13 +718,13 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >  
-> >      ivhash_name = strchr(ivgen_name, ':');
-> >      if (!ivhash_name) {
-> > -        ivhash = 0;
-> > +        luks->ivgen_hash_alg = 0;
-> >      } else {
-> >          *ivhash_name = '\0';
-> >          ivhash_name++;
-> >  
-> > -        ivhash = qcrypto_block_luks_hash_name_lookup(ivhash_name,
-> > -                                                     &local_err);
-> > +        luks->ivgen_hash_alg = qcrypto_block_luks_hash_name_lookup(ivhash_name,
-> > +                                                                   &local_err);
-> >          if (local_err) {
-> >              ret = -ENOTSUP;
-> >              error_propagate(errp, local_err);
-> > @@ -744,25 +732,27 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >          }
-> >      }
-> >  
-> > -    ciphermode = qcrypto_block_luks_cipher_mode_lookup(luks->header.cipher_mode,
-> > -                                                       &local_err);
-> > +    luks->cipher_mode = qcrypto_block_luks_cipher_mode_lookup(cipher_mode,
-> > +                                                              &local_err);
-> >      if (local_err) {
-> >          ret = -ENOTSUP;
-> >          error_propagate(errp, local_err);
-> >          goto fail;
-> >      }
-> >  
-> > -    cipheralg = qcrypto_block_luks_cipher_name_lookup(luks->header.cipher_name,
-> > -                                                      ciphermode,
-> > -                                                      luks->header.key_bytes,
-> > -                                                      &local_err);
-> > +    luks->cipher_alg =
-> > +            qcrypto_block_luks_cipher_name_lookup(luks->header.cipher_name,
-> > +                                                  luks->cipher_mode,
-> > +                                                  luks->header.key_bytes,
-> > +                                                  &local_err);
-> >      if (local_err) {
-> >          ret = -ENOTSUP;
-> >          error_propagate(errp, local_err);
-> >          goto fail;
-> >      }
-> >  
-> > -    hash = qcrypto_block_luks_hash_name_lookup(luks->header.hash_spec,
-> > +    luks->hash_alg =
-> > +            qcrypto_block_luks_hash_name_lookup(luks->header.hash_spec,
-> >                                                 &local_err);
-> >      if (local_err) {
-> >          ret = -ENOTSUP;
-> > @@ -770,23 +760,24 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >          goto fail;
-> >      }
-> >  
-> > -    ivalg = qcrypto_block_luks_ivgen_name_lookup(ivgen_name,
-> > -                                                 &local_err);
-> > +    luks->ivgen_alg = qcrypto_block_luks_ivgen_name_lookup(ivgen_name,
-> > +                                                           &local_err);
-> >      if (local_err) {
-> >          ret = -ENOTSUP;
-> >          error_propagate(errp, local_err);
-> >          goto fail;
-> >      }
-> >  
-> > -    if (ivalg == QCRYPTO_IVGEN_ALG_ESSIV) {
-> > +    if (luks->ivgen_alg == QCRYPTO_IVGEN_ALG_ESSIV) {
-> >          if (!ivhash_name) {
-> >              ret = -EINVAL;
-> >              error_setg(errp, "Missing IV generator hash specification");
-> >              goto fail;
-> >          }
-> > -        ivcipheralg = qcrypto_block_luks_essiv_cipher(cipheralg,
-> > -                                                      ivhash,
-> > -                                                      &local_err);
-> > +        luks->ivgen_cipher_alg =
-> > +                qcrypto_block_luks_essiv_cipher(luks->cipher_alg,
-> > +                                                luks->ivgen_hash_alg,
-> > +                                                &local_err);
-> >          if (local_err) {
-> >              ret = -ENOTSUP;
-> >              error_propagate(errp, local_err);
-> > @@ -800,21 +791,25 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >           * ignore hash names with these ivgens rather than report
-> >           * an error about the invalid usage
-> >           */
-> > -        ivcipheralg = cipheralg;
-> > +        luks->ivgen_cipher_alg = luks->cipher_alg;
-> >      }
-> >  
-> > +
-> > +    g_free(cipher_mode);
-> > +    cipher_mode = NULL;
-> > +    ivgen_name = NULL;
-> > +    ivhash_name = NULL;
-> > +
-> >      if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
-> >          /* Try to find which key slot our password is valid for
-> >           * and unlock the master key from that slot.
-> >           */
-> > +
-> > +        masterkey = g_new0(uint8_t, masterkeylen(luks));
-> > +
-> >          if (qcrypto_block_luks_find_key(block,
-> >                                          password,
-> > -                                        cipheralg, ciphermode,
-> > -                                        hash,
-> > -                                        ivalg,
-> > -                                        ivcipheralg,
-> > -                                        ivhash,
-> > -                                        &masterkey, &masterkeylen,
-> > +                                        masterkey,
-> >                                          readfunc, opaque,
-> >                                          errp) < 0) {
-> >              ret = -EACCES;
-> > @@ -824,21 +819,24 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >          /* We have a valid master key now, so can setup the
-> >           * block device payload decryption objects
-> >           */
-> > -        block->kdfhash = hash;
-> > -        block->niv = qcrypto_cipher_get_iv_len(cipheralg,
-> > -                                               ciphermode);
-> > -        block->ivgen = qcrypto_ivgen_new(ivalg,
-> > -                                         ivcipheralg,
-> > -                                         ivhash,
-> > -                                         masterkey, masterkeylen,
-> > +        block->kdfhash = luks->hash_alg;
-> > +        block->niv = qcrypto_cipher_get_iv_len(luks->cipher_alg,
-> > +                                               luks->cipher_mode);
-> > +
-> > +        block->ivgen = qcrypto_ivgen_new(luks->ivgen_alg,
-> > +                                         luks->ivgen_cipher_alg,
-> > +                                         luks->ivgen_hash_alg,
-> > +                                         masterkey, masterkeylen(luks),
-> >                                           errp);
-> >          if (!block->ivgen) {
-> >              ret = -ENOTSUP;
-> >              goto fail;
-> >          }
-> >  
-> > -        ret = qcrypto_block_init_cipher(block, cipheralg, ciphermode,
-> > -                                        masterkey, masterkeylen, n_threads,
-> > +        ret = qcrypto_block_init_cipher(block, luks->cipher_alg,
-> > +                                        luks->cipher_mode,
-> > +                                        masterkey, masterkeylen(luks),
-> > +                                        n_threads,
-> >                                          errp);
-> >          if (ret < 0) {
-> >              ret = -ENOTSUP;
-> > @@ -850,12 +848,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> >      block->payload_offset = luks->header.payload_offset *
-> >          block->sector_size;
-> >  
-> > -    luks->cipher_alg = cipheralg;
-> > -    luks->cipher_mode = ciphermode;
-> > -    luks->ivgen_alg = ivalg;
-> > -    luks->ivgen_hash_alg = ivhash;
-> > -    luks->hash_alg = hash;
-> > -
-> >      g_free(masterkey);
-> >      g_free(password);
-> >  
-> > @@ -910,7 +902,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-> >  
-> >      memcpy(&luks_opts, &options->u.luks, sizeof(luks_opts));
-> >      if (!luks_opts.has_iter_time) {
-> > -        luks_opts.iter_time = 2000;
-> > +        luks_opts.iter_time = QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME;
-> >      }
-> >      if (!luks_opts.has_cipher_alg) {
-> >          luks_opts.cipher_alg = QCRYPTO_CIPHER_ALG_AES_256;
-> > @@ -930,6 +922,17 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-> >              luks_opts.has_ivgen_hash_alg = true;
-> >          }
-> >      }
-> > +
-> > +    luks = g_new0(QCryptoBlockLUKS, 1);
-> > +    block->opaque = luks;
-> > +
-> > +    luks->cipher_alg = luks_opts.cipher_alg;
-> > +    luks->cipher_mode = luks_opts.cipher_mode;
-> > +    luks->ivgen_alg = luks_opts.ivgen_alg;
-> > +    luks->ivgen_hash_alg = luks_opts.ivgen_hash_alg;
-> > +    luks->hash_alg = luks_opts.hash_alg;
-> > +
-> > +
-> >      /* Note we're allowing ivgen_hash_alg to be set even for
-> >       * non-essiv iv generators that don't need a hash. It will
-> >       * be silently ignored, for compatibility with dm-crypt */
-> > @@ -944,8 +947,6 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-> >          return -1;
-> >      }
-> >  
-> > -    luks = g_new0(QCryptoBlockLUKS, 1);
-> > -    block->opaque = luks;
-> >  
-> >      memcpy(luks->header.magic, qcrypto_block_luks_magic,
-> >             QCRYPTO_BLOCK_LUKS_MAGIC_LEN);
-> > @@ -1003,6 +1004,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-> >          ivcipheralg = luks_opts.cipher_alg;
-> >      }
-> >  
-> > +    luks->ivgen_cipher_alg = ivcipheralg;
-> > +
-> >      strcpy(luks->header.cipher_name, cipher_alg);
-> >      strcpy(luks->header.cipher_mode, cipher_mode_spec);
-> >      strcpy(luks->header.hash_spec, hash_alg);
-> > @@ -1304,12 +1307,6 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-> >          goto error;
-> >      }
-> >  
-> > -    luks->cipher_alg = luks_opts.cipher_alg;
-> > -    luks->cipher_mode = luks_opts.cipher_mode;
-> > -    luks->ivgen_alg = luks_opts.ivgen_alg;
-> > -    luks->ivgen_hash_alg = luks_opts.ivgen_hash_alg;
-> > -    luks->hash_alg = luks_opts.hash_alg;
-> > -
-> >      memset(masterkey, 0, luks->header.key_bytes);
-> >      g_free(masterkey);
-> >      memset(slotkey, 0, luks->header.key_bytes);
-> > 
-
 
 
