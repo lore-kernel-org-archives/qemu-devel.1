@@ -2,62 +2,110 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A371DC3A59D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 09:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5F6C3A59D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 09:54:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78D0520989
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 09:53:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78D0520989
+	by mail.kernel.org (Postfix) with ESMTPS id A1CD520989
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 09:54:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1CD520989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzeLp-0002lr-Er
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 05:53:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36751)
+	id 1hzeNE-0004Ea-SY
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 05:54:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36984)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1hzeL5-0001vX-I9
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 05:52:36 -0400
+ (envelope-from <david@redhat.com>) id 1hzeM0-0003GO-PR
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 05:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hzeL4-0003vl-5x
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 05:52:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42732)
+ (envelope-from <david@redhat.com>) id 1hzeLz-0004Ho-Mn
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 05:53:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47556)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hzeL3-0003vN-Tz
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 05:52:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1hzeLz-0004HW-Fg; Mon, 19 Aug 2019 05:53:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8150F1089044
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 09:52:32 +0000 (UTC)
-Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44F931DA;
- Mon, 19 Aug 2019 09:52:31 +0000 (UTC)
-Date: Mon, 19 Aug 2019 10:52:28 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190819095228.GC12960@redhat.com>
-References: <20190814020218.1868-1-quintela@redhat.com>
- <20190814020218.1868-7-quintela@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 474E88980F2;
+ Mon, 19 Aug 2019 09:53:30 +0000 (UTC)
+Received: from [10.36.117.56] (ovpn-117-56.ams2.redhat.com [10.36.117.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 48B9A1E1;
+ Mon, 19 Aug 2019 09:53:28 +0000 (UTC)
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20190816084708.602-1-david@redhat.com>
+ <20190819114641.67b1db2f.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <6677dcb4-2102-9f1d-6d2e-bb600df3c25f@redhat.com>
+Date: Mon, 19 Aug 2019 11:53:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190819114641.67b1db2f.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190814020218.1868-7-quintela@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 19 Aug 2019 09:52:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.67]); Mon, 19 Aug 2019 09:53:30 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 6/6] RFH: We lost "connect" events
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] s390x/mmu: Storage key reference
+ and change bit handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,105 +117,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 14, 2019 at 04:02:18AM +0200, Juan Quintela wrote:
-> When we have lots of channels, sometimes multifd migration fails
-> with the following error:
-> 
-> (qemu) migrate -d tcp:0:4444
-> (qemu) qemu-system-x86_64: multifd_send_pages: channel 17 has already quit!
-> qemu-system-x86_64: multifd_send_pages: channel 17 has already quit!
-> qemu-system-x86_64: multifd_send_sync_main: multifd_send_pages fail
-> qemu-system-x86_64: Unable to write to socket: Connection reset by peer
-> info migrate
-> globals:
-> store-global-state: on
-> only-migratable: off
-> send-configuration: on
-> send-section-footer: on
-> decompress-error-check: on
-> clear-bitmap-shift: 18
-> capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks: off compress: off events: off postcopy-ram: off x-colo: off release-ram: off block: off return-path: off pause-before-switchover: off multifd: on dirty-bitmaps: off postcopy-blocktime: off late-block-activate: off x-ignore-shared: off
-> Migration status: failed (Unable to write to socket: Connection reset by peer)
-> total time: 0 milliseconds
-> 
-> On this particular example I am using 100 channels.  The bigger the
-> number of channels, the easier that it is to reproduce.  That don't
-> mean that it is a good idea to use so many channels.
-> 
-> With the previous patches on this series, I can run "reliabely" on my
-> hardware with until 10 channels.  Most of the time.  Until it fails.
-> With 100 channels, it fails almost always.
-> 
-> I thought that the problem was on the send side, so I tried to debug
-> there.  As you can see for the delay, if you put any
-> printf()/error_report/trace, you can get that the error goes away, it
-> is very timing sensitive.  With a delay of 10000 microseconds, it only
-> works sometimes.
-> 
-> What have I discovered so far:
-> 
-> - send side calls qemu_socket() on all the channels.  So it appears
->   that it gets created correctly.
-> - on the destination side, it appears that "somehowe" some of the
->   connections are lost by the listener.  This error happens when the
->   destination side socket hasn't been "accepted", and it is not
->   properly created.  As far as I can see, we have several options:
-> 
->   1- I don't know how to use properly qio asynchronously
->      (this is one big posiblity).
-> 
->   2- glib has one error in this case?  or how qio listener is
->      implemented on top of glib.  I put lots of printf() and other
->      instrumentation, and it appears that the listener io_func is not
->      called at all for the connections that are missing.
-> 
->   3- it is always possible that we are missing some g_main_loop_run()
->      somewhere.  Notice how test/test-io-channel-socket.c calls it
->      "creatively".
-> 
->   4- It is enterely possible that I should be using the sockets as
->      blocking instead of non-blocking.  But I am not sure about that
->      one yet.
-> 
-> - on the sending side, what happens is:
-> 
->   eventually it call socket_connect() after all the async dance with
->   thread creation, etc, etc. Source side creates all the channels, it
->   is the destination side which is missing some of them.
-> 
->   sending side sends the first packet by that channel, it "sucheeds"
->   and didn't give any error.
-> 
->   after some time, sending side decides to send another packet through
->   that channel, and it is now when we get the above error.
-> 
-> Any good ideas?
+On 19.08.19 11:46, Cornelia Huck wrote:
+> On Fri, 16 Aug 2019 10:47:02 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> The first two patches are modified patches from:
+>>     [PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions
+>>
+>> This series primarily fixes minor things in the storage key handling c=
+ode
+>> in the MMU and implements fairly reliable reference and change bit han=
+dling
+>> for TCG. To track the reference and change bit, we have to invalidate
+>> TLB entries whenever the storage key is changed by the guest and make =
+sure
+>> not TLB entry is writable in case the storage key does not indicate a
+>> change already.
+>>
+>> With this series, the kvm-unit-test "skey" now passes. \o/
+>>
+>> v2 -> v3:
+>> - Reshuffled patches to avoid a temporary uninitialized return value
+>> - Minor updates to patch descriptions
+>> - "s390x/tcg: Flush the TLB of all CPUs on SSKE and RRBE"
+>> -- Updated comments
+>> - "s390x/mmu: Factor out storage key handling"
+>> -- Reduce indentation
+>>
+>> v1 -> v2:
+>> - "s390x/tcg: Rework MMU selection for instruction fetches"
+>> -- Cleanup return value handling
+>> - Added RB's
+>>
+>> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> David Hildenbrand (6):
+>>   s390x/mmu: Trace the right value if setting/getting the storage key
+>>     fails
+>>   s390x/mmu: ASC selection in s390_cpu_get_phys_page_debug()
+>>   s390x/tcg: Rework MMU selection for instruction fetches
+>>   s390x/tcg: Flush the TLB of all CPUs on SSKE and RRBE
+>>   s390x/mmu: Better storage key reference and change bit handling
+>>   s390x/mmu: Factor out storage key handling
+>>
+>>  target/s390x/cpu.h        |   7 ++
+>>  target/s390x/helper.c     |   5 ++
+>>  target/s390x/mem_helper.c |  10 +++
+>>  target/s390x/mmu_helper.c | 135 ++++++++++++++++++++++++-------------=
+-
+>>  4 files changed, 107 insertions(+), 50 deletions(-)
+>>
+>=20
+> Looks good to me now.
+>=20
+> I can pick this up directly, or you can send me a pull request
+> (whichever you prefer).
+>=20
 
-In inet_listen_saddr() we call
+If you have some spare cycles, please pick it up :) Whatever you prefer!
 
-    if (!listen(slisten, 1)) {
+--=20
 
-note the second parameter sets the socket backlog, which is the max
-number of pending socket connections we allow. My guess is that the
-target QEMU is not accepting incoming connections quickly enough and
-thus you hit the limit & the kernel starts dropping the incoming
-connections.
+Thanks,
 
-As a quick test, just hack this code to pass a value of 100 and see
-if it makes your test reliable. If it does, then we'll need to figure
-out a nice way to handle backlog instead of hardcoding it at 1.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+David / dhildenb
 
