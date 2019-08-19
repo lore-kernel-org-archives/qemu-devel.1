@@ -2,89 +2,79 @@ Return-Path: <SRS0=e4Up=WP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB3D7C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88808C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:10:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79B44206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:09:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D6BF206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Aug 2019 14:10:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bjsspxvS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79B44206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XHzhGtCV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D6BF206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hziLY-0002vY-EW
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:09:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33466)
+	id 1hziMD-0004A5-Cc
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 10:10:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.weiyang@gmail.com>) id 1hziKm-0002PA-JZ
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:08:33 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hziLD-0002pB-6y
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:09:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.weiyang@gmail.com>) id 1hziKl-0004kw-8O
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:08:32 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:34912)
+ (envelope-from <peter.maydell@linaro.org>) id 1hziLC-0005IU-0C
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:08:58 -0400
+Received: from mail-io1-xd2b.google.com ([2607:f8b0:4864:20::d2b]:45658)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
- id 1hziKk-0004jP-UO
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:08:31 -0400
-Received: by mail-ed1-x542.google.com with SMTP id w20so1796446edd.2
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 07:08:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=y0vb0zDDucek2X2Zwz2Pk5/sXeMUw49VlVvAK71uEUc=;
- b=bjsspxvSp+lYkpvzuULC8xEDozv4XlzoWq5z34fgqWt3gXEu8OMk6chx5ROLGzStxg
- kmFnLa2r0VOgPLNkj0Q2TylYsPB6iwfktP3t5ocq0Y/NDRLmhKnJxTZCfK9sogUEemWe
- ZBXnn4h8GLVqCn6NcYCGPUAcloVMUxgQ7nKXS0W8fY5mbF46KgI2b1LXCO3a9lkuI/8H
- 5uZ/TNX80aDllQlZ2YS5W2NnYxdqBhKDS0oi5bxXLduEvREtdmQNATsz4EcsRW2uRJdI
- cE4IVidyFyczlSlrZss0bRtYCzX6hKWJ/Jk/wT29vyootV6/eQk64M/2Io2SCfv5D0JK
- vs/w==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hziLB-0005I4-Qd
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 10:08:57 -0400
+Received: by mail-io1-xd2b.google.com with SMTP id t3so4497059ioj.12
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 07:08:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9bKYx+zJ6NiHXoUt4YObnCpnjcuxo/ICemB8c0x04/E=;
+ b=XHzhGtCV0BEUkicmDdt4OJoyG9GxICaRA0gLjTv1niSGLFVdAkqZ0k42PCVqMqsaoQ
+ uVgpCu1INEXokzbcN8qQ5pGqNFJGEgHBFcBVaaLPZ3VkFgoEpj7IPlW1fZuZn1T6C/9U
+ ol6NKzxBptfPqXDEYeACCDzVftjCwNAVQ3mUH8DDB+9tv63XHBOVVInGDnJ330ZwIq49
+ ACTg4p0uItj4fuZ6rVLRLnQEDlHfoQ5SlmbLCuRiyQ0XEuExHSFqNChN5WQtFMrdMTRe
+ O/3VlHxxcdG//GyXXSiPehp7adXa54tYVmck8XXYmnISMdldiQVqMXaY+F7tSaisdBSA
+ lk7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=y0vb0zDDucek2X2Zwz2Pk5/sXeMUw49VlVvAK71uEUc=;
- b=qNQ9BCgd9iTe5S8D5vWhStRC56PDfDnjACSi91YuccRq517Cyu55XCz2iUQK3gmNoX
- zrA3luBTuofbPKVjQ5nazXynKnPLfIeAXgQpiqisycMvQuuBbhhkLPe7SU+uNbilNFLi
- aE3Y8MwuvoIjz8imgoKFMuNqlEzQCTSFXA2X1y2wPg53EB+IEibb2ELC2sDzATuQSlwY
- De9xLD8v9ETZT6MnZ/zRcaeFFoTCC6ICmVKYheCGAZLukkXv3L3h5ubqRoAlsFMx91To
- lhSvIGuRR8a4MtvZoTgH5g2DPft7a7k9ulml37tN5oSYvxaHzFEDCc/1mflReRCrZJPi
- LNZg==
-X-Gm-Message-State: APjAAAUDbb/V3q1bRBHrSLDZSk0bUP5YUE25ebYjXopx+BQqUFetiEgz
- 7cApD6aovuIMcJWnppgWR5E=
-X-Google-Smtp-Source: APXvYqwMTg3XdbD0XWi8kUtY+r7uhcXUG3C2Ziq5/i+0cAvd1yyvEr7DIav6qGVA4gsRlr2iWWWVUg==
-X-Received: by 2002:aa7:d94d:: with SMTP id l13mr24782634eds.72.1566223709868; 
- Mon, 19 Aug 2019 07:08:29 -0700 (PDT)
-Received: from localhost ([185.92.221.13])
- by smtp.gmail.com with ESMTPSA id j12sm2698313edt.66.2019.08.19.07.08.28
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 19 Aug 2019 07:08:29 -0700 (PDT)
-Date: Mon, 19 Aug 2019 14:08:28 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190819140828.otv7vq5lahvquczl@master>
-References: <20190621142739.23703-1-richardw.yang@linux.intel.com>
- <20190819112632.GA2765@work-vm>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9bKYx+zJ6NiHXoUt4YObnCpnjcuxo/ICemB8c0x04/E=;
+ b=phcDens3LknkkW5QoYfYfib3QrucQvt9vv0huClcAY/yYda0IKOAfKiStasQ9zlKyq
+ vNS/URz+BhQgXE8d5Ai/FqtRkozao+j53iAB25nWEdyX4dC6IqUS8mDW1BHu9q32gy0q
+ QwfC/TTTjWIOSddvao2xLJoa4yrk1TO9u/QDOSnxjd2cGEeZv3PheoNv1+WTbHVuVH7j
+ wOMTprlr1J9gC9mrIr9/mjOmoX+c908t0S5FHzC6/dAzVziAQH8Ecwj2kk0Lkc0ROYbu
+ Hi8v1waLppT5lh1q1Uzc/VWyfu8qA9VvMC4jWmqPG1fibH5Io//TjGtSQVJmurQkJusF
+ G6BA==
+X-Gm-Message-State: APjAAAU9Mppq2BQmWOy6ZeM4mxVD+j1ryrZT664BQ8dtKUjQ5ij/VekG
+ 6Refl19IqZyJ5xtVssRSPT7nRcMAxY7+OVDqiVLcjw==
+X-Google-Smtp-Source: APXvYqxtsPe2YuYuOgRJAMQaUpx7h0zJwj0WN0qP5GcGwRlOLVz0tMXcyHatkx6T06dP0XELhUqECo0D8aYOLA7tExM=
+X-Received: by 2002:a5e:9319:: with SMTP id k25mr15971959iom.137.1566223736849; 
+ Mon, 19 Aug 2019 07:08:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190819112632.GA2765@work-vm>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190817085443.11471-1-thuth@redhat.com>
+In-Reply-To: <20190817085443.11471-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Aug 2019 15:08:45 +0100
+Message-ID: <CAFEAcA84O3B3d9Tyi2NeB05Mk4_jhZuP10punJX5tspdkcU3Gw@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH] migrtion: define
- MigrationState/MigrationIncomingState.state as MigrationStatus
+X-Received-From: 2607:f8b0:4864:20::d2b
+Subject: Re: [Qemu-devel] [PULL 0/3] Run iotests during "make check"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,132 +86,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
- qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 19, 2019 at 12:26:32PM +0100, Dr. David Alan Gilbert wrote:
->* Wei Yang (richardw.yang@linux.intel.com) wrote:
->> No functional change. Add default case to fix warning.
+On Sat, 17 Aug 2019 at 09:54, Thomas Huth <thuth@redhat.com> wrote:
 >
->I think the problem with this is that migrate_set_state uses an
->atomic_cmpxchg and so we have to be careful that the type we use
->is compatible with that.
->MigrationStatus is an enum and I think compilers are allowed to
->choose the types of that;  so I'm not sure we're guaranteed
->that an enum is always OK for the atomic_cmpxchg, and if it is
-
-Took a look into the definition of atomic_cmpxchg, which finally calls
-
-  * __atomic_compare_exchange_n for c++11
-  * __sync_val_compare_and_swap
-
-Both of them take two pointers to compare and exchange its content.
-
-Per C99 standard, http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf,
-it mentioned:
-
-  Each enumerated type shall be compatible with char, a signed integer type,
-  or an unsigned integer type. The choice of type is implementation-defined,
-  but shall be capable of representing the values of all the members of the
-  enumeration.
-
-Based on this, I think atomic_cmpxchg should work fine with enum.
-
->then we also might have to make the old_state and new_state
->variables match.
+>  Hi Peter,
 >
-
-You are right.
->Dave
+> the following changes since commit afd760539308a5524accf964107cdb1d54a059e3:
 >
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  migration/migration.c | 8 +++++++-
->>  migration/migration.h | 6 +++---
->>  2 files changed, 10 insertions(+), 4 deletions(-)
->> 
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 2865ae3fa9..0fd2364961 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -946,6 +946,8 @@ static void fill_source_migration_info(MigrationInfo *info)
->>      case MIGRATION_STATUS_CANCELLED:
->>          info->has_status = true;
->>          break;
->> +    default:
->> +        return;
->>      }
->>      info->status = s->state;
->>  }
->> @@ -1054,6 +1056,8 @@ static void fill_destination_migration_info(MigrationInfo *info)
->>          info->has_status = true;
->>          fill_destination_postcopy_migration_info(info);
->>          break;
->> +    default:
->> +        return;
->>      }
->>      info->status = mis->state;
->>  }
->> @@ -1446,7 +1450,7 @@ void qmp_migrate_start_postcopy(Error **errp)
->>  
->>  /* shared migration helpers */
->>  
->> -void migrate_set_state(int *state, int old_state, int new_state)
->> +void migrate_set_state(MigrationStatus *state, int old_state, int new_state)
->>  {
->>      assert(new_state < MIGRATION_STATUS__MAX);
->>      if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
->> @@ -1683,6 +1687,8 @@ bool migration_is_idle(void)
->>          return false;
->>      case MIGRATION_STATUS__MAX:
->>          g_assert_not_reached();
->> +    default:
->> +        g_assert_not_reached();
->>      }
->>  
->>      return false;
->> diff --git a/migration/migration.h b/migration/migration.h
->> index 5e8f09c6db..418ee00053 100644
->> --- a/migration/migration.h
->> +++ b/migration/migration.h
->> @@ -65,7 +65,7 @@ struct MigrationIncomingState {
->>  
->>      QEMUBH *bh;
->>  
->> -    int state;
->> +    MigrationStatus state;
->>  
->>      bool have_colo_incoming_thread;
->>      QemuThread colo_incoming_thread;
->> @@ -151,7 +151,7 @@ struct MigrationState
->>      /* params from 'migrate-set-parameters' */
->>      MigrationParameters parameters;
->>  
->> -    int state;
->> +    MigrationStatus state;
->>  
->>      /* State related to return path */
->>      struct {
->> @@ -234,7 +234,7 @@ struct MigrationState
->>      bool decompress_error_check;
->>  };
->>  
->> -void migrate_set_state(int *state, int old_state, int new_state);
->> +void migrate_set_state(MigrationStatus *state, int old_state, int new_state);
->>  
->>  void migration_fd_process_incoming(QEMUFile *f);
->>  void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp);
->> -- 
->> 2.19.1
->> 
->--
->Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190816' into staging (2019-08-16 17:21:40 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-08-17
+>
+> for you to fetch changes up to 72e031f3b80a421b309ce0d1759b26e428f944db:
+>
+>   gitlab-ci: Remove qcow2 tests that are handled by "make check" already (2019-08-17 09:06:17 +0200)
+>
+> ----------------------------------------------------------------
+> - Run the iotest during "make check"
+> ----------------------------------------------------------------
+>
+> Paolo Bonzini (1):
+>       block: fix NetBSD qemu-iotests failure
+>
+> Thomas Huth (2):
+>       tests: Run the iotests during "make check" again
+>       gitlab-ci: Remove qcow2 tests that are handled by "make check" already
 
--- 
-Wei Yang
-Help you, Help me
+
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
