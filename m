@@ -2,60 +2,85 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87923C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 03:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2560C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 04:54:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C8CE214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 03:55:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C8CE214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 94C3F20C01
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 04:54:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94C3F20C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzvFA-0007qu-KT
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 23:55:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44324)
+	id 1hzwA0-0002Bv-Mk
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 00:54:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao.peng@linux.alibaba.com>) id 1hzuOT-00043d-Iq
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 23:01:10 -0400
+ (envelope-from <peterx@redhat.com>) id 1hzw8t-0001Mc-Lx
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 00:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao.peng@linux.alibaba.com>) id 1hzuON-00081z-8I
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 23:01:04 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:56500)
+ (envelope-from <peterx@redhat.com>) id 1hzw8r-000669-Gy
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 00:53:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38010)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao.peng@linux.alibaba.com>)
- id 1hzuOM-0007zz-TK
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 23:01:03 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R181e4; CH=green; DM=||false|;
- FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04407; MF=tao.peng@linux.alibaba.com; NM=1;
- PH=DS; RN=4; SR=0; TI=SMTPD_---0TZyVUo8_1566270041; 
-Received: from graymalkin.local(mailfrom:tao.peng@linux.alibaba.com
- fp:SMTPD_---0TZyVUo8_1566270041) by smtp.aliyun-inc.com(127.0.0.1);
- Tue, 20 Aug 2019 11:00:42 +0800
-To: Stefan Hajnoczi <stefanha@redhat.com>, virtio-fs@redhat.com
-References: <20190819160426.GB2625@stefanha-x1.localdomain>
-From: Peng Tao <tao.peng@linux.alibaba.com>
-Message-ID: <335d2ae6-4d06-9fb3-e1f6-fbef8aee946f@linux.alibaba.com>
-Date: Tue, 20 Aug 2019 11:00:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hzw8r-00065M-6d
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 00:53:09 -0400
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1DFB64627A
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 04:53:07 +0000 (UTC)
+Received: by mail-pl1-f199.google.com with SMTP id d6so3312075pls.17
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 21:53:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=7OAkatFtL3uV9O1KjVgASVF8+d2XpEtjZ+CJJQ33G+M=;
+ b=AesEp8GZ2nNX64XPAWI+maN3MIZ1p0Lngh/1ADTUwVMjCSPugus4xpBqhoybXSOiHD
+ y/IkVnxNN45NQ5//1GtwdjZSrHZj8kFLa4vU6+vfmLIUT4s7X0zSvPPSjPOjmOsV73S+
+ HeAhrAKr2H6IK7en4LsZ5FJiqchsSDT+BY4l12sxg7dpuqew0yxU+9EH3zxxBjN7HE3Q
+ uPVpyZUsdYD5nnRJ0xNupBGAlz4Lned1TsaWfirxswaw7DUK32nzjPV6FCBNQuGkEo6b
+ IIC7KeQZV6Rxndqb33C5w9pdDsAiaRAMKQ/sOownvjIWvu5BI3TqzZMEkUQ76pr7fCn8
+ v/5g==
+X-Gm-Message-State: APjAAAV7xaR8bSGvOJuFrMfaW3ZlKG4Jiz6N8i378Do/oCgicxVSzyJo
+ ByQCDCCDHuT/mskq/zLsmEap2iAYMp4FRV/OHO5dEik4ELET8fPtrxu+w2a2A96nUCvwbLYiQkY
+ Ub7FfvhnaGJzllro=
+X-Received: by 2002:a17:902:b094:: with SMTP id
+ p20mr5907473plr.320.1566276786642; 
+ Mon, 19 Aug 2019 21:53:06 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx6KOkpjqOpNxGIXb7/ZVrXlqY53BToGhJ/yLNu5IOwV356TQLCgWbD0CXINf4wQhKeCbfV9w==
+X-Received: by 2002:a17:902:b094:: with SMTP id
+ p20mr5907456plr.320.1566276786383; 
+ Mon, 19 Aug 2019 21:53:06 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id o67sm6997207pfb.39.2019.08.19.21.53.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Aug 2019 21:53:05 -0700 (PDT)
+Date: Tue, 20 Aug 2019 12:52:56 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190820045256.GF13560@xz-x1>
+References: <20190817093237.27967-1-peterx@redhat.com>
+ <20190817093237.27967-2-peterx@redhat.com>
+ <da9a1a0d-749b-a81d-fc9a-af6ff2775be8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190819160426.GB2625@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 47.88.44.36
-X-Mailman-Approved-At: Mon, 19 Aug 2019 23:53:53 -0400
-Subject: Re: [Qemu-devel] [kata-dev] [ANNOUNCE] virtio-fs v0.3 release
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <da9a1a0d-749b-a81d-fc9a-af6ff2775be8@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/2] memory: Replace has_coalesced_range
+ with add/del flags
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,92 +92,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, kata-dev@lists.katacontainers.io
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Aug 19, 2019 at 04:30:45PM +0200, Paolo Bonzini wrote:
+> On 17/08/19 11:32, Peter Xu wrote:
+> > The previous has_coalesced_range counter has a problem in that it only
+> > works for additions of coalesced mmio ranges but not deletions.  The
+> > reason is that has_coalesced_range information can be lost when the
+> > FlatView updates the topology again when the updated region is not
+> > covering the coalesced regions. When that happens, due to
+> > flatrange_equal() is not checking against has_coalesced_range, the new
+> > FlatRange will be seen as the same one as the old and the new
+> > instance (whose has_coalesced_range will be zero) will replace the old
+> > instance (whose has_coalesced_range _could_ be non-zero).
+> > 
+> > To fix it, we don't cache has_coalesced_range at all in the FlatRange.
+> > Instead we introduce two flags to make sure the coalesced_io_{add|del}
+> > will only be called once for every FlatRange instance.  This will even
+> > work if another FlatRange replaces current one.
+> 
+> It's still a bit ugly that coalesced_mmio_add_done ends up not being set
+> on the new (but equal) FlatRange.
+> 
+> Would something like this work too?
+> 
+> diff --git a/memory.c b/memory.c
+> index edd0c13..fc91f06 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -939,6 +939,7 @@ static void address_space_update_topology_pass(AddressSpace *as,
+>              /* In both and unchanged (except logging may have changed) */
+>  
+>              if (adding) {
+> +                frnew->has_coalesced_range = frold->has_coalesced_range;
+>                  MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, region_nop);
+>                  if (frnew->dirty_log_mask & ~frold->dirty_log_mask) {
+>                      MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, log_start,
 
+This seems to be a much better (and, shorter) idea. :-)
 
-On 2019/8/20 00:04, Stefan Hajnoczi wrote:
-> I am delighted to announce the release of virtio-fs v0.3, a shared file
-> system that lets virtual machines access a directory tree on the host.
-> This release is based on QEMU 4.1.0 and Linux 5.3-rc3.
-> 
-Good news! As virtio-fs is maturing and stabilizing, what's the plan for 
-upstreaming both qemu and kernel part of it?
+I'll verify it and repost if it goes well.
 
-Cheers,
-Tao
-
-> For more information about virtio-fs: https://virtio-fs.gitlab.io/
-> 
-> This is a development release aimed at early adopters of virtio-fs.  Work is
-> being done to upstream the code into Linux and QEMU.  We expect to stop
-> publishing virtio-fs releases once the code has been merged by these upstream
-> projects.
-> 
-> Where to get it:
-> 
->    https://gitlab.com/virtio-fs/linux/-/tags/virtio-fs-v0.3
->    https://gitlab.com/virtio-fs/qemu/-/tags/virtio-fs-v0.3
-> 
-> Changes:
-> 
->   * Please note that the mount syntax has changed to:
-> 
->       # mount -t virtio_fs myfs /mnt -o ...
-> 
->     The old syntax was "mount -t virtio_fs none /mnt -o tag=myfs,...".
-> 
->   * virtiofsd --fd=FDNUM takes a listen socket file descriptor number.  File
->     descriptor passing is an alternative way to manage the vhost-user UNIX
->     domain socket.  The parent process no longer needs to wait for virtiofsd to
->     create the listen socket before spawning the VM.
-> 
->   * virtiofsd --syslog logs to syslog(2) instead of stderr.  Useful for unifying
->     logging and when the virtiofsd process is not being supervised.
-> 
->   * virtiofsd --thread-pool-size=NUM sets the maximum number of worker threads
->     for FUSE request processing.  This can be used to control the host queue
->     depth.  The default is 64.
-> 
->   * Performance improvements and bug fixes.
-> 
-> Note for Kata Containers: the new kernel is not compatible with existing
-> Kata Containers releases due to the mount syntax change.  To try it out,
-> please apply the following kata-runtime patch:
-> 
->    https://gitlab.com/virtio-fs/runtime/commit/a2e44de817e438c02a495cf258039774527e3178
-> 
-> Kata Containers patches for virtio-fs v0.3 are under development and will be
-> submitted to Kata soon.
-> 
-> Thanks to the following people for contributing code and to many more
-> for helping the virtio-fs effort:
-> 
-> Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Eric Ren <renzhen@linux.alibaba.com>
-> Eryu Guan <eguan@linux.alibaba.com>
-> Ganesh Maharaj Mahalingam <ganesh.mahalingam@intel.com>
-> Jiufei Xue <jiufei.xue@linux.alibaba.com>
-> Liu Bo <bo.liu@linux.alibaba.com>
-> Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-> Miklos Szeredi <mszeredi@redhat.com>
-> Peng Tao <tao.peng@linux.alibaba.com>
-> piaojun <piaojun@huawei.com>
-> Sebastien Boeuf <sebastien.boeuf@intel.com>
-> Stefan Hajnoczi <stefanha@redhat.com>
-> Vivek Goyal <vgoyal@redhat.com>
-> Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-> 
-> 
-> _______________________________________________
-> kata-dev mailing list
-> kata-dev@lists.katacontainers.io
-> http://lists.katacontainers.io/cgi-bin/mailman/listinfo/kata-dev
-> 
+Regards,
 
 -- 
-Into something rich and strange.
+Peter Xu
 
