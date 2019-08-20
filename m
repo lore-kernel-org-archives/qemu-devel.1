@@ -6,83 +6,133 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4EDC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF78C41514
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8B6922DA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8B6922DA7
+	by mail.kernel.org (Postfix) with ESMTPS id CD11922DD6
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD11922DD6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i09ku-0002wO-Pq
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 15:25:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37974)
+	id 1i09ky-00031O-Hy
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 15:25:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i09dQ-0008Va-PF
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:17:40 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i09f2-0000WZ-2Y
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:19:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i09dP-0003V0-E6
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:17:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54598)
+ (envelope-from <jsnow@redhat.com>) id 1i09ey-000413-P3
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:19:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42826)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i09dK-0003Kt-Tq; Tue, 20 Aug 2019 15:17:31 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i09er-0003z4-DZ; Tue, 20 Aug 2019 15:19:06 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1097F300CB24;
- Tue, 20 Aug 2019 19:17:02 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 96BE510016EA;
- Tue, 20 Aug 2019 19:17:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0B6CF811BF;
+ Tue, 20 Aug 2019 19:19:03 +0000 (UTC)
+Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 512D8100195F;
+ Tue, 20 Aug 2019 19:19:02 +0000 (UTC)
 To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
  <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
 References: <20190820164616.4072-1-dplotnikov@virtuozzo.com>
  <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0df80b64-2f9f-b048-8b2e-4b3016b8e882@redhat.com>
-Date: Tue, 20 Aug 2019 21:16:58 +0200
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c0dd4525-0339-0956-f6d9-f6ee15cbb7a6@redhat.com>
+Date: Tue, 20 Aug 2019 15:19:01 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
 In-Reply-To: <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="cx1pWEl1z8V3wdVmFLIoAuZoaoFAMlCg9"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 20 Aug 2019 19:17:02 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Tue, 20 Aug 2019 19:19:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v10] qemu-io: add pattern file for write
@@ -98,172 +148,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cx1pWEl1z8V3wdVmFLIoAuZoaoFAMlCg9
-Content-Type: multipart/mixed; boundary="jTiIaGMBtG7QIJ4g4WLiv3tJmUjS73THC";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
- <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <0df80b64-2f9f-b048-8b2e-4b3016b8e882@redhat.com>
-Subject: Re: [PATCH v10] qemu-io: add pattern file for write command
-References: <20190820164616.4072-1-dplotnikov@virtuozzo.com>
- <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
-In-Reply-To: <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
 
---jTiIaGMBtG7QIJ4g4WLiv3tJmUjS73THC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 20.08.19 19:24, Eric Blake wrote:
+On 8/20/19 1:24 PM, Eric Blake wrote:
 > On 8/20/19 11:46 AM, Denis Plotnikov wrote:
 >> The patch allows to provide a pattern file for write
 >> command. There was no similar ability before.
 >>
 >> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 >> ---
->=20
->> @@ -983,8 +1057,9 @@ static int write_f(BlockBackend *blk, int argc, c=
-har **argv)
->>      /* Some compilers get confused and warn if this is not initialize=
-d.  */
->>      int64_t total =3D 0;
->>      int pattern =3D 0xcd;
->> +    const char *file_name =3D NULL;
->> =20
->> -    while ((c =3D getopt(argc, argv, "bcCfnpP:quz")) !=3D -1) {
->> +    while ((c =3D getopt(argc, argv, "bcCfnpP:quzs:")) !=3D -1) {
->=20
+> 
+>> @@ -983,8 +1057,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+>>      /* Some compilers get confused and warn if this is not initialized.  */
+>>      int64_t total = 0;
+>>      int pattern = 0xcd;
+>> +    const char *file_name = NULL;
+>>  
+>> -    while ((c = getopt(argc, argv, "bcCfnpP:quz")) != -1) {
+>> +    while ((c = getopt(argc, argv, "bcCfnpP:quzs:")) != -1) {
+> 
 > This one looks odd (I would have preserved ordering by sticking s:
 > between q and u).  But a maintainer could fix that.
->=20
+> 
 >>          switch (c) {
 >>          case 'b':
->>              bflag =3D true;
->> @@ -1020,6 +1095,10 @@ static int write_f(BlockBackend *blk, int argc,=
- char **argv)
+>>              bflag = true;
+>> @@ -1020,6 +1095,10 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
 >>          case 'z':
->>              zflag =3D true;
+>>              zflag = true;
 >>              break;
 >> +        case 's':
->> +            sflag =3D true;
->> +            file_name =3D optarg;
+>> +            sflag = true;
+>> +            file_name = optarg;
 >> +            break;
->=20
+> 
 > Likewise, sorting the cases in the same order as the getopt() listing
 > helps in finding code during later edits.
-
-But it is in order of the getopt() listing. ;-)
-
->> @@ -1088,7 +1168,14 @@ static int write_f(BlockBackend *blk, int argc,=
- char **argv)
+> 
+>> @@ -1088,7 +1168,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
 >>      }
->> =20
+>>  
 >>      if (!zflag) {
->> -        buf =3D qemu_io_alloc(blk, count, pattern);
+>> -        buf = qemu_io_alloc(blk, count, pattern);
 >> +        if (sflag) {
->> +            buf =3D qemu_io_alloc_from_file(blk, count, file_name);
+>> +            buf = qemu_io_alloc_from_file(blk, count, file_name);
 >> +            if (!buf) {
 >> +                return -EINVAL;
 >> +            }
 >> +        } else {
->> +            buf =3D qemu_io_alloc(blk, count, pattern);
+>> +            buf = qemu_io_alloc(blk, count, pattern);
 >> +        }
->=20
+> 
 > Pre-existing, but it is odd that qemu_io_alloc() exit()s rather than
 > returning NULL on huge allocation requests that can't be met.  (Then
-> again, we have an early exit on any length > 2G, and 2G allocations ten=
-d
-> to succeed on modern development machines).  Perhaps it would be nice t=
-o
-> teach qemu-io to use blk_try_blockalign for more graceful handling even=
-
+> again, we have an early exit on any length > 2G, and 2G allocations tend
+> to succeed on modern development machines).  Perhaps it would be nice to
+> teach qemu-io to use blk_try_blockalign for more graceful handling even
 > on 32-bit platforms, but that's not the problem of your patch.
-
-Then again, this is qemu-io.  Printing an error instead of just aborting
-doesn=E2=80=99t really help anyone.
-
-Also, the code would be wrong without an early exit on a length >
-INT_MAX.  (Because pattern_len is an int, so the result of fread() might
-overflow otherwise, which would be bad.)
-
-(I just noticed that fread() might do a short read, but let=E2=80=99s jus=
-t
-ignore this at this point.)
-
+> 
 > Option ordering is minor enough that I'm fine giving:
->=20
+> 
 > Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> Now, to figure out which maintainer should take it.  Perhaps you want t=
-o
-> add a patch 2/1 that adds an iotest using this new mode, to a) ensure i=
-t
+> 
+> Now, to figure out which maintainer should take it.  Perhaps you want to
+> add a patch 2/1 that adds an iotest using this new mode, to a) ensure it
 > doesn't regress, and b) makes it reasonable to take in through the
 > iotest tree.
+> 
 
-Adding a test does not seem to bad of an idea, but I don=E2=80=99t see ho=
-w that
-would clarify things.  Both qemu-io and the iotests are part of the
-block layer core:
+Yes, this is a good idea. I'm sure over time we'll pick up uses of
+pattern writing that will strengthen the the regression testing of the
+feature, but for now a simple test case will help ensure it.
 
-$ scripts/get_maintainer.pl -f qemu-io-cmds.c
-Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
-Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
-qemu-block@nongnu.org (open list:Block layer core)
-qemu-devel@nongnu.org (open list:All patches CC here)
+(It'll also help "document" how to use the feature for other test writers.)
 
-$ scripts/get_maintainer.pl -f tests/qemu-iotests
-Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
-Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
-qemu-block@nongnu.org (open list:Block layer core)
-qemu-devel@nongnu.org (open list:All patches CC here)
-
-
-So we only need to figure out whether it should be Kevin or me to take
-it; but Kevin is on PTO, so that decision is simple. :-)
-
-Therefor, I=E2=80=99ve changed the optstring (and switch case) order to b=
-e
-alphabetical, and applied the patch to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Thanks for the patch and the review,
-
-Max
-
-
-(I wouldn=E2=80=99t mind an iotest, but well.  qemu-io itself is a testin=
-g
-utility, so I don=E2=80=99t deem it important to test it.)
-
-
---jTiIaGMBtG7QIJ4g4WLiv3tJmUjS73THC--
-
---cx1pWEl1z8V3wdVmFLIoAuZoaoFAMlCg9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1cRyoACgkQ9AfbAGHV
-z0C6YAf+IBEjo4UyRTR1ulMbQ6bc3fL1Ay2aSw0fnORPu4QZxGL/etbbWFyCYiUA
-pCZhyd2jQlwOT2OsdxTahLzvSaGP4zW8hnLmh0LkaWQJjXOrJr+IWjPQxTruX7im
-+BSekVQOzFSFk3aeIvcvl6cwFMZpKlCIIQAOBfjQPyP5929mEg0lcelCQhaOTsZx
-CURfe2H02k/hivXcupSChIyvwv9Ve2lCGD1KGhgvOYQXnuvw2Y9kj+7gA2WnpQ0i
-H/9KYHFjbOspbS0xgBQGM9y5K63xzHlQ/ZR4HE1WHQLIKd6EdkX1xS0qo+D9u1oo
-IwMc8/pSmhaJlNmRj/i/uN0alGOl6w==
-=DeUH
------END PGP SIGNATURE-----
-
---cx1pWEl1z8V3wdVmFLIoAuZoaoFAMlCg9--
+Thanks!
 
