@@ -2,89 +2,64 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49C4C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45CA6C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:40:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86D452087E
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:39:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86D452087E
+	by mail.kernel.org (Postfix) with ESMTPS id 1D82F23401
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:40:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D82F23401
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i04ML-0003Rg-Mf
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 09:39:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46292)
+	id 1i04NQ-0004ib-9D
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 09:40:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46400)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i04LK-00031y-GE
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:38:35 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i04MJ-0003aK-Uo
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:39:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i04LJ-0001Hn-9d
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:38:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49618)
+ (envelope-from <dgilbert@redhat.com>) id 1i04MI-0001iY-AR
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:39:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37920)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i04LJ-0001HT-2M
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:38:33 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i04MI-0001hr-1w
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:39:34 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 18BB3A4D5E
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 13:38:32 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id t9so7096146wrx.9
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 06:38:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qb076JsVXdS5H+mO8IA0D+9RIrITh8FA82AqFXOSXc0=;
- b=mi4EKuFwsVD+3xbkynuG83buPYe5Q7Nmfg8y6dx8qiB92iI1PEeqxsO3fjdbsycFIX
- AxsIR6oj34NVZkWtJTbwCAqDeTaDjxBlnSlY6ODWfvlUaJKRQ+yKqTVg0NNM9OdXG2SX
- Unpi+juP8KK4O0fu5gUV/26cCu/8wlwfgpLtnq0qh/2tPV0gbuNIEkAWCodamyOkAh72
- joL35BO4/yNsGyBvoSKl7gyL5ufeBjXEJwepOT+Cz8dMIjg6t7AjbXZ9Xcr5xhmZ8mTh
- USebh8OY0Fe/SO7ZBut0EYmy2qc5DGgXGmGwIHYTkhXNCTUHm+FWtrZOXe4Q1OHMgwSe
- O5Zg==
-X-Gm-Message-State: APjAAAX3CZACMAPgmAEFjmomAQnKo3Xo8moYycKsR9Dbg/wnkFltqCqV
- f1bktqINPuH6Vhwa4DYn2XVG97oI/jjsvebvK1Ir87rU2Y2gRlAIpG+rWixE6ileScJeIdUntfc
- WF/YYK1WMKB2tp9I=
-X-Received: by 2002:a1c:9ec5:: with SMTP id h188mr51191wme.176.1566308310801; 
- Tue, 20 Aug 2019 06:38:30 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy9q/loN9XF/D56wS6p8PlmHvQdTnaMji37oL5ohjB28WJkvZCgWyEtsTTF0mkSLtVaF6u13A==
-X-Received: by 2002:a1c:9ec5:: with SMTP id h188mr51155wme.176.1566308310440; 
- Tue, 20 Aug 2019 06:38:30 -0700 (PDT)
-Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id m6sm13663212wrq.95.2019.08.20.06.38.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Aug 2019 06:38:29 -0700 (PDT)
-To: John Snow <jsnow@redhat.com>, seabios@seabios.org,
- Nikolay Nikolov <nickysn@users.sourceforge.net>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <fccac7fa-888e-6ac5-458d-688808f3b282@redhat.com>
- <699eee57-3009-4160-a9a2-1070f92b9c20@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <cc0b5a77-8bc4-070b-31e4-f29d5a174eb8@redhat.com>
-Date: Tue, 20 Aug 2019 15:38:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 487FB4FCD9
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 13:39:32 +0000 (UTC)
+Received: from work-vm (ovpn-117-33.ams2.redhat.com [10.36.117.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D36AE11C9A8;
+ Tue, 20 Aug 2019 13:39:18 +0000 (UTC)
+Date: Tue, 20 Aug 2019 14:39:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190820133915.GI2867@work-vm>
+References: <20190816143321.20903-1-dgilbert@redhat.com>
+ <20190816143321.20903-2-dgilbert@redhat.com>
+ <20190818065944-mutt-send-email-mst@kernel.org>
+ <20190820142428.7995cd89.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <699eee57-3009-4160-a9a2-1070f92b9c20@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190820142428.7995cd89.cohuck@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Tue, 20 Aug 2019 13:39:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Regression with floppy drive controller
+Subject: Re: [Qemu-devel] [PATCH 1/2] virtio: add vhost-user-fs base device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,82 +71,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex <coderain@sdf.org>
+Cc: vgoyal@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/20/19 3:12 PM, John Snow wrote:
-> On 8/20/19 6:25 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> [cross posting QEMU & SeaBIOS]
->>
->> Hello,
->>
->> I'v been looking at a QEMU bug report [1] which bisection resulted in =
-a
->> SeaBIOS commit:
->>
->> 4a6dbcea3e412fe12effa2f812f50dd7eae90955 is the first bad commit
->> commit 4a6dbcea3e412fe12effa2f812f50dd7eae90955
->> Author: Nikolay Nikolov <nickysn@users.sourceforge.net>
->> Date:   Sun Feb 4 17:27:01 2018 +0200
->>
->>     floppy: Use timer_check() in floppy_wait_irq()
->>
->>     Use timer_check() instead of using floppy_motor_counter in BDA for=
- the
->>     timeout check in floppy_wait_irq().
->>
->>     The problem with using floppy_motor_counter was that, after it rea=
-ches
->>     0, it immediately stops the floppy motors, which is not what is
->>     supposed to happen on real hardware. Instead, after a timeout (lik=
-e in
->>     the end of every floppy operation, regardless of the result - succ=
-ess,
->>     timeout or error), the floppy motors must be kept spinning for
->>     additional 2 seconds (the FLOPPY_MOTOR_TICKS). So, now the
->>     floppy_motor_counter is initialized to 255 (the max value) in the
->>     beginning of the floppy operation. For IRQ timeouts, a different
->>     timeout is used, specified by the new FLOPPY_IRQ_TIMEOUT constant
->>     (currently set to 5 seconds - a fairly conservative value, but sho=
-uld
->>     work reliably on most floppies).
->>
->>     After the floppy operation, floppy_drive_pio() resets the
->>     floppy_motor_counter to 2 seconds (FLOPPY_MOTOR_TICKS).
->>
->>     This is also consistent with what other PC BIOSes do.
->>
->>
->> This commit improve behavior with real hardware, so maybe QEMU is not
->> modelling something or modelling it incorrectly?
-[...]
->=20
-> Well, that's unfortunate.
->=20
-> What version of QEMU shipped the SeaBIOS that caused the regression?
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Sun, 18 Aug 2019 07:08:31 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Fri, Aug 16, 2019 at 03:33:20PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > The virtio-fs virtio device provides shared file system access using
+> > > the FUSE protocol carried ovew virtio.
+> > > The actual file server is implemented in an external vhost-user-fs device
+> > > backend process.
+> > > 
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > ---
+> > >  configure                                   |  13 +
+> > >  hw/virtio/Makefile.objs                     |   1 +
+> > >  hw/virtio/vhost-user-fs.c                   | 297 ++++++++++++++++++++
+> > >  include/hw/virtio/vhost-user-fs.h           |  45 +++
+> > >  include/standard-headers/linux/virtio_fs.h  |  41 +++
+> > >  include/standard-headers/linux/virtio_ids.h |   1 +
+> > >  6 files changed, 398 insertions(+)
+> > >  create mode 100644 hw/virtio/vhost-user-fs.c
+> > >  create mode 100644 include/hw/virtio/vhost-user-fs.h
+> > >  create mode 100644 include/standard-headers/linux/virtio_fs.h
+> 
+> > > diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
+> > > new file mode 100644
+> > > index 0000000000..2753c2c07a
+> > > --- /dev/null
+> > > +++ b/hw/virtio/vhost-user-fs.c
+> > > @@ -0,0 +1,297 @@
+> > > +/*
+> > > + * Vhost-user filesystem virtio device
+> > > + *
+> > > + * Copyright 2018 Red Hat, Inc.
+> > > + *
+> > > + * Authors:
+> > > + *  Stefan Hajnoczi <stefanha@redhat.com>
+> > > + *
+> > > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > > + * (at your option) any later version.  See the COPYING file in the
+> > > + * top-level directory.
+> > > + */
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +#include <sys/ioctl.h>
+> > > +#include "standard-headers/linux/virtio_fs.h"
+> > > +#include "qapi/error.h"
+> > > +#include "hw/virtio/virtio-bus.h"
+> > > +#include "hw/virtio/virtio-access.h"
+> > > +#include "qemu/error-report.h"
+> > > +#include "hw/virtio/vhost-user-fs.h"
+> > > +#include "monitor/monitor.h"
+> 
+> JFYI, this needs to include hw/qdev-properties.h as well on the latest
+> code level. (As does the pci part.)
 
-See https://bugs.launchpad.net/qemu/+bug/1840719/comments/3
+Thanks! Updated my local version.
 
-QEMU commit 0b8f74488e, slighly before QEMU v3.1.0
-(previous tag is v3.0.0).
+Dave
 
-But you can use v4.1.0 too, simply change the SeaBIOS bios.bin, i.e.:
-
-  qemu$ git checkout v4.1.0
-
-  qemu$ (cd roms/seabios && git checkout 4a6dbcea3e4~) && \
-        make -C roms bios
-
-Now pc-bios/bios.bin is built using the last commit working,
-
-  qemu$ (cd roms/seabios && git checkout 4a6dbcea3e4) && \
-        make -C roms bios
-
-And you can reproduce the error.
-
-Regards,
-
-Phil.
+> > > +
+> > > +static void vuf_get_config(VirtIODevice *vdev, uint8_t *config)
+> > > +{
+> > > +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> > > +    struct virtio_fs_config fscfg = {};
+> > > +
+> > > +    memcpy((char *)fscfg.tag, fs->conf.tag,
+> > > +           MIN(strlen(fs->conf.tag) + 1, sizeof(fscfg.tag)));
+> > > +
+> > > +    virtio_stl_p(vdev, &fscfg.num_queues, fs->conf.num_queues);
+> > > +
+> > > +    memcpy(config, &fscfg, sizeof(fscfg));
+> > > +}
+> > > +
+> > > +static void vuf_start(VirtIODevice *vdev)
+> > > +{
+> > > +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> > > +    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> > > +    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> > > +    int ret;
+> > > +    int i;
+> > > +
+> > > +    if (!k->set_guest_notifiers) {
+> > > +        error_report("binding does not support guest notifiers");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    ret = vhost_dev_enable_notifiers(&fs->vhost_dev, vdev);
+> > > +    if (ret < 0) {
+> > > +        error_report("Error enabling host notifiers: %d", -ret);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    ret = k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, true);
+> > > +    if (ret < 0) {
+> > > +        error_report("Error binding guest notifier: %d", -ret);
+> > > +        goto err_host_notifiers;
+> > > +    }
+> > > +
+> > > +    fs->vhost_dev.acked_features = vdev->guest_features;
+> > > +    ret = vhost_dev_start(&fs->vhost_dev, vdev);
+> > > +    if (ret < 0) {
+> > > +        error_report("Error starting vhost: %d", -ret);
+> > > +        goto err_guest_notifiers;
+> > > +    }
+> > > +
+> > > +    /*
+> > > +     * guest_notifier_mask/pending not used yet, so just unmask
+> > > +     * everything here.  virtio-pci will do the right thing by
+> > > +     * enabling/disabling irqfd.
+> 
+> Referring to 'virtio-pci' seems a bit suspicious :) Should that be 'the
+> transport'? (And 'the right thing' is not really self-explanatory...)
+> 
+> (I have wired it up for virtio-ccw, but have not actually tried it out.
+> Will send it out once I did.)
+> 
+> > > +     */
+> > > +    for (i = 0; i < fs->vhost_dev.nvqs; i++) {
+> > > +        vhost_virtqueue_mask(&fs->vhost_dev, vdev, i, false);
+> > > +    }
+> > > +
+> > > +    return;
+> > > +
+> > > +err_guest_notifiers:
+> > > +    k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, false);
+> > > +err_host_notifiers:
+> > > +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
+> > > +}
+> 
+> (...)
+> 
+> > > +static void vuf_device_realize(DeviceState *dev, Error **errp)
+> > > +{
+> > > +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> > > +    VHostUserFS *fs = VHOST_USER_FS(dev);
+> > > +    unsigned int i;
+> > > +    size_t len;
+> > > +    int ret;
+> > > +
+> > > +    if (!fs->conf.chardev.chr) {
+> > > +        error_setg(errp, "missing chardev");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!fs->conf.tag) {
+> > > +        error_setg(errp, "missing tag property");
+> > > +        return;
+> > > +    }
+> > > +    len = strlen(fs->conf.tag);
+> > > +    if (len == 0) {
+> > > +        error_setg(errp, "tag property cannot be empty");
+> > > +        return;
+> > > +    }
+> > > +    if (len > sizeof_field(struct virtio_fs_config, tag)) {
+> > > +        error_setg(errp, "tag property must be %zu bytes or less",
+> > > +                   sizeof_field(struct virtio_fs_config, tag));
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (fs->conf.num_queues == 0) {
+> > > +        error_setg(errp, "num-queues property must be larger than 0");
+> > > +        return;
+> > > +    }  
+> > 
+> > The strange thing is that actual # of queues is this number + 2.
+> > And this affects an optimal number of vectors (see patch 2).
+> > Not sure what a good solution is - include the
+> > mandatory queues in the number?
+> > Needs to be documented in some way.
+> 
+> I think the spec states that num_queues in the config space is the
+> number of request queues only. Can we rename to num_request_queues? The
+> hiprio queue is not really configurable, anyway.
+> 
+> > 
+> > > +
+> > > +    if (!is_power_of_2(fs->conf.queue_size)) {
+> > > +        error_setg(errp, "queue-size property must be a power of 2");
+> > > +        return;
+> > > +    }  
+> > 
+> > Hmm packed ring allows non power of 2 ...
+> > We need to look into a generic helper to support VQ
+> > size checks.
+> 
+> Huh, I didn't notice before that there are several devices which
+> already allow to configure the queue size... looking, there seem to be
+> the following cases:
+> 
+> - bound checks and checks for power of 2 (blk, net)
+> - no checks (scsi) -- isn't that dangerous, as virtio_add_queue() will
+>   abort() for a too large value?
+> 
+> Anyway, if we have a non power of 2 size and the driver does not
+> negotiate packed, we can just fail setting FEATURES_OK, so dropping the
+> power of 2 check should be fine, at least when we add packed support.
+> 
+> > 
+> > > +
+> > > +    if (fs->conf.queue_size > VIRTQUEUE_MAX_SIZE) {
+> > > +        error_setg(errp, "queue-size property must be %u or smaller",
+> > > +                   VIRTQUEUE_MAX_SIZE);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!vhost_user_init(&fs->vhost_user, &fs->conf.chardev, errp)) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    virtio_init(vdev, "vhost-user-fs", VIRTIO_ID_FS,
+> > > +                sizeof(struct virtio_fs_config));
+> > > +
+> > > +    /* Notifications queue */
+> > > +    virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> > > +
+> > > +    /* Hiprio queue */
+> > > +    virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> > >  
+> > 
+> > Weird, spec patch v6 says:
+> > 
+> > +\item[0] hiprio
+> > +\item[1\ldots n] request queues
+> > 
+> > where's the Notifications queue coming from?
+> 
+> Maybe an old name of the hiprio queue?
+> 
+> > 
+> > > +    /* Request queues */
+> > > +    for (i = 0; i < fs->conf.num_queues; i++) {
+> > > +        virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> > > +    }
+> > > +
+> > > +    /* 1 high prio queue, plus the number configured */
+> > > +    fs->vhost_dev.nvqs = 1 + fs->conf.num_queues;
+> 
+> Anyway, the notifications queue needs to go, or this is wrong :)
+> 
+> > > +    fs->vhost_dev.vqs = g_new0(struct vhost_virtqueue, fs->vhost_dev.nvqs);
+> > > +    ret = vhost_dev_init(&fs->vhost_dev, &fs->vhost_user,
+> > > +                         VHOST_BACKEND_TYPE_USER, 0);
+> > > +    if (ret < 0) {
+> > > +        error_setg_errno(errp, -ret, "vhost_dev_init failed");
+> > > +        goto err_virtio;
+> > > +    }
+> > > +
+> > > +    return;
+> > > +
+> > > +err_virtio:
+> > > +    vhost_user_cleanup(&fs->vhost_user);
+> > > +    virtio_cleanup(vdev);
+> > > +    g_free(fs->vhost_dev.vqs);
+> > > +    return;
+> > > +}
+> 
+> (...)
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
