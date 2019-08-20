@@ -2,80 +2,65 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8CD6C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4DBC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:32:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3164214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:22:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w8Os771p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3164214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4049B214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 13:32:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4049B214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0464-0003eD-T0
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 09:22:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43000)
+	id 1i04FG-00071b-EU
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 09:32:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45190)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i045Q-0003DQ-5t
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:22:09 -0400
+ (envelope-from <crosa@redhat.com>) id 1i04EN-0006ZT-KH
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:31:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i045P-0000RX-0y
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:22:07 -0400
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:36771)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i045O-0000R2-Pe
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:22:06 -0400
-Received: by mail-oi1-x231.google.com with SMTP id n1so1635149oic.3
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 06:22:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=cyONkCluLhUbUtA73Kfob8ivOrSdvZH5LxKYAcdPEak=;
- b=w8Os771p5XvNblEn7FI7T256mPxDwRs32xQtPz1WcelwjanH0RjKtexrrk+D96rfHm
- ltGRRruU9ghDSAHW/nXL9LskMtdOVtZnH3kMLoR0mshfUC+cr1RHVN8p2S9HGlgsZ4i3
- POxY5D8fmc93I7IaeHyrskqzm84rm1UotncB+qXF9IH4swDtO/ZP5TFJ4TwdWZRGQAh1
- 0EYclF+ghEJZQFRbq7OBGkcrUb9Y8KR101pX4JvoJ02DbDdRoQD0sNO7hVlJ9A7yIOrR
- g4i+TgiLYdAz1aUwRyOh+fcSU/qZHyBgS8bnsLPKvpogLuCWTZ1/gGLU1KhrFIprS/hR
- Ypqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=cyONkCluLhUbUtA73Kfob8ivOrSdvZH5LxKYAcdPEak=;
- b=MyuDViWKr2U284gHJ+FTsChAvCewQmXHxJ5y13RCSBaTQa61xEzWbX/HZDwaBNF22D
- pyGIaWnosCX2yvLfP0IEjQ5BvSLZZOau3kqIjYlOekTpkgHfg2oFs3k3oAEs5okFsnen
- CWlYZ9MCKIY8IqhD1jW6bFf5OF0d+SZD7w3CITeLEq24HMeLH+aVA0w+a4DsHPxiETL2
- 3RrWU9WYgwdRKxk7qjx04Bu1lTMq9W6PdnxQdeHCCYxoPacdkEjI/occHtaQ8GUP35tb
- 1Zs4ox9KDR9FMagw5UhC8dTZ0nJhsaSjpti6p+g19EPoXQukXgwIXKF7zSsN/d8MXpj+
- autA==
-X-Gm-Message-State: APjAAAVOxJsbtt7S4r62XfYS7maQNPN6jjWFdFIw0afVDoUJLpq5ocp1
- YEG/Pv2cihx/yn+Ryb7n/7QjuFdwCgfHsD/rsklIcQ==
-X-Google-Smtp-Source: APXvYqz05mYBUXa8CjA4xfzDpylRP+q3kL57zTMZggHnvqcHEzgvowofWKqoBMP6M57AN2UGQWsF07tJA7WWYeFmk5c=
-X-Received: by 2002:aca:4814:: with SMTP id v20mr17252084oia.98.1566307325850; 
- Tue, 20 Aug 2019 06:22:05 -0700 (PDT)
+ (envelope-from <crosa@redhat.com>) id 1i04EL-0006Nv-51
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:31:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34538)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i04EK-0006NJ-Vh
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 09:31:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EEC5D12AC9;
+ Tue, 20 Aug 2019 13:31:18 +0000 (UTC)
+Received: from dhcp-17-173.bos.redhat.com (dhcp-17-173.bos.redhat.com
+ [10.18.17.173])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4395C5C205;
+ Tue, 20 Aug 2019 13:31:15 +0000 (UTC)
+Date: Tue, 20 Aug 2019 09:31:13 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190820133113.GA4422@dhcp-17-173.bos.redhat.com>
+References: <20190818231827.27573-1-philmd@redhat.com>
+ <20190818231827.27573-4-philmd@redhat.com>
 MIME-Version: 1.0
-References: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Aug 2019 14:21:54 +0100
-Message-ID: <CAFEAcA9UJGXOdNUD49bxmrdoZ5FEv4VLqAvyzDw66MOGsGB=wg@mail.gmail.com>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190818231827.27573-4-philmd@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Tue, 20 Aug 2019 13:31:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::231
-Subject: Re: [Qemu-devel] Proposal for amending TCG interface naming scheme
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] tests/docker: Add test-acceptance
+ runner
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,73 +72,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Weil <sw@weilnetz.de>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 20 Aug 2019 at 13:50, Aleksandar Markovic
-<amarkovic@wavecomp.com> wrote:
->
-> Hello, all.
->
-> I noticed certain barrier and difficulties wrt learning TCG interface by =
-newcomers and to some extent oldcomers too. At least some of them can be at=
-tributed to not best choice of names for functions TCG exposes, especially =
-in the area of extract and sextract. I have a quick idea on how to improve =
-it using the following renaming scheme:
->
-> tcg_gen_extract_i32
-> tcg_gen_extract_i64
-> tcg_gen_extract_tl
-> tcg_gen_sextract_i32
-> tcg_gen_sextract_i64
-> tcg_gen_sextract_tl
-> tcg_gen_extract2_i32
-> tcg_gen_extract2_i64
-> tcg_gen_extract2_tl
-> tcg_gen_extrl_i64_i32
-> tcg_gen_extrh_i64_i32
-> tcg_gen_ext_i32_i64
-> tcg_gen_extu_i32_i64
->
-> could become:
->
-> tcg_gen_select_i32
-> tcg_gen_select_i64
-> tcg_gen_select_tl
-> tcg_gen_select_s_i32
-> tcg_gen_select_s_i64
-> tcg_gen_select_s_tl
-> tcg_gen_gather_i32
-> tcg_gen_gather_i64
-> tcg_gen_gather_tl
-> tcg_gen_extract_l_i64_i32
-> tcg_gen_extract_h_i64_i32
-> tcg_gen_extend_s_i32_i64
-> tcg_gen_extend_0_i32_i64
->
-> The idea is to provide significant "lexicographic" distance between those=
- groups of functions, rather than having the similar name (wiht common root=
- "ext) for all of them.
+On Mon, Aug 19, 2019 at 01:18:26AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Add a runner script to be able to run acceptance tests within
+> Docker images. We can now reproduce Travis CI builds locally (and
+> debug  them!).
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  tests/docker/test-acceptance | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>  create mode 100755 tests/docker/test-acceptance
+>=20
+> diff --git a/tests/docker/test-acceptance b/tests/docker/test-acceptanc=
+e
+> new file mode 100755
+> index 0000000000..84edaa676c
+> --- /dev/null
+> +++ b/tests/docker/test-acceptance
+> @@ -0,0 +1,21 @@
+> +#!/bin/bash -e
+> +#
+> +# Compile default Travis-CI target and run Avocado acceptance tests
+> +#
+> +# Copyright (c) 2019 Red Hat Inc.
+> +#
+> +# Authors:
+> +#  Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2
+> +# or (at your option) any later version. See the COPYING file in
+> +# the top-level directory.
+> +
+> +. common.rc
+> +
+> +cd "$BUILD_DIR"
+> +
+> +DEF_TARGET_LIST=3D"x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch6=
+4-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
+> +TARGET_LIST=3D${TARGET_LIST:-$DEF_TARGET_LIST} \
+> +build_qemu
+> +check_qemu check-acceptance
+> --=20
+> 2.20.1
+>=20
+>=20
 
-The current naming of the extract/sextract TCG ops is intended to keep
-them in line with the extract32/sextract32/extract64/sextract64 utility
-functions in bitops.h. I think those ones are reasonably named. The
-other ops are a bit more ad-hoc in naming, admittedly...
+I'm currently seeing test errors when running in a container:
 
-thanks
--- PMM
+  MKDIR   /tmp/qemu-test/build/tests/results
+  AVOCADO tests/acceptance
+JOB ID     : fe56cc0b2d1adbc0b5bb5828902e113d596edccf
+JOB LOG    : /tmp/qemu-test/build/tests/results/job-2019-08-19T22.13-fe56=
+cc0/job.log
+ (01/27) /tmp/qemu-test/src/tests/acceptance/boot_linux_console.py:BootLi=
+nuxConsole.test_x86_64_pc:  ERROR: join() argument must be str or bytes, =
+not 'NoneType' (0.05 s)
+Interrupting job (failfast).
+RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 26 | WARN 0 | INTERRUPT 0 |=
+ CANCEL 0
+JOB TIME   : 0.26 s
+/tmp/qemu-test/src/tests/Makefile.include:1158: recipe for target 'check-=
+acceptance' failed
+make: *** [check-acceptance] Error 9
+
+That being said, I'm not running it under docker, but under podman,
+although I'm not convinced yet that is the defining issue.  I'll try
+to identify what's going here.
+
+Cheers,
+- Cleber.
 
