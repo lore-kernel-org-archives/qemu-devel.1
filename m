@@ -2,49 +2,49 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BFAC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 11:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54036C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 11:44:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69800214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 11:43:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69800214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 2BD25216F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 11:44:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD25216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i02Xd-0007y9-B7
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 07:43:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56045)
+	id 1i02Yj-0000VZ-7g
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 07:44:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56238)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i02Wr-0007TL-PM
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 07:42:22 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i02Xp-0008J1-35
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 07:43:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i02Wq-0002fE-NM
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 07:42:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59574)
+ (envelope-from <mreitz@redhat.com>) id 1i02Xo-00038s-33
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 07:43:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55940)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i02Wn-0002dd-WE; Tue, 20 Aug 2019 07:42:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i02Xl-000379-Hy; Tue, 20 Aug 2019 07:43:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CAD8D30860DC;
- Tue, 20 Aug 2019 11:42:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C8324315C013;
+ Tue, 20 Aug 2019 11:43:16 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A08C5D9E1;
- Tue, 20 Aug 2019 11:42:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9274418B55;
+ Tue, 20 Aug 2019 11:43:15 +0000 (UTC)
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20190819185602.4267-1-mreitz@redhat.com>
  <20190819185602.4267-5-mreitz@redhat.com>
- <e0c477a9-7889-3042-382a-8cb511ea96b3@redhat.com>
+ <85d04ded-0bf6-ab67-7af9-cc97f30ad366@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,18 +71,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <72822609-d767-ace1-4a0c-6f6d0d7a361d@redhat.com>
-Date: Tue, 20 Aug 2019 13:42:13 +0200
+Message-ID: <9f41a69e-317e-b14b-30e9-59dadadb3c45@redhat.com>
+Date: Tue, 20 Aug 2019 13:43:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <e0c477a9-7889-3042-382a-8cb511ea96b3@redhat.com>
+In-Reply-To: <85d04ded-0bf6-ab67-7af9-cc97f30ad366@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="s74NRDeXAiBvpWINV876gk79L3ljYJpY3"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="aS42y3eB6W9xjs1HgXKAIRNF7INJxlQSE"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 20 Aug 2019 11:42:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Tue, 20 Aug 2019 11:43:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v2 04/16] qcow2: Keep unknown extra
@@ -104,25 +104,25 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---s74NRDeXAiBvpWINV876gk79L3ljYJpY3
-Content-Type: multipart/mixed; boundary="wPIJ6HUguOfTNX4Q3IjojEaVpTGTC16Rg";
+--aS42y3eB6W9xjs1HgXKAIRNF7INJxlQSE
+Content-Type: multipart/mixed; boundary="8MLLZuDV6Wcm8FNSTEyAg6vbB17h7sWHy";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <72822609-d767-ace1-4a0c-6f6d0d7a361d@redhat.com>
+Message-ID: <9f41a69e-317e-b14b-30e9-59dadadb3c45@redhat.com>
 Subject: Re: [PATCH v2 04/16] qcow2: Keep unknown extra snapshot data
 References: <20190819185602.4267-1-mreitz@redhat.com>
  <20190819185602.4267-5-mreitz@redhat.com>
- <e0c477a9-7889-3042-382a-8cb511ea96b3@redhat.com>
-In-Reply-To: <e0c477a9-7889-3042-382a-8cb511ea96b3@redhat.com>
+ <85d04ded-0bf6-ab67-7af9-cc97f30ad366@redhat.com>
+In-Reply-To: <85d04ded-0bf6-ab67-7af9-cc97f30ad366@redhat.com>
 
---wPIJ6HUguOfTNX4Q3IjojEaVpTGTC16Rg
+--8MLLZuDV6Wcm8FNSTEyAg6vbB17h7sWHy
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 19.08.19 21:23, Eric Blake wrote:
+On 19.08.19 21:34, Eric Blake wrote:
 > On 8/19/19 1:55 PM, Max Reitz wrote:
 >> The qcow2 specification says to ignore unknown extra data fields in
 >> snapshot table entries.  Currently, we discard it whenever we update t=
@@ -132,61 +132,81 @@ he
 >> This patch makes the qcow2 driver keep all unknown extra data fields
 >> when updating an image's snapshot table.
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/qcow2.h          |  5 ++++
->>  block/qcow2-snapshot.c | 61 +++++++++++++++++++++++++++++++++++------=
--
->>  2 files changed, 56 insertions(+), 10 deletions(-)
->>
 >=20
->> @@ -162,7 +184,7 @@ static int qcow2_write_snapshots(BlockDriverState =
-*bs)
->>          sn =3D s->snapshots + i;
->>          offset =3D ROUND_UP(offset, 8);
->>          offset +=3D sizeof(h);
->> -        offset +=3D sizeof(extra);
->> +        offset +=3D MAX(sizeof(extra), sn->extra_data_size);
+>> @@ -80,31 +80,53 @@ int qcow2_read_snapshots(BlockDriverState *bs, Err=
+or **errp)
+>>          sn->date_sec =3D be32_to_cpu(h.date_sec);
+>>          sn->date_nsec =3D be32_to_cpu(h.date_nsec);
+>>          sn->vm_clock_nsec =3D be64_to_cpu(h.vm_clock_nsec);
+>> -        extra_data_size =3D be32_to_cpu(h.extra_data_size);
+>> +        sn->extra_data_size =3D be32_to_cpu(h.extra_data_size);
+>> =20
+>>          id_str_size =3D be16_to_cpu(h.id_str_size);
+>>          name_size =3D be16_to_cpu(h.name_size);
+>> =20
+>> -        /* Read extra data */
+>> +        if (sn->extra_data_size > QCOW_MAX_SNAPSHOT_EXTRA_DATA) {
+>> +            ret =3D -EFBIG;
+>> +            error_setg(errp, "Too much extra metadata in snapshot tab=
+le "
+>> +                       "entry %i", i);
+>> +            goto fail;
 >=20
-> Why would we ever have less than sizeof(extra) bytes to write on output=
-,
-> since we always produce the fields on creation and synthesize the
-> missing fields of extra on read?  Can't you rewrite this as:
+> We fail if extra_data_size is > 1024...
 >=20
-> assert(sn->extra_data_size >=3D sizeof(extra));
-> offset +=3D sn->extra_data_size;
+>=20
+>> +        if (sn->extra_data_size > sizeof(extra)) {
+>> +            /* Store unknown extra data */
+>> +            size_t unknown_extra_data_size =3D
+>> +                sn->extra_data_size - sizeof(extra);
+>> +
+>=20
+> But read at most 1008 bytes into sn->unknown_extra_data.
+>=20
+>> @@ -234,6 +257,22 @@ static int qcow2_write_snapshots(BlockDriverState=
+ *bs)
+>>          }
+>>          offset +=3D sizeof(extra);
+>> =20
+>> +        if (sn->extra_data_size > sizeof(extra)) {
+>> +            size_t unknown_extra_data_size =3D
+>> +                sn->extra_data_size - sizeof(extra);
+>> +
+>> +            /* qcow2_read_snapshots() ensures no unbounded allocation=
+ */
+>> +            assert(unknown_extra_data_size <=3D BDRV_REQUEST_MAX_BYTE=
+S);
+>=20
+> So this assertion is quite loose in what it permits; tighter would be
+>=20
+> assert(unknown_extra_data_size <=3D QCOW_MAX_SNAPSHOT_EXTRA_DATA -
+> sizeof(extra))
 
-Hm, but I don=E2=80=99t prop up extra_data_size to be at least sizeof(ext=
-ra).  I
-can do that, but it would add a few extra lines here and there.
-
-> Otherwise,
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-In any case, thanks for reviewing again :-)
+As I said in the last version, I have this assertion here just because
+of the following bdrv_pwrite(); so all we need to assert is that it fits
+BDRV_REQUEST_MAX_BYTES (which it clearly does, as you say).
 
 Max
 
 
---wPIJ6HUguOfTNX4Q3IjojEaVpTGTC16Rg--
+--8MLLZuDV6Wcm8FNSTEyAg6vbB17h7sWHy--
 
---s74NRDeXAiBvpWINV876gk79L3ljYJpY3
+--aS42y3eB6W9xjs1HgXKAIRNF7INJxlQSE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1b3JUACgkQ9AfbAGHV
-z0AFeggAkbVkmYm1uw0iwntBA1XhEWw8XTZbcmwuzS9ZUmDfE3fZgKgwZeFpUL7M
-RRzxpiy5gIR3bFG5IGY4tQ5nrOFRH2cpvkzHlQjSXsGAtxVSVJOKKDRYZ99DRuQN
-1uIsWVo8/YOK0a/eXYVvGWw96DJo9PZD1S3hciyPL046OoB3CfES7XBhH1oalTC5
-89Kuy8VlTpE7H0dq43UpbMjaaLgsGJBBW6GWySoiQjullzW0oL3zyRZlHoa60OKH
-wzcQLZ6NdlcYz0L0mw3ivcwSSI/nV0NgM0t2WTvjryYiREmeKgtIoHJaIlcy2IDA
-xAoR/rk/wsnmOJGZzBboMaA4SCkyAQ==
-=tf5A
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1b3NIACgkQ9AfbAGHV
+z0AclQf9GWUusiyxUta87jpQGsqFXEJX0YlxyxlvWrzREtWf70mn8T6MvKzlz2aH
+mzq1LVToahYYORJlf7chwRX0aeo+OFINFqPVf7ecrFjXylQHqIT+JpIpb+xwTkn7
+WAKIQ8omiJzaVP1SMrrQJJFOKCZ8kz56tXbt1twI0ZWxtQqZzLal3ajycWFyctSx
+DbfKpL1FQe2Wr6g/avdI+LeGOds//I61h9yJ5S5uVV/RTaN9ufs2RVDhzR0ifg6q
+8E1mEsTpnia4Gs5Mme069d4u/wlWcVkF95P26S2FfkW1wwatIRNLvxiTD0PGCvAq
+/c+jMCGmrCTEWntr47N7ZCDED+l1pA==
+=Y9Tg
 -----END PGP SIGNATURE-----
 
---s74NRDeXAiBvpWINV876gk79L3ljYJpY3--
+--aS42y3eB6W9xjs1HgXKAIRNF7INJxlQSE--
 
