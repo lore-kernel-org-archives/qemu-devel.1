@@ -6,84 +6,87 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F6EC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C50CFC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:15:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AF11206DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:09:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF11206DF
+	by mail.kernel.org (Postfix) with ESMTPS id 9760D216F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:15:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9760D216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i05kr-0007PN-Gu
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 11:09:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60364)
+	id 1i05r6-0000qF-P9
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 11:15:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i05kB-0006U2-RA
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:08:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1i05qP-0000PH-3p
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i05kA-0002gQ-5N
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:08:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48746)
+ (envelope-from <philmd@redhat.com>) id 1i05qO-0007fL-01
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:14:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49160)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i05k9-0002fy-TP
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:08:18 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i05qN-0007eh-OY
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:14:43 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AF8855AFE9
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 15:08:16 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id a17so7225544wrw.3
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 08:08:16 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id AC106C047B6E
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 15:14:42 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id h3so7189666wrw.7
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 08:14:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=H6lEqg+qbEwqiv/+HCf8Mi53roJeWwDp1Nga5QWpIMk=;
- b=bH3OVw7MW5ARFkGbFG9tQEUC1Om7lQ2JPGY6kPp7HjytzDB2EBJ6or2QC1iR6HlRIk
- TqESzqdPmhkEjo9toe2075piWaeh8JdJJZOZqy6d3djKU34xKI8hLAWKLjNsYOq5aBN8
- RYyBqI5WFLpQlJxwlMPQuM1hCtUwkMrn4DG4pVFYzgQID6k7NLKod1UB3qG3AlVybz2R
- r0Mc2+lV5dMr5m1nxllVRIF3jMFoBVMaoEefI3HIX/KFQNOaoONQZInqHdVb45yHSIxj
- BUvn6W6dj4mmQ6Ya9zmCU7p7oZx8tbO/Ax6TiD/XcsdmpdhPyuB7+sRtaDDsvsiga8hU
- H/iQ==
-X-Gm-Message-State: APjAAAWlDAjzN5AxC48VO48RzLo9FHXTcV8Pn96YWQPbxgoKj5vXwyA0
- 3fgCk4ZXcGe+RASX/3WiPuzE2BuY5UrHOeNG1ck/hAnPPznx/+MNMPxlJxtLhZdeTqepsyxF1io
- YTEavwpfI714/OGQ=
-X-Received: by 2002:adf:dbcd:: with SMTP id e13mr33529417wrj.314.1566313695316; 
- Tue, 20 Aug 2019 08:08:15 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzF6tXiWFZ22Kz8lIXc33vW1MxEofFNxe9w9aR/CDqi5NqCEKrVRbZBmVT+iHedLWgZyEurFA==
-X-Received: by 2002:adf:dbcd:: with SMTP id e13mr33529382wrj.314.1566313695076; 
- Tue, 20 Aug 2019 08:08:15 -0700 (PDT)
+ bh=fd/2n21nVkxUxmmW8ie2dhjNS+F/De59CJBc4HRAo7s=;
+ b=WRtN1tgW0yJ3dS7VOb8qkWPXvRjTJZN9Jmn7QKvK1blYKYG5U+G9Ca81FO2y3h0DZ3
+ OptO0ZtL7lJApyoz6fTkDMrS1k3CYtdBJ2PwI4WFYlcygs9C6rx3OhMiU4TvjOBRChfB
+ uvq22eku+WaUwjIAYCFiL5WBlCfy2+IwppsqiDTfK8pUZTji/rkI1bD8dMJnEkEJzrkW
+ jur2YmvJBH/VdVZ4kHLuJP1WvrpbBwGHo6z3pmo3lGn82k/LzXgNXD2J2IWJ5pejncPd
+ 5Bd5QQ3oldQxo1aP54+2l5ukRinzsK7M0jZ9F+SHWdbi4UHEGkQX8fpV+jx/SFMF+pvb
+ dXqA==
+X-Gm-Message-State: APjAAAVI3gvQxEHnYj+M+pr783OsrEOyWzpTJRekkQAN7q5iYQVC9gl0
+ 8eQpzr+OO5ISfr5hXz6QWx0gQUZNv6drGl8Eccb9LgoqjSb3mgioA0Q88bB3IAPZEFhluW7Ku9h
+ TzgYOU1yKY7QU3SE=
+X-Received: by 2002:a05:6000:12c5:: with SMTP id
+ l5mr34700203wrx.122.1566314081422; 
+ Tue, 20 Aug 2019 08:14:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzG73tOzNKUrIMd7tolwVlxkD4mmOV5Djt2+nXK7vxUGpIkAezmX0IYZ8+aYSQpjUrybFAy8A==
+X-Received: by 2002:a05:6000:12c5:: with SMTP id
+ l5mr34700184wrx.122.1566314081261; 
+ Tue, 20 Aug 2019 08:14:41 -0700 (PDT)
 Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id i5sm19929710wrn.48.2019.08.20.08.08.13
+ by smtp.gmail.com with ESMTPSA id k124sm562328wmk.47.2019.08.20.08.14.40
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Aug 2019 08:08:14 -0700 (PDT)
-To: Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org
-References: <20190820123417.27930-1-philmd@redhat.com>
- <3e3fcb30-1e12-eaf4-07a2-47d09aea2511@roeck-us.net>
+ Tue, 20 Aug 2019 08:14:40 -0700 (PDT)
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <alpine.BSF.2.21.9999.1811292101280.5887@zero.eik.bme.hu>
+ <alpine.BSF.2.21.9999.1901151926320.72972@zero.eik.bme.hu>
+ <e72fd744-3440-a684-38c4-75d6d604cddb@redhat.com>
+ <alpine.BSF.2.21.9999.1908201648370.56910@zero.eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <509576fb-6fc1-7812-f73f-bda210c5ce99@redhat.com>
-Date: Tue, 20 Aug 2019 17:08:13 +0200
+Message-ID: <9b099b2c-07d6-9733-fe90-2c2a974efc44@redhat.com>
+Date: Tue, 20 Aug 2019 17:14:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <3e3fcb30-1e12-eaf4-07a2-47d09aea2511@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <alpine.BSF.2.21.9999.1908201648370.56910@zero.eik.bme.hu>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] hw/char/bcm2835_aux: Provide full
- 16550 UART support
+Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,116 +98,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/20/19 4:31 PM, Guenter Roeck wrote:
-> On 8/20/19 5:34 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi,
+Hey Zoltan,
+
+On 8/20/19 4:50 PM, BALATON Zoltan wrote:
+> On Tue, 15 Jan 2019, Philippe Mathieu-Daud=E9 wrote:
+>> On 1/15/19 7:29 PM, BALATON Zoltan wrote:
+>>> On Thu, 29 Nov 2018, BALATON Zoltan wrote:
+>>>> Then I've tried the same with the pll patches posted by Philippe
+>>>> Mathieu-Daud=E9 here:
+>>>>
+>>>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg00191.htm=
+l
+>>>>
+>>>> on top of v3.1.0-rc3 which helped to get rid of the cprman warnings
+>>>
+>>> Will these patches be merged eventually? These seem to at least get r=
+id
+>>> of some annoying warnings in Linux boot dmesg.
 >>
->> Since there has been some activity on the list asking about
->> Rasberry PI USB support, I had a look a some previous unfinished
->> work and rebased it to share, in case it helps hobbyist interested
->> in improving these machines.
+>> I'll respin this series addressing Peter's comments.
 >>
->> This series is some proof-of-concept on improving the AUX UART
->> support. See the commit description for various TODO/questions.
+>> Thanks for reminding me ;)
 >>
->> This can be tested using files documented by Peter Maydell in
->> his blog post:
->> https://translatedcode.wordpress.com/2018/04/25/debian-on-qemus-raspbe=
-rry-pi-3-model/
->>
->>
->> And using the kernel command line arguments suggested by Guenter Roeck=
-:
->>
->> qemu-system-aarch64 -M raspi3 -m 1024 \
->> =C2=A0=C2=A0 -kernel raspi3/bootpart/vmlinuz-4.14.0-3-arm64 \
->> =C2=A0=C2=A0 -initrd raspi3/bootpart/initrd.img-4.14.0-3-arm64 \
->> =C2=A0=C2=A0 -dtb raspi3/bootpart/bcm2837-rpi-3-b.dtb \
->> =C2=A0=C2=A0 -append 'earlycon=3Duart8250,mmio32,0x3f215040 rdinit=3D/=
-sbin/init
->> panic=3D-1 console=3DttyS1,115200' \
->> =C2=A0=C2=A0 -drive
->> file=3Draspi3/2018-01-08-raspberry-pi-3-buster-PREVIEW.img,format=3Dra=
-w,if=3Dsd
->> \
->> =C2=A0=C2=A0 -serial null -serial stdio \
->> =C2=A0=C2=A0 -d unimp,guest_errors -trace bcm283\*
+>> Phil.
 >=20
-> [ ... ]
->=20
->> [=C2=A0=C2=A0=C2=A0 3.123313] Unpacking initramfs...
->>
->> Here it hangs, even with CPRMAN patch from Guenter:
->> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03153.html
->>
->=20
-> This command line works for me:
->=20
-> qemu-system-aarch64 -M raspi3 -kernel arch/arm64/boot/Image -no-reboot =
-\
-> =C2=A0=C2=A0=C2=A0=C2=A0-nographic -snapshot -smp 4 -m 1G \
-> =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3Drootfs.ext2,format=3Draw,if=3Dsd =
-\
-> =C2=A0=C2=A0=C2=A0=C2=A0-serial null -serial stdio -monitor none -no-re=
-boot \
-> =C2=A0=C2=A0=C2=A0=C2=A0--append 'panic=3D-1 slub_debug=3DFZPUA root=3D=
-/dev/mmcblk0 rootwait
-> earlycon=3Duart8250,mmio32,0x3f215040 console=3DttyS1,115200' \
-> =C2=A0=C2=A0=C2=A0=C2=A0-dtb arch/arm64/boot/dts/broadcom/bcm2837-rpi-3=
--b.dtb
->=20
-> or, with initrd:
->=20
-> qemu-system-aarch64 -M raspi3 -kernel arch/arm64/boot/Image -no-reboot =
-\
-> =C2=A0=C2=A0=C2=A0=C2=A0-nographic \
-> =C2=A0=C2=A0=C2=A0=C2=A0-initrd rootfs.cpio \
-> =C2=A0=C2=A0=C2=A0=C2=A0-m 1G -serial null -serial stdio -monitor none =
--no-reboot \
-> =C2=A0=C2=A0=C2=A0=C2=A0--append 'panic=3D-1 slub_debug=3DFZPUA rdinit=3D=
-/sbin/init
-> earlycon=3Duart8250,mmio32,0x3f215040 console=3DttyS1,115200' \
-> =C2=A0=C2=A0=C2=A0=C2=A0-dtb arch/arm64/boot/dts/broadcom/bcm2837-rpi-3=
--b.dtb
->=20
-> This is with the mainline kernel.
->=20
-> I don't see a significant difference to your patch series.
+> While you're at raspi patches maybe I remind you again of the above :-)
+> I think I haven't seen these being merged yet but correct me if I'm wro=
+ng.
 
-Thank you for taking the time to test!
+You are correct :)
 
-The biggest difference is the diffstat:
+I did address the issue reported by Peter regarding the CPRMAN block.
 
- hw/char/bcm2835_aux.c         | 211 +++-------------------------------
+Guenter tried the series and reported issue with the A2W block (he did
+implement it, basically to return 0x10001 for a pair of registers, but I
+hadn't implemented it).
 
-The model is now cleaner and easier to maintain.
+Now I have a basic A2W implemented, but I can't reproduce the error
+Guenter reported, so I was waiting for more spare time to invest on
+this. Anyhow meanwhile I can post my work as RFC.
 
-The logical differences are noted in 2nd patch, basically:
-1- not same FIFO length (easily fixable)
-2- now the model implements more feature than supposed to
-3- migration
-
-I'll wait for the different ARM/Migration subsystem review.
-
-[...]
-> One possibility might be that your initrd has a problem. Can you boot
-> without your patch
-> series, or is it always stuck ?
-
-I remember it used to work for me back when I wrote it, so it is
-probably an initrd problem. I'll test later and keep you updated.
-
-Thanks!
+Regards,
 
 Phil.
 
