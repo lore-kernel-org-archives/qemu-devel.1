@@ -2,80 +2,84 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93399C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E4AC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:27:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D6D420C01
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:21:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GT2TciwQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D6D420C01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D15BE22CF4
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:27:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D15BE22CF4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i01GQ-0000sK-EQ
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 06:21:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43924)
+	id 1i01M5-0003zF-VP
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 06:27:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44813)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i01FT-0008I8-63
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:20:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1i01Kx-0003Kx-Kt
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i01FR-0002WQ-NB
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:20:18 -0400
-Received: from mail-io1-xd35.google.com ([2607:f8b0:4864:20::d35]:43367)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i01FR-0002U8-Hv
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:20:17 -0400
-Received: by mail-io1-xd35.google.com with SMTP id 18so10991591ioe.10
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 03:20:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=hq+M197GYsn02hijHhWJWXud6gpsnUI4NBlUgChhuLQ=;
- b=GT2TciwQIcYDuM0tUHeC8XCML0agAo3mcSy9gDdASeW7Kie6NwLQDkT/VB/XBnsNqY
- jFQFqWmhWifgQ+bCvYSF2QhQSY85nCnMaNnFQ6Kb2rNzxQ9itimtvAC8ZU9TXVps5Uta
- onmK91hZdDhhdnB+mfsaWmAQ+SLPt5RmI/g406cZDae3odef688iE65flwrKJ603Ub4a
- 8Jtf/z38E27L8VH+DaDHjsZ7jJw7ejXuFobVJ/TOkCVHiTBizl3iQRJ5bdCYARfCnzAV
- JqIDOiiy6gs68NFx3vLzwGLY55uemgYvZx8l0EGZbKMtazMfco3B27gBFwCnzTtn/LYZ
- kTmQ==
+ (envelope-from <philmd@redhat.com>) id 1i01Kv-0006cH-Un
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:25:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47542)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i01Kv-0006Zj-Le
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:25:57 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 69002A23CC
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 10:25:55 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id a17so6791877wrr.10
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 03:25:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=hq+M197GYsn02hijHhWJWXud6gpsnUI4NBlUgChhuLQ=;
- b=ey3XJM9oRozP/UAfxSxjjm9hQL8Gsuso602UBz694ZiVvhs9T94AF+Y8c8Y4ATbQFE
- HsusWKpvQ6Xj2EO0LcfSOSYa7yvjsEku9EtbbhEsq4fESWO6QuZlwj7IDslW4rNwx03I
- 6RsSsv8j6FSoeJ36FjS31oKV4j4Mmr2LqUcs4CatkktNNNJKjl0Dspp7S95W/48XXBvz
- lQ8YhfUtOCpr6YdKINi5jzgAC+g2PqU3vwYZtRJrNzuvvDGHbkR316ohduHuGSpoOHVF
- iVL2r/U1I7FoLhmJsVCHc8JMZDAo/Jw12NBhOGjZrr3TWq+8hgFj4fowH89KpeuZAtt8
- xwJg==
-X-Gm-Message-State: APjAAAWa7c7MKOyVDSobpkgkxxQjrnqOEugZyuVfKMcWlYz/IpUVKvD7
- R1l1oeIcN9NDxqvUDNiRYlmaDpKFc9dsz2qtdSXt/A==
-X-Google-Smtp-Source: APXvYqy3xHyH7sy3JyxIrURcvgT6PCBOnO4AT4SN9g4yhbuBc3SRc97wSfUspbl6feFLJqYmFDIlJ9+SZWkyo7uDqT0=
-X-Received: by 2002:a6b:fd13:: with SMTP id c19mr7252633ioi.168.1566296416347; 
- Tue, 20 Aug 2019 03:20:16 -0700 (PDT)
+ h=x-gm-message-state:to:from:subject:openpgp:cc:message-id:date
+ :user-agent:mime-version:content-language:content-transfer-encoding;
+ bh=oC7wDpFXg3tMHnfL5ict2ib9gtUl7N/dDInYCMI8K0E=;
+ b=UgV5KeqtCRpMReFA4ZU9nKvX1j/CA+r3dz+dwAk7Ibi7jclEPt2WBLZmwnVzgB1+jQ
+ Jej2gSRjoxUrMWW1l3FeK4CqLHPcHD1fCkLUnw20BBOZD4GIdKtUpITlXviCxSi0B/r0
+ 6RyOMjRshR/3tsyLkShVpVZF9i/dQpKUdkvGgcxf5v2X0/6R69AI0LzSrmyyx44jy5An
+ 5cFd4kH2yv09YCho60XVaYN9uXUNcoC3WpRyGd3qwsTfDLjUncid9M/wd5oIpNbjG9Zq
+ o/GbZDSueayIsqpqM37GPhKuC9P1xooiG3pe1VGb1tFUo8ESnpdk+W9+YkD98oQtqrsb
+ b4mw==
+X-Gm-Message-State: APjAAAXu3zXCqbdp4/3bwY9zpkaMizjrLUKuOLvVo8Vd50IY6cmJTQ0F
+ nYpha1c4nr8uqHqZq2w7bHNQ7M0wifV9JA+A1K13TpfdTREnt5dXHN2yZ/lLvADKm6/O6J7Qjsg
+ 7sq/tBoJb0kAB/5g=
+X-Received: by 2002:adf:efd2:: with SMTP id i18mr32683495wrp.145.1566296754170; 
+ Tue, 20 Aug 2019 03:25:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzXUqBFNaRv3SxCbR67cRhXHm+bLXJjM19jDyZ5JTRiX1Gff14Xg48P6n4NnM75O56+4d79Ew==
+X-Received: by 2002:adf:efd2:: with SMTP id i18mr32683471wrp.145.1566296753950; 
+ Tue, 20 Aug 2019 03:25:53 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id e9sm17016358wrt.69.2019.08.20.03.25.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Aug 2019 03:25:53 -0700 (PDT)
+To: seabios@seabios.org, Nikolay Nikolov <nickysn@users.sourceforge.net>,
+ John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <fccac7fa-888e-6ac5-458d-688808f3b282@redhat.com>
+Date: Tue, 20 Aug 2019 12:25:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <tencent_A4D270EBF3CC4134E8EB55BB9B541724780A@qq.com>
-In-Reply-To: <tencent_A4D270EBF3CC4134E8EB55BB9B541724780A@qq.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Aug 2019 11:20:04 +0100
-Message-ID: <CAFEAcA_yg6E00jq9Rk39CRpMQMZudg4vyKjwMnsN37RaE0=erw@mail.gmail.com>
-To: =?UTF-8?B?56uL?= <zhlb29@foxmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d35
-Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] Regression with floppy drive controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,46 +91,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Alex <coderain@sdf.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 20 Aug 2019 at 11:12, =E7=AB=8B <zhlb29@foxmail.com> wrote:
->
-> I am working on a project that requires me to modify the ISA of the MIPS =
-target. I have been staring at the source code for about a week, but found =
-it really difficult due to me being a young rookie and the sparse comments.
-> Specifically, I need to extend MIPS, by adding some new instructions and =
-new CPU registers to the current architecture, and that sounds really easy.=
- I think the place for me to look at should be at the directory ${qemu_root=
-}/target/mips/. With a MIPS Instruction Set Manual Release 6 handy, I have =
-difficulty finding the source code where the ISA resides. Is it in op_helpe=
-r.c? Or translate.c? Any guidance would be really appreciated. Thank you ve=
-ry much in advance.
+[cross posting QEMU & SeaBIOS]
 
-The general structure of a QEMU target front-end is that
-there is a 'decoder', typically in translate.c, which
-takes target instructions, figures out what they are,
-and emits TCG operations (an intermediate representation)
-for them. Sometimes a guest instruction is simple and
-can be handled by directly generating TCG code to do
-it. Some instructions are more complex, and we handle
-them by generating TCG code which will at runtime call
-a helper function to do the bulk of the work. Those
-helpers (and some other code, like code to handle TLB
-misses and various exceptions) lives in the various
-helper.c files.
+Hello,
 
-One important concept to be clear on is that QEMU is
-a JIT -- this means that we generate host code that
-corresponds to target code (at "translate time"), and
-then later we will run the host code (at "run time");
-code generated once can be run many times. You need
-to be clear about whether QEMU C code you're looking at
-is called at translate time or at run time, because
-the things that you can do are very different.
+I'v been looking at a QEMU bug report [1] which bisection resulted in a
+SeaBIOS commit:
 
-thanks
--- PMM
+4a6dbcea3e412fe12effa2f812f50dd7eae90955 is the first bad commit
+commit 4a6dbcea3e412fe12effa2f812f50dd7eae90955
+Author: Nikolay Nikolov <nickysn@users.sourceforge.net>
+Date:   Sun Feb 4 17:27:01 2018 +0200
+
+    floppy: Use timer_check() in floppy_wait_irq()
+
+    Use timer_check() instead of using floppy_motor_counter in BDA for the
+    timeout check in floppy_wait_irq().
+
+    The problem with using floppy_motor_counter was that, after it reaches
+    0, it immediately stops the floppy motors, which is not what is
+    supposed to happen on real hardware. Instead, after a timeout (like in
+    the end of every floppy operation, regardless of the result - success,
+    timeout or error), the floppy motors must be kept spinning for
+    additional 2 seconds (the FLOPPY_MOTOR_TICKS). So, now the
+    floppy_motor_counter is initialized to 255 (the max value) in the
+    beginning of the floppy operation. For IRQ timeouts, a different
+    timeout is used, specified by the new FLOPPY_IRQ_TIMEOUT constant
+    (currently set to 5 seconds - a fairly conservative value, but should
+    work reliably on most floppies).
+
+    After the floppy operation, floppy_drive_pio() resets the
+    floppy_motor_counter to 2 seconds (FLOPPY_MOTOR_TICKS).
+
+    This is also consistent with what other PC BIOSes do.
+
+
+This commit improve behavior with real hardware, so maybe QEMU is not
+modelling something or modelling it incorrectly?
+
+
+Regards,
+
+Phil.
+
+
+PD: How to reproduce:
+
+- Download Windows 98 SE floppy image from [2]
+
+- Run QEMU using the 'isapc' machine:
+
+  $ qemu-system-i386 -M isapc \
+     -fda Windows\ 98\ Second\ Edition\ Boot.img
+
+  SeaBIOS (version rel-1.11.0-11-g4a6dbce-prebuilt.qemu.org)
+  Booting from Floppy...
+  Boot failed: could not read the boot disk
+
+[1] https://bugs.launchpad.net/qemu/+bug/1840719
+[2] https://winworldpc.com/download/417d71c2-ae18-c39a-11c3-a4e284a2c3a5
 
