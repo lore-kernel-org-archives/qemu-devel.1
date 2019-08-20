@@ -2,84 +2,91 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF683C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F80C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:22:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A9AF22DD3
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:16:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ptV2C96I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A9AF22DD3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E31922CE3
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:22:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E31922CE3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i06oE-0003Vq-Fw
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:16:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43761)
+	id 1i06tk-0005fz-Fp
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:22:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i06nL-0002z9-N2
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:15:41 -0400
+ (envelope-from <philmd@redhat.com>) id 1i06t4-0005EC-Tn
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i06nK-0001RZ-3i
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:15:39 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:34136)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i06nJ-0001Qo-Te
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:15:38 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id g128so4530709oib.1
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 09:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mfZI9vKNpxE7fCSQTa0GxMEcN1qepcVPHGFp977KSbM=;
- b=ptV2C96IjnBGuRJms4qZcA07oEeoLGN4lxgILSMglPEcMl5HDO+VdE/jQEfdKpU2k8
- /b1SvYHUvjfoSDtlSDvFehS8im3ADcsncgqhhB8XbAfjC8MkPBYCsmtVfn1+QpCmaapL
- 9t7ASiagQevtAjgPb9gQfdqBKnYcoCbZsmeO/23FbxQIogTnt1UCEanwQIQie3It8H/a
- QmE6Yw/c5ileZzOT30vJO2IZb8pkjohEwWskfwc+C0BlGlvhbuYEF64gXhfYlMdofUs8
- fmXz1UAtxE/lCQH5vaRK5hKL+hKNCRQzIuDAvxcIBNOYy4Ulh7lhe5r6ZcXU5wyCmBe0
- f/7Q==
+ (envelope-from <philmd@redhat.com>) id 1i06t3-0006L9-8n
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:21:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36348)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i06t3-0006KR-1Y
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:21:33 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id ADA96693E7
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 16:21:31 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id l16so927665wmg.2
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 09:21:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mfZI9vKNpxE7fCSQTa0GxMEcN1qepcVPHGFp977KSbM=;
- b=nSeQZX6Sxc7LO4vR15bRwlKHvtM5wWgzIzm0oN58kfHMob1pqowMa9dxxYJp1lU6fy
- HNNmKQ0HLHAiesw2AtQ1S6qW67/ek6AR7MHVmij60bVb/ysKSi0BCkiUCqpt9Pqp4b3f
- Eayypgvp4SbOucRgHoGxp/wn9YFWZBHCcaybPi/EGULBXoFZjfQSdnh0oOq0siJqxo8k
- UD2f+EP+v6cWelXei6rwIX1xaW8s46TGh4u/X61NB5G8/xVDHhu3TtuJp6B4zXkrGrcA
- 4ST+p/OY3ouHvWU3PKARb91dv41gf///tQKRgD0cloLNNQ1p4ZDp+Jl6xQiVRY6P92aM
- Uh6w==
-X-Gm-Message-State: APjAAAVBN5W/XU1xsDZlNLde59wJ/atYwphXgtY1L0oyTKLWEYV9U8Ts
- y9mckj1j3X4R2xjKDr9QWTcVKZsPxboZGBiyuzg=
-X-Google-Smtp-Source: APXvYqwSTo3Vk22nl9nZCnukvDZQwwl7GBEwwWxQNx24uzm+U4Xxagy1MCsTTnxwotZhf6aqh3tx/49ZP07O5VJ7ROA=
-X-Received: by 2002:aca:fd92:: with SMTP id b140mr549588oii.79.1566317737052; 
- Tue, 20 Aug 2019 09:15:37 -0700 (PDT)
+ h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ea1RN9N8atXeGhJKNhTiAn8BJNQMPJstYaAd8WLOiHs=;
+ b=sOwyEvY4WELPlE4xxBGl7omsT0ta8TOjkgHYFdOPDY8bbmUZI4yTlVvH3I3wc5jePn
+ 0tW+fQq5chpZNG0wTXF5M6yNAovoEqJU55FmlJtmIZ2avnKs13k7wirpNquG9ygNMAzd
+ lCOy6JnrXQXm4dBdeiat/qTWJVTTrIo+DrWq0OMS6wyt3LPmHw6IIXLLWnt2Un37gBU4
+ 7zmdYZzk5mzTrtiVPT0lqSgaAcM3mSktZTatkCF2D3qAfGrgKQyMoTyDT0nJ3ZKz7a8N
+ vriBjYPtVWICALlltfEoKQ9noddnaLsfcEuU8s/ZVE9zmElHO/F3R9t4mJPYnZ0xNJqT
+ +I6Q==
+X-Gm-Message-State: APjAAAVlonHFSupHpW5e5JjgEjgwzDPjWpjqXAjIZcf2VAfaDgQYUhST
+ +6sDJoDyW7kj03rSs3pB4bJp90ME5uujh00necpTQ4uBKJd6AWSFilArpMzXoGIPdP5JHZFOUWb
+ +ODXrgf79oXbIHho=
+X-Received: by 2002:adf:e504:: with SMTP id j4mr34297422wrm.222.1566318090299; 
+ Tue, 20 Aug 2019 09:21:30 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxCmFb0XH8cKCLQONOilq9Hd9fsyNr8TwzRqqjQNscEo+WQxbVnggU4uIm7m7673lneutusKA==
+X-Received: by 2002:adf:e504:: with SMTP id j4mr34297386wrm.222.1566318090091; 
+ Tue, 20 Aug 2019 09:21:30 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id t14sm12316181wrs.58.2019.08.20.09.21.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Aug 2019 09:21:29 -0700 (PDT)
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: John Snow <jsnow@redhat.com>, seabios@seabios.org,
+ Nikolay Nikolov <nickysn@users.sourceforge.net>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <fccac7fa-888e-6ac5-458d-688808f3b282@redhat.com>
+ <699eee57-3009-4160-a9a2-1070f92b9c20@redhat.com>
+ <cc0b5a77-8bc4-070b-31e4-f29d5a174eb8@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7f6e8a5c-8262-ae39-333a-e8f18b3174f0@redhat.com>
+Date: Tue, 20 Aug 2019 18:21:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
- <CAFEAcA9UJGXOdNUD49bxmrdoZ5FEv4VLqAvyzDw66MOGsGB=wg@mail.gmail.com>
- <BN6PR2201MB1251C78A16D557867586FFD4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
- <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>
-In-Reply-To: <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 20 Aug 2019 18:15:26 +0200
-Message-ID: <CAL1e-=hx9bLLOZiwa2UySt98T3HGWhshwwm2j0wTp5JSjJxG-Q@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [EXTERNAL]Re: Proposal for amending TCG interface
- naming scheme
+In-Reply-To: <cc0b5a77-8bc4-070b-31e4-f29d5a174eb8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Regression with floppy drive controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,138 +98,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Palmer Dabbelt <palmer@sifive.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Weil <sw@weilnetz.de>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex <coderain@sdf.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 20, 2019 at 5:37 PM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+Cc'ing Eduardo, Paolo.
 
-> On 8/20/19 6:49 AM, Aleksandar Markovic wrote:
-> >> From: Peter Maydell <peter.maydell@linaro.org>
-> >> On Tue, 20 Aug 2019 at 13:50, Aleksandar Markovic
-> >> <amarkovic@wavecomp.com> wrote:
-> >>> The idea is to provide significant "lexicographic" distance between
-> those > groups of functions, rather than having the similar name (wiht
-> common root > "ext) for all of them.
-> >>
-> >> The current naming of the extract/sextract TCG ops is intended to keep
-> >> them in line with the extract32/sextract32/extract64/sextract64 utility
-> >> functions in bitops.h. I think those ones are reasonably named. The
-> >> other ops are a bit more ad-hoc in naming, admittedly...
-> >>
-> >
-> > How about
-> >
-> > tcg_gen_extract2_i32
-> > tcg_gen_extract2_i64
-> > tcg_gen_extract2_tl
-> > tcg_gen_extrl_i64_i32
-> > tcg_gen_extrh_i64_i32
-> > tcg_gen_ext_i32_i64
-> > tcg_gen_extu_i32_i64
-> >
-> > to
-> >
-> > tcg_gen_gather_i32
-> > tcg_gen_gather_i64
-> > tcg_gen_gather_tl
->
-> I'm not sure how "gather" applies.
+On 8/20/19 3:38 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 8/20/19 3:12 PM, John Snow wrote:
+>> On 8/20/19 6:25 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> [cross posting QEMU & SeaBIOS]
+>>>
+>>> Hello,
+>>>
+>>> I'v been looking at a QEMU bug report [1] which bisection resulted in=
+ a
+>>> SeaBIOS commit:
+>>>
+>>> 4a6dbcea3e412fe12effa2f812f50dd7eae90955 is the first bad commit
+>>> commit 4a6dbcea3e412fe12effa2f812f50dd7eae90955
+>>> Author: Nikolay Nikolov <nickysn@users.sourceforge.net>
+>>> Date:   Sun Feb 4 17:27:01 2018 +0200
+>>>
+>>>     floppy: Use timer_check() in floppy_wait_irq()
+>>>
+>>>     Use timer_check() instead of using floppy_motor_counter in BDA fo=
+r the
+>>>     timeout check in floppy_wait_irq().
+>>>
+>>>     The problem with using floppy_motor_counter was that, after it re=
+aches
+>>>     0, it immediately stops the floppy motors, which is not what is
+>>>     supposed to happen on real hardware. Instead, after a timeout (li=
+ke in
+>>>     the end of every floppy operation, regardless of the result - suc=
+cess,
+>>>     timeout or error), the floppy motors must be kept spinning for
+>>>     additional 2 seconds (the FLOPPY_MOTOR_TICKS). So, now the
+>>>     floppy_motor_counter is initialized to 255 (the max value) in the
+>>>     beginning of the floppy operation. For IRQ timeouts, a different
+>>>     timeout is used, specified by the new FLOPPY_IRQ_TIMEOUT constant
+>>>     (currently set to 5 seconds - a fairly conservative value, but sh=
+ould
+>>>     work reliably on most floppies).
+>>>
+>>>     After the floppy operation, floppy_drive_pio() resets the
+>>>     floppy_motor_counter to 2 seconds (FLOPPY_MOTOR_TICKS).
+>>>
+>>>     This is also consistent with what other PC BIOSes do.
+>>>
+>>>
+>>> This commit improve behavior with real hardware, so maybe QEMU is not
+>>> modelling something or modelling it incorrectly?
+> [...]
+>>
+>> Well, that's unfortunate.
+>>
+>> What version of QEMU shipped the SeaBIOS that caused the regression?
+>=20
+> See https://bugs.launchpad.net/qemu/+bug/1840719/comments/3
+>=20
+> QEMU commit 0b8f74488e, slighly before QEMU v3.1.0
+> (previous tag is v3.0.0).
+>=20
+> But you can use v4.1.0 too, simply change the SeaBIOS bios.bin, i.e.:
+>=20
+>   qemu$ git checkout v4.1.0
+>=20
+>   qemu$ (cd roms/seabios && git checkout 4a6dbcea3e4~) && \
+>         make -C roms bios
+>=20
+> Now pc-bios/bios.bin is built using the last commit working,
+>=20
+>   qemu$ (cd roms/seabios && git checkout 4a6dbcea3e4) && \
+>         make -C roms bios
+>=20
+> And you can reproduce the error.
 
+Back from here.
 
-gather = come together; assemble or accumulate
+So the SeaBIOS patch is:
 
+diff --git a/src/hw/floppy.c b/src/hw/floppy.c
+index 77dbade..3012b3a 100644
+--- a/src/hw/floppy.c
++++ b/src/hw/floppy.c
+@@ -34,6 +34,7 @@
+ #define FLOPPY_GAPLEN 0x1B
+ #define FLOPPY_FORMAT_GAPLEN 0x6c
+ #define FLOPPY_PIO_TIMEOUT 1000
++#define FLOPPY_IRQ_TIMEOUT 5000
 
-> To me this sounds like a vector
-> scatter/gather operation, where N different addresses are used to load the
-> N
-> elements of the vector.
->
-> When extract2 was named, I was only thinking "extract" because of how the
-> AArch64 instruction that implements this operation is named (EXTR), and
-> "extr"
-> itself was already taken.  We did ask for naming suggestions at the time,
-> but
-> no better ideas were floated...
->
-> Would it be clearer to use the x86 instruction name: SHRD (SHift Right
-> Doubleword)?
->
-> > tcg_gen_pick_l_i64_i32
-> > tcg_gen_pick_h_i64_i32
->
-> Hmm, "pick" doesn't mean anything to me.
+ #define FLOPPY_DOR_MOTOR_D     0x80 // Set to turn drive 3's motor ON
+ #define FLOPPY_DOR_MOTOR_C     0x40 // Set to turn drive 2's motor ON
+@@ -221,8 +222,9 @@ floppy_wait_irq(void)
+ {
+     u8 frs =3D GET_BDA(floppy_recalibration_status);
+     SET_BDA(floppy_recalibration_status, frs & ~FRS_IRQ);
++    u32 end =3D timer_calc(FLOPPY_IRQ_TIMEOUT);
+     for (;;) {
+-        if (!GET_BDA(floppy_motor_counter)) {
++        if (timer_check(end)) {
+             warn_timeout();
+             floppy_disable_controller();
+             return DISK_RET_ETIMEOUT;
 
+timer_calc() unit is milliseconds, so this patch should wait upto
+5seconds before failing, and it seems the timeout is not used at all.
 
-and "extl" does?
+SeaBIOS timer.c:
 
+// Return the TSC value that is 'msecs' time in the future.
+u32
+timer_calc(u32 msecs)
+{
+    return timer_read() + (GET_GLOBAL(TimerKHz) * msecs);
+}
 
-> Which makes it better than "gather",
-> but only just.
->
-> We do have a couple of related operations: tcg_gen_trunc_i64_tl and
-> tcg_gen_trunc_tl_i32.  It's easy to see tcg_gen_extrl_i64_i32 as
-> "truncate",
-> because that's what it does.  But it's harder to see tcg_gen_extrh_i64_i32
-> as
-> "truncate high".  Is tcg_gen_shr32_trunc_i64_i32 too unwieldy?
->
-> Or perhaps we could leave these alone.  Changing the others gives us the
-> desired (or at least increased) lexicographic distance.
->
-> > tcg_gen_extend_s_i32_i64
-> > tcg_gen_extend_0_i32_i64
->
-> These should not drift too far from the other extension names,
->
->     tcg_gen_ext{8,16}{u,s}_i32
->     tcg_gen_ext{8,16,32}{u,s}_i64
->
-> What if we use the AArch64 mnemonics: zxt (zero-extend) and sxt
-> (sign-extend)?
->  This would give us
->
->     tcg_gen_zxt8_i32
->     tcg_gen_sxt8_i32
->     (etc)
->     tcg_gen_zxt_i32_i64
->     tcg_gen_sxt_i32_i64
->
->
-Perhaps the whole "extend" front-end segment should be tweaked to be
-consistent.
+static u32
+timer_read(void)
+{
+    u16 port =3D GET_GLOBAL(TimerPort);
+    if (CONFIG_TSC_TIMER && !port)
+        // Read from CPU TSC
+        return rdtscll() >> GET_GLOBAL(ShiftTSC);
+    if (CONFIG_PMTIMER && port !=3D PORT_PIT_COUNTER0)
+        // Read from PMTIMER
+        return timer_adjust_bits(inl(port), 0xffffff);
+    // Read from PIT.
+    outb(PM_SEL_READBACK | PM_READ_VALUE | PM_READ_COUNTER0, PORT_PIT_MOD=
+E);
+    u16 v =3D inb(PORT_PIT_COUNTER0) | (inb(PORT_PIT_COUNTER0) << 8);
+    return timer_adjust_bits(v, 0xffff);
+}
 
-In general, Z/S scheme in these cases looks better than U/S scheme to me.
-The prevalent terms are "zero-extend" and "sign-extend", and involving
-Unsigned/Signed just widens the semantic gap.
+Using the default QEMU config, we build SeaBIOS to use the TSC timer:
 
-I used "0" and "s" to make the visual distinction easier (it is easier to
-spot).
+builds/seabios-128k/.config:CONFIG_TSC_TIMER=3Dy
+builds/seabios-256k/.config:CONFIG_TSC_TIMER=3Dy
 
-I was hoping we would remove "sextract" (well, it is funny a little bit
-definitely, but if there are zillion occurrences, and used everyday, it
-just stops being funny, and is somewhat distracting...), however it looks
-we will get "sextend", and "sextend2", and "sex_h" and "sex_l"...
+$ qemu-system-i386 -M isapc -cpu 486 \
+  -fda Windows\ 98\ Second\ Edition\ Boot.img \
+  -chardev stdio,id=3Dseabios \
+  -device isa-debugcon,iobase=3D0x402,chardev=3Dseabios
+Booting from Floppy...
+Floppy_drive_recal 0
+Floppy_enable_controller
+WARNING - Timeout at floppy_wait_irq:228!
+Floppy_disable_controller
+Floppy_enable_controller
+WARNING - Timeout at floppy_wait_irq:228!
+Floppy_disable_controller
+Boot failed: could not read the boot disk
 
-Aleksandar
+Now enabling the TSC feature:
 
+$ qemu-system-i386 -M isapc -cpu 486,tsc \
+  -fda Windows\ 98\ Second\ Edition\ Boot.img \
+  -chardev stdio,id=3Dseabios \
+  -device isa-debugcon,iobase=3D0x402,chardev=3Dseabios
+Booting from Floppy...
+Floppy_drive_recal 0
+Floppy_enable_controller
+Floppy_media_sense on drive 0 found rate 0
+Booting from 0000:7c00
+Floppy_disable_controller
+Floppy_enable_controller
+Floppy_drive_recal 0
+Floppy_media_sense on drive 0 found rate 0
 
->
-> r~
->
->
+Do we need a cpu with TSC support to run SeaBIOS?
+
+So we should use '-cpu Conroe' or '-cpu core2duo' minimum?
+
