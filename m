@@ -2,61 +2,59 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F10C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4635BC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:09:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD5A622DA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:09:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD5A622DA9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1ADF2205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:09:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ADF2205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i06hE-0004Hy-UC
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:09:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42197)
+	id 1i06hZ-00036Z-Ve
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:09:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1i06eX-0000dl-FU
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:06:34 -0400
+ (envelope-from <Dave.Martin@arm.com>) id 1i06bn-0005al-69
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:03:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1i06eW-0002f4-38
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:06:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46776)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1i06eV-0002eg-UL
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:06:32 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4D4683084212;
- Tue, 20 Aug 2019 16:06:31 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-117-179.ams2.redhat.com
- [10.36.117.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C81AD84952;
- Tue, 20 Aug 2019 16:06:27 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 20 Aug 2019 18:06:15 +0200
-Message-Id: <20190820160615.14616-4-lvivier@redhat.com>
-In-Reply-To: <20190820160615.14616-1-lvivier@redhat.com>
-References: <20190820160615.14616-1-lvivier@redhat.com>
+ (envelope-from <Dave.Martin@arm.com>) id 1i06bl-00007R-VA
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:03:43 -0400
+Received: from foss.arm.com ([217.140.110.172]:42868)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <Dave.Martin@arm.com>)
+ id 1i06bi-0008Vy-AH; Tue, 20 Aug 2019 12:03:38 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FC8228;
+ Tue, 20 Aug 2019 09:03:37 -0700 (PDT)
+Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 518CB3F246;
+ Tue, 20 Aug 2019 09:03:36 -0700 (PDT)
+Date: Tue, 20 Aug 2019 17:03:29 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190820160320.GA27757@arm.com>
+References: <20190803210803.5701-1-richard.henderson@linaro.org>
+ <20190803210803.5701-5-richard.henderson@linaro.org>
+ <CAFEAcA-_gMkE-0kA=xyUyNKxeqX0n6B-9i_7132xfFXQNRqb6w@mail.gmail.com>
+ <7c739082-c1d5-ad03-0020-9776cf08694a@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 20 Aug 2019 16:06:31 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c739082-c1d5-ad03-0020-9776cf08694a@linaro.org>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v8 3/3] virtio-rng: change default backend to
- rng-builtin
+X-Received-From: 217.140.110.172
+Subject: Re: [Qemu-devel] [PATCH v7 4/6] include/elf: Add defines related to
+ GNU property notes for AArch64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,90 +66,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>, Amit Shah <amit@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Richard W . M . Jones" <rjones@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- backends/rng-builtin.c | 1 -
- hw/virtio/virtio-rng.c | 3 +--
- include/sysemu/rng.h   | 2 ++
- qemu-options.hx        | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+On Tue, Aug 20, 2019 at 04:59:50PM +0100, Richard Henderson wrote:
+> On 8/20/19 8:39 AM, Peter Maydell wrote:
+> > On Sat, 3 Aug 2019 at 22:08, Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> These are all of the defines required to parse
+> >> GNU_PROPERTY_AARCH64_FEATURE_1_AND, copied from binutils.
+> >> Other missing defines related to other GNU program headers
+> >> and notes are elided for now.
+> >>
+> >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > 
+> > What's the authoritative source for these definitions? I
+> > tried looking in glibc, binutils and the kernel without
+> > any luck.
+> 
+> Presumably the true "authoritative" source is an ARM document, but I don't have
+> that handy.
+> 
+> For binutils, the defines are in include/elf/common.h:
+> 
+> https://sourceware.org/git/?p=binutils-gdb.git;a=blob_plain;f=include/elf/common.h;hb=HEAD
+> 
+> The upstream kernel is also lacking the defines, as they're part of the ARM
+> patch set that is still in flight.  The defines are still not present in glibc
+> as of today.
 
-diff --git a/backends/rng-builtin.c b/backends/rng-builtin.c
-index 3381d47174df..ba1b8d66b83e 100644
---- a/backends/rng-builtin.c
-+++ b/backends/rng-builtin.c
-@@ -10,7 +10,6 @@
- #include "qemu/main-loop.h"
- #include "qemu/guest-random.h"
-=20
--#define TYPE_RNG_BUILTIN "rng-builtin"
- #define RNG_BUILTIN(obj) OBJECT_CHECK(RngBuiltin, (obj), TYPE_RNG_BUILTI=
-N)
-=20
- typedef struct RngBuiltin {
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index fcf3b2e32912..e93bed020f64 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -19,7 +19,6 @@
- #include "hw/virtio/virtio-rng.h"
- #include "sysemu/rng.h"
- #include "sysemu/runstate.h"
--#include "sysemu/rng-random.h"
- #include "qom/object_interfaces.h"
- #include "trace.h"
-=20
-@@ -193,7 +192,7 @@ static void virtio_rng_device_realize(DeviceState *de=
-v, Error **errp)
-     }
-=20
-     if (vrng->conf.rng =3D=3D NULL) {
--        Object *default_backend =3D object_new(TYPE_RNG_RANDOM);
-+        Object *default_backend =3D object_new(TYPE_RNG_BUILTIN);
-=20
-         user_creatable_complete(USER_CREATABLE(default_backend),
-                                 &local_err);
-diff --git a/include/sysemu/rng.h b/include/sysemu/rng.h
-index 9b22c156f8e6..fa6eada78cd7 100644
---- a/include/sysemu/rng.h
-+++ b/include/sysemu/rng.h
-@@ -24,6 +24,8 @@
- #define RNG_BACKEND_CLASS(klass) \
-     OBJECT_CLASS_CHECK(RngBackendClass, (klass), TYPE_RNG_BACKEND)
-=20
-+#define TYPE_RNG_BUILTIN "rng-builtin"
-+
- typedef struct RngRequest RngRequest;
- typedef struct RngBackendClass RngBackendClass;
- typedef struct RngBackend RngBackend;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 312586cc18f8..14b0bbeffc96 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4328,7 +4328,7 @@ The @option{share} boolean option is @var{on} by de=
-fault with memfd.
- Creates a random number generator backend which obtains entropy from
- QEMU builtin functions. The @option{id} parameter is a unique ID that
- will be used to reference this entropy backend from the @option{virtio-r=
-ng}
--device.
-+device. By default, the @option{virtio-rng} device uses this RNG backend=
-.
-=20
- @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
-=20
---=20
-2.21.0
 
+The AArch64 spec is here:
+
+https://developer.arm.com/docs/ihi0056/latest/elf-for-the-arm-64-bit-architecture-aarch64-abi-2019q2-documentation
+
+Cheers
+---Dave
 
