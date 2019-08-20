@@ -2,48 +2,48 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC20EC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D26EC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82A5922D6D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:28:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A5922D6D
+	by mail.kernel.org (Postfix) with ESMTPS id 5127022DA7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:31:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5127022DA7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i08sC-0006Vw-JB
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 14:28:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60033)
+	id 1i08uy-0008Kw-Gc
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 14:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60405)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i08rR-0005ee-1e
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 14:28:02 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i08tR-0007R5-8i
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 14:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i08rP-0000i7-49
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 14:28:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49994)
+ (envelope-from <mreitz@redhat.com>) id 1i08tQ-00029x-BQ
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 14:30:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49998)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i08rL-0000ca-CE; Tue, 20 Aug 2019 14:27:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1i08tO-00026M-Bm; Tue, 20 Aug 2019 14:30:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9B2E4C0035C2;
- Tue, 20 Aug 2019 18:27:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A42AC195D837;
+ Tue, 20 Aug 2019 18:30:01 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A73A5C21F;
- Tue, 20 Aug 2019 18:27:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 51EFC60BF3;
+ Tue, 20 Aug 2019 18:29:57 +0000 (UTC)
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-8-mlevitsk@redhat.com>
+ <20190814202219.1870-13-mlevitsk@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +70,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <12c342c8-6ac8-3533-7a7b-e61826e9abb0@redhat.com>
-Date: Tue, 20 Aug 2019 20:27:48 +0200
+Message-ID: <80e25f5b-b26c-7867-bb3a-0992029b33b9@redhat.com>
+Date: Tue, 20 Aug 2019 20:29:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190814202219.1870-8-mlevitsk@redhat.com>
+In-Reply-To: <20190814202219.1870-13-mlevitsk@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="i5WvR3RGj9lgmr8JbsnYohiizEkgJ2HQ4"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 20 Aug 2019 18:27:54 +0000 (UTC)
+ boundary="GnGwiEL6Ux3n3TB9tkRa2kpUJkjpxMGJK"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 20 Aug 2019 18:30:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 07/13] block: add manage-encryption command
- (qmp and blockdev)
+Subject: Re: [Qemu-devel] [PATCH 12/13] qemu-img: implement key management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,8 +105,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i5WvR3RGj9lgmr8JbsnYohiizEkgJ2HQ4
-Content-Type: multipart/mixed; boundary="Exr5HmmcXqvgTfBzF7WNuN2lCmGE13reg";
+--GnGwiEL6Ux3n3TB9tkRa2kpUJkjpxMGJK
+Content-Type: multipart/mixed; boundary="ddLPEkBudgB9rdboMbf0Um3tUUbU97vWk";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
@@ -115,207 +114,52 @@ Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
-Message-ID: <12c342c8-6ac8-3533-7a7b-e61826e9abb0@redhat.com>
-Subject: Re: [PATCH 07/13] block: add manage-encryption command (qmp and
- blockdev)
+Message-ID: <80e25f5b-b26c-7867-bb3a-0992029b33b9@redhat.com>
+Subject: Re: [PATCH 12/13] qemu-img: implement key management
 References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-8-mlevitsk@redhat.com>
-In-Reply-To: <20190814202219.1870-8-mlevitsk@redhat.com>
+ <20190814202219.1870-13-mlevitsk@redhat.com>
+In-Reply-To: <20190814202219.1870-13-mlevitsk@redhat.com>
 
---Exr5HmmcXqvgTfBzF7WNuN2lCmGE13reg
+--ddLPEkBudgB9rdboMbf0Um3tUUbU97vWk
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 14.08.19 22:22, Maxim Levitsky wrote:
-> This adds:
->=20
-> * x-blockdev-update-encryption and x-blockdev-erase-encryption qmp comm=
-ands
->   Both commands take the QCryptoKeyManageOptions
->   the x-blockdev-update-encryption is meant for non destructive additio=
-n
->   of key slots / whatever the encryption driver supports in the future
->=20
->   x-blockdev-erase-encryption is meant for destructive encryption key e=
-rase,
->   in some cases even without way to recover the data.
->=20
->=20
-> * bdrv_setup_encryption callback in the block driver
->   This callback does both the above functions with 'action' parameter
->=20
-> * QCryptoKeyManageOptions with set of options that drivers can use for =
-encryption managment
->   Currently it has all the options that LUKS needs, and later it can be=
- extended
->   (via union) to support more encryption drivers if needed
->=20
-> * blk_setup_encryption / bdrv_setup_encryption - the usual block layer =
-wrappers.
->   Note that bdrv_setup_encryption takes BlockDriverState and not BdrvCh=
-ild,
->   for the ease of use from the qmp code. It is not expected that this f=
-unction
->   will be used by anything but qmp and qemu-img code
->=20
->=20
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  block/block-backend.c          |  9 ++++++++
->  block/io.c                     | 24 ++++++++++++++++++++
->  blockdev.c                     | 40 ++++++++++++++++++++++++++++++++++=
+>  block/crypto.c   |  16 ++++++
+>  block/crypto.h   |   3 +
+>  qemu-img-cmds.hx |  13 +++++
+>  qemu-img.c       | 140 +++++++++++++++++++++++++++++++++++++++++++++++=
 
->  include/block/block.h          | 12 ++++++++++
->  include/block/block_int.h      | 11 ++++++++++
->  include/sysemu/block-backend.h |  7 ++++++
->  qapi/block-core.json           | 36 ++++++++++++++++++++++++++++++
->  qapi/crypto.json               | 26 ++++++++++++++++++++++
->  8 files changed, 165 insertions(+)
+>  4 files changed, 172 insertions(+)
 
-Now I don=E2=80=99t know whether you want to keep this interface at all, =
-because
-the cover letter seemed to imply you=E2=80=99d prefer a QMP amend.  But l=
-et it
-be said that a QMP amend is no trivial task.  I think the most difficult
-bit is that the qcow2 implementation currently is inherently an offline
-operation.  It isn=E2=80=99t a good idea to use it on a live image.  (May=
-be it
-works, but it=E2=80=99s definitely not what I had in mind when I wrote it=
-=2E)
-
-So I=E2=80=99ll still take a quick glance at the interface here.
-
-[...]
-
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 0d43d4f37c..53ed411eed 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -5327,3 +5327,39 @@
->    'data' : { 'node-name': 'str',
->               'iothread': 'StrOrNull',
->               '*force': 'bool' } }
-> +
-> +
-> +##
-> +# @x-blockdev-update-encryption:
-> +#
-> +# Update the encryption keys for an encrypted block device
-> +#
-> +# @node-name: 	  Name of the blockdev to operate on
-> +# @force:         Disable safety checks (use with care)
-> +# @options:       Driver specific options
-> +#
-> +
-> +# Since: 4.2
-> +##
-> +{ 'command': 'x-blockdev-update-encryption',
-> +  'data': { 'node-name' : 'str',
-> +            '*force' : 'bool',
-> +            'options': 'QCryptoEncryptionSetupOptions' } }
-> +
-> +##
-> +# @x-blockdev-erase-encryption:
-> +#
-> +# Erase the encryption keys for an encrypted block device
-> +#
-> +# @node-name: 	  Name of the blockdev to operate on
-
-Why the tab?
-
-> +# @force:         Disable safety checks (use with care)
-
-I think being a bit more verbose wouldn=E2=80=99t hurt.
-
-(Same above.)
-
-> +# @options:       Driver specific options
-> +#
-> +# Returns: @QCryptoKeyManageResult
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'command': 'x-blockdev-erase-encryption',
-> +  'data': { 'node-name' : 'str',
-> +            '*force' : 'bool',
-> +            'options': 'QCryptoEncryptionSetupOptions' } }
-> diff --git a/qapi/crypto.json b/qapi/crypto.json
-> index b2a4cff683..69e8b086db 100644
-> --- a/qapi/crypto.json
-> +++ b/qapi/crypto.json
-> @@ -309,3 +309,29 @@
->    'base': 'QCryptoBlockInfoBase',
->    'discriminator': 'format',
->    'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
-> +
-> +
-> +##
-> +# @QCryptoEncryptionSetupOptions:
-> +#
-> +# Driver specific options for encryption key management.
-
-The options do seem LUKS-specific, but the name of this structure does no=
-t.
-
-> +# @key-secret: the ID of a QCryptoSecret object providing the password=
-
-> +#              to add or to erase (optional for erase)
-> +#
-> +# @old-key-secret: the ID of a QCryptoSecret object providing the pass=
-word
-> +#                  that can currently unlock the image
-> +#
-> +# @slot: Key slot to update/erase
-> +#        (optional, for update will select a free slot,
-> +#        for erase will erase all slots that match the password)
-> +#
-> +# @iter-time: number of milliseconds to spend in
-> +#             PBKDF passphrase processing. Currently defaults to 2000
-> +# Since: 4.2
-> +##
-
-Does it really make sense to use the same structure for erasing and
-updating?  I think there are ways to represent @key-secret vs. @slot
-being alternatives to each other for erase; @iter-time doesn=E2=80=99t se=
-em to
-make sense for erase; and @slot doesn=E2=80=99t seem to make sense for up=
-date.
-Also, I don=E2=80=99t know whether to use @key-secret or @old-key-secret =
-for erase.
-
-All in all, it seems more sensible to me to have separate structs for
-updating and erasing.
+Yes, this seems a bit weird.  Putting it under amend seems like the
+natural thing if that works; if not, I think it should be a single
+qemu-img subcommand instead of two.
 
 Max
 
-> +{ 'struct': 'QCryptoEncryptionSetupOptions',
-> +  'data': { '*key-secret': 'str',
-> +            '*old-key-secret': 'str',
-> +            '*slot': 'int',
-> +            '*iter-time': 'int' } }
->=20
 
+--ddLPEkBudgB9rdboMbf0Um3tUUbU97vWk--
 
-
---Exr5HmmcXqvgTfBzF7WNuN2lCmGE13reg--
-
---i5WvR3RGj9lgmr8JbsnYohiizEkgJ2HQ4
+--GnGwiEL6Ux3n3TB9tkRa2kpUJkjpxMGJK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1cO6QACgkQ9AfbAGHV
-z0C/bQgAtOzxiyDF4S8+HXySdADAhf7OdBxeC/GKg9UwY05Sj7yasDDkqG2YOevr
-mKBxYTnhxMEZLiftIMDswYLNY+5T3DGAh1nTnBQ1wpk3Ilch00kVTQBQvmeRMGyc
-OoW/ULjrS7gjtlrmS/HkZD8lco3zeRYGCGLedz93nxDfewONXOz1P1SfTi29a25K
-uy45I3qvSxohvQt8DgG1wnJmvgmh3mzycxyNJ0TBrsFwLdZzAUPxyW4kphOVy+hc
-+aXVNAVmT0x3Q4wmcRqiBgQ62TD6ZjtvwRhofUzT1+TC069osvc/C4M3lD1zKw8S
-9eqKaJN4/ztef6Uam6VRDCPdpGT4xw==
-=YzBj
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1cPCMACgkQ9AfbAGHV
+z0AOZwf9GmqdigYaoEIP5mkl3KP1rPsk9oVcw8Eev9ME5NnZkRjgNKo/Bp09ZsiB
+NOZLKDB9FYw/EU9oL71kBvCgIBoQdYzAUPB1fq19c9LxXL9+365zSK3r8dygK5n4
+AtV1T/jIbEK6lrYtxFXj6deQHBRTnq0J2Y90tK0OWeOqyqHe2Y8pGhfOY6o+dYzT
+FLXHcjvSlbvwRQl1eEOoiyRJkzFYrX42Od0ckU+GY6F+mYmLSVjJiclJ3EIeby5P
+Qz7GmpysSbVN1JoqcNYAGhPzTzwz3D2W7NY6eiPq0i7MbyyYzw97A2ikWQHaB2Ej
+h3g3I55sa96xnKGaDKVx7W45Z489Eg==
+=Pngj
 -----END PGP SIGNATURE-----
 
---i5WvR3RGj9lgmr8JbsnYohiizEkgJ2HQ4--
+--GnGwiEL6Ux3n3TB9tkRa2kpUJkjpxMGJK--
 
