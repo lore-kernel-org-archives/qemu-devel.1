@@ -2,60 +2,91 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76AE2C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00362C41514
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:54:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46F2122CE3
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:51:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F2122CE3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id BE91A22DBF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:54:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p8eHLak8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE91A22DBF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i05To-0004XN-BE
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 10:51:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57436)
+	id 1i05X2-0006OG-Sw
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 10:54:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57866)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1i05Sw-0003hY-9i
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:50:31 -0400
+ (envelope-from <groeck7@gmail.com>) id 1i05WL-0005hE-4I
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1i05Su-0004rN-Fn
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:50:29 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:27382)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1i05Su-0004nm-9J
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:50:28 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id E856E7456E2;
- Tue, 20 Aug 2019 16:50:25 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 67EFC7456D5; Tue, 20 Aug 2019 16:50:25 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 598977456B4;
- Tue, 20 Aug 2019 16:50:25 +0200 (CEST)
-Date: Tue, 20 Aug 2019 16:50:25 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-In-Reply-To: <e72fd744-3440-a684-38c4-75d6d604cddb@redhat.com>
-Message-ID: <alpine.BSF.2.21.9999.1908201648370.56910@zero.eik.bme.hu>
-References: <alpine.BSF.2.21.9999.1811292101280.5887@zero.eik.bme.hu>
- <alpine.BSF.2.21.9999.1901151926320.72972@zero.eik.bme.hu>
- <e72fd744-3440-a684-38c4-75d6d604cddb@redhat.com>
-User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
+ (envelope-from <groeck7@gmail.com>) id 1i05WK-0007Le-8A
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:54:01 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39893)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1i05WI-0007HP-05; Tue, 20 Aug 2019 10:53:58 -0400
+Received: by mail-pg1-x543.google.com with SMTP id u17so3395809pgi.6;
+ Tue, 20 Aug 2019 07:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=8XrptPr0YeXBkfbqu0cuLcnDeqgk6So/l9Vyuw324jY=;
+ b=p8eHLak8VRnIFGWtRCxq+g/asU/O29heyzMXQnRxvuJokfRCBsgRExz81KYXPhDxff
+ xBVbbiqGi9cR1IW0njiq1ZUMhy85cUSHY+na+XJz/58ncV8CTztuPMruPvYajaiNR6IU
+ KqsFM6IqTTeToVaWgvxboMatPFUxQmZKX4HbOBvvPZ69wxY82+umfHxX3MtSXoCeFaVX
+ hEQZozP97e7SKIpc6db3ZdrvK+aG9n97s/R9YGyhOnCoJy4Wg6nr14Y4ckn14a6FSKWd
+ 71OLEmb7O5y/AohEC9zb2CqmSs+fd2l0trjP80oQowLiezh0gNdrcRV0iQkGIZsC3wcf
+ iNjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8XrptPr0YeXBkfbqu0cuLcnDeqgk6So/l9Vyuw324jY=;
+ b=tqOBupqWRznPKtdRDZCyryWVEpLs+ZrX+ymR9lFXgpFhQ9y4POHkPM9QZL9KMtrouU
+ XX9ev/iljxUS1RkEp8Vaci7rs9l1z3GvJtTFa6RZESIt02ZMxdle/BBS6W6zAsPXa0HA
+ gsOM7qV518rBhl3FSGgCWKS6nYSDRRyDbEn8N+Bbr9DJ5WO8yV/qkyBJ1GtMCYrncSDN
+ XsYgJNYcQfrgM5dlAiPOmA8qtxKQBgr1LRgHj4b6vypjhmo0rgCIQkc4t6yj1Zv1CahR
+ RvsJzjcM+F7d6UDEalXJ7HwX6nes+oGHKfu7dbEILEYIZz/z3+VDHQLvEr0xV9Bkkuax
+ 7M5w==
+X-Gm-Message-State: APjAAAVrhae/nSuabWuzvxR+fT4QDu9zpLjLWh7kIJ/4SAVQE2VxfwIR
+ 1x0zRt3dtnU5TvsJbhJwcNA=
+X-Google-Smtp-Source: APXvYqx6NsxluSVwwnDXxlZ7Z8bwul/uhH0fx0e5PIbzibFTUChYPZh+LRi+WThf8qXSFfkri/S2Jg==
+X-Received: by 2002:a65:4507:: with SMTP id n7mr24154914pgq.86.1566312836684; 
+ Tue, 20 Aug 2019 07:53:56 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id
+ h17sm20397426pfo.24.2019.08.20.07.53.55
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 20 Aug 2019 07:53:55 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190820123417.27930-1-philmd@redhat.com>
+ <3e3fcb30-1e12-eaf4-07a2-47d09aea2511@roeck-us.net>
+ <CAFEAcA99kKzWL89gCQ8NZi4XKL=YzKDCJR1tLbXwQDLLmZyZJA@mail.gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <b71974e0-868d-0f8c-e344-ec9bf4be9d07@roeck-us.net>
+Date: Tue, 20 Aug 2019 07:53:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
+In-Reply-To: <CAFEAcA99kKzWL89gCQ8NZi4XKL=YzKDCJR1tLbXwQDLLmZyZJA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] hw/char/bcm2835_aux: Provide full
+ 16550 UART support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,36 +98,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Philippe,
+On 8/20/19 7:34 AM, Peter Maydell wrote:
+> On Tue, 20 Aug 2019 at 15:31, Guenter Roeck <linux@roeck-us.net> wrote:
+>> I tested with qemu 4.0, 4.1, and mainline (with my patch series applied on top of each).
+>> One problem I do see is that booting mainline (as of right now) is _slow_ compared
+>> to released versions of qemu. It takes some 35 seconds to get to "Unpacking initramfs",
+>> compared to ~8 seconds for v4.1 and earlier. Otherwise it works.
+> 
+> Hmm, slow compared to v4.1.0 ? That's not so long in the past so
+> that seems worth trying to bisect to find the culprit...
+> 
 
-On Tue, 15 Jan 2019, Philippe Mathieu-Daud=E9 wrote:
-> On 1/15/19 7:29 PM, BALATON Zoltan wrote:
->> On Thu, 29 Nov 2018, BALATON Zoltan wrote:
->>> Then I've tried the same with the pll patches posted by Philippe
->>> Mathieu-Daud=E9 here:
->>>
->>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg00191.html
->>>
->>> on top of v3.1.0-rc3 which helped to get rid of the cprman warnings
->>
->> Will these patches be merged eventually? These seem to at least get ri=
-d
->> of some annoying warnings in Linux boot dmesg.
->
-> I'll respin this series addressing Peter's comments.
->
-> Thanks for reminding me ;)
->
-> Phil.
+Turns out it was the "usual" problem: "--enable-debug" specified as
+configuration option. Sorry for the noise.
 
-While you're at raspi patches maybe I remind you again of the above :-)
-I think I haven't seen these being merged yet but correct me if I'm wrong=
-.
+Guenter
 
-Regards,
-BALATON Zoltan
