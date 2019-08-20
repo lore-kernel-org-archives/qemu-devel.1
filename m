@@ -2,86 +2,54 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 766E4C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 379BAC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A76C22CF4
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:38:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A76C22CF4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0BF972082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:40:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF972082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzxmZ-0004PN-GL
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 02:38:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39666)
+	id 1hzxoN-0006me-Ro
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 02:40:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1hzxlp-0003ak-NN
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:37:30 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzxmf-0004o0-1U
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hzxlo-0005mz-N5
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:37:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40052)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzxmd-0006UU-Cg
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:38:20 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:39273 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hzxlo-0005ml-FO
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:37:28 -0400
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C1EB4C05975D
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 06:37:27 +0000 (UTC)
-Received: by mail-pg1-f198.google.com with SMTP id g126so3948736pgc.22
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 23:37:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=qktQLjVFauAYFgDf3BubpscVHr7mx/rXCV0J6yVDbys=;
- b=ISXXjxDhsXp/RwCqFrqiIl3wuFk8/vGGq4VRied0Rkv4jzfdeshMGKevI9crUGz+3H
- fECAXxsEG51owamrjSTE83jUJMQmHN1yKds7W1RnJikFtHlpISQ5o8G8/Pn+fQKyHuqK
- 2X1MF+CfepYbqmypw3JnVsNjglmh5w5aC3oVF3BUm67Qm/qP/wmF4W/0EEMsWK0+qshD
- dpphcBxF2/sr0XPHFCS3j+ZfBjADKd3OI0yXRY/lY+2FsmUilLKKZXEfTatRIL0uJJ5Q
- vi9vVbclk4CgLdRhIsz2Spu3U83mLCvYDooamsdSuQSvcBTNLbyypQE3FvHRwG4orzdJ
- ToiA==
-X-Gm-Message-State: APjAAAXX4WJIhTEbTML6PlPMZCy3fp9SD/KJpVaRdhNVIFrub//LB9Vj
- KgDax7Nny27XWsJKCu4SarWrL/0V9TfeQA+udw55+dramFbfYq+2aNcoZCz12WfWMZM3sk8hJ8k
- vQqOrDz6v6VZ18r8=
-X-Received: by 2002:a17:90b:8e:: with SMTP id
- bb14mr24039726pjb.35.1566283047306; 
- Mon, 19 Aug 2019 23:37:27 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwDLNktvOjmjwJtMuWvbaBOSvqDnlSATgS1flCxew2XPUiyQdc1g4Ep2Ue/qQl/oNIKI6JUuw==
-X-Received: by 2002:a17:90b:8e:: with SMTP id
- bb14mr24039716pjb.35.1566283047107; 
- Mon, 19 Aug 2019 23:37:27 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id l26sm21580860pgb.90.2019.08.19.23.37.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 23:37:26 -0700 (PDT)
-Date: Tue, 20 Aug 2019 14:37:17 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190820063717.GI13560@xz-x1>
-References: <20190820051615.1210-1-peterx@redhat.com>
- <20190820051615.1210-3-peterx@redhat.com>
- <800a4208-627f-9089-8291-c6f4329cd4d5@redhat.com>
- <20190820063515.GH13560@xz-x1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190820063515.GH13560@xz-x1>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] memory: Split zones when do
- coalesced_io_del()
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hzxmd-0006Me-1A
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:38:19 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 655571A1FC6;
+ Tue, 20 Aug 2019 08:38:15 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 45B9B1A0F1A;
+ Tue, 20 Aug 2019 08:38:15 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 20 Aug 2019 08:37:52 +0200
+Message-Id: <1566283083-21838-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PULL 00/11] MIPS queue for August 20th, 2019
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,49 +61,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 20, 2019 at 02:35:15PM +0800, Peter Xu wrote:
-> On Tue, Aug 20, 2019 at 08:24:12AM +0200, Paolo Bonzini wrote:
-> > On 20/08/19 07:16, Peter Xu wrote:
-> > > It is a workaround of current KVM's KVM_UNREGISTER_COALESCED_MMIO
-> > > interface.  The kernel interface only allows to unregister an mmio
-> > > device with exactly the zone size when registered, or any smaller zone
-> > > that is included in the device mmio zone.  It does not support the
-> > > userspace to specify a very large zone to remove all the small mmio
-> > > devices within the zone covered.
-> > > 
-> > > Logically speaking it would be nicer to fix this from KVM side, though
-> > > in all cases we still need to coop with old kernels so let's do this.
-> > > 
-> > > This patch has nothing to do with 3ac7d43a6fbb5d4a3 because this is
-> > > probably broken from the very beginning when the
-> > > KVM_UNREGISTER_COALESCED_MMIO interface is introduced in kernel.
-> > > However to make the backport to stables easier, I'm still using the
-> > > commit 3ac7d43a6fbb5d4a3 to track this problem because this will
-> > > depend on that otherwise even additions of mmio devices won't work.
-> > > 
-> > > Fixes: 3ac7d43a6fbb5d4a3
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > 
-> > What about my comments to this patch? :)
-> 
-> I thought that comment was for patch 1 but wrongly replied to this
-> patch 2... :)
-> 
-> Isn't that comment only valid if we still use the old patch 1?  With
-> your suggestion, is that still needed to keep mr->coalesced untouched?
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Oops, ignore this reply...  It's needed of course!  So it also
-affecting this patch...
+The following changes since commit 50d69ee0d82378c7c21f482492dacfe0916b4863:
 
-I'll prepare a v3 soon.
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-softfloat-headers-190819-1' into staging (2019-08-19 15:58:01 +0100)
 
-Regards,
+are available in the git repository at:
+
+  https://github.com/AMarkovic/qemu tags/mips-queue-aug-20-2019
+
+for you to fetch changes up to 6eed53f71b33c3716e5d94eba506e4706d8dace8:
+
+  target/mips: tests/tcg: Fix target configurations for MSA tests (2019-08-19 19:53:37 +0200)
+
+----------------------------------------------------------------
+
+MIPS queue for August 20th, 2019
+
+Highlights:
+
+  - this pull request consists of selected patches from "target/mips:
+    Misc patches for 4.2" series; most of them are checkpatch cleanups,
+    and the rest are improvements of MSA TCG tests
+
+Note:
+
+  - an instance of checkpatch warning on updating MAINTAINERS for a patch
+    can be ignored
+
+----------------------------------------------------------------
+
+Aleksandar Markovic (11):
+  target/mips: Style improvements in cp0_timer.c
+  target/mips: Style improvements in cpu.c
+  target/mips: Style improvements in machine.c
+  target/mips: Style improvements in translate.c
+  target/mips: Style improvements in cps.c
+  target/mips: Style improvements in mips_fulong2e.c
+  target/mips: Style improvements in mips_int.c
+  target/mips: Style improvements in mips_malta.c
+  target/mips: Style improvements in mips_mipssim.c
+  target/mips: tests/tcg: Add optional printing of more detailed failure
+    info
+  target/mips: tests/tcg: Fix target configurations for MSA tests
+
+ hw/mips/cps.c                                      |   6 +-
+ hw/mips/mips_fulong2e.c                            |  96 ++-
+ hw/mips/mips_int.c                                 |   3 +-
+ hw/mips/mips_malta.c                               | 216 +++--
+ hw/mips/mips_mipssim.c                             |  19 +-
+ target/mips/cp0_timer.c                            |  42 +-
+ target/mips/cpu.c                                  |  17 +-
+ target/mips/machine.c                              |   4 +-
+ target/mips/translate.c                            | 773 ++++++++---------
+ tests/tcg/mips/include/test_utils_128.h            |  23 +-
+ .../mips/user/ase/msa/test_msa_compile_32r5eb.sh   | 917 +++++++++++++++++++++
+ .../mips/user/ase/msa/test_msa_compile_32r5el.sh   | 917 +++++++++++++++++++++
+ .../mips/user/ase/msa/test_msa_compile_32r6eb.sh   | 643 ---------------
+ .../mips/user/ase/msa/test_msa_compile_32r6el.sh   | 643 ---------------
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r5eb.sh | 371 +++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r5el.sh | 371 +++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh | 371 ---------
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh | 371 ---------
+ 18 files changed, 3231 insertions(+), 2572 deletions(-)
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r5eb.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r5el.sh
+ delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh
+ delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r5eb.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r5el.sh
+ delete mode 100644 tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh
+ delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh
 
 -- 
-Peter Xu
+2.7.4
+
 
