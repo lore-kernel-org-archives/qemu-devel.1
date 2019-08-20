@@ -2,89 +2,93 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D247BC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4B6C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:58:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4BD322DA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:37:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4BD322DA7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3BF9622CF7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:58:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ac8UkA0l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BF9622CF7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i084m-0003Br-Qv
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 13:37:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54048)
+	id 1i08OU-000878-8L
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 13:58:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56309)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i0845-0002g0-3c
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:37:02 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i08NW-0007g9-JN
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i0843-00071y-CL
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:37:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36946)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i083y-0006zP-Qi; Tue, 20 Aug 2019 13:36:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C70D410C0316;
- Tue, 20 Aug 2019 17:36:53 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 49E5127CCD;
- Tue, 20 Aug 2019 17:36:49 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-3-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4d242249-f823-7465-4b31-64fce484679f@redhat.com>
-Date: Tue, 20 Aug 2019 19:36:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i08NV-0002vM-75
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:57:06 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:34892)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i08NV-0002v9-2W
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:57:05 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id g17so5858918otl.2
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 10:57:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=v0H2vljjaYsdp/vaaLHREm40vISSemwDVVGQuOvzfck=;
+ b=ac8UkA0lbNo8ZRwXF5tVtPRG9mOIP6/ZnkU1wkz8Z55k51WYBk1bEPpRR+PvR5vhJi
+ 7PmDL/lod2ecak4BIQybO7ZDKr/WDMDdbU8zg3exr+eL1PKXaTfkgvMgprwkTgNhEQh+
+ 8Qg9/eU/muzdX+U75pLkPB0xmi3y3Ne4d4yl4gF+QqPVueOsBCbEytUBG0mq5/gKUahl
+ mNjOdL5pIwitHN4ZEcpq+xpdylUTJBOy1LWNlaze91pgwAlItbP9xTXT24X1UROrNmg6
+ XQYJbbOztAHJSVwVoKed2EuzMmJym+WaQ5cbmU6MPrVpIQZKg/3IUUiBftUvI4PkyhOp
+ Uzdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=v0H2vljjaYsdp/vaaLHREm40vISSemwDVVGQuOvzfck=;
+ b=f71BZluzL+pUe8hYXmr2y+OeG7a9lqim54+DoupA7U9/szs7sxp5hrqFjYmCw/Fhf8
+ tnhr6Se0eDf7YiXEqrlW9vGFXZE6VtAOgYO5ReamuYQHwIsfKhZM1M72wGcqDT6jEvph
+ DiiteBMbUOv152xR0e6osraZ7zGIKv1bs8hv/Ao7wM+Ny0SrGBg3CbliXImyg/SN8bGx
+ 7Quez9ac5NiCJyLsJlr2WgMIvR0qI0kJ/ibpcWv6ZZ/hn5pbgiqZjjALOuTFTMhCXJPf
+ buJWhUeX/1JSTidCAQI9XRbzf5ocxQt7D3K2w+f1EfRn/ewzOR2WxL21GqOyiyWurdpv
+ 5BPg==
+X-Gm-Message-State: APjAAAWXstZJ1Zqxj/67xiPLxMM44HG00csHlCpW2Y5cq2ShZn1x1Jx2
+ s6XUcj+3vSMY9UDII1f0tmh3ZE5sK+vJFweaaRo=
+X-Google-Smtp-Source: APXvYqx/gNe/VVScqFRnye0KXf8VunFKT9MddmIRRcTrndO1TZcSGnE1i+6EPyfVzzBaFTxSuP64IRorN6NGCLu7PxU=
+X-Received: by 2002:a9d:1288:: with SMTP id g8mr20607020otg.306.1566323824388; 
+ Tue, 20 Aug 2019 10:57:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190814202219.1870-3-mlevitsk@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="cURnaqahWlZMbiekiApkvBgwKo6URXHsL"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 20 Aug 2019 17:36:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/13] qcrypto-luks: misc refactoring
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Tue, 20 Aug 2019 10:57:03
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Tue, 20 Aug 2019 10:57:03
+ -0700 (PDT)
+In-Reply-To: <CAFEAcA_OyRA8rh57bFZRGWbv-rCNKGqGY1BEQ_FhkzgYQANr9g@mail.gmail.com>
+References: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <CAFEAcA9UJGXOdNUD49bxmrdoZ5FEv4VLqAvyzDw66MOGsGB=wg@mail.gmail.com>
+ <BN6PR2201MB1251C78A16D557867586FFD4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>
+ <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
+ <BN6PR2201MB12512C4D20F05C8F21E5945DC6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <00b3cf35-d879-60d6-048a-fe757a461938@redhat.com>
+ <CAFEAcA_OyRA8rh57bFZRGWbv-rCNKGqGY1BEQ_FhkzgYQANr9g@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 20 Aug 2019 19:57:03 +0200
+Message-ID: <CAL1e-=hEjR-tDynT-qYxQmpUDBfGEZZDt-RVhTK-wdKQ6eXmOA@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [EXTERNAL]Re: Proposal for amending TCG interface
+ naming scheme
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,264 +100,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cURnaqahWlZMbiekiApkvBgwKo6URXHsL
-Content-Type: multipart/mixed; boundary="R1gzTPmd3H1VIwUBqFyOY3lpfLiKj1fmQ";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
-Message-ID: <4d242249-f823-7465-4b31-64fce484679f@redhat.com>
-Subject: Re: [PATCH 02/13] qcrypto-luks: misc refactoring
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-3-mlevitsk@redhat.com>
-In-Reply-To: <20190814202219.1870-3-mlevitsk@redhat.com>
+20.08.2019. 18.49, "Peter Maydell" <peter.maydell@linaro.org> =D1=98=D0=B5 =
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On Tue, 20 Aug 2019 at 17:44, David Hildenbrand <david@redhat.com> wrote:
+> >
+> > On 20.08.19 18:38, Aleksandar Markovic wrote:
+> > >> From: BALATON Zoltan <balaton@eik.bme.hu>
+> > >>
+> > >> Sorry to comment on this without really knowing what is it about but
+maybe
+> > >> my view is not completely useless if this is to be understood by
+people
+> > >> who don't know anything about it. If it is not useful just ignore.
+> > >
+> > > No, Zoltan, to the contrary, you hit the nail - the good interface
+scheme
+> > > should look natural even for people not acquainted with the gory
+details
+> > > of the area.
+> > >
+> >
+> > I just got familiar with the terminology and everything I read so far
+> > confuses me even more (gather/pick/extend/extl/shrd). No, I don't like
+that.
+>
+> FWIW the way I tend to approach these is to say "I want to do
+> $WHATEVER, surely we must have a tcg op for that, it's probably
+> got 'ext' in it, search through tcg/README to find something
+> that seems like it matches what I want to do"...
+>
 
---R1gzTPmd3H1VIwUBqFyOY3lpfLiKj1fmQ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I must admit this is the most practical, pragmatic view among us.
 
-On 14.08.19 22:22, Maxim Levitsky wrote:
-> This is also a preparation for key read/write/erase functions
->=20
-> * use master key len from the header
-> * prefer to use crypto params in the QCryptoBlockLUKS
->   over passing them as function arguments
-> * define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME
-> * Add comments to various crypto parameters in the QCryptoBlockLUKS
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  crypto/block-luks.c | 213 ++++++++++++++++++++++----------------------=
+Aleksamdar
 
->  1 file changed, 105 insertions(+), 108 deletions(-)
->=20
-> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> index 409ab50f20..48213abde7 100644
-> --- a/crypto/block-luks.c
-> +++ b/crypto/block-luks.c
-
-[...]
-
-> @@ -199,13 +201,25 @@ QEMU_BUILD_BUG_ON(sizeof(struct QCryptoBlockLUKSH=
-eader) !=3D 592);
->  struct QCryptoBlockLUKS {
->      QCryptoBlockLUKSHeader header;
-> =20
-> -    /* Cache parsed versions of what's in header fields,
-> -     * as we can't rely on QCryptoBlock.cipher being
-> -     * non-NULL */
-
-Hm, why remove this comment?
-
-> +    /* Main encryption algorithm used for encryption*/
->      QCryptoCipherAlgorithm cipher_alg;
-> +
-> +    /* Mode of encryption for the selected encryption algorithm */
->      QCryptoCipherMode cipher_mode;
-> +
-> +    /* Initialization vector generation algorithm */
->      QCryptoIVGenAlgorithm ivgen_alg;
-> +
-> +    /* Hash algorithm used for IV generation*/
->      QCryptoHashAlgorithm ivgen_hash_alg;
-> +
-> +    /*
-> +     * Encryption algorithm used for IV generation.
-> +     * Usually the same as main encryption algorithm
-> +     */
-> +    QCryptoCipherAlgorithm ivgen_cipher_alg;
-> +
-> +    /* Hash algorithm used in pbkdf2 function */
->      QCryptoHashAlgorithm hash_alg;
->  };
-> =20
-> @@ -397,6 +411,12 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgor=
-ithm cipher,
->      }
->  }
-> =20
-> +static int masterkeylen(QCryptoBlockLUKS *luks)
-
-This should be a const pointer.
-
-> +{
-> +    return luks->header.key_bytes;
-> +}
-> +
-> +
->  /*
->   * Given a key slot, and user password, this will attempt to unlock
->   * the master encryption key from the key slot.
-> @@ -410,21 +430,15 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgo=
-rithm cipher,
->   */
->  static int
->  qcrypto_block_luks_load_key(QCryptoBlock *block,
-> -                            QCryptoBlockLUKSKeySlot *slot,
-> +                            uint slot_idx,
-
-Did you use uint on purpose or do you mean a plain =E2=80=9Cunsigned=E2=80=
-=9D?
-
->                              const char *password,
-> -                            QCryptoCipherAlgorithm cipheralg,
-> -                            QCryptoCipherMode ciphermode,
-> -                            QCryptoHashAlgorithm hash,
-> -                            QCryptoIVGenAlgorithm ivalg,
-> -                            QCryptoCipherAlgorithm ivcipheralg,
-> -                            QCryptoHashAlgorithm ivhash,
->                              uint8_t *masterkey,
-> -                            size_t masterkeylen,
->                              QCryptoBlockReadFunc readfunc,
->                              void *opaque,
->                              Error **errp)
->  {
->      QCryptoBlockLUKS *luks =3D block->opaque;
-> +    QCryptoBlockLUKSKeySlot *slot =3D &luks->header.key_slots[slot_idx=
-];
-
-I think this is a great opportunity to make this a const pointer.
-
->      uint8_t *splitkey;
->      size_t splitkeylen;
->      uint8_t *possiblekey;
-
-[...]
-
-> @@ -710,6 +696,8 @@ qcrypto_block_luks_open(QCryptoBlock *block,
->          goto fail;
->      }
-> =20
-> +    cipher_mode =3D g_strdup(luks->header.cipher_mode);
-> +
-
-This should be freed under the fail label.
-
-(And maybe the fact that this no longer modifies
-luks->header.cipher_mode should be mentioned in the commit message, I
-don=E2=80=99t know.)
-
->      /*
->       * The cipher_mode header contains a string that we have
->       * to further parse, of the format
-
-[...]
-
-> @@ -730,13 +718,13 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-> =20
->      ivhash_name =3D strchr(ivgen_name, ':');
->      if (!ivhash_name) {
-> -        ivhash =3D 0;
-> +        luks->ivgen_hash_alg =3D 0;
-
-*luks is initialized to 0 anyway, but it doesn=E2=80=99t hurt, of course.=
-
-
->      } else {
->          *ivhash_name =3D '\0';
->          ivhash_name++;
-> =20
-> -        ivhash =3D qcrypto_block_luks_hash_name_lookup(ivhash_name,
-> -                                                     &local_err);
-> +        luks->ivgen_hash_alg =3D qcrypto_block_luks_hash_name_lookup(i=
-vhash_name,
-> +                                                                   &lo=
-cal_err);
->          if (local_err) {
->              ret =3D -ENOTSUP;
->              error_propagate(errp, local_err);
-> @@ -744,25 +732,27 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-
-[...]
-
-> =20
-> -    hash =3D qcrypto_block_luks_hash_name_lookup(luks->header.hash_spe=
-c,
-> +    luks->hash_alg =3D
-> +            qcrypto_block_luks_hash_name_lookup(luks->header.hash_spec=
-,
->                                                 &local_err);
-
-Indentation is off now.
-
->      if (local_err) {
->          ret =3D -ENOTSUP;
-
-[...]
-
-> @@ -930,6 +922,17 @@ qcrypto_block_luks_create(QCryptoBlock *block,
->              luks_opts.has_ivgen_hash_alg =3D true;
->          }
->      }
-> +
-> +    luks =3D g_new0(QCryptoBlockLUKS, 1);
-> +    block->opaque =3D luks;
-> +
-> +    luks->cipher_alg =3D luks_opts.cipher_alg;
-> +    luks->cipher_mode =3D luks_opts.cipher_mode;
-> +    luks->ivgen_alg =3D luks_opts.ivgen_alg;
-> +    luks->ivgen_hash_alg =3D luks_opts.ivgen_hash_alg;
-> +    luks->hash_alg =3D luks_opts.hash_alg;
-> +
-> +
-
-Why did you pull this up?  Now @luks is leaked in both of the next error
-paths.
-
->      /* Note we're allowing ivgen_hash_alg to be set even for
->       * non-essiv iv generators that don't need a hash. It will
->       * be silently ignored, for compatibility with dm-crypt */
-
-[...]
-
-> @@ -1003,6 +1004,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
->          ivcipheralg =3D luks_opts.cipher_alg;
->      }
-> =20
-> +    luks->ivgen_cipher_alg =3D ivcipheralg;
-> +
-
-What=E2=80=99s the point in having a dedicated ivcipheralg variable then?=
-
-
-Max
-
->      strcpy(luks->header.cipher_name, cipher_alg);
->      strcpy(luks->header.cipher_mode, cipher_mode_spec);
->      strcpy(luks->header.hash_spec, hash_alg);
-
-
---R1gzTPmd3H1VIwUBqFyOY3lpfLiKj1fmQ--
-
---cURnaqahWlZMbiekiApkvBgwKo6URXHsL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1cL68ACgkQ9AfbAGHV
-z0A5fggAkC4Cbs02xDuzTfpwoVY9DVQHv0eDpC5kNLl1qNDRoclNuoq8VCSN6vHJ
-afhWCtTeuqGjJrfArkENjyE4Ja5LiP+er94DWntDRUJAELCfnH+ZMSETxUlEK8oS
-FLZFDIYYY2HO10nFkT9M30IHNDFKw1iscU7rWWacQlycxvWErcUOWg1sltAwlJJm
-tGT0THXMmXj2LiX4NKC/4Y/dRG1bOQ/nTRYKgpAwhDYZJqZe3cNomIdEN8nD8QEc
-PqePTA2peu5ylybxWYBvUEJepmIZxq58POT2ljcpNJxenCBwhUpfN+lk48TOVrJT
-tp+zctJU3e2Ovm5OrvWxJ6lAyb6ywg==
-=M7CC
------END PGP SIGNATURE-----
-
---cURnaqahWlZMbiekiApkvBgwKo6URXHsL--
-
+> thanks
+> -- PMM
+>
