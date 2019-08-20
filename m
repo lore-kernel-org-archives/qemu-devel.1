@@ -2,89 +2,118 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1839BC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A49BC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1CB3214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:39:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1CB3214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58BEB214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:39:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="Zu/vG3bM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58BEB214DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i079w-0008Ia-O0
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:39:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46650)
+	id 1i07A3-0008Re-Hb
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:39:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46672)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i079C-0007Tq-Ru
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:38:15 -0400
+ (envelope-from <amarkovic@wavecomp.com>) id 1i079G-0007YB-U0
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:38:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i079B-0002D8-Ph
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:38:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43070)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i0799-0002Av-M5; Tue, 20 Aug 2019 12:38:11 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 68BD44E925;
- Tue, 20 Aug 2019 16:38:10 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F11460BF4;
- Tue, 20 Aug 2019 16:38:02 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-2-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a55bee89-9f0a-07ee-e411-7f2811449199@redhat.com>
-Date: Tue, 20 Aug 2019 18:38:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <amarkovic@wavecomp.com>) id 1i079F-0002Fr-N3
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:38:18 -0400
+Received: from mail-eopbgr740092.outbound.protection.outlook.com
+ ([40.107.74.92]:20802 helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+ id 1i079F-0002Ey-FW
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:38:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VT1gMs5xDHcRTFjpvDUG1U0IPIIhct2vo7G/OTmGPvwILUQlDgfKZcuTh36p0eapqrx3DlnfNSpOoAoTPCxjZNQAuxzxddMDDR1FvChtemLaF6hSIB4W81WjOfdS+pSLXfFins+mZcZkEcCpaiM8+64atCpUm3h9ccz07HqwN/LSVmdZrVl3Lk3yDx+IcbFqFYRM5rKvzuD5xjHPGfYWbiy+NTlCP9S5npE9Cooi6LdveOrXdgnxce8ULW+dHvS37WX7KV/TI1smXs20591gPkLv3Bif6MFX8q1MNwn8Vfi2W7W0M4wipRxM2SsiZq6VrlgvE48+aCaPlqRd9Pdh5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xloYEUuMTeVYjse6ucnvGUUd1o85c4ZKYlndmx5phGw=;
+ b=JUTYzGYlrvnOfHErBvHJXs7oC4soypfv1EpdtPsd+lOOmgp5Gw9u0/uZJdhLqEAo29U9RxpNIt7mIsWL/2hfVtavyt+vAZGl2HVCjYGWkYBc4ZMVRHxTQYQsdt29IFuJgHtps6LqRwVgQDfFlZuGJCQ2kc+IqzCrH3zzKDKjYteVX13x0OHCiyBxQhbXc8hApvudXbm/Txz4LzgFqbu96OssKy19iU7ceaSk33jnMwftfFSv2qEgJ9IurvbXzgI4S+Zed9ZmZydCy++OrvIDZKCxGpoXe2wvDtPc+2/0ehQXUiwCJbvLsmVGoakbhrQBVRJBqYZYvXc3a7VnTaX+/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
+ dkim=pass header.d=wavecomp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xloYEUuMTeVYjse6ucnvGUUd1o85c4ZKYlndmx5phGw=;
+ b=Zu/vG3bMd9WRgYeEM9CHfUNthxeFqBbAp+3C4SuEsfF0tuwva5uCWLCIbkdtkrIDzaBb4Ww9jEinoCtxDNulNCcgk02cJW0+Ycj/ZQojkVCfs6A/mvyXF2axe7Fu15QEu5fu/+HX8XQ3HhL3jzvtNJT3CYjmTkpy+y81azrCRBY=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+ BN6PR2201MB1537.namprd22.prod.outlook.com (10.174.85.157) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2178.18; Tue, 20 Aug 2019 16:38:15 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::709c:ea73:df85:b135]) by BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::709c:ea73:df85:b135%12]) with mapi id 15.20.2178.018; Tue, 20 Aug
+ 2019 16:38:15 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, Richard Henderson
+ <richard.henderson@linaro.org>
+Thread-Topic: [Qemu-devel] [EXTERNAL]Re: Proposal for amending TCG interface
+ naming scheme
+Thread-Index: AQHVV1XFWW/0Wa1HQESTSd2lS0WjRqcEBcwAgAAGa4mAAB9pAIAADDyAgAABwzo=
+Date: Tue, 20 Aug 2019 16:38:15 +0000
+Message-ID: <BN6PR2201MB12512C4D20F05C8F21E5945DC6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <CAFEAcA9UJGXOdNUD49bxmrdoZ5FEv4VLqAvyzDw66MOGsGB=wg@mail.gmail.com>
+ <BN6PR2201MB1251C78A16D557867586FFD4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>,
+ <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
+In-Reply-To: <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3e9ab856-36b9-4bb4-d6d5-08d7258cccba
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:BN6PR2201MB1537; 
+x-ms-traffictypediagnostic: BN6PR2201MB1537:
+x-microsoft-antispam-prvs: <BN6PR2201MB153718ABC9FF7D417C1C1DD4C6AB0@BN6PR2201MB1537.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 013568035E
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(346002)(376002)(396003)(39850400004)(366004)(189003)(199004)(25786009)(14454004)(256004)(66556008)(54906003)(7416002)(66476007)(64756008)(66446008)(8936002)(478600001)(81166006)(110136005)(2906002)(229853002)(81156014)(316002)(26005)(446003)(186003)(6436002)(6506007)(11346002)(55236004)(9686003)(102836004)(4744005)(5660300002)(33656002)(4326008)(55016002)(8676002)(53936002)(476003)(486006)(52536014)(71190400001)(6246003)(66066001)(76176011)(7696005)(3846002)(6116002)(86362001)(7736002)(305945005)(99286004)(66946007)(74316002)(76116006)(71200400001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1537;
+ H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: s7tjNcz8YtinQ84cAPnjrcaPq34JgGMvcmWk8z+2w5O8PyTu5uxNagNN0oIyYRVA2f4JTRHD8A4LMDl6pc1TfJ6J78KhjmqzlTgkDiZINV2LhigdgKJcg44nYSMF5L0n1Vf9OPmf6FBIxuHUcof9GyqjhxC5hm8GO18wl0VTiGWKXYGQH+gdOjayaS4DP/Bdn1E2xJeM3JdGPLDHGa7hFSO8JeTu+FkVE1VFppVIHYBrjhkIPdcU89qzg8xGI3bkml87wVUu86DU0LExooILGbhdZ2EyH+rykoTwbat47UQchkOZ2+gW6YP2EG+0NqwEFNyE3Humt84In9FhNQDbTGgH7CAt3oPndB5E0x8bRXU04AWx0XaFbO3dCLXHcUXK0QKiVl2JAWiQr1e4CB55MNTRdsJ/amLYJSxRfOxR4l4=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20190814202219.1870-2-mlevitsk@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="vm4fR1rHmwVwVq5x7zAsYq2M47NuAQzzG"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 20 Aug 2019 16:38:10 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 01/13] block-crypto: misc refactoring
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e9ab856-36b9-4bb4-d6d5-08d7258cccba
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Aug 2019 16:38:15.3861 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2hS0ZZd5uqxOvlJoUu55yDOohI0ASBgd/eJ9J9yxKxFVUtCNJhLdqcvq2PuDQ/5/oX8jZwxtCbTG90d6O5nqDQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1537
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.74.92
+Subject: Re: [Qemu-devel] [EXTERNAL]Re: Proposal for amending TCG interface
+ naming scheme
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,94 +125,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Palmer Dabbelt <palmer@sifive.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vm4fR1rHmwVwVq5x7zAsYq2M47NuAQzzG
-Content-Type: multipart/mixed; boundary="u7Co6Qbo8o2wqOrrxe6TxHxm9EQbqfg5K";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
-Message-ID: <a55bee89-9f0a-07ee-e411-7f2811449199@redhat.com>
-Subject: Re: [PATCH 01/13] block-crypto: misc refactoring
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-2-mlevitsk@redhat.com>
-In-Reply-To: <20190814202219.1870-2-mlevitsk@redhat.com>
-
---u7Co6Qbo8o2wqOrrxe6TxHxm9EQbqfg5K
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 14.08.19 22:22, Maxim Levitsky wrote:
-> * rename the write_func to create_write_func,
->   and init_func to create_init_func
->   this is  preparation for other write_func that will
->   be used to update the encryption keys.
+> From: BALATON Zoltan <balaton@eik.bme.hu>
 >=20
-> No functional changes
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  block/crypto.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
->=20
+> Sorry to comment on this without really knowing what is it about but mayb=
+e
+> my view is not completely useless if this is to be understood by people
+> who don't know anything about it. If it is not useful just ignore.
 
-I=E2=80=99m not quite sure why you remove or add blank lines seemingly at=
- random...
+No, Zoltan, to the contrary, you hit the nail - the good interface scheme
+should look natural even for people not acquainted with the gory details
+of the area.
 
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 8237424ae6..42a3f0898b 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
+I have a couple of students, and these names just don't stick to their
+minds, they just want to run away from using them. There seems to be
+an "entry barrier" that is self-imposed by us.
 
-[...]
+All those functions seem to me underused in QEMU code. Partially
+because some of them are relatively new, but for sure partially because
+of some kind of disorganization of the naming.
 
-> @@ -77,7 +76,7 @@ struct BlockCryptoCreateData {
->  };
-> =20
-> =20
-> -static ssize_t block_crypto_write_func(QCryptoBlock *block,
-> +static ssize_t block_crypto_create_write_func(QCryptoBlock *block,
->                                         size_t offset,
->                                         const uint8_t *buf,
->                                         size_t buflen,
-
-Alignment should be kept at the opening parentheses.
-
-But other than those two things, why not.
-
-Max
-
-
---u7Co6Qbo8o2wqOrrxe6TxHxm9EQbqfg5K--
-
---vm4fR1rHmwVwVq5x7zAsYq2M47NuAQzzG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1cIekACgkQ9AfbAGHV
-z0B4ZAf/dxTpi5UYLvtw2UZJ8N4C6WmksTQ41aOxvseJbQeq1PZYgcXy/mDfCD7X
-e4LOtZaP7uZy+KsIQkLlyyZYAldmxT0wi0zkNaPHQZ3HO4Iva1oxY5Ez/Fygq8/q
-KMHBq+A1DJ6QKhK4/UWIHW2AZZj3p/Y2bUTA/ARsK/6ziItrmEW45MM7pXGh7a+8
-nlsF7m88xh2RtEA5TlJGYiaSgLbKgoigoNDPQ01wpG39H58dZEto+cV6Hl2orLNH
-2Ob3Si4wBbZICBaOSZzjmeSOs1o5y40BsqGu3eWF/7F/Rb7SKrv4GRIgmKRwCLwO
-ntHC3zoCBeGlCSDjwPEc64yKYTvgLw==
-=Qpbk
------END PGP SIGNATURE-----
-
---vm4fR1rHmwVwVq5x7zAsYq2M47NuAQzzG--
+Aleksandar=
 
