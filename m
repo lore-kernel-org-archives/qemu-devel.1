@@ -2,141 +2,111 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF78C41514
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 775CFC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD11922DD6
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD11922DD6
+	by mail.kernel.org (Postfix) with ESMTPS id 50E3922DD6
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:25:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E3922DD6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i09ky-00031O-Hy
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 15:25:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38250)
+	id 1i09l5-0003Ek-C0
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 15:25:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i09f2-0000WZ-2Y
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:19:17 -0400
+ (envelope-from <thuth@redhat.com>) id 1i09fl-0000hk-Cx
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:20:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i09ey-000413-P3
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:19:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42826)
+ (envelope-from <thuth@redhat.com>) id 1i09fj-0004F9-Ds
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:20:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40548)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i09er-0003z4-DZ; Tue, 20 Aug 2019 15:19:06 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1i09fe-0004Dd-VY; Tue, 20 Aug 2019 15:19:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0B6CF811BF;
- Tue, 20 Aug 2019 19:19:03 +0000 (UTC)
-Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 512D8100195F;
- Tue, 20 Aug 2019 19:19:02 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
- <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20190820164616.4072-1-dplotnikov@virtuozzo.com>
- <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
-From: John Snow <jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5291D3175283;
+ Tue, 20 Aug 2019 19:19:54 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-232.ams2.redhat.com [10.36.116.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 130A360BFB;
+ Tue, 20 Aug 2019 19:19:52 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190819075348.4078-1-thuth@redhat.com>
+ <5e753b9d-dd21-ce31-7f5c-7bc68c39cd2e@redhat.com>
+ <8e0ff9ce-c770-6ff6-3e41-494fef4bd40a@redhat.com>
+ <b35ee5a6-e3b1-d134-0a28-bfd45f5c8de4@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c0dd4525-0339-0956-f6d9-f6ee15cbb7a6@redhat.com>
-Date: Tue, 20 Aug 2019 15:19:01 -0400
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <77f00bba-ce4b-ec6e-e48c-89ea797f3cd3@redhat.com>
+Date: Tue, 20 Aug 2019 21:19:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <b35ee5a6-e3b1-d134-0a28-bfd45f5c8de4@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="466FIDHMHmV7e4ff6GTLb5dCOo04CNZIl"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 20 Aug 2019 19:19:03 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Tue, 20 Aug 2019 19:19:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v10] qemu-io: add pattern file for write
- command
+Subject: Re: [Qemu-devel] [PATCH] iotests: Check for enabled drivers before
+ testing them
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,84 +118,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--466FIDHMHmV7e4ff6GTLb5dCOo04CNZIl
+Content-Type: multipart/mixed; boundary="1VNHbQNIxOdDwEXMICO0nzDx2pnW5aWGn";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <77f00bba-ce4b-ec6e-e48c-89ea797f3cd3@redhat.com>
+Subject: Re: [PATCH] iotests: Check for enabled drivers before testing them
+References: <20190819075348.4078-1-thuth@redhat.com>
+ <5e753b9d-dd21-ce31-7f5c-7bc68c39cd2e@redhat.com>
+ <8e0ff9ce-c770-6ff6-3e41-494fef4bd40a@redhat.com>
+ <b35ee5a6-e3b1-d134-0a28-bfd45f5c8de4@redhat.com>
+In-Reply-To: <b35ee5a6-e3b1-d134-0a28-bfd45f5c8de4@redhat.com>
 
+--1VNHbQNIxOdDwEXMICO0nzDx2pnW5aWGn
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 8/20/19 1:24 PM, Eric Blake wrote:
-> On 8/20/19 11:46 AM, Denis Plotnikov wrote:
->> The patch allows to provide a pattern file for write
->> command. There was no similar ability before.
+On 8/20/19 8:48 PM, Max Reitz wrote:
+> On 20.08.19 18:01, Thomas Huth wrote:
+[...]
+>> Well, we disable blkverify in our downstream RHEL version of QEMU - so=
+
+>> it would be great if the iotests could at least adapt to that missing
+>> driver.
+>=20
+> I would like to say that RHEL is not a gold standard
+
+Well, let's put it this way: The less changes we have to carry along
+downstream (and thus review each time we rebase the downstream tree),
+the more time we have to work on upstream.
+
+> It feels a bit weird to me to say =E2=80=9Cblkverify is not essential, =
+because
+> RHEL disables it, but null-co is=E2=80=9D =E2=80=93 even though there i=
+s no reason why
+> anyone would need null-co except for testing either.
+
+Ok, fine for me, too, if we also declare "null-co" as optional for the
+iotests - let's make sure that the tests in the "auto" group also work
+without them.
+
+>>> Of course, that no longer works as an argument now that we
+>>> unconditionally run some iotests in make check.
+>>>
+>>> But still, the question is how strict you want to be.  If blkdebug
+>>> cannot be assumed to be present, what about null-co?  What about raw?=
+
 >>
->> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
->> ---
-> 
->> @@ -983,8 +1057,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
->>      /* Some compilers get confused and warn if this is not initialized.  */
->>      int64_t total = 0;
->>      int pattern = 0xcd;
->> +    const char *file_name = NULL;
->>  
->> -    while ((c = getopt(argc, argv, "bcCfnpP:quz")) != -1) {
->> +    while ((c = getopt(argc, argv, "bcCfnpP:quzs:")) != -1) {
-> 
-> This one looks odd (I would have preserved ordering by sticking s:
-> between q and u).  But a maintainer could fix that.
-> 
->>          switch (c) {
->>          case 'b':
->>              bflag = true;
->> @@ -1020,6 +1095,10 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
->>          case 'z':
->>              zflag = true;
->>              break;
->> +        case 's':
->> +            sflag = true;
->> +            file_name = optarg;
->> +            break;
-> 
-> Likewise, sorting the cases in the same order as the getopt() listing
-> helps in finding code during later edits.
-> 
->> @@ -1088,7 +1168,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
->>      }
->>  
->>      if (!zflag) {
->> -        buf = qemu_io_alloc(blk, count, pattern);
->> +        if (sflag) {
->> +            buf = qemu_io_alloc_from_file(blk, count, file_name);
->> +            if (!buf) {
->> +                return -EINVAL;
->> +            }
->> +        } else {
->> +            buf = qemu_io_alloc(blk, count, pattern);
->> +        }
-> 
-> Pre-existing, but it is odd that qemu_io_alloc() exit()s rather than
-> returning NULL on huge allocation requests that can't be met.  (Then
-> again, we have an early exit on any length > 2G, and 2G allocations tend
-> to succeed on modern development machines).  Perhaps it would be nice to
-> teach qemu-io to use blk_try_blockalign for more graceful handling even
-> on 32-bit platforms, but that's not the problem of your patch.
-> 
-> Option ordering is minor enough that I'm fine giving:
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> Now, to figure out which maintainer should take it.  Perhaps you want to
-> add a patch 2/1 that adds an iotest using this new mode, to a) ensure it
-> doesn't regress, and b) makes it reasonable to take in through the
-> iotest tree.
-> 
+>> I tried to disable everything beside qcow2 - but that causes so many
+>> things to fail that it hardly makes sense to try to get that working.
+>=20
+> Hm, really?  I just whitelisted qcow2 and file and running the auto
+> group worked rather well (except for the failing tests you address here=
+,
+> and the two others I mentioned).
 
-Yes, this is a good idea. I'm sure over time we'll pick up uses of
-pattern writing that will strengthen the the regression testing of the
-feature, but for now a simple test case will help ensure it.
+IIRC I tried to run all qcow2 tests when I disabled null-co and saw lots
+of failures ... but anyway, let's just focus on the "auto" tests right
+now, that should be doable.
 
-(It'll also help "document" how to use the feature for other test writers.)
+ Thomas
 
-Thanks!
+
+--1VNHbQNIxOdDwEXMICO0nzDx2pnW5aWGn--
+
+--466FIDHMHmV7e4ff6GTLb5dCOo04CNZIl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl1cR9MACgkQLtnXdP5w
+LbW39Q//Yuxc/WN5oyZpZHLMzwS1sno4Gm+RpLVi8Ht4qubaR+x/nHO72nKsI+iZ
+6bZdjGVk7gg9wRVjJg4RKAa/un3vxQHdOpl6TWFDIXcQkCgFOcRnrQiNpUz1Hs4e
+6AOfyRRE43xlU467mxqGPzArjRrCEaPl36X3dgpJmnveSaHvBFVBZLevG/0ubYHO
+mAs6B7lHu9r7br6Kyrc/4nvAiNI5p4IhyTDD6SoLUWEjmiaCrZKk3IjCiMv5lLri
+TQdgkQ6xlm8hoc3m5LGtfWVFEbYMUYzjR/RTzttVHQLbLt4AFwnuFm5CYp2AK081
+NcTSyx8lRppfbjg7yPNxe5OpCB+CPS2fDkECahYzTwJUVqt3Nq4JXb21DA1oKHBn
+e4KGxKz9G+AleUHLYEbifDfUXenBn4QuWhnYwAasF6Sc8HbxVF/LDa1IXDEmQHPd
+FqPSt9GKqMNZ9bA8IcyS5I4E0hMmeqOelcbW7rS9tyogUYJo7ND8/DZBwh9h34UU
+9t6j485We41jAIMkT9qhIxyvgL7KTFvzmKe6FN9sg8kBBzt9Ps3QibD/lvzppxYF
+8TYFyhDamuwQf089PeiMVnfLJRjcfDWPdfEVPZXgQVy9cn3fi7I6/IAaJtGHrtme
+lwzu/7XDudNeAzZjA4BSSWhKfO3s6DqKrkf8AKmoKp7qt66KP60=
+=qjn9
+-----END PGP SIGNATURE-----
+
+--466FIDHMHmV7e4ff6GTLb5dCOo04CNZIl--
 
