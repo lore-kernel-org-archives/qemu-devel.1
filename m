@@ -2,58 +2,60 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67409C3A59D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C4AC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:37:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40F1722DA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:36:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40F1722DA7
+	by mail.kernel.org (Postfix) with ESMTPS id C17BD22CF7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:37:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C17BD22CF7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i03Nd-0007L2-7X
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 08:36:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35905)
+	id 1i03O8-0008JW-Qv
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 08:37:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35970)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i03LT-0005rZ-0k
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:34:41 -0400
+ (envelope-from <philmd@redhat.com>) id 1i03Ln-000620-UL
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i03LR-00024d-1U
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:34:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57808)
+ (envelope-from <philmd@redhat.com>) id 1i03Lm-0002hq-47
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:34:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41220)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1i03LM-0001mP-Ib; Tue, 20 Aug 2019 08:34:32 -0400
+ id 1i03Lh-0002bM-1l; Tue, 20 Aug 2019 08:34:53 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1131918C890D;
- Tue, 20 Aug 2019 12:34:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5763D3084246;
+ Tue, 20 Aug 2019 12:34:52 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.209])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 45BC95C21F;
- Tue, 20 Aug 2019 12:34:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9714A5C21F;
+ Tue, 20 Aug 2019 12:34:39 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 20 Aug 2019 14:34:15 +0200
-Message-Id: <20190820123417.27930-1-philmd@redhat.com>
+Date: Tue, 20 Aug 2019 14:34:17 +0200
+Message-Id: <20190820123417.27930-3-philmd@redhat.com>
+In-Reply-To: <20190820123417.27930-1-philmd@redhat.com>
+References: <20190820123417.27930-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Tue, 20 Aug 2019 12:34:31 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 20 Aug 2019 12:34:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC PATCH 0/2] hw/char/bcm2835_aux: Provide full
+Subject: [Qemu-devel] [RFC PATCH 2/2] hw/char/bcm2835_aux: Provide full
  16550 UART support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,221 +73,402 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Guenter Roeck <linux@roeck-us.net>
+ Paolo Bonzini <pbonzini@redhat.com>, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Since there has been some activity on the list asking about
-Rasberry PI USB support, I had a look a some previous unfinished
-work and rebased it to share, in case it helps hobbyist interested
-in improving these machines.
+The BCM2835 AUX UART is compatible with the 16650 model.
+Since a such model is already available and tested, reuse
+it.
 
-This series is some proof-of-concept on improving the AUX UART
-support. See the commit description for various TODO/questions.
+TODO:
+- The serial model hardcodes a 16B FIFO (16550A) while
+  this model is a 8B FIFO
+- Various 16550A register bits are not implemented, thus
+  require to be properly masked
+- How to keep migration working?
+- How to use a chardev property?
 
-This can be tested using files documented by Peter Maydell in
-his blog post:
-https://translatedcode.wordpress.com/2018/04/25/debian-on-qemus-raspberry=
--pi-3-model/
-
-And using the kernel command line arguments suggested by Guenter Roeck:
-
-qemu-system-aarch64 -M raspi3 -m 1024 \
-  -kernel raspi3/bootpart/vmlinuz-4.14.0-3-arm64 \
-  -initrd raspi3/bootpart/initrd.img-4.14.0-3-arm64 \
-  -dtb raspi3/bootpart/bcm2837-rpi-3-b.dtb \
-  -append 'earlycon=3Duart8250,mmio32,0x3f215040 rdinit=3D/sbin/init pani=
-c=3D-1 console=3DttyS1,115200' \
-  -drive file=3Draspi3/2018-01-08-raspberry-pi-3-buster-PREVIEW.img,forma=
-t=3Draw,if=3Dsd \
-  -serial null -serial stdio \
-  -d unimp,guest_errors -trace bcm283\*
-27459@1566304158.228297:bcm2835_sdhost_edm_change (device reset) EDM now =
-0xc60f
-[    0.000000] Booting Linux on physical CPU 0x0
-[    0.000000] Linux version 4.14.0-3-arm64 (debian-kernel@lists.debian.o=
-rg) (gcc version 7.2.0 (Debian 7.2.0-18)) #1 SMP Debian 4.14.12-2 (2018-0=
-1-06)
-[    0.000000] Boot CPU: AArch64 Processor [410fd034]
-[    0.000000] Machine model: Raspberry Pi 3 Model B
-[    0.000000] earlycon: uart8250 at MMIO32 0x000000003f215040 (options '=
-')
-[    0.000000] bootconsole [uart8250] enabled
-[    0.000000] efi: Getting EFI parameters from FDT:
-[    0.000000] efi: UEFI not found.
-[    0.000000] cma: Reserved 64 MiB at 0x0000000038000000
-[    0.000000] NUMA: No NUMA configuration found
-[    0.000000] NUMA: Faking a node at [mem 0x0000000000000000-0x000000003=
-bffffff]
-[    0.000000] NUMA: NODE_DATA [mem 0x37fdf180-0x37fe0c7f]
-[    0.000000] Zone ranges:
-[    0.000000]   DMA      [mem 0x0000000000000000-0x000000003bffffff]
-[    0.000000]   Normal   empty
-[    0.000000] Movable zone start for each node
-[    0.000000] Early memory node ranges
-[    0.000000]   node   0: [mem 0x0000000000000000-0x000000003bffffff]
-[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000003bf=
-fffff]
-[    0.000000] random: fast init done
-[    0.000000] percpu: Embedded 22 pages/cpu @ffff800037f74000 s51608 r81=
-92 d30312 u90112
-[    0.000000] Detected VIPT I-cache on CPU0
-[    0.000000] CPU features: enabling workaround for ARM erratum 845719
-[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 241=
-920
-[    0.000000] Policy zone: DMA
-[    0.000000] Kernel command line: earlycon=3Duart8250,mmio32,0x3f215040=
- rdinit=3D/sbin/init panic=3D-1 console=3DttyS1,115200
-[    0.000000] PID hash table entries: 4096 (order: 3, 32768 bytes)
-[    0.000000] Memory: 864772K/983040K available (8252K kernel code, 1448=
-K rwdata, 2692K rodata, 4480K init, 601K bss, 52732K reserved, 65536K cma=
--reserved)
-[    0.000000] Virtual kernel memory layout:
-[    0.000000]     modules : 0xffff000000000000 - 0xffff000008000000   ( =
-  128 MB)
-[    0.000000]     vmalloc : 0xffff000008000000 - 0xffff7dffbfff0000   (1=
-29022 GB)
-[    0.000000]       .text : 0xffff000008080000 - 0xffff000008890000   ( =
- 8256 KB)
-[    0.000000]     .rodata : 0xffff000008890000 - 0xffff000008b40000   ( =
- 2752 KB)
-[    0.000000]       .init : 0xffff000008b40000 - 0xffff000008fa0000   ( =
- 4480 KB)
-[    0.000000]       .data : 0xffff000008fa0000 - 0xffff00000910a200   ( =
- 1449 KB)
-[    0.000000]        .bss : 0xffff00000910a200 - 0xffff0000091a0910   ( =
-  602 KB)
-[    0.000000]     fixed   : 0xffff7dfffe7fd000 - 0xffff7dfffec00000   ( =
- 4108 KB)
-[    0.000000]     PCI I/O : 0xffff7dfffee00000 - 0xffff7dffffe00000   ( =
-   16 MB)
-[    0.000000]     vmemmap : 0xffff7e0000000000 - 0xffff800000000000   ( =
- 2048 GB maximum)
-[    0.000000]               0xffff7e0000000000 - 0xffff7e0000f00000   ( =
-   15 MB actual)
-[    0.000000]     memory  : 0xffff800000000000 - 0xffff80003c000000   ( =
-  960 MB)
-[    0.000000] ftrace: allocating 30760 entries in 121 pages
-[    0.000000] Hierarchical RCU implementation.
-[    0.000000]  RCU restricting CPUs from NR_CPUS=3D256 to nr_cpu_ids=3D4=
-.
-[    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=3D16, nr_cpu_i=
-ds=3D4
-[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
-bcm2836_control_write: Bad offset 0
-bcm2836_control_write: Bad offset 8
-[    0.000000] arch_timer: WARNING: Invalid trigger for IRQ2, assuming le=
-vel low
-[    0.000000] arch_timer: WARNING: Please fix your firmware
-[    0.000000] arch_timer: cp15 timer(s) running at 62.50MHz (phys).
-[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_=
-cycles: 0x1cd42e208c, max_idle_ns: 881590405314 ns
-[    0.001154] sched_clock: 56 bits at 62MHz, resolution 16ns, wraps ever=
-y 4398046511096ns
-[    0.068563] Console: colour dummy device 80x25
-[    0.081268] Calibrating delay loop (skipped), value calculated using t=
-imer frequency.. 125.00 BogoMIPS (lpj=3D250000)
-[    0.083225] pid_max: default: 32768 minimum: 301
-[    0.094763] Security Framework initialized
-[    0.096254] Yama: disabled by default; enable with sysctl kernel.yama.=
-*
-[    0.113385] AppArmor: AppArmor initialized
-[    0.127602] Dentry cache hash table entries: 131072 (order: 8, 1048576=
- bytes)
-[    0.135573] Inode-cache hash table entries: 65536 (order: 7, 524288 by=
-tes)
-[    0.137705] Mount-cache hash table entries: 2048 (order: 2, 16384 byte=
-s)
-[    0.138861] Mountpoint-cache hash table entries: 2048 (order: 2, 16384=
- bytes)
-[    0.369415] ASID allocator initialised with 65536 entries
-[    0.376083] Hierarchical SRCU implementation.
-[    0.437838] EFI services will not be available.
-[    0.462860] smp: Bringing up secondary CPUs ...
-[    0.487588] Detected VIPT I-cache on CPU1
-[    0.490893] arch_timer: WARNING: Invalid trigger for IRQ2, assuming le=
-vel low
-[    0.490944] arch_timer: WARNING: Please fix your firmware
-[    0.491388] CPU1: Booted secondary processor [410fd034]
-[    0.546624] Detected VIPT I-cache on CPU2
-[    0.547535] arch_timer: WARNING: Invalid trigger for IRQ2, assuming le=
-vel low
-[    0.547632] arch_timer: WARNING: Please fix your firmware
-[    0.548032] CPU2: Booted secondary processor [410fd034]
-[    0.574539] Detected VIPT I-cache on CPU3
-[    0.575101] arch_timer: WARNING: Invalid trigger for IRQ2, assuming le=
-vel low
-[    0.575150] arch_timer: WARNING: Please fix your firmware
-[    0.575367] CPU3: Booted secondary processor [410fd034]
-[    0.578684] smp: Brought up 1 node, 4 CPUs
-[    0.584515] SMP: Total of 4 processors activated.
-[    0.585656] CPU features: detected feature: 32-bit EL0 Support
-[    0.603653] CPU: All CPU(s) started at EL2
-[    0.607831] alternatives: patching kernel code
-[    0.695440] devtmpfs: initialized
-[    0.806025] Registered cp15_barrier emulation handler
-[    0.806837] Registered setend emulation handler
-[    0.816246] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xfffff=
-fff, max_idle_ns: 7645041785100000 ns
-[    0.818294] futex hash table entries: 1024 (order: 5, 131072 bytes)
-[    0.864640] pinctrl core: initialized pinctrl subsystem
-[    0.929209] DMI not present or invalid.
-[    0.955714] NET: Registered protocol family 16
-[    1.063727] cpuidle: using governor ladder
-[    1.068747] cpuidle: using governor menu
-[    1.079439] vdso: 2 pages (1 code @ ffff000008896000, 1 data @ ffff000=
-008fa5000)
-[    1.081031] hw-breakpoint: found 6 breakpoint and 4 watchpoint registe=
-rs.
-[    1.127784] DMA: preallocated 256 KiB pool for atomic allocations
-[    1.137470] Serial: AMBA PL011 UART driver
-[    1.195277] uart-pl011 3f201000.serial: could not find pctldev for nod=
-e /soc/gpio@7e200000/uart0_gpio32, deferring probe
-[    1.398312] HugeTLB registered 2.00 MiB page size, pre-allocated 0 pag=
-es
-[    1.436505] ACPI: Interpreter disabled.
-[    1.461028] vgaarb: loaded
-[    1.473307] EDAC MC: Ver: 3.0.0
-[    1.481644] dmi: Firmware registration failed.
-[    1.543428] clocksource: Switched to clocksource arch_sys_counter
-[    2.815434] VFS: Disk quotas dquot_6.6.0
-[    2.817156] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 by=
-tes)
-[    2.850332] AppArmor: AppArmor Filesystem Enabled
-[    2.854670] pnp: PnP ACPI: disabled
-[    3.035675] NET: Registered protocol family 2
-[    3.071712] TCP established hash table entries: 8192 (order: 4, 65536 =
-bytes)
-[    3.073599] TCP bind hash table entries: 8192 (order: 5, 131072 bytes)
-[    3.075011] TCP: Hash tables configured (established 8192 bind 8192)
-[    3.082515] UDP hash table entries: 512 (order: 2, 16384 bytes)
-[    3.083954] UDP-Lite hash table entries: 512 (order: 2, 16384 bytes)
-[    3.094971] NET: Registered protocol family 1
-[    3.123313] Unpacking initramfs...
-
-Here it hangs, even with CPRMAN patch from Guenter:
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03153.html
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daud=C3=A9 (2):
-  hw/char/serial: Add a helper to set the divisor register
-  hw/char/bcm2835_aux: Provide full 16550 UART support
-
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
  hw/arm/bcm2835_peripherals.c  |   2 -
  hw/char/bcm2835_aux.c         | 211 +++-------------------------------
- hw/char/serial.c              |   6 +
  include/hw/char/bcm2835_aux.h |   7 +-
- include/hw/char/serial.h      |   1 +
- 5 files changed, 27 insertions(+), 200 deletions(-)
+ 3 files changed, 20 insertions(+), 200 deletions(-)
 
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 8984e2e91f..dbe396fd40 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -167,8 +167,6 @@ static void bcm2835_peripherals_realize(DeviceState *=
+dev, Error **errp)
+         qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
+                                INTERRUPT_UART));
+     /* AUX / UART1 */
+-    qdev_prop_set_chr(DEVICE(&s->aux), "chardev", serial_hd(1));
+-
+     object_property_set_bool(OBJECT(&s->aux), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/hw/char/bcm2835_aux.c b/hw/char/bcm2835_aux.c
+index 3f855196e3..10154b9530 100644
+--- a/hw/char/bcm2835_aux.c
++++ b/hw/char/bcm2835_aux.c
+@@ -2,149 +2,56 @@
+  * BCM2835 (Raspberry Pi / Pi 2) Aux block (mini UART and SPI).
+  * Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+- * Based on pl011.c, copyright terms below:
+- *
+- * Arm PrimeCell PL011 UART
+- *
+- * Copyright (c) 2006 CodeSourcery.
+- * Written by Paul Brook
+  *
+  * This code is licensed under the GPL.
+  *
+  * At present only the core UART functions (data path for tx/rx) are
+  * implemented. The following features/registers are unimplemented:
+- *  - Line/modem control
+- *  - Scratch register
+  *  - Extra control
+- *  - Baudrate
+  *  - SPI interfaces
+  */
+=20
+ #include "qemu/osdep.h"
+ #include "hw/char/bcm2835_aux.h"
+-#include "hw/irq.h"
+-#include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+ #include "qemu/log.h"
+-#include "qemu/module.h"
++#include "sysemu/sysemu.h"
+=20
+ #define AUX_IRQ         0x0
+ #define AUX_ENABLES     0x4
+-#define AUX_MU_IO_REG   0x40
+-#define AUX_MU_IER_REG  0x44
+-#define AUX_MU_IIR_REG  0x48
+-#define AUX_MU_LCR_REG  0x4c
+-#define AUX_MU_MCR_REG  0x50
+-#define AUX_MU_LSR_REG  0x54
+-#define AUX_MU_MSR_REG  0x58
+-#define AUX_MU_SCRATCH  0x5c
++#define AUX_MU_REGS     0x40
+ #define AUX_MU_CNTL_REG 0x60
+ #define AUX_MU_STAT_REG 0x64
+ #define AUX_MU_BAUD_REG 0x68
+=20
+-/* bits in IER/IIR registers */
+-#define RX_INT  0x1
+-#define TX_INT  0x2
+-
+-static void bcm2835_aux_update(BCM2835AuxState *s)
+-{
+-    /* signal an interrupt if either:
+-     * 1. rx interrupt is enabled and we have a non-empty rx fifo, or
+-     * 2. the tx interrupt is enabled (since we instantly drain the tx f=
+ifo)
+-     */
+-    s->iir =3D 0;
+-    if ((s->ier & RX_INT) && s->read_count !=3D 0) {
+-        s->iir |=3D RX_INT;
+-    }
+-    if (s->ier & TX_INT) {
+-        s->iir |=3D TX_INT;
+-    }
+-    qemu_set_irq(s->irq, s->iir !=3D 0);
+-}
+-
+ static uint64_t bcm2835_aux_read(void *opaque, hwaddr offset, unsigned s=
+ize)
+ {
+     BCM2835AuxState *s =3D opaque;
+-    uint32_t c, res;
++    uint32_t res;
+=20
+     switch (offset) {
+     case AUX_IRQ:
+-        return s->iir !=3D 0;
++        return s->serial->iir !=3D 0;
+=20
+     case AUX_ENABLES:
+         return 1; /* mini UART permanently enabled */
+=20
+-    case AUX_MU_IO_REG:
+-        /* "DLAB bit set means access baudrate register" is NYI */
+-        c =3D s->read_fifo[s->read_pos];
+-        if (s->read_count > 0) {
+-            s->read_count--;
+-            if (++s->read_pos =3D=3D BCM2835_AUX_RX_FIFO_LEN) {
+-                s->read_pos =3D 0;
+-            }
+-        }
+-        qemu_chr_fe_accept_input(&s->chr);
+-        bcm2835_aux_update(s);
+-        return c;
+-
+-    case AUX_MU_IER_REG:
+-        /* "DLAB bit set means access baudrate register" is NYI */
+-        return 0xc0 | s->ier; /* FIFO enables always read 1 */
+-
+-    case AUX_MU_IIR_REG:
+-        res =3D 0xc0; /* FIFO enables */
+-        /* The spec is unclear on what happens when both tx and rx
+-         * interrupts are active, besides that this cannot occur. At
+-         * present, we choose to prioritise the rx interrupt, since
+-         * the tx fifo is always empty. */
+-        if (s->read_count !=3D 0) {
+-            res |=3D 0x4;
+-        } else {
+-            res |=3D 0x2;
+-        }
+-        if (s->iir =3D=3D 0) {
+-            res |=3D 0x1;
+-        }
+-        return res;
+-
+-    case AUX_MU_LCR_REG:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_LCR_REG unsupported\n", __f=
+unc__);
+-        return 0;
+-
+-    case AUX_MU_MCR_REG:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_MCR_REG unsupported\n", __f=
+unc__);
+-        return 0;
+-
+-    case AUX_MU_LSR_REG:
+-        res =3D 0x60; /* tx idle, empty */
+-        if (s->read_count !=3D 0) {
+-            res |=3D 0x1;
+-        }
+-        return res;
+-
+-    case AUX_MU_MSR_REG:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_MSR_REG unsupported\n", __f=
+unc__);
+-        return 0;
+-
+-    case AUX_MU_SCRATCH:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_SCRATCH unsupported\n", __f=
+unc__);
+-        return 0;
+-
+     case AUX_MU_CNTL_REG:
+         return 0x3; /* tx, rx enabled */
+=20
+     case AUX_MU_STAT_REG:
+         res =3D 0x30e; /* space in the output buffer, empty tx fifo, idl=
+e tx/rx */
+-        if (s->read_count > 0) {
+-            res |=3D 0x1; /* data in input buffer */
+-            assert(s->read_count < BCM2835_AUX_RX_FIFO_LEN);
+-            res |=3D ((uint32_t)s->read_count) << 16; /* rx fifo fill le=
+vel */
+-        }
++        res |=3D fifo8_num_used(&s->serial->xmit_fifo) << 24;
++        res |=3D fifo8_num_used(&s->serial->recv_fifo) << 16;
++        res |=3D fifo8_is_empty(&s->serial->xmit_fifo) << 8;
++        res |=3D fifo8_is_full(&s->serial->xmit_fifo) << 5;
++        res |=3D fifo8_is_full(&s->serial->recv_fifo) << 4;
++        res |=3D !fifo8_is_full(&s->serial->xmit_fifo) << 1;
++        res |=3D !fifo8_is_empty(&s->serial->recv_fifo) << 0;
+         return res;
+=20
+     case AUX_MU_BAUD_REG:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_BAUD_REG unsupported\n", __=
+func__);
+-        return 0;
++        return s->serial->divider;
+=20
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+@@ -157,7 +64,6 @@ static void bcm2835_aux_write(void *opaque, hwaddr off=
+set, uint64_t value,
+                               unsigned size)
+ {
+     BCM2835AuxState *s =3D opaque;
+-    unsigned char ch;
+=20
+     switch (offset) {
+     case AUX_ENABLES:
+@@ -167,81 +73,18 @@ static void bcm2835_aux_write(void *opaque, hwaddr o=
+ffset, uint64_t value,
+         }
+         break;
+=20
+-    case AUX_MU_IO_REG:
+-        /* "DLAB bit set means access baudrate register" is NYI */
+-        ch =3D value;
+-        /* XXX this blocks entire thread. Rewrite to use
+-         * qemu_chr_fe_write and background I/O callbacks */
+-        qemu_chr_fe_write_all(&s->chr, &ch, 1);
+-        break;
+-
+-    case AUX_MU_IER_REG:
+-        /* "DLAB bit set means access baudrate register" is NYI */
+-        s->ier =3D value & (TX_INT | RX_INT);
+-        bcm2835_aux_update(s);
+-        break;
+-
+-    case AUX_MU_IIR_REG:
+-        if (value & 0x2) {
+-            s->read_count =3D 0;
+-        }
+-        break;
+-
+-    case AUX_MU_LCR_REG:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_LCR_REG unsupported\n", __f=
+unc__);
+-        break;
+-
+-    case AUX_MU_MCR_REG:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_MCR_REG unsupported\n", __f=
+unc__);
+-        break;
+-
+-    case AUX_MU_SCRATCH:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_SCRATCH unsupported\n", __f=
+unc__);
+-        break;
+-
+     case AUX_MU_CNTL_REG:
+         qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_CNTL_REG unsupported\n", __=
+func__);
+         break;
+=20
+     case AUX_MU_BAUD_REG:
+-        qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_BAUD_REG unsupported\n", __=
+func__);
++        serial_set_divider(s->serial, value);
+         break;
+=20
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+                       __func__, offset);
+     }
+-
+-    bcm2835_aux_update(s);
+-}
+-
+-static int bcm2835_aux_can_receive(void *opaque)
+-{
+-    BCM2835AuxState *s =3D opaque;
+-
+-    return s->read_count < BCM2835_AUX_RX_FIFO_LEN;
+-}
+-
+-static void bcm2835_aux_put_fifo(void *opaque, uint8_t value)
+-{
+-    BCM2835AuxState *s =3D opaque;
+-    int slot;
+-
+-    slot =3D s->read_pos + s->read_count;
+-    if (slot >=3D BCM2835_AUX_RX_FIFO_LEN) {
+-        slot -=3D BCM2835_AUX_RX_FIFO_LEN;
+-    }
+-    s->read_fifo[slot] =3D value;
+-    s->read_count++;
+-    if (s->read_count =3D=3D BCM2835_AUX_RX_FIFO_LEN) {
+-        /* buffer full */
+-    }
+-    bcm2835_aux_update(s);
+-}
+-
+-static void bcm2835_aux_receive(void *opaque, const uint8_t *buf, int si=
+ze)
+-{
+-    bcm2835_aux_put_fifo(opaque, *buf);
+ }
+=20
+ static const MemoryRegionOps bcm2835_aux_ops =3D {
+@@ -254,15 +97,9 @@ static const MemoryRegionOps bcm2835_aux_ops =3D {
+=20
+ static const VMStateDescription vmstate_bcm2835_aux =3D {
+     .name =3D TYPE_BCM2835_AUX,
+-    .version_id =3D 1,
+-    .minimum_version_id =3D 1,
++    .version_id =3D 2,
++    .minimum_version_id =3D 2,
+     .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT8_ARRAY(read_fifo, BCM2835AuxState,
+-                            BCM2835_AUX_RX_FIFO_LEN),
+-        VMSTATE_UINT8(read_pos, BCM2835AuxState),
+-        VMSTATE_UINT8(read_count, BCM2835AuxState),
+-        VMSTATE_UINT8(ier, BCM2835AuxState),
+-        VMSTATE_UINT8(iir, BCM2835AuxState),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -276,29 +113,17 @@ static void bcm2835_aux_init(Object *obj)
+                           TYPE_BCM2835_AUX, 0x100);
+     sysbus_init_mmio(sbd, &s->iomem);
+     sysbus_init_irq(sbd, &s->irq);
++
++    s->serial =3D serial_mm_init(&s->iomem, AUX_MU_REGS, 2, s->irq, 2419=
+200,
++                               serial_hd(1), DEVICE_LITTLE_ENDIAN);
+ }
+=20
+-static void bcm2835_aux_realize(DeviceState *dev, Error **errp)
+-{
+-    BCM2835AuxState *s =3D BCM2835_AUX(dev);
+-
+-    qemu_chr_fe_set_handlers(&s->chr, bcm2835_aux_can_receive,
+-                             bcm2835_aux_receive, NULL, NULL, s, NULL, t=
+rue);
+-}
+-
+-static Property bcm2835_aux_props[] =3D {
+-    DEFINE_PROP_CHR("chardev", BCM2835AuxState, chr),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void bcm2835_aux_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+=20
+-    dc->realize =3D bcm2835_aux_realize;
+     dc->vmsd =3D &vmstate_bcm2835_aux;
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+-    dc->props =3D bcm2835_aux_props;
+ }
+=20
+ static const TypeInfo bcm2835_aux_info =3D {
+diff --git a/include/hw/char/bcm2835_aux.h b/include/hw/char/bcm2835_aux.=
+h
+index cdbf7e3e37..f534bccf5d 100644
+--- a/include/hw/char/bcm2835_aux.h
++++ b/include/hw/char/bcm2835_aux.h
+@@ -9,6 +9,7 @@
+ #define BCM2835_AUX_H
+=20
+ #include "hw/sysbus.h"
++#include "hw/char/serial.h"
+ #include "chardev/char-fe.h"
+=20
+ #define TYPE_BCM2835_AUX "bcm2835-aux"
+@@ -22,12 +23,8 @@ typedef struct {
+     /*< public >*/
+=20
+     MemoryRegion iomem;
+-    CharBackend chr;
+     qemu_irq irq;
+-
+-    uint8_t read_fifo[BCM2835_AUX_RX_FIFO_LEN];
+-    uint8_t read_pos, read_count;
+-    uint8_t ier, iir;
++    SerialState *serial;
+ } BCM2835AuxState;
+=20
+ #endif
 --=20
 2.20.1
 
