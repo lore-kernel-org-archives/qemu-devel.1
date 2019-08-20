@@ -6,67 +6,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8A7C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F5BC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:17:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EAAA214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:17:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EAAA214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 2936C214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 14:17:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2936C214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i04xE-0006JW-HR
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 10:17:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51787)
+	id 1i04xH-0006Ps-4i
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 10:17:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1i04tN-0002Rh-UD
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:13:46 -0400
+ (envelope-from <peterx@redhat.com>) id 1i04tS-0002Wl-Qx
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:13:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1i04tM-0007LP-RA
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:13:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49050)
+ (envelope-from <peterx@redhat.com>) id 1i04tR-0007Qu-SK
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:13:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49914)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i04tM-0007Ku-Js
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:13:44 -0400
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198])
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i04tR-0007QO-NA
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 10:13:49 -0400
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC1AFC0467C3
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 14:13:43 +0000 (UTC)
-Received: by mail-pf1-f198.google.com with SMTP id 191so4891379pfy.20
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 07:13:43 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1006A89AC2
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 14:13:49 +0000 (UTC)
+Received: by mail-pl1-f199.google.com with SMTP id f5so4174769plr.0
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 07:13:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cZFoxwy7BgOSzGeOdH9WM+DUKNeOVDwNKzYU3L8feJA=;
- b=nPbo4iilvikd2RBiCrJvolHevhz65InrCna8P1TPa+1VXDXV5ZHcFL/SbQ/XtQu38n
- qPHI+N2nseP9kjcejhhI1FdLIZg8SoG2zVXUydtJ8A+m7ERssaZ9OFBbowMtyBhkqU7l
- KBf8o3WnOUZ5+Rs5SgKs0cqXiyopFts4TvTC1ySDpZPSWnRqjcQk+mAtT/suV49xJMP5
- OXhaGwSVzV5oRPVFe3JMsycXXUYSHzz/rKdh0ALhn1X3PylLPZ390l0mmycvUvGhHuME
- TKRINus4luUuyjk3s7E1RYXd7bCnEqZVxiJBGZeseZT9jfGkDwDpQXxjbe921FQwGW1N
- 1BIA==
-X-Gm-Message-State: APjAAAUgPHL1V0KREYj2TijRA0G8gyqrkKG3MdRk6PKNKoaW6hQ4MHcV
- pkU3chsOVHfTXnjiINAKMixlu3YCDQyyENtqctow3GynkZkzL28rFRd+uFS30HRY1TBKWiiX5ff
- vakvRV8TbopWnMr4=
-X-Received: by 2002:aa7:9a5a:: with SMTP id x26mr29329594pfj.47.1566310422776; 
- Tue, 20 Aug 2019 07:13:42 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzQKgYqnxpqMDObrt2pbF3XE0Qi1egFttdRsx8+3xSfOupBH+bOgVMgL9UUcBGDor/8frnJhw==
-X-Received: by 2002:aa7:9a5a:: with SMTP id x26mr29329576pfj.47.1566310422588; 
- Tue, 20 Aug 2019 07:13:42 -0700 (PDT)
+ bh=2PxH9JaNXkeuvOjhzmhEfzKK45LxMRv9xnnAwcfD0eo=;
+ b=PMBywFCsFNwwcPRGNb3ro9t4B7gT5R1gAqHLZ1/OSZeYFAn+vD21Uck1jy9lX9CM8l
+ dlv9hMvzD/dMEFlY9mwCFA0DS8PikG1xaz7rQLSzLVY22f4UdY8rdo00HN9cUVkH+bBD
+ OBds7fUt0SXQLaG9Hs1VIud4D8C1Gb/8SW4M8O+k0ZMXINYK99m05CI5/dkJskp4RrWm
+ kh9hLgInxATKIHaiwFtLXydk1U+qEB4ssCJ9O1dsy/6w1iRvRcE0siEQ4JzoLPkyZvff
+ fet0M7Qwa+YphPv72J36/djJLrXruO4nBFpz7OA4fnjPclbgkwZQ6u9CU2iaZohY0XnG
+ MkxQ==
+X-Gm-Message-State: APjAAAVod3p7TjTL/5477ybndLb83FkBskgadUvwOCj0rwngBzwNcU+Q
+ 9HKDXP4QrkNKF7gxGRUcGsHvf54OHtrrhZU72muJOdlbcymdXr2J0F8bWjAjv4QN4mOyPhPpAS3
+ 3il8ZSGAudZbMnwY=
+X-Received: by 2002:a17:902:7c8a:: with SMTP id
+ y10mr27982683pll.65.1566310428281; 
+ Tue, 20 Aug 2019 07:13:48 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzhd+5Ot7CHyzqOniQ30wJxCNFI+sApSy093OVkQHhamL8alwAGuGSUJefUBqzFqiIHcOkQRQ==
+X-Received: by 2002:a17:902:7c8a:: with SMTP id
+ y10mr27982664pll.65.1566310428133; 
+ Tue, 20 Aug 2019 07:13:48 -0700 (PDT)
 Received: from xz-x1.redhat.com ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id e185sm9057921pfa.119.2019.08.20.07.13.40
+ by smtp.gmail.com with ESMTPSA id e185sm9057921pfa.119.2019.08.20.07.13.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Aug 2019 07:13:41 -0700 (PDT)
+ Tue, 20 Aug 2019 07:13:47 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 20 Aug 2019 22:13:25 +0800
-Message-Id: <20190820141328.10009-2-peterx@redhat.com>
+Date: Tue, 20 Aug 2019 22:13:27 +0800
+Message-Id: <20190820141328.10009-4-peterx@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190820141328.10009-1-peterx@redhat.com>
 References: <20190820141328.10009-1-peterx@redhat.com>
@@ -74,8 +76,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 1/4] memory: Split zones when do
- coalesced_io_del()
+Subject: [Qemu-devel] [PATCH v3 3/4] memory: Refactor
+ memory_region_clear_coalescing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,111 +94,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is a workaround of current KVM's KVM_UNREGISTER_COALESCED_MMIO
-interface.  The kernel interface only allows to unregister an mmio
-device with exactly the zone size when registered, or any smaller zone
-that is included in the device mmio zone.  It does not support the
-userspace to specify a very large zone to remove all the small mmio
-devices within the zone covered.
-
-Logically speaking it would be nicer to fix this from KVM side, though
-in all cases we still need to coop with old kernels so let's do this.
+Removing the update variable and quit earlier if the memory region has
+no coalesced range.  This prepares for the next patch.
 
 Fixes: 3ac7d43a6fbb5d4a3
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- memory.c | 49 +++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 35 insertions(+), 14 deletions(-)
+ memory.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/memory.c b/memory.c
-index 8141486832..8173f6be62 100644
+index 360e0cfa67..2f7a67086a 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -855,8 +855,39 @@ static void address_space_update_ioeventfds(AddressS=
-pace *as)
-     flatview_unref(view);
- }
-=20
-+/*
-+ * Notify the memory listeners about the coalesced IO change events of
-+ * range `cmr'.  Only the part that has intersection of the specified
-+ * FlatRange will be sent.
-+ */
-+static void flat_range_coalesced_io_notify(FlatRange *fr, AddressSpace *=
-as,
-+                                           CoalescedMemoryRange *cmr, bo=
-ol add)
-+{
-+    AddrRange tmp;
+@@ -2283,7 +2283,10 @@ void memory_region_add_coalescing(MemoryRegion *mr=
+,
+ void memory_region_clear_coalescing(MemoryRegion *mr)
+ {
+     CoalescedMemoryRange *cmr;
+-    bool updated =3D false;
 +
-+    tmp =3D addrrange_shift(cmr->addr,
-+                          int128_sub(fr->addr.start,
-+                                     int128_make64(fr->offset_in_region)=
-));
-+    if (!addrrange_intersects(tmp, fr->addr)) {
++    if (QTAILQ_EMPTY(&mr->coalesced)) {
 +        return;
 +    }
-+    tmp =3D addrrange_intersection(tmp, fr->addr);
-+
-+    if (add) {
-+        MEMORY_LISTENER_UPDATE_REGION(fr, as, Forward, coalesced_io_add,
-+                                      int128_get64(tmp.start),
-+                                      int128_get64(tmp.size));
-+    } else {
-+        MEMORY_LISTENER_UPDATE_REGION(fr, as, Reverse, coalesced_io_del,
-+                                      int128_get64(tmp.start),
-+                                      int128_get64(tmp.size));
-+    }
-+}
-+
- static void flat_range_coalesced_io_del(FlatRange *fr, AddressSpace *as)
- {
-+    CoalescedMemoryRange *cmr;
-+
-     if (!fr->has_coalesced_range) {
-         return;
-     }
-@@ -865,16 +896,15 @@ static void flat_range_coalesced_io_del(FlatRange *=
-fr, AddressSpace *as)
-         return;
+=20
+     qemu_flush_coalesced_mmio_buffer();
+     mr->flush_coalesced_mmio =3D false;
+@@ -2292,12 +2295,9 @@ void memory_region_clear_coalescing(MemoryRegion *=
+mr)
+         cmr =3D QTAILQ_FIRST(&mr->coalesced);
+         QTAILQ_REMOVE(&mr->coalesced, cmr, link);
+         g_free(cmr);
+-        updated =3D true;
      }
 =20
--    MEMORY_LISTENER_UPDATE_REGION(fr, as, Reverse, coalesced_io_del,
--                                  int128_get64(fr->addr.start),
--                                  int128_get64(fr->addr.size));
-+    QTAILQ_FOREACH(cmr, &fr->mr->coalesced, link) {
-+        flat_range_coalesced_io_notify(fr, as, cmr, false);
-+    }
+-    if (updated) {
+-        memory_region_update_coalesced_range(mr);
+-    }
++    memory_region_update_coalesced_range(mr);
  }
 =20
- static void flat_range_coalesced_io_add(FlatRange *fr, AddressSpace *as)
- {
-     MemoryRegion *mr =3D fr->mr;
-     CoalescedMemoryRange *cmr;
--    AddrRange tmp;
-=20
-     if (QTAILQ_EMPTY(&mr->coalesced)) {
-         return;
-@@ -885,16 +915,7 @@ static void flat_range_coalesced_io_add(FlatRange *f=
-r, AddressSpace *as)
-     }
-=20
-     QTAILQ_FOREACH(cmr, &mr->coalesced, link) {
--        tmp =3D addrrange_shift(cmr->addr,
--                              int128_sub(fr->addr.start,
--                                         int128_make64(fr->offset_in_reg=
-ion)));
--        if (!addrrange_intersects(tmp, fr->addr)) {
--            continue;
--        }
--        tmp =3D addrrange_intersection(tmp, fr->addr);
--        MEMORY_LISTENER_UPDATE_REGION(fr, as, Forward, coalesced_io_add,
--                                      int128_get64(tmp.start),
--                                      int128_get64(tmp.size));
-+        flat_range_coalesced_io_notify(fr, as, cmr, true);
-     }
- }
-=20
+ void memory_region_set_flush_coalesced(MemoryRegion *mr)
 --=20
 2.21.0
 
