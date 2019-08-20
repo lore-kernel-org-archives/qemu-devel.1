@@ -2,89 +2,61 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9507C3A59E
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 23:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82469C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 23:57:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3FB6206B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 23:57:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A4zd9NlW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3FB6206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5880C206B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 23:57:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5880C206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0E0E-0008WK-U3
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 19:57:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49015)
+	id 1i0E0N-0000Uo-He
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 19:57:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i0Dxs-0005Vf-Q7
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 19:55:02 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i0Dvu-0002az-Pu
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 19:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i0Dxr-0006kD-9U
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 19:55:00 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40502)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i0Dxr-0006jH-1e
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 19:54:59 -0400
-Received: by mail-pl1-x644.google.com with SMTP id h3so275178pls.7
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 16:54:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language;
- bh=bqL6VVZsmBEz56sB/yNc1xn8GU2AW+BrfR4Xoq3SXQ4=;
- b=A4zd9NlWvoMEvO2uju63ZcaopUUzK27bjZ14S+sLJDWlfNu0ZjnFPj/HJI307/ON4X
- FNxbLF89jRUnzPMvsIHPY74J0h16fGiStKHDa6yHFsV16brReKv/yJwOO3yqn5QmlvwY
- Z+ESLrBHPQqVUmY7FmdynIAdJhPfXO9JKAN2J+cZi4PBQAWf1nNEhnNrmoHqw1WMs4uh
- 6p0H57On6ot8++GynVEmeQpe0fgXvPwiXq2mFVqrxoUKAI+kfluFgC8r6F+sdDeIlE+1
- l82TFC6BGIbiepinSh1QR23R78xXmCUtJRRYwmgXkIBKFUJkVY//nOA8NRLNrTPgsYR2
- xpsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language;
- bh=bqL6VVZsmBEz56sB/yNc1xn8GU2AW+BrfR4Xoq3SXQ4=;
- b=oacCiYtT0M0ow/YoXtCsWgNl1MJo3etLs1mESFOLA0KPKarol7msVqPZhqzMyPiI0L
- cxeP73PfnvzQGoa0lmWd5qSODaEI9zl4CcV6MJwPWHgvZHGub95/ytIjDbjCi1qbY7iS
- hGneMGodOM8J598iejtbwxCwHFokV2siBeVATto6Zsen2e9QyCdCJ+cyFRxDPUVOtNgS
- wcpuYDSsApz9lvQ7+VpflZHWLSnnonT3v3iuAZgj33myBnGXqTuK9ZzZjXQ8NuRmAe8Q
- 4TDYqAngcGQKzixHKMlto6gc0OasuJosU2wVU6Yph79TDYH80vX+mS7dZ2lGlY/MR7Xl
- vLFQ==
-X-Gm-Message-State: APjAAAXzzSY7G92ywupKJZif8qn7nFmeoSOIvSpPLVKdLsiNjN2EeZns
- icsWmI3OX9KjzQA9LWQVkCVzcQ==
-X-Google-Smtp-Source: APXvYqx+alqDxkv3kra3TaHJGwZSCWJtNEfFyqagQRQ3ZoRIVQC8HNbgh4U5TV4biWux70MHAijq3A==
-X-Received: by 2002:a17:902:9a8d:: with SMTP id
- w13mr30403064plp.157.1566345297474; 
- Tue, 20 Aug 2019 16:54:57 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id y13sm13721145pfb.48.2019.08.20.16.54.56
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 20 Aug 2019 16:54:56 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-References: <20190820210720.18976-1-richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <dacbea19-9692-0288-9b64-8500d0cf232a@linaro.org>
-Date: Tue, 20 Aug 2019 16:54:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <jsnow@redhat.com>) id 1i0Dvs-00058s-QU
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 19:52:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47510)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i0Dvn-00051k-Dr; Tue, 20 Aug 2019 19:52:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C01BC8980E3;
+ Tue, 20 Aug 2019 23:52:50 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1959757990;
+ Tue, 20 Aug 2019 23:52:50 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Tue, 20 Aug 2019 19:52:43 -0400
+Message-Id: <20190820235243.26092-5-jsnow@redhat.com>
+In-Reply-To: <20190820235243.26092-1-jsnow@redhat.com>
+References: <20190820235243.26092-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190820210720.18976-1-richard.henderson@linaro.org>
-Content-Type: multipart/mixed; boundary="------------5233F652544173C873D1DD62"
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH v5 00/17] target/arm: Reduce overhead of
- cpu_get_tb_cpu_state
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Tue, 20 Aug 2019 23:52:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 4/4] iotests: use python logging for
+ iotests.log()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,121 +68,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ ehabkost@redhat.com, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------5233F652544173C873D1DD62
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+We can turn logging on/off globally instead of per-function.
 
-On 8/20/19 2:07 PM, Richard Henderson wrote:
-> Changes since v4:
->   * Split patch 1 into 15 smaller patches.
->   * Cache the new DEBUG_TARGET_EL field.
->   * Split out m-profile hflags separately from a-profile 32-bit.
->   * Move around non-cached tb flags as well, avoiding repetitive
->     checks for m-profile or other mutually exclusive conditions.
+Remove use_log from run_job, and use python logging to turn on
+diffable output when we run through a script entry point.
 
-Just after I posted this, I started rebasing my VHE patch set on top, and I
-found that the new DEBUG_TARGET_EL field has used The Last Bit, so that I could
-not add the one bit that I need for VHE.
+iotest 245 changes output order due to buffering reasons.
+---
+ tests/qemu-iotests/030        |  4 +--
+ tests/qemu-iotests/245        |  1 +
+ tests/qemu-iotests/245.out    | 24 +++++++++---------
+ tests/qemu-iotests/iotests.py | 47 +++++++++++++++++++++--------------
+ 4 files changed, 43 insertions(+), 33 deletions(-)
 
-However, while working on this patch set, I noticed that we have a lot of
-unnecessary overlap between A- and M- profile in the TBFLAGs.  Thus point 4
-above and the completely separate rebuild_hflags_m32().
-
-If we rearrange things like the appended, then we recover 4 bits.
-
-Thoughts?
-
-
-r~
-
---------------5233F652544173C873D1DD62
-Content-Type: text/x-patch;
- name="m-tbflag.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="m-tbflag.patch"
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 91a54662c3..0c2803baa1 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3183,38 +3183,50 @@ FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
-  */
- FIELD(TBFLAG_ANY, DEBUG_TARGET_EL, 21, 2)
- 
--/* Bit usage when in AArch32 state: */
--FIELD(TBFLAG_A32, THUMB, 0, 1)          /* Not cached. */
--FIELD(TBFLAG_A32, VECLEN, 1, 3)         /* Not cached. */
--FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)      /* Not cached. */
-+/*
-+ * Bit usage when in AArch32 state, both A- and M-profile.
-+ */
-+FIELD(TBFLAG_AM32, CONDEXEC, 0, 8)      /* Not cached. */
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 1b69f318c6..a382cb430b 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -411,8 +411,8 @@ class TestParallelOps(iotests.QMPTestCase):
+         result =3D self.vm.qmp('block-job-set-speed', device=3D'drive0',=
+ speed=3D0)
+         self.assert_qmp(result, 'return', {})
+=20
+-        self.vm.run_job(job=3D'drive0', auto_dismiss=3DTrue, use_log=3DF=
+alse)
+-        self.vm.run_job(job=3D'node4', auto_dismiss=3DTrue, use_log=3DFa=
+lse)
++        self.vm.run_job(job=3D'drive0', auto_dismiss=3DTrue)
++        self.vm.run_job(job=3D'node4', auto_dismiss=3DTrue)
+         self.assert_no_active_block_jobs()
+=20
+     # Test a block-stream and a block-commit job in parallel
+diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+index bc1ceb9792..3bc29acb33 100644
+--- a/tests/qemu-iotests/245
++++ b/tests/qemu-iotests/245
+@@ -1000,4 +1000,5 @@ class TestBlockdevReopen(iotests.QMPTestCase):
+         self.reopen(opts, {'backing': 'hd2'})
+=20
+ if __name__ =3D=3D '__main__':
++    iotests.activate_logging()
+     iotests.main(supported_fmts=3D["qcow2"])
+diff --git a/tests/qemu-iotests/245.out b/tests/qemu-iotests/245.out
+index a19de5214d..15c3630e92 100644
+--- a/tests/qemu-iotests/245.out
++++ b/tests/qemu-iotests/245.out
+@@ -1,17 +1,17 @@
++{"execute": "job-finalize", "arguments": {"id": "commit0"}}
++{"return": {}}
++{"data": {"id": "commit0", "type": "commit"}, "event": "BLOCK_JOB_PENDIN=
+G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "commit0", "len": 3145728, "offset": 3145728, "speed=
+": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
++{"execute": "job-finalize", "arguments": {"id": "stream0"}}
++{"return": {}}
++{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
+G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
+": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
++{"execute": "job-finalize", "arguments": {"id": "stream0"}}
++{"return": {}}
++{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
+G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
+": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+ ..................
+ ----------------------------------------------------------------------
+ Ran 18 tests
+=20
+ OK
+-{"execute": "job-finalize", "arguments": {"id": "commit0"}}
+-{"return": {}}
+-{"data": {"id": "commit0", "type": "commit"}, "event": "BLOCK_JOB_PENDIN=
+G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "commit0", "len": 3145728, "offset": 3145728, "speed=
+": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+-{"execute": "job-finalize", "arguments": {"id": "stream0"}}
+-{"return": {}}
+-{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
+G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
+": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+-{"execute": "job-finalize", "arguments": {"id": "stream0"}}
+-{"return": {}}
+-{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
+G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+-{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
+": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 661d7f93bf..b97cc2fab2 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -35,6 +35,13 @@ from collections import OrderedDict
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pyt=
+hon'))
+ from qemu import qtest
+=20
++# Use this logger for logging messages directly from the iotests module
++logger =3D logging.getLogger(__name__)
++logger.addHandler(logging.NullHandler())
 +
-+/*
-+ * Bit usage when in AArch32 state, for A-profile only.
-+ */
-+FIELD(TBFLAG_A32, THUMB, 8, 1)          /* Not cached. */
-+FIELD(TBFLAG_A32, VECLEN, 9, 3)         /* Not cached. */
-+FIELD(TBFLAG_A32, VECSTRIDE, 12, 2)     /* Not cached. */
- /*
-  * We store the bottom two bits of the CPAR as TB flags and handle
-  * checks on the other bits at runtime. This shares the same bits as
-  * VECSTRIDE, which is OK as no XScale CPU has VFP.
-  * Not cached, because VECLEN+VECSTRIDE are not cached.
-  */
--FIELD(TBFLAG_A32, XSCALE_CPAR, 4, 2)
-+FIELD(TBFLAG_A32, XSCALE_CPAR, 12, 2)
-+FIELD(TBFLAG_A32, VFPEN, 14, 1)         /* Partially cached, minus FPEXC. */
-+FIELD(TBFLAG_A32, SCTLR_B, 15, 1)
- /*
-  * Indicates whether cp register reads and writes by guest code should access
-  * the secure or nonsecure bank of banked registers; note that this is not
-  * the same thing as the current security state of the processor!
-  */
--FIELD(TBFLAG_A32, NS, 6, 1)
--FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Partially cached, minus FPEXC. */
--FIELD(TBFLAG_A32, CONDEXEC, 8, 8)       /* Not cached. */
--FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
--/* For M profile only, set if FPCCR.LSPACT is set */
--FIELD(TBFLAG_A32, LSPACT, 18, 1)        /* Not cached. */
--/* For M profile only, set if we must create a new FP context */
--FIELD(TBFLAG_A32, NEW_FP_CTXT_NEEDED, 19, 1) /* Not cached. */
--/* For M profile only, set if FPCCR.S does not match current security state */
--FIELD(TBFLAG_A32, FPCCR_S_WRONG, 20, 1) /* Not cached. */
--/* For M profile only, Handler (ie not Thread) mode */
--FIELD(TBFLAG_A32, HANDLER, 21, 1)
--/* For M profile only, whether we should generate stack-limit checks */
--FIELD(TBFLAG_A32, STACKCHECK, 22, 1)
-+FIELD(TBFLAG_A32, NS, 16, 1)
- 
--/* Bit usage when in AArch64 state */
-+/*
-+ * Bit usage when in AArch32 state, for M-profile only.
-+ */
-+/* Set if FPCCR.LSPACT is set */
-+FIELD(TBFLAG_M32, LSPACT, 8, 1)                  /* Not cached. */
-+/* Set if we must create a new FP context */
-+FIELD(TBFLAG_M32, NEW_FP_CTXT_NEEDED, 9, 1)      /* Not cached. */
-+/* Set if FPCCR.S does not match current security state */
-+FIELD(TBFLAG_M32, FPCCR_S_WRONG, 10, 1)          /* Not cached. */
-+/* Handler (ie not Thread) mode */
-+FIELD(TBFLAG_A32, HANDLER, 11, 1)
-+/* Whether we should generate stack-limit checks */
-+FIELD(TBFLAG_A32, STACKCHECK, 12, 1)
++# Use this logger for messages that ought to be used for diff output.
++test_logger =3D logging.getLogger('.'.join((__name__, 'iotest')))
++test_logger.addHandler(logging.NullHandler())
+=20
+ # This will not work if arguments contain spaces but is necessary if we
+ # want to support the override options that ./check supports.
+@@ -343,10 +350,10 @@ def log(msg, filters=3D[], indent=3DNone):
+         separators =3D (', ', ': ') if indent is None else (',', ': ')
+         # Don't sort if it's already sorted
+         do_sort =3D not isinstance(msg, OrderedDict)
+-        print(json.dumps(msg, sort_keys=3Ddo_sort,
+-                         indent=3Dindent, separators=3Dseparators))
++        test_logger.info(json.dumps(msg, sort_keys=3Ddo_sort,
++                                    indent=3Dindent, separators=3Dsepara=
+tors))
+     else:
+-        print(msg)
++        test_logger.info(msg)
+=20
+ class Timeout:
+     def __init__(self, seconds, errmsg =3D "Timeout"):
+@@ -559,7 +566,7 @@ class VM(qtest.QEMUQtestMachine):
+=20
+     # Returns None on success, and an error string on failure
+     def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse,
+-                pre_finalize=3DNone, cancel=3DFalse, use_log=3DTrue, wai=
+t=3D60.0):
++                pre_finalize=3DNone, cancel=3DFalse, wait=3D60.0):
+         """
+         run_job moves a job from creation through to dismissal.
+=20
+@@ -572,7 +579,6 @@ class VM(qtest.QEMUQtestMachine):
+                              invoked prior to issuing job-finalize, if a=
+ny.
+         :param cancel: Bool. When true, cancels the job after the pre_fi=
+nalize
+                        callback.
+-        :param use_log: Bool. When false, does not log QMP messages.
+         :param wait: Float. Timeout value specifying how long to wait fo=
+r any
+                      event, in seconds. Defaults to 60.0.
+         """
+@@ -590,8 +596,7 @@ class VM(qtest.QEMUQtestMachine):
+         while True:
+             ev =3D filter_qmp_event(self.events_wait(events))
+             if ev['event'] !=3D 'JOB_STATUS_CHANGE':
+-                if use_log:
+-                    log(ev)
++                log(ev)
+                 continue
+             status =3D ev['data']['status']
+             if status =3D=3D 'aborting':
+@@ -599,24 +604,16 @@ class VM(qtest.QEMUQtestMachine):
+                 for j in result['return']:
+                     if j['id'] =3D=3D job:
+                         error =3D j['error']
+-                        if use_log:
+-                            log('Job failed: %s' % (j['error']))
++                        log('Job failed: %s' % (j['error']))
+             elif status =3D=3D 'pending' and not auto_finalize:
+                 if pre_finalize:
+                     pre_finalize()
+-                if cancel and use_log:
++                if cancel:
+                     self.qmp_log('job-cancel', id=3Djob)
+-                elif cancel:
+-                    self.qmp('job-cancel', id=3Djob)
+-                elif use_log:
++                else:
+                     self.qmp_log('job-finalize', id=3Djob)
+-                else:
+-                    self.qmp('job-finalize', id=3Djob)
+             elif status =3D=3D 'concluded' and not auto_dismiss:
+-                if use_log:
+-                    self.qmp_log('job-dismiss', id=3Djob)
+-                else:
+-                    self.qmp('job-dismiss', id=3Djob)
++                self.qmp_log('job-dismiss', id=3Djob)
+             elif status =3D=3D 'null':
+                 return error
+=20
+@@ -949,6 +946,7 @@ def execute_setup_common(supported_fmts=3D[],
+     if debug:
+         sys.argv.remove('-d')
+     logging.basicConfig(level=3D(logging.DEBUG if debug else logging.WAR=
+N))
++    logger.debug("iotests debugging messages active")
+=20
+     return debug
+=20
+@@ -961,14 +959,25 @@ def execute_test(test_function=3DNone, *args, **kwa=
+rgs):
+     else:
+         test_function()
+=20
++def activate_logging():
++    """Activate iotests.log() output to stdout for script-style tests.""=
+"
++    handler =3D logging.StreamHandler(stream=3Dsys.stdout)
++    formatter =3D logging.Formatter('%(message)s')
++    handler.setFormatter(formatter)
++    test_logger.addHandler(handler)
++    test_logger.setLevel(logging.INFO)
++    test_logger.propagate =3D False
 +
-+/*
-+ * Bit usage when in AArch64 state
-+ */
- FIELD(TBFLAG_A64, TBII, 0, 2)
- FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
- FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
+ # This is called from script-style iotests without a single point of ent=
+ry
+ def script_initialize(*args, **kwargs):
+     """Initialize script-style tests without running any tests."""
++    activate_logging()
+     execute_setup_common(*args, **kwargs)
+=20
+ # This is called from script-style iotests with a single point of entry
+ def script_main(test_function, *args, **kwargs):
+     """Run script-style tests outside of the unittest framework"""
++    activate_logging()
+     execute_test(test_function, *args, **kwargs)
+=20
+ # This is called from unittest style iotests
+--=20
+2.21.0
 
---------------5233F652544173C873D1DD62--
 
