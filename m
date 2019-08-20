@@ -2,64 +2,90 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAC9C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 20:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 905B6C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 20:42:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 716D022DD3
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 20:41:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 716D022DD3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BB0822DD3
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 20:42:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="DIxqFyCv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB0822DD3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Aw8-000788-H1
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 16:41:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49690)
+	id 1i0Axe-000837-JM
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 16:42:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1i0AtS-0005PM-JM
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 16:38:16 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1i0Aqs-00033F-Bs
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 16:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1i0AtO-00054u-Od
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 16:38:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34986)
+ (envelope-from <kwankhede@nvidia.com>) id 1i0Aqq-0004BY-3U
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 16:35:33 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:2221)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i0AtO-00053z-5x
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 16:38:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B02FA2A09D5;
- Tue, 20 Aug 2019 20:38:07 +0000 (UTC)
-Received: from localhost (ovpn-116-73.gru2.redhat.com [10.97.116.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 03DC21DA;
- Tue, 20 Aug 2019 20:37:59 +0000 (UTC)
-Date: Tue, 20 Aug 2019 17:37:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190820203757.GK3908@habkost.net>
-References: <fccac7fa-888e-6ac5-458d-688808f3b282@redhat.com>
- <699eee57-3009-4160-a9a2-1070f92b9c20@redhat.com>
- <cc0b5a77-8bc4-070b-31e4-f29d5a174eb8@redhat.com>
- <7f6e8a5c-8262-ae39-333a-e8f18b3174f0@redhat.com>
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1i0Aqp-0004BB-7V
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 16:35:31 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d5c59910000>; Tue, 20 Aug 2019 13:35:30 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Tue, 20 Aug 2019 13:35:30 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Tue, 20 Aug 2019 13:35:30 -0700
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 20 Aug
+ 2019 20:35:29 +0000
+Received: from [10.24.71.106] (172.20.13.39) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 20 Aug
+ 2019 20:35:19 +0000
+To: Yan Zhao <yan.y.zhao@intel.com>, Alex Williamson
+ <alex.williamson@redhat.com>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+ <1562665760-26158-11-git-send-email-kwankhede@nvidia.com>
+ <20190712025213.GH9176@joy-OptiPlex-7040>
+ <a8f67428-0f42-4b18-0cfd-02a21c3d4343@nvidia.com>
+ <20190722032028.GJ8912@joy-OptiPlex-7040> <20190722130713.2aaa0446@x1.home>
+ <20190722215017.GA3937@joy-OptiPlex-7040>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <1712fc28-37b9-35bc-7a00-8e8d0ac0ec32@nvidia.com>
+Date: Wed, 21 Aug 2019 02:05:14 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <7f6e8a5c-8262-ae39-333a-e8f18b3174f0@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 20 Aug 2019 20:38:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Regression with floppy drive controller
+In-Reply-To: <20190722215017.GA3937@joy-OptiPlex-7040>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1566333330; bh=WN8R275PgEXdysEmf2P9tDy/3dWeUU121zWJtpvusCg=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+ X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=DIxqFyCvdt9uspFBNOi1/ug5thrtcs4NXR9XrY3WLGj+y7ZjDDzVWZk1paiWAYt79
+ UOC5BDnB4gWgygKBa+d4WSh99dckFK+k1aG1BONtsqT0QAy1O74oG8I93RD63DxjX1
+ CVMNstE/8jyZuQyjCVefRlhV3l9OtfZaxvz4MFXS82gsKfozH3RcNfnJjRdHaohEJY
+ 6nQAMm/iHB8vjOkom34a3rQq1Ejs7d9jyTki8qStShrJyMMg22UP1qQILuEgmX9BNU
+ zj3wUVgGnBIxC/uyaWchfXSKApnRT/95gSshrdEvsr+soUzdHm4LeATcvtR+zX/Lgc
+ GrDCSOYC5Qn9g==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 216.228.121.143
+Subject: Re: [Qemu-devel] [PATCH v7 10/13] vfio: Add load state functions to
+ SaveVMHandlers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,193 +97,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex <coderain@sdf.org>, seabios@seabios.org,
- QEMU Developers <qemu-devel@nongnu.org>,
- Nikolay Nikolov <nickysn@users.sourceforge.net>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 20, 2019 at 06:21:28PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Cc'ing Eduardo, Paolo.
->=20
-> On 8/20/19 3:38 PM, Philippe Mathieu-Daud=E9 wrote:
-> > On 8/20/19 3:12 PM, John Snow wrote:
-> >> On 8/20/19 6:25 AM, Philippe Mathieu-Daud=E9 wrote:
-> >>> [cross posting QEMU & SeaBIOS]
-> >>>
-> >>> Hello,
-> >>>
-> >>> I'v been looking at a QEMU bug report [1] which bisection resulted =
-in a
-> >>> SeaBIOS commit:
-> >>>
-> >>> 4a6dbcea3e412fe12effa2f812f50dd7eae90955 is the first bad commit
-> >>> commit 4a6dbcea3e412fe12effa2f812f50dd7eae90955
-> >>> Author: Nikolay Nikolov <nickysn@users.sourceforge.net>
-> >>> Date:   Sun Feb 4 17:27:01 2018 +0200
-> >>>
-> >>>     floppy: Use timer_check() in floppy_wait_irq()
-> >>>
-> >>>     Use timer_check() instead of using floppy_motor_counter in BDA =
-for the
-> >>>     timeout check in floppy_wait_irq().
-> >>>
-> >>>     The problem with using floppy_motor_counter was that, after it =
-reaches
-> >>>     0, it immediately stops the floppy motors, which is not what is
-> >>>     supposed to happen on real hardware. Instead, after a timeout (=
-like in
-> >>>     the end of every floppy operation, regardless of the result - s=
-uccess,
-> >>>     timeout or error), the floppy motors must be kept spinning for
-> >>>     additional 2 seconds (the FLOPPY_MOTOR_TICKS). So, now the
-> >>>     floppy_motor_counter is initialized to 255 (the max value) in t=
-he
-> >>>     beginning of the floppy operation. For IRQ timeouts, a differen=
-t
-> >>>     timeout is used, specified by the new FLOPPY_IRQ_TIMEOUT consta=
-nt
-> >>>     (currently set to 5 seconds - a fairly conservative value, but =
-should
-> >>>     work reliably on most floppies).
-> >>>
-> >>>     After the floppy operation, floppy_drive_pio() resets the
-> >>>     floppy_motor_counter to 2 seconds (FLOPPY_MOTOR_TICKS).
-> >>>
-> >>>     This is also consistent with what other PC BIOSes do.
-> >>>
-> >>>
-> >>> This commit improve behavior with real hardware, so maybe QEMU is n=
-ot
-> >>> modelling something or modelling it incorrectly?
-> > [...]
-> >>
-> >> Well, that's unfortunate.
-> >>
-> >> What version of QEMU shipped the SeaBIOS that caused the regression?
-> >=20
-> > See https://bugs.launchpad.net/qemu/+bug/1840719/comments/3
-> >=20
-> > QEMU commit 0b8f74488e, slighly before QEMU v3.1.0
-> > (previous tag is v3.0.0).
-> >=20
-> > But you can use v4.1.0 too, simply change the SeaBIOS bios.bin, i.e.:
-> >=20
-> >   qemu$ git checkout v4.1.0
-> >=20
-> >   qemu$ (cd roms/seabios && git checkout 4a6dbcea3e4~) && \
-> >         make -C roms bios
-> >=20
-> > Now pc-bios/bios.bin is built using the last commit working,
-> >=20
-> >   qemu$ (cd roms/seabios && git checkout 4a6dbcea3e4) && \
-> >         make -C roms bios
-> >=20
-> > And you can reproduce the error.
->=20
-> Back from here.
->=20
-> So the SeaBIOS patch is:
->=20
-> diff --git a/src/hw/floppy.c b/src/hw/floppy.c
-> index 77dbade..3012b3a 100644
-> --- a/src/hw/floppy.c
-> +++ b/src/hw/floppy.c
-> @@ -34,6 +34,7 @@
->  #define FLOPPY_GAPLEN 0x1B
->  #define FLOPPY_FORMAT_GAPLEN 0x6c
->  #define FLOPPY_PIO_TIMEOUT 1000
-> +#define FLOPPY_IRQ_TIMEOUT 5000
->=20
->  #define FLOPPY_DOR_MOTOR_D     0x80 // Set to turn drive 3's motor ON
->  #define FLOPPY_DOR_MOTOR_C     0x40 // Set to turn drive 2's motor ON
-> @@ -221,8 +222,9 @@ floppy_wait_irq(void)
->  {
->      u8 frs =3D GET_BDA(floppy_recalibration_status);
->      SET_BDA(floppy_recalibration_status, frs & ~FRS_IRQ);
-> +    u32 end =3D timer_calc(FLOPPY_IRQ_TIMEOUT);
->      for (;;) {
-> -        if (!GET_BDA(floppy_motor_counter)) {
-> +        if (timer_check(end)) {
->              warn_timeout();
->              floppy_disable_controller();
->              return DISK_RET_ETIMEOUT;
->=20
-> timer_calc() unit is milliseconds, so this patch should wait upto
-> 5seconds before failing, and it seems the timeout is not used at all.
->=20
-> SeaBIOS timer.c:
->=20
-> // Return the TSC value that is 'msecs' time in the future.
-> u32
-> timer_calc(u32 msecs)
-> {
->     return timer_read() + (GET_GLOBAL(TimerKHz) * msecs);
-> }
->=20
-> static u32
-> timer_read(void)
-> {
->     u16 port =3D GET_GLOBAL(TimerPort);
->     if (CONFIG_TSC_TIMER && !port)
->         // Read from CPU TSC
->         return rdtscll() >> GET_GLOBAL(ShiftTSC);
->     if (CONFIG_PMTIMER && port !=3D PORT_PIT_COUNTER0)
->         // Read from PMTIMER
->         return timer_adjust_bits(inl(port), 0xffffff);
->     // Read from PIT.
->     outb(PM_SEL_READBACK | PM_READ_VALUE | PM_READ_COUNTER0, PORT_PIT_M=
-ODE);
->     u16 v =3D inb(PORT_PIT_COUNTER0) | (inb(PORT_PIT_COUNTER0) << 8);
->     return timer_adjust_bits(v, 0xffff);
-> }
->=20
-> Using the default QEMU config, we build SeaBIOS to use the TSC timer:
->=20
-> builds/seabios-128k/.config:CONFIG_TSC_TIMER=3Dy
-> builds/seabios-256k/.config:CONFIG_TSC_TIMER=3Dy
->=20
-> $ qemu-system-i386 -M isapc -cpu 486 \
->   -fda Windows\ 98\ Second\ Edition\ Boot.img \
->   -chardev stdio,id=3Dseabios \
->   -device isa-debugcon,iobase=3D0x402,chardev=3Dseabios
-> Booting from Floppy...
-> Floppy_drive_recal 0
-> Floppy_enable_controller
-> WARNING - Timeout at floppy_wait_irq:228!
-> Floppy_disable_controller
-> Floppy_enable_controller
-> WARNING - Timeout at floppy_wait_irq:228!
-> Floppy_disable_controller
-> Boot failed: could not read the boot disk
->=20
-> Now enabling the TSC feature:
->=20
-> $ qemu-system-i386 -M isapc -cpu 486,tsc \
->   -fda Windows\ 98\ Second\ Edition\ Boot.img \
->   -chardev stdio,id=3Dseabios \
->   -device isa-debugcon,iobase=3D0x402,chardev=3Dseabios
-> Booting from Floppy...
-> Floppy_drive_recal 0
-> Floppy_enable_controller
-> Floppy_media_sense on drive 0 found rate 0
-> Booting from 0000:7c00
-> Floppy_disable_controller
-> Floppy_enable_controller
-> Floppy_drive_recal 0
-> Floppy_media_sense on drive 0 found rate 0
->=20
-> Do we need a cpu with TSC support to run SeaBIOS?
->=20
-> So we should use '-cpu Conroe' or '-cpu core2duo' minimum?
 
-It's probably about time we update qemu64 (the default CPU model)
-to provide a more modern set of features.  Once libvirt adapts to
-the CPU model alias/version interface we added in 4.1, this will
-become easier to do.
 
---=20
-Eduardo
+On 7/23/2019 3:20 AM, Yan Zhao wrote:
+> On Tue, Jul 23, 2019 at 03:07:13AM +0800, Alex Williamson wrote:
+>> On Sun, 21 Jul 2019 23:20:28 -0400
+>> Yan Zhao <yan.y.zhao@intel.com> wrote:
+>>
+>>> On Fri, Jul 19, 2019 at 03:00:13AM +0800, Kirti Wankhede wrote:
+>>>>
+>>>>
+>>>> On 7/12/2019 8:22 AM, Yan Zhao wrote:  
+>>>>> On Tue, Jul 09, 2019 at 05:49:17PM +0800, Kirti Wankhede wrote:  
+>>>>>> Flow during _RESUMING device state:
+>>>>>> - If Vendor driver defines mappable region, mmap migration region.
+>>>>>> - Load config state.
+>>>>>> - For data packet, till VFIO_MIG_FLAG_END_OF_STATE is not reached
+>>>>>>     - read data_size from packet, read buffer of data_size
+>>>>>>     - read data_offset from where QEMU should write data.
+>>>>>>         if region is mmaped, write data of data_size to mmaped region.
+>>>>>>     - write data_size.
+>>>>>>         In case of mmapped region, write to data_size indicates kernel
+>>>>>>         driver that data is written in staging buffer.
+>>>>>>     - if region is trapped, pwrite() data of data_size from data_offset.
+>>>>>> - Repeat above until VFIO_MIG_FLAG_END_OF_STATE.
+>>>>>> - Unmap migration region.
+>>>>>>
+>>>>>> For user, data is opaque. User should write data in the same order as
+>>>>>> received.
+>>>>>>
+>>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>>>>> ---
+>>>>>>  hw/vfio/migration.c  | 162 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>  hw/vfio/trace-events |   3 +
+>>>>>>  2 files changed, 165 insertions(+)
+>>>>>>
+>>>>>> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+>>>>>> index 4e9b4cce230b..5fb4c5329ede 100644
+>>>>>> --- a/hw/vfio/migration.c
+>>>>>> +++ b/hw/vfio/migration.c
+>>>>>> @@ -249,6 +249,26 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
+>>>>>>      return qemu_file_get_error(f);
+>>>>>>  }
+>>>>>>  
+>>>>>> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+>>>>>> +{
+>>>>>> +    VFIODevice *vbasedev = opaque;
+>>>>>> +    uint64_t data;
+>>>>>> +
+>>>>>> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
+>>>>>> +        vbasedev->ops->vfio_load_config(vbasedev, f);
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    data = qemu_get_be64(f);
+>>>>>> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
+>>>>>> +        error_report("%s: Failed loading device config space, "
+>>>>>> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
+>>>>>> +        return -EINVAL;
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    trace_vfio_load_device_config_state(vbasedev->name);
+>>>>>> +    return qemu_file_get_error(f);
+>>>>>> +}
+>>>>>> +
+>>>>>>  /* ---------------------------------------------------------------------- */
+>>>>>>  
+>>>>>>  static int vfio_save_setup(QEMUFile *f, void *opaque)
+>>>>>> @@ -421,12 +441,154 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
+>>>>>>      return ret;
+>>>>>>  }
+>>>>>>  
+>>>>>> +static int vfio_load_setup(QEMUFile *f, void *opaque)
+>>>>>> +{
+>>>>>> +    VFIODevice *vbasedev = opaque;
+>>>>>> +    VFIOMigration *migration = vbasedev->migration;
+>>>>>> +    int ret = 0;
+>>>>>> +
+>>>>>> +    if (migration->region.buffer.mmaps) {
+>>>>>> +        ret = vfio_region_mmap(&migration->region.buffer);
+>>>>>> +        if (ret) {
+>>>>>> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
+>>>>>> +                         vbasedev->name, migration->region.index,
+>>>>>> +                         strerror(-ret));
+>>>>>> +            return ret;
+>>>>>> +        }
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RESUMING);
+>>>>>> +    if (ret) {
+>>>>>> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
+>>>>>> +    }
+>>>>>> +    return ret;
+>>>>>> +}
+>>>>>> +
+>>>>>> +static int vfio_load_cleanup(void *opaque)
+>>>>>> +{
+>>>>>> +    vfio_save_cleanup(opaque);
+>>>>>> +    return 0;
+>>>>>> +}
+>>>>>> +
+>>>>>> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
+>>>>>> +{
+>>>>>> +    VFIODevice *vbasedev = opaque;
+>>>>>> +    VFIOMigration *migration = vbasedev->migration;
+>>>>>> +    int ret = 0;
+>>>>>> +    uint64_t data, data_size;
+>>>>>> +  
+>>>>> I think checking of version_id is still needed.
+>>>>>   
+>>>>
+>>>> Checking version_id with what value?
+>>>>  
+>>> this version_id passed-in is the source VFIO software interface id.
+>>> need to check it with the value in target side, right?
+>>>
+>>> Though we previously discussed the sysfs node interface to check live
+>>> migration version even before launching live migration, I think we still
+>>> need this runtime software version check in qemu to ensure software
+>>> interfaces in QEMU VFIO are compatible.
+>>
+>> Do we want QEMU to interact directly with sysfs for that, which would
+>> require write privileges to sysfs, or do we want to suggest that vendor
+>> drivers should include equivalent information early in their migration
+>> data stream to force a migration failure as early as possible for
+>> incompatible data?  I think we need the latter regardless because the
+>> vendor driver should never trust userspace like that, but does that
+>> make any QEMU use of the sysfs version test itself redundant?  Thanks,
+>>
+>> Alex
+> 
+> hi Alex
+> I think QEMU needs to check at least the code version of software interface in
+> QEMU, like format of migration region, details of migration protocol,
+> IOW, the software version QEMU interacts with vendor driver.
+> This information should not be known to vendor driver until migration
+> running to certain phase.
+> e.g. if saving flow or format in source qemu is changed a little as a result
+> of software upgrading, target qemu has to detect that from this
+> version_id check, as vendor driver has no knowledge of that.
+> Does that make sense?
+> 
+
+That is already done in qemu_loadvm_section_start_full()
+
+    /* Validate version */
+    if (version_id > se->version_id) {
+        error_report("savevm: unsupported version %d for '%s' v%d",
+                     version_id, idstr, se->version_id);
+        return -EINVAL;
+    }
+    se->load_version_id = version_id;
+
+Thanks,
+Kirti
 
