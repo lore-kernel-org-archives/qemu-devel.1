@@ -4,46 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90380C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 299E3C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:36:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60594206DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:36:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60594206DD
+	by mail.kernel.org (Postfix) with ESMTPS id F2284206DD
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:36:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2284206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0BnP-0008Du-1s
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 17:36:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54327)
+	id 1i0BnY-0008U4-PV
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 17:36:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i0BOS-0003Ry-03
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:10:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i0Bka-0006c3-UY
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i0BOQ-0001pw-Rw
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:10:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42640)
+ (envelope-from <jsnow@redhat.com>) id 1i0BkZ-00008q-Pl
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:33:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42826)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i0BOO-0001nb-AS; Tue, 20 Aug 2019 17:10:12 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i0BkW-00006n-MV; Tue, 20 Aug 2019 17:33:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A341D317528A;
- Tue, 20 Aug 2019 21:10:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 09C553C934;
+ Tue, 20 Aug 2019 21:33:04 +0000 (UTC)
 Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F17ED1D2;
- Tue, 20 Aug 2019 21:10:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8720110016F3;
+ Tue, 20 Aug 2019 21:32:58 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-9-mreitz@redhat.com>
+ <20190819201851.24418-7-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,21 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <5e61d90b-82e8-afc1-cba3-d0761031f72e@redhat.com>
-Date: Tue, 20 Aug 2019 17:10:10 -0400
+Message-ID: <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
+Date: Tue, 20 Aug 2019 17:32:58 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190819201851.24418-9-mreitz@redhat.com>
+In-Reply-To: <20190819201851.24418-7-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 20 Aug 2019 21:10:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Tue, 20 Aug 2019 21:33:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] iotests: Cache supported_formats()
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting
+ in 093
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,46 +153,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Any particular reason? I guess an "itch."
+
 
 On 8/19/19 4:18 PM, Max Reitz wrote:
+> null-aio may not be whitelisted.  Skip all test cases that require it.
+> 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
+>  tests/qemu-iotests/093 | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 8f315538e9..f6492b355f 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -884,9 +884,17 @@ def qemu_pipe(*args):
->  def supported_formats(read_only=False):
->      '''Set 'read_only' to True to check ro-whitelist
->         Otherwise, rw-whitelist is checked'''
-> -    format_message = qemu_pipe("-drive", "format=help")
-> -    line = 1 if read_only else 0
-> -    return format_message.splitlines()[line].split(":")[1].split()
-> +
-> +    if not hasattr(supported_formats, "formats"):
-> +        supported_formats.formats = {}
-> +
-> +    if read_only not in supported_formats.formats:
-> +        format_message = qemu_pipe("-drive", "format=help")
-> +        line = 1 if read_only else 0
-> +        supported_formats.formats[read_only] = \
-> +            format_message.splitlines()[line].split(":")[1].split()
-> +
-
-Seems a little odd to use a boolean as a dict key, but I guess it works
-and is fine.
-
-> +    return supported_formats.formats[read_only]
+> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+> index 50c1e7f2ec..f03fa24a07 100755
+> --- a/tests/qemu-iotests/093
+> +++ b/tests/qemu-iotests/093
+> @@ -24,7 +24,7 @@ import iotests
+>  nsec_per_sec = 1000000000
 >  
->  def skip_if_unsupported(required_formats=[], read_only=False):
->      '''Skip Test Decorator
+>  class ThrottleTestCase(iotests.QMPTestCase):
+> -    test_img = "null-aio://"
+> +    test_driver = "null-aio"
+>      max_drives = 3
+>  
+>      def blockstats(self, device):
+> @@ -35,10 +35,14 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>                  return stat['rd_bytes'], stat['rd_operations'], stat['wr_bytes'], stat['wr_operations']
+>          raise Exception("Device not found for blockstats: %s" % device)
+>  
+> +    def required_drivers(self):
+> +        return [self.test_driver]
+> +
+> +    @iotests.skip_if_unsupported(required_drivers)
+
+Oh, I see why you're passing args[0] back to the callback now. Why not
+just pass self.required_drivers and call it with no arguments instead?
+
+You can get a bound version that way that doesn't need additional
+arguments, and then the callback is free to take generic callables of
+any kind.
+
+>      def setUp(self):
+>          self.vm = iotests.VM()
+>          for i in range(0, self.max_drives):
+> -            self.vm.add_drive(self.test_img, "file.read-zeroes=on")
+> +            self.vm.add_drive(self.test_driver + "://", "file.read-zeroes=on")
+>          self.vm.launch()
+>  
+>      def tearDown(self):
+> @@ -264,7 +268,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>          self.assertEqual(self.blockstats('drive1')[0], 4096)
+>  
+>  class ThrottleTestCoroutine(ThrottleTestCase):
+> -    test_img = "null-co://"
+> +    test_driver = "null-co"
+>  
+>  class ThrottleTestGroupNames(iotests.QMPTestCase):
+>      max_drives = 3
+> @@ -425,4 +429,6 @@ class ThrottleTestRemovableMedia(iotests.QMPTestCase):
+>  
+>  
+>  if __name__ == '__main__':
+> +    if 'null-co' not in iotests.supported_formats():
+> +        iotests.notrun('null-co driver support missing')
+>      iotests.main(supported_fmts=["raw"])
 > 
-
-Eh, why not.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
 
