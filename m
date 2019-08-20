@@ -2,65 +2,63 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D66C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF067C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FCBF23777
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:43:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FCBF23777
+	by mail.kernel.org (Postfix) with ESMTPS id 93C912339E
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:45:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C912339E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzzju-0005oJ-FX
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 04:43:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57118)
+	id 1hzzm9-0006wZ-R3
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 04:45:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1hzzia-0004nd-OS
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:42:17 -0400
+ (envelope-from <abologna@redhat.com>) id 1hzzlU-0006Ri-UD
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:45:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hzziZ-0002gK-L3
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:42:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45944)
+ (envelope-from <abologna@redhat.com>) id 1hzzlT-0004X9-Tb
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:45:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36480)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1hzziX-0002cq-5H; Tue, 20 Aug 2019 04:42:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <abologna@redhat.com>) id 1hzzlT-0004WX-No
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:45:15 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 707997FDFF;
- Tue, 20 Aug 2019 08:42:12 +0000 (UTC)
-Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 48BF05D9CD;
- Tue, 20 Aug 2019 08:42:01 +0000 (UTC)
-Date: Tue, 20 Aug 2019 09:41:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190820084158.GE23352@redhat.com>
-References: <20190820082459.2101-1-quintela@redhat.com>
- <20190820082459.2101-6-quintela@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4914F51EE4;
+ Tue, 20 Aug 2019 08:45:14 +0000 (UTC)
+Received: from kinshicho (unknown [10.43.2.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B0D018B66;
+ Tue, 20 Aug 2019 08:45:12 +0000 (UTC)
+Message-ID: <31906efac93bec3cd5aceddcd79ff4e62bb64391.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+To: Andrew Jones <drjones@redhat.com>, "Zhang, Lei" <zhang.lei@jp.fujitsu.com>
+Date: Tue, 20 Aug 2019 10:45:11 +0200
+In-Reply-To: <20190820075328.ew6kfiozom2ptcjv@kamzik.brq.redhat.com>
+References: <8898674D84E3B24BA3A2D289B872026A78C0BF32@G01JPEXMBKW03>
+ <20190820075328.ew6kfiozom2ptcjv@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190820082459.2101-6-quintela@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 20 Aug 2019 08:42:12 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.30]); Tue, 20 Aug 2019 08:45:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] multifd: Use number of channels as
- listen backlog
+Subject: Re: [Qemu-devel] [PATCH v3 00/15] target/arm/kvm: enable SVE in
+ guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,35 +70,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: "Mizuma, Masayoshi" <masayoshi.mizuma@fujitsu.com>, "Okamoto,
+ Takayuki" <tokamoto@jp.fujitsu.com>,
+ "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 20, 2019 at 10:24:59AM +0200, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/socket.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+On Tue, 2019-08-20 at 09:53 +0200, Andrew Jones wrote:
+> On Tue, Aug 20, 2019 at 06:08:04AM +0000, Zhang, Lei wrote:
+> > Hi Andrew,
+> > 
+> > I have tested your patch on kernel- 5.2.7 + QEMU (4.0.94 + patch).
+> 
+> Thanks for the testing! I guess it's time for me to get back to this
+> series and spin a v4 (so we can test some more :-)
+> 
+> > This patch series works fine for my tests when use qemu-system-aarch64 directly.
+> > But I can't startup kvm when I use virsh[1].
+> > 
+> > Command I executed.
+> > # virsh start test1
+> > 
+> > The error message is [internal error: CPU features not supported by hypervisor for aarch64 architecture.]
+> > Do you have any ideas for this error? 
+> 
+> I've CC'ed Andrea.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+I've specifically patched out that check in my series... Are you
+sure you're using the modified libvirt version, and that your guest
+is configured to use the modified QEMU binary?
 
+Anyway, once v4 has been posted I'll respin the libvirt series as
+well, since in the meantime conflicts have popped up and it no longer
+applies cleanly on top of master.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+Andrea Bolognani / Red Hat / Virtualization
+
 
