@@ -2,89 +2,94 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2228FC41514
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A7DCC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:26:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED31B2339D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:25:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED31B2339D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F1D722DD3
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 17:26:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F1D722DD3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i07tB-0006LT-7A
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 13:25:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52569)
+	id 1i07uM-0007Jx-AX
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 13:26:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i07sW-0005lA-D6
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:25:05 -0400
+ (envelope-from <pc@us.ibm.com>) id 1i07tg-0006nw-9n
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i07sV-0004YU-Cc
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:25:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58166)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i07sS-0004Up-B3; Tue, 20 Aug 2019 13:25:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 94BC6A4D5E;
- Tue, 20 Aug 2019 17:24:59 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E7E38183A5;
- Tue, 20 Aug 2019 17:24:58 +0000 (UTC)
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20190820164616.4072-1-dplotnikov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
-Date: Tue, 20 Aug 2019 12:24:58 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190820164616.4072-1-dplotnikov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="1tgTX5C6IXNT9Bdp1zgEizQW8oE2AM4RL"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 20 Aug 2019 17:24:59 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v10] qemu-io: add pattern file for write
- command
+ (envelope-from <pc@us.ibm.com>) id 1i07td-0005rZ-P1
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:26:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29154
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pc@us.ibm.com>) id 1i07td-0005qg-KB
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:26:13 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7KHMV6T147026
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 13:26:11 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2ugkbh5pvr-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 13:26:11 -0400
+Received: from localhost
+ by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <pc@us.ibm.com>;
+ Tue, 20 Aug 2019 18:26:10 +0100
+Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
+ by e35.co.us.ibm.com (192.168.1.135) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 20 Aug 2019 18:26:06 +0100
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x7KHQ5Uw45941238
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 20 Aug 2019 17:26:06 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D93B76A057;
+ Tue, 20 Aug 2019 17:26:05 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A135A6A047;
+ Tue, 20 Aug 2019 17:26:05 +0000 (GMT)
+Received: from localhost (unknown [9.85.217.41])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 20 Aug 2019 17:26:05 +0000 (GMT)
+From: "Paul A. Clarke" <pc@us.ibm.com>
+To: david@gibson.dropbear.id.au
+Date: Tue, 20 Aug 2019 12:26:04 -0500
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+x-cbid: 19082017-0012-0000-0000-0000175D5296
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011624; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01249608; UDB=6.00659683; IPR=6.01031157; 
+ MB=3.00028248; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-20 17:26:08
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19082017-0013-0000-0000-0000588B3F92
+Message-Id: <1566321964-1447-1-git-send-email-pc@us.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-20_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=855 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908200159
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH] ppc: Fix xscvdpspn for SNAN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,120 +101,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1tgTX5C6IXNT9Bdp1zgEizQW8oE2AM4RL
-Content-Type: multipart/mixed; boundary="luNY7QZUNr4R9r4QJTya9L8dJDxT1Xsdr";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com
-Message-ID: <d1de09cd-2243-0ae8-c589-2871be826f66@redhat.com>
-Subject: Re: [PATCH v10] qemu-io: add pattern file for write command
-References: <20190820164616.4072-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190820164616.4072-1-dplotnikov@virtuozzo.com>
+From: "Paul A. Clarke" <pc@us.ibm.com>
 
---luNY7QZUNr4R9r4QJTya9L8dJDxT1Xsdr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+helper_xscvdpspn() uses float64_to_float32() to convert double-precision
+floating-point to single-precision.  Unfortunately, float64_to_float32()
+converts SNAN to QNAN, which should not happen with xscvdpspn.
 
-On 8/20/19 11:46 AM, Denis Plotnikov wrote:
-> The patch allows to provide a pattern file for write
-> command. There was no similar ability before.
->=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
+float64_to_float32() is also used by other instruction implementations
+for conversions which _should_ convert SNAN to QNAN.
 
-> @@ -983,8 +1057,9 @@ static int write_f(BlockBackend *blk, int argc, ch=
-ar **argv)
->      /* Some compilers get confused and warn if this is not initialized=
-=2E  */
->      int64_t total =3D 0;
->      int pattern =3D 0xcd;
-> +    const char *file_name =3D NULL;
-> =20
-> -    while ((c =3D getopt(argc, argv, "bcCfnpP:quz")) !=3D -1) {
-> +    while ((c =3D getopt(argc, argv, "bcCfnpP:quzs:")) !=3D -1) {
+Rather than trying to wedge code to preserve SNAN in float64_to_float32()
+just for this this one case, I instead embed an embodiment of the
+conversion code outlined in the POWER ISA for xscvdpspn.
 
-This one looks odd (I would have preserved ordering by sticking s:
-between q and u).  But a maintainer could fix that.
+Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+---
+ target/ppc/fpu_helper.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
->          switch (c) {
->          case 'b':
->              bflag =3D true;
-> @@ -1020,6 +1095,10 @@ static int write_f(BlockBackend *blk, int argc, =
-char **argv)
->          case 'z':
->              zflag =3D true;
->              break;
-> +        case 's':
-> +            sflag =3D true;
-> +            file_name =3D optarg;
-> +            break;
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 07bc905..c8e7192 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2887,12 +2887,40 @@ void helper_xscvqpdp(CPUPPCState *env, uint32_t opcode,
+ 
+ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
+ {
+-    uint64_t result;
++    uint64_t result, sign, exp, frac;
+ 
+     float_status tstat = env->fp_status;
+     set_float_exception_flags(0, &tstat);
+ 
+-    result = (uint64_t)float64_to_float32(xb, &tstat);
++    sign = extract64(xb, 63,  1);
++    exp  = extract64(xb, 52, 11);
++    frac = extract64(xb,  0, 52) | 0x10000000000000ULL;
++
++    if (unlikely(exp == 0 && extract64(frac, 0, 52) != 0)) {
++        /* DP denormal operand.  */
++        /* Exponent override to DP min exp.  */
++        exp = 1;
++        /* Implicit bit override to 0.  */
++        frac = deposit64(frac, 53, 1, 0);
++    }
++
++    if (unlikely(exp < 897 && frac != 0)) {
++        /* SP tiny operand.  */
++        if (897 - exp > 63) {
++            frac = 0;
++        } else {
++            /* Denormalize until exp = SP min exp.  */
++            frac >>= (897 - exp);
++        }
++        /* Exponent override to SP min exp - 1.  */
++        exp = 896;
++    }
++
++    result = sign << 31;
++    result |= extract64(exp, 10, 1) << 30;
++    result |= extract64(exp, 0, 7) << 23;
++    result |= extract64(frac, 29, 23);
++
+     /* hardware replicates result to both words of the doubleword result.  */
+     return (result << 32) | result;
+ }
+-- 
+1.8.3.1
 
-Likewise, sorting the cases in the same order as the getopt() listing
-helps in finding code during later edits.
-
-> @@ -1088,7 +1168,14 @@ static int write_f(BlockBackend *blk, int argc, =
-char **argv)
->      }
-> =20
->      if (!zflag) {
-> -        buf =3D qemu_io_alloc(blk, count, pattern);
-> +        if (sflag) {
-> +            buf =3D qemu_io_alloc_from_file(blk, count, file_name);
-> +            if (!buf) {
-> +                return -EINVAL;
-> +            }
-> +        } else {
-> +            buf =3D qemu_io_alloc(blk, count, pattern);
-> +        }
-
-Pre-existing, but it is odd that qemu_io_alloc() exit()s rather than
-returning NULL on huge allocation requests that can't be met.  (Then
-again, we have an early exit on any length > 2G, and 2G allocations tend
-to succeed on modern development machines).  Perhaps it would be nice to
-teach qemu-io to use blk_try_blockalign for more graceful handling even
-on 32-bit platforms, but that's not the problem of your patch.
-
-Option ordering is minor enough that I'm fine giving:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Now, to figure out which maintainer should take it.  Perhaps you want to
-add a patch 2/1 that adds an iotest using this new mode, to a) ensure it
-doesn't regress, and b) makes it reasonable to take in through the
-iotest tree.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---luNY7QZUNr4R9r4QJTya9L8dJDxT1Xsdr--
-
---1tgTX5C6IXNT9Bdp1zgEizQW8oE2AM4RL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1cLOoACgkQp6FrSiUn
-Q2pF7wf+JSYkMTdVYBRhPlyC4FkGPcmrs4/QUDL/hKt18YOTra5flXzeJwx3Ct69
-MLXSpNdmKF3t0UWgz74/64vVftq6WF4yyNpHNxE+rLifmBiN19XIz1mifKPXBTBY
-KhMqIcxqHhypxJD0Cvl1crToo7P5ZrXg78Xr0HmDVejN6fpwRokB1OlaaQYXTOEL
-HfKJwidz+gGt1pIeHjQsAgnvtGblG9JpA2W1tvoP1BnUtgox6IOXMqCquIhyO2kL
-llWWAs0Kn0xv9W/JfbvEkMG80riIunfsJo4SGV/2S2WyPqUM2tkjtMnuksMWS5a1
-lAT7ZVcszs6E5XR2c4X+5oPlyUOcrA==
-=Sc9C
------END PGP SIGNATURE-----
-
---1tgTX5C6IXNT9Bdp1zgEizQW8oE2AM4RL--
 
