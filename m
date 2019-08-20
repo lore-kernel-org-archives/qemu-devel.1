@@ -2,68 +2,88 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F16C9C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F6EC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:09:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C35CD22DA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:06:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C35CD22DA9
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF11206DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:09:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF11206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i05iJ-0004Qt-LZ
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 11:06:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59724)
+	id 1i05kr-0007PN-Gu
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 11:09:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i05gu-00034x-Q0
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:04:58 -0400
+ (envelope-from <philmd@redhat.com>) id 1i05kB-0006U2-RA
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:08:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i05gr-0008TW-G2
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:04:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35516)
+ (envelope-from <philmd@redhat.com>) id 1i05kA-0002gQ-5N
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:08:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48746)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i05gq-0008SV-MH
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:04:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i05k9-0002fy-TP
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:08:18 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 97627898107;
- Tue, 20 Aug 2019 15:04:51 +0000 (UTC)
-Received: from work-vm (ovpn-117-33.ams2.redhat.com [10.36.117.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EBFF81001DC2;
- Tue, 20 Aug 2019 15:04:45 +0000 (UTC)
-Date: Tue, 20 Aug 2019 16:04:43 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190820150443.GM2867@work-vm>
-References: <fccac7fa-888e-6ac5-458d-688808f3b282@redhat.com>
- <699eee57-3009-4160-a9a2-1070f92b9c20@redhat.com>
- <cc0b5a77-8bc4-070b-31e4-f29d5a174eb8@redhat.com>
- <1a45cee8-66e1-448d-78bc-4f0b9695cab4@redhat.com>
- <20190820143614.GJ2867@work-vm>
- <70fd81a1-08bb-5cc8-616c-68ec2a7472e2@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id AF8855AFE9
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 15:08:16 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id a17so7225544wrw.3
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 08:08:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=H6lEqg+qbEwqiv/+HCf8Mi53roJeWwDp1Nga5QWpIMk=;
+ b=bH3OVw7MW5ARFkGbFG9tQEUC1Om7lQ2JPGY6kPp7HjytzDB2EBJ6or2QC1iR6HlRIk
+ TqESzqdPmhkEjo9toe2075piWaeh8JdJJZOZqy6d3djKU34xKI8hLAWKLjNsYOq5aBN8
+ RYyBqI5WFLpQlJxwlMPQuM1hCtUwkMrn4DG4pVFYzgQID6k7NLKod1UB3qG3AlVybz2R
+ r0Mc2+lV5dMr5m1nxllVRIF3jMFoBVMaoEefI3HIX/KFQNOaoONQZInqHdVb45yHSIxj
+ BUvn6W6dj4mmQ6Ya9zmCU7p7oZx8tbO/Ax6TiD/XcsdmpdhPyuB7+sRtaDDsvsiga8hU
+ H/iQ==
+X-Gm-Message-State: APjAAAWlDAjzN5AxC48VO48RzLo9FHXTcV8Pn96YWQPbxgoKj5vXwyA0
+ 3fgCk4ZXcGe+RASX/3WiPuzE2BuY5UrHOeNG1ck/hAnPPznx/+MNMPxlJxtLhZdeTqepsyxF1io
+ YTEavwpfI714/OGQ=
+X-Received: by 2002:adf:dbcd:: with SMTP id e13mr33529417wrj.314.1566313695316; 
+ Tue, 20 Aug 2019 08:08:15 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzF6tXiWFZ22Kz8lIXc33vW1MxEofFNxe9w9aR/CDqi5NqCEKrVRbZBmVT+iHedLWgZyEurFA==
+X-Received: by 2002:adf:dbcd:: with SMTP id e13mr33529382wrj.314.1566313695076; 
+ Tue, 20 Aug 2019 08:08:15 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id i5sm19929710wrn.48.2019.08.20.08.08.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Aug 2019 08:08:14 -0700 (PDT)
+To: Guenter Roeck <linux@roeck-us.net>, qemu-devel@nongnu.org
+References: <20190820123417.27930-1-philmd@redhat.com>
+ <3e3fcb30-1e12-eaf4-07a2-47d09aea2511@roeck-us.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <509576fb-6fc1-7812-f73f-bda210c5ce99@redhat.com>
+Date: Tue, 20 Aug 2019 17:08:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <3e3fcb30-1e12-eaf4-07a2-47d09aea2511@roeck-us.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <70fd81a1-08bb-5cc8-616c-68ec2a7472e2@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 20 Aug 2019 15:04:51 +0000 (UTC)
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [SeaBIOS] Re: Regression with floppy drive
- controller
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] hw/char/bcm2835_aux: Provide full
+ 16550 UART support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,186 +95,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex <coderain@sdf.org>, Nikolay Nikolov <nickysn@users.sourceforge.net>,
- seabios@seabios.org, John Snow <jsnow@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
-> On 8/20/19 4:36 PM, Dr. David Alan Gilbert wrote:
-> > * Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
-> >> On 8/20/19 3:38 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>> On 8/20/19 3:12 PM, John Snow wrote:
-> >>>> On 8/20/19 6:25 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>>> [cross posting QEMU & SeaBIOS]
-> >>>>>
-> >>>>> Hello,
-> >>>>>
-> >>>>> I'v been looking at a QEMU bug report [1] which bisection resulte=
-d in a
-> >>>>> SeaBIOS commit:
-> >>>>>
-> >>>>> 4a6dbcea3e412fe12effa2f812f50dd7eae90955 is the first bad commit
-> >>>>> commit 4a6dbcea3e412fe12effa2f812f50dd7eae90955
-> >>>>> Author: Nikolay Nikolov <nickysn@users.sourceforge.net>
-> >>>>> Date:   Sun Feb 4 17:27:01 2018 +0200
-> >>>>>
-> >>>>>     floppy: Use timer_check() in floppy_wait_irq()
-> >>>>>
-> >>>>>     Use timer_check() instead of using floppy_motor_counter in BD=
-A for the
-> >>>>>     timeout check in floppy_wait_irq().
-> >>>>>
-> >>>>>     The problem with using floppy_motor_counter was that, after i=
-t reaches
-> >>>>>     0, it immediately stops the floppy motors, which is not what =
-is
-> >>>>>     supposed to happen on real hardware. Instead, after a timeout=
- (like in
-> >>>>>     the end of every floppy operation, regardless of the result -=
- success,
-> >>>>>     timeout or error), the floppy motors must be kept spinning fo=
-r
-> >>>>>     additional 2 seconds (the FLOPPY_MOTOR_TICKS). So, now the
-> >>>>>     floppy_motor_counter is initialized to 255 (the max value) in=
- the
-> >>>>>     beginning of the floppy operation. For IRQ timeouts, a differ=
-ent
-> >>>>>     timeout is used, specified by the new FLOPPY_IRQ_TIMEOUT cons=
-tant
-> >>>>>     (currently set to 5 seconds - a fairly conservative value, bu=
-t should
-> >>>>>     work reliably on most floppies).
-> >>>>>
-> >>>>>     After the floppy operation, floppy_drive_pio() resets the
-> >>>>>     floppy_motor_counter to 2 seconds (FLOPPY_MOTOR_TICKS).
-> >>>>>
-> >>>>>     This is also consistent with what other PC BIOSes do.
-> >>>>>
-> >>>>>
-> >>>>> This commit improve behavior with real hardware, so maybe QEMU is=
- not
-> >>>>> modelling something or modelling it incorrectly?
-> [...]
-> >> Looking at the fdc timer I noticed it use a static '50 ns' magic val=
-ue.
-> >=20
-> > That's not 50ns
-> >=20
-> >> Increasing this value allows the floppy image to boot again, using t=
-his
-> >> snippet:
-> >>
-> >> -- >8 --
-> >> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> >> index 9b24cb9b85..5fc54073fd 100644
-> >> --- a/hw/block/fdc.c
-> >> +++ b/hw/block/fdc.c
-> >> @@ -2134,7 +2134,7 @@ static void fdctrl_handle_readid(FDCtrl *fdctr=
-l,
-> >> int direction)
-> >>
-> >>      cur_drv->head =3D (fdctrl->fifo[1] >> 2) & 1;
-> >>      timer_mod(fdctrl->result_timer, qemu_clock_get_ns(QEMU_CLOCK_VI=
-RTUAL) +
-> >> -             (NANOSECONDS_PER_SECOND / 50));
-> >=20
-> > That's 1/50th of a second in ns.
+On 8/20/19 4:31 PM, Guenter Roeck wrote:
+> On 8/20/19 5:34 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Hi,
+>>
+>> Since there has been some activity on the list asking about
+>> Rasberry PI USB support, I had a look a some previous unfinished
+>> work and rebased it to share, in case it helps hobbyist interested
+>> in improving these machines.
+>>
+>> This series is some proof-of-concept on improving the AUX UART
+>> support. See the commit description for various TODO/questions.
+>>
+>> This can be tested using files documented by Peter Maydell in
+>> his blog post:
+>> https://translatedcode.wordpress.com/2018/04/25/debian-on-qemus-raspbe=
+rry-pi-3-model/
+>>
+>>
+>> And using the kernel command line arguments suggested by Guenter Roeck=
+:
+>>
+>> qemu-system-aarch64 -M raspi3 -m 1024 \
+>> =C2=A0=C2=A0 -kernel raspi3/bootpart/vmlinuz-4.14.0-3-arm64 \
+>> =C2=A0=C2=A0 -initrd raspi3/bootpart/initrd.img-4.14.0-3-arm64 \
+>> =C2=A0=C2=A0 -dtb raspi3/bootpart/bcm2837-rpi-3-b.dtb \
+>> =C2=A0=C2=A0 -append 'earlycon=3Duart8250,mmio32,0x3f215040 rdinit=3D/=
+sbin/init
+>> panic=3D-1 console=3DttyS1,115200' \
+>> =C2=A0=C2=A0 -drive
+>> file=3Draspi3/2018-01-08-raspberry-pi-3-buster-PREVIEW.img,format=3Dra=
+w,if=3Dsd
+>> \
+>> =C2=A0=C2=A0 -serial null -serial stdio \
+>> =C2=A0=C2=A0 -d unimp,guest_errors -trace bcm283\*
 >=20
-> Just noticed that too, so we have here 20ms.
+> [ ... ]
 >=20
-> >> +             (NANOSECONDS_PER_SECOND / 5000));
-> >=20
-> > I'm not too sure about readid; but assuming we're rotating at 360rpm,
-> > that's 6 revolutions/second, and 18 sectors/track =3D 108 sectors/sec=
-ond
-> > (half of that for a double density disk).
-> >=20
-> > So, the wait for a sector to spin around and read feels like it shoul=
-d
-> > be in the region of 1/108 of a second + some latency - so 1/50th of a
-> > second would seem to be in the ballpark or being right, where as 1/50=
-00
-> > of a second is way too fast for a poor old floppy.
+>> [=C2=A0=C2=A0=C2=A0 3.123313] Unpacking initramfs...
+>>
+>> Here it hangs, even with CPRMAN patch from Guenter:
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03153.html
+>>
 >=20
-> The first command sent is READ_ID.
+> This command line works for me:
 >=20
-> Reading the Intel 82077AA datasheet:
+> qemu-system-aarch64 -M raspi3 -kernel arch/arm64/boot/Image -no-reboot =
+\
+> =C2=A0=C2=A0=C2=A0=C2=A0-nographic -snapshot -smp 4 -m 1G \
+> =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3Drootfs.ext2,format=3Draw,if=3Dsd =
+\
+> =C2=A0=C2=A0=C2=A0=C2=A0-serial null -serial stdio -monitor none -no-re=
+boot \
+> =C2=A0=C2=A0=C2=A0=C2=A0--append 'panic=3D-1 slub_debug=3DFZPUA root=3D=
+/dev/mmcblk0 rootwait
+> earlycon=3Duart8250,mmio32,0x3f215040 console=3DttyS1,115200' \
+> =C2=A0=C2=A0=C2=A0=C2=A0-dtb arch/arm64/boot/dts/broadcom/bcm2837-rpi-3=
+-b.dtb
 >=20
->   The READ ID command is used to find the present
->   position of the recording heads. The 82077AA
->   stores the values from the first ID Field it is able to
->   read into its registers. If the 82077AA does not find
->   an ID Address Mark on the diskette after the second
->   occurrence of a pulse on the IDX pin, it then sets the
->   IC code in Status Register 0 to =E2=80=98=E2=80=9801=E2=80=99=E2=80=99=
- (Abnormal ter-
->   mination), sets the MA bit in Status Register 1 to
->   =E2=80=98=E2=80=991=E2=80=99=E2=80=99, and terminates the command.
+> or, with initrd:
 >=20
-> Then later the SPECIFICATIONS table:
+> qemu-system-aarch64 -M raspi3 -kernel arch/arm64/boot/Image -no-reboot =
+\
+> =C2=A0=C2=A0=C2=A0=C2=A0-nographic \
+> =C2=A0=C2=A0=C2=A0=C2=A0-initrd rootfs.cpio \
+> =C2=A0=C2=A0=C2=A0=C2=A0-m 1G -serial null -serial stdio -monitor none =
+-no-reboot \
+> =C2=A0=C2=A0=C2=A0=C2=A0--append 'panic=3D-1 slub_debug=3DFZPUA rdinit=3D=
+/sbin/init
+> earlycon=3Duart8250,mmio32,0x3f215040 console=3DttyS1,115200' \
+> =C2=A0=C2=A0=C2=A0=C2=A0-dtb arch/arm64/boot/dts/broadcom/bcm2837-rpi-3=
+-b.dtb
 >=20
->   nRD/nWR Pulse Width: min 90ns
->   INDEX Pulse Width: min 5 'Internal Clock Period'
+> This is with the mainline kernel.
+>=20
+> I don't see a significant difference to your patch series.
 
-Note that's the pulse width, not the gap between the idx pulses.
-My understanding is that an index pulse is once per rotation; ie. every
-1/60th of a second.
+Thank you for taking the time to test!
 
-The failure after 2 IDX pin pulses makes sense, that's saying if you've
-not found a sector after spinning the disk twice then you fail.
+The biggest difference is the diffstat:
 
-So, your time to deliver a good result to a readid shoukd be the
-rotational time for 1 or 2 sectors, where as the time to fail should
-be the rotational time for about 2 whole rotations (ie 1/30 of a
-second).
+ hw/char/bcm2835_aux.c         | 211 +++-------------------------------
 
-Dave
+The model is now cleaner and easier to maintain.
 
->   The nominal values for the 'internal clock period' for the various
->   data rates are:
->=20
->     1 Mbps:  3 * osc period =3D 125ns
->   500 Kbps:  6 * osc period =3D 250ns
->   300 Kbps: 10 * osc period =3D 420ns
->   250 Kbps: 12 * osc period =3D 500ns
->=20
-> IIUC the model we have DATARATE SELECT REGISTER (DSR) =3D 0
->=20
-> So DRATESEL=3D0 =3D> datarate =3D 500 Kbps
->=20
-> So we should wait at least 250ns.
->=20
-> Trying the following snippet it also works:
->=20
-> -- >8 --
-> @@ -2133,8 +2133,8 @@ static void fdctrl_handle_readid(FDCtrl *fdctrl,
-> int direction)
->      FDrive *cur_drv =3D get_cur_drv(fdctrl);
->=20
->      cur_drv->head =3D (fdctrl->fifo[1] >> 2) & 1;
-> -    timer_mod(fdctrl->result_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTU=
-AL) +
-> -             (NANOSECONDS_PER_SECOND / 50));
-> +    timer_mod(fdctrl->result_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTU=
-AL)
-> +                                    + 250);
->  }
-> ---
->=20
-> Note this is not the spining-up delay on reset:
->=20
->   Before data can be transferred to or from the disk-
->   ette, the disk drive motor must be brought up to
->   speed. For most 3(/2 =C3=97 disk drives, the spin-up time is
->   300 ms, while the 5(/4 =C3=97 drive usually requires about
->   500 ms due to the increased moment of inertia asso-
->   ciated with the larger diameter diskette.
->=20
-> This looks more closer to the 20ms order. So maybe what we miss
-> here is a RESET delay (of 500ms?) previous to the READ_ID?
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The logical differences are noted in 2nd patch, basically:
+1- not same FIFO length (easily fixable)
+2- now the model implements more feature than supposed to
+3- migration
+
+I'll wait for the different ARM/Migration subsystem review.
+
+[...]
+> One possibility might be that your initrd has a problem. Can you boot
+> without your patch
+> series, or is it always stuck ?
+
+I remember it used to work for me back when I wrote it, so it is
+probably an initrd problem. I'll test later and keep you updated.
+
+Thanks!
+
+Phil.
 
