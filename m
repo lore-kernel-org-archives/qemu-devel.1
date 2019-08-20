@@ -2,64 +2,84 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3648DC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 01:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D330FC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 03:13:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F385B22DA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 01:34:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E2C8218BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 03:13:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="N1mY3ET3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F385B22DA7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pvwuH6x4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E2C8218BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzt2J-00010f-6B
-	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 21:34:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33689)
+	id 1hzuZz-0007Jw-SD
+	for qemu-devel@archiver.kernel.org; Mon, 19 Aug 2019 23:13:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1hzszO-0006sg-Rc
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 21:31:12 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1hzuYx-0006Gm-Tt
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 23:12:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hzszM-0008F2-I1
- for qemu-devel@nongnu.org; Mon, 19 Aug 2019 21:31:10 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51797 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hzszI-0008BZ-QB; Mon, 19 Aug 2019 21:31:06 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CCtB4YWxz9sML; Tue, 20 Aug 2019 11:30:58 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566264658;
- bh=KaoGbYN34/ZymmVYggXkmdR5AhYcb5acqMo2xRZcamI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=N1mY3ET3TV2kM8Bk96zxVMJ0Q4GIPLKroUrEVRXRCoLkjbUrq2IxiQdgNeRZJjW70
- aOs6MD1KNIBndWXyEbb30FgSQyaobmAoqqiSVV7NwlvEhAlJ5LtFyGD9ivko9Wm4yQ
- hePuknjlG3ZQD9ikNZvMwxYpccMBHcDHhubYi0ZQ=
-Date: Tue, 20 Aug 2019 10:58:19 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: "Paul A. Clarke" <pc@us.ibm.com>
-Message-ID: <20190820005819.GD24503@umbus.fritz.box>
-References: <1566236601-22954-1-git-send-email-pc@us.ibm.com>
+ (envelope-from <edgar.iglesias@gmail.com>) id 1hzuYw-0005UR-OX
+ for qemu-devel@nongnu.org; Mon, 19 Aug 2019 23:11:59 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36948)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1hzuYw-0005TH-EZ; Mon, 19 Aug 2019 23:11:58 -0400
+Received: by mail-lj1-x241.google.com with SMTP id t14so3682860lji.4;
+ Mon, 19 Aug 2019 20:11:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=opF2Kjd4xhjet2Ok9MagWcGdoiR+78PtkQz6eXk5xsk=;
+ b=pvwuH6x4g2RD618z9nkWleyIT+6+twBUIvVz2ZiuSW7t4OUC4ypUZILRbI5tzpPlXM
+ 01ZuAi7rMVbJ/luuKM7/OU8+CfxDwOxM6yahhJ3FIi819g+J3mXGhXnFSX/T1hMbQ6Mc
+ NpAZHDg0y+faC9iil7yD+b4B2CydMwJ86lVkBLi4tvsx16pbw924ZQId/jkaGPvOa+Ks
+ WFXC5CDoUf8lUcDbksineCbDwMOgbIHsZA57FmmrbSrozZKk3KLX+nRSQrFq4epUkdWZ
+ 6Fuf4XDh5PVWVOzVjPB1MGcakGK3z8A6DUeUD15puLgREEMw0VyMuXJS7dIKmU9Zb9OS
+ kNQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=opF2Kjd4xhjet2Ok9MagWcGdoiR+78PtkQz6eXk5xsk=;
+ b=Qm1aHZ5yrKlnl563+JmeO4G+G2lpmm0eDzkZuwkxmB2yAabcLxpc0t1FIjayC42THw
+ DqmMZQaGRanCkJ8W2g6FNscLJA1JBAsPi1+RwWgsVDuW/ke7CAbwTeKA43LQ3tyoTiEv
+ n2ISmt4GLzK0hclwHW9NpGDuS/I1jFG4IvhZINPrTKSCACaUTSXBGD5qNqsJQcQBhJJJ
+ 6UycYKkoG1tx8MCo5Av37IShSETwx0xlfqvYI/iGBv+fWDQBbZa2G37eWZEXuLNUkjRd
+ hrsS7/K6SLBNOw5YEqPelLiu0BYOgf+MIWisjA2s7SmZOa136XG0W5PUdsp9ppEDuX9W
+ 5Z3w==
+X-Gm-Message-State: APjAAAV5RVR+ey9+7B2Gqqz+KJmJheX29InimYupNSckMlFWnsDQtgV0
+ tVrGwuMhdgC9Ncr+jwSwak9zHcwrrPcC98vXUG4=
+X-Google-Smtp-Source: APXvYqx049c5BZmAP/osr25SDM/2wewEcsQwTaKoKF5FTV81RkVyM97wkfYz72vrFlTUdvzt6yXvg9zXn8tOUEjgzJg=
+X-Received: by 2002:a2e:9a84:: with SMTP id p4mr2611284lji.52.1566270716435;
+ Mon, 19 Aug 2019 20:11:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ytoMbUMiTKPMT3hY"
-Content-Disposition: inline
-In-Reply-To: <1566236601-22954-1-git-send-email-pc@us.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
+ <1565941032362.60179@bt.com> <1b5f5a92-1b75-f0d9-d7bc-4605094ad8e7@redhat.com>
+ <8d8b37c9-3daf-d241-df92-1a5467bca451@redhat.com>
+ <3b983f77-8503-3fcd-7c42-45d0121845e6@redhat.com>
+ <b79a173d-a682-21da-6e7f-489ce06c8f7a@linaro.org>
+In-Reply-To: <b79a173d-a682-21da-6e7f-489ce06c8f7a@linaro.org>
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Tue, 20 Aug 2019 05:11:46 +0200
+Message-ID: <CAJy5ezpXMNnMTWh67cY1xOrWQEySsjv8uuTkd3VS5pyMKM9FAQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v2] ppc: conform to processor User's Manual
- for xscvdpspn
+X-Received-From: 2a00:1450:4864:20::241
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v7 33/42] exec: Replace
+ device_endian with MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,119 +91,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- aleksandar.m.mail@gmail.com
+Cc: frederic.konrad@adacore.com, berto@igalia.com, qemu-block@nongnu.org,
+ arikalo@wavecomp.com, pasic@linux.ibm.com, hpoussin@reactos.org,
+ anthony.perard@citrix.com, xen-devel@lists.xenproject.org, lersek@redhat.com,
+ jasowang@redhat.com, jiri@resnulli.us, ehabkost@redhat.com,
+ b.galvani@gmail.com, eric.auger@redhat.com, alex.williamson@redhat.com,
+ stefanha@redhat.com, jsnow@redhat.com, rth@twiddle.net, kwolf@redhat.com,
+ andrew@aj.id.au, claudio.fontana@suse.com, crwulff@gmail.com,
+ laurent@vivier.eu, sundeep.lkml@gmail.com, michael@walle.cc,
+ qemu-ppc@nongnu.org, kbastian@mail.uni-paderborn.de, imammedo@redhat.com,
+ fam@euphon.net, peter.maydell@linaro.org, david@redhat.com, palmer@sifive.com,
+ keith.busch@intel.com, jcmvbkbc@gmail.com, hare@suse.com,
+ sstabellini@kernel.org, andrew.smirnov@gmail.com, deller@gmx.de,
+ magnus.damm@gmail.com, atar4qemu@gmail.com, Thomas Huth <thuth@redhat.com>,
+ minyard@acm.org, sw@weilnetz.de, yuval.shaia@oracle.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, jan.kiszka@web.de, clg@kaod.org, shorne@gmail.com,
+ qemu-riscv@nongnu.org, i.mitsyanko@gmail.com, cohuck@redhat.com,
+ amarkovic@wavecomp.com, peter.chubb@nicta.com.au, aurelien@aurel32.net,
+ pburton@wavecomp.com, sagark@eecs.berkeley.edu, green@moxielogic.com,
+ kraxel@redhat.com, gxt@mprc.pku.edu.cn, robh@kernel.org,
+ borntraeger@de.ibm.com, joel@jms.id.au, antonynpavlov@gmail.com,
+ chouteau@adacore.com, philmd@redhat.com, Andrew.Baumann@microsoft.com,
+ mreitz@redhat.com, walling@linux.ibm.com, dmitry.fleytman@gmail.com,
+ mst@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ jslaby@suse.cz, marex@denx.de, proljc@gmail.com, marcandre.lureau@redhat.com,
+ alistair@alistair23.me, paul.durrant@citrix.com, david@gibson.dropbear.id.au,
+ tony.nguyen@bt.com, xiaoguangrong.eric@gmail.com, huth@tuxfamily.org,
+ jcd@tribudubois.net, Paolo Bonzini <pbonzini@redhat.com>,
+ stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 19 Aug. 2019, 23:01 Richard Henderson, <richard.henderson@linaro.org>
+wrote:
 
---ytoMbUMiTKPMT3hY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 8/19/19 11:29 AM, Paolo Bonzini wrote:
+> > On 19/08/19 20:28, Paolo Bonzini wrote:
+> >> On 16/08/19 12:12, Thomas Huth wrote:
+> >>> This patch is *huge*, more than 800kB. It keeps being stuck in the the
+> >>> filter of the qemu-s390x list each time you send it. Please:
+> >>>
+> >>> 1) Try to break it up in more digestible pieces, e.g. change only one
+> >>> subsystem at a time (this is also better reviewable by people who are
+> >>> interested in one area)
+> >>
+> >> This is not really possible, since the patch is basically a
+> >> search-and-replace.  You could perhaps use some magic
+> >> ("DEVICE_MEMOP_ENDIAN" or something like that) to allow a split, but it
+> >> would introduce more complication than anything else.
+> >
+> > I'm stupid, at this point of the series it _would_ be possible to split
+> > the patch by subsystem.  Still not sure it would be actually an
+> advantage.
+>
+> It might be easier to review if we split by symbol, one rename per patch
+> over
+> the entire code base.
+>
+>
+> r~
+>
 
-On Mon, Aug 19, 2019 at 12:43:21PM -0500, Paul A. Clarke wrote:
-> From: "Paul A. Clarke" <pc@us.ibm.com>
->=20
-> The POWER8 and POWER9 User's Manuals specify the implementation
-> behavior for what the ISA leaves "undefined" behavior for the
-> xscvdpspn and xscvdpsp instructions.  This patch corrects the QEMU
-> implementation to match the hardware implementation for that case.
->=20
-> ISA 3.0B has xscvdpspn leaving its result in word 0 of the target registe=
-r,
-> with the other words of the target register left "undefined".
->=20
-> The User's Manuals specify:
->   VSX scalar convert from double-precision to single-precision (xscvdpsp,
->   xscvdpspn).
->   VSR[32:63] is set to VSR[0:31].
-> So, words 0 and 1 both contain the result.
->=20
-> Note: this is important because GCC as of version 8 or so, assumes and ta=
-kes
-> advantage of this behavior to optimize the following sequence:
->   xscvdpspn vs0,vs1
->   mffprwz   r8,f0
-> ISA 3.0B has xscvdpspn leaving its result in word 0 of the target registe=
-r,
-> and mffprwz expecting its input to come from word 1 of the source registe=
-r.
-> This sequence fails with QEMU, as a shift is required between those two
-> instructions.  However, since the hardware splats the result to both word=
-s 0
-> and 1 of its output register, the shift is not necessary.
->=20
-> Expect a future revision of the ISA to specify this behavior.
->=20
-> Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+Or if we review your script (I assume this wasn't a manual change). I'm not
+sure it's realistic to have review on the entire patch or patches.
 
-Applied to ppc-for-4.2, thanks.
+Best regards,
+Edgar
 
->=20
-> v2
-> - Splitting patch "ppc: Three floating point fixes"; this is just one par=
-t.
-> - Updated commit message to clarify behavior is documented in User's Manu=
-als.
-> - Updated commit message to correct which words are in output and source =
-of
->   xscvdpspn and mffprz.
-> - No source changes to this part of the original patch.
->=20
-> ---
->  target/ppc/fpu_helper.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-> index 5611cf0..23b9c97 100644
-> --- a/target/ppc/fpu_helper.c
-> +++ b/target/ppc/fpu_helper.c
-> @@ -2871,10 +2871,14 @@ void helper_xscvqpdp(CPUPPCState *env, uint32_t o=
-pcode,
-> =20
->  uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
->  {
-> +    uint64_t result;
-> +
->      float_status tstat =3D env->fp_status;
->      set_float_exception_flags(0, &tstat);
-> =20
-> -    return (uint64_t)float64_to_float32(xb, &tstat) << 32;
-> +    result =3D (uint64_t)float64_to_float32(xb, &tstat);
-> +    /* hardware replicates result to both words of the doubleword result=
-=2E  */
-> +    return (result << 32) | result;
->  }
-> =20
->  uint64_t helper_xscvspdpn(CPUPPCState *env, uint64_t xb)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---ytoMbUMiTKPMT3hY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1bRasACgkQbDjKyiDZ
-s5IgGg//YfpBJ6YjzIlJdQC31MsuN9731b03O2tPFYPJ2alSxNxHAVLw8IYCWuFd
-VNsUGHvykSzQuNn6uFGUD/SUV1pdMgt6DHMUUL4ATELNDX1i8NGvnOqfh1BauU6i
-LpLjmidFG3hrs7yPGJZl4yCCkZ1bvb5IodqoPlIP2SHsdfmrH33OnkyeSxDbcRH0
-JjtRaNJLyy9NJW3dOyHlxg+FsHS0u+dap39Wa/kRlM3lnbboLwqLeKtVC4Df5jsQ
-+Yg2gCxmxpCyp2bBb6+IzGrJNA/yY1PK71N6gLZj3fFuAk+DqKw51FduXL9+5eCP
-D26NzUxInsSpRO58SA9ihGLq4IAokoKyNuUe1v1f94EbtKJKg50jgqSbJag4KizJ
-RaHKVsa273+oEBZF+5ygOE6333TXf4mx95CzK7dDUfRa+t4thSqQCBiJ/TPEhGyd
-Rcj2UXpodiL7y4QyJh4GURKkjf5YoYwlYY+1BjQ02UgaFSnteqgR2D4ar/znnMoM
-stE4p/svO1dr/y19oHgor4OgZm43S0VeKpo3Do0bFwsCBDpBoB+o1Muh2o5s2CpY
-IHR5EFS5fnIljLgKGKJIdOzsCjmwjZ2+qDpvO6rgpmvZIaq84tace8UmwZa7Vn7i
-NZNMu6JqMCn7BnXkNZFVvRdCVtdtGtH4JmhsKGI0fheKKduQEQ4=
-=sULM
------END PGP SIGNATURE-----
-
---ytoMbUMiTKPMT3hY--
-
+>
