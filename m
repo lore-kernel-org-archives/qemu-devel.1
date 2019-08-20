@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A97C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86C5C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:13:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 696E522DA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:10:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 696E522DA9
+	by mail.kernel.org (Postfix) with ESMTPS id BE65B2082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 12:13:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE65B2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i02y0-0002MH-8c
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 08:10:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60434)
+	id 1i030b-0003UD-Vd
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 08:13:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i02xC-0001ZV-Kn
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:09:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i02zr-0002za-BD
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:12:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i02xA-0000jj-WA
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:09:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44432)
+ (envelope-from <mreitz@redhat.com>) id 1i02zq-0005FM-Dj
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 08:12:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36440)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i02x7-0000e2-OO; Tue, 20 Aug 2019 08:09:29 -0400
+ id 1i02zo-0005AJ-5y; Tue, 20 Aug 2019 08:12:16 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D315E300DA7F;
- Tue, 20 Aug 2019 12:09:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6486B3091786;
+ Tue, 20 Aug 2019 12:12:15 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8835D5D9D5;
- Tue, 20 Aug 2019 12:09:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 63B4F5D9DC;
+ Tue, 20 Aug 2019 12:12:14 +0000 (UTC)
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-13-mreitz@redhat.com>
- <272cbeba-2053-9aa6-7ceb-e1b3827de540@redhat.com>
+ <20190819185602.4267-14-mreitz@redhat.com>
+ <f56ce7e1-e41d-d861-3c32-eb6e22dfc936@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <39066a69-e319-c3ad-7b3b-2983bb248a25@redhat.com>
-Date: Tue, 20 Aug 2019 14:09:25 +0200
+Message-ID: <8ce2f381-49be-ad33-324e-36d7fa8d8fdb@redhat.com>
+Date: Tue, 20 Aug 2019 14:12:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <272cbeba-2053-9aa6-7ceb-e1b3827de540@redhat.com>
+In-Reply-To: <f56ce7e1-e41d-d861-3c32-eb6e22dfc936@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="2XdxdbbIMRBjIaxpX0ERdDR1LKrTVsANl"
+ boundary="XLrg9trFAIxdKL8BXREFCHM1htwuEpea6"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 20 Aug 2019 12:09:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Tue, 20 Aug 2019 12:12:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 12/16] qcow2: Fix overly long snapshot
- tables
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] qcow2: Repair snapshot table with
+ too many entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,79 +104,61 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2XdxdbbIMRBjIaxpX0ERdDR1LKrTVsANl
-Content-Type: multipart/mixed; boundary="FzlbyzU3oVCjYdHH811GmSykL0eBNsf1Y";
+--XLrg9trFAIxdKL8BXREFCHM1htwuEpea6
+Content-Type: multipart/mixed; boundary="LJYPhrm7hVs9HeYZslhjFeN5snB0NtcC5";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <39066a69-e319-c3ad-7b3b-2983bb248a25@redhat.com>
-Subject: Re: [PATCH v2 12/16] qcow2: Fix overly long snapshot tables
+Message-ID: <8ce2f381-49be-ad33-324e-36d7fa8d8fdb@redhat.com>
+Subject: Re: [PATCH v2 13/16] qcow2: Repair snapshot table with too many
+ entries
 References: <20190819185602.4267-1-mreitz@redhat.com>
- <20190819185602.4267-13-mreitz@redhat.com>
- <272cbeba-2053-9aa6-7ceb-e1b3827de540@redhat.com>
-In-Reply-To: <272cbeba-2053-9aa6-7ceb-e1b3827de540@redhat.com>
+ <20190819185602.4267-14-mreitz@redhat.com>
+ <f56ce7e1-e41d-d861-3c32-eb6e22dfc936@redhat.com>
+In-Reply-To: <f56ce7e1-e41d-d861-3c32-eb6e22dfc936@redhat.com>
 
---FzlbyzU3oVCjYdHH811GmSykL0eBNsf1Y
+--LJYPhrm7hVs9HeYZslhjFeN5snB0NtcC5
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 19.08.19 21:43, Eric Blake wrote:
+On 19.08.19 21:45, Eric Blake wrote:
 > On 8/19/19 1:55 PM, Max Reitz wrote:
->> We currently refuse to open qcow2 images with overly long snapshot
->> tables.  This patch makes qemu-img check -r all drop all offending
->> entries past what we deem acceptable.
->>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  block/qcow2-snapshot.c | 88 +++++++++++++++++++++++++++++++++++++----=
--
->>  1 file changed, 78 insertions(+), 10 deletions(-)
 >=20
-> I know I was reluctant in v1, but you also managed to convince me that
-> it really takes a LOT of effort to get a table with that many entries.
-> And a user has to opt-in to 'qemu-img -r' (it may discard a snapshot
-> they value, but that beats not being able to use the image under qemu a=
-t
-> all, and we don't erase it for plain 'qemu-img check').  So I'm okay
-> with this going in.  Maybe the commit message can state this sort of
-> reasoning.
+> Short on the reasoning why this isn't a problem in practice.  (Again,
+> because we only do it via opt-in qemu-img -r; you can already learn if
+> qemu-img will have problem with your file created externally without
+> destroying the image, and elect to not have qemu-img clean it if you
+> don't like the algorithm qemu-img will use).
 
-So maybe:
-
-The user cannot choose which snapshots are removed.  This is fine
-because we have chosen the maximum snapshot table size to be so large
-(64 MB) that it cannot be reasonably reached.  If the snapshot table
-exceeds this size, the image has probably been corrupted in some way; in
-this case, it is most important to just make the image usable such that
-the user can copy off at least the active layer.
-(Also note that the snapshots will be removed only with "-r all", so a
-plain "check" or "check -r leaks" will not delete any data.)
-
-?
+OK.  I=E2=80=99ll add the same message as for patch 12, just with s/64 MB=
+/65536
+snapshots/, if that seems good to you.
 
 Max
 
 
---FzlbyzU3oVCjYdHH811GmSykL0eBNsf1Y--
+--LJYPhrm7hVs9HeYZslhjFeN5snB0NtcC5--
 
---2XdxdbbIMRBjIaxpX0ERdDR1LKrTVsANl
+--XLrg9trFAIxdKL8BXREFCHM1htwuEpea6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEyBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1b4vUACgkQ9AfbAGHV
-z0CHfQf4kzbh9eWijLnF7G7i1eZk7PBODtlcs1MKLzPybS6xkI+ZJQBxd4HyKksi
-SHhGigOBcWlGDJeh8ET8t6/5BGRrGsBz2o6HyDn5zPSNDYCl2TYdB/qQRs3HF0gW
-R0MHBFq9mHBNL0Rm5T30a6fWx/C55LC0Cy7gGCB1kK0qwMM41UTerodZ9d7io/I3
-Ure0iv0/XPObHWn6/l+aMDA8zQDJQMIV9p5M9h4ffEEyKL0cKPy2aj7YAsT4KqM2
-0RK1c8Bn+oKeTWCDyPNtCD/uRiBIOCrNhrbb6FYaw1/PpUOGnkVVKwYo/hr8xtlX
-jNX+7LlwzgSBjRbfUdACAUaMSCZP
-=OSb+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1b45wACgkQ9AfbAGHV
+z0A5Kgf/SzQMtyAufN2ejEZt5kGxt56HfpEibgjQvh/gKLRp14wcWleOzDDN8s0f
+8P3A3ndVQjM4gB6gDgWIqCS7TWaRvS5KcYq1/pA5aO5OBnQLBVoS9cMmKXy/vNqU
+JWMzlmwzmN9Cy8eUDQt+VfcP6/E8l1TY05Y+q33sVlMbTs4Pc7l7tHwf88r6uhdn
+bdONy0pE9VgYy0jRRc5IsgIf/dCSc6FPn+fbVKYeEyPeSauqdNvhRgKlKwc1nlFY
+pi4y44H9Rk7QUdnK6iICJkwOaCGO6DOAwzBBDfjECPnX1KgRewHtiV8r70YfUxSJ
+sK6u40v1Ag57Sy1d/JIylQ+hL1kcFQ==
+=R7xC
 -----END PGP SIGNATURE-----
 
---2XdxdbbIMRBjIaxpX0ERdDR1LKrTVsANl--
+--XLrg9trFAIxdKL8BXREFCHM1htwuEpea6--
 
