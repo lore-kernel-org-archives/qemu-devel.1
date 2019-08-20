@@ -2,85 +2,80 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2560C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 04:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 118F1C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 05:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94C3F20C01
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 04:54:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94C3F20C01
+	by mail.kernel.org (Postfix) with ESMTPS id D99E42087E
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 05:17:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D99E42087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzwA0-0002Bv-Mk
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 00:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55518)
+	id 1hzwWl-0008J2-Il
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 01:17:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1hzw8t-0001Mc-Lx
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 00:53:12 -0400
+ (envelope-from <peterx@redhat.com>) id 1hzwVS-0006oI-9Q
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 01:16:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hzw8r-000669-Gy
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 00:53:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38010)
+ (envelope-from <peterx@redhat.com>) id 1hzwVQ-0004wr-Ij
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 01:16:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43206)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hzw8r-00065M-6d
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 00:53:09 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hzwVQ-0004wN-Dt
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 01:16:28 -0400
 Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
  [209.85.214.199])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1DFB64627A
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 04:53:07 +0000 (UTC)
-Received: by mail-pl1-f199.google.com with SMTP id d6so3312075pls.17
- for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 21:53:07 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 576A066C58
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 05:16:27 +0000 (UTC)
+Received: by mail-pl1-f199.google.com with SMTP id 71so3347989pld.1
+ for <qemu-devel@nongnu.org>; Mon, 19 Aug 2019 22:16:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=7OAkatFtL3uV9O1KjVgASVF8+d2XpEtjZ+CJJQ33G+M=;
- b=AesEp8GZ2nNX64XPAWI+maN3MIZ1p0Lngh/1ADTUwVMjCSPugus4xpBqhoybXSOiHD
- y/IkVnxNN45NQ5//1GtwdjZSrHZj8kFLa4vU6+vfmLIUT4s7X0zSvPPSjPOjmOsV73S+
- HeAhrAKr2H6IK7en4LsZ5FJiqchsSDT+BY4l12sxg7dpuqew0yxU+9EH3zxxBjN7HE3Q
- uPVpyZUsdYD5nnRJ0xNupBGAlz4Lned1TsaWfirxswaw7DUK32nzjPV6FCBNQuGkEo6b
- IIC7KeQZV6Rxndqb33C5w9pdDsAiaRAMKQ/sOownvjIWvu5BI3TqzZMEkUQ76pr7fCn8
- v/5g==
-X-Gm-Message-State: APjAAAV7xaR8bSGvOJuFrMfaW3ZlKG4Jiz6N8i378Do/oCgicxVSzyJo
- ByQCDCCDHuT/mskq/zLsmEap2iAYMp4FRV/OHO5dEik4ELET8fPtrxu+w2a2A96nUCvwbLYiQkY
- Ub7FfvhnaGJzllro=
-X-Received: by 2002:a17:902:b094:: with SMTP id
- p20mr5907473plr.320.1566276786642; 
- Mon, 19 Aug 2019 21:53:06 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx6KOkpjqOpNxGIXb7/ZVrXlqY53BToGhJ/yLNu5IOwV356TQLCgWbD0CXINf4wQhKeCbfV9w==
-X-Received: by 2002:a17:902:b094:: with SMTP id
- p20mr5907456plr.320.1566276786383; 
- Mon, 19 Aug 2019 21:53:06 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id o67sm6997207pfb.39.2019.08.19.21.53.04
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=E9Dwo1FV2giLPODc47v+fqtPgWxUXq7+Jhb3E+lD+wQ=;
+ b=s5IXb2f+EePp99/qMndiGYwyC0V6RxGIHMIRwKolNzWBg4sbIQuBHcQEGumKGuiKWF
+ Qs0SxAnO8LIv+CK/uFB91ciGF+6PJRr0ATCuJo5rgGgQ7TtK8LcJ55r/WnOIIMltvcno
+ 19O8/tcbrFOo3jeQy30fLUBEVWy2vP+uDSO/GmoukR46ndOwxLSnPg58nZ7jfStonSV5
+ K2OW3Sb/1UKjSNac84HCYd7AYNYjGlqGbxb5vad/uOfmA1WRvR5ayy0IvnrwRFzEw4yG
+ BaX8sQznb/eX0snIt9z9Q014VldiSOgCWa7qUQsIoC9dkdsGR/oGyXV9B6+VRRscZL5x
+ sCFA==
+X-Gm-Message-State: APjAAAVg/pK5o7C/G0zkSYoRZpOVKDNBa72YcmaoyBhjCaHdE/Al7hDh
+ y2b5xxzrcfx27qB0xppsWlnx+ZMnUHFOShmSo5oDGQYBXqcjmq5skclZ3Lk/GubgetXtjAbIBDq
+ ylfcztGWmtlMfLy4=
+X-Received: by 2002:a17:902:30d:: with SMTP id
+ 13mr26537940pld.284.1566278186358; 
+ Mon, 19 Aug 2019 22:16:26 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxOMAYdlBlx9VYXMO8fiD64PkWL+g4hjQiwni/dE8Y6cvaALIvP6AJNfK4o3RAwJVCGvJwIog==
+X-Received: by 2002:a17:902:30d:: with SMTP id
+ 13mr26537918pld.284.1566278186157; 
+ Mon, 19 Aug 2019 22:16:26 -0700 (PDT)
+Received: from xz-x1.redhat.com ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id e6sm17462610pfn.71.2019.08.19.22.16.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Aug 2019 21:53:05 -0700 (PDT)
-Date: Tue, 20 Aug 2019 12:52:56 +0800
+ Mon, 19 Aug 2019 22:16:25 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190820045256.GF13560@xz-x1>
-References: <20190817093237.27967-1-peterx@redhat.com>
- <20190817093237.27967-2-peterx@redhat.com>
- <da9a1a0d-749b-a81d-fc9a-af6ff2775be8@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 20 Aug 2019 13:16:13 +0800
+Message-Id: <20190820051615.1210-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <da9a1a0d-749b-a81d-fc9a-af6ff2775be8@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] memory: Replace has_coalesced_range
- with add/del flags
+Subject: [Qemu-devel] [PATCH v2 0/2] memory: Fix up coalesced_io_del not
+ working for KVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,52 +87,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 19, 2019 at 04:30:45PM +0200, Paolo Bonzini wrote:
-> On 17/08/19 11:32, Peter Xu wrote:
-> > The previous has_coalesced_range counter has a problem in that it only
-> > works for additions of coalesced mmio ranges but not deletions.  The
-> > reason is that has_coalesced_range information can be lost when the
-> > FlatView updates the topology again when the updated region is not
-> > covering the coalesced regions. When that happens, due to
-> > flatrange_equal() is not checking against has_coalesced_range, the new
-> > FlatRange will be seen as the same one as the old and the new
-> > instance (whose has_coalesced_range will be zero) will replace the old
-> > instance (whose has_coalesced_range _could_ be non-zero).
-> > 
-> > To fix it, we don't cache has_coalesced_range at all in the FlatRange.
-> > Instead we introduce two flags to make sure the coalesced_io_{add|del}
-> > will only be called once for every FlatRange instance.  This will even
-> > work if another FlatRange replaces current one.
-> 
-> It's still a bit ugly that coalesced_mmio_add_done ends up not being set
-> on the new (but equal) FlatRange.
-> 
-> Would something like this work too?
-> 
-> diff --git a/memory.c b/memory.c
-> index edd0c13..fc91f06 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -939,6 +939,7 @@ static void address_space_update_topology_pass(AddressSpace *as,
->              /* In both and unchanged (except logging may have changed) */
->  
->              if (adding) {
-> +                frnew->has_coalesced_range = frold->has_coalesced_range;
->                  MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, region_nop);
->                  if (frnew->dirty_log_mask & ~frold->dirty_log_mask) {
->                      MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, log_start,
+v2:
+- simply migrate has_coalesced_range in patch 1, while I added
+  comments in the code because that can be a bit unobvious [Paolo]
 
-This seems to be a much better (and, shorter) idea. :-)
+v1 is here:
 
-I'll verify it and repost if it goes well.
+https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03293.html
 
-Regards,
+Peter Xu (2):
+  memory: Inherit has_coalesced_range from the same old FlatRange
+  memory: Split zones when do coalesced_io_del()
 
--- 
-Peter Xu
+ memory.c | 39 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 36 insertions(+), 3 deletions(-)
+
+--=20
+2.21.0
+
 
