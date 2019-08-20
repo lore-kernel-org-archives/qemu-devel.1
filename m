@@ -2,47 +2,50 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 202D3C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53265C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB57022DA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:30:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB57022DA7
+	by mail.kernel.org (Postfix) with ESMTPS id 29BD422DD3
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 19:36:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29BD422DD3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i09pe-0007mA-4X
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 15:30:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39321)
+	id 1i09vV-0001XA-C9
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 15:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39590)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i09nB-0005um-Sk
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:27:43 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i09pr-0008Ef-33
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:30:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i09nA-0006Nr-Du
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:27:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36358)
+ (envelope-from <jsnow@redhat.com>) id 1i09pp-0007GD-U4
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 15:30:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43768)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i09n7-0006MM-76; Tue, 20 Aug 2019 15:27:37 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1i09pl-0007Es-6L; Tue, 20 Aug 2019 15:30:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2DF113090FDF;
- Tue, 20 Aug 2019 19:27:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 696848980F6;
+ Tue, 20 Aug 2019 19:30:20 +0000 (UTC)
 Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3EABA10016F3;
- Tue, 20 Aug 2019 19:27:29 +0000 (UTC)
-To: Nir Soffer <nirsof@gmail.com>, qemu-block@nongnu.org
-References: <20190817175346.12518-1-nsoffer@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8927419D7A;
+ Tue, 20 Aug 2019 19:30:19 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <a018756a-fa67-49fb-a7db-622267b7d4e5@email.android.com>
+ <18cda58f-c7d2-3e6c-0bf0-c2b98acd66e7@redhat.com>
+ <10b53c20-0974-eab1-d4a4-a1d00003eb8e@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -119,22 +122,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <1624c705-aa27-b840-ea6a-26886ba52b8e@redhat.com>
-Date: Tue, 20 Aug 2019 15:27:28 -0400
+Message-ID: <2393ca56-c21b-6bda-9049-951bf328674e@redhat.com>
+Date: Tue, 20 Aug 2019 15:30:19 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190817175346.12518-1-nsoffer@redhat.com>
+In-Reply-To: <10b53c20-0974-eab1-d4a4-a1d00003eb8e@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 20 Aug 2019 19:27:36 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Tue, 20 Aug 2019 19:30:20 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Use QEMU_IS_ALIGNED
- instead of reinventing it
+Subject: Re: [Qemu-devel] [PATCH 0/4] backup: fix skipping unallocated
+ clusters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,178 +149,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/17/19 1:53 PM, Nir Soffer wrote:
-> Replace instances of:
-> 
->     (n & (BDRV_SECTOR_SIZE - 1)) == 0)
-> 
-> With:
-> 
->     QEMU_IS_ALIGNED(n, BDRV_SECTOR_SIZE)
-> 
+On 8/20/19 4:28 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 16.08.2019 22:11, John Snow wrote:
+>>
+>>
+>> On 8/14/19 12:54 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>>
+>>>
+>>> 14 =D0=B0=D0=B2=D0=B3. 2019 =D0=B3. 17:43 =D0=BF=D0=BE=D0=BB=D1=8C=D0=
+=B7=D0=BE=D0=B2=D0=B0=D1=82=D0=B5=D0=BB=D1=8C Vladimir Sementsov-Ogievski=
+y
+>>> <vsementsov@virtuozzo.com> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BB=
+:
+>>>
+>>>      Hi all!
+>>>
+>>>      There is a bug in not yet merged patch
+>>>      "block/backup: teach TOP to never copy unallocated regions"
+>>>      in https://github.com/jnsnow/qemu bitmaps. 04 fixes it. So, I pr=
+opose
+>>>      to put 01-03 somewhere before
+>>>      "block/backup: teach TOP to never copy unallocated regions"
+>>>      and squash 04 into "block/backup: teach TOP to never copy
+>>>      unallocated regions"
+>>>
+>>>
+>>> Hmm, don't bother with it. Simpler is fix the bug in your commit by j=
+ust
+>>> use skip_bytes variable when initializing dirty_end.
+>>>
+>>
+>> OK, just use Max's fix instead of this entire 4 patch series?
+>>
+>> --js
+>>
+>=20
+> Yes, I think it's OK
+>=20
 
-Do you have a magical incantation you used to find these?
-
-> Which reveals the intent of the code better, and makes it easier to
-> locate the code checking alignment.
-> 
-> QEMU_IS_ALIGNED is implemented using %, which may be less efficient but
-> it is used only in assert() except one instance, so it should not
-> matter.
-> 
-
-There is virtually no way these aren't optimized by the compiler.
-
-> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-
-Therefore:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  block/bochs.c | 4 ++--
->  block/cloop.c | 4 ++--
->  block/dmg.c   | 4 ++--
->  block/io.c    | 8 ++++----
->  block/qcow2.c | 4 ++--
->  block/vvfat.c | 8 ++++----
->  qemu-img.c    | 2 +-
->  7 files changed, 17 insertions(+), 17 deletions(-)
-> 
-> diff --git a/block/bochs.c b/block/bochs.c
-> index 962f18592d..32bb83b268 100644
-> --- a/block/bochs.c
-> +++ b/block/bochs.c
-> @@ -248,8 +248,8 @@ bochs_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->      QEMUIOVector local_qiov;
->      int ret;
->  
-> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
->  
->      qemu_iovec_init(&local_qiov, qiov->niov);
->      qemu_co_mutex_lock(&s->lock);
-> diff --git a/block/cloop.c b/block/cloop.c
-> index 384c9735bb..4de94876d4 100644
-> --- a/block/cloop.c
-> +++ b/block/cloop.c
-> @@ -253,8 +253,8 @@ cloop_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->      int nb_sectors = bytes >> BDRV_SECTOR_BITS;
->      int ret, i;
->  
-> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
->  
->      qemu_co_mutex_lock(&s->lock);
->  
-> diff --git a/block/dmg.c b/block/dmg.c
-> index 45f6b28f17..4a045f2b3e 100644
-> --- a/block/dmg.c
-> +++ b/block/dmg.c
-> @@ -697,8 +697,8 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->      int nb_sectors = bytes >> BDRV_SECTOR_BITS;
->      int ret, i;
->  
-> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
->  
->      qemu_co_mutex_lock(&s->lock);
->  
-> diff --git a/block/io.c b/block/io.c
-> index 56bbf195bb..7508703ecd 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1080,8 +1080,8 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
->      sector_num = offset >> BDRV_SECTOR_BITS;
->      nb_sectors = bytes >> BDRV_SECTOR_BITS;
->  
-> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
->      assert(bytes <= BDRV_REQUEST_MAX_BYTES);
->      assert(drv->bdrv_co_readv);
->  
-> @@ -1133,8 +1133,8 @@ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
->      sector_num = offset >> BDRV_SECTOR_BITS;
->      nb_sectors = bytes >> BDRV_SECTOR_BITS;
->  
-> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
->      assert(bytes <= BDRV_REQUEST_MAX_BYTES);
->  
->      assert(drv->bdrv_co_writev);
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 59cff1d4cb..41cab70e1d 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2072,8 +2072,8 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
->              }
->              if (bs->encrypted) {
->                  assert(s->crypto);
-> -                assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -                assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +                assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +                assert(QEMU_IS_ALIGNED(cur_bytes, BDRV_SECTOR_SIZE));
->                  if (qcow2_co_decrypt(bs, cluster_offset, offset,
->                                       cluster_data, cur_bytes) < 0) {
->                      ret = -EIO;
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index f6c28805dd..019b8f1341 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -1547,8 +1547,8 @@ vvfat_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->      int nb_sectors = bytes >> BDRV_SECTOR_BITS;
->      void *buf;
->  
-> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
->  
->      buf = g_try_malloc(bytes);
->      if (bytes && buf == NULL) {
-> @@ -3082,8 +3082,8 @@ vvfat_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->      int nb_sectors = bytes >> BDRV_SECTOR_BITS;
->      void *buf;
->  
-> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
->  
->      buf = g_try_malloc(bytes);
->      if (bytes && buf == NULL) {
-> diff --git a/qemu-img.c b/qemu-img.c
-> index c920e3564c..ca3af0c549 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -2138,7 +2138,7 @@ static int img_convert(int argc, char **argv)
->              int64_t sval;
->  
->              sval = cvtnum(optarg);
-> -            if (sval < 0 || sval & (BDRV_SECTOR_SIZE - 1) ||
-> +            if (sval < 0 || !QEMU_IS_ALIGNED(sval, BDRV_SECTOR_SIZE) ||
->                  sval / BDRV_SECTOR_SIZE > MAX_BUF_SECTORS) {
->                  error_report("Invalid buffer size for sparse output specified. "
->                      "Valid sizes are multiples of %llu up to %llu. Select "
-> 
-
+ACK, thank you!
 
