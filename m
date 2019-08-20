@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C56BAC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CED5C3A59D
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:41:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B4DD22CF7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:41:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B4DD22CF7
+	by mail.kernel.org (Postfix) with ESMTPS id 280F222CF7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 08:41:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 280F222CF7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzzhY-0002zW-Qg
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 04:41:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56817)
+	id 1hzziA-0003st-8J
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 04:41:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1hzzgv-0002Rl-5I
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:40:34 -0400
+ (envelope-from <berrange@redhat.com>) id 1hzzhQ-00031h-Cd
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hzzgu-00013z-0t
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:40:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42392)
+ (envelope-from <berrange@redhat.com>) id 1hzzhP-0001aS-6k
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 04:41:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49842)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1hzzgr-00010d-PB; Tue, 20 Aug 2019 04:40:29 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hzzhM-0001X3-Np; Tue, 20 Aug 2019 04:41:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0972D10C0216;
- Tue, 20 Aug 2019 08:40:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DE8F9307D921;
+ Tue, 20 Aug 2019 08:40:59 +0000 (UTC)
 Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D8D81001B09;
- Tue, 20 Aug 2019 08:40:13 +0000 (UTC)
-Date: Tue, 20 Aug 2019 09:40:10 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 00ECE1DD;
+ Tue, 20 Aug 2019 08:40:50 +0000 (UTC)
+Date: Tue, 20 Aug 2019 09:40:47 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190820084010.GB23352@redhat.com>
+Message-ID: <20190820084047.GC23352@redhat.com>
 References: <20190820082459.2101-1-quintela@redhat.com>
- <20190820082459.2101-3-quintela@redhat.com>
+ <20190820082459.2101-4-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190820082459.2101-3-quintela@redhat.com>
+In-Reply-To: <20190820082459.2101-4-quintela@redhat.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 20 Aug 2019 08:40:29 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 20 Aug 2019 08:40:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] socket: Add num connections to
- qio_channel_socket_sync()
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] socket: Add num connections to
+ qio_channel_socket_async()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,18 +85,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 20, 2019 at 10:24:56AM +0200, Juan Quintela wrote:
+On Tue, Aug 20, 2019 at 10:24:57AM +0200, Juan Quintela wrote:
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  include/io/channel-socket.h    | 2 ++
->  io/channel-socket.c            | 7 ++++---
->  io/net-listener.c              | 2 +-
->  io/trace-events                | 2 +-
->  scsi/qemu-pr-helper.c          | 2 +-
->  tests/test-char.c              | 4 ++--
->  tests/test-io-channel-socket.c | 2 +-
->  tests/tpm-emu.c                | 2 +-
->  8 files changed, 13 insertions(+), 10 deletions(-)
+>  include/io/channel-socket.h    |  2 ++
+>  io/channel-socket.c            | 30 +++++++++++++++++++++++-------
+>  io/trace-events                |  2 +-
+>  tests/test-io-channel-socket.c |  2 +-
+>  4 files changed, 27 insertions(+), 9 deletions(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
