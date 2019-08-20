@@ -2,47 +2,48 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E040BC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 612C3C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:03:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE1B1214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:00:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE1B1214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 345B1214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 18:03:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345B1214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i08Qf-0000ul-Ts
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 14:00:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56596)
+	id 1i08TZ-0002y1-8V
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 14:03:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i08Pz-0000Ns-7v
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:59:40 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i08Rg-0001w7-90
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 14:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i08Py-0003fn-6t
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 13:59:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41738)
+ (envelope-from <mreitz@redhat.com>) id 1i08Rf-0004Ra-5J
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 14:01:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39538)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i08Pv-0003eD-E3; Tue, 20 Aug 2019 13:59:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1i08Rc-0004QL-GZ; Tue, 20 Aug 2019 14:01:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AB794898102;
- Tue, 20 Aug 2019 17:59:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CF67E307D84B;
+ Tue, 20 Aug 2019 18:01:19 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C23C917D50;
- Tue, 20 Aug 2019 17:59:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B569610013A1;
+ Tue, 20 Aug 2019 18:01:12 +0000 (UTC)
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <20190814202219.1870-4-mlevitsk@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -69,22 +70,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <daa54ca3-6b57-0201-fc8a-6102ea1c509b@redhat.com>
-Date: Tue, 20 Aug 2019 19:59:24 +0200
+Message-ID: <56f412ca-1985-589c-85b4-a8164f701a64@redhat.com>
+Date: Tue, 20 Aug 2019 20:01:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190814202219.1870-1-mlevitsk@redhat.com>
+In-Reply-To: <20190814202219.1870-4-mlevitsk@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="toC5qqAs52hUzixQ275hgvnMEJb84ezU2"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 20 Aug 2019 17:59:34 +0000 (UTC)
+ boundary="pdDxZy7Md3zHmDPaqDbTX0lWTFG5LFalR"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 20 Aug 2019 18:01:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] RFC: luks/encrypted qcow2 key
- management
+Subject: Re: [Qemu-devel] [PATCH 03/13] qcrypto-luks: refactoring: extract
+ load/store/check/parse header functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,8 +106,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---toC5qqAs52hUzixQ275hgvnMEJb84ezU2
-Content-Type: multipart/mixed; boundary="lDU2n9puLlKf61gxgZPCqXLmw1Jww7kDC";
+--pdDxZy7Md3zHmDPaqDbTX0lWTFG5LFalR
+Content-Type: multipart/mixed; boundary="ilwMD2FgzJ51AP78tzWAakgmscAkfzszO";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
@@ -114,80 +115,74 @@ Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
-Message-ID: <daa54ca3-6b57-0201-fc8a-6102ea1c509b@redhat.com>
-Subject: Re: [PATCH 00/13] RFC: luks/encrypted qcow2 key management
+Message-ID: <56f412ca-1985-589c-85b4-a8164f701a64@redhat.com>
+Subject: Re: [PATCH 03/13] qcrypto-luks: refactoring: extract
+ load/store/check/parse header functions
 References: <20190814202219.1870-1-mlevitsk@redhat.com>
-In-Reply-To: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <20190814202219.1870-4-mlevitsk@redhat.com>
+In-Reply-To: <20190814202219.1870-4-mlevitsk@redhat.com>
 
---lDU2n9puLlKf61gxgZPCqXLmw1Jww7kDC
+--ilwMD2FgzJ51AP78tzWAakgmscAkfzszO
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 14.08.19 22:22, Maxim Levitsky wrote:
+> With upcoming key management, the header will
+> need to be stored after the image is created.
+>=20
+> Extracting load header isn't strictly needed, but
+> do this anyway for the symmetry.
+>=20
+> Also I extracted a function that does basic sanity
+> checks on the just read header, and a function
+> which parses all the crypto format to make the
+> code a bit more readable, plus now the code
+> doesn't destruct the in-header cipher-mode string,
+> so that the header now can be stored many times,
+> which is needed for the key management.
+>=20
+> Also this allows to contain the endianess conversions
+> in these functions alone
+>=20
+> The header is no longer endian swapped in place,
+> to prevent (mostly theoretical races I think)
+> races where someone could see the header in the
+> process of beeing byteswapped.
 
-[...]
+The formatting looks weird, it doesn=E2=80=99t look quite 72 characters w=
+ide...
+ (what commit messages normally use)
 
-> Testing. This was lightly tested with manual testing and with few iotes=
-ts that I prepared.
-> I haven't yet tested fully the write sharing behavior, nor did I run th=
-e whole iotests
-> suite to see if this code causes some regressions. Since I will need pr=
-obably
-> to rewrite some chunks of it to change to 'amend' interface, I decided =
-to post it now,
-> to see if you have other ideas/comments to add.
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  crypto/block-luks.c | 756 ++++++++++++++++++++++++++------------------=
 
-I can see that, because half of the qcow2 tests that contain the string
-=E2=80=9Csecret=E2=80=9D break:
+>  1 file changed, 440 insertions(+), 316 deletions(-)
 
-Failures: 087 134 158 178 188 198 206
-Failed 7 of 13 tests
-
-Also, 210 when run with -luks.
-
-Some are just due to different test outputs (because you change
-_filter_img_create to filter some encrypt.* parameters), but some of
-them are due to aborts.  All of them look like different kinds of heap
-corruptions.
-
-
-I can fully understand not running all iotests (because only the
-maintainers do that before pull requests), but just running the iotests
-that immediately concern a series seems prudent to me (unless the series
-is trivial).
-
-(Just =E2=80=9C(cd tests/qemu-iotests && grep -l secret ???)=E2=80=9D tel=
-ls you which
-tests to run that may concern themselves with qcow2 encryption, for
-example.)
-
-
-So I suppose I=E2=80=99ll stop reviewing the series in detail and just gi=
-ve a
-more cursory glance from now on.
+Also, this commit is just too big.
 
 Max
 
 
---lDU2n9puLlKf61gxgZPCqXLmw1Jww7kDC--
+--ilwMD2FgzJ51AP78tzWAakgmscAkfzszO--
 
---toC5qqAs52hUzixQ275hgvnMEJb84ezU2
+--pdDxZy7Md3zHmDPaqDbTX0lWTFG5LFalR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1cNPwACgkQ9AfbAGHV
-z0AFxQf/f/DAIpFpaqHMvVF6S4mgPSCvk4TMDxDpKOv9cSqDaNT71R/5Q+zYn18m
-BAkZcbnrD5RS4YE4X0TzX8g2s8bp+pM34wbMvWEbmaMFxNQPBVl9c+0ziboH+Nab
-VtZYtAH2jdjbUoJST98ShD8eVkRAqulFSLqaUkZgZrZNYdsvJhusewGCZfYYK7FF
-loUJkAofU3HZzTuKCSZI+DIRm1Mb5ZAs2St3T1FY5RbuAC1hK/QQgiIXEXC/I1Zn
-ualE5zz9gBfoYt3NikukF3QRrnrWKqMyE6ThC+dIeyOBU1cTELDSMvTtv10Aikb8
-3yNqrQ+rWDC+EyKMuJ0MBgkdP1RKpA==
-=JdvK
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1cNWcACgkQ9AfbAGHV
+z0DkXQf7BH3LrrBCvw8blXiu3hNO8mQSVHbeqE58cKrL5eD2udSeobUPkx/VB5TA
+J7go8Og2d9S+r+xUyTrmpOBnHJgKjwYUnyT6uE8Zdt3ybG+ynceCH/tyJ5W5RjJN
+wil/ixCb3NA+u7AeI889s6F5ZnybwtvFC+rRk1F0YgbiMi9PsW5ywF7sTwaWDGM3
+jy66RZas+mudqB6u80dU8ewORLOSaZ66o7SRhTn3BE/bpckYNgMN878Jk5Cz6V/I
+AymJy9UtKivILFsdsiNUguDFfovKhrKVy2Cx5RJxlwFLkvGHtXaSpOp0QuuQLWA8
+oVorNGNE5SPZypy9k7jCfAtg8zYbTQ==
+=btkr
 -----END PGP SIGNATURE-----
 
---toC5qqAs52hUzixQ275hgvnMEJb84ezU2--
+--pdDxZy7Md3zHmDPaqDbTX0lWTFG5LFalR--
 
