@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88CE4C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11387C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E396206DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E396206DF
+	by mail.kernel.org (Postfix) with ESMTPS id DDCFB206DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 10:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDCFB206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i01ij-0007Xu-8j
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 06:50:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48722)
+	id 1i01il-0007hg-Ug
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 06:50:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1i01hB-0005t8-IU
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:48:59 -0400
+ (envelope-from <quintela@redhat.com>) id 1i01hF-00060g-EY
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1i01h9-0004au-Q2
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:48:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43528)
+ (envelope-from <quintela@redhat.com>) id 1i01hC-0004fp-QV
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 06:49:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37282)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <quintela@redhat.com>)
- id 1i01h6-0004XF-BL; Tue, 20 Aug 2019 06:48:52 -0400
+ id 1i01h9-0004aN-Lv; Tue, 20 Aug 2019 06:48:55 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 95C4E881341;
- Tue, 20 Aug 2019 10:48:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EC036300BCE9;
+ Tue, 20 Aug 2019 10:48:54 +0000 (UTC)
 Received: from secure.mitica (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9EDD15D9CD;
- Tue, 20 Aug 2019 10:48:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E92CA5D9CD;
+ Tue, 20 Aug 2019 10:48:51 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 20 Aug 2019 12:48:32 +0200
-Message-Id: <20190820104836.3093-2-quintela@redhat.com>
+Date: Tue, 20 Aug 2019 12:48:33 +0200
+Message-Id: <20190820104836.3093-3-quintela@redhat.com>
 In-Reply-To: <20190820104836.3093-1-quintela@redhat.com>
 References: <20190820104836.3093-1-quintela@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Tue, 20 Aug 2019 10:48:51 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Tue, 20 Aug 2019 10:48:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 1/5] socket: Add backlog parameter to
- socket_listen
+Subject: [Qemu-devel] [PATCH v3 2/5] socket: Add num connections to
+ qio_channel_socket_sync()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,297 +81,175 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Current parameter was always one.  We continue with that value for now
-in all callers.
-
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-
 ---
-Moved trace to socket_listen
----
- include/qemu/sockets.h    |  2 +-
- io/channel-socket.c       |  2 +-
- qga/channel-posix.c       |  2 +-
- tests/test-util-sockets.c | 12 ++++++------
- util/qemu-sockets.c       | 33 ++++++++++++++++++++++-----------
- util/trace-events         |  3 +++
- 6 files changed, 34 insertions(+), 20 deletions(-)
+ include/io/channel-socket.h    | 2 ++
+ io/channel-socket.c            | 7 ++++---
+ io/net-listener.c              | 2 +-
+ io/trace-events                | 2 +-
+ scsi/qemu-pr-helper.c          | 3 ++-
+ tests/test-char.c              | 4 ++--
+ tests/test-io-channel-socket.c | 2 +-
+ tests/tpm-emu.c                | 2 +-
+ 8 files changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-index 8140fea685..57cd049d6e 100644
---- a/include/qemu/sockets.h
-+++ b/include/qemu/sockets.h
-@@ -41,7 +41,7 @@ int unix_connect(const char *path, Error **errp);
+diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
+index d7134d2cd6..ed88e5b8c1 100644
+--- a/include/io/channel-socket.h
++++ b/include/io/channel-socket.h
+@@ -123,6 +123,7 @@ void qio_channel_socket_connect_async(QIOChannelSocke=
+t *ioc,
+  * qio_channel_socket_listen_sync:
+  * @ioc: the socket channel object
+  * @addr: the address to listen to
++ * @num: the expected ammount of connections
+  * @errp: pointer to a NULL-initialized error object
+  *
+  * Attempt to listen to the address @addr. This method
+@@ -132,6 +133,7 @@ void qio_channel_socket_connect_async(QIOChannelSocke=
+t *ioc,
+  */
+ int qio_channel_socket_listen_sync(QIOChannelSocket *ioc,
+                                    SocketAddress *addr,
++                                   int num,
+                                    Error **errp);
 =20
- SocketAddress *socket_parse(const char *str, Error **errp);
- int socket_connect(SocketAddress *addr, Error **errp);
--int socket_listen(SocketAddress *addr, Error **errp);
-+int socket_listen(SocketAddress *addr, int num, Error **errp);
- void socket_listen_cleanup(int fd, Error **errp);
- int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **er=
-rp);
-=20
+ /**
 diff --git a/io/channel-socket.c b/io/channel-socket.c
-index bec3d931d1..a533c8bc11 100644
+index a533c8bc11..6258c25983 100644
 --- a/io/channel-socket.c
 +++ b/io/channel-socket.c
-@@ -202,7 +202,7 @@ int qio_channel_socket_listen_sync(QIOChannelSocket *=
-ioc,
+@@ -197,12 +197,13 @@ void qio_channel_socket_connect_async(QIOChannelSoc=
+ket *ioc,
+=20
+ int qio_channel_socket_listen_sync(QIOChannelSocket *ioc,
+                                    SocketAddress *addr,
++                                   int num,
+                                    Error **errp)
+ {
      int fd;
 =20
-     trace_qio_channel_socket_listen_sync(ioc, addr);
--    fd =3D socket_listen(addr, errp);
-+    fd =3D socket_listen(addr, 1, errp);
+-    trace_qio_channel_socket_listen_sync(ioc, addr);
+-    fd =3D socket_listen(addr, 1, errp);
++    trace_qio_channel_socket_listen_sync(ioc, addr, num);
++    fd =3D socket_listen(addr, num, errp);
      if (fd < 0) {
          trace_qio_channel_socket_listen_fail(ioc);
          return -1;
-diff --git a/qga/channel-posix.c b/qga/channel-posix.c
-index 5a925a9818..8fc205ad21 100644
---- a/qga/channel-posix.c
-+++ b/qga/channel-posix.c
-@@ -215,7 +215,7 @@ static gboolean ga_channel_open(GAChannel *c, const g=
-char *path,
-                 return false;
-             }
+@@ -226,7 +227,7 @@ static void qio_channel_socket_listen_worker(QIOTask =
+*task,
+     SocketAddress *addr =3D opaque;
+     Error *err =3D NULL;
 =20
--            fd =3D socket_listen(addr, &local_err);
-+            fd =3D socket_listen(addr, 1, &local_err);
-             qapi_free_SocketAddress(addr);
-             if (local_err !=3D NULL) {
-                 g_critical("%s", error_get_pretty(local_err));
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index f1ebffee5a..c8e1893c11 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -93,7 +93,7 @@ static void test_socket_fd_pass_name_good(void)
-     g_assert_cmpint(fd, !=3D, mon_fd);
-     close(fd);
+-    qio_channel_socket_listen_sync(ioc, addr, &err);
++    qio_channel_socket_listen_sync(ioc, addr, 1, &err);
 =20
--    fd =3D socket_listen(&addr, &error_abort);
-+    fd =3D socket_listen(&addr, 1, &error_abort);
-     g_assert_cmpint(fd, !=3D, -1);
-     g_assert_cmpint(fd, !=3D, mon_fd);
-     close(fd);
-@@ -124,7 +124,7 @@ static void test_socket_fd_pass_name_bad(void)
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
--    fd =3D socket_listen(&addr, &err);
-+    fd =3D socket_listen(&addr, 1, &err);
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
-@@ -151,7 +151,7 @@ static void test_socket_fd_pass_name_nomon(void)
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
--    fd =3D socket_listen(&addr, &err);
-+    fd =3D socket_listen(&addr, 1, &err);
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
-@@ -174,7 +174,7 @@ static void test_socket_fd_pass_num_good(void)
-     fd =3D socket_connect(&addr, &error_abort);
-     g_assert_cmpint(fd, =3D=3D, sfd);
-=20
--    fd =3D socket_listen(&addr, &error_abort);
-+    fd =3D socket_listen(&addr, 1, &error_abort);
-     g_assert_cmpint(fd, =3D=3D, sfd);
-=20
-     g_free(addr.u.fd.str);
-@@ -197,7 +197,7 @@ static void test_socket_fd_pass_num_bad(void)
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
--    fd =3D socket_listen(&addr, &err);
-+    fd =3D socket_listen(&addr, 1, &err);
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
-@@ -220,7 +220,7 @@ static void test_socket_fd_pass_num_nocli(void)
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
--    fd =3D socket_listen(&addr, &err);
-+    fd =3D socket_listen(&addr, 1, &err);
-     g_assert_cmpint(fd, =3D=3D, -1);
-     error_free_or_abort(&err);
-=20
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index e3a1666578..98ff3a1cce 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -31,6 +31,7 @@
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qemu/cutils.h"
-+#include "trace.h"
-=20
- #ifndef AI_ADDRCONFIG
- # define AI_ADDRCONFIG 0
-@@ -207,6 +208,7 @@ static int try_bind(int socket, InetSocketAddress *sa=
-ddr, struct addrinfo *e)
-=20
- static int inet_listen_saddr(InetSocketAddress *saddr,
-                              int port_offset,
-+                             int num,
-                              Error **errp)
- {
-     struct addrinfo ai,*res,*e;
-@@ -309,7 +311,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr=
+     qio_task_set_error(task, err);
+ }
+diff --git a/io/net-listener.c b/io/net-listener.c
+index d8cfe52673..dc81150318 100644
+--- a/io/net-listener.c
++++ b/io/net-listener.c
+@@ -82,7 +82,7 @@ int qio_net_listener_open_sync(QIONetListener *listener=
 ,
-                     goto listen_failed;
-                 }
-             } else {
--                if (!listen(slisten, 1)) {
-+                if (!listen(slisten, num)) {
-                     goto listen_ok;
-                 }
-                 if (errno !=3D EADDRINUSE) {
-@@ -774,6 +776,7 @@ static int vsock_connect_saddr(VsockSocketAddress *va=
-ddr, Error **errp)
- }
+     for (i =3D 0; i < nresaddrs; i++) {
+         QIOChannelSocket *sioc =3D qio_channel_socket_new();
 =20
- static int vsock_listen_saddr(VsockSocketAddress *vaddr,
-+                              int num,
-                               Error **errp)
- {
-     struct sockaddr_vm svm;
-@@ -795,7 +798,7 @@ static int vsock_listen_saddr(VsockSocketAddress *vad=
-dr,
-         return -1;
-     }
+-        if (qio_channel_socket_listen_sync(sioc, resaddrs[i],
++        if (qio_channel_socket_listen_sync(sioc, resaddrs[i], 1,
+                                            err ? NULL : &err) =3D=3D 0) =
+{
+             success =3D true;
 =20
--    if (listen(slisten, 1) !=3D 0) {
-+    if (listen(slisten, num) !=3D 0) {
-         error_setg_errno(errp, errno, "Failed to listen on socket");
-         closesocket(slisten);
-         return -1;
-@@ -836,6 +839,7 @@ static int vsock_connect_saddr(VsockSocketAddress *va=
-ddr, Error **errp)
- }
-=20
- static int vsock_listen_saddr(VsockSocketAddress *vaddr,
-+                              int num,
-                               Error **errp)
- {
-     vsock_unsupported(errp);
-@@ -853,6 +857,7 @@ static int vsock_parse(VsockSocketAddress *addr, cons=
-t char *str,
- #ifndef _WIN32
-=20
- static int unix_listen_saddr(UnixSocketAddress *saddr,
-+                             int num,
-                              Error **errp)
- {
-     struct sockaddr_un un;
-@@ -914,7 +919,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr=
-,
-         error_setg_errno(errp, errno, "Failed to bind socket to %s", pat=
-h);
-         goto err;
-     }
--    if (listen(sock, 1) < 0) {
-+    if (listen(sock, num) < 0) {
-         error_setg_errno(errp, errno, "Failed to listen on socket");
-         goto err;
-     }
-@@ -981,6 +986,7 @@ static int unix_connect_saddr(UnixSocketAddress *sadd=
-r, Error **errp)
- #else
-=20
- static int unix_listen_saddr(UnixSocketAddress *saddr,
-+                             int num,
-                              Error **errp)
- {
-     error_setg(errp, "unix sockets are not available on windows");
-@@ -1004,7 +1010,7 @@ int unix_listen(const char *str, Error **errp)
-=20
-     saddr =3D g_new0(UnixSocketAddress, 1);
-     saddr->path =3D g_strdup(str);
--    sock =3D unix_listen_saddr(saddr, errp);
-+    sock =3D unix_listen_saddr(saddr, 1, errp);
-     qapi_free_UnixSocketAddress(saddr);
-     return sock;
- }
-@@ -1061,9 +1067,13 @@ fail:
-     return NULL;
- }
-=20
--static int socket_get_fd(const char *fdstr, Error **errp)
-+static int socket_get_fd(const char *fdstr, int num, Error **errp)
- {
-     int fd;
-+    if (num !=3D 1) {
-+        error_setg_errno(errp, EINVAL, "socket_get_fd: too many connecti=
-ons");
-+        return -1;
-+    }
-     if (cur_mon) {
-         fd =3D monitor_get_fd(cur_mon, fdstr, errp);
-         if (fd < 0) {
-@@ -1099,7 +1109,7 @@ int socket_connect(SocketAddress *addr, Error **err=
-p)
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_FD:
--        fd =3D socket_get_fd(addr->u.fd.str, errp);
-+        fd =3D socket_get_fd(addr->u.fd.str, 1, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_VSOCK:
-@@ -1112,25 +1122,26 @@ int socket_connect(SocketAddress *addr, Error **e=
-rrp)
-     return fd;
- }
-=20
--int socket_listen(SocketAddress *addr, Error **errp)
-+int socket_listen(SocketAddress *addr, int num, Error **errp)
- {
-     int fd;
-=20
-+    trace_socket_listen(num);
-     switch (addr->type) {
-     case SOCKET_ADDRESS_TYPE_INET:
--        fd =3D inet_listen_saddr(&addr->u.inet, 0, errp);
-+        fd =3D inet_listen_saddr(&addr->u.inet, 0, num, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_UNIX:
--        fd =3D unix_listen_saddr(&addr->u.q_unix, errp);
-+        fd =3D unix_listen_saddr(&addr->u.q_unix, num, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_FD:
--        fd =3D socket_get_fd(addr->u.fd.str, errp);
-+        fd =3D socket_get_fd(addr->u.fd.str, num, errp);
-         break;
-=20
-     case SOCKET_ADDRESS_TYPE_VSOCK:
--        fd =3D vsock_listen_saddr(&addr->u.vsock, errp);
-+        fd =3D vsock_listen_saddr(&addr->u.vsock, num, errp);
-         break;
-=20
-     default:
-diff --git a/util/trace-events b/util/trace-events
-index 9dbd237dad..83b6639018 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -64,6 +64,9 @@ lockcnt_futex_wait(const void *lockcnt, int val) "lockc=
-nt %p waiting on %d"
- lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p afte=
-r wait: %d"
- lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter=
+diff --git a/io/trace-events b/io/trace-events
+index 378390521e..2e6aa1d749 100644
+--- a/io/trace-events
++++ b/io/trace-events
+@@ -17,7 +17,7 @@ qio_channel_socket_connect_sync(void *ioc, void *addr) =
+"Socket connect sync ioc=3D
+ qio_channel_socket_connect_async(void *ioc, void *addr) "Socket connect =
+async ioc=3D%p addr=3D%p"
+ qio_channel_socket_connect_fail(void *ioc) "Socket connect fail ioc=3D%p=
 "
+ qio_channel_socket_connect_complete(void *ioc, int fd) "Socket connect c=
+omplete ioc=3D%p fd=3D%d"
+-qio_channel_socket_listen_sync(void *ioc, void *addr) "Socket listen syn=
+c ioc=3D%p addr=3D%p"
++qio_channel_socket_listen_sync(void *ioc, void *addr, int num) "Socket l=
+isten sync ioc=3D%p addr=3D%p num=3D%d"
+ qio_channel_socket_listen_async(void *ioc, void *addr) "Socket listen as=
+ync ioc=3D%p addr=3D%p"
+ qio_channel_socket_listen_fail(void *ioc) "Socket listen fail ioc=3D%p"
+ qio_channel_socket_listen_complete(void *ioc, int fd) "Socket listen com=
+plete ioc=3D%p fd=3D%d"
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index a256ce490b..a8a74d1dba 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -1005,7 +1005,8 @@ int main(int argc, char **argv)
+             .u.q_unix.path =3D socket_path,
+         };
+         server_ioc =3D qio_channel_socket_new();
+-        if (qio_channel_socket_listen_sync(server_ioc, &saddr, &local_er=
+r) < 0) {
++        if (qio_channel_socket_listen_sync(server_ioc, &saddr,
++                                           1, &local_err) < 0) {
+             object_unref(OBJECT(server_ioc));
+             error_report_err(local_err);
+             return 1;
+diff --git a/tests/test-char.c b/tests/test-char.c
+index f9440cdcfd..af131fc850 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -666,7 +666,7 @@ char_socket_addr_to_opt_str(SocketAddress *addr, bool=
+ fd_pass,
+         char *optstr;
+         g_assert(!reconnect);
+         if (is_listen) {
+-            qio_channel_socket_listen_sync(ioc, addr, &error_abort);
++            qio_channel_socket_listen_sync(ioc, addr, 1, &error_abort);
+         } else {
+             qio_channel_socket_connect_sync(ioc, addr, &error_abort);
+         }
+@@ -891,7 +891,7 @@ static void char_socket_client_test(gconstpointer opa=
+que)
+      */
+     ioc =3D qio_channel_socket_new();
+     g_assert_nonnull(ioc);
+-    qio_channel_socket_listen_sync(ioc, config->addr, &error_abort);
++    qio_channel_socket_listen_sync(ioc, config->addr, 1, &error_abort);
+     addr =3D qio_channel_socket_get_local_address(ioc, &error_abort);
+     g_assert_nonnull(addr);
 =20
-+# qemu-sockets.c
-+socket_listen(int num) "backlog: %d"
-+
- # qemu-thread-common.h
- qemu_mutex_lock(void *mutex, const char *file, const int line) "waiting =
-on mutex %p (%s:%d)"
- qemu_mutex_locked(void *mutex, const char *file, const int line) "taken =
-mutex %p (%s:%d)"
+diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socke=
+t.c
+index d2053c464c..6eebcee115 100644
+--- a/tests/test-io-channel-socket.c
++++ b/tests/test-io-channel-socket.c
+@@ -57,7 +57,7 @@ static void test_io_channel_setup_sync(SocketAddress *l=
+isten_addr,
+     QIOChannelSocket *lioc;
+=20
+     lioc =3D qio_channel_socket_new();
+-    qio_channel_socket_listen_sync(lioc, listen_addr, &error_abort);
++    qio_channel_socket_listen_sync(lioc, listen_addr, 1, &error_abort);
+=20
+     if (listen_addr->type =3D=3D SOCKET_ADDRESS_TYPE_INET) {
+         SocketAddress *laddr =3D qio_channel_socket_get_local_address(
+diff --git a/tests/tpm-emu.c b/tests/tpm-emu.c
+index 125e697181..c43ac4aef8 100644
+--- a/tests/tpm-emu.c
++++ b/tests/tpm-emu.c
+@@ -76,7 +76,7 @@ void *tpm_emu_ctrl_thread(void *data)
+     QIOChannelSocket *lioc =3D qio_channel_socket_new();
+     QIOChannel *ioc;
+=20
+-    qio_channel_socket_listen_sync(lioc, s->addr, &error_abort);
++    qio_channel_socket_listen_sync(lioc, s->addr, 1, &error_abort);
+=20
+     g_mutex_lock(&s->data_mutex);
+     s->data_cond_signal =3D true;
 --=20
 2.21.0
 
