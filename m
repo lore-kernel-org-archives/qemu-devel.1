@@ -3,53 +3,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 664BAC3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D36C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D2B92054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:45:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D2B92054F
+	by mail.kernel.org (Postfix) with ESMTPS id 3D70B2054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 16:48:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D70B2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i07Gf-00030k-D4
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:45:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47381)
+	id 1i07JM-0005I1-6L
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 12:48:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i07Fg-000267-5E
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:44:57 -0400
+ (envelope-from <david@redhat.com>) id 1i07Ha-0003ud-6d
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i07Ff-000050-4l
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:44:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60218)
+ (envelope-from <david@redhat.com>) id 1i07HZ-0002TC-0m
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:46:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43196)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1i07Fe-0008RL-Sp
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:44:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1i07HX-0002QD-Gp
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 12:46:52 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0AC9B3084212;
- Tue, 20 Aug 2019 16:44:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 00335307D84B;
+ Tue, 20 Aug 2019 16:46:49 +0000 (UTC)
 Received: from [10.36.117.226] (ovpn-117-226.ams2.redhat.com [10.36.117.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0BD7B5D9E1;
- Tue, 20 Aug 2019 16:44:46 +0000 (UTC)
-To: Aleksandar Markovic <amarkovic@wavecomp.com>,
- BALATON Zoltan <balaton@eik.bme.hu>,
- Richard Henderson <richard.henderson@linaro.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CA5AD1DB;
+ Tue, 20 Aug 2019 16:46:45 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 References: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
  <CAFEAcA9UJGXOdNUD49bxmrdoZ5FEv4VLqAvyzDw66MOGsGB=wg@mail.gmail.com>
  <BN6PR2201MB1251C78A16D557867586FFD4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
  <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>
- <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
- <BN6PR2201MB12512C4D20F05C8F21E5945DC6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -96,18 +94,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <00b3cf35-d879-60d6-048a-fe757a461938@redhat.com>
-Date: Tue, 20 Aug 2019 18:44:45 +0200
+Message-ID: <ee2c817c-6cb5-6f0a-ea04-da47c0ab67bb@redhat.com>
+Date: Tue, 20 Aug 2019 18:46:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB12512C4D20F05C8F21E5945DC6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 20 Aug 2019 16:44:51 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Tue, 20 Aug 2019 16:46:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [EXTERNAL]Re: Proposal for amending TCG interface
@@ -123,47 +121,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Palmer Dabbelt <palmer@sifive.com>, Eduardo Habkost <ehabkost@redhat.com>,
+Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>,
+ Palmer Dabbelt <palmer@sifive.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
  Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>,
  "aurelien@aurel32.net" <aurelien@aurel32.net>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.08.19 18:38, Aleksandar Markovic wrote:
->> From: BALATON Zoltan <balaton@eik.bme.hu>
+On 20.08.19 17:37, Richard Henderson wrote:
+> On 8/20/19 6:49 AM, Aleksandar Markovic wrote:
+>>> From: Peter Maydell <peter.maydell@linaro.org>
+>>> On Tue, 20 Aug 2019 at 13:50, Aleksandar Markovic
+>>> <amarkovic@wavecomp.com> wrote:
+>>>> The idea is to provide significant "lexicographic" distance between those > groups of functions, rather than having the similar name (wiht common root > "ext) for all of them.
+>>>
+>>> The current naming of the extract/sextract TCG ops is intended to keep
+>>> them in line with the extract32/sextract32/extract64/sextract64 utility
+>>> functions in bitops.h. I think those ones are reasonably named. The
+>>> other ops are a bit more ad-hoc in naming, admittedly...
+>>>
 >>
->> Sorry to comment on this without really knowing what is it about but maybe
->> my view is not completely useless if this is to be understood by people
->> who don't know anything about it. If it is not useful just ignore.
+>> How about
+>>
+>> tcg_gen_extract2_i32
+>> tcg_gen_extract2_i64
+>> tcg_gen_extract2_tl
+>> tcg_gen_extrl_i64_i32
+>> tcg_gen_extrh_i64_i32
+>> tcg_gen_ext_i32_i64
+>> tcg_gen_extu_i32_i64
+>>
+>> to
+>>
+>> tcg_gen_gather_i32
+>> tcg_gen_gather_i64
+>> tcg_gen_gather_tl
 > 
-> No, Zoltan, to the contrary, you hit the nail - the good interface scheme
-> should look natural even for people not acquainted with the gory details
-> of the area.
+> I'm not sure how "gather" applies.  To me this sounds like a vector
+> scatter/gather operation, where N different addresses are used to load the N
+> elements of the vector.
+> 
+> When extract2 was named, I was only thinking "extract" because of how the
+> AArch64 instruction that implements this operation is named (EXTR), and "extr"
+> itself was already taken.  We did ask for naming suggestions at the time, but
+> no better ideas were floated...
+> 
+> Would it be clearer to use the x86 instruction name: SHRD (SHift Right Doubleword)?
 > 
 
-I just got familiar with the terminology and everything I read so far
-confuses me even more (gather/pick/extend/extl/shrd). No, I don't like that.
-
-> I have a couple of students, and these names just don't stick to their
-> minds, they just want to run away from using them. There seems to be
-> an "entry barrier" that is self-imposed by us.
-> 
-> All those functions seem to me underused in QEMU code. Partially
-> because some of them are relatively new, but for sure partially because
-> of some kind of disorganization of the naming.
-> 
-> Aleksandar
-> 
+I still think your proposal back then made sense - extract2. Extract a
+64bit value from a 128bit value.
 
 -- 
 
