@@ -2,59 +2,81 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8332C3A59E
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77ABBC3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:33:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91A89206BB
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:29:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A89206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42D7B2054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 15:33:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fiuNZ+MU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D7B2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i064f-0004Uu-PY
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 11:29:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35106)
+	id 1i068F-00063X-Fx
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 11:33:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1i0632-0002dU-3S
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:27:49 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i066m-0005SO-85
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1i0630-0007jr-SX
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:27:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59274)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i0630-0007j9-Nl
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:27:46 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 161933018FC6;
- Tue, 20 Aug 2019 15:27:46 +0000 (UTC)
-Received: from 640k.localdomain.com (ovpn-112-20.ams2.redhat.com
- [10.36.112.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1330A10013A1;
- Tue, 20 Aug 2019 15:27:44 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 20 Aug 2019 17:27:41 +0200
-Message-Id: <1566314861-32709-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1566314861-32709-1-git-send-email-pbonzini@redhat.com>
-References: <1566314861-32709-1-git-send-email-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 20 Aug 2019 15:27:46 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 31/34] migration: do not rom_reset() during
- incoming migration
+ (envelope-from <peter.maydell@linaro.org>) id 1i066l-0002SI-A3
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:31:40 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35064)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i066l-0002Rc-5d
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 11:31:39 -0400
+Received: by mail-ot1-x344.google.com with SMTP id g17so5412970otl.2
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 08:31:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zpB9XLMo1Q8vxKxjfFa8+dNSfxsG4UwS/v+5EZ7yVGE=;
+ b=fiuNZ+MUpFYo+Un6MR2cnrRt40+xZysKRDRPqjnra2SopPGAIPOxNxhd90g03VEiuR
+ zPLCEtJTdMp8VObOJBjItr1W6SON6nZ24BC3oP/B9rcClfP1W7jgnI3mDJCilKrf4wgB
+ tcLwJyqz2mgv2MCfUC7eLPiX32Ubc6dG9HohmPG2X28dfGnXP1tRYXkxTLuWKdGNbg/a
+ 3sEZKNk7hpAgMEGamTuCCsDzJAuvVAAF8xGT99adCzp5B5Xw2M0TgBtoBPgCFcSI/H9/
+ O0PmngspOAd+RyOtFHqpHMqxnlVYXOVoVxVeZR0tPOrOxqTa6Y7tTdwh3appCZMsb0/v
+ Qk/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zpB9XLMo1Q8vxKxjfFa8+dNSfxsG4UwS/v+5EZ7yVGE=;
+ b=bseYqkdBXQDbL7u6XCL7ToFcmhDI9quBfc7n/6Mm+TAY4LlrZWkeP6YHPi79ZnyH2R
+ 3FRMjomeVSLaimNVZTaz0QBfI8hbNAB/tcTZscjBvIUjXTbWX/5YdLq3qgG3quA+UYkV
+ a1XqbdtOYoIv7BlUmv+2PVxmLAUJo3dH8RY04lB4SKUxAJR2hHDj5owuDyMNB7nS5aRC
+ 4g46ig9PLXdOOPMjTQ1HrFriUOsq0rvOrp81IRHtSHarA0eo7G8dvk8P+UDE8cTMWLO4
+ ZqH27pq2ieNimJEvtZLLgYms9KohGUC5ndXkFtRSjeSnNGrJ22mN80Air2rnU2h8fubk
+ LUJw==
+X-Gm-Message-State: APjAAAXXeDwnDFH1/QPrWe7xpRN9mBMwgskaS+lG3h6AYKa+FotKsekW
+ 28OilfqB1WHI8nIuAkz2V/cYM2jiWKRJRXVcNCr/7A==
+X-Google-Smtp-Source: APXvYqy5h7Y6KP2UHXIsqChtlrxY4OxuU/O1HVfFIGAh8uHoRnhub9igSYF5/qJKQQs5PvLPkIfpYU9q6Qn67x4Cpj0=
+X-Received: by 2002:a05:6830:2103:: with SMTP id
+ i3mr23438141otc.135.1566315094670; 
+ Tue, 20 Aug 2019 08:31:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190803210803.5701-1-richard.henderson@linaro.org>
+ <20190803210803.5701-7-richard.henderson@linaro.org>
+In-Reply-To: <20190803210803.5701-7-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Aug 2019 16:31:23 +0100
+Message-ID: <CAFEAcA-cFi8BLBhh3vPdT4d=ps_pmP5gNz1W00mskVhhzN175w@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v7 6/6] tests/tcg/aarch64: Add bti smoke
+ test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,76 +88,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Catherine Ho <catherine.hecx@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Dave P Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Catherine Ho <catherine.hecx@gmail.com>
+On Sat, 3 Aug 2019 at 22:08, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> This will build with older toolchains, without the upstream support
+> for -mbranch-protection.  Such a toolchain will produce a warning
+> in such cases,
+>
+> ld: warning: /tmp/ccyZt0kq.o: unsupported GNU_PROPERTY_TYPE (5) \
+> type: 0xc0000000
+>
+> but the still places the note at the correct location in the binary
+> for processing by the runtime loader.
 
-Commit 18269069c310 ("migration: Introduce ignore-shared capability")
-addes ignore-shared capability to bypass the shared ramblock (e,g,
-membackend + numa node). It does good to live migration.
+Is there some way to suppress these warnings ? 'make check-tcg'
+output includes
 
-As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
-until VM starts, but it does on aarch64 qemu:
-Backtrace:
-1  0x000055f4a296dd84 in address_space_write_rom_internal () at
-exec.c:3458
-2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
-3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
-4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
-5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
-6  0x000055f4a2c9851d in main () at vl.c:4552
+  BUILD   TCG tests for aarch64-linux-user
+  BUILD   aarch64 guest-tests with aarch64-linux-gnu-gcc
+/usr/lib/gcc-cross/aarch64-linux-gnu/7/../../../../aarch64-linux-gnu/bin/ld:
+warning: /tmp/cccZ8Fk7.o: unsupported GNU_PROPERTY_TYPE (5) type:
+0xc0000000
+/usr/lib/gcc-cross/aarch64-linux-gnu/7/../../../../aarch64-linux-gnu/bin/ld:
+warning: .note.gnu.build-id section discarded, --build-id ignored.
+  RUN     TCG tests for aarch64-linux-user
 
-Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
-druing rom_reset. In ignore-shared incoming case, this rom filling
-is not required since all the data has been stored in memory backend
-file.
+and these are going to come up in the merge-testing search
+for warnings in the build logs...
 
-Further more, as suggested by Peter Xu, if we do rom_reset() now with
-these ROMs then the RAM data should be re-filled again too with the
-migration stream coming in.
-
-Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
-capability")
-Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
-Suggested-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-Acked-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/core/loader.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index de00f56..32f7cc7 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -58,6 +58,7 @@
- #include "exec/address-spaces.h"
- #include "hw/boards.h"
- #include "qemu/cutils.h"
-+#include "sysemu/runstate.h"
- 
- #include <zlib.h>
- 
-@@ -1114,6 +1115,15 @@ static void rom_reset(void *unused)
- {
-     Rom *rom;
- 
-+    /*
-+     * We don't need to fill in the RAM with ROM data because we'll fill
-+     * the data in during the next incoming migration in all cases.  Note
-+     * that some of those RAMs can actually be modified by the guest on ARM
-+     * so this is probably the only right thing to do here.
-+     */
-+    if (runstate_check(RUN_STATE_INMIGRATE))
-+        return;
-+
-     QTAILQ_FOREACH(rom, &roms, next) {
-         if (rom->fw_file) {
-             continue;
--- 
-1.8.3.1
+thanks
+-- PMM
 
