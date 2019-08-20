@@ -4,46 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 012DFC3A59D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90380C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:36:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA7142332A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:35:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA7142332A
+	by mail.kernel.org (Postfix) with ESMTPS id 60594206DD
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 21:36:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60594206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Bmu-0007kK-HM
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 17:35:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56528)
+	id 1i0BnP-0008Du-1s
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 17:36:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i0BfB-000174-MR
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:27:35 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i0BOS-0003Ry-03
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:10:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i0BfA-00054N-NW
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:27:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41530)
+ (envelope-from <jsnow@redhat.com>) id 1i0BOQ-0001pw-Rw
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 17:10:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42640)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i0Bf1-00051Y-Lx; Tue, 20 Aug 2019 17:27:23 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i0BOO-0001nb-AS; Tue, 20 Aug 2019 17:10:12 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E6B893CA20;
- Tue, 20 Aug 2019 21:27:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A341D317528A;
+ Tue, 20 Aug 2019 21:10:11 +0000 (UTC)
 Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 41181194BE;
- Tue, 20 Aug 2019 21:27:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F17ED1D2;
+ Tue, 20 Aug 2019 21:10:10 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-5-mreitz@redhat.com>
+ <20190819201851.24418-9-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <3e717f46-489f-170a-a201-cbe841d400f6@redhat.com>
-Date: Tue, 20 Aug 2019 17:27:21 -0400
+Message-ID: <5e61d90b-82e8-afc1-cba3-d0761031f72e@redhat.com>
+Date: Tue, 20 Aug 2019 17:10:10 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190819201851.24418-5-mreitz@redhat.com>
+In-Reply-To: <20190819201851.24418-9-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 20 Aug 2019 21:27:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Tue, 20 Aug 2019 21:10:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] iotests: Use case_skip() in
- skip_if_unsupported()
+Subject: Re: [Qemu-devel] [PATCH v3 8/8] iotests: Cache supported_formats()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -153,43 +152,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
+Any particular reason? I guess an "itch."
 
 On 8/19/19 4:18 PM, Max Reitz wrote:
-> skip_if_unsupported() should use the stronger variant case_skip(),
-> because this allows it to be used even with setUp() (in a meaningful
-> way).
-> 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tests/qemu-iotests/iotests.py | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 > 
 > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 2f53baf633..726f904f50 100644
+> index 8f315538e9..f6492b355f 100644
 > --- a/tests/qemu-iotests/iotests.py
 > +++ b/tests/qemu-iotests/iotests.py
-> @@ -896,7 +896,7 @@ def skip_if_unsupported(required_formats=[], read_only=False):
->              usf_list = list(set(required_formats) -
->                              set(supported_formats(read_only)))
->              if usf_list:
-> -                case_notrun('{}: formats {} are not whitelisted'.format(
-> +                args[0].case_skip('{}: formats {} are not whitelisted'.format(
->                      args[0], usf_list))
->              else:
->                  return func(*args, **kwargs)
+> @@ -884,9 +884,17 @@ def qemu_pipe(*args):
+>  def supported_formats(read_only=False):
+>      '''Set 'read_only' to True to check ro-whitelist
+>         Otherwise, rw-whitelist is checked'''
+> -    format_message = qemu_pipe("-drive", "format=help")
+> -    line = 1 if read_only else 0
+> -    return format_message.splitlines()[line].split(":")[1].split()
+> +
+> +    if not hasattr(supported_formats, "formats"):
+> +        supported_formats.formats = {}
+> +
+> +    if read_only not in supported_formats.formats:
+> +        format_message = qemu_pipe("-drive", "format=help")
+> +        line = 1 if read_only else 0
+> +        supported_formats.formats[read_only] = \
+> +            format_message.splitlines()[line].split(":")[1].split()
+> +
+
+Seems a little odd to use a boolean as a dict key, but I guess it works
+and is fine.
+
+> +    return supported_formats.formats[read_only]
+>  
+>  def skip_if_unsupported(required_formats=[], read_only=False):
+>      '''Skip Test Decorator
 > 
 
-Should we promote args[0] to a named argument here, because we depend on
-it having a specific type? It's not truly as polymorphic as we're making
-it appear.
+Eh, why not.
 
-That type here is iotests.QMPTestCase because we're relying on case_skip
-being present.
-
-def test_wrapper(test_case, *args, **kwargs):
-    ...
-        return func(test_case, *args, **kwargs)
-
---js
+Reviewed-by: John Snow <jsnow@redhat.com>
 
