@@ -2,56 +2,109 @@ Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF077C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 703B1C3A589
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:45:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0F0C2082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:45:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0F0C2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 483202082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 06:45:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483202082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hzxtT-0005XR-NP
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 02:45:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39973)
+	id 1hzxtp-0006Sp-8f
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 02:45:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40365)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzxmg-0004pG-0L
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:38:23 -0400
+ (envelope-from <thuth@redhat.com>) id 1hzxpM-0000Kh-E2
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hzxme-0006bU-Mt
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:38:21 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:39308 helo=mail.rt-rk.com)
+ (envelope-from <thuth@redhat.com>) id 1hzxpL-0000CL-9k
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:41:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hzxme-0006Vc-AC
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 02:38:20 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id CD8031A1FF8;
- Tue, 20 Aug 2019 08:38:15 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 9497A1A2046;
- Tue, 20 Aug 2019 08:38:15 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 20 Aug 2019 08:38:01 +0200
-Message-Id: <1566283083-21838-10-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1566283083-21838-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1566283083-21838-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 09/11] target/mips: Style improvements in
- mips_mipssim.c
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hzxpI-0000An-Qd; Tue, 20 Aug 2019 02:41:05 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 13DB4307D921;
+ Tue, 20 Aug 2019 06:41:04 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-232.ams2.redhat.com [10.36.116.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0D6081DD;
+ Tue, 20 Aug 2019 06:40:59 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190819201851.24418-1-mreitz@redhat.com>
+ <20190819201851.24418-7-mreitz@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <c0d92948-0d97-321d-ea26-17ce4d2da5d9@redhat.com>
+Date: Tue, 20 Aug 2019 08:40:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190819201851.24418-7-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 20 Aug 2019 06:41:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting
+ in 093
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,84 +116,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 8/19/19 10:18 PM, Max Reitz wrote:
+> null-aio may not be whitelisted.  Skip all test cases that require it.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/093 | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+> index 50c1e7f2ec..f03fa24a07 100755
+> --- a/tests/qemu-iotests/093
+> +++ b/tests/qemu-iotests/093
+> @@ -24,7 +24,7 @@ import iotests
+>  nsec_per_sec = 1000000000
+>  
+>  class ThrottleTestCase(iotests.QMPTestCase):
+> -    test_img = "null-aio://"
+> +    test_driver = "null-aio"
+>      max_drives = 3
+>  
+>      def blockstats(self, device):
+> @@ -35,10 +35,14 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>                  return stat['rd_bytes'], stat['rd_operations'], stat['wr_bytes'], stat['wr_operations']
+>          raise Exception("Device not found for blockstats: %s" % device)
+>  
+> +    def required_drivers(self):
+> +        return [self.test_driver]
+> +
+> +    @iotests.skip_if_unsupported(required_drivers)
+>      def setUp(self):
+>          self.vm = iotests.VM()
+>          for i in range(0, self.max_drives):
+> -            self.vm.add_drive(self.test_img, "file.read-zeroes=on")
+> +            self.vm.add_drive(self.test_driver + "://", "file.read-zeroes=on")
+>          self.vm.launch()
+>  
+>      def tearDown(self):
+> @@ -264,7 +268,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>          self.assertEqual(self.blockstats('drive1')[0], 4096)
+>  
+>  class ThrottleTestCoroutine(ThrottleTestCase):
+> -    test_img = "null-co://"
+> +    test_driver = "null-co"
+>  
+>  class ThrottleTestGroupNames(iotests.QMPTestCase):
+>      max_drives = 3
+> @@ -425,4 +429,6 @@ class ThrottleTestRemovableMedia(iotests.QMPTestCase):
+>  
+>  
+>  if __name__ == '__main__':
+> +    if 'null-co' not in iotests.supported_formats():
+> +        iotests.notrun('null-co driver support missing')
+>      iotests.main(supported_fmts=["raw"])
 
-Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
+Maybe also mention null-co in the patch description?
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-Id: <1566216496-17375-17-git-send-email-aleksandar.markovic@rt-rk.com>
----
- hw/mips/mips_mipssim.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
-
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 1ca7e90..282bbec 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -3,7 +3,7 @@
-  *
-  * Emulates a very simple machine model similar to the one used by the
-  * proprietary MIPS emulator.
-- * 
-+ *
-  * Copyright (c) 2007 Thiemo Seufer
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-@@ -76,8 +76,9 @@ static int64_t load_kernel(void)
-                            (uint64_t *)&kernel_high, big_endian,
-                            EM_MIPS, 1, 0);
-     if (kernel_size >= 0) {
--        if ((entry & ~0x7fffffffULL) == 0x80000000)
-+        if ((entry & ~0x7fffffffULL) == 0x80000000) {
-             entry = (int32_t)entry;
-+        }
-     } else {
-         error_report("could not load kernel '%s': %s",
-                      loaderparams.kernel_filename,
-@@ -89,9 +90,10 @@ static int64_t load_kernel(void)
-     initrd_size = 0;
-     initrd_offset = 0;
-     if (loaderparams.initrd_filename) {
--        initrd_size = get_image_size (loaderparams.initrd_filename);
-+        initrd_size = get_image_size(loaderparams.initrd_filename);
-         if (initrd_size > 0) {
--            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
-+            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) &
-+                            INITRD_PAGE_MASK;
-             if (initrd_offset + initrd_size > loaderparams.ram_size) {
-                 error_report("memory too small for initial ram disk '%s'",
-                              loaderparams.initrd_filename);
-@@ -175,8 +177,9 @@ mips_mipssim_init(MachineState *machine)
-     /* Map the BIOS / boot exception handler. */
-     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
-     /* Load a BIOS / boot exception handler image. */
--    if (bios_name == NULL)
-+    if (bios_name == NULL) {
-         bios_name = BIOS_FILENAME;
-+    }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-     if (filename) {
-         bios_size = load_image_targphys(filename, 0x1fc00000LL, BIOS_SIZE);
-@@ -212,8 +215,10 @@ mips_mipssim_init(MachineState *machine)
-                              get_system_io(), 0, 0x00010000);
-     memory_region_add_subregion(get_system_memory(), 0x1fd00000, isa);
- 
--    /* A single 16450 sits at offset 0x3f8. It is attached to
--       MIPS CPU INT2, which is interrupt 4. */
-+    /*
-+     * A single 16450 sits at offset 0x3f8. It is attached to
-+     * MIPS CPU INT2, which is interrupt 4.
-+     */
-     if (serial_hd(0))
-         serial_init(0x3f8, env->irq[4], 115200, serial_hd(0),
-                     get_system_io());
--- 
-2.7.4
-
+ Thomas
 
