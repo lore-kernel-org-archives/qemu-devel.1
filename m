@@ -2,92 +2,63 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F898C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB46FC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6300922CE3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:54:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6300922CE3
+	by mail.kernel.org (Postfix) with ESMTPS id 8E4F922CE3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:55:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4F922CE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Vke-00022D-Jd
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:54:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44811)
+	id 1i0Vlc-00036P-OO
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i0Uld-0004LV-Q7
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:51:31 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i0UnH-0007E7-GH
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i0Ulc-0006hs-OR
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:51:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35992)
+ (envelope-from <dgilbert@redhat.com>) id 1i0UnF-0001QF-TZ
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:53:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58774)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i0UlZ-0006aL-HT; Wed, 21 Aug 2019 13:51:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i0UnF-0001MB-Jr
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:53:09 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AC9D830165F6;
- Wed, 21 Aug 2019 17:51:24 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 16E66605C6;
- Wed, 21 Aug 2019 17:51:21 +0000 (UTC)
-To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Andrew Jones <drjones@redhat.com>
-References: <db672a84-0f30-bb82-ef94-c543e444372e@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b0b27c5c-c07a-527b-294a-c4e7ec6d4204@redhat.com>
-Date: Wed, 21 Aug 2019 19:51:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 0A8BA30872DD
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 17:53:08 +0000 (UTC)
+Received: from work-vm (ovpn-117-245.ams2.redhat.com [10.36.117.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FDD61001947;
+ Wed, 21 Aug 2019 17:53:01 +0000 (UTC)
+Date: Wed, 21 Aug 2019 18:52:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190821175259.GM3309@work-vm>
+References: <20190816143321.20903-1-dgilbert@redhat.com>
+ <20190816143321.20903-2-dgilbert@redhat.com>
+ <20190818065944-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <db672a84-0f30-bb82-ef94-c543e444372e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190818065944-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 21 Aug 2019 17:51:24 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Wed, 21 Aug 2019 17:53:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Broken aarch64 by qcow2: skip writing zero buffers
- to empty COW areas [v2]
+Subject: Re: [Qemu-devel] [PATCH 1/2] virtio: add vhost-user-fs base device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,29 +70,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21.08.19 16:14, Luk=C3=A1=C5=A1 Doktor wrote:
-> Hello guys,
->=20
-> First attempt was rejected due to zip attachment, let's try it again wi=
-th just Avocado-vt debug.log and serial console log files attached.
->=20
-> I bisected a regression on aarch64 all the way to this commit: "qcow2: =
-skip writing zero buffers to empty COW areas" c8bb23cbdbe32f5c326365e0a82=
-e1b0e68cdcd8a. Would you please have a look at it?
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Fri, Aug 16, 2019 at 03:33:20PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-I think I can see the issue on my x64 system (I don=E2=80=99t see the XFS
-corruption, but the installation fails because of some segfaults).
+> > +    /* Hiprio queue */
+> > +    virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> >
+> 
+> Weird, spec patch v6 says:
+> 
+> +\item[0] hiprio
+> +\item[1\ldots n] request queues
+> 
+> where's the Notifications queue coming from?
 
-I haven=E2=80=99t found a simpler way to reproduce the problem yet, thoug=
-h,
-which is a pain... :-/
+Oops, that's a left over from when we used to have a notification queue;
+all the other parts of it are gone.
 
-It looks like the problem disappears when I configure qemu with
-=E2=80=9C--disable-xfsctl=E2=80=9D.  Can you try that?
+Dave
 
-Max
+> > +    /* Request queues */
+> > +    for (i = 0; i < fs->conf.num_queues; i++) {
+> > +        virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> > +    }
+> > +
+> > +    /* 1 high prio queue, plus the number configured */
+> > +    fs->vhost_dev.nvqs = 1 + fs->conf.num_queues;
+> > +    fs->vhost_dev.vqs = g_new0(struct vhost_virtqueue, fs->vhost_dev.nvqs);
+> > +    ret = vhost_dev_init(&fs->vhost_dev, &fs->vhost_user,
+> > +                         VHOST_BACKEND_TYPE_USER, 0);
+> > +    if (ret < 0) {
+> > +        error_setg_errno(errp, -ret, "vhost_dev_init failed");
+> > +        goto err_virtio;
+> > +    }
+> > +
+> > +    return;
+> > +
+> > +err_virtio:
+> > +    vhost_user_cleanup(&fs->vhost_user);
+> > +    virtio_cleanup(vdev);
+> > +    g_free(fs->vhost_dev.vqs);
+> > +    return;
+> > +}
+> > +
+> > +static void vuf_device_unrealize(DeviceState *dev, Error **errp)
+> > +{
+> > +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> > +    VHostUserFS *fs = VHOST_USER_FS(dev);
+> > +
+> > +    /* This will stop vhost backend if appropriate. */
+> > +    vuf_set_status(vdev, 0);
+> > +
+> > +    vhost_dev_cleanup(&fs->vhost_dev);
+> > +
+> > +    vhost_user_cleanup(&fs->vhost_user);
+> > +
+> > +    virtio_cleanup(vdev);
+> > +    g_free(fs->vhost_dev.vqs);
+> > +    fs->vhost_dev.vqs = NULL;
+> > +}
+> > +
+> > +static const VMStateDescription vuf_vmstate = {
+> > +    .name = "vhost-user-fs",
+> > +    .unmigratable = 1,
+> > +};
+> > +
+> > +static Property vuf_properties[] = {
+> > +    DEFINE_PROP_CHR("chardev", VHostUserFS, conf.chardev),
+> > +    DEFINE_PROP_STRING("tag", VHostUserFS, conf.tag),
+> > +    DEFINE_PROP_UINT16("num-queues", VHostUserFS, conf.num_queues, 1),
+> > +    DEFINE_PROP_UINT16("queue-size", VHostUserFS, conf.queue_size, 128),
+> > +    DEFINE_PROP_STRING("vhostfd", VHostUserFS, conf.vhostfd),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static void vuf_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > +    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
+> > +
+> > +    dc->props = vuf_properties;
+> > +    dc->vmsd = &vuf_vmstate;
+> > +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> > +    vdc->realize = vuf_device_realize;
+> > +    vdc->unrealize = vuf_device_unrealize;
+> > +    vdc->get_features = vuf_get_features;
+> > +    vdc->get_config = vuf_get_config;
+> > +    vdc->set_status = vuf_set_status;
+> > +    vdc->guest_notifier_mask = vuf_guest_notifier_mask;
+> > +    vdc->guest_notifier_pending = vuf_guest_notifier_pending;
+> > +}
+> > +
+> > +static const TypeInfo vuf_info = {
+> > +    .name = TYPE_VHOST_USER_FS,
+> > +    .parent = TYPE_VIRTIO_DEVICE,
+> > +    .instance_size = sizeof(VHostUserFS),
+> > +    .class_init = vuf_class_init,
+> > +};
+> > +
+> > +static void vuf_register_types(void)
+> > +{
+> > +    type_register_static(&vuf_info);
+> > +}
+> > +
+> > +type_init(vuf_register_types)
+> > diff --git a/include/hw/virtio/vhost-user-fs.h b/include/hw/virtio/vhost-user-fs.h
+> > new file mode 100644
+> > index 0000000000..d07ab134b9
+> > --- /dev/null
+> > +++ b/include/hw/virtio/vhost-user-fs.h
+> > @@ -0,0 +1,45 @@
+> > +/*
+> > + * Vhost-user filesystem virtio device
+> > + *
+> > + * Copyright 2018 Red Hat, Inc.
+> > + *
+> > + * Authors:
+> > + *  Stefan Hajnoczi <stefanha@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * (at your option) any later version.  See the COPYING file in the
+> > + * top-level directory.
+> > + */
+> > +
+> > +#ifndef _QEMU_VHOST_USER_FS_H
+> > +#define _QEMU_VHOST_USER_FS_H
+> > +
+> > +#include "hw/virtio/virtio.h"
+> > +#include "hw/virtio/vhost.h"
+> > +#include "hw/virtio/vhost-user.h"
+> > +#include "chardev/char-fe.h"
+> > +
+> > +#define TYPE_VHOST_USER_FS "x-vhost-user-fs-device"
+> > +#define VHOST_USER_FS(obj) \
+> > +        OBJECT_CHECK(VHostUserFS, (obj), TYPE_VHOST_USER_FS)
+> > +
+> > +typedef struct {
+> > +    CharBackend chardev;
+> > +    char *tag;
+> > +    uint16_t num_queues;
+> > +    uint16_t queue_size;
+> > +    char *vhostfd;
+> > +} VHostUserFSConf;
+> > +
+> > +typedef struct {
+> > +    /*< private >*/
+> > +    VirtIODevice parent;
+> > +    VHostUserFSConf conf;
+> > +    struct vhost_virtqueue *vhost_vqs;
+> > +    struct vhost_dev vhost_dev;
+> > +    VhostUserState vhost_user;
+> > +
+> > +    /*< public >*/
+> > +} VHostUserFS;
+> > +
+> > +#endif /* _QEMU_VHOST_USER_FS_H */
+> > diff --git a/include/standard-headers/linux/virtio_fs.h b/include/standard-headers/linux/virtio_fs.h
+> > new file mode 100644
+> > index 0000000000..4f811a0b70
+> > --- /dev/null
+> > +++ b/include/standard-headers/linux/virtio_fs.h
+> > @@ -0,0 +1,41 @@
+> > +#ifndef _LINUX_VIRTIO_FS_H
+> > +#define _LINUX_VIRTIO_FS_H
+> > +/* This header is BSD licensed so anyone can use the definitions to implement
+> > + * compatible drivers/servers.
+> > + *
+> > + * Redistribution and use in source and binary forms, with or without
+> > + * modification, are permitted provided that the following conditions
+> > + * are met:
+> > + * 1. Redistributions of source code must retain the above copyright
+> > + *    notice, this list of conditions and the following disclaimer.
+> > + * 2. Redistributions in binary form must reproduce the above copyright
+> > + *    notice, this list of conditions and the following disclaimer in the
+> > + *    documentation and/or other materials provided with the distribution.
+> > + * 3. Neither the name of IBM nor the names of its contributors
+> > + *    may be used to endorse or promote products derived from this software
+> > + *    without specific prior written permission.
+> > + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
+> > + * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> > + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> > + * ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR CONTRIBUTORS BE LIABLE
+> > + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+> > + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+> > + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> > + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+> > + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+> > + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+> > + * SUCH DAMAGE. */
+> > +#include "standard-headers/linux/types.h"
+> > +#include "standard-headers/linux/virtio_ids.h"
+> > +#include "standard-headers/linux/virtio_config.h"
+> > +#include "standard-headers/linux/virtio_types.h"
+> > +
+> > +struct virtio_fs_config {
+> > +	/* Filesystem name (UTF-8, not NUL-terminated, padded with NULs) */
+> > +	uint8_t tag[36];
+> > +
+> > +	/* Number of request queues */
+> > +	uint32_t num_queues;
+> > +} QEMU_PACKED;
+> > +
+> > +#endif /* _LINUX_VIRTIO_FS_H */
+> > diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
+> > index 32b2f94d1f..73fc004807 100644
+> > --- a/include/standard-headers/linux/virtio_ids.h
+> > +++ b/include/standard-headers/linux/virtio_ids.h
+> > @@ -43,6 +43,7 @@
+> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
+> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> > +#define VIRTIO_ID_FS           26 /* virtio filesystem */
+> >  #define VIRTIO_ID_PMEM         27 /* virtio pmem */
+> >  
+> >  #endif /* _LINUX_VIRTIO_IDS_H */
+> > -- 
+> > 2.21.0
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
