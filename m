@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0285C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E30C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:55:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EC8F2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:51:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC8F2082F
+	by mail.kernel.org (Postfix) with ESMTPS id 8A97822CF4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:55:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A97822CF4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0ODV-0001Di-R6
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 06:51:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48873)
+	id 1i0OGr-0002yx-Qg
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 06:55:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49614)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i0OCX-0000iK-O1
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:50:50 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i0OG2-0002UG-TW
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:54:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i0OCW-0005sU-OC
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:50:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54106)
+ (envelope-from <mreitz@redhat.com>) id 1i0OG1-0007Rd-Vp
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:54:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60057)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i0OCU-0005rj-66; Wed, 21 Aug 2019 06:50:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1i0OFz-0007Qk-Hv; Wed, 21 Aug 2019 06:54:23 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 67124301E136;
- Wed, 21 Aug 2019 10:50:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 970423083363;
+ Wed, 21 Aug 2019 10:54:22 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 33AB18CC0E;
- Wed, 21 Aug 2019 10:50:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D7BAA2B9EC;
+ Wed, 21 Aug 2019 10:54:18 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-5-mreitz@redhat.com>
- <3e717f46-489f-170a-a201-cbe841d400f6@redhat.com>
+ <20190819201851.24418-6-mreitz@redhat.com>
+ <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <118225df-67b0-f415-9c1e-bdcaa9330044@redhat.com>
-Date: Wed, 21 Aug 2019 12:50:35 +0200
+Message-ID: <cf342a07-2077-4ff5-0a7d-6807dd29ae78@redhat.com>
+Date: Wed, 21 Aug 2019 12:54:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <3e717f46-489f-170a-a201-cbe841d400f6@redhat.com>
+In-Reply-To: <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="F4fAtdDvkOXxOYpAMDdxDbiSgo0TSeKmn"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 21 Aug 2019 10:50:45 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 21 Aug 2019 10:54:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] iotests: Use case_skip() in
- skip_if_unsupported()
+Subject: Re: [Qemu-devel] [PATCH v3 5/8] iotests: Let skip_if_unsupported()
+ accept a method
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,99 +105,101 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F4fAtdDvkOXxOYpAMDdxDbiSgo0TSeKmn
-Content-Type: multipart/mixed; boundary="5N4XGbrBQtqmiKeV3kdGFZZWmak03EUwj";
+--iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704
+Content-Type: multipart/mixed; boundary="J50EFjFxeHbDdeyXEjLBkjugSJNwAAahy";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
  qemu-devel@nongnu.org
-Message-ID: <118225df-67b0-f415-9c1e-bdcaa9330044@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] iotests: Use case_skip() in
- skip_if_unsupported()
+Message-ID: <cf342a07-2077-4ff5-0a7d-6807dd29ae78@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/8] iotests: Let skip_if_unsupported()
+ accept a method
 References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-5-mreitz@redhat.com>
- <3e717f46-489f-170a-a201-cbe841d400f6@redhat.com>
-In-Reply-To: <3e717f46-489f-170a-a201-cbe841d400f6@redhat.com>
+ <20190819201851.24418-6-mreitz@redhat.com>
+ <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
+In-Reply-To: <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
 
---5N4XGbrBQtqmiKeV3kdGFZZWmak03EUwj
+--J50EFjFxeHbDdeyXEjLBkjugSJNwAAahy
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 20.08.19 23:27, John Snow wrote:
+On 20.08.19 23:31, John Snow wrote:
 >=20
 >=20
 > On 8/19/19 4:18 PM, Max Reitz wrote:
->> skip_if_unsupported() should use the stronger variant case_skip(),
->> because this allows it to be used even with setUp() (in a meaningful
->> way).
+>> This lets tests use skip_if_unsupported() with a potentially variable
+>> list of required formats.
 >>
+>> Suggested-by: Kevin Wolf <kwolf@redhat.com>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  tests/qemu-iotests/iotests.py | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>  tests/qemu-iotests/iotests.py | 8 ++++++--
+>>  1 file changed, 6 insertions(+), 2 deletions(-)
 >>
 >> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
 s.py
->> index 2f53baf633..726f904f50 100644
+>> index 726f904f50..8f315538e9 100644
 >> --- a/tests/qemu-iotests/iotests.py
 >> +++ b/tests/qemu-iotests/iotests.py
->> @@ -896,7 +896,7 @@ def skip_if_unsupported(required_formats=3D[], rea=
-d_only=3DFalse):
->>              usf_list =3D list(set(required_formats) -
->>                              set(supported_formats(read_only)))
+>> @@ -893,8 +893,12 @@ def skip_if_unsupported(required_formats=3D[], re=
+ad_only=3DFalse):
+>>         Runs the test if all the required formats are whitelisted'''
+>>      def skip_test_decorator(func):
+>>          def func_wrapper(*args, **kwargs):
+>> -            usf_list =3D list(set(required_formats) -
+>> -                            set(supported_formats(read_only)))
+>> +            if callable(required_formats):
+>> +                fmts =3D required_formats(args[0])
+>> +            else:
+>> +                fmts =3D required_formats
+>> +
+>> +            usf_list =3D list(set(fmts) - set(supported_formats(read_=
+only)))
 >>              if usf_list:
->> -                case_notrun('{}: formats {} are not whitelisted'.form=
-at(
->> +                args[0].case_skip('{}: formats {} are not whitelisted=
+>>                  args[0].case_skip('{}: formats {} are not whitelisted=
 '.format(
 >>                      args[0], usf_list))
->>              else:
->>                  return func(*args, **kwargs)
 >>
 >=20
-> Should we promote args[0] to a named argument here, because we depend o=
-n
-> it having a specific type? It's not truly as polymorphic as we're makin=
-g
-> it appear.
->=20
-> That type here is iotests.QMPTestCase because we're relying on case_ski=
-p
-> being present.
->=20
-> def test_wrapper(test_case, *args, **kwargs):
->     ...
->         return func(test_case, *args, **kwargs)
+> I am required to inform you that this is in direct violation of the
+> pythonista treaty of 2007; which mandates that you try to call and fail=
 
-That sounds good to me indeed.
+> instead of attempting to gracefully check ahead of time.
+>=20
+> Luckily, I am not fond of such rules.
 
-(I didn=E2=80=99t feel too bad about it because we already use args[0] fo=
-r the
-skip reason, but it really should be named, yes.)
+:-)
+
+I blame Kevin=E2=80=99s proposal.  (We should always have someone on PTO =
+to
+blame for everything.)
+
+
+Thanks for reviewing.
 
 Max
 
 
---5N4XGbrBQtqmiKeV3kdGFZZWmak03EUwj--
+--J50EFjFxeHbDdeyXEjLBkjugSJNwAAahy--
 
---F4fAtdDvkOXxOYpAMDdxDbiSgo0TSeKmn
+--iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1dIfwACgkQ9AfbAGHV
-z0AnzQgAnb03N1CNxvmZgSaVeCPOgGxzZ+LS99NbTPRw19zxfnQGFocU7487N4Wp
-6RqqHZ9hAr2dBEsLWX6G9BGGLWLBoR9gihyzCGrWxiIocn9Btv8qgR6+XKAmLjwL
-sHFh0UXFWiuvyjkiGZfxIBQmItUxP6rdLKXrtFaKotGNIZPzfoNXNTQCF1iU4Xch
-U7kpsNzgSVejEfyhcKiWPAXTnrTKnfKMo+kMvqn9axLAkfQm2PS5ru7k/JESSPZH
-1SBqlp02DLce01XKgbnPdDP8Qsy9CL4WgRlJHrM1P2LGvQ68gXR3daoXqGjMAWTE
-XkECgWii9S2zAZQrJzq+LoY1MZNFHA==
-=In59
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1dItkACgkQ9AfbAGHV
+z0AKeAgAs8RX7kRD9mlLTBE4Yr0MIcpEUZrBcKpYOLvZOxWkqooCUWOTO2g8PQU9
+vpXThRRy4KA1k54j82EqkTMlUe+DGEQR/wXh1C5XS7A/7/faog/rcCP/G/WifcGG
+7VFhq24ku8xNYsG/AKxd1cPY6VfNB14UIF3ihsK0biXBCh3opDOfk5b93oTE7pDD
+42U/of9ggWk8n9dhEpeKgUlWIx1VjDLDLvB7XBUo3mHTlir14wHvUvaEsnKiwTnX
+rl1JfgLac52FJjI5wpyqFPoDplx/rw7+9+ORFUDBur+DBaiwJ6sczP1AzAENCan0
+axOKR+9yzkH+eXnOMNgN8uUGn5+hLA==
+=IkhH
 -----END PGP SIGNATURE-----
 
---F4fAtdDvkOXxOYpAMDdxDbiSgo0TSeKmn--
+--iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704--
 
