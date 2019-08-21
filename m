@@ -1,62 +1,66 @@
-Return-Path: <SRS0=VgPO=WQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82469C3A589
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 23:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0A4C3A589
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 00:11:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5880C206B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Aug 2019 23:57:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5880C206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B55B2087E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 00:11:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B55B2087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0E0N-0000Uo-He
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 19:57:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48800)
+	id 1i0EE9-00067k-PM
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 20:11:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51710)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i0Dvu-0002az-Pu
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 19:53:00 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i0EDM-0005bL-8N
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 20:11:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i0Dvs-00058s-QU
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 19:52:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47510)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i0Dvn-00051k-Dr; Tue, 20 Aug 2019 19:52:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C01BC8980E3;
- Tue, 20 Aug 2019 23:52:50 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1959757990;
- Tue, 20 Aug 2019 23:52:50 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Tue, 20 Aug 2019 19:52:43 -0400
-Message-Id: <20190820235243.26092-5-jsnow@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1i0EDK-0008Lr-Cm
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 20:11:00 -0400
+Resent-Date: Tue, 20 Aug 2019 20:11:00 -0400
+Resent-Message-Id: <E1i0EDK-0008Lr-Cm@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21437)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i0EDC-0008HC-LI; Tue, 20 Aug 2019 20:10:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1566346234; cv=none; d=zoho.com; s=zohoarc; 
+ b=INvRJogmn/v0vKZLRt+h0XoFE7IbvCxuLsrYbBeLMm6QElVvUZc+C5nA7oHkraHLvYcNkpTxuWDPq6Hlc4SIj4dS41yyod8DYRsEUJgBam+QWeBNSpDHI4zqCVnmoYlyhwYXve/99lIBO8aGDcyRY03ehp0bL1CxOiECbaNuWXU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1566346234;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=8A1z2w3ZRc/emILTU4RZIpUHa8jTXbKtjWgO1Rq5i4Q=; 
+ b=do5yJ4Lxalaix3RyjdStHd4uAU6+bQmidOhgr6M4b9VvsNk5waDZ6gE2SsMeYMK05Gtw8muLdUwmOesJRpgGS35rHYiONSemg8WyoOavcTOoOqHOARNkRuSWphrjXOgEdzoT5lzhbpbolcDJ44D8V0B50cNOcVrKoqWbUD0qnU0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1566346232626838.0057600773463;
+ Tue, 20 Aug 2019 17:10:32 -0700 (PDT)
 In-Reply-To: <20190820235243.26092-1-jsnow@redhat.com>
-References: <20190820235243.26092-1-jsnow@redhat.com>
+Message-ID: <156634623142.13663.3643515445255180825@5dec9699b7de>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 20 Aug 2019 23:52:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jsnow@redhat.com
+Date: Tue, 20 Aug 2019 17:10:32 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 4/4] iotests: use python logging for
- iotests.log()
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] iotests: use python logging
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,239 +72,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- ehabkost@redhat.com, Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can turn logging on/off globally instead of per-function.
-
-Remove use_log from run_job, and use python logging to turn on
-diffable output when we run through a script entry point.
-
-iotest 245 changes output order due to buffering reasons.
----
- tests/qemu-iotests/030        |  4 +--
- tests/qemu-iotests/245        |  1 +
- tests/qemu-iotests/245.out    | 24 +++++++++---------
- tests/qemu-iotests/iotests.py | 47 +++++++++++++++++++++--------------
- 4 files changed, 43 insertions(+), 33 deletions(-)
-
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 1b69f318c6..a382cb430b 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -411,8 +411,8 @@ class TestParallelOps(iotests.QMPTestCase):
-         result =3D self.vm.qmp('block-job-set-speed', device=3D'drive0',=
- speed=3D0)
-         self.assert_qmp(result, 'return', {})
-=20
--        self.vm.run_job(job=3D'drive0', auto_dismiss=3DTrue, use_log=3DF=
-alse)
--        self.vm.run_job(job=3D'node4', auto_dismiss=3DTrue, use_log=3DFa=
-lse)
-+        self.vm.run_job(job=3D'drive0', auto_dismiss=3DTrue)
-+        self.vm.run_job(job=3D'node4', auto_dismiss=3DTrue)
-         self.assert_no_active_block_jobs()
-=20
-     # Test a block-stream and a block-commit job in parallel
-diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-index bc1ceb9792..3bc29acb33 100644
---- a/tests/qemu-iotests/245
-+++ b/tests/qemu-iotests/245
-@@ -1000,4 +1000,5 @@ class TestBlockdevReopen(iotests.QMPTestCase):
-         self.reopen(opts, {'backing': 'hd2'})
-=20
- if __name__ =3D=3D '__main__':
-+    iotests.activate_logging()
-     iotests.main(supported_fmts=3D["qcow2"])
-diff --git a/tests/qemu-iotests/245.out b/tests/qemu-iotests/245.out
-index a19de5214d..15c3630e92 100644
---- a/tests/qemu-iotests/245.out
-+++ b/tests/qemu-iotests/245.out
-@@ -1,17 +1,17 @@
-+{"execute": "job-finalize", "arguments": {"id": "commit0"}}
-+{"return": {}}
-+{"data": {"id": "commit0", "type": "commit"}, "event": "BLOCK_JOB_PENDIN=
-G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"device": "commit0", "len": 3145728, "offset": 3145728, "speed=
-": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
-+{"execute": "job-finalize", "arguments": {"id": "stream0"}}
-+{"return": {}}
-+{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
-G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
-": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
-+{"execute": "job-finalize", "arguments": {"id": "stream0"}}
-+{"return": {}}
-+{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
-G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
-": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
- ..................
- ----------------------------------------------------------------------
- Ran 18 tests
-=20
- OK
--{"execute": "job-finalize", "arguments": {"id": "commit0"}}
--{"return": {}}
--{"data": {"id": "commit0", "type": "commit"}, "event": "BLOCK_JOB_PENDIN=
-G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
--{"data": {"device": "commit0", "len": 3145728, "offset": 3145728, "speed=
-": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
--{"execute": "job-finalize", "arguments": {"id": "stream0"}}
--{"return": {}}
--{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
-G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
--{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
-": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
--{"execute": "job-finalize", "arguments": {"id": "stream0"}}
--{"return": {}}
--{"data": {"id": "stream0", "type": "stream"}, "event": "BLOCK_JOB_PENDIN=
-G", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
--{"data": {"device": "stream0", "len": 3145728, "offset": 3145728, "speed=
-": 0, "type": "stream"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 661d7f93bf..b97cc2fab2 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -35,6 +35,13 @@ from collections import OrderedDict
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pyt=
-hon'))
- from qemu import qtest
-=20
-+# Use this logger for logging messages directly from the iotests module
-+logger =3D logging.getLogger(__name__)
-+logger.addHandler(logging.NullHandler())
-+
-+# Use this logger for messages that ought to be used for diff output.
-+test_logger =3D logging.getLogger('.'.join((__name__, 'iotest')))
-+test_logger.addHandler(logging.NullHandler())
-=20
- # This will not work if arguments contain spaces but is necessary if we
- # want to support the override options that ./check supports.
-@@ -343,10 +350,10 @@ def log(msg, filters=3D[], indent=3DNone):
-         separators =3D (', ', ': ') if indent is None else (',', ': ')
-         # Don't sort if it's already sorted
-         do_sort =3D not isinstance(msg, OrderedDict)
--        print(json.dumps(msg, sort_keys=3Ddo_sort,
--                         indent=3Dindent, separators=3Dseparators))
-+        test_logger.info(json.dumps(msg, sort_keys=3Ddo_sort,
-+                                    indent=3Dindent, separators=3Dsepara=
-tors))
-     else:
--        print(msg)
-+        test_logger.info(msg)
-=20
- class Timeout:
-     def __init__(self, seconds, errmsg =3D "Timeout"):
-@@ -559,7 +566,7 @@ class VM(qtest.QEMUQtestMachine):
-=20
-     # Returns None on success, and an error string on failure
-     def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFalse,
--                pre_finalize=3DNone, cancel=3DFalse, use_log=3DTrue, wai=
-t=3D60.0):
-+                pre_finalize=3DNone, cancel=3DFalse, wait=3D60.0):
-         """
-         run_job moves a job from creation through to dismissal.
-=20
-@@ -572,7 +579,6 @@ class VM(qtest.QEMUQtestMachine):
-                              invoked prior to issuing job-finalize, if a=
-ny.
-         :param cancel: Bool. When true, cancels the job after the pre_fi=
-nalize
-                        callback.
--        :param use_log: Bool. When false, does not log QMP messages.
-         :param wait: Float. Timeout value specifying how long to wait fo=
-r any
-                      event, in seconds. Defaults to 60.0.
-         """
-@@ -590,8 +596,7 @@ class VM(qtest.QEMUQtestMachine):
-         while True:
-             ev =3D filter_qmp_event(self.events_wait(events))
-             if ev['event'] !=3D 'JOB_STATUS_CHANGE':
--                if use_log:
--                    log(ev)
-+                log(ev)
-                 continue
-             status =3D ev['data']['status']
-             if status =3D=3D 'aborting':
-@@ -599,24 +604,16 @@ class VM(qtest.QEMUQtestMachine):
-                 for j in result['return']:
-                     if j['id'] =3D=3D job:
-                         error =3D j['error']
--                        if use_log:
--                            log('Job failed: %s' % (j['error']))
-+                        log('Job failed: %s' % (j['error']))
-             elif status =3D=3D 'pending' and not auto_finalize:
-                 if pre_finalize:
-                     pre_finalize()
--                if cancel and use_log:
-+                if cancel:
-                     self.qmp_log('job-cancel', id=3Djob)
--                elif cancel:
--                    self.qmp('job-cancel', id=3Djob)
--                elif use_log:
-+                else:
-                     self.qmp_log('job-finalize', id=3Djob)
--                else:
--                    self.qmp('job-finalize', id=3Djob)
-             elif status =3D=3D 'concluded' and not auto_dismiss:
--                if use_log:
--                    self.qmp_log('job-dismiss', id=3Djob)
--                else:
--                    self.qmp('job-dismiss', id=3Djob)
-+                self.qmp_log('job-dismiss', id=3Djob)
-             elif status =3D=3D 'null':
-                 return error
-=20
-@@ -949,6 +946,7 @@ def execute_setup_common(supported_fmts=3D[],
-     if debug:
-         sys.argv.remove('-d')
-     logging.basicConfig(level=3D(logging.DEBUG if debug else logging.WAR=
-N))
-+    logger.debug("iotests debugging messages active")
-=20
-     return debug
-=20
-@@ -961,14 +959,25 @@ def execute_test(test_function=3DNone, *args, **kwa=
-rgs):
-     else:
-         test_function()
-=20
-+def activate_logging():
-+    """Activate iotests.log() output to stdout for script-style tests.""=
-"
-+    handler =3D logging.StreamHandler(stream=3Dsys.stdout)
-+    formatter =3D logging.Formatter('%(message)s')
-+    handler.setFormatter(formatter)
-+    test_logger.addHandler(handler)
-+    test_logger.setLevel(logging.INFO)
-+    test_logger.propagate =3D False
-+
- # This is called from script-style iotests without a single point of ent=
-ry
- def script_initialize(*args, **kwargs):
-     """Initialize script-style tests without running any tests."""
-+    activate_logging()
-     execute_setup_common(*args, **kwargs)
-=20
- # This is called from script-style iotests with a single point of entry
- def script_main(test_function, *args, **kwargs):
-     """Run script-style tests outside of the unittest framework"""
-+    activate_logging()
-     execute_test(test_function, *args, **kwargs)
-=20
- # This is called from unittest style iotests
---=20
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgyMDIzNTI0My4yNjA5
+Mi0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAv
+NF0gaW90ZXN0czogdXNlIHB5dGhvbiBsb2dnaW5nCk1lc3NhZ2UtaWQ6IDIwMTkwODIwMjM1MjQz
+LjI2MDkyLTEtanNub3dAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
+RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
+ICAgICAgICAgcGF0Y2hldy8yMDE5MDgyMDIzNTI0My4yNjA5Mi0xLWpzbm93QHJlZGhhdC5jb20g
+LT4gcGF0Y2hldy8yMDE5MDgyMDIzNTI0My4yNjA5Mi0xLWpzbm93QHJlZGhhdC5jb20KU3VibW9k
+dWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQpIHJl
+Z2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8vZ2l0
+LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1vZHVs
+ZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11TWFj
+RHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnClN1
+Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0KSBy
+ZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9lZGsyJyAoaHR0
+cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2VkazIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
+L2VkazInClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lw
+eGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9v
+cGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUn
+IChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBm
+b3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1Ym1vZHVsZSAncm9tcy9vcGVuc2JpJyAoaHR0
+cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5zYmkuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL29wZW5zYmknClN1Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQvcWVtdS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9x
+ZW11LXBhbGNvZGUnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5v
+cmcvZ2l0L3NlYWJpb3MuZ2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpT
+dWJtb2R1bGUgJ3JvbXMvc2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3Nl
+YWJpb3MtaHBwYS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJwpT
+dWJtb2R1bGUgJ3JvbXMvc2dhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZ2FiaW9z
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJtb2R1bGUgJ3JvbXMv
+c2tpYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9za2lib290LmdpdCkgcmVnaXN0ZXJl
+ZCBmb3IgcGF0aCAncm9tcy9za2lib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAoaHR0cHM6
+Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMv
+dS1ib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0cHM6Ly9naXQucWVt
+dS5vcmcvZ2l0L3UtYm9vdC1zYW00NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMv
+dS1ib290LXNhbTQ2MGV4JwpTdWJtb2R1bGUgJ3NsaXJwJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
+Z2l0L2xpYnNsaXJwLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnc2xpcnAnClN1Ym1vZHVsZSAn
+dGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
+YmVya2VsZXktc29mdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9i
+ZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0Zmxv
+YXQtMycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9iZXJrZWxleS10ZXN0ZmxvYXQtMy5naXQp
+IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJwpTdWJt
+b2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9rZXljb2Rl
+bWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFwZGInCkNsb25pbmcg
+aW50byAnY2Fwc3RvbmUnLi4uClN1Ym1vZHVsZSBwYXRoICdjYXBzdG9uZSc6IGNoZWNrZWQgb3V0
+ICcyMmVhZDNlMGJmZGI4NzUxNjY1NjQ1MzMzNjE2MGUwYTM3YjA2NmJmJwpDbG9uaW5nIGludG8g
+J2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4OGYxODkwOWRiNzMx
+YTYyNzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5NTM2JwpDbG9uaW5nIGludG8gJ3JvbXMvUWVtdU1hY0Ry
+aXZlcnMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJzogY2hlY2tlZCBv
+dXQgJzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3YjllYTg2OWRmMWMyZDljOGUyNjYnCkNsb25pbmcgaW50
+byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9TTE9GJzogY2hlY2tlZCBvdXQg
+J2JhMWFiMzYwZWViZTYzMzhiYjhkN2Q4M2E5MjIwY2NmN2UyMTNhZjMnCkNsb25pbmcgaW50byAn
+cm9tcy9lZGsyJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyJzogY2hlY2tlZCBvdXQgJzIw
+ZDJlNWExMjVlMzRmYzg1MDEwMjY2MTNhNzE1NDliMmExYTNlNTQnClN1Ym1vZHVsZSAnU29mdEZs
+b2F0JyAoaHR0cHM6Ly9naXRodWIuY29tL3VjYi1iYXIvYmVya2VsZXktc29mdGZsb2F0LTMuZ2l0
+KSByZWdpc3RlcmVkIGZvciBwYXRoICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVy
+a2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExp
+Yi9vcGVuc3NsJyAoaHR0cHM6Ly9naXRodWIuY29tL29wZW5zc2wvb3BlbnNzbCkgcmVnaXN0ZXJl
+ZCBmb3IgcGF0aCAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJwpDbG9uaW5n
+IGludG8gJ0FybVBrZy9MaWJyYXJ5L0FybVNvZnRGbG9hdExpYi9iZXJrZWxleS1zb2Z0ZmxvYXQt
+MycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9Bcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0Rmxv
+YXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMzMjc2Zjk3
+ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICdDcnlwdG9Qa2cvTGlicmFy
+eS9PcGVuc3NsTGliL29wZW5zc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRv
+UGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJzogY2hlY2tlZCBvdXQgJzUwZWFhYzlmMzMz
+NzY2NzI1OWRlNzI1NDUxZjIwMWU3ODQ1OTk2ODcnClN1Ym1vZHVsZSAnYm9yaW5nc3NsJyAoaHR0
+cHM6Ly9ib3Jpbmdzc2wuZ29vZ2xlc291cmNlLmNvbS9ib3Jpbmdzc2wpIHJlZ2lzdGVyZWQgZm9y
+IHBhdGggJ2JvcmluZ3NzbCcKU3VibW9kdWxlICdrcmI1JyAoaHR0cHM6Ly9naXRodWIuY29tL2ty
+YjUva3JiNSkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAna3JiNScKU3VibW9kdWxlICdweWNhLmNyeXB0
+b2dyYXBoeScgKGh0dHBzOi8vZ2l0aHViLmNvbS9weWNhL2NyeXB0b2dyYXBoeS5naXQpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ3B5Y2EtY3J5cHRvZ3JhcGh5JwpDbG9uaW5nIGludG8gJ2JvcmluZ3Nz
+bCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3Ns
+TGliL29wZW5zc2wvYm9yaW5nc3NsJzogY2hlY2tlZCBvdXQgJzIwNzBmOGFkOTE1MWRjOGYzYTcz
+YmZmYWExNDZiNWU2OTM3YTU4M2YnCkNsb25pbmcgaW50byAna3JiNScuLi4KU3VibW9kdWxlIHBh
+dGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wva3JiNSc6
+IGNoZWNrZWQgb3V0ICdiOWFkNmM0OTUwNWM5NmEwODgzMjZiNjJhNTI1NjhlMzQ4NGYyMTY4JwpD
+bG9uaW5nIGludG8gJ3B5Y2EtY3J5cHRvZ3JhcGh5Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9l
+ZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbC9weWNhLWNyeXB0b2dyYXBo
+eSc6IGNoZWNrZWQgb3V0ICcwOTQwMzEwMGRlMmY2ZjFjZGQwZDQ4NGRjYjhlNjIwZjFjMzM1Yzhm
+JwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvaXB4ZSc6
+IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2VlOTAxYmI2ZTE3JwpD
+bG9uaW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5i
+aW9zJzogY2hlY2tlZCBvdXQgJ2M3OWUwZWNiODRmNGYxZWUzZjczZjUyMTYyMmUyNjRlZGQxYmYx
+NzQnCkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1vZHVsZSBwYXRoICdy
+b21zL29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1ZTQ1ZWYxZjY3OTc4
+ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbnNiaScuLi4KU3VibW9kdWxl
+IHBhdGggJ3JvbXMvb3BlbnNiaSc6IGNoZWNrZWQgb3V0ICdjZTIyOGVlMDkxOWRlYjk5NTcxOTJk
+NzIzZWVjYzhhYWFlMjY5N2M2JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1wYWxjb2RlJy4uLgpT
+dWJtb2R1bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91dCAnYmYwZTEzNjk4
+ODcyNDUwMTY0ZmE3MDQwZGEzNmE5NWQyZDRiMzI2ZicKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJp
+b3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2VkIG91dCAnYTVjYWI1
+OGU5YTNmYjZlMTY4YWJhOTE5YzU2NjliZWE0MDY1NzNiNCcKQ2xvbmluZyBpbnRvICdyb21zL3Nl
+YWJpb3MtaHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJzogY2hlY2tl
+ZCBvdXQgJzBmNGZlODQ2NTgxNjVlOTZjZTM1ODcwZmQxOWZjNjM0ZTE4MmU3N2InCkNsb25pbmcg
+aW50byAncm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZ2FiaW9zJzogY2hl
+Y2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFjOTAxNWEnCkNsb25p
+bmcgaW50byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9za2lib290Jzog
+Y2hlY2tlZCBvdXQgJzI2MWNhOGU3NzllNTEzODg2OWE0NWYxNzRjYWE0OWJlNmEyNzQ1MDEnCkNs
+b25pbmcgaW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdCc6
+IGNoZWNrZWQgb3V0ICdkMzY4OTI2N2Y5MmM1OTU2ZTA5Y2M3ZDFiYWE0NzAwMTQxNjYyYmZmJwpD
+bG9uaW5nIGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9t
+cy91LWJvb3Qtc2FtNDYwZXgnOiBjaGVja2VkIG91dCAnNjBiMzkxNmYzM2U2MTdhODE1OTczYzVh
+NmRmNzcwNTViMmUzYTU4OCcKQ2xvbmluZyBpbnRvICdzbGlycCcuLi4KU3VibW9kdWxlIHBhdGgg
+J3NsaXJwJzogY2hlY2tlZCBvdXQgJzEyNmMwNGFjYmFiZDdhZDMyYzJiMDE4ZmUxMGRmYWMyYTNi
+YzEyMTAnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1
+Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0
+ICdiNjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8g
+J3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMv
+ZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMyNzM5NmEw
+MTFhMTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFwZGInLi4u
+ClN1Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUy
+YjY0NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0Jwo0MzEzZmVkIGlvdGVzdHM6IHVzZSBweXRob24gbG9nZ2luZyBmb3IgaW90ZXN0cy5s
+b2coKQo5MzFjMDQ4IGlvdGVzdHM6IGFkZCBwcm90b2NvbCBzdXBwb3J0IHRvIGluaXRpYWxpemF0
+aW9uIGluZm8KMGFiNWI5YyBpb3Rlc3QgMjU4OiB1c2Ugc2NyaXB0X21haW4KZDc0ZGM1MiBpb3Rl
+c3RzOiBhZGQgc2NyaXB0X2luaXRpYWxpemUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNCBDaGVj
+a2luZyBjb21taXQgZDc0ZGM1MmM3NDY1IChpb3Rlc3RzOiBhZGQgc2NyaXB0X2luaXRpYWxpemUp
+CkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgMzU2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvNCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKMi80IENoZWNraW5nIGNvbW1pdCAwYWI1YjljZWE1MmIgKGlvdGVzdCAyNTg6
+IHVzZSBzY3JpcHRfbWFpbikKRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoK
+dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzQg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMvNCBDaGVja2luZyBjb21taXQgOTMxYzA0ODVj
+MzZmIChpb3Rlc3RzOiBhZGQgcHJvdG9jb2wgc3VwcG9ydCB0byBpbml0aWFsaXphdGlvbiBpbmZv
+KQpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMs
+IDAgd2FybmluZ3MsIDY3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvNCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKNC80IENoZWNraW5nIGNvbW1pdCA0MzEzZmVkOWQ0ZDAgKGlvdGVzdHM6IHVz
+ZSBweXRob24gbG9nZ2luZyBmb3IgaW90ZXN0cy5sb2coKSkKRVJST1I6IE1pc3NpbmcgU2lnbmVk
+LW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNDEgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggNC80IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDgyMDIzNTI0My4y
+NjA5Mi0xLWpzbm93QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
 
 
