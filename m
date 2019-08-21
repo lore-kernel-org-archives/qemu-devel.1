@@ -2,87 +2,90 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8D2C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:33:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD1AC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:34:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38EBE233A0
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:33:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWkpW2ic"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38EBE233A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D4F5216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:34:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D4F5216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0VQN-00052H-23
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:33:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41373)
+	id 1i0VR9-0006Qs-3L
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:34:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1i0URo-0001hM-EZ
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:02 -0400
+ (envelope-from <eblake@redhat.com>) id 1i0UWE-0007bT-6p
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:35:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1i0URm-0008Kt-FT
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:00 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:41466)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0URi-00089u-Ln
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:30:56 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id 1so900811ybj.8
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 10:30:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=dCAnUoqj/GPXx5JdXdQFBAGk0+RtvAipvhXnYHQQRl4=;
- b=SWkpW2icRFz7+dNEJdXFlfXKqIGZrcuzQwjkwKIa8WKbxf4XZVwab5qb1LDcKbY/Lm
- 1Xm43uMtdNrlrN6pQaSvI3dZqZ+dJyYYELViinVi2TC8WRlKbec1PhO3gDaBkWDbgnuM
- kU6iucTKbcyPAHIYqNV6IYFntt2NYT/Yy4a6DqwS2ltWCXQfIyXPs+doRTA6BfEuUFqs
- J1zf1lCkOPv65ZTTs0Sch38aH2VrnCZh35X4pu2c/6v6PspD2uNvaRcNXieizZZpjBjj
- jUqaEjsAVV3hxbPVmWo+xa9BK6AosulL+4HRB/VuM0WIyoE+kEam/LqT0Fgs8aIqO0Hr
- pssQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=dCAnUoqj/GPXx5JdXdQFBAGk0+RtvAipvhXnYHQQRl4=;
- b=pABp/tROvSHqVblQaRAd1MbQc2+16AibMJIDgawz+C7/AbpWGnq5r9JxltLoWPZPag
- jMSUPuOfm7m+2dtZ2O1uj46X2dzkF6a5zSkCFcQlprXy59KiPpTLYYvnxzxSUxU+jjRs
- fT69Kq2S5K8ZF1GE+wdFuoI3YMvY8UU8Bwci1hYqUFwpnw1N3Ul/nSydMmiSNbcrdYfa
- epx+FTBcnTPLmriDvlIVxlgRBIvnrM/F9w7txnQ5kNb4dzxqaOIOg1XVZ/UTSRIqX9nM
- MpR+gSGC6/Zb/X8/dKZf8fG4kCeWIJDKsPHnkyjGh8GtTsJKnMvLiaFSXpxOvvzDxvGc
- ChHw==
-X-Gm-Message-State: APjAAAUjHCcFyxpsCO9GScWVf8jFQdqMC+u8lnXA3HEOR9v7x5nJeAKO
- qlZ/cllr5gwzAQltl4WsqiMRFamk
-X-Google-Smtp-Source: APXvYqyERs28C54jUGP5C1van7eu0zSY3AElYkO2Bo09G3rdSJFRO1+uYp4f4vjTXTij5dAm2ajaOA==
-X-Received: by 2002:a25:42cb:: with SMTP id
- p194mr22462857yba.334.1566408652465; 
- Wed, 21 Aug 2019 10:30:52 -0700 (PDT)
-Received: from localhost.localdomain ([2601:c0:c67f:e390::3])
- by smtp.gmail.com with ESMTPSA id l71sm2826167ywl.39.2019.08.21.10.30.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Aug 2019 10:30:51 -0700 (PDT)
-From: Jan Bobek <jan.bobek@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 21 Aug 2019 13:29:31 -0400
-Message-Id: <20190821172951.15333-56-jan.bobek@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190821172951.15333-1-jan.bobek@gmail.com>
-References: <20190821172951.15333-1-jan.bobek@gmail.com>
+ (envelope-from <eblake@redhat.com>) id 1i0UWC-0006UQ-7U
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:35:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43424)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i0UW8-0006ML-DI; Wed, 21 Aug 2019 13:35:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AA66C307D90D;
+ Wed, 21 Aug 2019 17:35:27 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E20C60F88;
+ Wed, 21 Aug 2019 17:35:24 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190821165215.61406-1-vsementsov@virtuozzo.com>
+ <20190821165215.61406-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <4f7cce1f-d7a8-aa3f-01d0-15c28c97b6dd@redhat.com>
+Date: Wed, 21 Aug 2019 12:35:23 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::b41
-Subject: [Qemu-devel] [RFC PATCH v4 55/75] target/i386: introduce SSE4.2
- vector instructions to sse-opcode.inc.h
+In-Reply-To: <20190821165215.61406-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 21 Aug 2019 17:35:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v8 2/3] block/nbd: nbd reconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,52 +97,324 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Bobek <jan.bobek@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: fam@euphon.net, kwolf@redhat.com, sheepdog@lists.wpkg.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
+ namei.unix@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add all the SSE4.2 vector instruction entries to sse-opcode.inc.h.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI
+Content-Type: multipart/mixed; boundary="ok6G0SI9tkw42d5zME29YOPthXlg0drQL";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, sheepdog@lists.wpkg.org, stefanha@redhat.com,
+ namei.unix@gmail.com, fam@euphon.net, mreitz@redhat.com, kwolf@redhat.com,
+ den@openvz.org
+Message-ID: <4f7cce1f-d7a8-aa3f-01d0-15c28c97b6dd@redhat.com>
+Subject: Re: [PATCH v8 2/3] block/nbd: nbd reconnect
+References: <20190821165215.61406-1-vsementsov@virtuozzo.com>
+ <20190821165215.61406-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190821165215.61406-3-vsementsov@virtuozzo.com>
 
-Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
----
- target/i386/sse-opcode.inc.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+--ok6G0SI9tkw42d5zME29YOPthXlg0drQL
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/i386/sse-opcode.inc.h b/target/i386/sse-opcode.inc.h
-index 9682cce7ef..f43436213e 100644
---- a/target/i386/sse-opcode.inc.h
-+++ b/target/i386/sse-opcode.inc.h
-@@ -441,6 +441,14 @@
-  * 66 0f 38 34 /r          PMOVZXWQ xmm1, xmm2/m32
-  * 66 0f 38 35 /r          PMOVZXDQ xmm1, xmm2/m64
-  * 66 0F 38 2A /r          MOVNTDQA xmm1, m128
-+ *
-+ * SSE4.2 Instructions
-+ * --------------------
-+ * 66 0F 38 37 /r          PCMPGTQ xmm1,xmm2/m128
-+ * 66 0F 3A 60 /r imm8     PCMPESTRM xmm1, xmm2/m128, imm8
-+ * 66 0F 3A 61 /r imm8     PCMPESTRI xmm1, xmm2/m128, imm8
-+ * 66 0F 3A 62 /r imm8     PCMPISTRM xmm1, xmm2/m128, imm8
-+ * 66 0F 3A 63 /r imm8     PCMPISTRI xmm1, xmm2/m128, imm8
-  */
- 
- OPCODE(movd, LEG(NP, 0F, 0, 0x6e), MMX, WR, Pq, Ed)
-@@ -646,6 +654,11 @@ OPCODE(pcmpgtw, LEG(NP, 0F, 0, 0x65), MMX, WRR, Pq, Pq, Qq)
- OPCODE(pcmpgtw, LEG(66, 0F, 0, 0x65), SSE2, WRR, Vdq, Vdq, Wdq)
- OPCODE(pcmpgtd, LEG(NP, 0F, 0, 0x66), MMX, WRR, Pq, Pq, Qq)
- OPCODE(pcmpgtd, LEG(66, 0F, 0, 0x66), SSE2, WRR, Vdq, Vdq, Wdq)
-+OPCODE(pcmpgtq, LEG(66, 0F38, 0, 0x37), SSE4_2, WRR, Vdq, Vdq, Wdq)
-+OPCODE(pcmpestrm, LEG(66, 0F3A, 0, 0x60), SSE4_2, RRR, Vdq, Wdq, Ib)
-+OPCODE(pcmpestri, LEG(66, 0F3A, 0, 0x61), SSE4_2, RRR, Vdq, Wdq, Ib)
-+OPCODE(pcmpistrm, LEG(66, 0F3A, 0, 0x62), SSE4_2, RRR, Vdq, Wdq, Ib)
-+OPCODE(pcmpistri, LEG(66, 0F3A, 0, 0x63), SSE4_2, RRR, Vdq, Wdq, Ib)
- OPCODE(ptest, LEG(66, 0F38, 0, 0x17), SSE4_1, RR, Vdq, Wdq)
- OPCODE(cmpps, LEG(NP, 0F, 0, 0xc2), SSE, WRRR, Vdq, Vdq, Wdq, Ib)
- OPCODE(cmppd, LEG(66, 0F, 0, 0xc2), SSE2, WRRR, Vdq, Vdq, Wdq, Ib)
--- 
-2.20.1
+On 8/21/19 11:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Implement reconnect. To achieve this:
+>=20
+> 1. add new modes:
+>    connecting-wait: means, that reconnecting is in progress, and there
+>      were small number of reconnect attempts, so all requests are
+>      waiting for the connection.
+>    connecting-nowait: reconnecting is in progress, there were a lot of
+>      attempts of reconnect, all requests will return errors.
+>=20
+>    two old modes are used too:
+>    connected: normal state
+>    quit: exiting after fatal error or on close
+>=20
+> Possible transitions are:
+>=20
+>    * -> quit
+>    connecting-* -> connected
+>    connecting-wait -> connecting-nowait (transition is done after
+>                       reconnect-delay seconds in connecting-wait mode)
+>    connected -> connecting-wait
+>=20
+> 2. Implement reconnect in connection_co. So, in connecting-* mode,
+>     connection_co, tries to reconnect unlimited times.
+>=20
+> 3. Retry nbd queries on channel error, if we are in connecting-wait
+>     state.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
+> +static bool nbd_client_connecting(BDRVNBDState *s)
+> +{
+> +    return s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT ||
+> +            s->state =3D=3D NBD_CLIENT_CONNECTING_NOWAIT;
+
+
+Indentation looks unusual. I might have done:
+
+    return (s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT ||
+            s->state =3D=3D NBD_CLIENT_CONNECTING_NOWAIT);
+
+Or even exploit the enum encoding:
+
+    return s->state <=3D NBD_CLIENT_CONNECTING_NOWAIT
+
+Is s->state updated atomically, or do we risk the case where we might
+see two different values of s->state across the || sequence point?  Does
+that matter?
+
+> +}
+> +
+> +static bool nbd_client_connecting_wait(BDRVNBDState *s)
+> +{
+> +    return s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT;
+> +}
+> +
+> +static coroutine_fn void nbd_reconnect_attempt(BDRVNBDState *s)
+> +{
+> +    Error *local_err =3D NULL;
+> +
+> +    if (!nbd_client_connecting(s)) {
+> +        return;
+> +    }
+> +    assert(nbd_client_connecting(s));
+
+This assert adds nothing given the condition beforehand.
+
+> +
+> +    /* Wait for completion of all in-flight requests */
+> +
+> +    qemu_co_mutex_lock(&s->send_mutex);
+> +
+> +    while (s->in_flight > 0) {
+> +        qemu_co_mutex_unlock(&s->send_mutex);
+> +        nbd_recv_coroutines_wake_all(s);
+> +        s->wait_in_flight =3D true;
+> +        qemu_coroutine_yield();
+> +        s->wait_in_flight =3D false;
+> +        qemu_co_mutex_lock(&s->send_mutex);
+> +    }
+> +
+> +    qemu_co_mutex_unlock(&s->send_mutex);
+> +
+> +    if (!nbd_client_connecting(s)) {
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * Now we are sure that nobody is accessing the channel, and no on=
+e will
+> +     * try until we set the state to CONNECTED.
+> +     */
+> +
+> +    /* Finalize previous connection if any */
+> +    if (s->ioc) {
+> +        nbd_client_detach_aio_context(s->bs);
+> +        object_unref(OBJECT(s->sioc));
+> +        s->sioc =3D NULL;
+> +        object_unref(OBJECT(s->ioc));
+> +        s->ioc =3D NULL;
+> +    }
+> +
+> +    s->connect_status =3D nbd_client_connect(s->bs, &local_err);
+> +    error_free(s->connect_err);
+> +    s->connect_err =3D NULL;
+> +    error_propagate(&s->connect_err, local_err);
+> +    local_err =3D NULL;
+> +
+> +    if (s->connect_status < 0) {
+> +        /* failed attempt */
+> +        return;
+> +    }
+> +
+> +    /* successfully connected */
+> +    s->state =3D NBD_CLIENT_CONNECTED;
+> +    qemu_co_queue_restart_all(&s->free_sema);
+> +}
+> +
+> +static coroutine_fn void nbd_reconnect_loop(BDRVNBDState *s)
+> +{
+> +    uint64_t start_time_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);=
+
+> +    uint64_t delay_ns =3D s->reconnect_delay * NANOSECONDS_PER_SECOND;=
+
+> +    uint64_t timeout =3D 1 * NANOSECONDS_PER_SECOND;
+> +    uint64_t max_timeout =3D 16 * NANOSECONDS_PER_SECOND;
+> +
+> +    nbd_reconnect_attempt(s);
+> +
+> +    while (nbd_client_connecting(s)) {
+> +        if (s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT &&
+> +            qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time_ns > d=
+elay_ns)
+> +        {
+> +            s->state =3D NBD_CLIENT_CONNECTING_NOWAIT;
+> +            qemu_co_queue_restart_all(&s->free_sema);
+> +        }
+> +
+> +        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, timeout,
+> +                         &s->connection_co_sleep_ns_state);
+> +        if (s->drained) {
+> +            bdrv_dec_in_flight(s->bs);
+> +            s->wait_drained_end =3D true;
+> +            while (s->drained) {
+> +                /*
+> +                 * We may be entered once from nbd_client_attach_aio_c=
+ontext_bh
+> +                 * and then from nbd_client_co_drain_end. So here is a=
+ loop.
+> +                 */
+> +                qemu_coroutine_yield();
+> +            }
+> +            bdrv_inc_in_flight(s->bs);
+> +        }
+> +        if (timeout < max_timeout) {
+> +            timeout *=3D 2;
+> +        }
+> +
+> +        nbd_reconnect_attempt(s);
+> +    }
+>  }
+> =20
+>  static coroutine_fn void nbd_connection_entry(void *opaque)
+>  {
+> -    BDRVNBDState *s =3D opaque;
+> +    BDRVNBDState *s =3D (BDRVNBDState *)opaque;
+
+The cast is not necessary.
+
+>      uint64_t i;
+>      int ret =3D 0;
+>      Error *local_err =3D NULL;
+> @@ -177,16 +331,26 @@ static coroutine_fn void nbd_connection_entry(voi=
+d *opaque)
+>           * Therefore we keep an additional in_flight reference all the=
+ time and
+>           * only drop it temporarily here.
+>           */
+> +
+> +        if (nbd_client_connecting(s)) {
+> +            nbd_reconnect_loop(s);
+> +        }
+> +
+> +        if (s->state !=3D NBD_CLIENT_CONNECTED) {
+> +            continue;
+> +        }
+> +
+>          assert(s->reply.handle =3D=3D 0);
+>          ret =3D nbd_receive_reply(s->bs, s->ioc, &s->reply, &local_err=
+);
+> =20
+>          if (local_err) {
+>              trace_nbd_read_reply_entry_fail(ret, error_get_pretty(loca=
+l_err));
+>              error_free(local_err);
+> +            local_err =3D NULL;
+>          }
+>          if (ret <=3D 0) {
+>              nbd_channel_error(s, ret ? ret : -EIO);
+> -            break;
+> +            continue;
+>          }
+> =20
+>          /*
+> @@ -201,7 +365,7 @@ static coroutine_fn void nbd_connection_entry(void =
+*opaque)
+>              (nbd_reply_is_structured(&s->reply) && !s->info.structured=
+_reply))
+>          {
+>              nbd_channel_error(s, -EINVAL);
+> -            break;
+> +            continue;
+>          }
+> =20
+
+The commit message says you re-attempt the request after reconnection if
+you have not yet timed out from the previous connection; but do you also
+need to clear out any partial reply received to make sure the new
+request isn't operating on stale assumptions left over if the server
+died between two structured chunks?
+
+
+> @@ -927,20 +1113,26 @@ static int nbd_co_request(BlockDriverState *bs, =
+NBDRequest *request,
+>      } else {
+>          assert(request->type !=3D NBD_CMD_WRITE);
+>      }
+> -    ret =3D nbd_co_send_request(bs, request, write_qiov);
+> -    if (ret < 0) {
+> -        return ret;
+> -    }
+> =20
+> -    ret =3D nbd_co_receive_return_code(s, request->handle,
+> -                                     &request_ret, &local_err);
+> -    if (local_err) {
+> -        trace_nbd_co_request_fail(request->from, request->len, request=
+->handle,
+> -                                  request->flags, request->type,
+> -                                  nbd_cmd_lookup(request->type),
+> -                                  ret, error_get_pretty(local_err));
+> -        error_free(local_err);
+> -    }
+> +    do {
+> +        ret =3D nbd_co_send_request(bs, request, write_qiov);
+> +        if (ret < 0) {
+> +            continue;
+> +        }
+> +
+> +        ret =3D nbd_co_receive_return_code(s, request->handle,
+> +                                         &request_ret, &local_err);
+> +        if (local_err) {
+> +            trace_nbd_co_request_fail(request->from, request->len,
+> +                                      request->handle, request->flags,=
+
+> +                                      request->type,
+> +                                      nbd_cmd_lookup(request->type),
+> +                                      ret, error_get_pretty(local_err)=
+);
+> +            error_free(local_err);
+> +            local_err =3D NULL;
+> +        }
+> +    } while (ret < 0 && nbd_client_connecting_wait(s));
+
+I ask because nothing seems to reset request_ret here in the new loop.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--ok6G0SI9tkw42d5zME29YOPthXlg0drQL--
+
+--cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1dgNsACgkQp6FrSiUn
+Q2qSIQf8D6H/po6NEe90rpy6RH8ypkZKiq5jq24WkUDXbZgAknuNmmIFBO6yKTmF
+ktvAW5065x2LkBQYD7CdWlY6mgoNHwR7W52K0aPNGrrkpHl1VKJ8+KH++eBnLmHv
+k8BmICw78PMswwhdmmxTzLWB4exRptpDw+aSupWuj+TcHpUWeY5d7bvfwe/pwJ7G
+xBCHUtW0zU8GdwyzAD1USudha8LF5lPhS7VAJvITJNynG6xf/dNG2fWJXA7vvFHo
+eqyI2e/ZpPwBiJraf1lrP7ux2/e3kWGXumXZqzfh/zpV4/Uiq19VTws+EW/WEu/H
+Gv7zECZfMQ/LXee6Ml6cdWeIhyVn1w==
+=j38a
+-----END PGP SIGNATURE-----
+
+--cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI--
 
