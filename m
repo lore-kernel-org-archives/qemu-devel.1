@@ -2,49 +2,49 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E30C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C231C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:56:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A97822CF4
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:55:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A97822CF4
+	by mail.kernel.org (Postfix) with ESMTPS id 302D922CF4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 10:56:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 302D922CF4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0OGr-0002yx-Qg
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 06:55:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49614)
+	id 1i0OI2-0004A8-DW
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 06:56:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49908)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i0OG2-0002UG-TW
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:54:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i0OHK-0003Ut-EA
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:55:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i0OG1-0007Rd-Vp
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:54:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60057)
+ (envelope-from <mreitz@redhat.com>) id 1i0OHJ-0007zz-FC
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 06:55:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47770)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i0OFz-0007Qk-Hv; Wed, 21 Aug 2019 06:54:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i0OHH-0007yd-4L; Wed, 21 Aug 2019 06:55:43 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 970423083363;
- Wed, 21 Aug 2019 10:54:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 77D9A3D94D;
+ Wed, 21 Aug 2019 10:55:42 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D7BAA2B9EC;
- Wed, 21 Aug 2019 10:54:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A68707987;
+ Wed, 21 Aug 2019 10:55:38 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-6-mreitz@redhat.com>
- <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
+ <20190819201851.24418-7-mreitz@redhat.com>
+ <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cf342a07-2077-4ff5-0a7d-6807dd29ae78@redhat.com>
-Date: Wed, 21 Aug 2019 12:54:17 +0200
+Message-ID: <a2c3afe8-beec-5e2e-7401-ad8955f61ae0@redhat.com>
+Date: Wed, 21 Aug 2019 12:55:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
+In-Reply-To: <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="o7no4F4OsF0L7mahxCNRo1VrmivC3YPqO"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 21 Aug 2019 10:54:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Wed, 21 Aug 2019 10:55:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 5/8] iotests: Let skip_if_unsupported()
- accept a method
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting
+ in 093
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,101 +105,92 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704
-Content-Type: multipart/mixed; boundary="J50EFjFxeHbDdeyXEjLBkjugSJNwAAahy";
+--o7no4F4OsF0L7mahxCNRo1VrmivC3YPqO
+Content-Type: multipart/mixed; boundary="CjapRK7pmlneNHoMNBMB32upCo6gbWvLb";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
  qemu-devel@nongnu.org
-Message-ID: <cf342a07-2077-4ff5-0a7d-6807dd29ae78@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/8] iotests: Let skip_if_unsupported()
- accept a method
+Message-ID: <a2c3afe8-beec-5e2e-7401-ad8955f61ae0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting in
+ 093
 References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-6-mreitz@redhat.com>
- <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
-In-Reply-To: <23c31011-70d4-11ab-b8b9-294fe47453da@redhat.com>
+ <20190819201851.24418-7-mreitz@redhat.com>
+ <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
+In-Reply-To: <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
 
---J50EFjFxeHbDdeyXEjLBkjugSJNwAAahy
+--CjapRK7pmlneNHoMNBMB32upCo6gbWvLb
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 20.08.19 23:31, John Snow wrote:
+On 20.08.19 23:32, John Snow wrote:
 >=20
 >=20
 > On 8/19/19 4:18 PM, Max Reitz wrote:
->> This lets tests use skip_if_unsupported() with a potentially variable
->> list of required formats.
+>> null-aio may not be whitelisted.  Skip all test cases that require it.=
+
 >>
->> Suggested-by: Kevin Wolf <kwolf@redhat.com>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  tests/qemu-iotests/iotests.py | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
+>>  tests/qemu-iotests/093 | 12 +++++++++---
+>>  1 file changed, 9 insertions(+), 3 deletions(-)
 >>
->> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
-s.py
->> index 726f904f50..8f315538e9 100644
->> --- a/tests/qemu-iotests/iotests.py
->> +++ b/tests/qemu-iotests/iotests.py
->> @@ -893,8 +893,12 @@ def skip_if_unsupported(required_formats=3D[], re=
-ad_only=3DFalse):
->>         Runs the test if all the required formats are whitelisted'''
->>      def skip_test_decorator(func):
->>          def func_wrapper(*args, **kwargs):
->> -            usf_list =3D list(set(required_formats) -
->> -                            set(supported_formats(read_only)))
->> +            if callable(required_formats):
->> +                fmts =3D required_formats(args[0])
->> +            else:
->> +                fmts =3D required_formats
+>> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+>> index 50c1e7f2ec..f03fa24a07 100755
+>> --- a/tests/qemu-iotests/093
+>> +++ b/tests/qemu-iotests/093
+>> @@ -24,7 +24,7 @@ import iotests
+>>  nsec_per_sec =3D 1000000000
+>> =20
+>>  class ThrottleTestCase(iotests.QMPTestCase):
+>> -    test_img =3D "null-aio://"
+>> +    test_driver =3D "null-aio"
+>>      max_drives =3D 3
+>> =20
+>>      def blockstats(self, device):
+>> @@ -35,10 +35,14 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>>                  return stat['rd_bytes'], stat['rd_operations'], stat[=
+'wr_bytes'], stat['wr_operations']
+>>          raise Exception("Device not found for blockstats: %s" % devic=
+e)
+>> =20
+>> +    def required_drivers(self):
+>> +        return [self.test_driver]
 >> +
->> +            usf_list =3D list(set(fmts) - set(supported_formats(read_=
-only)))
->>              if usf_list:
->>                  args[0].case_skip('{}: formats {} are not whitelisted=
-'.format(
->>                      args[0], usf_list))
->>
+>> +    @iotests.skip_if_unsupported(required_drivers)
 >=20
-> I am required to inform you that this is in direct violation of the
-> pythonista treaty of 2007; which mandates that you try to call and fail=
-
-> instead of attempting to gracefully check ahead of time.
+> Oh, I see why you're passing args[0] back to the callback now. Why not
+> just pass self.required_drivers and call it with no arguments instead?
 >=20
-> Luckily, I am not fond of such rules.
+> You can get a bound version that way that doesn't need additional
+> arguments, and then the callback is free to take generic callables of
+> any kind.
 
-:-)
-
-I blame Kevin=E2=80=99s proposal.  (We should always have someone on PTO =
-to
-blame for everything.)
-
-
-Thanks for reviewing.
+That would be nicer indeed.
 
 Max
 
 
---J50EFjFxeHbDdeyXEjLBkjugSJNwAAahy--
+--CjapRK7pmlneNHoMNBMB32upCo6gbWvLb--
 
---iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704
+--o7no4F4OsF0L7mahxCNRo1VrmivC3YPqO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1dItkACgkQ9AfbAGHV
-z0AKeAgAs8RX7kRD9mlLTBE4Yr0MIcpEUZrBcKpYOLvZOxWkqooCUWOTO2g8PQU9
-vpXThRRy4KA1k54j82EqkTMlUe+DGEQR/wXh1C5XS7A/7/faog/rcCP/G/WifcGG
-7VFhq24ku8xNYsG/AKxd1cPY6VfNB14UIF3ihsK0biXBCh3opDOfk5b93oTE7pDD
-42U/of9ggWk8n9dhEpeKgUlWIx1VjDLDLvB7XBUo3mHTlir14wHvUvaEsnKiwTnX
-rl1JfgLac52FJjI5wpyqFPoDplx/rw7+9+ORFUDBur+DBaiwJ6sczP1AzAENCan0
-axOKR+9yzkH+eXnOMNgN8uUGn5+hLA==
-=IkhH
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1dIykACgkQ9AfbAGHV
+z0AjXAf/WNXZTcpg71iXjEqdBj/X5ofZEALvFe608wFnSkMwS5qNPrQhVoqkpy3R
+r6S7NxfIQOUPBKB/ryZ7GBHp6bLxdr5PMJhs/bkZ1xuOo16iro26U/qUWRSx3l5V
+tY4WdJy6082H/Nv5WXTXVGjK4I9/PoSMDYduokBKsZX0RmDtrSirgiT0JjhbQIiT
+cFiOccgUPZegVoFxwAtZi886bb5vrrVTXqYE4XXl3VeLibi3rZnxEv4U65sChG0Q
+AmfHor/gfIH8P1Eu0sVtqVeJShi4KLTFAkVzCUVo0LrIVTaeN+5KRAAY5VmSyJ+z
+dliDipEOQVYT1dYyleiH34xKqTe7kw==
+=XFT3
 -----END PGP SIGNATURE-----
 
---iJeOHsF9E1Jn0LA9p11vnsc9qCDEJf704--
+--o7no4F4OsF0L7mahxCNRo1VrmivC3YPqO--
 
