@@ -2,65 +2,85 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F74DC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94070C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:52:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5053422CE3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:51:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5053422CE3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B85922CE3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:52:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="JWSZjV5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B85922CE3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Vhp-0007Hq-B8
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:51:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42263)
+	id 1i0Vio-0008IC-Im
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:52:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i0UUw-00063w-0F
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:34:15 -0400
+ (envelope-from <palmer@sifive.com>) id 1i0UY7-0002NI-Jg
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i0UUu-0004Pj-JR
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:34:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40344)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i0UUu-0004Og-Ba
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:34:12 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9833E7F762;
- Wed, 21 Aug 2019 17:34:11 +0000 (UTC)
-Received: from work-vm (ovpn-117-245.ams2.redhat.com [10.36.117.245])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B682410013A1;
- Wed, 21 Aug 2019 17:34:09 +0000 (UTC)
-Date: Wed, 21 Aug 2019 18:34:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Message-ID: <20190821173407.GK3309@work-vm>
-References: <20190815200815.2cffc21b@luklap> <20190815185737.GC2883@work-vm>
- <20190815214804.69e4334f@luklap>
- <9CFF81C0F6B98A43A459C9EDAD400D780621F1B6@shsmsx102.ccr.corp.intel.com>
- <20190816202007.5577756b@luklap>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190816202007.5577756b@luklap>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Wed, 21 Aug 2019 17:34:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
- replication
+ (envelope-from <palmer@sifive.com>) id 1i0UY6-0008KA-8F
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:37:31 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43429)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1i0UY5-0008JN-Ur
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:37:30 -0400
+Received: by mail-pg1-x541.google.com with SMTP id k3so1697965pgb.10
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 10:37:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ibQloZmh6YxJr73VWUAfF1EqB9nKWMbL7i3yL4R/AWU=;
+ b=JWSZjV5eAjjWtiQkC7s/tLEIQCdk4ix0cV37v1q7tYPil/geow3qER23Ma8H2iJPhH
+ SRyq+lsSaV51pZg8NGaA2Vy3QwE1FsZ+4XdUAxQW3hhbJTR2gql2IEzbLVbFRK6hFItT
+ zHnBlojdFbLp8lDlZFhxHmXkCozzSmM1I+AGVnZAnayZm1C59YCvq472re4TViUjzjtv
+ 5WeZeafnpsj9R3tYqIgYg0ThzekcD5DvFdmGleRY8jRZgZMN02eVldZ9vdviFqA8whf2
+ Rzkr/10bOu+RrTBPwh1g9tto72EAqFK0Im54mkVUsQzXpokifHCkmYSUJNji68HsLJAd
+ VJzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=ibQloZmh6YxJr73VWUAfF1EqB9nKWMbL7i3yL4R/AWU=;
+ b=F5gxLwZuyAphY3reclxGG7ZARp+Qr1KkQV1nAMRfTw6U3P8MmmmPq2XjDi6YJrxpaO
+ 8iFXaUjhf99t9GTsR8okPqgVRiN2bAJ705DLwznYqBt0NhHwa3QS9OKFM4VUc9XgIUPF
+ YHRaMmOBiGYhQ7wo5a4GbqL3PzdbTgwqNccu4cai/3Jgspb7UjFb9abjXNzOTMC9x/Rb
+ hNXoHUE73X6Z9smeuOOImVl9ZT5flttJqiR/magsWim1zPIDW7vt684edVfdduKb2L+A
+ Mil7L5QlhB1p9inBrxNmrFbBk3oQcM++dPfgSttH3gJixFK+fnH8QMQsc4hjRFNAd1ta
+ lkfg==
+X-Gm-Message-State: APjAAAXpHlgfSsa/Ov1n5+acRfhtCSEsp3qcERu+EFGZMpUX5F/v2hT4
+ YTuMLC0tjda+pp4LWqjIobjD7A==
+X-Google-Smtp-Source: APXvYqwf/xMNskUEIUVx70oZ+FBwfd5+wWBwXXauBsisK2cuw+YuPX+92vJ9WYZ+R8jQb44GToEPAg==
+X-Received: by 2002:a17:90a:ae15:: with SMTP id
+ t21mr1142164pjq.50.1566409047857; 
+ Wed, 21 Aug 2019 10:37:27 -0700 (PDT)
+Received: from localhost (wsip-184-188-36-2.sd.sd.cox.net. [184.188.36.2])
+ by smtp.gmail.com with ESMTPSA id n7sm26281704pff.59.2019.08.21.10.37.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 21 Aug 2019 10:37:26 -0700 (PDT)
+Date: Wed, 21 Aug 2019 10:37:26 -0700 (PDT)
+X-Google-Original-Date: Wed, 21 Aug 2019 10:36:42 PDT (-0700)
+In-Reply-To: <CANnJOVHdcb2wuTZ9U5ziJsuPVin8pae9gUZjh=VH5WJ_5Yn+rw@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: jonathan@fintelia.io
+Message-ID: <mhng-4545b3da-b9ba-4fa2-91e8-b0d7e66329d8@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH v2] target/riscv: Hardwire mcounter.TM and
+ upper bits of [m|s]counteren
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,88 +92,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhang, Chen" <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Wen Congyang <wencongyang2@huawei.com>
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com,
+ bmeng.cn@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lukas Straub (lukasstraub2@web.de) wrote:
-> On Fri, 16 Aug 2019 01:51:20 +0000
-> "Zhang, Chen" <chen.zhang@intel.com> wrote:
-> 
-> > > -----Original Message-----
-> > > From: Lukas Straub [mailto:lukasstraub2@web.de]
-> > > Sent: Friday, August 16, 2019 3:48 AM
-> > > To: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > Cc: qemu-devel <qemu-devel@nongnu.org>; Zhang, Chen
-> > > <chen.zhang@intel.com>; Jason Wang <jasowang@redhat.com>; Xie
-> > > Changlong <xiechanglong.d@gmail.com>; Wen Congyang
-> > > <wencongyang2@huawei.com>
-> > > Subject: Re: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
-> > > replication
-> > >
-> > > On Thu, 15 Aug 2019 19:57:37 +0100
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >
-> > > > * Lukas Straub (lukasstraub2@web.de) wrote:
-> > > > > Hello Everyone,
-> > > > > These Patches add support for continious replication to colo.
-> > > > > Please review.
-> > > >
-> > > >
-> > > > OK, for those who haven't followed COLO for so long; 'continuous
-> > > > replication' is when after the first primary fails, you can promote
-> > > > the original secondary to a new primary and start replicating again;
-> > > >
-> > > > i.e. current COLO gives you
-> > > >
-> > > > p<->s
-> > > >     <primary fails>
-> > > >     s
-> > > >
-> > > > with your patches you can do
-> > > >
-> > > >     s becomes p2
-> > > >     p2<->s2
-> > > >
-> > > > and you're back to being resilient again.
-> > > >
-> > > > Which is great; because that was always an important missing piece.
-> > > >
-> > > > Do you have some test scripts/setup for this - it would be great to
-> > > > automate some testing.
-> > >
-> > > My Plan is to write a Pacemaker Resource Agent[1] for qemu-colo and then do
-> > > some long-term testing in my small cluster here. Writing standalone tests using
-> > > that Resource Agent should be easy, it just needs to be provided with the right
-> > > arguments and environment Variables.
+On Wed, 14 Aug 2019 20:19:39 PDT (-0700), jonathan@fintelia.io wrote:
+> Ping! What is the status of this patch?
 
-Could you update tests/test-replication.c to test the extra steps?
+Sorry, I must have lost track of it.  I've added it to my patch queue.
 
-Dave
-
-> > Thanks Dave's explanation.
-> > It looks good for me and I will test this series in my side.
-> >
-> > Another question: Is "Pacemaker Resource Agent[1] "  like a heartbeat module?
-> 
-> It's a bit more than that. Pacemaker itself is an Cluster Resource Manager, you can think of it like sysvinit but for clusters. It controls where in the cluster Resources run, what state (master/slave) and what to do in case of a Node or Resource failure. Now Resources can be anything like SQL-Server, Webserver, VM, etc. and Pacemaker itself doesn't directly control them, that's the Job of the Resource Agents. So a Resource Agent is like an init-script, but cluster-aware with more actions like start, stop, monitor, promote (to master) or migrate-to.
-> 
-> > I have wrote an internal heartbeat module running on Qemu, it make COLO can detect fail and trigger failover automatically, no need external APP to call the QMP command "x-colo-lost-heartbeat". If you need it, I can send a RFC version recently.
-> 
-> Cool, this should be faster to failover than with Pacemaker.
-> What is the plan with cases like Primary-failover, which need to issue multiple commands?
-> 
-> > Thanks
-> > Zhang Chen
-> > >
-> > > Regards,
-> > > Lukas Straub
-> > >
-> > > [1] https://github.com/ClusterLabs/resource-agents/blob/master/doc/dev-guides/ra-dev-guide.asc#what-is-a-resource-agent
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> On Wed, Jul 3, 2019 at 2:02 PM Jonathan Behrens <jonathan@fintelia.io>
+> wrote:
+>
+>> Bin, that proposal proved to be somewhat more controversial than I was
+>> expecting, since it was different than how currently available hardware
+>> worked. This option seemed much more likely to be accepted in the short
+>> term.
+>>
+>> Jonathan
+>>
+>> On Mon, Jul 1, 2019 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>>
+>>> On Tue, Jul 2, 2019 at 8:20 AM Alistair Francis <alistair23@gmail.com>
+>>> wrote:
+>>> >
+>>> > On Mon, Jul 1, 2019 at 8:56 AM <jonathan@fintelia.io> wrote:
+>>> > >
+>>> > > From: Jonathan Behrens <jonathan@fintelia.io>
+>>> > >
+>>> > > QEMU currently always triggers an illegal instruction exception when
+>>> > > code attempts to read the time CSR. This is valid behavor, but only if
+>>> > > the TM bit in mcounteren is hardwired to zero. This change also
+>>> > > corrects mcounteren and scounteren CSRs to be 32-bits on both 32-bit
+>>> > > and 64-bit targets.
+>>> > >
+>>> > > Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
+>>> >
+>>> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>>> >
+>>>
+>>> I am a little bit lost here. I think we agreed to allow directly read
+>>> to time CSR when mcounteren.TM is set, no?
+>>>
+>>> Regards,
+>>> Bin
+>>>
+>>
 
