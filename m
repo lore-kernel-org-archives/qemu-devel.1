@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76BA0C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27423C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:51:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4153622DA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:51:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E66E722DA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:51:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D+66zVAn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4153622DA7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="d8j2wIRU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E66E722DA7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0LOz-0000qZ-8Q
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:51:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42618)
+	id 1i0LPE-0001Ie-Ub
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:51:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0r-0005Bz-E2
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:35 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0T-0004dm-Ld
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0q-0008UL-48
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:33 -0400
-Received: from ozlabs.org ([203.11.71.1]:49305)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0Q-000868-FW
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:09 -0400
+Received: from ozlabs.org ([203.11.71.1]:57403)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L0p-00089v-82; Wed, 21 Aug 2019 03:26:32 -0400
+ id 1i0L0O-00081U-A0; Wed, 21 Aug 2019 03:26:06 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CzjF2C7Rz9sQy; Wed, 21 Aug 2019 17:25:51 +1000 (AEST)
+ id 46CzjC3WPxz9sPn; Wed, 21 Aug 2019 17:25:49 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372353;
- bh=5NEgZKDdcOaJCDCiAi3qAZVToJWd/48Fn/4AGJJvmnI=;
+ d=gibson.dropbear.id.au; s=201602; t=1566372351;
+ bh=/Dle6wZbIMbneQ+F1agaSsQQsfyIA7WAL1f4+JCNAao=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=D+66zVAnbnU6cpgNsHZl/FTd9/pSzz+MYZMAwmIXgHOPhYP134ttrlI7zILO5tdxy
- OtJx5chAObPJ2w60MYeBfm0ozlJtPrJ02hcst4QhR+OVeKsxrG9T4spBNKDif8lg+v
- zaTn+ROwgsv4g8Ku9DV//rZr4o8FrtBlt+kWin+k=
+ b=d8j2wIRUJmBhNjWfYl7uoXnxf08Au1I3LH/wmEnWcUGgbvLH+6QpQrvmFmOptdeSJ
+ P0vyDc9NEACcVmAE0hnQ0W3+ZQSIBjo5DgmLHCsCxjql+f3YjphP6IufUCUHHMkQx+
+ wEHFX9jLttP2NA+UhFx4oQ2Dtho5MjPwUY1sJch4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:36 +1000
-Message-Id: <20190821072542.23090-37-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:14 +1000
+Message-Id: <20190821072542.23090-15-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
@@ -55,8 +55,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 36/42] spapr: Implement better workaround in
- spapr-vty device
+Subject: [Qemu-devel] [PULL 14/42] ppc: fix leak in
+ h_client_architecture_support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,89 +68,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- Paul Mackerras <paulus@ozlabs.org>, qemu-ppc@nongnu.org,
+Cc: lvivier@redhat.com, Shivaprasad G Bhat <sbhat@linux.ibm.com>, aik@ozlabs.ru,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paul Mackerras <paulus@ozlabs.org>
+From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 
-Linux guest kernels have code which scans the string of characters
-returned from the H_GET_TERM_CHAR hypercall and removes any \0
-character which comes immediately after a \r character.  This is to
-work around a bug which was present in some ancient versions of
-PowerVM.  In order to avoid the corruption of the console byte stream
-that this introduced, commit 6c3bc244d3cb ("spapr: Implement bug in
-spapr-vty device to be compatible with PowerVM") added a workaround
-which adds a \0 character after every \r character.  Unfortunately,
-this corrupts the console byte stream for those operating systems,
-such as AIX, which don't remove the null bytes.
+Free all SpaprOptionVector local pointers after use.
 
-We can avoid triggering the Linux kernel workaround if we avoid
-returning a buffer which contains a \0 after a \r.  We can do that by
-breaking out of the loop in vty_getchars() if we are about to insert a
-\0 and the previous character in the buffer is a \r.  That means we
-return the characters up to the \r for the current H_GET_TERM_CHAR,
-and the characters starting with the \0 for the next one.
-
-With this workaround, we don't insert any spurious characters and we
-avoid triggering the Linux kernel workaround, so the guest will
-receive an uncorrupted stream whether or not they have the workaround.
-
-Fixes: 6c3bc244d3cb ("spapr: Implement bug in spapr-vty device to be comp=
-atible with PowerVM")
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-Message-Id: <20190731043653.shdi5sizjp4t65op@oak.ozlabs.ibm.com>
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Message-Id: <156335160761.82682.11912058325777251614.stgit@lep8c.aus.stgl=
+abs.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/char/spapr_vty.c | 30 ++++++++++++------------------
- 1 file changed, 12 insertions(+), 18 deletions(-)
+ hw/ppc/spapr_hcall.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
-index 7f860fcce7..087c93e4fa 100644
---- a/hw/char/spapr_vty.c
-+++ b/hw/char/spapr_vty.c
-@@ -59,25 +59,19 @@ static int vty_getchars(SpaprVioDevice *sdev, uint8_t=
- *buf, int max)
-     int n =3D 0;
-=20
-     while ((n < max) && (dev->out !=3D dev->in)) {
--        buf[n++] =3D dev->buf[dev->out++ % VTERM_BUFSIZE];
--
--        /* PowerVM's vty implementation has a bug where it inserts a
--         * \0 after every \r going to the guest.  Existing guests have
--         * a workaround for this which removes every \0 immediately
--         * following a \r, so here we make ourselves bug-for-bug
--         * compatible, so that the guest won't drop a real \0-after-\r
--         * that happens to occur in a binary stream. */
--        if (buf[n - 1] =3D=3D '\r') {
--            if (n < max) {
--                buf[n++] =3D '\0';
--            } else {
--                /* No room for the extra \0, roll back and try again
--                 * next time */
--                dev->out--;
--                n--;
--                break;
--            }
-+        /*
-+         * Long ago, PowerVM's vty implementation had a bug where it
-+         * inserted a \0 after every \r going to the guest.  Existing
-+         * guests have a workaround for this which removes every \0
-+         * immediately following a \r.  To avoid triggering this
-+         * workaround, we stop before inserting a \0 if the preceding
-+         * character in the output buffer is a \r.
-+         */
-+        if (n > 0 && (buf[n - 1] =3D=3D '\r') &&
-+                (dev->buf[dev->out % VTERM_BUFSIZE] =3D=3D '\0')) {
-+            break;
-         }
-+        buf[n++] =3D dev->buf[dev->out++ % VTERM_BUFSIZE];
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 225c60a9fc..47b566882b 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1613,6 +1613,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+     ov5_updates =3D spapr_ovec_new();
+     spapr->cas_reboot =3D spapr_ovec_diff(ov5_updates,
+                                         ov5_cas_old, spapr->ov5_cas);
++    spapr_ovec_cleanup(ov5_cas_old);
+     /* Now that processing is finished, set the radix/hash bit for the
+      * guest if it requested a valid mode; otherwise terminate the boot.=
+ */
+     if (guest_radix) {
+@@ -1630,6 +1631,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
      }
-=20
-     qemu_chr_fe_accept_input(&dev->chardev);
+     spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
+                                                           OV1_PPC_3_00);
++    spapr_ovec_cleanup(ov1_guest);
+     if (!spapr->cas_reboot) {
+         /* If spapr_machine_reset() did not set up a HPT but one is nece=
+ssary
+          * (because the guest isn't going to use radix) then set it up h=
+ere. */
 --=20
 2.21.0
 
