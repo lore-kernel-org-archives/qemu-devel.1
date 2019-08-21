@@ -2,76 +2,79 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C64C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E25D3C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:13:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9870922DA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:08:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92D7322CE3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:13:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oi0/xrEy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9870922DA7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXR0/N+V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92D7322CE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Iqz-0006SF-P1
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 01:08:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55013)
+	id 1i0Iw6-0000TU-RI
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 01:13:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1i0IqJ-00063I-SP
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:07:32 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1i0IvP-0008Sw-LK
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:12:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1i0IqI-0007xr-4c
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:07:31 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:41400)
+ (envelope-from <jan.bobek@gmail.com>) id 1i0IvO-0000oy-GI
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:12:47 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:45847)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0IqG-0007xL-9v
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:07:28 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id i138so434280ywg.8
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 22:07:28 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0IvO-0000oY-9w
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:12:46 -0400
+Received: by mail-yw1-xc41.google.com with SMTP id n69so428530ywd.12
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 22:12:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to;
- bh=gnmPeeuzeIj6JuKh6hG+hXD9AZiez9cpBr+furHDk2c=;
- b=Oi0/xrEyXjeO0mAdRAj4tpbDDICc5YcrfTUFAJmruGmvmFBIWkebcMQwJlmlHLv5ot
- UrYnu14BeZTmTlucsogENxJMrcQOfO4ZlMKzZxJWqia253SH0xgw46GDvIsby/P+ftLc
- +bs/RzFFu4gB6Dsj3K4fGmo3NKIZ385hfVl9UIp5Cc9Yp9AoWcG8EjBds1XX2jL3HGgi
- s8yw70Vl/mj5jHmTns6E7pqkd+RhPYNVN13Qj5uos7NbzK/MvpVpum7XdNQuOv3Cod4X
- T0XCAFEkFZJqNjANZi9W7MxaBRhmfsrHMr1Cq4WVUXu75VbfRjURFFrIExCevRZpmWSf
- U57g==
+ bh=3WlwUblCurlOe8YQdiXf194H3JOxrR+ZV9WTCb9pMMI=;
+ b=lXR0/N+VYAbE76IMIjsMLqQhUvDS5D//zLcpEmzvnfwKKh+9P3smFx+ZZylGfu/CoM
+ mToKF41J/53BFUWy5r416vQai8o+y2W8jE2XMr6P/+63K+sdp40Qp8UtmjTq2QUXBzUP
+ rQWrnB2N/N2/LVC3LeIpOeK+OfRGBpSi2ITZWcRCWE75HZ2v38L69KOeEiawVz6SDlEg
+ 7k3mrMvzQvjkmvQmUkvDXoFI+kHoZU4pmOKiZFXRWb4gEY2IBOYGfAbIplyqkq3tMC8b
+ tCedLE1+GczkdTxS7lwfGibaJvt60rR7KegmCy/sQJDFF24TIMaIqDDDEu9GWIUjuqQY
+ C+JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to;
- bh=gnmPeeuzeIj6JuKh6hG+hXD9AZiez9cpBr+furHDk2c=;
- b=Qh1UQXpW20myIObcKRKJBo9fgjn8F3hXJq7dtKiJtPyuZ3Oan6hL+QEsP2XZw6lBvr
- S3SCSbL0fQhQkabAWqMKyCChygKHRMH+T5Ae8ZYIbiRe0RiC0xUmnUyyNfkDsSCyqzEt
- szJVcErWZ7PT7Woagh4a3ftN9BJT9+ZqvH6SVV57hFhOWIIMGCYF38m1o30xQu2m+HPE
- vDUGXvbsqAnMqDZshYcOgkCi+AV/hIwYMArzqJFvmayfXPvFcuxjyKtxFJFI0fAKBT6a
- AMSN98IneSxErSXysGNZFtIOHEXpjpzxzPFxe3BMI5LALeP7+i2lePToV6oBdkCmhgyY
- PrCw==
-X-Gm-Message-State: APjAAAXJrR5AKMbbIgawBn1eW5WyZQT4tqJSI418i8n7cckiAwlDjV4Q
- 3UqbAtQFPsyDT/4h9FKPfXBinDod
-X-Google-Smtp-Source: APXvYqxyXDMGs7DFZN1Ctdj4gpIMSIKalbBIwz0hNHAnsFEdlYxa+bHw7RRzzA0eACOjZHcfwvE1lg==
-X-Received: by 2002:a81:5c87:: with SMTP id
- q129mr21341618ywb.403.1566364047615; 
- Tue, 20 Aug 2019 22:07:27 -0700 (PDT)
+ bh=3WlwUblCurlOe8YQdiXf194H3JOxrR+ZV9WTCb9pMMI=;
+ b=k31e8dcW5xV8ChGZm3E0aNiBwNbNjbkTBflbn9nqlUuC8IT9yEnqD9LfRDfCBgUiwr
+ Zkvmwc6+eu7kde+PABU4R4h+GV/UXC5yDKr38CiQDpVx/9QMkke5YgWgZ+aNoMB0QAdp
+ /8Vgd9rTUIOh+488+NHeRPay2C0XbJuKsUe0M2brgH38sHBfsIs5YWpnss++FYeC4aVL
+ cDWp/7L3ZJWxB1FdBsX4zy0gYuPmVaIko89qll1aA8lXp0zVI/BYuI9gz9mm5a0Y34Rh
+ kKjxxVk8SqIv5UcaoyJbuXSI9OZUfSnhw4I5ucoXwZpOSUGPipdpSZ+/0bOuYuDqZGtF
+ 0mAQ==
+X-Gm-Message-State: APjAAAUH/ngci+5IizondzhX6GV5C4FBkIuz2jz2vO3/9CGccWmBUR5f
+ 42/jkNwHDIlxsxA2Y4aUS40=
+X-Google-Smtp-Source: APXvYqwXb6woxk28MrZiHG28j6vx2nj00iTXxuKeQ8UOWD5diYuuBJjO4tsV1PZcMGbSPkgN6hQawA==
+X-Received: by 2002:a0d:db51:: with SMTP id d78mr23641489ywe.319.1566364364517; 
+ Tue, 20 Aug 2019 22:12:44 -0700 (PDT)
 Received: from ?IPv6:2601:c0:c67f:e390::3? ([2601:c0:c67f:e390::3])
- by smtp.googlemail.com with ESMTPSA id l5sm1316154ywa.65.2019.08.20.22.07.26
+ by smtp.googlemail.com with ESMTPSA id v141sm4177814ywe.66.2019.08.20.22.12.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Aug 2019 22:07:26 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+ Tue, 20 Aug 2019 22:12:43 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>
 References: <20190815020928.9679-1-jan.bobek@gmail.com>
- <20190815020928.9679-16-jan.bobek@gmail.com>
- <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
+ <20190815020928.9679-3-jan.bobek@gmail.com>
+ <CAL1e-=j9eDuFSspcUx3oac3UFvY7-N4rYOwVvQ2eSvc9DnbC=A@mail.gmail.com>
+ <8a3988c7-5cca-d6b9-2be9-84cfe4b59f9f@linaro.org>
+ <CAL1e-=i7iW50-0uDywH_-eP0KDWaFGMo5qc3v3PX0SA8Fg+W9w@mail.gmail.com>
 From: Jan Bobek <jan.bobek@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
@@ -148,20 +151,20 @@ Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
  uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
  sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
  WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
-Message-ID: <404dea2e-1d22-df1f-b9df-4bb32567a612@gmail.com>
-Date: Wed, 21 Aug 2019 01:07:25 -0400
+Message-ID: <7bda2088-b8ee-d829-2204-29c6594c1da7@gmail.com>
+Date: Wed, 21 Aug 2019 01:12:42 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
+In-Reply-To: <CAL1e-=i7iW50-0uDywH_-eP0KDWaFGMo5qc3v3PX0SA8Fg+W9w@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC"
+ boundary="7FCCPtjigErGZkMjSCFgbb8bAL8sy4BiT"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c43
-Subject: Re: [Qemu-devel] [RFC PATCH v3 15/46] target/i386: introduce
- function ck_cpuid
+X-Received-From: 2607:f8b0:4864:20::c41
+Subject: Re: [Qemu-devel] [RFC PATCH v3 02/46] target/i386: Push rex_w into
+ DisasContext
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -174,79 +177,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC
-Content-Type: multipart/mixed; boundary="SlHiXmT1XBFV8uyegyZ93FXkrnuGwVKYb";
+--7FCCPtjigErGZkMjSCFgbb8bAL8sy4BiT
+Content-Type: multipart/mixed; boundary="mWypjKNXiZxaOL9Xneceu9nSmWPZcxErZ";
  protected-headers="v1"
 From: Jan Bobek <jan.bobek@gmail.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Message-ID: <404dea2e-1d22-df1f-b9df-4bb32567a612@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v3 15/46] target/i386: introduce function
- ck_cpuid
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+Message-ID: <7bda2088-b8ee-d829-2204-29c6594c1da7@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v3 02/46] target/i386: Push rex_w into
+ DisasContext
 References: <20190815020928.9679-1-jan.bobek@gmail.com>
- <20190815020928.9679-16-jan.bobek@gmail.com>
- <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
-In-Reply-To: <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
+ <20190815020928.9679-3-jan.bobek@gmail.com>
+ <CAL1e-=j9eDuFSspcUx3oac3UFvY7-N4rYOwVvQ2eSvc9DnbC=A@mail.gmail.com>
+ <8a3988c7-5cca-d6b9-2be9-84cfe4b59f9f@linaro.org>
+ <CAL1e-=i7iW50-0uDywH_-eP0KDWaFGMo5qc3v3PX0SA8Fg+W9w@mail.gmail.com>
+In-Reply-To: <CAL1e-=i7iW50-0uDywH_-eP0KDWaFGMo5qc3v3PX0SA8Fg+W9w@mail.gmail.com>
 
---SlHiXmT1XBFV8uyegyZ93FXkrnuGwVKYb
+--mWypjKNXiZxaOL9Xneceu9nSmWPZcxErZ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/15/19 11:01 AM, Aleksandar Markovic wrote:
+On 8/15/19 6:19 AM, Aleksandar Markovic wrote:
 >=20
-> 15.08.2019. 04.23, "Jan Bobek" <jan.bobek@gmail.com <mailto:jan.bobek@g=
-mail.com>> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=
-=D0=B0:
+> 15.08.2019. 11.55, "Richard Henderson" <richard.henderson@linaro.org <m=
+ailto:richard.henderson@linaro.org>> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=
+=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >>
->> Introduce a helper function to take care of instruction CPUID checks.
+>> On 8/15/19 8:30 AM, Aleksandar Markovic wrote:
+>> >
+>> > 15.08.2019. 04.13, "Jan Bobek" <jan.bobek@gmail.com <mailto:jan.bobe=
+k@gmail.com>
+>> > <mailto:jan.bobek@gmail.com <mailto:jan.bobek@gmail.com>>> =D1=98=D0=
+=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>> >>
+>> >> From: Richard Henderson <rth@twiddle.net <mailto:rth@twiddle.net> <=
+mailto:rth@twiddle.net <mailto:rth@twiddle.net>>>
+>> >>
+>> >> Treat this the same as we already do for other rex bits.
+>> >>
+>> >> Signed-off-by: Richard Henderson <rth@twiddle.net <mailto:rth@twidd=
+le.net> <mailto:rth@twiddle.net <mailto:rth@twiddle.net>>>
+>> >> ---
+>> >> =C2=A0target/i386/translate.c | 19 +++++++++++--------
+>> >> =C2=A01 file changed, 11 insertions(+), 8 deletions(-)
+>> >>
+>> >> diff --git a/target/i386/translate.c b/target/i386/translate.c
+>> >> index d74dbfd585..c0866c2797 100644
+>> >> --- a/target/i386/translate.c
+>> >> +++ b/target/i386/translate.c
+>> >> @@ -44,11 +44,13 @@
+>> >> =C2=A0#define REX_X(s) ((s)->rex_x)
+>> >> =C2=A0#define REX_B(s) ((s)->rex_b)
+>> >> =C2=A0#define REX_R(s) ((s)->rex_r)
+>> >> +#define REX_W(s) ((s)->rex_w)
+>> >> =C2=A0#else
+>> >> =C2=A0#define CODE64(s) 0
+>> >> =C2=A0#define REX_X(s) 0
+>> >> =C2=A0#define REX_B(s) 0
+>> >> =C2=A0#define REX_R(s) 0
+>> >> +#define REX_W(s) -1
+>> >
+>> > The commit message says "treat rex_w the same as other rex bits". Wh=
+y is then
+>> > REX_W() treated differently here?
 >>
->> Signed-off-by: Jan Bobek <jan.bobek@gmail.com <mailto:jan.bobek@gmail.=
-com>>
->> ---
+>> "Treated the same" in terms of being referenced by a macro instead of =
+a local
+>> variable.=C2=A0 As for the -1, if you look at the rest of the patch yo=
+u can clearly
+>> see it preserves existing behaviour.
+>>
 >=20
-> Jan, what is the origin of "CK"? If it is a QEMU internal thing, perhap=
-s use "CHECK".
+> That is exactly what I dislike about your commit messages: they often i=
+ntroduce ambiguity, without any real need, and with really bad consequenc=
+es to the reader. Is adding "in terms of being referenced by a macro inst=
+ead of a local
+> variable" to the commit message that hard?
 >=20
-> The function should be called check_cpuid(), imho. I know, Richard woul=
-d like c_ci(), or simpler cc(), better.
+> When writing commit messages, you need to try to put yourself in the sh=
+oes of the reader.
 
-It was completely my initiative to name it like that. I'll rename
-it to check_cpuid().
+FWIW, personally I don't find it confusing. I think even just the
+first couple of lines of the patch make it quite clear what's
+going on. Just my 2 cents.
 
 -Jan
 
 
---SlHiXmT1XBFV8uyegyZ93FXkrnuGwVKYb--
+--mWypjKNXiZxaOL9Xneceu9nSmWPZcxErZ--
 
---wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC
+--7FCCPtjigErGZkMjSCFgbb8bAL8sy4BiT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl1c0Y0ACgkQZeg2ldrj
-Ns/RGw//R+OX9HcB1myGqZ915qn6l+c7Uj4LOU8jRI6OVF8jb3rab/xOuw1LCz8p
-j4xsgRIF/HkFVkDjvT7VxYXdsdOa/zmUz0XmO8CPTHqhcSbk6bwYXCZGtVpRAbAV
-rEYz8XN/K5C7Db7Z8x5PM0hTIX2UgXemVuULTKLTBYJA9qwa1QXU9LsxgTT4XZ6B
-B+9VSJ0xazkC4EWKaoakqGXIXqU83RuFaFzoAlSVD+i+J8bvAmO9EIS9r9fqXtqB
-HMWCTB12P5tY4mSI19IYbC5+ULxgCL4hcf4SKkjjttCRaDonzDVHgAFDJJtcO0Nx
-N2RRj1MTacweD7/Zd4ylYT4Sr49nHSN5OxuTs81CiQSxQk+BSOm5v3jrfXp/+tdE
-c68eld8T89ONKCPV2zpSrkio5MX4wclexR1q/4o1/XbZyZK0xxGxKc9168G7EamI
-F9dj5Q/i3t1aLOLAegbm5BMkZkluDwdPOSmLLfroDxeazdbNkLBCRUxBNA5PZnNx
-O9q47HDMlv33WuP43HNOm0A2IjtuUo7XjEljdSCAGg4d10HqhmeqcBOT7klPDN5L
-VhijacEmOKdDRbCNhYenFOENe38+jhWDNY/JSbInFd1AnsUFF1hTSx3BrfPvZ4YM
-02sqLlgYDKRy0x1H7Yu2CCCNt4o2Rm+B1v2IGpC78JXT9skPxFQ=
-=PBXK
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl1c0soACgkQZeg2ldrj
+Ns8agxAAiC1cUZNBoDmQwsB73shsYl1SkBxAuWAD6xSP3mKbbRZ/x3wEiROJ6eqv
+B3gPjWekmhklC3BGBbzDiT1V7uvK1avHzwHF0pCprNKW1YoGdNLCjMTK8f1BHgfd
+0BfwXnWarzOuIr1bjDLxPoeRTmSkbAjjoZmdE8UmWFCU4MaRIhkPZojbKssJTHNa
+gJmcJici9+IvIHRqToHF3qb7gwLlKIWDitxRFJGE0KprDGZyywqcFgAxb3yKagLM
+e0jK4N+BKgxjUbyys3qE/LwJU/yenco7G2F3vw5vb5aSpmgWRiMEmp2a0IIvANtT
+luWVMjRDAyCzsViJLsiLBx7LIzqZOwdoPaDdpH2WF6ZxVZOGDBEfMm39Gx+gsVLt
+uE6b3sIWgJuFKlPooFf2pOozZwYijguxhy/Ao/Qa9OB1ZJuGES/mYMYpweX7eqpV
++h347YK6F6G+V8YUDZovs0ZPoYJ19U0no6hShi5cVSt2O1MqswdYt2zxCpODMA6B
+LgqxUHMqINzoBMx8oFFnDa+LKdLUGWAQwvMuLYM0XAbt0Acxd/yL1U2dgtrCkrID
+z/5ElEPBhXaZbeffZOJiUQiqkAcjRM4ZneHgoW7JINCLsLSRis3wRf0EemKDFPoG
+RvRK1ehFwJAoVSbcisJuCVVDqsvSWjuQC/hqh8Ddx8nCsCN3HT8=
+=Qh6b
 -----END PGP SIGNATURE-----
 
---wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC--
+--7FCCPtjigErGZkMjSCFgbb8bAL8sy4BiT--
 
