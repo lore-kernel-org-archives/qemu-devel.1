@@ -2,71 +2,65 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75532C3A59D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 02:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18098C3A589
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:05:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CBCD20870
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 02:41:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CBCD20870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DFF4D22DA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:05:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFF4D22DA7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ucloud.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0GZI-0005xZ-DY
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 22:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39566)
+	id 1i0GwW-0003wY-29
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 23:05:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i0GYN-0005CV-9O
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 22:40:52 -0400
+ (envelope-from <owen.si@ucloud.cn>) id 1i0Gvl-0002rJ-2Z
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i0GYL-0006uk-Uo
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 22:40:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55918)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i0GYL-0006tS-Oj
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 22:40:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i0GYJ-00038K-QW
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 02:40:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C77C52E8070
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 02:40:47 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Aug 2019 02:33:50 -0000
-From: fangying <1840865@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: yorifang
-X-Launchpad-Bug-Reporter: fangying (yorifang)
-X-Launchpad-Bug-Modifier: fangying (yorifang)
-Message-Id: <156635483019.23159.9094249492846476541.malonedeb@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b8eee8ec939871b78ff512079be7b67393944a1f
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1840865] [NEW] qemu crashes when doing iotest on
- virtio-9p filesystem
+ (envelope-from <owen.si@ucloud.cn>) id 1i0Gvh-00081h-Ev
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:04:58 -0400
+Received: from m9785.mail.qiye.163.com ([220.181.97.85]:12280)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <owen.si@ucloud.cn>) id 1i0Gvg-0007uE-S2
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:04:57 -0400
+Received: from SKY-20190329ATQ (unknown [117.48.120.186])
+ by m9785.mail.qiye.163.com (Hmail) with ESMTPA id A6B5E5C1640;
+ Wed, 21 Aug 2019 11:04:46 +0800 (CST)
+Date: Wed, 21 Aug 2019 11:04:46 +0800
+From: "owen.si@ucloud.cn" <owen.si@ucloud.cn>
+To: "Eduardo Habkost" <ehabkost@redhat.com>
+References: <20190819100924.14968-1-owen.si@ucloud.cn>, 
+ <20190820212306.GM3908@habkost.net>
+X-Priority: 3
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.10.151[cn]
+Mime-Version: 1.0
+Message-ID: <2019082111044638341815@ucloud.cn>
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZVkpVSEtJS0tLT0tIT0tPSU9ZV1koWU
+ FJQjdXWS1ZQUlXWQkOFx4IWUFZNTQpNjo3JCkuNz5ZBg++
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Nwg6Lww5ITg#OT8cTCxLDk8x
+ Mz4aCglVSlVKTk1NSE5NTUNMSktCVTMWGhIXVRQMHhVVCBI7DhgXFA4fVRgVRVlXWRILWUFZSkpM
+ VU9DVUpJS1VKQ01ZV1kIAVlBQ05JSjcG
+X-HM-Tid: 0a6cb222476b2087kuqya6b5e5c1640
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.181.97.85
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] Revert "i386: correct cpu_x86_cpuid(0xd)"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,118 +69,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1840865 <1840865@bugs.launchpad.net>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Qemu crashes when doing avocado-vt test on virtio-9p filesystem.
-This bug can be reproduced running https://github.com/autotest/tp-qemu/blob=
-/master/qemu/tests/9p.py.
-The crash stack goes like:
-
-Program terminated with signal SIGSEGV, Segmentation fault.
-#0  v9fs_mark_fids_unreclaim (pdu=3Dpdu@entry=3D0xaaab00046868, path=3Dpath=
-@entry=3D0xffff851e2fa8)
-    at hw/9pfs/9p.c:505
-#1  0x0000aaaae3585acc in v9fs_unlinkat (opaque=3D0xaaab00046868) at hw/9pf=
-s/9p.c:2590
-#2  0x0000aaaae3811c10 in coroutine_trampoline (i0=3D<optimized out>, i1=3D=
-<optimized out>)
-    at util/coroutine-ucontext.c:116
-#3  0x0000ffffa13ddb20 in ?? () from /lib64/libc.so.6
-Backtrace stopped: not enough registers or memory available to unwind furth=
-er
-
-A segment fault is triggered at hw/9pfs/9p.c line 505
-
-    for (fidp =3D s->fid_list; fidp; fidp =3D fidp->next) {
-        if (fidp->path.size !=3D path->size) {     # fidp is invalid =
-
-            continue;
-        }
-
-(gdb) p path
-$10 =3D (V9fsPath *) 0xffff851e2fa8
-(gdb) p *path
-$11 =3D {size =3D 21, data =3D 0xaaaafed6f420 "./9p_test/p2a1/d0/f1"}
-(gdb) p *fidp
-Cannot access memory at address 0x101010101010101
-(gdb) p *pdu
-$12 =3D {size =3D 19, tag =3D 54, id =3D 76 'L', cancelled =3D 0 '\000', co=
-mplete =3D {entries =3D {
-      sqh_first =3D 0x0, sqh_last =3D 0xaaab00046870}}, s =3D 0xaaab000454b=
-8, next =3D {
-    le_next =3D 0xaaab000467c0, le_prev =3D 0xaaab00046f88}, idx =3D 88}
-(gdb) =
-
-
-Address Sanitizer shows error and saying that there is a heap-use-after-
-free on *fidp*.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1840865
-
-Title:
-  qemu crashes when doing iotest on  virtio-9p filesystem
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu crashes when doing avocado-vt test on virtio-9p filesystem.
-  This bug can be reproduced running https://github.com/autotest/tp-qemu/bl=
-ob/master/qemu/tests/9p.py.
-  The crash stack goes like:
-
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  v9fs_mark_fids_unreclaim (pdu=3Dpdu@entry=3D0xaaab00046868, path=3Dpa=
-th@entry=3D0xffff851e2fa8)
-      at hw/9pfs/9p.c:505
-  #1  0x0000aaaae3585acc in v9fs_unlinkat (opaque=3D0xaaab00046868) at hw/9=
-pfs/9p.c:2590
-  #2  0x0000aaaae3811c10 in coroutine_trampoline (i0=3D<optimized out>, i1=
-=3D<optimized out>)
-      at util/coroutine-ucontext.c:116
-  #3  0x0000ffffa13ddb20 in ?? () from /lib64/libc.so.6
-  Backtrace stopped: not enough registers or memory available to unwind fur=
-ther
-
-  A segment fault is triggered at hw/9pfs/9p.c line 505
-
-      for (fidp =3D s->fid_list; fidp; fidp =3D fidp->next) {
-          if (fidp->path.size !=3D path->size) {     # fidp is invalid =
-
-              continue;
-          }
-
-  (gdb) p path
-  $10 =3D (V9fsPath *) 0xffff851e2fa8
-  (gdb) p *path
-  $11 =3D {size =3D 21, data =3D 0xaaaafed6f420 "./9p_test/p2a1/d0/f1"}
-  (gdb) p *fidp
-  Cannot access memory at address 0x101010101010101
-  (gdb) p *pdu
-  $12 =3D {size =3D 19, tag =3D 54, id =3D 76 'L', cancelled =3D 0 '\000', =
-complete =3D {entries =3D {
-        sqh_first =3D 0x0, sqh_last =3D 0xaaab00046870}}, s =3D 0xaaab00045=
-4b8, next =3D {
-      le_next =3D 0xaaab000467c0, le_prev =3D 0xaaab00046f88}, idx =3D 88}
-  (gdb) =
-
-
-  Address Sanitizer shows error and saying that there is a heap-use-
-  after-free on *fidp*.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1840865/+subscriptions
-
+VGhhbmtzIGZvciB5b3UgcmVwbHksIHdlIGhhdmUgc29tZSBob3N0cyBydW5uaW5nIHdpdGggbGVn
+YWN5IGtlcm5lbCwgZGlmZmljdWx0IHRvIHVwZ3JhZGUsIGFuZCBpIHdhbnQgdG8gcnVuIHRoZSBs
+YXRlc3QgcWVtdS4NCkRvZXMgUUVNVSBzdXBwb3J0IHJ1bm5pbmcgd2l0aCBsZWdhY3kga2VybmVs
+KGt2bSkgaW4gZGVzaWduPw0KDQoNCg0Kb3dlbi5zaUB1Y2xvdWQuY24NCiANCkZyb206IEVkdWFy
+ZG8gSGFia29zdA0KRGF0ZTogMjAxOS0wOC0yMSAwNToyMw0KVG86IEJpbmdzb25nIFNpDQpDQzog
+cWVtdS1kZXZlbA0KU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0hdIFJldmVydCAiaTM4
+NjogY29ycmVjdCBjcHVfeDg2X2NwdWlkKDB4ZCkiDQpPbiBNb24sIEF1ZyAxOSwgMjAxOSBhdCAw
+NjowOToyNFBNICswODAwLCBCaW5nc29uZyBTaSB3cm90ZToNCj4gVGhpcyByZXZlcnRzIGNvbW1p
+dCBkZTJlNjhjOTAyZjdiNmU0MzhiMGZhM2NmZWRkNzRhMDZhMjA3MDRmLg0KPiANCj4gSW5pdGlh
+bCB2YWx1ZSBvZiBlbnYtPnhjcjAgPT0gMCwgdGhlbiBDUFVJRChFQVg9MHhkLEVDWD0wKS5FQlgg
+PT0gMCwgYWZ0ZXIga3ZtDQo+IHVwc3RyZWFtIGNvbW1pdCA0MTJhM2M0MSwgSXQgaXMgb2suDQo+
+IE9uIGhvc3QgYmVmb3JlIGNvbW1pdCA0MTJhM2M0MSwgc29tZSBsZWdhY3kgZ3Vlc3QsIGkuZS4g
+Q2VudE9TIDYsIGdldA0KPiB4c3RhdGVfc2l6ZSA9PSAwLCB3aWxsIGNyYXNoIHRoZSBndWVzdC4N
+Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IEJpbmdzb25nIFNpIDxvd2VuLnNpQHVjbG91ZC5jbj4NCiAN
+CmNwdV94ODZfY3B1aWQoKSBpcyBhbHNvIHVzZWQgYnkgVENHLCBhbmQgbmVlZHMgdG8gcmV0dXJu
+IHRoZQ0KY29ycmVjdCBkYXRhIGRlcGVuZGluZyBvbiB4Y3IwLiAgSWYgeW91IHdhbnQgdG8gd29y
+ayBhcm91bmQgYSBLVk0NCmJ1ZyBieSBpZ25vcmluZyB4Y3IwLCBpdCBuZWVkcyB0byBiZSBjb25k
+aXRpb25hbCBvbg0Ka3ZtX2VuYWJsZWQoKS4NCiANCkJ1dCBldmVuIGlmIHdlIHlvdSBtYWtlIHRo
+aXMgY29uZGl0aW9uYWwgb24ga3ZtX2VuYWJsZWQoKSwgSQ0KZG9uJ3QgdW5kZXJzdGFuZCB3aHkg
+UUVNVSB3b3VsZCBuZWVkIGEgd29ya2Fyb3VuZCBmb3IgYSBLVk0gYnVnDQp0aGF0IHdhcyBmaXhl
+ZCBtb3JlIHRoYW4gNCB5ZWFycyBhZ28uDQogDQo+IC0tLQ0KPiAgdGFyZ2V0L2kzODYvY3B1LmMg
+fCAyICstDQo+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkN
+Cj4gDQo+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9jcHUuYyBiL3RhcmdldC9pMzg2L2NwdS5j
+DQo+IGluZGV4IGZmNjVlMTEwMDguLjY5NTYyZTIxZWQgMTAwNjQ0DQo+IC0tLSBhL3RhcmdldC9p
+Mzg2L2NwdS5jDQo+ICsrKyBiL3RhcmdldC9pMzg2L2NwdS5jDQo+IEBAIC00NDE2LDcgKzQ0MTYs
+NyBAQCB2b2lkIGNwdV94ODZfY3B1aWQoQ1BVWDg2U3RhdGUgKmVudiwgdWludDMyX3QgaW5kZXgs
+IHVpbnQzMl90IGNvdW50LA0KPiAgICAgICAgICAgICAgKmVjeCA9IHhzYXZlX2FyZWFfc2l6ZSh4
+ODZfY3B1X3hzYXZlX2NvbXBvbmVudHMoY3B1KSk7DQo+ICAgICAgICAgICAgICAqZWF4ID0gZW52
+LT5mZWF0dXJlc1tGRUFUX1hTQVZFX0NPTVBfTE9dOw0KPiAgICAgICAgICAgICAgKmVkeCA9IGVu
+di0+ZmVhdHVyZXNbRkVBVF9YU0FWRV9DT01QX0hJXTsNCj4gLSAgICAgICAgICAgICplYnggPSB4
+c2F2ZV9hcmVhX3NpemUoZW52LT54Y3IwKTsNCj4gKyAgICAgICAgICAgICplYnggPSAqZWN4Ow0K
+PiAgICAgICAgICB9IGVsc2UgaWYgKGNvdW50ID09IDEpIHsNCj4gICAgICAgICAgICAgICplYXgg
+PSBlbnYtPmZlYXR1cmVzW0ZFQVRfWFNBVkVdOw0KPiAgICAgICAgICB9IGVsc2UgaWYgKGNvdW50
+IDwgQVJSQVlfU0laRSh4ODZfZXh0X3NhdmVfYXJlYXMpKSB7DQo+IC0tIA0KPiAyLjIyLjANCj4g
+DQo+IA0KIA0KLS0gDQpFZHVhcmRvDQo=
