@@ -7,56 +7,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8DEC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8505DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:45:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E0A92339F
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:44:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BDDD2339F
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:45:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="qQowfhqO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E0A92339F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="azlSd8yr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BDDD2339F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0LIC-0001U6-HW
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:44:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42574)
+	id 1i0LJ5-0002G4-QN
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:45:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0p-0005BY-8X
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:34 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0R-0004Zy-R8
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0o-0008Rl-6p
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:31 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:44673)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0Q-000853-8B
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:07 -0400
+Received: from ozlabs.org ([203.11.71.1]:44371)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L0n-00086s-0S; Wed, 21 Aug 2019 03:26:30 -0400
+ id 1i0L0N-0007zp-QY; Wed, 21 Aug 2019 03:26:04 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CzjD49d6z9sR7; Wed, 21 Aug 2019 17:25:50 +1000 (AEST)
+ id 46CzjB1GyDz9sQn; Wed, 21 Aug 2019 17:25:49 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372352;
- bh=djbVlC8N25YL//fyM3PhmQf5jm2n/3eUfbuieIBOl9o=;
+ d=gibson.dropbear.id.au; s=201602; t=1566372350;
+ bh=+ll5cKS8GpOsg1khTBTggYL8D2mfNQnbIIz1+Y1r/oc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qQowfhqOTbcnlBwz5AOmRwL4l2heczzKI2Htz8slsYmJWeF9NqOJhOXOXUs58JJZt
- iVM7dOYyaDEEdooO/i6UxLWMJ5Tg2kjufFPPTRfzqvHBHVMiL3lEoAw5VyzSeGrHz/
- jeGCc4qSpNhjh0Ubub/ZhfF9OIPosX/5O0G4rAvw=
+ b=azlSd8yrrBNnQcLtQ/iPF/8qkBll2P8rZUH5mD+8UVayCCFCplNMTJ6+GP8SXcE2k
+ B8Ds2FvN+wOLCMvVwFb9SPQ+iwshZ4TzoRzoJUwZGcNP7bb+RRJ8ljaX04BT7a29Vq
+ zubuzSg18TBzVJ6pHNFTSdhFAK2C4ySK8fkwNj6g=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:29 +1000
-Message-Id: <20190821072542.23090-30-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:16 +1000
+Message-Id: <20190821072542.23090-17-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 29/42] machine: Add wakeup method to MachineClass
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 16/42] spapr: Implement H_PROD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,7 +69,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
  Nicholas Piggin <npiggin@gmail.com>, groug@kaod.org, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -78,73 +76,105 @@ Sender: "Qemu-devel"
 
 From: Nicholas Piggin <npiggin@gmail.com>
 
-Waking from suspend is not logically a machine reset on all machines,
-particularly in the paravirtualized case rather than hardware
-emulated. The ppc spapr machine for example just invokes hypervisor
-to suspend, and expects that call to return with the machine in the
-same state (modulo some possible migration and reconfiguration
-details).
-
-Implement a machine ->wakeup method and use that if it exists.
+H_PROD is added, and H_CEDE is modified to test the prod bit
+according to PAPR.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Message-Id: <20190722053215.20808-2-npiggin@gmail.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20190718034214.14948-3-npiggin@gmail.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/boards.h |  1 +
- vl.c                | 18 +++++++++++++++++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c                  |  1 +
+ hw/ppc/spapr_hcall.c            | 32 ++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr_cpu_core.h |  1 +
+ 3 files changed, 34 insertions(+)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index aa35955f7f..60d69217b4 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -180,6 +180,7 @@ struct MachineClass {
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 08cc7c2bd6..0890c2840f 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4312,6 +4312,7 @@ static void spapr_cpu_exec_enter(PPCVirtualHypervis=
+or *vhyp, PowerPCCPU *cpu)
 =20
-     void (*init)(MachineState *state);
-     void (*reset)(MachineState *state);
-+    void (*wakeup)(MachineState *state);
-     void (*hot_add_cpu)(MachineState *state, const int64_t id, Error **e=
-rrp);
-     int (*kvm_type)(MachineState *machine, const char *arg);
-     void (*smp_parse)(MachineState *ms, QemuOpts *opts);
-diff --git a/vl.c b/vl.c
-index edd5390110..09aa18cb35 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1557,6 +1557,22 @@ void qemu_system_reset(ShutdownCause reason)
-     cpu_synchronize_all_post_reset();
- }
+     /* These are only called by TCG, KVM maintains dispatch state */
 =20
-+/*
-+ * Wake the VM after suspend.
-+ */
-+static void qemu_system_wakeup(void)
-+{
-+    MachineClass *mc;
++    spapr_cpu->prod =3D false;
+     if (spapr_cpu->vpa_addr) {
+         CPUState *cs =3D CPU(cpu);
+         uint32_t dispatch;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 4c5ea17250..dd584da1ce 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1051,14 +1051,44 @@ static target_ulong h_cede(PowerPCCPU *cpu, Spapr=
+MachineState *spapr,
+ {
+     CPUPPCState *env =3D &cpu->env;
+     CPUState *cs =3D CPU(cpu);
++    SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
+=20
+     env->msr |=3D (1ULL << MSR_EE);
+     hreg_compute_hflags(env);
 +
-+    mc =3D current_machine ? MACHINE_GET_CLASS(current_machine) : NULL;
-+
-+    if (mc && mc->wakeup) {
-+        mc->wakeup(current_machine);
-+    } else {
-+        qemu_system_reset(SHUTDOWN_CAUSE_NONE);
++    if (spapr_cpu->prod) {
++        spapr_cpu->prod =3D false;
++        return H_SUCCESS;
 +    }
++
+     if (!cpu_has_work(cs)) {
+         cs->halted =3D 1;
+         cs->exception_index =3D EXCP_HLT;
+         cs->exit_request =3D 1;
+     }
++
++    return H_SUCCESS;
 +}
 +
- void qemu_system_guest_panicked(GuestPanicInformation *info)
- {
-     qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed");
-@@ -1765,7 +1781,7 @@ static bool main_loop_should_exit(void)
-     }
-     if (qemu_wakeup_requested()) {
-         pause_all_vcpus();
--        qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-+        qemu_system_wakeup();
-         notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
-         wakeup_reason =3D QEMU_WAKEUP_REASON_NONE;
-         resume_all_vcpus();
++static target_ulong h_prod(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                           target_ulong opcode, target_ulong *args)
++{
++    target_long target =3D args[0];
++    PowerPCCPU *tcpu;
++    CPUState *cs;
++    SpaprCpuState *spapr_cpu;
++
++    tcpu =3D spapr_find_cpu(target);
++    cs =3D CPU(tcpu);
++    if (!cs) {
++        return H_PARAMETER;
++    }
++
++    spapr_cpu =3D spapr_cpu_state(tcpu);
++    spapr_cpu->prod =3D true;
++    cs->halted =3D 0;
++    qemu_cpu_kick(cs);
++
+     return H_SUCCESS;
+ }
+=20
+@@ -1885,6 +1915,8 @@ static void hypercall_register_types(void)
+     /* hcall-splpar */
+     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+     spapr_register_hypercall(H_CEDE, h_cede);
++    spapr_register_hypercall(H_PROD, h_prod);
++
+     spapr_register_hypercall(H_SIGNAL_SYS_RESET, h_signal_sys_reset);
+=20
+     /* processor register resource access h-calls */
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
+ore.h
+index 35e0a7eead..1c4cc6559c 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -46,6 +46,7 @@ typedef struct SpaprCpuState {
+     uint64_t vpa_addr;
+     uint64_t slb_shadow_addr, slb_shadow_size;
+     uint64_t dtl_addr, dtl_size;
++    bool prod; /* not migrated, only used to improve dispatch latencies =
+*/
+     struct ICPState *icp;
+     struct XiveTCTX *tctx;
+ } SpaprCpuState;
 --=20
 2.21.0
 
