@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27423C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6A8C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:53:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E66E722DA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:51:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1851233A0
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:53:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="d8j2wIRU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E66E722DA7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k1JMFcPW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1851233A0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0LPE-0001Ie-Ub
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:51:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42308)
+	id 1i0LQv-0003nb-Rj
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:53:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0T-0004dm-Ld
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:11 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0r-0005By-7j
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0Q-000868-FW
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:09 -0400
-Received: from ozlabs.org ([203.11.71.1]:57403)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0q-0008UK-3m
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:33 -0400
+Received: from ozlabs.org ([203.11.71.1]:33781)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L0O-00081U-A0; Wed, 21 Aug 2019 03:26:06 -0400
+ id 1i0L0p-0008BV-NP; Wed, 21 Aug 2019 03:26:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CzjC3WPxz9sPn; Wed, 21 Aug 2019 17:25:49 +1000 (AEST)
+ id 46CzjF4BGcz9sRD; Wed, 21 Aug 2019 17:25:51 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372351;
- bh=/Dle6wZbIMbneQ+F1agaSsQQsfyIA7WAL1f4+JCNAao=;
+ d=gibson.dropbear.id.au; s=201602; t=1566372353;
+ bh=6GY9++/Hv1KppOVgXUV+rDcGBLJtsjsXR/b4Qa8ecqI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=d8j2wIRUJmBhNjWfYl7uoXnxf08Au1I3LH/wmEnWcUGgbvLH+6QpQrvmFmOptdeSJ
- P0vyDc9NEACcVmAE0hnQ0W3+ZQSIBjo5DgmLHCsCxjql+f3YjphP6IufUCUHHMkQx+
- wEHFX9jLttP2NA+UhFx4oQ2Dtho5MjPwUY1sJch4=
+ b=k1JMFcPWQRQwEf/bcGe7LEaPA3b2+wWqHLXrD6PXtZvEzy3seq85zXthhPV5D8N5x
+ 5ZY99VWTBfEo3YkcVgXlqmfgIOudzLB4seAOe8zdj/kelx2TXhXdZvkaUleDwwyY33
+ nF8tar15+srUojPhvwj5/khp/lTTgKRozF8ihMfU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:14 +1000
-Message-Id: <20190821072542.23090-15-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:38 +1000
+Message-Id: <20190821072542.23090-39-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
@@ -55,8 +55,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 14/42] ppc: fix leak in
- h_client_architecture_support
+Subject: [Qemu-devel] [PULL 38/42] target/ppc: Add Directed Privileged
+ Door-bell Exception State (DPDES) SPR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,51 +68,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Shivaprasad G Bhat <sbhat@linux.ibm.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Free all SpaprOptionVector local pointers after use.
+DPDES stores a status of a doorbell message and if it is lost in
+migration, the destination CPU won't receive it. This does not hit us
+much as IPIs complete too quick to catch a pending one and even if
+we missed one, broadcasts happen often enough to wake that CPU.
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Message-Id: <156335160761.82682.11912058325777251614.stgit@lep8c.aus.stgl=
-abs.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+This defines DPDES and registers with KVM for migration.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-Id: <20190816061733.53572-1-aik@ozlabs.ru>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/ppc/cpu.h                |  1 +
+ target/ppc/translate_init.inc.c | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 225c60a9fc..47b566882b 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1613,6 +1613,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
-     ov5_updates =3D spapr_ovec_new();
-     spapr->cas_reboot =3D spapr_ovec_diff(ov5_updates,
-                                         ov5_cas_old, spapr->ov5_cas);
-+    spapr_ovec_cleanup(ov5_cas_old);
-     /* Now that processing is finished, set the radix/hash bit for the
-      * guest if it requested a valid mode; otherwise terminate the boot.=
- */
-     if (guest_radix) {
-@@ -1630,6 +1631,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
-     }
-     spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
-                                                           OV1_PPC_3_00);
-+    spapr_ovec_cleanup(ov1_guest);
-     if (!spapr->cas_reboot) {
-         /* If spapr_machine_reset() did not set up a HPT but one is nece=
-ssary
-          * (because the guest isn't going to use radix) then set it up h=
-ere. */
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 50245a8c4d..4b35c8e4f4 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1466,6 +1466,7 @@ typedef PowerPCCPU ArchCPU;
+ #define SPR_MPC_ICTRL         (0x09E)
+ #define SPR_MPC_BAR           (0x09F)
+ #define SPR_PSPB              (0x09F)
++#define SPR_DPDES             (0x0B0)
+ #define SPR_DAWR              (0x0B4)
+ #define SPR_RPR               (0x0BA)
+ #define SPR_CIABR             (0x0BB)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index c9fcd87095..7e41ae1456 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8198,6 +8198,18 @@ static void gen_spr_power8_pspb(CPUPPCState *env)
+                      KVM_REG_PPC_PSPB, 0);
+ }
+=20
++static void gen_spr_power8_dpdes(CPUPPCState *env)
++{
++#if !defined(CONFIG_USER_ONLY)
++    /* Directed Privileged Door-bell Exception State, used for IPI */
++    spr_register_kvm_hv(env, SPR_DPDES, "DPDES",
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        &spr_read_generic, SPR_NOACCESS,
++                        &spr_read_generic, &spr_write_generic,
++                        KVM_REG_PPC_DPDES, 0x00000000);
++#endif
++}
++
+ static void gen_spr_power8_ic(CPUPPCState *env)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+@@ -8629,6 +8641,7 @@ static void init_proc_POWER8(CPUPPCState *env)
+     gen_spr_power8_pmu_user(env);
+     gen_spr_power8_tm(env);
+     gen_spr_power8_pspb(env);
++    gen_spr_power8_dpdes(env);
+     gen_spr_vtb(env);
+     gen_spr_power8_ic(env);
+     gen_spr_power8_book4(env);
+@@ -8817,6 +8830,7 @@ static void init_proc_POWER9(CPUPPCState *env)
+     gen_spr_power8_pmu_user(env);
+     gen_spr_power8_tm(env);
+     gen_spr_power8_pspb(env);
++    gen_spr_power8_dpdes(env);
+     gen_spr_vtb(env);
+     gen_spr_power8_ic(env);
+     gen_spr_power8_book4(env);
 --=20
 2.21.0
 
