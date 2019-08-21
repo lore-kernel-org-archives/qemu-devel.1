@@ -6,69 +6,63 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 766D5C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 13:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81306C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:00:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EB1A233A0
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 13:56:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EB1A233A0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 572CA206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:00:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572CA206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0R6X-0001gz-91
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 09:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56015)
+	id 1i0R9w-0003Aw-Fi
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:00:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i0R5T-0000Jg-4k
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:55:44 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i0R9G-0002ii-91
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i0R5R-0001DR-QW
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:55:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59312)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i0R5R-0001Ce-Ky
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:55:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i0R5P-0000Y3-HM
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 13:55:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7AD1A2E80CF
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 13:55:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Aug 2019 13:48:00 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1819289@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cbparker curryrice71 dgilbert-h philmd pmaydell
-X-Launchpad-Bug-Reporter: John M (curryrice71)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
+ (envelope-from <mlevitsk@redhat.com>) id 1i0R9E-0002p1-4w
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:59:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37224)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1i0R9D-0002oZ-Vz
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:59:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 75112307D90D;
+ Wed, 21 Aug 2019 13:59:34 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 71FB960600;
+ Wed, 21 Aug 2019 13:59:33 +0000 (UTC)
+Message-ID: <51d9225a35fa87339a2045029a05f4dda8bfb837.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, Bug 1819289
+ <1819289@bugs.launchpad.net>
+Date: Wed, 21 Aug 2019 16:59:32 +0300
+In-Reply-To: <CAL1e-=gp6ZEP8GeseG9hPJbP7=ma4+GkV7RLrV8ttqQvnUQJxA@mail.gmail.com>
 References: <155216177409.9624.16357609956497374456.malonedeb@gac.canonical.com>
-Message-Id: <156639528052.27151.8641350033638469136.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d67ae4941da8f40d97c3ce1719d868859b17f4f4
+ <156633742863.16769.2783105280357246181.malone@wampee.canonical.com>
+ <CAL1e-=gp6ZEP8GeseG9hPJbP7=ma4+GkV7RLrV8ttqQvnUQJxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 21 Aug 2019 13:59:34 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1819289] Re: Windows 95 and Windows 98 will not
- install or run
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Bug 1819289] Re: Windows 95 and Windows 98 will
+ not install or run
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,88 +71,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1819289 <1819289@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> cd1bfd5ef336166b275a09dc9842542bf5e63ae3 is the first bad commit
+On Wed, 2019-08-21 at 00:31 +0200, Aleksandar Markovic wrote:
+> 20.08.2019. 23.56, "Brad Parker" <1819289@bugs.launchpad.net> =D1=98=D0=
+=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >=20
+> > So it looks like even though that commit fixed it, it seems to break
+> > again (differently) in 3.0.0, so I'll need to do another bisect betwe=
+en
+> > cfcca36 and v3.0.0 then I guess. And keep working my way up to master=
+ as
+> > well.
+> >=20
+> > --
+>=20
+> At least you will have an interesting debugging story to tell afterward=
+s. I
+> wish you luck!
 
-Unfortunately this is a commit related to SeaBIOS submodule.
-This commit only update the built BIOS roms.
+Does disabling the boot logo help? I do have a working win98 VM here=20
+(nostaligia reasons, that was my first and last primary OS prior to me
+switching to Linux) and what you describe seems to be the hang during the
+win98 boot logo?
 
-The commits before this one are the ones modifying SeaBIOS, justifying
-roms to be rebuilt:
+If it is disabled (logo=3D0 in msdos.sys, under [Options])
+or if you quickly press escape while the logo just showed up, the vm won'=
+t hang,
+and work normally.
 
-eda553a442 seabios: enable ide dma
-429d3ae2c8 seabios: update submodule to release 1.11.2
+The funniest thing is that when _KVM_ is disabled (that is TCG is used in=
+stead), the bug doesn't happen,
+so it might instruction emulation bug in KVM. Or something timing related=
+.
 
-The first one (enable ide dma) is a change in the config.
-You can rebuild the BIOS image and bisect around this commit.
+I also usually see even a message from the in-kernel instruction decoder =
+about
+'cmpchg decoded as nop' or something like that, but don't seem to see it =
+anymore on current kernel.
 
-You can rebuild the SeaBIOS image running this command in QEMU source
-repository:
+I just verified these claims with qemu-4.1.0, kernel 5.3.0-rc4, and an wi=
+n98 (although I only booted it with and without logo few times,
+and didn't do an install)
 
-  $ make -C roms bios
+Speaking of other issue you will face with win98 is that it doesn't detec=
+t the PnP bios by default, so it doesn't see any devices qemu exposes
+on the PCI bus. Thankfully this can be fixed by explicitly overriding the=
+ driver
+http://computernewb.com/wiki/Install_QEMU_Tablet_Driver_on_Windows_98
 
-This will update 'pc-bios/bios.bin' which you use while bisecting.
+For other hardware I had luck with pcnet network card, AC97 sound (SB16 w=
+orks too but it tends to block mouse during the sound,
+probably some PIO/interrupt whatever stuff that is very emulation heavy. =
+For AC97 it was really hard to find a working driver,
+but eventually I found some Win95 old style driver (not the newer WDM dri=
+vers that just don't work).
 
-The second one update the SeaBIOS submodule from commit 0551a4be2c to
-commit f9626ccb91.
+It was really fun weekend, few months ago when I set the thing up :-)
 
-These are not so many commits, so the bisect won't be painful:
+Best regards,
+	Maxim Levitsky
 
-$ git log --oneline 0551a4be2~..f9626ccb91
-f9626cc (tag: rel-1.11.2) cbvga_set_mode: refine clear display logic
-f88297a qemu: add qemu ramfb support
-a2e4001 vgasrc: add allocate_pmm()
-17b01f4 pmm: use tmp zone on oom
-44b17d0 bochs_display_setup: return error on failure
-4ba61fa cbvga_set_mode: disable clearmem in windows x86 emulator.
-dd69189 cbvga_list_modes: don't list current mode twice
-5f0e7c9 cbvga_setup_modes: use real mode number instead of 0x140
-961f67c qemu: add bochs-display support
-767365e cbvga: factor out cbvga_setup_modes()
-7906460 optionrom: enable non-vga display devices
-0551a4b (tag: rel-1.11.1) paravirt: Only enable sercon in NOGRAPHIC mode if=
- no other console specified
-
-I recommend doing your bisection using 2 terminals:
-
-- one in QEMU source, running 'make -C roms bios' to rebuild 'pc-
-bios/bios.bin' and run QEMU installing your image,
-
-- one in roms/seabios/ where you run the 'git bisect' commands.
-
-Note, you don't have to rebuild QEMU.
-
-Alternatively, using a single terminal, you can stand in the
-roms/seabios/ directory, bisect and run 'make -C .. bios'. In this case
-it might be useful to run QEMU with -L ../../pc-bios to specify the path
-to the generated bios.bin.
-
-You are close, good luck!
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1819289
-
-Title:
-  Windows 95 and Windows 98 will not install or run
-
-Status in QEMU:
-  New
-
-Bug description:
-  The last version of QEMU I have been able to run Windows 95 or Windows
-  98 on was 2.7 or 2.8. Recent versions since then even up to 3.1 will
-  either not install or will not run 95 or 98 at all. I have tried every
-  combination of options like isapc or no isapc, cpu pentium  or cpu as
-  486. Tried different memory configurations, but they just don't work
-  anymore.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1819289/+subscriptions
 
