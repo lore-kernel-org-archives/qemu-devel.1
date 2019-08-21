@@ -7,57 +7,56 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABE8C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A96CC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:03:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5301622D6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:02:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6CB722D6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:03:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="A3Il0kCb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5301622D6D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PVlliHW6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6CB722D6D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0LZs-0007aP-CV
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:02:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42943)
+	id 1i0LaS-0008Em-Ng
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:03:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L1H-0005hI-Dn
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:27:00 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0q-0005Bb-2B
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L1F-0000Kq-Ru
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:59 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:53327)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0o-0008Ri-6n
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:31 -0400
+Received: from ozlabs.org ([203.11.71.1]:41709)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L1F-00005E-EU; Wed, 21 Aug 2019 03:26:57 -0400
+ id 1i0L0m-00086k-NU; Wed, 21 Aug 2019 03:26:29 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CzjH26Wsz9sRM; Wed, 21 Aug 2019 17:25:52 +1000 (AEST)
+ id 46CzjD4w7Dz9sR3; Wed, 21 Aug 2019 17:25:51 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372355;
- bh=jK/ciQJoSLXGmTAlQkkkT7mytfHoAHk++6GYWm8bOaA=;
+ d=gibson.dropbear.id.au; s=201602; t=1566372352;
+ bh=c+EmIbgga9qhHKchaVJfp3Gud/L+/Rf9uswnPZgRVJw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=A3Il0kCbHGwp+6xoHS3g0Zcn0KLkFjwNWTyIPsjuDej0cEsvtUqRAwMaY7DB5+APh
- U8pvbZv5+tPkWSU7pyDR6lcn7otMNwQmSrn5YldI28hWW3w0HdqLT6KlFh5DG5PWP0
- u04uWid690q79Nphe3NEcwQBdwHUkt4TmCx0HIJQ=
+ b=PVlliHW65k94TdXB0EF/obHFSaqP21jdpnA3IknQifzlTzVnrLc09o5D43wVxzozF
+ OL3bggLPfZJ+ucqNRY69dgApRPLHnut/0jj9SizewS6eQKUuHPjSbfEtkf0laUVse/
+ tQT2+OAp/Vf+UN0uLnxJIYtXzdA9wRXsv/Vru+U8=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:40 +1000
-Message-Id: <20190821072542.23090-41-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:35 +1000
+Message-Id: <20190821072542.23090-36-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 40/42] ppc: conform to processor User's Manual
- for xscvdpspn
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 35/42] spapr/irq: Drop spapr_irq_msi_reset()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,85 +69,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, "Paul A. Clarke" <pc@us.ibm.com>,
+ qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Paul A. Clarke" <pc@us.ibm.com>
+From: Greg Kurz <groug@kaod.org>
 
-The POWER8 and POWER9 User's Manuals specify the implementation
-behavior for what the ISA leaves "undefined" behavior for the
-xscvdpspn and xscvdpsp instructions.  This patch corrects the QEMU
-implementation to match the hardware implementation for that case.
+PHBs already take care of clearing the MSIs from the bitmap during reset
+or unplug. No need to do this globally from the machine code. Rather add
+an assert to ensure that PHBs have acted as expected.
 
-ISA 3.0B has xscvdpspn leaving its result in word 0 of the target registe=
-r,
-with the other words of the target register left "undefined".
-
-The User's Manuals specify:
-  VSX scalar convert from double-precision to single-precision (xscvdpsp,
-  xscvdpspn).
-  VSR[32:63] is set to VSR[0:31].
-So, words 0 and 1 both contain the result.
-
-Note: this is important because GCC as of version 8 or so, assumes and ta=
-kes
-advantage of this behavior to optimize the following sequence:
-  xscvdpspn vs0,vs1
-  mffprwz   r8,f0
-ISA 3.0B has xscvdpspn leaving its result in word 0 of the target registe=
-r,
-and mffprwz expecting its input to come from word 1 of the source registe=
-r.
-This sequence fails with QEMU, as a shift is required between those two
-instructions.  However, since the hardware splats the result to both word=
-s 0
-and 1 of its output register, the shift is not necessary.
-
-Expect a future revision of the ISA to specify this behavior.
-
-Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
-
-v2
-- Splitting patch "ppc: Three floating point fixes"; this is just one par=
-t.
-- Updated commit message to clarify behavior is documented in User's Manu=
-als.
-- Updated commit message to correct which words are in output and source =
-of
-  xscvdpspn and mffprz.
-- No source changes to this part of the original patch.
-
-Message-Id: <1566236601-22954-1-git-send-email-pc@us.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <156415228966.1064338.190189424190233355.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+[dwg: Fix crash in qtest case where spapr->irq_map can be NULL at the
+ new assert()]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c             | 4 ----
+ hw/ppc/spapr_irq.c         | 7 ++-----
+ include/hw/ppc/spapr_irq.h | 1 -
+ 3 files changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 5611cf0156..23b9c97439 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -2871,10 +2871,14 @@ void helper_xscvqpdp(CPUPPCState *env, uint32_t o=
-pcode,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 51e1cb0d46..64fc2255cc 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1755,10 +1755,6 @@ static void spapr_machine_reset(MachineState *mach=
+ine)
+         ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
+l);
+     }
 =20
- uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
- {
-+    uint64_t result;
-+
-     float_status tstat =3D env->fp_status;
-     set_float_exception_flags(0, &tstat);
-=20
--    return (uint64_t)float64_to_float32(xb, &tstat) << 32;
-+    result =3D (uint64_t)float64_to_float32(xb, &tstat);
-+    /* hardware replicates result to both words of the doubleword result=
-.  */
-+    return (result << 32) | result;
+-    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+-        spapr_irq_msi_reset(spapr);
+-    }
+-
+     /*
+      * This is fixing some of the default configuration of the XIVE
+      * devices. To be called after the reset of the machine devices.
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 2f87fe08f3..06fe2432ba 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -59,11 +59,6 @@ void spapr_irq_msi_free(SpaprMachineState *spapr, int =
+irq, uint32_t num)
+     bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
  }
 =20
- uint64_t helper_xscvspdpn(CPUPPCState *env, uint64_t xb)
+-void spapr_irq_msi_reset(SpaprMachineState *spapr)
+-{
+-    bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
+-}
+-
+ static void spapr_irq_init_kvm(SpaprMachineState *spapr,
+                                   SpaprIrq *irq, Error **errp)
+ {
+@@ -731,6 +726,8 @@ int spapr_irq_post_load(SpaprMachineState *spapr, int=
+ version_id)
+=20
+ void spapr_irq_reset(SpaprMachineState *spapr, Error **errp)
+ {
++    assert(!spapr->irq_map || bitmap_empty(spapr->irq_map, spapr->irq_ma=
+p_nr));
++
+     if (spapr->irq->reset) {
+         spapr->irq->reset(spapr, errp);
+     }
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index 8132e00366..5db305165c 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -30,7 +30,6 @@ void spapr_irq_msi_init(SpaprMachineState *spapr, uint3=
+2_t nr_msis);
+ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool ali=
+gn,
+                         Error **errp);
+ void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t num)=
+;
+-void spapr_irq_msi_reset(SpaprMachineState *spapr);
+=20
+ typedef struct SpaprIrq {
+     uint32_t    nr_irqs;
 --=20
 2.21.0
 
