@@ -2,72 +2,86 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6473FC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D98FC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:04:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B9AF22DA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:51:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9AF22DA7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 749F422DD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:04:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 749F422DD3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Hf2-0003Np-8I
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 23:51:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47502)
+	id 1i0In0-0003Mp-Fk
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 01:04:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54516)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i0HeP-0002wt-TK
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:51:10 -0400
+ (envelope-from <peterx@redhat.com>) id 1i0ImD-0002vI-Dq
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i0HeO-0004vA-R5
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:51:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34988)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i0HeO-0004uZ-LS
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:51:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i0HeM-00087l-TV
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 03:51:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C555B2E807E
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 03:51:06 +0000 (UTC)
+ (envelope-from <peterx@redhat.com>) id 1i0ImB-0006LO-Ve
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:03:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34628)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i0ImB-0006L9-Mz
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:03:15 -0400
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B019859FF
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 05:03:14 +0000 (UTC)
+Received: by mail-pg1-f199.google.com with SMTP id a9so606412pga.16
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 22:03:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=J2A2DI6gYnhnkK+dYpL4wO5heNJB67BMKNYwt2UV6E4=;
+ b=HE8+fE78YFKeUA9/ZrqzHFSLDybhe52ETIbX4aDjqyP5wMOJRMe/Fyxk18EAiO7Ogz
+ ct+Ua7Cm+yepoQOOhG3i19kI/f2M3qadkv/F1mlwRt1XfEYqP8SvJuisjmCQUlMBGFPB
+ hlltD0WyRfvXGU/dr0RUGnHVNvq363SK2eZemUeD58Ge5TQk3dAdlKHIMFpe8FNOEjpR
+ 8Uktmcq5pFPy2jJ/WC5+uVVF12wYN52O3yjr1fgN+soPEjAxvd0xh/syRT6a1qeUqTZp
+ 9MiUSazcVS+rIRKwfEhR1VW6XP/eqFc7w9SDfF2pBqGkUaYTJsEV0PklVyyHnQFsiRtl
+ nWEg==
+X-Gm-Message-State: APjAAAWkSsSlREuAoZ/vOd016FnWG7rIMzvXeE9yYND8jqNXRR6yGV41
+ 22B7DhckplURpJo1LxtSq6dMZgFvCDFZ3gemYvr7BvjZddbcPd6TtWBfMuTHuYiwPqvcmaouam2
+ JgBhZqu4NpINiIaI=
+X-Received: by 2002:a63:c246:: with SMTP id l6mr27998977pgg.210.1566363793797; 
+ Tue, 20 Aug 2019 22:03:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzZzzsXs+k3RcR8cycX8UqXLB4TFPAVz7/n6RtMuld1+M8XiwQUDdx9Gz95R+nAsVvcGyObMg==
+X-Received: by 2002:a63:c246:: with SMTP id l6mr27998953pgg.210.1566363793399; 
+ Tue, 20 Aug 2019 22:03:13 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id k64sm28774381pgk.74.2019.08.20.22.03.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Aug 2019 22:03:12 -0700 (PDT)
+Date: Wed, 21 Aug 2019 13:03:02 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190821050302.GA25454@xz-x1>
+References: <20190812074531.28970-1-peterx@redhat.com>
+ <20190820052240.GG13560@xz-x1>
+ <f8e320ca-8c24-a562-1f5b-e55bd5c64d4a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Aug 2019 03:42:04 -0000
-From: Brad Parker <1819289@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cbparker curryrice71 dgilbert-h philmd pmaydell
-X-Launchpad-Bug-Reporter: John M (curryrice71)
-X-Launchpad-Bug-Modifier: Brad Parker (cbparker)
-References: <155216177409.9624.16357609956497374456.malonedeb@gac.canonical.com>
-Message-Id: <156635892465.26559.12940677354754486239.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a26d239688c6bc9873d4c5c516e80a419ddc959c
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f8e320ca-8c24-a562-1f5b-e55bd5c64d4a@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1819289] Re: Windows 95 and Windows 98 will not
- install or run
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH RFC 0/4] intel_iommu: Do sanity check of
+ vfio-pci earlier
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,62 +90,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1819289 <1819289@bugs.launchpad.net>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Bandan Das <bsd@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just finished a bisect between cfcca36 (working) and current master (not
-working), here is the result:
+On Tue, Aug 20, 2019 at 08:24:49AM +0200, Paolo Bonzini wrote:
+> On 20/08/19 07:22, Peter Xu wrote:
+> > On Mon, Aug 12, 2019 at 09:45:27AM +0200, Peter Xu wrote:
+> >> This is a RFC series.
+> >>
+> >> The VT-d code has some defects, one of them is that we cannot detect
+> >> the misuse of vIOMMU and vfio-pci early enough.
+> >>
+> >> For example, logically this is not allowed:
+> >>
+> >>   -device intel-iommu,caching-mode=off \
+> >>   -device vfio-pci,host=05:00.0
+> >>
+> >> Because the caching mode is required to make vfio-pci devices
+> >> functional.
+> >>
+> >> Previously we did this sanity check in vtd_iommu_notify_flag_changed()
+> >> as when the memory regions change their attributes.  However that's
+> >> too late in most cases!  Because the memory region layouts will only
+> >> change after IOMMU is enabled, and that's in most cases during the
+> >> guest OS boots.  So when the configuration is wrong, we will only bail
+> >> out during the guest boots rather than simply telling the user before
+> >> QEMU starts.
+> >>
+> >> The same problem happens on device hotplug, say, when we have this:
+> >>
+> >>   -device intel-iommu,caching-mode=off
+> >>
+> >> Then we do something like:
+> >>
+> >>   (HMP) device_add vfio-pci,host=05:00.0,bus=pcie.1
+> >>
+> >> If at that time the vIOMMU is enabled in the guest then the QEMU
+> >> process will simply quit directly due to this hotplug event.  This is
+> >> a bit insane...
+> >>
+> >> This series tries to solve above two problems by introducing two
+> >> sanity checks upon these places separately:
+> >>
+> >>   - machine done
+> >>   - hotplug device
+> >>
+> >> This is a bit awkward but I hope this could be better than before.
+> >> There is of course other solutions like hard-code the check into
+> >> vfio-pci but I feel it even more unpretty.  I didn't think out any
+> >> better way to do this, if there is please kindly shout out.
+> >>
+> >> Please have a look to see whether this would be acceptable, thanks.
+> > 
+> > Any more comment on this?
+> 
+> No problem from me, but I wouldn't mind if someone else merged it. :)
 
-$ git bisect bad
-cd1bfd5ef336166b275a09dc9842542bf5e63ae3 is the first bad commit
-commit cd1bfd5ef336166b275a09dc9842542bf5e63ae3
-Author: Gerd Hoffmann <kraxel@redhat.com>
-Date:   Wed Jun 20 12:17:34 2018 +0200
+Can I read this as an "acked-by"? :)
 
-    seabios: update bios and vgabios binaries
-    =
+Michael, should this be for your tree?  What do you think about the
+series?  Please let me know what I need to do to move this forward.  I
+can repost a non-rfc series if needed, but it'll be exactly the same
+content.
 
-    Adds two new vgabios binaries, for ramfb and bochs-display.
-    =
+Regards,
 
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
- pc-bios/bios-256k.bin             | Bin 262144 -> 262144 bytes
- pc-bios/bios.bin                  | Bin 131072 -> 131072 bytes
- pc-bios/vgabios-bochs-display.bin | Bin 0 -> 27648 bytes
- pc-bios/vgabios-cirrus.bin        | Bin 38400 -> 38400 bytes
- pc-bios/vgabios-qxl.bin           | Bin 38912 -> 38912 bytes
- pc-bios/vgabios-ramfb.bin         | Bin 0 -> 28160 bytes
- pc-bios/vgabios-stdvga.bin        | Bin 38912 -> 38912 bytes
- pc-bios/vgabios-virtio.bin        | Bin 38912 -> 38912 bytes
- pc-bios/vgabios-vmware.bin        | Bin 38912 -> 38912 bytes
- pc-bios/vgabios.bin               | Bin 38400 -> 38400 bytes
- 10 files changed, 0 insertions(+), 0 deletions(-)
- create mode 100644 pc-bios/vgabios-bochs-display.bin
- create mode 100644 pc-bios/vgabios-ramfb.bin
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1819289
-
-Title:
-  Windows 95 and Windows 98 will not install or run
-
-Status in QEMU:
-  New
-
-Bug description:
-  The last version of QEMU I have been able to run Windows 95 or Windows
-  98 on was 2.7 or 2.8. Recent versions since then even up to 3.1 will
-  either not install or will not run 95 or 98 at all. I have tried every
-  combination of options like isapc or no isapc, cpu pentium  or cpu as
-  486. Tried different memory configurations, but they just don't work
-  anymore.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1819289/+subscriptions
+-- 
+Peter Xu
 
