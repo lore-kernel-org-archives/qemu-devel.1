@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D170C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85964C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42A36206BA
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:06:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42A36206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 559D52339E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:07:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 559D52339E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0RGB-00023P-74
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:06:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57704)
+	id 1i0RH9-0002xM-DB
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i0RAT-0003xZ-Bf
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:54 -0400
+ (envelope-from <bounces@canonical.com>) id 1i0RAU-0003zc-Hq
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i0RAR-0003Qe-52
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60108)
+ (envelope-from <bounces@canonical.com>) id 1i0RAT-0003Rr-Af
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60128)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i0RAP-0003PP-9X
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:49 -0400
+ id 1i0RAR-0003PY-8L
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:53 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i0RAN-00019B-HR
+ id 1i0RAN-00019B-WD
  for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 14:00:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 818D72E8041
+ by loganberry.canonical.com (Postfix) with ESMTP id F1B8C2E8041
  for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 14:00:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Aug 2019 13:52:56 -0000
+Date: Wed, 21 Aug 2019 13:53:14 -0000
 From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,13 +56,13 @@ X-Launchpad-Bug-Commenters: christophe-lyon
 X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
 X-Launchpad-Bug-Modifier: Christophe Lyon (christophe-lyon)
 References: <156639548437.26869.13792283715555746637.malonedeb@gac.canonical.com>
-Message-Id: <156639557662.22883.7851771625435109723.malone@chaenomeles.canonical.com>
+Message-Id: <156639559461.16537.5717589522704486595.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19022";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 7a0425087e2375e3ac73ef28bf6f58a0cf406ad3
+X-Launchpad-Hash: 93b192a8a4eac9f3ec453357d5ff4b9f4e51e1bc
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1840922] Re: qemu-arm for cortex-m33 aborts with
@@ -82,9 +82,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "qemu trace at -Os"
-   https://bugs.launchpad.net/qemu/+bug/1840922/+attachment/5283731/+files/=
-20000822-1.trace.Os
+** Attachment added: "qemu trace at -O2"
+   https://bugs.launchpad.net/qemu/+bug/1840922/+attachment/5283732/+files/=
+20000822-1.trace.O2
 
 -- =
 
