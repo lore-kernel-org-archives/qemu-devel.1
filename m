@@ -2,67 +2,73 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81306C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D28AC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:02:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 572CA206BA
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:00:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572CA206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63E80206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:02:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63E80206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0R9w-0003Aw-Fi
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:00:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57219)
+	id 1i0RCC-0005jb-3I
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:02:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i0R9G-0002ii-91
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:59:39 -0400
+ (envelope-from <bounces@canonical.com>) id 1i0RAR-0003tD-8n
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i0R9E-0002p1-4w
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:59:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37224)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1i0R9D-0002oZ-Vz
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:59:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 75112307D90D;
- Wed, 21 Aug 2019 13:59:34 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 71FB960600;
- Wed, 21 Aug 2019 13:59:33 +0000 (UTC)
-Message-ID: <51d9225a35fa87339a2045029a05f4dda8bfb837.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, Bug 1819289
- <1819289@bugs.launchpad.net>
-Date: Wed, 21 Aug 2019 16:59:32 +0300
-In-Reply-To: <CAL1e-=gp6ZEP8GeseG9hPJbP7=ma4+GkV7RLrV8ttqQvnUQJxA@mail.gmail.com>
-References: <155216177409.9624.16357609956497374456.malonedeb@gac.canonical.com>
- <156633742863.16769.2783105280357246181.malone@wampee.canonical.com>
- <CAL1e-=gp6ZEP8GeseG9hPJbP7=ma4+GkV7RLrV8ttqQvnUQJxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 21 Aug 2019 13:59:34 +0000 (UTC)
+ (envelope-from <bounces@canonical.com>) id 1i0RAP-0003Q2-BM
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60032)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i0RAN-0003OW-BP
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:00:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i0RAL-0001AK-S7
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 14:00:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D1BE72E8041
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 14:00:45 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 21 Aug 2019 13:51:49 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: christophe-lyon
+X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
+X-Launchpad-Bug-Modifier: Christophe Lyon (christophe-lyon)
+References: <156639548437.26869.13792283715555746637.malonedeb@gac.canonical.com>
+Message-Id: <156639550965.22730.9048170412970326178.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19022";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: ee445783264b04137325fb28a4e91b62ac34f24b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Bug 1819289] Re: Windows 95 and Windows 98 will
- not install or run
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1840922] Re: qemu-arm for cortex-m33 aborts with
+ unhandled CPU exception 0x8
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,68 +77,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1840922 <1840922@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2019-08-21 at 00:31 +0200, Aleksandar Markovic wrote:
-> 20.08.2019. 23.56, "Brad Parker" <1819289@bugs.launchpad.net> =D1=98=D0=
-=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >=20
-> > So it looks like even though that commit fixed it, it seems to break
-> > again (differently) in 3.0.0, so I'll need to do another bisect betwe=
-en
-> > cfcca36 and v3.0.0 then I guess. And keep working my way up to master=
- as
-> > well.
-> >=20
-> > --
->=20
-> At least you will have an interesting debugging story to tell afterward=
-s. I
-> wish you luck!
+** Attachment added: "asm at -Os"
+   https://bugs.launchpad.net/qemu/+bug/1840922/+attachment/5283727/+files/=
+20000822-1.s.Os
 
-Does disabling the boot logo help? I do have a working win98 VM here=20
-(nostaligia reasons, that was my first and last primary OS prior to me
-switching to Linux) and what you describe seems to be the hang during the
-win98 boot logo?
+-- =
 
-If it is disabled (logo=3D0 in msdos.sys, under [Options])
-or if you quickly press escape while the logo just showed up, the vm won'=
-t hang,
-and work normally.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1840922
 
-The funniest thing is that when _KVM_ is disabled (that is TCG is used in=
-stead), the bug doesn't happen,
-so it might instruction emulation bug in KVM. Or something timing related=
-.
+Title:
+  qemu-arm for cortex-m33 aborts with unhandled CPU exception 0x8
 
-I also usually see even a message from the in-kernel instruction decoder =
-about
-'cmpchg decoded as nop' or something like that, but don't seem to see it =
-anymore on current kernel.
+Status in QEMU:
+  New
 
-I just verified these claims with qemu-4.1.0, kernel 5.3.0-rc4, and an wi=
-n98 (although I only booted it with and without logo few times,
-and didn't do an install)
+Bug description:
+  Hi,
 
-Speaking of other issue you will face with win98 is that it doesn't detec=
-t the PnP bios by default, so it doesn't see any devices qemu exposes
-on the PCI bus. Thankfully this can be fixed by explicitly overriding the=
- driver
-http://computernewb.com/wiki/Install_QEMU_Tablet_Driver_on_Windows_98
+  While experimenting with running the GCC testsuite with cortex-m33 as tar=
+get (to exercise v8-m code), I came across this failure:
+  qemu: unhandled CPU exception 0x8 - aborting
+  R00=3Dfffeaf58 R01=3Dfffeaf58 R02=3D00000000 R03=3Dfffeaf5d
+  R04=3Dfffeaf5c R05=3Dfffeaf9c R06=3D00000000 R07=3Dfffeaf80
+  R08=3D00000000 R09=3D00000000 R10=3D00019dbc R11=3D00000000
+  R12=3D000000f0 R13=3Dfffeaf58 R14=3D000081f3 R15=3Dfffeaf5c
+  XPSR=3D61000000 -ZC- T NS priv-thread
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6033=
+c908
 
-For other hardware I had luck with pcnet network card, AC97 sound (SB16 w=
-orks too but it tends to block mouse during the sound,
-probably some PIO/interrupt whatever stuff that is very emulation heavy. =
-For AC97 it was really hard to find a working driver,
-but eventually I found some Win95 old style driver (not the newer WDM dri=
-vers that just don't work).
+  I'm using arm-eabi-gcc, so it targets bare-metal, not linux.
 
-It was really fun weekend, few months ago when I set the thing up :-)
+  The testcase is GCC's
+  gcc/testsuite/gcc.c-torture/execute/20000822-1.c; it works when
+  compiled at -O2, but crashes when compiled at -Os. The test uses
+  nested functions, so it creates a trampoline on the stack, whose
+  address may be a problem. But since the stack address seems to be in
+  the same range in the O2 and Os cases, it's not that clear.
 
-Best regards,
-	Maxim Levitsky
+  I'm attaching the C source, asm, binary executables and qemu traces
+  with in_asm,cpu.
 
+  I execute the binaries with:
+  qemu-arm --cpu cortex-m33  ./20000822-1.exe.Os
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1840922/+subscriptions
 
