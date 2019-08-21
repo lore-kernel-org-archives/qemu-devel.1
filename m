@@ -2,83 +2,51 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F71C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:54:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD76DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:54:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BB9722DD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:54:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=temperror (0-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="G/MeHLaH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BB9722DD3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 81DD422DD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:54:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81DD422DD3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Ts4-0001We-Hj
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:54:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59701)
+	id 1i0TsP-0002at-O9
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:54:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1i0Ta6-0007rD-LL
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:31 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i0TqU-0007mj-D9
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1i0Ta5-0006Bc-Dl
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:30 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:36492)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i0TqS-0004Q6-OY
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:52:26 -0400
+Received: from relay.sw.ru ([185.231.240.75]:53184)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1i0Ta5-0006Ae-5c
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:29 -0400
-Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPS id DC66D96F54;
- Wed, 21 Aug 2019 16:35:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1566405328;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IoXWqtvBGWyNCiBvyV0lKqkzc+865svTakM6A2Tn4Wk=;
- b=G/MeHLaH4aAjNQudwW3sXabdf2FzcsahvfF33SALhn2jSgXXDnFsgr5W4Zxmw5vZfZ7+l1
- wKumm0o2gYn2vBUw2zGlrUIq8EjX95fho8iBq1nkPaXKPn/H+FxDQCh8RG4ew4eRiaoFJO
- XW7EqGwzpS2/dWTwzPZFDoCCJHNtVRk=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 21 Aug 2019 18:33:40 +0200
-Message-Id: <20190821163341.16309-10-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190821163341.16309-1-damien.hedde@greensocs.com>
-References: <20190821163341.16309-1-damien.hedde@greensocs.com>
-MIME-Version: 1.0
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1566405328;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IoXWqtvBGWyNCiBvyV0lKqkzc+865svTakM6A2Tn4Wk=;
- b=OLi8yLSbTEHnvGY6grGbLGGgzTuR4VU0EJxNEhluRs6/WFlqje4iQcdy8ye2tTgkeBMN6x
- ltIj5ttoqJhPtHVKAfYxthFz6GSypZR9MlZ8V+C9lREJH4RETEoQlmmF2q7WoTpFx7GWT3
- R9ogOklrt4xhn9D+fJ+I+Fd8eBcSZPw=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1566405328; a=rsa-sha256; cv=none;
- b=597dorltUPx5uesqcLQCv6daraqUYiPE46pTVlnjKi0Gb6RmAwl4fJkJMGm4a0R7ePNpHf
- +nPHru8zyO3aR2nuT1ozHx7H0FoXpup7TR1Ye3IIdt7s6173dNsDesCUOsxDWw9avRGs8z
- YWRHRDSy9RUxHLu5Gkerr0uRX7ASnJI=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [PATCH v4 09/10] hw/core/: add warm reset helpers for
- devices and buses
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i0TqP-0004AP-4z; Wed, 21 Aug 2019 12:52:21 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i0TqK-0003Ry-QB; Wed, 21 Aug 2019 19:52:16 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Wed, 21 Aug 2019 19:52:13 +0300
+Message-Id: <20190821165215.61406-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190821165215.61406-1-vsementsov@virtuozzo.com>
+References: <20190821165215.61406-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v8 1/3] qemu-coroutine-sleep: introduce
+ qemu_co_sleep_wake
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,136 +58,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- edgar.iglesias@xilinx.com, berrange@redhat.com, ehabkost@redhat.com,
- mark.burton@greensocs.com, pbonzini@redhat.com, philmd@redhat.com,
- david@gibson.dropbear.id.au
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ sheepdog@lists.wpkg.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org, namei.unix@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This add helpers to trigger warm reset and to retrieve the
-reset current reset type.
+Introduce a function to gracefully wake a coroutine sleeping in
+qemu_co_sleep_ns().
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/core/bus.c          | 11 +++++++++++
- hw/core/qdev.c         | 11 +++++++++++
- include/hw/qdev-core.h | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 56 insertions(+)
+ include/qemu/coroutine.h    | 17 ++++++++++++--
+ block/null.c                |  2 +-
+ block/sheepdog.c            |  2 +-
+ tests/test-bdrv-drain.c     |  6 ++---
+ tests/test-block-iothread.c |  2 +-
+ util/qemu-coroutine-sleep.c | 47 +++++++++++++++++++++++++++----------
+ 6 files changed, 55 insertions(+), 21 deletions(-)
 
-diff --git a/hw/core/bus.c b/hw/core/bus.c
-index 3be65ad041..b245fd6937 100644
---- a/hw/core/bus.c
-+++ b/hw/core/bus.c
-@@ -74,11 +74,22 @@ void bus_cold_reset(BusState *bus)
-     resettable_reset(OBJECT(bus), RESET_TYPE_COLD);
- }
-=20
-+void bus_warm_reset(BusState *bus)
-+{
-+    resettable_reset(OBJECT(bus), RESET_TYPE_WARM);
-+}
-+
- bool bus_is_resetting(BusState *bus)
- {
-     return resettable_is_resetting(OBJECT(bus));
- }
-=20
-+bool bus_test_reset_type(BusState *bus, ResetType type)
-+{
-+    ResetType cur_type =3D resettable_get_type(OBJECT(bus));
-+    return (cur_type & type);
-+}
-+
- static ResetState *bus_get_reset_state(Object *obj)
- {
-     BusState *bus =3D BUS(obj);
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 1638bc9f3b..9095f2b9c1 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -281,11 +281,22 @@ void device_cold_reset(DeviceState *dev)
-     resettable_reset(OBJECT(dev), RESET_TYPE_COLD);
- }
-=20
-+void device_warm_reset(DeviceState *dev)
-+{
-+    resettable_reset(OBJECT(dev), RESET_TYPE_WARM);
-+}
-+
- bool device_is_resetting(DeviceState *dev)
- {
-     return resettable_is_resetting(OBJECT(dev));
- }
-=20
-+bool device_test_reset_type(DeviceState *dev, ResetType type)
-+{
-+    ResetType cur_type =3D resettable_get_type(OBJECT(dev));
-+    return (cur_type & type);
-+}
-+
- static ResetState *device_get_reset_state(Object *obj)
- {
-     DeviceState *dev =3D DEVICE(obj);
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 2976121fbc..eb11f0f801 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -422,18 +422,52 @@ void device_cold_reset(DeviceState *dev);
-  */
- void bus_cold_reset(BusState *bus);
-=20
-+/**
-+ * device_warm_reset:
-+ * Trigger a warm reset of the device @dev.
-+ *
-+ * Use the Resettable interface (see hw/interface.h); it also reset the
-+ * device's qdev/qbus subtree.
-+ */
-+void device_warm_reset(DeviceState *dev);
-+
-+/**
-+ * bus_warm_reset:
-+ * Trigger a warm reset of the bus @bus.
-+ *
-+ * Use the Resettable interface (see hw/interface.h); it also reset the
-+ * bus's qdev/qbus subtree.
-+ */
-+void bus_warm_reset(BusState *bus);
-+
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index 9801e7f5a4..96780a4902 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -274,9 +274,22 @@ void qemu_co_rwlock_wrlock(CoRwlock *lock);
+ void qemu_co_rwlock_unlock(CoRwlock *lock);
+ 
  /**
-  * device_is_resetting:
-  * Return true if the device @dev is currently being reset.
+- * Yield the coroutine for a given duration
++ * Yield the coroutine for a given duration. During this yield @sleep_state (if
++ * not NULL) is set to opaque pointer, which may be used for
++ * qemu_co_sleep_wake(). Be careful, the pointer is set back to zero when timer
++ * shoots. Don't save obtained value to other variables and don't call
++ * qemu_co_sleep_wake from another aio context.
   */
- bool device_is_resetting(DeviceState *dev);
-=20
-+/**
-+ * device_test_reset_type:
-+ * Return true if the device @dev is currently under reset type
-+ * @type.
-+ * Only valid if device_is_resetting() is true
-+ */
-+bool device_test_reset_type(DeviceState *dev, ResetType type);
+-void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
++void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns,
++                                   void **sleep_state);
 +
++/**
++ * Wake a coroutine if it is sleeping by qemu_co_sleep_ns. Timer will be
++ * deleted. @sleep_state must be the variable which address was given to
++ * qemu_co_sleep_ns() and should be checked to be non-NULL before calling
++ * qemu_co_sleep_wake().
++ */
++void qemu_co_sleep_wake(void *sleep_state);
+ 
  /**
-  * bus_is_resetting:
-  * Return true if the bus @bus is currently being reset.
-  */
- bool bus_is_resetting(BusState *bus);
-=20
-+/**
-+ * bus_test_reset_type:
-+ * Return true if the bus @bus is currently under reset type
-+ * @type.
-+ * Only valid if device_is_resetting() is true
-+ */
-+bool bus_test_reset_type(BusState *bus, ResetType type);
+  * Yield until a file descriptor becomes readable
+diff --git a/block/null.c b/block/null.c
+index 699aa295cb..1e3f26b07e 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -109,7 +109,7 @@ static coroutine_fn int null_co_common(BlockDriverState *bs)
+     BDRVNullState *s = bs->opaque;
+ 
+     if (s->latency_ns) {
+-        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, s->latency_ns);
++        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, s->latency_ns, NULL);
+     }
+     return 0;
+ }
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 773dfc6ab1..3a7ef2f209 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -743,7 +743,7 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
+         if (s->fd < 0) {
+             trace_sheepdog_reconnect_to_sdog();
+             error_report_err(local_err);
+-            qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000000ULL);
++            qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000000ULL, NULL);
+         }
+     };
+ 
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 374bef6bb2..2f53a7add5 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -43,7 +43,7 @@ static void coroutine_fn bdrv_test_co_drain_begin(BlockDriverState *bs)
+     BDRVTestState *s = bs->opaque;
+     s->drain_count++;
+     if (s->sleep_in_drain_begin) {
+-        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
++        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000, NULL);
+     }
+ }
+ 
+@@ -74,7 +74,7 @@ static int coroutine_fn bdrv_test_co_preadv(BlockDriverState *bs,
+      * it to complete. We need to sleep a while as bdrv_drain_invoke() comes
+      * first and polls its result, too, but it shouldn't accidentally complete
+      * this request yet. */
+-    qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
++    qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000, NULL);
+ 
+     if (s->bh_indirection_ctx) {
+         aio_bh_schedule_oneshot(s->bh_indirection_ctx, co_reenter_bh,
+@@ -829,7 +829,7 @@ static int coroutine_fn test_job_run(Job *job, Error **errp)
+         /* Avoid job_sleep_ns() because it marks the job as !busy. We want to
+          * emulate some actual activity (probably some I/O) here so that drain
+          * has to wait for this activity to stop. */
+-        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000);
++        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000, NULL);
+ 
+         job_pause_point(&s->common.job);
+     }
+diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
+index 926577b1f9..a1ac5efcaa 100644
+--- a/tests/test-block-iothread.c
++++ b/tests/test-block-iothread.c
+@@ -381,7 +381,7 @@ static int coroutine_fn test_job_run(Job *job, Error **errp)
+          * emulate some actual activity (probably some I/O) here so that the
+          * drain involved in AioContext switches has to wait for this activity
+          * to stop. */
+-        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000);
++        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000, NULL);
+ 
+         job_pause_point(&s->common.job);
+     }
+diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
+index 4bfdd30cbf..48a64bb8d8 100644
+--- a/util/qemu-coroutine-sleep.c
++++ b/util/qemu-coroutine-sleep.c
+@@ -17,31 +17,52 @@
+ #include "qemu/timer.h"
+ #include "block/aio.h"
+ 
+-static void co_sleep_cb(void *opaque)
+-{
+-    Coroutine *co = opaque;
++const char *qemu_co_sleep_ns__scheduled = "qemu_co_sleep_ns";
 +
- /* This should go away once we get rid of the NULL bus hack */
- BusState *sysbus_get_default(void);
-=20
---=20
-2.22.0
++typedef struct QemuCoSleepState {
++    Coroutine *co;
++    QEMUTimer *ts;
++    void **user_state_pointer;
++} QemuCoSleepState;
+ 
++void qemu_co_sleep_wake(void *sleep_state)
++{
++    QemuCoSleepState *s = (QemuCoSleepState *)sleep_state;
+     /* Write of schedule protected by barrier write in aio_co_schedule */
+-    atomic_set(&co->scheduled, NULL);
+-    aio_co_wake(co);
++    const char *scheduled = atomic_cmpxchg(&s->co->scheduled,
++                                           qemu_co_sleep_ns__scheduled, NULL);
++
++    assert(scheduled == qemu_co_sleep_ns__scheduled);
++    if (s->user_state_pointer) {
++        *s->user_state_pointer = NULL;
++    }
++    timer_del(s->ts);
++    aio_co_wake(s->co);
+ }
+ 
+-void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns)
++void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns,
++                                   void **sleep_state)
+ {
+     AioContext *ctx = qemu_get_current_aio_context();
+-    QEMUTimer *ts;
+-    Coroutine *co = qemu_coroutine_self();
++    QemuCoSleepState state = {
++        .co = qemu_coroutine_self(),
++        .ts = aio_timer_new(ctx, type, SCALE_NS, qemu_co_sleep_wake, &state),
++        .user_state_pointer = sleep_state,
++    };
+ 
+-    const char *scheduled = atomic_cmpxchg(&co->scheduled, NULL, __func__);
++    const char *scheduled = atomic_cmpxchg(&state.co->scheduled, NULL,
++                                           qemu_co_sleep_ns__scheduled);
+     if (scheduled) {
+         fprintf(stderr,
+                 "%s: Co-routine was already scheduled in '%s'\n",
+                 __func__, scheduled);
+         abort();
+     }
+-    ts = aio_timer_new(ctx, type, SCALE_NS, co_sleep_cb, co);
+-    timer_mod(ts, qemu_clock_get_ns(type) + ns);
++
++    if (sleep_state) {
++        *sleep_state = &state;
++    }
++    timer_mod(state.ts, qemu_clock_get_ns(type) + ns);
+     qemu_coroutine_yield();
+-    timer_del(ts);
+-    timer_free(ts);
++    timer_free(state.ts);
+ }
+-- 
+2.18.0
 
 
