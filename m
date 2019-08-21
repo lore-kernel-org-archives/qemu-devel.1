@@ -2,96 +2,86 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EA7C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 20:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F39B7C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 20:27:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE09D2339E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 20:25:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE09D2339E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA69A22DD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 20:27:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="anCiP+DQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA69A22DD3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0XAx-00042u-QW
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 16:25:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60028)
+	id 1i0XD1-0005AU-Vc
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 16:27:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <michael.d.kinney@intel.com>) id 1i0X2h-0006Rc-PG
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:17:16 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0XCN-0004kc-7w
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <michael.d.kinney@intel.com>) id 1i0X2f-0008Iv-Q8
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:17:14 -0400
-Received: from mga09.intel.com ([134.134.136.24]:54807)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <michael.d.kinney@intel.com>)
- id 1i0X2f-0008HW-Im
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:17:13 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Aug 2019 13:17:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,412,1559545200"; d="scan'208";a="190322594"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
- by orsmga002.jf.intel.com with ESMTP; 21 Aug 2019 13:17:09 -0700
-Received: from orsmsx163.amr.corp.intel.com (10.22.240.88) by
- ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 21 Aug 2019 13:17:09 -0700
-Received: from orsmsx113.amr.corp.intel.com ([169.254.9.198]) by
- ORSMSX163.amr.corp.intel.com ([169.254.9.208]) with mapi id 14.03.0439.000;
- Wed, 21 Aug 2019 13:17:09 -0700
-From: "Kinney, Michael D" <michael.d.kinney@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, "rfc@edk2.groups.io"
- <rfc@edk2.groups.io>, "Yao, Jiewen" <jiewen.yao@intel.com>, "Kinney, Michael
- D" <michael.d.kinney@intel.com>
-Thread-Topic: [edk2-rfc] [edk2-devel] CPU hotplug using SMM with QEMU+OVMF
-Thread-Index: AQHVUfF5vU6QBeHgZE+cN7DIWDHHwKb6jzUA//+ZRQCAAaHSAIAAFq8AgAEuZqD//8zIAIAAiChAgABQUYCAACK6gIAAmpdAgAJgcwCAALs9d4AEPCbwgACNBoD//467cAAPWXAAAAlUNOA=
-Date: Wed, 21 Aug 2019 20:17:08 +0000
-Message-ID: <E92EE9817A31E24EB0585FDF735412F5B9D9E82C@ORSMSX113.amr.corp.intel.com>
-References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
- <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
- <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
- <99219f81-33a3-f447-95f8-f10341d70084@redhat.com>
- <6f8b9507-58d0-5fbd-b827-c7194b3b2948@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
- <7cb458ea-956e-c1df-33f7-025e4f0f22df@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F7600B9@shsmsx102.ccr.corp.intel.com>
- <bb6fdbe0-2a3b-e586-e9a5-93e1ac0803ec@redhat.com>
- <20190816161933.7d30a881@x1.home>
- <74D8A39837DF1E4DA445A8C0B3885C503F761B96@shsmsx102.ccr.corp.intel.com>
- <35396800-32d2-c25f-b0d0-2d7cd8438687@redhat.com>
- <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
- <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
- <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9D9D74A@ORSMSX113.amr.corp.intel.com>
- <adf3f3b8-1dc9-79e1-7411-4d9131657a1f@redhat.com>
-In-Reply-To: <adf3f3b8-1dc9-79e1-7411-4d9131657a1f@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.139]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0XCL-0004fU-5B
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:27:15 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44210)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i0XCL-0004f2-0U
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:27:13 -0400
+Received: by mail-ot1-x344.google.com with SMTP id w4so3297835ote.11
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 13:27:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=JDCc7gULav1TTulhVx4N0uvNHX96QLHd6afN0FRmvXo=;
+ b=anCiP+DQtX3Opfg98AmESJe68RHB3V7v1eAS3kiNwGNiRRRM+fPepPMdQGJ1Wy01qu
+ XeBbaAXL2+cs7mLVUG4GU0+gOjtu+aaDOI6FO2580hjLKcz4dflNx3E1a31oPbw/fLkP
+ z2WOaFgIq7m52Je5joK8cFehc8n6zYUXYqCkz7u+WNsuEHXxmaQkZiD658PXKcjOK0EL
+ sZlNKI+dXYh/UAX8L0CscFmZ9NIyEmBJKLhSGi1Bk04wNzj0KotZaEkWW7BJtd39CoNv
+ Dt/MG+GXzZeLcSkXIBaFb1mpNaNeOClqnb0maeRjOkAKHDbDmvCEgH1j+qSYTQxHJahp
+ x7MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=JDCc7gULav1TTulhVx4N0uvNHX96QLHd6afN0FRmvXo=;
+ b=ubE7OD4Mfw8TiKYLWiW1vzRJpWJOmop0P+ZJI+WZ41XxK8eVDwI6d2y0UNzwtimMWu
+ QtUwJydagGIxtfR5daAc9vIbMiYzZLZq3hSlSafv5Mw00q88lPL8DEn2AiHTa2t6j2VM
+ v5ZwRnYrA3c0+PUnfUH/0LDmRlZJahfUksvy9uWYCMJpz4HD3/3B2vxjitVqdcEAQxvi
+ pY7exsTHfO9VGI0Yw+1U7RnCVEf3Hz47FvqChyHjqxzD3xDElN50q6mvRtQlIih2FEm4
+ xwGQO0MrPh4MG7+zvWaHVE3KUX+/J/2XiaNkXzmItF78V0O5zR/AixRiS/STSj6+gjqG
+ gTpQ==
+X-Gm-Message-State: APjAAAXN88eZ8pfGxXILlSNodfidxAybnrLuPGe/K3w/BSurFooPN6D4
+ kXgjsPEzkT8KfcDy1+Ct6pL2R4j0jTZy6LE4EOw=
+X-Google-Smtp-Source: APXvYqxIct9RZ9bnKRLBt69hSqGRbQ2IjfP3/nup1eSxpLQ4s06mp2FpB4jOUVQXJYZT/I9ijBgoqMkECaz9KODwIP8=
+X-Received: by 2002:a9d:1288:: with SMTP id g8mr303986otg.306.1566419231978;
+ Wed, 21 Aug 2019 13:27:11 -0700 (PDT)
 MIME-Version: 1.0
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 13:27:11
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 13:27:11
+ -0700 (PDT)
+In-Reply-To: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 21 Aug 2019 22:27:11 +0200
+Message-ID: <CAL1e-=hWc6G7Ob+LU7EWoY3LVBvABY2ky=RT28dSzqM=9O=OEA@mail.gmail.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.24
-X-Mailman-Approved-At: Wed, 21 Aug 2019 16:24:46 -0400
-Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
- QEMU+OVMF
+X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 0/2] tests/acceptance: Update MIPS Malta
+ ssh test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,83 +93,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
- "devel@edk2.groups.io" <devel@edk2.groups.io>,
- Phillip Goerl <phillip.goerl@oracle.com>, qemu
- devel list <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>, "Nakajima,
- Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>, Laszlo Ersek <lersek@redhat.com>,
- Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
+Cc: ehabkost@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
+ f4bug@amsat.org, crosa@redhat.com, amarkovic@wavecomp.com, ccarrara@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo,
+02.08.2019. 17.37, "Aleksandar Markovic" <aleksandar.markovic@rt-rk.com> =
+=D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> This little series improves linux_ssh_mips_malta.py, both in the sense
+> of code organization and in the sense of quantity of executed tests.
+>
 
-It makes sense to match real HW.  That puts us back to
-the reset vector and handling the initial SMI at
-3000:8000.  That is all workable from a FW implementation
-perspective.  It look like the only issue left is DMA.
+Hello, all.
 
-DMA protection of memory ranges is a chipset feature.
-For the current QEMU implementation, what ranges of
-memory are guaranteed to be protected from DMA?  Is
-it only A/B seg and TSEG?
+I am going to send a new version in few days, and I have a question for
+test team:
 
-Thanks,
+Currently, the outcome of the script execition is either PASS:1 FAIL:0 or
+PASS:0 FAIL:1. But the test actually consists of several subtests. Is there
+any way that this single Python script considers these subtests as separate
+tests (test cases), reporting something like PASS:12 FAIL:7? If yes, what
+would be the best way to achieve that?
 
-Mike
+Thanks in advance,
+Aleksandar
 
-> -----Original Message-----
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> Sent: Wednesday, August 21, 2019 10:40 AM
-> To: Kinney, Michael D <michael.d.kinney@intel.com>;
-> rfc@edk2.groups.io; Yao, Jiewen <jiewen.yao@intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>; Laszlo
-> Ersek <lersek@redhat.com>; devel@edk2.groups.io; qemu
-> devel list <qemu-devel@nongnu.org>; Igor Mammedov
-> <imammedo@redhat.com>; Chen, Yingwen
-> <yingwen.chen@intel.com>; Nakajima, Jun
-> <jun.nakajima@intel.com>; Boris Ostrovsky
-> <boris.ostrovsky@oracle.com>; Joao Marcal Lemos Martins
-> <joao.m.martins@oracle.com>; Phillip Goerl
-> <phillip.goerl@oracle.com>
-> Subject: Re: [edk2-rfc] [edk2-devel] CPU hotplug using
-> SMM with QEMU+OVMF
->=20
-> On 21/08/19 19:25, Kinney, Michael D wrote:
-> > Could we have an initial SMBASE that is within TSEG.
-> >
-> > If we bring in hot plug CPUs one at a time, then
-> initial SMBASE in
-> > TSEG can reprogram the SMBASE to the correct value for
-> that CPU.
-> >
-> > Can we add a register to the hot plug controller that
-> allows the BSP
-> > to set the initial SMBASE value for a hot added CPU?
-> The default can
-> > be 3000:8000 for compatibility.
-> >
-> > Another idea is when the SMI handler runs for a hot
-> add CPU event, the
-> > SMM monarch programs the hot plug controller register
-> with the SMBASE
-> > to use for the CPU that is being added.  As each CPU
-> is added, a
-> > different SMBASE value can be programmed by the SMM
-> Monarch.
->=20
-> Yes, all of these would work.  Again, I'm interested in
-> having something that has a hope of being implemented in
-> real hardware.
->=20
-> Another, far easier to implement possibility could be a
-> lockable MSR (could be the existing
-> MSR_SMM_FEATURE_CONTROL) that allows programming the
-> SMBASE outside SMM.  It would be nice if such a bit
-> could be defined by Intel.
->=20
-> Paolo
-
+> Aleksandar Markovic (2):
+>   tests/acceptance: Refactor and improve reporting in
+>     linux_ssh_mips_malta.py
+>   tests/acceptance: Add new test cases in linux_ssh_mips_malta.py
+>
+>  tests/acceptance/linux_ssh_mips_malta.py | 81
+++++++++++++++++++++++++++------
+>  1 file changed, 66 insertions(+), 15 deletions(-)
+>
+> --
+> 2.7.4
+>
+>
