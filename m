@@ -8,82 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C202C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8769DC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:13:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54471216F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:13:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53D41216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:13:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oaF/DoJM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54471216F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQexT5/O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D41216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49337 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0SIR-00061W-4h
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 11:13:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44951)
+	id 1i0SIv-0006sV-6t
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 11:13:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SFN-0001us-Qk
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:02 -0400
+ (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SFK-0001ps-Rp
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SFM-0002T5-Ju
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:01 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39497)
+ (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SFJ-0002P0-J8
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:09:58 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38809)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <tony.nguyen.git@gmail.com>)
- id 1i0SFM-0002SD-EZ; Wed, 21 Aug 2019 11:10:00 -0400
-Received: by mail-pl1-x644.google.com with SMTP id z3so1490834pln.6;
- Wed, 21 Aug 2019 08:10:00 -0700 (PDT)
+ id 1i0SFJ-0002Nr-DO; Wed, 21 Aug 2019 11:09:57 -0400
+Received: by mail-pf1-x444.google.com with SMTP id o70so1621498pfg.5;
+ Wed, 21 Aug 2019 08:09:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/2kcX3vntX5/cxws0OYeICfLeOq4JTTwSz2UmwBIlYA=;
- b=oaF/DoJMNMaaa2iM5pZZVUOMNnvDV0irrBuFDtEkdrMaHlEKD31AaF/7t3Im9MfoDg
- Qbd+f5GD4dq2kyUgCmaWgJSt7sgB7p37w/jw4muDAMESPJrvsAqNitntEZsjeMiyo/rF
- cN/Psgsx5U1csmTzRUM/CibvuUEf+NWEKQvoZ8Pt+mxdi2GY/zAZOiY55pPHh7oP5vLr
- rg8Vm4mA/23f+NgcboO1DRLr0yzXH4BDvB8oy0rdo0hfDFjtksF5jcEgWld8ABWdD44i
- MZa5MaHl3rGLpARU99hbnhLhq5R+LSJ1rqIRtS3R5z4KxmdifaUv1BWT72raPShUV/Ne
- 3C2Q==
+ bh=f0x3e7GMMpiso6K6CGS6kNz9AsRvhQApmKNwlZl47D0=;
+ b=ZQexT5/Od9wawLaf5cXC4tRi+/frza1XiZFuERt0oZv/xlWkFbVAZiTegQMIaZ5Csd
+ dUI0aO8kWgGkT5V99bAq+EEoJEmpee6L2OnR53tvFintH71R89Og1f89j4/axQC4G6D2
+ SJ29CKWeW5Hk+QfwyIT+ApiITUXDwIwKC5fNxVqv6+nuMKixWJ0wK6tsZ1YrRea/Vh+e
+ cBRaR4HoJ3iZrxBvwJz/JGGCoZef3W7XqSJ9RtdtrnxfFZLicHNsWRtjI/xrmtfwGvla
+ 4iVyObGbPmUVS/thn9Dxk2M/cb20v7nNanl+FTS7ZgDmRMZ0ionOTyBU+C8rAEikLWwr
+ xq2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/2kcX3vntX5/cxws0OYeICfLeOq4JTTwSz2UmwBIlYA=;
- b=tMyy23RSK07I2UU5DOcpHJ6JYV6RpKPSjUoyRphMXUUkL/qQ629JgTJjLnbCfOOLQI
- JT1fXrG3HV6FET30kyb8f8wpiXSttMYSCf06wV9RlAjv9GMefFw7TwpAr5Wr+/jAmrsJ
- tKcrd65gFMYD0obh0b27zMDTpaKOkb0HZAbJSpQDsnnLzVcrSdnnraGb1hySp9nlPt6v
- XK4N5UYnOz1zE+iqP2ucJYFfsh5WO3P7UyymULX2j+sP0q7Z2Z93W74l7Pd3oBTp5UAj
- MT2913+TaSZp6uRryUJNZqnti1W7d40K37yntrgaXZuUstoAyr2qKuIK97rtvKGngN2y
- CDXg==
-X-Gm-Message-State: APjAAAWg4dJoBBnYpF79lLmzOCbe0NLWlq83WT+RI7JBV+iw6XLogaA0
- zpU19lW4FLlBJWz0vfAIBprirGwE3D8=
-X-Google-Smtp-Source: APXvYqz11v5bYlRHZ6rmSoQ7aDNSSQjnhxbh/1PbgXRN00TkdDndZE4v0qA2BZaGdrcnD6Kikg4QSw==
-X-Received: by 2002:a17:902:2bc5:: with SMTP id
- l63mr31956117plb.239.1566400199398; 
- Wed, 21 Aug 2019 08:09:59 -0700 (PDT)
+ bh=f0x3e7GMMpiso6K6CGS6kNz9AsRvhQApmKNwlZl47D0=;
+ b=sSozYCIgx9mpmpOvBdFO1+hyvwLAZBAZRdH2dy0dDCIKOdD+pqYr9bLDB30bFsSenE
+ Pvkp15wITyLoUZJmGcdmzD57ZUu15sEg6qi43+5awapO2qSHMd5sUofpx/DZD5zQf9uW
+ 0mVxLA9F9/hJ3yCRKWAJhGQnLlEfPs1GAsliAZH2/0v1rxRcR7ThRRuV0tx3Lx2MJ34G
+ 6JWktlO7sRm6N+oqNO1QD3z2McFB94NNA1Pv6F4+WAiwVBUAmYYPV2H0GJFH8Jgw/8Wk
+ Tdvw3nMP8JAdL+ZVhnzyz4ETaNKF9Pbv2U0CzYN6Y1+8UgZogYi7LvpBIeaDOwSNtmi/
+ H4YQ==
+X-Gm-Message-State: APjAAAWQ/d5XTX4z5aNOMGOqJm07eVo4lGeWCRUrrb28i4CXj+ZFGq6T
+ lGDG8vSun/MFjUID3BkMiDi6JNYZD2Y=
+X-Google-Smtp-Source: APXvYqxs1abTmzKRmFvCVF0yFLd3g/Mcjrz1He/uHS7WTfMH641pa4AnqK5ahVNzVTrUd2Ay4XNBAg==
+X-Received: by 2002:a17:90a:bc4b:: with SMTP id
+ t11mr454672pjv.87.1566400196071; 
+ Wed, 21 Aug 2019 08:09:56 -0700 (PDT)
 Received: from localhost.localdomain ([58.173.98.68])
- by smtp.gmail.com with ESMTPSA id e19sm5887633pfh.114.2019.08.21.08.09.56
+ by smtp.gmail.com with ESMTPSA id e19sm5887633pfh.114.2019.08.21.08.09.52
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Wed, 21 Aug 2019 08:09:59 -0700 (PDT)
+ Wed, 21 Aug 2019 08:09:55 -0700 (PDT)
 From: Tony Nguyen <tony.nguyen.git@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 01:09:00 +1000
-Message-Id: <9754e5803feae88a4cfbc507b9da83c0b502e901.1566397711.git.tony.nguyen.git@gmail.com>
+Date: Thu, 22 Aug 2019 01:08:59 +1000
+Message-Id: <500caaa5821fd752a13e2893f8c166f0e085e151.1566397711.git.tony.nguyen.git@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1566397711.git.tony.nguyen.git@gmail.com>
 References: <cover.1566397711.git.tony.nguyen.git@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PATCH v8 06/21] hw/intc/armv7m_nic: Access
- MemoryRegion with MemOp
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v8 05/21] hw/s390x: Access MemoryRegion with
+ MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,10 +94,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Nguyen <tony.nguyen@bt.com>, Peter Maydell <peter.maydell@linaro.org>,
- Tony Nguyen <tony.nguyen.git@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Tony Nguyen <tony.nguyen@bt.com>, Collin Walling <walling@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Tony Nguyen <tony.nguyen.git@gmail.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -115,63 +117,52 @@ will be converted into a "MemOp op".
 As size_memop is a no-op, this patch does not change any behaviour.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/intc/armv7m_nvic.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ hw/s390x/s390-pci-inst.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 62ab8b7273..7220940133 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -21,6 +21,7 @@
- #include "hw/qdev-properties.h"
- #include "target/arm/cpu.h"
- #include "exec/exec-all.h"
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 00235148be..0c958fc391 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -15,6 +15,7 @@
+ #include "cpu.h"
+ #include "s390-pci-inst.h"
+ #include "s390-pci-bus.h"
 +#include "exec/memop.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "trace.h"
-@@ -2348,7 +2349,8 @@ static MemTxResult nvic_sysreg_ns_write(void *opaque, hwaddr addr,
-     if (attrs.secure) {
-         /* S accesses to the alias act like NS accesses to the real region */
-         attrs.secure = 0;
--        return memory_region_dispatch_write(mr, addr, value, size, attrs);
-+        return memory_region_dispatch_write(mr, addr, value, size_memop(size),
-+                                            attrs);
-     } else {
-         /* NS attrs are RAZ/WI for privileged, and BusFault for user */
-         if (attrs.user) {
-@@ -2367,7 +2369,8 @@ static MemTxResult nvic_sysreg_ns_read(void *opaque, hwaddr addr,
-     if (attrs.secure) {
-         /* S accesses to the alias act like NS accesses to the real region */
-         attrs.secure = 0;
--        return memory_region_dispatch_read(mr, addr, data, size, attrs);
-+        return memory_region_dispatch_read(mr, addr, data, size_memop(size),
-+                                           attrs);
-     } else {
-         /* NS attrs are RAZ/WI for privileged, and BusFault for user */
-         if (attrs.user) {
-@@ -2393,7 +2396,8 @@ static MemTxResult nvic_systick_write(void *opaque, hwaddr addr,
- 
-     /* Direct the access to the correct systick */
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]), 0);
--    return memory_region_dispatch_write(mr, addr, value, size, attrs);
-+    return memory_region_dispatch_write(mr, addr, value, size_memop(size),
-+                                        attrs);
+ #include "exec/memory-internal.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/hw_accel.h"
+@@ -372,7 +373,7 @@ static MemTxResult zpci_read_bar(S390PCIBusDevice *pbdev, uint8_t pcias,
+     mr = pbdev->pdev->io_regions[pcias].memory;
+     mr = s390_get_subregion(mr, offset, len);
+     offset -= mr->addr;
+-    return memory_region_dispatch_read(mr, offset, data, len,
++    return memory_region_dispatch_read(mr, offset, data, size_memop(len),
+                                        MEMTXATTRS_UNSPECIFIED);
  }
  
- static MemTxResult nvic_systick_read(void *opaque, hwaddr addr,
-@@ -2405,7 +2409,7 @@ static MemTxResult nvic_systick_read(void *opaque, hwaddr addr,
- 
-     /* Direct the access to the correct systick */
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->systick[attrs.secure]), 0);
--    return memory_region_dispatch_read(mr, addr, data, size, attrs);
-+    return memory_region_dispatch_read(mr, addr, data, size_memop(size), attrs);
+@@ -471,7 +472,7 @@ static MemTxResult zpci_write_bar(S390PCIBusDevice *pbdev, uint8_t pcias,
+     mr = pbdev->pdev->io_regions[pcias].memory;
+     mr = s390_get_subregion(mr, offset, len);
+     offset -= mr->addr;
+-    return memory_region_dispatch_write(mr, offset, data, len,
++    return memory_region_dispatch_write(mr, offset, data, size_memop(len),
+                                         MEMTXATTRS_UNSPECIFIED);
  }
  
- static const MemoryRegionOps nvic_systick_ops = {
+@@ -780,7 +781,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+ 
+     for (i = 0; i < len / 8; i++) {
+         result = memory_region_dispatch_write(mr, offset + i * 8,
+-                                              ldq_p(buffer + i * 8), 8,
++                                              ldq_p(buffer + i * 8),
++                                              size_memop(8),
+                                               MEMTXATTRS_UNSPECIFIED);
+         if (result != MEMTX_OK) {
+             s390_program_interrupt(env, PGM_OPERAND, 6, ra);
 -- 
 2.23.0
 
