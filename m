@@ -7,55 +7,58 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967B4C41514
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AB0C3A59E
 	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:40:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63872233A0
+	by mail.kernel.org (Postfix) with ESMTPS id 4F26C2339F
 	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:40:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iLNllmOh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63872233A0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ebayNIsB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F26C2339F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0LEM-00040X-Pw
+	id 1i0LEM-0003za-Nr
 	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:40:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42183)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0Q-0004XV-FP
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:09 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0M-0004U0-K3
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0O-000844-8b
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:06 -0400
-Received: from ozlabs.org ([203.11.71.1]:33927)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0K-0007zl-QY
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:02 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:51469)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L0N-00080y-M8; Wed, 21 Aug 2019 03:26:04 -0400
+ id 1i0L0K-0007tX-0s; Wed, 21 Aug 2019 03:26:00 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CzjC1N27z9sPV; Wed, 21 Aug 2019 17:25:49 +1000 (AEST)
+ id 46Czj959KKz9sP7; Wed, 21 Aug 2019 17:25:48 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372351;
- bh=WXwNYOWKcVD8fT6frteigyYRh/UVz+d5FBWDZT7i9rQ=;
+ d=gibson.dropbear.id.au; s=201602; t=1566372349;
+ bh=IJjvyAJRI8Nn3VKxWazB60FQBl2Ny9jjhlwsGiGZ5Qs=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=iLNllmOh2zTxqOSj/iwteCxEA7jtU/kdcutl/0Oza9GpLq/FhcfiBcoBmUxPqtmJI
- 9WL7dRHeG+SZcQ6dv0aCgWpEv7FUCWNJzoDb9BDiIJdyy41r/CtO08zdFjaL8N0RYV
- hbLcqQ5NZBRZRDWfoIdPh11ThkOLeswbTYteGnM8=
+ b=ebayNIsBq2gP1ZY0aCumZIx+r/i6UGxk3Grx6PCVuNDTSeoUg1JKi1bD1sTtO0un3
+ bYzfgRugniy8rbwGlqHyjypG+6Ti0LTSl9blw7/c2YZlHthyUQecTOYoRp/osGWFik
+ dFf0SNB9V/m/sX/kmmuAORUmcfK7nQ83N/GNDRTU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:15 +1000
-Message-Id: <20190821072542.23090-16-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:06 +1000
+Message-Id: <20190821072542.23090-7-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 15/42] spapr: Implement dispatch tracking for tcg
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 06/42] target/ppc: Optimize emulation of lvsl
+ and lvsr instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,205 +70,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
- Nicholas Piggin <npiggin@gmail.com>, groug@kaod.org, qemu-ppc@nongnu.org,
+Cc: lvivier@redhat.com, aik@ozlabs.ru,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org,
+ Stefan Brankovic <stefan.brankovic@rt-rk.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nicholas Piggin <npiggin@gmail.com>
+From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 
-Implement cpu_exec_enter/exit on ppc which calls into new methods of
-the same name in PPCVirtualHypervisorClass. These are used by spapr
-to implement the splpar VPA dispatch counter initially.
+Adding simple macro that is calling tcg implementation of appropriate
+instruction if altivec support is active.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Message-Id: <20190718034214.14948-2-npiggin@gmail.com>
-[dwg: Removed unnecessary CONFIG_USER_ONLY checks as suggested by gkurz]
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Optimization of altivec instruction lvsl (Load Vector for Shift Left).
+Place bytes sh:sh+15 of value 0x00 || 0x01 || 0x02 || ... || 0x1E || 0x1F
+in destination register. Sh is calculated by adding 2 source registers an=
+d
+getting bits 60-63 of result.
+
+First, the bits [28-31] are placed from EA to variable sh. After that,
+the bytes are created in the following way:
+sh:(sh+7) of X(from description) by multiplying sh with 0x010101010101010=
+1
+followed by addition of the result with 0x0001020304050607. Value obtaine=
+d
+is placed in higher doubleword element of vD.
+(sh+8):(sh+15) by adding the result of previous multiplication with
+0x08090a0b0c0d0e0f. Value obtained is placed in lower doubleword element
+of vD.
+
+Optimization of altivec instruction lvsr (Load Vector for Shift Right).
+Place bytes 16-sh:31-sh of value 0x00 || 0x01 || 0x02 || ... || 0x1E ||
+0x1F in destination register. Sh is calculated by adding 2 source
+registers and getting bits 60-63 of result.
+
+First, the bits [28-31] are placed from EA to variable sh. After that,
+the bytes are created in the following way:
+sh:(sh+7) of X(from description) by multiplying sh with 0x010101010101010=
+1
+followed by substraction of the result from 0x1011121314151617. Value
+obtained is placed in higher doubleword element of vD.
+(sh+8):(sh+15) by substracting the result of previous multiplication from
+0x18191a1b1c1d1e1f. Value obtained is placed in lower doubleword element
+of vD.
+
+Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <1563200574-11098-2-git-send-email-stefan.brankovic@rt-rk.com=
+>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c                  | 48 +++++++++++++++++++++++++++++++++
- hw/ppc/spapr_hcall.c            |  5 ----
- include/hw/ppc/spapr.h          |  7 +++++
- target/ppc/cpu.h                |  4 +++
- target/ppc/translate_init.inc.c | 27 +++++++++++++++++++
- 5 files changed, 86 insertions(+), 5 deletions(-)
+ target/ppc/helper.h                 |   2 -
+ target/ppc/int_helper.c             |  18 -----
+ target/ppc/translate/vmx-impl.inc.c | 121 ++++++++++++++++++++--------
+ 3 files changed, 89 insertions(+), 52 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 22a45c3737..08cc7c2bd6 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4306,6 +4306,52 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
-     return NULL;
- }
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 380c9b1e2a..121d7868d0 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -193,8 +193,6 @@ DEF_HELPER_2(vprtybw, void, avr, avr)
+ DEF_HELPER_2(vprtybd, void, avr, avr)
+ DEF_HELPER_2(vprtybq, void, avr, avr)
+ DEF_HELPER_3(vsubcuw, void, avr, avr, avr)
+-DEF_HELPER_2(lvsl, void, avr, tl)
+-DEF_HELPER_2(lvsr, void, avr, tl)
+ DEF_HELPER_FLAGS_5(vaddsbs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+ DEF_HELPER_FLAGS_5(vaddshs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+ DEF_HELPER_FLAGS_5(vaddsws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 8f037af956..5dcca5362b 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -459,24 +459,6 @@ SATCVT(sd, uw, int64_t, uint32_t, 0, UINT32_MAX)
+ #undef SATCVT
+ #undef SATCVTU
 =20
-+static void spapr_cpu_exec_enter(PPCVirtualHypervisor *vhyp, PowerPCCPU =
-*cpu)
-+{
-+    SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
-+
-+    /* These are only called by TCG, KVM maintains dispatch state */
-+
-+    if (spapr_cpu->vpa_addr) {
-+        CPUState *cs =3D CPU(cpu);
-+        uint32_t dispatch;
-+
-+        dispatch =3D ldl_be_phys(cs->as,
-+                               spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTE=
-R);
-+        dispatch++;
-+        if ((dispatch & 1) !=3D 0) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "VPA: incorrect dispatch counter value for "
-+                          "dispatched partition %u, correcting.\n", disp=
-atch);
-+            dispatch++;
-+        }
-+        stl_be_phys(cs->as,
-+                    spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTER, dispatch=
-);
-+    }
-+}
-+
-+static void spapr_cpu_exec_exit(PPCVirtualHypervisor *vhyp, PowerPCCPU *=
-cpu)
-+{
-+    SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
-+
-+    if (spapr_cpu->vpa_addr) {
-+        CPUState *cs =3D CPU(cpu);
-+        uint32_t dispatch;
-+
-+        dispatch =3D ldl_be_phys(cs->as,
-+                               spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTE=
-R);
-+        dispatch++;
-+        if ((dispatch & 1) !=3D 1) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "VPA: incorrect dispatch counter value for "
-+                          "preempted partition %u, correcting.\n", dispa=
-tch);
-+            dispatch++;
-+        }
-+        stl_be_phys(cs->as,
-+                    spapr_cpu->vpa_addr + VPA_DISPATCH_COUNTER, dispatch=
-);
-+    }
-+}
-+
- static void spapr_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-@@ -4362,6 +4408,8 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     vhc->hpte_set_r =3D spapr_hpte_set_r;
-     vhc->get_pate =3D spapr_get_pate;
-     vhc->encode_hpt_for_kvm_pr =3D spapr_encode_hpt_for_kvm_pr;
-+    vhc->cpu_exec_enter =3D spapr_cpu_exec_enter;
-+    vhc->cpu_exec_exit =3D spapr_cpu_exec_exit;
-     xic->ics_get =3D spapr_ics_get;
-     xic->ics_resend =3D spapr_ics_resend;
-     xic->icp_get =3D spapr_icp_get;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 47b566882b..4c5ea17250 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -875,11 +875,6 @@ unmap_out:
- #define FLAGS_DEREGISTER_DTL       0x0000c00000000000ULL
- #define FLAGS_DEREGISTER_SLBSHADOW 0x0000e00000000000ULL
-=20
--#define VPA_MIN_SIZE           640
--#define VPA_SIZE_OFFSET        0x4
--#define VPA_SHARED_PROC_OFFSET 0x9
--#define VPA_SHARED_PROC_VAL    0x2
+-void helper_lvsl(ppc_avr_t *r, target_ulong sh)
+-{
+-    int i, j =3D (sh & 0xf);
 -
- static target_ulong register_vpa(PowerPCCPU *cpu, target_ulong vpa)
+-    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
+-        r->VsrB(i) =3D j++;
+-    }
+-}
+-
+-void helper_lvsr(ppc_avr_t *r, target_ulong sh)
+-{
+-    int i, j =3D 0x10 - (sh & 0xf);
+-
+-    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
+-        r->VsrB(i) =3D j++;
+-    }
+-}
+-
+ void helper_mtvscr(CPUPPCState *env, uint32_t vscr)
  {
-     CPUState *cs =3D CPU(cpu);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 60553d32c4..5d36eec9d0 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -525,6 +525,13 @@ void spapr_register_hypercall(target_ulong opcode, s=
-papr_hcall_fn fn);
- target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
-                              target_ulong *args);
+     env->vscr =3D vscr & ~(1u << VSCR_SAT);
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+index 663275b729..a9fe3c7834 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -142,38 +142,6 @@ GEN_VR_STVE(bx, 0x07, 0x04, 1);
+ GEN_VR_STVE(hx, 0x07, 0x05, 2);
+ GEN_VR_STVE(wx, 0x07, 0x06, 4);
 =20
-+/* Virtual Processor Area structure constants */
-+#define VPA_MIN_SIZE           640
-+#define VPA_SIZE_OFFSET        0x4
-+#define VPA_SHARED_PROC_OFFSET 0x9
-+#define VPA_SHARED_PROC_VAL    0x2
-+#define VPA_DISPATCH_COUNTER   0x100
-+
- /* ibm,set-eeh-option */
- #define RTAS_EEH_DISABLE                 0
- #define RTAS_EEH_ENABLE                  1
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 630a25c246..50245a8c4d 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1224,6 +1224,10 @@ struct PPCVirtualHypervisorClass {
-     void (*hpte_set_r)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t=
- pte1);
-     void (*get_pate)(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *entry);
-     target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
-+#ifndef CONFIG_USER_ONLY
-+    void (*cpu_exec_enter)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
-+    void (*cpu_exec_exit)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
-+#endif
- };
-=20
- #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 9cd2033bb9..c9fcd87095 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10469,6 +10469,28 @@ static bool ppc_cpu_is_big_endian(CPUState *cs)
-=20
-     return !msr_le;
+-static void gen_lvsl(DisasContext *ctx)
+-{
+-    TCGv_ptr rd;
+-    TCGv EA;
+-    if (unlikely(!ctx->altivec_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_VPU);
+-        return;
+-    }
+-    EA =3D tcg_temp_new();
+-    gen_addr_reg_index(ctx, EA);
+-    rd =3D gen_avr_ptr(rD(ctx->opcode));
+-    gen_helper_lvsl(rd, EA);
+-    tcg_temp_free(EA);
+-    tcg_temp_free_ptr(rd);
+-}
+-
+-static void gen_lvsr(DisasContext *ctx)
+-{
+-    TCGv_ptr rd;
+-    TCGv EA;
+-    if (unlikely(!ctx->altivec_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_VPU);
+-        return;
+-    }
+-    EA =3D tcg_temp_new();
+-    gen_addr_reg_index(ctx, EA);
+-    rd =3D gen_avr_ptr(rD(ctx->opcode));
+-    gen_helper_lvsr(rd, EA);
+-    tcg_temp_free(EA);
+-    tcg_temp_free_ptr(rd);
+-}
+-
+ static void gen_mfvscr(DisasContext *ctx)
+ {
+     TCGv_i32 t;
+@@ -316,6 +284,16 @@ static void glue(gen_, name)(DisasContext *ctx)     =
+                    \
+     tcg_temp_free_ptr(rd);                                              =
+\
  }
-+
-+static void ppc_cpu_exec_enter(CPUState *cs)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =3D
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->cpu_exec_enter(cpu->vhyp, cpu);
-+    }
+=20
++#define GEN_VXFORM_TRANS(name, opc2, opc3)                              =
+\
++static void glue(gen_, name)(DisasContext *ctx)                         =
+\
++{                                                                       =
+\
++    if (unlikely(!ctx->altivec_enabled)) {                              =
+\
++        gen_exception(ctx, POWERPC_EXCP_VPU);                           =
+\
++        return;                                                         =
+\
++    }                                                                   =
+\
++    trans_##name(ctx);                                                  =
+\
 +}
 +
-+static void ppc_cpu_exec_exit(CPUState *cs)
+ #define GEN_VXFORM_ENV(name, opc2, opc3)                                =
+\
+ static void glue(gen_, name)(DisasContext *ctx)                         =
+\
+ {                                                                       =
+\
+@@ -515,6 +493,83 @@ static void gen_vmrgow(DisasContext *ctx)
+     tcg_temp_free_i64(avr);
+ }
+=20
++/*
++ * lvsl VRT,RA,RB - Load Vector for Shift Left
++ *
++ * Let the EA be the sum (rA|0)+(rB). Let sh=3DEA[28=E2=80=9331].
++ * Let X be the 32-byte value 0x00 || 0x01 || 0x02 || ... || 0x1E || 0x1=
+F.
++ * Bytes sh:sh+15 of X are placed into vD.
++ */
++static void trans_lvsl(DisasContext *ctx)
 +{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++    int VT =3D rD(ctx->opcode);
++    TCGv_i64 result =3D tcg_temp_new_i64();
++    TCGv_i64 sh =3D tcg_temp_new_i64();
++    TCGv EA =3D tcg_temp_new();
 +
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =3D
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->cpu_exec_exit(cpu->vhyp, cpu);
-+    }
++    /* Get sh(from description) by anding EA with 0xf. */
++    gen_addr_reg_index(ctx, EA);
++    tcg_gen_extu_tl_i64(sh, EA);
++    tcg_gen_andi_i64(sh, sh, 0xfULL);
++
++    /*
++     * Create bytes sh:sh+7 of X(from description) and place them in
++     * higher doubleword of vD.
++     */
++    tcg_gen_muli_i64(sh, sh, 0x0101010101010101ULL);
++    tcg_gen_addi_i64(result, sh, 0x0001020304050607ull);
++    set_avr64(VT, result, true);
++    /*
++     * Create bytes sh+8:sh+15 of X(from description) and place them in
++     * lower doubleword of vD.
++     */
++    tcg_gen_addi_i64(result, sh, 0x08090a0b0c0d0e0fULL);
++    set_avr64(VT, result, false);
++
++    tcg_temp_free_i64(result);
++    tcg_temp_free_i64(sh);
++    tcg_temp_free(EA);
 +}
- #endif
-=20
- static void ppc_cpu_instance_init(Object *obj)
-@@ -10622,6 +10644,11 @@ static void ppc_cpu_class_init(ObjectClass *oc, =
-void *data)
-     cc->tcg_initialize =3D ppc_translate_init;
-     cc->tlb_fill =3D ppc_cpu_tlb_fill;
- #endif
-+#ifndef CONFIG_USER_ONLY
-+    cc->cpu_exec_enter =3D ppc_cpu_exec_enter;
-+    cc->cpu_exec_exit =3D ppc_cpu_exec_exit;
-+#endif
 +
-     cc->disas_set_info =3D ppc_disas_set_info;
++/*
++ * lvsr VRT,RA,RB - Load Vector for Shift Right
++ *
++ * Let the EA be the sum (rA|0)+(rB). Let sh=3DEA[28=E2=80=9331].
++ * Let X be the 32-byte value 0x00 || 0x01 || 0x02 || ... || 0x1E || 0x1=
+F.
++ * Bytes (16-sh):(31-sh) of X are placed into vD.
++ */
++static void trans_lvsr(DisasContext *ctx)
++{
++    int VT =3D rD(ctx->opcode);
++    TCGv_i64 result =3D tcg_temp_new_i64();
++    TCGv_i64 sh =3D tcg_temp_new_i64();
++    TCGv EA =3D tcg_temp_new();
++
++
++    /* Get sh(from description) by anding EA with 0xf. */
++    gen_addr_reg_index(ctx, EA);
++    tcg_gen_extu_tl_i64(sh, EA);
++    tcg_gen_andi_i64(sh, sh, 0xfULL);
++
++    /*
++     * Create bytes (16-sh):(23-sh) of X(from description) and place the=
+m in
++     * higher doubleword of vD.
++     */
++    tcg_gen_muli_i64(sh, sh, 0x0101010101010101ULL);
++    tcg_gen_subfi_i64(result, 0x1011121314151617ULL, sh);
++    set_avr64(VT, result, true);
++    /*
++     * Create bytes (24-sh):(32-sh) of X(from description) and place the=
+m in
++     * lower doubleword of vD.
++     */
++    tcg_gen_subfi_i64(result, 0x18191a1b1c1d1e1fULL, sh);
++    set_avr64(VT, result, false);
++
++    tcg_temp_free_i64(result);
++    tcg_temp_free_i64(sh);
++    tcg_temp_free(EA);
++}
++
+ GEN_VXFORM(vmuloub, 4, 0);
+ GEN_VXFORM(vmulouh, 4, 1);
+ GEN_VXFORM(vmulouw, 4, 2);
+@@ -662,6 +717,8 @@ GEN_VXFORM_DUAL(vmrgow, PPC_NONE, PPC2_ALTIVEC_207,
+ GEN_VXFORM_HETRO(vextubrx, 6, 28)
+ GEN_VXFORM_HETRO(vextuhrx, 6, 29)
+ GEN_VXFORM_HETRO(vextuwrx, 6, 30)
++GEN_VXFORM_TRANS(lvsl, 6, 31)
++GEN_VXFORM_TRANS(lvsr, 6, 32)
+ GEN_VXFORM_DUAL(vmrgew, PPC_NONE, PPC2_ALTIVEC_207, \
+                 vextuwrx, PPC_NONE, PPC2_ISA300)
 =20
-     dc->fw_name =3D "PowerPC,UNKNOWN";
 --=20
 2.21.0
 
