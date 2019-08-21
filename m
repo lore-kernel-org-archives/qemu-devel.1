@@ -2,79 +2,88 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F788C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 13:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A1DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 13:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE64422D6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 13:04:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hUEjbF4e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE64422D6D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 444F62082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 13:07:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444F62082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0QI0-0003uF-0H
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 09:04:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42054)
+	id 1i0QKk-0005bz-F3
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 09:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i0QHG-0003JN-5I
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:03:55 -0400
+ (envelope-from <philmd@redhat.com>) id 1i0QK0-00050I-UA
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i0QHB-0006Xy-4K
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:03:49 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:46359)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i0QHA-0006XP-Vu
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:03:45 -0400
-Received: by mail-ot1-x333.google.com with SMTP id z17so1908766otk.13
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 06:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=UwvzvB4SEE6/d1QR9Q8LZH8qGjKNPnlAOp089lEVWRk=;
- b=hUEjbF4eg07IquppL7LtdJq4vXDETpj9BwhcB8spZlMXuzmBqMhdSFSMBXNwucafem
- gFvjsgu44JHOSzvxnCWT4rNErI7i7Lp2d4CpRzU73Hym0U/zjATm9/d4ljkDoOGuIL4M
- 2kyRf5yNYtOdoqF3uMt/mrtc7fPy5iFZrb1/wwWtcnrWcOT/Mjd+YlBoauPtJTVGxbYn
- 5CXkb2E1+JMaGKFaDoicF0kCaaMHi8appRR+ikjGWB3CQRV7WbbV+4p9aBvHLMrpzKK/
- RzmqS3jDTYI1nNIybsiuJpPnzIas6t3eMelEKb2OrkMMaFzwR15WlYEfUCRaMh+OFtmU
- qy3Q==
+ (envelope-from <philmd@redhat.com>) id 1i0QJy-0008Bo-OW
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:06:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57212)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i0QJy-0008BS-Gw
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 09:06:38 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 476351108
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 13:06:37 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id f9so1201421wrq.14
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 06:06:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=UwvzvB4SEE6/d1QR9Q8LZH8qGjKNPnlAOp089lEVWRk=;
- b=dVbwoIts989pBRgV84HsefzkN3WhJT9J2l4q1E+PY8O3V0mjSDCrq1YgwgCjEd/H1D
- HZtl1FCb31fI7yfDz4XfjDH4AknpabUbLW6v+OFDdQ+exfYWci6s+bdjicEeFqyKotBB
- 5Zs9e5VhrKdF4j4ydXJ11SLuI2JPTcFn338BOAxUXVPkXTjJqeP/QEmLCEHfrDyESSkK
- fCbKbk8jLvaGBxJuKHR2lUTBKdUR1CZAH3z5WXAmZdFSZEqYnxknZqXhh9oNlJGAh2Ns
- BwR7qiuM11UxrmFCtVEfa4j2aPdqaNRPVklSPUKl3DoDEzgLNWndYQcebaMArvFGer4+
- N8Zg==
-X-Gm-Message-State: APjAAAV1/NlTqgmYCsC65xqgXmBj1cGRr1Qw4M3cWtfoJ0s3AVuKM98h
- kl8gks/Ia+my7u9UMBaZlqV/NPZ9AfW31e8SULJ4eg==
-X-Google-Smtp-Source: APXvYqxZziDTVz/5gDN2LsxfPL4fqWYeFrRUgPed0Df7a6iMY4w++9PBHq4q4qg1TG8CoJZUMccyt5ZOBxHyvvSmye4=
-X-Received: by 2002:a9d:6a94:: with SMTP id l20mr3613237otq.221.1566392623569; 
- Wed, 21 Aug 2019 06:03:43 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hYElJxr5AFBq/nCY5K8esjGQwLIHA76r8VPjbDucolo=;
+ b=sHqjJuJQo3eXBruIhOCkDkgnXwcp7aTeTkzGwzyrQOZF7TTav4SHuACT51OCVQrjV2
+ /1NaR/qwzrXWiLe63/kMOjcUf+F75zG99BM+piWWc0KHoTxbFiXHko74p/QpSRgFBMYW
+ g3GrvksKqJII9J+A1yFaCvbrgGoHWmG49kVBOGGLYlbRk5NwFSReh8zYSVw1abGVWwSx
+ VZKzKzcDbhG8UtnypRVeRndKe3dfFI+oAKi4NpeZAVdyRhDC66nRerVIFBwXTxvEAvlx
+ 0Ppn0y1PDTXY6x45mtvbKwdKJQWY4UyHovXVOYQd4IACYSOjuSoGLnVi47H/zZlJgkt8
+ 6ccw==
+X-Gm-Message-State: APjAAAWmXi1XeCDNW5lO0KMmV1stSc5VRktCblMbpmxB8yBw1v4u8wTd
+ CJ2UvH1N+vN+u2A0atUvfWtA3Pe/37MT+bmCVi0nNVUHDivg4x+MUMLFlC2PrHq91pToOp3WbCg
+ jxXqoBnZvQ0c/E5M=
+X-Received: by 2002:a5d:4492:: with SMTP id j18mr40173607wrq.53.1566392796004; 
+ Wed, 21 Aug 2019 06:06:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwQaTouFSotfj+o6Y9Sz2RpvBO/+VkVQHWTfe1of+RY6++ybLrdutROU7PI1mVobf6E3WI5YA==
+X-Received: by 2002:a5d:4492:: with SMTP id j18mr40173577wrq.53.1566392795775; 
+ Wed, 21 Aug 2019 06:06:35 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id w13sm49817359wre.44.2019.08.21.06.06.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 21 Aug 2019 06:06:35 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-3-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <9e63bb8e-bbec-afe1-0fc4-6b7723a889ef@redhat.com>
+Date: Wed, 21 Aug 2019 15:06:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <1566324078-56764-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1566324078-56764-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 21 Aug 2019 14:03:31 +0100
-Message-ID: <CAFEAcA-6pt4-M2=Lxo6Zr4HF476z7Yr087Wfep7ApcirGd8tZQ@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::333
-Subject: Re: [Qemu-devel] [PULL v3 00/33] Misc patches for 2019-08-20
+In-Reply-To: <20190819213755.26175-3-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 02/68] target/arm: Add stubs for aa32
+ decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,45 +95,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 20 Aug 2019 at 19:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 17dc57990320edaad52ac9ea808be9719c91cea6:
->
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-08-20' into staging (2019-08-20 14:14:20 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 80db491da4ce8b199e0e8d1e23943b20aab82f69:
->
->   x86: Intel AVX512_BF16 feature enabling (2019-08-20 20:00:52 +0200)
->
-> ----------------------------------------------------------------
-> * New KVM PV features (Marcelo, Wanpeng)
-> * valgrind fixes (Andrey)
-> * Remove clock reset notifiers (David)
-> * KConfig and Makefile cleanups (Paolo)
-> * Replay and icount improvements (Pavel)
-> * x86 FP fixes (Peter M.)
-> * TCG locking assertions (Roman)
-> * x86 support for mmap-ed -kernel/-initrd (Stefano)
-> * Other cleanups (Wei Yang, Yan Zhao, Tony)
-> * LSI fix for infinite loop (Prasad)
-> * ARM migration fix (Catherine)
-> * AVX512_BF16 feature (Jing)
->
+On 8/19/19 11:36 PM, Richard Henderson wrote:
+> Add the infrastructure that will become the new decoder.
+> No instructions adjusted so far.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Applied, thanks.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+> ---
+>  target/arm/translate.c       | 31 ++++++++++++++++++++++++++++++-
+>  target/arm/Makefile.objs     | 18 ++++++++++++++++++
+>  target/arm/a32-uncond.decode | 23 +++++++++++++++++++++++
+>  target/arm/a32.decode        | 23 +++++++++++++++++++++++
+>  target/arm/t32.decode        | 20 ++++++++++++++++++++
+>  5 files changed, 114 insertions(+), 1 deletion(-)
+>  create mode 100644 target/arm/a32-uncond.decode
+>  create mode 100644 target/arm/a32.decode
+>  create mode 100644 target/arm/t32.decode
+>=20
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index db69d998eb..c759fe0797 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -7661,6 +7661,18 @@ static void arm_skip_unless(DisasContext *s, uin=
+t32_t cond)
+>      arm_gen_test_cc(cond ^ 1, s->condlabel);
+>  }
+> =20
+> +/*
+> + * Include the generated decoders.
+> + */
+> +
+> +#include "decode-a32.inc.c"
+> +#include "decode-a32-uncond.inc.c"
+> +#include "decode-t32.inc.c"
+> +
+> +/*
+> + * Legacy decoder.
+> + */
+> +
+>  static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>  {
+>      unsigned int cond, val, op1, i, shift, rm, rs, rn, rd, sh;
+> @@ -7679,7 +7691,8 @@ static void disas_arm_insn(DisasContext *s, unsig=
+ned int insn)
+>          return;
+>      }
+>      cond =3D insn >> 28;
+> -    if (cond =3D=3D 0xf){
+> +
+> +    if (cond =3D=3D 0xf) {
+>          /* In ARMv3 and v4 the NV condition is UNPREDICTABLE; we
+>           * choose to UNDEF. In ARMv5 and above the space is used
+>           * for miscellaneous unconditional instructions.
+> @@ -7687,6 +7700,11 @@ static void disas_arm_insn(DisasContext *s, unsi=
+gned int insn)
+>          ARCH(5);
+> =20
+>          /* Unconditional instructions.  */
+> +        if (disas_a32_uncond(s, insn)) {
+> +            return;
+> +        }
+> +        /* fall back to legacy decoder */
+> +
+>          if (((insn >> 25) & 7) =3D=3D 1) {
+>              /* NEON Data processing.  */
+>              if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+> @@ -7901,6 +7919,12 @@ static void disas_arm_insn(DisasContext *s, unsi=
+gned int insn)
+>             next instruction */
+>          arm_skip_unless(s, cond);
+>      }
+> +
+> +    if (disas_a32(s, insn)) {
+> +        return;
+> +    }
+> +    /* fall back to legacy decoder */
+> +
+>      if ((insn & 0x0f900000) =3D=3D 0x03000000) {
+>          if ((insn & (1 << 21)) =3D=3D 0) {
+>              ARCH(6T2);
+> @@ -9386,6 +9410,11 @@ static void disas_thumb2_insn(DisasContext *s, u=
+int32_t insn)
+>          ARCH(6T2);
+>      }
+> =20
+> +    if (disas_t32(s, insn)) {
+> +        return;
+> +    }
+> +    /* fall back to legacy decoder */
+> +
+>      rn =3D (insn >> 16) & 0xf;
+>      rs =3D (insn >> 12) & 0xf;
+>      rd =3D (insn >> 8) & 0xf;
+> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+> index 5cafc1eb6c..7806b4dac0 100644
+> --- a/target/arm/Makefile.objs
+> +++ b/target/arm/Makefile.objs
+> @@ -28,9 +28,27 @@ target/arm/decode-vfp-uncond.inc.c: $(SRC_PATH)/targ=
+et/arm/vfp-uncond.decode $(D
+>  	  $(PYTHON) $(DECODETREE) --static-decode disas_vfp_uncond -o $@ $<,\
+>  	  "GEN", $(TARGET_DIR)$@)
+> =20
+> +target/arm/decode-a32.inc.c: $(SRC_PATH)/target/arm/a32.decode $(DECOD=
+ETREE)
+> +	$(call quiet-command,\
+> +	  $(PYTHON) $(DECODETREE) --static-decode disas_a32 -o $@ $<,\
+> +	  "GEN", $(TARGET_DIR)$@)
+> +
+> +target/arm/decode-a32-uncond.inc.c: $(SRC_PATH)/target/arm/a32-uncond.=
+decode $(DECODETREE)
+> +	$(call quiet-command,\
+> +	  $(PYTHON) $(DECODETREE) --static-decode disas_a32_uncond -o $@ $<,\
+> +	  "GEN", $(TARGET_DIR)$@)
+> +
+> +target/arm/decode-t32.inc.c: $(SRC_PATH)/target/arm/t32.decode $(DECOD=
+ETREE)
+> +	$(call quiet-command,\
+> +	  $(PYTHON) $(DECODETREE) --static-decode disas_t32 -o $@ $<,\
+> +	  "GEN", $(TARGET_DIR)$@)
+> +
+>  target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+>  target/arm/translate.o: target/arm/decode-vfp.inc.c
+>  target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
+> +target/arm/translate.o: target/arm/decode-a32.inc.c
+> +target/arm/translate.o: target/arm/decode-a32-uncond.inc.c
+> +target/arm/translate.o: target/arm/decode-t32.inc.c
+> =20
+>  obj-y +=3D tlb_helper.o debug_helper.o
+>  obj-y +=3D translate.o op_helper.o
+> diff --git a/target/arm/a32-uncond.decode b/target/arm/a32-uncond.decod=
+e
+> new file mode 100644
+> index 0000000000..8dee26d3b6
+> --- /dev/null
+> +++ b/target/arm/a32-uncond.decode
+> @@ -0,0 +1,23 @@
+> +# A32 unconditional instructions
+> +#
+> +#  Copyright (c) 2019 Linaro, Ltd
+> +#
+> +# This library is free software; you can redistribute it and/or
+> +# modify it under the terms of the GNU Lesser General Public
+> +# License as published by the Free Software Foundation; either
+> +# version 2 of the License, or (at your option) any later version.
+> +#
+> +# This library is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> +# Lesser General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU Lesser General Public
+> +# License along with this library; if not, see <http://www.gnu.org/lic=
+enses/>.
+> +
+> +#
+> +# This file is processed by scripts/decodetree.py
+> +#
+> +# All insns that have 0xf in insn[31:28] are decoded here.
+> +# All of those that have a COND field in insn[31:28] are in a32.decode
+> +#
+> diff --git a/target/arm/a32.decode b/target/arm/a32.decode
+> new file mode 100644
+> index 0000000000..a3e6e8c1c2
+> --- /dev/null
+> +++ b/target/arm/a32.decode
+> @@ -0,0 +1,23 @@
+> +# A32 conditional instructions
+> +#
+> +#  Copyright (c) 2019 Linaro, Ltd
+> +#
+> +# This library is free software; you can redistribute it and/or
+> +# modify it under the terms of the GNU Lesser General Public
+> +# License as published by the Free Software Foundation; either
+> +# version 2 of the License, or (at your option) any later version.
+> +#
+> +# This library is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> +# Lesser General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU Lesser General Public
+> +# License along with this library; if not, see <http://www.gnu.org/lic=
+enses/>.
+> +
+> +#
+> +# This file is processed by scripts/decodetree.py
+> +#
+> +# All of the insn that have a COND field in insn[31:28] are here.
+> +# All insns that have 0xf in insn[31:28] are in a32-uncond.decode.
+> +#
+> diff --git a/target/arm/t32.decode b/target/arm/t32.decode
+> new file mode 100644
+> index 0000000000..ac01fb6958
+> --- /dev/null
+> +++ b/target/arm/t32.decode
+> @@ -0,0 +1,20 @@
+> +# Thumb2 instructions
+> +#
+> +#  Copyright (c) 2019 Linaro, Ltd
+> +#
+> +# This library is free software; you can redistribute it and/or
+> +# modify it under the terms of the GNU Lesser General Public
+> +# License as published by the Free Software Foundation; either
+> +# version 2 of the License, or (at your option) any later version.
+> +#
+> +# This library is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> +# Lesser General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU Lesser General Public
+> +# License along with this library; if not, see <http://www.gnu.org/lic=
+enses/>.
+> +
+> +#
+> +# This file is processed by scripts/decodetree.py
+> +#
+>=20
 
