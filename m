@@ -8,70 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 416F6C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8D2C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AD36216F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:32:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38EBE233A0
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:33:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQHIe3qt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AD36216F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWkpW2ic"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38EBE233A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0VPJ-0003a3-PQ
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:32:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41538)
+	id 1i0VQN-00052H-23
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:33:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1i0URy-0001rk-5g
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:11 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1i0URo-0001hM-EZ
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1i0URw-00007v-B7
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:10 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:38910)
+ (envelope-from <jan.bobek@gmail.com>) id 1i0URm-0008Kt-FT
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:00 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:41466)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0URw-00007d-5p
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:08 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id j199so1343304ybg.5
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 10:31:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0URi-00089u-Ln
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:30:56 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id 1so900811ybj.8
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 10:30:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GgH8nUWn4/ATpKN8BOE+DhOwRl+PR6wW9XuCGiyh5qE=;
- b=mQHIe3qtxEWa21brJCcaMKDwmSPmPePpbQSmmhW2W8wWDawzaUlPJd91hikgv8zFDi
- i330gNocWm8iPbz0/7QrgZNPV5VVSl3kIOkSlBc9o33H9lRBL58LxVnTJYLer0XlLFm4
- LFTTnGMG/s78ifS5Yx9hhbUd++SPDO5xC6Q5jQ20NN+O9iG2mKqsWjrm5PmY9NIDd+qd
- b9mlhhjCamqJ+2WmKRpeBMrd5IorHYIFLW+QOX7Pc2nIhrNwS9u7XvMbFnDrgcFgoQ+b
- 3bxRF1aQqqjnIuq1tjFO/SKRxEI0yCRT/L1WXkCzbdao+dNFxUh+GQx3wZEsRBrPIznA
- wb8w==
+ bh=dCAnUoqj/GPXx5JdXdQFBAGk0+RtvAipvhXnYHQQRl4=;
+ b=SWkpW2icRFz7+dNEJdXFlfXKqIGZrcuzQwjkwKIa8WKbxf4XZVwab5qb1LDcKbY/Lm
+ 1Xm43uMtdNrlrN6pQaSvI3dZqZ+dJyYYELViinVi2TC8WRlKbec1PhO3gDaBkWDbgnuM
+ kU6iucTKbcyPAHIYqNV6IYFntt2NYT/Yy4a6DqwS2ltWCXQfIyXPs+doRTA6BfEuUFqs
+ J1zf1lCkOPv65ZTTs0Sch38aH2VrnCZh35X4pu2c/6v6PspD2uNvaRcNXieizZZpjBjj
+ jUqaEjsAVV3hxbPVmWo+xa9BK6AosulL+4HRB/VuM0WIyoE+kEam/LqT0Fgs8aIqO0Hr
+ pssQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GgH8nUWn4/ATpKN8BOE+DhOwRl+PR6wW9XuCGiyh5qE=;
- b=iJ60C1TxvDJumVOLQoA5oAJpNJj7LyifoCLGIcKkKWD4QIsfzXxtyaN6b7XadDdBfw
- S8a3qT6akyvCFBXg01fPjjEi5d+WN4LWdcHL71VpvYEoMgaXJM3YZ/NxQxD3FJG19h1S
- enjhpCJH3y1OmhGOOPTB+/WdQ6s+TmLCP4GVSUECL1GKdIGr7SAoCmuSU1VPZmE46vOS
- VBDyF+IK6peff+PSKwgrdZgMwR0ZEAmY0EuAsVoQh0A2nfabC+uiIbEckX0vGmvbCNsU
- RIhW07pXavDUYVgYxMbhORQ1SAVMWtm683+ijvhEkntS7bwhxm/FZAXM/we9GfHy4O50
- KDZg==
-X-Gm-Message-State: APjAAAXpEzsRYq0mluG1lFoAUlqkJlRy4xMYl69+mw81hDxImb+5zod0
- jkl2fEZJejM15vSLz0rzfozzbG7S
-X-Google-Smtp-Source: APXvYqwegk5Zd8ecA7WwxS++iPkZ4TNjbtvcQbzL6GGQ+dTjjxv3y0rMePl8jjn1KrPZUyhvvNSPMg==
-X-Received: by 2002:a25:90f:: with SMTP id 15mr1280286ybj.344.1566408667449;
- Wed, 21 Aug 2019 10:31:07 -0700 (PDT)
+ bh=dCAnUoqj/GPXx5JdXdQFBAGk0+RtvAipvhXnYHQQRl4=;
+ b=pABp/tROvSHqVblQaRAd1MbQc2+16AibMJIDgawz+C7/AbpWGnq5r9JxltLoWPZPag
+ jMSUPuOfm7m+2dtZ2O1uj46X2dzkF6a5zSkCFcQlprXy59KiPpTLYYvnxzxSUxU+jjRs
+ fT69Kq2S5K8ZF1GE+wdFuoI3YMvY8UU8Bwci1hYqUFwpnw1N3Ul/nSydMmiSNbcrdYfa
+ epx+FTBcnTPLmriDvlIVxlgRBIvnrM/F9w7txnQ5kNb4dzxqaOIOg1XVZ/UTSRIqX9nM
+ MpR+gSGC6/Zb/X8/dKZf8fG4kCeWIJDKsPHnkyjGh8GtTsJKnMvLiaFSXpxOvvzDxvGc
+ ChHw==
+X-Gm-Message-State: APjAAAUjHCcFyxpsCO9GScWVf8jFQdqMC+u8lnXA3HEOR9v7x5nJeAKO
+ qlZ/cllr5gwzAQltl4WsqiMRFamk
+X-Google-Smtp-Source: APXvYqyERs28C54jUGP5C1van7eu0zSY3AElYkO2Bo09G3rdSJFRO1+uYp4f4vjTXTij5dAm2ajaOA==
+X-Received: by 2002:a25:42cb:: with SMTP id
+ p194mr22462857yba.334.1566408652465; 
+ Wed, 21 Aug 2019 10:30:52 -0700 (PDT)
 Received: from localhost.localdomain ([2601:c0:c67f:e390::3])
- by smtp.gmail.com with ESMTPSA id l71sm2826167ywl.39.2019.08.21.10.31.06
+ by smtp.gmail.com with ESMTPSA id l71sm2826167ywl.39.2019.08.21.10.30.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Aug 2019 10:31:06 -0700 (PDT)
+ Wed, 21 Aug 2019 10:30:51 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 21 Aug 2019 13:29:46 -0400
-Message-Id: <20190821172951.15333-71-jan.bobek@gmail.com>
+Date: Wed, 21 Aug 2019 13:29:31 -0400
+Message-Id: <20190821172951.15333-56-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190821172951.15333-1-jan.bobek@gmail.com>
 References: <20190821172951.15333-1-jan.bobek@gmail.com>
@@ -79,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b44
-Subject: [Qemu-devel] [RFC PATCH v4 70/75] target/i386: convert pavgb/pavgw
- helpers to gvec style
+X-Received-From: 2607:f8b0:4864:20::b41
+Subject: [Qemu-devel] [RFC PATCH v4 55/75] target/i386: introduce SSE4.2
+ vector instructions to sse-opcode.inc.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,129 +101,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make these helpers suitable for use with tcg_gen_gvec_* functions.
+Add all the SSE4.2 vector instruction entries to sse-opcode.inc.h.
 
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- target/i386/ops_sse.h        | 33 +++++++++++++++++++++++++++++----
- target/i386/ops_sse_header.h |  7 +++++--
- target/i386/translate.c      | 20 +++++++++-----------
- 3 files changed, 43 insertions(+), 17 deletions(-)
+ target/i386/sse-opcode.inc.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
-index 6ec116573b..1661bd7c64 100644
---- a/target/i386/ops_sse.h
-+++ b/target/i386/ops_sse.h
-@@ -413,8 +413,6 @@ static inline int satsw(int x)
- }
+diff --git a/target/i386/sse-opcode.inc.h b/target/i386/sse-opcode.inc.h
+index 9682cce7ef..f43436213e 100644
+--- a/target/i386/sse-opcode.inc.h
++++ b/target/i386/sse-opcode.inc.h
+@@ -441,6 +441,14 @@
+  * 66 0f 38 34 /r          PMOVZXWQ xmm1, xmm2/m32
+  * 66 0f 38 35 /r          PMOVZXDQ xmm1, xmm2/m64
+  * 66 0F 38 2A /r          MOVNTDQA xmm1, m128
++ *
++ * SSE4.2 Instructions
++ * --------------------
++ * 66 0F 38 37 /r          PCMPGTQ xmm1,xmm2/m128
++ * 66 0F 3A 60 /r imm8     PCMPESTRM xmm1, xmm2/m128, imm8
++ * 66 0F 3A 61 /r imm8     PCMPESTRI xmm1, xmm2/m128, imm8
++ * 66 0F 3A 62 /r imm8     PCMPISTRM xmm1, xmm2/m128, imm8
++ * 66 0F 3A 63 /r imm8     PCMPISTRI xmm1, xmm2/m128, imm8
+  */
  
- #define FMULHRW(a, b) (((int16_t)(a) * (int16_t)(b) + 0x8000) >> 16)
--
--#define FAVG(a, b) (((a) + (b) + 1) >> 1)
- #endif
- 
- void glue(helper_pmullw, SUFFIX)(Reg *d, Reg *a, Reg *b, uint32_t desc)
-@@ -457,8 +455,35 @@ void glue(helper_pmulhw, SUFFIX)(Reg *d, Reg *a, Reg *b, uint32_t desc)
-     glue(clear_high, SUFFIX)(d, oprsz, maxsz);
- }
- 
--SSE_HELPER_B(helper_pavgb, FAVG)
--SSE_HELPER_W(helper_pavgw, FAVG)
-+void glue(helper_pavgb, SUFFIX)(Reg *d, Reg *a, Reg *b, uint32_t desc)
-+{
-+    const intptr_t oprsz = simd_oprsz(desc);
-+    const intptr_t maxsz = simd_maxsz(desc);
-+
-+    for (intptr_t i = 0; i * sizeof(uint8_t) < oprsz; ++i) {
-+        d->B(i) = (a->B(i) + b->B(i) + 1) >> 1;
-+    }
-+    glue(clear_high, SUFFIX)(d, oprsz, maxsz);
-+}
-+
-+#if SHIFT == 0
-+void glue(helper_pavgusb, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
-+{
-+    const uint32_t desc = simd_desc(sizeof(Reg), sizeof(Reg), 0);
-+    glue(helper_pavgb, SUFFIX)(d, s, s, desc);
-+}
-+#endif
-+
-+void glue(helper_pavgw, SUFFIX)(Reg *d, Reg *a, Reg *b, uint32_t desc)
-+{
-+    const intptr_t oprsz = simd_oprsz(desc);
-+    const intptr_t maxsz = simd_maxsz(desc);
-+
-+    for (intptr_t i = 0; i * sizeof(uint16_t) < oprsz; ++i) {
-+        d->W(i) = (a->W(i) + b->W(i) + 1) >> 1;
-+    }
-+    glue(clear_high, SUFFIX)(d, oprsz, maxsz);
-+}
- 
- void glue(helper_pmuludq, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
- {
-diff --git a/target/i386/ops_sse_header.h b/target/i386/ops_sse_header.h
-index 7e6411fc82..b5e8aae897 100644
---- a/target/i386/ops_sse_header.h
-+++ b/target/i386/ops_sse_header.h
-@@ -65,8 +65,11 @@ DEF_HELPER_3(glue(pmulhrw, SUFFIX), void, env, Reg, Reg)
- DEF_HELPER_4(glue(pmulhuw, SUFFIX), void, Reg, Reg, Reg, i32)
- DEF_HELPER_4(glue(pmulhw, SUFFIX), void, Reg, Reg, Reg, i32)
- 
--DEF_HELPER_3(glue(pavgb, SUFFIX), void, env, Reg, Reg)
--DEF_HELPER_3(glue(pavgw, SUFFIX), void, env, Reg, Reg)
-+DEF_HELPER_4(glue(pavgb, SUFFIX), void, Reg, Reg, Reg, i32)
-+#if SHIFT == 0
-+DEF_HELPER_3(glue(pavgusb, SUFFIX), void, env, Reg, Reg)
-+#endif
-+DEF_HELPER_4(glue(pavgw, SUFFIX), void, Reg, Reg, Reg, i32)
- 
- DEF_HELPER_3(glue(pmuludq, SUFFIX), void, env, Reg, Reg)
- DEF_HELPER_3(glue(pmaddwd, SUFFIX), void, env, Reg, Reg)
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 79f8c1ddac..77b2e18f34 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -2803,8 +2803,6 @@ static const SSEFunc_0_epp sse_op_table1[256][4] = {
-     [0xd0] = { NULL, gen_helper_addsubpd, NULL, gen_helper_addsubps },
-     [0xd6] = { NULL, SSE_SPECIAL, SSE_SPECIAL, SSE_SPECIAL },
-     [0xd7] = { SSE_SPECIAL, SSE_SPECIAL }, /* pmovmskb */
--    [0xe0] = MMX_OP2(pavgb),
--    [0xe3] = MMX_OP2(pavgw),
-     [0xe6] = { NULL, gen_helper_cvttpd2dq, gen_helper_cvtdq2pd, gen_helper_cvtpd2dq },
-     [0xe7] = { SSE_SPECIAL , SSE_SPECIAL },  /* movntq, movntq */
-     [0xf0] = { NULL, NULL, NULL, SSE_SPECIAL }, /* lddqu */
-@@ -2878,7 +2876,7 @@ static const SSEFunc_0_epp sse_op_table5[256] = {
-     [0xb6] = gen_helper_movq, /* pfrcpit2 */
-     [0xb7] = gen_helper_pmulhrw_mmx,
-     [0xbb] = gen_helper_pswapd,
--    [0xbf] = gen_helper_pavgb_mmx /* pavgusb */
-+    [0xbf] = gen_helper_pavgusb_mmx
- };
- 
- struct SSEOpHelper_epp {
-@@ -6252,14 +6250,14 @@ DEF_GEN_INSN3_HELPER_EPP(maxss, maxss, Vd, Vd, Wd)
- DEF_GEN_INSN3_HELPER_EPP(vmaxss, maxss, Vd, Hd, Wd)
- DEF_GEN_INSN3_HELPER_EPP(maxsd, maxsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(vmaxsd, maxsd, Vq, Hq, Wq)
--DEF_GEN_INSN3_HELPER_EPP(pavgb, pavgb_mmx, Pq, Pq, Qq)
--DEF_GEN_INSN3_HELPER_EPP(pavgb, pavgb_xmm, Vdq, Vdq, Wdq)
--DEF_GEN_INSN3_HELPER_EPP(vpavgb, pavgb_xmm, Vdq, Hdq, Wdq)
--DEF_GEN_INSN3_HELPER_EPP(vpavgb, pavgb_xmm, Vqq, Hqq, Wqq)
--DEF_GEN_INSN3_HELPER_EPP(pavgw, pavgw_mmx, Pq, Pq, Qq)
--DEF_GEN_INSN3_HELPER_EPP(pavgw, pavgw_xmm, Vdq, Vdq, Wdq)
--DEF_GEN_INSN3_HELPER_EPP(vpavgw, pavgw_xmm, Vdq, Hdq, Wdq)
--DEF_GEN_INSN3_HELPER_EPP(vpavgw, pavgw_xmm, Vqq, Hqq, Wqq)
-+DEF_GEN_INSN3_GVEC(pavgb, Pq, Pq, Qq, 3_ool, MM_OPRSZ, MM_MAXSZ, pavgb_mmx)
-+DEF_GEN_INSN3_GVEC(pavgb, Vdq, Vdq, Wdq, 3_ool, XMM_OPRSZ, XMM_MAXSZ, pavgb_xmm)
-+DEF_GEN_INSN3_GVEC(vpavgb, Vdq, Hdq, Wdq, 3_ool, XMM_OPRSZ, XMM_MAXSZ, pavgb_xmm)
-+DEF_GEN_INSN3_GVEC(vpavgb, Vqq, Hqq, Wqq, 3_ool, XMM_OPRSZ, XMM_MAXSZ, pavgb_xmm)
-+DEF_GEN_INSN3_GVEC(pavgw, Pq, Pq, Qq, 3_ool, MM_OPRSZ, MM_MAXSZ, pavgw_mmx)
-+DEF_GEN_INSN3_GVEC(pavgw, Vdq, Vdq, Wdq, 3_ool, XMM_OPRSZ, XMM_MAXSZ, pavgw_xmm)
-+DEF_GEN_INSN3_GVEC(vpavgw, Vdq, Hdq, Wdq, 3_ool, XMM_OPRSZ, XMM_MAXSZ, pavgw_xmm)
-+DEF_GEN_INSN3_GVEC(vpavgw, Vqq, Hqq, Wqq, 3_ool, XMM_OPRSZ, XMM_MAXSZ, pavgw_xmm)
- DEF_GEN_INSN3_HELPER_EPP(psadbw, psadbw_mmx, Pq, Pq, Qq)
- DEF_GEN_INSN3_HELPER_EPP(psadbw, psadbw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(vpsadbw, psadbw_xmm, Vdq, Hdq, Wdq)
+ OPCODE(movd, LEG(NP, 0F, 0, 0x6e), MMX, WR, Pq, Ed)
+@@ -646,6 +654,11 @@ OPCODE(pcmpgtw, LEG(NP, 0F, 0, 0x65), MMX, WRR, Pq, Pq, Qq)
+ OPCODE(pcmpgtw, LEG(66, 0F, 0, 0x65), SSE2, WRR, Vdq, Vdq, Wdq)
+ OPCODE(pcmpgtd, LEG(NP, 0F, 0, 0x66), MMX, WRR, Pq, Pq, Qq)
+ OPCODE(pcmpgtd, LEG(66, 0F, 0, 0x66), SSE2, WRR, Vdq, Vdq, Wdq)
++OPCODE(pcmpgtq, LEG(66, 0F38, 0, 0x37), SSE4_2, WRR, Vdq, Vdq, Wdq)
++OPCODE(pcmpestrm, LEG(66, 0F3A, 0, 0x60), SSE4_2, RRR, Vdq, Wdq, Ib)
++OPCODE(pcmpestri, LEG(66, 0F3A, 0, 0x61), SSE4_2, RRR, Vdq, Wdq, Ib)
++OPCODE(pcmpistrm, LEG(66, 0F3A, 0, 0x62), SSE4_2, RRR, Vdq, Wdq, Ib)
++OPCODE(pcmpistri, LEG(66, 0F3A, 0, 0x63), SSE4_2, RRR, Vdq, Wdq, Ib)
+ OPCODE(ptest, LEG(66, 0F38, 0, 0x17), SSE4_1, RR, Vdq, Wdq)
+ OPCODE(cmpps, LEG(NP, 0F, 0, 0xc2), SSE, WRRR, Vdq, Vdq, Wdq, Ib)
+ OPCODE(cmppd, LEG(66, 0F, 0, 0xc2), SSE2, WRRR, Vdq, Vdq, Wdq, Ib)
 -- 
 2.20.1
 
