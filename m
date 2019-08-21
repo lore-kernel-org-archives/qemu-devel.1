@@ -2,92 +2,52 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2BEC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D9EC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:37:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21DA8216F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:36:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21DA8216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B58EC22D6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:37:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B58EC22D6D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernkonzept.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Tb3-0000Rw-7z
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:36:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59244)
+	id 1i0TcC-0002u1-Pt
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:37:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59113)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i0TZh-0006qZ-Cc
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:06 -0400
+ (envelope-from <georg.kotheimer@kernkonzept.com>) id 1i0TZh-0006Y3-Ub
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i0TTz-0002Qv-Lm
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:29:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51804)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i0TTz-0002QU-ET
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:29:11 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7D08433026D
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 16:29:10 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id s18so1452039wrt.21
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 09:29:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Rd8ogXOTn3+XqTwYTyF0LJn+wdjlrM6jMibpOnG9qJg=;
- b=tyOlG+zoU03ZSd2ka80wvNsYMdS/MjsCpQ7y73XC2nUer6+d7PUcAzq7YKbysMne52
- xxwM/shojzVbSZn15nDwQAMksxlAjoSd8GGeP57LkMiXW7Yb9w4NMoR/cZrGRd4QvbSE
- az9hhnAuvtqPm9tePBJhYkaJU59xc9ZJ61kzBl2+bfbk1Z+SdcYadGzlsaYeQgdGTI8q
- coxinkLMqtWhSJcwL5J6jEmEBafivfgq7ye1NlUsEliYwpnKrD18l09HXvPWC4M9nbrb
- 7g5alaOA0CxeTCZk6nMJIsd3qjA7yf0MmsV0HwneROHc6CQeXho4MOSdA8uxIWelgQJt
- /SNw==
-X-Gm-Message-State: APjAAAV/lCU4FXDjxTmIu0NZlkgkz9oowx0JZQ/SiA+6Lr5UClxLW675
- 9cnJn353tWZsuPpb4QPFkj8V8B4JOr/qMTPJBPYvUcTaNQIrS6U30BuJg6wUewcbtKoc0SV9SYi
- vEX2eB4qeVDa/sSM=
-X-Received: by 2002:a5d:6b52:: with SMTP id x18mr12399526wrw.66.1566404949262; 
- Wed, 21 Aug 2019 09:29:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy7cCDK432jRZLnHxeb7TOhMLfHJptPDKPuMMLMdJ7NY1YTNtcIgoNec7U4HpxrPx4r1Bnt0g==
-X-Received: by 2002:a5d:6b52:: with SMTP id x18mr12399493wrw.66.1566404949103; 
- Wed, 21 Aug 2019 09:29:09 -0700 (PDT)
-Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id r16sm47052049wrc.81.2019.08.21.09.29.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 21 Aug 2019 09:29:08 -0700 (PDT)
-To: BALATON Zoltan <balaton@eik.bme.hu>,
- Richard Henderson <richard.henderson@linaro.org>
-References: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
- <CAFEAcA9UJGXOdNUD49bxmrdoZ5FEv4VLqAvyzDw66MOGsGB=wg@mail.gmail.com>
- <BN6PR2201MB1251C78A16D557867586FFD4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
- <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>
- <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <9c6110d6-1319-418d-ba4c-9fa8be460cf9@redhat.com>
-Date: Wed, 21 Aug 2019 18:29:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <georg.kotheimer@kernkonzept.com>) id 1i0TTU-0002FI-4K
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:28:41 -0400
+Received: from serv1.kernkonzept.com ([2a01:4f8:1c1c:b490::2]:44095
+ helo=mx.kernkonzept.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <georg.kotheimer@kernkonzept.com>)
+ id 1i0TTT-0002F0-HS; Wed, 21 Aug 2019 12:28:39 -0400
+Received: from [95.90.100.178] (helo=tweek.dd1.int.kernkonzept.com)
+ by mx.kernkonzept.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.92) id 1i0TTS-00084n-Cz; Wed, 21 Aug 2019 18:28:38 +0200
+From: Georg Kotheimer <georg.kotheimer@kernkonzept.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 21 Aug 2019 18:28:31 +0200
+Message-Id: <20190821162831.27811-1-georg.kotheimer@kernkonzept.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [EXTERNAL]Re: Proposal for amending TCG interface
- naming scheme
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:4f8:1c1c:b490::2
+Subject: [Qemu-devel] [PATCH v3] RISC-V: Select FPU gdb xml file based on
+ the supported extensions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,42 +59,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ Georg Kotheimer <georg.kotheimer@kernkonzept.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/20/19 6:21 PM, BALATON Zoltan wrote:
->On 8/20/19 5:37 PM, Richard Henderson wrote:
->> What if we use the AArch64 mnemonics: zxt (zero-extend) and sxt
->> (sign-extend)?
->> This would give us
->>
->> =C2=A0=C2=A0 tcg_gen_zxt8_i32
->> =C2=A0=C2=A0 tcg_gen_sxt8_i32
->> =C2=A0=C2=A0 (etc)
->> =C2=A0=C2=A0 tcg_gen_zxt_i32_i64
->> =C2=A0=C2=A0 tcg_gen_sxt_i32_i64
->=20
-> Again this might look familiar to those knowing AArch64 but not to
-> someone who does not know that. Maybe zext sext is a bit more decyphera=
-ble.
+The size of the FPU registers depends solely on the floating point
+extensions supported by the target architecture.
+However, in the previous implementation the floating point register
+size was derived from whether the target architecture is 32-bit or
+64-bit.
 
-Both namings seems acceptable.
+To allow RVF without RVD, changes to riscv_gdb_get_fpu() and
+riscv_gdb_set_fpu() were necessary.
 
-Not sure if the lexicographic distance is reduced, neither if reducing
-it would make a difference :)
+Signed-off-by: Georg Kotheimer <georg.kotheimer@kernkonzept.com>
+---
+ configure              |  4 ++--
+ target/riscv/gdbstub.c | 45 ++++++++++++++++++++++++------------------
+ 2 files changed, 28 insertions(+), 21 deletions(-)
+
+diff --git a/configure b/configure
+index 714e7fb6a1..44ee953022 100755
+--- a/configure
++++ b/configure
+@@ -7596,14 +7596,14 @@ case "$target_name" in
+     TARGET_BASE_ARCH=riscv
+     TARGET_ABI_DIR=riscv
+     mttcg=yes
+-    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml"
++    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-32bit-csr.xml"
+     target_compiler=$cross_cc_riscv32
+   ;;
+   riscv64)
+     TARGET_BASE_ARCH=riscv
+     TARGET_ABI_DIR=riscv
+     mttcg=yes
+-    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
++    gdb_xml_files="riscv-64bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
+     target_compiler=$cross_cc_riscv64
+   ;;
+   sh4|sh4eb)
+diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+index 27be93279b..89b2543c9d 100644
+--- a/target/riscv/gdbstub.c
++++ b/target/riscv/gdbstub.c
+@@ -303,19 +303,22 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+ static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+-        return gdb_get_reg64(mem_buf, env->fpr[n]);
++        if (env->misa & RVD) {
++            return gdb_get_reg64(mem_buf, env->fpr[n]);
++        }
++        return gdb_get_reg32(mem_buf, env->fpr[n]);
+     /* there is hole between ft11 and fflags in fpu.xml */
+     } else if (n < 36 && n > 32) {
+         target_ulong val = 0;
+         int result;
+         /*
+-         * CSR_FFLAGS is at index 8 in csr_register, and gdb says it is FP
+-         * register 33, so we recalculate the map index.
++         * CSR_FFLAGS is at index 1 in the csr space, and gdb says it is FP
++         * register 33, so we recalculate the csr index.
+          * This also works for CSR_FRM and CSR_FCSR.
+          */
+-        result = riscv_csrrw_debug(env, n - 33 +  8, &val, 0, 0);
++        result = riscv_csrrw_debug(env, n - 33 + CSR_FFLAGS, &val, 0, 0);
+         if (result == 0) {
+-            return gdb_get_regl(mem_buf, val);
++            return gdb_get_reg32(mem_buf, val);
+         }
+     }
+     return 0;
+@@ -324,20 +327,25 @@ static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+ static int riscv_gdb_set_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+-        env->fpr[n] = ldq_p(mem_buf); /* always 64-bit */
+-        return sizeof(uint64_t);
++        if (env->misa & RVD) {
++            env->fpr[n] = ldq_p(mem_buf);
++            return sizeof(uint64_t);
++        } else {
++            env->fpr[n] = ldl_p(mem_buf);
++            return sizeof(uint32_t);
++        }
+     /* there is hole between ft11 and fflags in fpu.xml */
+     } else if (n < 36 && n > 32) {
+-        target_ulong val = ldtul_p(mem_buf);
++        target_ulong val = ldl_p(mem_buf);
+         int result;
+         /*
+-         * CSR_FFLAGS is at index 8 in csr_register, and gdb says it is FP
+-         * register 33, so we recalculate the map index.
++         * CSR_FFLAGS is at index 1 in the csr space, and gdb says it is FP
++         * register 33, so we recalculate the csr index.
+          * This also works for CSR_FRM and CSR_FCSR.
+          */
+-        result = riscv_csrrw_debug(env, n - 33 + 8, NULL, val, -1);
++        result = riscv_csrrw_debug(env, n - 33 + CSR_FFLAGS, NULL, val, -1);
+         if (result == 0) {
+-            return sizeof(target_ulong);
++            return sizeof(uint32_t);
+         }
+     }
+     return 0;
+@@ -375,20 +383,19 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+ {
+     RISCVCPU *cpu = RISCV_CPU(cs);
+     CPURISCVState *env = &cpu->env;
+-#if defined(TARGET_RISCV32)
+-    if (env->misa & RVF) {
++
++    if (env->misa & RVD) {
++        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
++                                 36, "riscv-64bit-fpu.xml", 0);
++    } else if (env->misa & RVF) {
+         gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+                                  36, "riscv-32bit-fpu.xml", 0);
+     }
+ 
++#if defined(TARGET_RISCV32)
+     gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+                              4096, "riscv-32bit-csr.xml", 0);
+ #elif defined(TARGET_RISCV64)
+-    if (env->misa & RVF) {
+-        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+-                                 36, "riscv-64bit-fpu.xml", 0);
+-    }
+-
+     gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+                              4096, "riscv-64bit-csr.xml", 0);
+ #endif
+-- 
+2.20.1
+
 
