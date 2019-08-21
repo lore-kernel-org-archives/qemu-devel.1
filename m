@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCD89C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 21:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02211C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 21:22:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9D82332A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 21:22:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9D82332A
+	by mail.kernel.org (Postfix) with ESMTPS id C80E02332A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 21:22:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C80E02332A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Y43-00007C-9N
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 17:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52053)
+	id 1i0Y44-0000An-I0
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 17:22:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i0Y2C-00064i-RV
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 17:20:49 -0400
+ (envelope-from <bounces@canonical.com>) id 1i0Y2D-00066N-EP
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 17:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i0Y2B-0002cw-Km
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 17:20:48 -0400
+ (envelope-from <bounces@canonical.com>) id 1i0Y2C-0002d8-CQ
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 17:20:49 -0400
 Received: from indium.canonical.com ([91.189.90.7]:44054)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i0Y2B-0002ci-Ff
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 17:20:47 -0400
+ id 1i0Y2C-0002ci-6F
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 17:20:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i0Y29-0004Bn-Ss
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 21:20:45 +0000
+ id 1i0Xin-0001oy-P1
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 21:00:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A282B2E80CC
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 21:20:45 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B9EA42E8074
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 21:00:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Aug 2019 21:15:05 -0000
+Date: Wed, 21 Aug 2019 20:54:29 -0000
 From: Richard Henderson <rth@twiddle.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,17 +52,17 @@ X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: christophe-lyon rth
+X-Launchpad-Bug-Commenters: christophe-lyon
 X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
 X-Launchpad-Bug-Modifier: Richard Henderson (rth)
 References: <156639548437.26869.13792283715555746637.malonedeb@gac.canonical.com>
-Message-Id: <156642210571.26299.14375954692077672363.malone@gac.canonical.com>
+Message-Id: <156642087181.16299.15922415665092176439.launchpad@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19022";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 80653507dcd834a056b6256ac44211abf6bad0a6
+X-Launchpad-Hash: f4f5041744a3c5e6937dc504cb6164e76c9b7601
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1840922] Re: qemu-arm for cortex-m33 aborts with
@@ -82,25 +82,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This happens because we're applying a loose test for the v8m magic
-exception return address.
-
-There are two possible fixes for this, and perhaps we should
-apply both of them:
-
-(1) Unset ARM_FEATURE_M_SECURITY for arm-linux-user.
-    This would disable the FNC_RETURN_MIN_MAGIC test,
-    which, unlike EXC_RETURN_MIN_MAGIC, is not protected
-    by a condition that linux-user cannot satisfy (Handler mode).
-
-(2) Limit the address space to 0x7ffffff, the normal end of
-    write-back cached ram.  Since M-profile doesn't have an MMU,
-    this would make linux-user addresses more like what we'd see
-    running the same test under system mode.
-
-** Patch added: "Hack to work around the problem; not a proper solution."
-   https://bugs.launchpad.net/qemu/+bug/1840922/+attachment/5283854/+files/=
-z.patch
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
 -- =
 
