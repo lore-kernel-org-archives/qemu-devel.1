@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CED7C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6855DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:33:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D99AA2332A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33C1A2332A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:33:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NNuX0NB6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D99AA2332A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Z69Q38IE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33C1A2332A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0L6z-0002qF-Gr
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:32:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42080)
+	id 1i0L7N-000359-KQ
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:33:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42089)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0M-0004TE-3Q
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:03 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0M-0004Tc-Bu
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0K-0007z9-Cw
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:01 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:42071)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0K-0007zX-MZ
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:02 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:43563)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L0J-0007sy-LE; Wed, 21 Aug 2019 03:26:00 -0400
+ id 1i0L0J-0007sz-Qn; Wed, 21 Aug 2019 03:26:00 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46Czj91gHVz9sND; Wed, 21 Aug 2019 17:25:49 +1000 (AEST)
+ id 46Czj9109Rz9sNk; Wed, 21 Aug 2019 17:25:48 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1566372349;
- bh=W0SUWrowz5QUfB8a0jGTaV1ZYR7DK6nAsa+DrTnUQvc=;
+ bh=sRXk7SNRvroQ2qFl7AEBNqbIUZ7MSRvgK0vwUkIjtnY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NNuX0NB6n6B64qkQ0rMzBzAnRgxCR0trp/QjPHA7MS0CchZPSnPBJnqkqf1dHb6ht
- RKqtuelIJs4yhRZ9zljhaQHPJhb5F0/0u1GxVipUNnbXPMS1AGdYHmr1yUn90BE0FH
- pKuEXmwlgIKwCsNl9oJ6qzrl1/YGPXP9qMnAgFws=
+ b=Z69Q38IEtwqTqwKBbuh3qQ/2GsBw77JDb41a/mjzLfHB/pD3EkbyxyRNpveVhT9P4
+ dU4gtEsD3iB8fMErSWEN+XYmxK2HQsbm8JnF6xjpAt14cFzdVMuWhE5yoW5ggc1JBs
+ jaO5v4AmBeqWvo04WpOHrUHpWFAE7btWFygaZNZ4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:10 +1000
-Message-Id: <20190821072542.23090-11-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:03 +1000
+Message-Id: <20190821072542.23090-4-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
@@ -56,8 +56,7 @@ Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 10/42] target/ppc: Optimize emulation of vclzd
- instruction
+Subject: [Qemu-devel] [PULL 03/42] hw: add compat machines for 4.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,123 +68,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- groug@kaod.org, qemu-ppc@nongnu.org,
- Stefan Brankovic <stefan.brankovic@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, aik@ozlabs.ru,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+From: Cornelia Huck <cohuck@redhat.com>
 
-Optimize Altivec instruction vclzd (Vector Count Leading Zeros Doubleword=
-).
-This instruction counts the number of leading zeros of each doubleword el=
-ement
-in source register and places result in the appropriate doubleword elemen=
-t of
-destination register.
+Add 4.2 machine types for arm/i440fx/q35/s390x/spapr.
 
-Using tcg-s count leading zeros instruction two times(once for each
-doubleword element of source register vB) and placing result in
-appropriate doubleword element of destination register vD.
+For i440fx and q35, unversioned cpu models are still translated
+to -v1, as 0788a56bd1ae ("i386: Make unversioned CPU models be
+aliases") states this should only transition to the latest cpu
+model version in 4.3 (or later).
 
-Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <1563200574-11098-6-git-send-email-stefan.brankovic@rt-rk.com=
->
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20190724103524.20916-1-cohuck@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h                 |  1 -
- target/ppc/int_helper.c             |  3 ---
- target/ppc/translate/vmx-impl.inc.c | 28 +++++++++++++++++++++++++++-
- 3 files changed, 27 insertions(+), 5 deletions(-)
+ hw/arm/virt.c              |  9 ++++++++-
+ hw/core/machine.c          |  3 +++
+ hw/i386/pc.c               |  3 +++
+ hw/i386/pc_piix.c          | 14 +++++++++++++-
+ hw/i386/pc_q35.c           | 13 ++++++++++++-
+ hw/ppc/spapr.c             | 15 +++++++++++++--
+ hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+ include/hw/boards.h        |  3 +++
+ include/hw/i386/pc.h       |  3 +++
+ 9 files changed, 71 insertions(+), 6 deletions(-)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 9b486a0c37..e203f76bf1 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -311,7 +311,6 @@ DEF_HELPER_4(vctsxs, void, env, avr, avr, i32)
- DEF_HELPER_2(vclzb, void, avr, avr)
- DEF_HELPER_2(vclzh, void, avr, avr)
- DEF_HELPER_2(vclzw, void, avr, avr)
--DEF_HELPER_2(vclzd, void, avr, avr)
- DEF_HELPER_2(vctzb, void, avr, avr)
- DEF_HELPER_2(vctzh, void, avr, avr)
- DEF_HELPER_2(vctzw, void, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index a265cb07c5..b82765db33 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1820,17 +1820,14 @@ VUPK(lsw, s64, s32, UPKLO)
- #define clzb(v) ((v) ? clz32((uint32_t)(v) << 24) : 8)
- #define clzh(v) ((v) ? clz32((uint32_t)(v) << 16) : 16)
- #define clzw(v) clz32((v))
--#define clzd(v) clz64((v))
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 02510acb81..0d1629ccb3 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2050,10 +2050,17 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
 =20
- VGENERIC_DO(clzb, u8)
- VGENERIC_DO(clzh, u16)
- VGENERIC_DO(clzw, u32)
--VGENERIC_DO(clzd, u64)
++static void virt_machine_4_2_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
++
+ static void virt_machine_4_1_options(MachineClass *mc)
+ {
++    virt_machine_4_2_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
+;
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
++DEFINE_VIRT_MACHINE(4, 1)
 =20
- #undef clzb
- #undef clzh
- #undef clzw
--#undef clzd
+ static void virt_machine_4_0_options(MachineClass *mc)
+ {
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 32d1ca9abc..83cd1bfeec 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -27,6 +27,9 @@
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
 =20
- #define ctzb(v) ((v) ? ctz32(v) : 8)
- #define ctzh(v) ((v) ? ctz32(v) : 16)
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
-mx-impl.inc.c
-index 13153352e4..3372c2c3d3 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -742,6 +742,32 @@ static void trans_vgbbd(DisasContext *ctx)
-     tcg_temp_free_i64(avr[1]);
++GlobalProperty hw_compat_4_1[] =3D {};
++const size_t hw_compat_4_1_len =3D G_N_ELEMENTS(hw_compat_4_1);
++
+ GlobalProperty hw_compat_4_0[] =3D {
+     { "VGA",            "edid", "false" },
+     { "secondary-vga",  "edid", "false" },
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 3ab4bcb3ca..95edbbfe9e 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -119,6 +119,9 @@ struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_=
+MAX};
+ /* Physical Address of PVH entry point read from kernel ELF NOTE */
+ static size_t pvh_start_addr;
+=20
++GlobalProperty pc_compat_4_1[] =3D {};
++const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
++
+ GlobalProperty pc_compat_4_0[] =3D {};
+ const size_t pc_compat_4_0_len =3D G_N_ELEMENTS(pc_compat_4_0);
+=20
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 9e187f856a..a70cf0aafc 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -432,7 +432,7 @@ static void pc_i440fx_machine_options(MachineClass *m=
+)
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
  }
 =20
-+/*
-+ * vclzd VRT,VRB - Vector Count Leading Zeros Doubleword
-+ *
-+ * Counting the number of leading zero bits of each doubleword element i=
-n source
-+ * register and placing result in appropriate doubleword element of dest=
-ination
-+ * register.
-+ */
-+static void trans_vclzd(DisasContext *ctx)
+-static void pc_i440fx_4_1_machine_options(MachineClass *m)
++static void pc_i440fx_4_2_machine_options(MachineClass *m)
+ {
+     PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+     pc_i440fx_machine_options(m);
+@@ -441,6 +441,18 @@ static void pc_i440fx_4_1_machine_options(MachineCla=
+ss *m)
+     pcmc->default_cpu_version =3D 1;
+ }
+=20
++DEFINE_I440FX_MACHINE(v4_2, "pc-i440fx-4.2", NULL,
++                      pc_i440fx_4_2_machine_options);
++
++static void pc_i440fx_4_1_machine_options(MachineClass *m)
 +{
-+    int VT =3D rD(ctx->opcode);
-+    int VB =3D rB(ctx->opcode);
-+    TCGv_i64 avr =3D tcg_temp_new_i64();
-+
-+    /* high doubleword */
-+    get_avr64(avr, VB, true);
-+    tcg_gen_clzi_i64(avr, avr, 64);
-+    set_avr64(VT, avr, true);
-+
-+    /* low doubleword */
-+    get_avr64(avr, VB, false);
-+    tcg_gen_clzi_i64(avr, avr, 64);
-+    set_avr64(VT, avr, false);
-+
-+    tcg_temp_free_i64(avr);
++    pc_i440fx_4_2_machine_options(m);
++    m->alias =3D NULL;
++    m->is_default =3D 0;
++    compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
++    compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
 +}
 +
- GEN_VXFORM(vmuloub, 4, 0);
- GEN_VXFORM(vmulouh, 4, 1);
- GEN_VXFORM(vmulouw, 4, 2);
-@@ -1258,7 +1284,7 @@ GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23)
- GEN_VXFORM_NOA(vclzb, 1, 28)
- GEN_VXFORM_NOA(vclzh, 1, 29)
- GEN_VXFORM_NOA(vclzw, 1, 30)
--GEN_VXFORM_NOA(vclzd, 1, 31)
-+GEN_VXFORM_TRANS(vclzd, 1, 31)
- GEN_VXFORM_NOA_2(vnegw, 1, 24, 6)
- GEN_VXFORM_NOA_2(vnegd, 1, 24, 7)
- GEN_VXFORM_NOA_2(vextsb2w, 1, 24, 16)
+ DEFINE_I440FX_MACHINE(v4_1, "pc-i440fx-4.1", NULL,
+                       pc_i440fx_4_1_machine_options);
+=20
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index be3464f485..d4e8a1cb9f 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -364,7 +364,7 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus =3D 288;
+ }
+=20
+-static void pc_q35_4_1_machine_options(MachineClass *m)
++static void pc_q35_4_2_machine_options(MachineClass *m)
+ {
+     PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+     pc_q35_machine_options(m);
+@@ -372,6 +372,17 @@ static void pc_q35_4_1_machine_options(MachineClass =
+*m)
+     pcmc->default_cpu_version =3D 1;
+ }
+=20
++DEFINE_Q35_MACHINE(v4_2, "pc-q35-4.2", NULL,
++                   pc_q35_4_2_machine_options);
++
++static void pc_q35_4_1_machine_options(MachineClass *m)
++{
++    pc_q35_4_2_machine_options(m);
++    m->alias =3D NULL;
++    compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
++    compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
++}
++
+ DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
+                    pc_q35_4_1_machine_options);
+=20
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e09c67eb75..6587d9b559 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4430,15 +4430,26 @@ static const TypeInfo spapr_machine_info =3D {
+     }                                                                \
+     type_init(spapr_machine_register_##suffix)
+=20
++/*
++ * pseries-4.2
++ */
++static void spapr_machine_4_2_class_options(MachineClass *mc)
++{
++    /* Defaults for the latest behaviour inherited from the base class *=
+/
++}
++
++DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
++
+ /*
+  * pseries-4.1
+  */
+ static void spapr_machine_4_1_class_options(MachineClass *mc)
+ {
+-    /* Defaults for the latest behaviour inherited from the base class *=
+/
++    spapr_machine_4_2_class_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
+;
+ }
+=20
+-DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
++DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
+=20
+ /*
+  * pseries-4.0
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 434d933ec9..8bfb6684cb 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -663,14 +663,26 @@ bool css_migration_enabled(void)
+     }                                                                   =
+      \
+     type_init(ccw_machine_register_##suffix)
+=20
++static void ccw_machine_4_2_instance_options(MachineState *machine)
++{
++}
++
++static void ccw_machine_4_2_class_options(MachineClass *mc)
++{
++}
++DEFINE_CCW_MACHINE(4_2, "4.2", true);
++
+ static void ccw_machine_4_1_instance_options(MachineState *machine)
+ {
++    ccw_machine_4_2_instance_options(machine);
+ }
+=20
+ static void ccw_machine_4_1_class_options(MachineClass *mc)
+ {
++    ccw_machine_4_2_class_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
+;
+ }
+-DEFINE_CCW_MACHINE(4_1, "4.1", true);
++DEFINE_CCW_MACHINE(4_1, "4.1", false);
+=20
+ static void ccw_machine_4_0_instance_options(MachineState *machine)
+ {
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 739d109fe1..aa35955f7f 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -317,6 +317,9 @@ struct MachineState {
+     } \
+     type_init(machine_initfn##_register_types)
+=20
++extern GlobalProperty hw_compat_4_1[];
++extern const size_t hw_compat_4_1_len;
++
+ extern GlobalProperty hw_compat_4_0[];
+ extern const size_t hw_compat_4_0_len;
+=20
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 4bb9e29114..ec538df9b7 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -301,6 +301,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+=20
++extern GlobalProperty pc_compat_4_1[];
++extern const size_t pc_compat_4_1_len;
++
+ extern GlobalProperty pc_compat_4_0[];
+ extern const size_t pc_compat_4_0_len;
+=20
 --=20
 2.21.0
 
