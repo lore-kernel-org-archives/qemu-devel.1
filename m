@@ -2,86 +2,111 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D5AC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35459C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CE98216F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:36:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pFpLkMNy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE98216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED2D2216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:36:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED2D2216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0VSq-0000Q5-V7
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:36:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41402)
+	id 1i0VTc-0001Zd-NF
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:36:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1i0URq-0001hk-Cg
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:04 -0400
+ (envelope-from <david@redhat.com>) id 1i0UYZ-0002vB-S6
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1i0URo-0008Pd-KJ
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:02 -0400
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:45840)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0URm-0008IX-FP
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:00 -0400
-Received: by mail-yw1-xc41.google.com with SMTP id n69so1222696ywd.12
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 10:30:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=370BzNA3AWFdFiLriyDposG4pv4fhHrQn56gCrkrpxY=;
- b=pFpLkMNyI1VYI/vFtpMRMpnmJ5ZTpBekdQOyDFoa7472a2/6uQSuXI2sgwCfsxKtVf
- 9VrnjWRWak8SRI/Q1wjrUI5D6DNk3/SM0AdHEicdmEmUeaRg/RwXKCv55ciBS5ZYU3XQ
- 9Y9c6KSHWVDRDquKJWWczQXM0X/xXA0lZZAsAb5xmKcYtS8TTfiqZWFE27fd/dcxguvT
- ZzG0yCQ7P3XnFsUEanXZJz9+fipChJkTHzMbg/hgM8DfPgiMiF0li6i9mKISSn0N+iC/
- 4HCSkL8hk2vsUu7jFquKrhlug5eTwBHYnRUL5QEepYD7hEHTwfMwP4q8WzWio/WqhAnP
- VLRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=370BzNA3AWFdFiLriyDposG4pv4fhHrQn56gCrkrpxY=;
- b=ZnWBKk9D/8sambM3y0yHz1ZUwx3H1qb0O2xw6Pp7Cy3aI1fH0Wqzq0W3D8qq/aI19y
- T4G+CGqPhWUZ1duVbrCYYHdxIKjscp4vPR4a720hO/ejVSzDF5/KHuwm2fXvqE8RaX/K
- S5jq0gGQP7y86ilms3h2MQ3PUeLsadioRO+GKBf9rOU8WHrXPi7V5Xyfezs4fzX5/uAf
- Z6ZkfutXjVW9+Vspbo9FFlb3qMbreeRIStEMEnul9ve6nf/ifEzCWk6kuEcPpT9f8ajQ
- 5FTVgZ41Z1RFqKlOjJOxy9pmkFw20qKWavPZn9xKo1ZYgaenY3Ta5OoqSyvGpKnWql/1
- UGtA==
-X-Gm-Message-State: APjAAAW6RJkeQi+Veoj49sAYiZ3tXZFBF9SF3JLWLzvXyDE8lZUj08Yl
- 2JtfLnyCCTDHS2vB30D3tRGq42/L
-X-Google-Smtp-Source: APXvYqwGhdkUhlePZ5QcPXe/Zkq+op0PQ7FQEiIe5FEUDql/LC9njXsjjyCfUiyocl526ruJ6lp0fQ==
-X-Received: by 2002:a81:ad4c:: with SMTP id l12mr24371223ywk.300.1566408656192; 
- Wed, 21 Aug 2019 10:30:56 -0700 (PDT)
-Received: from localhost.localdomain ([2601:c0:c67f:e390::3])
- by smtp.gmail.com with ESMTPSA id l71sm2826167ywl.39.2019.08.21.10.30.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Aug 2019 10:30:55 -0700 (PDT)
-From: Jan Bobek <jan.bobek@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 21 Aug 2019 13:29:35 -0400
-Message-Id: <20190821172951.15333-60-jan.bobek@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190821172951.15333-1-jan.bobek@gmail.com>
-References: <20190821172951.15333-1-jan.bobek@gmail.com>
+ (envelope-from <david@redhat.com>) id 1i0UYX-0000E7-Lo
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:37:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34755)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1i0UYX-0000CC-Ci; Wed, 21 Aug 2019 13:37:57 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1BB988980EF;
+ Wed, 21 Aug 2019 17:37:56 +0000 (UTC)
+Received: from [10.36.118.29] (unknown [10.36.118.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3F1D160600;
+ Wed, 21 Aug 2019 17:37:54 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190821092252.26541-1-david@redhat.com>
+ <20190821092252.26541-3-david@redhat.com>
+ <dc42887a-f991-1fe0-36a7-a7804bc4a939@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <60d60d82-0407-9549-09b8-ff35218a4e71@redhat.com>
+Date: Wed, 21 Aug 2019 19:37:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c41
-Subject: [Qemu-devel] [RFC PATCH v4 59/75] target/i386: introduce AVX
- translators
+In-Reply-To: <dc42887a-f991-1fe0-36a7-a7804bc4a939@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Wed, 21 Aug 2019 17:37:56 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 2/4] s390x/tcg: Introduce
+ probe_read_access()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,163 +118,411 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Bobek <jan.bobek@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
+ qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use the translator macros to define translators required by AVX
-instructions.
+On 21.08.19 19:26, Richard Henderson wrote:
+> On 8/21/19 2:22 AM, David Hildenbrand wrote:
+>> +/*
+>> + * Make sure the read access is permitted and TLB entries are created=
+. In
+>> + * very rare cases it might happen that the actual accesses might nee=
+d
+>> + * new MMU translations. If the page tables were changed in between, =
+we
+>> + * might still trigger a fault. However, this seems to barely happen,=
+ so we
+>> + * can ignore this for now.
+>> + */
+>> +void probe_read_access(CPUS390XState *env, uint64_t addr, uint64_t le=
+n,
+>> +                       uintptr_t ra)
+>> +{
+>> +#ifdef CONFIG_USER_ONLY
+>> +    if (!guest_addr_valid(addr) || !guest_addr_valid(addr + len - 1) =
+||
+>> +        page_check_range(addr, len, PAGE_READ) < 0) {
+>> +        s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
+>> +    }
+>> +#else
+>> +    while (len) {
+>> +        const uint64_t pagelen =3D -(addr | -TARGET_PAGE_MASK);
+>> +        const uint64_t curlen =3D MIN(pagelen, len);
+>> +
+>> +        cpu_ldub_data_ra(env, addr, ra);
+>> +        addr =3D wrap_address(env, addr + curlen);
+>> +        len -=3D curlen;
+>> +    }
+>> +#endif
+>> +}
+>=20
+> I don't think this is really the right approach, precisely because of t=
+he
+> comment above.
+>=20
+> I think we should
+>=20
+> (1) Modify the generic probe_write to return the host address,
+>     akin to tlb_vaddr_to_host except it *will* fault.
+>=20
+> (2) Create a generic version of probe_write for CONFIG_USER_ONLY,
+>     much like the one you have done for target/s390x.
+>=20
+> (3) Create generic version of probe_read that does the same.
+>=20
+> (4) Rewrite fast_memset and fast_memmove to fetch all of the host
+>     addresses before doing any modifications.  The functions are
+>     currently written as if len can be very large, handling any
+>     number of pages.  Except that's not true.  While there are
+>     several kinds of users apart from MVC, two pages are sufficient
+>     for all users.
+>=20
+>     Well, should be.  We would need to adjust do_mvcl to limit the
+>     operation to TARGET_PAGE_SIZE (CC=3D3, cpu-determined number of
+>     bytes moved without reaching end of first operand).
+>     Which is probably a good idea anyway.  System mode should not
+>     spend forever executing one instruction, as it would if you
+>     pass in a 64-bit length from MVCLE.
 
-Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
+
+Hah, guess what, I implemented a similar variant of "fetch all
+of the host addresses" *but* it is not that easy as you might
+think (sorry for the bad news).
+
+There are certain cases where we can't get access to the raw host
+page. Namely, cpu watchpoints, LAP, NODIRTY. In summary: this won't
+as you describe. (my first approach did exactly this)
+
+The following patch requires another re-factoring
+(tcg_s390_cpu_mmu_translate), but you should get the idea.
+
+
+
+From 0cacd2aea3dbc25e93492cca04f6c866b86d7f8a Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 20 Aug 2019 09:37:11 +0200
+Subject: [PATCH v1] s390x/tcg: Fault-safe MVC (MOVE) implementation
+
+MVC can cross page boundaries. In case we fault on the second page, we
+already partially copied data. If we have overlaps, we would
+trigger a fault after having partially moved data, eventually having
+our original data already overwritten. When continuing after the fault,
+we would try to move already modified data, not the original data -
+very bad.
+
+glibc started to use MVC for forward memmove() and is able to trigger
+exectly this corruption (via rpmbuild and rpm). Fedora 31 (rawhide)
+currently fails to install as we trigger rpm database corruptions due to
+this bug.
+
+We need a way to translate a virtual address range to individual pages th=
+at
+we can access later on without triggering faults. Probing all virtual
+addresses once before the read/write is not sufficient - the guest could
+have modified the page tables (e.g., write-protect, map out) in between,
+so on we could fault on any new tlb_fill() - we have to skip any new MMU
+translations.
+
+Unfortunately, there are TLB entries for which cannot get a host address
+for (esp., watchpoints, LAP, NOTDIRTY) - in these cases we cannot avoid
+a new MMU translation using the ordinary ld/st helpers. Let's fallback
+to guest physical addresses in these cases, that we access via
+cpu_physical_memory_(read|write),
+
+This change reduced the boottime for s390x guests (to prompt) from ~1:29
+min to ~1:19 min in my tests. For example, LAP protected pages are now on=
+ly
+translated once when writing to them using MVC and we don't always fallba=
+ck
+to byte-based copies.
+
+We will want to use the same mechanism for other accesses as well (e.g.,
+mvcl), prepare for that right away.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/i386/translate.c | 48 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ target/s390x/mem_helper.c | 213 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 200 insertions(+), 13 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 14117c2993..9b9f0d4ed1 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -6708,10 +6708,12 @@ DEF_TRANSLATE_INSN2(Eq, Pq)
- DEF_TRANSLATE_INSN2(Eq, Vdq)
- DEF_TRANSLATE_INSN2(Gd, Nq)
- DEF_TRANSLATE_INSN2(Gd, Udq)
-+DEF_TRANSLATE_INSN2(Gd, Uqq)
- DEF_TRANSLATE_INSN2(Gd, Wd)
- DEF_TRANSLATE_INSN2(Gd, Wq)
- DEF_TRANSLATE_INSN2(Gq, Nq)
- DEF_TRANSLATE_INSN2(Gq, Udq)
-+DEF_TRANSLATE_INSN2(Gq, Uqq)
- DEF_TRANSLATE_INSN2(Gq, Wd)
- DEF_TRANSLATE_INSN2(Gq, Wq)
- DEF_TRANSLATE_INSN2(Md, Gd)
-@@ -6720,6 +6722,7 @@ DEF_TRANSLATE_INSN2(Mq, Gq)
- DEF_TRANSLATE_INSN2(Mq, Pq)
- DEF_TRANSLATE_INSN2(Mq, Vdq)
- DEF_TRANSLATE_INSN2(Mq, Vq)
-+DEF_TRANSLATE_INSN2(Mqq, Vqq)
- DEF_TRANSLATE_INSN2(Pq, Ed)
- DEF_TRANSLATE_INSN2(Pq, Eq)
- DEF_TRANSLATE_INSN2(Pq, Nq)
-@@ -6735,6 +6738,7 @@ DEF_TRANSLATE_INSN2(Vd, Wd)
- DEF_TRANSLATE_INSN2(Vd, Wq)
- DEF_TRANSLATE_INSN2(Vdq, Ed)
- DEF_TRANSLATE_INSN2(Vdq, Eq)
-+DEF_TRANSLATE_INSN2(Vdq, Md)
- DEF_TRANSLATE_INSN2(Vdq, Mdq)
- DEF_TRANSLATE_INSN2(Vdq, Nq)
- DEF_TRANSLATE_INSN2(Vdq, Qq)
-@@ -6742,14 +6746,22 @@ DEF_TRANSLATE_INSN2(Vdq, Udq)
- DEF_TRANSLATE_INSN2(Vdq, Wd)
- DEF_TRANSLATE_INSN2(Vdq, Wdq)
- DEF_TRANSLATE_INSN2(Vdq, Wq)
-+DEF_TRANSLATE_INSN2(Vdq, Wqq)
- DEF_TRANSLATE_INSN2(Vdq, Ww)
- DEF_TRANSLATE_INSN2(Vq, Ed)
- DEF_TRANSLATE_INSN2(Vq, Eq)
- DEF_TRANSLATE_INSN2(Vq, Wd)
- DEF_TRANSLATE_INSN2(Vq, Wq)
-+DEF_TRANSLATE_INSN2(Vqq, Md)
-+DEF_TRANSLATE_INSN2(Vqq, Mdq)
-+DEF_TRANSLATE_INSN2(Vqq, Mq)
-+DEF_TRANSLATE_INSN2(Vqq, Mqq)
-+DEF_TRANSLATE_INSN2(Vqq, Wdq)
-+DEF_TRANSLATE_INSN2(Vqq, Wqq)
- DEF_TRANSLATE_INSN2(Wd, Vd)
- DEF_TRANSLATE_INSN2(Wdq, Vdq)
- DEF_TRANSLATE_INSN2(Wq, Vq)
-+DEF_TRANSLATE_INSN2(Wqq, Vqq)
- DEF_TRANSLATE_INSN2(modrm_mod, modrm)
- 
- #define DEF_TRANSLATE_INSN3(opT1, opT2, opT3)                           \
-@@ -6796,6 +6808,9 @@ DEF_TRANSLATE_INSN3(Gd, Nq, Ib)
- DEF_TRANSLATE_INSN3(Gd, Udq, Ib)
- DEF_TRANSLATE_INSN3(Gq, Nq, Ib)
- DEF_TRANSLATE_INSN3(Gq, Udq, Ib)
-+DEF_TRANSLATE_INSN3(Hdq, Udq, Ib)
-+DEF_TRANSLATE_INSN3(Mdq, Hdq, Vdq)
-+DEF_TRANSLATE_INSN3(Mqq, Hqq, Vqq)
- DEF_TRANSLATE_INSN3(Nq, Nq, Ib)
- DEF_TRANSLATE_INSN3(Pq, Pq, Qd)
- DEF_TRANSLATE_INSN3(Pq, Pq, Qq)
-@@ -6803,17 +6818,34 @@ DEF_TRANSLATE_INSN3(Pq, Qq, Ib)
- DEF_TRANSLATE_INSN3(RdMb, Vdq, Ib)
- DEF_TRANSLATE_INSN3(RdMw, Vdq, Ib)
- DEF_TRANSLATE_INSN3(Udq, Udq, Ib)
-+DEF_TRANSLATE_INSN3(Vd, Hd, Ed)
-+DEF_TRANSLATE_INSN3(Vd, Hd, Eq)
-+DEF_TRANSLATE_INSN3(Vd, Hd, Wd)
-+DEF_TRANSLATE_INSN3(Vd, Hd, Wq)
- DEF_TRANSLATE_INSN3(Vd, Vd, Wd)
- DEF_TRANSLATE_INSN3(Vd, Wd, Ib)
-+DEF_TRANSLATE_INSN3(Vdq, Hdq, Mdq)
-+DEF_TRANSLATE_INSN3(Vdq, Hdq, Mq)
-+DEF_TRANSLATE_INSN3(Vdq, Hdq, UdqMhq)
- DEF_TRANSLATE_INSN3(Vdq, Hdq, Wdq)
-+DEF_TRANSLATE_INSN3(Vdq, Hq, Mq)
-+DEF_TRANSLATE_INSN3(Vdq, Hq, Wq)
- DEF_TRANSLATE_INSN3(Vdq, Vdq, Mq)
- DEF_TRANSLATE_INSN3(Vdq, Vdq, UdqMhq)
- DEF_TRANSLATE_INSN3(Vdq, Vdq, Wdq)
- DEF_TRANSLATE_INSN3(Vdq, Vq, Mq)
- DEF_TRANSLATE_INSN3(Vdq, Vq, Wq)
- DEF_TRANSLATE_INSN3(Vdq, Wdq, Ib)
-+DEF_TRANSLATE_INSN3(Vq, Hq, Ed)
-+DEF_TRANSLATE_INSN3(Vq, Hq, Eq)
-+DEF_TRANSLATE_INSN3(Vq, Hq, Wd)
-+DEF_TRANSLATE_INSN3(Vq, Hq, Wq)
- DEF_TRANSLATE_INSN3(Vq, Vq, Wq)
- DEF_TRANSLATE_INSN3(Vq, Wq, Ib)
-+DEF_TRANSLATE_INSN3(Vqq, Hqq, Mqq)
-+DEF_TRANSLATE_INSN3(Vqq, Hqq, Wqq)
-+DEF_TRANSLATE_INSN3(Vqq, Wqq, Ib)
-+DEF_TRANSLATE_INSN3(Wdq, Vqq, Ib)
- 
- #define DEF_TRANSLATE_INSN4(opT1, opT2, opT3, opT4)                     \
-     static void translate_insn4(opT1, opT2, opT3, opT4)(                \
-@@ -6861,8 +6893,15 @@ DEF_TRANSLATE_INSN3(Vq, Wq, Ib)
- 
- DEF_TRANSLATE_INSN4(Pq, Pq, Qq, Ib)
- DEF_TRANSLATE_INSN4(Pq, Pq, RdMw, Ib)
-+DEF_TRANSLATE_INSN4(Vd, Hd, Wd, Ib)
- DEF_TRANSLATE_INSN4(Vd, Vd, Wd, Ib)
-+DEF_TRANSLATE_INSN4(Vdq, Hdq, Ed, Ib)
-+DEF_TRANSLATE_INSN4(Vdq, Hdq, Eq, Ib)
-+DEF_TRANSLATE_INSN4(Vdq, Hdq, RdMb, Ib)
-+DEF_TRANSLATE_INSN4(Vdq, Hdq, RdMw, Ib)
-+DEF_TRANSLATE_INSN4(Vdq, Hdq, Wd, Ib)
- DEF_TRANSLATE_INSN4(Vdq, Hdq, Wdq, Ib)
-+DEF_TRANSLATE_INSN4(Vdq, Hdq, Wdq, Ldq)
- DEF_TRANSLATE_INSN4(Vdq, Vdq, Ed, Ib)
- DEF_TRANSLATE_INSN4(Vdq, Vdq, Eq, Ib)
- DEF_TRANSLATE_INSN4(Vdq, Vdq, RdMb, Ib)
-@@ -6871,7 +6910,11 @@ DEF_TRANSLATE_INSN4(Vdq, Vdq, Wd, Ib)
- DEF_TRANSLATE_INSN4(Vdq, Vdq, Wd, modrm_mod)
- DEF_TRANSLATE_INSN4(Vdq, Vdq, Wdq, Ib)
- DEF_TRANSLATE_INSN4(Vdq, Vdq, Wq, modrm_mod)
-+DEF_TRANSLATE_INSN4(Vq, Hq, Wq, Ib)
- DEF_TRANSLATE_INSN4(Vq, Vq, Wq, Ib)
-+DEF_TRANSLATE_INSN4(Vqq, Hqq, Wdq, Ib)
-+DEF_TRANSLATE_INSN4(Vqq, Hqq, Wqq, Ib)
-+DEF_TRANSLATE_INSN4(Vqq, Hqq, Wqq, Lqq)
- 
- #define DEF_TRANSLATE_INSN5(opT1, opT2, opT3, opT4, opT5)               \
-     static void translate_insn5(opT1, opT2, opT3, opT4, opT5)(          \
-@@ -6924,6 +6967,11 @@ DEF_TRANSLATE_INSN4(Vq, Vq, Wq, Ib)
-         }                                                               \
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 91ba2e03d9..1ca293e00d 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -24,8 +24,10 @@
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/cpu-common.h"
+ #include "qemu/int128.h"
+ #include "qemu/atomic128.h"
++#include "tcg_s390x.h"
+=20
+ #if !defined(CONFIG_USER_ONLY)
+ #include "hw/s390x/storage-keys.h"
+@@ -104,6 +106,181 @@ static inline void cpu_stsize_data_ra(CPUS390XState=
+ *env, uint64_t addr,
      }
- 
-+DEF_TRANSLATE_INSN5(Vdq, Hdq, Wd, modrm_mod, vex_v)
-+DEF_TRANSLATE_INSN5(Vdq, Hdq, Wq, modrm_mod, vex_v)
-+DEF_TRANSLATE_INSN5(Wdq, Hdq, Vd, modrm_mod, vex_v)
-+DEF_TRANSLATE_INSN5(Wdq, Hdq, Vq, modrm_mod, vex_v)
+ }
+=20
++/*
++ * An access covers one page, except for the start/end of the translated
++ * virtual address range.
++ */
++typedef struct S390Access {
++    union {
++        char *haddr;
++        hwaddr paddr;
++    };
++    uint16_t size;
++    bool isHaddr;
++} S390Access;
 +
- #define OPCODE_GRP_BEGIN(grpname)                                       \
-     static void translate_group(grpname)(                               \
-         CPUX86State *env, DisasContext *s, int modrm)                   \
--- 
-2.20.1
++/*
++ * Prepare access to a virtual address range, guaranteeing we won't trig=
+ger
++ * faults during the actual access. Sometimes we can't get access to the
++ * host address (e.g., LAP, cpu watchpoints/PER, clean pages, ...). Then=
+, we
++ * translate to guest physical addresses instead. We'll have to perform
++ * slower, indirect, access to these physical addresses then.
++ */
++static void access_prepare_idx(CPUS390XState *env, S390Access access[],
++                               int nb_access, vaddr vaddr, target_ulong =
+size,
++                               MMUAccessType access_type, int mmu_idx,
++                               uintptr_t ra)
++{
++    int i =3D 0;
++    int cur_size;
++
++    /*
++     * After we obtained the host address of a TLB entry that entry migh=
+t
++     * be invalidated again - e.g., via tlb_set_dirty(), via another
++     * tlb_fill(). We assume here that it is fine to temporarily store t=
+he
++     * host address to access it later - we didn't agree to any tlb flus=
+h and
++     * there seems to be no mechanism protecting the return value of
++     * tlb_vaddr_to_host().
++     */
++    while (size) {
++        g_assert(i < nb_access);
++        cur_size =3D adj_len_to_page(size, vaddr);
++
++        access[i].isHaddr =3D true;
++        access[i].haddr =3D tlb_vaddr_to_host(env, vaddr, access_type, m=
+mu_idx);
++        if (!access[i].haddr) {
++            access[i].isHaddr =3D false;
++            tcg_s390_cpu_mmu_translate(env, vaddr, cur_size, access_type=
+,
++                                       mmu_idx, false, &access[i].paddr,
++                                       NULL, ra);
++        }
++        access[i].size =3D cur_size;
++
++        vaddr +=3D cur_size;
++        size -=3D cur_size;
++        i++;
++    }
++
++    /* let's zero-out the remaining entries, so we have a size of 0 */
++    if (i < nb_access) {
++        memset(&access[i], 0 , sizeof(S390Access) * (nb_access - i));
++    }
++}
++
++static void access_prepare(CPUS390XState *env, S390Access access[],
++                           int nb_access, target_ulong vaddr, target_ulo=
+ng size,
++                           MMUAccessType access_type, uintptr_t ra)
++{
++    int mmu_idx =3D cpu_mmu_index(env, false);
++
++    access_prepare_idx(env, access, nb_access, vaddr, size, access_type,
++                       mmu_idx, ra);
++}
++
++static void access_set(CPUS390XState *env, S390Access write[], int nb_wr=
+ite,
++                       uint8_t byte, target_ulong size)
++{
++    target_ulong cur_size;
++    void *buf =3D NULL;
++    int w =3D 0;
++
++    while (size) {
++        g_assert(w < nb_write);
++        if (!write[w].size) {
++            w++;
++            continue;
++        }
++
++        cur_size =3D MIN(size, write[w].size);
++        if (write[w].isHaddr) {
++            memset(write[w].haddr, byte, cur_size);
++            write[w].haddr +=3D cur_size;
++        } else {
++#ifndef CONFIG_USER_ONLY
++            if (!buf) {
++                buf =3D g_malloc(TARGET_PAGE_SIZE);
++                memset(buf, byte, cur_size);
++            }
++            cpu_physical_memory_write(write[w].paddr, buf, cur_size);
++            write[w].paddr +=3D cur_size;
++#else
++            g_assert_not_reached();
++#endif
++        }
++        write[w].size -=3D cur_size;
++        size -=3D cur_size;
++    }
++    g_free(buf);
++}
++
++/*
++ * Copy memory in chunks up to chunk_size. If the ranges don't overlap o=
+r
++ * if it's a forward move, this function behaves like memmove().
++ *
++ * To achieve a backwards byte-by-byte copy (e.g., MVC), the chunk_size
++ * must not be bigger than the address difference (in the worst case, 1 =
+byte).
++ */
++static void access_copy(CPUS390XState *env, S390Access write[], int nb_w=
+rite,
++                        S390Access read[], int nb_read, target_ulong siz=
+e,
++                        target_ulong chunk_size)
++{
++    target_ulong cur_size;
++    void *buf =3D NULL;
++    int r =3D 0;
++    int w =3D 0;
++
++    g_assert(chunk_size > 0);
++    chunk_size =3D MIN(chunk_size, TARGET_PAGE_SIZE);
++
++    while (size) {
++        g_assert(w < nb_write);
++        g_assert(r < nb_read);
++        if (!write[w].size) {
++            w++;
++            continue;
++        }
++        if (!read[r].size) {
++            r++;
++            continue;
++        }
++        cur_size =3D MIN(MIN(MIN(size, write[w].size), read[r].size), ch=
+unk_size);
++
++        if (write[w].isHaddr && read[r].isHaddr) {
++            memmove(write[w].haddr, read[r].haddr,
++                    cur_size);
++            write[w].haddr +=3D cur_size;
++            read[r].haddr +=3D cur_size;
++#ifndef CONFIG_USER_ONLY
++        } else if (!write[w].isHaddr && read[r].isHaddr) {
++            cpu_physical_memory_write(write[w].paddr,
++                                      read[r].haddr, cur_size);
++            write[w].paddr +=3D cur_size;
++            read[r].haddr +=3D cur_size;
++        } else if (write[w].isHaddr && !read[r].isHaddr) {
++            cpu_physical_memory_read(read[r].paddr,
++                                     write[w].haddr, cur_size);
++            write[w].haddr +=3D cur_size;
++            read[r].paddr +=3D cur_size;
++        } else {
++            if (!buf) {
++                buf =3D g_malloc(chunk_size);
++            }
++            cpu_physical_memory_read(read[r].paddr, buf, cur_size);
++            cpu_physical_memory_write(write[w].paddr, buf, cur_size);
++            write[w].paddr +=3D cur_size;
++            read[r].paddr +=3D cur_size;
++#else
++        } else {
++            g_assert_not_reached();
++#endif
++        }
++        write[w].size -=3D cur_size;
++        read[r].size -=3D cur_size;
++        size -=3D cur_size;
++    }
++    g_free(buf);
++}
++
+ static void fast_memset(CPUS390XState *env, uint64_t dest, uint8_t byte,
+                         uint32_t l, uintptr_t ra)
+ {
+@@ -302,24 +479,34 @@ uint32_t HELPER(oc)(CPUS390XState *env, uint32_t l,=
+ uint64_t dest,
+ static uint32_t do_helper_mvc(CPUS390XState *env, uint32_t l, uint64_t d=
+est,
+                               uint64_t src, uintptr_t ra)
+ {
+-    uint32_t i;
++    /* 256 bytes cannot cross more than two pages */
++    S390Access read[2];
++    S390Access write[2];
+=20
+     HELPER_LOG("%s l %d dest %" PRIx64 " src %" PRIx64 "\n",
+                __func__, l, dest, src);
++    l++;
+=20
+-    /* mvc and memmove do not behave the same when areas overlap! */
+-    /* mvc with source pointing to the byte after the destination is the
+-       same as memset with the first source byte */
++    g_assert(l <=3D 256);
++    access_prepare(env, write, ARRAY_SIZE(write), dest, l, MMU_DATA_STOR=
+E, ra);
++
++    /*
++     * The result of MVC is as if moving single bytes from left to right
++     * (in contrast to memmove()). It can be used like memset().
++     */
+     if (dest =3D=3D src + 1) {
+-        fast_memset(env, dest, cpu_ldub_data_ra(env, src, ra), l + 1, ra=
+);
+-    } else if (dest < src || src + l < dest) {
+-        fast_memmove(env, dest, src, l + 1, ra);
+-    } else {
+-        /* slow version with byte accesses which always work */
+-        for (i =3D 0; i <=3D l; i++) {
+-            uint8_t x =3D cpu_ldub_data_ra(env, src + i, ra);
+-            cpu_stb_data_ra(env, dest + i, x, ra);
+-        }
++        access_set(env, write, ARRAY_SIZE(write),
++                   cpu_ldub_data_ra(env, src, ra), l);
++        return env->cc_op;
++    }
++
++    access_prepare(env, read, ARRAY_SIZE(read), src, l, MMU_DATA_LOAD, r=
+a);
++    if (dest < src || src + l <=3D dest) {
++        access_copy(env, write, ARRAY_SIZE(write), read, ARRAY_SIZE(read=
+), l,
++                    TARGET_PAGE_SIZE);
++    } else if (src < dest) {
++        access_copy(env, write, ARRAY_SIZE(write), read, ARRAY_SIZE(read=
+), l,
++                    dest - src);
+     }
+=20
+     return env->cc_op;
+--=20
+2.21.0
 
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
