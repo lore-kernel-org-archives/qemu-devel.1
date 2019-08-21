@@ -2,115 +2,83 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BECEDC3A5A0
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEAFC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C8EF22DD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:56:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9D8922DD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="Anca+UNi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8EF22DD3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	dkim=temperror (0-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="2hh4BAez"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D8922DD3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0TuB-0004QS-Pz
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33503)
+	id 1i0TuW-00049b-3M
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:56:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59714)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <amarkovic@wavecomp.com>) id 1i0Tn7-00058t-0Z
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:48:58 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1i0Ta8-0007tg-5g
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <amarkovic@wavecomp.com>) id 1i0Tn5-0002yh-Dr
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:48:56 -0400
-Received: from mail-eopbgr810091.outbound.protection.outlook.com
- ([40.107.81.91]:39072 helo=NAM01-BY2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
- id 1i0Tn4-0002wl-UV
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:48:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lBXKIRbOv8TPpQPXPTrlLcurnuK/K+RU4UUIPdm1wQVv6QZKCqAvRtcbrBCD/QgB/iYUuLBQZ9BfhMBcu0xZFqxzZ3qXCmyHbmJu0p6WvTXg/8fHe3jzxic/bAfv5mnTTBoObrm1hMxNe/RFOS87ntQ8EPFbKOliSYlNQF3mUPBnhvZxAXs9pseEq/BTRF+iMbLbva73P2qgnY4fQ8QIT/5UMjoTby4y2EPXsAiAa5ZbYvapNbLfoEAkzfCLWwa3gUtKNQbljExRcOb6q2hFVKPTksuRFeyFKKwIB8AW/z39JU+fkyxWfmd+TbJHArKUOBoHY/MH0o8b1XiFf9VU/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AfCb4vSVcanQ9esnkoi64YxzH26a9yTQzbJD3UnzQgo=;
- b=lH0T2Jvv97gj3AM4r9DOdzUX2nJeUXjoCxNmyUTYVFwZNKNTh+sE++w8OOavIPuSFAq+gXOnZsUsOZ/NAQI8I/zH1+3Dza4BPpyqEJ52qYsmAUuqrwu2TVOKMt1U7lvZWY/gs5GMAlFITb7uxJPV9K81DRL4aaDM3xpx1WR6xOdfoJJLgGdzWPGxnImKUCwVTlfHLqkCOngF6QQijHuoAiA5hnVRc2R1dPWsvOawRiAscXenrV8RetrMlcaHfvGEC/cYf/Xnp0fv7VfHtd4zwwx5bOLPjVAxIe7h46s0Ai5QtrTLSuHuESNk4miXsgpBvNquk3+298cTel6JJtPTrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
- dkim=pass header.d=wavecomp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AfCb4vSVcanQ9esnkoi64YxzH26a9yTQzbJD3UnzQgo=;
- b=Anca+UNix/e2su3EplCqDL37dvRf6umaNauSe3PAfSpa9NBUaFL0YehtSZl/W713yn4d8cxWwlrJYNep3Q9+ZBR4IX/U2szpLGYiJDzSZtf6E3YUykv5ji1jvbaa1uMq/ejd63L7Qkt3y9SMH2vO+NuJYZvHdwVpsOkHzhO78D8=
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
- BN6PR2201MB1457.namprd22.prod.outlook.com (10.174.91.14) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.18; Wed, 21 Aug 2019 16:48:50 +0000
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::709c:ea73:df85:b135]) by BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::709c:ea73:df85:b135%12]) with mapi id 15.20.2178.020; Wed, 21 Aug
- 2019 16:48:50 +0000
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-To: Tony Nguyen <tony.nguyen.git@gmail.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [EXTERNAL][Qemu-devel] [PATCH v8 13/21] target/mips: Hard code
- size with MO_{8|16|32|64}
-Thread-Index: AQHVWDKPiNmF/rpjc0+VJBU13ap8C6cFz9Dr
-Date: Wed, 21 Aug 2019 16:48:50 +0000
-Message-ID: <BN6PR2201MB1251E827136B587C32FCAF02C6AA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1566397711.git.tony.nguyen.git@gmail.com>,
- <9d992aa745964bd151b0e314a2e380b6612a090f.1566397711.git.tony.nguyen.git@gmail.com>
-In-Reply-To: <9d992aa745964bd151b0e314a2e380b6612a090f.1566397711.git.tony.nguyen.git@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=amarkovic@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a36265fd-4c9d-4118-999f-08d7265771a0
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:BN6PR2201MB1457; 
-x-ms-traffictypediagnostic: BN6PR2201MB1457:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN6PR2201MB14576808ABAE4CD27CFC38AEC6AA0@BN6PR2201MB1457.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2399;
-x-forefront-prvs: 0136C1DDA4
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(396003)(366004)(376002)(39840400004)(346002)(189003)(199004)(14454004)(71190400001)(14444005)(86362001)(256004)(71200400001)(52536014)(4744005)(26005)(476003)(11346002)(76176011)(446003)(486006)(55016002)(7696005)(9686003)(3846002)(6116002)(25786009)(186003)(99286004)(107886003)(4326008)(305945005)(53936002)(316002)(478600001)(33656002)(55236004)(6506007)(74316002)(6436002)(81166006)(7736002)(81156014)(102836004)(76116006)(66446008)(64756008)(66556008)(66476007)(66946007)(5660300002)(8676002)(66066001)(2501003)(2906002)(54906003)(8936002)(229853002)(6246003)(110136005)(83133001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1457;
- H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: vObpnduUQ2VaRFYmVWGdudxB2dENg2arOF8q7B2VkKcam9RPtSCDEQJARb2tBT/fdDXkdePJOkVPKjVX9O2iQEnyyxTVmC+Som2E3nMjTkFetkN4UpJYP5ulr8pdVdm+pGzBNsKfCDKMky94sN2xVucje/bxdeq/3J0vwqDhNJGw4VuIcFu40fegtPQcwUDUJFDx4JB/RiVUT4dUP8ZtbLqp0RuOyCkEdx6h28pgWyAQ92+L89Ur/k9uCBzKI/lkny5NGsP08SUNhmVRcLh11KQ2CHQpo009HYJzW/fJcqCJ1SZK+Y1nm0OxIJ3KdBZCrJOOrgsLxtmOLEOBeblU2u1fwUffzQOSV08tERxeeL/FUzUtdWf/C+maPZ+tCKR/f+VMAbPOpiK+36Ui3qzySkn+WFoUscPi2FkEVQByyIs=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <damien.hedde@greensocs.com>) id 1i0Ta6-0006Cd-PU
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:32 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:36506)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1i0Ta6-0006Bt-Fl
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:30 -0400
+Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 37FC296F56;
+ Wed, 21 Aug 2019 16:35:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1566405329;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0BR3eridDeouQ+ZfE9j4HBjTSNzRxIpuXQwC0lZSXRw=;
+ b=2hh4BAez+k2D75Mso0k7eea36N1cRG5Vw0XGPBO+50R4TDtQskzOXCnnrea3c4swsdard+
+ 6RNuD7BKc1cKf7QpFL49CM2H6lL0QzhUB43a82fI0DX19hzDm++cxl6XWAGSPmbEnr9N/4
+ EHxtvwT67qyvOb4nmo9w9TGtPiWbnL4=
+From: Damien Hedde <damien.hedde@greensocs.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 21 Aug 2019 18:33:41 +0200
+Message-Id: <20190821163341.16309-11-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190821163341.16309-1-damien.hedde@greensocs.com>
+References: <20190821163341.16309-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a36265fd-4c9d-4118-999f-08d7265771a0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Aug 2019 16:48:50.5175 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dD/6vkCvyILj/GtCPKeMdvdZqsUWRmJR+x08QszDXFg1oESnhEXzmOMaMJxqpvToWfTV6nOlNp9fv5HakxG0yA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1457
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.81.91
-Subject: Re: [Qemu-devel] [EXTERNAL] [PATCH v8 13/21] target/mips: Hard code
- size with MO_{8|16|32|64}
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1566405329;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0BR3eridDeouQ+ZfE9j4HBjTSNzRxIpuXQwC0lZSXRw=;
+ b=C6cas6EmaSKbb/7RvHLBDI+LBytvNe17O7DS2ja5KD+tjb+L0qrF4Mf/qnoyBRmWSLXYtN
+ xxwYEZiNDw7NeBRqSf1uyrN6GidMbDnzEJzQ4dl5Y1tmzRJVBkREZwPQ/uvSY+8xcmMhuH
+ ViDinnU+kKmcyFyCsI+fxnlsZpBswA8=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1566405329; a=rsa-sha256; cv=none;
+ b=auUOw8C4R+1wmvrmoFFW3MpmAuPceMMtoj5n3r2Qf9nYuf3cnzNeyvjiyU/0leAteZIA/C
+ OF2gp3K7rNZVSshUIs8RSdDVQqDJVG13wdlwnYumr3Uqi7N3SwzPly5b63DoAKjD+83NYo
+ oeuPxqVrcm2El/9mNQJ3HUuib5tLMog=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
+Subject: [Qemu-devel] [PATCH v4 10/10] docs/devel/reset.txt: add
+ documentation about warm reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,25 +90,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Tony Nguyen <tony.nguyen@bt.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ edgar.iglesias@xilinx.com, berrange@redhat.com, ehabkost@redhat.com,
+ mark.burton@greensocs.com, pbonzini@redhat.com, philmd@redhat.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Tony Nguyen <tony.nguyen.git@gmail.com>
->
-> Temporarily no-op size_memop was introduced to aid the conversion of
-> memory_region_dispatch_{read|write} operand "unsigned size" into
-> "MemOp op".
->=20
-> Now size_memop is implemented, again hard coded size but with
-> MO_{8|16|32|64}. This is more expressive and avoids size_memop calls.
->=20
-> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
+Complete the documentation with the handling of several reset types
+(cold and warm).
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+---
+ docs/devel/reset.txt | 55 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 51 insertions(+), 4 deletions(-)
+
+diff --git a/docs/devel/reset.txt b/docs/devel/reset.txt
+index 77ff29b3d7..ed1a72566d 100644
+--- a/docs/devel/reset.txt
++++ b/docs/devel/reset.txt
+@@ -31,16 +31,21 @@ makes no difference. But there can be some; some conf=
+iguration may be kept when
+ applying a warm reset for example.
+=20
+ The Resettable interface handles reset kinds with an enum. For now only =
+cold
+-reset is defined, others may be added later.
++and warm reset are defined, others may be added later.
+ ```
+ typedef enum ResetType {
+     RESET_TYPE_COLD,
++    RESET_TYPE_WARM,
+ } ResetType;
+ ```
+=20
+ In qemu, RESET_TYPE_COLD means we reset to the initial state correspondi=
+ng to
+ the start of qemu; this might differs from what is a read hardware cold =
+reset.
+=20
++Although the interface can handle several kind of resets, these are not =
+totally
++independant and disjoint. There are some constraints; these are explaine=
+d below
++in the "multi-phase" section.
++
+=20
+ Triggering reset
+ ----------------
+@@ -49,21 +54,41 @@ This section documents the APIs which "users" of a re=
+settable object should use
+ to control it. All resettable control functions must be called while hol=
+ding
+ the iothread lock.
+=20
+-You can trigger a reset event on a resettable object with resettable_res=
+et().
+-The object will be instantly reset.
++A resettable object can be put into its "in reset" state and held there
++indefinitely.
++
++You must call resettable_assert_reset() to put an object in reset. It wi=
+ll stay
++in this state until you eventually call resettable_deassert_reset(). Car=
+e must
++be taken to call resettable_deassert_reset() once and only once per call=
+ of
++resettable_assert_reset().
++
++```resettable_assert_reset(Object *obj, ResetType type);```
++The parameter "obj" is an object implementing the Resettable interface.
++The parameter "type" gives the type of reset you want to trigger.
++
++```resettable_deassert_reset(Object *obj);```
++The parameter "obj" is an object implementing the Resettable interface.
++
++If you want to just trigger a reset event but not leave the object in re=
+set for
++any period of time, you can use resettable_reset(), which is a convenien=
+ce
++function identical in behaviour to calling resettable_assert() and then
++immediately calling resettable_deassert().
+=20
+ ```void resettable_reset(Object *obj, ResetType type);```
+ The parameter "obj" is an object implementing the Resettable interface.
+ The parameter "type" gives the type of reset you want to trigger.
+=20
+ It is possible to interleave multiple calls to
++ - resettable_assert_reset(),
++ - resettable_deassert_reset(),
+  - resettable_reset().
+=20
+ There may be several reset sources/controllers of a given object. The in=
+terface
+ handles everything and the different reset controllers do not need to kn=
+ow
+ anything about each others. The object will leave reset state only when =
+each
+ other controllers end their reset operation. This point is handled by
+-maintaining a count of reset.
++maintaining a count of reset; this is why resettable_deassert_reset() mu=
+st be
++called once and only once per resettable_assert_reset().
+=20
+ Note that it is a programming error to call a resettable function on a
+ non-Resettable object and it will trigger a run time assert error. Since=
+ most
+@@ -74,6 +99,8 @@ For Devices and Buses, the following helper functions e=
+xists:
+ ```
+ void device_cold_reset(Device *dev);
+ void bus_cold_reset(Bus *bus);
++void device_warm_reset(Device *dev);
++void bus_warm_reset(Bus *bus);
+ ```
+=20
+ These are simple wrappers around resettable_reset() function; they only =
+cast the
+@@ -123,6 +150,25 @@ The exit phase is executed only when the last reset =
+operation ends. Therefore
+ the object has not to care how many reset controllers it has and how man=
+y of
+ them have started a reset.
+=20
++An exception to that is when entering a new reset type AND if there was =
+no
++previous cold reset; in that case, init and hold methods are executed ag=
+ain
++because the different reset type may reset more things than the previous=
+ one
++has done.
++
++For example if some controller has started a RESET_TYPE_WARM with
++resettable_assert_reset() on a device and another controller does a
++device_cold_reset() on the same object, then the init phase is executed =
+with
++RESET_TYPE_COLD as an argument and then the hold phase.
++If the first reset was a cold reset, then the warm reset would have trig=
+gered
++nothing because the cold reset is "stronger".
++
++Note also that the exit phase will never be executed twice; it will only=
+ be
++executed when all reset operation are closed, independently of the numbe=
+r of
++reset types that were issued. This is a limitation of the interface, the=
+re is
++only a global count of reset (not a count per reset type). The consequen=
+ce is
++that the different reset types must be close enough in behavior to not r=
+equire
++different exit phases.
++
+=20
+ Handling reset in a new resettable object
+ -----------------------------------------
+@@ -203,6 +249,7 @@ interface.
+ typedef struct ResetState {
+     uint32_t count;
+     bool hold_phase_needed;
++    ResetType type;
+ } ResetState;
+=20
+ typedef ResetState *(*ResettableGetState)(Object *obj);
+--=20
+2.22.0
+
 
