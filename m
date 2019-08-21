@@ -2,115 +2,62 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4164BC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE0EC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:43:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 142DE22D6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:43:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 142DE22D6D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 549AC22D6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:43:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549AC22D6D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0MD8-0005Go-Q8
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:43:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55061)
+	id 1i0MDJ-0005Xj-QR
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55129)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i0MB4-0003cV-TT
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:41:11 -0400
+ (envelope-from <kraxel@redhat.com>) id 1i0MBF-0003ie-6y
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i0MB3-0004yI-FS
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:41:10 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:33287)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i0MB3-0004wZ-41; Wed, 21 Aug 2019 04:41:09 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N63mC-1iKQC90QdU-016NMO; Wed, 21 Aug 2019 10:41:05 +0200
-To: Michal Privoznik <mprivozn@redhat.com>, qemu-trivial@nongnu.org
-References: <db150a03315a89a849ab9968e4a5a26110d41424.1562942402.git.mprivozn@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c2a4ba95-c77c-d311-f597-2312b2462720@vivier.eu>
-Date: Wed, 21 Aug 2019 10:41:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <kraxel@redhat.com>) id 1i0MBD-00052s-OY
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:41:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44712)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i0MBD-00052E-H7
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:41:19 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 855EE307D88D;
+ Wed, 21 Aug 2019 08:41:17 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-60.ams2.redhat.com
+ [10.36.116.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B20DA6B49A;
+ Wed, 21 Aug 2019 08:41:14 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 661B616E1A; Wed, 21 Aug 2019 10:41:13 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 21 Aug 2019 10:40:58 +0200
+Message-Id: <20190821084113.1840-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <db150a03315a89a849ab9968e4a5a26110d41424.1562942402.git.mprivozn@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:XlzmmF7pyeb+mDvfXFzAiFk0EskfKcdVRvY1Wsh9e54f19xow42
- aAlSXok8ysLM2C3LMyhxrJSDqdEO2tZJNshjeUrRw3uuiKfH1U7kM9dTKrD4VuVICuc82CX
- BQLp1ZqNY+XFBVu0wydKhekkJmuR+6fK57Gj1Kg7tOsvFJ8+ZC3mIiVE3RAMj5Ub7HKjxui
- u6LbsjMUXlnRSp3qLJOzw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:fP4Bt6n1+J0=:PoQqWcL2OgW6XPObVmi311
- D4hmCev9odrAKYKxX4mWoDeZdgtuXJDSPlSl+ts/NhTv+7krwXi1deGZIfthKDZ1P0SMSBUqG
- doE6wK0n+ldNdJTY5gH3Wt8Yd7SVW8Bf4C61jnogBWmBGN1Cib6JkWLcZnKiat8phS8U3nrbg
- 7myx/cZcSnPD7G0FgJ4Ek3MLn8U5GWtIDyoN5T+DaVVpx5i/+lZsBcBxGgFkBXrXX755xHqhj
- ev+PrCI9G8jFf/UxdfyDxkdxQsEXaNFncXYgOnn1vD0yLrXFAUwEN69qKoXZhTSsINkVrPQ9w
- LbvGJMeSTqUfSvgQtn7EBm2JDi2vJN4O0Y3r6br6LOWPI9dWN1Sc+VulJOatwaFYfXU/X8kT/
- zBEj5/GQfS2SrrykDCSOAUf8oLi5vY85CNGakq/LndNo8EolwOGfekzZV3GOPzvwVmHB9552N
- Uu0GN0kSGiLUtI8xYivq7dNNWs54535K3Eajf5JYVpyzSq2c5+eK3CIE0RmqNWo563s340aFv
- SJFplWKsvT6IZLajtqbHXLI3KeZbYcpO4/MRnf3BEjAvkXYzqGZnI1SfkNJ9JCetbZzQzg/ut
- R9+Ta9F+MO2+3yowN/eS8EFQjMCD6FcBHU3ukIlhQfDfrO1EDcLgcjRYpHJPrbtGEINKZuY/3
- Lyzz1KlEPYKF7SXZofStZh/Y8leWZWdccddlafOeikWB8Jq4l9i7Vg0apvNKsTrSFDERLGPb2
- /+TWJZX9p74Cf/6vrsdcIC6QU9lMkHvFQvTx9JUJ9loRh5ZV2ZcBPBdXElTZ6S/F+WWvjCw2e
- fz/fQEC4OZ9L3RRBlDcX0ABAg4Svg==
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 21 Aug 2019 08:41:17 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] .gitignore: ignore some
- vhost-user* related files
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 00/15] Audio 20190821 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,47 +69,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/07/2019 à 16:41, Michal Privoznik a écrit :
-> Commit d52c454aadc creates
-> '/contrib/vhost-user-gpu/50-qemu-gpu.json' and '/vhost-user-gpu'
-> and commit 06914c97d3a creates '/vhost-user-input' neither of
-> which is ignored by git.
-> 
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-> ---
->  .gitignore | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/.gitignore b/.gitignore
-> index fd6e6c38c7..e9bbc006d3 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -65,6 +65,8 @@
->  /scsi/qemu-pr-helper
->  /vhost-user-scsi
->  /vhost-user-blk
-> +/vhost-user-gpu
-> +/vhost-user-input
->  /fsdev/virtfs-proxy-helper
->  *.tmp
->  *.[1-9]
-> @@ -131,6 +133,7 @@
->  /docs/interop/qemu-qmp-ref.info*
->  /docs/interop/qemu-qmp-ref.txt
->  /docs/version.texi
-> +/contrib/vhost-user-gpu/50-qemu-gpu.json
->  *.tps
->  .stgit-*
->  .git-submodule-status
-> 
+The following changes since commit 17dc57990320edaad52ac9ea808be9719c91ce=
+a6:
 
-Applied to my trivial-patches branch.
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-201=
+9-08-20' into staging (2019-08-20 14:14:20 +0100)
 
-Thanks,
-Laurent
+are available in the Git repository at:
+
+  git://git.kraxel.org/qemu tags/audio-20190821-pull-request
+
+for you to fetch changes up to e76ba19a1f1377314573a6df7e2d82b597aa3d0a:
+
+  audio: fix memory leak reported by ASAN (2019-08-21 09:13:37 +0200)
+
+----------------------------------------------------------------
+audio: second batch of -audiodev support, adding support for multiple bac=
+kends.
+
+----------------------------------------------------------------
+
+K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n (14):
+  audio: reduce glob_audio_state usage
+  audio: basic support for multi backend audio
+  audio: add audiodev property to vnc and wav_capture
+  audio: add audiodev properties to frontends
+  paaudio: prepare for multiple audiodev
+  audio: audiodev=3D parameters no longer optional when -audiodev present
+  paaudio: do not move stream when sink/source name is specified
+  paaudio: properly disconnect streams in fini_*
+  audio: remove audio_MIN, audio_MAX
+  audio: do not run each backend in audio_run
+  paaudio: fix playback glitches
+  audio: remove read and write pcm_ops
+  audio: use size_t where makes sense
+  audio: fix memory leak reported by ASAN
+
+Stefan Weil (1):
+  audio: Add missing fall through comments
+
+ audio/audio.h                    |  37 ++-
+ audio/audio_int.h                |  43 ++--
+ audio/audio_template.h           |  62 +++--
+ audio/mixeng.h                   |   9 +-
+ audio/rate_template.h            |   2 +-
+ include/hw/qdev-properties.h     |   3 +
+ include/sysemu/replay.h          |   4 +-
+ ui/vnc.h                         |   2 +
+ audio/alsaaudio.c                |  49 ++--
+ audio/audio.c                    | 347 ++++++++++++++-----------
+ audio/coreaudio.c                |  18 +-
+ audio/dsoundaudio.c              |  31 +--
+ audio/noaudio.c                  |  39 +--
+ audio/ossaudio.c                 |  75 +++---
+ audio/paaudio.c                  | 421 ++++++++++++++++++-------------
+ audio/sdlaudio.c                 |  30 +--
+ audio/spiceaudio.c               |  34 +--
+ audio/wavaudio.c                 |  18 +-
+ audio/wavcapture.c               |   6 +-
+ hw/audio/ac97.c                  |  11 +-
+ hw/audio/adlib.c                 |   5 +-
+ hw/audio/cs4231a.c               |   5 +-
+ hw/audio/es1370.c                |  13 +-
+ hw/audio/gus.c                   |   7 +-
+ hw/audio/hda-codec.c             |  17 +-
+ hw/audio/milkymist-ac97.c        |  14 +-
+ hw/audio/pcspk.c                 |   3 +-
+ hw/audio/pl041.c                 |   1 +
+ hw/audio/sb16.c                  |   3 +-
+ hw/audio/wm8750.c                |  10 +-
+ hw/core/qdev-properties-system.c |  57 +++++
+ hw/usb/dev-audio.c               |   1 +
+ monitor/misc.c                   |  22 +-
+ replay/replay-audio.c            |  16 +-
+ replay/replay.c                  |   2 +-
+ ui/vnc.c                         |  15 +-
+ hmp-commands.hx                  |  11 +-
+ qemu-options.hx                  |   6 +
+ 38 files changed, 794 insertions(+), 655 deletions(-)
+
+--=20
+2.18.1
+
 
