@@ -2,83 +2,61 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FECC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14506C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93FA722CF7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:07:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D33552332A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:27:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5wkHxt/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93FA722CF7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IZ7xWkTK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D33552332A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Kib-000885-Rt
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:07:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40232)
+	id 1i0L25-0006SB-CC
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:27:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1i0Kha-0007fY-4w
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:06:39 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0G-0004Ol-42
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1i0KhY-0005M3-PZ
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:06:38 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:36135)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1i0KhY-0005L7-HC
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:06:36 -0400
-Received: by mail-wr1-x436.google.com with SMTP id r3so947690wrt.3
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 00:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=K3ZcHeR0fCcY+QJXVdDsc1wM6iYLSy+1SZ8zgBaJ7SA=;
- b=d5wkHxt/JWQwsbWmZj8cWWLWGPFiW+M8RBGOV+6TQwrMor6HAmve7JavuCAsVrsx0Y
- 1mzNi6lF2psyrH6geeXMtAkSi6dx0JOQybE8KDKTSBo9z2uZJKtvcDx8ctBa8LEuZc3p
- 2AK//skrJ3GEb2924kU+NivVaaZWGrjiIfD3iaqZyeKi2g9/H80jqaPc6cJP9JQq5svK
- BUqadGdIwxwxF+S/dHe92YE4FJ2GOaWTiYo2z9iT0ONZ9WeVd2FSHKCwmZpFPQhRMt3d
- u950o3MUDZ2c5COtZOOibSDcZcFZhku36DVwtxeRJRqqEgEtQQNsPbLiIdEzGt5zY+j9
- vjag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=K3ZcHeR0fCcY+QJXVdDsc1wM6iYLSy+1SZ8zgBaJ7SA=;
- b=EZtXxLbxXNs4CRz+y3URxkiz0jM4Id3SfsTVNmYlhDtMWl84Xq6SAkFuDdsDURbckm
- 1WU5LPIPiuZFzTN9IybaObhnk6pVcVBN0BrMMYzx2VKqIuCkqQ2oBrk2Blkej+FsDOdJ
- eKg73vZjzVOjtaMZtdyrRI6EIjo3gjYsoZF7Rf+pXHYIDdF8uuUbWYeP5SMPGxdB7+QY
- LC03S8Z8oFY0IqYGDYjFKQCa/lvMxGecW8muWuR59fHzzhdC1OmWI+CzOHNzh99MrSFl
- w1ZIBM4U2+vVBuea6gHN8nabgB6Ic/JrVVY1mpegKKst0w4lixQykeD5m4KdSedsWfus
- +TEA==
-X-Gm-Message-State: APjAAAUTQEy7ovPwi1ezV8c/MDhbtp2MQMur0U6ivLpGlrvQa8pYnnwj
- xamPXWH8vgMowgkTHdbKQL0cOQxivZSQTgolIeM=
-X-Google-Smtp-Source: APXvYqxKKztdqd0y7CE1CxmOnhQ7ixNNfB9Mk5pLzwdHwuCKed+pNGBDS7bXUzPVy8hyoSB5wM+qJa0sZOoDqYYIHvo=
-X-Received: by 2002:a05:6000:1284:: with SMTP id
- f4mr5047671wrx.89.1566371194372; 
- Wed, 21 Aug 2019 00:06:34 -0700 (PDT)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0E-0007so-W6
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:25:55 -0400
+Received: from ozlabs.org ([203.11.71.1]:46439)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1i0L0E-0007qR-4p; Wed, 21 Aug 2019 03:25:54 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46Czj8724gz9sNm; Wed, 21 Aug 2019 17:25:48 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1566372348;
+ bh=s3rP9nOYw6dbdVMOG48CakC3NHOqA8jLpQtmp70iOPY=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=IZ7xWkTKythI5rZJ3biZJ6SrrGXgDv7Cki0dXLwoOYeyIikB4+G2iqCN9BHnA+USf
+ 1Ix9/YkwjEr26IZtDXLcS/Q4HQehV0L4Ag8dbV20gS7MZ/sq/EZgcYUpCk2IWTYUjP
+ UEgodGWK72bvpjlP9jHaIqAnyIMmIBBEv/w7bF48=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Wed, 21 Aug 2019 17:25:04 +1000
+Message-Id: <20190821072542.23090-5-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
+References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-References: <20190819105753.30913-1-alex.bennee@linaro.org>
-In-Reply-To: <20190819105753.30913-1-alex.bennee@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 21 Aug 2019 11:06:22 +0400
-Message-ID: <CAJ+F1CL=qQ6JDFUKo5r2TJHh2WAMHPz7+=fUhZ5NiRFW8otP9Q@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
-Subject: Re: [Qemu-devel] [Webpage PATCH] add support page
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 04/42] spapr_pci: Allow 2MiB and 16MiB IOMMU
+ pagesizes by default
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,81 +68,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 19, 2019 at 2:58 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
-> This is intended to be a useful page we can link to in the banner of
-> the IRC channel explaining the various support options someone might
-> have.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+We've had the qemu and kernel KVM infrastructure to handle larger TCE
+page sizes for a while, but forgot to update the defaults to actually
+allow them.  This turns that change on.
 
-May be you should remove "bug reporting" and "contact" sections from
-README, and link to this file instead?
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c     | 6 ++++++
+ hw/ppc/spapr_pci.c | 3 ++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-anyway lgtm,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  support.md | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
->  create mode 100644 support.md
->
-> diff --git a/support.md b/support.md
-> new file mode 100644
-> index 0000000..b9f4aa6
-> --- /dev/null
-> +++ b/support.md
-> @@ -0,0 +1,37 @@
-> +---
-> +title: Support
-> +permalink: /support/
-> +---
-> +
-> +If you have a support question that is not answered by our
-> +[documentation](/documentation) you have a number of options available
-> +to you.
-> +
-> +If the question is specifically about the integration of QEMU with the
-> +rest of your distribution you may be better served by asking through
-> +your distribution's support channels. This includes questions about a
-> +specifically packaged versions of QEMU. The developers are generally
-> +concerned with the latest release and the current state of the [master
-> +branch](https://git.qemu.org/?p=3Dqemu.git).
-> +
-> +Questions about complex configurations of networking and storage are
-> +usually met with a recommendation to use management tool like
-> +[virt-manager](https://virt-manager.org/) from the [libvirt
-> +project](https://libvirt.org/) to configure and run QEMU.
-> +
-> +* There is a
-> +[qemu-discuss@nongnu.org](https://lists.nongnu.org/mailman/listinfo/qemu=
--discuss)
-> +mailing list for user focused questions<br>
-> +If your question is more technical or architecture specific you may
-> +want to send your question to another of [QEMU's mailing
-> +lists](https://wiki.qemu.org/MailingLists)
-> +
-> +* A lot of developers hang around on IRC (network: irc.oftc.net,
-> +channel #qemu)<br> QEMU developers tend to hold normal office hours
-> +and are distributed around the world. Please be patient as you may
-> +have to wait some time for a response. If you can't leave IRC open and
-> +wait you may be better served by a mailing list.
-> +
-> +* If you think you have found a bug you can report it on [our bug
-> +  tracker](https://bugs.launchpad.net/qemu/)<br>
-> +Please see our guide on [how to report a bug](/contribute/report-a-bug/)
-> --
-> 2.20.1
->
->
-
-
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6587d9b559..22a45c3737 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4445,8 +4445,14 @@ DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
+  */
+ static void spapr_machine_4_1_class_options(MachineClass *mc)
+ {
++    static GlobalProperty compat[] =3D {
++        /* Only allow 4kiB and 64kiB IOMMU pagesizes */
++        { TYPE_SPAPR_PCI_HOST_BRIDGE, "pgsz", "0x11000" },
++    };
++
+     spapr_machine_4_2_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
+;
++    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+ }
+=20
+ DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index bf31fd854c..4c5420c465 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2093,7 +2093,8 @@ static Property spapr_phb_properties[] =3D {
+                        0x800000000000000ULL),
+     DEFINE_PROP_BOOL("ddw", SpaprPhbState, ddw_enabled, true),
+     DEFINE_PROP_UINT64("pgsz", SpaprPhbState, page_size_mask,
+-                       (1ULL << 12) | (1ULL << 16)),
++                       (1ULL << 12) | (1ULL << 16)
++                       | (1ULL << 21) | (1ULL << 24)),
+     DEFINE_PROP_UINT32("numa_node", SpaprPhbState, numa_node, -1),
+     DEFINE_PROP_BOOL("pre-2.8-migration", SpaprPhbState,
+                      pre_2_8_migration, false),
 --=20
-Marc-Andr=C3=A9 Lureau
+2.21.0
+
 
