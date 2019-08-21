@@ -2,78 +2,76 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995C8C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C64C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:08:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B99F22DD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9870922DA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 05:08:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhauaFvk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B99F22DD3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oi0/xrEy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9870922DA7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Iow-0005QO-35
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 01:06:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54725)
+	id 1i0Iqz-0006SF-P1
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 01:08:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55013)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1i0Io8-0004u2-5R
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:05:17 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1i0IqJ-00063I-SP
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:07:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1i0Io5-00077D-V3
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:05:15 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:41391)
+ (envelope-from <jan.bobek@gmail.com>) id 1i0IqI-0007xr-4c
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:07:31 -0400
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:41400)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0Io3-00075I-Sr
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:05:12 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id i138so432305ywg.8
- for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 22:05:10 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0IqG-0007xL-9v
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 01:07:28 -0400
+Received: by mail-yw1-xc43.google.com with SMTP id i138so434280ywg.8
+ for <qemu-devel@nongnu.org>; Tue, 20 Aug 2019 22:07:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to;
- bh=ZuCmWuXC3V9eqsULef6bjj3zQGF1ZM0yjdraL9TjXxE=;
- b=ZhauaFvkMKej9MSHEg7zu+YxIfCGyQxfXGV8J9ym71f1Sv+VyyEhc2lYGHgrhRp3cb
- WhctqoU7Os/VJgFtqf0KwMUqzq0hMFB28vv5wroN3FO7MENeoi1qgFhGUAWTUpUVWbNs
- NaiFI61vklkjUHZbsZ+x6IW0NYCubrqEbKNe+m0SHafP1tWifJ4nGZHB7G6W1MFc8X+J
- pFU727lD1vHI5uZVxIBwpKUfrp22NHt5iQo0nYTeQPOHzXccndAmlXbUAdt6g4y1a1lP
- 4PRi/kRFIC8Rkrst/WKjkKn8UwprrqxWjcvrpXRlqP0f04FzfCnqJVYK55xJoGwqfKtm
- ErEg==
+ bh=gnmPeeuzeIj6JuKh6hG+hXD9AZiez9cpBr+furHDk2c=;
+ b=Oi0/xrEyXjeO0mAdRAj4tpbDDICc5YcrfTUFAJmruGmvmFBIWkebcMQwJlmlHLv5ot
+ UrYnu14BeZTmTlucsogENxJMrcQOfO4ZlMKzZxJWqia253SH0xgw46GDvIsby/P+ftLc
+ +bs/RzFFu4gB6Dsj3K4fGmo3NKIZ385hfVl9UIp5Cc9Yp9AoWcG8EjBds1XX2jL3HGgi
+ s8yw70Vl/mj5jHmTns6E7pqkd+RhPYNVN13Qj5uos7NbzK/MvpVpum7XdNQuOv3Cod4X
+ T0XCAFEkFZJqNjANZi9W7MxaBRhmfsrHMr1Cq4WVUXu75VbfRjURFFrIExCevRZpmWSf
+ U57g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to;
- bh=ZuCmWuXC3V9eqsULef6bjj3zQGF1ZM0yjdraL9TjXxE=;
- b=D1xjxUk1tv4a1cR2ODaAgWeoymSkaJPU1g+4f2yHWaTZBthtDnRa2wDqbdJRdLIs0x
- fghxw6DNRnWftPnpMMt+Xh489TrwMfrz8q5x0RbCSipHge1qtTo6xf7SKjIClX7YPSd7
- ko/Gq1+ij1tOhS5voAX4L3OQreHDLNTv9/HByVQuXY/ONmMLHY71KOWCOEWVkcYgBxr3
- nfyRmm2fkP8KcNz6YaHK3w6kxT753DQ5hOd/Q2SihEYmGY7Ycphc9Jt0S5RqChmU9sNm
- ipdki+tdFbA5BOgz4ARNfaUq2Lg/y/jkRz+hP3X4M6ZHZMYd8ar0aSGywy+cdWmGEf8G
- InWg==
-X-Gm-Message-State: APjAAAW6w7QpGF/h6yCx/Az2CICifpHlVRRHvK6v5KEYTSBauDgWpYbS
- S4qY+JMgGmk3QndY7A14Zo0=
-X-Google-Smtp-Source: APXvYqw65YwvvVrPFtgOkHLdY4MXq3ZuWvWSEgRKE8oyP5IVfIBOKXaOX6vvYcbwOHYc2NgeYV3qbA==
-X-Received: by 2002:a0d:dd01:: with SMTP id g1mr23378381ywe.482.1566363909211; 
- Tue, 20 Aug 2019 22:05:09 -0700 (PDT)
+ bh=gnmPeeuzeIj6JuKh6hG+hXD9AZiez9cpBr+furHDk2c=;
+ b=Qh1UQXpW20myIObcKRKJBo9fgjn8F3hXJq7dtKiJtPyuZ3Oan6hL+QEsP2XZw6lBvr
+ S3SCSbL0fQhQkabAWqMKyCChygKHRMH+T5Ae8ZYIbiRe0RiC0xUmnUyyNfkDsSCyqzEt
+ szJVcErWZ7PT7Woagh4a3ftN9BJT9+ZqvH6SVV57hFhOWIIMGCYF38m1o30xQu2m+HPE
+ vDUGXvbsqAnMqDZshYcOgkCi+AV/hIwYMArzqJFvmayfXPvFcuxjyKtxFJFI0fAKBT6a
+ AMSN98IneSxErSXysGNZFtIOHEXpjpzxzPFxe3BMI5LALeP7+i2lePToV6oBdkCmhgyY
+ PrCw==
+X-Gm-Message-State: APjAAAXJrR5AKMbbIgawBn1eW5WyZQT4tqJSI418i8n7cckiAwlDjV4Q
+ 3UqbAtQFPsyDT/4h9FKPfXBinDod
+X-Google-Smtp-Source: APXvYqxyXDMGs7DFZN1Ctdj4gpIMSIKalbBIwz0hNHAnsFEdlYxa+bHw7RRzzA0eACOjZHcfwvE1lg==
+X-Received: by 2002:a81:5c87:: with SMTP id
+ q129mr21341618ywb.403.1566364047615; 
+ Tue, 20 Aug 2019 22:07:27 -0700 (PDT)
 Received: from ?IPv6:2601:c0:c67f:e390::3? ([2601:c0:c67f:e390::3])
- by smtp.googlemail.com with ESMTPSA id q35sm4403281ywa.69.2019.08.20.22.05.08
+ by smtp.googlemail.com with ESMTPSA id l5sm1316154ywa.65.2019.08.20.22.07.26
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Aug 2019 22:05:08 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>
+ Tue, 20 Aug 2019 22:07:26 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 References: <20190815020928.9679-1-jan.bobek@gmail.com>
- <20190815020928.9679-47-jan.bobek@gmail.com>
- <CAL1e-=gZF1+=Gduqm4TwS0p-G6rvb4q+rw+hL9nzAz3P-r3+BQ@mail.gmail.com>
- <9240f24b-3f3c-531c-5c7d-06f359c26fd1@linaro.org>
- <CAL1e-=g8X+BOJfj=pwc3MbrfL_b1QbJ4uha8CikKs=z4wegchA@mail.gmail.com>
+ <20190815020928.9679-16-jan.bobek@gmail.com>
+ <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
 From: Jan Bobek <jan.bobek@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
@@ -150,20 +148,20 @@ Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
  uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
  sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
  WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
-Message-ID: <f9179d1b-71d6-30a3-e13e-704f9da3deb6@gmail.com>
-Date: Wed, 21 Aug 2019 01:04:57 -0400
+Message-ID: <404dea2e-1d22-df1f-b9df-4bb32567a612@gmail.com>
+Date: Wed, 21 Aug 2019 01:07:25 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=g8X+BOJfj=pwc3MbrfL_b1QbJ4uha8CikKs=z4wegchA@mail.gmail.com>
+In-Reply-To: <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="ZAhE94l9tEMnOnSDakcn80rl8JzcLcyob"
+ boundary="wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::c43
-Subject: Re: [Qemu-devel] [RFC PATCH v3 46/46] target/i386: introduce SSE3
- instructions to sse-opcode.inc.h
+Subject: Re: [Qemu-devel] [RFC PATCH v3 15/46] target/i386: introduce
+ function ck_cpuid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -176,83 +174,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZAhE94l9tEMnOnSDakcn80rl8JzcLcyob
-Content-Type: multipart/mixed; boundary="ZUTyM8DoXaUqUWR1FnmE8Rzc8VElKZ1v4";
+--wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC
+Content-Type: multipart/mixed; boundary="SlHiXmT1XBFV8uyegyZ93FXkrnuGwVKYb";
  protected-headers="v1"
 From: Jan Bobek <jan.bobek@gmail.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-Message-ID: <f9179d1b-71d6-30a3-e13e-704f9da3deb6@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v3 46/46] target/i386: introduce SSE3
- instructions to sse-opcode.inc.h
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Message-ID: <404dea2e-1d22-df1f-b9df-4bb32567a612@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v3 15/46] target/i386: introduce function
+ ck_cpuid
 References: <20190815020928.9679-1-jan.bobek@gmail.com>
- <20190815020928.9679-47-jan.bobek@gmail.com>
- <CAL1e-=gZF1+=Gduqm4TwS0p-G6rvb4q+rw+hL9nzAz3P-r3+BQ@mail.gmail.com>
- <9240f24b-3f3c-531c-5c7d-06f359c26fd1@linaro.org>
- <CAL1e-=g8X+BOJfj=pwc3MbrfL_b1QbJ4uha8CikKs=z4wegchA@mail.gmail.com>
-In-Reply-To: <CAL1e-=g8X+BOJfj=pwc3MbrfL_b1QbJ4uha8CikKs=z4wegchA@mail.gmail.com>
+ <20190815020928.9679-16-jan.bobek@gmail.com>
+ <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
+In-Reply-To: <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
 
---ZUTyM8DoXaUqUWR1FnmE8Rzc8VElKZ1v4
+--SlHiXmT1XBFV8uyegyZ93FXkrnuGwVKYb
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/15/19 6:07 AM, Aleksandar Markovic wrote:
+On 8/15/19 11:01 AM, Aleksandar Markovic wrote:
 >=20
-> 15.08.2019. 11.55, "Richard Henderson" <richard.henderson@linaro.org <m=
-ailto:richard.henderson@linaro.org>> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=
-=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> 15.08.2019. 04.23, "Jan Bobek" <jan.bobek@gmail.com <mailto:jan.bobek@g=
+mail.com>> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=
+=D0=B0:
 >>
->> On 8/15/19 8:02 AM, Aleksandar Markovic wrote:
->> > A question for you: What about FISTTP, MONITOR, MWAIT, that belong t=
-o SSE3, but
->> > are not mentioned in this patch?
->> >
+>> Introduce a helper function to take care of instruction CPUID checks.
 >>
->> They are also not vector instructions, which is the subject of this pa=
-tch set.
->>
+>> Signed-off-by: Jan Bobek <jan.bobek@gmail.com <mailto:jan.bobek@gmail.=
+com>>
+>> ---
 >=20
-> The subject of the patch and the patch set says "SSE3", not "vector", r=
-ead it again.
+> Jan, what is the origin of "CK"? If it is a QEMU internal thing, perhap=
+s use "CHECK".
+>=20
+> The function should be called check_cpuid(), imho. I know, Richard woul=
+d like c_ci(), or simpler cc(), better.
 
-Richard is right, I will clarify the series' subject and the
-commit message.
+It was completely my initiative to name it like that. I'll rename
+it to check_cpuid().
 
 -Jan
 
 
---ZUTyM8DoXaUqUWR1FnmE8Rzc8VElKZ1v4--
+--SlHiXmT1XBFV8uyegyZ93FXkrnuGwVKYb--
 
---ZAhE94l9tEMnOnSDakcn80rl8JzcLcyob
+--wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl1c0P4ACgkQZeg2ldrj
-Ns84uQ/+OjbNk+PKeezGHwP0LY6SZymph1Y0BU/iYYaaWFnz2PxFq5PBFB74S3I5
-rY2qgK5nNQYoDcS/WsYySGtOdTR0V7foFiT2fAscvE2CPd3ePq7V5DxQByVFnTVO
-ePb/R5pDOKXjqbolxXhknvi3gPXUC3MpazoOu743Zk9hupgO7wl4DK3ZX1TE+nXT
-9o+yPpBALNSgU+ANE6SZmdtFtckaxW1BN1yCPBwC4hD1Ov+BDSCyXtBraTffENdp
-zjj+yAIvP6UGdKwjnlpx9hqDj8Q6U9yibOB8cMhc9qq8xMNZH7ZwypHPR42SjBTI
-ubXZ5KgbC1hYHxUzxPtA/jRQptL+xY2kWQhKPsLS0xJU14j4aXrXyKbFsl5qQuzu
-MxlbVP4wn6pUZTIUoQWHeS5UkNxiSTsOBaJHrQ0mws5QGh5ir1Ko2TbNkHu5NAZg
-OOxWpZPQUC/UpXcnCZpG0sIB22T8aVAigMdZ38+iPnwyCx82yxOynpUi55Ldc/U4
-gaOHaprihDsXeeiQ8NdIXGOHrvmgazsuMd1Q6of3Wfz8Xhp6XOYvTMC1VyLzg4Yh
-iTifF3sYMgoyaLnzMWqA5fZM0PCVrqEbymlrDn3cnlfmMplkzGmJD+e1eOKPLmlw
-baxnPIIhtneVHYGUKcuPHY6DPhWl+mseAiFfH+5Yk0BsEYxvf0I=
-=lb/E
+iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl1c0Y0ACgkQZeg2ldrj
+Ns/RGw//R+OX9HcB1myGqZ915qn6l+c7Uj4LOU8jRI6OVF8jb3rab/xOuw1LCz8p
+j4xsgRIF/HkFVkDjvT7VxYXdsdOa/zmUz0XmO8CPTHqhcSbk6bwYXCZGtVpRAbAV
+rEYz8XN/K5C7Db7Z8x5PM0hTIX2UgXemVuULTKLTBYJA9qwa1QXU9LsxgTT4XZ6B
+B+9VSJ0xazkC4EWKaoakqGXIXqU83RuFaFzoAlSVD+i+J8bvAmO9EIS9r9fqXtqB
+HMWCTB12P5tY4mSI19IYbC5+ULxgCL4hcf4SKkjjttCRaDonzDVHgAFDJJtcO0Nx
+N2RRj1MTacweD7/Zd4ylYT4Sr49nHSN5OxuTs81CiQSxQk+BSOm5v3jrfXp/+tdE
+c68eld8T89ONKCPV2zpSrkio5MX4wclexR1q/4o1/XbZyZK0xxGxKc9168G7EamI
+F9dj5Q/i3t1aLOLAegbm5BMkZkluDwdPOSmLLfroDxeazdbNkLBCRUxBNA5PZnNx
+O9q47HDMlv33WuP43HNOm0A2IjtuUo7XjEljdSCAGg4d10HqhmeqcBOT7klPDN5L
+VhijacEmOKdDRbCNhYenFOENe38+jhWDNY/JSbInFd1AnsUFF1hTSx3BrfPvZ4YM
+02sqLlgYDKRy0x1H7Yu2CCCNt4o2Rm+B1v2IGpC78JXT9skPxFQ=
+=PBXK
 -----END PGP SIGNATURE-----
 
---ZAhE94l9tEMnOnSDakcn80rl8JzcLcyob--
+--wcnsQ5j2IkaM8UfxTDc7TXzHPJY9biQUC--
 
