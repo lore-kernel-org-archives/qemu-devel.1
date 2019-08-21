@@ -7,56 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6855DC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE7BC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33C1A2332A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F6012332A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Z69Q38IE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33C1A2332A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ODHF3SkA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F6012332A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0L7N-000359-KQ
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:33:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42089)
+	id 1i0L7Y-0003MR-1O
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:33:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42370)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0M-0004Tc-Bu
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:04 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0V-0004h2-Gz
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0K-0007zX-MZ
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:02 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:43563)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0T-000896-22
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:11 -0400
+Received: from ozlabs.org ([203.11.71.1]:55445)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L0J-0007sz-Qn; Wed, 21 Aug 2019 03:26:00 -0400
+ id 1i0L0S-00086W-CK; Wed, 21 Aug 2019 03:26:08 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46Czj9109Rz9sNk; Wed, 21 Aug 2019 17:25:48 +1000 (AEST)
+ id 46CzjC6Wb4z9sQr; Wed, 21 Aug 2019 17:25:50 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372349;
- bh=sRXk7SNRvroQ2qFl7AEBNqbIUZ7MSRvgK0vwUkIjtnY=;
+ d=gibson.dropbear.id.au; s=201602; t=1566372351;
+ bh=nD2L+SiGYUChIjp0CrLusuaG7viZyrANK72wGdiR5tM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Z69Q38IEtwqTqwKBbuh3qQ/2GsBw77JDb41a/mjzLfHB/pD3EkbyxyRNpveVhT9P4
- dU4gtEsD3iB8fMErSWEN+XYmxK2HQsbm8JnF6xjpAt14cFzdVMuWhE5yoW5ggc1JBs
- jaO5v4AmBeqWvo04WpOHrUHpWFAE7btWFygaZNZ4=
+ b=ODHF3SkAlwP8ouTlUkWwoGY0k6opY/REiHpmhLEfACYd8iXEN7I4OA1aFFZY6SyUk
+ 09OpoC5beumS3dR+W/Pf6lfzSMyUSG8xdgvqdkLaEg6gBQMBWELEJWs/OXX+2nSKut
+ EqvwxdyppYXfarlOHB+XG6p9Qy3IGKSdfOYz/NvY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:03 +1000
-Message-Id: <20190821072542.23090-4-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:26 +1000
+Message-Id: <20190821072542.23090-27-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 03/42] hw: add compat machines for 4.2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 26/42] ppc/xive: Provide unconditional
+ escalation support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,255 +69,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, aik@ozlabs.ru,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cornelia Huck <cohuck@redhat.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Add 4.2 machine types for arm/i440fx/q35/s390x/spapr.
+When the 'u' bit is set the escalation is said to be 'unconditional'
+which means that the ESe PQ bits are not used. Introduce a
+xive_router_end_es_notify() routine to share code with the ESn
+notification.
 
-For i440fx and q35, unversioned cpu models are still translated
-to -v1, as 0788a56bd1ae ("i386: Make unversioned CPU models be
-aliases") states this should only transition to the latest cpu
-model version in 4.3 (or later).
-
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20190724103524.20916-1-cohuck@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190718115420.19919-7-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/arm/virt.c              |  9 ++++++++-
- hw/core/machine.c          |  3 +++
- hw/i386/pc.c               |  3 +++
- hw/i386/pc_piix.c          | 14 +++++++++++++-
- hw/i386/pc_q35.c           | 13 ++++++++++++-
- hw/ppc/spapr.c             | 15 +++++++++++++--
- hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
- include/hw/boards.h        |  3 +++
- include/hw/i386/pc.h       |  3 +++
- 9 files changed, 71 insertions(+), 6 deletions(-)
+ hw/intc/xive.c             | 44 ++++++++++++++++++++++++++++++--------
+ include/hw/ppc/xive_regs.h |  2 ++
+ 2 files changed, 37 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 02510acb81..0d1629ccb3 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2050,10 +2050,17 @@ static void machvirt_machine_init(void)
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 12f0d09df6..3fe84f3e76 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1429,6 +1429,27 @@ static bool xive_presenter_notify(XiveRouter *xrtr=
+, uint8_t format,
+     return found;
  }
- type_init(machvirt_machine_init);
-=20
-+static void virt_machine_4_2_options(MachineClass *mc)
-+{
-+}
-+DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
-+
- static void virt_machine_4_1_options(MachineClass *mc)
- {
-+    virt_machine_4_2_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
-;
- }
--DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
-+DEFINE_VIRT_MACHINE(4, 1)
-=20
- static void virt_machine_4_0_options(MachineClass *mc)
- {
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 32d1ca9abc..83cd1bfeec 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -27,6 +27,9 @@
- #include "hw/pci/pci.h"
- #include "hw/mem/nvdimm.h"
-=20
-+GlobalProperty hw_compat_4_1[] =3D {};
-+const size_t hw_compat_4_1_len =3D G_N_ELEMENTS(hw_compat_4_1);
-+
- GlobalProperty hw_compat_4_0[] =3D {
-     { "VGA",            "edid", "false" },
-     { "secondary-vga",  "edid", "false" },
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3ab4bcb3ca..95edbbfe9e 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -119,6 +119,9 @@ struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_=
-MAX};
- /* Physical Address of PVH entry point read from kernel ELF NOTE */
- static size_t pvh_start_addr;
-=20
-+GlobalProperty pc_compat_4_1[] =3D {};
-+const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
-+
- GlobalProperty pc_compat_4_0[] =3D {};
- const size_t pc_compat_4_0_len =3D G_N_ELEMENTS(pc_compat_4_0);
-=20
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 9e187f856a..a70cf0aafc 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -432,7 +432,7 @@ static void pc_i440fx_machine_options(MachineClass *m=
-)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
-=20
--static void pc_i440fx_4_1_machine_options(MachineClass *m)
-+static void pc_i440fx_4_2_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
-     pc_i440fx_machine_options(m);
-@@ -441,6 +441,18 @@ static void pc_i440fx_4_1_machine_options(MachineCla=
-ss *m)
-     pcmc->default_cpu_version =3D 1;
- }
-=20
-+DEFINE_I440FX_MACHINE(v4_2, "pc-i440fx-4.2", NULL,
-+                      pc_i440fx_4_2_machine_options);
-+
-+static void pc_i440fx_4_1_machine_options(MachineClass *m)
-+{
-+    pc_i440fx_4_2_machine_options(m);
-+    m->alias =3D NULL;
-+    m->is_default =3D 0;
-+    compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-+    compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
-+}
-+
- DEFINE_I440FX_MACHINE(v4_1, "pc-i440fx-4.1", NULL,
-                       pc_i440fx_4_1_machine_options);
-=20
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index be3464f485..d4e8a1cb9f 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -364,7 +364,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus =3D 288;
- }
-=20
--static void pc_q35_4_1_machine_options(MachineClass *m)
-+static void pc_q35_4_2_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
-     pc_q35_machine_options(m);
-@@ -372,6 +372,17 @@ static void pc_q35_4_1_machine_options(MachineClass =
-*m)
-     pcmc->default_cpu_version =3D 1;
- }
-=20
-+DEFINE_Q35_MACHINE(v4_2, "pc-q35-4.2", NULL,
-+                   pc_q35_4_2_machine_options);
-+
-+static void pc_q35_4_1_machine_options(MachineClass *m)
-+{
-+    pc_q35_4_2_machine_options(m);
-+    m->alias =3D NULL;
-+    compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-+    compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
-+}
-+
- DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
-                    pc_q35_4_1_machine_options);
-=20
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e09c67eb75..6587d9b559 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4430,15 +4430,26 @@ static const TypeInfo spapr_machine_info =3D {
-     }                                                                \
-     type_init(spapr_machine_register_##suffix)
 =20
 +/*
-+ * pseries-4.2
++ * Notification using the END ESe/ESn bit (Event State Buffer for
++ * escalation and notification). Profide futher coalescing in the
++ * Router.
 + */
-+static void spapr_machine_4_2_class_options(MachineClass *mc)
++static bool xive_router_end_es_notify(XiveRouter *xrtr, uint8_t end_blk,
++                                      uint32_t end_idx, XiveEND *end,
++                                      uint32_t end_esmask)
 +{
-+    /* Defaults for the latest behaviour inherited from the base class *=
-/
-+}
++    uint8_t pq =3D xive_get_field32(end_esmask, end->w1);
++    bool notify =3D xive_esb_trigger(&pq);
 +
-+DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
++    if (pq !=3D xive_get_field32(end_esmask, end->w1)) {
++        end->w1 =3D xive_set_field32(end_esmask, end->w1, pq);
++        xive_router_write_end(xrtr, end_blk, end_idx, end, 1);
++    }
++
++    /* ESe/n[Q]=3D1 : end of notification */
++    return notify;
++}
 +
  /*
-  * pseries-4.1
-  */
- static void spapr_machine_4_1_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class *=
-/
-+    spapr_machine_4_2_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
-;
- }
+  * An END trigger can come from an event trigger (IPI or HW) or from
+  * another chip. We don't model the PowerBus but the END trigger
+@@ -1485,16 +1506,9 @@ static void xive_router_end_notify(XiveRouter *xrt=
+r, uint8_t end_blk,
+      * even futher coalescing in the Router
+      */
+     if (!xive_end_is_notify(&end)) {
+-        uint8_t pq =3D xive_get_field32(END_W1_ESn, end.w1);
+-        bool notify =3D xive_esb_trigger(&pq);
+-
+-        if (pq !=3D xive_get_field32(END_W1_ESn, end.w1)) {
+-            end.w1 =3D xive_set_field32(END_W1_ESn, end.w1, pq);
+-            xive_router_write_end(xrtr, end_blk, end_idx, &end, 1);
+-        }
+-
+         /* ESn[Q]=3D1 : end of notification */
+-        if (!notify) {
++        if (!xive_router_end_es_notify(xrtr, end_blk, end_idx,
++                                       &end, END_W1_ESn)) {
+             return;
+         }
+     }
+@@ -1558,6 +1572,18 @@ static void xive_router_end_notify(XiveRouter *xrt=
+r, uint8_t end_blk,
+         return;
+     }
 =20
--DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
-+DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
-=20
- /*
-  * pseries-4.0
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 434d933ec9..8bfb6684cb 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -663,14 +663,26 @@ bool css_migration_enabled(void)
-     }                                                                   =
-      \
-     type_init(ccw_machine_register_##suffix)
-=20
-+static void ccw_machine_4_2_instance_options(MachineState *machine)
-+{
-+}
++    /*
++     * Check the END ESe (Event State Buffer for escalation) for even
++     * futher coalescing in the Router
++     */
++    if (!xive_end_is_uncond_escalation(&end)) {
++        /* ESe[Q]=3D1 : end of notification */
++        if (!xive_router_end_es_notify(xrtr, end_blk, end_idx,
++                                       &end, END_W1_ESe)) {
++            return;
++        }
++    }
 +
-+static void ccw_machine_4_2_class_options(MachineClass *mc)
-+{
-+}
-+DEFINE_CCW_MACHINE(4_2, "4.2", true);
-+
- static void ccw_machine_4_1_instance_options(MachineState *machine)
+     /*
+      * The END trigger becomes an Escalation trigger
+      */
+diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+index b0c68ab5f7..4378d7259c 100644
+--- a/include/hw/ppc/xive_regs.h
++++ b/include/hw/ppc/xive_regs.h
+@@ -210,6 +210,8 @@ typedef struct XiveEND {
+ #define xive_end_is_notify(end)   (be32_to_cpu((end)->w0) & END_W0_UCOND=
+_NOTIFY)
+ #define xive_end_is_backlog(end)  (be32_to_cpu((end)->w0) & END_W0_BACKL=
+OG)
+ #define xive_end_is_escalate(end) (be32_to_cpu((end)->w0) & END_W0_ESCAL=
+ATE_CTL)
++#define xive_end_is_uncond_escalation(end)              \
++    (be32_to_cpu((end)->w0) & END_W0_UNCOND_ESCALATE)
+=20
+ static inline uint64_t xive_end_qaddr(XiveEND *end)
  {
-+    ccw_machine_4_2_instance_options(machine);
- }
-=20
- static void ccw_machine_4_1_class_options(MachineClass *mc)
- {
-+    ccw_machine_4_2_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
-;
- }
--DEFINE_CCW_MACHINE(4_1, "4.1", true);
-+DEFINE_CCW_MACHINE(4_1, "4.1", false);
-=20
- static void ccw_machine_4_0_instance_options(MachineState *machine)
- {
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 739d109fe1..aa35955f7f 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -317,6 +317,9 @@ struct MachineState {
-     } \
-     type_init(machine_initfn##_register_types)
-=20
-+extern GlobalProperty hw_compat_4_1[];
-+extern const size_t hw_compat_4_1_len;
-+
- extern GlobalProperty hw_compat_4_0[];
- extern const size_t hw_compat_4_0_len;
-=20
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 4bb9e29114..ec538df9b7 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -301,6 +301,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-=20
-+extern GlobalProperty pc_compat_4_1[];
-+extern const size_t pc_compat_4_1_len;
-+
- extern GlobalProperty pc_compat_4_0[];
- extern const size_t pc_compat_4_0_len;
-=20
 --=20
 2.21.0
 
