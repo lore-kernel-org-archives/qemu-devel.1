@@ -7,56 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14506C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D95C6C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D33552332A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:27:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A74CA2332A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:27:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IZ7xWkTK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D33552332A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="d1xqWc7e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A74CA2332A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0L25-0006SB-CC
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:27:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41942)
+	id 1i0L28-0006W6-AD
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:27:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0G-0004Ol-42
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0G-0004Oj-21
  for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L0E-0007so-W6
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L0E-0007sX-Qx
  for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:25:55 -0400
-Received: from ozlabs.org ([203.11.71.1]:46439)
+Received: from ozlabs.org ([2401:3900:2:1::2]:53363)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L0E-0007qR-4p; Wed, 21 Aug 2019 03:25:54 -0400
+ id 1i0L0E-0007qM-Ag; Wed, 21 Aug 2019 03:25:54 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46Czj8724gz9sNm; Wed, 21 Aug 2019 17:25:48 +1000 (AEST)
+ id 46Czj86LCYz9sN6; Wed, 21 Aug 2019 17:25:48 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1566372348;
- bh=s3rP9nOYw6dbdVMOG48CakC3NHOqA8jLpQtmp70iOPY=;
+ bh=aw5W83RgbqJeiMgkHYQ5Rg2X9vFhxMjn+uUovii8P/A=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IZ7xWkTKythI5rZJ3biZJ6SrrGXgDv7Cki0dXLwoOYeyIikB4+G2iqCN9BHnA+USf
- 1Ix9/YkwjEr26IZtDXLcS/Q4HQehV0L4Ag8dbV20gS7MZ/sq/EZgcYUpCk2IWTYUjP
- UEgodGWK72bvpjlP9jHaIqAnyIMmIBBEv/w7bF48=
+ b=d1xqWc7e50udB77cS0IHhRo/aoj8z3dMVpuENTiBdPrAfJrU3dtGBBkwPEHjU/UuM
+ yyVEwGfzto49GPnvS4dRE4wfP4lieyiQyZxRUH5wJ2dteVcro28yELutpIDe6j/Hdu
+ G9F78koQwlI9vSaVPud6vA+/bSljeSjAYW9WPx08=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:04 +1000
-Message-Id: <20190821072542.23090-5-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:05 +1000
+Message-Id: <20190821072542.23090-6-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 04/42] spapr_pci: Allow 2MiB and 16MiB IOMMU
- pagesizes by default
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 05/42] migration: Do not re-read the clock on
+ pre_save in case of paused guest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,56 +69,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
+ "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>, groug@kaod.org,
  qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We've had the qemu and kernel KVM infrastructure to handle larger TCE
-page sizes for a while, but forgot to update the defaults to actually
-allow them.  This turns that change on.
+From: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
 
+Re-read the timebase before migrate was ported from x86 commit:
+   6053a86fe7bd: kvmclock: reduce kvmclock difference on migration
+
+The clock move makes the guest knows about the paused time between
+the stop and migrate commands. This is an issue in an already-paused
+VM because some side effects, like process stalls, could happen
+after migration.
+
+So, this patch checks the runstate of guest in the pre_save handler and
+do not re-reads the timebase in case of paused state (cold migration).
+
+Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
+Message-Id: <20190711194702.26598-1-maxiwell@linux.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c     | 6 ++++++
- hw/ppc/spapr_pci.c | 3 ++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ hw/ppc/ppc.c         | 13 +++++++++----
+ target/ppc/cpu-qom.h |  1 +
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6587d9b559..22a45c3737 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4445,8 +4445,14 @@ DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
-  */
- static void spapr_machine_4_1_class_options(MachineClass *mc)
- {
-+    static GlobalProperty compat[] =3D {
-+        /* Only allow 4kiB and 64kiB IOMMU pagesizes */
-+        { TYPE_SPAPR_PCI_HOST_BRIDGE, "pgsz", "0x11000" },
-+    };
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index 7963feeab4..52a18eb7d7 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -1011,6 +1011,8 @@ static void timebase_save(PPCTimebase *tb)
+      * there is no need to update it from KVM here
+      */
+     tb->guest_timebase =3D ticks + first_ppc_cpu->env.tb_env->tb_offset;
 +
-     spapr_machine_4_2_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
-;
-+    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
++    tb->runstate_paused =3D runstate_check(RUN_STATE_PAUSED);
  }
 =20
- DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index bf31fd854c..4c5420c465 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -2093,7 +2093,8 @@ static Property spapr_phb_properties[] =3D {
-                        0x800000000000000ULL),
-     DEFINE_PROP_BOOL("ddw", SpaprPhbState, ddw_enabled, true),
-     DEFINE_PROP_UINT64("pgsz", SpaprPhbState, page_size_mask,
--                       (1ULL << 12) | (1ULL << 16)),
-+                       (1ULL << 12) | (1ULL << 16)
-+                       | (1ULL << 21) | (1ULL << 24)),
-     DEFINE_PROP_UINT32("numa_node", SpaprPhbState, numa_node, -1),
-     DEFINE_PROP_BOOL("pre-2.8-migration", SpaprPhbState,
-                      pre_2_8_migration, false),
+ static void timebase_load(PPCTimebase *tb)
+@@ -1054,9 +1056,9 @@ void cpu_ppc_clock_vm_state_change(void *opaque, in=
+t running,
+ }
+=20
+ /*
+- * When migrating, read the clock just before migration,
+- * so that the guest clock counts during the events
+- * between:
++ * When migrating a running guest, read the clock just
++ * before migration, so that the guest clock counts
++ * during the events between:
+  *
+  *  * vm_stop()
+  *  *
+@@ -1071,7 +1073,10 @@ static int timebase_pre_save(void *opaque)
+ {
+     PPCTimebase *tb =3D opaque;
+=20
+-    timebase_save(tb);
++    /* guest_timebase won't be overridden in case of paused guest */
++    if (!tb->runstate_paused) {
++        timebase_save(tb);
++    }
+=20
+     return 0;
+ }
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index a2f202f021..5769fb78a9 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -201,6 +201,7 @@ typedef struct PowerPCCPUClass {
+ typedef struct PPCTimebase {
+     uint64_t guest_timebase;
+     int64_t time_of_the_day_ns;
++    bool runstate_paused;
+ } PPCTimebase;
+=20
+ extern const VMStateDescription vmstate_ppc_timebase;
 --=20
 2.21.0
 
