@@ -2,51 +2,47 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7D5C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94EBBC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:56:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CBB2206BA
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:48:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CBB2206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 6A27322DA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:56:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A27322DA7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0RuK-0002hS-JN
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39841)
+	id 1i0S2D-0004wG-KY
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:56:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41668)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i0RtP-00025U-0s
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:47:19 -0400
+ (envelope-from <eblake@redhat.com>) id 1i0S1X-0004S7-Sg
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:55:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i0RtN-0008EZ-Tb
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:47:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60626)
+ (envelope-from <eblake@redhat.com>) id 1i0S1W-000774-Ft
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:55:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43250)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i0RtL-0008BQ-03; Wed, 21 Aug 2019 10:47:15 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1i0S1T-00073D-Mk; Wed, 21 Aug 2019 10:55:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 19E1E191C2CB;
- Wed, 21 Aug 2019 14:47:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E07FD30821BF;
+ Wed, 21 Aug 2019 14:55:38 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C0437104812F;
- Wed, 21 Aug 2019 14:47:09 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
- <e66505eb-78e1-612d-6742-4774c3167412@virtuozzo.com>
- <b8b6d285-7091-484e-35db-5cec736f8314@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EF0A60603;
+ Wed, 21 Aug 2019 14:55:38 +0000 (UTC)
+To: qemu-devel@nongnu.org
+References: <20190819175751.18075-1-eblake@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -73,21 +69,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <982d86ee-438d-a01d-65f5-77439d5102df@redhat.com>
-Date: Wed, 21 Aug 2019 09:47:08 -0500
+Message-ID: <d7e0a76e-dd3f-aa64-933a-8557afcab1c0@redhat.com>
+Date: Wed, 21 Aug 2019 09:55:37 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <b8b6d285-7091-484e-35db-5cec736f8314@virtuozzo.com>
+In-Reply-To: <20190819175751.18075-1-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="PEnV7MoIunzqmEJ6127GyXqXjTfitZS47"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Wed, 21 Aug 2019 14:47:14 +0000 (UTC)
+ boundary="5LfOEAti7TorWQ3tNcnS317bpBl8n69jK"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 21 Aug 2019 14:55:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 0/9] NBD reconnect
+Subject: Re: [Qemu-devel] [PATCH] nbd: Tolerate more errors to structured
+ reply request
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,67 +96,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: vsementsov@virtuozzo.com, rjones@redhat.com,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PEnV7MoIunzqmEJ6127GyXqXjTfitZS47
-Content-Type: multipart/mixed; boundary="Fi5sZ5F5J1dDgIzfspKF7oZKdab6YnC19";
+--5LfOEAti7TorWQ3tNcnS317bpBl8n69jK
+Content-Type: multipart/mixed; boundary="rjRKemFedhcc1uNe4bjvY15LiJKjE3iyw";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com"
- <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <982d86ee-438d-a01d-65f5-77439d5102df@redhat.com>
-Subject: Re: [PATCH v7 0/9] NBD reconnect
-References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
- <e66505eb-78e1-612d-6742-4774c3167412@virtuozzo.com>
- <b8b6d285-7091-484e-35db-5cec736f8314@virtuozzo.com>
-In-Reply-To: <b8b6d285-7091-484e-35db-5cec736f8314@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, rjones@redhat.com,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Message-ID: <d7e0a76e-dd3f-aa64-933a-8557afcab1c0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] nbd: Tolerate more errors to structured
+ reply request
+References: <20190819175751.18075-1-eblake@redhat.com>
+In-Reply-To: <20190819175751.18075-1-eblake@redhat.com>
 
---Fi5sZ5F5J1dDgIzfspKF7oZKdab6YnC19
+--rjRKemFedhcc1uNe4bjvY15LiJKjE3iyw
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/21/19 6:41 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Should I resend with 07 dropped?
+On 8/19/19 12:57 PM, Eric Blake wrote:
+> A server may have a reason to reject a request for structured replies,
+> beyond just not recognizing them as a valid request.  It doesn't hurt
+> us to continue talking to such a server; otherwise 'qemu-nbd --list'
+> of such a server fails to display all possible details about the
+> export.
+>=20
+> Encountered when temporarily tweaking nbdkit to reply with
+> NBD_REP_ERR_POLICY.  Present since structured reply support was first
+> added (commit d795299b reused starttls handling, but starttls has to
+> reject all errors).
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  nbd/client.c | 39 +++++++++++++++++++++++----------------
+>  1 file changed, 23 insertions(+), 16 deletions(-)
 >=20
 
-At this point, the earlier patches in the series are now in-tree, and
-the later patches need rebasing again...
+> -/* If reply represents success, return 1 without further action.
+> - * If reply represents an error, consume the optional payload of
+> - * the packet on ioc.  Then return 0 for unsupported (so the client
+> - * can fall back to other approaches), or -1 with errp set for other
+> - * errors.
+> +/*
+> + * If reply represents success, return 1 without further action.  If
+> + * reply represents an error, consume the optional payload of the
+> + * packet on ioc.  Then return 0 for unsupported (so the client can
+> + * fall back to other approaches), where @strict determines if only
+> + * ERR_UNSUP or all errors fit that category, or -1 with errp set for
+> + * other errors.
+>   */
+>  static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply=
+,
+> -                                Error **errp)
+> +                                bool strict, Error **errp)
+>  {
+>      char *msg =3D NULL;
+> -    int result =3D -1;
+> +    int result =3D strict ? -1 : 0;
+>=20
+>      if (!(reply->type & (1 << 31))) {
+>          return 1;
+> @@ -162,6 +164,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NB=
+DOptionReply *reply,
+>              error_setg(errp, "server error %" PRIu32
+>                         " (%s) message is too long",
+>                         reply->type, nbd_rep_lookup(reply->type));
+> +            result =3D -1;
+>              goto cleanup;
+>          }
+>          msg =3D g_malloc(reply->length + 1);
+> @@ -169,6 +172,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NB=
+DOptionReply *reply,
+>              error_prepend(errp, "Failed to read option error %" PRIu32=
+
+>                            " (%s) message: ",
+>                            reply->type, nbd_rep_lookup(reply->type));
+> +            result =3D -1;
+>              goto cleanup;
+>          }
+>          msg[reply->length] =3D '\0';
+
+Previously - nbd_handle_reply_err() left errp unchanged when returning
+0, now if strict=3Dfalse and return is 0, errp may be set.
+
+Doesn't affect callers that pass strict=3Dtrue, but...
 
 
->>> v7:
->>> almost all: rebased on merged nbd.c and nbd-client.c (including patch=
- subject)
->>> 01-04: add Eric's r-b
->>> 04: wording
->>> 05: new
->>> 06: rewrite to remove timer earlier
->>> 07: new
->>> 08:
->>> =C2=A0 - rebase on 05 and 07
->>> =C2=A0 - drop "All rights reserved"
->>> =C2=A0 - handle drain
->>> =C2=A0 - improve handling aio context attach
->>> 09: move 249 -> 257
+> -static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error *=
+*errp)
+> +static int nbd_request_simple_option(QIOChannel *ioc, int opt, bool st=
+rict,
+> +                                     Error **errp)
+>  {
+>      NBDOptionReply reply;
+>      int error;
+> @@ -562,7 +569,7 @@ static int nbd_request_simple_option(QIOChannel *io=
+c, int opt, Error **errp)
+>      if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
+>          return -1;
+>      }
+> -    error =3D nbd_handle_reply_err(ioc, &reply, errp);
+> +    error =3D nbd_handle_reply_err(ioc, &reply, strict, errp);
+>      if (error <=3D 0) {
+>          return error;
+>      }
 
-257 snuck into the tree for a different test, so you'll get to move it
-again.
+> @@ -950,7 +957,7 @@ static int nbd_start_negotiate(AioContext *aio_cont=
+ext, QIOChannel *ioc,
+>              if (structured_reply) {
+>                  result =3D nbd_request_simple_option(ioc,
+>                                                     NBD_OPT_STRUCTURED_=
+REPLY,
+> -                                                   errp);
+> +                                                   false, errp);
+>                  if (result < 0) {
+>                      return -EINVAL;
+>                  }
 
-But yes, dropping patch 7 (with controversial SI unit addition) in favor
-of more discernable constants locally (such as NANOSECONDS_PER_SECOND)
-as part of the rebase is a good idea.
+=2E..this now can leave errp set, which can wreck callers.  I'll need to
+post v2.
+
+Also, I suspect that nbd_negotiate_simple_meta_context() should consider
+the use of a non-strict error check (STARTTLS is really the only case
+where if the server fails with an unexpected error, we really can't
+continue on with some sane fallback regardless of the error).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -167,24 +234,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---Fi5sZ5F5J1dDgIzfspKF7oZKdab6YnC19--
+--rjRKemFedhcc1uNe4bjvY15LiJKjE3iyw--
 
---PEnV7MoIunzqmEJ6127GyXqXjTfitZS47
+--5LfOEAti7TorWQ3tNcnS317bpBl8n69jK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1dWWwACgkQp6FrSiUn
-Q2oTcQgAgdypmkiTBGljl3EpM5uP1L0Qin1ir8NEwAizirrpcaC7UWpvlscnmKFw
-D4yF8dYP6r4voj65q8/XKGE3+Cmdsx7sSMNoXn3JjruKT1zu1ViXyFGMNpwLs7/w
-8t12I5ogQWiEYYUXyNtUY+9aKtpLwbpbc/JqSkteNzcPHMm81b8DtZrOFtRghonI
-yS8ebDan2jc7n01WhKODmfX6rHyYyQdSO3DE2kjzwXZA6zwj6wI8fqb8C1VMcN5I
-KjrHeo4+rdmO9NzJ8K4cur0HgyJo8PTI/As8KrnezC8nFoV9I+juJWQJufYlDy+y
-mVcVfe4KYB/pO2KkjkSIDpr8JhBPfg==
-=4Uej
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1dW2kACgkQp6FrSiUn
+Q2qmbQf9GqYguhK4tXOBZaGieWt43fbOaCEp0faMhdsP79Bm+JKbnWk+yH0cUwu+
+s/VuOkklXfVt3cTLR8cVmy9PdJU/zG9DjR0vKCWqZhOIot06eyJv1AbnDJfZf7dV
+EGKsNtY9LJLpFvJphG45FoKIrBndCUxIsR+XRm3qVdmt0im2R9Ko1o3PT2RtmwRg
+9RqT7XmABfVIIr3GqNjQxdDHX7S1eIKefJs+C5khK3RuMLFW5+rtgvGeTMEjZ9Qx
+lP74q3Ysadz3zrMWDesryeg9ENyG0HoypGxqZpO5h37JaLowODsipRM0O6Z6DvsZ
+UeMpbKO9IXzQgSllP3Yl1y/l/ZO4lQ==
+=Qcpl
 -----END PGP SIGNATURE-----
 
---PEnV7MoIunzqmEJ6127GyXqXjTfitZS47--
+--5LfOEAti7TorWQ3tNcnS317bpBl8n69jK--
 
