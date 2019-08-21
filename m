@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D06C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22683C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB0B822D6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:58:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DEE6022D6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 07:59:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gmuS3eI1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0B822D6D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="P1MhiYgz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEE6022D6D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0LVm-0001X0-NK
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:58:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42882)
+	id 1i0LWk-0002nA-M1
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 03:59:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42819)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L1F-0005do-7u
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:58 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L1D-0005aY-5H
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L1E-0000Hx-1j
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:57 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:55877)
+ (envelope-from <dgibson@ozlabs.org>) id 1i0L1B-0000GD-Tk
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:26:55 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:54227)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L1D-0008WF-KT; Wed, 21 Aug 2019 03:26:55 -0400
+ id 1i0L1B-0008SO-6e; Wed, 21 Aug 2019 03:26:53 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CzjH0frgz9sR6; Wed, 21 Aug 2019 17:25:52 +1000 (AEST)
+ id 46CzjG4F0wz9sQt; Wed, 21 Aug 2019 17:25:50 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372355;
- bh=09s3Sx5x9dItVKpkAhqcWtlr41w7mRGKr2ii2x7SWlc=;
+ d=gibson.dropbear.id.au; s=201602; t=1566372354;
+ bh=wU5H61CwJkmgDFkNVITD7MVdyA45DnpLl8N5eMfxsL0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=gmuS3eI1p63ubtJ5yo2a1NHuAh2EYkDTZzZE2Z7EuNsu8dOBd+oOPGDWyg0zyOemG
- k/Oqc/lossuzOzdbd457fvu/xHMbkJxA0hysJbVT4PtkRYvfv3FqHYcdg0jaGppAhu
- No4rR3WVrN9uPtQm1+qjekeNwLYkFY2qk4kifgpw=
+ b=P1MhiYgzTY68Yc0YWoCozd/KAgNwuf/8Fx4YjP7JR0shhFZ6QoEUhaCsWenpUwc/j
+ R8hMx6524AkcVZtP+Uztg6W9jFm0HcEBVE1nD+yMWO7aiSbTzKzT0ykwWHa5gK20kj
+ 74/4OUEjgug0EysJQ/BlTCjEzHx6fvwXTimRbzgQ=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:42 +1000
-Message-Id: <20190821072542.23090-43-david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 17:25:24 +1000
+Message-Id: <20190821072542.23090-25-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 42/42] ppc: Fix emulated single to double
- denormalized conversions
+Subject: [Qemu-devel] [PULL 24/42] ppc/xive: Provide backlog support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,67 +69,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- groug@kaod.org, qemu-ppc@nongnu.org, "Paul A. Clarke" <pc@us.ibm.com>,
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Paul A. Clarke" <pc@us.ibm.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-helper_todouble() was not properly converting any denormalized 32 bit
-float to 64 bit double.
+If backlog is activated ('b' bit) on the END, the pending priority of
+a missed event is recorded in the IPB field of the NVT for a later
+resend.
 
-Fix-suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
-
-v2:
-- Splitting patch "ppc: Three floating point fixes"; this is just one par=
-t.
-- Original suggested "fix" was likely flawed.  v2 is rewritten by
-  Richard Henderson (Thanks, Richard!); I reformatted the comments in a
-  couple of places, compiled, and tested.
-Message-Id: <1566250936-14538-1-git-send-email-pc@us.ibm.com>
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190718115420.19919-5-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ hw/intc/xive.c | 77 +++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 48 insertions(+), 29 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 52bcda27a6..07bc9051b0 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -73,11 +73,20 @@ uint64_t helper_todouble(uint32_t arg)
-         /* Zero or Denormalized operand.  */
-         ret =3D (uint64_t)extract32(arg, 31, 1) << 63;
-         if (unlikely(abs_arg !=3D 0)) {
--            /* Denormalized operand.  */
--            int shift =3D clz32(abs_arg) - 9;
--            int exp =3D -126 - shift + 1023;
-+            /*
-+             * Denormalized operand.
-+             * Shift fraction so that the msb is in the implicit bit pos=
-ition.
-+             * Thus, shift is in the range [1:23].
-+             */
-+            int shift =3D clz32(abs_arg) - 8;
-+            /*
-+             * The first 3 terms compute the float64 exponent.  We then =
-bias
-+             * this result by -1 so that we can swallow the implicit bit=
- below.
-+             */
-+            int exp =3D -126 - shift + 1023 - 1;
-+
-             ret |=3D (uint64_t)exp << 52;
--            ret |=3D abs_arg << (shift + 29);
-+            ret +=3D (uint64_t)abs_arg << (52 - 23 + shift);
-         }
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index ab7ce64a83..f27b4e3328 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1411,46 +1411,22 @@ static bool xive_presenter_match(XiveRouter *xrtr=
+, uint8_t format,
+  *
+  * The parameters represent what is sent on the PowerBus
+  */
+-static void xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
++static bool xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
+                                   uint8_t nvt_blk, uint32_t nvt_idx,
+                                   bool cam_ignore, uint8_t priority,
+                                   uint32_t logic_serv)
+ {
+-    XiveNVT nvt;
+     XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
+     bool found;
+=20
+-    /* NVT cache lookup */
+-    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
+-        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
+-                      nvt_blk, nvt_idx);
+-        return;
+-    }
+-
+-    if (!xive_nvt_is_valid(&nvt)) {
+-        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is invalid\n",
+-                      nvt_blk, nvt_idx);
+-        return;
+-    }
+-
+     found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
+gnore,
+                                  priority, logic_serv, &match);
+     if (found) {
+         ipb_update(&match.tctx->regs[match.ring], priority);
+         xive_tctx_notify(match.tctx, match.ring);
+-        return;
      }
-     return ret;
+=20
+-    /* Record the IPB in the associated NVT structure */
+-    ipb_update((uint8_t *) &nvt.w4, priority);
+-    xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4);
+-
+-    /*
+-     * If no matching NVT is dispatched on a HW thread :
+-     * - update the NVT structure if backlog is activated
+-     * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
+-     *   activated
+-     */
++    return found;
+ }
+=20
+ /*
+@@ -1464,6 +1440,10 @@ static void xive_router_end_notify(XiveRouter *xrt=
+r, uint8_t end_blk,
+     XiveEND end;
+     uint8_t priority;
+     uint8_t format;
++    uint8_t nvt_blk;
++    uint32_t nvt_idx;
++    XiveNVT nvt;
++    bool found;
+=20
+     /* END cache lookup */
+     if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
+@@ -1522,14 +1502,53 @@ static void xive_router_end_notify(XiveRouter *xr=
+tr, uint8_t end_blk,
+     /*
+      * Follows IVPE notification
+      */
+-    xive_presenter_notify(xrtr, format,
+-                          xive_get_field32(END_W6_NVT_BLOCK, end.w6),
+-                          xive_get_field32(END_W6_NVT_INDEX, end.w6),
++    nvt_blk =3D xive_get_field32(END_W6_NVT_BLOCK, end.w6);
++    nvt_idx =3D xive_get_field32(END_W6_NVT_INDEX, end.w6);
++
++    /* NVT cache lookup */
++    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
++                      nvt_blk, nvt_idx);
++        return;
++    }
++
++    if (!xive_nvt_is_valid(&nvt)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is invalid\n",
++                      nvt_blk, nvt_idx);
++        return;
++    }
++
++    found =3D xive_presenter_notify(xrtr, format, nvt_blk, nvt_idx,
+                           xive_get_field32(END_W7_F0_IGNORE, end.w7),
+                           priority,
+                           xive_get_field32(END_W7_F1_LOG_SERVER_ID, end.=
+w7));
+=20
+     /* TODO: Auto EOI. */
++
++    if (found) {
++        return;
++    }
++
++    /*
++     * If no matching NVT is dispatched on a HW thread :
++     * - specific VP: update the NVT structure if backlog is activated
++     * - logical server : forward request to IVPE (not supported)
++     */
++    if (xive_end_is_backlog(&end)) {
++        if (format =3D=3D 1) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "XIVE: END %x/%x invalid config: F1 & backlog\=
+n",
++                          end_blk, end_idx);
++            return;
++        }
++        /* Record the IPB in the associated NVT structure */
++        ipb_update((uint8_t *) &nvt.w4, priority);
++        xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4);
++
++        /*
++         * On HW, follows a "Broadcast Backlog" to IVPEs
++         */
++    }
+ }
+=20
+ void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
 --=20
 2.21.0
 
