@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7865EC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3E8C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:49:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3442522D6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:49:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2875422D6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:49:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=temperror (0-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="KA34+g8+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3442522D6D
+	dkim=temperror (0-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="3GvDSfLC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2875422D6D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0TnE-000443-UA
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:49:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59279)
+	id 1i0Tnf-0004tO-8x
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:49:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1i0TZe-0006sy-70
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:04 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1i0TZx-0007Z4-3f
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1i0TZc-0005dE-2W
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:02 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:36390)
+ (envelope-from <damien.hedde@greensocs.com>) id 1i0TZv-00062I-8P
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:21 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:36338)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1i0TZb-0005cG-QP
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:00 -0400
+ id 1i0TZS-0005Rt-TT; Wed, 21 Aug 2019 12:34:51 -0400
 Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPS id 81F2D96F53;
- Wed, 21 Aug 2019 16:34:58 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 151EC96F51;
+ Wed, 21 Aug 2019 16:34:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1566405298;
+ s=mail; t=1566405289;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5s3g+eOtJnwndxxC6fRoKzELDl+Nr+QvbKDkRFoK0lY=;
- b=KA34+g8+D/lNpDybKrqki0WeQbTgsEc785IbxS4FjTxSty6pPi47bamytRWGQnEouhZ9k/
- y1hNN3wmcSTLrShIUDOvmlpMm1jfnyx6TFqxlv5jugsio4ypMNyJD184YuIwowskIeALxH
- uoKc/gG+KqclQ/YkTQh3xP5NU2KjRZU=
+ bh=P6SapPxRej/FiM0qOsHgMc57cnM2e6ZeN4HLykX3sVw=;
+ b=3GvDSfLC1YLBBbQNnwPEUmKTQv4vYxTZMhqnLq8bvey06rH0PfhS+Z1WVi7P/RHVqVXsJ/
+ EJHc+GQk5rPkA3FSrAHJwaOOHUbiYnRGQc+cZVNlExt9ex5YQt9IL3VaHkggHm5Lieu8xU
+ MZHcUAR4NjPEytEjdSCMEGGUJ6Lb+RU=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 21 Aug 2019 18:33:35 +0200
-Message-Id: <20190821163341.16309-5-damien.hedde@greensocs.com>
+Date: Wed, 21 Aug 2019 18:33:32 +0200
+Message-Id: <20190821163341.16309-2-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190821163341.16309-1-damien.hedde@greensocs.com>
 References: <20190821163341.16309-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1566405298;
+ s=mail; t=1566405290;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5s3g+eOtJnwndxxC6fRoKzELDl+Nr+QvbKDkRFoK0lY=;
- b=cHMrXL3oSWGuYmRkZrUWJ7rOVUguSLrNJrAYvPUjWNIpet4oOX4EQdEe7jd7GuxjVLMiuF
- YCgwurv0LllmyECsuh+LRGcpiNHlkxEMRM3RhhqQ42EgbDCu54AJacgLt3ddmz2LMcKuwr
- hmxufvyvzubTjd53NSevZtF+30Fzh6Q=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1566405299; a=rsa-sha256; cv=none;
- b=2Ar5XziUDI9kXbdIS3NcX6aKYGudLi+ShHtLpoyT79VYH+AACYUj/5kCd4ssmAAzRSLNXY
- XjZO2hOnElN8kTSflSFVwPhNlZIRHTciFCOSQIftsiy3Hv9f/GiIfR5Zt7nBO6hNtVL8CQ
- faaiS8XejOadW+wJ4S+ziGSlU+RXrz8=
+ bh=P6SapPxRej/FiM0qOsHgMc57cnM2e6ZeN4HLykX3sVw=;
+ b=IKLG2Qo8sANJdbwrZF8lxq9eD5gCvoaIblyl5mp1uSMx/SrD0JBerQOSfjUPDyrAFAEuEw
+ 8iHF9rqvrJssFuwq6246mxWTvaNogKeYRZ98P68a2VrWTqjkjdm4k6uCokC4t1HwrPTCwl
+ 3ih87QvUL5wnvor67uEMM7dvHewq15w=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1566405290; a=rsa-sha256; cv=none;
+ b=LEELEocpSDKmNkGPmpN2oIksSSExTMkAoQb3Qm2gaGWarJq9nRMRpOVZOv1I7v0js2PaLA
+ iHmTiOvU2ZMuzB/eltqGpceB+6oLubs/KLz4CD8jV1Clw9QTnk8dbSYZNswlvy8aRhfjDr
+ dmLIr4vPQE6apbSXahtWsL5vYk4x8mg=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [PATCH v4 04/10] docs/devel/reset.txt: create doc
- about Resettable interface
+Subject: [Qemu-devel] [PATCH v4 01/10] add device_legacy_reset function to
+ prepare for reset api change
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,334 +90,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- edgar.iglesias@xilinx.com, berrange@redhat.com, ehabkost@redhat.com,
- mark.burton@greensocs.com, pbonzini@redhat.com, philmd@redhat.com,
- david@gibson.dropbear.id.au
+Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org,
+ Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ edgar.iglesias@xilinx.com, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, david@gibson.dropbear.id.au,
+ philmd@redhat.com, ehabkost@redhat.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Damien Hedde <damien.hedde@greensocs.com>, berrange@redhat.com,
+ Cornelia Huck <cohuck@redhat.com>, mark.burton@greensocs.com,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It documents only the multi-phase mechanism with one reset possible type
-(cold). Other features will be documented by further commits.
+Provide a temporary device_legacy_reset function doing what
+device_reset does to prepare for the transition with Resettable
+API.
+
+All occurrence of device_reset in the code tree are also replaced
+by device_legacy_reset.
+
+The new resettable API has different prototype and semantics
+(resetting child buses as well as the specified device). Subsequent
+commits will make the changeover for each call site individually; once
+that is complete device_legacy_reset() will be removed.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/devel/reset.txt | 237 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 237 insertions(+)
- create mode 100644 docs/devel/reset.txt
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: John Snow <jsnow@redhat.com>
+Cc: "C=C3=A9dric Le Goater" <clg@kaod.org>
+Cc: Collin Walling <walling@linux.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>
+Cc: qemu-block@nongnu.org
+Cc: qemu-ppc@nongnu.org
+Cc: qemu-s390x@nongnu.org
+Cc: qemu-arm@nongnu.org
+---
+ hw/audio/intel-hda.c     | 2 +-
+ hw/core/qdev.c           | 6 +++---
+ hw/hyperv/hyperv.c       | 2 +-
+ hw/i386/pc.c             | 2 +-
+ hw/ide/microdrive.c      | 8 ++++----
+ hw/intc/spapr_xive.c     | 2 +-
+ hw/ppc/pnv_psi.c         | 2 +-
+ hw/ppc/spapr_pci.c       | 2 +-
+ hw/ppc/spapr_vio.c       | 2 +-
+ hw/s390x/s390-pci-inst.c | 2 +-
+ hw/scsi/vmw_pvscsi.c     | 2 +-
+ hw/sd/omap_mmc.c         | 2 +-
+ hw/sd/pl181.c            | 2 +-
+ include/hw/qdev-core.h   | 4 ++--
+ 14 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/docs/devel/reset.txt b/docs/devel/reset.txt
-new file mode 100644
-index 0000000000..77ff29b3d7
---- /dev/null
-+++ b/docs/devel/reset.txt
-@@ -0,0 +1,237 @@
-+
-+=3D=3D=3D=3D=3D
-+Reset
-+=3D=3D=3D=3D=3D
-+
-+The reset of qemu objects is handled using the Resettable interface decl=
-ared
-+in *include/hw/resettable.h*.
-+
-+This interface allows to group objects (on a tree basis) and to reset th=
-e
-+whole group consistently. Each individual member object does not have to=
- care
-+about others; in particular problems of order (which object is reset fir=
-st)
-+are addressed.
-+
-+As of now DeviceClass and BusClass implement this interface.
-+
-+
-+Reset types
-+-----------
-+
-+There are several kinds of reset. The most obvious one is the "cold" res=
-et: a
-+"cold" reset is the operation resulting of a power cycle (when we apply =
-the
-+power).
-+
-+By opposition, we call a "warm" reset, a reset operation not resulting o=
-f a
-+power cycle; it can be triggered by a gpio or a software operation.
-+
-+Some buses also define specific kinds of reset.
-+
-+What does a reset is device-dependent. For most devices, cold or warm re=
-set
-+makes no difference. But there can be some; some configuration may be ke=
-pt when
-+applying a warm reset for example.
-+
-+The Resettable interface handles reset kinds with an enum. For now only =
-cold
-+reset is defined, others may be added later.
-+```
-+typedef enum ResetType {
-+    RESET_TYPE_COLD,
-+} ResetType;
-+```
-+
-+In qemu, RESET_TYPE_COLD means we reset to the initial state correspondi=
-ng to
-+the start of qemu; this might differs from what is a read hardware cold =
-reset.
-+
-+
-+Triggering reset
-+----------------
-+
-+This section documents the APIs which "users" of a resettable object sho=
-uld use
-+to control it. All resettable control functions must be called while hol=
-ding
-+the iothread lock.
-+
-+You can trigger a reset event on a resettable object with resettable_res=
-et().
-+The object will be instantly reset.
-+
-+```void resettable_reset(Object *obj, ResetType type);```
-+The parameter "obj" is an object implementing the Resettable interface.
-+The parameter "type" gives the type of reset you want to trigger.
-+
-+It is possible to interleave multiple calls to
-+ - resettable_reset().
-+
-+There may be several reset sources/controllers of a given object. The in=
-terface
-+handles everything and the different reset controllers do not need to kn=
-ow
-+anything about each others. The object will leave reset state only when =
-each
-+other controllers end their reset operation. This point is handled by
-+maintaining a count of reset.
-+
-+Note that it is a programming error to call a resettable function on a
-+non-Resettable object and it will trigger a run time assert error. Since=
- most
-+call to Resettable interface are done through base class functions, such=
- an
-+error is not likely to happen.
-+
-+For Devices and Buses, the following helper functions exists:
-+```
-+void device_cold_reset(Device *dev);
-+void bus_cold_reset(Bus *bus);
-+```
-+
-+These are simple wrappers around resettable_reset() function; they only =
-cast the
-+Device or Bus into an Object and add the corresponding reset type.
-+
-+Device and bus functions co-exist because there can be semantic differen=
-ces
-+between resetting a bus and resetting the controller bridge which owns i=
-t.
-+For example, considering a SCSI controller. Resetting the controller put=
-s all
-+its registers back to what reset state was as well as reset everything o=
-n the
-+SCSI bus. Whereas resetting just the SCSI bus only resets everything tha=
-t's on
-+it but not the controller.
-+
-+
-+How it works: multi-phase reset
-+-------------------------------
-+
-+This section documents the internals of the resettable interface.
-+
-+The resettable interface uses a multi-phase system to relieve objects an=
-d
-+machines from reset ordering problems. To address this, the reset operat=
-ion
-+of an object is split into 3 well defined phases.
-+
-+When resetting a several objects (for example the whole machine at simul=
-ation
-+startup), all 1st phases of all objects are executed, then all 2nd phase=
-s and
-+then all 3rd phases.
-+
-+The 3 phases are:
-+
-+  1. INIT: This phase is executed when the object enters reset. It shoul=
-d reset
-+  local state of the object, but it must not do anything that has a side=
--effect
-+  on other objects, such as raising or lowering a qemu_irq line or readi=
-ng or
-+  writing guest memory.
-+
-+  2. HOLD: This phase is executed for entry into reset, once every objec=
-t in the
-+  system which is being reset has had its init phase executed. At this p=
-oint
-+  devices can do actions that affect other objects.
-+
-+  3. EXIT: This phase is executed when the object leaves the reset state=
-.
-+  Actions affecting other objects are permitted.
-+
-+As said in previous section, the interface maintains a count of reset. T=
-his
-+count is used to ensure phases are executed only when required.
-+init and hold phases are executed only when entering reset for the first=
- time
-+(if an object is already in reset state when calling resettable_assert_r=
-eset()
-+or resettable_reset(), they are not executed).
-+The exit phase is executed only when the last reset operation ends. Ther=
-efore
-+the object has not to care how many reset controllers it has and how man=
-y of
-+them have started a reset.
-+
-+
-+Handling reset in a new resettable object
-+-----------------------------------------
-+
-+This section documents the APIs that an implementation of a resettable o=
-bject
-+must provide and what functions it has access to.
-+
-+There are three methods in the interface that must be implemented in an
-+resettable object.
-+The methods correspond to the three phases described in the previous sec=
-tion:
-+```
-+typedef void (*ResettableInitPhase)(Object *obj, ResetType type);
-+typedef void (*ResettableHoldPhase)(Object *obj);
-+typedef void (*ResettableExitPhase)(Object *obj);
-+typedef struct ResettableClass {
-+    InterfaceClass parent_class;
-+
-+    struct ResettablePhases {
-+        ResettableInitPhase init;
-+        ResettableHoldPhase hold;
-+        ResettableExitPhase exit;
-+    } phases;
-+    [...]
-+} ResettableClass;
-+```
-+
-+All phases takes a pointer to the object as first argument. The init pha=
-se also
-+takes the reset type.
-+
-+These methods should be updated when specializing an object. For this th=
-e
-+helper function resettable_class_set_parent_phases() can be used to "bac=
-kup"
-+parent methods while changing the specialized ones:
-+
-+
-+```
-+void resettable_class_set_parent_reset_phases(ResettableClass *rc,
-+                                              ResettableInitPhase init,
-+                                              ResettableHoldPhase hold,
-+                                              ResettableExitPhase exit,
-+                                              ResettablePhases *parent_p=
-hases);
-+```
-+"rc" argument is the interface class structure; "init", "hold" and "exit=
-" are
-+the specialized phase methods for the object; and "parent_phases" is an
-+allocated space (typically in the specialized object class) to backup th=
-e
-+parent phases. This function only do the backup and update operation for=
- phase
-+arguments that are non-NULL; you can use it to specialize only the init =
-method
-+for example. When you specialize a method, it's on you to call or not th=
-e parent
-+method inside the specialized one.
-+
-+If for some operation in the object, you need to know the reset state, t=
-here is
-+a function to access that:
-+```
-+bool resettable_is_resetting(Object *obj);
-+```
-+
-+resettable_is_resetting() tells if the resettable object is currently un=
-der
-+reset.
-+
-+Helpers are defined for devices and buses that wrap resettable_is_resett=
-ing():
-+```
-+bool device_is_resetting(DeviceState *dev);
-+bool bus_is_resetting(BusState *bus);
-+```
-+
-+
-+Base class handling of reset
-+----------------------------
-+
-+This section documents parts of the reset mechanism that you only need t=
-o know
-+about if you are extending it to work with a new base class other than
-+DeviceClass or BusClass, or maintaining the existing code in those class=
-es. Most
-+people can ignore it.
-+
-+There are two other methods that need to exist in a class implementing t=
-he
-+interface.
-+
-+```
-+typedef struct ResetState {
-+    uint32_t count;
-+    bool hold_phase_needed;
-+} ResetState;
-+
-+typedef ResetState *(*ResettableGetState)(Object *obj);
-+typedef void (*ResettableForeachChild)(Object *obj,
-+                                       void (*visitor)(Object *, ResetTy=
-pe),
-+                                       ResetType type);
-+typedef struct ResettableClass {
-+    InterfaceClass parent_class;
-+
-+    [...]
-+
-+    ResettableGetState get_state;
-+    ResettableForeachChild foreach_child;
-+} ResettableClass;
-+```
-+
-+get_state() must return a pointer to an allocated ResetState structure.
-+This structure is used by the interface to store the information require=
-d
-+to handle reset properly. This structure must not be modified by the obj=
-ect
-+directly. The object must handle eventual allocation/deallocation of thi=
-s
-+structure during its creation and deletion. Typically it is located in t=
-he
-+object state structure.
-+
-+The reset hierarchy is handled by means of the foreach_child() method. T=
-his
-+method executes a given function on all reset children. An additional ty=
-pe
-+argument is given to foreach_child() and must be passed to the function.
-+
-+In DeviceClass and BusClass the ResetState structure is located
-+DeviceState/BusState structure. foreach_child() is implemented to follow=
- the bus
-+hierarchy; for a bus, it calls the function on every child device; for a=
- device,
-+it calls the function on every bus child. So when we reset the main syst=
-em bus,
-+we reset the whole machine bus tree.
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index 6ecd383540..27b71c57cf 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -1087,7 +1087,7 @@ static void intel_hda_reset(DeviceState *dev)
+     QTAILQ_FOREACH(kid, &d->codecs.qbus.children, sibling) {
+         DeviceState *qdev =3D kid->child;
+         cdev =3D HDA_CODEC_DEVICE(qdev);
+-        device_reset(DEVICE(cdev));
++        device_legacy_reset(DEVICE(cdev));
+         d->state_sts |=3D (1 << cdev->cad);
+     }
+     intel_hda_update_irq(d);
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 60d66c2f39..a95d4fa87d 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -257,7 +257,7 @@ HotplugHandler *qdev_get_hotplug_handler(DeviceState =
+*dev)
+=20
+ static int qdev_reset_one(DeviceState *dev, void *opaque)
+ {
+-    device_reset(dev);
++    device_legacy_reset(dev);
+=20
+     return 0;
+ }
+@@ -865,7 +865,7 @@ static void device_set_realized(Object *obj, bool val=
+ue, Error **errp)
+             }
+         }
+         if (dev->hotplugged) {
+-            device_reset(dev);
++            device_legacy_reset(dev);
+         }
+         dev->pending_deleted_event =3D false;
+=20
+@@ -1087,7 +1087,7 @@ void device_class_set_parent_unrealize(DeviceClass =
+*dc,
+     dc->unrealize =3D dev_unrealize;
+ }
+=20
+-void device_reset(DeviceState *dev)
++void device_legacy_reset(DeviceState *dev)
+ {
+     DeviceClass *klass =3D DEVICE_GET_CLASS(dev);
+=20
+diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+index 6ebf31c310..cd9db3cb5c 100644
+--- a/hw/hyperv/hyperv.c
++++ b/hw/hyperv/hyperv.c
+@@ -140,7 +140,7 @@ void hyperv_synic_reset(CPUState *cs)
+     SynICState *synic =3D get_synic(cs);
+=20
+     if (synic) {
+-        device_reset(DEVICE(synic));
++        device_legacy_reset(DEVICE(synic));
+     }
+ }
+=20
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 3ab4bcb3ca..f33a8de42f 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2826,7 +2826,7 @@ static void pc_machine_reset(MachineState *machine)
+         cpu =3D X86_CPU(cs);
+=20
+         if (cpu->apic_state) {
+-            device_reset(cpu->apic_state);
++            device_legacy_reset(cpu->apic_state);
+         }
+     }
+ }
+diff --git a/hw/ide/microdrive.c b/hw/ide/microdrive.c
+index b0272ea14b..6b30e36ed8 100644
+--- a/hw/ide/microdrive.c
++++ b/hw/ide/microdrive.c
+@@ -173,7 +173,7 @@ static void md_attr_write(PCMCIACardState *card, uint=
+32_t at, uint8_t value)
+     case 0x00:	/* Configuration Option Register */
+         s->opt =3D value & 0xcf;
+         if (value & OPT_SRESET) {
+-            device_reset(DEVICE(s));
++            device_legacy_reset(DEVICE(s));
+         }
+         md_interrupt_update(s);
+         break;
+@@ -316,7 +316,7 @@ static void md_common_write(PCMCIACardState *card, ui=
+nt32_t at, uint16_t value)
+     case 0xe:	/* Device Control */
+         s->ctrl =3D value;
+         if (value & CTRL_SRST) {
+-            device_reset(DEVICE(s));
++            device_legacy_reset(DEVICE(s));
+         }
+         md_interrupt_update(s);
+         break;
+@@ -541,7 +541,7 @@ static int dscm1xxxx_attach(PCMCIACardState *card)
+     md->attr_base =3D pcc->cis[0x74] | (pcc->cis[0x76] << 8);
+     md->io_base =3D 0x0;
+=20
+-    device_reset(DEVICE(md));
++    device_legacy_reset(DEVICE(md));
+     md_interrupt_update(md);
+=20
+     return 0;
+@@ -551,7 +551,7 @@ static int dscm1xxxx_detach(PCMCIACardState *card)
+ {
+     MicroDriveState *md =3D MICRODRIVE(card);
+=20
+-    device_reset(DEVICE(md));
++    device_legacy_reset(DEVICE(md));
+     return 0;
+ }
+=20
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index aad981cb78..a0f1787ee0 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -1514,7 +1514,7 @@ static target_ulong h_int_reset(PowerPCCPU *cpu,
+         return H_PARAMETER;
+     }
+=20
+-    device_reset(DEVICE(xive));
++    device_legacy_reset(DEVICE(xive));
+=20
+     if (kvm_irqchip_in_kernel()) {
+         Error *local_err =3D NULL;
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index 88ba8e7b9b..bfdc30d4e1 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -705,7 +705,7 @@ static void pnv_psi_p9_mmio_write(void *opaque, hwadd=
+r addr,
+         break;
+     case PSIHB9_INTERRUPT_CONTROL:
+         if (val & PSIHB9_IRQ_RESET) {
+-            device_reset(DEVICE(&psi9->source));
++            device_legacy_reset(DEVICE(&psi9->source));
+         }
+         psi->regs[reg] =3D val;
+         break;
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index bf31fd854c..f4c918be8b 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2031,7 +2031,7 @@ static int spapr_phb_children_reset(Object *child, =
+void *opaque)
+     DeviceState *dev =3D (DeviceState *) object_dynamic_cast(child, TYPE=
+_DEVICE);
+=20
+     if (dev) {
+-        device_reset(dev);
++        device_legacy_reset(dev);
+     }
+=20
+     return 0;
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 0803649658..ff7ee4d822 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -305,7 +305,7 @@ int spapr_vio_send_crq(SpaprVioDevice *dev, uint8_t *=
+crq)
+ static void spapr_vio_quiesce_one(SpaprVioDevice *dev)
+ {
+     if (dev->tcet) {
+-        device_reset(DEVICE(dev->tcet));
++        device_legacy_reset(DEVICE(dev->tcet));
+     }
+     free_crq(dev);
+ }
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 00235148be..93cda37c27 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -242,7 +242,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintpt=
+r_t ra)
+                 stw_p(&ressetpci->hdr.rsp, CLP_RC_SETPCIFN_FHOP);
+                 goto out;
+             }
+-            device_reset(DEVICE(pbdev));
++            device_legacy_reset(DEVICE(pbdev));
+             pbdev->fh &=3D ~FH_MASK_ENABLE;
+             pbdev->state =3D ZPCI_FS_DISABLED;
+             stl_p(&ressetpci->fh, pbdev->fh);
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index 452a3b63b2..7baab1532f 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -838,7 +838,7 @@ pvscsi_on_cmd_reset_device(PVSCSIState *s)
+=20
+     if (sdev !=3D NULL) {
+         s->resetting++;
+-        device_reset(&sdev->qdev);
++        device_legacy_reset(&sdev->qdev);
+         s->resetting--;
+         return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+     }
+diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
+index c6e516b611..4088a8a80b 100644
+--- a/hw/sd/omap_mmc.c
++++ b/hw/sd/omap_mmc.c
+@@ -318,7 +318,7 @@ void omap_mmc_reset(struct omap_mmc_s *host)
+      * into any bus, and we must reset it manually. When omap_mmc is
+      * QOMified this must move into the QOM reset function.
+      */
+-    device_reset(DEVICE(host->card));
++    device_legacy_reset(DEVICE(host->card));
+ }
+=20
+ static uint64_t omap_mmc_read(void *opaque, hwaddr offset,
+diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+index 8033fe455d..2b3776a6a0 100644
+--- a/hw/sd/pl181.c
++++ b/hw/sd/pl181.c
+@@ -482,7 +482,7 @@ static void pl181_reset(DeviceState *d)
+     /* Since we're still using the legacy SD API the card is not plugged
+      * into any bus, and we must reset it manually.
+      */
+-    device_reset(DEVICE(s->card));
++    device_legacy_reset(DEVICE(s->card));
+ }
+=20
+ static void pl181_init(Object *obj)
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index de70b7a19a..09e6dfd664 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -406,11 +406,11 @@ char *qdev_get_own_fw_dev_path_from_handler(BusStat=
+e *bus, DeviceState *dev);
+ void qdev_machine_init(void);
+=20
+ /**
+- * @device_reset
++ * device_legacy_reset:
+  *
+  * Reset a single device (by calling the reset method).
+  */
+-void device_reset(DeviceState *dev);
++void device_legacy_reset(DeviceState *dev);
+=20
+ void device_class_set_parent_reset(DeviceClass *dc,
+                                    DeviceReset dev_reset,
 --=20
 2.22.0
 
