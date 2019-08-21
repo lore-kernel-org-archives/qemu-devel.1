@@ -2,89 +2,89 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94EBBC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5225DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:10:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A27322DA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 14:56:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A27322DA7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D932216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:10:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fc567Lfc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D932216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0S2D-0004wG-KY
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 10:56:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41668)
+	id 1i0SGA-0002To-N0
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 11:10:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44808)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i0S1X-0004S7-Sg
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:55:44 -0400
+ (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SEz-0001Tt-Lx
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i0S1W-000774-Ft
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 10:55:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43250)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i0S1T-00073D-Mk; Wed, 21 Aug 2019 10:55:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E07FD30821BF;
- Wed, 21 Aug 2019 14:55:38 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EF0A60603;
- Wed, 21 Aug 2019 14:55:38 +0000 (UTC)
+ (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SEy-0001sV-70
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:09:37 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42919)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <tony.nguyen.git@gmail.com>)
+ id 1i0SEx-0001q2-U6
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:09:36 -0400
+Received: by mail-pl1-x643.google.com with SMTP id y1so1474000plp.9
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 08:09:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=0l7y7+YzddUCO1ZZokVB7I29ZOqZMPg6LQzchxJqgfM=;
+ b=Fc567Lfc+9t3kKxDF/ls05GzH2rZTT3lZLTzwzjBacIKkupBv34CSX1O5BQigCz8MT
+ 1BwkLtCfNsv/g8SLOCjCpgLDeUbMYg78QeVm/OnNqQelH8CI2JLHXjYVLarPFkz6sHne
+ mkrHDlRGPxQ/WmQ7tSka3b/LLkWSqvC7TZK1reHn4SaRUUY8y++tWAon4Z39qNVBcrIE
+ gStjQxDCQSaa3lA//iOjw6PDIA/geqdxhWIV5yBQalFQJ8I3zxbOZ8INSoS11je4DKXq
+ RggcFWcW0acilcBNfEgIDfa8i2cK+hcNBsE7rUF61ocdS614Kj6z7WKHVGISnv1B6L4+
+ zSQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=0l7y7+YzddUCO1ZZokVB7I29ZOqZMPg6LQzchxJqgfM=;
+ b=k4+BELB5t3RADlLwmq5IPXNUCaSVoh1PH5Hra3ENkhy/K5CGmM5tW0bMdZ7lwkXXBR
+ nFJseMfd81xDpk/p1eNhOGTnfPOHbr/Nk7Y6/r2mTkQdon0qgoeU2luNMsDuocQqN8mw
+ 7oXp/GCOCwhjmDXksqwq731bXxzG6yoQeheyosaDaYjvfnM2rGwtmTHZzSA+pLPRpVHf
+ kesGaU8zK9nu0M9GWDwa5d6v4OC8u0d68vQEQdGzYdmyzuHE5kjn69njjYbJnFUScEDV
+ H9touqHGaBLzvXw9C6u4PkmIfotnmfjqs6DMX+y3Je6OmRbhawf3kBIuRQoVZM2U+Bys
+ L/2w==
+X-Gm-Message-State: APjAAAXUlG52LAongCcaX7fAliUJyaXL+SdwlLe9NxnBHfumSWYGDW6G
+ GE+hpWSm1H32z1OQVWIIVu72FDSZL3s=
+X-Google-Smtp-Source: APXvYqycWy1ryBhBSjFYgrzqnpXc7NkmHMbECQeCPRve0Z6Jd+SXyNGfm3FxV9FK4iDAokghrcGpOw==
+X-Received: by 2002:a17:902:b406:: with SMTP id
+ x6mr33031895plr.114.1566400174426; 
+ Wed, 21 Aug 2019 08:09:34 -0700 (PDT)
+Received: from localhost.localdomain ([58.173.98.68])
+ by smtp.gmail.com with ESMTPSA id e19sm5887633pfh.114.2019.08.21.08.09.29
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Wed, 21 Aug 2019 08:09:34 -0700 (PDT)
+From: Tony Nguyen <tony.nguyen.git@gmail.com>
 To: qemu-devel@nongnu.org
-References: <20190819175751.18075-1-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <d7e0a76e-dd3f-aa64-933a-8557afcab1c0@redhat.com>
-Date: Wed, 21 Aug 2019 09:55:37 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Date: Thu, 22 Aug 2019 01:08:55 +1000
+Message-Id: <00f837b07ebb2468af5254626cc6b2bf94ddab4b.1566397711.git.tony.nguyen.git@gmail.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <cover.1566397711.git.tony.nguyen.git@gmail.com>
+References: <cover.1566397711.git.tony.nguyen.git@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190819175751.18075-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="5LfOEAti7TorWQ3tNcnS317bpBl8n69jK"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 21 Aug 2019 14:55:38 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] nbd: Tolerate more errors to structured
- reply request
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: [Qemu-devel] [PATCH v8 01/21] configure: Define TARGET_ALIGNED_ONLY
+ in configure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,162 +96,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, rjones@redhat.com,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Tony Nguyen <tony.nguyen@bt.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Max Filippov <jcmvbkbc@gmail.com>, Tony Nguyen <tony.nguyen.git@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5LfOEAti7TorWQ3tNcnS317bpBl8n69jK
-Content-Type: multipart/mixed; boundary="rjRKemFedhcc1uNe4bjvY15LiJKjE3iyw";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, rjones@redhat.com,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
-Message-ID: <d7e0a76e-dd3f-aa64-933a-8557afcab1c0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] nbd: Tolerate more errors to structured
- reply request
-References: <20190819175751.18075-1-eblake@redhat.com>
-In-Reply-To: <20190819175751.18075-1-eblake@redhat.com>
+Rename ALIGNED_ONLY to TARGET_ALIGNED_ONLY for clarity and move
+defines out of target/foo/cpu.h into configure, as we do with
+TARGET_WORDS_BIGENDIAN, so that it is always defined early.
 
---rjRKemFedhcc1uNe4bjvY15LiJKjE3iyw
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Poisoned TARGET_ALIGNED_ONLY to prevent use in common code.
 
-On 8/19/19 12:57 PM, Eric Blake wrote:
-> A server may have a reason to reject a request for structured replies,
-> beyond just not recognizing them as a valid request.  It doesn't hurt
-> us to continue talking to such a server; otherwise 'qemu-nbd --list'
-> of such a server fails to display all possible details about the
-> export.
->=20
-> Encountered when temporarily tweaking nbdkit to reply with
-> NBD_REP_ERR_POLICY.  Present since structured reply support was first
-> added (commit d795299b reused starttls handling, but starttls has to
-> reject all errors).
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  nbd/client.c | 39 +++++++++++++++++++++++----------------
->  1 file changed, 23 insertions(+), 16 deletions(-)
->=20
+Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ configure             | 10 +++++++++-
+ include/exec/poison.h |  1 +
+ include/qom/cpu.h     |  2 +-
+ target/alpha/cpu.h    |  2 --
+ target/hppa/cpu.h     |  1 -
+ target/mips/cpu.h     |  2 --
+ target/sh4/cpu.h      |  2 --
+ target/sparc/cpu.h    |  2 --
+ target/xtensa/cpu.h   |  2 --
+ tcg/tcg.c             |  2 +-
+ tcg/tcg.h             |  8 +++++---
+ 11 files changed, 17 insertions(+), 17 deletions(-)
 
-> -/* If reply represents success, return 1 without further action.
-> - * If reply represents an error, consume the optional payload of
-> - * the packet on ioc.  Then return 0 for unsupported (so the client
-> - * can fall back to other approaches), or -1 with errp set for other
-> - * errors.
-> +/*
-> + * If reply represents success, return 1 without further action.  If
-> + * reply represents an error, consume the optional payload of the
-> + * packet on ioc.  Then return 0 for unsupported (so the client can
-> + * fall back to other approaches), where @strict determines if only
-> + * ERR_UNSUP or all errors fit that category, or -1 with errp set for
-> + * other errors.
->   */
->  static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply=
-,
-> -                                Error **errp)
-> +                                bool strict, Error **errp)
->  {
->      char *msg =3D NULL;
-> -    int result =3D -1;
-> +    int result =3D strict ? -1 : 0;
->=20
->      if (!(reply->type & (1 << 31))) {
->          return 1;
-> @@ -162,6 +164,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NB=
-DOptionReply *reply,
->              error_setg(errp, "server error %" PRIu32
->                         " (%s) message is too long",
->                         reply->type, nbd_rep_lookup(reply->type));
-> +            result =3D -1;
->              goto cleanup;
->          }
->          msg =3D g_malloc(reply->length + 1);
-> @@ -169,6 +172,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NB=
-DOptionReply *reply,
->              error_prepend(errp, "Failed to read option error %" PRIu32=
+diff --git a/configure b/configure
+index 714e7fb6a1..482ba0b240 100755
+--- a/configure
++++ b/configure
+@@ -7431,8 +7431,13 @@ for target in $target_list; do
+ target_dir="$target"
+ config_target_mak=$target_dir/config-target.mak
+ target_name=$(echo $target | cut -d '-' -f 1)
++target_aligned_only="no"
++case "$target_name" in
++  alpha|hppa|mips64el|mips64|mipsel|mips|mipsn32|mipsn32el|sh4|sh4eb|sparc|sparc64|sparc32plus|xtensa|xtensaeb)
++  target_aligned_only="yes"
++  ;;
++esac
+ target_bigendian="no"
+-
+ case "$target_name" in
+   armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
+   target_bigendian=yes
+@@ -7717,6 +7722,9 @@ fi
+ if supported_whpx_target $target; then
+     echo "CONFIG_WHPX=y" >> $config_target_mak
+ fi
++if test "$target_aligned_only" = "yes" ; then
++  echo "TARGET_ALIGNED_ONLY=y" >> $config_target_mak
++fi
+ if test "$target_bigendian" = "yes" ; then
+   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
+ fi
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index b862320fa6..955eb863ab 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -35,6 +35,7 @@
+ #pragma GCC poison TARGET_UNICORE32
+ #pragma GCC poison TARGET_XTENSA
+ 
++#pragma GCC poison TARGET_ALIGNED_ONLY
+ #pragma GCC poison TARGET_HAS_BFLT
+ #pragma GCC poison TARGET_NAME
+ #pragma GCC poison TARGET_SUPPORTS_MTTCG
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index ddb91bbaff..77fca95a40 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -89,7 +89,7 @@ struct TranslationBlock;
+  * @do_unassigned_access: Callback for unassigned access handling.
+  * (this is deprecated: new targets should use do_transaction_failed instead)
+  * @do_unaligned_access: Callback for unaligned access handling, if
+- * the target defines #ALIGNED_ONLY.
++ * the target defines #TARGET_ALIGNED_ONLY.
+  * @do_transaction_failed: Callback for handling failed memory transactions
+  * (ie bus faults or external aborts; not MMU faults)
+  * @virtio_is_big_endian: Callback to return %true if a CPU which supports
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index 4619530660..a530249a5b 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -23,8 +23,6 @@
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
+ 
+-#define ALIGNED_ONLY
+-
+ /* Alpha processors have a weak memory model */
+ #define TCG_GUEST_DEFAULT_MO      (0)
+ 
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 4b816cc13a..6713d04f11 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -30,7 +30,6 @@
+    basis.  It's probably easier to fall back to a strong memory model.  */
+ #define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL
+ 
+-#define ALIGNED_ONLY
+ #define MMU_KERNEL_IDX   0
+ #define MMU_USER_IDX     3
+ #define MMU_PHYS_IDX     4
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index d235117dab..1fd4a180e1 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1,8 +1,6 @@
+ #ifndef MIPS_CPU_H
+ #define MIPS_CPU_H
+ 
+-#define ALIGNED_ONLY
+-
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
+ #include "fpu/softfloat-types.h"
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index aee733eaaa..ecaa7a18a9 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -23,8 +23,6 @@
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
+ 
+-#define ALIGNED_ONLY
+-
+ /* CPU Subtypes */
+ #define SH_CPU_SH7750  (1 << 0)
+ #define SH_CPU_SH7750S (1 << 1)
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 0d5b01efe5..694d7139cf 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -5,8 +5,6 @@
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
+ 
+-#define ALIGNED_ONLY
+-
+ #if !defined(TARGET_SPARC64)
+ #define TARGET_DPREGS 16
+ #else
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index 2c277134f1..0459243e6b 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -32,8 +32,6 @@
+ #include "exec/cpu-defs.h"
+ #include "xtensa-isa.h"
+ 
+-#define ALIGNED_ONLY
+-
+ /* Xtensa processors have a weak memory model */
+ #define TCG_GUEST_DEFAULT_MO      (0)
+ 
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 2db83ce2e8..0458eaec57 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -1925,7 +1925,7 @@ static const char * const ldst_name[] =
+ };
+ 
+ static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] = {
+-#ifdef ALIGNED_ONLY
++#ifdef TARGET_ALIGNED_ONLY
+     [MO_UNALN >> MO_ASHIFT]    = "un+",
+     [MO_ALIGN >> MO_ASHIFT]    = "",
+ #else
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index b411e17a28..529acb2ed8 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -333,10 +333,12 @@ typedef enum TCGMemOp {
+     MO_TE    = MO_LE,
+ #endif
+ 
+-    /* MO_UNALN accesses are never checked for alignment.
++    /*
++     * MO_UNALN accesses are never checked for alignment.
+      * MO_ALIGN accesses will result in a call to the CPU's
+      * do_unaligned_access hook if the guest address is not aligned.
+-     * The default depends on whether the target CPU defines ALIGNED_ONLY.
++     * The default depends on whether the target CPU defines
++     * TARGET_ALIGNED_ONLY.
+      *
+      * Some architectures (e.g. ARMv8) need the address which is aligned
+      * to a size more than the size of the memory access.
+@@ -353,7 +355,7 @@ typedef enum TCGMemOp {
+      */
+     MO_ASHIFT = 4,
+     MO_AMASK = 7 << MO_ASHIFT,
+-#ifdef ALIGNED_ONLY
++#ifdef TARGET_ALIGNED_ONLY
+     MO_ALIGN = 0,
+     MO_UNALN = MO_AMASK,
+ #else
+-- 
+2.23.0
 
->                            " (%s) message: ",
->                            reply->type, nbd_rep_lookup(reply->type));
-> +            result =3D -1;
->              goto cleanup;
->          }
->          msg[reply->length] =3D '\0';
-
-Previously - nbd_handle_reply_err() left errp unchanged when returning
-0, now if strict=3Dfalse and return is 0, errp may be set.
-
-Doesn't affect callers that pass strict=3Dtrue, but...
-
-
-> -static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error *=
-*errp)
-> +static int nbd_request_simple_option(QIOChannel *ioc, int opt, bool st=
-rict,
-> +                                     Error **errp)
->  {
->      NBDOptionReply reply;
->      int error;
-> @@ -562,7 +569,7 @@ static int nbd_request_simple_option(QIOChannel *io=
-c, int opt, Error **errp)
->      if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
->          return -1;
->      }
-> -    error =3D nbd_handle_reply_err(ioc, &reply, errp);
-> +    error =3D nbd_handle_reply_err(ioc, &reply, strict, errp);
->      if (error <=3D 0) {
->          return error;
->      }
-
-> @@ -950,7 +957,7 @@ static int nbd_start_negotiate(AioContext *aio_cont=
-ext, QIOChannel *ioc,
->              if (structured_reply) {
->                  result =3D nbd_request_simple_option(ioc,
->                                                     NBD_OPT_STRUCTURED_=
-REPLY,
-> -                                                   errp);
-> +                                                   false, errp);
->                  if (result < 0) {
->                      return -EINVAL;
->                  }
-
-=2E..this now can leave errp set, which can wreck callers.  I'll need to
-post v2.
-
-Also, I suspect that nbd_negotiate_simple_meta_context() should consider
-the use of a non-strict error check (STARTTLS is really the only case
-where if the server fails with an unexpected error, we really can't
-continue on with some sane fallback regardless of the error).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---rjRKemFedhcc1uNe4bjvY15LiJKjE3iyw--
-
---5LfOEAti7TorWQ3tNcnS317bpBl8n69jK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1dW2kACgkQp6FrSiUn
-Q2qmbQf9GqYguhK4tXOBZaGieWt43fbOaCEp0faMhdsP79Bm+JKbnWk+yH0cUwu+
-s/VuOkklXfVt3cTLR8cVmy9PdJU/zG9DjR0vKCWqZhOIot06eyJv1AbnDJfZf7dV
-EGKsNtY9LJLpFvJphG45FoKIrBndCUxIsR+XRm3qVdmt0im2R9Ko1o3PT2RtmwRg
-9RqT7XmABfVIIr3GqNjQxdDHX7S1eIKefJs+C5khK3RuMLFW5+rtgvGeTMEjZ9Qx
-lP74q3Ysadz3zrMWDesryeg9ENyG0HoypGxqZpO5h37JaLowODsipRM0O6Z6DvsZ
-UeMpbKO9IXzQgSllP3Yl1y/l/ZO4lQ==
-=Qcpl
------END PGP SIGNATURE-----
-
---5LfOEAti7TorWQ3tNcnS317bpBl8n69jK--
 
