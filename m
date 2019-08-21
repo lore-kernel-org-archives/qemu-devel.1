@@ -2,88 +2,104 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B736CC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 17:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBCDC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 17:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BBC522DD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 17:05:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BBC522DD3
+	by mail.kernel.org (Postfix) with ESMTPS id 8254D22DD3
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 17:06:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8254D22DD3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0U3R-0004T6-Ob
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 13:05:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36586)
+	id 1i0U4D-0005OF-Nf
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 13:06:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i0U2B-0003fR-Gm
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:04:32 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1i0U3X-0004ho-MN
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i0U2A-0001yn-54
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:04:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27492)
+ (envelope-from <pbonzini@redhat.com>) id 1i0U3V-0002r9-Q7
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:05:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47220)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i0U26-0001uW-TM; Wed, 21 Aug 2019 13:04:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i0U3V-0002qd-Hr
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:05:53 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 636FF315C009;
- Wed, 21 Aug 2019 17:04:22 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 80D545D6B7;
- Wed, 21 Aug 2019 17:04:19 +0000 (UTC)
-To: Nir Soffer <nirsof@gmail.com>, qemu-block@nongnu.org
-References: <20190817212111.13265-1-nsoffer@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 94E6C7E425
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 17:05:52 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id k10so1496895wru.23
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 10:05:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gXJ+NHbUHMveReSqMrUcgn6Az2OcygrDoyZ/PQGsmgc=;
+ b=MjzH5lIMqJu9siOH1V1LsNnaTqlM12dC+miT/E5QSNxReT/ZY92mBzWSh9ZqRZxF6t
+ MpwW3bKYWJibHi0jBFc17m0FhbuFHWlx3LJ+PA9ypLOkgTuYJ0N3PUeWQUxKlhpaLzhD
+ twSTPS8E8z8/rHFdRmGqgYux9kgX7Rvl6rVc+Tv+pOWtZvcfQqR4nu8rTqx4HZBrId//
+ LOtDLeokLuyA4JDRcVZczQudzIVrEEoUDojp3o++9sRY6QxzCda/PG9HyIx6RZWUJDjD
+ ylSzTv7LE1sYI25JgX31O2SeMmp3o4FhnGxEDj6Cq9TvzvjTwYCDDhQZPmzRjX74yW0r
+ 1xew==
+X-Gm-Message-State: APjAAAXgBQxxGACroYsqe7xEXr8FbUfDvyYkeqNMz1oGPpcca4J3txUx
+ IGS7ZD4cZIYrUdu0L1L1SpptRag2q/S7zQ6wqU1C/2m6K4IEDOfTL2ubSNg+F6v+htRFuolkjz5
+ CF/Z61EEyCOx57Bw=
+X-Received: by 2002:a05:600c:207:: with SMTP id
+ 7mr1147873wmi.146.1566407150416; 
+ Wed, 21 Aug 2019 10:05:50 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzag7f0De7kGe4F0By0ZV/xiSzZmZkPOU5yGbJSHJEYAOGAx+79c3hCoq1s11d6qZKPNTfzVQ==
+X-Received: by 2002:a05:600c:207:: with SMTP id
+ 7mr1147826wmi.146.1566407150091; 
+ Wed, 21 Aug 2019 10:05:50 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3?
+ ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
+ by smtp.gmail.com with ESMTPSA id c8sm21411577wrn.50.2019.08.21.10.05.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 21 Aug 2019 10:05:49 -0700 (PDT)
+To: "Kinney, Michael D" <michael.d.kinney@intel.com>,
+ "rfc@edk2.groups.io" <rfc@edk2.groups.io>, "Yao, Jiewen"
+ <jiewen.yao@intel.com>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+ <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
+ <99219f81-33a3-f447-95f8-f10341d70084@redhat.com>
+ <6f8b9507-58d0-5fbd-b827-c7194b3b2948@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
+ <7cb458ea-956e-c1df-33f7-025e4f0f22df@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F7600B9@shsmsx102.ccr.corp.intel.com>
+ <bb6fdbe0-2a3b-e586-e9a5-93e1ac0803ec@redhat.com>
+ <20190816161933.7d30a881@x1.home>
+ <74D8A39837DF1E4DA445A8C0B3885C503F761B96@shsmsx102.ccr.corp.intel.com>
+ <35396800-32d2-c25f-b0d0-2d7cd8438687@redhat.com>
+ <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9b59c887-ff97-ff0a-fa18-ef9a19c1ad6e@redhat.com>
-Date: Wed, 21 Aug 2019 19:04:17 +0200
+Message-ID: <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
+Date: Wed, 21 Aug 2019 19:05:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190817212111.13265-1-nsoffer@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="hWc6yHwzjYBB2StFzb4GR0qR7qaQqFatz"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 21 Aug 2019 17:04:22 +0000 (UTC)
+In-Reply-To: <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] block: gluster: Probe alignment limits
+Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
+ QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,200 +111,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- integration@gluster.org, qemu-devel@nongnu.org,
- Niels de Vos <ndevos@redhat.com>
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ "devel@edk2.groups.io" <devel@edk2.groups.io>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>,
+ Alex Williamson <alex.williamson@redhat.com>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>, Laszlo Ersek <lersek@redhat.com>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hWc6yHwzjYBB2StFzb4GR0qR7qaQqFatz
-Content-Type: multipart/mixed; boundary="agE4LFLyPvCxqP4o5iD8sEx6GZFX525hS";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Nir Soffer <nirsof@gmail.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, integration@gluster.org,
- Niels de Vos <ndevos@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>
-Message-ID: <9b59c887-ff97-ff0a-fa18-ef9a19c1ad6e@redhat.com>
-Subject: Re: [PATCH] block: gluster: Probe alignment limits
-References: <20190817212111.13265-1-nsoffer@redhat.com>
-In-Reply-To: <20190817212111.13265-1-nsoffer@redhat.com>
+On 21/08/19 17:48, Kinney, Michael D wrote:
+> Perhaps there is a way to avoid the 3000:8000 startup
+> vector.
+> 
+> If a CPU is added after a cold reset, it is already in a
+> different state because one of the active CPUs needs to
+> release it by interacting with the hot plug controller.
+> 
+> Can the SMRR for CPUs in that state be pre-programmed to
+> match the SMRR in the rest of the active CPUs?
+> 
+> For OVMF we expect all the active CPUs to use the same
+> SMRR value, so a check can be made to verify that all 
+> the active CPUs have the same SMRR value.  If they do,
+> then any CPU released through the hot plug controller 
+> can have its SMRR pre-programmed and the initial SMI
+> will start within TSEG.
+> 
+> We just need to decide what to do in the unexpected 
+> case where all the active CPUs do not have the same
+> SMRR value.
+> 
+> This should also reduce the total number of steps.
 
---agE4LFLyPvCxqP4o5iD8sEx6GZFX525hS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The problem is not the SMRR but the SMBASE.  If the SMBASE area is
+outside TSEG, it is vulnerable to DMA attacks independent of the SMRR.
+SMBASE is also different for all CPUs, so it cannot be preprogrammed.
 
-On 17.08.19 23:21, Nir Soffer wrote:
-> Implement alignment probing similar to file-posix, by reading from the
-> first 4k of the image.
->=20
-> Before this change, provisioning a VM on storage with sector size of
-> 4096 bytes would fail when the installer try to create filesystems. Her=
-e
-> is an example command that reproduces this issue:
->=20
->     $ qemu-system-x86_64 -accel kvm -m 2048 -smp 2 \
->         -drive file=3Dgluster://gluster1/gv0/fedora29.raw,format=3Draw,=
-cache=3Dnone \
->         -cdrom Fedora-Server-dvd-x86_64-29-1.2.iso
->=20
-> The installer fails in few seconds when trying to create filesystem on
-> /dev/mapper/fedora-root. In error report we can see that it failed with=
+(As an aside, virt platforms are also immune to cache poisoning so they
+don't have SMRR yet - we could use them for SMM_CODE_CHK_EN and block
+execution outside SMRR but we never got round to it).
 
-> EINVAL (I could not extract the error from guest).
->=20
-> Copying disk fails with EINVAL:
->=20
->     $ qemu-img convert -p -f raw -O raw -t none -T none \
->         gluster://gluster1/gv0/fedora29.raw \
->         gluster://gluster1/gv0/fedora29-clone.raw
->     qemu-img: error while writing sector 4190208: Invalid argument
->=20
-> This is a fix to same issue fixed in commit a6b257a08e3d (file-posix:
-> Handle undetectable alignment) for gluster:// images.
->=20
-> This fix has the same limit, that the first block of the image should b=
-e
-> allocated, otherwise we cannot detect the alignment and fallback to a
-> safe value (4096) even when using storage with sector size of 512 bytes=
-=2E
->=20
-> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-> ---
->  block/gluster.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 47 insertions(+)
->=20
-> diff --git a/block/gluster.c b/block/gluster.c
-> index f64dc5b01e..d936240b72 100644
-> --- a/block/gluster.c
-> +++ b/block/gluster.c
-> @@ -52,6 +52,9 @@
-> =20
->  #define GERR_INDEX_HINT "hint: check in 'server' array index '%d'\n"
-> =20
-> +/* The value is known only on the server side. */
-> +#define MAX_ALIGN 4096
-> +
->  typedef struct GlusterAIOCB {
->      int64_t size;
->      int ret;
-> @@ -902,8 +905,52 @@ out:
->      return ret;
->  }
-> =20
-> +/*
-> + * Check if read is allowed with given memory buffer and length.
-> + *
-> + * This function is used to check O_DIRECT request alignment.
-> + */
-> +static bool gluster_is_io_aligned(struct glfs_fd *fd, void *buf, size_=
-t len)
-> +{
-> +    ssize_t ret =3D glfs_pread(fd, buf, len, 0, 0, NULL);
-> +    return ret >=3D 0 || errno !=3D EINVAL;
+An even simpler alternative would be to make A0000h the initial SMBASE.
+ However, I would like to understand what hardware platforms plan to do,
+if anything.
 
-Is glfs_pread() guaranteed to return EINVAL on invalid alignment?
-file-posix says this is only the case on Linux (for normal files).  Now
-I also don=E2=80=99t know whether the gluster driver works on anything bu=
-t Linux
-anyway.
+Paolo
 
-> +}
-> +
-> +static void gluster_probe_alignment(BlockDriverState *bs, struct glfs_=
-fd *fd,
-> +                                    Error **errp)
-> +{
-> +    char *buf;
-> +    size_t alignments[] =3D {1, 512, 1024, 2048, 4096};
-> +    size_t align;
-> +    int i;
-> +
-> +    buf =3D qemu_memalign(MAX_ALIGN, MAX_ALIGN);
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(alignments); i++) {
-> +        align =3D alignments[i];
-> +        if (gluster_is_io_aligned(fd, buf, align)) {
-> +            /* Fallback to safe value. */
-> +            bs->bl.request_alignment =3D (align !=3D 1) ? align : MAX_=
-ALIGN;
-> +            break;
-> +        }
-> +    }
+> Mike
+> 
+>> -----Original Message-----
+>> From: rfc@edk2.groups.io [mailto:rfc@edk2.groups.io] On
+>> Behalf Of Yao, Jiewen
+>> Sent: Sunday, August 18, 2019 4:01 PM
+>> To: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Alex Williamson <alex.williamson@redhat.com>; Laszlo
+>> Ersek <lersek@redhat.com>; devel@edk2.groups.io; edk2-
+>> rfc-groups-io <rfc@edk2.groups.io>; qemu devel list
+>> <qemu-devel@nongnu.org>; Igor Mammedov
+>> <imammedo@redhat.com>; Chen, Yingwen
+>> <yingwen.chen@intel.com>; Nakajima, Jun
+>> <jun.nakajima@intel.com>; Boris Ostrovsky
+>> <boris.ostrovsky@oracle.com>; Joao Marcal Lemos Martins
+>> <joao.m.martins@oracle.com>; Phillip Goerl
+>> <phillip.goerl@oracle.com>
+>> Subject: Re: [edk2-rfc] [edk2-devel] CPU hotplug using
+>> SMM with QEMU+OVMF
+>>
+>> in real world, we deprecate AB-seg usage because they
+>> are vulnerable to smm cache poison attack.
+>> I assume cache poison is out of scope in the virtual
+>> world, or there is a way to prevent ABseg cache poison.
+>>
+>> thank you!
+>> Yao, Jiewen
+>>
+>>
+>>> 在 2019年8月19日，上午3:50，Paolo Bonzini
+>> <pbonzini@redhat.com> 写道：
+>>>
+>>>> On 17/08/19 02:20, Yao, Jiewen wrote:
+>>>> [Jiewen] That is OK. Then we MUST add the third
+>> adversary.
+>>>> -- Adversary: Simple hardware attacker, who can use
+>> device to perform DMA attack in the virtual world.
+>>>> NOTE: The DMA attack in the real world is out of
+>> scope. That is be handled by IOMMU in the real world,
+>> such as VTd. -- Please do clarify if this is TRUE.
+>>>>
+>>>> In the real world:
+>>>> #1: the SMM MUST be non-DMA capable region.
+>>>> #2: the MMIO MUST be non-DMA capable region.
+>>>> #3: the stolen memory MIGHT be DMA capable region or
+>> non-DMA capable
+>>>> region. It depends upon the silicon design.
+>>>> #4: the normal OS accessible memory - including ACPI
+>> reclaim, ACPI
+>>>> NVS, and reserved memory not included by #3 - MUST be
+>> DMA capable region.
+>>>> As such, IOMMU protection is NOT required for #1 and
+>> #2. IOMMU
+>>>> protection MIGHT be required for #3 and MUST be
+>> required for #4.
+>>>> I assume the virtual environment is designed in the
+>> same way. Please
+>>>> correct me if I am wrong.
+>>>>
+>>>
+>>> Correct.  The 0x30000...0x3ffff area is the only
+>> problematic one;
+>>> Igor's idea (or a variant, for example optionally
+>> remapping
+>>> 0xa0000..0xaffff SMRAM to 0x30000) is becoming more
+>> and more attractive.
+>>>
+>>> Paolo
+>>
+>> -=-=-=-=-=-=-=-=-=-=-=-
+>> Groups.io Links: You receive all messages sent to this
+>> group.
+>>
+>> View/Reply Online (#47):
+>> https://edk2.groups.io/g/rfc/message/47
+>> Mute This Topic: https://groups.io/mt/32887711/1643496
+>> Group Owner: rfc+owner@edk2.groups.io
+>> Unsubscribe: https://edk2.groups.io/g/rfc/unsub
+>> [michael.d.kinney@intel.com]
+>> -=-=-=-=-=-=-=-=-=-=-=-
+> 
 
-I don=E2=80=99t like the fact that the last element of alignments[] shoul=
-d be
-the same as MAX_ALIGN, without that ever having been made explicit anywhe=
-re.
-
-It=E2=80=99s a bit worse in the file-posix patch, because if getpagesize(=
-) is
-greater than 4k, max_align will be greater than 4k.  But MAX_BLOCKSIZE
-is 4k, too, so I suppose we wouldn=E2=80=99t support any block size beyon=
-d that
-anyway, which makes the error message appropriate still.
-
-> +
-> +    qemu_vfree(buf);
-> +
-> +    if (!bs->bl.request_alignment) {
-> +        error_setg(errp, "Could not find working O_DIRECT alignment");=
-
-> +        error_append_hint(errp, "Try cache.direct=3Doff\n");
-> +    }
-> +}
-> +
->  static void qemu_gluster_refresh_limits(BlockDriverState *bs, Error **=
-errp)
->  {
-> +    BDRVGlusterState *s =3D bs->opaque;
-> +
-> +    gluster_probe_alignment(bs, s->fd, errp);
-> +
-> +    bs->bl.min_mem_alignment =3D bs->bl.request_alignment;
-
-Well, I=E2=80=99ll just trust you that there is no weird system where the=
- memory
-alignment is greater than the request alignment.
-
-> +    bs->bl.opt_mem_alignment =3D MAX(bs->bl.request_alignment, MAX_ALI=
-GN);
-
-Isn=E2=80=99t request_alignment guaranteed to not exceed MAX_ALIGN, i.e. =
-isn=E2=80=99t
-this always MAX_ALIGN?
-
->      bs->bl.max_transfer =3D GLUSTER_MAX_TRANSFER;
->  }
-
-file-posix has a check in raw_reopen_prepare() whether we can find a
-working alignment for the new FD.  Shouldn=E2=80=99t we do the same in
-qemu_gluster_reopen_prepare()?
-
-Max
-
-
---agE4LFLyPvCxqP4o5iD8sEx6GZFX525hS--
-
---hWc6yHwzjYBB2StFzb4GR0qR7qaQqFatz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1deZEACgkQ9AfbAGHV
-z0CVsggAnjaggy60WnXuQzkjIDite8qLRh9IFClzaZ8rqJQiRTJBUyTRhqaEdHcH
-GyvtuClAB7rcrz+HvZ4obrcDb1D5Wae/bKohLvtcP3DvhTJRgeiKuYx8wjuHOUIH
-fDk1iVnUKh322MDZG0pis27GAJntb1y2Sq0zHmu63ton41JlK0eJQbxX4p0duK9q
-7CrA89o/MlmL/qH2h5F+7Hc6Qk5xDXxkcQFVbrSjTMfN3z/56C2GwJaeKK0tSMtJ
-/2yoG9E1jjgastiSFCvzf3doZs32koD3FRZ8IiRrKnW5eCHMAyefX4dFv+GN8uLt
-1I6lvzIBhOZXX7gFzSkQ7oW1E6B7Gg==
-=wK//
------END PGP SIGNATURE-----
-
---hWc6yHwzjYBB2StFzb4GR0qR7qaQqFatz--
 
