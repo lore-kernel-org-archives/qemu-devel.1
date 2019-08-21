@@ -2,90 +2,88 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C1BC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2BEC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9B7F22DD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:17:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B7F22DD3
+	by mail.kernel.org (Postfix) with ESMTPS id 21DA8216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 16:36:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21DA8216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0TIK-0002MG-Bz
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:17:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56879)
+	id 1i0Tb3-0000Rw-7z
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 12:36:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59244)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i0THE-0001kp-PK
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:16:01 -0400
+ (envelope-from <philmd@redhat.com>) id 1i0TZh-0006qZ-Cc
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i0THD-0005yP-At
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:16:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43036)
+ (envelope-from <philmd@redhat.com>) id 1i0TTz-0002Qv-Lm
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:29:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51804)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i0THD-0005xw-2c
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:15:59 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i0TTz-0002QU-ET
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 12:29:11 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C027A8A4AD
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 16:15:57 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id n13so1020149wmi.4
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 09:15:57 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7D08433026D
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 16:29:10 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id s18so1452039wrt.21
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 09:29:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=gJ5Y0e18LiKdiPobAJw2FFKFDy/Yhb1hPMFJ+EtPDjM=;
- b=CKKO/xTarkhaZYR505Y7ySdP7+SUDyBs8aoizYWWae7bg9aU6FkkicWyWet/Bqg/+c
- rR6EK8+cMklpwlQ7acLImgU2hSRk0INpZkAkhKD6Kzbr0RFmMFWpwMgs2E7z8lsuGohR
- QpKlRaucxj0fd49gjHuTxdaCDiYBycTKl8SA5qXTt6M8kbF+EDyJ2hq4zd2w6ufcnfKH
- 66OsngKhZdSOYXh0tnk92JmmlzIObdNBLPbfVixTvNjDghgcyl52HacO1MEPzg88Xp3Q
- RnTUsrS4v7qFb6QpZOuQ7+IpbOTQrlLS0hXIzGJilaRtH0jQIcLUeiMDBJZeSU5JJwDA
- 7JQw==
-X-Gm-Message-State: APjAAAXcRWSCsI+/+EtoJcEh04dgtKUQ/2H7Kxobzl27Mpj+kQEkQd9l
- J8SecmQ96sTv9VDKPRF6L21xYAnvm9lyDdV4L1yV06DHTC84jYYQ9Gg8jAlg3+7Yw8NVKSR1j+/
- UaSIVKSlv4DaVEUI=
-X-Received: by 2002:a1c:2015:: with SMTP id g21mr895493wmg.33.1566404156487;
- Wed, 21 Aug 2019 09:15:56 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxlqSSJFubiPgvydM/DxRIUxbYZTc4wmS5EAm7wj6sET2v/VDsRi4bASK7byYfas82eaa17Rw==
-X-Received: by 2002:a1c:2015:: with SMTP id g21mr895460wmg.33.1566404156309;
- Wed, 21 Aug 2019 09:15:56 -0700 (PDT)
+ bh=Rd8ogXOTn3+XqTwYTyF0LJn+wdjlrM6jMibpOnG9qJg=;
+ b=tyOlG+zoU03ZSd2ka80wvNsYMdS/MjsCpQ7y73XC2nUer6+d7PUcAzq7YKbysMne52
+ xxwM/shojzVbSZn15nDwQAMksxlAjoSd8GGeP57LkMiXW7Yb9w4NMoR/cZrGRd4QvbSE
+ az9hhnAuvtqPm9tePBJhYkaJU59xc9ZJ61kzBl2+bfbk1Z+SdcYadGzlsaYeQgdGTI8q
+ coxinkLMqtWhSJcwL5J6jEmEBafivfgq7ye1NlUsEliYwpnKrD18l09HXvPWC4M9nbrb
+ 7g5alaOA0CxeTCZk6nMJIsd3qjA7yf0MmsV0HwneROHc6CQeXho4MOSdA8uxIWelgQJt
+ /SNw==
+X-Gm-Message-State: APjAAAV/lCU4FXDjxTmIu0NZlkgkz9oowx0JZQ/SiA+6Lr5UClxLW675
+ 9cnJn353tWZsuPpb4QPFkj8V8B4JOr/qMTPJBPYvUcTaNQIrS6U30BuJg6wUewcbtKoc0SV9SYi
+ vEX2eB4qeVDa/sSM=
+X-Received: by 2002:a5d:6b52:: with SMTP id x18mr12399526wrw.66.1566404949262; 
+ Wed, 21 Aug 2019 09:29:09 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy7cCDK432jRZLnHxeb7TOhMLfHJptPDKPuMMLMdJ7NY1YTNtcIgoNec7U4HpxrPx4r1Bnt0g==
+X-Received: by 2002:a5d:6b52:: with SMTP id x18mr12399493wrw.66.1566404949103; 
+ Wed, 21 Aug 2019 09:29:09 -0700 (PDT)
 Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id r11sm16951127wrt.84.2019.08.21.09.15.54
+ by smtp.gmail.com with ESMTPSA id r16sm47052049wrc.81.2019.08.21.09.29.07
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 21 Aug 2019 09:15:55 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Peter Maydell <peter.maydell@linaro.org>
+ Wed, 21 Aug 2019 09:29:08 -0700 (PDT)
+To: BALATON Zoltan <balaton@eik.bme.hu>,
+ Richard Henderson <richard.henderson@linaro.org>
 References: <BN6PR2201MB1251511E7694854909AFEEB4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
  <CAFEAcA9UJGXOdNUD49bxmrdoZ5FEv4VLqAvyzDw66MOGsGB=wg@mail.gmail.com>
  <BN6PR2201MB1251C78A16D557867586FFD4C6AB0@BN6PR2201MB1251.namprd22.prod.outlook.com>
  <1fc18db5-abd4-80be-11ee-209dfd4a55f4@linaro.org>
- <ee2c817c-6cb5-6f0a-ea04-da47c0ab67bb@redhat.com>
+ <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <43fefe68-1e54-9882-ed30-fcaa046b0bb3@redhat.com>
-Date: Wed, 21 Aug 2019 18:15:54 +0200
+Message-ID: <9c6110d6-1319-418d-ba4c-9fa8be460cf9@redhat.com>
+Date: Wed, 21 Aug 2019 18:29:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <ee2c817c-6cb5-6f0a-ea04-da47c0ab67bb@redhat.com>
+In-Reply-To: <alpine.LMD.2.03.1908201811150.2980@eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [EXTERNAL]Re: Proposal for amending TCG interface
@@ -101,65 +99,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@sifive.com>, Eduardo Habkost <ehabkost@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>,
+ Palmer Dabbelt <palmer@sifive.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
  Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>,
  "aurelien@aurel32.net" <aurelien@aurel32.net>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/20/19 6:46 PM, David Hildenbrand wrote:
-> On 20.08.19 17:37, Richard Henderson wrote:
->> On 8/20/19 6:49 AM, Aleksandar Markovic wrote:
->>>> From: Peter Maydell <peter.maydell@linaro.org>
->>>> On Tue, 20 Aug 2019 at 13:50, Aleksandar Markovic
->>>> <amarkovic@wavecomp.com> wrote:
->>>>> The idea is to provide significant "lexicographic" distance between those > groups of functions, rather than having the similar name (wiht common root > "ext) for all of them.
->>>>
->>>> The current naming of the extract/sextract TCG ops is intended to keep
->>>> them in line with the extract32/sextract32/extract64/sextract64 utility
->>>> functions in bitops.h. I think those ones are reasonably named. The
->>>> other ops are a bit more ad-hoc in naming, admittedly...
->>>>
->>>
->>> How about
->>>
->>> tcg_gen_extract2_i32
->>> tcg_gen_extract2_i64
->>> tcg_gen_extract2_tl
->>> tcg_gen_extrl_i64_i32
->>> tcg_gen_extrh_i64_i32
->>> tcg_gen_ext_i32_i64
->>> tcg_gen_extu_i32_i64
->>>
->>> to
->>>
->>> tcg_gen_gather_i32
->>> tcg_gen_gather_i64
->>> tcg_gen_gather_tl
+On 8/20/19 6:21 PM, BALATON Zoltan wrote:
+>On 8/20/19 5:37 PM, Richard Henderson wrote:
+>> What if we use the AArch64 mnemonics: zxt (zero-extend) and sxt
+>> (sign-extend)?
+>> This would give us
 >>
->> I'm not sure how "gather" applies.  To me this sounds like a vector
->> scatter/gather operation, where N different addresses are used to load the N
->> elements of the vector.
->>
->> When extract2 was named, I was only thinking "extract" because of how the
->> AArch64 instruction that implements this operation is named (EXTR), and "extr"
->> itself was already taken.  We did ask for naming suggestions at the time, but
->> no better ideas were floated...
->>
->> Would it be clearer to use the x86 instruction name: SHRD (SHift Right Doubleword)?
->>
-> 
-> I still think your proposal back then made sense - extract2. Extract a
-> 64bit value from a 128bit value.
+>> =C2=A0=C2=A0 tcg_gen_zxt8_i32
+>> =C2=A0=C2=A0 tcg_gen_sxt8_i32
+>> =C2=A0=C2=A0 (etc)
+>> =C2=A0=C2=A0 tcg_gen_zxt_i32_i64
+>> =C2=A0=C2=A0 tcg_gen_sxt_i32_i64
+>=20
+> Again this might look familiar to those knowing AArch64 but not to
+> someone who does not know that. Maybe zext sext is a bit more decyphera=
+ble.
 
-It is also valid to extract 32bit from 64bit.
+Both namings seems acceptable.
+
+Not sure if the lexicographic distance is reduced, neither if reducing
+it would make a difference :)
 
