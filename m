@@ -2,61 +2,92 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7E4C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DD6C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:11:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 847F42332A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:08:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Id8/Z6qx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 847F42332A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id CDD072332A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:11:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDD072332A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Ley-0005a4-Ob
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:08:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43046)
+	id 1i0Lik-0000Nb-2Q
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:11:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L1a-0006AG-61
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:27:19 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1i0LJL-0003HX-H9
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0L1Y-0000Ug-IN
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:27:18 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:35097)
+ (envelope-from <pbonzini@redhat.com>) id 1i0LJK-0003G2-GR
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:45:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33876)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0L1X-0000FZ-TR; Wed, 21 Aug 2019 03:27:16 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46CzjH3MCTz9sRK; Wed, 21 Aug 2019 17:25:52 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566372355;
- bh=zJX1WYNT6gpp6KhwS3tqKkTcR3wZv/KDIUPLufTIcRk=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Id8/Z6qxeqARbrFa8uRP+reOWdoUZdUDkPfRnHKm/SVQn0DrifE2AkbCNlHnonsh9
- bIFmlcucLHLR9j1RMzZFiwVjTkdAV08UBG71/ybLCO9qWfcwdfUxZ9i2PWGQ9fugJV
- tINr+Lc0HSrUtZPzkRTSWjXa+KbtJ19XrKeNfyhA=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Wed, 21 Aug 2019 17:25:39 +1000
-Message-Id: <20190821072542.23090-40-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190821072542.23090-1-david@gibson.dropbear.id.au>
-References: <20190821072542.23090-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i0LJK-0003Ep-Af
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 03:45:38 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C2F5385545
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 07:45:36 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id t9so828214wrx.9
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 00:45:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gRuH2f3gZIE7itReI28qNk3gmy2+1sz4SZxDr8nmqGY=;
+ b=GBDJL38MxFr8aM5DLZmna0GUCtHsiTIpGFpv0jYLdP8yj6UM0qODZ+dln3PWqFxdgP
+ PgHGtTKFhi4Tw1CKCzsnnLiMl8tEdnraUx7OmKKTtmFobAR4QfmshAeHE3XtAEDBfrSH
+ z8gvakM9fFEOVdnLFEQagNB7OT4GpyTcsZ3FL4iOQeaGFOUFlq/oIfgXJHVK7FvZT5mv
+ G9XNK82ZVYiFvbp/k+z0D8EdFwHlTuVR49HAaVrFMV3YFe9OULwQlgp9+HY/146Nqt48
+ sxnRnYOf0Cg74QgTpMmorzx1o+GHO7jAhgK1V++IZTVSGreEki1QchW3vt5Sge3/tqze
+ Su/w==
+X-Gm-Message-State: APjAAAXxzqTxs84vDE1bLt+ttTcw9XNgA1H0hwFmL2KqhkIVGvX7qwY7
+ Hi5pYkgDkLRbJIpqi0A7tl7TrNd14+ZCMJXSnKadUIMvyvVHQcZ34PPY8Hr6zWgDROilBMFPzkc
+ BwXHWKnBg8NjcdLM=
+X-Received: by 2002:a05:600c:21ca:: with SMTP id
+ x10mr4495341wmj.112.1566373535431; 
+ Wed, 21 Aug 2019 00:45:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxp3/qlaYM5XMBgCQbZg7jQTaB8DNA97WKaHyZdXh6pXYikSCbGowUHzYiheygFZoW+guTn7w==
+X-Received: by 2002:a05:600c:21ca:: with SMTP id
+ x10mr4495304wmj.112.1566373535120; 
+ Wed, 21 Aug 2019 00:45:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:56e1:adff:fed9:caf0?
+ ([2001:b07:6468:f312:56e1:adff:fed9:caf0])
+ by smtp.gmail.com with ESMTPSA id l5sm2141438wmj.4.2019.08.21.00.45.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 21 Aug 2019 00:45:34 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <fccac7fa-888e-6ac5-458d-688808f3b282@redhat.com>
+ <699eee57-3009-4160-a9a2-1070f92b9c20@redhat.com>
+ <cc0b5a77-8bc4-070b-31e4-f29d5a174eb8@redhat.com>
+ <7f6e8a5c-8262-ae39-333a-e8f18b3174f0@redhat.com>
+ <20190821064208.eckikvttpdc3zjmd@sirius.home.kraxel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6206c058-8fa6-2a19-b76b-dcb5fa260e56@redhat.com>
+Date: Wed, 21 Aug 2019 09:45:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 39/42] ppc: Add support for 'mffsl' instruction
+In-Reply-To: <20190821064208.eckikvttpdc3zjmd@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Regression with floppy drive controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,222 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, "Paul A. Clarke" <pc@us.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Alex <coderain@sdf.org>,
+ seabios@seabios.org, QEMU Developers <qemu-devel@nongnu.org>,
+ Nikolay Nikolov <nickysn@users.sourceforge.net>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Paul A. Clarke" <pc@us.ibm.com>
+On 21/08/19 08:42, Gerd Hoffmann wrote:
+>> So we should use '-cpu Conroe' or '-cpu core2duo' minimum?
+> -cpu Conroe for -M isapc is kida silly though ...
+> 
+> Maybe we should simply build seabios with CONFIG_TSC_TIMER=n ?
+> 
+> Using the TSC in a virtual machine is problematic anyway, the
+> calibration can be _way_ off on a loaded host, this is why seabios
+> prefers the (fixed frequency) pmtimer. 
 
-ISA 3.0B added a set of Floating-Point Status and Control Register (FPSCR=
-)
-instructions: mffsce, mffscdrn, mffscdrni, mffscrn, mffscrni, mffsl.
-This patch adds support for 'mffsl'.
+Yeah, that falls back to the PIT which is a good enough source for
+SeasBIOS's needs (1 MHz, one third of the pmtimer).  It overflows a bit
+too easily but it shouldn't be a big deal for users of isapc.
 
-'mffsl' is identical to 'mffs', except it only returns mode, status, and =
-enable
-bits from the FPSCR.
-
-On CPUs without support for 'mffsl' (below ISA 3.0), the 'mffsl' instruct=
-ion
-will execute identically to 'mffs'.
-
-Note: I renamed FPSCR_RN to FPSCR_RN0 so I could create an FPSCR_RN mask =
-which
-is both bits of the FPSCR rounding mode, as defined in the ISA.
-
-I also fixed a typo in the definition of FPSCR_FR.
-
-Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
-
-v4:
-- nit: added some braces to resolve a checkpatch complaint.
-
-v3:
-- Changed tcg_gen_and_i64 to tcg_gen_andi_i64, eliminating the need for a
-  temporary, per review from Richard Henderson.
-
-v2:
-- I found that I copied too much of the 'mffs' implementation.
-  The 'Rc' condition code bits are not needed for 'mffsl'.  Removed.
-- I now free the (renamed) 'tmask' temporary.
-- I now bail early for older ISA to the original 'mffs' implementation.
-
-Message-Id: <1565982203-11048-1-git-send-email-pc@us.ibm.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- disas/ppc.c                        |  5 +++++
- target/ppc/cpu.h                   | 15 ++++++++++-----
- target/ppc/fpu_helper.c            |  4 ++--
- target/ppc/translate/fp-impl.inc.c | 22 ++++++++++++++++++++++
- target/ppc/translate/fp-ops.inc.c  |  4 +++-
- 5 files changed, 42 insertions(+), 8 deletions(-)
-
-diff --git a/disas/ppc.c b/disas/ppc.c
-index a545437de9..63e97cfe1d 100644
---- a/disas/ppc.c
-+++ b/disas/ppc.c
-@@ -1765,6 +1765,9 @@ extract_tbr (unsigned long insn,
- /* An X_MASK with the RA and RB fields fixed.  */
- #define XRARB_MASK (X_MASK | RA_MASK | RB_MASK)
-=20
-+/* An X form instruction with the RA field fixed.  */
-+#define XRA(op, xop, ra) (X((op), (xop)) | (((ra) << 16) & XRA_MASK))
-+
- /* An XRARB_MASK, but with the L bit clear.  */
- #define XRLARB_MASK (XRARB_MASK & ~((unsigned long) 1 << 16))
-=20
-@@ -4998,6 +5001,8 @@ const struct powerpc_opcode powerpc_opcodes[] =3D {
- { "ddivq",   XRC(63,546,0), X_MASK,	POWER6,		{ FRT, FRA, FRB } },
- { "ddivq.",  XRC(63,546,1), X_MASK,	POWER6,		{ FRT, FRA, FRB } },
-=20
-+{ "mffsl",   XRA(63,583,12), XRARB_MASK,	POWER9,	{ FRT } },
-+
- { "mffs",    XRC(63,583,0), XRARB_MASK,	COM,		{ FRT } },
- { "mffs.",   XRC(63,583,1), XRARB_MASK,	COM,		{ FRT } },
-=20
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 4b35c8e4f4..eaee1a5575 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -591,7 +591,7 @@ enum {
- #define FPSCR_XE     3  /* Floating-point inexact exception enable      =
-     */
- #define FPSCR_NI     2  /* Floating-point non-IEEE mode                 =
-     */
- #define FPSCR_RN1    1
--#define FPSCR_RN     0  /* Floating-point rounding control              =
-     */
-+#define FPSCR_RN0    0  /* Floating-point rounding control              =
-     */
- #define fpscr_fex    (((env->fpscr) >> FPSCR_FEX)    & 0x1)
- #define fpscr_vx     (((env->fpscr) >> FPSCR_VX)     & 0x1)
- #define fpscr_ox     (((env->fpscr) >> FPSCR_OX)     & 0x1)
-@@ -614,7 +614,7 @@ enum {
- #define fpscr_ze     (((env->fpscr) >> FPSCR_ZE)     & 0x1)
- #define fpscr_xe     (((env->fpscr) >> FPSCR_XE)     & 0x1)
- #define fpscr_ni     (((env->fpscr) >> FPSCR_NI)     & 0x1)
--#define fpscr_rn     (((env->fpscr) >> FPSCR_RN)     & 0x3)
-+#define fpscr_rn     (((env->fpscr) >> FPSCR_RN0)    & 0x3)
- /* Invalid operation exception summary */
- #define fpscr_ix ((env->fpscr) & ((1 << FPSCR_VXSNAN) | (1 << FPSCR_VXIS=
-I)  | \
-                                   (1 << FPSCR_VXIDI)  | (1 << FPSCR_VXZD=
-Z)  | \
-@@ -640,7 +640,7 @@ enum {
- #define FP_VXZDZ        (1ull << FPSCR_VXZDZ)
- #define FP_VXIMZ        (1ull << FPSCR_VXIMZ)
- #define FP_VXVC         (1ull << FPSCR_VXVC)
--#define FP_FR           (1ull << FSPCR_FR)
-+#define FP_FR           (1ull << FPSCR_FR)
- #define FP_FI           (1ull << FPSCR_FI)
- #define FP_C            (1ull << FPSCR_C)
- #define FP_FL           (1ull << FPSCR_FL)
-@@ -648,7 +648,7 @@ enum {
- #define FP_FE           (1ull << FPSCR_FE)
- #define FP_FU           (1ull << FPSCR_FU)
- #define FP_FPCC         (FP_FL | FP_FG | FP_FE | FP_FU)
--#define FP_FPRF         (FP_C  | FP_FL | FP_FG | FP_FE | FP_FU)
-+#define FP_FPRF         (FP_C | FP_FPCC)
- #define FP_VXSOFT       (1ull << FPSCR_VXSOFT)
- #define FP_VXSQRT       (1ull << FPSCR_VXSQRT)
- #define FP_VXCVI        (1ull << FPSCR_VXCVI)
-@@ -659,7 +659,12 @@ enum {
- #define FP_XE           (1ull << FPSCR_XE)
- #define FP_NI           (1ull << FPSCR_NI)
- #define FP_RN1          (1ull << FPSCR_RN1)
--#define FP_RN           (1ull << FPSCR_RN)
-+#define FP_RN0          (1ull << FPSCR_RN0)
-+#define FP_RN           (FP_RN1 | FP_RN0)
-+
-+#define FP_MODE         FP_RN
-+#define FP_ENABLES      (FP_VE | FP_OE | FP_UE | FP_ZE | FP_XE)
-+#define FP_STATUS       (FP_FR | FP_FI | FP_FPRF)
-=20
- /* the exception bits which can be cleared by mcrfs - includes FX */
- #define FP_EX_CLEAR_BITS (FP_FX     | FP_OX     | FP_UX     | FP_ZX     =
-| \
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index f437c88aad..5611cf0156 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -403,7 +403,7 @@ void helper_fpscr_clrbit(CPUPPCState *env, uint32_t b=
-it)
-     if (prev =3D=3D 1) {
-         switch (bit) {
-         case FPSCR_RN1:
--        case FPSCR_RN:
-+        case FPSCR_RN0:
-             fpscr_set_rounding_mode(env);
-             break;
-         case FPSCR_VXSNAN:
-@@ -557,7 +557,7 @@ void helper_fpscr_setbit(CPUPPCState *env, uint32_t b=
-it)
-             }
-             break;
-         case FPSCR_RN1:
--        case FPSCR_RN:
-+        case FPSCR_RN0:
-             fpscr_set_rounding_mode(env);
-             break;
-         default:
-diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
--impl.inc.c
-index 9dcff947c0..7cd9d8db05 100644
---- a/target/ppc/translate/fp-impl.inc.c
-+++ b/target/ppc/translate/fp-impl.inc.c
-@@ -617,6 +617,28 @@ static void gen_mffs(DisasContext *ctx)
-     tcg_temp_free_i64(t0);
- }
-=20
-+/* mffsl */
-+static void gen_mffsl(DisasContext *ctx)
-+{
-+    TCGv_i64 t0;
-+
-+    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300))) {
-+        return gen_mffs(ctx);
-+    }
-+
-+    if (unlikely(!ctx->fpu_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_FPU);
-+        return;
-+    }
-+    t0 =3D tcg_temp_new_i64();
-+    gen_reset_fpstatus();
-+    tcg_gen_extu_tl_i64(t0, cpu_fpscr);
-+    /* Mask everything except mode, status, and enables.  */
-+    tcg_gen_andi_i64(t0, t0, FP_MODE | FP_STATUS | FP_ENABLES);
-+    set_fpr(rD(ctx->opcode), t0);
-+    tcg_temp_free_i64(t0);
-+}
-+
- /* mtfsb0 */
- static void gen_mtfsb0(DisasContext *ctx)
- {
-diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-=
-ops.inc.c
-index 621f6bfe0c..88ebc2526c 100644
---- a/target/ppc/translate/fp-ops.inc.c
-+++ b/target/ppc/translate/fp-ops.inc.c
-@@ -104,7 +104,9 @@ GEN_HANDLER_E(fcpsgn, 0x3F, 0x08, 0x00, 0x00000000, P=
-PC_NONE, PPC2_ISA205),
- GEN_HANDLER_E(fmrgew, 0x3F, 0x06, 0x1E, 0x00000001, PPC_NONE, PPC2_VSX20=
-7),
- GEN_HANDLER_E(fmrgow, 0x3F, 0x06, 0x1A, 0x00000001, PPC_NONE, PPC2_VSX20=
-7),
- GEN_HANDLER(mcrfs, 0x3F, 0x00, 0x02, 0x0063F801, PPC_FLOAT),
--GEN_HANDLER(mffs, 0x3F, 0x07, 0x12, 0x001FF800, PPC_FLOAT),
-+GEN_HANDLER_E_2(mffs, 0x3F, 0x07, 0x12, 0x00, 0x00000000, PPC_FLOAT, PPC=
-_NONE),
-+GEN_HANDLER_E_2(mffsl, 0x3F, 0x07, 0x12, 0x18, 0x00000000, PPC_FLOAT,
-+    PPC2_ISA300),
- GEN_HANDLER(mtfsb0, 0x3F, 0x06, 0x02, 0x001FF800, PPC_FLOAT),
- GEN_HANDLER(mtfsb1, 0x3F, 0x06, 0x01, 0x001FF800, PPC_FLOAT),
- GEN_HANDLER(mtfsf, 0x3F, 0x07, 0x16, 0x00000000, PPC_FLOAT),
---=20
-2.21.0
-
+Paolo
 
