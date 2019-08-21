@@ -6,38 +6,37 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2FCC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4164BC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6F5922D6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:38:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F5922D6D
+	by mail.kernel.org (Postfix) with ESMTPS id 142DE22D6D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:43:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 142DE22D6D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0M84-0002CY-0V
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:38:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54293)
+	id 1i0MD8-0005Go-Q8
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:43:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i0M7P-0001mR-9E
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:37:24 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i0MB4-0003cV-TT
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i0M7O-0003Mq-7Q
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:37:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:38131)
+ (envelope-from <laurent@vivier.eu>) id 1i0MB3-0004yI-FS
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:41:10 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:33287)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i0M7N-0003MB-V0
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:37:22 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1i0MB3-0004wZ-41; Wed, 21 Aug 2019 04:41:09 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MUTxo-1hrexA0lJA-00QR1P; Wed, 21 Aug 2019 10:37:16 +0200
-To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>,
- qemu-devel@nongnu.org
-References: <20190710225528.409-1-carenas@gmail.com>
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N63mC-1iKQC90QdU-016NMO; Wed, 21 Aug 2019 10:41:05 +0200
+To: Michal Privoznik <mprivozn@redhat.com>, qemu-trivial@nongnu.org
+References: <db150a03315a89a849ab9968e4a5a26110d41424.1562942402.git.mprivozn@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,35 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <715e2b4d-5b3b-75be-266a-43c3bd3f8a1b@vivier.eu>
-Date: Wed, 21 Aug 2019 10:37:13 +0200
+Message-ID: <c2a4ba95-c77c-d311-f597-2312b2462720@vivier.eu>
+Date: Wed, 21 Aug 2019 10:41:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190710225528.409-1-carenas@gmail.com>
+In-Reply-To: <db150a03315a89a849ab9968e4a5a26110d41424.1562942402.git.mprivozn@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ekLiNupoyU6PdszYknSSQNSr8dNdUH4fgTJNdkdt75QoOHY0Oif
- JW2VJZMdoFRacwDZhNYylR+VBniXbt4bz+HZPstHLuSohrMjoeJuGyGnl+dJwLn0A4kB3xM
- WARXGWFQ90ZQnt9bD2ujTWbIl/sTSApB4npbAgZC/04TocZmQXQnzDVTdBi8ESah1qnMeRU
- 3wUV6elmBWRXBK0D5d//Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KcD0Gd+ot/Y=:yDqZOLeap0IKxufAtspRpE
- EI7G+0PZsQcgf0/RoNeYE/h3axM32Xpu2te8GCJJC3o5O6OfaZ5d+WUH/oIa9PUT9QudNzw7y
- P/ZJR59MHoBkBI++8MBRVIr7EslVe/qqPQdWbWAewrndPZmGYLrwfwRhBxJaauq/DiVk9X7bY
- wZ2S6z21PuV/lA+OYbKXshyLPEXq5bnz/nISOaoT0JAmHcPBv3qFa7XT2ZaHtvnJTMjMeqAuh
- VCzsuOg+g0bQmNIHWN3/QSSTQrMkHOoDiWyBcroYRLnTiDx9ZsaYbeglVtRuc4a0e2sKI5kJ9
- kVHkYIFehciQOyAjL/r1y9FTBfeuCQW4uuJkCOZr1Jpr+sRS7wzxVqEY0ZUvDS48KrzsOhEOx
- Md3KLUpBp+ajQkRnkh+pmiI0moH0P/oyfmN/g62SaANjcCID5GqSBBsRU/krhUA5v7X/7HObg
- xU3YMPkw0Pu/6yi4y5AHXZ4uWc1si7l/liwnKy3SG/ra8l7IUjN+K9D63v3hSgxNWCrmBgmEM
- bj9JWF+FLvGlKxkDJNlfd/bgB1ylNf4wa+96S0zsXDHpQAa2PRvyqdvhFUmCZPb76EGxYoMGV
- TR2MwzrzjKs6tDFMO0FBbzFPFlvyJuTXeNqhDpyoaL9m7qlG7cEZhYuKXMS/aykt18b/IDL5X
- kC2q5Tl7uU5sp2x8cujE3ykMBGHAQ5QP5+k8xbcTKptc3BNZJLoBPIZzNvAW/U8PpCBhhK+wd
- VFK6KQW8DzxR1Iu5tnWOoqoEix+36E3JrHsKrJNzKvmMFXUTzzeNpi6TTZw=
+X-Provags-ID: V03:K1:XlzmmF7pyeb+mDvfXFzAiFk0EskfKcdVRvY1Wsh9e54f19xow42
+ aAlSXok8ysLM2C3LMyhxrJSDqdEO2tZJNshjeUrRw3uuiKfH1U7kM9dTKrD4VuVICuc82CX
+ BQLp1ZqNY+XFBVu0wydKhekkJmuR+6fK57Gj1Kg7tOsvFJ8+ZC3mIiVE3RAMj5Ub7HKjxui
+ u6LbsjMUXlnRSp3qLJOzw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:fP4Bt6n1+J0=:PoQqWcL2OgW6XPObVmi311
+ D4hmCev9odrAKYKxX4mWoDeZdgtuXJDSPlSl+ts/NhTv+7krwXi1deGZIfthKDZ1P0SMSBUqG
+ doE6wK0n+ldNdJTY5gH3Wt8Yd7SVW8Bf4C61jnogBWmBGN1Cib6JkWLcZnKiat8phS8U3nrbg
+ 7myx/cZcSnPD7G0FgJ4Ek3MLn8U5GWtIDyoN5T+DaVVpx5i/+lZsBcBxGgFkBXrXX755xHqhj
+ ev+PrCI9G8jFf/UxdfyDxkdxQsEXaNFncXYgOnn1vD0yLrXFAUwEN69qKoXZhTSsINkVrPQ9w
+ LbvGJMeSTqUfSvgQtn7EBm2JDi2vJN4O0Y3r6br6LOWPI9dWN1Sc+VulJOatwaFYfXU/X8kT/
+ zBEj5/GQfS2SrrykDCSOAUf8oLi5vY85CNGakq/LndNo8EolwOGfekzZV3GOPzvwVmHB9552N
+ Uu0GN0kSGiLUtI8xYivq7dNNWs54535K3Eajf5JYVpyzSq2c5+eK3CIE0RmqNWo563s340aFv
+ SJFplWKsvT6IZLajtqbHXLI3KeZbYcpO4/MRnf3BEjAvkXYzqGZnI1SfkNJ9JCetbZzQzg/ut
+ R9+Ta9F+MO2+3yowN/eS8EFQjMCD6FcBHU3ukIlhQfDfrO1EDcLgcjRYpHJPrbtGEINKZuY/3
+ Lyzz1KlEPYKF7SXZofStZh/Y8leWZWdccddlafOeikWB8Jq4l9i7Vg0apvNKsTrSFDERLGPb2
+ /+TWJZX9p74Cf/6vrsdcIC6QU9lMkHvFQvTx9JUJ9loRh5ZV2ZcBPBdXElTZ6S/F+WWvjCw2e
+ fz/fQEC4OZ9L3RRBlDcX0ABAg4Svg==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: Re: [Qemu-devel] [PATCH] configure: fix sdl detection using
- sdl2-config
+X-Received-From: 212.227.126.130
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] .gitignore: ignore some
+ vhost-user* related files
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,72 +122,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 11/07/2019 à 00:55, Carlo Marcelo Arenas Belón a écrit :
-> If SDL2 is requested but pkg-config doesn't have a module for it
-> configure should fallback to use sdl*-config, but wasn't able to
-> because and old variable (from SDL) was being used by mistake.
+Le 12/07/2019 à 16:41, Michal Privoznik a écrit :
+> Commit d52c454aadc creates
+> '/contrib/vhost-user-gpu/50-qemu-gpu.json' and '/vhost-user-gpu'
+> and commit 06914c97d3a creates '/vhost-user-input' neither of
+> which is ignored by git.
 > 
-> Correct the variable name and complete other related changes so
-> there are no more references to the old SDL.
-> 
-> Fixes: 0015ca5cbabe ("ui: remove support for SDL1.2 in favour of SDL2")
-> Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
 > ---
->  configure | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+>  .gitignore | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/configure b/configure
-> index 4983c8b533..0f88ba98a6 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3016,15 +3016,15 @@ fi
->  ##########################################
->  # SDL probe
->  
-> -# Look for sdl configuration program (pkg-config or sdl-config).  Try
-> -# sdl-config even without cross prefix, and favour pkg-config over sdl-config.
-> +# Look for sdl configuration program (pkg-config or sdl2-config).  Try
-> +# sdl2-config even without cross prefix, and favour pkg-config over sdl2-config.
->  
->  sdl_probe ()
->  {
->    if $pkg_config sdl2 --exists; then
->      sdlconfig="$pkg_config sdl2"
->      sdlversion=$($sdlconfig --modversion 2>/dev/null)
-> -  elif has ${sdl_config}; then
-> +  elif has "$sdl2_config"; then
->      sdlconfig="$sdl2_config"
->      sdlversion=$($sdlconfig --version)
->    else
-> @@ -3035,7 +3035,7 @@ sdl_probe ()
->      # no need to do the rest
->      return
->    fi
-> -  if test -n "$cross_prefix" && test "$(basename "$sdlconfig")" = sdl-config; then
-> +  if test -n "$cross_prefix" && test "$(basename "$sdlconfig")" = sdl2-config; then
->      echo warning: using "\"$sdlconfig\"" to detect cross-compiled sdl >&2
->    fi
->  
-> @@ -8019,7 +8019,6 @@ preserve_env PKG_CONFIG
->  preserve_env PKG_CONFIG_LIBDIR
->  preserve_env PKG_CONFIG_PATH
->  preserve_env PYTHON
-> -preserve_env SDL_CONFIG
->  preserve_env SDL2_CONFIG
->  preserve_env SMBD
->  preserve_env STRIP
+> diff --git a/.gitignore b/.gitignore
+> index fd6e6c38c7..e9bbc006d3 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -65,6 +65,8 @@
+>  /scsi/qemu-pr-helper
+>  /vhost-user-scsi
+>  /vhost-user-blk
+> +/vhost-user-gpu
+> +/vhost-user-input
+>  /fsdev/virtfs-proxy-helper
+>  *.tmp
+>  *.[1-9]
+> @@ -131,6 +133,7 @@
+>  /docs/interop/qemu-qmp-ref.info*
+>  /docs/interop/qemu-qmp-ref.txt
+>  /docs/version.texi
+> +/contrib/vhost-user-gpu/50-qemu-gpu.json
+>  *.tps
+>  .stgit-*
+>  .git-submodule-status
 > 
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
-
-
 
