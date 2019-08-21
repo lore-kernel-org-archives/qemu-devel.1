@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD25C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A35C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:32:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D662082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:30:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D662082F
+	by mail.kernel.org (Postfix) with ESMTPS id AA7F222DA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 08:32:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA7F222DA7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0M0o-0005xL-82
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:30:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52696)
+	id 1i0M2X-0007ck-Ss
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 04:32:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i0M06-0004pu-KR
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:29:51 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i0M0v-0006ac-Rz
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i0M05-0000Ca-G3
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:29:50 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:51399)
+ (envelope-from <laurent@vivier.eu>) id 1i0M0u-0000YS-GC
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 04:30:41 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:40541)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i0M05-0000C8-7L; Wed, 21 Aug 2019 04:29:49 -0400
+ id 1i0M0u-0000Xs-7L; Wed, 21 Aug 2019 04:30:40 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Macaw-1iY37I0avi-00c6fc; Wed, 21 Aug 2019 10:29:30 +0200
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M9nlN-1hubFu3pQL-005uHq; Wed, 21 Aug 2019 10:30:36 +0200
+To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>,
  qemu-devel@nongnu.org
-References: <20190708204909.10891-1-marcandre.lureau@redhat.com>
+References: <20190709234330.89699-1-carenas@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <6a282568-ec94-2270-c72a-34658acaba8b@vivier.eu>
-Date: Wed, 21 Aug 2019 10:29:28 +0200
+Message-ID: <300152e2-9078-cceb-1ff0-d50c5d5a52d0@vivier.eu>
+Date: Wed, 21 Aug 2019 10:30:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190708204909.10891-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190709234330.89699-1-carenas@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:nZdYq6pQN+uCUVKJAX5vp99mjjQu9ZHKbN0uvSXZOB0qr2K1Jfp
- Rj6I47yZ9gtQNd9mQLEQ/Bnbpbt31gRTEZtB9J5fK3fIDCRqMVnQtsd8esj4H10YSgTtLFM
- W82MfWMCAlYqct+uB+/hEUX5HaXsmp7o8Tj3zteJoBFCS4kQF9DsrAQWrSL2DdXpxVYmaaV
- lxncSjlBU65p5B/MJxl/Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PT73seJAjQU=:YT4jMXZ4sbdntkzUoqX3iq
- fWp7ZRCmOgkRd1oeuJSz9W67ge9vwej3QzbFJ1GTIt37JWQuUgu9em2c5wmSqr5ml7rXKtRel
- REmuDdbxmaSSAk5FvesgplCBBvCYHNLJfTeqjW2UpHuIBd3yJpW9PMO0mXFtiQpd1dDmxsiaw
- hRUpRX5utLScx12fZsl7E0LRQiuXtRDLmDrU04scA6hlvkuF2JbfphX2DDsCa2tZ/G6YwU6D+
- jzOB+15rGBwbJ0Ml/uaAtFqSsQwfa+4jRubDwSRpRGl6irsi+Tv66rI8c31nd+H4SBPPZkuWj
- ZUnnzDLU0F5QEYjWXQCQma2m7unikqutuJ59ZQQrdGBdKaYZNNkftweae2rVw2ciwdB2JtrvO
- 8OPOh3bYqplLPK5gL58hj+mP06qGU5RYWSPCgfJUdDop0C43yhGnaYw33ZLIfUakBCqeMK7jv
- ZymNuUaD1f3dNu+sF257eVhDaE02GQajP5/mmE9xSjBnydHlhw8txKFgbA5NgRaFV0FgaaiTK
- iU+7flHYgWA45x3mmlltaSumheOI+vxtuKMpWgS4c8F/DQovjNrCNXsPiEWXV4Qy30pAaPkPc
- mECymElLJAXxCem4XhLgnokaRQ1dIrN/D529jn7CT6qZ8AD0YVo0SgcPi6l5ew1nLJErkzGyg
- /QLiIEdOd7NL7V4iYl5caBDM1J12/Y+3YTa70EKwaJYGgHXifm4cOCr+R5GgpPxkYhtdFcntk
- ybDjs8nhe+v52wo2k6v7PXMAowgw4AEtlb3NwSkL1kSjfMLfGBGKNQFAVoc=
+X-Provags-ID: V03:K1:3i7SnvmLFGfugx27+6UrZcflAKCfsM+XURURyAHmdtnK0TQSKm7
+ BggN8Yz5obGOBURwTNarvomZuevFIngf/pvfIutbHbfRA5IKKLdUGhvh2lcj6UB8X3fPKBL
+ 8rJkCAZscuDmVAhMKc2bEfSfmDgZ1ovkoK3zf6RzuAHJF78KAlzn/YkKXx+9Lfzw/UkPLkD
+ qrqZX1vauHyNc5HC1uROw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:bnqHVXWmJfQ=:2xDgsyprae5+Zm+IHCGV9R
+ EJ388Y0F99iZ58iWDGyqUexYb9AsBbbinLou7CjOTOE5JhMZZ3gg+NjnxEegE1vdZqJx5KaJy
+ Rji4ITuqsmtbgoM6iqucPwJnbnEFYCCqlFU6yIag7po7JTxDz2r/YpHO4qhiTITlJ9Lr4JNlH
+ 7xvYvW2sOOgI4rQ9qkFGgT/bxtFfjbIQweT5Kl8tWxy/qIEGLWjRwqcyg0ykzpxBoKH2LR/SX
+ dCVU5Dpj8DSJgK/T7QjhhtKT4B6M2h4nBt8dSHX1k6V9/zGz5Y2sNzacCvtUgy3wQVT2SxEXp
+ 6A2FkK9jSaTpumlDS/H4YokMwVxA1BEijLmJObNSfebDiuJBP54u5Ch37HJD6Iud0Oj06evxN
+ YUeSeBJlKtA/+5JKJlihk8PSjWZWGAlU05NoiMlH+W/cd5nPCZq/goqNYd2Zz+b6WWwz2ZHtd
+ biAO4jyvErxukypeTdY71LLUmzLUsZ59Ayn2Zb0kP4saGJb00j6N4C99R6AR55qDY+6WmaaAt
+ GUXlP1LbQjVgJTmN2Sby2T+5jWnF63YvIc++c80n/GhlAXIhBQYkK84v7hy1SCsU3ZiuWjUii
+ 2qqWQEhpzY3l0voeZQX8WR4qjhud/23SDL9uhoGxG6OX2evw4leaz6z2IS3wUR1WBQSGxzylE
+ IgxSdzN+0PaQiFUS1VWqi7d9ImeTBSHyy70xToxbAc3kmFS8t3s9znuJKSIDBSoEWM+d9N2fa
+ /FaqAlUAVL+cvmfcfFwkgZ3miwU5iy0xOBklXbmGBzu3udD21uDyrqTCBFs=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] misc: fix naming scheme of
- compatiblity arrays
+X-Received-From: 212.227.126.135
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] configure: remove obsoleted
+ $sparc_cpu variable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,57 +122,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 08/07/2019 à 22:49, Marc-André Lureau a écrit :
-> Since merge 31ed41889e6e13699871040fe089a2884dca46cb ("Merge
-> remote-tracking branch
-> 'remotes/elmarco/tags/machine-props-pull-request' into staging"), the
-> compat arrays are in lowercase.
+Le 10/07/2019 à 01:43, Carlo Marcelo Arenas Belón a écrit :
+> 9b9c37c364 ("tcg-sparc: Assume v9 cpu always, i.e. force v8plus in
+> 32-bit mode.", 2012-09-21) removed the need for this variable and
+> most of the references to it, but this one.
 > 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Remove defunct code, no effect or functionality change expected.
+> 
+> Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
 > ---
->  docs/devel/migration.rst | 2 +-
->  hw/i386/pc_piix.c        | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  configure | 3 ---
+>  1 file changed, 3 deletions(-)
 > 
-> diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-> index 220059679a..f7668ae389 100644
-> --- a/docs/devel/migration.rst
-> +++ b/docs/devel/migration.rst
-> @@ -314,7 +314,7 @@ For example:
->  
->     a) Add a new property using ``DEFINE_PROP_BOOL`` - e.g. support-foo and
->        default it to true.
-> -   b) Add an entry to the ``HW_COMPAT_`` for the previous version that sets
-> +   b) Add an entry to the ``hw_compat_`` for the previous version that sets
->        the property to false.
->     c) Add a static bool  support_foo function that tests the property.
->     d) Add a subsection with a .needed set to the support_foo function
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index c2280c72ef..6a0e29de7c 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -313,7 +313,7 @@ else {
->   * pc_compat_*() functions that run on machine-init time and
->   * change global QEMU state are deprecated. Please don't create
->   * one, and implement any pc-*-2.4 (and newer) compat code in
-> - * HW_COMPAT_*, PC_COMPAT_*, or * pc_*_machine_options().
-> + * hw_compat_*, pc_compat_*, or * pc_*_machine_options().
->   */
->  
->  static void pc_compat_2_3_fn(MachineState *machine)
+> diff --git a/configure b/configure
+> index 4983c8b533..7518f201ab 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6378,9 +6378,6 @@ if test "$vnc" = "yes" ; then
+>      echo "VNC JPEG support  $vnc_jpeg"
+>      echo "VNC PNG support   $vnc_png"
+>  fi
+> -if test -n "$sparc_cpu"; then
+> -    echo "Target Sparc Arch $sparc_cpu"
+> -fi
+>  echo "xen support       $xen"
+>  if test "$xen" = "yes" ; then
+>    echo "xen ctrl version  $xen_ctrl_version"
 > 
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
+
 
