@@ -2,90 +2,86 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD1AC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E15FC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:34:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D4F5216F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:34:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D4F5216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 26ABE216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 18:34:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XzsBqYpX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26ABE216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0VR9-0006Qs-3L
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:34:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42548)
+	id 1i0VRf-0006wA-14
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 14:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i0UWE-0007bT-6p
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:35:36 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1i0URv-0001ns-Mx
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i0UWC-0006UQ-7U
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:35:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43424)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i0UW8-0006ML-DI; Wed, 21 Aug 2019 13:35:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AA66C307D90D;
- Wed, 21 Aug 2019 17:35:27 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E20C60F88;
- Wed, 21 Aug 2019 17:35:24 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190821165215.61406-1-vsementsov@virtuozzo.com>
- <20190821165215.61406-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <4f7cce1f-d7a8-aa3f-01d0-15c28c97b6dd@redhat.com>
-Date: Wed, 21 Aug 2019 12:35:23 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <jan.bobek@gmail.com>) id 1i0URm-0008Ks-FK
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:31:07 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:46163)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1i0URi-0007vD-Kk
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 13:30:56 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id x10so1325687ybs.13
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 10:30:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=pU4OjXMQdfhpu4voemk/g2dOGLQZu6Z3EM3QJS/y5Hk=;
+ b=XzsBqYpXhI4blTRF6DoUtl6ZqPW27AuRBHgg4vanGvR9eDQH7yOc3fp/9Ghb432OCV
+ r8kgt9MwnNlWQdwG37acuEm3O2EqNDuw/Tol1W8revGD1NEttQRZMqWdbhGGFni0aCZi
+ vxHcxxYWEL+sP9RadLmW4Fwh384iPaKJexWfIzUro0YKDr/c4I+ep/JGhvbSXOsoY/x5
+ n1MUKS/e24AkGyplz3eIqHNa2rcSh3ofWjqurB/VD22S7GleXjf/WdCzaQv/WouZLWaE
+ 1DexHLsMULwQfcDySdapkIshjXuyaaz5f6GTgzW2KqE2AB/upOMveTZvjHz4F1zk8Rya
+ bUUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=pU4OjXMQdfhpu4voemk/g2dOGLQZu6Z3EM3QJS/y5Hk=;
+ b=mpLEjwVKWt+nHKEAGOz6dKU5hfhdtbv59yilzA0obakHa5fsPLuq9Mtilhv8QLklzk
+ ty/ol4BJJksQpzzsoCKOsjFSZ1n0GQHLvjigBEk+k4M+gc67TZLflYdb3FaDM6ng9kTT
+ KZV4YeIl1ZF3D5N0CAn3n8QL6umuL62yJzLGIoAZbnG+8W1lwSf8fcnXQPrw/SgSq5OL
+ 8YgF9Em1wuPrVOdw74hmYkw0ot1pIsdeb9CnVGwT7Qw3VqoQ44XU5PG6Cx4y29AZ7rOf
+ rjYAAZ5+ADSCvr6huQsGrOrtP7YaoHLiBb0VtZUTSROACGOy6mICnuqQz8eWduiANq51
+ qUqQ==
+X-Gm-Message-State: APjAAAWdzaIjWwoy2fCQNhVZODVeQJHa5AcgZRRH4v7n24IIEPYZaBiB
+ 8izVVLF+KbZLjR2bKJkzPQfAg5IX
+X-Google-Smtp-Source: APXvYqz6Ollxe0RId96LARzICEKPANZRL4e+IS8Wl1wNvUpW/uE4lVJ9sKdezpfpEFhnXvFyhHvGiQ==
+X-Received: by 2002:a5b:cc2:: with SMTP id e2mr23826057ybr.288.1566408642934; 
+ Wed, 21 Aug 2019 10:30:42 -0700 (PDT)
+Received: from localhost.localdomain ([2601:c0:c67f:e390::3])
+ by smtp.gmail.com with ESMTPSA id l71sm2826167ywl.39.2019.08.21.10.30.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 21 Aug 2019 10:30:42 -0700 (PDT)
+From: Jan Bobek <jan.bobek@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 21 Aug 2019 13:29:19 -0400
+Message-Id: <20190821172951.15333-44-jan.bobek@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190821172951.15333-1-jan.bobek@gmail.com>
+References: <20190821172951.15333-1-jan.bobek@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190821165215.61406-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 21 Aug 2019 17:35:27 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 2/3] block/nbd: nbd reconnect
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b43
+Subject: [Qemu-devel] [RFC PATCH v4 43/75] target/i386: introduce SSE2 code
+ generators
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,324 +93,701 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, sheepdog@lists.wpkg.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
- namei.unix@gmail.com
+Cc: Jan Bobek <jan.bobek@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI
-Content-Type: multipart/mixed; boundary="ok6G0SI9tkw42d5zME29YOPthXlg0drQL";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, sheepdog@lists.wpkg.org, stefanha@redhat.com,
- namei.unix@gmail.com, fam@euphon.net, mreitz@redhat.com, kwolf@redhat.com,
- den@openvz.org
-Message-ID: <4f7cce1f-d7a8-aa3f-01d0-15c28c97b6dd@redhat.com>
-Subject: Re: [PATCH v8 2/3] block/nbd: nbd reconnect
-References: <20190821165215.61406-1-vsementsov@virtuozzo.com>
- <20190821165215.61406-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190821165215.61406-3-vsementsov@virtuozzo.com>
+Introduce code generators required by SSE2 instructions.
 
---ok6G0SI9tkw42d5zME29YOPthXlg0drQL
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
+---
+ target/i386/translate.c | 427 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 425 insertions(+), 2 deletions(-)
 
-On 8/21/19 11:52 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Implement reconnect. To achieve this:
->=20
-> 1. add new modes:
->    connecting-wait: means, that reconnecting is in progress, and there
->      were small number of reconnect attempts, so all requests are
->      waiting for the connection.
->    connecting-nowait: reconnecting is in progress, there were a lot of
->      attempts of reconnect, all requests will return errors.
->=20
->    two old modes are used too:
->    connected: normal state
->    quit: exiting after fatal error or on close
->=20
-> Possible transitions are:
->=20
->    * -> quit
->    connecting-* -> connected
->    connecting-wait -> connecting-nowait (transition is done after
->                       reconnect-delay seconds in connecting-wait mode)
->    connected -> connecting-wait
->=20
-> 2. Implement reconnect in connection_co. So, in connecting-* mode,
->     connection_co, tries to reconnect unlimited times.
->=20
-> 3. Retry nbd queries on channel error, if we are in connecting-wait
->     state.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 43917edc76..3445b4cff1 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -5563,6 +5563,7 @@ INSNOP_LDST(xmm, Mhq)
+     }
+ 
+ GEN_INSN2(movq, Pq, Eq);        /* forward declaration */
++GEN_INSN2(movq, Vdq, Eq);       /* forward declaration */
+ GEN_INSN2(movd, Pq, Ed)
+ {
+     const insnop_arg_t(Eq) arg2_r64 = tcg_temp_new_i64();
+@@ -5574,6 +5575,17 @@ GEN_INSN2(movd, Ed, Pq)
+ {
+     tcg_gen_ld_i32(arg1, cpu_env, arg2 + offsetof(MMXReg, MMX_L(0)));
+ }
++GEN_INSN2(movd, Vdq, Ed)
++{
++    const insnop_arg_t(Eq) arg2_r64 = tcg_temp_new_i64();
++    tcg_gen_extu_i32_i64(arg2_r64, arg2);
++    gen_insn2(movq, Vdq, Eq)(env, s, arg1, arg2_r64);
++    tcg_temp_free_i64(arg2_r64);
++}
++GEN_INSN2(movd, Ed, Vdq)
++{
++    tcg_gen_ld_i32(arg1, cpu_env, arg2 + offsetof(ZMMReg, ZMM_L(0)));
++}
+ 
+ GEN_INSN2(movq, Pq, Eq)
+ {
+@@ -5583,13 +5595,45 @@ GEN_INSN2(movq, Eq, Pq)
+ {
+     tcg_gen_ld_i64(arg1, cpu_env, arg2 + offsetof(MMXReg, MMX_Q(0)));
+ }
++GEN_INSN2(movq, Vdq, Eq)
++{
++    const TCGv_i64 r64 = tcg_temp_new_i64();
++    tcg_gen_st_i64(arg2, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(0)));
++    tcg_gen_movi_i64(r64, 0);
++    tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
++    tcg_temp_free_i64(r64);
++}
++GEN_INSN2(movq, Eq, Vdq)
++{
++    tcg_gen_ld_i64(arg1, cpu_env, arg2 + offsetof(ZMMReg, ZMM_Q(0)));
++}
+ 
+ DEF_GEN_INSN2_GVEC(movq, Pq, Qq, mov, MM_OPRSZ, MM_MAXSZ, MO_64)
+ DEF_GEN_INSN2_GVEC(movq, Qq, Pq, mov, MM_OPRSZ, MM_MAXSZ, MO_64)
++GEN_INSN2(movq, Vdq, Wq)
++{
++    const TCGv_i64 r64 = tcg_temp_new_i64();
++    tcg_gen_ld_i64(r64, cpu_env, arg2 + offsetof(ZMMReg, ZMM_Q(0)));
++    gen_insn2(movq, Vdq, Eq)(env, s, arg1, r64);
++    tcg_temp_free_i64(r64);
++}
++GEN_INSN2(movq, UdqMq, Vq)
++{
++    gen_insn2(movq, Vdq, Wq)(env, s, arg1, arg2);
++}
++
+ DEF_GEN_INSN2_GVEC(movaps, Vdq, Wdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN2_GVEC(movaps, Wdq, Vdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movapd, Vdq, Wdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movapd, Wdq, Vdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movdqa, Vdq, Wdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movdqa, Wdq, Vdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN2_GVEC(movups, Vdq, Wdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN2_GVEC(movups, Wdq, Vdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movupd, Vdq, Wdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movupd, Wdq, Vdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movdqu, Vdq, Wdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN2_GVEC(movdqu, Wdq, Vdq, mov, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ 
+ GEN_INSN4(movss, Vdq, Vdq, Wd, modrm_mod)
+ {
+@@ -5621,6 +5665,46 @@ GEN_INSN2(movss, Wd, Vd)
+     gen_insn4(movss, Vdq, Vdq, Wd, modrm_mod)(env, s, arg1, arg1, arg2, 3);
+ }
+ 
++GEN_INSN4(movsd, Vdq, Vdq, Wq, modrm_mod)
++{
++    const TCGv_i64 r64 = tcg_temp_new_i64();
++    tcg_gen_ld_i64(r64, cpu_env, arg3 + offsetof(ZMMReg, ZMM_Q(0)));
++    tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(0)));
++    if (arg4 == 3) {
++        /* merging movsd */
++        if (arg1 != arg2) {
++            tcg_gen_ld_i64(r64, cpu_env, arg2 + offsetof(ZMMReg, ZMM_Q(1)));
++            tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
++        }
++    } else {
++        /* zero-extending movsd */
++        tcg_gen_movi_i64(r64, 0);
++        tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
++    }
++    tcg_temp_free_i64(r64);
++}
++GEN_INSN2(movsd, Wq, Vq)
++{
++    gen_insn4(movsd, Vdq, Vdq, Wq, modrm_mod)(env, s, arg1, arg1, arg2, 3);
++}
++
++GEN_INSN2(movq2dq, Vdq, Nq)
++{
++    const insnop_arg_t(Vdq) dofs = offsetof(ZMMReg, ZMM_Q(0));
++    const insnop_arg_t(Nq) aofs = offsetof(MMXReg, MMX_Q(0));
++    gen_op_movq(s, arg1 + dofs, arg2 + aofs);
++
++    const TCGv_i64 r64z = tcg_const_i64(0);
++    tcg_gen_st_i64(r64z, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
++    tcg_temp_free_i64(r64z);
++}
++GEN_INSN2(movdq2q, Pq, Uq)
++{
++    const insnop_arg_t(Pq) dofs = offsetof(MMXReg, MMX_Q(0));
++    const insnop_arg_t(Uq) aofs = offsetof(ZMMReg, ZMM_Q(0));
++    gen_op_movq(s, arg1 + dofs, arg2 + aofs);
++}
++
+ GEN_INSN3(movhlps, Vdq, Vdq, UdqMhq)
+ {
+     const TCGv_i64 r64 = tcg_temp_new_i64();
+@@ -5637,6 +5721,21 @@ GEN_INSN2(movlps, Mq, Vq)
+     insnop_ldst(xmm, Mq)(env, s, 1, arg2, arg1);
+ }
+ 
++GEN_INSN3(movlpd, Vdq, Vdq, Mq)
++{
++    insnop_ldst(xmm, Mq)(env, s, 0, arg1, arg3);
++    if (arg1 != arg2) {
++        const TCGv_i64 r64 = tcg_temp_new_i64();
++        tcg_gen_ld_i64(r64, cpu_env, arg2 + offsetof(ZMMReg, ZMM_Q(1)));
++        tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
++        tcg_temp_free_i64(r64);
++    }
++}
++GEN_INSN2(movlpd, Mq, Vq)
++{
++    insnop_ldst(xmm, Mq)(env, s, 1, arg2, arg1);
++}
++
+ GEN_INSN3(movlhps, Vdq, Vq, Wq)
+ {
+     const TCGv_i64 r64 = tcg_temp_new_i64();
+@@ -5653,6 +5752,21 @@ GEN_INSN2(movhps, Mq, Vdq)
+     insnop_ldst(xmm, Mhq)(env, s, 1, arg2, arg1);
+ }
+ 
++GEN_INSN3(movhpd, Vdq, Vq, Mq)
++{
++    if (arg1 != arg2) {
++        const TCGv_i64 r64 = tcg_temp_new_i64();
++        tcg_gen_ld_i64(r64, cpu_env, arg2 + offsetof(ZMMReg, ZMM_Q(0)));
++        tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(0)));
++        tcg_temp_free_i64(r64);
++    }
++    insnop_ldst(xmm, Mhq)(env, s, 0, arg1, arg3);
++}
++GEN_INSN2(movhpd, Mq, Vdq)
++{
++    insnop_ldst(xmm, Mhq)(env, s, 1, arg2, arg1);
++}
++
+ DEF_GEN_INSN2_HELPER_DEP(pmovmskb, pmovmskb_mmx, Gd, Nq)
+ GEN_INSN2(pmovmskb, Gq, Nq)
+ {
+@@ -5661,6 +5775,14 @@ GEN_INSN2(pmovmskb, Gq, Nq)
+     tcg_gen_extu_i32_i64(arg1, arg1_r32);
+     tcg_temp_free_i32(arg1_r32);
+ }
++DEF_GEN_INSN2_HELPER_DEP(pmovmskb, pmovmskb_xmm, Gd, Udq)
++GEN_INSN2(pmovmskb, Gq, Udq)
++{
++    const TCGv_i32 arg1_r32 = tcg_temp_new_i32();
++    gen_insn2(pmovmskb, Gd, Udq)(env, s, arg1_r32, arg2);
++    tcg_gen_extu_i32_i64(arg1, arg1_r32);
++    tcg_temp_free_i32(arg1_r32);
++}
+ 
+ DEF_GEN_INSN2_HELPER_DEP(movmskps, movmskps, Gd, Udq)
+ GEN_INSN2(movmskps, Gq, Udq)
+@@ -5671,78 +5793,154 @@ GEN_INSN2(movmskps, Gq, Udq)
+     tcg_temp_free_i32(arg1_r32);
+ }
+ 
++DEF_GEN_INSN2_HELPER_DEP(movmskpd, movmskpd, Gd, Udq)
++GEN_INSN2(movmskpd, Gq, Udq)
++{
++    const TCGv_i32 arg1_r32 = tcg_temp_new_i32();
++    gen_insn2(movmskpd, Gd, Udq)(env, s, arg1_r32, arg2);
++    tcg_gen_extu_i32_i64(arg1, arg1_r32);
++    tcg_temp_free_i32(arg1_r32);
++}
++
+ DEF_GEN_INSN3_GVEC(paddb, Pq, Pq, Qq, add, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(paddb, Vdq, Vdq, Wdq, add, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(paddw, Pq, Pq, Qq, add, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(paddw, Vdq, Vdq, Wdq, add, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_GVEC(paddd, Pq, Pq, Qq, add, MM_OPRSZ, MM_MAXSZ, MO_32)
++DEF_GEN_INSN3_GVEC(paddd, Vdq, Vdq, Wdq, add, XMM_OPRSZ, XMM_MAXSZ, MO_32)
++DEF_GEN_INSN3_GVEC(paddq, Pq, Pq, Qq, add, MM_OPRSZ, MM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(paddq, Vdq, Vdq, Wdq, add, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(paddsb, Pq, Pq, Qq, ssadd, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(paddsb, Vdq, Vdq, Wdq, ssadd, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(paddsw, Pq, Pq, Qq, ssadd, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(paddsw, Vdq, Vdq, Wdq, ssadd, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_GVEC(paddusb, Pq, Pq, Qq, usadd, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(paddusb, Vdq, Vdq, Wdq, usadd, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(paddusw, Pq, Pq, Qq, usadd, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(paddusw, Vdq, Vdq, Wdq, usadd, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_HELPER_EPP(addps, addps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(addpd, addpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(addss, addss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(addsd, addsd, Vq, Vq, Wq)
+ 
+ DEF_GEN_INSN3_GVEC(psubb, Pq, Pq, Qq, sub, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(psubb, Vdq, Vdq, Wdq, sub, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(psubw, Pq, Pq, Qq, sub, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(psubw, Vdq, Vdq, Wdq, sub, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_GVEC(psubd, Pq, Pq, Qq, sub, MM_OPRSZ, MM_MAXSZ, MO_32)
++DEF_GEN_INSN3_GVEC(psubd, Vdq, Vdq, Wdq, sub, XMM_OPRSZ, XMM_MAXSZ, MO_32)
++DEF_GEN_INSN3_GVEC(psubq, Pq, Pq, Qq, sub, MM_OPRSZ, MM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(psubq, Vdq, Vdq, Wdq, sub, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(psubsb, Pq, Pq, Qq, sssub, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(psubsb, Vdq, Vdq, Wdq, sssub, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(psubsw, Pq, Pq, Qq, sssub, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(psubsw, Vdq, Vdq, Wdq, sssub, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_GVEC(psubusb, Pq, Pq, Qq, ussub, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(psubusb, Vdq, Vdq, Wdq, ussub, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(psubusw, Pq, Pq, Qq, ussub, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(psubusw, Vdq, Vdq, Wdq, ussub, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_HELPER_EPP(subps, subps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(subpd, subpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(subss, subss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(subsd, subsd, Vq, Vq, Wq)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(pmullw, pmullw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pmullw, pmullw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(pmulhw, pmulhw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pmulhw, pmulhw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(pmulhuw, pmulhuw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pmulhuw, pmulhuw_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(pmuludq, pmuludq_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pmuludq, pmuludq_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(mulps, mulps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(mulpd, mulpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(mulss, mulss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(mulsd, mulsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(pmaddwd, pmaddwd_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pmaddwd, pmaddwd_xmm, Vdq, Vdq, Wdq)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(divps, divps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(divpd, divpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(divss, divss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(divsd, divsd, Vq, Vq, Wq)
+ 
+ DEF_GEN_INSN2_HELPER_EPP(rcpps, rcpps, Vdq, Wdq)
+ DEF_GEN_INSN2_HELPER_EPP(rcpss, rcpss, Vd, Wd)
+ DEF_GEN_INSN2_HELPER_EPP(sqrtps, sqrtps, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(sqrtpd, sqrtpd, Vdq, Wdq)
+ DEF_GEN_INSN2_HELPER_EPP(sqrtss, sqrtss, Vd, Wd)
++DEF_GEN_INSN2_HELPER_EPP(sqrtsd, sqrtsd, Vq, Wq)
+ DEF_GEN_INSN2_HELPER_EPP(rsqrtps, rsqrtps, Vdq, Wdq)
+ DEF_GEN_INSN2_HELPER_EPP(rsqrtss, rsqrtss, Vd, Wd)
+ 
+ DEF_GEN_INSN3_GVEC(pminub, Pq, Pq, Qq, umin, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(pminub, Vdq, Vdq, Wdq, umin, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(pminsw, Pq, Pq, Qq, smin, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(pminsw, Vdq, Vdq, Wdq, smin, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_HELPER_EPP(minps, minps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(minpd, minpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(minss, minss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(minsd, minsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_GVEC(pmaxub, Pq, Pq, Qq, umax, MM_OPRSZ, MM_MAXSZ, MO_8)
++DEF_GEN_INSN3_GVEC(pmaxub, Vdq, Vdq, Wdq, umax, XMM_OPRSZ, XMM_MAXSZ, MO_8)
+ DEF_GEN_INSN3_GVEC(pmaxsw, Pq, Pq, Qq, smax, MM_OPRSZ, MM_MAXSZ, MO_16)
++DEF_GEN_INSN3_GVEC(pmaxsw, Vdq, Vdq, Wdq, smax, XMM_OPRSZ, XMM_MAXSZ, MO_16)
+ DEF_GEN_INSN3_HELPER_EPP(maxps, maxps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(maxpd, maxpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(maxss, maxss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(maxsd, maxsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(pavgb, pavgb_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pavgb, pavgb_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(pavgw, pavgw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pavgw, pavgw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(psadbw, psadbw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psadbw, psadbw_xmm, Vdq, Vdq, Wdq)
+ 
+ DEF_GEN_INSN3_GVEC(pcmpeqb, Pq, Pq, Qq, cmp, MM_OPRSZ, MM_MAXSZ, MO_8, TCG_COND_EQ)
++DEF_GEN_INSN3_GVEC(pcmpeqb, Vdq, Vdq, Wdq, cmp, XMM_OPRSZ, XMM_MAXSZ, MO_8, TCG_COND_EQ)
+ DEF_GEN_INSN3_GVEC(pcmpeqw, Pq, Pq, Qq, cmp, MM_OPRSZ, MM_MAXSZ, MO_16, TCG_COND_EQ)
++DEF_GEN_INSN3_GVEC(pcmpeqw, Vdq, Vdq, Wdq, cmp, XMM_OPRSZ, XMM_MAXSZ, MO_16, TCG_COND_EQ)
+ DEF_GEN_INSN3_GVEC(pcmpeqd, Pq, Pq, Qq, cmp, MM_OPRSZ, MM_MAXSZ, MO_32, TCG_COND_EQ)
++DEF_GEN_INSN3_GVEC(pcmpeqd, Vdq, Vdq, Wdq, cmp, XMM_OPRSZ, XMM_MAXSZ, MO_32, TCG_COND_EQ)
+ DEF_GEN_INSN3_GVEC(pcmpgtb, Pq, Pq, Qq, cmp, MM_OPRSZ, MM_MAXSZ, MO_8, TCG_COND_GT)
++DEF_GEN_INSN3_GVEC(pcmpgtb, Vdq, Vdq, Wdq, cmp, XMM_OPRSZ, XMM_MAXSZ, MO_8, TCG_COND_GT)
+ DEF_GEN_INSN3_GVEC(pcmpgtw, Pq, Pq, Qq, cmp, MM_OPRSZ, MM_MAXSZ, MO_16, TCG_COND_GT)
++DEF_GEN_INSN3_GVEC(pcmpgtw, Vdq, Vdq, Wdq, cmp, XMM_OPRSZ, XMM_MAXSZ, MO_16, TCG_COND_GT)
+ DEF_GEN_INSN3_GVEC(pcmpgtd, Pq, Pq, Qq, cmp, MM_OPRSZ, MM_MAXSZ, MO_32, TCG_COND_GT)
++DEF_GEN_INSN3_GVEC(pcmpgtd, Vdq, Vdq, Wdq, cmp, XMM_OPRSZ, XMM_MAXSZ, MO_32, TCG_COND_GT)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(cmpeqps, cmpeqps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpeqpd, cmpeqpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpeqss, cmpeqss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpeqsd, cmpeqsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpltps, cmpltps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpltpd, cmpltpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpltss, cmpltss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpltsd, cmpltsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpleps, cmpleps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmplepd, cmplepd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpless, cmpless, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmplesd, cmplesd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpunordps, cmpunordps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpunordpd, cmpunordpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpunordss, cmpunordss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpunordsd, cmpunordsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpneqps, cmpneqps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpneqpd, cmpneqpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpneqss, cmpneqss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpneqsd, cmpneqsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpnltps, cmpnltps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpnltpd, cmpnltpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpnltss, cmpnltss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpnltsd, cmpnltsd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpnleps, cmpnleps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpnlepd, cmpnlepd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpnless, cmpnless, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpnlesd, cmpnlesd, Vq, Vq, Wq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpordps, cmpordps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpordpd, cmpordpd, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(cmpordss, cmpordss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpordsd, cmpordsd, Vq, Vq, Wq)
+ 
+ GEN_INSN4(cmpps, Vdq, Vdq, Wdq, Ib)
+ {
+@@ -5776,6 +5974,38 @@ GEN_INSN4(cmpps, Vdq, Vdq, Wdq, Ib)
+     g_assert_not_reached();
+ }
+ 
++GEN_INSN4(cmppd, Vdq, Vdq, Wdq, Ib)
++{
++    switch (arg4 & 7) {
++    case 0:
++        gen_insn3(cmpeqpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 1:
++        gen_insn3(cmpltpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 2:
++        gen_insn3(cmplepd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 3:
++        gen_insn3(cmpunordpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 4:
++        gen_insn3(cmpneqpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 5:
++        gen_insn3(cmpnltpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 6:
++        gen_insn3(cmpnlepd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 7:
++        gen_insn3(cmpordpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    }
++
++    g_assert_not_reached();
++}
++
+ GEN_INSN4(cmpss, Vd, Vd, Wd, Ib)
+ {
+     switch (arg4 & 7) {
+@@ -5808,26 +6038,78 @@ GEN_INSN4(cmpss, Vd, Vd, Wd, Ib)
+     g_assert_not_reached();
+ }
+ 
++GEN_INSN4(cmpsd, Vq, Vq, Wq, Ib)
++{
++    switch (arg4 & 7) {
++    case 0:
++        gen_insn3(cmpeqsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    case 1:
++        gen_insn3(cmpltsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    case 2:
++        gen_insn3(cmplesd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    case 3:
++        gen_insn3(cmpunordsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    case 4:
++        gen_insn3(cmpneqsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    case 5:
++        gen_insn3(cmpnltsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    case 6:
++        gen_insn3(cmpnlesd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    case 7:
++        gen_insn3(cmpordsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
++        return;
++    }
++
++    g_assert_not_reached();
++}
++
+ DEF_GEN_INSN2_HELPER_EPP(comiss, comiss, Vd, Wd)
++DEF_GEN_INSN2_HELPER_EPP(comisd, comisd, Vq, Wq)
+ DEF_GEN_INSN2_HELPER_EPP(ucomiss, ucomiss, Vd, Wd)
++DEF_GEN_INSN2_HELPER_EPP(ucomisd, ucomisd, Vq, Wq)
+ 
+ DEF_GEN_INSN3_GVEC(pand, Pq, Pq, Qq, and, MM_OPRSZ, MM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(pand, Vdq, Vdq, Wdq, and, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(andps, Vdq, Vdq, Wdq, and, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(andpd, Vdq, Vdq, Wdq, and, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(pandn, Pq, Pq, Qq, andn, MM_OPRSZ, MM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(pandn, Vdq, Vdq, Wdq, andn, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(andnps, Vdq, Vdq, Wdq, andn, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(andnpd, Vdq, Vdq, Wdq, andn, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(por, Pq, Pq, Qq, or, MM_OPRSZ, MM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(por, Vdq, Vdq, Wdq, or, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(orps, Vdq, Vdq, Wdq, or, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(orpd, Vdq, Vdq, Wdq, or, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(pxor, Pq, Pq, Qq, xor, MM_OPRSZ, MM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(pxor, Vdq, Vdq, Wdq, xor, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ DEF_GEN_INSN3_GVEC(xorps, Vdq, Vdq, Wdq, xor, XMM_OPRSZ, XMM_MAXSZ, MO_64)
++DEF_GEN_INSN3_GVEC(xorpd, Vdq, Vdq, Wdq, xor, XMM_OPRSZ, XMM_MAXSZ, MO_64)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(psllw, psllw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psllw, psllw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(pslld, pslld_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pslld, pslld_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(psllq, psllq_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psllq, psllq_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(pslldq, pslldq_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(psrlw, psrlw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psrlw, psrlw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(psrld, psrld_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psrld, psrld_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(psrlq, psrlq_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psrlq, psrlq_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(psrldq, psrldq_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(psraw, psraw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psraw, psraw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(psrad, psrad_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psrad, psrad_xmm, Vdq, Vdq, Wdq)
+ 
+ #define DEF_GEN_PSHIFT_IMM_MM(mnem, opT1, opT2)                         \
+     GEN_INSN3(mnem, opT1, opT2, Ib)                                     \
+@@ -5841,31 +6123,70 @@ DEF_GEN_INSN3_HELPER_EPP(psrad, psrad_mmx, Pq, Pq, Qq)
+         gen_insn2(movq, Pq, Eq)(env, s, arg3_mm, arg3_r64);             \
+         gen_insn3(mnem, Pq, Pq, Qq)(env, s, arg1, arg2, arg3_mm);       \
+     }
++#define DEF_GEN_PSHIFT_IMM_XMM(mnem, opT1, opT2)                        \
++    GEN_INSN3(mnem, opT1, opT2, Ib)                                     \
++    {                                                                   \
++        const uint64_t arg3_ui64 = (uint8_t)arg3;                       \
++        const insnop_arg_t(Eq) arg3_r64 = s->tmp1_i64;                  \
++        const insnop_arg_t(Wdq) arg3_xmm =                              \
++            offsetof(CPUX86State, xmm_t0.ZMM_Q(0));                     \
++                                                                        \
++        tcg_gen_movi_i64(arg3_r64, arg3_ui64);                          \
++        gen_insn2(movq, Vdq, Eq)(env, s, arg3_xmm, arg3_r64);           \
++        gen_insn3(mnem, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3_xmm);   \
++    }
+ 
+ DEF_GEN_PSHIFT_IMM_MM(psllw, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(psllw, Udq, Udq)
+ DEF_GEN_PSHIFT_IMM_MM(pslld, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(pslld, Udq, Udq)
+ DEF_GEN_PSHIFT_IMM_MM(psllq, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(psllq, Udq, Udq)
++DEF_GEN_PSHIFT_IMM_XMM(pslldq, Udq, Udq)
+ DEF_GEN_PSHIFT_IMM_MM(psrlw, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(psrlw, Udq, Udq)
+ DEF_GEN_PSHIFT_IMM_MM(psrld, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(psrld, Udq, Udq)
+ DEF_GEN_PSHIFT_IMM_MM(psrlq, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(psrlq, Udq, Udq)
++DEF_GEN_PSHIFT_IMM_XMM(psrldq, Udq, Udq)
+ DEF_GEN_PSHIFT_IMM_MM(psraw, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(psraw, Udq, Udq)
+ DEF_GEN_PSHIFT_IMM_MM(psrad, Nq, Nq)
++DEF_GEN_PSHIFT_IMM_XMM(psrad, Udq, Udq)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(packsswb, packsswb_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(packsswb, packsswb_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(packssdw, packssdw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(packssdw, packssdw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(packuswb, packuswb_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(packuswb, packuswb_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(punpcklbw, punpcklbw_mmx, Pq, Pq, Qd)
++DEF_GEN_INSN3_HELPER_EPP(punpcklbw, punpcklbw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(punpcklwd, punpcklwd_mmx, Pq, Pq, Qd)
++DEF_GEN_INSN3_HELPER_EPP(punpcklwd, punpcklwd_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(punpckldq, punpckldq_mmx, Pq, Pq, Qd)
++DEF_GEN_INSN3_HELPER_EPP(punpckldq, punpckldq_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(punpcklqdq, punpcklqdq_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(punpckhbw, punpckhbw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(punpckhbw, punpckhbw_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(punpckhwd, punpckhwd_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(punpckhwd, punpckhwd_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(punpckhdq, punpckhdq_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(punpckhdq, punpckhdq_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(punpckhqdq, punpckhqdq_xmm, Vdq, Vdq, Wdq)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(unpcklps, punpckldq_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(unpcklpd, punpcklqdq_xmm, Vdq, Vdq, Wdq)
+ DEF_GEN_INSN3_HELPER_EPP(unpckhps, punpckhdq_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(unpckhpd, punpckhqdq_xmm, Vdq, Vdq, Wdq)
+ 
+ DEF_GEN_INSN3_HELPER_PPI(pshufw, pshufw_mmx, Pq, Qq, Ib)
++DEF_GEN_INSN3_HELPER_PPI(pshuflw, pshuflw_xmm, Vdq, Wdq, Ib)
++DEF_GEN_INSN3_HELPER_PPI(pshufhw, pshufhw_xmm, Vdq, Wdq, Ib)
++DEF_GEN_INSN3_HELPER_PPI(pshufd, pshufd_xmm, Vdq, Wdq, Ib)
+ DEF_GEN_INSN4_HELPER_PPI(shufps, shufps, Vdq, Vdq, Wdq, Ib)
++DEF_GEN_INSN4_HELPER_PPI(shufpd, shufpd, Vdq, Vdq, Wdq, Ib)
+ 
+ GEN_INSN4(pinsrw, Pq, Pq, RdMw, Ib)
+ {
+@@ -5874,6 +6195,13 @@ GEN_INSN4(pinsrw, Pq, Pq, RdMw, Ib)
+     const size_t ofs = offsetof(MMXReg, MMX_W(arg4 & 3));
+     tcg_gen_st16_i32(arg3, cpu_env, arg1 + ofs);
+ }
++GEN_INSN4(pinsrw, Vdq, Vdq, RdMw, Ib)
++{
++    assert(arg1 == arg2);
++
++    const size_t ofs = offsetof(ZMMReg, ZMM_W(arg4 & 7));
++    tcg_gen_st16_i32(arg3, cpu_env, arg1 + ofs);
++}
+ 
+ GEN_INSN3(pextrw, Gd, Nq, Ib)
+ {
+@@ -5885,16 +6213,46 @@ GEN_INSN3(pextrw, Gq, Nq, Ib)
+     const size_t ofs = offsetof(MMXReg, MMX_W(arg3 & 3));
+     tcg_gen_ld16u_i64(arg1, cpu_env, arg2 + ofs);
+ }
++GEN_INSN3(pextrw, Gd, Udq, Ib)
++{
++    const size_t ofs = offsetof(ZMMReg, ZMM_W(arg3 & 7));
++    tcg_gen_ld16u_i32(arg1, cpu_env, arg2 + ofs);
++}
++GEN_INSN3(pextrw, Gq, Udq, Ib)
++{
++    const size_t ofs = offsetof(ZMMReg, ZMM_W(arg3 & 7));
++    tcg_gen_ld16u_i64(arg1, cpu_env, arg2 + ofs);
++}
+ 
+ DEF_GEN_INSN2_HELPER_EPP(cvtpi2ps, cvtpi2ps, Vdq, Qq)
+ DEF_GEN_INSN2_HELPER_EPD(cvtsi2ss, cvtsi2ss, Vd, Ed)
+ DEF_GEN_INSN2_HELPER_EPQ(cvtsi2ss, cvtsq2ss, Vd, Eq)
++DEF_GEN_INSN2_HELPER_EPP(cvtpi2pd, cvtpi2pd, Vdq, Qq)
++DEF_GEN_INSN2_HELPER_EPD(cvtsi2sd, cvtsi2sd, Vq, Ed)
++DEF_GEN_INSN2_HELPER_EPQ(cvtsi2sd, cvtsq2sd, Vq, Eq)
+ DEF_GEN_INSN2_HELPER_EPP(cvtps2pi, cvtps2pi, Pq, Wq)
+ DEF_GEN_INSN2_HELPER_DEP(cvtss2si, cvtss2si, Gd, Wd)
+ DEF_GEN_INSN2_HELPER_QEP(cvtss2si, cvtss2sq, Gq, Wd)
++DEF_GEN_INSN2_HELPER_EPP(cvtpd2pi, cvtpd2pi, Pq, Wdq)
++DEF_GEN_INSN2_HELPER_DEP(cvtsd2si, cvtsd2si, Gd, Wq)
++DEF_GEN_INSN2_HELPER_QEP(cvtsd2si, cvtsd2sq, Gq, Wq)
+ DEF_GEN_INSN2_HELPER_EPP(cvttps2pi, cvttps2pi, Pq, Wq)
+ DEF_GEN_INSN2_HELPER_DEP(cvttss2si, cvttss2si, Gd, Wd)
+ DEF_GEN_INSN2_HELPER_QEP(cvttss2si, cvttss2sq, Gq, Wd)
++DEF_GEN_INSN2_HELPER_EPP(cvttpd2pi, cvttpd2pi, Pq, Wdq)
++DEF_GEN_INSN2_HELPER_DEP(cvttsd2si, cvttsd2si, Gd, Wq)
++DEF_GEN_INSN2_HELPER_QEP(cvttsd2si, cvttsd2sq, Gq, Wq)
++
++DEF_GEN_INSN2_HELPER_EPP(cvtpd2dq, cvtpd2dq, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(cvttpd2dq, cvttpd2dq, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(cvtdq2pd, cvtdq2pd, Vdq, Wq)
++DEF_GEN_INSN2_HELPER_EPP(cvtps2pd, cvtps2pd, Vdq, Wq)
++DEF_GEN_INSN2_HELPER_EPP(cvtpd2ps, cvtpd2ps, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(cvtss2sd, cvtss2sd, Vq, Wd)
++DEF_GEN_INSN2_HELPER_EPP(cvtsd2ss, cvtsd2ss, Vd, Wq)
++DEF_GEN_INSN2_HELPER_EPP(cvtdq2ps, cvtdq2ps, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(cvtps2dq, cvtps2dq, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(cvttps2dq, cvttps2dq, Vdq, Wdq)
+ 
+ GEN_INSN2(maskmovq, Pq, Nq)
+ {
+@@ -5912,25 +6270,90 @@ GEN_INSN2(maskmovq, Pq, Nq)
+     tcg_temp_free_ptr(arg1_ptr);
+     tcg_temp_free_ptr(arg2_ptr);
+ }
++GEN_INSN2(maskmovdqu, Vdq, Udq)
++{
++    const TCGv_ptr arg1_ptr = tcg_temp_new_ptr();
++    const TCGv_ptr arg2_ptr = tcg_temp_new_ptr();
++
++    tcg_gen_mov_tl(s->A0, cpu_regs[R_EDI]);
++    gen_extu(s->aflag, s->A0);
++    gen_add_A0_ds_seg(s);
++
++    tcg_gen_addi_ptr(arg1_ptr, cpu_env, arg1);
++    tcg_gen_addi_ptr(arg2_ptr, cpu_env, arg2);
++    gen_helper_maskmov_xmm(cpu_env, arg1_ptr, arg2_ptr, s->A0);
++
++    tcg_temp_free_ptr(arg1_ptr);
++    tcg_temp_free_ptr(arg2_ptr);
++}
+ 
+ GEN_INSN2(movntps, Mdq, Vdq)
+ {
+     insnop_ldst(xmm, Mdq)(env, s, 1, arg2, arg1);
+ }
++GEN_INSN2(movntpd, Mdq, Vdq)
++{
++    insnop_ldst(xmm, Mdq)(env, s, 1, arg2, arg1);
++}
++
++GEN_INSN2(movnti, Md, Gd)
++{
++    insnop_ldst(tcg_i32, Md)(env, s, 1, arg2, arg1);
++}
++GEN_INSN2(movnti, Mq, Gq)
++{
++    insnop_ldst(tcg_i64, Mq)(env, s, 1, arg2, arg1);
++}
+ 
+ GEN_INSN2(movntq, Mq, Pq)
+ {
+     insnop_ldst(mm, Mq)(env, s, 1, arg2, arg1);
+ }
++GEN_INSN2(movntdq, Mdq, Vdq)
++{
++    insnop_ldst(xmm, Mdq)(env, s, 1, arg2, arg1);
++}
++
++GEN_INSN0(pause)
++{
++    /* handled in disas_insn at the moment */
++    g_assert_not_reached();
++}
+ 
+ DEF_GEN_INSN0_HELPER(emms, emms)
+ 
+-GEN_INSN0(sfence)
++GEN_INSN2(sfence_clflush, modrm_mod, modrm)
++{
++    if (arg1 == 3) {
++        /* sfence */
++        if (s->prefix & PREFIX_LOCK) {
++            gen_illegal_opcode(s);
++        } else {
++            tcg_gen_mb(TCG_MO_ST_ST | TCG_BAR_SC);
++        }
++    } else {
++        /* clflush */
++        if (!check_cpuid(env, s, CHECK_CPUID_CLFLUSH)) {
++            gen_illegal_opcode(s);
++        } else {
++            gen_nop_modrm(env, s, arg2);
++        }
++    }
++}
++GEN_INSN0(lfence)
++{
++    if (s->prefix & PREFIX_LOCK) {
++        gen_illegal_opcode(s);
++    } else {
++        tcg_gen_mb(TCG_MO_LD_LD | TCG_BAR_SC);
++    }
++}
++GEN_INSN0(mfence)
+ {
+     if (s->prefix & PREFIX_LOCK) {
+         gen_illegal_opcode(s);
+     } else {
+-        tcg_gen_mb(TCG_MO_ST_ST | TCG_BAR_SC);
++        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+     }
+ }
+ 
+-- 
+2.20.1
 
-> +static bool nbd_client_connecting(BDRVNBDState *s)
-> +{
-> +    return s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT ||
-> +            s->state =3D=3D NBD_CLIENT_CONNECTING_NOWAIT;
-
-
-Indentation looks unusual. I might have done:
-
-    return (s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT ||
-            s->state =3D=3D NBD_CLIENT_CONNECTING_NOWAIT);
-
-Or even exploit the enum encoding:
-
-    return s->state <=3D NBD_CLIENT_CONNECTING_NOWAIT
-
-Is s->state updated atomically, or do we risk the case where we might
-see two different values of s->state across the || sequence point?  Does
-that matter?
-
-> +}
-> +
-> +static bool nbd_client_connecting_wait(BDRVNBDState *s)
-> +{
-> +    return s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT;
-> +}
-> +
-> +static coroutine_fn void nbd_reconnect_attempt(BDRVNBDState *s)
-> +{
-> +    Error *local_err =3D NULL;
-> +
-> +    if (!nbd_client_connecting(s)) {
-> +        return;
-> +    }
-> +    assert(nbd_client_connecting(s));
-
-This assert adds nothing given the condition beforehand.
-
-> +
-> +    /* Wait for completion of all in-flight requests */
-> +
-> +    qemu_co_mutex_lock(&s->send_mutex);
-> +
-> +    while (s->in_flight > 0) {
-> +        qemu_co_mutex_unlock(&s->send_mutex);
-> +        nbd_recv_coroutines_wake_all(s);
-> +        s->wait_in_flight =3D true;
-> +        qemu_coroutine_yield();
-> +        s->wait_in_flight =3D false;
-> +        qemu_co_mutex_lock(&s->send_mutex);
-> +    }
-> +
-> +    qemu_co_mutex_unlock(&s->send_mutex);
-> +
-> +    if (!nbd_client_connecting(s)) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Now we are sure that nobody is accessing the channel, and no on=
-e will
-> +     * try until we set the state to CONNECTED.
-> +     */
-> +
-> +    /* Finalize previous connection if any */
-> +    if (s->ioc) {
-> +        nbd_client_detach_aio_context(s->bs);
-> +        object_unref(OBJECT(s->sioc));
-> +        s->sioc =3D NULL;
-> +        object_unref(OBJECT(s->ioc));
-> +        s->ioc =3D NULL;
-> +    }
-> +
-> +    s->connect_status =3D nbd_client_connect(s->bs, &local_err);
-> +    error_free(s->connect_err);
-> +    s->connect_err =3D NULL;
-> +    error_propagate(&s->connect_err, local_err);
-> +    local_err =3D NULL;
-> +
-> +    if (s->connect_status < 0) {
-> +        /* failed attempt */
-> +        return;
-> +    }
-> +
-> +    /* successfully connected */
-> +    s->state =3D NBD_CLIENT_CONNECTED;
-> +    qemu_co_queue_restart_all(&s->free_sema);
-> +}
-> +
-> +static coroutine_fn void nbd_reconnect_loop(BDRVNBDState *s)
-> +{
-> +    uint64_t start_time_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);=
-
-> +    uint64_t delay_ns =3D s->reconnect_delay * NANOSECONDS_PER_SECOND;=
-
-> +    uint64_t timeout =3D 1 * NANOSECONDS_PER_SECOND;
-> +    uint64_t max_timeout =3D 16 * NANOSECONDS_PER_SECOND;
-> +
-> +    nbd_reconnect_attempt(s);
-> +
-> +    while (nbd_client_connecting(s)) {
-> +        if (s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT &&
-> +            qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time_ns > d=
-elay_ns)
-> +        {
-> +            s->state =3D NBD_CLIENT_CONNECTING_NOWAIT;
-> +            qemu_co_queue_restart_all(&s->free_sema);
-> +        }
-> +
-> +        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, timeout,
-> +                         &s->connection_co_sleep_ns_state);
-> +        if (s->drained) {
-> +            bdrv_dec_in_flight(s->bs);
-> +            s->wait_drained_end =3D true;
-> +            while (s->drained) {
-> +                /*
-> +                 * We may be entered once from nbd_client_attach_aio_c=
-ontext_bh
-> +                 * and then from nbd_client_co_drain_end. So here is a=
- loop.
-> +                 */
-> +                qemu_coroutine_yield();
-> +            }
-> +            bdrv_inc_in_flight(s->bs);
-> +        }
-> +        if (timeout < max_timeout) {
-> +            timeout *=3D 2;
-> +        }
-> +
-> +        nbd_reconnect_attempt(s);
-> +    }
->  }
-> =20
->  static coroutine_fn void nbd_connection_entry(void *opaque)
->  {
-> -    BDRVNBDState *s =3D opaque;
-> +    BDRVNBDState *s =3D (BDRVNBDState *)opaque;
-
-The cast is not necessary.
-
->      uint64_t i;
->      int ret =3D 0;
->      Error *local_err =3D NULL;
-> @@ -177,16 +331,26 @@ static coroutine_fn void nbd_connection_entry(voi=
-d *opaque)
->           * Therefore we keep an additional in_flight reference all the=
- time and
->           * only drop it temporarily here.
->           */
-> +
-> +        if (nbd_client_connecting(s)) {
-> +            nbd_reconnect_loop(s);
-> +        }
-> +
-> +        if (s->state !=3D NBD_CLIENT_CONNECTED) {
-> +            continue;
-> +        }
-> +
->          assert(s->reply.handle =3D=3D 0);
->          ret =3D nbd_receive_reply(s->bs, s->ioc, &s->reply, &local_err=
-);
-> =20
->          if (local_err) {
->              trace_nbd_read_reply_entry_fail(ret, error_get_pretty(loca=
-l_err));
->              error_free(local_err);
-> +            local_err =3D NULL;
->          }
->          if (ret <=3D 0) {
->              nbd_channel_error(s, ret ? ret : -EIO);
-> -            break;
-> +            continue;
->          }
-> =20
->          /*
-> @@ -201,7 +365,7 @@ static coroutine_fn void nbd_connection_entry(void =
-*opaque)
->              (nbd_reply_is_structured(&s->reply) && !s->info.structured=
-_reply))
->          {
->              nbd_channel_error(s, -EINVAL);
-> -            break;
-> +            continue;
->          }
-> =20
-
-The commit message says you re-attempt the request after reconnection if
-you have not yet timed out from the previous connection; but do you also
-need to clear out any partial reply received to make sure the new
-request isn't operating on stale assumptions left over if the server
-died between two structured chunks?
-
-
-> @@ -927,20 +1113,26 @@ static int nbd_co_request(BlockDriverState *bs, =
-NBDRequest *request,
->      } else {
->          assert(request->type !=3D NBD_CMD_WRITE);
->      }
-> -    ret =3D nbd_co_send_request(bs, request, write_qiov);
-> -    if (ret < 0) {
-> -        return ret;
-> -    }
-> =20
-> -    ret =3D nbd_co_receive_return_code(s, request->handle,
-> -                                     &request_ret, &local_err);
-> -    if (local_err) {
-> -        trace_nbd_co_request_fail(request->from, request->len, request=
-->handle,
-> -                                  request->flags, request->type,
-> -                                  nbd_cmd_lookup(request->type),
-> -                                  ret, error_get_pretty(local_err));
-> -        error_free(local_err);
-> -    }
-> +    do {
-> +        ret =3D nbd_co_send_request(bs, request, write_qiov);
-> +        if (ret < 0) {
-> +            continue;
-> +        }
-> +
-> +        ret =3D nbd_co_receive_return_code(s, request->handle,
-> +                                         &request_ret, &local_err);
-> +        if (local_err) {
-> +            trace_nbd_co_request_fail(request->from, request->len,
-> +                                      request->handle, request->flags,=
-
-> +                                      request->type,
-> +                                      nbd_cmd_lookup(request->type),
-> +                                      ret, error_get_pretty(local_err)=
-);
-> +            error_free(local_err);
-> +            local_err =3D NULL;
-> +        }
-> +    } while (ret < 0 && nbd_client_connecting_wait(s));
-
-I ask because nothing seems to reset request_ret here in the new loop.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---ok6G0SI9tkw42d5zME29YOPthXlg0drQL--
-
---cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1dgNsACgkQp6FrSiUn
-Q2qSIQf8D6H/po6NEe90rpy6RH8ypkZKiq5jq24WkUDXbZgAknuNmmIFBO6yKTmF
-ktvAW5065x2LkBQYD7CdWlY6mgoNHwR7W52K0aPNGrrkpHl1VKJ8+KH++eBnLmHv
-k8BmICw78PMswwhdmmxTzLWB4exRptpDw+aSupWuj+TcHpUWeY5d7bvfwe/pwJ7G
-xBCHUtW0zU8GdwyzAD1USudha8LF5lPhS7VAJvITJNynG6xf/dNG2fWJXA7vvFHo
-eqyI2e/ZpPwBiJraf1lrP7ux2/e3kWGXumXZqzfh/zpV4/Uiq19VTws+EW/WEu/H
-Gv7zECZfMQ/LXee6Ml6cdWeIhyVn1w==
-=j38a
------END PGP SIGNATURE-----
-
---cX92qz9sBoGENbt8NtgSvkTH66m6wV0sI--
 
