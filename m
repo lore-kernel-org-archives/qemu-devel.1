@@ -2,95 +2,64 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AFFC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 20:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCA4C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 21:15:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7B782332A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 20:39:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RGufuJx7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7B782332A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8F102206DD
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 21:15:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F102206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0XOV-0005F8-3V
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 16:39:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35164)
+	id 1i0Xwf-0001R4-OK
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 17:15:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40117)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i0XNJ-0003s9-O9
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:38:34 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1i0XdO-0002KK-4m
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i0XNI-0005xS-64
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:38:33 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46467)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i0XNH-0005w2-SP
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:38:32 -0400
-Received: by mail-pg1-x544.google.com with SMTP id m3so1990360pgv.13
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 13:38:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EB27c3pMn0UInpU2AIvspJmspehoVyhRIMTlLogIUx8=;
- b=RGufuJx7RB3AiWExBAFXRPJPynmIxp8s+sURdYqw27yuu4YSQAyEFJNxB1t8fujanD
- BQrEf+ZT+mRb4sjG+yLEH+SpcOJEpgqjjt6DQAJa/0iyz1TY0BX0qMveSoOWvO6rd1rX
- bO5SUm1Cl5WtfbgQufcti/pxEULP29CuLwDAgJ0+YqjEoTQpxUWXAiiFjZSE+W+eVJvS
- FD1Cee2riQL1CDvNMY5l9iiUy61Pwwg7GryyMGfeRydls0OAoC4Ru/3t570qBIJIvEjU
- rOwqPfCMQW53tGoMeRYsSDgmZvHA4I/xansRnBOawtFCJmwECLXNPRmT/CghsjE4yENt
- BysQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EB27c3pMn0UInpU2AIvspJmspehoVyhRIMTlLogIUx8=;
- b=hpu3qvX0OnNzKgxECDwbyToklGjwXanrNJC0ZXlOW7MWszchUsaopCecE1EJbGt90S
- FcrrKa+ie02T/hrxruIO3wi4SdcGZNpXZWSVJ3hivTZLhhdlfErj5F6NsdliXX5A8Hwf
- ozijNO/8RCogTn7/d0VEpjlOuqRqF92h2svMEAC26gHyslq4igBpOQ+/0MQ9PxQTKeQt
- Z5751QR2VkCNBgkq+JDlpLf9/xlPkfwJXuDyLZU744/BbKf05IMzOqbjpPlNVpn43DSG
- QmJzWORuCJccqB+rPsFkJ2KlHgCJ7oycU4mQzKJETE5aKrCkchKphAYDUCedTDM5rNYG
- dTBA==
-X-Gm-Message-State: APjAAAX8QjNM9P/yevzHYuHFMuf/rjYFxE5rs2KzpONKP2wcmWkhoAUj
- 3/YzFscS21+oBtKuyKN5vYGdEA==
-X-Google-Smtp-Source: APXvYqxOIifgvVCHUrAtM9U0zHvD9cA9jmsPcnQjDnhFqmwClmNvs602T4KOmw/TMJZOkG2jppr9tA==
-X-Received: by 2002:aa7:8201:: with SMTP id k1mr36749566pfi.97.1566419910493; 
- Wed, 21 Aug 2019 13:38:30 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id b5sm23659343pfo.149.2019.08.21.13.38.28
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 21 Aug 2019 13:38:29 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190821092252.26541-1-david@redhat.com>
- <20190821092252.26541-3-david@redhat.com>
- <dc42887a-f991-1fe0-36a7-a7804bc4a939@linaro.org>
- <60d60d82-0407-9549-09b8-ff35218a4e71@redhat.com>
- <8973f904-c171-bcdd-3f6e-5e18cb37035c@linaro.org>
- <1c0c597d-c851-4116-184e-6b35fae08011@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <d46f1b05-ef1f-cf82-f49c-ef9eb814c10e@linaro.org>
-Date: Wed, 21 Aug 2019 13:38:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <ehabkost@redhat.com>) id 1i0XTu-0006Yn-Pl
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:45:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59248)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i0XTu-0006VS-H7
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 16:45:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C162430833CB;
+ Wed, 21 Aug 2019 20:45:20 +0000 (UTC)
+Received: from localhost (ovpn-116-73.gru2.redhat.com [10.97.116.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4202B5C21A;
+ Wed, 21 Aug 2019 20:45:20 +0000 (UTC)
+Date: Wed, 21 Aug 2019 17:45:18 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "owen.si@ucloud.cn" <owen.si@ucloud.cn>
+Message-ID: <20190821204518.GG7077@habkost.net>
+References: <20190819100924.14968-1-owen.si@ucloud.cn>
+ <20190820212306.GM3908@habkost.net>
+ <2019082111044638341815@ucloud.cn>
+ <20190821111934.GO3908@habkost.net>
+ <2019082119541665112723@ucloud.cn>
 MIME-Version: 1.0
-In-Reply-To: <1c0c597d-c851-4116-184e-6b35fae08011@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] s390x/tcg: Introduce
- probe_read_access()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2019082119541665112723@ucloud.cn>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Wed, 21 Aug 2019 20:45:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] Revert "i386: correct cpu_x86_cpuid(0xd)"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,79 +71,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
- qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/21/19 12:36 PM, David Hildenbrand wrote:
->>> There are certain cases where we can't get access to the raw host
->>> page. Namely, cpu watchpoints, LAP, NODIRTY. In summary: this won't
->>> as you describe. (my first approach did exactly this)
->>
->> NODIRTY and LAP are automatically handled via probe_write
->> faulting instead of returning the address.  I think there
->> may be a bug in probe_write at present not checking
+On Wed, Aug 21, 2019 at 07:54:17PM +0800, owen.si@ucloud.cn wrote:
+> It is CentOS 6.3 with kernel version 2.6.32-279. Actually all CentOS 6 releases have this issue.
+
+We stopped supporting CentOS 6 in July 2016 (2 years after CentOS
+7 was released).  Be aware that even if we work around that
+specific bug, there are no guarantees that QEMU will still build
+on a CentOS 6 host in the future.
+
+That said, I probably wouldn't reject a patch that works around
+that CentOS 6 bug, if it's conditional on kvm_enabled() and has a
+comment explaining why the workaround exists.
+
 > 
-> For LAP pages we immediately set TLB_INVALID_MASK again, to trigger a
-> new fault on the next write access (only). The could be handled in
-> tlb_vaddr_to_host(), simply returning the address to the page after
-> trying to fill the tlb and succeeding (I implemented that, that's the
-> easy part).
+> 
+> 
+> owen.si@ucloud.cn
+>  
+> From: Eduardo Habkost
+> Date: 2019-08-21 19:19
+> To: owen.si@ucloud.cn
+> CC: qemu-devel
+> Subject: Re: Re: [Qemu-devel] [PATCH] Revert "i386: correct cpu_x86_cpuid(0xd)"
+> On Wed, Aug 21, 2019 at 11:04:46AM +0800, owen.si@ucloud.cn wrote:
+> > Thanks for you reply, we have some hosts running with legacy kernel, difficult to upgrade, and i want to run the latest qemu.
+> > Does QEMU support running with legacy kernel(kvm) in design?
+>  
+> For KVM, QEMU requires Linux 4.5 or newer.  See "System
+> requirements" / "KVM kernel module" section on qemu-doc.  We also
+> aim to support the latest version of Linux distributions with
+> long term support (e.g. RHEL, Debian, Ubuntu LTS, SLES).
+>  
+> Do you have more details on the kernel you are using?  Is it
+> built and distributed by a third party?
+>  
+>  
+> > 
+> > 
+> > 
+> > owen.si@ucloud.cn
+> >  
+> > From: Eduardo Habkost
+> > Date: 2019-08-21 05:23
+> > To: Bingsong Si
+> > CC: qemu-devel
+> > Subject: Re: [Qemu-devel] [PATCH] Revert "i386: correct cpu_x86_cpuid(0xd)"
+> > On Mon, Aug 19, 2019 at 06:09:24PM +0800, Bingsong Si wrote:
+> > > This reverts commit de2e68c902f7b6e438b0fa3cfedd74a06a20704f.
+> > > 
+> > > Initial value of env->xcr0 == 0, then CPUID(EAX=0xd,ECX=0).EBX == 0, after kvm
+> > > upstream commit 412a3c41, It is ok.
+> > > On host before commit 412a3c41, some legacy guest, i.e. CentOS 6, get
+> > > xstate_size == 0, will crash the guest.
+> > > 
+> > > Signed-off-by: Bingsong Si <owen.si@ucloud.cn>
+> >  
+> > cpu_x86_cpuid() is also used by TCG, and needs to return the
+> > correct data depending on xcr0.  If you want to work around a KVM
+> > bug by ignoring xcr0, it needs to be conditional on
+> > kvm_enabled().
+> >  
+> > But even if we you make this conditional on kvm_enabled(), I
+> > don't understand why QEMU would need a workaround for a KVM bug
+> > that was fixed more than 4 years ago.
+> >  
+> > > ---
+> > >  target/i386/cpu.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index ff65e11008..69562e21ed 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -4416,7 +4416,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+> > >              *ecx = xsave_area_size(x86_cpu_xsave_components(cpu));
+> > >              *eax = env->features[FEAT_XSAVE_COMP_LO];
+> > >              *edx = env->features[FEAT_XSAVE_COMP_HI];
+> > > -            *ebx = xsave_area_size(env->xcr0);
+> > > +            *ebx = *ecx;
+> > >          } else if (count == 1) {
+> > >              *eax = env->features[FEAT_XSAVE];
+> > >          } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
+> > > -- 
+> > > 2.22.0
+> > > 
+> > > 
+> >  
+> > -- 
+> > Eduardo
+>  
+> -- 
+> Eduardo
 
-Yes.
-
-> TLB_NOTDIRTY and TLB_MMIO are the real issue. We don't want to refault,
-> we want to treat that memory like IO memory and route it via
-> MemoryRegionOps() - e.g., watch_mem_ops() in qemu/exec.c. So it's not a
-> fault but IO memory.
-
-Watchpoints are not *really* i/o memory (unless of course it's a watchpoint on
-a device, which is a different matter), that's merely how we've chosen to
-implement it to force the memory operation through the slow path.  We can, and
-probably should, implement this differently wrt probe_write.
-
-Real MMIO can only fault via cc->transaction_failed(), for some sort of bus
-error.  Which s390x does not currently implement.  In the meantime, a
-probe_write proves that the page is at least mapped correctly, so we have
-eliminated the normal access fault.
-
-NOTDIRTY cannot fault at all.  The associated rcu critical section is ugly
-enough to make me not want to do anything except continue to go through the
-regular MMIO path.
-
-In any case, so long as we eliminate *access* faults by probing the page table,
-then falling back to the byte-by-byte loop is, AFAICS, sufficient to implement
-the instructions correctly.
-
-> probe_write() performs the MMU translation. If that succeeds, there is
-> no fault. If there are watchpoints, the memory is treated like IO and
-> memory access is rerouted. I think this works as designed.
-
-Well, if BP_STOP_BEFORE_ACCESS, then we want to raise a debug exception before
-any changes are made.  If !BP_STOP_BEFORE_ACCESS, then we longjmp back to the
-main cpu loop and single-step the current instruction.
-
-In the latter case, if the instruction has had any side effects prior to the
-longjmp, they will be re-done when we re-start the current instruction.
-
-To me this seems like a rather large bug in our implementation of watchpoints,
-as it only really works properly for simple load/store/load-op-store type
-instructions.  Anything that works on many addresses and doesn't delay side
-effects until all accesses are complete will Do The Wrong Thing.
-
-The fix, AFAICS, is for probe_write to call check_watchpoint(), so that we
-take the debug exit early.
-
-> You mean two pages I assume. Yeah, I could certainly simplify the
-> prototype patch I have here quite a lot. 2 pages should be enough for
-> everybody ;)
-
-Heh.  But, seriously, TARGET_PAGE_SIZE bytes is enough at one go, without
-releasing control so that interrupts etc may be recognized.
-
-
-r~
+-- 
+Eduardo
 
