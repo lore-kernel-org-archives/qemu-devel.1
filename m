@@ -2,78 +2,78 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD32C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7FAC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:16:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FB7B216F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 951B8216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 15:16:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NX+jpnMP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FB7B216F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPxbKe9r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951B8216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0SKx-0001rZ-DD
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 11:15:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45095)
+	id 1i0SLN-0001zg-Eh
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 11:16:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45280)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SFe-0002DY-V0
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:21 -0400
+ (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SG4-0002uB-Lj
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SFd-0002wA-Jy
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:18 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39497)
+ (envelope-from <tony.nguyen.git@gmail.com>) id 1i0SG3-0003iO-IK
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:44 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:42925)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <tony.nguyen.git@gmail.com>)
- id 1i0SFd-0002uV-CF
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:17 -0400
-Received: by mail-pl1-x642.google.com with SMTP id z3so1491211pln.6
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 08:10:16 -0700 (PDT)
+ id 1i0SG3-0003hE-Cm
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 11:10:43 -0400
+Received: by mail-pl1-x641.google.com with SMTP id y1so1475597plp.9
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 08:10:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zdj58c8A9QRTAa5i396K+J8rIcvzCaaq0/p6FGydUPQ=;
- b=NX+jpnMP5ZWrp/f149XBy9yr4047kE3ykLAeVt642aLOqdHeFugJ4Q0Hi5JecBBwbt
- IlSdMMyBuzcmM3Qiu4UgTBfooDjgI41Cl9G2tbss/Tlp5ij7IJx1kzRpjW9Czd5xULkR
- C/6I131wm8cYBlFL8HGRm/I1NIwV8CpgiZuXfuPzn9OkPpF8MxIS0GSzNltWavZw7yhn
- pwVu4geV0uS3KCSp5FAocJrIku64h7CHl6F59vKkjDdZh/G6CLVBPgJfe3lBAMTdehN5
- yarW7jhh/SVmEfXLtXBx5UJ4rc5VVp4rOvyyjogtUCfqvlefE9JQEP3Ub+rPIL+DKCy/
- j3wA==
+ bh=ujKrPsuHk32r3CHV81dhZOO77B/mJJvkyhEgOa7WSFI=;
+ b=PPxbKe9rs3eYtGNVw2+/Zak24XYlrWMivX0hLy8xffk16Ak/bq8cB8fq93rcaD5h2e
+ qX0j51YpNdyiTdygy8CKsI4migS6y3hwiKR0HWwKHEsKJCdimRXeq5lxa8ofbo8dhrof
+ 1/D7LjHSJ7gzaasmTeDX6qfKqU2qexQ3pOMaSGPHoVdE3bcTE6QAhYZfliy+vgIb0rwc
+ qdVH1lTg2lUBC9j+0HOt45CvjE6jF0iMT9xe4Vg44FJ5DYZykm6dhqOfMP7pL3OH/1Di
+ Swdn27XsdLsezFTsuBfDhY3y7MEXqaNcaRut2fcyAnDhFwVwxU56aAtxFASelafT4hi2
+ dfRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zdj58c8A9QRTAa5i396K+J8rIcvzCaaq0/p6FGydUPQ=;
- b=ZrLlQvcI4+zOsLR2g9nyPvjbocnfXVRqadkddSQe9plCSk+Md1J5SaVKCw8nr1+TV8
- 14Eg6lYaoaQIxX0GmOVkrWmF4gaxyo59Il6xi0iQwclU1wHS2MPbblY4dinO3XKgVUOx
- Fshx2LXvpbCXuMplWp+gdtvf3nF0bBXnENonlSBjG/1TZYIP6f2QwsIvFJjaBU7u8cQU
- nyyf1+f3dVp91QsAPQmgROSZMcK8/vVJl7ZoP0qS9gWnfgVyBnmVRRsj6pyNE2DhrmEX
- n1eTKwqj/0bosbQKsyi/SDnnMrDbdQE8zpxLIg9FkAsNSObVtm+0mksbaZ5KKDRChPCx
- BAMA==
-X-Gm-Message-State: APjAAAXrV5SZ4iZ2xq8C9EFGkV92HYutEQCX63WhncN4/eS2GQlBy2Pd
- RpFvO9mOzihsLMk2h3FeHlvtWCpkrew=
-X-Google-Smtp-Source: APXvYqyBj00X1zjgxCf6MiEAOHc5yzlWciF75uSa9qbYl2CCUZYn/QVDQ9pk+nV5GPtbn4m3L3jCGg==
-X-Received: by 2002:a17:902:e592:: with SMTP id
- cl18mr2941943plb.291.1566400215839; 
- Wed, 21 Aug 2019 08:10:15 -0700 (PDT)
+ bh=ujKrPsuHk32r3CHV81dhZOO77B/mJJvkyhEgOa7WSFI=;
+ b=YmvRhuCLLtNefuxQKFmtmx2BKJ3uKKFtImYs5jk7tjcyZTyCBF2uH3EVnuYk8dG5k6
+ 2yR23xI5vfNpyEipS8c+ta/yfC5jmAL5wF7qNq2IXex+r6My1EyZJIuiavI/CZWeCHSv
+ QUVSFDfKxUSzDOs9TbxEvWPDbA/UCnaGLk4/xdzCoOkoKGil9ltw9TWBkwBDLWA05Ity
+ W+XxNItpyBwADJhlOlOLGQO5CLkDic5HhrVOC46IturStt4kkWDXIid87NiVetmsYgmO
+ 5kBLcdJ2wGrWqyEN00nQKVufnj/ewRtSoVR5cpocH2DzdIBVxdF5+BffX9yDW5M6oMcr
+ jtZw==
+X-Gm-Message-State: APjAAAWCZZjZ66iPhA5aT0LUmRCDtW0KtcvTjfexwvZYZGYKofJh6myY
+ +zkW5o4rxcm2G195lCT21pKB20vNRwc=
+X-Google-Smtp-Source: APXvYqxCo7va33WSmmoLm7Dv67ucgIzycaEPWNvesnpOiPNHybkGc3VB9r2rF5q3bbKEVO3NgNkdVQ==
+X-Received: by 2002:a17:902:d717:: with SMTP id
+ w23mr16633995ply.321.1566400242248; 
+ Wed, 21 Aug 2019 08:10:42 -0700 (PDT)
 Received: from localhost.localdomain ([58.173.98.68])
- by smtp.gmail.com with ESMTPSA id e19sm5887633pfh.114.2019.08.21.08.10.13
+ by smtp.gmail.com with ESMTPSA id e19sm5887633pfh.114.2019.08.21.08.10.39
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Wed, 21 Aug 2019 08:10:15 -0700 (PDT)
+ Wed, 21 Aug 2019 08:10:41 -0700 (PDT)
 From: Tony Nguyen <tony.nguyen.git@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 01:09:05 +1000
-Message-Id: <db6a7e38ed6d2050be0b3d2d7567faf8eef6c1aa.1566397711.git.tony.nguyen.git@gmail.com>
+Date: Thu, 22 Aug 2019 01:09:12 +1000
+Message-Id: <2c13e85942fa740953fd5ceee6f65f854dc9b8de.1566397711.git.tony.nguyen.git@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1566397711.git.tony.nguyen.git@gmail.com>
 References: <cover.1566397711.git.tony.nguyen.git@gmail.com>
@@ -81,8 +81,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [PATCH v8 11/21] memory: Access MemoryRegion with MemOp
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [PATCH v8 18/21] cpu: TLB_FLAGS_MASK bit to force
+ memory slow path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,136 +96,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Tony Nguyen <tony.nguyen.git@gmail.com>, Tony Nguyen <tony.nguyen@bt.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert memory_region_dispatch_{read|write} operand "unsigned size"
-into a "MemOp op".
+The fast path is taken when TLB_FLAGS_MASK is all zero.
+
+TLB_FORCE_SLOW is simply a TLB_FLAGS_MASK bit to force the slow path,
+there are no other side effects.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/memop.h  | 20 ++++++++++++++------
- include/exec/memory.h |  9 +++++----
- memory.c              |  7 +++++--
- 3 files changed, 24 insertions(+), 12 deletions(-)
+ include/exec/cpu-all.h | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/memop.h b/include/exec/memop.h
-index dfd76a1604..0a610b75d9 100644
---- a/include/exec/memop.h
-+++ b/include/exec/memop.h
-@@ -12,6 +12,8 @@
- #ifndef MEMOP_H
- #define MEMOP_H
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 536ea58f81..e496f9900f 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -331,12 +331,18 @@ CPUArchState *cpu_copy(CPUArchState *env);
+ #define TLB_MMIO            (1 << (TARGET_PAGE_BITS - 3))
+ /* Set if TLB entry must have MMU lookup repeated for every access */
+ #define TLB_RECHECK         (1 << (TARGET_PAGE_BITS - 4))
++/* Set if TLB entry must take the slow path.  */
++#define TLB_FORCE_SLOW      (1 << (TARGET_PAGE_BITS - 5))
  
-+#include "qemu/host-utils.h"
-+
- typedef enum MemOp {
-     MO_8     = 0,
-     MO_16    = 1,
-@@ -107,14 +109,20 @@ typedef enum MemOp {
-     MO_SSIZE = MO_SIZE | MO_SIGN,
- } MemOp;
- 
-+/* MemOp to size in bytes.  */
-+static inline unsigned memop_size(MemOp op)
-+{
-+    return 1 << (op & MO_SIZE);
-+}
-+
- /* Size in bytes to MemOp.  */
--static inline unsigned size_memop(unsigned size)
-+static inline MemOp size_memop(unsigned size)
- {
--    /*
--     * FIXME: No-op to aid conversion of memory_region_dispatch_{read|write}
--     * "unsigned size" operand into a "MemOp op".
--     */
--    return size;
-+#ifdef CONFIG_DEBUG_TCG
-+    /* Power of 2 up to 8.  */
-+    assert((size & (size - 1)) == 0 && size >= 1 && size <= 8);
-+#endif
-+    return ctz32(size);
- }
- 
- #endif
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index d99eb25d2e..887aece05d 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -19,6 +19,7 @@
- #include "exec/cpu-common.h"
- #include "exec/hwaddr.h"
- #include "exec/memattrs.h"
-+#include "exec/memop.h"
- #include "exec/ramlist.h"
- #include "qemu/bswap.h"
- #include "qemu/queue.h"
-@@ -1737,13 +1738,13 @@ void mtree_info(bool flatview, bool dispatch_tree, bool owner);
-  * @mr: #MemoryRegion to access
-  * @addr: address within that region
-  * @pval: pointer to uint64_t which the data is written to
-- * @size: size of the access in bytes
-+ * @op: size, sign, and endianness of the memory operation
-  * @attrs: memory transaction attributes to use for the access
+ /* Use this mask to check interception with an alignment mask
+  * in a TCG backend.
   */
- MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
-                                         hwaddr addr,
-                                         uint64_t *pval,
--                                        unsigned size,
-+                                        MemOp op,
-                                         MemTxAttrs attrs);
- /**
-  * memory_region_dispatch_write: perform a write directly to the specified
-@@ -1752,13 +1753,13 @@ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
-  * @mr: #MemoryRegion to access
-  * @addr: address within that region
-  * @data: data to write
-- * @size: size of the access in bytes
-+ * @op: size, sign, and endianness of the memory operation
-  * @attrs: memory transaction attributes to use for the access
-  */
- MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                          hwaddr addr,
-                                          uint64_t data,
--                                         unsigned size,
-+                                         MemOp op,
-                                          MemTxAttrs attrs);
+-#define TLB_FLAGS_MASK  (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO \
+-                         | TLB_RECHECK)
++#define TLB_FLAGS_MASK \
++    (TLB_INVALID_MASK  \
++     | TLB_NOTDIRTY    \
++     | TLB_MMIO        \
++     | TLB_RECHECK     \
++     | TLB_FORCE_SLOW)
  
  /**
-diff --git a/memory.c b/memory.c
-index 8141486832..19f3324232 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1439,9 +1439,10 @@ static MemTxResult memory_region_dispatch_read1(MemoryRegion *mr,
- MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
-                                         hwaddr addr,
-                                         uint64_t *pval,
--                                        unsigned size,
-+                                        MemOp op,
-                                         MemTxAttrs attrs)
- {
-+    unsigned size = memop_size(op);
-     MemTxResult r;
- 
-     if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
-@@ -1483,9 +1484,11 @@ static bool memory_region_dispatch_write_eventfds(MemoryRegion *mr,
- MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                          hwaddr addr,
-                                          uint64_t data,
--                                         unsigned size,
-+                                         MemOp op,
-                                          MemTxAttrs attrs)
- {
-+    unsigned size = memop_size(op);
-+
-     if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
-         unassigned_mem_write(mr, addr, data, size);
-         return MEMTX_DECODE_ERROR;
+  * tlb_hit_page: return true if page aligned @addr is a hit against the
 -- 
 2.23.0
 
