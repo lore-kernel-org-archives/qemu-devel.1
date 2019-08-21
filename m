@@ -2,68 +2,62 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC51BC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 11:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FFEC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 11:25:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF43E2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 11:23:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF43E2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 282D52082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 11:25:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 282D52082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0Oi3-0000Es-Fe
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 07:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53587)
+	id 1i0Ojq-0002HA-RY
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 07:25:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i0OfS-00057I-RC
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 07:20:44 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1i0Of0-0004Lz-5k
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 07:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i0OfQ-0006dw-SO
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 07:20:42 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:49615)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i0OfM-0006Yy-T4; Wed, 21 Aug 2019 07:20:38 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MbBUc-1iXWU71nWC-00bcEU; Wed, 21 Aug 2019 13:20:11 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Wed, 21 Aug 2019 13:19:44 +0200
-Message-Id: <20190821111947.26580-12-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190821111947.26580-1-laurent@vivier.eu>
-References: <20190821111947.26580-1-laurent@vivier.eu>
+ (envelope-from <ehabkost@redhat.com>) id 1i0OeQ-000622-C1
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 07:19:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34800)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i0OeQ-00061e-6N
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 07:19:38 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2745E30A5686;
+ Wed, 21 Aug 2019 11:19:37 +0000 (UTC)
+Received: from localhost (ovpn-116-73.gru2.redhat.com [10.97.116.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9F396197E9;
+ Wed, 21 Aug 2019 11:19:36 +0000 (UTC)
+Date: Wed, 21 Aug 2019 08:19:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "owen.si@ucloud.cn" <owen.si@ucloud.cn>
+Message-ID: <20190821111934.GO3908@habkost.net>
+References: <20190819100924.14968-1-owen.si@ucloud.cn>
+ <20190820212306.GM3908@habkost.net>
+ <2019082111044638341815@ucloud.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/oOFEv+k3MPTZ96mUEMj/iCXZ45kRUL3eJQ8HPBaJiqO5J0VmDa
- 2k9TwkVRGXjuYvwXElBiKM3v1yh68CFr5ElZUw4QMLhzZnT00TuS9pM0RVWHLCql7N5U/rt
- RLiwj2RyW/m4hHYxtzcmKuagGjgNGtiPLatUFycPIiWpmyOUqN2oBYOQKtRKYMcQbeeS4ZJ
- qPhYDng9Lv9teI7IlUV0Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BxAiurucm6M=:OTRWXvXQbGGgFzqW+rNfSQ
- on7IFr0c27dgp2X1cDZMDFP4dUJvJOEM7f7v/8Nmi186sFBwMSqcEukgDZcb2vtD8SZvTwAu+
- 8hN4B+Wu+dANO6UJDEDWPV6Ot9HzQhHHqmS6t0PlSnkPXyqBl/zLxV6YkPVSLgaqqq4yATFG7
- jMYsX8Q44wndzfNVQyF/UEMYspxqfWipLdp77fl1x7M4yHl2OuUCiBsQ+NPIP16sTCdGjEyqF
- EAhO66A8TEeBJurAGPEcUcLpt7ldpWeTmWGq5NPJdLPD5+eoexnC7yjmN7DmzzH8yazXkfC91
- Pyo0UfKYCRj+JnrtzeDDzzYLdG5UE77ggEcfNFE/tsLAwDxiqlZ6eJNjsuZy9s9Bdk25KD0LD
- 8LNDt05YOMSIyct4eTdtYZITA76TmgIcxy5Pqjzo5Uf7pFN4O5W+D4bRq0Dm+jHZEk47+/WnH
- 755SmoZniMwwisMkThKcA2yPfGiNZBnsVUdqSkSC9DQhsei9HLRIcqCmGyuoSegTCAP5x2pRh
- UMPojOXps4HC1mlKohK+wWsx9HFIhtPB0dZUp6adsPpA3VlspkUkR31DcwIGMEol+2Ty66iIh
- pQpswTmtkioYLkkzViI6B14hgWUOW9i6IQqRJHMVClAxwIZoUUasAdw9TW+o29/2zgiRwUa3v
- 4AqjqR6yQsro7RoZaXiRIahjCGGApxFH8DDznAnr3xDCJlP8juZAEW5MVqX4l79JL6cnEByYQ
- prK/OxiJdNxlCUHtNcUkippyUzJtw0A39wJYu81p+1cf777368FRUWwCCS4=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2019082111044638341815@ucloud.cn>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 21 Aug 2019 11:19:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PULL 11/14] vl: Rewrite a fall through comment
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] Revert "i386: correct cpu_x86_cpuid(0xd)"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,62 +69,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
- Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
- Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Wed, Aug 21, 2019 at 11:04:46AM +0800, owen.si@ucloud.cn wrote:
+> Thanks for you reply, we have some hosts running with legacy kernel, difficult to upgrade, and i want to run the latest qemu.
+> Does QEMU support running with legacy kernel(kvm) in design?
 
-GCC9 is confused by this comment when building with CFLAG
--Wimplicit-fallthrough=2:
+For KVM, QEMU requires Linux 4.5 or newer.  See "System
+requirements" / "KVM kernel module" section on qemu-doc.  We also
+aim to support the latest version of Linux distributions with
+long term support (e.g. RHEL, Debian, Ubuntu LTS, SLES).
 
-  vl.c: In function ‘qemu_ref_timedate’:
-  vl.c:773:15: error: this statement may fall through [-Werror=implicit-fallthrough=]
-    773 |         value -= rtc_realtime_clock_offset;
-        |         ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  vl.c:775:5: note: here
-    775 |     case QEMU_CLOCK_VIRTUAL:
-        |     ^~~~
-  cc1: all warnings being treated as errors
+Do you have more details on the kernel you are using?  Is it
+built and distributed by a third party?
 
-Rewrite the comment using 'fall through' which is recognized by
-GCC and static analyzers.
 
-Reported-by: Stefan Weil <sw@weilnetz.de>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-Id: <20190719131425.10835-7-philmd@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- vl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> 
+> 
+> owen.si@ucloud.cn
+>  
+> From: Eduardo Habkost
+> Date: 2019-08-21 05:23
+> To: Bingsong Si
+> CC: qemu-devel
+> Subject: Re: [Qemu-devel] [PATCH] Revert "i386: correct cpu_x86_cpuid(0xd)"
+> On Mon, Aug 19, 2019 at 06:09:24PM +0800, Bingsong Si wrote:
+> > This reverts commit de2e68c902f7b6e438b0fa3cfedd74a06a20704f.
+> > 
+> > Initial value of env->xcr0 == 0, then CPUID(EAX=0xd,ECX=0).EBX == 0, after kvm
+> > upstream commit 412a3c41, It is ok.
+> > On host before commit 412a3c41, some legacy guest, i.e. CentOS 6, get
+> > xstate_size == 0, will crash the guest.
+> > 
+> > Signed-off-by: Bingsong Si <owen.si@ucloud.cn>
+>  
+> cpu_x86_cpuid() is also used by TCG, and needs to return the
+> correct data depending on xcr0.  If you want to work around a KVM
+> bug by ignoring xcr0, it needs to be conditional on
+> kvm_enabled().
+>  
+> But even if we you make this conditional on kvm_enabled(), I
+> don't understand why QEMU would need a workaround for a KVM bug
+> that was fixed more than 4 years ago.
+>  
+> > ---
+> >  target/i386/cpu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index ff65e11008..69562e21ed 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -4416,7 +4416,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+> >              *ecx = xsave_area_size(x86_cpu_xsave_components(cpu));
+> >              *eax = env->features[FEAT_XSAVE_COMP_LO];
+> >              *edx = env->features[FEAT_XSAVE_COMP_HI];
+> > -            *ebx = xsave_area_size(env->xcr0);
+> > +            *ebx = *ecx;
+> >          } else if (count == 1) {
+> >              *eax = env->features[FEAT_XSAVE];
+> >          } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
+> > -- 
+> > 2.22.0
+> > 
+> > 
+>  
+> -- 
+> Eduardo
 
-diff --git a/vl.c b/vl.c
-index edd5390110b2..1588dd8fc337 100644
---- a/vl.c
-+++ b/vl.c
-@@ -772,7 +772,7 @@ static time_t qemu_ref_timedate(QEMUClockType clock)
-     switch (clock) {
-     case QEMU_CLOCK_REALTIME:
-         value -= rtc_realtime_clock_offset;
--        /* no break */
-+        /* fall through */
-     case QEMU_CLOCK_VIRTUAL:
-         value += rtc_ref_start_datetime;
-         break;
 -- 
-2.21.0
-
+Eduardo
 
