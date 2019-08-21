@@ -2,58 +2,65 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A17C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 12:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A52C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 12:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB4DC2064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 12:18:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB4DC2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B8A6206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 12:21:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8A6206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0PZ1-0004oQ-0b
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 08:18:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34640)
- by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pagupta@redhat.com>) id 1i0PXn-0004FG-7k
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 08:16:52 -0400
+	id 1i0Pbq-0006Ql-JH
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 08:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35192)
+ by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
+ <SRS0=9d03=721=mail.uni-paderborn.de=kbastian@mail.uni-paderborn.de>)
+ id 1i0PbA-0005k9-OS
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 08:20:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1i0PXl-00045i-8V
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 08:16:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56008)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1i0PXj-000438-B8
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 08:16:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 66FD43083362;
- Wed, 21 Aug 2019 12:16:45 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-177.sin2.redhat.com
- [10.67.116.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 639012B0E7;
- Wed, 21 Aug 2019 12:16:28 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
+ (envelope-from
+ <SRS0=9d03=721=mail.uni-paderborn.de=kbastian@mail.uni-paderborn.de>)
+ id 1i0Pb8-00068F-NV
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 08:20:20 -0400
+Received: from zuban.uni-paderborn.de ([131.234.189.17]:48028
+ helo=mail.uni-paderborn.de)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from
+ <SRS0=9d03=721=mail.uni-paderborn.de=kbastian@mail.uni-paderborn.de>)
+ id 1i0Pb8-000677-G3
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 08:20:18 -0400
+Received: from magmaria.uni-paderborn.de ([131.234.189.24]
+ helo=localhost.localdomain)
+ by mail.uni-paderborn.de with esmtp (Exim 4.89 zuban)
+ id 1i0Pb6-00016j-Kd; Wed, 21 Aug 2019 14:20:16 +0200
+Received: from mail.uni-paderborn.de by magmaria with queue id 3651640-3;
+ Wed, 21 Aug 2019 12:20:15 GMT
+X-Envelope-From: <kbastian@mail.uni-paderborn.de>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 To: qemu-devel@nongnu.org
-Date: Wed, 21 Aug 2019 17:46:24 +0530
-Message-Id: <20190821121624.5382-1-pagupta@redhat.com>
+Date: Wed, 21 Aug 2019 14:20:03 +0200
+Message-Id: <20190821122007.17448-2-kbastian@mail.uni-paderborn.de>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20190821122007.17448-1-kbastian@mail.uni-paderborn.de>
+References: <20190821122007.17448-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 21 Aug 2019 12:16:45 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-PMX-Version: 6.4.7.2805085, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2019.8.21.121217, AntiVirus-Engine: 5.63.0,
+ AntiVirus-Data: 2019.8.13.5630000
+X-IMT-Spam-Score: 0.0 ()
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3] virtio pmem: user document
+X-Received-From: 131.234.189.17
+Subject: [Qemu-devel] [PATCH v2 1/5] target/tricore: Use DisasContextBase API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,126 +72,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, david@redhat.com, cohuck@redhat.com,
- lcapitulino@redhat.com, mst@redhat.com, stefanha@redhat.com, riel@surriel.com,
- nilal@redhat.com
+Cc: kbastian@mail.uni-paderborn.de, david.brenken@efs-auto.de,
+ richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch documents the steps to use virtio pmem.
-It also documents other useful information about
-virtio pmem e.g use-case, comparison with Qemu NVDIMM
-backend and current limitations.
+this gets rid of the copied fields of TriCore's DisasContext and now
+uses the shared DisasContextBase, which is necessary for the conversion
+to translate_loop.
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 ---
-v3->v3
- - Text format fixes - Cornerlia
-v1->v2
- - Fixes on text format and 'Guest Data persistence'
-   section - Cornelia
+ target/tricore/translate.c | 98 +++++++++++++++++---------------------
+ 1 file changed, 44 insertions(+), 54 deletions(-)
 
- docs/virtio-pmem.rst | 75 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
- create mode 100644 docs/virtio-pmem.rst
-
-diff --git a/docs/virtio-pmem.rst b/docs/virtio-pmem.rst
-new file mode 100644
-index 0000000000..e77881b26f
---- /dev/null
-+++ b/docs/virtio-pmem.rst
-@@ -0,0 +1,75 @@
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+QEMU virtio pmem
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+ This document explains the setup and usage of the virtio pmem device
-+ which is available since QEMU v4.1.0.
-+
-+ The virtio pmem device is a paravirtualized persistent memory device
-+ on regular (i.e non-NVDIMM) storage.
-+
-+Usecase
-+--------
-+
-+  Virtio pmem allows to bypass the guest page cache and directly use
-+  host page cache. This reduces guest memory footprint as the host can
-+  make efficient memory reclaim decisions under memory pressure.
-+
-+o How does virtio-pmem compare to the nvdimm emulation supported by QEMU=
-?
-+
-+  NVDIMM emulation on regular (i.e. non-NVDIMM) host storage does not
-+  persist the guest writes as there are no defined semantics in the devi=
-ce
-+  specification. The virtio pmem device provides guest write persistence
-+  on non-NVDIMM host storage.
-+
-+virtio pmem usage
-+-----------------
-+
-+  A virtio pmem device backed by a memory-backend-file can be created on
-+  the QEMU command line as in the following example:
-+
-+  -object memory-backend-file,id=3Dmem1,share,mem-path=3D./virtio_pmem.i=
-mg,size=3D4G
-+  -device virtio-pmem-pci,memdev=3Dmem1,id=3Dnv1
-+
-+   where:
-+   - "object memory-backend-file,id=3Dmem1,share,mem-path=3D<image>, siz=
-e=3D<image size>"
-+     creates a backend file with the specified size.
-+
-+   - "device virtio-pmem-pci,id=3Dnvdimm1,memdev=3Dmem1" creates a virti=
-o pmem
-+     pci device whose storage is provided by above memory backend device=
-.
-+
-+  Multiple virtio pmem devices can be created if multiple pairs of "-obj=
-ect"
-+  and "-device" are provided.
-+
-+Hotplug
-+-------
-+
-+Virtio pmem devices can be hotplugged via the QEMU monitor. First, the
-+memory backing has to be added via 'object_add'; afterwards, the virtio
-+pmem device can be added via 'device_add'.
-+
-+For example, the following commands add another 4GB virtio pmem device t=
-o
-+the guest:
-+
-+ (qemu) object_add memory-backend-file,id=3Dmem2,share=3Don,mem-path=3Dv=
-irtio_pmem2.img,size=3D4G
-+ (qemu) device_add virtio-pmem-pci,id=3Dvirtio_pmem2,memdev=3Dmem2
-+
-+Guest Data Persistence
-+----------------------
-+
-+ Guest data persistence on non-NVDIMM requires guest userspace applicati=
-ons
-+ to perform fsync/msync. This is different from a real nvdimm backend wh=
-ere
-+ no additional fsync/msync is required. This is to persist guest writes =
-in
-+ host backing file which otherwise remains in host page cache and there =
-is
-+ risk of losing the data in case of power failure.
-+
-+ With virtio pmem device, MAP_SYNC mmap flag is not supported. This prov=
-ides
-+ a hint to application to perform fsync for write persistence.
-+
-+Limitations
-+------------
-+- Real nvdimm device backend is not supported.
-+- virtio pmem hotunplug is not supported.
-+- ACPI NVDIMM features like regions/namespaces are not supported.
-+- ndctl command is not supported.
---=20
-2.21.0
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index dc2a65f3f9..ca67b6cd4c 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -30,6 +30,7 @@
+ #include "exec/helper-gen.h"
+ 
+ #include "tricore-opcodes.h"
++#include "exec/translator.h"
+ #include "exec/log.h"
+ 
+ /*
+@@ -64,24 +65,14 @@ static const char *regnames_d[] = {
+     };
+ 
+ typedef struct DisasContext {
+-    struct TranslationBlock *tb;
+-    target_ulong pc, saved_pc, next_pc;
++    DisasContextBase base;
++    target_ulong pc_succ_insn;
+     uint32_t opcode;
+-    int singlestep_enabled;
+     /* Routine used to access memory */
+     int mem_idx;
+     uint32_t hflags, saved_hflags;
+-    int bstate;
+ } DisasContext;
+ 
+-enum {
+-
+-    BS_NONE   = 0,
+-    BS_STOP   = 1,
+-    BS_BRANCH = 2,
+-    BS_EXCP   = 3,
+-};
+-
+ enum {
+     MODE_LL = 0,
+     MODE_LU = 1,
+@@ -3230,12 +3221,12 @@ static inline void gen_save_pc(target_ulong pc)
+ 
+ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+ {
+-    if (unlikely(ctx->singlestep_enabled)) {
++    if (unlikely(ctx->base.singlestep_enabled)) {
+         return false;
+     }
+ 
+ #ifndef CONFIG_USER_ONLY
+-    return (ctx->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
++    return (ctx->base.tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
+ #else
+     return true;
+ #endif
+@@ -3246,10 +3237,10 @@ static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+     if (use_goto_tb(ctx, dest)) {
+         tcg_gen_goto_tb(n);
+         gen_save_pc(dest);
+-        tcg_gen_exit_tb(ctx->tb, n);
++        tcg_gen_exit_tb(ctx->base.tb, n);
+     } else {
+         gen_save_pc(dest);
+-        if (ctx->singlestep_enabled) {
++        if (ctx->base.singlestep_enabled) {
+             /* raise exception debug */
+         }
+         tcg_gen_exit_tb(NULL, 0);
+@@ -3261,9 +3252,9 @@ static void generate_trap(DisasContext *ctx, int class, int tin)
+     TCGv_i32 classtemp = tcg_const_i32(class);
+     TCGv_i32 tintemp = tcg_const_i32(tin);
+ 
+-    gen_save_pc(ctx->pc);
++    gen_save_pc(ctx->base.pc_next);
+     gen_helper_raise_exception_sync(cpu_env, classtemp, tintemp);
+-    ctx->bstate = BS_EXCP;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ 
+     tcg_temp_free(classtemp);
+     tcg_temp_free(tintemp);
+@@ -3275,10 +3266,10 @@ static inline void gen_branch_cond(DisasContext *ctx, TCGCond cond, TCGv r1,
+     TCGLabel *jumpLabel = gen_new_label();
+     tcg_gen_brcond_tl(cond, r1, r2, jumpLabel);
+ 
+-    gen_goto_tb(ctx, 1, ctx->next_pc);
++    gen_goto_tb(ctx, 1, ctx->pc_succ_insn);
+ 
+     gen_set_label(jumpLabel);
+-    gen_goto_tb(ctx, 0, ctx->pc + address * 2);
++    gen_goto_tb(ctx, 0, ctx->base.pc_next + address * 2);
+ }
+ 
+ static inline void gen_branch_condi(DisasContext *ctx, TCGCond cond, TCGv r1,
+@@ -3295,9 +3286,9 @@ static void gen_loop(DisasContext *ctx, int r1, int32_t offset)
+ 
+     tcg_gen_subi_tl(cpu_gpr_a[r1], cpu_gpr_a[r1], 1);
+     tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_gpr_a[r1], -1, l1);
+-    gen_goto_tb(ctx, 1, ctx->pc + offset);
++    gen_goto_tb(ctx, 1, ctx->base.pc_next + offset);
+     gen_set_label(l1);
+-    gen_goto_tb(ctx, 0, ctx->next_pc);
++    gen_goto_tb(ctx, 0, ctx->pc_succ_insn);
+ }
+ 
+ static void gen_fcall_save_ctx(DisasContext *ctx)
+@@ -3306,7 +3297,7 @@ static void gen_fcall_save_ctx(DisasContext *ctx)
+ 
+     tcg_gen_addi_tl(temp, cpu_gpr_a[10], -4);
+     tcg_gen_qemu_st_tl(cpu_gpr_a[11], temp, ctx->mem_idx, MO_LESL);
+-    tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
++    tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
+     tcg_gen_mov_tl(cpu_gpr_a[10], temp);
+ 
+     tcg_temp_free(temp);
+@@ -3321,7 +3312,7 @@ static void gen_fret(DisasContext *ctx)
+     tcg_gen_addi_tl(cpu_gpr_a[10], cpu_gpr_a[10], 4);
+     tcg_gen_mov_tl(cpu_PC, temp);
+     tcg_gen_exit_tb(NULL, 0);
+-    ctx->bstate = BS_BRANCH;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ 
+     tcg_temp_free(temp);
+ }
+@@ -3336,12 +3327,12 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+ /* SB-format jumps */
+     case OPC1_16_SB_J:
+     case OPC1_32_B_J:
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+     case OPC1_32_B_CALL:
+     case OPC1_16_SB_CALL:
+-        gen_helper_1arg(call, ctx->next_pc);
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        gen_helper_1arg(call, ctx->pc_succ_insn);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+     case OPC1_16_SB_JZ:
+         gen_branch_condi(ctx, TCG_COND_EQ, cpu_gpr_d[15], 0, offset);
+@@ -3433,26 +3424,26 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+         break;
+ /* B-format */
+     case OPC1_32_B_CALLA:
+-        gen_helper_1arg(call, ctx->next_pc);
++        gen_helper_1arg(call, ctx->pc_succ_insn);
+         gen_goto_tb(ctx, 0, EA_B_ABSOLUT(offset));
+         break;
+     case OPC1_32_B_FCALL:
+         gen_fcall_save_ctx(ctx);
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+     case OPC1_32_B_FCALLA:
+         gen_fcall_save_ctx(ctx);
+         gen_goto_tb(ctx, 0, EA_B_ABSOLUT(offset));
+         break;
+     case OPC1_32_B_JLA:
+-        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
++        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
+         /* fall through */
+     case OPC1_32_B_JA:
+         gen_goto_tb(ctx, 0, EA_B_ABSOLUT(offset));
+         break;
+     case OPC1_32_B_JL:
+-        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
+-        gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         break;
+ /* BOL format */
+     case OPCM_32_BRC_EQ_NEQ:
+@@ -3551,7 +3542,7 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+             gen_loop(ctx, r2, offset * 2);
+         } else {
+             /* OPC2_32_BRR_LOOPU */
+-            gen_goto_tb(ctx, 0, ctx->pc + offset * 2);
++            gen_goto_tb(ctx, 0, ctx->base.pc_next + offset * 2);
+         }
+         break;
+     case OPCM_32_BRR_JNE:
+@@ -3585,7 +3576,7 @@ static void gen_compute_branch(DisasContext *ctx, uint32_t opc, int r1,
+     default:
+         generate_trap(ctx, TRAPC_INSN_ERR, TIN2_IOPC);
+     }
+-    ctx->bstate = BS_BRANCH;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+ 
+@@ -3933,7 +3924,7 @@ static void decode_sr_system(CPUTriCoreState *env, DisasContext *ctx)
+     case OPC2_16_SR_RFE:
+         gen_helper_rfe(cpu_env);
+         tcg_gen_exit_tb(NULL, 0);
+-        ctx->bstate = BS_BRANCH;
++        ctx->base.is_jmp = DISAS_NORETURN;
+         break;
+     case OPC2_16_SR_DEBUG:
+         /* raise EXCP_DEBUG */
+@@ -6557,11 +6548,11 @@ static void decode_rr_idirect(CPUTriCoreState *env, DisasContext *ctx)
+         tcg_gen_andi_tl(cpu_PC, cpu_gpr_a[r1], ~0x1);
+         break;
+     case OPC2_32_RR_JLI:
+-        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->next_pc);
++        tcg_gen_movi_tl(cpu_gpr_a[11], ctx->pc_succ_insn);
+         tcg_gen_andi_tl(cpu_PC, cpu_gpr_a[r1], ~0x1);
+         break;
+     case OPC2_32_RR_CALLI:
+-        gen_helper_1arg(call, ctx->next_pc);
++        gen_helper_1arg(call, ctx->pc_succ_insn);
+         tcg_gen_andi_tl(cpu_PC, cpu_gpr_a[r1], ~0x1);
+         break;
+     case OPC2_32_RR_FCALLI:
+@@ -6572,7 +6563,7 @@ static void decode_rr_idirect(CPUTriCoreState *env, DisasContext *ctx)
+         generate_trap(ctx, TRAPC_INSN_ERR, TIN2_IOPC);
+     }
+     tcg_gen_exit_tb(NULL, 0);
+-    ctx->bstate = BS_BRANCH;
++    ctx->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
+@@ -8391,7 +8382,7 @@ static void decode_sys_interrupts(CPUTriCoreState *env, DisasContext *ctx)
+     case OPC2_32_SYS_RFE:
+         gen_helper_rfe(cpu_env);
+         tcg_gen_exit_tb(NULL, 0);
+-        ctx->bstate = BS_BRANCH;
++        ctx->base.is_jmp = DISAS_NORETURN;
+         break;
+     case OPC2_32_SYS_RFM:
+         if ((ctx->hflags & TRICORE_HFLAG_KUU) == TRICORE_HFLAG_SM) {
+@@ -8404,7 +8395,7 @@ static void decode_sys_interrupts(CPUTriCoreState *env, DisasContext *ctx)
+             gen_helper_rfm(cpu_env);
+             gen_set_label(l1);
+             tcg_gen_exit_tb(NULL, 0);
+-            ctx->bstate = BS_BRANCH;
++            ctx->base.is_jmp = DISAS_NORETURN;
+             tcg_temp_free(tmp);
+         } else {
+             /* generate privilege trap */
+@@ -8790,11 +8781,11 @@ static void decode_opc(CPUTriCoreState *env, DisasContext *ctx, int *is_branch)
+ {
+     /* 16-Bit Instruction */
+     if ((ctx->opcode & 0x1) == 0) {
+-        ctx->next_pc = ctx->pc + 2;
++        ctx->pc_succ_insn = ctx->base.pc_next + 2;
+         decode_16Bit_opc(env, ctx);
+     /* 32-Bit Instruction */
+     } else {
+-        ctx->next_pc = ctx->pc + 4;
++        ctx->pc_succ_insn = ctx->base.pc_next + 4;
+         decode_32Bit_opc(env, ctx);
+     }
+ }
+@@ -8807,33 +8798,32 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+     int num_insns = 0;
+ 
+     pc_start = tb->pc;
+-    ctx.pc = pc_start;
+-    ctx.saved_pc = -1;
+-    ctx.tb = tb;
+-    ctx.singlestep_enabled = cs->singlestep_enabled;
+-    ctx.bstate = BS_NONE;
++    ctx.base.pc_next = pc_start;
++    ctx.base.tb = tb;
++    ctx.base.singlestep_enabled = cs->singlestep_enabled;
++    ctx.base.is_jmp = DISAS_NEXT;
+     ctx.mem_idx = cpu_mmu_index(env, false);
+     ctx.hflags = (uint32_t)tb->flags;
+ 
+     tcg_clear_temp_count();
+     gen_tb_start(tb);
+-    while (ctx.bstate == BS_NONE) {
+-        tcg_gen_insn_start(ctx.pc);
++    while (ctx.base.is_jmp == DISAS_NEXT) {
++        tcg_gen_insn_start(ctx.base.pc_next);
+         num_insns++;
+ 
+-        ctx.opcode = cpu_ldl_code(env, ctx.pc);
++        ctx.opcode = cpu_ldl_code(env, ctx.base.pc_next);
+         decode_opc(env, &ctx, 0);
+ 
+         if (num_insns >= max_insns || tcg_op_buf_full()) {
+-            gen_save_pc(ctx.next_pc);
++            gen_save_pc(ctx.pc_succ_insn);
+             tcg_gen_exit_tb(NULL, 0);
+             break;
+         }
+-        ctx.pc = ctx.next_pc;
++        ctx.base.pc_next = ctx.pc_succ_insn;
+     }
+ 
+     gen_tb_end(tb, num_insns);
+-    tb->size = ctx.pc - pc_start;
++    tb->size = ctx.base.pc_next - pc_start;
+     tb->icount = num_insns;
+ 
+     if (tcg_check_temp_count()) {
+@@ -8845,7 +8835,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+         && qemu_log_in_addr_range(pc_start)) {
+         qemu_log_lock();
+         qemu_log("IN: %s\n", lookup_symbol(pc_start));
+-        log_target_disas(cs, pc_start, ctx.pc - pc_start);
++        log_target_disas(cs, pc_start, ctx.base.pc_next - pc_start);
+         qemu_log("\n");
+         qemu_log_unlock();
+     }
+-- 
+2.23.0
 
 
