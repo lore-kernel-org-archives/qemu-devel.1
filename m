@@ -2,84 +2,64 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C0F1C3A589
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0663DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:40:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3667F22DD3
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:19:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="Wwx1eqz4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3667F22DD3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id CA8EE22DA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:40:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA8EE22DA7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0H9X-0001tj-4j
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 23:19:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43642)
+	id 1i0HTf-0007fi-1t
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 23:40:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46285)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1i0H7L-00018e-9C
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:17:00 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i0HSf-0006zT-PV
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:39:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1i0H7K-0008PN-6K
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:16:59 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:40085)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1i0H7H-0008NA-KN; Tue, 20 Aug 2019 23:16:55 -0400
-Received: by mail-qt1-x843.google.com with SMTP id e8so1328644qtp.7;
- Tue, 20 Aug 2019 20:16:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=HefSvfC8MkuDZ3t3Fra2/mWNZ34tCHmc7DbjtKktUlg=;
- b=Wwx1eqz4a34jRLEMFkT67o7h6p+5u6DkCPdNp/SyGtSlThBv8BMFVxRGBYevzw+s/h
- U2NeRr5CN/msQxu9W+o+d9tmQ51nxiNd1KXPQx0cssydDUSMGeUMdCYmYJ/p7rDJwD6B
- mmpsOrtpMjmPck1KEb0kmEYPt1akRFgHDFTNM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=HefSvfC8MkuDZ3t3Fra2/mWNZ34tCHmc7DbjtKktUlg=;
- b=XNiDcyYm3mA7cnyGRKbnWGNRBWQkgoMkUrKCgzwSC5n5m26HDNWyWqCkfKq5PTA4Xb
- ioDOEKJy9rKssQ/SakqhubZ6ajs6KdU7GOJs3EL1fJIagFeyDo2BSXocwCq3JbXRaaNG
- e9kcmW9MgOc8T7V2H/MQLwLXhI61QDOs0ewsDtADGXpENOh1jON4VM4F0iBC6SSZjhxI
- MbAOr/Y8h8mkor57BK9luhObM+1rJZ/DBOPw74JzJhoEstOEm9vyuLIdMlFfYJqVPpTV
- t1OnOdCjYaZCRJhJuHXvuaWhYrqSCNaTtatqThdzy+MzKuy8fb/dEPPrefYDMCVRRx3V
- OShQ==
-X-Gm-Message-State: APjAAAXtX2qRw9d6VmyD6l4OBq/hiXBhq1hhToDJDMGMEV6FF7WZX/L5
- qwWzPvPi8u+mPDo3+YIHEMTw3mzo0jelRuxoXgE=
-X-Google-Smtp-Source: APXvYqxcaAdtiB0NAU9+vzab644npVO1OHqmatimmknY2cCQHL/2CgLF4z+MTiiyzbNzVb2eNgIegHhsu9DACJJI1Cg=
-X-Received: by 2002:a05:6214:12ad:: with SMTP id
- w13mr7153220qvu.172.1566357414548; 
- Tue, 20 Aug 2019 20:16:54 -0700 (PDT)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i0HSd-0000CU-V0
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:39:01 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43702)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1i0HSd-000099-Cm; Tue, 20 Aug 2019 23:38:59 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06875435|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.0852348-0.00798114-0.906784; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e02c03302; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=8; RT=8; SR=0;
+ TI=SMTPD_---.FFdpZ73_1566358728; 
+Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.FFdpZ73_1566358728)
+ by smtp.aliyun-inc.com(10.147.40.233);
+ Wed, 21 Aug 2019 11:38:52 +0800
+To: Chih-Min Chao <chihmin.chao@sifive.com>
+References: <0141541d-43ff-98d8-e9d4-4a2fdcfdcf36@c-sky.com>
+ <CAKmqyKPr0V6acB2-Y+N1-aoj-5LSofwi=Jz=u6KFJN1fPUWjzA@mail.gmail.com>
+ <2b741fb0-0f12-0f07-a516-9cc23abc0b6e@c-sky.com>
+ <CAEiOBXU1SbdgJdsn_Cvny4=7NTxE+XQPrQQn6NevBxwB8Wox5w@mail.gmail.com>
+From: liuzhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <8e288bee-75ee-5bd6-e085-d1679d1d1a1b@c-sky.com>
+Date: Wed, 21 Aug 2019 11:33:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-References: <20190704055150.4899-1-clg@kaod.org>
- <cd1f8a48-27cb-5cc5-1fd2-46f1597a7094@redhat.com>
- <20190704101345.GC1609@stefanha-x1.localdomain>
- <b304e4bd-1315-b1be-6c48-add99df92626@redhat.com>
- <CACPK8XdFUO6+Fx17Dry0D2QFhM885DugdvOkWnhgjxPc9VgG2Q@mail.gmail.com>
- <CACPK8XfZq1FvMBXLgS-WHoJy4s_L9k19hLW-XgBNoiY-DhGhWA@mail.gmail.com>
- <f5ed785c-027d-66fe-aba2-d03001b44162@redhat.com>
-In-Reply-To: <f5ed785c-027d-66fe-aba2-d03001b44162@redhat.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Wed, 21 Aug 2019 03:16:42 +0000
-Message-ID: <CACPK8XcG4JRq0hAUPu4+vv-j1TFNwwsu5iv6X9M-qAgm0atTRA@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::843
-Subject: Re: [Qemu-devel] [PATCH for 4.1] aspeed/timer: Provide
- back-pressure information for short periods
+In-Reply-To: <CAEiOBXU1SbdgJdsn_Cvny4=7NTxE+XQPrQQn6NevBxwB8Wox5w@mail.gmail.com>
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-riscv]  RISCV: when will the CLIC be ready?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,56 +71,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 16 Jul 2019 at 07:02, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
-> On 7/16/19 9:00 AM, Joel Stanley wrote:
-> > On Tue, 16 Jul 2019 at 06:54, Joel Stanley <joel@jms.id.au> wrote:
-> >> On Thu, 4 Jul 2019 at 12:26, Paolo Bonzini <pbonzini@redhat.com> wrote=
-:
-> >>> On 04/07/19 12:13, Stefan Hajnoczi wrote:
-> >>>> On Thu, Jul 04, 2019 at 11:26:53AM +0200, Philippe Mathieu-Daud=C3=
-=A9 wrote:
-> >>>>> CC'ing Stefan & Paolo for a non-ARM view on this...
-> >>>>
-> >>>> I'm not familiar with the various clock smoothing techniques impleme=
-nted
-> >>>> in QEMU and KVM, but this looks okay given that Linux guests expect
-> >>>> this.
-> >>>
-> >>> Yeah, even KVM applies a minimum period of 200us to the x86 LAPIC tim=
-er.
-> >>
-> >> Can we please merge this so guests can boot on 4.1?
-> >
-> > C=C3=A9dric pointed out this lacks my reviewed by. I had not provided i=
-t in
-> > the past as I wondered if we could come up with a better fix. However,
-> > I consider this a good fix for 4.1, and if sometime finds time to
-> > further rework the timer model in the future then we can do that work
-> > later.
+
+On 2019/8/20 上午12:38, Chih-Min Chao wrote:
 >
-> Agreed.
 >
-> >
-> > Reviewed-by: Joel Stanley <joel@jms.id.au>
-> > Tested-by: Joel Stanley <joel@jms.id.au>
+> On Mon, Aug 19, 2019 at 9:47 PM liuzhiwei <zhiwei_liu@c-sky.com 
+> <mailto:zhiwei_liu@c-sky.com>> wrote:
 >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+>     On 2019/8/17 上午1:29, Alistair Francis wrote:
+>     > On Thu, Aug 15, 2019 at 8:39 PM liuzhiwei<zhiwei_liu@c-sky.com
+>     <mailto:zhiwei_liu@c-sky.com>> wrote:
+>     >> Hi, Palmer
+>     >>
+>     >> When Michael Clark still was the maintainer of RISCV QEMU, he
+>     wrote in the mail list, "the CLIC interrupt controller is under
+>     testing,
+>     >> and will be included in QEMU 3.1 or 3.2". It is pity that the
+>     CLIC is not in
+>     >> included even in QEMU 4.1.0.
+>     > I see that there is a CLIC branch available here:
+>     > https://github.com/riscv/riscv-qemu/pull/157
+>     >
+>     > It looks like all of the work is in a single commit
+>     >
+>     (https://github.com/riscv/riscv-qemu/pull/157/commits/206d9ac339feb9ef2c325402a00f0f45f453d019)
+>     > and that most of the other commits in the PR have already made
+>     it into
+>     > master.
+>     >
+>     > Although the CLIC commit is very large it doesn't seem impossible to
+>     > manually pull out the CLIC bits and apply it onto master.
+>     >
+>     > Do you know the state of the CLIC model? If it's working it
+>     shouldn't
+>     > be too hard to rebase the work and get the code into mainline.
+>     >
+>     > Alistair
+>     >
+>     Hi,  Alistair
+>
+>     In my opinion, the CLIC code almost works.
+>
+>     Last year when my workmate ported an RTOS, I once read the CLIC
+>     specification and used the CLIC model code. It worked through  all
+>     the tests after fixed two bugs. I also had sent the patch to
+>     Michael, but without response(maybe a wrong email address).
+>
+>     diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+>     index 7bf6cbc..95d80ab 100644
+>     --- a/target/riscv/cpu_helper.c
+>     +++ b/target/riscv/cpu_helper.c
+>     @@ -505,6 +505,9 @@ static target_ulong
+>     riscv_intr_pc(CPURISCVState *env,
+>           if (!(async || clic)) {
+>               return tvec & ~0b11;
+>           }
+>     +    if (clic) {
+>     +        cause &= 0x3ff;
+>     +    }
+>
+>           /* bits [1:0] encode mode; 0 = direct, 1 = vectored, 2 >=
+>     reserved */
+>           switch (mode1) {
+>     @@ -645,6 +648,9 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+>               riscv_cpu_set_mode(env, PRV_M);
+>           }
+>
+>     +    if (clic) {
+>     +        env->exccode = 0;
+>     +    }
+>           /* NOTE: it is not necessary to yield load reservations
+>     here. It is only
+>              necessary for an SC from "another hart" to cause a load
+>     reservation
+>              to be yielded. Refer to the memory consistency model
+>     section of the
+>
+>     After that, the specification has updated and the code may
+>     changed. I didn't pull new code again.
+>
+>     If the CLIC model may merged into the mainline, and no body
+>     maintain the code, I'd like to work on it, fixing the bugs and
+>     updating the code according to latest specification.
+>
+>     Best Regards,
+>     Zhiwei
+>
+>     >> As we have cpus using CLIC, I have to use the out of tree qemu
+>     code in SIFIVE
+>     >> a long time. Could you tell me when it will be upstreamed?
+>     >>
+>     >> Best Regards
+>     >> Zhiwei
+>     >>
+>
+>
+> Hi Zhiwei,
+>
+> I think what Alistair point out is the latest clic version (or 
+> https://github.com/riscv/riscv-qemu/tree/riscv-qemu-3.1). The two 
+> versions, on pull request and 3.1 branch, should be similar.
+> As far as I know, there is no concrete plan on CLIC patch in short term.
+> It is good to know that the clic patch has been run with real RTOS.
+> It is also great if you could update the implementation to latest spec 
+> and send the patch again.
+>
+> chihmin
 
-HI Peter,
+Hi chihmin,
 
-Is this one still in your queue?
+Thanks for your reminding and approval. I will pull the latest clic 
+version code and send the patch about two or three weeks later.
 
-Cheers,
+The RTOS is Rhino,  which is the kernel of 
+AliOS-Things(https://github.com/alibaba/AliOS-Things).
 
-Joel
+It is also the kernel of YOC(https://cop.c-sky.com).
+
+Best Regards
+Zhiwei
 
