@@ -2,63 +2,84 @@ Return-Path: <SRS0=GSUr=WR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E682C3A589
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 016C1C3A589
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:12:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B65C22D6D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:07:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B65C22D6D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id C072E2332B
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Aug 2019 03:12:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TT6fjxKL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C072E2332B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0GyR-0005p9-9W
-	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 23:07:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42627)
+	id 1i0H2f-0007Kh-SL
+	for qemu-devel@archiver.kernel.org; Tue, 20 Aug 2019 23:12:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i0Gxk-0004q0-71
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:07:05 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1i0H0Z-0006e2-CR
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:10:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i0Gxi-0001MT-L0
- for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:07:03 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:47863)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1i0Gxi-0001As-AS; Tue, 20 Aug 2019 23:07:02 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07439327|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.55312-0.0189336-0.427946; FP=0|0|0|0|0|-1|-1|-1;
- HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=7; RT=7; SR=0;
- TI=SMTPD_---.FFcpSje_1566356812; 
-Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.FFcpSje_1566356812)
- by smtp.aliyun-inc.com(10.147.44.118);
- Wed, 21 Aug 2019 11:06:54 +0800
-To: Alistair Francis <alistair23@gmail.com>
-References: <0141541d-43ff-98d8-e9d4-4a2fdcfdcf36@c-sky.com>
- <CAKmqyKPr0V6acB2-Y+N1-aoj-5LSofwi=Jz=u6KFJN1fPUWjzA@mail.gmail.com>
- <2b741fb0-0f12-0f07-a516-9cc23abc0b6e@c-sky.com>
- <CAKmqyKPa2YbAASRsQ8cAm+LR58Z3i_bCXDd7tYtD5TtXvv4YdQ@mail.gmail.com>
-From: liuzhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <5689fa51-c167-863a-0798-1fa16e628c47@c-sky.com>
-Date: Wed, 21 Aug 2019 11:01:58 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ (envelope-from <joel.stan@gmail.com>) id 1i0H0Y-0003Xd-Ed
+ for qemu-devel@nongnu.org; Tue, 20 Aug 2019 23:09:59 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43831)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1i0H0W-0003TI-2W; Tue, 20 Aug 2019 23:09:56 -0400
+Received: by mail-pl1-x642.google.com with SMTP id 4so497448pld.10;
+ Tue, 20 Aug 2019 20:09:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4H0DNln+vkIfh3c16gEfBqSh6PiHJ/PVZ4BRLm+SFLI=;
+ b=TT6fjxKLXHGBiNm3kYcqos/P1+uUqIFmRu4wrlu18JrXhGnRoV8lgryOIU3JCIfWjr
+ MB7a56PpHkyiku5ARARow/VTelXruvv38sklWPkLS3ulHGjm0WO80SURfsJ6grLlAMMy
+ qLvS+C1OdiXemZjpskZGzu3kFkKmXdO6nchF99xMn6C1dG58CPgr/FubEzqc4jmWBmmN
+ t49mbcth9vyPQJQadYqGvWD8T+9oJXAWu4Qun4Qv3HVP1L1c/AumnFKXRsHoadI4mXhI
+ JHWl70AS2GqkQkDVxsfayogPQBR3Q5cfmY6+Lb+sdxC0k9lnNetOkjQH2sjKdEOKQx/j
+ Cutw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=4H0DNln+vkIfh3c16gEfBqSh6PiHJ/PVZ4BRLm+SFLI=;
+ b=ZPAkTAiUZ8BzI2Y7Scy3ryNhlaX3fAHdVabvdI/6tmNmRpL5OHJfllaH72byDF+hAP
+ rryfHbDHNkJEKyDa8DKBx1PuRJdVjLJ6J1xc2uakJX0KmkNwrbPiv5yvCRkDj0jgnJUz
+ G5zH9L5T9Hn3ajnfjNwnovhR2KzQMYVv4hncexjKV5ItEMzjYYX5vIiNEpuFI/adZqKF
+ HHr3wdL+d1DZkNvMI0R9QI4txZMhhqu5UsaO8/CwDs96WJmgNsq8x/t+3bht05d2Emtl
+ X5VqL2mgO4sy9X80233r8adXEIIA7wxENqOQ3OwjV5JEF3foUOZfjmGbXDR9h1CV8aqK
+ fLvQ==
+X-Gm-Message-State: APjAAAV+j4+Md5ze9xgUW7ZMssBXGzC+mq9wp+TUi0FdKnF9hBxC4kRC
+ oGXUy2UdGIYA7+FzHB0m8LA+2Uv0
+X-Google-Smtp-Source: APXvYqz+fsexjRX/MjnQEbaR8sNd55NIudhCNs2m5xczzd25mqpRbPTLeqvtprDONJW1MfWDEahdsQ==
+X-Received: by 2002:a17:902:b604:: with SMTP id
+ b4mr30612298pls.94.1566356993571; 
+ Tue, 20 Aug 2019 20:09:53 -0700 (PDT)
+Received: from voyager.ibm.com ([36.255.48.244])
+ by smtp.gmail.com with ESMTPSA id j10sm21335220pfn.188.2019.08.20.20.09.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Aug 2019 20:09:53 -0700 (PDT)
+From: Joel Stanley <joel@jms.id.au>
+To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 21 Aug 2019 12:39:45 +0930
+Message-Id: <20190821030945.473-1-joel@jms.id.au>
+X-Mailer: git-send-email 2.23.0.rc1
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPa2YbAASRsQ8cAm+LR58Z3i_bCXDd7tYtD5TtXvv4YdQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 121.197.200.217
-Subject: Re: [Qemu-devel] RISCV: when will the CLIC be ready?
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: [Qemu-devel] [PATCH v2] ppc/pnv: Set default ram size to 1.75GB
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,100 +91,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This makes the powernv machine easier for end users as the default
+initrd address (1.5GB) is now within RAM.
 
-On 2019/8/20 上午2:56, Alistair Francis wrote:
-> On Mon, Aug 19, 2019 at 6:44 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
->>
->> On 2019/8/17 上午1:29, Alistair Francis wrote:
->>> On Thu, Aug 15, 2019 at 8:39 PM liuzhiwei<zhiwei_liu@c-sky.com>  wrote:
->>>> Hi, Palmer
->>>>
->>>> When Michael Clark still was the maintainer of RISCV QEMU, he wrote in the mail list, "the CLIC interrupt controller is under testing,
->>>> and will be included in QEMU 3.1 or 3.2". It is pity that the CLIC is not in
->>>> included even in QEMU 4.1.0.
->>> I see that there is a CLIC branch available here:
->>> https://github.com/riscv/riscv-qemu/pull/157
->>>
->>> It looks like all of the work is in a single commit
->>> (https://github.com/riscv/riscv-qemu/pull/157/commits/206d9ac339feb9ef2c325402a00f0f45f453d019)
->>> and that most of the other commits in the PR have already made it into
->>> master.
->>>
->>> Although the CLIC commit is very large it doesn't seem impossible to
->>> manually pull out the CLIC bits and apply it onto master.
->>>
->>> Do you know the state of the CLIC model? If it's working it shouldn't
->>> be too hard to rebase the work and get the code into mainline.
->>>
->>> Alistair
->>>
->> Hi,  Alistair
->>
->> In my opinion, the CLIC code almost works.
->>
->> Last year when my workmate ported an RTOS, I once read the CLIC specification and used the CLIC model code. It worked through  all the tests after fixed two bugs. I also had sent the patch to Michael, but without response(maybe a wrong email address).
->>
->> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
->> index 7bf6cbc..95d80ab 100644
->> --- a/target/riscv/cpu_helper.c
->> +++ b/target/riscv/cpu_helper.c
->> @@ -505,6 +505,9 @@ static target_ulong riscv_intr_pc(CPURISCVState *env,
->>        if (!(async || clic)) {
->>            return tvec & ~0b11;
->>        }
->> +    if (clic) {
->> +        cause &= 0x3ff;
->> +    }
->>
->>        /* bits [1:0] encode mode; 0 = direct, 1 = vectored, 2 >= reserved */
->>        switch (mode1) {
->> @@ -645,6 +648,9 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->>            riscv_cpu_set_mode(env, PRV_M);
->>        }
->>
->> +    if (clic) {
->> +        env->exccode = 0;
->> +    }
->>        /* NOTE: it is not necessary to yield load reservations here. It is only
->>           necessary for an SC from "another hart" to cause a load reservation
->>           to be yielded. Refer to the memory consistency model section of the
->>
->> After that, the specification has updated and the code may changed. I didn't pull new code again.
->>
->> If the CLIC model may merged into the mainline, and no body maintain the code, I'd like to work on it, fixing the bugs and updating the code according to latest specification.
-> Yes please! We will be happy to merge it!
->
-> If you would like to it would be great if you could update the code,
-> fix the bugs and then send patches to this list.
->
-> Alistair
->
-OK,  I'd like to. As the vector extension patch has already been under 
-data  disclosure  review,
+This uses less than 2GB of RAM to ensure 32 bit Qemu still works.
 
-I will forward move on to this work and send the patch about two or 
-three weeks later.
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+--
+v2: Use INITRD defines, whcih come out to 1.75, instead of 2GB
+---
+ hw/ppc/pnv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Best Regards,
-Zhiwei
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index d95086fbbd1e..5000db5faab5 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -1361,7 +1361,9 @@ static void pnv_machine_class_init(ObjectClass *oc, void *data)
+                                       * storage */
+     mc->no_parallel = 1;
+     mc->default_boot_order = NULL;
+-    mc->default_ram_size = 1 * GiB;
++    /* RAM defaults to less than 2048 for 32-bit hosts, and large
++     * enough to fit the maximum initrd size at it's load address */
++    mc->default_ram_size = INITRD_LOAD_ADDR + INITRD_MAX_SIZE;
+     xic->icp_get = pnv_icp_get;
+     xic->ics_get = pnv_ics_get;
+     xic->ics_resend = pnv_ics_resend;
+-- 
+2.23.0.rc1
 
->> Best Regards,
->> Zhiwei
->>
->>>> As we have cpus using CLIC, I have to use the out of tree qemu code in SIFIVE
->>>> a long time. Could you tell me when it will be upstreamed?
->>>>
->>>> Best Regards
->>>> Zhiwei
->>>>
 
