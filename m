@@ -2,85 +2,79 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C24FDC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 626EEC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:58:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9643721743
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:54:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9643721743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B87021743
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:58:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B6AwOhqI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B87021743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0qLv-0003jO-QC
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:54:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52456)
+	id 1i0qPf-0006QY-8o
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:58:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1i0qKt-0002D0-12
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:53:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i0qOd-0004ov-MC
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1i0qKr-0000nF-M5
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:53:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33044)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i0qKr-0000mR-Fh
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:53:17 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8D3A112BB
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 16:53:16 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id a17so3494906wrw.3
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 09:53:16 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1i0qOb-0004Aq-5X
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:57:11 -0400
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:34169)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i0qOa-00049T-Sq
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:57:09 -0400
+Received: by mail-oi1-x22c.google.com with SMTP id g128so4912773oib.1
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 09:57:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Di9oxKFhxaxncUQ2W/+cux8HAQbPeHs6aCsDdtQrV40=;
+ b=B6AwOhqIh/Oxr42w6X2UaL+eyvyiS+vFtpwdLfz5VubMsWRqmyIZnDteC4onYbX2EN
+ 9QgQ1+2YBB1CU1pogPTjKnnmrfcJbu4oEZULXgrxJ5t2itaMKUUpoKgmx0SmHb4cifhK
+ wFB+/YT1M9Hw9sN4juujdI8Eh6SIwxJM3aLweLkDwGl6smyQM30FOENRdc+0BVkhiSNO
+ Inki3tY0EFr+PkfU6zbrj0+TeNlDt64nY4BWdT2C8jCvIBIeXhC8ketcabCdV11pyukh
+ PiDLXdU2vpz0Q40gGvhNMtI/KIbrI9BT7gFqngG7WMFJsSwa1TJRGymQHHHZYvcdgyyD
+ IUNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=7OylcwYLww+r4/Ek6o+oEXpH43QgKe6vW2vuiCM0CiI=;
- b=dhdZGt//UIBEG6u4cpqg1SH6s2y399J6HBWOW/YXjjucNKR+oPbHRONL5jRu5tlIbJ
- uqyPqlXrCbZBbpOwpSEurjloz6yURkUWk56BcRx0wajKPmyuUTgkJ54UsiycGil4tEtE
- oG/aEoXOBa9yINI52fgj0zuE1iUxpc6H1SnS4F5whAsD2hi4wY1xDJhhWoR+kBy7dXFj
- jcAZhXZ6UPz+YYiv2M4Hs/yfuoj3dqfFcgnZhP9kQt5ntioAvTGv3nIJa94HlbGRRuyH
- 8zsqIAR4of1NukNrZi59aWYbhN+f7kEd+ccMXV8EEiunRpjgHLhdOULaBTRZn6J1aRbC
- HMBg==
-X-Gm-Message-State: APjAAAUNqD2X8HPSaNkzi2CfV7jRkmKzrpXSJNFgejbgCl1gTt3jI8oh
- RV+oR9RQMiUveWnA6D7wjGi6NXXpeiFdgY0iMcYEkAxj7f9cZMOa67+zK6MfS5ZZ9PZ+kYgNph2
- vaHLy6fO2uEWkc54=
-X-Received: by 2002:a1c:6785:: with SMTP id b127mr15754wmc.66.1566492795111;
- Thu, 22 Aug 2019 09:53:15 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy8gs3/FLa9xW1Qm3jHbJTLuNrGp3xQDvR57d5z+pOjOG/besnj3kBHF2sfOOJ1ZFyY5LPMHA==
-X-Received: by 2002:a1c:6785:: with SMTP id b127mr15730wmc.66.1566492794823;
- Thu, 22 Aug 2019 09:53:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3?
- ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
- by smtp.gmail.com with ESMTPSA id o129sm72228wmb.41.2019.08.22.09.53.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 22 Aug 2019 09:53:14 -0700 (PDT)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190822162618.27670-1-mreitz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <47d2cafd-da56-eb81-b54f-4f666aff016f@redhat.com>
-Date: Thu, 22 Aug 2019 18:53:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Di9oxKFhxaxncUQ2W/+cux8HAQbPeHs6aCsDdtQrV40=;
+ b=T7h2v54tr66kVYaxxvVC51/F+ia7F/gkFSYoxe1w3To1aJvOl8pDjmaPEyL7/+XkZS
+ r0J9mm3aJ5fAZZ/EzFPgTSPZSZ+qYZ9GyTPUJW3l3/sGYaW6SbhKbIrMSkt0qyt1pame
+ UcrgCQ4gnSC2c8W08yozJfXd8XLPZLfbhDWlnfgh8xKCF429J2ddifSgPrbNkLdgwAZS
+ iHkhJHJQv0VRkUMZe9kzbtuvlltSkr5j4FJNH6GjEIBSMhGMjRLo+UrlVYwPH+Ohi9g0
+ TNb4J/AJEEi6PE8XuhgdIgMB7uv7XfRBMqsD5fNyr2TQArL8kN3hEw8dhkwXVma4RUeb
+ vpwA==
+X-Gm-Message-State: APjAAAVfCx7ONarBG23kra0qEdYnESV3gK2vHWuDsDVR9GFKhVdAuvcr
+ I61915kxBMJ4DTC6DF6ToreG6mMc+yHwxafQmDUoYmJl
+X-Google-Smtp-Source: APXvYqxsZAQOmJaAmIipdsUEUPF4efzAN7lkmuSDUaZDl3GdLWQvpl5DehyE5nzUKTkd0J+FNGL2zJZQIhWMLMfqMSk=
+X-Received: by 2002:aca:50cb:: with SMTP id e194mr108391oib.48.1566493027642; 
+ Thu, 22 Aug 2019 09:57:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190822162618.27670-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/2] block/file-posix: Fix
- xfs_write_zeroes()
+References: <20190822102046.8765-1-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20190822102046.8765-1-kbastian@mail.uni-paderborn.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Aug 2019 17:56:56 +0100
+Message-ID: <CAFEAcA-L18-5PW17yMJKM8R3W_GP_fALCcmkq2bB29BPp=0Txw@mail.gmail.com>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22c
+Subject: Re: [Qemu-devel] [PULL 0/5] tricore queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,40 +86,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, qemu-stable@nongnu.org,
- qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/08/19 18:26, Max Reitz wrote:
-> Luk=C3=A0=C5=A1 ran over a nasty regression in our xfs_write_zeroes() f=
-unction
-> (sorry, my fault) made apparent by a recent patch from Anton that makes
-> qcow2 images heavily exercise the offending code path.
->=20
-> This series fixes the bug and adds a test to prevent it from
-> reoccurring.
->=20
->=20
-> Max Reitz (2):
->   block/file-posix: Fix xfs_write_zeroes()
->   iotests: Test reverse sub-cluster qcow2 writes
->=20
->  block/file-posix.c         | 16 ++++++---
->  tests/qemu-iotests/265     | 67 ++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/265.out |  6 ++++
->  tests/qemu-iotests/group   |  1 +
->  4 files changed, 85 insertions(+), 5 deletions(-)
->  create mode 100755 tests/qemu-iotests/265
->  create mode 100644 tests/qemu-iotests/265.out
->=20
+On Thu, 22 Aug 2019 at 11:20, Bastian Koppelmann
+<kbastian@mail.uni-paderborn.de> wrote:
+>
+> The following changes since commit fe066b4848bab4f9365a419f3c8ba59ccecf67c0:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-08-21 16:59:22 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/bkoppelmann/qemu.git tags/pull-tricore-20190822-1
+>
+> for you to fetch changes up to d4881da9b39df183f976349f223231ac1d81087b:
+>
+>   target/tricore: Fix tricore_tr_translate_insn (2019-08-22 12:17:01 +0200)
+>
+> ----------------------------------------------------------------
+> Converted target/tricore to translate_loop
 
-What about just killing libxfs support and only use fallocate?
-FALLOC_FL_ZERO_RANGE was added in Linux 3.15 (2014) and the only
-platform we probably support with such an old kernel is of course
-RHEL/CentOS 7 which has had it backported.
 
-Paolo
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
