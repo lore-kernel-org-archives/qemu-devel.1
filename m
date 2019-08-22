@@ -6,56 +6,64 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02342C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CFC3C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:12:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBB9721743
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:10:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB9721743
+	by mail.kernel.org (Postfix) with ESMTPS id F162021743
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:12:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F162021743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0nne-0004mI-Va
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:10:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48433)
+	id 1i0nou-0006NY-2w
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:12:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50725)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1i0ncE-0000CN-Ji
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:59:03 -0400
+ (envelope-from <armbru@redhat.com>) id 1i0nkV-0001h5-9S
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:07:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1i0ncD-0004J0-AI
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:59:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51350)
+ (envelope-from <armbru@redhat.com>) id 1i0nkT-0007jy-8H
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:07:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40426)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1i0ncD-0004IE-3D; Thu, 22 Aug 2019 09:59:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1i0nkP-0007iE-8g; Thu, 22 Aug 2019 10:07:29 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 650B48D6CC6;
- Thu, 22 Aug 2019 13:59:00 +0000 (UTC)
-Received: from localhost (dhcp-192-222.str.redhat.com [10.33.192.222])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BB4E160606;
- Thu, 22 Aug 2019 13:58:57 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Aug 2019 15:58:36 +0200
-Message-Id: <20190822135839.32340-6-cohuck@redhat.com>
-In-Reply-To: <20190822135839.32340-1-cohuck@redhat.com>
-References: <20190822135839.32340-1-cohuck@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 90DA980F79;
+ Thu, 22 Aug 2019 14:07:28 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C5790600CD;
+ Thu, 22 Aug 2019 14:07:25 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 48BD91162B63; Thu, 22 Aug 2019 16:07:24 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <20190814202219.1870-8-mlevitsk@redhat.com>
+ <87sgpukafd.fsf@dusky.pond.sub.org>
+ <2ac0407fbbed8558dc22fc0b8a30ef77bddcea6f.camel@redhat.com>
+Date: Thu, 22 Aug 2019 16:07:24 +0200
+In-Reply-To: <2ac0407fbbed8558dc22fc0b8a30ef77bddcea6f.camel@redhat.com>
+ (Maxim Levitsky's message of "Thu, 22 Aug 2019 01:24:09 +0300")
+Message-ID: <877e75cmzn.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 22 Aug 2019 13:59:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Thu, 22 Aug 2019 14:07:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/7] s390x/tcg: Rework MMU selection for
- instruction fetches
+Subject: Re: [Qemu-devel] [PATCH 07/13] block: add manage-encryption command
+ (qmp and blockdev)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,151 +75,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- David Hildenbrand <david@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-Instructions are always fetched from primary address space, except when
-in home address mode. Perform the selection directly in cpu_mmu_index().
+> On Wed, 2019-08-21 at 13:47 +0200, Markus Armbruster wrote:
+>> Maxim Levitsky <mlevitsk@redhat.com> writes:
+>> 
+>> > This adds:
+>> > 
+>> > * x-blockdev-update-encryption and x-blockdev-erase-encryption qmp commands
+>> >   Both commands take the QCryptoKeyManageOptions
+>> >   the x-blockdev-update-encryption is meant for non destructive addition
+>> >   of key slots / whatever the encryption driver supports in the future
+>> > 
+>> >   x-blockdev-erase-encryption is meant for destructive encryption key erase,
+>> >   in some cases even without way to recover the data.
+>> > 
+>> > 
+>> > * bdrv_setup_encryption callback in the block driver
+>> >   This callback does both the above functions with 'action' parameter
+>> > 
+>> > * QCryptoKeyManageOptions with set of options that drivers can use for encryption managment
+>> >   Currently it has all the options that LUKS needs, and later it can be extended
+>> >   (via union) to support more encryption drivers if needed
+>> > 
+>> > * blk_setup_encryption / bdrv_setup_encryption - the usual block layer wrappers.
+>> >   Note that bdrv_setup_encryption takes BlockDriverState and not BdrvChild,
+>> >   for the ease of use from the qmp code. It is not expected that this function
+>> >   will be used by anything but qmp and qemu-img code
+>> > 
+>> > 
+>> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> 
+>> [...]
+>> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> > index 0d43d4f37c..53ed411eed 100644
+>> > --- a/qapi/block-core.json
+>> > +++ b/qapi/block-core.json
+>> > @@ -5327,3 +5327,39 @@
+>> >    'data' : { 'node-name': 'str',
+>> >               'iothread': 'StrOrNull',
+>> >               '*force': 'bool' } }
+>> > +
+>> > +
+>> > +##
+>> > +# @x-blockdev-update-encryption:
+>> > +#
+>> > +# Update the encryption keys for an encrypted block device
+>> > +#
+>> > +# @node-name: 	  Name of the blockdev to operate on
+>> > +# @force:         Disable safety checks (use with care)
+>> 
+>> What checks excactly are disabled?
+> Ability to overwrite an used slot with a different password. 
+> If overwrite fails, the image won't be recoverable.
+>
+> The safe way is to add a new slot, then erase the old
+> one, but this changes the slot where the password
+> is stored, unless this procedure is used twice
 
-get_mem_index() is only used to perform data access, instructions are
-fetched via cpu_lduw_code(), which translates to cpu_mmu_index(env, true)=
-.
+Would this be a useful addition to the doc comment?
 
-We don't care about restricting the access permissions of the TLB
-entries anymore, as we no longer enter PRIMARY entries into the
-SECONDARY MMU. Cleanup related code a bit.
+>> > +# @options:       Driver specific options
+>> > +#
+>> > +
+>> > +# Since: 4.2
+>> > +##
+>> > +{ 'command': 'x-blockdev-update-encryption',
+>> > +  'data': { 'node-name' : 'str',
+>> > +            '*force' : 'bool',
+>> > +            'options': 'QCryptoEncryptionSetupOptions' } }
+>> > +
+>> > +##
+>> > +# @x-blockdev-erase-encryption:
+>> > +#
+>> > +# Erase the encryption keys for an encrypted block device
+>> > +#
+>> > +# @node-name: 	  Name of the blockdev to operate on
+>> > +# @force:         Disable safety checks (use with care)
+>> 
+>> Likewise.
+> 1. Erase a slot which is already marked as
+> erased. Mostly harmless but pointless as well.
+>
+> 2. Erase last keyslot. This irreversibly destroys
+> any ability to read the data from the device,
+> unless a backup of the header and the key material is
+> done prior. Still can be useful when it is desired to
+> erase the data fast.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20190816084708.602-4-david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/cpu.h        |  7 +++++++
- target/s390x/mmu_helper.c | 38 +++++++++++++++-----------------------
- 2 files changed, 22 insertions(+), 23 deletions(-)
+Would this be a useful addition to the doc comment?
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 3d9de25f7ce3..79202c098096 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -332,6 +332,13 @@ static inline int cpu_mmu_index(CPUS390XState *env, =
-bool ifetch)
-         return MMU_REAL_IDX;
-     }
-=20
-+    if (ifetch) {
-+        if ((env->psw.mask & PSW_MASK_ASC) =3D=3D PSW_ASC_HOME) {
-+            return MMU_HOME_IDX;
-+        }
-+        return MMU_PRIMARY_IDX;
-+    }
-+
-     switch (env->psw.mask & PSW_MASK_ASC) {
-     case PSW_ASC_PRIMARY:
-         return MMU_PRIMARY_IDX;
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 6cf74502ef1e..40b6c1fc36a9 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -350,8 +350,9 @@ int mmu_translate(CPUS390XState *env, target_ulong va=
-ddr, int rw, uint64_t asc,
- {
-     static S390SKeysState *ss;
-     static S390SKeysClass *skeyclass;
--    int r =3D -1;
-+    uint64_t asce;
-     uint8_t key;
-+    int r;
-=20
-     if (unlikely(!ss)) {
-         ss =3D s390_get_skeys_device();
-@@ -381,36 +382,21 @@ int mmu_translate(CPUS390XState *env, target_ulong =
-vaddr, int rw, uint64_t asc,
-=20
-     if (!(env->psw.mask & PSW_MASK_DAT)) {
-         *raddr =3D vaddr;
--        r =3D 0;
--        goto out;
-+        goto nodat;
-     }
-=20
-     switch (asc) {
-     case PSW_ASC_PRIMARY:
-         PTE_DPRINTF("%s: asc=3Dprimary\n", __func__);
--        r =3D mmu_translate_asce(env, vaddr, asc, env->cregs[1], raddr, =
-flags,
--                               rw, exc);
-+        asce =3D env->cregs[1];
-         break;
-     case PSW_ASC_HOME:
-         PTE_DPRINTF("%s: asc=3Dhome\n", __func__);
--        r =3D mmu_translate_asce(env, vaddr, asc, env->cregs[13], raddr,=
- flags,
--                               rw, exc);
-+        asce =3D env->cregs[13];
-         break;
-     case PSW_ASC_SECONDARY:
-         PTE_DPRINTF("%s: asc=3Dsecondary\n", __func__);
--        /*
--         * Instruction: Primary
--         * Data: Secondary
--         */
--        if (rw =3D=3D MMU_INST_FETCH) {
--            r =3D mmu_translate_asce(env, vaddr, PSW_ASC_PRIMARY, env->c=
-regs[1],
--                                   raddr, flags, rw, exc);
--            *flags &=3D ~(PAGE_READ | PAGE_WRITE);
--        } else {
--            r =3D mmu_translate_asce(env, vaddr, PSW_ASC_SECONDARY, env-=
->cregs[7],
--                                   raddr, flags, rw, exc);
--            *flags &=3D ~(PAGE_EXEC);
--        }
-+        asce =3D env->cregs[7];
-         break;
-     case PSW_ASC_ACCREG:
-     default:
-@@ -418,11 +404,17 @@ int mmu_translate(CPUS390XState *env, target_ulong =
-vaddr, int rw, uint64_t asc,
-         break;
-     }
-=20
-- out:
-+    /* perform the DAT translation */
-+    r =3D mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, ex=
-c);
-+    if (r) {
-+        return r;
-+    }
-+
-+nodat:
-     /* Convert real address -> absolute address */
-     *raddr =3D mmu_real2abs(env, *raddr);
-=20
--    if (r =3D=3D 0 && *raddr < ram_size) {
-+    if (*raddr < ram_size) {
-         r =3D skeyclass->get_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &ke=
-y);
-         if (r) {
-             trace_get_skeys_nonzero(r);
-@@ -444,7 +436,7 @@ int mmu_translate(CPUS390XState *env, target_ulong va=
-ddr, int rw, uint64_t asc,
-         }
-     }
-=20
--    return r;
-+    return 0;
- }
-=20
- /**
---=20
-2.20.1
+>> > +# @options:       Driver specific options
+>> > +#
+>> > +# Returns: @QCryptoKeyManageResult
+>> 
+>> Doc comment claims the command returns something, even though it
+>> doesn't.  Please fix.  Sadly, the doc generator fails to flag that.
+> This is leftover, fixed now although most likely this interface will die.
+> I was initially planning to return
+> information on which slot was allocated when user left that
+> decision to the driver.
+>
+>> 
+>> > +#
+>> > +# Since: 4.2
+>> > +##
+>> > +{ 'command': 'x-blockdev-erase-encryption',
+>> > +  'data': { 'node-name' : 'str',
+>> > +            '*force' : 'bool',
+>> > +            'options': 'QCryptoEncryptionSetupOptions' } }
 
+Hmm, all members of @options are optional.  If I don't want to specify
+any of them, I still have to say "options": {}.  Should @options be
+optional, too?
+
+Question is not relevant for x-blockdev-update-encryption, because
+there, options.key-secret isn't actually optional.  Correct?
+
+>> > diff --git a/qapi/crypto.json b/qapi/crypto.json
+>> > index b2a4cff683..69e8b086db 100644
+>> > --- a/qapi/crypto.json
+>> > +++ b/qapi/crypto.json
+>> > @@ -309,3 +309,29 @@
+>> >    'base': 'QCryptoBlockInfoBase',
+>> >    'discriminator': 'format',
+>> >    'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
+>> > +
+>> > +
+>> > +##
+>> > +# @QCryptoEncryptionSetupOptions:
+>> > +#
+>> > +# Driver specific options for encryption key management.
+>> 
+>> Specific to which driver?
+>
+> This is the same issue, of not beeing able to detect an union.
+>
+> I was planning to have an union here where we could add
+> add the driver specific options if we need to have another crypto driver,
+> however since I discovered that union needs user to pass the driver name,
+> I just placed it in a struct.
+>
+> So this struct is supposed to represent driver specific options, but
+> currently contains only luks options.
+
+Imagine we find driver DRV needs options.  How would we extend your QAPI
+schema then?
+
+We can add DRV's options to this struct.  QMP clients then must use only
+the LUKS members when the driver is actually LUKS, and only the DRV
+members when it's actually DRV.  Works as long as all members are
+optional.  Confusing, and ugly as sin.
+
+We can add a second struct for DRV's options.  Call it
+QCryptoEncryptionSetupOptionsDRV.  Add an optional parameter 'drv':
+'QCryptoEncryptionSetupOptionsDRV' to x-blockdev-*-encryption, make
+existing parameter @options optional.  Can't rename it to @luks
+(compatibility break).  Probably want to rename
+QCryptoEncryptionSetupOptions to QCryptoEncryptionSetupOptionsLUKS.  QMP
+clients then must use @options when the driver is actually LUKS, and
+@drv when it's actually DRV.  Less confusing, still ugly.
+
+I'm not happy with either idea.  Do you have a better one?
+
+>> > +#
+>> > +# @key-secret: the ID of a QCryptoSecret object providing the password
+>> > +#              to add or to erase (optional for erase)
+>> > +#
+>> > +# @old-key-secret: the ID of a QCryptoSecret object providing the password
+>> > +#                  that can currently unlock the image
+>> > +#
+>> > +# @slot: Key slot to update/erase
+>> > +#        (optional, for update will select a free slot,
+>> > +#        for erase will erase all slots that match the password)
+>> > +#
+>> > +# @iter-time: number of milliseconds to spend in
+>> > +#             PBKDF passphrase processing. Currently defaults to 2000
+
+Let's scratch "currently".
+
+>> > +# Since: 4.2
+>> > +##
+>> > +{ 'struct': 'QCryptoEncryptionSetupOptions',
+>> > +  'data': { '*key-secret': 'str',
+>> > +            '*old-key-secret': 'str',
+>> > +            '*slot': 'int',
+>> > +            '*iter-time': 'int' } }
+>> 
+>> The two new commands have identical arguments.  Some of them you factor
+>> out into their own struct.  Can you explain what makes them special?
+>
+>
+> Uniting these means that I need to add some kind of 'action' to the
+> options, which is kind of adding a subcommand to a qmp command, which is also feels
+> kind of wrong.
+>
+> That is why internally this is implemented as one block driver callback,
+> with action = {erase,update}, but qmp exposes two commands.
+
+Yes, multiplexed commands are ugly more often than not.
+
+> I would personally prefer to have that erase field,and I would have to have
+> it, if I switch to the amend interface.
+>
+>
+>> 
+>> The extra nesting on the wire is kind of ugly.  We can talk about how to
+>> avoid it once I understand why we want the extra struct.
+>> 
+> I kind of agree with that but The reason for that is that I designed that interface like that is  to be not specific to luks.
+>
+> I pass the options structure down the stack till it reaches the luks driver where it can deal with
+> it. If a new crypto driver is added, all you would have to do is to define new options in the json,
+> and use them in the new crypto driver. The rest of the code doesn't know what is in that struct.
+> Kind of the same as done with blockdev-create I guess.
+
+Actually, blockdev-create is quite different in one important way: it
+uses a *union* for driver-specific arguments, not a struct.
+
+If we make QCryptoEncryptionSetupOptions ab union, like
+BlockdevCreateOptions is, then the way to grow it to more drivers is
+obvious.
+
+We can talk about nesting later.
 
