@@ -2,67 +2,65 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9141AC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 12:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6385C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 12:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64C5A22CE3
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 12:08:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64C5A22CE3
+	by mail.kernel.org (Postfix) with ESMTPS id 9C0E122CE3
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 12:09:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C0E122CE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0ltF-0000We-KV
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 08:08:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36369)
+	id 1i0lts-0001Dr-Hs
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 08:09:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33611)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i0lbD-0003CH-Km
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:49:52 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i0lT6-0001fq-L3
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:41:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i0lbC-0000lf-5O
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:49:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53696)
+ (envelope-from <dgilbert@redhat.com>) id 1i0lT3-0003MD-DR
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:41:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35678)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1i0lb8-0000gN-CY; Thu, 22 Aug 2019 07:49:46 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i0lSz-0003Hq-IF
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:41:23 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A3348308427C;
- Thu, 22 Aug 2019 11:49:45 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9951D60FA2;
- Thu, 22 Aug 2019 11:49:41 +0000 (UTC)
-Date: Thu, 22 Aug 2019 12:49:39 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190822114939.GT3267@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-9-mlevitsk@redhat.com>
- <20190822111608.GN3267@redhat.com>
- <1cedbbf007f4447f9424d09848c6486b0341b43d.camel@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D522E7F75C
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 11:41:17 +0000 (UTC)
+Received: from work-vm (ovpn-117-231.ams2.redhat.com [10.36.117.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DCCA88FD;
+ Thu, 22 Aug 2019 11:41:13 +0000 (UTC)
+Date: Thu, 22 Aug 2019 12:41:11 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190822114111.GG3277@work-vm>
+References: <20190808150325.21939-1-marcandre.lureau@redhat.com>
+ <20190808150325.21939-3-marcandre.lureau@redhat.com>
+ <20190822105558.GF3277@work-vm>
+ <CAMxuvayE_5yEzQzwGUUwDP6mCNqJHSuBRz7R=bd6eqUfbXO4GA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1cedbbf007f4447f9424d09848c6486b0341b43d.camel@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 22 Aug 2019 11:49:45 +0000 (UTC)
+In-Reply-To: <CAMxuvayE_5yEzQzwGUUwDP6mCNqJHSuBRz7R=bd6eqUfbXO4GA@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Thu, 22 Aug 2019 11:41:17 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 08/13] qcrypto: add the plumbing for
- encryption management
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] Add dbus-vmstate object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,160 +72,900 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 22, 2019 at 02:47:03PM +0300, Maxim Levitsky wrote:
-> On Thu, 2019-08-22 at 12:16 +0100, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Aug 14, 2019 at 11:22:14PM +0300, Maxim Levitsky wrote:
-> > > This adds qcrypto_block_manage_encryption, which
-> > >  is thin wrapper around manage_encryption of the crypto driver
-> > >  which is also added
-> > >=20
-> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > ---
-> > >  crypto/block.c         | 29 +++++++++++++++++++++++++++++
-> > >  crypto/blockpriv.h     |  9 +++++++++
-> > >  include/crypto/block.h | 27 +++++++++++++++++++++++++++
-> > >  3 files changed, 65 insertions(+)
-> > >=20
-> > > diff --git a/crypto/block.c b/crypto/block.c
-> > > index ee96759f7d..5916e49aba 100644
-> > > --- a/crypto/block.c
-> > > +++ b/crypto/block.c
-> > > @@ -20,6 +20,7 @@
-> > > =20
-> > >  #include "qemu/osdep.h"
-> > >  #include "qapi/error.h"
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Hi
+>=20
+> On Thu, Aug 22, 2019 at 2:56 PM Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> >
+> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > > When instanciated, this object will connect to the given D-Bus
+> > > bus. During migration, it will take the data from org.qemu.VMState1
+> > > instances.
+> > >
+> > > See documentation for further details.
+> >
+> > I'll leave the main review to someone who understands the details of
+> > DBUS, however from the migration side:
+> >
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >
+> > <snip>
+> >
 > > > +
-> > >  #include "blockpriv.h"
-> > >  #include "block-qcow.h"
-> > >  #include "block-luks.h"
-> > > @@ -282,6 +283,34 @@ void qcrypto_block_free(QCryptoBlock *block)
-> > >  }
-> > > =20
-> > > =20
-> > > +int qcrypto_block_setup_encryption(QCryptoBlock *block,
-> > > +                                   QCryptoBlockReadFunc readfunc,
-> > > +                                   QCryptoBlockWriteFunc writefunc=
-,
-> > > +                                   void *opaque,
-> > > +                                   enum BlkSetupEncryptionAction a=
-ction,
-> > > +                                   QCryptoEncryptionSetupOptions *=
-options,
-> > > +                                   bool force,
-> > > +                                   Error **errp)
+> > > +static int
+> > > +dbus_load_state(QEMUFile *f, void *opaque, int version_id)
 > > > +{
-> > > +    if (!block->driver->setup_encryption) {
-> > > +        error_setg(errp,
-> > > +                "Crypto format %s doesn't support management of en=
-cryption keys",
-> > > +                QCryptoBlockFormat_str(block->format));
-> > > +        return -1;
+> > > +    DBusVMState *self =3D DBUS_VMSTATE(opaque);
+> > > +    uint8_t *data =3D NULL;
+> > > +    int ret =3D -1;
+> > > +    char id[256];
+> > > +    unsigned int size;
+> >
+> > Higher level question; do you actually need a separate ID, or does
+> > the ID that's stored by the migration code in the section name
+> > give you enough uniqueness?
+>=20
+>=20
+> The ID stored in migration section name is based on the handler ID:
+> TYPE_DBUS_VMSTATE "-" handler_id
+>=20
+> By design, handler_id must be unique (and documented as such).
+>=20
+> Do you see a problem with that approach?
+
+OK, so if that's unique, why do you need an 'id' stored here?
+
+> >
+> > > +    if (qemu_get_counted_string(f, id) =3D=3D 0) {
+> > > +        error_report("Invalid vmstate Id");
+> > > +        goto end;
+> >
+> > I generally prefer to include something telling me where the error ha=
+s
+> > come from, just to make it easier to track down if I see the error in
+> > a log; e.g. use __func__
+>=20
+> ok
+>=20
+> >
 > > > +    }
 > > > +
-> > > +    return block->driver->setup_encryption(block,
-> > > +                                           readfunc,
-> > > +                                           writefunc,
-> > > +                                           opaque,
-> > > +                                           action,
-> > > +                                           options,
-> > > +                                           force,
-> > > +                                           errp);
+> > > +    if (g_strcmp0(id, self->id)) {
+> > > +        error_report("Invalid vmstate Id: %s !=3D %s", id, self->i=
+d);
+> > > +        goto end;
+> > > +    }
+> > > +
+> > > +    size =3D qemu_get_be32(f);
+> > > +    if (size > DBUS_VMSTATE_SIZE_LIMIT) {
+> > > +        error_report("Invalid vmstate size: %u", size);
+> > > +        goto end;
+> > > +    }
+> > > +
+> > > +    data =3D g_malloc(size);
+> > > +    if (qemu_get_buffer(f, data, size) !=3D size) {
+> > > +        error_report("Failed to read %u bytes", size);
+> > > +        goto end;
+> > > +    }
+> > > +
+> > > +    if (dbus_load_state_proxy(self->proxy, data, size) < 0) {
+> > > +        error_report("Failed to restore Id '%s'", id);
+> > > +        goto end;
+> > > +    }
+> > > +
+> > > +    ret =3D 0;
+> > > +
+> > > +end:
+> > > +    g_clear_pointer(&data, g_free);
+> > > +    return ret;
+> > > +}
+> > > +
+> > > +static void
+> > > +dbus_save_state(QEMUFile *f, void *opaque)
+> > > +{
+> > > +    DBusVMState *self =3D DBUS_VMSTATE(opaque);
+> > > +    GVariant *result =3D NULL, *child =3D NULL;
+> > > +    const uint8_t *data;
+> > > +    size_t size;
+> > > +    GError *err =3D NULL;
+> > > +
+> > > +    result =3D g_dbus_proxy_call_sync(self->proxy, "Save",
+> > > +                                    NULL, G_DBUS_CALL_FLAGS_NO_AUT=
+O_START,
+> > > +                                    -1, NULL, &err);
+> > > +    if (!result) {
+> > > +        error_report("Failed to Save: %s", err->message);
+> > > +        g_clear_error(&err);
+> > > +        goto end;
+> > > +    }
+> > > +
+> > > +    child =3D g_variant_get_child_value(result, 0);
+> > > +    data =3D g_variant_get_fixed_array(child, &size, sizeof(char))=
+;
+> > > +    if (!data) {
+> > > +        error_report("Failed to Save: not a byte array");
+> > > +        goto end;
+> > > +    }
+> > > +    if (size > DBUS_VMSTATE_SIZE_LIMIT) {
+> > > +        error_report("Too much vmstate data to save: %zu", size);
+> > > +        goto end;
+> > > +    }
+> > > +
+> > > +    qemu_put_counted_string(f, self->id);
+> > > +    qemu_put_be32(f, size);
+> > > +    qemu_put_buffer(f, data, size);
+> > > +
+> > > +end:
+> > > +    g_clear_pointer(&child, g_variant_unref);
+> > > +    g_clear_pointer(&result, g_variant_unref);
+> > > +}
+> > > +
+> > > +static const SaveVMHandlers savevm_handlers =3D {
+> > > +    .save_state =3D dbus_save_state,
+> > > +    .load_state =3D dbus_load_state,
+> > > +};
+> > > +
+> > > +static void
+> > > +dbus_vmstate_complete(UserCreatable *uc, Error **errp)
+> > > +{
+> > > +    DBusVMState *self =3D DBUS_VMSTATE(uc);
+> > > +    GError *err =3D NULL;
+> > > +    GDBusConnection *bus =3D NULL;
+> > > +    GDBusProxy *proxy =3D NULL;
+> > > +    char *idstr =3D NULL;
+> > > +
+> > > +    if (!self->dbus_addr) {
+> > > +        error_setg(errp, QERR_MISSING_PARAMETER, "addr");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    bus =3D g_dbus_connection_new_for_address_sync(self->dbus_addr=
+,
+> > > +               G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
+> > > +               NULL, NULL, &err);
+> > > +    if (err) {
+> > > +        error_setg(errp, "failed to connect to DBus: '%s'", err->m=
+essage);
+> > > +        g_clear_error(&err);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    self->bus =3D bus;
+> > > +
+> > > +    proxy =3D g_dbus_proxy_new_sync(bus,
+> > > +                G_DBUS_PROXY_FLAGS_NONE,
+> > > +                (GDBusInterfaceInfo *) &vmstate1_interface_info,
+> > > +                NULL,
+> > > +                "/org/qemu/VMState1",
+> > > +                "org.qemu.VMState1",
+> > > +                NULL, &err);
+> > > +
+> > > +    if (err) {
+> > > +        error_setg(errp, "failed to create DBus proxy: '%s'", err-=
+>message);
+> > > +        g_clear_error(&err);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    self->proxy =3D proxy;
+> > > +
+> > > +    self->id =3D dbus_proxy_get_id(proxy, &err);
+> > > +    if (!self->id) {
+> > > +        error_setg(errp, "failed to get DBus Id: '%s'", err->messa=
+ge);
+> > > +        g_clear_error(&err);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    idstr =3D get_idstr(self);
+> > > +    if (register_savevm_live(NULL, idstr, 0, 0,
+> > > +                             &savevm_handlers, self) < 0) {
+> > > +        error_setg(errp, "Failed to register savevm handler");
+> > > +    }
+> >
+> > Can you try and avoid register_savevm_live if possible and just wire =
+a
+> > vmsd onto the class like most other devices? We don't have many
+> > register_savevm_live calls, and I'd like to get them down to just the
+> > iterative devices.
+>=20
+> Sure if I could, but it's not a device.
+>=20
+> Perhaps we could have a qom interface for vmsd users? I can try that ev=
+entually.
+
+Hmm, why isn't it a device?
+
+
+Dave
+
+> thanks
+>=20
+> > Dave
+> >
+> >
+> > > +    g_free(idstr);
+> > > +}
+> > > +
+> > > +static void
+> > > +dbus_vmstate_finalize(Object *o)
+> > > +{
+> > > +    DBusVMState *self =3D DBUS_VMSTATE(o);
+> > > +    char *idstr =3D get_idstr(self);
+> > > +
+> > > +    unregister_savevm(NULL, idstr, self);
+> > > +
+> > > +    g_clear_object(&self->bus);
+> > > +    g_clear_object(&self->proxy);
+> > > +    g_free(self->dbus_addr);
+> > > +    g_free(self->id);
+> > > +    g_free(idstr);
+> > > +}
+> > > +
+> > > +static char *
+> > > +get_dbus_addr(Object *o, Error **errp)
+> > > +{
+> > > +    DBusVMState *self =3D DBUS_VMSTATE(o);
+> > > +
+> > > +    return g_strdup(self->dbus_addr);
+> > > +}
+> > > +
+> > > +static void
+> > > +set_dbus_addr(Object *o, const char *str, Error **errp)
+> > > +{
+> > > +    DBusVMState *self =3D DBUS_VMSTATE(o);
+> > > +
+> > > +    g_free(self->dbus_addr);
+> > > +    self->dbus_addr =3D g_strdup(str);
+> > > +}
+> > > +
+> > > +static void
+> > > +dbus_vmstate_class_init(ObjectClass *oc, void *data)
+> > > +{
+> > > +    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
+> > > +
+> > > +    ucc->complete =3D dbus_vmstate_complete;
+> > > +
+> > > +    object_class_property_add_str(oc, "addr",
+> > > +                                  get_dbus_addr, set_dbus_addr,
+> > > +                                  &error_abort);
+> > > +}
+> > > +
+> > > +static const TypeInfo dbus_vmstate_info =3D {
+> > > +    .name =3D TYPE_DBUS_VMSTATE,
+> > > +    .parent =3D TYPE_OBJECT,
+> > > +    .instance_size =3D sizeof(DBusVMState),
+> > > +    .instance_finalize =3D dbus_vmstate_finalize,
+> > > +    .class_size =3D sizeof(DBusVMStateClass),
+> > > +    .class_init =3D dbus_vmstate_class_init,
+> > > +    .interfaces =3D (InterfaceInfo[]) {
+> > > +        { TYPE_USER_CREATABLE },
+> > > +        { }
+> > > +    }
+> > > +};
+> > > +
+> > > +static void
+> > > +register_types(void)
+> > > +{
+> > > +    type_register_static(&dbus_vmstate_info);
+> > > +}
+> > > +
+> > > +type_init(register_types);
+> > > diff --git a/configure b/configure
+> > > index 714e7fb6a1..e5b34f5ca7 100755
+> > > --- a/configure
+> > > +++ b/configure
+> > > @@ -3665,10 +3665,16 @@ if $pkg_config --atleast-version=3D$glib_re=
+q_ver gio-2.0; then
+> > >      gio=3Dyes
+> > >      gio_cflags=3D$($pkg_config --cflags gio-2.0)
+> > >      gio_libs=3D$($pkg_config --libs gio-2.0)
+> > > +    gdbus_codegen=3D$($pkg_config --variable=3Dgdbus_codegen gio-2=
+.0)
+> > >  else
+> > >      gio=3Dno
+> > >  fi
+> > >
+> > > +if $pkg_config --atleast-version=3D$glib_req_ver gio-unix-2.0; the=
+n
+> > > +    gio_cflags=3D"$gio_cflags $($pkg_config --cflags gio-unix-2.0)=
+"
+> > > +    gio_libs=3D"$gio_libs $($pkg_config --libs gio-unix-2.0)"
+> > > +fi
+> > > +
+> > >  # Sanity check that the current size_t matches the
+> > >  # size that glib thinks it should be. This catches
+> > >  # problems on multi-arch where people try to build
+> > > @@ -6830,6 +6836,7 @@ if test "$gio" =3D "yes" ; then
+> > >      echo "CONFIG_GIO=3Dy" >> $config_host_mak
+> > >      echo "GIO_CFLAGS=3D$gio_cflags" >> $config_host_mak
+> > >      echo "GIO_LIBS=3D$gio_libs" >> $config_host_mak
+> > > +    echo "GDBUS_CODEGEN=3D$gdbus_codegen" >> $config_host_mak
+> > >  fi
+> > >  echo "CONFIG_TLS_PRIORITY=3D\"$tls_priority\"" >> $config_host_mak
+> > >  if test "$gnutls" =3D "yes" ; then
+> > > diff --git a/docs/interop/dbus-vmstate.rst b/docs/interop/dbus-vmst=
+ate.rst
+> > > new file mode 100644
+> > > index 0000000000..4a32a183fb
+> > > --- /dev/null
+> > > +++ b/docs/interop/dbus-vmstate.rst
+> > > @@ -0,0 +1,63 @@
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +DBus VMState
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +
+> > > +Introduction
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +
+> > > +Helper processes may have their state migrated with the help of
+> > > +QEMU "dbus-vmstate" objects.
+> > > +
+> > > +At this point, the connection to the helper is done in DBus
+> > > +peer-to-peer mode (no initial Hello, and no bus name for
+> > > +communication). The helper must be listening to the given address.
+> > > +
+> > > +Helper may save arbitrary data to be transferred in the migration
+> > > +stream and restored/loaded on destination.
+> > > +
+> > > +The data amount to be transferred is limited to 1Mb. The state mus=
+t be
+> > > +saved quickly (a few seconds maximum). (DBus imposes a time limit =
+on
+> > > +reply anyway, and migration would fail if the data isn't given qui=
+ckly
+> > > +enough)
+> > > +
+> > > +Interface
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +
+> > > +On /org/qemu/VMState1 object path:
+> > > +
+> > > +.. code:: xml
+> > > +
+> > > +  <interface name=3D"org.qemu.VMState1">
+> > > +    <property name=3D"Id" type=3D"s" access=3D"read"/>
+> > > +    <method name=3D"Load">
+> > > +      <arg type=3D"ay" name=3D"data" direction=3D"in"/>
+> > > +    </method>
+> > > +    <method name=3D"Save">
+> > > +      <arg type=3D"ay" name=3D"data" direction=3D"out"/>
+> > > +    </method>
+> > > +  </interface>
+> > > +
+> > > +"Id" property
+> > > +-------------
+> > > +
+> > > +A utf8 encoded string that identifies the helper uniquely.
+> > > +Must be <256 bytes.
+> > > +
+> > > +Load(in u8[] bytes) method
+> > > +--------------------------
+> > > +
+> > > +The method called on destination with the state to restore.
+> > > +
+> > > +The helper may be initially started in a waiting state (with
+> > > +an --incoming argument for example), and it may resume on load
+> > > +success.
+> > > +
+> > > +An error may be returned to the caller.
+> > > +
+> > > +Save(out u8[] bytes) method
+> > > +---------------------------
+> > > +
+> > > +The method called on the source to get the current state to be
+> > > +migrated. The helper should continue to run normally.
+> > > +
+> > > +An error may be returned to the caller.
+> > > diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+> > > index b4bfcab417..6bb173cfa6 100644
+> > > --- a/docs/interop/index.rst
+> > > +++ b/docs/interop/index.rst
+> > > @@ -13,6 +13,7 @@ Contents:
+> > >     :maxdepth: 2
+> > >
+> > >     bitmaps
+> > > +   dbus-vmstate
+> > >     live-block-operations
+> > >     pr-helper
+> > >     vhost-user
+> > > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > > index fd7fdb8658..2c610086a7 100644
+> > > --- a/tests/Makefile.include
+> > > +++ b/tests/Makefile.include
+> > > @@ -157,7 +157,9 @@ check-qtest-pci-$(CONFIG_RTL8139_PCI) +=3D test=
+s/rtl8139-test$(EXESUF)
+> > >  check-qtest-pci-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
+> > >  check-qtest-pci-$(CONFIG_HDA) +=3D tests/intel-hda-test$(EXESUF)
+> > >  check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) +=3D tests/ivshmem-test$(=
+EXESUF)
+> > > -
+> > > +ifneq ($(GDBUS_CODEGEN),)
+> > > +check-qtest-pci-$(CONFIG_GIO) +=3D tests/dbus-vmstate-test$(EXESUF=
+)
+> > > +endif
+> > >  check-qtest-i386-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(=
+EXESUF)
+> > >  check-qtest-i386-y +=3D tests/fdc-test$(EXESUF)
+> > >  check-qtest-i386-y +=3D tests/ide-test$(EXESUF)
+> > > @@ -618,6 +620,18 @@ tests/qapi-schema/doc-good.test.texi: $(SRC_PA=
+TH)/tests/qapi-schema/doc-good.jso
+> > >       @mv tests/qapi-schema/doc-good-qapi-doc.texi $@
+> > >       @rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-sche=
+ma/doc-good-qmp-*.[ch]
+> > >
+> > > +tests/dbus-vmstate1.h tests/dbus-vmstate1.c: tests/dbus-vmstate1-g=
+en-timestamp ;
+> > > +tests/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/dbus-vmstate1=
+.xml
+> > > +     $(call quiet-command,$(GDBUS_CODEGEN) $< \
+> > > +             --interface-prefix org.qemu --generate-c-code tests/d=
+bus-vmstate1, \
+> > > +             "GEN","$(@:%-timestamp=3D%)")
+> > > +     @>$@
+> > > +
+> > > +tests/dbus-vmstate1.o-cflags :=3D $(GIO_CFLAGS)
+> > > +tests/dbus-vmstate1.o-libs :=3D $(GIO_LIBS)
+> > > +
+> > > +tests/dbus-vmstate-test.o: tests/dbus-vmstate1.h
+> > > +
+> > >  tests/test-string-output-visitor$(EXESUF): tests/test-string-outpu=
+t-visitor.o $(test-qapi-obj-y)
+> > >  tests/test-string-input-visitor$(EXESUF): tests/test-string-input-=
+visitor.o $(test-qapi-obj-y)
+> > >  tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-=
+obj-y) tests/test-qapi-events.o
+> > > @@ -820,6 +834,7 @@ tests/test-filter-mirror$(EXESUF): tests/test-f=
+ilter-mirror.o $(qtest-obj-y)
+> > >  tests/test-filter-redirector$(EXESUF): tests/test-filter-redirecto=
+r.o $(qtest-obj-y)
+> > >  tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.=
+o $(qtest-obj-y)
+> > >  tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-=
+server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> > > +tests/dbus-vmstate-test$(EXESUF): tests/dbus-vmstate-test.o tests/=
+dbus-vmstate1.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> > >  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test=
+-util-obj-y) libvhost-user.a
+> > >  tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+> > >  tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+> > > @@ -1172,6 +1187,7 @@ check-clean:
+> > >       rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+> > >       rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check=
+-qtest-$(target)-y)) $(check-qtest-generic-y))
+> > >       rm -f tests/test-qapi-gen-timestamp
+> > > +     rm -f tests/dbus-vmstate1-gen-timestamp
+> > >       rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+> > >
+> > >  clean: check-clean
+> > > diff --git a/tests/dbus-vmstate-test.c b/tests/dbus-vmstate-test.c
+> > > new file mode 100644
+> > > index 0000000000..45d44916d2
+> > > --- /dev/null
+> > > +++ b/tests/dbus-vmstate-test.c
+> > > @@ -0,0 +1,371 @@
+> > > +#include "qemu/osdep.h"
+> > > +#include <glib/gstdio.h>
+> > > +#include <gio/gio.h>
+> > > +#include "libqtest.h"
+> > > +#include "qemu-common.h"
+> > > +#include "dbus-vmstate1.h"
+> > > +
+> > > +static char *workdir;
+> > > +
+> > > +typedef struct TestServerId {
+> > > +    const char *name;
+> > > +    const char *data;
+> > > +    size_t size;
+> > > +} TestServerId;
+> > > +
+> > > +static const TestServerId idA =3D {
+> > > +    "idA", "I'am\0idA!", sizeof("I'am\0idA!")
+> > > +};
+> > > +
+> > > +static const TestServerId idB =3D {
+> > > +    "idB", "I'am\0idB!", sizeof("I'am\0idB!")
+> > > +};
+> > > +
+> > > +typedef struct TestServer {
+> > > +    const TestServerId *id;
+> > > +    bool save_called;
+> > > +    bool load_called;
+> > > +    GDBusObjectManagerServer *om;
+> > > +    GDBusServer *server;
+> > > +} TestServer;
+> > > +
+> > > +typedef struct Test {
+> > > +    bool migrate_fail;
+> > > +    TestServer srcA;
+> > > +    TestServer dstA;
+> > > +    TestServer srcB;
+> > > +    TestServer dstB;
+> > > +    GMainLoop *loop, *dbus_loop;
+> > > +    QTestState *src_qemu;
+> > > +} Test;
+> > > +
+> > > +GMutex mutex;
+> > > +GCond cond;
+> > > +
+> > > +static gboolean
+> > > +vmstate_load(VMState1 *object, GDBusMethodInvocation *invocation,
+> > > +             const gchar *arg_data, gpointer user_data)
+> > > +{
+> > > +    TestServer *h =3D user_data;
+> > > +    GVariant *args, *var;
+> > > +    const uint8_t *data;
+> > > +    size_t size;
+> > > +
+> > > +    args =3D g_dbus_method_invocation_get_parameters(invocation);
+> > > +    var =3D g_variant_get_child_value(args, 0);
+> > > +    data =3D g_variant_get_fixed_array(var, &size, sizeof(char));
+> > > +    g_assert_cmpuint(size, =3D=3D, h->id->size);
+> > > +    g_assert(!memcmp(data, h->id->data, h->id->size));
+> > > +    h->load_called =3D true;
+> > > +    g_variant_unref(var);
+> > > +
+> > > +    g_dbus_method_invocation_return_value(invocation, g_variant_ne=
+w("()"));
+> > > +    return TRUE;
+> > > +}
+> > > +
+> > > +static gboolean
+> > > +vmstate_save(VMState1 *object, GDBusMethodInvocation *invocation,
+> > > +             gpointer user_data)
+> > > +{
+> > > +    TestServer *h =3D user_data;
+> > > +    GVariant *var;
+> > > +
+> > > +    var =3D g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE,
+> > > +                                    h->id->data, h->id->size, size=
+of(char));
+> > > +    g_dbus_method_invocation_return_value(invocation,
+> > > +                                          g_variant_new("(@ay)", v=
+ar));
+> > > +    h->save_called =3D true;
+> > > +
+> > > +    return TRUE;
+> > > +}
+> > > +
+> > > +static void
+> > > +connection_closed(GDBusConnection *connection,
+> > > +                  gboolean remote_peer_vanished,
+> > > +                  GError *Error,
+> > > +                  gpointer user_data)
+> > > +{
+> > > +    TestServer *h =3D user_data;
+> > > +
+> > > +    g_clear_object(&h->om);
+> > > +    g_clear_object(&connection);
+> > > +}
+> > > +
+> > > +static GDBusObjectManagerServer *
+> > > +get_omserver(GDBusConnection *conn, gpointer user_data)
+> > > +{
+> > > +    TestServer *h =3D user_data;
+> > > +    GDBusObjectManagerServer *om;
+> > > +    GDBusObjectSkeleton *sk;
+> > > +    VMState1 *v;
+> > > +
+> > > +    om =3D g_dbus_object_manager_server_new("/org/qemu");
+> > > +    sk =3D g_dbus_object_skeleton_new("/org/qemu/VMState1");
+> > > +
+> > > +    v =3D vmstate1_skeleton_new();
+> > > +    g_object_set(v, "id", h->id->name, NULL);
+> > > +    g_signal_connect(v, "handle-load", G_CALLBACK(vmstate_load), u=
+ser_data);
+> > > +    g_signal_connect(v, "handle-save", G_CALLBACK(vmstate_save), u=
+ser_data);
+> > > +
+> > > +    g_dbus_object_skeleton_add_interface(sk, G_DBUS_INTERFACE_SKEL=
+ETON(v));
+> > > +    g_dbus_object_manager_server_export(om, sk);
+> > > +    g_dbus_object_manager_server_set_connection(om, conn);
+> > > +
+> > > +    g_clear_object(&v);
+> > > +    g_clear_object(&sk);
+> > > +
+> > > +    return om;
+> > > +}
+> > > +
+> > > +static gboolean
+> > > +on_new_connection(GDBusServer *server,
+> > > +                  GDBusConnection *connection,
+> > > +                  gpointer user_data)
+> > > +{
+> > > +    TestServer *h =3D user_data;
+> > > +
+> > > +    g_object_ref(connection);
+> > > +    g_signal_connect(connection, "closed",
+> > > +                     G_CALLBACK(connection_closed), user_data);
+> > > +    h->om =3D get_omserver(connection, user_data);
+> > > +
+> > > +    return TRUE;
+> > > +}
+> > > +
+> > > +static gboolean
+> > > +allow_mechanism_cb(GDBusAuthObserver *observer,
+> > > +                   const gchar *mechanism,
+> > > +                   gpointer user_data)
+> > > +{
+> > > +    return g_strcmp0(mechanism, "EXTERNAL") =3D=3D 0;
+> > > +}
+> > > +
+> > > +static gboolean
+> > > +authorize_authenticated_peer_cb(GDBusAuthObserver *observer,
+> > > +                                GIOStream *stream,
+> > > +                                GCredentials *credentials,
+> > > +                                gpointer user_data)
+> > > +{
+> > > +    gboolean authorized =3D FALSE;
+> > > +
+> > > +    if (credentials !=3D NULL) {
+> > > +        GCredentials *own_credentials =3D g_credentials_new();
+> > > +
+> > > +        if (g_credentials_is_same_user(credentials, own_credential=
+s, NULL)) {
+> > > +            authorized =3D TRUE;
+> > > +        }
+> > > +
+> > > +        g_clear_object(&own_credentials);
+> > > +    }
+> > > +
+> > > +    return authorized;
+> > > +}
+> > > +
+> > > +static GDBusServer *
+> > > +server_start(TestServer *h, const char *p, const TestServerId *id)
+> > > +{
+> > > +    GDBusAuthObserver *observer =3D NULL;
+> > > +    GDBusServer *server =3D NULL;
+> > > +    gchar *guid =3D NULL;
+> > > +    GError *error =3D NULL;
+> > > +    char *addr =3D NULL;
+> > > +
+> > > +    h->id =3D id;
+> > > +    addr =3D g_strdup_printf("unix:path=3D%s/dbus-%s%s", workdir, =
+p, h->id->name);
+> > > +    guid =3D g_dbus_generate_guid();
+> > > +    observer =3D g_dbus_auth_observer_new();
+> > > +    g_signal_connect(observer, "allow-mechanism",
+> > > +                     G_CALLBACK(allow_mechanism_cb), h);
+> > > +    g_signal_connect(observer, "authorize-authenticated-peer",
+> > > +                     G_CALLBACK(authorize_authenticated_peer_cb), =
+h);
+> > > +
+> > > +    server =3D g_dbus_server_new_sync(addr,
+> > > +                                    G_DBUS_SERVER_FLAGS_NONE,
+> > > +                                    guid,
+> > > +                                    observer,
+> > > +                                    NULL, /* GCancellable */
+> > > +                                    &error);
+> > > +    g_dbus_server_start(server);
+> > > +    g_clear_object(&observer);
+> > > +    g_free(guid);
+> > > +
+> > > +    if (server =3D=3D NULL) {
+> > > +        g_printerr("Error creating server at address %s: %s\n",
+> > > +                   addr, error->message);
+> > > +        g_error_free(error);
+> > > +        return NULL;
+> > > +    }
+> > > +
+> > > +    g_signal_connect(server, "new-connection",
+> > > +                     G_CALLBACK(on_new_connection), h);
+> > > +
+> > > +    g_free(addr);
+> > > +    return server;
 > > > +}
 > > > +
 > > > +
+> > > +static gpointer
+> > > +dbus_thread(gpointer p)
+> > > +{
+> > > +    Test *test =3D p;
+> > > +    GMainContext *context =3D g_main_context_new();
+> > > +    GMainLoop *loop =3D g_main_loop_new(context, FALSE);
 > > > +
-> > >  typedef int (*QCryptoCipherEncDecFunc)(QCryptoCipher *cipher,
-> > >                                          const void *in,
-> > >                                          void *out,
-> > > diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
-> > > index 71c59cb542..804965dca3 100644
-> > > --- a/crypto/blockpriv.h
-> > > +++ b/crypto/blockpriv.h
-> > > @@ -81,6 +81,15 @@ struct QCryptoBlockDriver {
-> > > =20
-> > >      bool (*has_format)(const uint8_t *buf,
-> > >                         size_t buflen);
+> > > +    g_main_context_push_thread_default(context);
 > > > +
-> > > +    int (*setup_encryption)(QCryptoBlock *block,
-> > > +                            QCryptoBlockReadFunc readfunc,
-> > > +                            QCryptoBlockWriteFunc writefunc,
-> > > +                            void *opaque,
-> > > +                            enum BlkSetupEncryptionAction action,
-> > > +                            QCryptoEncryptionSetupOptions *options=
-,
-> > > +                            bool force,
-> > > +                            Error **errp);
-> > >  };
-> > > =20
-> > > =20
-> > > diff --git a/include/crypto/block.h b/include/crypto/block.h
-> > > index fe12899831..60d46e3efc 100644
-> > > --- a/include/crypto/block.h
-> > > +++ b/include/crypto/block.h
-> > > @@ -23,6 +23,7 @@
-> > > =20
-> > >  #include "crypto/cipher.h"
-> > >  #include "crypto/ivgen.h"
-> > > +#include "block/block.h"
-> > > =20
-> > >  typedef struct QCryptoBlock QCryptoBlock;
-> > > =20
-> > > @@ -268,4 +269,30 @@ uint64_t qcrypto_block_get_sector_size(QCrypto=
-Block *block);
-> > >   */
-> > >  void qcrypto_block_free(QCryptoBlock *block);
-> > > =20
+> > > +    g_mutex_lock(&mutex);
+> > > +    test->srcA.server =3D server_start(&test->srcA, "src", &idA);
+> > > +    test->srcB.server =3D server_start(&test->srcB, "src", &idB);
+> > > +    test->dstA.server =3D server_start(&test->dstA, "dst", &idA);
+> > > +    test->dstB.server =3D server_start(&test->dstB, "dst", &idB);
+> > > +    test->dbus_loop =3D loop;
+> > > +    g_cond_signal(&cond);
+> > > +    g_mutex_unlock(&mutex);
 > > > +
-> > > +/**
-> > > + * qcrypto_block_setup_encryption:
-> > > + * @block: the block encryption object
-> > > + *
-> > > + * @readfunc: callback for reading data from the volume header
-> > > + * @writefunc: callback for writing data to the volume header
-> > > + * @opaque: data to pass to @readfunc and @writefunc
-> > > + * @action: tell the driver the setup action (add/erase currently)
-> > > + * @options: driver specific options, that specify
-> > > + *           what encryption settings to manage
-> > > + * @force: hint for the driver to allow unsafe operation
-> > > + * @errp: error pointer
-> > > + *
-> > > + * Adds/Erases a new encryption key using @options
-> >=20
-> > I'd prefer to see separate APIs for add + erase instead
-> > of overloading. It'll lead to a clearer API from callers
-> > POV to see exactly which parameters are for each action.
->=20
->=20
-> The downside of this is some duplication of code in the middle layers.
-> I don't mind doing that if you are OK with that.
->=20
-> Also note that if we go with amend options, we will have to use the sin=
-gle
-> API.
-
-That should not be the case. The interface used at the qemu-img/QMP
-layer is something for the block layer to be concerned with. THis
-code is in the crypto layer and shouldn't depend on stuff defined
-in the block layer QAPI schema. The block layer ammend options impl
-should translate to the relevant API calls needed at the crypto layer.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> > > +    g_main_loop_run(loop);
+> > > +
+> > > +    g_main_loop_unref(loop);
+> > > +    g_main_context_unref(context);
+> > > +
+> > > +    g_mutex_lock(&mutex);
+> > > +    g_clear_object(&test->srcA.server);
+> > > +    g_clear_object(&test->srcB.server);
+> > > +    g_clear_object(&test->dstA.server);
+> > > +    g_clear_object(&test->dstB.server);
+> > > +    g_mutex_unlock(&mutex);
+> > > +
+> > > +    return NULL;
+> > > +}
+> > > +
+> > > +static gboolean
+> > > +wait_for_migration_complete(gpointer user_data)
+> > > +{
+> > > +    Test *test =3D user_data;
+> > > +    QDict *rsp_return;
+> > > +    bool stop =3D false;
+> > > +    const char *status;
+> > > +
+> > > +    qtest_qmp_send(test->src_qemu, "{ 'execute': 'query-migrate' }=
+");
+> > > +    rsp_return =3D qtest_qmp_receive_success(test->src_qemu, NULL,=
+ NULL);
+> > > +    status =3D qdict_get_str(rsp_return, "status");
+> > > +    if (g_str_equal(status, "completed") || g_str_equal(status, "f=
+ailed")) {
+> > > +        stop =3D true;
+> > > +        g_assert_cmpstr(status, =3D=3D,
+> > > +                        test->migrate_fail ? "failed" : "completed=
+");
+> > > +    }
+> > > +    qobject_unref(rsp_return);
+> > > +
+> > > +    if (stop) {
+> > > +        g_main_loop_quit(test->loop);
+> > > +    }
+> > > +    return stop ? G_SOURCE_REMOVE : G_SOURCE_CONTINUE;
+> > > +}
+> > > +
+> > > +static void migrate(QTestState *who, const char *uri)
+> > > +{
+> > > +    QDict *args, *rsp;
+> > > +
+> > > +    args =3D qdict_new();
+> > > +    qdict_put_str(args, "uri", uri);
+> > > +
+> > > +    rsp =3D qtest_qmp(who, "{ 'execute': 'migrate', 'arguments': %=
+p }", args);
+> > > +
+> > > +    g_assert(qdict_haskey(rsp, "return"));
+> > > +    qobject_unref(rsp);
+> > > +}
+> > > +
+> > > +static void
+> > > +test_dbus_vmstate(Test *test)
+> > > +{
+> > > +    QTestState *src_qemu =3D NULL, *dst_qemu =3D NULL;
+> > > +    char *src_qemu_args =3D NULL, *dst_qemu_args =3D NULL;
+> > > +    char *uri =3D g_strdup_printf("unix:%s/migsocket", workdir);
+> > > +    GThread *t =3D g_thread_new("dbus", dbus_thread, test);
+> > > +
+> > > +    g_mutex_lock(&mutex);
+> > > +    while (!test->dbus_loop) {
+> > > +        g_cond_wait(&cond, &mutex);
+> > > +    }
+> > > +
+> > > +    src_qemu_args =3D
+> > > +        g_strdup_printf("-object dbus-vmstate,id=3DdvA,addr=3D%s "
+> > > +                        "-object dbus-vmstate,id=3DdvB,addr=3D%s",
+> > > +                        g_dbus_server_get_client_address(test->src=
+A.server),
+> > > +                        g_dbus_server_get_client_address(test->src=
+B.server));
+> > > +
+> > > +
+> > > +    dst_qemu_args =3D
+> > > +        g_strdup_printf("-object dbus-vmstate,id=3DdvA,addr=3D%s "
+> > > +                        "-object dbus-vmstate,id=3DdvB,addr=3D%s "
+> > > +                        "-incoming %s",
+> > > +                        g_dbus_server_get_client_address(test->dst=
+A.server),
+> > > +                        g_dbus_server_get_client_address(test->dst=
+B.server),
+> > > +                        uri);
+> > > +
+> > > +    src_qemu =3D qtest_init(src_qemu_args);
+> > > +    dst_qemu =3D qtest_init(dst_qemu_args);
+> > > +
+> > > +    test->loop =3D g_main_loop_new(NULL, TRUE);
+> > > +
+> > > +    migrate(src_qemu, uri);
+> > > +    test->src_qemu =3D src_qemu;
+> > > +    g_timeout_add_seconds(1, wait_for_migration_complete, test);
+> > > +
+> > > +    g_main_loop_run(test->loop);
+> > > +    g_main_loop_unref(test->loop);
+> > > +
+> > > +    g_free(uri);
+> > > +    qtest_quit(dst_qemu);
+> > > +    qtest_quit(src_qemu);
+> > > +    g_free(dst_qemu_args);
+> > > +    g_free(src_qemu_args);
+> > > +
+> > > +    g_main_loop_quit(test->dbus_loop);
+> > > +    g_mutex_unlock(&mutex);
+> > > +
+> > > +    g_thread_join(t);
+> > > +}
+> > > +
+> > > +static void
+> > > +check_migrated(TestServer *s, TestServer *d)
+> > > +{
+> > > +    assert(s->save_called);
+> > > +    assert(!s->load_called);
+> > > +    assert(!d->save_called);
+> > > +    assert(d->load_called);
+> > > +}
+> > > +
+> > > +static void
+> > > +test_dbus_vmstate_migrate(void)
+> > > +{
+> > > +    Test test =3D { };
+> > > +
+> > > +    test_dbus_vmstate(&test);
+> > > +
+> > > +    check_migrated(&test.srcA, &test.dstA);
+> > > +    check_migrated(&test.srcB, &test.dstB);
+> > > +}
+> > > +
+> > > +int
+> > > +main(int argc, char **argv)
+> > > +{
+> > > +    GError *err =3D NULL;
+> > > +    int ret;
+> > > +
+> > > +    g_test_init(&argc, &argv, NULL);
+> > > +
+> > > +    workdir =3D g_dir_make_tmp("dbus-vmstate-test-XXXXXX", &err);
+> > > +    if (!workdir) {
+> > > +        g_error("Unable to create temporary dir: %s\n", err->messa=
+ge);
+> > > +    }
+> > > +
+> > > +    qtest_add_func("/dbus-vmstate/migrate",
+> > > +                   test_dbus_vmstate_migrate);
+> > > +
+> > > +    ret =3D g_test_run();
+> > > +
+> > > +    rmdir(workdir);
+> > > +    g_free(workdir);
+> > > +
+> > > +    return ret;
+> > > +}
+> > > diff --git a/tests/dbus-vmstate1.xml b/tests/dbus-vmstate1.xml
+> > > new file mode 100644
+> > > index 0000000000..cc8563be4c
+> > > --- /dev/null
+> > > +++ b/tests/dbus-vmstate1.xml
+> > > @@ -0,0 +1,12 @@
+> > > +<?xml version=3D"1.0"?>
+> > > +<node name=3D"/" xmlns:doc=3D"http://www.freedesktop.org/dbus/1.0/=
+doc.dtd">
+> > > +  <interface name=3D"org.qemu.VMState1">
+> > > +    <property name=3D"Id" type=3D"s" access=3D"read"/>
+> > > +    <method name=3D"Load">
+> > > +      <arg type=3D"ay" name=3D"data" direction=3D"in"/>
+> > > +    </method>
+> > > +    <method name=3D"Save">
+> > > +      <arg type=3D"ay" name=3D"data" direction=3D"out"/>
+> > > +    </method>
+> > > +  </interface>
+> > > +</node>
+> > > --
+> > > 2.23.0.rc1
+> > >
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
