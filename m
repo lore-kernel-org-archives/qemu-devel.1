@@ -2,94 +2,89 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B969EC3A59E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 02:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6207DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 03:16:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82F6A22CE3
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 02:57:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AB3721848
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 03:16:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AMkPn11H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82F6A22CE3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoCgtAw+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB3721848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0dHX-0007hc-Hw
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 22:56:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41142)
+	id 1i0dae-0004lD-9Z
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 23:16:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i0dGn-0007B9-Gv
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 22:56:14 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0dZf-00042N-OS
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i0dGm-00050b-6i
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 22:56:13 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:43794)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0dZc-0004zJ-UQ
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:15:43 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33742)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i0dGl-00050P-Vf
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 22:56:12 -0400
-Received: by mail-pf1-x442.google.com with SMTP id v12so2843190pfn.10
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 19:56:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=pqsV1GhFYAgEf6DwOiFvo3EJnjxsVUqJQ/dirtTmVrI=;
- b=AMkPn11HrBJ6ik8/LNaMfh2KOpRw0cz3IUDqZW62D4i9Sf0oZmXimkypyRLxutXF7U
- YOt+Qafdk1GlU3QNc1+maQFv5GALIRWwdmyKgdQKEjbEDIn5ypnQlDDTq1JjEfLhdexM
- Hfep5SqHj0hGJJYJeuwx779bqzbUHCo0FDtKqxgBnr6QJ+QpEgYVgkVylIVKQBEAICU+
- s7gAnYWCaCr3Z61SecpImqIzxqpNTQbAcxzmJQmi25F4He5nmj7DCIAfcmvj1OLMXO0d
- dR5ts8wYkI0HrdDclxBd9hULqtZoDmbfmPJoDAmw0Y84Q7tNv1wbh3uGuVHVYCil9X/M
- AuOg==
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i0dZc-0004wx-OW
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:15:40 -0400
+Received: by mail-ot1-x342.google.com with SMTP id q20so4162716otl.0
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 20:15:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=3FaEz41VHrCv4ggKON+AaigUXpTek1upl5TMe1IE8mE=;
+ b=VoCgtAw+S5HOw+wIPfxOqfINqLHmvdI8l2tD7uZjgV433ArWQppqdufKSskckU2lVR
+ L9FLEgLUSlMlvokT5pkbmPcBPh66Ea5L0DuEhijPVclbwRh0VLy53cSQEuZfodYUBgzk
+ +4ne8/QHaKNazAhh1TMofYY1hsC1ee7dt2ML7MAstXa434QbzHns19klY6JyAHYBkccp
+ Cw9U776U5Xcq2vY7zIVOC4r2v4eVsCiDrIQu6DuKz2uRed2cNLrbUjfptkIezHnG4Yl3
+ dsgmAbLe1PLUSD2Sggp99O44YzHHO8azyYyShXG2ECrVXqDVKVOFnsKDiOCJkwKHJDc1
+ Pdlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pqsV1GhFYAgEf6DwOiFvo3EJnjxsVUqJQ/dirtTmVrI=;
- b=falLn5zk7BHsDjXRODna/oep5J9ocuSrVCVhPWq1i5fvbMu1SLhyt+aK1KZLN9iSV9
- AGgwc2qeLl0e81xLwwfwuRHgRV9XNPCTYWkSp5EhQSv9Fbhwc0c8KzXXMgbKk8zw2equ
- ZK1+ZNtg5YfCLYetw/X0eHVH+8Htj5J31gQTONHLluK8LnMeP8bQG5NejCxkoIW5NXkz
- SRAl6UDNwSoO9JeUmsnm89ft8GZVYWJkN25ITcBdPR+dn8iADeHt3C2y47VMWVU9jgf9
- 77ImwfaXqBvnVWt/u98ELH9tsN7WRVgE67JCgMQ7kpvpvQyLwIa01z2FUrgxFTvC4Ef6
- 55Aw==
-X-Gm-Message-State: APjAAAXJZxkwZRwAdQPMsT5n2jA3cezd/6xM6MmbUidKFtTsWXhs9Se+
- uH0no7nENmojEZkTHhdEMBEgkA==
-X-Google-Smtp-Source: APXvYqxdnLelDV5rdYar9Kz2dmw0FgivH8INaA2Vx2DeW+WRNIQLhqrzuKL6QqU0NmC7lQQ6ZQr4rw==
-X-Received: by 2002:a17:90a:224e:: with SMTP id
- c72mr3178921pje.9.1566442570163; 
- Wed, 21 Aug 2019 19:56:10 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id u7sm20970812pgr.94.2019.08.21.19.56.08
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 21 Aug 2019 19:56:09 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
-References: <20190821133932.7428-1-aurelien@aurel32.net>
- <CAFEAcA-YEeYEkLW1AL_dgqoANFnfpqJu=XSAkVBctNOh1i=kcw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <b37aa2d9-7352-3cc0-4e58-5ac23f99c8a6@linaro.org>
-Date: Wed, 21 Aug 2019 19:56:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=3FaEz41VHrCv4ggKON+AaigUXpTek1upl5TMe1IE8mE=;
+ b=msq+tQgcWSEl/52GLqmjk/SYhcwGLSEOC/MQbzYOpt00bcuUNL1JYqaM+f3OZSbPWf
+ yHJ7gfN2M/zaRqBTOUAupci8Q0aq6crxHBAmhSc162NUyN4PEdCX7RoQOB8Lgk+yxsVB
+ rY5BbzmqWg7w1+i/xWwWatHMHXh7C7Z/SAMea/Lxv+LfI0N71ULS5E/Cf4ErpQJhk2ac
+ LfPoMtPToMHYD3DntMccPavcAVAeHnkStz2ibXf1MqSBJiMOJtuDHUOTFBsND1xPa8rH
+ lBvl2zHMibDDwSUwtslLEzCn56X+0o+KCLWHtnWauU632u3DN69Y0h0PiFUJfmHjVf6k
+ qZqA==
+X-Gm-Message-State: APjAAAW952nZ9lKF7Co5mWmEpavlBL8zdS32yK5mI3q/TRWFaOCAvapA
+ 3M5GvC9yme5nuqvNl5r+/JAMI/GH6G+hp1tX218=
+X-Google-Smtp-Source: APXvYqyCZWLMebH0QAiLLc50G4MFc8aFU1SaXZPpwYgx+36LlmAu/3RENDgddWJ1HYHCFbFYvSCAUUqIFUnIHeWTub0=
+X-Received: by 2002:a05:6830:1d75:: with SMTP id
+ l21mr27704727oti.121.1566443739933; 
+ Wed, 21 Aug 2019 20:15:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-YEeYEkLW1AL_dgqoANFnfpqJu=XSAkVBctNOh1i=kcw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 20:15:39
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 20:15:39
+ -0700 (PDT)
+In-Reply-To: <20190821210030.GH7077@habkost.net>
+References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <CAL1e-=hWc6G7Ob+LU7EWoY3LVBvABY2ky=RT28dSzqM=9O=OEA@mail.gmail.com>
+ <20190821210030.GH7077@habkost.net>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 22 Aug 2019 05:15:39 +0200
+Message-ID: <CAL1e-=iZziwdyjJeaE-ZC2Rbjdmr_enYGBdK5zs4Lh0kN1DQOg@mail.gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH] target/alpha: fix tlb_fill trap_arg2 value
- for instruction fetch
+X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 0/2] tests/acceptance: Update MIPS Malta
+ ssh test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,54 +96,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable <qemu-stable@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: cohuck@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, amarkovic@wavecomp.com,
+ crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/21/19 6:52 AM, Peter Maydell wrote:
-> On Wed, 21 Aug 2019 at 14:42, Aurelien Jarno <aurelien@aurel32.net> wrote:
->>
->> Commit e41c94529740cc26 ("target/alpha: Convert to CPUClass::tlb_fill")
->> slightly changed the way the trap_arg2 value is computed in case of TLB
->> fill. The type of the variable used in the ternary operator has been
->> changed from an int to an enum. This causes the -1 value to not be
->> sign-extended to 64-bit in case of an instruction fetch. The trap_arg2
->> ends up with 0xffffffff instead of 0xffffffffffffffff. Fix that by
->> changing the -1 into -1LL.
->>
->> This fixes the execution of user space processes in qemu-system-alpha.
->>
->> Fixes: e41c94529740cc26
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
->> ---
->>  target/alpha/helper.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
->> index 93b8e788b1..9e9d880c1a 100644
->> --- a/target/alpha/helper.c
->> +++ b/target/alpha/helper.c
->> @@ -283,7 +283,7 @@ bool alpha_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
->>          cs->exception_index = EXCP_MMFAULT;
->>          env->trap_arg0 = addr;
->>          env->trap_arg1 = fail;
->> -        env->trap_arg2 = (access_type == MMU_INST_FETCH ? -1 : access_type);
->> +        env->trap_arg2 = (access_type == MMU_INST_FETCH ? -1LL : access_type);
->>          cpu_loop_exit_restore(cs, retaddr);
->>      }
-> 
-> Oops. Thanks for the catch.
-> 
-> Maybe we should not rely directly on the value of the access_type
-> enum to set trap_arg2 at all (ie just go for a switch on access_type and
-> set env->trap_arg2 to the right h/w value in the three cases)?
+21.08.2019. 23.00, "Eduardo Habkost" <ehabkost@redhat.com> =D1=98=D0=B5 =D0=
+=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On Wed, Aug 21, 2019 at 10:27:11PM +0200, Aleksandar Markovic wrote:
+> > 02.08.2019. 17.37, "Aleksandar Markovic" <aleksandar.markovic@rt-rk.com=
+>
+=D1=98=D0=B5
+> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> > >
+> > > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > >
+> > > This little series improves linux_ssh_mips_malta.py, both in the sens=
+e
+> > > of code organization and in the sense of quantity of executed tests.
+> > >
+> >
+> > Hello, all.
+> >
+> > I am going to send a new version in few days, and I have a question for
+> > test team:
+> >
+> > Currently, the outcome of the script execition is either PASS:1 FAIL:0
+or
+> > PASS:0 FAIL:1. But the test actually consists of several subtests. Is
+there
+> > any way that this single Python script considers these subtests as
+separate
+> > tests (test cases), reporting something like PASS:12 FAIL:7? If yes,
+what
+> > would be the best way to achieve that?
+>
+> If you are talking about each test_*() method, they are already
+> treated like separate tests.  If you mean treating each
+> ssh_command_output_contains() call as a separate test, this might
+> be difficult.
+>
 
-Yes, I'll do that.  I'm somewhat embarrassed that I haven't tested Alpha in a
-while, and moreso because we just did a release.
+Yes, I meant the latter one, individual code segments involving an
+invocation of ssh_command_output_contains() instance being treated as
+separate tests.
 
+> Cleber, is there something already available in the Avocado API
+> that would help us report more fine-grained results inside each
+> test case?
+>
 
-r~
+Thanks, that would be a better way of expressing my question.
 
+>
+> >
+> > Thanks in advance,
+> > Aleksandar
+> >
+> > > Aleksandar Markovic (2):
+> > >   tests/acceptance: Refactor and improve reporting in
+> > >     linux_ssh_mips_malta.py
+> > >   tests/acceptance: Add new test cases in linux_ssh_mips_malta.py
+> > >
+> > >  tests/acceptance/linux_ssh_mips_malta.py | 81
+> > ++++++++++++++++++++++++++------
+> > >  1 file changed, 66 insertions(+), 15 deletions(-)
+> > >
+> > > --
+> > > 2.7.4
+> > >
+> > >
+>
+> --
+> Eduardo
