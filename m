@@ -2,90 +2,91 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7F7C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A8FBC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:46:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97DF1233A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:45:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ql9wTHqu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97DF1233A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E192F233A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:46:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E192F233A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0oKi-0006sM-Et
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:45:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34048)
+	id 1i0oLv-0008RH-0C
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:46:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34891)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1i0oHF-0003Tu-E2
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i0oIG-000564-Cf
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1i0oHD-0002Q6-VD
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:25 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34641)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i0oHD-0002Pg-K6
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:23 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s18so5707046wrn.1
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 07:41:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=pJNguMv23aDELdz/i/JA9gXNH838QBw/VvuRPcJ6lp0=;
- b=Ql9wTHquMPo5pu0ftBNPiNQY4DxfXVVhMO604RoGCMqsXdP9102fKrCCRq7hdbHyKh
- I8GKVclfYziFLWsQUQrHPL5ybIYJAoMoWHodUDI8DFSGWZAzU/qyYsaVFQ0F/adhwidT
- ubfEssxZaTNSgFRSaAOXFRqhI9k9aN+cH+gooL+l7xdn7YktmnSSb6TjpmUnxlClDaAw
- DT/2QAU4XmfVyfTqhw6DSVTqtvI3Z86JggzVxxjueUKHXawrIAhQOE2h0OxwlOxKrsjg
- Ioatg6ajGJlZiQwWmZH4xK6E760Wcfh47YfsaRlRBphCFcYQv/He8G5ypUAcskUkYa5Y
- OPmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=pJNguMv23aDELdz/i/JA9gXNH838QBw/VvuRPcJ6lp0=;
- b=D9u3xiZHrh/9EGkC33VV1WvaxRkYykefukORNTuSKcJZdkv0/Mq5XdCxr5dwjCqItu
- xQU8GDyav516Xt+ZumWyTdsZhc46M1Fp7/ekshJfA/J4jvVbbNK188uuG2UfiuYYoPky
- GBLkzYPHsNTL7Hov10IBnU32DG0nM4z5yRQvWFoylWCBkciZ+SiM9lcsO3REI84P/FDs
- UmciHzMOTaN8Yn0Tt/svmT9pWPO4kEj1sdl97RjiafMA2spwMiQYDbVTWr9BPQXqC23G
- 0hg9ieisLN5EDysohQN8stbhHHibidvSZDdZF9gZt+/hrVpzVRM3NtHpQyVS/NMFmW0m
- yqWw==
-X-Gm-Message-State: APjAAAV/JT5WpUCOOv1okzSyL+TDZfYxAmCMmS7buci29Sy5O+OGc+Vx
- ao28Ct1dXAeHX8YyWulGqoU=
-X-Google-Smtp-Source: APXvYqzV1EALoJ9jkeBXw699NQRXGiIE8XW8IspQ85vM/IFNQYk65BsHlVOYqRHtH/7kBrdIpvXngA==
-X-Received: by 2002:a5d:6ccd:: with SMTP id c13mr41760385wrc.4.1566484882429; 
- Thu, 22 Aug 2019 07:41:22 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id a23sm6076767wma.24.2019.08.22.07.41.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 22 Aug 2019 07:41:21 -0700 (PDT)
-Date: Thu, 22 Aug 2019 15:41:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Message-ID: <20190822144120.GM20491@stefanha-x1.localdomain>
-References: <20190815023725.2659-1-vandersonmr2@gmail.com>
- <20190815023725.2659-2-vandersonmr2@gmail.com>
- <20190815144036.GG10996@stefanha-x1.localdomain>
- <87lfvummhe.fsf@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1i0oIE-0003Lt-DT
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:42:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42550)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i0oIB-0003K7-UU; Thu, 22 Aug 2019 10:42:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 48862308427C;
+ Thu, 22 Aug 2019 14:42:23 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BCBA660603;
+ Thu, 22 Aug 2019 14:42:18 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <20190814202219.1870-13-mlevitsk@redhat.com>
+ <80e25f5b-b26c-7867-bb3a-0992029b33b9@redhat.com>
+ <20190822113222.GQ3267@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <28be6b06-1a26-dd9a-806b-66df67da7f07@redhat.com>
+Date: Thu, 22 Aug 2019 16:42:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190822113222.GQ3267@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="nrXiCraHbXeog9mY"
-Content-Disposition: inline
-In-Reply-To: <87lfvummhe.fsf@linaro.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] accel/tcg: adding integration with
- linux perf
+ protocol="application/pgp-signature";
+ boundary="FpOSBtKVwE0YrkN2rmDVtk0mtdp89YBRO"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 22 Aug 2019 14:42:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 12/13] qemu-img: implement key management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,151 +98,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vandersonmr <vandersonmr2@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FpOSBtKVwE0YrkN2rmDVtk0mtdp89YBRO
+Content-Type: multipart/mixed; boundary="Oe5DCVbA9rlSVCGfdN8w8ar9yfNHJFLuU";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
+Message-ID: <28be6b06-1a26-dd9a-806b-66df67da7f07@redhat.com>
+Subject: Re: [PATCH 12/13] qemu-img: implement key management
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <20190814202219.1870-13-mlevitsk@redhat.com>
+ <80e25f5b-b26c-7867-bb3a-0992029b33b9@redhat.com>
+ <20190822113222.GQ3267@redhat.com>
+In-Reply-To: <20190822113222.GQ3267@redhat.com>
 
---nrXiCraHbXeog9mY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--Oe5DCVbA9rlSVCGfdN8w8ar9yfNHJFLuU
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 15, 2019 at 05:17:49PM +0100, Alex Benn=E9e wrote:
+On 22.08.19 13:32, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Aug 20, 2019 at 08:29:55PM +0200, Max Reitz wrote:
+>> On 14.08.19 22:22, Maxim Levitsky wrote:
+>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>>> ---
+>>>  block/crypto.c   |  16 ++++++
+>>>  block/crypto.h   |   3 +
+>>>  qemu-img-cmds.hx |  13 +++++
+>>>  qemu-img.c       | 140 +++++++++++++++++++++++++++++++++++++++++++++=
+++
+>>>  4 files changed, 172 insertions(+)
+>>
+>> Yes, this seems a bit weird.  Putting it under amend seems like the
+>> natural thing if that works; if not, I think it should be a single
+>> qemu-img subcommand instead of two.
 >=20
-> Stefan Hajnoczi <stefanha@gmail.com> writes:
->=20
-> > On Wed, Aug 14, 2019 at 11:37:24PM -0300, vandersonmr wrote:
-> >> This commit adds support to Linux Perf in order
-> >> to be able to analyze qemu jitted code and
-> >> also to able to see the TBs PC in it.
-> >
-> > Is there any reference to the file format?  Please include it in a code
-> > comment, if such a thing exists.
-> >
-> >> diff --git a/accel/tcg/perf/jitdump.c b/accel/tcg/perf/jitdump.c
-> >> new file mode 100644
-> >> index 0000000000..6f4c0911c2
-> >> --- /dev/null
-> >> +++ b/accel/tcg/perf/jitdump.c
-> >> @@ -0,0 +1,180 @@
-> >
-> > License header?
-> >
-> >> +#ifdef __linux__
-> >
-> > If the entire source file is #ifdef __linux__ then Makefile.objs should
-> > probably contain obj-$(CONFIG_LINUX) +=3D jitdump.o instead.  Letting t=
-he
-> > build system decide what to compile is cleaner than ifdeffing large
-> > amounts of code.
-> >
-> >> +
-> >> +#include <stdint.h>
-> >> +
-> >> +#include <stdio.h>
-> >> +#include <unistd.h>
-> >> +#include <time.h>
-> >> +#include <sys/syscall.h>
-> >> +#include <elf.h>
-> >> +
-> >> +#include "jitdump.h"
-> >> +#include "qemu-common.h"
-> >
-> > Please follow QEMU's header ordering conventions.  See ./HACKING "1.2.
-> > Include directives".
-> >
-> >> +void start_jitdump_file(void)
-> >> +{
-> >> +    GString *dumpfile_name =3D g_string_new(NULL);;
-> >> +    g_string_printf(dumpfile_name, "./jit-%d.dump", getpid());
-> >
-> > Simpler:
-> >
-> >   gchar *dumpfile_name =3D g_strdup_printf("./jit-%d.dump", getpid());
-> >   ...
-> >   g_free(dumpfile_name);
-> >
-> >> +    dumpfile =3D fopen(dumpfile_name->str, "w+");
-> >
-> > getpid() and the global dumpfile variable make me wonder what happens
-> > with multi-threaded TCG?
-> >
-> >> +
-> >> +    perf_marker =3D mmap(NULL, sysconf(_SC_PAGESIZE),
-> >
-> > Please mention the point of this mmap in a comment.  My best guess is
-> > that perf stores the /proc/$PID/maps and this is how it finds the
-> > jitdump file?
-> >
-> >> +                          PROT_READ | PROT_EXEC,
-> >> +                          MAP_PRIVATE,
-> >> +                          fileno(dumpfile), 0);
-> >> +
-> >> +    if (perf_marker =3D=3D MAP_FAILED) {
-> >> +        printf("Failed to create mmap marker file for perf %d\n", fil=
-eno(dumpfile));
-> >> +        fclose(dumpfile);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    g_string_free(dumpfile_name, TRUE);
-> >> +
-> >> +    struct jitheader *header =3D g_new0(struct jitheader, 1);
-> >
-> > Why g_new this struct?  It's small and can be declared on the stack.
-> >
-> > Please use g_free() with g_malloc/new/etc().  It's not safe to mismatch
-> > glib and libc memory allocation functions.
-> >
-> >> +    header->magic =3D 0x4A695444;
-> >> +    header->version =3D 1;
-> >> +    header->elf_mach =3D get_e_machine();
-> >> +    header->total_size =3D sizeof(struct jitheader);
-> >> +    header->pid =3D getpid();
-> >> +    header->timestamp =3D get_timestamp();
-> >> +
-> >> +    fwrite(header, header->total_size, 1, dumpfile);
-> >> +
-> >> +    free(header);
-> >> +    fflush(dumpfile);
-> >> +}
-> >> +
-> >> +void append_load_in_jitdump_file(TranslationBlock *tb)
-> >> +{
-> >> +    GString *func_name =3D g_string_new(NULL);
-> >> +    g_string_printf(func_name, "TB virt:0x"TARGET_FMT_lx"%c", tb->pc,=
- '\0');
-> >
-> > The explicit NUL character looks strange to me.  I think the idea is to
-> > avoid func_name->len + 1?  Adding NUL characters to C strings can be a
-> > source of bugs, I would stick to convention and do len + 1 instead of
-> > putting NUL characters into the GString.  This is a question of style
-> > though.
->=20
-> The glib functions always add null characters so you shouldn't need to
-> manually.
+> I'm not convinced by overloading two distinct operations on to one
+> sub-command - doesn't seem to give an obvious benefit to overload
+> them & IME experiance overloading results in harder to understand
+> commands due to having distinct args to each command.
 
-Yep, just remember to do func_name->len + 1 since glib doesn't count the
-NUL character that gets added automatically.
+Because it suits the qemu-img interface we currently have.  For example,
+we have a single subcommand for internal snapshot management (=E2=80=9Cqe=
+mu-img
+snapshot=E2=80=9D), so I think it makes sense to have a single subcommand=
+ for
+encrypted image management.
 
---nrXiCraHbXeog9mY
+Max
+
+
+--Oe5DCVbA9rlSVCGfdN8w8ar9yfNHJFLuU--
+
+--FpOSBtKVwE0YrkN2rmDVtk0mtdp89YBRO
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1eqZAACgkQnKSrs4Gr
-c8jEkAf/efrOhnUDfhiCIsi950AWLCOXLgQzY3SGNWLmEsq28mODsO09TcbKFBsY
-ulx3Rbz2eDFK6uYfP0j51LR81GOlJFzcnN3WccAM5f6kQBeDS7t5vVNK3CwsvdD+
-qOC2UCVbjRRSEXvgPqV3+IrCUrqx8lsX2ay7K4o+W50aeHoFkKsm6RH/5YNJQLaR
-lS2O6Xagz/7H5vXkiqf/aiGokpwBTfcv5cW9jzSqkk2ieo6uVq0pmmKuYgIaulfx
-w2lEXELvMIQK0TX4NN99po6CtCIZxEDILRYm4BYkeN7pQHfJLR1s6JZtj4il9WzW
-jw1xaC5hcx0bVEr1B80WIz9Erf3HLQ==
-=fBE8
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1eqckACgkQ9AfbAGHV
+z0D+bggAt9DelCEDp0U9MWPMGeI5pdVSL0Hqpj35YhQ7RYVqjgcIfWEF0t4L2C6D
+rXESY/aBJYVNdHOd2/jsiuAWi88zbdVvKvML4/rQa571Cf0k0NEyGrn7AQ2D+8Q/
+9lfcbSKH34X7DUN1a6xcuWcdZcFP1OXrDqd5dY2aMgzAOIoyAZLsTwfjX2vt/P9X
+aqO7NV3RqqW77l6E472nOThy0knLg1YLFvkNo4f3UOoWSIHUPTNq77dAN+SS2FS4
+wdLQ/rnTXuh1cJbwwj32KLmtjxG9fDIdmlrllSG2YINqzw40mxpqiUFXhbt2L7ln
+CMoTp3hJN+hlwjWJ00IZM0D1qjTvTQ==
+=y+Mn
 -----END PGP SIGNATURE-----
 
---nrXiCraHbXeog9mY--
+--FpOSBtKVwE0YrkN2rmDVtk0mtdp89YBRO--
 
