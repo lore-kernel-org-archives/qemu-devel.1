@@ -6,59 +6,81 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1012C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C24FDC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:54:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88B72233FC
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:52:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88B72233FC
+	by mail.kernel.org (Postfix) with ESMTPS id 9643721743
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:54:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9643721743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0qJq-0000j9-Ph
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:52:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51665)
+	id 1i0qLv-0003jO-QC
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:54:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i0qIa-0008T1-SB
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:50:57 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1i0qKt-0002D0-12
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:53:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i0qIZ-0007XG-Tp
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:50:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58160)
+ (envelope-from <pbonzini@redhat.com>) id 1i0qKr-0000nF-M5
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:53:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33044)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i0qIZ-0007Wj-OY
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:50:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i0qKr-0000mR-Fh
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:53:17 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 15C33C049D59;
- Thu, 22 Aug 2019 16:50:55 +0000 (UTC)
-Received: from work-vm (ovpn-117-231.ams2.redhat.com [10.36.117.231])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C7AA60603;
- Thu, 22 Aug 2019 16:50:47 +0000 (UTC)
-Date: Thu, 22 Aug 2019 17:50:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190822165045.GM3277@work-vm>
-References: <CAFEAcA8kEKVcRu62+VGDkzRj2J87QPxzjg05dCHszeBC6X76pg@mail.gmail.com>
- <20190822114747.GS3267@redhat.com> <20190822163150.GA3332@work-vm>
- <9caf3a64-0841-dde6-3413-a77dc80e22bd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8D3A112BB
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 16:53:16 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id a17so3494906wrw.3
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 09:53:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7OylcwYLww+r4/Ek6o+oEXpH43QgKe6vW2vuiCM0CiI=;
+ b=dhdZGt//UIBEG6u4cpqg1SH6s2y399J6HBWOW/YXjjucNKR+oPbHRONL5jRu5tlIbJ
+ uqyPqlXrCbZBbpOwpSEurjloz6yURkUWk56BcRx0wajKPmyuUTgkJ54UsiycGil4tEtE
+ oG/aEoXOBa9yINI52fgj0zuE1iUxpc6H1SnS4F5whAsD2hi4wY1xDJhhWoR+kBy7dXFj
+ jcAZhXZ6UPz+YYiv2M4Hs/yfuoj3dqfFcgnZhP9kQt5ntioAvTGv3nIJa94HlbGRRuyH
+ 8zsqIAR4of1NukNrZi59aWYbhN+f7kEd+ccMXV8EEiunRpjgHLhdOULaBTRZn6J1aRbC
+ HMBg==
+X-Gm-Message-State: APjAAAUNqD2X8HPSaNkzi2CfV7jRkmKzrpXSJNFgejbgCl1gTt3jI8oh
+ RV+oR9RQMiUveWnA6D7wjGi6NXXpeiFdgY0iMcYEkAxj7f9cZMOa67+zK6MfS5ZZ9PZ+kYgNph2
+ vaHLy6fO2uEWkc54=
+X-Received: by 2002:a1c:6785:: with SMTP id b127mr15754wmc.66.1566492795111;
+ Thu, 22 Aug 2019 09:53:15 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy8gs3/FLa9xW1Qm3jHbJTLuNrGp3xQDvR57d5z+pOjOG/besnj3kBHF2sfOOJ1ZFyY5LPMHA==
+X-Received: by 2002:a1c:6785:: with SMTP id b127mr15730wmc.66.1566492794823;
+ Thu, 22 Aug 2019 09:53:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3?
+ ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
+ by smtp.gmail.com with ESMTPSA id o129sm72228wmb.41.2019.08.22.09.53.14
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 22 Aug 2019 09:53:14 -0700 (PDT)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190822162618.27670-1-mreitz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <47d2cafd-da56-eb81-b54f-4f666aff016f@redhat.com>
+Date: Thu, 22 Aug 2019 18:53:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9caf3a64-0841-dde6-3413-a77dc80e22bd@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 22 Aug 2019 16:50:55 +0000 (UTC)
+In-Reply-To: <20190822162618.27670-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] more automated/public CI for QEMU pullreqs
+Subject: Re: [Qemu-devel] [PATCH 0/2] block/file-posix: Fix
+ xfs_write_zeroes()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,44 +92,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Samuel Ortiz <sameo@linux.intel.com>, Kashyap Chamarthy <kchamart@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 22/08/19 18:31, Dr. David Alan Gilbert wrote:
-> >> With both these points in mind, I think it is  pretty hard sell to
-> >> say we should write & maintain a custom CI system just for QEMU
-> >> unless it is offering major compelling functionality we can't do
-> >> without.
+On 22/08/19 18:26, Max Reitz wrote:
+> Luk=C3=A0=C5=A1 ran over a nasty regression in our xfs_write_zeroes() f=
+unction
+> (sorry, my fault) made apparent by a recent patch from Anton that makes
+> qcow2 images heavily exercise the offending code path.
+>=20
+> This series fixes the bug and adds a test to prevent it from
+> reoccurring.
+>=20
+>=20
+> Max Reitz (2):
+>   block/file-posix: Fix xfs_write_zeroes()
+>   iotests: Test reverse sub-cluster qcow2 writes
+>=20
+>  block/file-posix.c         | 16 ++++++---
+>  tests/qemu-iotests/265     | 67 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/265.out |  6 ++++
+>  tests/qemu-iotests/group   |  1 +
+>  4 files changed, 85 insertions(+), 5 deletions(-)
+>  create mode 100755 tests/qemu-iotests/265
+>  create mode 100644 tests/qemu-iotests/265.out
+>=20
 
-(That was Dan's comment)
+What about just killing libxfs support and only use fallocate?
+FALLOC_FL_ZERO_RANGE was added in Linux 3.15 (2014) and the only
+platform we probably support with such an old kernel is of course
+RHEL/CentOS 7 which has had it backported.
 
-> In theory I agree.
-> 
-> In practice, the major compelling functionality is portability.  If it
-> is true that setting up runners is problematic even on aarch64, frankly
-> GitLab CI is dead on arrival.  If it is not true, then I'd be very happy
-> to use GitLab CI too.
-
-IMHO if for some weird reason Gitlab has problems on aarch64 then we just need to get that
-fixed.
-
-Dave
-
-> Paolo
-> 
-> > I'd agree; and I'd also find it useful to have runners setup for
-> > Gitlab CI for related things (it would be useful for the virtio-fs
-> > stuff);  if there are problems on other architectures then we should
-> > find some go wranglers to go fix it.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
 
