@@ -2,59 +2,64 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA783C3A59D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5026BC3A59D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADCBF205ED
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:05:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADCBF205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1ACBB233A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:22:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="jSocrE/Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ACBB233A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0jyd-00015l-Vu
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 06:05:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56505)
+	id 1i0kF2-0007BA-S6
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 06:22:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60907)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i0jx6-0007mW-HZ
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:04:22 -0400
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1i0kDH-0005tk-V2
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i0jx4-0005on-92
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:04:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44162)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i0jx3-0005n7-SW
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:04:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 945A28D5BA6;
- Thu, 22 Aug 2019 10:04:14 +0000 (UTC)
-Received: from dhcp-16-132.lcy.redhat.com (unknown [10.42.16.132])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 363D0600CD;
- Thu, 22 Aug 2019 10:04:13 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1i0kDG-0005XH-9F
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:21:03 -0400
+Received: from telepax.uni-paderborn.de ([131.234.189.14]:43866)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1i0kDF-0005Sm-8n
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:21:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:MIME-Version
+ :Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+ Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+ :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+ List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=9hvltkHZDAXhNEYulLjnp92nPBggtUWUYvo27UxriG0=; b=jSocrE/YEBlUK7P06PIn5N0poF
+ bPUTepBX/zf+NhfUQF57rSX4ut546eH8fy/xaV60azGYm1AaVmYD0c5qoFf2/3fKh9KLfhHIB/dP0
+ +PN3g92yjH8UkgydS+AgVdiZfAYTzyoYKODRJFqcCUjdnmHdPkLjbJr9aK76ZP3k7Rwk=;
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 11:04:12 +0100
-Message-Id: <20190822100412.23746-1-berrange@redhat.com>
+Date: Thu, 22 Aug 2019 12:20:41 +0200
+Message-Id: <20190822102046.8765-1-kbastian@mail.uni-paderborn.de>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 22 Aug 2019 10:04:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.7.2805085, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2019.8.22.101216, AntiVirus-Engine: 5.63.0,
+ AntiVirus-Data: 2019.8.13.5630000
+X-IMT-Authenticated-Sender: uid=kbastian,ou=People,o=upb,c=de
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3] qapi: report the default CPU type for each
- machine
+X-Received-From: 131.234.189.14
+Subject: [Qemu-devel] [PULL 0/5] tricore queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,67 +71,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When user doesn't request any explicit CPU model with libvirt or QEMU,
-a machine type specific CPU model is picked. Currently there is no way
-to determine what this QEMU built-in default is, so libvirt cannot
-report this back to the user in the XML config.
+The following changes since commit fe066b4848bab4f9365a419f3c8ba59ccecf67c0:
 
-This extends the "query-machines" QMP command so that it reports the
-default CPU model typename for each machine.
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-08-21 16:59:22 +0100)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- hw/core/machine-qmp-cmds.c | 4 ++++
- qapi/machine.json          | 5 ++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-index 526fbd5ced..033b76f7bd 100644
---- a/hw/core/machine-qmp-cmds.c
-+++ b/hw/core/machine-qmp-cmds.c
-@@ -230,6 +230,10 @@ MachineInfoList *qmp_query_machines(Error **errp)
-         info->hotpluggable_cpus =3D mc->has_hotpluggable_cpus;
-         info->numa_mem_supported =3D mc->numa_mem_supported;
-         info->deprecated =3D !!mc->deprecation_reason;
-+        if (mc->default_cpu_type) {
-+            info->default_cpu_type =3D g_strdup(mc->default_cpu_type);
-+            info->has_default_cpu_type =3D true;
-+        }
-=20
-         entry =3D g_malloc0(sizeof(*entry));
-         entry->value =3D info;
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 6db8a7e2ec..bd9cfb02da 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -325,13 +325,16 @@
- #              in future versions of QEMU according to the QEMU deprecat=
-ion
- #              policy (since 4.1.0)
- #
-+# @default-cpu-type: default CPU model typename if none is requested via
-+#                    the -cpu argument. (since 4.2)
-+#
- # Since: 1.2.0
- ##
- { 'struct': 'MachineInfo',
-   'data': { 'name': 'str', '*alias': 'str',
-             '*is-default': 'bool', 'cpu-max': 'int',
-             'hotpluggable-cpus': 'bool',  'numa-mem-supported': 'bool',
--            'deprecated': 'bool' } }
-+            'deprecated': 'bool', '*default-cpu-type': 'str' } }
-=20
- ##
- # @query-machines:
---=20
-2.21.0
+  https://github.com/bkoppelmann/qemu.git tags/pull-tricore-20190822-1
 
+for you to fetch changes up to d4881da9b39df183f976349f223231ac1d81087b:
+
+  target/tricore: Fix tricore_tr_translate_insn (2019-08-22 12:17:01 +0200)
+
+----------------------------------------------------------------
+Converted target/tricore to translate_loop
+
+----------------------------------------------------------------
+Bastian Koppelmann (5):
+      target/tricore: Use DisasContextBase API
+      target-tricore: Make env a member of DisasContext
+      target/tricore: Use translate_loop
+      target/tricore: Implement a qemu excptions helper
+      target/tricore: Fix tricore_tr_translate_insn
+
+ target/tricore/helper.h    |   1 +
+ target/tricore/op_helper.c |   7 +
+ target/tricore/translate.c | 577 +++++++++++++++++++++++++--------------------
+ 3 files changed, 324 insertions(+), 261 deletions(-)
 
