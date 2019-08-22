@@ -2,65 +2,81 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0832FC3A59D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99702C3A59D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE10D21726
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:05:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE10D21726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6428221726
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:06:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wucQCZ/W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6428221726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0kuW-00043K-W6
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 07:05:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49664)
+	id 1i0kv1-0004x5-Jz
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 07:06:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i0ktY-00036c-H6
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:04:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i0ktl-0003Iw-Vr
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:04:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i0ktX-0005jK-8T
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:04:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48810)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i0ktU-0005hM-Aa; Thu, 22 Aug 2019 07:04:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 918B3C04DBCD;
- Thu, 22 Aug 2019 11:04:39 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B4E83600CD;
- Thu, 22 Aug 2019 11:04:29 +0000 (UTC)
-Message-ID: <7daeb59c95e5b28125a82caf0bb004c5660af9f2.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>, John Snow
- <jsnow@redhat.com>
-Date: Thu, 22 Aug 2019 14:04:28 +0300
-In-Reply-To: <20190822102914.GE3267@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-3-mlevitsk@redhat.com>
- <6b9b4bf7-5765-400b-7452-e37ec797eed1@redhat.com>
- <20190822102914.GE3267@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i0ktk-0005st-GB
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:04:57 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33831)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i0ktk-0005sM-BD
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:04:56 -0400
+Received: by mail-ot1-x343.google.com with SMTP id c7so5081272otp.1
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 04:04:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=NYa+/rURSKgY/V70970UKgcUAVqcgZSMitLhCjtBxq4=;
+ b=wucQCZ/WA6hzcjZIjJxuN55sIFsVV+ke0AzifkadsjXQ5WnLvodT7Proyq+wJ81oB1
+ cmjtHGeXQsFod2XvJDmpSuxVd5dsG6RaxZXeFZI6q1kErfshlhamD4jdxPdqqEkoYVM/
+ 2TcXCKP9Tjqqh10TWycrLQHD5pqFOLu8WFNru17Ltn4X2CXvhsBkAuKpN06AIjFsI2NA
+ nwj0wH+Xi/uTuMlVyHxjKtqMMYGDaCAmHKo810yZqMguDiOAp/f35PvYIuogJ4AV+xIp
+ BRvNmzIjUWwAK6ilMh89V6P1ggkYEf+zLOSmmKqld5wuYy1Z7eU1fCLJ0IuAOdnyhs7B
+ Z6SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=NYa+/rURSKgY/V70970UKgcUAVqcgZSMitLhCjtBxq4=;
+ b=lqfgC3/chsYj3mHUFiAlZZhH/5g46toi/1xKjDCn/umV4cB1VUEAxPjqtXe3EV3pIN
+ dqOuSomi1wg8s5Wl+MxVBK9mC2ZH54P9SFkw/hhuLjyY2YMhw/TNyUIuAs4e10+M6+bq
+ sHqqtfkn69UCTNhS0WnK6KtocBb6y3SupbmBvrv/PxnKwL8PQz+/QWX/OBjblvEPOokx
+ /MZGHUMyq/wd/AAr1gv6ms65c0z2diFBdCX1mDaiG/Sspxm51NqwveeqCxXqmO0cb6Im
+ ATwBIHZM+pX4j/5RGgVdKpXzqnQ9/AtbNqyJm+Q8IIrcBKD4Q94aQBQS1RKZIifDI/O5
+ CstA==
+X-Gm-Message-State: APjAAAU+cXwgKFmzHDdu1r4WlbAx7xBYBDDbhIwyfHnzbw/QmMtSF+69
+ KJ6X7PQK+jjKF4k0nltgzcjXi09Jn6AsRLlWXeiWbA==
+X-Google-Smtp-Source: APXvYqyeJ5ZwRYeND7GwhREEQu+pa0FBbn5s+MBmYBZbkRWjsO3A5mYf1HFAGJnGIss2UbQfunfrPb1fuEyj52otis8=
+X-Received: by 2002:a05:6830:2103:: with SMTP id
+ i3mr6088492otc.135.1566471895054; 
+ Thu, 22 Aug 2019 04:04:55 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAFEAcA8kEKVcRu62+VGDkzRj2J87QPxzjg05dCHszeBC6X76pg@mail.gmail.com>
+ <20190822104957.GE20491@stefanha-x1.localdomain>
+In-Reply-To: <20190822104957.GE20491@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Aug 2019 12:04:44 +0100
+Message-ID: <CAFEAcA8c_BukhU+ZgfqUxPUqsOaN6MJdJL5n3-Daf-j05ZeTig@mail.gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 22 Aug 2019 11:04:39 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 02/13] qcrypto-luks: misc
- refactoring
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] more automated/public CI for QEMU pullreqs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,98 +88,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-08-22 at 11:29 +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Aug 15, 2019 at 05:40:11PM -0400, John Snow wrote:
-> >=20
-> >=20
-> > On 8/14/19 4:22 PM, Maxim Levitsky wrote:
-> > > This is also a preparation for key read/write/erase functions
-> > >=20
-> >=20
-> > This is a matter of taste and I am not usually reviewing LUKS patches
-> > (So don't take me too seriously), but I would prefer not to have "mis=
-c"
-> > patches and instead split things out by individual changes along with=
- a
-> > nice commit message for each change.
-> >=20
-> > > * use master key len from the header
-> >=20
-> > This touches enough lines that you could make it its own patch, I thi=
-nk.
-> >=20
-> > > * prefer to use crypto params in the QCryptoBlockLUKS
-> > >   over passing them as function arguments
-> >=20
-> > I think the same is true here, and highlighting which variables you a=
-re
-> > sticking into state instead of leaving as functional parameters would=
- be
-> > nice to see without all the other changes.
-> >=20
-> > > * define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME
-> >=20
-> > This can likely be squashed with whichever patch of yours first needs=
- to
-> > use it, because it's so short.
-> >=20
-> > > * Add comments to various crypto parameters in the QCryptoBlockLUKS
-> > >=20
-> >=20
-> > Can probably be squashed with item #2.
->=20
-> Agreed, with all these points  - it is too hard to review this
-> for correctness with everything merged in one commit, so I'll
-> wait for v2 before reviewing much more.
->=20
-> > > @@ -397,6 +411,12 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherA=
-lgorithm cipher,
-> > >      }
-> > >  }
-> > > =20
-> > > +static int masterkeylen(QCryptoBlockLUKS *luks)
-> > > +{
-> > > +    return luks->header.key_bytes;
-> > > +}
-> > > +
-> > > +
-> >=20
-> > generally QEMU uses snake_case_names; please spell as "master_key_len=
-".
->=20
-> Also naming convention in this file expects "qcrypto_block_luks_" prefi=
-x
-> for all methods
->=20
-The point of adding the masterkeylen was that IMHO it wasn't clear that
-luks->header.key_bytes is the master key length.
+On Thu, 22 Aug 2019 at 11:50, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> One-off tasks:
+>
+> 1. Create CI runners that offer similar cross-architecture coverage to
+>    Peter's current setup.  qemu.org has some x86, ppc, and s390 server
+>    resources available.  I'm not sure about ARM and other architectures.
 
-However defining something like qcrypto_block_luks_master_key_len(QCrypto=
-BlockLUKS *luks)=20
-is way longer, and will force me to wrap just too many places in the code=
- to keep 80
-character limit.
+Quick list of what I currently have:
+ * freebsd/openbsd/netbsd -- these are just running the tests/vm stuff
+ * an x86-64 machine doing the w32/w64 crossbuilds
+ * aarch64
+ * aarch32 (done via chroot on an aarch64 box)
+ * osx
+ * ppc64 (on a gcc compile farm machine)
+ * s390 (on a machine Christian arranged for project use)
+ * x86-64 various configs
+ * there's also a sparc64 box in the gcc compile farm, but I am
+   not currently using it because 'make check' hangs intermittently
+   in a weird way that last time I tried to dig into it made me
+   suspect a bug in the host kernel (we were doing a syscall with
+   what seemed like a valid timeout and never timing out)
 
-Now I am thinking of other ways to make this thing better:
+Of those the s390 is OK for project use. I'm not sure the gcc
+compile farm stuff is recommended for fully automatic CI, so
+if we can avoid that it would be better. Linaro can probably
+provide some arm-server resources but I haven't checked/asked yet.
 
-1. How about adding luks->masterkeylen and using it. luks state already h=
-as
-several parsed values from the header, so using another one wouldn't hurt=
-?
+> 2. Write CI configuration to run Peter's "make && make check && make
+>    check-tcg && linux-user-test".
 
+My local scripting for all this is archived here:
+https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree
 
-2. how about renaming the luks->header.key_bytes to luks->header->master_=
-key_len?
-
-Best regards,
-	Maxim Levitsky
-
+thanks
+-- PMM
 
