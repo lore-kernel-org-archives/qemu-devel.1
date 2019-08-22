@@ -2,98 +2,87 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F1EC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1617BC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A77C23400
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:35:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A77C23400
+	by mail.kernel.org (Postfix) with ESMTPS id DB73E233FD
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:41:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB73E233FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0q3I-0008FE-2W
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:35:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44633)
+	id 1i0q9H-0002jn-2r
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:41:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i0q1S-0006JM-Tz
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:33:16 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1i0q7n-0001g3-Mh
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:39:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i0q1Q-0005uW-Sh
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:33:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47410)
+ (envelope-from <pbonzini@redhat.com>) id 1i0q7m-0000d2-Ii
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:39:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i0q1M-0005rC-2x; Thu, 22 Aug 2019 12:33:08 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i0q7m-0000cZ-9N
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:39:46 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 344237FDC9;
- Thu, 22 Aug 2019 16:33:07 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.206])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 60A245D6A7;
- Thu, 22 Aug 2019 16:33:00 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-References: <db672a84-0f30-bb82-ef94-c543e444372e@redhat.com>
- <b0b27c5c-c07a-527b-294a-c4e7ec6d4204@redhat.com>
- <84dd318a-28d4-b2f3-b03b-d870a5f618d5@redhat.com>
- <80341376-ecbd-cbf4-8800-022fdd65c04d@redhat.com>
- <8e42ea8e-0629-2645-d14d-785722df6466@redhat.com>
- <9b09731a-1769-2cbe-4b6f-3d7787f74ebc@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 2F809C057FA6
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 16:39:45 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id t9so3463265wrx.9
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 09:39:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SpX3ut6lI999gVdn81kmIakC3FjE1qZ82bbAOhbR8g0=;
+ b=eZX8f7b9u1cgKFhQLHLRNNLgPwe0jY9h0XeXG0QJTx8eg8wGsHfl8sYC6R5CsCQlQs
+ O22dQgUFq41uA+hX8iSjFJLGCmsoWdcAzviEsIDSyonf/6NUxPopiaFcCi1GlPCC+9yP
+ 19mIc9KA27LOEUx8Gs610Igd1ym1A5OKLxRfKgwI4YUQHfo/rTpqToVNpC50DcBDAHhX
+ RD9brfulF+A5L2FaOo1U15coBC4NjTmmTBTAJKkthPCyzBnnZK44ne57bbtuVSHLRy+0
+ 4RGag4RNisojkVBml1KfX/Z5tInPBoAhrwl7JUP2bS0hZHI74oYjTFDqzZlTR7mOkxIr
+ LoSA==
+X-Gm-Message-State: APjAAAX4h/1vquxIat2FAVh5LYQOID6mLAIO+cq9BwrjgETtUCkAzcqY
+ PaeVl3OnNX0jWn1/UMjz0VM1Jvh0DqAPdT3hodi8jX2Ook+6bZtIyyYn1+grPfPxikQkurclVry
+ ppGhRijKAnp4hXrg=
+X-Received: by 2002:a05:600c:228f:: with SMTP id
+ 15mr7080761wmf.160.1566491983855; 
+ Thu, 22 Aug 2019 09:39:43 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwxfBp3IL8H6Ax2DMiXMZ25YugWbgUkyYZnIhYjOLxmVEWBNc+Pk6B6HqciWnHCgXZcGkueIA==
+X-Received: by 2002:a05:600c:228f:: with SMTP id
+ 15mr7080733wmf.160.1566491983562; 
+ Thu, 22 Aug 2019 09:39:43 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3?
+ ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
+ by smtp.gmail.com with ESMTPSA id r17sm147613wrg.93.2019.08.22.09.39.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 22 Aug 2019 09:39:42 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190822133846.10923-1-armbru@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1ac19336-e9f4-753c-ebd2-41156152eb9a@redhat.com>
-Date: Thu, 22 Aug 2019 18:32:59 +0200
+Message-ID: <d5a993f3-0793-182b-f1ff-658801455cfd@redhat.com>
+Date: Thu, 22 Aug 2019 18:39:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <9b09731a-1769-2cbe-4b6f-3d7787f74ebc@redhat.com>
+In-Reply-To: <20190822133846.10923-1-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 22 Aug 2019 16:33:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Broken aarch64 by qcow2: skip writing zero buffers
- to empty COW areas [v2]
+Subject: Re: [Qemu-devel] [PATCH] pr-manager: Fix invalid g_free() crash bug
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,100 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-stable@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22.08.19 17:40, Max Reitz wrote:
-> On 22.08.19 17:25, Max Reitz wrote:
->> On 22.08.19 14:09, Max Reitz wrote:
->>> (CC-ing Paolo because of the XFS connection, and Stefan because why n=
-ot.)
->>>
->>> On 22.08.19 13:27, Luk=C3=A1=C5=A1 Doktor wrote:
->>>> Dne 21. 08. 19 v 19:51 Max Reitz napsal(a):
->>>>> On 21.08.19 16:14, Luk=C3=A1=C5=A1 Doktor wrote:
->>>>>> Hello guys,
->>>>>>
->>>>>> First attempt was rejected due to zip attachment, let's try it aga=
-in with just Avocado-vt debug.log and serial console log files attached.
->>>>>>
->>>>>> I bisected a regression on aarch64 all the way to this commit: "qc=
-ow2: skip writing zero buffers to empty COW areas" c8bb23cbdbe32f5c326365=
-e0a82e1b0e68cdcd8a. Would you please have a look at it?
->>>>>
->>>>> I think I can see the issue on my x64 system (I don=E2=80=99t see t=
-he XFS
->>>>> corruption, but the installation fails because of some segfaults).
->>>>>
->>>>> I haven=E2=80=99t found a simpler way to reproduce the problem yet,=
- though,
->>>>> which is a pain... :-/
->>>>>
->>>>> It looks like the problem disappears when I configure qemu with
->>>>> =E2=80=9C--disable-xfsctl=E2=80=9D.  Can you try that?
->>>>>
->>>>> Max
->>>>>
->>>>
->>>> Hello Max,
->>>>
->>>> yes, I'm getting the same behavior. With "--disable-xfsctl" it works=
- well. Also looking at the option I understand why it only failed on aarc=
-h64 for me, I don't have libs installed on the other machines, therefor i=
-t was disabled by "./configure" there. Anyway I guess disabling it in my =
-builds won't really fix the issue, right? :-)
->>>
->>> Thanks!
->>>
->>> No, it won=E2=80=99t, but it means the actual root of the problem is =
-probably
->>> rather in some XFS-related code (be it because qemu uses it the wrong
->>> way or because of XFS kernel code) than in the pure qcow2 commit that
->>> made the problem surface by exercising it heavily.  (Or in an
->>> interaction between the two.)
->>
->> OK, I got a simpler reproducer now:
->>
->> $ ./qemu-img create -f qcow2 test.qcow2 1M
->> $ (for i in $(seq 15 -1 0); do \
->>        echo "aio_write -P 42 $((i * 64 + 1))k 62k"; \
->>    done) \
->>   | ./qemu-io test.qcow2
->> $ for i in $(seq 0 15); do \
->>       echo $i; \
->>       ofs=3D$((i * 64)); \
->>       ./qemu-io -c "read -P 0 ${ofs}k 1k" \
->>                 -c "read -P 42 $((ofs + 1))k 62k" \
->>                 -c "read -P 0 $((ofs + 63))k 1k" \
->>                 test.qcow2 \
->>           | grep 'verification'; \
->>   done
->>
->> On XFS with --enable-xfsctl, this basically always gives me some
->> verification failure somewhere.  (On tmpfs or with --disable-xfsctl, i=
-t
->> never fails.)
->>
->> So it seems to be related to I/O from back to front.
->>
->> (You can also reproduce it with a plain =E2=80=9Cqemu-img bench=E2=80=9D=
- invocation,
->> like =E2=80=9C./qemu-img bench -w --pattern=3D42 -o 1k -S 64k -s 62k t=
-est.qcow2=E2=80=9D
->> (on, say, a 4 GB image), but then the failure appears much later in th=
-e
->> image, because you have to wait from some requests to come in reverse
->> (by chance) first.)
->=20
-> The problem is the ftruncate() in xfs_write_zeroes().  It is possible
-> for it to yield, then other requests come in, and the data they write
-> may get discarded once the ftruncate() settles.
+On 22/08/19 15:38, Markus Armbruster wrote:
+> pr_manager_worker() passes its @opaque argument to g_free().  Wrong;
+> it points to pr_manager_worker()'s automatic @data.  Broken when
+> commit 2f3a7ab39be converted @data from heap- to stack-allocated.  Fix
+> by deleting the g_free().
+> 
+> Fixes: 2f3a7ab39bec4ba8022dc4d42ea641165b004e3e
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scsi/pr-manager.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
+> index ee43663576..0c866e8698 100644
+> --- a/scsi/pr-manager.c
+> +++ b/scsi/pr-manager.c
+> @@ -39,7 +39,6 @@ static int pr_manager_worker(void *opaque)
+>      int fd = data->fd;
+>      int r;
+>  
+> -    g_free(data);
+>      trace_pr_manager_run(fd, hdr->cmdp[0], hdr->cmdp[1]);
+>  
+>      /* The reference was taken in pr_manager_execute.  */
+> 
 
-I=E2=80=99ve just sent a patch: =E2=80=9Cblock/file-posix: Fix xfs_write_=
-zeroes()=E2=80=9D,
-Message-ID <20190822162618.27670-1-mreitz@redhat.com>:
-https://lists.nongnu.org/archive/html/qemu-block/2019-08/msg01148.html
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Max
+Since I am disappearing soon, I wouldn't mind if the block layer people
+picked this up.
+
+Paolo
 
