@@ -3,59 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE04DC3A59D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 06:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B6FC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 06:58:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2159233A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 06:58:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2159233A1
+	by mail.kernel.org (Postfix) with ESMTPS id D1C37233A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 06:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1C37233A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0h3H-0004US-GJ
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 02:58:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38961)
+	id 1i0h3I-0004Z8-Ib
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 02:58:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1i0gxn-0007Ik-Ei
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 02:52:52 -0400
+ (envelope-from <kraxel@redhat.com>) id 1i0gxr-0007LP-87
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 02:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1i0gxj-0004dN-Hy
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 02:52:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53610)
+ (envelope-from <kraxel@redhat.com>) id 1i0gxn-0004jl-N3
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 02:52:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52412)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i0gxj-0004am-5A
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 02:52:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i0gxn-0004fq-Cf
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 02:52:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 01826308427C;
- Thu, 22 Aug 2019 06:52:46 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 90D6D106BB25
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 06:52:48 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-60.ams2.redhat.com
  [10.36.116.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3AECA10018F9;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C3D3600CD;
  Thu, 22 Aug 2019 06:52:43 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 7FCE593C9; Thu, 22 Aug 2019 08:52:42 +0200 (CEST)
+ id 8FDD2934B; Thu, 22 Aug 2019 08:52:42 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 08:52:39 +0200
-Message-Id: <20190822065242.12496-3-kraxel@redhat.com>
+Date: Thu, 22 Aug 2019 08:52:41 +0200
+Message-Id: <20190822065242.12496-5-kraxel@redhat.com>
 In-Reply-To: <20190822065242.12496-1-kraxel@redhat.com>
 References: <20190822065242.12496-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 22 Aug 2019 06:52:46 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Thu, 22 Aug 2019 06:52:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 2/5] usb-redir: merge interrupt packets
+Subject: [Qemu-devel] [PULL 4/5] usb: reword -usb command-line option and
+ mention xHCI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,138 +68,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Martin Cerveny <M.Cerveny@computer.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Martin Cerveny <M.Cerveny@computer.org>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Interrupt packets (limited by wMaxPacketSize) should be buffered and merged
-by algorithm described in USB spec.
-(see usb_20.pdf/5.7.3 Interrupt Transfer Packet Size Constraints).
+The -usb section of the man page is not very clear on what exactly -usb
+does and fails to mention xHCI as a modern alternative (-device
+nec-usb-xhci).
 
-Signed-off-by: Martin Cerveny <M.Cerveny@computer.org>
-Message-id: 20190724125859.14624-2-M.Cerveny@computer.org
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20190815141428.29080-1-stefanha@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/redirect.c | 71 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 49 insertions(+), 22 deletions(-)
+ qemu-options.hx | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
-index be15b9f30334..e0f5ca6f818b 100644
---- a/hw/usb/redirect.c
-+++ b/hw/usb/redirect.c
-@@ -819,8 +819,8 @@ static void usbredir_handle_interrupt_in_data(USBRedirDevice *dev,
-                                               USBPacket *p, uint8_t ep)
- {
-     /* Input interrupt endpoint, buffered packet input */
--    struct buf_packet *intp;
--    int status, len;
-+    struct buf_packet *intp, *intp_to_free;
-+    int status, len, sum;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9621e934c0bf..1fb362f06faa 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1436,12 +1436,15 @@ STEXI
+ ETEXI
  
-     if (!dev->endpoint[EP2I(ep)].interrupt_started &&
-             !dev->endpoint[EP2I(ep)].interrupt_error) {
-@@ -839,9 +839,17 @@ static void usbredir_handle_interrupt_in_data(USBRedirDevice *dev,
-         dev->endpoint[EP2I(ep)].bufpq_dropping_packets = 0;
-     }
+ DEF("usb", 0, QEMU_OPTION_usb,
+-    "-usb            enable the USB driver (if it is not used by default yet)\n",
++    "-usb            enable on-board USB host controller (if not enabled by default)\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -usb
+ @findex -usb
+-Enable the USB driver (if it is not used by default yet).
++Enable USB emulation on machine types with an on-board USB host controller (if
++not enabled by default).  Note that on-board USB host controllers may not
++support USB 3.0.  In this case @option{-device qemu-xhci} can be used instead
++on machines with PCI.
+ ETEXI
  
--    intp = QTAILQ_FIRST(&dev->endpoint[EP2I(ep)].bufpq);
-+    /* check for completed interrupt message (with all fragments) */
-+    sum = 0;
-+    QTAILQ_FOREACH(intp, &dev->endpoint[EP2I(ep)].bufpq, next) {
-+        sum += intp->len;
-+        if (intp->len < dev->endpoint[EP2I(ep)].max_packet_size ||
-+            sum >= p->iov.size)
-+            break;
-+    }
-+
-     if (intp == NULL) {
--        DPRINTF2("interrupt-token-in ep %02X, no intp\n", ep);
-+        DPRINTF2("interrupt-token-in ep %02X, no intp, buffered %d\n", ep, sum);
-         /* Check interrupt_error for stream errors */
-         status = dev->endpoint[EP2I(ep)].interrupt_error;
-         dev->endpoint[EP2I(ep)].interrupt_error = 0;
-@@ -852,18 +860,42 @@ static void usbredir_handle_interrupt_in_data(USBRedirDevice *dev,
-         }
-         return;
-     }
--    DPRINTF("interrupt-token-in ep %02X status %d len %d\n", ep,
--            intp->status, intp->len);
--
--    status = intp->status;
--    len = intp->len;
--    if (len > p->iov.size) {
--        ERROR("received int data is larger then packet ep %02X\n", ep);
--        len = p->iov.size;
--        status = usb_redir_babble;
-+
-+    /* copy of completed interrupt message */
-+    sum = 0;
-+    status = usb_redir_success;
-+    intp_to_free = NULL;
-+    QTAILQ_FOREACH(intp, &dev->endpoint[EP2I(ep)].bufpq, next) {
-+        if (intp_to_free) {
-+            bufp_free(dev, intp_to_free, ep);
-+        }
-+        DPRINTF("interrupt-token-in ep %02X fragment status %d len %d\n", ep,
-+                intp->status, intp->len);
-+
-+        sum += intp->len;
-+        len = intp->len;
-+        if (status == usb_redir_success) {
-+            status = intp->status;
-+        }
-+        if (sum > p->iov.size) {
-+            ERROR("received int data is larger then packet ep %02X\n", ep);
-+            len -= (sum - p->iov.size);
-+            sum = p->iov.size;
-+            status = usb_redir_babble;
-+        }
-+
-+        usb_packet_copy(p, intp->data, len);
-+
-+        intp_to_free = intp;
-+        if (intp->len < dev->endpoint[EP2I(ep)].max_packet_size ||
-+            sum >= p->iov.size)
-+            break;
-+    }
-+    if (intp_to_free) {
-+        bufp_free(dev, intp_to_free, ep);
-     }
--    usb_packet_copy(p, intp->data, len);
--    bufp_free(dev, intp, ep);
-+    DPRINTF("interrupt-token-in ep %02X summary status %d len %d\n", ep,
-+            status, sum);
-     usbredir_handle_status(dev, p, status);
- }
- 
-@@ -2041,22 +2073,17 @@ static void usbredir_interrupt_packet(void *priv, uint64_t id,
-     }
- 
-     if (ep & USB_DIR_IN) {
--        bool q_was_empty;
--
-         if (dev->endpoint[EP2I(ep)].interrupt_started == 0) {
-             DPRINTF("received int packet while not started ep %02X\n", ep);
-             free(data);
-             return;
-         }
- 
--        q_was_empty = QTAILQ_EMPTY(&dev->endpoint[EP2I(ep)].bufpq);
--
-         /* bufp_alloc also adds the packet to the ep queue */
-         bufp_alloc(dev, data, data_len, interrupt_packet->status, ep, data);
- 
--        if (q_was_empty) {
--            usb_wakeup(usb_ep_get(&dev->dev, USB_TOKEN_IN, ep & 0x0f), 0);
--        }
-+        /* insufficient data solved with USB_RET_NAK */
-+        usb_wakeup(usb_ep_get(&dev->dev, USB_TOKEN_IN, ep & 0x0f), 0);
-     } else {
-         /*
-          * We report output interrupt packets as completed directly upon
+ DEF("usbdevice", HAS_ARG, QEMU_OPTION_usbdevice,
 -- 
 2.18.1
 
