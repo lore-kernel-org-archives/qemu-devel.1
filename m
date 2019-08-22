@@ -2,79 +2,92 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626EEC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8A2C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B87021743
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:58:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B5AF20870
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:04:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B6AwOhqI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B87021743
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RFyvlE1+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5AF20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0qPf-0006QY-8o
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:58:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54300)
+	id 1i0qVs-0000fy-Hu
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 13:04:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i0qOd-0004ov-MC
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:57:13 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i0qUI-0007qL-VI
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:03:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i0qOb-0004Aq-5X
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:57:11 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:34169)
+ (envelope-from <richard.henderson@linaro.org>) id 1i0qUH-0000Dx-Ey
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:03:02 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46506)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i0qOa-00049T-Sq
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:57:09 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id g128so4912773oib.1
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 09:57:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i0qUH-0000Cp-6A
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:03:01 -0400
+Received: by mail-pf1-x441.google.com with SMTP id q139so4336252pfc.13
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 10:03:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Di9oxKFhxaxncUQ2W/+cux8HAQbPeHs6aCsDdtQrV40=;
- b=B6AwOhqIh/Oxr42w6X2UaL+eyvyiS+vFtpwdLfz5VubMsWRqmyIZnDteC4onYbX2EN
- 9QgQ1+2YBB1CU1pogPTjKnnmrfcJbu4oEZULXgrxJ5t2itaMKUUpoKgmx0SmHb4cifhK
- wFB+/YT1M9Hw9sN4juujdI8Eh6SIwxJM3aLweLkDwGl6smyQM30FOENRdc+0BVkhiSNO
- Inki3tY0EFr+PkfU6zbrj0+TeNlDt64nY4BWdT2C8jCvIBIeXhC8ketcabCdV11pyukh
- PiDLXdU2vpz0Q40gGvhNMtI/KIbrI9BT7gFqngG7WMFJsSwa1TJRGymQHHHZYvcdgyyD
- IUNQ==
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=eZq2vsqsa0wP6reNOee0MyZDgeFMn6SHLG16kdwn5WQ=;
+ b=RFyvlE1+BKAp+GEuC48SUH1Qdc8zfIFhXlU7wJAvEClyIHmcSqJ8bus/DOExnD9XKV
+ iY0dafEAx1M2M7SmcL5MuefUFVJltElBcd6c73/WIfUGX2Nt51CzsfyXvFp1CY9Q0Znx
+ 5JTLUQ9xiL10PwfSyetdoL0XHzWRbFkEM4HGOzBbno95tjKjNunUvrdYrMyOKPuobETd
+ 6I3hpehOjjdGX+ImT3zOxSphvaoEOp6mUzmtusFrqRsQXubayZtUjsk816WuXN1Wij3Q
+ IUUO4gUfDWQBWjBM1LOpaPWmncgbVIspFd74wY1ID6G45Xcbp61qQaRP08t68vzP88Kg
+ eUjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Di9oxKFhxaxncUQ2W/+cux8HAQbPeHs6aCsDdtQrV40=;
- b=T7h2v54tr66kVYaxxvVC51/F+ia7F/gkFSYoxe1w3To1aJvOl8pDjmaPEyL7/+XkZS
- r0J9mm3aJ5fAZZ/EzFPgTSPZSZ+qYZ9GyTPUJW3l3/sGYaW6SbhKbIrMSkt0qyt1pame
- UcrgCQ4gnSC2c8W08yozJfXd8XLPZLfbhDWlnfgh8xKCF429J2ddifSgPrbNkLdgwAZS
- iHkhJHJQv0VRkUMZe9kzbtuvlltSkr5j4FJNH6GjEIBSMhGMjRLo+UrlVYwPH+Ohi9g0
- TNb4J/AJEEi6PE8XuhgdIgMB7uv7XfRBMqsD5fNyr2TQArL8kN3hEw8dhkwXVma4RUeb
- vpwA==
-X-Gm-Message-State: APjAAAVfCx7ONarBG23kra0qEdYnESV3gK2vHWuDsDVR9GFKhVdAuvcr
- I61915kxBMJ4DTC6DF6ToreG6mMc+yHwxafQmDUoYmJl
-X-Google-Smtp-Source: APXvYqxsZAQOmJaAmIipdsUEUPF4efzAN7lkmuSDUaZDl3GdLWQvpl5DehyE5nzUKTkd0J+FNGL2zJZQIhWMLMfqMSk=
-X-Received: by 2002:aca:50cb:: with SMTP id e194mr108391oib.48.1566493027642; 
- Thu, 22 Aug 2019 09:57:07 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eZq2vsqsa0wP6reNOee0MyZDgeFMn6SHLG16kdwn5WQ=;
+ b=qiSOoEVADIL353k0tTV+e0C1RyohJIghI8zmQjCMzkCiL1NN8UWlTwpWLUAnqrwwgq
+ km2jz6swC0BUKMPZMBgfWRnrvc742K0YfyoMRwFbOVFtKqy+goJ6AKe6/ZLS1G1oH/yt
+ 9YOyQvcQBLfgYGB+vI6uCXR0Y++Fkj4aQqFun9jIoWU/FtOgbE0FjnKfqHB0NEcBdJWR
+ iZXmWZo6bodnZxquMYXjog0axHaI7EAEPN3/ZRAJBIipif21BHxQAhxqn4HHFYcR418P
+ W8dNJd9uQD2ZBePcwupE3D0jUhHnM8vhVQsNn+pt5QxqTJMSzGtGf6vMvD0uhlTgEZgP
+ peOQ==
+X-Gm-Message-State: APjAAAXP4cgN0j1ErKjgXWYa0d8Jaw7h+u/XPpeAkicJYNR4j7mUt9/Y
+ iQ87Dj4JbtvS6+cprvGH60MZVw==
+X-Google-Smtp-Source: APXvYqyXZ67W+Pam6BD416XVQsVd3Xavq3NKFg+4etmL5wtcTdiA4n2tRxB2fnENW3ZD7SO+fJUbmQ==
+X-Received: by 2002:a17:90a:dac3:: with SMTP id g3mr684465pjx.45.1566493379131; 
+ Thu, 22 Aug 2019 10:02:59 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id c5sm29425654pfo.175.2019.08.22.10.02.57
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 22 Aug 2019 10:02:58 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190822131534.16602-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c944bd01-14e0-b9f0-28a8-2dee677ed6c4@linaro.org>
+Date: Thu, 22 Aug 2019 10:02:55 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190822102046.8765-1-kbastian@mail.uni-paderborn.de>
-In-Reply-To: <20190822102046.8765-1-kbastian@mail.uni-paderborn.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Aug 2019 17:56:56 +0100
-Message-ID: <CAFEAcA-L18-5PW17yMJKM8R3W_GP_fALCcmkq2bB29BPp=0Txw@mail.gmail.com>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190822131534.16602-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
-Subject: Re: [Qemu-devel] [PULL 0/5] tricore queue
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Don't abort on M-profile
+ exception return in linux-user mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,34 +99,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Christophe Lyon <christophe.lyon@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 22 Aug 2019 at 11:20, Bastian Koppelmann
-<kbastian@mail.uni-paderborn.de> wrote:
->
-> The following changes since commit fe066b4848bab4f9365a419f3c8ba59ccecf67c0:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-08-21 16:59:22 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/bkoppelmann/qemu.git tags/pull-tricore-20190822-1
->
-> for you to fetch changes up to d4881da9b39df183f976349f223231ac1d81087b:
->
->   target/tricore: Fix tricore_tr_translate_insn (2019-08-22 12:17:01 +0200)
->
-> ----------------------------------------------------------------
-> Converted target/tricore to translate_loop
+On 8/22/19 6:15 AM, Peter Maydell wrote:
+> The upshot of all this is that for linux-user mode we should never
+> do any of the bx_excret magic, so the code change is simple.
+> 
+> This ought to be a weird corner case that only affects broken guest
+> code (because Linux user processes should never be attempting to do
+> exception returns or NS function returns), except that the code that
+> assigns addresses in RAM for the process and stack in our linux-user
+> code does not attempt to avoid this magic address range, so
+> legitimate code attempting to return to a trampoline routine on the
+> stack can fall into this case. This change fixes those programs,
+> but we should also look at restricting the range of memory we
+> use for M-profile linux-user guests to the area that would be
+> real RAM in hardware.
+> 
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Christophe Lyon <christophe.lyon@linaro.org>
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1840922
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+> I have no idea how we could achieve the "restrict addresses
+> shown to guest for linux-user" mentioned in the last para:
+> any suggestions?
+
+I guess we'd want a new cpu hook, and change MAX_RESERVED_VA
+from a macro into a function call.
+
+Move the cpu_create() in linux-user/main.c up a few lines
+before we default reserved_va for 64-bit hosts.
+
+Move the check of the command-line setting of reserved_va
+vs MAX_RESERVED_VA out from handle_arg_reserved_va to just
+after the aforementioned default.
+
+Seems plausible, anyway.
 
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+r~
 
