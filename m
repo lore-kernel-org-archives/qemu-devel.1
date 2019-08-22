@@ -2,81 +2,61 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 028AFC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7425C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:26:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C12E523407
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:24:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b4U8cefl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C12E523407
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C0CD02342C
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:26:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0CD02342C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0qoe-00055Y-1I
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 13:24:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35127)
+	id 1i0qqo-0007eo-PK
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 13:26:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i0qnP-00044E-DL
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:22:49 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1i0qol-0005ha-9C
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i0qnN-0002Gi-QJ
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:22:47 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:37531)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i0qnN-0002GB-LF
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:22:45 -0400
-Received: by mail-oi1-x229.google.com with SMTP id b25so4970686oib.4
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 10:22:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=b7Os2zPX887jxZFCMNAZGEH7Uv4sRCC6BXaQ3msmskU=;
- b=b4U8ceflAKMgvejL7cFRDPL8F+TmEUP7CpDMFbfYceHfTAKUh1wfDRLNsKRJNKdWiy
- mNJjwSHTqo0XWDw/bVc/a7wfYY+XWH6+mOusPPLwmWr/YgoM9xZzdbv72pM1m1+utnnr
- 1qqQC3p4pa0vIY/s7jmcK3aSfbZtFbqSr/+ROM3wnEGHNlSvuQLXL/nqpU9NG3aQYV8N
- CNWkY8lDB1IDtqnx9xDOqbiNOWpW/AEHf0VN38mtBACNU71ufq2ogwi6Sm1tgS1yltge
- 5Mg1qSxgZ0DWjFkZL/gj9kltQpVyT1dvTti+nz2b60c21KvA9gK5LLX0L0J07mny6VJB
- 4aWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=b7Os2zPX887jxZFCMNAZGEH7Uv4sRCC6BXaQ3msmskU=;
- b=nwYv+YJjY2434JJxiHpkamaSLC6qQJ3Sl/j8K7RP+IDhiqR3PS+7S7MigOWLE/GABJ
- k21t0WUY0lWKe1l3dBFPjMETJ+rPwe6dk7eJ4s8i8eZHYRbjPeQSqu4qs561ZUUGLd9o
- XezdT//UIf18ijp3UJS0pZi+v/XSYZoXwhSNvMR2djygE9l3rqTTTcX5MmRXElO+iNNn
- FmrHW9AqCs8mX67uwq4vakuoH57jdFtkSFwqvtnVsCwfQc6bWJXEfph1xbkFkacz0hpK
- aNZKyFbgHOuiCzHsrdQULcFFZpsVUsJ8uADkN4erwey/dMyaWdf7J/peWfby3l2uI0k2
- Qnxg==
-X-Gm-Message-State: APjAAAXAgppS3It/gOaJWkIk0rMuw6VR3L2DJbW9CBKoYC4q2poVrShP
- 0R7FBGrfm1Q8Y83bxOwNwkPTIdGsP21sVFXVs6unLQ==
-X-Google-Smtp-Source: APXvYqydCvxBAw+OPuh4RtUGLmgL+gnyQ9wiHWKgHgf7pxM2Zqwxdz3mn57qATg/qr9cv1pYVwqK+xWwnGbds9O9FLA=
-X-Received: by 2002:aca:4814:: with SMTP id v20mr193441oia.98.1566494564688;
- Thu, 22 Aug 2019 10:22:44 -0700 (PDT)
+ (envelope-from <eric.auger@redhat.com>) id 1i0qoj-00031z-Vn
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:24:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39536)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1i0qog-0002y8-Ds; Thu, 22 Aug 2019 13:24:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B040F10C696D;
+ Thu, 22 Aug 2019 17:24:03 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-105.ams2.redhat.com [10.36.116.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E467760603;
+ Thu, 22 Aug 2019 17:23:56 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com,
+ pbonzini@redhat.com, alex.williamson@redhat.com
+Date: Thu, 22 Aug 2019 19:23:45 +0200
+Message-Id: <20190822172350.12008-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-References: <1566408501-48680-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1566408501-48680-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Aug 2019 18:22:33 +0100
-Message-ID: <CAFEAcA8fuvkNKYWPEfobSh+3e-BbpPvStXJRvkWxODRY6DwTSQ@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Thu, 22 Aug 2019 17:24:03 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::229
-Subject: Re: [Qemu-devel] [PULL 00/13] Misc patches for 2019-08-21
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 0/5] ARM SMMUv3: Fix spurious notification
+ errors and fail with VFIO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,69 +68,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 21 Aug 2019 at 18:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit e65472c7bc413d79faa61eb1d05c540b039458=
-94:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.2-20190821=
-' into staging (2019-08-21 14:04:17 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 78d01598aea85841f0e4f8baf62c42b76230a81c:
->
->   char-socket: Lock tcp_chr_disconnect() and socket_reconnect_timeout() (=
-2019-08-21 16:31:59 +0200)
->
-> ----------------------------------------------------------------
-> * Longstanding chardev race condition fix (Berto)
-> * Cleanups and tests from the Meson POC (Marc-Andr=C3=A9, myself)
-> * Coalesced range cleanup (Peter)
->
-> ----------------------------------------------------------------
-> Alberto Garcia (2):
->       main-loop: Fix GSource leak in qio_task_thread_worker()
->       char-socket: Lock tcp_chr_disconnect() and socket_reconnect_timeout=
-()
->
-> Marc-Andr=C3=A9 Lureau (5):
->       module: use g_hash_table_add()
->       module: return success on module load
->       tests: add module loading test
->       configure: remove AUTOCONF_HOST
->       minikconf: don't print CONFIG_FOO=3Dn lines
->
-> Paolo Bonzini (2):
->       qemu-ga: clean up TOOLS variable
->       configure: define CONFIG_TOOLS here
->
-> Peter Xu (4):
->       memory: Refactor memory_region_clear_coalescing
->       memory: Split zones when do coalesced_io_del()
->       memory: Remove has_coalesced_range counter
->       memory: Fix up memory_region_{add|del}_coalescing
+As of today when a guest is assigned with a host PCI device and
+an SMMUv3, VFIO calls memory_region_iommu_replay() default
+implementation. This translates the whole address range and
+completely stalls the execution. As VFIO/SMMUv3 integration
+is not supported yet (it requires SMMUv3 HW nested paging), let's
+recognize this situation and fail.
 
-This seems to cause a compile failure on one of the travis
-build configs (the --enable-modules one):
+Also the series silences some spurious translation configuration
+decoding errors (STE out of span or invalid STE) that may happen
+on guest IOVA invalidation notifications.
 
-tests/modules-test.c: In function 'test_modules_load':
-tests/modules-test.c:7:25: error: initialization discards 'const'
-qualifier from pointer target type [-Werror=3Ddiscarded-qualifiers]
-     const char **args =3D data;
-                         ^
+Best Regards
 
-First failing travis build:
-https://travis-ci.org/qemu/qemu/builds/575361859
+Eric
 
-thanks
--- PMM
+This series can be found at:
+https://github.com/eauger/qemu/tree/v4.1.0_smmu_vfio_fail_v4
+
+History:
+
+v3 -> v4:
+- see individual patches
+
+v2 -> v3:
+- squash IOMMU_ATTR_VFIO_NESTED introduction and SMMUv3 usage
+- assert when recognizing VFIO/NESTED case
+- collect R-bs
+
+v1 -> v2:
+- Added "memory: Remove unused memory_region_iommu_replay_all()" &
+  "hw/arm/smmuv3: Log a guest error when decoding an invalid STE"
+- do not attempt to implement replay Cb but rather remove the call
+  in case it is not needed
+- explain why we do not remove other log messages on config decoding
+
+Eric Auger (5):
+  memory: Remove unused memory_region_iommu_replay_all()
+  memory: Add IOMMU_ATTR_HW_NESTED_PAGING IOMMU memory region attribute
+  hw/vfio/common: Fail on VFIO/HW nested paging detection
+  hw/arm/smmuv3: Log a guest error when decoding an invalid STE
+  hw/arm/smmuv3: Remove spurious error messages on IOVA invalidations
+
+ hw/arm/smmuv3-internal.h |  1 +
+ hw/arm/smmuv3.c          | 30 +++++++++++++++++++++++-------
+ hw/vfio/common.c         | 10 ++++++++++
+ include/exec/memory.h    | 18 +++++++-----------
+ memory.c                 |  9 ---------
+ 5 files changed, 41 insertions(+), 27 deletions(-)
+
+--=20
+2.20.1
+
 
