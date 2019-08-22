@@ -2,66 +2,62 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E539EC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8F5C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCD8322CE3
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:20:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCD8322CE3
+	by mail.kernel.org (Postfix) with ESMTPS id D4A2E22CE3
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:22:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4A2E22CE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0nxK-0007dw-Td
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:20:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55423)
+	id 1i0nyZ-0000JN-3b
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:22:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i0nw1-0006Sl-3h
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:19:30 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1i0nxg-00089T-Eh
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i0nvz-00078q-Tl
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:19:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50750)
+ (envelope-from <ehabkost@redhat.com>) id 1i0nxf-00087K-Dj
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:21:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52032)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1i0nvx-00077n-A0; Thu, 22 Aug 2019 10:19:25 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i0nxf-000876-3m
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:21:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9DCAF10C6960;
- Thu, 22 Aug 2019 14:19:24 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B1E1688FD;
- Thu, 22 Aug 2019 14:19:22 +0000 (UTC)
-Date: Thu, 22 Aug 2019 15:19:20 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190822141920.GU3267@redhat.com>
-References: <20190820104836.3093-1-quintela@redhat.com>
- <20190820104836.3093-2-quintela@redhat.com>
- <20190820105034.GG23352@redhat.com> <87mug4xezc.fsf@trasno.org>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5D6E1180158A
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 14:21:10 +0000 (UTC)
+Received: from localhost (ovpn-116-73.gru2.redhat.com [10.97.116.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB4B760606;
+ Thu, 22 Aug 2019 14:21:09 +0000 (UTC)
+Date: Thu, 22 Aug 2019 11:21:08 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190822142108.GM7077@habkost.net>
+References: <20190822100412.23746-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <87mug4xezc.fsf@trasno.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20190822100412.23746-1-berrange@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Thu, 22 Aug 2019 14:19:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.63]); Thu, 22 Aug 2019 14:21:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] socket: Add backlog parameter to
- socket_listen
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: report the default CPU type for
+ each machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,56 +69,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 20, 2019 at 01:17:59PM +0200, Juan Quintela wrote:
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> > On Tue, Aug 20, 2019 at 12:48:32PM +0200, Juan Quintela wrote:
-> >> Current parameter was always one.  We continue with that value for n=
-ow
-> >> in all callers.
-> >>=20
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >>=20
-> >> ---
-> >> Moved trace to socket_listen
-> >> ---
-> >>  include/qemu/sockets.h    |  2 +-
-> >>  io/channel-socket.c       |  2 +-
-> >>  qga/channel-posix.c       |  2 +-
-> >>  tests/test-util-sockets.c | 12 ++++++------
-> >>  util/qemu-sockets.c       | 33 ++++++++++++++++++++++-----------
-> >>  util/trace-events         |  3 +++
-> >>  6 files changed, 34 insertions(+), 20 deletions(-)
-> >
-> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On Thu, Aug 22, 2019 at 11:04:12AM +0100, Daniel P. Berrang=E9 wrote:
+> When user doesn't request any explicit CPU model with libvirt or QEMU,
+> a machine type specific CPU model is picked. Currently there is no way
+> to determine what this QEMU built-in default is, so libvirt cannot
+> report this back to the user in the XML config.
 >=20
-> Hi
+> This extends the "query-machines" QMP command so that it reports the
+> default CPU model typename for each machine.
 >=20
-> Everything is reviewed by you, and it is mostly socket code.  Should I
-> do the pull request, or are you doing it?
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
 
-I'm fine if you want to send a PR, since this is ultimately about
-fixing migration problems.
+Sorry for making this miss 4.1.  Queueing now.
 
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Eduardo
 
