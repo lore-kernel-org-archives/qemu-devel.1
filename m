@@ -2,66 +2,89 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89410C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFC2C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:58:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5250D233A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:49:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5250D233A2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 11609233FC
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:58:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11609233FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0wpA-00045q-I7
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 19:49:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58246)
+	id 1i0wy4-0000N9-8L
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 19:58:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i0woW-0003hI-T1
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:48:22 -0400
+ (envelope-from <kevin.tian@intel.com>) id 1i0wxF-0007cf-6D
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i0woU-00030H-Uk
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:48:20 -0400
-Resent-Date: Thu, 22 Aug 2019 19:48:20 -0400
-Resent-Message-Id: <E1i0woU-00030H-Uk@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21565)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i0woU-000309-NK
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:48:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1566517670; cv=none; d=zoho.com; s=zohoarc; 
- b=YadgAvV2vtYXuRZq8w9/o6nbGu9TQc2GElzsXzD3z4FAfsvpbVENWJgtprMam2G1ozi1ffZOQYr5LQjEGU9chGct0vwpY00ECG2AQGBHtJ/jTaX8lRaSqQMFXFyC3mvFsJhr8EhONWAdBmPiPWW9ncDcn6HxT+FISMsgPbm+tI0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1566517670;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=pelolRT6HF9b7LCfkoNQ4jEorQUkveq7nMgNd9EN2Rs=; 
- b=UrUD8a0jNLODi8gkbkvhXNbl93zp9q0+8USDdBEIEpRzDrPX/mBpUdvfxrBxT7HIQR0QhLd9yUaF33d8QhHlWW813vnHcTtmaSeHCqOYvEgogYHMaBCM6SmgLKZc3aeA+OFaR2Wq3AdCmGdHCds7Wm35afWHR4QDRGooMuaJfY4=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1566517669900232.23703968179768;
- Thu, 22 Aug 2019 16:47:49 -0700 (PDT)
-In-Reply-To: <20190822231443.172099-1-scw@google.com>
-Message-ID: <156651766884.1709.2856399069694825729@5dec9699b7de>
+ (envelope-from <kevin.tian@intel.com>) id 1i0wxD-0006Gp-67
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:57:20 -0400
+Received: from mga03.intel.com ([134.134.136.65]:18729)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+ id 1i0wxC-0006EH-V7
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:57:19 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 22 Aug 2019 16:57:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,419,1559545200"; d="scan'208";a="186721007"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+ by FMSMGA003.fm.intel.com with ESMTP; 22 Aug 2019 16:57:10 -0700
+Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 22 Aug 2019 16:57:10 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 22 Aug 2019 16:57:10 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.112]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.249]) with mapi id 14.03.0439.000;
+ Fri, 23 Aug 2019 07:57:08 +0800
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kirti Wankhede
+ <kwankhede@nvidia.com>
+Thread-Topic: [PATCH v7 04/13] vfio: Add save and load functions for VFIO
+ PCI devices
+Thread-Index: AQHVNjwCXGgcT2JZ9ESxChTH7c7tTqbEz8SAgEGH1ICAAE7jgIAAoVgAgAAA1oCAANL+EA==
+Date: Thu, 22 Aug 2019 23:57:07 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D543525@SHSMSX104.ccr.corp.intel.com>
+References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
+ <1562665760-26158-5-git-send-email-kwankhede@nvidia.com>
+ <20190711120713.GM3971@work-vm>
+ <d6400fd9-5f86-b9f2-a10a-1ad53813a066@nvidia.com>
+ <20190822093235.GC3277@work-vm>
+ <092a9a37-d018-1d6e-7c61-7f8ada8819a7@nvidia.com>
+ <20190822191303.GO3277@work-vm>
+In-Reply-To: <20190822191303.GO3277@work-vm>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzQzZGU1MzgtMDIxOC00YmYwLTgzMDYtODRmNWUyMDE2YmQyIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNm9EN2pHV0Vsb0JsdkUzVGx2cXNpb2c5d0I1RkVSZU1WbzhmZDNMXC82U0hNK09LSzI4d3gzVjU3bjlWS2w0a0oifQ==
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 16:47:49 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH 0/2] Adding some setsockopt() options
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
+Subject: Re: [Qemu-devel] [PATCH v7 04/13] vfio: Add save and load functions
+ for VFIO PCI devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,151 +96,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: scw@google.com, riku.voipio@iki.fi, laurent@vivier.eu,
- qemu-devel@nongnu.org
+Cc: "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "Liu,
+ Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wang, 
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
+ Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgyMjIzMTQ0My4xNzIw
-OTktMS1zY3dAZ29vZ2xlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yXSBB
-ZGRpbmcgc29tZSBzZXRzb2Nrb3B0KCkgb3B0aW9ucwpNZXNzYWdlLWlkOiAyMDE5MDgyMjIzMTQ0
-My4xNzIwOTktMS1zY3dAZ29vZ2xlLmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-U3VibW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5n
-aXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBz
-Oi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1
-Ym1vZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9R
-ZW11TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZl
-cnMnClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0Yu
-Z2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9lZGsy
-JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2VkazIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
-ICdyb21zL2VkazInClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
-Z2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2lweGUnClN1Ym1vZHVsZSAn
-cm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuYmlvcy5naXQpIHJl
-Z2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1Ym1vZHVsZSAncm9tcy9vcGVuaGFj
-a3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmhhY2t3YXJlLmdpdCkgcmVnaXN0
-ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1Ym1vZHVsZSAncm9tcy9vcGVuc2Jp
-JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5zYmkuZ2l0KSByZWdpc3RlcmVkIGZvciBw
-YXRoICdyb21zL29wZW5zYmknClN1Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczov
-L2dpdC5xZW11Lm9yZy9naXQvcWVtdS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
-cm9tcy9xZW11LXBhbGNvZGUnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQu
-cWVtdS5vcmcvZ2l0L3NlYWJpb3MuZ2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFi
-aW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
-Z2l0L3NlYWJpb3MtaHBwYS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcy1o
-cHBhJwpTdWJtb2R1bGUgJ3JvbXMvc2dhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9z
-Z2FiaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJtb2R1bGUg
-J3JvbXMvc2tpYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9za2lib290LmdpdCkgcmVn
-aXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9za2lib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAo
-aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGgg
-J3JvbXMvdS1ib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0cHM6Ly9n
-aXQucWVtdS5vcmcvZ2l0L3UtYm9vdC1zYW00NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGgg
-J3JvbXMvdS1ib290LXNhbTQ2MGV4JwpTdWJtb2R1bGUgJ3NsaXJwJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L2xpYnNsaXJwLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnc2xpcnAnClN1Ym1v
-ZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQvYmVya2VsZXktc29mdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0
-cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS10
-ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9iZXJrZWxleS10ZXN0ZmxvYXQt
-My5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0z
-JwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9r
-ZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFwZGInCkNs
-b25pbmcgaW50byAnY2Fwc3RvbmUnLi4uClN1Ym1vZHVsZSBwYXRoICdjYXBzdG9uZSc6IGNoZWNr
-ZWQgb3V0ICcyMmVhZDNlMGJmZGI4NzUxNjY1NjQ1MzMzNjE2MGUwYTM3YjA2NmJmJwpDbG9uaW5n
-IGludG8gJ2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4OGYxODkw
-OWRiNzMxYTYyNzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5NTM2JwpDbG9uaW5nIGludG8gJ3JvbXMvUWVt
-dU1hY0RyaXZlcnMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJzogY2hl
-Y2tlZCBvdXQgJzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3YjllYTg2OWRmMWMyZDljOGUyNjYnCkNsb25p
-bmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9TTE9GJzogY2hlY2tl
-ZCBvdXQgJzdiZmU1ODRlMzIxOTQ2NzcxNjkyNzExZmY4M2FkMmI1ODUwZGFjYTcnCkNsb25pbmcg
-aW50byAncm9tcy9lZGsyJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyJzogY2hlY2tlZCBv
-dXQgJzIwZDJlNWExMjVlMzRmYzg1MDEwMjY2MTNhNzE1NDliMmExYTNlNTQnClN1Ym1vZHVsZSAn
-U29mdEZsb2F0JyAoaHR0cHM6Ly9naXRodWIuY29tL3VjYi1iYXIvYmVya2VsZXktc29mdGZsb2F0
-LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRM
-aWIvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAnQ3J5cHRvUGtnL0xpYnJhcnkvT3Bl
-bnNzbExpYi9vcGVuc3NsJyAoaHR0cHM6Ly9naXRodWIuY29tL29wZW5zc2wvb3BlbnNzbCkgcmVn
-aXN0ZXJlZCBmb3IgcGF0aCAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJwpD
-bG9uaW5nIGludG8gJ0FybVBrZy9MaWJyYXJ5L0FybVNvZnRGbG9hdExpYi9iZXJrZWxleS1zb2Z0
-ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9Bcm1Qa2cvTGlicmFyeS9Bcm1T
-b2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMz
-Mjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICdDcnlwdG9Qa2cv
-TGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIv
-Q3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJzogY2hlY2tlZCBvdXQgJzUwZWFh
-YzlmMzMzNzY2NzI1OWRlNzI1NDUxZjIwMWU3ODQ1OTk2ODcnClN1Ym1vZHVsZSAnYm9yaW5nc3Ns
-JyAoaHR0cHM6Ly9ib3Jpbmdzc2wuZ29vZ2xlc291cmNlLmNvbS9ib3Jpbmdzc2wpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ2JvcmluZ3NzbCcKU3VibW9kdWxlICdrcmI1JyAoaHR0cHM6Ly9naXRodWIu
-Y29tL2tyYjUva3JiNSkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAna3JiNScKU3VibW9kdWxlICdweWNh
-LmNyeXB0b2dyYXBoeScgKGh0dHBzOi8vZ2l0aHViLmNvbS9weWNhL2NyeXB0b2dyYXBoeS5naXQp
-IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3B5Y2EtY3J5cHRvZ3JhcGh5JwpDbG9uaW5nIGludG8gJ2Jv
-cmluZ3NzbCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9P
-cGVuc3NsTGliL29wZW5zc2wvYm9yaW5nc3NsJzogY2hlY2tlZCBvdXQgJzIwNzBmOGFkOTE1MWRj
-OGYzYTczYmZmYWExNDZiNWU2OTM3YTU4M2YnCkNsb25pbmcgaW50byAna3JiNScuLi4KU3VibW9k
-dWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wv
-a3JiNSc6IGNoZWNrZWQgb3V0ICdiOWFkNmM0OTUwNWM5NmEwODgzMjZiNjJhNTI1NjhlMzQ4NGYy
-MTY4JwpDbG9uaW5nIGludG8gJ3B5Y2EtY3J5cHRvZ3JhcGh5Jy4uLgpTdWJtb2R1bGUgcGF0aCAn
-cm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbC9weWNhLWNyeXB0
-b2dyYXBoeSc6IGNoZWNrZWQgb3V0ICcwOTQwMzEwMGRlMmY2ZjFjZGQwZDQ4NGRjYjhlNjIwZjFj
-MzM1YzhmJwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
-aXB4ZSc6IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2VlOTAxYmI2
-ZTE3JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21z
-L29wZW5iaW9zJzogY2hlY2tlZCBvdXQgJ2M3OWUwZWNiODRmNGYxZWUzZjczZjUyMTYyMmUyNjRl
-ZGQxYmYxNzQnCkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1vZHVsZSBw
-YXRoICdyb21zL29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1ZTQ1ZWYx
-ZjY3OTc4ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbnNiaScuLi4KU3Vi
-bW9kdWxlIHBhdGggJ3JvbXMvb3BlbnNiaSc6IGNoZWNrZWQgb3V0ICdjZTIyOGVlMDkxOWRlYjk5
-NTcxOTJkNzIzZWVjYzhhYWFlMjY5N2M2JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1wYWxjb2Rl
-Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91dCAnYmYw
-ZTEzNjk4ODcyNDUwMTY0ZmE3MDQwZGEzNmE5NWQyZDRiMzI2ZicKQ2xvbmluZyBpbnRvICdyb21z
-L3NlYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2VkIG91dCAn
-YTVjYWI1OGU5YTNmYjZlMTY4YWJhOTE5YzU2NjliZWE0MDY1NzNiNCcKQ2xvbmluZyBpbnRvICdy
-b21zL3NlYWJpb3MtaHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJzog
-Y2hlY2tlZCBvdXQgJzBmNGZlODQ2NTgxNjVlOTZjZTM1ODcwZmQxOWZjNjM0ZTE4MmU3N2InCkNs
-b25pbmcgaW50byAncm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZ2FiaW9z
-JzogY2hlY2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFjOTAxNWEn
-CkNsb25pbmcgaW50byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9za2li
-b290JzogY2hlY2tlZCBvdXQgJzI2MWNhOGU3NzllNTEzODg2OWE0NWYxNzRjYWE0OWJlNmEyNzQ1
-MDEnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3Ut
-Ym9vdCc6IGNoZWNrZWQgb3V0ICdkMzY4OTI2N2Y5MmM1OTU2ZTA5Y2M3ZDFiYWE0NzAwMTQxNjYy
-YmZmJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgpTdWJtb2R1bGUgcGF0
-aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnOiBjaGVja2VkIG91dCAnNjBiMzkxNmYzM2U2MTdhODE1
-OTczYzVhNmRmNzcwNTViMmUzYTU4OCcKQ2xvbmluZyBpbnRvICdzbGlycCcuLi4KU3VibW9kdWxl
-IHBhdGggJ3NsaXJwJzogY2hlY2tlZCBvdXQgJzEyNmMwNGFjYmFiZDdhZDMyYzJiMDE4ZmUxMGRm
-YWMyYTNiYzEyMTAnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMn
-Li4uClN1Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNr
-ZWQgb3V0ICdiNjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5n
-IGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAn
-dGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMy
-NzM5NmEwMTFhMTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFw
-ZGInLi4uClN1Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIz
-ZDcxNmUyYjY0NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0Jwo0N2E5ZGU3IGxpbnV4LXVzZXI6IHRpbWUgc3RhbXBpbmcgb3B0aW9ucyBm
-b3Igc2V0c29ja29wdCgpCjgzNGNjYTUgbGludXgtdXNlcjogYWRkIG1pc3NpbmcgVURQIGFuZCBJ
-UHY2IHNldHNvY2tvcHQgb3B0aW9ucwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yIENoZWNraW5n
-IGNvbW1pdCA4MzRjY2E1ZTMxYTMgKGxpbnV4LXVzZXI6IGFkZCBtaXNzaW5nIFVEUCBhbmQgSVB2
-NiBzZXRzb2Nrb3B0IG9wdGlvbnMpCkVSUk9SOiBBdXRob3IgZW1haWwgYWRkcmVzcyBpcyBtYW5n
-bGVkIGJ5IHRoZSBtYWlsaW5nIGxpc3QKIzI6IApBdXRob3I6IFNodS1DaHVuIFdlbmcgdmlhIFFl
-bXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMjYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IDQ3YTlkZTdkY2ExYyAobGludXgtdXNlcjogdGltZSBz
-dGFtcGluZyBvcHRpb25zIGZvciBzZXRzb2Nrb3B0KCkpCkVSUk9SOiBBdXRob3IgZW1haWwgYWRk
-cmVzcyBpcyBtYW5nbGVkIGJ5IHRoZSBtYWlsaW5nIGxpc3QKIzI6IApBdXRob3I6IFNodS1DaHVu
-IFdlbmcgdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4KCnRvdGFsOiAxIGVy
-cm9ycywgMCB3YXJuaW5ncywgMzYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8yIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDgyMjIzMTQ0My4xNzIwOTktMS1zY3dAZ29vZ2xlLmNvbS90ZXN0aW5n
-LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> Sent: Friday, August 23, 2019 3:13 AM
+>=20
+> * Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> >
+> >
+> > On 8/22/2019 3:02 PM, Dr. David Alan Gilbert wrote:
+> > > * Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> > >> Sorry for delay to respond.
+> > >>
+> > >> On 7/11/2019 5:37 PM, Dr. David Alan Gilbert wrote:
+> > >>> * Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> > >>>> These functions save and restore PCI device specific data - config
+> > >>>> space of PCI device.
+> > >>>> Tested save and restore with MSI and MSIX type.
+> > >>>>
+> > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > >>>> ---
+> > >>>>  hw/vfio/pci.c                 | 114
+> ++++++++++++++++++++++++++++++++++++++++++
+> > >>>>  include/hw/vfio/vfio-common.h |   2 +
+> > >>>>  2 files changed, 116 insertions(+)
+> > >>>>
+> > >>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > >>>> index de0d286fc9dd..5fe4f8076cac 100644
+> > >>>> --- a/hw/vfio/pci.c
+> > >>>> +++ b/hw/vfio/pci.c
+> > >>>> @@ -2395,11 +2395,125 @@ static Object
+> *vfio_pci_get_object(VFIODevice *vbasedev)
+> > >>>>      return OBJECT(vdev);
+> > >>>>  }
+> > >>>>
+> > >>>> +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *=
+f)
+> > >>>> +{
+> > >>>> +    VFIOPCIDevice *vdev =3D container_of(vbasedev, VFIOPCIDevice,
+> vbasedev);
+> > >>>> +    PCIDevice *pdev =3D &vdev->pdev;
+> > >>>> +    uint16_t pci_cmd;
+> > >>>> +    int i;
+> > >>>> +
+> > >>>> +    for (i =3D 0; i < PCI_ROM_SLOT; i++) {
+> > >>>> +        uint32_t bar;
+> > >>>> +
+> > >>>> +        bar =3D pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 =
++ i *
+> 4, 4);
+> > >>>> +        qemu_put_be32(f, bar);
+> > >>>> +    }
+> > >>>> +
+> > >>>> +    qemu_put_be32(f, vdev->interrupt);
+> > >>>> +    if (vdev->interrupt =3D=3D VFIO_INT_MSI) {
+> > >>>> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi =3D 0, msi_d=
+ata;
+> > >>>> +        bool msi_64bit;
+> > >>>> +
+> > >>>> +        msi_flags =3D pci_default_read_config(pdev, pdev->msi_cap=
+ +
+> PCI_MSI_FLAGS,
+> > >>>> +                                            2);
+> > >>>> +        msi_64bit =3D (msi_flags & PCI_MSI_FLAGS_64BIT);
+> > >>>> +
+> > >>>> +        msi_addr_lo =3D pci_default_read_config(pdev,
+> > >>>> +                                         pdev->msi_cap + PCI_MSI_=
+ADDRESS_LO, 4);
+> > >>>> +        qemu_put_be32(f, msi_addr_lo);
+> > >>>> +
+> > >>>> +        if (msi_64bit) {
+> > >>>> +            msi_addr_hi =3D pci_default_read_config(pdev,
+> > >>>> +                                             pdev->msi_cap + PCI_=
+MSI_ADDRESS_HI,
+> > >>>> +                                             4);
+> > >>>> +        }
+> > >>>> +        qemu_put_be32(f, msi_addr_hi);
+> > >>>> +
+> > >>>> +        msi_data =3D pci_default_read_config(pdev,
+> > >>>> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 :
+> PCI_MSI_DATA_32),
+> > >>>> +                2);
+> > >>>> +        qemu_put_be32(f, msi_data);
+> > >>>> +    } else if (vdev->interrupt =3D=3D VFIO_INT_MSIX) {
+> > >>>> +        uint16_t offset;
+> > >>>> +
+> > >>>> +        /* save enable bit and maskall bit */
+> > >>>> +        offset =3D pci_default_read_config(pdev,
+> > >>>> +                                       pdev->msix_cap + PCI_MSIX_=
+FLAGS + 1, 2);
+> > >>>> +        qemu_put_be16(f, offset);
+> > >>>> +        msix_save(pdev, f);
+> > >>>> +    }
+> > >>>> +    pci_cmd =3D pci_default_read_config(pdev, PCI_COMMAND, 2);
+> > >>>> +    qemu_put_be16(f, pci_cmd);
+> > >>>> +}
+> > >>>> +
+> > >>>> +static void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *=
+f)
+> > >>>> +{
+> > >>>> +    VFIOPCIDevice *vdev =3D container_of(vbasedev, VFIOPCIDevice,
+> vbasedev);
+> > >>>> +    PCIDevice *pdev =3D &vdev->pdev;
+> > >>>> +    uint32_t interrupt_type;
+> > >>>> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi =3D 0, msi_data;
+> > >>>> +    uint16_t pci_cmd;
+> > >>>> +    bool msi_64bit;
+> > >>>> +    int i;
+> > >>>> +
+> > >>>> +    /* retore pci bar configuration */
+> > >>>> +    pci_cmd =3D pci_default_read_config(pdev, PCI_COMMAND, 2);
+> > >>>> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> > >>>> +                        pci_cmd & (!(PCI_COMMAND_IO |
+> PCI_COMMAND_MEMORY)), 2);
+> > >>>> +    for (i =3D 0; i < PCI_ROM_SLOT; i++) {
+> > >>>> +        uint32_t bar =3D qemu_get_be32(f);
+> > >>>> +
+> > >>>> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, b=
+ar, 4);
+> > >>>> +    }
+> > >>>
+> > >>> Is it possible to validate the bar's at all?  We just had a bug on =
+a
+> > >>> virtual device where one version was asking for a larger bar than t=
+he
+> > >>> other; our validation caught this in some cases so we could tell th=
+at
+> > >>> the guest had a BAR that was aligned at the wrong alignment.
 
+I'm a bit confused here. Did you mean that src and dest include
+different versions of the virtual device which implements different
+BAR size? If that is the case, shouldn't the migration fail at the start
+when doing compatibility check?
+
+> > >>>
+> > >>
+> > >> "Validate the bars" does that means validate size of bars?
+> > >
+> > > I meant validate the address programmed into the BAR against the size=
+,
+> > > assuming you know the size; e.g. if it's a 128MB BAR, then make sure =
+the
+> > > address programmed in is 128MB aligned.
+> > >
+> >
+> > If this validation fails, migration resume should fail, right?
+>=20
+> Yes I think so; if you've got a device that wants 128MB alignment and
+> someone gives you a non-aligned address, who knows what will happen.
+
+If misalignment is really caused by the guest, shouldn't we just follow
+the hardware behavior, i.e. hard-wiring the lower bits to 0 before
+updating the cfg space?=20
+
+Thanks
+Kevin
 
