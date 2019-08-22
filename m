@@ -2,74 +2,63 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C9E2C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:42:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB82C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:43:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36280233A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:42:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36280233A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 48B43233A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:43:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B43233A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0oI9-00043h-Io
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:42:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33799)
+	id 1i0oJG-0005r1-Hl
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:43:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i0oGu-0003D5-CF
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1i0oHf-00045l-3p
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i0oGt-00028R-8j
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51284)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i0oGt-00027W-3H
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i0oGr-0002gG-DL
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 14:41:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4B9D12E80CC
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 14:41:01 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1i0oHe-0002oz-5w
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38220)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1i0oHd-0002oD-Vw; Thu, 22 Aug 2019 10:41:50 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 44544308FC4E;
+ Thu, 22 Aug 2019 14:41:49 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.175])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BECCB5D6A7;
+ Thu, 22 Aug 2019 14:41:46 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: slirp@lists.freedesktop.org
+Date: Thu, 22 Aug 2019 16:41:34 +0200
+Message-Id: <20190822144134.23521-3-philmd@redhat.com>
+In-Reply-To: <20190822144134.23521-1-philmd@redhat.com>
+References: <20190822144134.23521-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Thu, 22 Aug 2019 14:41:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Aug 2019 14:27:50 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: christophe-lyon pmaydell rth
-X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
-X-Launchpad-Bug-Modifier: Christophe Lyon (christophe-lyon)
-References: <156639548437.26869.13792283715555746637.malonedeb@gac.canonical.com>
-Message-Id: <156648407047.26064.13767240366164589263.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b8d4ef58930d09e132505e70bea0c2fe698a15e0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1840922] Re: qemu-arm for cortex-m33 aborts with
- unhandled CPU exception 0x8
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [RFC PATCH 2/2] Delay crash when mbufs are corrupted
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,54 +67,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1840922 <1840922@bugs.launchpad.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-stable@nongnu.org, Petr Matousek <pmatouse@redhat.com>,
+ qemu-devel@nongnu.org, Prasad J Pandit <ppandit@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks Peter and Richard for the quick patch. It works for me.
+If the mbufs linked list is corrupted, give the application
+a chance to properly shutdown itself without causing dataloss.
 
--- =
+For now, this means slowly leaking the heap.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1840922
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ src/ip_input.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Title:
-  qemu-arm for cortex-m33 aborts with unhandled CPU exception 0x8
+diff --git a/src/ip_input.c b/src/ip_input.c
+index ee52085..36962b5 100644
+--- a/src/ip_input.c
++++ b/src/ip_input.c
+@@ -185,6 +185,15 @@ void ip_input(struct mbuf *m)
+             if (ip =3D=3D NULL)
+                 return;
+             m =3D dtom(slirp, ip);
++            if (m =3D=3D NULL) {
++                /* The mbufs linked list is corrupted, we
++                 * should properly shutdown the application.
++                 * We prefer to leak a mbuf on the heap
++                 * rather than allowing null dereference
++                 * and eventual crash (data corruption).
++                 */
++                return; /* TODO warn the library consumer! */
++            }
+         } else if (fp)
+             ip_freef(slirp, fp);
+=20
+--=20
+2.20.1
 
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hi,
-
-  While experimenting with running the GCC testsuite with cortex-m33 as tar=
-get (to exercise v8-m code), I came across this failure:
-  qemu: unhandled CPU exception 0x8 - aborting
-  R00=3Dfffeaf58 R01=3Dfffeaf58 R02=3D00000000 R03=3Dfffeaf5d
-  R04=3Dfffeaf5c R05=3Dfffeaf9c R06=3D00000000 R07=3Dfffeaf80
-  R08=3D00000000 R09=3D00000000 R10=3D00019dbc R11=3D00000000
-  R12=3D000000f0 R13=3Dfffeaf58 R14=3D000081f3 R15=3Dfffeaf5c
-  XPSR=3D61000000 -ZC- T NS priv-thread
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6033=
-c908
-
-  I'm using arm-eabi-gcc, so it targets bare-metal, not linux.
-
-  The testcase is GCC's
-  gcc/testsuite/gcc.c-torture/execute/20000822-1.c; it works when
-  compiled at -O2, but crashes when compiled at -Os. The test uses
-  nested functions, so it creates a trampoline on the stack, whose
-  address may be a problem. But since the stack address seems to be in
-  the same range in the O2 and Os cases, it's not that clear.
-
-  I'm attaching the C source, asm, binary executables and qemu traces
-  with in_asm,cpu.
-
-  I execute the binaries with:
-  qemu-arm --cpu cortex-m33  ./20000822-1.exe.Os
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1840922/+subscriptions
 
