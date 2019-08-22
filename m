@@ -2,81 +2,104 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E43C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78625C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A95322CE3
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:20:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 416C522CE3
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:21:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t8QnwI7R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A95322CE3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Mu3szqWr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416C522CE3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0n0m-0007m2-8Y
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 09:20:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35406)
+	id 1i0n1P-00005F-47
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 09:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i0mxI-0005pO-Fr
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:16:45 -0400
+ (envelope-from <ross.lagerwall@citrix.com>) id 1i0myl-0006o8-9c
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:18:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i0mxH-0008It-2L
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:16:44 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:45392)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i0mxG-0008IU-QB
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:16:42 -0400
-Received: by mail-ot1-x329.google.com with SMTP id m24so5356656otp.12
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 06:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Ehz3md5fEQQONS866XzVW/EBdKEq+9laLlbcN52qzBU=;
- b=t8QnwI7Rf8/XXbNdUAw3d5qe3A6V1MlBiG0TR5V1u3aQ5gr8Cd4vuBbUL+DM2LZaeX
- mT3Hbdacb8yAorBYagMT4qZakqL+nh7gw1qY/igWTOSdkbAYM00faonv911WSiYUHc8I
- Tx5m9wPecOqV3aFVWCbI3CBMpzKs5BQmET+2EuRS4aJOr5kNd/VqVVpj08BDtcFGiYpR
- Cio4zvzCCiMoL2zBwGB5Za5XRbW6dKoQyNkH71stqVQOrRVilhoVg95BiGfW27d+k9i9
- Az2GIlOtbJVe2C4tkT+F648CF1O5IeB9zo5b2Lsz1TgZwjDHbCCrTKPKNdOJ+4RTAh2i
- L4sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Ehz3md5fEQQONS866XzVW/EBdKEq+9laLlbcN52qzBU=;
- b=qzxQNZB/wB4z+7kGGpIhP32twykN10i8YPCyt/dZYVSmE//1lC/Nc0IkfIrNd1rU9V
- DXWlk4enEvVQwbpJ0Dm2wVKb8UqZnEgecOeZSd7mS9nDggvfWCWH+rVGDu9dVmKwGJ2Z
- uNr+wtQOz5WDepkjku22huVAar/8XeVoB3ly1EhbNpGEBRH6QN23o/F5ChbXCyiwGdbF
- dFsi9BGcsZPu6WS0l+JkiP1MgnwudVwGxh/ICz44KKEcaIZm76ELD/wEyfgM9jvgNUAs
- QeMz+xMZNbLbsL/JRcTHXcAu7XwedZ0dAQ5WwF0Bw4eQX0E5TQSxKhG3qPkp3gXqC9oR
- hosg==
-X-Gm-Message-State: APjAAAWFA0nd1WQwLLNP+uUSLEEW/dYgOe30QRo9qf5lIrqnjEu7SWfl
- AxHnnQVIsMbfpI8Rzr0RFlxuru0Y+81oMJ1/u/v0vw==
-X-Google-Smtp-Source: APXvYqwgha7v5rsagdxlzwdXzX+cqHCmPm93or5su1N3IDj77MZGi2/u+hh6f1I9EO8IN64vaq0FKKDK9F7+n02HDPE=
-X-Received: by 2002:a9d:6a94:: with SMTP id l20mr7785317otq.221.1566479801887; 
- Thu, 22 Aug 2019 06:16:41 -0700 (PDT)
+ (envelope-from <ross.lagerwall@citrix.com>) id 1i0myj-0000xM-Bh
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:18:15 -0400
+Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:60322)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ross.lagerwall@citrix.com>)
+ id 1i0myh-0000tc-Cw; Thu, 22 Aug 2019 09:18:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1566479891;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=zYVlyooVgI7lstgmEWgPQkxO49tKIRn7xJYyMzKhbYE=;
+ b=Mu3szqWrCPXI8yNOph6T0SboNgUn3n7klNASTVHEvcKF1IVGmFb/zMCF
+ RXnLBPK003Eo9aLAy53DJFDoRH+HLi18zF1zmqSA7a5GLZWVidnnqouzo
+ 0bIBugGCLiH9mtJLIFa08smYcN8VYGicW1Z/VEFfSalcKie8+N/aP9QVE U=;
+Authentication-Results: esa4.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=ross.lagerwall@citrix.com;
+ spf=Pass smtp.mailfrom=ross.lagerwall@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ ross.lagerwall@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="ross.lagerwall@citrix.com";
+ x-sender="ross.lagerwall@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa4.hc3370-68.iphmx.com: domain of
+ ross.lagerwall@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="ross.lagerwall@citrix.com";
+ x-sender="ross.lagerwall@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="ross.lagerwall@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: GkSfQ6281CNVwPkvI+BYtwC1u6Y5M4fWU/ei12dyUXU6gIphzVa5sqXiXKUjk+ErLTQq9SmSV/
+ 9Bmoru3meJEg3Cp18/0dGg750dN0IZakM73RZQIiCVKk6kPB0avRH5yUvBFNLc4VLUwoVdTWD/
+ HHFocYsQG67++no3opm37JK78AeKBUn6RFKm4EvNkRmMQcFxEdRZX5/qN0l3UB5xoVUzz4Q73h
+ kv/Df4mcZ+0/pQKWuXbG4tclWdAG2/D/oUZoWtP3m5kn4a3TidS7dXcqxUMKWISdAtVw2FMXJC
+ luI=
+X-SBRS: 2.7
+X-MesageID: 4836268
+X-Ironport-Server: esa4.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,416,1559534400"; 
+   d="scan'208";a="4836268"
+To: Klaus Birkelund Jensen <klaus@birkelund.eu>, <qemu-block@nongnu.org>
+References: <20190705072333.17171-1-klaus@birkelund.eu>
+ <20190705072333.17171-17-klaus@birkelund.eu>
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Message-ID: <79fb195f-91dc-869d-f290-40fdcb96eea3@citrix.com>
+Date: Thu, 22 Aug 2019 14:18:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1566408501-48680-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1566408501-48680-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Aug 2019 14:16:30 +0100
-Message-ID: <CAFEAcA8HuH5ff+jZvAzGvaHvRQ9H3JQM7Y64CrmCGfp+LTQZeA@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
-Subject: Re: [Qemu-devel] [PULL 00/13] Misc patches for 2019-08-21
+In-Reply-To: <20190705072333.17171-17-klaus@birkelund.eu>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.155.144
+Subject: Re: [Qemu-devel] [PATCH 16/16] nvme: support multiple namespaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,41 +111,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, armbru@redhat.com, matt.fitzpatrick@oakgatetech.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, keith.busch@intel.com,
+ lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 21 Aug 2019 at 18:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit e65472c7bc413d79faa61eb1d05c540b039458=
-94:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.2-20190821=
-' into staging (2019-08-21 14:04:17 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 78d01598aea85841f0e4f8baf62c42b76230a81c:
->
->   char-socket: Lock tcp_chr_disconnect() and socket_reconnect_timeout() (=
-2019-08-21 16:31:59 +0200)
->
-> ----------------------------------------------------------------
-> * Longstanding chardev race condition fix (Berto)
-> * Cleanups and tests from the Meson POC (Marc-Andr=C3=A9, myself)
-> * Coalesced range cleanup (Peter)
->
-> ----------------------------------------------------------------
+On 7/5/19 8:23 AM, Klaus Birkelund Jensen wrote:
+> This adds support for multiple namespaces by introducing a new 'nvme-ns'
+> device model. The nvme device creates a bus named from the device name
+> ('id'). The nvme-ns devices then connect to this and registers
+> themselves with the nvme device.
+> 
+> This changes how an nvme device is created. Example with two namespaces:
+> 
+>    -drive file=nvme0n1.img,if=none,id=disk1
+>    -drive file=nvme0n2.img,if=none,id=disk2
+>    -device nvme,serial=deadbeef,id=nvme0
+>    -device nvme-ns,drive=disk1,bus=nvme0,nsid=1
+>    -device nvme-ns,drive=disk2,bus=nvme0,nsid=2
+> 
+> A maximum of 256 namespaces can be configured.
+> 
+snip
+>   static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>   {
+> +    NvmeNamespace *ns = req->ns;
+> +
+>       uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+>       uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+>       uint32_t result;
+> @@ -1464,7 +1474,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>           result = cpu_to_le32(n->features.err_rec);
+>           break;
+>       case NVME_VOLATILE_WRITE_CACHE:
+> -        result = blk_enable_write_cache(n->conf.blk);
+> +        result = blk_enable_write_cache(ns->conf.blk);
+>           trace_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
+>           break;
 
+I tried this patch series by installing Windows with a single NVME 
+controller having two namespaces. QEMU crashed in get_feature / 
+NVME_VOLATILE_WRITE_CACHE because req->ns was NULL.
 
-Applied, thanks.
+nvme_get_feature / nvme_set_feature look wrong to me since I can't see 
+how req->ns would have been set. Should they have similar code to 
+nvme_io_cmd to set req->ns from cmd->nsid?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+After working around this issue everything else seemed to be working 
+well. Thanks for your work on this patch series.
 
--- PMM
+Thanks,
+-- 
+Ross Lagerwall
 
