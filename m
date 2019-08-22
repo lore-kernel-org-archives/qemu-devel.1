@@ -2,61 +2,63 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D4D9C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17217C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:53:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13E4021848
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:52:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13E4021848
+	by mail.kernel.org (Postfix) with ESMTPS id E1D5721848
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 14:53:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1D5721848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0oRi-0005dE-FN
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:52:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34369)
+	id 1i0oT6-00072D-1m
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 10:53:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36874)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i0oHc-00041V-Rp
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:50 -0400
+ (envelope-from <berrange@redhat.com>) id 1i0oPJ-0003AD-Tv
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:49:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i0oHb-0002lN-9E
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:41:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38392)
+ (envelope-from <berrange@redhat.com>) id 1i0oPI-00068g-HT
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:49:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35128)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1i0oHa-0002jd-UQ; Thu, 22 Aug 2019 10:41:47 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i0oPI-00068E-92
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 10:49:44 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3011C3082A98;
- Thu, 22 Aug 2019 14:41:46 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.175])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6EDD15D6A7;
- Thu, 22 Aug 2019 14:41:42 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: slirp@lists.freedesktop.org
-Date: Thu, 22 Aug 2019 16:41:33 +0200
-Message-Id: <20190822144134.23521-2-philmd@redhat.com>
-In-Reply-To: <20190822144134.23521-1-philmd@redhat.com>
-References: <20190822144134.23521-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 88FA918C4269;
+ Thu, 22 Aug 2019 14:49:43 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B3FDB5D6A7;
+ Thu, 22 Aug 2019 14:49:42 +0000 (UTC)
+Date: Thu, 22 Aug 2019 15:49:40 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190822144940.GV3267@redhat.com>
+References: <20190822011620.106337-1-aik@ozlabs.ru>
+ <87wof5b7ze.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87wof5b7ze.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 22 Aug 2019 14:41:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Thu, 22 Aug 2019 14:49:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/2] Do not reassemble fragments pointing
- outside of the original payload
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qapi: Add query-memory-checksum
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,90 +70,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Petr Matousek <pmatouse@redhat.com>, Vishnu Dev TJ <vishnudevtj@gmail.com>,
- qemu-stable@nongnu.org, qemu-devel@nongnu.org,
- Prasad J Pandit <ppandit@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The vulnerability CVE-2019-14378 is well explained in [1]:
+On Thu, Aug 22, 2019 at 04:16:53PM +0200, Markus Armbruster wrote:
+> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+> 
+> > This returns MD5 checksum of all RAM blocks for migration debugging
+> > as this is way faster than saving the entire RAM to a file and checking
+> > that.
+> >
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> Any particular reason for MD5?  Have you measured the other choices
+> offered by GLib?
+> 
+> I understand you don't need crypto-strength here.  Both MD5 and SHA-1
+> would be bad choices then.
 
-  The bug is triggered when large IPv4 fragmented packets are
-  reassembled for processing.
+We have a tests/bench-crypto-hash test but its hardcoded for sha256.
+I hacked it to report all algorithms and got these results for varying
+input chunk sizes:
 
-  For the NAT translation if the incoming packets are fragmented
-  they should be reassembled before they are edited and
-  re-transmitted.
-  This reassembly is done by the
-  ip_reass(Slirp *slirp, struct ip *ip, struct ipq *fp) function.
-  ip contains the current IP packet data, fp is a link list
-  containing the fragmented packets.
+/crypto/hash/md5/speed-512: 519.12 MB/sec OK
+/crypto/hash/md5/speed-1024: 560.39 MB/sec OK
+/crypto/hash/md5/speed-4096: 591.39 MB/sec OK
+/crypto/hash/md5/speed-16384: 576.46 MB/sec OK
+/crypto/hash/sha1/speed-512: 443.12 MB/sec OK
+/crypto/hash/sha1/speed-1024: 518.82 MB/sec OK
+/crypto/hash/sha1/speed-4096: 555.60 MB/sec OK
+/crypto/hash/sha1/speed-16384: 568.16 MB/sec OK
+/crypto/hash/sha224/speed-512: 221.90 MB/sec OK
+/crypto/hash/sha224/speed-1024: 239.79 MB/sec OK
+/crypto/hash/sha224/speed-4096: 269.37 MB/sec OK
+/crypto/hash/sha224/speed-16384: 274.87 MB/sec OK
+/crypto/hash/sha256/speed-512: 222.75 MB/sec OK
+/crypto/hash/sha256/speed-1024: 253.25 MB/sec OK
+/crypto/hash/sha256/speed-4096: 272.80 MB/sec OK
+/crypto/hash/sha256/speed-16384: 275.59 MB/sec OK
+/crypto/hash/sha384/speed-512: 322.73 MB/sec OK
+/crypto/hash/sha384/speed-1024: 369.84 MB/sec OK
+/crypto/hash/sha384/speed-4096: 406.71 MB/sec OK
+/crypto/hash/sha384/speed-16384: 417.87 MB/sec OK
+/crypto/hash/sha512/speed-512: 320.62 MB/sec OK
+/crypto/hash/sha512/speed-1024: 361.93 MB/sec OK
+/crypto/hash/sha512/speed-4096: 404.91 MB/sec OK
+/crypto/hash/sha512/speed-16384: 418.53 MB/sec OK
+/crypto/hash/ripemd160/speed-512: 226.45 MB/sec OK
+/crypto/hash/ripemd160/speed-1024: 239.25 MB/sec OK
+/crypto/hash/ripemd160/speed-4096: 251.31 MB/sec OK
+/crypto/hash/ripemd160/speed-16384: 255.01 MB/sec OK
 
-  ip_reass() does the following:
 
-  * If first fragment to arrive (fp=3D=3DNULL), create a reassembly
-    queue and insert ip into this queue.
-  * Check if the fragment is overlapping with previous received
-    fragments, then discard it.
-  * If all the fragmented packets are received reassemble it.
-    Create header for new ip packet by modifying header of first
-    packet.
+IOW, md5 is clearly the quickest, by a considerable margin over
+SHA256/512. SHA1 is slightly slower.
 
-  The bug is at the calculation of the variable delta. The code
-  assumes that the first fragmented packet will not be allocated in
-  the external buffer (m_ext). The calculation q - m->dat is valid
-  when the packet data is inside mbuf->m_dat (q will be inside m_dat)
-  (q is structure containing link list of fragments and packet data).
-  Otherwise if m_ext buffer was allocated, then q will be inside the
-  external buffer and the calculation of the delta will be wrong.
+Assuming that we document that this command is intentionally
+*not* trying to guarantee collision resistances we're ok.
 
-  Later the newly calculated pointer q is converted into ip structure
-  and values are modified, Due to the wrong calculation of the delta,
-  ip will be pointing to incorrect location and ip_src and ip_dst can
-  be used to write controlled data onto the calculated location. This
-  may also crash qemu if the calculated ip is located in unmaped area.
+In fact we should not document what kind of checksum is
+reported by query-memory-checksum. The impl should be a black
+box from user's POV.
 
-Do not queue fragments pointing out of the original payload to avoid
-to calculate the variable delta.
+If we're just aiming for debugging tool to detect accidental
+corruption, could we even just ignore cryptographic hashs
+entirely and do a crc32 - that'd be way faster than even
+md5.
 
-[1] https://vishnudevtj.github.io/notes/qemu-vm-escape-cve-2019-14378
-
-Fixes: CVE-2019-14378
-Reported-by: Vishnu Dev TJ <vishnudevtj@gmail.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- src/ip_input.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/src/ip_input.c b/src/ip_input.c
-index 7364ce0..ee52085 100644
---- a/src/ip_input.c
-+++ b/src/ip_input.c
-@@ -304,6 +304,19 @@ static struct ip *ip_reass(Slirp *slirp, struct ip *=
-ip, struct ipq *fp)
-         ip_deq(q->ipf_prev);
-     }
-=20
-+    /*
-+     * If we received the first fragment, we know the original
-+     * payload size. Verify fragments are within our payload.
-+     */
-+    for (q =3D fp->frag_link.next; q !=3D (struct ipasfrag*)&fp->frag_li=
-nk;
-+            q =3D q->ipf_next) {
-+        if (!q->ipf_off && q->ipf_len) {
-+            if (ip->ip_off + ip->ip_len >=3D q->ipf_len) {
-+                goto dropfrag;
-+            }
-+        }
-+    }
-+
- insert:
-     /*
-      * Stick new segment in its place;
---=20
-2.20.1
-
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
