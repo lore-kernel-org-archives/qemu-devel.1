@@ -2,88 +2,60 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F15C3A59E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 466DAC3A59E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:57:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 587A72339E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:34:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 587A72339E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1370F21655
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:57:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1370F21655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0bzW-00048L-Fk
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 21:34:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34072)
+	id 1i0cLW-0004NZ-83
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 21:57:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36542)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i0byT-0002tp-En
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:33:14 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i0cKg-0003po-Cx
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:56:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i0byQ-0006Kv-DP
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:33:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57348)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i0cKe-0001M0-Kh
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:56:10 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:39139)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i0byO-0006KD-Nc
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:33:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 031DC3082E57;
- Thu, 22 Aug 2019 01:33:06 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 87CE260600;
- Thu, 22 Aug 2019 01:33:05 +0000 (UTC)
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-References: <20190822011620.106337-1-aik@ozlabs.ru>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <b9098689-a8cb-0c68-0065-f9362cdcb32d@redhat.com>
-Date: Wed, 21 Aug 2019 20:33:04 -0500
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1i0cKe-0001Jp-92; Wed, 21 Aug 2019 21:56:08 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07441657|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.249713-0.0208414-0.729446; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e02c03275; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=10; RT=10; SR=0;
+ TI=SMTPD_---.FG9x9hN_1566438956; 
+Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.FG9x9hN_1566438956)
+ by smtp.aliyun-inc.com(10.147.42.253);
+ Thu, 22 Aug 2019 09:56:01 +0800
+To: Palmer Dabbelt <palmer@sifive.com>, alistair23@gmail.com,
+ Jonathan Behrens <fintelia@gmail.com>
+References: <mhng-04cdd93a-df3e-4de0-b1f5-0365f2be0fab@palmer-si-x1c4>
+From: liuzhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <96d32c8a-a4a2-9e40-d5be-97a0617703ac@c-sky.com>
+Date: Thu, 22 Aug 2019 09:50:58 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20190822011620.106337-1-aik@ozlabs.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="m02TyPsTxNG6Nl7Zh3ZKdsHfeYghLcyFv"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 22 Aug 2019 01:33:06 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] qapi: Add query-memory-checksum
+In-Reply-To: <mhng-04cdd93a-df3e-4de0-b1f5-0365f2be0fab@palmer-si-x1c4>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 121.197.200.217
+Subject: Re: [Qemu-devel] RISC-V: Vector && DSP Extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,137 +67,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ sagark@eecs.berkeley.edu, bastian@mail.uni-paderborn.de, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---m02TyPsTxNG6Nl7Zh3ZKdsHfeYghLcyFv
-Content-Type: multipart/mixed; boundary="KjfhyBYqJJpDTJp6babPfRsOqR2k5MNxy";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b9098689-a8cb-0c68-0065-f9362cdcb32d@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] qapi: Add query-memory-checksum
-References: <20190822011620.106337-1-aik@ozlabs.ru>
-In-Reply-To: <20190822011620.106337-1-aik@ozlabs.ru>
 
---KjfhyBYqJJpDTJp6babPfRsOqR2k5MNxy
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 2019/8/22 上午3:31, Palmer Dabbelt wrote:
+> On Thu, 15 Aug 2019 14:37:52 PDT (-0700), alistair23@gmail.com wrote:
+>> On Thu, Aug 15, 2019 at 2:07 AM Peter Maydell 
+>> <peter.maydell@linaro.org> wrote:
+>>>
+>>> On Thu, 15 Aug 2019 at 09:53, Aleksandar Markovic
+>>> <aleksandar.m.mail@gmail.com> wrote:
+>>> >
+>>> > > We can accept draft
+>>> > > extensions in QEMU as long as they are disabled by default.
+>>>
+>>> > Hi, Alistair, Palmer,
+>>> >
+>>> > Is this an official stance of QEMU community, or perhaps Alistair's
+>>> > personal judgement, or maybe a rule within risv subcomunity?
+>>>
+>>> Alistair asked on a previous thread; my view was:
+>>> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03364.html
+>>> and nobody else spoke up disagreeing (summary: should at least be
+>>> disabled-by-default and only enabled by setting an explicit
+>>> property whose name should start with the 'x-' prefix).
+>>
+>> Agreed!
+>>
+>>>
+>>> In general QEMU does sometimes introduce experimental extensions
+>>> (we've had them in the block layer, for example) and so the 'x-'
+>>> property to enable them is a reasonably established convention.
+>>> I think it's a reasonable compromise to allow this sort of work
+>>> to start and not have to live out-of-tree for a long time, without
+>>> confusing users or getting into a situation where some QEMU
+>>> versions behave differently or to obsolete drafts of a spec
+>>> without it being clear from the command line that experimental
+>>> extensions are being enabled.
+>>>
+>>> There is also an element of "submaintainer judgement" to be applied
+>>> here -- upstream is probably not the place for a draft extension
+>>> to be implemented if it is:
+>>>  * still fast moving or subject to major changes of design direction
+>>>  * major changes to the codebase (especially if it requires
+>>>    changes to core code) that might later need to be redone
+>>>    entirely differently
+>>>  * still experimental
+>>
+>> Yep, agreed. For RISC-V I think this would extend to only allowing
+>> extensions that have backing from the foundation and are under active
+>> discussion.
+>
+> My general philosophy here is that we'll take anything written down in 
+> an official RISC-V ISA manual (ie, the ones actually released by the 
+> foundation).  This provides a single source of truth for what an 
+> extension name / version means, which is important to avoid 
+> confusion.  If it's a ratified extension then I see no reason not to 
+> support it on my end.  For frozen extensions we should probably just 
+> wait the 45 days until they go up for a ratification vote, but I'd be 
+> happy to start reviewing patches then (or earlier :)).
+>
+> If the spec is a draft in the ISA manual then we need to worry about 
+> the support burden, which I don't have a fixed criteria for -- 
+> generally there shouldn't be issues here, but early drafts can be in a 
+> state where they're going to change extensively and are unlikely to be 
+> used by anyone.  There's also the question of "what is an official 
+> release of a draft specification?".
+> That's a bit awkward right now: the current ratified ISA manual 
+> contains version 0.3 of the hypervisor extension, but I just talked to 
+> Andrew and the plan is to remove the draft extensions from the 
+> ratified manuals because these drafts are old and the official manuals 
+> update slowly.  For now I guess we'll need an an-hoc way of 
+> determining if a draft extension has been officially versioned or not, 
+> which is a bit of a headache.
+>
+> We already have examples of supporting draft extensions, including 
+> priv-1.9.1.  This does cause some pain for us on the QEMU side (CSR 
+> bits have different semantics between the specs), but there's 1.9.1 
+> hardware out there and the port continues to be useful so I'd be in 
+> favor of keeping it around for now.  I suppose there is an implicit 
+> risk that draft extensions will be deprecated, but the "x-" prefix, 
+> draft status, and long deprecation period should be sufficient to 
+> inform users of the risk.  I wouldn't be opposed to adding a "this is 
+> a draft ISA" warning, but I feel like it might be a bit overkill.
+>
+Hi, Palmer
 
-On 8/21/19 8:16 PM, Alexey Kardashevskiy wrote:
-> This returns MD5 checksum of all RAM blocks for migration debugging
-> as this is way faster than saving the entire RAM to a file and checking=
+Maybe it is the headache of open source hardware. Everyone cooperates to 
+build a better architecture.
 
-> that.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->=20
->=20
-> I am actually wondering if there is an easier way of getting these
-> checksums and I just do not see it, it cannot be that we fixed all
-> memory migration bugs :)
+In my opinion, we should focus on the future. The code in QEMU mainline 
+should evolve to the  ratified extension step by step, and only support 
+the best extension at last.
 
-I'm not sure whether the command itself makes sense, but for the interfac=
-e:
+At that time,  even many hardwares just support  the deprecated draft 
+extension,  the draft codes should be in the wild and maintained by the 
+hardware manufactures.
 
+But before that,  it is better to  have a draft implementation. So that 
+We can work step by step to accelerate the coming of the ratified 
+extension.
 
-> +++ b/qapi/misc.json
-> @@ -1194,6 +1194,33 @@
->  ##
->  { 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
-> =20
-> +##
-> +# @MemoryChecksum:
-> +#
-> +# A string with MD5 checksum of all RAMBlocks.
-> +#
-> +# @checksum: the checksum.
-> +#
-> +# Since: 3.2.0
+Even at last draft extension implementation are deprecated, they are not 
+meaningless. The manufactures may use  the  history commit to support 
+their hardwares that
 
-This should be 4.2, not 3.2.
+only support drafted extension.
 
-> +##
-> +{ 'struct': 'MemoryChecksum',
-> +  'data'  : { 'checksum': 'str' } }
-> +
-> +##
-> +# @query-memory-checksum:
-> +#
-> +# Return the MD5 checksum of all RAMBlocks.
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-memory-checksum" }
-> +# <- { "return": { "checksum": "a0880304994f64cb2edad77b9a1cd58f" } }
-> +#
-> +# Since: 3.2.0
+Best Regards,
 
-and again
+Zhiwei
 
-> +##
-> +{ 'command': 'query-memory-checksum',
-> +  'returns': 'MemoryChecksum' }
-> +
-> =20
-
-> +++ b/exec.c
-> @@ -2050,6 +2050,22 @@ void *qemu_ram_get_host_addr(RAMBlock *rb)
->      return rb->host;
->  }
-> =20
-> +gchar *qemu_ram_chksum(void)
-
-gchar is a pointless glib type.  Use 'char' instead.
-
-> +{
-> +    struct RAMBlock *rb;
-> +    GChecksum *chksum =3D g_checksum_new(G_CHECKSUM_MD5);
-> +    gchar *ret;
-> +
-> +    RAMBLOCK_FOREACH(rb) {
-> +        g_checksum_update(chksum, qemu_ram_get_host_addr(rb),
-> +                          qemu_ram_get_used_length(rb));
-> +    }
-> +    ret =3D g_strdup(g_checksum_get_string(chksum));
-> +    g_checksum_free(chksum);
-> +
-> +    return ret;
-> +}
-
-How long does this take to run?  Is it something where you really want
-to block the guest while chewing over the guest's entire memory?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---KjfhyBYqJJpDTJp6babPfRsOqR2k5MNxy--
-
---m02TyPsTxNG6Nl7Zh3ZKdsHfeYghLcyFv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1d8NAACgkQp6FrSiUn
-Q2o9cAgAoCWnwqzwSPRAAiD5+V7msbNA5hm4EDcr2TJ9Thad1A44xshX/SMvOR+q
-Bavsmlj1Z1fBd9uQNs3j9sYEKreDMwxb9T3dRJU5PLd6QMjJofwcdVwB60DdEJkE
-1SVqmQefCVYXEAOjXGr7LYaUkhSJUgdU656YgGwHQTe+vuHbordavz5uZjdsFeyr
-XswHj5JiK/E0EOCiZe/Ueo5kAyAUhSAdDdChsNK6IskBcaRCYXv9BEfoMAIoLQ4b
-OCSLN9CwpALdWJgU4r2hWkvGbPvirpUD3e29Ovwxe6f1mAN/SkrWoByT9nvFuhS1
-kW+dxSNJIJbbf1Z3cP/RAD1F6/bB5A==
-=Ulv9
------END PGP SIGNATURE-----
-
---m02TyPsTxNG6Nl7Zh3ZKdsHfeYghLcyFv--
+>>
+>> Alistair
+>>
+>>>
+>>> thanks
+>>> -- PMM
+>
 
