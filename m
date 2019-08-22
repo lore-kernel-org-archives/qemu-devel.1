@@ -2,81 +2,80 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3692AC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA28EC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00CD220856
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:50:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dE0DA4SP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CD220856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9F9BA2089E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 17:54:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F9BA2089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0rDy-0000z2-8b
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 13:50:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45018)
+	id 1i0rHv-0003yv-SE
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 13:54:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i0rD1-0008PA-0T
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:49:16 -0400
+ (envelope-from <lersek@redhat.com>) id 1i0rHD-0003Ty-83
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:53:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i0rCz-00085c-1H
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:49:14 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39177)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i0rCw-00083m-WB
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:49:12 -0400
-Received: by mail-pf1-x444.google.com with SMTP id f17so4433915pfn.6
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 10:49:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=umjbQvyNhOeOnMJlj/UuLiaomopZxKybKESiEh98ACs=;
- b=dE0DA4SPGerbn4y2RCGP0X8kvObOOlORj5VZGKoZeNOjE589UWR/8l4koJUuH2AYqU
- XJkWOsEidEgOSXeC3+A2Vp41yGZikzoG8VBkoZLVV4Rc7UjiBvA47ES0OIwRHQBFRWxz
- EJiAgN24vjNT3kRKUmORi58/HYrklStKxqR0CCpfY0mokobAR+oGh8pduBk3E/y99InL
- NRhEXtLpF7e1M7gJAoaYZHbjYbqm82ASFXt7yc6dLhFYl884vXlV2TkgERzJ0RllJNW1
- YURg8q/bA4mOgulmXDsG+SnSTQX4XkySBSLfvQ+pnvk1mQMIBVdqFjLQAaIpiQ2R6+xE
- xH+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=umjbQvyNhOeOnMJlj/UuLiaomopZxKybKESiEh98ACs=;
- b=TupOdPWgT5oBIwCn9HA7MD9yYoKIviFssEncjTzR3riK74My2k7q7qWzP62ZeOgrl6
- sAXxlaG10ZEnZyHE9ULzFRjH8yE2f/kVLm40JlWVYIa+7NLABF7n8aEn74FM+VApEydF
- FUXjXrlXYIV9H9E01IdoCTxuHZUX32eGGjwoCb+LWchOVVFCDGnKJaj8+Ym83oPOb9VJ
- ZGMHi7FsVb0BMtfuFX0+6od3LRifN6Ft917YN72dVrJBhMdP/YIry6wxEvz4GYb5ERd2
- e+D7N/6PYlY+N908A/sQSrEEZei0DWB/E7XQDdkYSSJaHNZnOV3WLnOl2O7Od6FaFluc
- zoVQ==
-X-Gm-Message-State: APjAAAXlIa3aTvUopRHqis+WrkHbd0Vi5mO3bqVI7uNjy7By4U35RAZ+
- j4WHG391PJeaPkcsIDfzEUVcpscbGBU=
-X-Google-Smtp-Source: APXvYqzP6X6BaB2oTnXvNz9jlsATcjiMd1/QQ3GTvbgucImEie+nhRAkWg/Ke9ckajMw+8Gif8RTDw==
-X-Received: by 2002:a17:90a:d343:: with SMTP id i3mr920810pjx.15.1566496146793; 
- Thu, 22 Aug 2019 10:49:06 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id k64sm40469177pgk.74.2019.08.22.10.49.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 22 Aug 2019 10:49:05 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 10:49:04 -0700
-Message-Id: <20190822174904.11339-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v2] target/alpha: fix tlb_fill trap_arg2 value
- for instruction fetch
+ (envelope-from <lersek@redhat.com>) id 1i0rHB-0001tJ-Na
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:53:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52174)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1i0rHB-0001sC-Fi
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 13:53:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6ADBA3086213;
+ Thu, 22 Aug 2019 17:53:31 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.36.118.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 65A735DE5C;
+ Thu, 22 Aug 2019 17:53:24 +0000 (UTC)
+To: "Kinney, Michael D" <michael.d.kinney@intel.com>,
+ "rfc@edk2.groups.io" <rfc@edk2.groups.io>, "Yao, Jiewen"
+ <jiewen.yao@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+ <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
+ <99219f81-33a3-f447-95f8-f10341d70084@redhat.com>
+ <6f8b9507-58d0-5fbd-b827-c7194b3b2948@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
+ <7cb458ea-956e-c1df-33f7-025e4f0f22df@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F7600B9@shsmsx102.ccr.corp.intel.com>
+ <bb6fdbe0-2a3b-e586-e9a5-93e1ac0803ec@redhat.com>
+ <20190816161933.7d30a881@x1.home>
+ <74D8A39837DF1E4DA445A8C0B3885C503F761B96@shsmsx102.ccr.corp.intel.com>
+ <35396800-32d2-c25f-b0d0-2d7cd8438687@redhat.com>
+ <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <98a2ba66-a42a-67e9-79b1-6d684b5e31c6@redhat.com>
+Date: Thu, 22 Aug 2019 19:53:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
+MIME-Version: 1.0
+In-Reply-To: <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Thu, 22 Aug 2019 17:53:31 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
+ QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,49 +87,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-stable@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ "devel@edk2.groups.io" <devel@edk2.groups.io>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>,
+ Alex Williamson <alex.williamson@redhat.com>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aurelien Jarno <aurelien@aurel32.net>
+On 08/21/19 17:48, Kinney, Michael D wrote:
+> Perhaps there is a way to avoid the 3000:8000 startup
+> vector.
+>
+> If a CPU is added after a cold reset, it is already in a
+> different state because one of the active CPUs needs to
+> release it by interacting with the hot plug controller.
+>
+> Can the SMRR for CPUs in that state be pre-programmed to
+> match the SMRR in the rest of the active CPUs?
+>
+> For OVMF we expect all the active CPUs to use the same
+> SMRR value, so a check can be made to verify that all
+> the active CPUs have the same SMRR value.  If they do,
+> then any CPU released through the hot plug controller
+> can have its SMRR pre-programmed and the initial SMI
+> will start within TSEG.
 
-Commit e41c94529740cc26 ("target/alpha: Convert to CPUClass::tlb_fill")
-slightly changed the way the trap_arg2 value is computed in case of TLB
-fill. The type of the variable used in the ternary operator has been
-changed from an int to an enum. This causes the -1 value to not be
-sign-extended to 64-bit in case of an instruction fetch. The trap_arg2
-ends up with 0xffffffff instead of 0xffffffffffffffff. Fix that by
-changing the -1 into -1LL.
+Yes, that is what I proposed here:
 
-This fixes the execution of user space processes in qemu-system-alpha.
+* http://mid.mail-archive.com/effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com
+* https://edk2.groups.io/g/devel/message/45570
 
-Fixes: e41c94529740cc26
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-[rth: Test MMU_DATA_LOAD and MMU_DATA_STORE instead of implying them.]
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/alpha/helper.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Namely:
 
-diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-index c6998348df..19cda0a2db 100644
---- a/target/alpha/helper.c
-+++ b/target/alpha/helper.c
-@@ -283,7 +283,9 @@ bool alpha_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-         cs->exception_index = EXCP_MMFAULT;
-         env->trap_arg0 = addr;
-         env->trap_arg1 = fail;
--        env->trap_arg2 = (access_type == MMU_INST_FETCH ? -1 : access_type);
-+        env->trap_arg2 = (access_type == MMU_DATA_LOAD ? 0ull :
-+                          access_type == MMU_DATA_STORE ? 1ull :
-+                          /* access_type == MMU_INST_FETCH */ -1ull);
-         cpu_loop_exit_restore(cs, retaddr);
-     }
- 
--- 
-2.17.1
+> When the SMM setup quiesces during normal firmware boot, OVMF could
+> use existent (finalized) SMBASE infomation to *pre-program* some
+> virtual QEMU hardware, with such state that would be expected, as
+> "final" state, of any new hotplugged CPU. Afterwards, if / when the
+> hotplug actually happens, QEMU could blanket-apply this state to the
+> new CPU, and broadcast a hardware SMI to all CPUs except the new one.
 
+(I know that Paolo didn't like it; I'm just confirming that I had the
+same, or at least a very similar, idea.)
+
+Thanks!
+Laszlo
 
