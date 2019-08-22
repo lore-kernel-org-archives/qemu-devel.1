@@ -2,62 +2,62 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 205EEC3A59E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 00:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3425C3A59E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 00:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF9A721848
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 00:33:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HY+TrLeL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF9A721848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id C6DC12145D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 00:36:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6DC12145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0b2N-0004OS-UD
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 20:33:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55811)
+	id 1i0b61-0006Rt-19
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 20:36:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56611)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i0ayY-00012s-8D
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:29:15 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1i0b5K-000634-Gi
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i0ayX-0008Sy-76
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:29:14 -0400
-Received: from ozlabs.org ([203.11.71.1]:44321)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1i0b5J-0003G4-AZ
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:36:14 -0400
+Received: from mga09.intel.com ([134.134.136.24]:21306)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i0ayW-0008Nb-0j; Wed, 21 Aug 2019 20:29:13 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46DQPp108Vz9sNF; Thu, 22 Aug 2019 10:29:01 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566433742;
- bh=AEpg+r3FDv8nHfheDF9jZUDYAU1yYj+g7x4MuqWaoXM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=HY+TrLeLV+AyoruH9BLqK/3+qYBgd0CFt6IXuFDxRs8vlIx8gnHD7dGjeCr29vRyt
- I/FJqD6/E9wHeSVut5yLXJxpWVTKLxWC+rVgd3NKJZXMK8mr6Wg68nltpWZG7+uVsA
- KcAVb5/7IVLvlQf3P2b1yy0Yu8SfLPYsvXxqZK4A=
-Date: Thu, 22 Aug 2019 08:56:01 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: "Paul A. Clarke" <pc@us.ibm.com>
-Message-ID: <20190821225601.GG20890@umbus>
-References: <1566401321-22419-1-git-send-email-pc@us.ibm.com>
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1i0b5J-0003FX-2t
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:36:13 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Aug 2019 17:36:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,414,1559545200"; d="scan'208";a="378324678"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga005.fm.intel.com with ESMTP; 21 Aug 2019 17:36:09 -0700
+Date: Thu, 22 Aug 2019 08:35:47 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190822003547.GA11547@richard>
+References: <20190821155327.25208-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="YrlhzR9YrZtruaFS"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1566401321-22419-1-git-send-email-pc@us.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] ppc: Fix xsmaddmdp and friends
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190821155327.25208-1-berrange@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
+Subject: Re: [Qemu-devel] [PATCH] tests: make filemonitor test more robust
+ to event ordering
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,90 +69,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Aug 21, 2019 at 04:53:27PM +0100, Daniel P. Berrangé wrote:
+>The ordering of events that are emitted during the rmdir
+>test have changed with kernel >= 5.3. Semantically both
+>new & old orderings are correct, so we must be able to
+>cope with either.
+>
+>To cope with this, when we see an unexpected event, we
+>push it back onto the queue and look and the subsequent
+>event to see if that matches instead.
+>
+>Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 
---YrlhzR9YrZtruaFS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Tested-by: Wei Yang <richardw.yang@linux.intel.com>
 
-On Wed, Aug 21, 2019 at 10:28:41AM -0500, Paul A. Clarke wrote:
-> From: "Paul A. Clarke" <pc@us.ibm.com>
->=20
-> A class of instructions of the form:
->   op Target,A,B
-> which operate like:
->   Target =3D Target * A + B
-> have a bit set which distinguishes them from instructions that operate as:
->   Target =3D Target * B + A
->=20
-> This bit is not being checked properly (using PPC_BIT macro), so all
-> instructions in this class are operating incorrectly as the second form
-> above.  The bit was being checked as if it were part of a 64-bit
-> instruction opcode, rather than a proper 32-bit opcode.  Fix by using the
-> macro (PPC_BIT32) which treats the opcode as a 32-bit quantity.
->=20
-> Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+>---
+> tests/test-util-filemonitor.c | 43 +++++++++++++++++++++++++++--------
+> 1 file changed, 34 insertions(+), 9 deletions(-)
+>
+>diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.c
+>index 46e781c022..301cd2db61 100644
+>--- a/tests/test-util-filemonitor.c
+>+++ b/tests/test-util-filemonitor.c
+>@@ -45,6 +45,11 @@ typedef struct {
+>     const char *filedst;
+>     int64_t *watchid;
+>     int eventid;
+>+    /*
+>+     * Only valid with OP_EVENT - this event might be
+>+     * swapped with the next OP_EVENT
+>+     */
+>+    bool swapnext;
+> } QFileMonitorTestOp;
+> 
+> typedef struct {
+>@@ -98,6 +103,10 @@ qemu_file_monitor_test_handler(int64_t id,
+>     QFileMonitorTestData *data = opaque;
+>     QFileMonitorTestRecord *rec = g_new0(QFileMonitorTestRecord, 1);
+> 
+>+    if (debug) {
+>+        g_printerr("Queue event id %" PRIx64 " event %d file %s\n",
+>+                   id, event, filename);
+>+    }
+>     rec->id = id;
+>     rec->event = event;
+>     rec->filename = g_strdup(filename);
+>@@ -125,7 +134,8 @@ qemu_file_monitor_test_record_free(QFileMonitorTestRecord *rec)
+>  * to wait for the event to be queued for us.
+>  */
+> static QFileMonitorTestRecord *
+>-qemu_file_monitor_test_next_record(QFileMonitorTestData *data)
+>+qemu_file_monitor_test_next_record(QFileMonitorTestData *data,
+>+                                   QFileMonitorTestRecord *pushback)
+> {
+>     GTimer *timer = g_timer_new();
+>     QFileMonitorTestRecord *record = NULL;
+>@@ -139,9 +149,15 @@ qemu_file_monitor_test_next_record(QFileMonitorTestData *data)
+>     }
+>     if (data->records) {
+>         record = data->records->data;
+>-        tmp = data->records;
+>-        data->records = g_list_remove_link(data->records, tmp);
+>-        g_list_free(tmp);
+>+        if (pushback) {
+>+            data->records->data = pushback;
+>+        } else {
+>+            tmp = data->records;
+>+            data->records = g_list_remove_link(data->records, tmp);
+>+            g_list_free(tmp);
+>+        }
+>+    } else if (pushback) {
+>+        qemu_file_monitor_test_record_free(pushback);
+>     }
+>     qemu_mutex_unlock(&data->lock);
+> 
+>@@ -158,13 +174,15 @@ static bool
+> qemu_file_monitor_test_expect(QFileMonitorTestData *data,
+>                               int64_t id,
+>                               QFileMonitorEvent event,
+>-                              const char *filename)
+>+                              const char *filename,
+>+                              bool swapnext)
+> {
+>     QFileMonitorTestRecord *rec;
+>     bool ret = false;
+> 
+>-    rec = qemu_file_monitor_test_next_record(data);
+>+    rec = qemu_file_monitor_test_next_record(data, NULL);
+> 
+>+ retry:
+>     if (!rec) {
+>         g_printerr("Missing event watch id %" PRIx64 " event %d file %s\n",
+>                    id, event, filename);
+>@@ -172,6 +190,11 @@ qemu_file_monitor_test_expect(QFileMonitorTestData *data,
+>     }
+> 
+>     if (id != rec->id) {
+>+        if (swapnext) {
+>+            rec = qemu_file_monitor_test_next_record(data, rec);
+>+            swapnext = false;
+>+            goto retry;
+>+        }
+>         g_printerr("Expected watch id %" PRIx64 " but got %" PRIx64 "\n",
+>                    id, rec->id);
+>         goto cleanup;
+>@@ -347,7 +370,8 @@ test_file_monitor_events(void)
+>           .filesrc = "fish", },
+>         { .type = QFILE_MONITOR_TEST_OP_EVENT,
+>           .filesrc = "", .watchid = &watch4,
+>-          .eventid = QFILE_MONITOR_EVENT_IGNORED },
+>+          .eventid = QFILE_MONITOR_EVENT_IGNORED,
+>+          .swapnext = true },
+>         { .type = QFILE_MONITOR_TEST_OP_EVENT,
+>           .filesrc = "fish", .watchid = &watch0,
+>           .eventid = QFILE_MONITOR_EVENT_DELETED },
+>@@ -493,8 +517,9 @@ test_file_monitor_events(void)
+>                 g_printerr("Event id=%" PRIx64 " event=%d file=%s\n",
+>                            *op->watchid, op->eventid, op->filesrc);
+>             }
+>-            if (!qemu_file_monitor_test_expect(
+>-                    &data, *op->watchid, op->eventid, op->filesrc))
+>+            if (!qemu_file_monitor_test_expect(&data, *op->watchid,
+>+                                               op->eventid, op->filesrc,
+>+                                               op->swapnext))
+>                 goto cleanup;
+>             break;
+>         case QFILE_MONITOR_TEST_OP_CREATE:
+>-- 
+>2.21.0
 
-Applied to ppc-for-4.2, thanks.
-
-> ---
->  target/ppc/translate/vsx-impl.inc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
-sx-impl.inc.c
-> index 3922686..8287e27 100644
-> --- a/target/ppc/translate/vsx-impl.inc.c
-> +++ b/target/ppc/translate/vsx-impl.inc.c
-> @@ -1308,7 +1308,7 @@ static void gen_##name(DisasContext *ctx)          =
-                           \
->      }                                                                   =
-      \
->      xt =3D gen_vsr_ptr(xT(ctx->opcode));                                =
-        \
->      xa =3D gen_vsr_ptr(xA(ctx->opcode));                                =
-        \
-> -    if (ctx->opcode & PPC_BIT(25)) {                                    =
-      \
-> +    if (ctx->opcode & PPC_BIT32(25)) {                                  =
-      \
->          /*                                                              =
-      \
->           * AxT + B                                                      =
-      \
->           */                                                             =
-      \
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---YrlhzR9YrZtruaFS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1dzAEACgkQbDjKyiDZ
-s5KLYQ/+Kj3r7+t/5YS20sfJ9YHJqoLazDcScjfAmwXCH8rtpDUwYgFhJ2lUEt1c
-C9URmcTKW7Xzh9XAmaSmkN0PDe7DFJISMyscYhXJWi2xvsEnvevL2K2guF1bidGK
-zkRX/gH+JExcEySlcLWTmSXjwHG+pq7Mo4epzjqG++ORossf31IPzeL+3ShJvweR
-AXlJppCq06C4+7oBZV9L+fTTk3iBSBdyeyiHZcEnsUWiugKcMbdFhFaD9ojgJguk
-JhgK38n+j0ersHfxOxl1BcUA+6JUiGHS2S/pqINEsOktBoyPt6gImYq2bhtMhUgB
-uRk74GnE0R18Wskq0/6QRA9KiJQ+WWdSvgELjJwExSEpBaxIrL2KUGCE/Wn6vdCT
-P2PghiYrx3n417u6dSdeKuiV0sQpDpay/dpgKNw/rRfkBhtpwma1MxrqQrjmsRF6
-4WFVZ7+dGYx/FLA5Dy83CSFUYsPYGj2RDkCnx4CEse+DCJ8Z6GLEJubi7acEhXCu
-iJuwLHrYoDEfpibN+FG2BF+wS823Xm0VfAZlh2goyg+RttxHQsSdW9xNQCuk8NUL
-83GgHrgBldHMdXI9gPXmeFqbGcvQNFciZpjTmw/7/DX37VktuQ1NbjDlmPMVHqdU
-NnbrVQ9UW4WC+rmolgeebPWFswkGFkY3ywuf6olN/kDAARNXT4w=
-=55wV
------END PGP SIGNATURE-----
-
---YrlhzR9YrZtruaFS--
+-- 
+Wei Yang
+Help you, Help me
 
