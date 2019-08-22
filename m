@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 487ADC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D711C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:53:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DD622339F
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:52:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DD622339F
+	by mail.kernel.org (Postfix) with ESMTPS id 1EB2E2339F
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 11:53:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB2E2339F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41447 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0ldx-0006qg-PO
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 07:52:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60144)
+	id 1i0leN-0007IW-TB
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 07:53:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i0lPL-00059Z-C2
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:37:37 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i0lP7-0004jp-UG
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i0lPI-00085r-Lw
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:37:34 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49970 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i0lP3-0007rU-Ek
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:37:21 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48216 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i0lPH-0007rB-DL
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:37:31 -0400
+ id 1i0lOw-0007iw-E5
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 07:37:12 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 450FE1A20E9;
- Thu, 22 Aug 2019 13:35:59 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id CD5521A20A4;
+ Thu, 22 Aug 2019 13:35:58 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 12CD61A20BE;
- Thu, 22 Aug 2019 13:35:59 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 9C4E01A2080;
+ Thu, 22 Aug 2019 13:35:58 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 13:35:46 +0200
-Message-Id: <1566473750-17743-23-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 22 Aug 2019 13:35:37 +0200
+Message-Id: <1566473750-17743-14-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566473750-17743-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1566473750-17743-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH 22/26] target/mips: Clean up handling of CP0
- register 27
+Subject: [Qemu-devel] [PATCH 13/26] target/mips: Clean up handling of CP0
+ register 16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,65 +70,216 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up handling of CP0 register 27.
+Clean up handling of CP0 register 16.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 20 ++++----------------
- 1 file changed, 4 insertions(+), 16 deletions(-)
+ target/mips/cpu.h       |  3 ++-
+ target/mips/translate.c | 60 ++++++++++++++++++++++++-------------------------
+ 2 files changed, 32 insertions(+), 31 deletions(-)
 
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 3a8c560..625d364 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -371,7 +371,8 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG16__CONFIG3         3
+ #define CP0_REG16__CONFIG4         4
+ #define CP0_REG16__CONFIG5         5
+-#define CP0_REG00__CONFIG7         7
++#define CP0_REG16__CONFIG6         6
++#define CP0_REG16__CONFIG7         7
+ /* CP0 Register 17 */
+ #define CP0_REG17__LLADDR          0
+ #define CP0_REG17__MAAR            1
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f7e33f6..936c51c 100644
+index 97a274a..7878fcb 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -7513,10 +7513,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -7293,36 +7293,36 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_27:
+     case CP0_REGISTER_16:
          switch (sel) {
 -        case 0:
--        case 1:
--        case 2:
--        case 3:
-+        case CP0_REG27__CACHERR:
-             tcg_gen_movi_tl(arg, 0); /* unimplemented */
-             register_name = "CacheErr";
++        case CP0_REG16__CONFIG:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config0));
+             register_name = "Config";
              break;
-@@ -8275,10 +8272,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+-        case 1:
++        case CP0_REG16__CONFIG1:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config1));
+             register_name = "Config1";
+             break;
+-        case 2:
++        case CP0_REG16__CONFIG2:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config2));
+             register_name = "Config2";
+             break;
+-        case 3:
++        case CP0_REG16__CONFIG3:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config3));
+             register_name = "Config3";
+             break;
+-        case 4:
++        case CP0_REG16__CONFIG4:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config4));
+             register_name = "Config4";
+             break;
+-        case 5:
++        case CP0_REG16__CONFIG5:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config5));
+             register_name = "Config5";
+             break;
+         /* 6,7 are implementation dependent */
+-        case 6:
++        case CP0_REG16__CONFIG6:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config6));
+             register_name = "Config6";
+             break;
+-        case 7:
++        case CP0_REG16__CONFIG7:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config7));
+             register_name = "Config7";
+             break;
+@@ -8022,45 +8022,45 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_27:
+     case CP0_REGISTER_16:
          switch (sel) {
 -        case 0:
++        case CP0_REG16__CONFIG:
+             gen_helper_mtc0_config0(cpu_env, arg);
+             register_name = "Config";
+             /* Stop translation as we may have switched the execution mode */
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
 -        case 1:
++        case CP0_REG16__CONFIG1:
+             /* ignored, read only */
+             register_name = "Config1";
+             break;
 -        case 2:
++        case CP0_REG16__CONFIG2:
+             gen_helper_mtc0_config2(cpu_env, arg);
+             register_name = "Config2";
+             /* Stop translation as we may have switched the execution mode */
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
 -        case 3:
-+        case CP0_REG27__CACHERR:
++        case CP0_REG16__CONFIG3:
+             gen_helper_mtc0_config3(cpu_env, arg);
+             register_name = "Config3";
+             /* Stop translation as we may have switched the execution mode */
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
+-        case 4:
++        case CP0_REG16__CONFIG4:
+             gen_helper_mtc0_config4(cpu_env, arg);
+             register_name = "Config4";
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
+-        case 5:
++        case CP0_REG16__CONFIG5:
+             gen_helper_mtc0_config5(cpu_env, arg);
+             register_name = "Config5";
+             /* Stop translation as we may have switched the execution mode */
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
+         /* 6,7 are implementation dependent */
+-        case 6:
++        case CP0_REG16__CONFIG6:
              /* ignored */
-             register_name = "CacheErr";
+             register_name = "Config6";
              break;
-@@ -9014,10 +9008,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     case CP0_REGISTER_27:
-         switch (sel) {
-         /* ignored */
--        case 0:
--        case 1:
--        case 2:
--        case 3:
-+        case CP0_REG27__CACHERR:
-             tcg_gen_movi_tl(arg, 0); /* unimplemented */
-             register_name = "CacheErr";
-             break;
-@@ -9757,10 +9748,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_27:
-         switch (sel) {
--        case 0:
--        case 1:
--        case 2:
--        case 3:
-+        case CP0_REG27__CACHERR:
+-        case 7:
++        case CP0_REG16__CONFIG7:
              /* ignored */
-             register_name = "CacheErr";
+             register_name = "Config7";
              break;
+@@ -8777,36 +8777,36 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_16:
+         switch (sel) {
+-        case 0:
++        case CP0_REG16__CONFIG:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config0));
+             register_name = "Config";
+             break;
+-        case 1:
++        case CP0_REG16__CONFIG1:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config1));
+             register_name = "Config1";
+             break;
+-        case 2:
++        case CP0_REG16__CONFIG2:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config2));
+             register_name = "Config2";
+             break;
+-        case 3:
++        case CP0_REG16__CONFIG3:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config3));
+             register_name = "Config3";
+             break;
+-        case 4:
++        case CP0_REG16__CONFIG4:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config4));
+             register_name = "Config4";
+             break;
+-        case 5:
++        case CP0_REG16__CONFIG5:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config5));
+             register_name = "Config5";
+             break;
+        /* 6,7 are implementation dependent */
+-        case 6:
++        case CP0_REG16__CONFIG6:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config6));
+             register_name = "Config6";
+             break;
+-        case 7:
++        case CP0_REG16__CONFIG7:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Config7));
+             register_name = "Config7";
+             break;
+@@ -9497,33 +9497,33 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_16:
+         switch (sel) {
+-        case 0:
++        case CP0_REG16__CONFIG:
+             gen_helper_mtc0_config0(cpu_env, arg);
+             register_name = "Config";
+             /* Stop translation as we may have switched the execution mode */
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
+-        case 1:
++        case CP0_REG16__CONFIG1:
+             /* ignored, read only */
+             register_name = "Config1";
+             break;
+-        case 2:
++        case CP0_REG16__CONFIG2:
+             gen_helper_mtc0_config2(cpu_env, arg);
+             register_name = "Config2";
+             /* Stop translation as we may have switched the execution mode */
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
+-        case 3:
++        case CP0_REG16__CONFIG3:
+             gen_helper_mtc0_config3(cpu_env, arg);
+             register_name = "Config3";
+             /* Stop translation as we may have switched the execution mode */
+             ctx->base.is_jmp = DISAS_STOP;
+             break;
+-        case 4:
++        case CP0_REG16__CONFIG4:
+             /* currently ignored */
+             register_name = "Config4";
+             break;
+-        case 5:
++        case CP0_REG16__CONFIG5:
+             gen_helper_mtc0_config5(cpu_env, arg);
+             register_name = "Config5";
+             /* Stop translation as we may have switched the execution mode */
 -- 
 2.7.4
 
