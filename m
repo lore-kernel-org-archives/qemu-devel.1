@@ -2,60 +2,94 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 466DAC3A59E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B969EC3A59E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 02:57:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1370F21655
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1370F21655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 82F6A22CE3
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 02:57:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AMkPn11H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82F6A22CE3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0cLW-0004NZ-83
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 21:57:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36542)
+	id 1i0dHX-0007hc-Hw
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 22:56:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41142)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i0cKg-0003po-Cx
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:56:11 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i0dGn-0007B9-Gv
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 22:56:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i0cKe-0001M0-Kh
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:56:10 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:39139)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1i0cKe-0001Jp-92; Wed, 21 Aug 2019 21:56:08 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07441657|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.249713-0.0208414-0.729446; FP=0|0|0|0|0|-1|-1|-1;
- HT=e02c03275; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=10; RT=10; SR=0;
- TI=SMTPD_---.FG9x9hN_1566438956; 
-Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.FG9x9hN_1566438956)
- by smtp.aliyun-inc.com(10.147.42.253);
- Thu, 22 Aug 2019 09:56:01 +0800
-To: Palmer Dabbelt <palmer@sifive.com>, alistair23@gmail.com,
- Jonathan Behrens <fintelia@gmail.com>
-References: <mhng-04cdd93a-df3e-4de0-b1f5-0365f2be0fab@palmer-si-x1c4>
-From: liuzhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <96d32c8a-a4a2-9e40-d5be-97a0617703ac@c-sky.com>
-Date: Thu, 22 Aug 2019 09:50:58 +0800
+ (envelope-from <richard.henderson@linaro.org>) id 1i0dGm-00050b-6i
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 22:56:13 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:43794)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i0dGl-00050P-Vf
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 22:56:12 -0400
+Received: by mail-pf1-x442.google.com with SMTP id v12so2843190pfn.10
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 19:56:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=pqsV1GhFYAgEf6DwOiFvo3EJnjxsVUqJQ/dirtTmVrI=;
+ b=AMkPn11HrBJ6ik8/LNaMfh2KOpRw0cz3IUDqZW62D4i9Sf0oZmXimkypyRLxutXF7U
+ YOt+Qafdk1GlU3QNc1+maQFv5GALIRWwdmyKgdQKEjbEDIn5ypnQlDDTq1JjEfLhdexM
+ Hfep5SqHj0hGJJYJeuwx779bqzbUHCo0FDtKqxgBnr6QJ+QpEgYVgkVylIVKQBEAICU+
+ s7gAnYWCaCr3Z61SecpImqIzxqpNTQbAcxzmJQmi25F4He5nmj7DCIAfcmvj1OLMXO0d
+ dR5ts8wYkI0HrdDclxBd9hULqtZoDmbfmPJoDAmw0Y84Q7tNv1wbh3uGuVHVYCil9X/M
+ AuOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pqsV1GhFYAgEf6DwOiFvo3EJnjxsVUqJQ/dirtTmVrI=;
+ b=falLn5zk7BHsDjXRODna/oep5J9ocuSrVCVhPWq1i5fvbMu1SLhyt+aK1KZLN9iSV9
+ AGgwc2qeLl0e81xLwwfwuRHgRV9XNPCTYWkSp5EhQSv9Fbhwc0c8KzXXMgbKk8zw2equ
+ ZK1+ZNtg5YfCLYetw/X0eHVH+8Htj5J31gQTONHLluK8LnMeP8bQG5NejCxkoIW5NXkz
+ SRAl6UDNwSoO9JeUmsnm89ft8GZVYWJkN25ITcBdPR+dn8iADeHt3C2y47VMWVU9jgf9
+ 77ImwfaXqBvnVWt/u98ELH9tsN7WRVgE67JCgMQ7kpvpvQyLwIa01z2FUrgxFTvC4Ef6
+ 55Aw==
+X-Gm-Message-State: APjAAAXJZxkwZRwAdQPMsT5n2jA3cezd/6xM6MmbUidKFtTsWXhs9Se+
+ uH0no7nENmojEZkTHhdEMBEgkA==
+X-Google-Smtp-Source: APXvYqxdnLelDV5rdYar9Kz2dmw0FgivH8INaA2Vx2DeW+WRNIQLhqrzuKL6QqU0NmC7lQQ6ZQr4rw==
+X-Received: by 2002:a17:90a:224e:: with SMTP id
+ c72mr3178921pje.9.1566442570163; 
+ Wed, 21 Aug 2019 19:56:10 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id u7sm20970812pgr.94.2019.08.21.19.56.08
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 21 Aug 2019 19:56:09 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
+References: <20190821133932.7428-1-aurelien@aurel32.net>
+ <CAFEAcA-YEeYEkLW1AL_dgqoANFnfpqJu=XSAkVBctNOh1i=kcw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <b37aa2d9-7352-3cc0-4e58-5ac23f99c8a6@linaro.org>
+Date: Wed, 21 Aug 2019 19:56:06 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <mhng-04cdd93a-df3e-4de0-b1f5-0365f2be0fab@palmer-si-x1c4>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA-YEeYEkLW1AL_dgqoANFnfpqJu=XSAkVBctNOh1i=kcw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 121.197.200.217
-Subject: Re: [Qemu-devel] RISC-V: Vector && DSP Extension
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH] target/alpha: fix tlb_fill trap_arg2 value
+ for instruction fetch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,127 +101,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
- sagark@eecs.berkeley.edu, bastian@mail.uni-paderborn.de, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>, aleksandar.m.mail@gmail.com
+Cc: qemu-stable <qemu-stable@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2019/8/22 上午3:31, Palmer Dabbelt wrote:
-> On Thu, 15 Aug 2019 14:37:52 PDT (-0700), alistair23@gmail.com wrote:
->> On Thu, Aug 15, 2019 at 2:07 AM Peter Maydell 
->> <peter.maydell@linaro.org> wrote:
->>>
->>> On Thu, 15 Aug 2019 at 09:53, Aleksandar Markovic
->>> <aleksandar.m.mail@gmail.com> wrote:
->>> >
->>> > > We can accept draft
->>> > > extensions in QEMU as long as they are disabled by default.
->>>
->>> > Hi, Alistair, Palmer,
->>> >
->>> > Is this an official stance of QEMU community, or perhaps Alistair's
->>> > personal judgement, or maybe a rule within risv subcomunity?
->>>
->>> Alistair asked on a previous thread; my view was:
->>> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03364.html
->>> and nobody else spoke up disagreeing (summary: should at least be
->>> disabled-by-default and only enabled by setting an explicit
->>> property whose name should start with the 'x-' prefix).
+On 8/21/19 6:52 AM, Peter Maydell wrote:
+> On Wed, 21 Aug 2019 at 14:42, Aurelien Jarno <aurelien@aurel32.net> wrote:
 >>
->> Agreed!
+>> Commit e41c94529740cc26 ("target/alpha: Convert to CPUClass::tlb_fill")
+>> slightly changed the way the trap_arg2 value is computed in case of TLB
+>> fill. The type of the variable used in the ternary operator has been
+>> changed from an int to an enum. This causes the -1 value to not be
+>> sign-extended to 64-bit in case of an instruction fetch. The trap_arg2
+>> ends up with 0xffffffff instead of 0xffffffffffffffff. Fix that by
+>> changing the -1 into -1LL.
 >>
->>>
->>> In general QEMU does sometimes introduce experimental extensions
->>> (we've had them in the block layer, for example) and so the 'x-'
->>> property to enable them is a reasonably established convention.
->>> I think it's a reasonable compromise to allow this sort of work
->>> to start and not have to live out-of-tree for a long time, without
->>> confusing users or getting into a situation where some QEMU
->>> versions behave differently or to obsolete drafts of a spec
->>> without it being clear from the command line that experimental
->>> extensions are being enabled.
->>>
->>> There is also an element of "submaintainer judgement" to be applied
->>> here -- upstream is probably not the place for a draft extension
->>> to be implemented if it is:
->>>  * still fast moving or subject to major changes of design direction
->>>  * major changes to the codebase (especially if it requires
->>>    changes to core code) that might later need to be redone
->>>    entirely differently
->>>  * still experimental
+>> This fixes the execution of user space processes in qemu-system-alpha.
 >>
->> Yep, agreed. For RISC-V I think this would extend to only allowing
->> extensions that have backing from the foundation and are under active
->> discussion.
->
-> My general philosophy here is that we'll take anything written down in 
-> an official RISC-V ISA manual (ie, the ones actually released by the 
-> foundation).  This provides a single source of truth for what an 
-> extension name / version means, which is important to avoid 
-> confusion.  If it's a ratified extension then I see no reason not to 
-> support it on my end.  For frozen extensions we should probably just 
-> wait the 45 days until they go up for a ratification vote, but I'd be 
-> happy to start reviewing patches then (or earlier :)).
->
-> If the spec is a draft in the ISA manual then we need to worry about 
-> the support burden, which I don't have a fixed criteria for -- 
-> generally there shouldn't be issues here, but early drafts can be in a 
-> state where they're going to change extensively and are unlikely to be 
-> used by anyone.  There's also the question of "what is an official 
-> release of a draft specification?".
-> That's a bit awkward right now: the current ratified ISA manual 
-> contains version 0.3 of the hypervisor extension, but I just talked to 
-> Andrew and the plan is to remove the draft extensions from the 
-> ratified manuals because these drafts are old and the official manuals 
-> update slowly.  For now I guess we'll need an an-hoc way of 
-> determining if a draft extension has been officially versioned or not, 
-> which is a bit of a headache.
->
-> We already have examples of supporting draft extensions, including 
-> priv-1.9.1.  This does cause some pain for us on the QEMU side (CSR 
-> bits have different semantics between the specs), but there's 1.9.1 
-> hardware out there and the port continues to be useful so I'd be in 
-> favor of keeping it around for now.  I suppose there is an implicit 
-> risk that draft extensions will be deprecated, but the "x-" prefix, 
-> draft status, and long deprecation period should be sufficient to 
-> inform users of the risk.  I wouldn't be opposed to adding a "this is 
-> a draft ISA" warning, but I feel like it might be a bit overkill.
->
-Hi, Palmer
-
-Maybe it is the headache of open source hardware. Everyone cooperates to 
-build a better architecture.
-
-In my opinion, we should focus on the future. The code in QEMU mainline 
-should evolve to the  ratified extension step by step, and only support 
-the best extension at last.
-
-At that time,  even many hardwares just support  the deprecated draft 
-extension,  the draft codes should be in the wild and maintained by the 
-hardware manufactures.
-
-But before that,  it is better to  have a draft implementation. So that 
-We can work step by step to accelerate the coming of the ratified 
-extension.
-
-Even at last draft extension implementation are deprecated, they are not 
-meaningless. The manufactures may use  the  history commit to support 
-their hardwares that
-
-only support drafted extension.
-
-Best Regards,
-
-Zhiwei
-
+>> Fixes: e41c94529740cc26
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+>> ---
+>>  target/alpha/helper.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> Alistair
->>
->>>
->>> thanks
->>> -- PMM
->
+>> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+>> index 93b8e788b1..9e9d880c1a 100644
+>> --- a/target/alpha/helper.c
+>> +++ b/target/alpha/helper.c
+>> @@ -283,7 +283,7 @@ bool alpha_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
+>>          cs->exception_index = EXCP_MMFAULT;
+>>          env->trap_arg0 = addr;
+>>          env->trap_arg1 = fail;
+>> -        env->trap_arg2 = (access_type == MMU_INST_FETCH ? -1 : access_type);
+>> +        env->trap_arg2 = (access_type == MMU_INST_FETCH ? -1LL : access_type);
+>>          cpu_loop_exit_restore(cs, retaddr);
+>>      }
+> 
+> Oops. Thanks for the catch.
+> 
+> Maybe we should not rely directly on the value of the access_type
+> enum to set trap_arg2 at all (ie just go for a switch on access_type and
+> set env->trap_arg2 to the right h/w value in the three cases)?
+
+Yes, I'll do that.  I'm somewhat embarrassed that I haven't tested Alpha in a
+while, and moreso because we just did a release.
+
+
+r~
 
