@@ -2,60 +2,63 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAEFC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:32:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F6AC41514
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:34:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24BCA23401
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:32:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24BCA23401
+	by mail.kernel.org (Postfix) with ESMTPS id 0915A23404
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:34:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0915A23404
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0q0o-00055u-PG
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:32:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40955)
+	id 1i0q2Q-0006OV-44
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:34:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i0pv7-0001FA-Bs
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:26:44 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i0q0G-00054z-Ix
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:32:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i0pv4-0001Ck-Ri
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:26:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57660)
+ (envelope-from <dgilbert@redhat.com>) id 1i0q0E-00050Q-Lv
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:32:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42744)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i0puw-00015K-Fo; Thu, 22 Aug 2019 12:26:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i0q0E-0004xq-8q
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:31:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CA1333082D9E;
- Thu, 22 Aug 2019 16:26:25 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.206])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 63F595C226;
- Thu, 22 Aug 2019 16:26:25 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Thu, 22 Aug 2019 18:26:18 +0200
-Message-Id: <20190822162618.27670-3-mreitz@redhat.com>
-In-Reply-To: <20190822162618.27670-1-mreitz@redhat.com>
-References: <20190822162618.27670-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D94713C928;
+ Thu, 22 Aug 2019 16:31:54 +0000 (UTC)
+Received: from work-vm (ovpn-117-231.ams2.redhat.com [10.36.117.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A340E10016E9;
+ Thu, 22 Aug 2019 16:31:52 +0000 (UTC)
+Date: Thu, 22 Aug 2019 17:31:50 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190822163150.GA3332@work-vm>
+References: <CAFEAcA8kEKVcRu62+VGDkzRj2J87QPxzjg05dCHszeBC6X76pg@mail.gmail.com>
+ <20190822114747.GS3267@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190822114747.GS3267@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 22 Aug 2019 16:26:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Thu, 22 Aug 2019 16:31:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Test reverse sub-cluster qcow2
- writes
+Subject: Re: [Qemu-devel] more automated/public CI for QEMU pullreqs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,122 +70,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>,
- qemu-stable@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Samuel Ortiz <sameo@linux.intel.com>, Kashyap Chamarthy <kchamart@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This exercises the regression introduced in commit
-50ba5b2d994853b38fed10e0841b119da0f8b8e5.  On my machine, it has close
-to a 50 % false-negative rate, but that should still be sufficient to
-test the fix.
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Fri, Aug 16, 2019 at 07:16:55PM +0100, Peter Maydell wrote:
+> > The two major contenders suggested were:
+> >=20
+> > (1) GitLab CI, which supports custom 'runners' which we can set
+> > up to run builds and tests on machines we have project access to
+> >=20
+> > (2) Patchew, which can handle running tests on multiple machines (eg
+> > we do s390 testing today for all patches on list), and which we could
+> > enhance to provide support for the release-manager to do their work
+> >=20
+> > Advantages of Gitlab CI:
+> >  * somebody else is doing the development and maintainance of the
+> >    CI tool -- bigger 'bus factor' than patchew
+> >  * already does (more or less) what we want without needing
+> >    extra coding work
+> >=20
+> > Advantages of Patchew:
+> >  * we're already using it for patch submissions, so we know it's
+> >    not going to go away
+> >  * it's very easy to deploy to a new host
+> >  * no dependencies except Python, so works anywhere we expect
+> >    to be able to build QEMU (whereas gitlab CI's runner is
+> >    written in Go, and there seem to be ongoing issues with getting
+> >    it actually to compile for other architectures than x86)
+>=20
+> IMHO the development tools/processes chosen should enable the project
+> contributors to maximise the time they can put into developing useful
+> features for QEMU itself. Time we spend writing CI systems like patchew
+> is time we're taking away from writing QEMU features, unless the new CI
+> system offers major efficiency benefits over other existing solutions.
+>=20
+> A second important aspect is that to enable a smooth/shallow onramp
+> for new contributors it is useful to have our development processes
+> and tools be familiar to those with general open source dev experience
+> outside QEMU.
+>=20
+> With both these points in mind, I think it is  pretty hard sell to
+> say we should write & maintain a custom CI system just for QEMU
+> unless it is offering major compelling functionality we can't do
+> without.
+>=20
+> IOW, I'd be biased in favour of GitLab CI.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/265     | 67 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/265.out |  6 ++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 74 insertions(+)
- create mode 100755 tests/qemu-iotests/265
- create mode 100644 tests/qemu-iotests/265.out
+I'd agree; and I'd also find it useful to have runners setup for
+Gitlab CI for related things (it would be useful for the virtio-fs
+stuff);  if there are problems on other architectures then we should
+find some go wranglers to go fix it.
 
-diff --git a/tests/qemu-iotests/265 b/tests/qemu-iotests/265
-new file mode 100755
-index 0000000000..dce6f77be3
---- /dev/null
-+++ b/tests/qemu-iotests/265
-@@ -0,0 +1,67 @@
-+#!/usr/bin/env bash
-+#
-+# Test reverse-ordered qcow2 writes on a sub-cluster level
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=3D$(basename $0)
-+echo "QA output created by $seq"
-+
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+# qcow2-specific test
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+echo '--- Writing to the image ---'
-+
-+# Reduce cluster size so we get more and quicker I/O
-+IMGOPTS=3D'cluster_size=3D4096' _make_test_img 1M
-+(for ((kb =3D 1024 - 4; kb >=3D 0; kb -=3D 4)); do \
-+     echo "aio_write -P 42 $((kb + 1))k 2k"; \
-+ done) \
-+ | $QEMU_IO "$TEST_IMG" > /dev/null
-+
-+echo '--- Verifying its content ---'
-+
-+(for ((kb =3D 0; kb < 1024; kb +=3D 4)); do \
-+    echo "read -P 0 ${kb}k 1k"; \
-+    echo "read -P 42 $((kb + 1))k 2k"; \
-+    echo "read -P 0 $((kb + 3))k 1k"; \
-+ done) \
-+ | $QEMU_IO "$TEST_IMG" | _filter_qemu_io | grep 'verification'
-+
-+# Status of qemu-io
-+if [ ${PIPESTATUS[1]} =3D 0 ]; then
-+    echo 'Content verified.'
-+fi
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/265.out b/tests/qemu-iotests/265.out
-new file mode 100644
-index 0000000000..6eac620f25
---- /dev/null
-+++ b/tests/qemu-iotests/265.out
-@@ -0,0 +1,6 @@
-+QA output created by 265
-+--- Writing to the image ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
-+--- Verifying its content ---
-+Content verified.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index d95d556414..0c129c1644 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -274,3 +274,4 @@
- 257 rw
- 258 rw quick
- 262 rw quick migration
-+265 rw auto quick
---=20
-2.21.0
+Dave
 
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
