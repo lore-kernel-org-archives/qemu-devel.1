@@ -2,65 +2,88 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1B0C3A59D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 08:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D058EC3A59D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 08:59:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B075221848
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 08:53:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B075221848
+	by mail.kernel.org (Postfix) with ESMTPS id A5F7D2173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 08:59:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F7D2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0iqS-0000c5-RF
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 04:53:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36749)
+	id 1i0ivx-0003R6-Qn
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 04:59:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i0ipp-00006i-3u
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:52:46 -0400
+ (envelope-from <philmd@redhat.com>) id 1i0iv3-00031O-9K
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i0ipn-0001DB-T6
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:52:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38020)
+ (envelope-from <philmd@redhat.com>) id 1i0iv2-0003YI-1g
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:58:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52626)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i0ipn-0001CY-KB
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:52:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i0iv1-0003Y7-PE
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:58:07 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D6FD6308A968
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 08:52:41 +0000 (UTC)
-Received: from localhost (ovpn-117-251.ams2.redhat.com [10.36.117.251])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EDD9F5D9D3;
- Thu, 22 Aug 2019 08:52:38 +0000 (UTC)
-Date: Thu, 22 Aug 2019 09:52:37 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190822085237.GA20491@stefanha-x1.localdomain>
-References: <20190816143321.20903-1-dgilbert@redhat.com>
- <20190816143321.20903-2-dgilbert@redhat.com>
- <20190818065944-mutt-send-email-mst@kernel.org>
- <20190821191118.GN3309@work-vm>
+ by mx1.redhat.com (Postfix) with ESMTPS id AD1DFC08EC1D
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 08:58:06 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id c14so2663844wml.5
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 01:58:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to;
+ bh=d3q7m48DTcotzNF5DTk0GFoZSRniDLygmk1QCcFza9o=;
+ b=GSgXEUoZXzrltjsjXXATFIueUIFsa8SFvS6z3iTziTTzZS54NKWVzN2l+KixYE2WKI
+ VhaB/Hg08ys1kpFts9MUVqlK3fnDMBC5abmRE9tTABqmOJY3yvU4jzd0skmaFi8hv+Gk
+ 1TVw0whmT6N5RZYuHBobfJbvtPERXElfSw5dEvYrpCyd0657cvbITHd1fn0CLo5pLIuk
+ 5orIYas2d3P5oFJ5r3XE2odfyQqSzHPzHLTEwVvN77dF99nqveefq849Ny29pFg0vH+s
+ PRD83JBp4WQV8tAN7veyjf3hHyh41YuGAvX/ki1DhAHB4jQBsIZjGQMTOKB4HfUDTrfs
+ 6ymA==
+X-Gm-Message-State: APjAAAXJ+afJ7kl7XNGW5R0POubNq61uUuDNKhoN6gCpQe77a8nHEEY8
+ Ya0o2fXk0ciksdd2/L3rNLokajhjceut+xpd8FobTIpls6tlOwE9L8looW1CgPN0BjDm/bFDxdG
+ g4840iFlZkIJGLwU=
+X-Received: by 2002:a1c:be15:: with SMTP id o21mr4869092wmf.140.1566464285366; 
+ Thu, 22 Aug 2019 01:58:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzP5DwMYh4fVTjvRcPTDEz493Sjg2XrVB06GRHDnqVLOZqqdGwKcktjzkeEcn5fDYN7GlRI4A==
+X-Received: by 2002:a1c:be15:: with SMTP id o21mr4869050wmf.140.1566464285129; 
+ Thu, 22 Aug 2019 01:58:05 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id c201sm6224519wmd.33.2019.08.22.01.58.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 22 Aug 2019 01:58:04 -0700 (PDT)
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
+References: <1560299717-177734-1-git-send-email-raphael.norwitz@nutanix.com>
+ <20190614091841.GE10957@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <44e330cb-fe17-6f22-523f-2ecc6e280859@redhat.com>
+Date: Thu, 22 Aug 2019 10:58:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190614091841.GE10957@stefanha-x1.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
-Content-Disposition: inline
-In-Reply-To: <20190821191118.GN3309@work-vm>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 22 Aug 2019 08:52:41 +0000 (UTC)
+ protocol="application/pgp-signature";
+ boundary="iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] virtio: add vhost-user-fs base device
+Subject: Re: [Qemu-devel] [PATCH] vhost-user-scsi: prevent using
+ uninitialized vqs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,136 +95,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, vgoyal@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK
+Content-Type: multipart/mixed; boundary="BJVmbyPMAAcEjPjMAJxZkF49qcnCfy7ZS";
+ protected-headers="v1"
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <44e330cb-fe17-6f22-523f-2ecc6e280859@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost-user-scsi: prevent using uninitialized
+ vqs
+References: <1560299717-177734-1-git-send-email-raphael.norwitz@nutanix.com>
+ <20190614091841.GE10957@stefanha-x1.localdomain>
+In-Reply-To: <20190614091841.GE10957@stefanha-x1.localdomain>
 
---2oS5YaxWCcQjTEyO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--BJVmbyPMAAcEjPjMAJxZkF49qcnCfy7ZS
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 21, 2019 at 08:11:18PM +0100, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Fri, Aug 16, 2019 at 03:33:20PM +0100, Dr. David Alan Gilbert (git) =
-wrote:
-> > > +static void vuf_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> > > +{
-> > > +    /* Do nothing */
-> >=20
-> > Why is this safe?  Is this because this never triggers?  assert(0) then?
-> > If it triggers then backend won't be notified, which might
-> > cause it to get stuck.
+Hi Raphael, Stefan,
+
+On 6/14/19 11:18 AM, Stefan Hajnoczi wrote:
+> On Tue, Jun 11, 2019 at 05:35:17PM -0700, Raphael Norwitz wrote:
+>> Of the 3 virtqueues, seabios only sets cmd, leaving ctrl
+>> and event without a physical address. This can cause
+>> vhost_verify_ring_part_mapping to return ENOMEM, causing
+>> the following logs:
+>>
+>> qemu-system-x86_64: Unable to map available ring for ring 0
+>> qemu-system-x86_64: Verify ring failure on region 0
+>>
+>> The qemu commit e6cc11d64fc998c11a4dfcde8fda3fc33a74d844
+>> has already resolved the issue for vhost scsi devices but
+>> the fix was never applied to vhost-user scsi devices.
+>>
+>> Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+>> ---
+>>  hw/scsi/vhost-user-scsi.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> We never process these queues in qemu - always in the guest; so am I
-> correct in thinking those shouldn't be used?
-
-s/guest/vhost-user backend process/
-
-vuf_handle_output() should never be called.
-
-> > > +}
-> > > +
-> > > +static void vuf_guest_notifier_mask(VirtIODevice *vdev, int idx,
-> > > +                                            bool mask)
-> > > +{
-> > > +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> > > +
-> > > +    vhost_virtqueue_mask(&fs->vhost_dev, vdev, idx, mask);
-> > > +}
-> > > +
-> > > +static bool vuf_guest_notifier_pending(VirtIODevice *vdev, int idx)
-> > > +{
-> > > +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> > > +
-> > > +    return vhost_virtqueue_pending(&fs->vhost_dev, idx);
-> > > +}
-> > > +
-> > > +static void vuf_device_realize(DeviceState *dev, Error **errp)
-> > > +{
-> > > +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> > > +    VHostUserFS *fs =3D VHOST_USER_FS(dev);
-> > > +    unsigned int i;
-> > > +    size_t len;
-> > > +    int ret;
-> > > +
-> > > +    if (!fs->conf.chardev.chr) {
-> > > +        error_setg(errp, "missing chardev");
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (!fs->conf.tag) {
-> > > +        error_setg(errp, "missing tag property");
-> > > +        return;
-> > > +    }
-> > > +    len =3D strlen(fs->conf.tag);
-> > > +    if (len =3D=3D 0) {
-> > > +        error_setg(errp, "tag property cannot be empty");
-> > > +        return;
-> > > +    }
-> > > +    if (len > sizeof_field(struct virtio_fs_config, tag)) {
-> > > +        error_setg(errp, "tag property must be %zu bytes or less",
-> > > +                   sizeof_field(struct virtio_fs_config, tag));
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (fs->conf.num_queues =3D=3D 0) {
-> > > +        error_setg(errp, "num-queues property must be larger than 0"=
-);
-> > > +        return;
-> > > +    }
-> >=20
-> > The strange thing is that actual # of queues is this number + 2.
-> > And this affects an optimal number of vectors (see patch 2).
-> > Not sure what a good solution is - include the
-> > mandatory queues in the number?
-> > Needs to be documented in some way.
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 >=20
-> Should we be doing nvectors the same way virtio-scsi-pci does it;
-> with a magic 'unspecified' default where it sets the nvectors based on
-> the number of queues?
->=20
-> I think my preference is not to show the users the mandatory queues.
 
-I agree.  Users want to control multiqueue, not on the absolute number
-of virtqueues including mandatory queues.
+What about backends/vhost-user.c and hw/block/vhost-user-blk.c?
 
-> > > +
-> > > +    if (!is_power_of_2(fs->conf.queue_size)) {
-> > > +        error_setg(errp, "queue-size property must be a power of 2");
-> > > +        return;
-> > > +    }
-> >=20
-> > Hmm packed ring allows non power of 2 ...
-> > We need to look into a generic helper to support VQ
-> > size checks.
->=20
-> Which would also have to include the negotiation of where it's doing
-> packaged ring?
 
-It's impossible to perform this check at .realize() time since the
-packed virtqueue layout is negotiated via a VIRTIO feature bit.  This
-puts us in the awkward position of either failing when the guest has
-already booted or rounding up the queue size for split ring layouts
-(with a warning message?).
+--BJVmbyPMAAcEjPjMAJxZkF49qcnCfy7ZS--
 
---2oS5YaxWCcQjTEyO
+--iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1eV9UACgkQnKSrs4Gr
-c8g2SwgAuDe+sv8cbgkopQFnHSom++jeERSsBO9K8HDR3dp//XMIPTptMFq3jYHL
-RE2j/zu6qYtxVIptcdxhzLGTBUE2ZT7Ithhk5l33Bp/8B9oE/qxt20UmelkUQEpz
-PrmoehGcqbfUg2YSG7AcXncFaNjlXtQXYlvRRO43RB7TIm6ohce4oRKj+A/YL87o
-jclVKf2b+RunwFiJuv/pdQ37cQ+1ARkWMX3PCjW67OT8MOmwcPPNv5nzM9CQlNhq
-+r7ix/AlNZAe2uwtDaYrE40riZOVMZntwfZp+cxZ8574n06/mO9uSloVmQFfcgVY
-CVpbUQIQmfMvsHbZeAFrCbUVTGZzCQ==
-=wfAK
+iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAl1eWRoACgkQoqP9bt6t
+wN7/PQ//d/yry/2epfthODV4QDxasPd2P13EaI5Gtyn9/2ORJQ9OOiFLLEHuKrdh
+V0r4G/y2JuIIrk2jBQtxblNtCYEU/p/XWW339sLMfq44N/fDFU2eGeqA8rxu4tEv
+puXI/OPXau1ZSGaQAXtI0u4lbFG10PHsig/XhQY7CwHCSjlJT7mzyg5zDRIzjDol
+FCliCRi+7iRFJCs0kNOJj3pzrTKS5s8622PWbuoGDepYuiyxEOsPlsO2e73fIBif
++yWa1osvU+D57V+6C5YHtCSye+yOmlZSwAjjwcpTmND0F04WJHq9qHDImImgbRJE
+GVuJTCrFOJOGclWac4l/suWVTlIfysJs0paEson/6ZwR7Ccf73BdKmZSiMihxt9D
+HCk3XQjARtSe2CHmTiooGH8Va8ObB/QYE8rwl85ZJ3UnEI/Nw8JKq2c1GQ7hHumM
+kPFXTZXEYEhcM22O02VzOwvc/EV0uLdSkB8BWzS9xov67d+R6WSTwgbdIWd9tZNT
+riewZYprFNONamewfmKlaOcCL5xVvFpwgJag8JhLaC0w6RcEmtYvuHdmMl5DnFs3
+IIfqzfjPYAHbQvoIZhN7A5afgRePoOc0NbSRcEA2wFslKVCqRieWEeu0N8SImkVE
+0wlFLeDelb6vNwy6+NN4mpVKKjx3Bx+9vL1KDG09HZl7awqMIRs=
+=s7iH
 -----END PGP SIGNATURE-----
 
---2oS5YaxWCcQjTEyO--
+--iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK--
 
