@@ -2,79 +2,58 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F70C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58980C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:18:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C04D92173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:17:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="BdRzCBCv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C04D92173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2CADD2173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 23:18:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CADD2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0wKJ-00055S-ES
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 19:17:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53952)
- by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
- <36iFfXQMKCpsN7RBJJBG9.7JHL9HP-89Q9GIJIBIP.JMB@flex--scw.bounces.google.com>)
- id 1i0wIB-0003UL-3F
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:14:56 -0400
+	id 1i0wLG-0006Ov-UW
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 19:18:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53679)
+ by lists.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <philmd@redhat.com>) id 1i0wG1-0001FD-3u
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from
- <36iFfXQMKCpsN7RBJJBG9.7JHL9HP-89Q9GIJIBIP.JMB@flex--scw.bounces.google.com>)
- id 1i0wIA-0007it-4y
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:14:54 -0400
-Received: from mail-yb1-xb49.google.com ([2607:f8b0:4864:20::b49]:46395)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from
- <36iFfXQMKCpsN7RBJJBG9.7JHL9HP-89Q9GIJIBIP.JMB@flex--scw.bounces.google.com>)
- id 1i0wI9-0007i8-Vw
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:14:54 -0400
-Received: by mail-yb1-xb49.google.com with SMTP id t18so5321558ybp.13
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 16:14:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=oSjaBZiB897A+JXI+hGh8XrU+/BygSpBt6d69nCXV4U=;
- b=BdRzCBCvXFIziyMLIe1oqvYA5pw9zWB45eV7s13IU/fvHtMyjQiI2Ft5PeEKpgOneF
- WMZEJN+ntJXCBCmyiBAOLT5rsBkdLr4VxMQm+0MPDWoEo8hO/9NxwD5w6sHe5OZjAR+Q
- HCziM6cbd4a0fYpuoGW7LDY7oGgdEJahtSMiGAaL6C5Nw56812g+Xl21aM8AoO8xuPgx
- 6Own03viPAGKLeZBv4XxrVvhYExXIXVfArfcLrTJuzv1kIFVc0qO4yBW4YbGHgIVouUy
- /ZJG+RWJoYP/tsSq6Ig1Evq5gF0hPCx0p6GnVRiGAyVxBXhDB17CvAZadCpyuPUFyD8W
- em5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=oSjaBZiB897A+JXI+hGh8XrU+/BygSpBt6d69nCXV4U=;
- b=KtCE70Ix6E0nVWttb8/5OnnrjB4Uozq3DYlngq44U6v92aTn/1voNWRGNiQrqgOMb0
- jUKsCgq0hcxdgqwapLFnkFr5k2QUvZbDW3UikKACtS5xMlPIV9XyoiMi9BdtTqyFRhZV
- gj8W2g0jJQo9XWoanBNxyP84o3UKFb78Wu/cXSTqlgy8i732U5uMH+fW2CqUcitX0PK/
- bJaQq7sgD9iRnCA5rbCM7jvbopXwwLzSNmz8mdwjco1DIwR60SprCgkBIiy6ZCBs44Se
- BF4csMSOHwFzAGMJCRkZZzt2mzYihY5hZYclyblDkC4cBJZAZGnl4xzQa8CuE5z+tm3b
- cIpw==
-X-Gm-Message-State: APjAAAXUxm/OaO/JAAuarCOb7aCyFhzzt+cYAf45qY9dq0xAFu00RGQw
- N7zy1dVxnAHWsAW5E1giabHO+bM=
-X-Google-Smtp-Source: APXvYqxCz6dKhnBVZNLPDKMQ041r+77KdsIGHdg/H5/ohG8XN07yW8eDl4c/rXsLit0AvxrudDBgLrQ=
-X-Received: by 2002:a81:914a:: with SMTP id i71mr1358782ywg.141.1566515690793; 
- Thu, 22 Aug 2019 16:14:50 -0700 (PDT)
-Date: Thu, 22 Aug 2019 16:14:41 -0700
-Message-Id: <20190822231443.172099-1-scw@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::b49
-Subject: [Qemu-devel] [PATCH 0/2] Adding some setsockopt() options
+ (envelope-from <philmd@redhat.com>) id 1i0wG0-0006lo-3T
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 19:12:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49272)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1i0wFz-0006lX-Uy; Thu, 22 Aug 2019 19:12:40 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3B26BA2E0EE;
+ Thu, 22 Aug 2019 23:12:39 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.175])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 96E111001938;
+ Thu, 22 Aug 2019 23:12:34 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 23 Aug 2019 01:12:31 +0200
+Message-Id: <20190822231231.1306-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Thu, 22 Aug 2019 23:12:39 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] contrib/gitdm: Add RT-RK to the domain-map
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,24 +65,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Shu-Chun Weng via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Shu-Chun Weng <scw@google.com>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Shu-Chun Weng <scw@google.com>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Shu-Chun Weng (2):
-  linux-user: add missing UDP and IPv6 setsockopt options
-  linux-user: time stamping options for setsockopt()
+This company has at least 7 contributors, add a domain-map entry.
 
- linux-user/generic/sockbits.h |  4 ++++
- linux-user/mips/sockbits.h    |  4 ++++
- linux-user/syscall.c          | 16 +++++++++++++---
- 3 files changed, 21 insertions(+), 3 deletions(-)
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ contrib/gitdm/domain-map | 1 +
+ 1 file changed, 1 insertion(+)
 
--- 
-2.23.0.187.g17f5b7556c-goog
+diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
+index fa9d454473..9efe066ec9 100644
+--- a/contrib/gitdm/domain-map
++++ b/contrib/gitdm/domain-map
+@@ -18,6 +18,7 @@ nokia.com       Nokia
+ oracle.com      Oracle
+ proxmox.com     Proxmox
+ redhat.com      Red Hat
++rt-rk.com       RT-RK
+ siemens.com     Siemens
+ sifive.com      SiFive
+ suse.de         SUSE
+--=20
+2.20.1
 
 
