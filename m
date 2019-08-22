@@ -2,88 +2,64 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D058EC3A59D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 08:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CECC0C3A59D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 09:18:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5F7D2173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 08:59:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F7D2173E
+	by mail.kernel.org (Postfix) with ESMTPS id A0B7421848
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 09:18:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0B7421848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0ivx-0003R6-Qn
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 04:59:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37786)
+	id 1i0jF6-0002Bf-Qg
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 05:18:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i0iv3-00031O-9K
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:58:10 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i0jDx-0000T5-IU
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 05:17:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i0iv2-0003YI-1g
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:58:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52626)
+ (envelope-from <stefanha@redhat.com>) id 1i0jDv-0003TG-IR
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 05:17:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46566)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i0iv1-0003Y7-PE
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 04:58:07 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1i0jCy-00035X-Cd; Thu, 22 Aug 2019 05:17:28 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AD1DFC08EC1D
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 08:58:06 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id c14so2663844wml.5
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 01:58:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to;
- bh=d3q7m48DTcotzNF5DTk0GFoZSRniDLygmk1QCcFza9o=;
- b=GSgXEUoZXzrltjsjXXATFIueUIFsa8SFvS6z3iTziTTzZS54NKWVzN2l+KixYE2WKI
- VhaB/Hg08ys1kpFts9MUVqlK3fnDMBC5abmRE9tTABqmOJY3yvU4jzd0skmaFi8hv+Gk
- 1TVw0whmT6N5RZYuHBobfJbvtPERXElfSw5dEvYrpCyd0657cvbITHd1fn0CLo5pLIuk
- 5orIYas2d3P5oFJ5r3XE2odfyQqSzHPzHLTEwVvN77dF99nqveefq849Ny29pFg0vH+s
- PRD83JBp4WQV8tAN7veyjf3hHyh41YuGAvX/ki1DhAHB4jQBsIZjGQMTOKB4HfUDTrfs
- 6ymA==
-X-Gm-Message-State: APjAAAXJ+afJ7kl7XNGW5R0POubNq61uUuDNKhoN6gCpQe77a8nHEEY8
- Ya0o2fXk0ciksdd2/L3rNLokajhjceut+xpd8FobTIpls6tlOwE9L8looW1CgPN0BjDm/bFDxdG
- g4840iFlZkIJGLwU=
-X-Received: by 2002:a1c:be15:: with SMTP id o21mr4869092wmf.140.1566464285366; 
- Thu, 22 Aug 2019 01:58:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzP5DwMYh4fVTjvRcPTDEz493Sjg2XrVB06GRHDnqVLOZqqdGwKcktjzkeEcn5fDYN7GlRI4A==
-X-Received: by 2002:a1c:be15:: with SMTP id o21mr4869050wmf.140.1566464285129; 
- Thu, 22 Aug 2019 01:58:05 -0700 (PDT)
-Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id c201sm6224519wmd.33.2019.08.22.01.58.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 22 Aug 2019 01:58:04 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@gmail.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
-References: <1560299717-177734-1-git-send-email-raphael.norwitz@nutanix.com>
- <20190614091841.GE10957@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <44e330cb-fe17-6f22-523f-2ecc6e280859@redhat.com>
-Date: Thu, 22 Aug 2019 10:58:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 605C08980E4;
+ Thu, 22 Aug 2019 09:16:39 +0000 (UTC)
+Received: from localhost (ovpn-117-251.ams2.redhat.com [10.36.117.251])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4861F4F7B;
+ Thu, 22 Aug 2019 09:16:36 +0000 (UTC)
+Date: Thu, 22 Aug 2019 10:16:34 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Message-ID: <20190822091634.GC20491@stefanha-x1.localdomain>
+References: <20190715201950.9444-1-stefanha@redhat.com>
+ <3ccd9e30-d6ec-c752-fb0d-08318091fc6b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190614091841.GE10957@stefanha-x1.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK"
+ protocol="application/pgp-signature"; boundary="DIOMP1UsTsWJauNi"
+Content-Disposition: inline
+In-Reply-To: <3ccd9e30-d6ec-c752-fb0d-08318091fc6b@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Thu, 22 Aug 2019 09:16:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] vhost-user-scsi: prevent using
- uninitialized vqs
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/3] block/io_uring: fix EINTR
+ and resubmit short reads
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,83 +71,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefan@redhat.com>,
+ Julia Suvorova <jusual@mail.ru>, Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK
-Content-Type: multipart/mixed; boundary="BJVmbyPMAAcEjPjMAJxZkF49qcnCfy7ZS";
- protected-headers="v1"
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <44e330cb-fe17-6f22-523f-2ecc6e280859@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost-user-scsi: prevent using uninitialized
- vqs
-References: <1560299717-177734-1-git-send-email-raphael.norwitz@nutanix.com>
- <20190614091841.GE10957@stefanha-x1.localdomain>
-In-Reply-To: <20190614091841.GE10957@stefanha-x1.localdomain>
 
---BJVmbyPMAAcEjPjMAJxZkF49qcnCfy7ZS
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+--DIOMP1UsTsWJauNi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Raphael, Stefan,
-
-On 6/14/19 11:18 AM, Stefan Hajnoczi wrote:
-> On Tue, Jun 11, 2019 at 05:35:17PM -0700, Raphael Norwitz wrote:
->> Of the 3 virtqueues, seabios only sets cmd, leaving ctrl
->> and event without a physical address. This can cause
->> vhost_verify_ring_part_mapping to return ENOMEM, causing
->> the following logs:
->>
->> qemu-system-x86_64: Unable to map available ring for ring 0
->> qemu-system-x86_64: Verify ring failure on region 0
->>
->> The qemu commit e6cc11d64fc998c11a4dfcde8fda3fc33a74d844
->> has already resolved the issue for vhost scsi devices but
->> the fix was never applied to vhost-user scsi devices.
->>
->> Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
->> ---
->>  hw/scsi/vhost-user-scsi.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Aug 21, 2019 at 06:20:39PM -0400, John Snow wrote:
 >=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 >=20
+> On 7/15/19 4:19 PM, Stefan Hajnoczi wrote:
+> > Short reads are possible with cache=3Dwriteback (see Patch 3 for detail=
+s).
+> > Handle this by resubmitting requests until the read is completed.
+> >=20
+> > Patch 1 adds trace events useful for debugging io_uring.
+> >=20
+> > Patch 2 fixes EINTR.  This lays the groundwork for resubmitting request=
+s in
+> > Patch 3.
+> >=20
+> > Aarushi: Feel free to squash this into your patch series if you are hap=
+py with
+> > the code, I don't mind if the authorship information is lost.  After ap=
+plying
+> > these patches I can successfully boot a Fedora 30 guest qcow2 file with
+> > cache=3Dwriteback.
+> >=20
+> > Based-on: <20190610134905.22294-1-mehta.aaru20@gmail.com>
+> >=20
+> > Stefan Hajnoczi (3):
+> >   block/io_uring: add submission and completion trace events
+> >   block/io_uring: fix EINTR request resubmission
+> >   block/io_uring: resubmit short buffered reads
+> >=20
+> >  block/io_uring.c   | 136 ++++++++++++++++++++++++++++++++++-----------
+> >  block/trace-events |   6 +-
+> >  2 files changed, 108 insertions(+), 34 deletions(-)
+> >=20
+>=20
+> Since this is over the 30 days mark, I'm going to assume this WAS
+> squashed into Aarushi's patchset, and it's safe to drop this from the
+> review queue for now?
 
-What about backends/vhost-user.c and hw/block/vhost-user-blk.c?
+Yes, Aarushi included in the io_uring patch series.
 
+Stefan
 
---BJVmbyPMAAcEjPjMAJxZkF49qcnCfy7ZS--
-
---iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK
+--DIOMP1UsTsWJauNi
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAl1eWRoACgkQoqP9bt6t
-wN7/PQ//d/yry/2epfthODV4QDxasPd2P13EaI5Gtyn9/2ORJQ9OOiFLLEHuKrdh
-V0r4G/y2JuIIrk2jBQtxblNtCYEU/p/XWW339sLMfq44N/fDFU2eGeqA8rxu4tEv
-puXI/OPXau1ZSGaQAXtI0u4lbFG10PHsig/XhQY7CwHCSjlJT7mzyg5zDRIzjDol
-FCliCRi+7iRFJCs0kNOJj3pzrTKS5s8622PWbuoGDepYuiyxEOsPlsO2e73fIBif
-+yWa1osvU+D57V+6C5YHtCSye+yOmlZSwAjjwcpTmND0F04WJHq9qHDImImgbRJE
-GVuJTCrFOJOGclWac4l/suWVTlIfysJs0paEson/6ZwR7Ccf73BdKmZSiMihxt9D
-HCk3XQjARtSe2CHmTiooGH8Va8ObB/QYE8rwl85ZJ3UnEI/Nw8JKq2c1GQ7hHumM
-kPFXTZXEYEhcM22O02VzOwvc/EV0uLdSkB8BWzS9xov67d+R6WSTwgbdIWd9tZNT
-riewZYprFNONamewfmKlaOcCL5xVvFpwgJag8JhLaC0w6RcEmtYvuHdmMl5DnFs3
-IIfqzfjPYAHbQvoIZhN7A5afgRePoOc0NbSRcEA2wFslKVCqRieWEeu0N8SImkVE
-0wlFLeDelb6vNwy6+NN4mpVKKjx3Bx+9vL1KDG09HZl7awqMIRs=
-=s7iH
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1eXXIACgkQnKSrs4Gr
+c8hNfAgAtO/CC0ZGGfHP2mCnEaGasZika+GAeAy1N75At4VxFZRaAZL02X1uWY+j
+NG3PCKaa4ia8ChVqd/zBCfqfzXRY8ZbFJmfY8eb4TJa6cQgQYg5hOJgw5qs7PZHi
+OutuGIutfhsbpsWP0ElJ9BL0cSUVhlhisEjJqtP14KP6RkYU7ppDLG98ddDSYhJd
+8Jsjcxs1Asqr3f9liej5FTUgHJDOP5BfMn9NucBfHePdIYmbbhaEPOkzHVNx8hIc
+7zb0s/ZT17r5r/b34zNugEkZNswxZq0A7fYgxotIG4dxXJ0f2BILuh6/vaWEYebs
+fHGTIg6WLPByki3zdGjcfGSfFFUX0w==
+=3dwx
 -----END PGP SIGNATURE-----
 
---iATNbjMuysIcrjOWYZpRi2TusxC7HhIuK--
+--DIOMP1UsTsWJauNi--
 
