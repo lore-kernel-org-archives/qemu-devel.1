@@ -2,87 +2,56 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6843DC3A59D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 04:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A9A4C3A59D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 04:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3030021848
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 04:34:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uG4Iwyqs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3030021848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4523A2173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 04:40:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4523A2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ucloud.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0enn-0000Hg-Bn
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 00:34:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50607)
+	id 1i0eu3-0002lT-Sk
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 00:40:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51181)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0en2-0008HN-Sm
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 00:33:38 -0400
+ (envelope-from <owen.si@ucloud.cn>) id 1i0etD-0001yZ-N0
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 00:40:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0en1-00081r-Cx
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 00:33:36 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46467)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i0en1-00081G-5b
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 00:33:35 -0400
-Received: by mail-ot1-x343.google.com with SMTP id z17so4215280otk.13
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 21:33:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=/Hypxkz7VT3mXa9Kz0qVNEQ4ptsUVJ1+RFcaBt+lFwk=;
- b=uG4Iwyqs3sShK6IJCdaUCRQMlkBdCfd59yV6lBtk6wy1fjBX/Wwmuss+X7aH2fTcEP
- Appym/y58bh5/vAXcIba0TVNTegcpUCI2C2q4zQu0K+ky4DfLdPPFSgpHeUKctP19bnr
- 7WnO++RF7ilZCLU0w3EkhFjVLqGUP6cwWqORe6QofuvLm8tXxaLy1KBAMIQs2vLb34eP
- 8tV4zWoPb7B2BEtC/pEdhybQd/iufoz2Syh5zJInHqsA4gDuy2siuoAZ4vJH7C8Y68SW
- bEfYvUlM8LS56fZ9RCCk5O3af/wAQm2VeOfpZbxEBbY3Ci2D7b/3DqeSp7A6yIYC/l/J
- 1Xhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=/Hypxkz7VT3mXa9Kz0qVNEQ4ptsUVJ1+RFcaBt+lFwk=;
- b=lG/qrNryFDlcN5NqIRDFt9qd5qxNwtJzF8bfLGkYvDmpKIVw7sXKyjhxr3v5uEWeau
- 32nWDPkDpoBLGnSTbg36ov6fPGneZO1pfbqlv2JTitKm0noKbCpzOGu32ZNHlw9udYBJ
- 2ewQbe4flJ4rqkKCfO2kTQPYCZ0+WypBziTSe0911zrCOVAKEIeHVKb11GXJm9R9ZB+s
- Bnh/+xF4NZyy/j5zAmn+5v80BKMQwN4mFz9Ctic+4bkUC6twXNMljBXoo4ZV67y2zlwH
- utk6FOJByIAQi5HOlF0cIHTydSYSJlDzbZOVbXomzqK3kF1BHr1TWe7Q5y5MTarW5Dc7
- 675A==
-X-Gm-Message-State: APjAAAU6lqx33wmQHvJToX6OFXuXTK0XmjvVJVrkx7QlGHqHV0wza3c5
- H/5mxg726vX6y6QFxZR6cYFIDGrCXZnfR9V43SE=
-X-Google-Smtp-Source: APXvYqzqrfrfssRqrTZjbSDMjFaSrXlA79D390WhQ58HfFPyNDmHZsnOtobJaG8kFUnCdEriKbvtUA0XQrdRwZSsHYs=
-X-Received: by 2002:a9d:851:: with SMTP id 75mr30567256oty.341.1566448414295; 
- Wed, 21 Aug 2019 21:33:34 -0700 (PDT)
+ (envelope-from <owen.si@ucloud.cn>) id 1i0etC-0001vN-4a
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 00:39:59 -0400
+Received: from m9785.mail.qiye.163.com ([220.181.97.85]:36084)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <owen.si@ucloud.cn>) id 1i0etB-0001qw-ID
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 00:39:58 -0400
+Received: from localhost.localdomain (unknown [120.132.1.230])
+ by m9785.mail.qiye.163.com (Hmail) with ESMTPA id 68AAD5C167D;
+ Thu, 22 Aug 2019 12:39:43 +0800 (CST)
+From: Bingsong Si <owen.si@ucloud.cn>
+To: qemu-devel@nongnu.org
+Date: Thu, 22 Aug 2019 12:29:01 +0800
+Message-Id: <20190822042901.16858-1-owen.si@ucloud.cn>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 21:33:33
- -0700 (PDT)
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 21:33:33
- -0700 (PDT)
-In-Reply-To: <20190821172951.15333-32-jan.bobek@gmail.com>
-References: <20190821172951.15333-1-jan.bobek@gmail.com>
- <20190821172951.15333-32-jan.bobek@gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 22 Aug 2019 06:33:33 +0200
-Message-ID: <CAL1e-=j8vR1Whdj1RkVEBSi8rat-2r8nZb9F8ue+dfozXzda9Q@mail.gmail.com>
-To: Jan Bobek <jan.bobek@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZSFVOTk5CQkJMTk5DTkJIQ1lXWShZQU
+ lCN1dZLVlBSVdZCQ4XHghZQVk1NCk2OjckKS43PlkG
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6KzY6MCo4Szg4Fz4VLREqQiow
+ IUkwFEtVSlVKTk1NT09DTENITElMVTMWGhIXVRQMHhVVCBI7DhgXFA4fVRgVRVlXWRILWUFZSklL
+ VUpISVVKVUlIS1lXWQgBWUFPTU1INwY+
+X-HM-Tid: 0a6cb79f90842087kuqy68aad5c167d
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [RFC PATCH v4 31/75] target/i386: introduce code
- generators
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.181.97.85
+Subject: [Qemu-devel] [PATCH] i386: Fix legacy guest with xsave panic on
+ host kvm without update cpuid.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,93 +63,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-21.08.2019. 20.12, "Jan Bobek" <jan.bobek@gmail.com> =D1=98=D0=B5 =D0=BD=D0=
-=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> In this context, "code generators" are functions that receive decoded
-> instruction operands and emit TCG ops implementing the correct
-> instruction functionality. Introduce the naming macros first, actual
-> generator macros will be added later.
->
-> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
-> ---
+without kvm commit 412a3c41, CPUID(EAX=3D0xd,ECX=3D0).EBX always equal to=
+ 0 even
+through guest update xcr0, this will crash legacy guest(e.g., CentOS 6).
+Below is the call trace on the guest.
 
-I advice some caution here. Before adopting the coding approach that relies
-heavily on preprocessor, you should seriously evaluate
-not-always-so-obvious aspects of debugability and readibility of the end
-result. In other words, you should provide a clear and objective answer to
-this: What is gained and what is lost by using macros?
+[    0.000000] kernel BUG at mm/bootmem.c:469!
+[    0.000000] invalid opcode: 0000 [#1] SMP
+[    0.000000] last sysfs file:
+[    0.000000] CPU 0
+[    0.000000] Modules linked in:
+[    0.000000]
+[    0.000000] Pid: 0, comm: swapper Tainted: G           ---------------=
+ H  2.6.32-279#2 Red Hat KVM
+[    0.000000] RIP: 0010:[<ffffffff81c4edc4>]  [<ffffffff81c4edc4>] alloc=
+_bootmem_core+0x7b/0x29e
+[    0.000000] RSP: 0018:ffffffff81a01cd8  EFLAGS: 00010046
+[    0.000000] RAX: ffffffff81cb1748 RBX: ffffffff81cb1720 RCX: 000000000=
+1000000
+[    0.000000] RDX: 0000000000000040 RSI: 0000000000000000 RDI: ffffffff8=
+1cb1720
+[    0.000000] RBP: ffffffff81a01d38 R08: 0000000000000000 R09: 000000000=
+0001000
+[    0.000000] R10: 02008921da802087 R11: 00000000ffff8800 R12: 000000000=
+0000000
+[    0.000000] R13: 0000000000000000 R14: 0000000000000000 R15: 000000000=
+1000000
+[    0.000000] FS:  0000000000000000(0000) GS:ffff880002200000(0000) knlG=
+S:0000000000000000
+[    0.000000] CS:  0010 DS: 0018 ES: 0018 CR0: 0000000080050033
+[    0.000000] CR2: 0000000000000000 CR3: 0000000001a85000 CR4: 000000000=
+01406b0
+[    0.000000] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
+0000000
+[    0.000000] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 000000000=
+0000400
+[    0.000000] Process swapper (pid: 0, threadinfo ffffffff81a00000, task=
+ ffffffff81a8d020)
+[    0.000000] Stack:
+[    0.000000]  0000000000000002 81a01dd881eaf060 000000007e5fe227 000000=
+0000001001
+[    0.000000] <d> 0000000000000040 0000000000000001 0000006cffffffff 000=
+0000001000000
+[    0.000000] <d> ffffffff81cb1720 0000000000000000 0000000000000000 000=
+0000000000000
+[    0.000000] Call Trace:
+[    0.000000]  [<ffffffff81c4f074>] ___alloc_bootmem_nopanic+0x8d/0xca
+[    0.000000]  [<ffffffff81c4f0cf>] ___alloc_bootmem+0x11/0x39
+[    0.000000]  [<ffffffff81c4f172>] __alloc_bootmem+0xb/0xd
+[    0.000000]  [<ffffffff814d42d9>] xsave_cntxt_init+0x249/0x2c0
+[    0.000000]  [<ffffffff814e0689>] init_thread_xstate+0x17/0x25
+[    0.000000]  [<ffffffff814e0710>] fpu_init+0x79/0xaa
+[    0.000000]  [<ffffffff814e27e3>] cpu_init+0x301/0x344
+[    0.000000]  [<ffffffff81276395>] ? sort+0x155/0x230
+[    0.000000]  [<ffffffff81c30cf2>] trap_init+0x24e/0x25f
+[    0.000000]  [<ffffffff81c2bd73>] start_kernel+0x21c/0x430
+[    0.000000]  [<ffffffff81c2b33a>] x86_64_start_reservations+0x125/0x12=
+9
+[    0.000000]  [<ffffffff81c2b438>] x86_64_start_kernel+0xfa/0x109
+[    0.000000] Code: 03 48 89 f1 49 c1 e8 0c 48 0f af d0 48 c7 c6 00 a6 6=
+1 81 48 c7 c7 00 e5 79 81 31 c0 4c 89 74 24 08 e8 f2 d7 89 ff 4d 85 e4 75=
+ 04 <0f> 0b eb fe 48 8b 45 c0 48 83 e8 01 48 85 45
+c0 74 04 0f 0b eb
 
-Thanks,
-Aleksandar
+Signed-off-by: Bingsong Si <owen.si@ucloud.cn>
+---
+ target/i386/cpu.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
->  target/i386/translate.c | 46 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
->
-> diff --git a/target/i386/translate.c b/target/i386/translate.c
-> index 2e78bed78f..603a5b80a1 100644
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -5331,6 +5331,52 @@ INSNOP_LDST(xmm, Mhq)
->      tcg_temp_free_i64(r64);
->  }
->
-> +/*
-> + * Code generators
-> + */
-> +#define gen_insn(mnem, argc, ...)               \
-> +    glue(gen_insn, argc)(mnem, ## __VA_ARGS__)
-> +#define gen_insn0(mnem)                         \
-> +    gen_ ## mnem ## _0
-> +#define gen_insn1(mnem, opT1)                   \
-> +    gen_ ## mnem ## _1 ## opT1
-> +#define gen_insn2(mnem, opT1, opT2)             \
-> +    gen_ ## mnem ## _2 ## opT1 ## opT2
-> +#define gen_insn3(mnem, opT1, opT2, opT3)       \
-> +    gen_ ## mnem ## _3 ## opT1 ## opT2 ## opT3
-> +#define gen_insn4(mnem, opT1, opT2, opT3, opT4)         \
-> +    gen_ ## mnem ## _4 ## opT1 ## opT2 ## opT3 ## opT4
-> +#define gen_insn5(mnem, opT1, opT2, opT3, opT4, opT5)           \
-> +    gen_ ## mnem ## _5 ## opT1 ## opT2 ## opT3 ## opT4 ## opT5
-> +
-> +#define GEN_INSN0(mnem)                         \
-> +    static void gen_insn0(mnem)(                \
-> +        CPUX86State *env, DisasContext *s)
-> +#define GEN_INSN1(mnem, opT1)                   \
-> +    static void gen_insn1(mnem, opT1)(          \
-> +        CPUX86State *env, DisasContext *s,      \
-> +        insnop_arg_t(opT1) arg1)
-> +#define GEN_INSN2(mnem, opT1, opT2)                             \
-> +    static void gen_insn2(mnem, opT1, opT2)(                    \
-> +        CPUX86State *env, DisasContext *s,                      \
-> +        insnop_arg_t(opT1) arg1, insnop_arg_t(opT2) arg2)
-> +#define GEN_INSN3(mnem, opT1, opT2, opT3)                       \
-> +    static void gen_insn3(mnem, opT1, opT2, opT3)(              \
-> +        CPUX86State *env, DisasContext *s,                      \
-> +        insnop_arg_t(opT1) arg1, insnop_arg_t(opT2) arg2,       \
-> +        insnop_arg_t(opT3) arg3)
-> +#define GEN_INSN4(mnem, opT1, opT2, opT3, opT4)                 \
-> +    static void gen_insn4(mnem, opT1, opT2, opT3, opT4)(        \
-> +        CPUX86State *env, DisasContext *s,                      \
-> +        insnop_arg_t(opT1) arg1, insnop_arg_t(opT2) arg2,       \
-> +        insnop_arg_t(opT3) arg3, insnop_arg_t(opT4) arg4)
-> +#define GEN_INSN5(mnem, opT1, opT2, opT3, opT4, opT5)           \
-> +    static void gen_insn5(mnem, opT1, opT2, opT3, opT4, opT5)(  \
-> +        CPUX86State *env, DisasContext *s,                      \
-> +        insnop_arg_t(opT1) arg1, insnop_arg_t(opT2) arg2,       \
-> +        insnop_arg_t(opT3) arg3, insnop_arg_t(opT4) arg4,       \
-> +        insnop_arg_t(opT5) arg5)
-> +
->  static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
->  {
->      enum {
-> --
-> 2.20.1
->
->
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ff65e11008..77510cdacd 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4416,7 +4416,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t inde=
+x, uint32_t count,
+             *ecx =3D xsave_area_size(x86_cpu_xsave_components(cpu));
+             *eax =3D env->features[FEAT_XSAVE_COMP_LO];
+             *edx =3D env->features[FEAT_XSAVE_COMP_HI];
+-            *ebx =3D xsave_area_size(env->xcr0);
++            /*
++             * The initial value of xcr0 and ebx =3D=3D 0, On host witho=
+ut kvm
++             * commit 412a3c41(e.g., CentOS 6), the ebx's value always =3D=
+=3D 0
++             * even through guest update xcr0, this will crash some lega=
+cy guest
++             * (e.g., CentOS 6), So set ebx =3D=3D ecx to workaroud it.
++             */
++            *ebx =3D kvm_enabled() ? *ecx : xsave_area_size(env->xcr0);
+         } else if (count =3D=3D 1) {
+             *eax =3D env->features[FEAT_XSAVE];
+         } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
+--=20
+2.22.0
+
+
