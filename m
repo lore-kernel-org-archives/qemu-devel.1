@@ -2,65 +2,72 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3425C3A59E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 00:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E72C3A59E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6DC12145D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 00:36:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6DC12145D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A611922DD3
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 01:11:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A611922DD3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0b61-0006Rt-19
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 20:36:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56611)
+	id 1i0bdR-0001xz-L8
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 21:11:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1i0b5K-000634-Gi
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:36:15 -0400
+ (envelope-from <bounces@canonical.com>) id 1i0bcm-0001Wn-Vv
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1i0b5J-0003G4-AZ
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:36:14 -0400
-Received: from mga09.intel.com ([134.134.136.24]:21306)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1i0b5J-0003FX-2t
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 20:36:13 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Aug 2019 17:36:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,414,1559545200"; d="scan'208";a="378324678"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga005.fm.intel.com with ESMTP; 21 Aug 2019 17:36:09 -0700
-Date: Thu, 22 Aug 2019 08:35:47 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190822003547.GA11547@richard>
-References: <20190821155327.25208-1-berrange@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1i0bcl-0000P2-Il
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:10:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38646)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i0bcl-0000NP-DQ
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 21:10:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i0bcj-0004We-WF
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 01:10:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EFA0B2E80C7
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 01:10:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190821155327.25208-1-berrange@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH] tests: make filemonitor test more robust
- to event ordering
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 22 Aug 2019 00:59:11 -0000
+From: fangying <1840865@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: yorifang
+X-Launchpad-Bug-Reporter: fangying (yorifang)
+X-Launchpad-Bug-Modifier: fangying (yorifang)
+References: <156635483019.23159.9094249492846476541.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156643555230.26445.12748455654865300430.launchpad@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19022";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: ef9dac9eb5719a31aaafb0f28c2d799a70a34454
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1840865] Re: qemu crashes when doing iotest on
+ virtio-9p filesystem
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,143 +76,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>
+Reply-To: Bug 1840865 <1840865@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 21, 2019 at 04:53:27PM +0100, Daniel P. Berrangé wrote:
->The ordering of events that are emitted during the rmdir
->test have changed with kernel >= 5.3. Semantically both
->new & old orderings are correct, so we must be able to
->cope with either.
->
->To cope with this, when we see an unexpected event, we
->push it back onto the queue and look and the subsequent
->event to see if that matches instead.
->
->Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+** Description changed:
 
-Tested-by: Wei Yang <richardw.yang@linux.intel.com>
+  Qemu crashes when doing avocado-vt test on virtio-9p filesystem.
+- This bug can be reproduced running https://github.com/autotest/tp-qemu/bl=
+ob/master/qemu/tests/9p.py.
++ This bug can be reproduced running https://github.com/autotest/tp-qemu/bl=
+ob/master/qemu/tests/9p.py with the latest qemu-4.0.0.
+  The crash stack goes like:
+  =
 
->---
-> tests/test-util-filemonitor.c | 43 +++++++++++++++++++++++++++--------
-> 1 file changed, 34 insertions(+), 9 deletions(-)
->
->diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.c
->index 46e781c022..301cd2db61 100644
->--- a/tests/test-util-filemonitor.c
->+++ b/tests/test-util-filemonitor.c
->@@ -45,6 +45,11 @@ typedef struct {
->     const char *filedst;
->     int64_t *watchid;
->     int eventid;
->+    /*
->+     * Only valid with OP_EVENT - this event might be
->+     * swapped with the next OP_EVENT
->+     */
->+    bool swapnext;
-> } QFileMonitorTestOp;
-> 
-> typedef struct {
->@@ -98,6 +103,10 @@ qemu_file_monitor_test_handler(int64_t id,
->     QFileMonitorTestData *data = opaque;
->     QFileMonitorTestRecord *rec = g_new0(QFileMonitorTestRecord, 1);
-> 
->+    if (debug) {
->+        g_printerr("Queue event id %" PRIx64 " event %d file %s\n",
->+                   id, event, filename);
->+    }
->     rec->id = id;
->     rec->event = event;
->     rec->filename = g_strdup(filename);
->@@ -125,7 +134,8 @@ qemu_file_monitor_test_record_free(QFileMonitorTestRecord *rec)
->  * to wait for the event to be queued for us.
->  */
-> static QFileMonitorTestRecord *
->-qemu_file_monitor_test_next_record(QFileMonitorTestData *data)
->+qemu_file_monitor_test_next_record(QFileMonitorTestData *data,
->+                                   QFileMonitorTestRecord *pushback)
-> {
->     GTimer *timer = g_timer_new();
->     QFileMonitorTestRecord *record = NULL;
->@@ -139,9 +149,15 @@ qemu_file_monitor_test_next_record(QFileMonitorTestData *data)
->     }
->     if (data->records) {
->         record = data->records->data;
->-        tmp = data->records;
->-        data->records = g_list_remove_link(data->records, tmp);
->-        g_list_free(tmp);
->+        if (pushback) {
->+            data->records->data = pushback;
->+        } else {
->+            tmp = data->records;
->+            data->records = g_list_remove_link(data->records, tmp);
->+            g_list_free(tmp);
->+        }
->+    } else if (pushback) {
->+        qemu_file_monitor_test_record_free(pushback);
->     }
->     qemu_mutex_unlock(&data->lock);
-> 
->@@ -158,13 +174,15 @@ static bool
-> qemu_file_monitor_test_expect(QFileMonitorTestData *data,
->                               int64_t id,
->                               QFileMonitorEvent event,
->-                              const char *filename)
->+                              const char *filename,
->+                              bool swapnext)
-> {
->     QFileMonitorTestRecord *rec;
->     bool ret = false;
-> 
->-    rec = qemu_file_monitor_test_next_record(data);
->+    rec = qemu_file_monitor_test_next_record(data, NULL);
-> 
->+ retry:
->     if (!rec) {
->         g_printerr("Missing event watch id %" PRIx64 " event %d file %s\n",
->                    id, event, filename);
->@@ -172,6 +190,11 @@ qemu_file_monitor_test_expect(QFileMonitorTestData *data,
->     }
-> 
->     if (id != rec->id) {
->+        if (swapnext) {
->+            rec = qemu_file_monitor_test_next_record(data, rec);
->+            swapnext = false;
->+            goto retry;
->+        }
->         g_printerr("Expected watch id %" PRIx64 " but got %" PRIx64 "\n",
->                    id, rec->id);
->         goto cleanup;
->@@ -347,7 +370,8 @@ test_file_monitor_events(void)
->           .filesrc = "fish", },
->         { .type = QFILE_MONITOR_TEST_OP_EVENT,
->           .filesrc = "", .watchid = &watch4,
->-          .eventid = QFILE_MONITOR_EVENT_IGNORED },
->+          .eventid = QFILE_MONITOR_EVENT_IGNORED,
->+          .swapnext = true },
->         { .type = QFILE_MONITOR_TEST_OP_EVENT,
->           .filesrc = "fish", .watchid = &watch0,
->           .eventid = QFILE_MONITOR_EVENT_DELETED },
->@@ -493,8 +517,9 @@ test_file_monitor_events(void)
->                 g_printerr("Event id=%" PRIx64 " event=%d file=%s\n",
->                            *op->watchid, op->eventid, op->filesrc);
->             }
->-            if (!qemu_file_monitor_test_expect(
->-                    &data, *op->watchid, op->eventid, op->filesrc))
->+            if (!qemu_file_monitor_test_expect(&data, *op->watchid,
->+                                               op->eventid, op->filesrc,
->+                                               op->swapnext))
->                 goto cleanup;
->             break;
->         case QFILE_MONITOR_TEST_OP_CREATE:
->-- 
->2.21.0
+  Program terminated with signal SIGSEGV, Segmentation fault.
+  #0  v9fs_mark_fids_unreclaim (pdu=3Dpdu@entry=3D0xaaab00046868, path=3Dpa=
+th@entry=3D0xffff851e2fa8)
+-     at hw/9pfs/9p.c:505
++ =C2=A0=C2=A0=C2=A0=C2=A0at hw/9pfs/9p.c:505
+  #1  0x0000aaaae3585acc in v9fs_unlinkat (opaque=3D0xaaab00046868) at hw/9=
+pfs/9p.c:2590
+  #2  0x0000aaaae3811c10 in coroutine_trampoline (i0=3D<optimized out>, i1=
+=3D<optimized out>)
+-     at util/coroutine-ucontext.c:116
++ =C2=A0=C2=A0=C2=A0=C2=A0at util/coroutine-ucontext.c:116
+  #3  0x0000ffffa13ddb20 in ?? () from /lib64/libc.so.6
+  Backtrace stopped: not enough registers or memory available to unwind fur=
+ther
+  =
 
--- 
-Wei Yang
-Help you, Help me
+  A segment fault is triggered at hw/9pfs/9p.c line 505
+  =
+
+-     for (fidp =3D s->fid_list; fidp; fidp =3D fidp->next) {
+-         if (fidp->path.size !=3D path->size) {     # fidp is invalid =
+
+-             continue;
+-         }
++ =C2=A0=C2=A0=C2=A0=C2=A0for (fidp =3D s->fid_list; fidp; fidp =3D fidp->n=
+ext) {
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (fidp->path.size !=3D =
+path->size) {     # fidp is invalid
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0c=
+ontinue;
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =
+
+  (gdb) p path
+  $10 =3D (V9fsPath *) 0xffff851e2fa8
+  (gdb) p *path
+  $11 =3D {size =3D 21, data =3D 0xaaaafed6f420 "./9p_test/p2a1/d0/f1"}
+  (gdb) p *fidp
+  Cannot access memory at address 0x101010101010101
+  (gdb) p *pdu
+  $12 =3D {size =3D 19, tag =3D 54, id =3D 76 'L', cancelled =3D 0 '\000', =
+complete =3D {entries =3D {
+-       sqh_first =3D 0x0, sqh_last =3D 0xaaab00046870}}, s =3D 0xaaab00045=
+4b8, next =3D {
+-     le_next =3D 0xaaab000467c0, le_prev =3D 0xaaab00046f88}, idx =3D 88}
+- (gdb) =
+
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sqh_first =3D 0x0, sqh_last =3D 0xaaa=
+b00046870}}, s =3D 0xaaab000454b8, next =3D {
++ =C2=A0=C2=A0=C2=A0=C2=A0le_next =3D 0xaaab000467c0, le_prev =3D 0xaaab000=
+46f88}, idx =3D 88}
++ (gdb)
+  =
+
+  Address Sanitizer shows error and saying that there is a heap-use-after-
+  free on *fidp*.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1840865
+
+Title:
+  qemu crashes when doing iotest on  virtio-9p filesystem
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu crashes when doing avocado-vt test on virtio-9p filesystem.
+  This bug can be reproduced running https://github.com/autotest/tp-qemu/bl=
+ob/master/qemu/tests/9p.py with the latest qemu-4.0.0.
+  The crash stack goes like:
+
+  Program terminated with signal SIGSEGV, Segmentation fault.
+  #0  v9fs_mark_fids_unreclaim (pdu=3Dpdu@entry=3D0xaaab00046868, path=3Dpa=
+th@entry=3D0xffff851e2fa8)
+  =C2=A0=C2=A0=C2=A0=C2=A0at hw/9pfs/9p.c:505
+  #1  0x0000aaaae3585acc in v9fs_unlinkat (opaque=3D0xaaab00046868) at hw/9=
+pfs/9p.c:2590
+  #2  0x0000aaaae3811c10 in coroutine_trampoline (i0=3D<optimized out>, i1=
+=3D<optimized out>)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/coroutine-ucontext.c:116
+  #3  0x0000ffffa13ddb20 in ?? () from /lib64/libc.so.6
+  Backtrace stopped: not enough registers or memory available to unwind fur=
+ther
+
+  A segment fault is triggered at hw/9pfs/9p.c line 505
+
+  =C2=A0=C2=A0=C2=A0=C2=A0for (fidp =3D s->fid_list; fidp; fidp =3D fidp->n=
+ext) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (fidp->path.size !=3D =
+path->size) {     # fidp is invalid
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0c=
+ontinue;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+
+  (gdb) p path
+  $10 =3D (V9fsPath *) 0xffff851e2fa8
+  (gdb) p *path
+  $11 =3D {size =3D 21, data =3D 0xaaaafed6f420 "./9p_test/p2a1/d0/f1"}
+  (gdb) p *fidp
+  Cannot access memory at address 0x101010101010101
+  (gdb) p *pdu
+  $12 =3D {size =3D 19, tag =3D 54, id =3D 76 'L', cancelled =3D 0 '\000', =
+complete =3D {entries =3D {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sqh_first =3D 0x0, sqh_last =3D 0xaaa=
+b00046870}}, s =3D 0xaaab000454b8, next =3D {
+  =C2=A0=C2=A0=C2=A0=C2=A0le_next =3D 0xaaab000467c0, le_prev =3D 0xaaab000=
+46f88}, idx =3D 88}
+  (gdb)
+
+  Address Sanitizer shows error and saying that there is a heap-use-
+  after-free on *fidp*.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1840865/+subscriptions
 
