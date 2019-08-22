@@ -2,89 +2,90 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6207DC3A59E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 03:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07723C3A59E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 03:22:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AB3721848
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 03:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE78621848
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 03:22:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoCgtAw+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB3721848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="pCP8P7pf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE78621848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0dae-0004lD-9Z
-	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 23:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42576)
+	id 1i0dft-0006f9-UP
+	for qemu-devel@archiver.kernel.org; Wed, 21 Aug 2019 23:22:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0dZf-00042N-OS
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:15:45 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1i0ded-0005q6-Me
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0dZc-0004zJ-UQ
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:15:43 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33742)
+ (envelope-from <aik@ozlabs.ru>) id 1i0deb-0006uQ-Pj
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:20:51 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34705)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i0dZc-0004wx-OW
- for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:15:40 -0400
-Received: by mail-ot1-x342.google.com with SMTP id q20so4162716otl.0
- for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 20:15:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=3FaEz41VHrCv4ggKON+AaigUXpTek1upl5TMe1IE8mE=;
- b=VoCgtAw+S5HOw+wIPfxOqfINqLHmvdI8l2tD7uZjgV433ArWQppqdufKSskckU2lVR
- L9FLEgLUSlMlvokT5pkbmPcBPh66Ea5L0DuEhijPVclbwRh0VLy53cSQEuZfodYUBgzk
- +4ne8/QHaKNazAhh1TMofYY1hsC1ee7dt2ML7MAstXa434QbzHns19klY6JyAHYBkccp
- Cw9U776U5Xcq2vY7zIVOC4r2v4eVsCiDrIQu6DuKz2uRed2cNLrbUjfptkIezHnG4Yl3
- dsgmAbLe1PLUSD2Sggp99O44YzHHO8azyYyShXG2ECrVXqDVKVOFnsKDiOCJkwKHJDc1
- Pdlw==
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1i0deb-0006sR-A0
+ for qemu-devel@nongnu.org; Wed, 21 Aug 2019 23:20:49 -0400
+Received: by mail-pg1-x543.google.com with SMTP id n9so2624726pgc.1
+ for <qemu-devel@nongnu.org>; Wed, 21 Aug 2019 20:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=tkecvGXeiG9Z+qcwZpcnBYeSLRNGXrmTD19umqSG4uc=;
+ b=pCP8P7pfZYf8DvG+O6gquJPeMz+v9mi2q3Fs7VVMeKVxaSF/2lD1iyLTSdYwZlAoVl
+ bk2Yh7N17462wgsOM+9kDdMVWyNLxBEI67y8VPaYJgA4/8GQQaeObgm107adIqzDkpTv
+ W3XZSeas2R0oVUx1ZvXbS12f4zrcjBn548i0XE1R9trvr4urY7R+axYpVJgQKCnclHG4
+ HEpzygqjn1LSEKOcslNiqiSRHI3SBXfREQjAsSJu968SZ2EPapwPv8ampD4zhSgaIrRF
+ /57yPJR8mnZhYseuXlvJgt3As1ZYFhHRQu1lGAuPXLm4MNb4ebO/XLqPYjxlIXZrfD2C
+ mHAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=3FaEz41VHrCv4ggKON+AaigUXpTek1upl5TMe1IE8mE=;
- b=msq+tQgcWSEl/52GLqmjk/SYhcwGLSEOC/MQbzYOpt00bcuUNL1JYqaM+f3OZSbPWf
- yHJ7gfN2M/zaRqBTOUAupci8Q0aq6crxHBAmhSc162NUyN4PEdCX7RoQOB8Lgk+yxsVB
- rY5BbzmqWg7w1+i/xWwWatHMHXh7C7Z/SAMea/Lxv+LfI0N71ULS5E/Cf4ErpQJhk2ac
- LfPoMtPToMHYD3DntMccPavcAVAeHnkStz2ibXf1MqSBJiMOJtuDHUOTFBsND1xPa8rH
- lBvl2zHMibDDwSUwtslLEzCn56X+0o+KCLWHtnWauU632u3DN69Y0h0PiFUJfmHjVf6k
- qZqA==
-X-Gm-Message-State: APjAAAW952nZ9lKF7Co5mWmEpavlBL8zdS32yK5mI3q/TRWFaOCAvapA
- 3M5GvC9yme5nuqvNl5r+/JAMI/GH6G+hp1tX218=
-X-Google-Smtp-Source: APXvYqyCZWLMebH0QAiLLc50G4MFc8aFU1SaXZPpwYgx+36LlmAu/3RENDgddWJ1HYHCFbFYvSCAUUqIFUnIHeWTub0=
-X-Received: by 2002:a05:6830:1d75:: with SMTP id
- l21mr27704727oti.121.1566443739933; 
- Wed, 21 Aug 2019 20:15:39 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tkecvGXeiG9Z+qcwZpcnBYeSLRNGXrmTD19umqSG4uc=;
+ b=RDMvcHZyGo9Oe7GGJ1VX8GcYoQu9knbat71YGivyvj541lyTOQBrbcAc6bf6Wdi0F3
+ 0Dd+1HLI6K49az0jDYE8stFZ0ADt/ep+OE705G2Tqh+lZQnM5L5sYO7KnsXkRaAG77fZ
+ MaBhZGcrF4z1aHr5uaYzNRAQjPzb+Ysn6oDAfrFWw/IzIJZRd6crOv9Ktyj9btbwgVgF
+ Kupq0IG6ODpdY8P4DSzR7OMfu55hiPcWSOEjBFc6RjRdEPjOoLzTlU4rjqJE7wDs8wdE
+ 4qCS0uOLT+f1eCkXGmdyKeiGJZPRtzYg6JmACUmf4FfpMEzBZ/NlHcYL1p8Bpez3pYX0
+ Mv9A==
+X-Gm-Message-State: APjAAAVsB3NOFEviBUXentW6xgVqwmvfOns4KZ/IJOrF6Mvq98dAV2em
+ 1NAji5WE+0MDjpBxJ3GUHZTM0g==
+X-Google-Smtp-Source: APXvYqwnzoozR/xJdLNP5Q7qc6FccKOA7g9hyCHHqRqb+MbxyljjsFePtGq4PlCvFLd+q0OzIq2btw==
+X-Received: by 2002:aa7:91cc:: with SMTP id z12mr39130271pfa.76.1566444048141; 
+ Wed, 21 Aug 2019 20:20:48 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id c71sm26127712pfc.106.2019.08.21.20.20.46
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 21 Aug 2019 20:20:47 -0700 (PDT)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20190822011620.106337-1-aik@ozlabs.ru>
+ <b9098689-a8cb-0c68-0065-f9362cdcb32d@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <2535da96-5e47-b840-d91c-d4d71a9b5981@ozlabs.ru>
+Date: Thu, 22 Aug 2019 13:20:43 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 20:15:39
- -0700 (PDT)
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Wed, 21 Aug 2019 20:15:39
- -0700 (PDT)
-In-Reply-To: <20190821210030.GH7077@habkost.net>
-References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <CAL1e-=hWc6G7Ob+LU7EWoY3LVBvABY2ky=RT28dSzqM=9O=OEA@mail.gmail.com>
- <20190821210030.GH7077@habkost.net>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 22 Aug 2019 05:15:39 +0200
-Message-ID: <CAL1e-=iZziwdyjJeaE-ZC2Rbjdmr_enYGBdK5zs4Lh0kN1DQOg@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
+In-Reply-To: <b9098689-a8cb-0c68-0065-f9362cdcb32d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 0/2] tests/acceptance: Update MIPS Malta
- ssh test
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qapi: Add query-memory-checksum
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,79 +97,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, amarkovic@wavecomp.com,
- crosa@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-21.08.2019. 23.00, "Eduardo Habkost" <ehabkost@redhat.com> =D1=98=D0=B5 =D0=
-=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On Wed, Aug 21, 2019 at 10:27:11PM +0200, Aleksandar Markovic wrote:
-> > 02.08.2019. 17.37, "Aleksandar Markovic" <aleksandar.markovic@rt-rk.com=
->
-=D1=98=D0=B5
-> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > >
-> > > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > >
-> > > This little series improves linux_ssh_mips_malta.py, both in the sens=
-e
-> > > of code organization and in the sense of quantity of executed tests.
-> > >
-> >
-> > Hello, all.
-> >
-> > I am going to send a new version in few days, and I have a question for
-> > test team:
-> >
-> > Currently, the outcome of the script execition is either PASS:1 FAIL:0
-or
-> > PASS:0 FAIL:1. But the test actually consists of several subtests. Is
-there
-> > any way that this single Python script considers these subtests as
-separate
-> > tests (test cases), reporting something like PASS:12 FAIL:7? If yes,
-what
-> > would be the best way to achieve that?
->
-> If you are talking about each test_*() method, they are already
-> treated like separate tests.  If you mean treating each
-> ssh_command_output_contains() call as a separate test, this might
-> be difficult.
->
 
-Yes, I meant the latter one, individual code segments involving an
-invocation of ssh_command_output_contains() instance being treated as
-separate tests.
 
-> Cleber, is there something already available in the Avocado API
-> that would help us report more fine-grained results inside each
-> test case?
->
+On 22/08/2019 11:33, Eric Blake wrote:
+> On 8/21/19 8:16 PM, Alexey Kardashevskiy wrote:
+>> This returns MD5 checksum of all RAM blocks for migration debugging
+>> as this is way faster than saving the entire RAM to a file and checking
+>> that.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>
+>>
+>> I am actually wondering if there is an easier way of getting these
+>> checksums and I just do not see it, it cannot be that we fixed all
+>> memory migration bugs :)
+> 
+> I'm not sure whether the command itself makes sense, but for the interface:
+> 
+> 
+>> +++ b/qapi/misc.json
+>> @@ -1194,6 +1194,33 @@
+>>   ##
+>>   { 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
+>>   
+>> +##
+>> +# @MemoryChecksum:
+>> +#
+>> +# A string with MD5 checksum of all RAMBlocks.
+>> +#
+>> +# @checksum: the checksum.
+>> +#
+>> +# Since: 3.2.0
+> 
+> This should be 4.2, not 3.2.
+> 
+>> +##
+>> +{ 'struct': 'MemoryChecksum',
+>> +  'data'  : { 'checksum': 'str' } }
+>> +
+>> +##
+>> +# @query-memory-checksum:
+>> +#
+>> +# Return the MD5 checksum of all RAMBlocks.
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "query-memory-checksum" }
+>> +# <- { "return": { "checksum": "a0880304994f64cb2edad77b9a1cd58f" } }
+>> +#
+>> +# Since: 3.2.0
+> 
+> and again
+> 
+>> +##
+>> +{ 'command': 'query-memory-checksum',
+>> +  'returns': 'MemoryChecksum' }
+>> +
+>>   
+> 
+>> +++ b/exec.c
+>> @@ -2050,6 +2050,22 @@ void *qemu_ram_get_host_addr(RAMBlock *rb)
+>>       return rb->host;
+>>   }
+>>   
+>> +gchar *qemu_ram_chksum(void)
+> 
+> gchar is a pointless glib type.  Use 'char' instead.
+> 
+>> +{
+>> +    struct RAMBlock *rb;
+>> +    GChecksum *chksum = g_checksum_new(G_CHECKSUM_MD5);
+>> +    gchar *ret;
+>> +
+>> +    RAMBLOCK_FOREACH(rb) {
+>> +        g_checksum_update(chksum, qemu_ram_get_host_addr(rb),
+>> +                          qemu_ram_get_used_length(rb));
+>> +    }
+>> +    ret = g_strdup(g_checksum_get_string(chksum));
+>> +    g_checksum_free(chksum);
+>> +
+>> +    return ret;
+>> +}
+> 
+> How long does this take to run?  Is it something where you really want
+> to block the guest while chewing over the guest's entire memory?
 
-Thanks, that would be a better way of expressing my question.
 
->
-> >
-> > Thanks in advance,
-> > Aleksandar
-> >
-> > > Aleksandar Markovic (2):
-> > >   tests/acceptance: Refactor and improve reporting in
-> > >     linux_ssh_mips_malta.py
-> > >   tests/acceptance: Add new test cases in linux_ssh_mips_malta.py
-> > >
-> > >  tests/acceptance/linux_ssh_mips_malta.py | 81
-> > ++++++++++++++++++++++++++------
-> > >  1 file changed, 66 insertions(+), 15 deletions(-)
-> > >
-> > > --
-> > > 2.7.4
-> > >
-> > >
->
-> --
-> Eduardo
+10-20 times faster than "pmemsave" and blocking the guest is not a 
+problem here as both - source and destination - guests are stopped 
+(otherwise the checksum does not make sense).
+
+
+
+-- 
+Alexey
+
