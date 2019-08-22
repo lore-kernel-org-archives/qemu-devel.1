@@ -2,63 +2,98 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F6AC41514
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F1EC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:35:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0915A23404
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:34:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0915A23404
+	by mail.kernel.org (Postfix) with ESMTPS id 0A77C23400
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 16:35:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A77C23400
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0q2Q-0006OV-44
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43828)
+	id 1i0q3I-0008FE-2W
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 12:35:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44633)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i0q0G-00054z-Ix
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:32:02 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i0q1S-0006JM-Tz
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:33:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i0q0E-00050Q-Lv
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:32:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42744)
+ (envelope-from <mreitz@redhat.com>) id 1i0q1Q-0005uW-Sh
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:33:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47410)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i0q0E-0004xq-8q
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 12:31:58 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i0q1M-0005rC-2x; Thu, 22 Aug 2019 12:33:08 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D94713C928;
- Thu, 22 Aug 2019 16:31:54 +0000 (UTC)
-Received: from work-vm (ovpn-117-231.ams2.redhat.com [10.36.117.231])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A340E10016E9;
- Thu, 22 Aug 2019 16:31:52 +0000 (UTC)
-Date: Thu, 22 Aug 2019 17:31:50 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190822163150.GA3332@work-vm>
-References: <CAFEAcA8kEKVcRu62+VGDkzRj2J87QPxzjg05dCHszeBC6X76pg@mail.gmail.com>
- <20190822114747.GS3267@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 344237FDC9;
+ Thu, 22 Aug 2019 16:33:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 60A245D6A7;
+ Thu, 22 Aug 2019 16:33:00 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <db672a84-0f30-bb82-ef94-c543e444372e@redhat.com>
+ <b0b27c5c-c07a-527b-294a-c4e7ec6d4204@redhat.com>
+ <84dd318a-28d4-b2f3-b03b-d870a5f618d5@redhat.com>
+ <80341376-ecbd-cbf4-8800-022fdd65c04d@redhat.com>
+ <8e42ea8e-0629-2645-d14d-785722df6466@redhat.com>
+ <9b09731a-1769-2cbe-4b6f-3d7787f74ebc@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <1ac19336-e9f4-753c-ebd2-41156152eb9a@redhat.com>
+Date: Thu, 22 Aug 2019 18:32:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190822114747.GS3267@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <9b09731a-1769-2cbe-4b6f-3d7787f74ebc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 22 Aug 2019 16:31:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Thu, 22 Aug 2019 16:33:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] more automated/public CI for QEMU pullreqs
+Subject: Re: [Qemu-devel] Broken aarch64 by qcow2: skip writing zero buffers
+ to empty COW areas [v2]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,78 +105,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Samuel Ortiz <sameo@linux.intel.com>, Kashyap Chamarthy <kchamart@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Fri, Aug 16, 2019 at 07:16:55PM +0100, Peter Maydell wrote:
-> > The two major contenders suggested were:
-> >=20
-> > (1) GitLab CI, which supports custom 'runners' which we can set
-> > up to run builds and tests on machines we have project access to
-> >=20
-> > (2) Patchew, which can handle running tests on multiple machines (eg
-> > we do s390 testing today for all patches on list), and which we could
-> > enhance to provide support for the release-manager to do their work
-> >=20
-> > Advantages of Gitlab CI:
-> >  * somebody else is doing the development and maintainance of the
-> >    CI tool -- bigger 'bus factor' than patchew
-> >  * already does (more or less) what we want without needing
-> >    extra coding work
-> >=20
-> > Advantages of Patchew:
-> >  * we're already using it for patch submissions, so we know it's
-> >    not going to go away
-> >  * it's very easy to deploy to a new host
-> >  * no dependencies except Python, so works anywhere we expect
-> >    to be able to build QEMU (whereas gitlab CI's runner is
-> >    written in Go, and there seem to be ongoing issues with getting
-> >    it actually to compile for other architectures than x86)
+On 22.08.19 17:40, Max Reitz wrote:
+> On 22.08.19 17:25, Max Reitz wrote:
+>> On 22.08.19 14:09, Max Reitz wrote:
+>>> (CC-ing Paolo because of the XFS connection, and Stefan because why n=
+ot.)
+>>>
+>>> On 22.08.19 13:27, Luk=C3=A1=C5=A1 Doktor wrote:
+>>>> Dne 21. 08. 19 v 19:51 Max Reitz napsal(a):
+>>>>> On 21.08.19 16:14, Luk=C3=A1=C5=A1 Doktor wrote:
+>>>>>> Hello guys,
+>>>>>>
+>>>>>> First attempt was rejected due to zip attachment, let's try it aga=
+in with just Avocado-vt debug.log and serial console log files attached.
+>>>>>>
+>>>>>> I bisected a regression on aarch64 all the way to this commit: "qc=
+ow2: skip writing zero buffers to empty COW areas" c8bb23cbdbe32f5c326365=
+e0a82e1b0e68cdcd8a. Would you please have a look at it?
+>>>>>
+>>>>> I think I can see the issue on my x64 system (I don=E2=80=99t see t=
+he XFS
+>>>>> corruption, but the installation fails because of some segfaults).
+>>>>>
+>>>>> I haven=E2=80=99t found a simpler way to reproduce the problem yet,=
+ though,
+>>>>> which is a pain... :-/
+>>>>>
+>>>>> It looks like the problem disappears when I configure qemu with
+>>>>> =E2=80=9C--disable-xfsctl=E2=80=9D.  Can you try that?
+>>>>>
+>>>>> Max
+>>>>>
+>>>>
+>>>> Hello Max,
+>>>>
+>>>> yes, I'm getting the same behavior. With "--disable-xfsctl" it works=
+ well. Also looking at the option I understand why it only failed on aarc=
+h64 for me, I don't have libs installed on the other machines, therefor i=
+t was disabled by "./configure" there. Anyway I guess disabling it in my =
+builds won't really fix the issue, right? :-)
+>>>
+>>> Thanks!
+>>>
+>>> No, it won=E2=80=99t, but it means the actual root of the problem is =
+probably
+>>> rather in some XFS-related code (be it because qemu uses it the wrong
+>>> way or because of XFS kernel code) than in the pure qcow2 commit that
+>>> made the problem surface by exercising it heavily.  (Or in an
+>>> interaction between the two.)
+>>
+>> OK, I got a simpler reproducer now:
+>>
+>> $ ./qemu-img create -f qcow2 test.qcow2 1M
+>> $ (for i in $(seq 15 -1 0); do \
+>>        echo "aio_write -P 42 $((i * 64 + 1))k 62k"; \
+>>    done) \
+>>   | ./qemu-io test.qcow2
+>> $ for i in $(seq 0 15); do \
+>>       echo $i; \
+>>       ofs=3D$((i * 64)); \
+>>       ./qemu-io -c "read -P 0 ${ofs}k 1k" \
+>>                 -c "read -P 42 $((ofs + 1))k 62k" \
+>>                 -c "read -P 0 $((ofs + 63))k 1k" \
+>>                 test.qcow2 \
+>>           | grep 'verification'; \
+>>   done
+>>
+>> On XFS with --enable-xfsctl, this basically always gives me some
+>> verification failure somewhere.  (On tmpfs or with --disable-xfsctl, i=
+t
+>> never fails.)
+>>
+>> So it seems to be related to I/O from back to front.
+>>
+>> (You can also reproduce it with a plain =E2=80=9Cqemu-img bench=E2=80=9D=
+ invocation,
+>> like =E2=80=9C./qemu-img bench -w --pattern=3D42 -o 1k -S 64k -s 62k t=
+est.qcow2=E2=80=9D
+>> (on, say, a 4 GB image), but then the failure appears much later in th=
+e
+>> image, because you have to wait from some requests to come in reverse
+>> (by chance) first.)
 >=20
-> IMHO the development tools/processes chosen should enable the project
-> contributors to maximise the time they can put into developing useful
-> features for QEMU itself. Time we spend writing CI systems like patchew
-> is time we're taking away from writing QEMU features, unless the new CI
-> system offers major efficiency benefits over other existing solutions.
->=20
-> A second important aspect is that to enable a smooth/shallow onramp
-> for new contributors it is useful to have our development processes
-> and tools be familiar to those with general open source dev experience
-> outside QEMU.
->=20
-> With both these points in mind, I think it is  pretty hard sell to
-> say we should write & maintain a custom CI system just for QEMU
-> unless it is offering major compelling functionality we can't do
-> without.
->=20
-> IOW, I'd be biased in favour of GitLab CI.
+> The problem is the ftruncate() in xfs_write_zeroes().  It is possible
+> for it to yield, then other requests come in, and the data they write
+> may get discarded once the ftruncate() settles.
 
-I'd agree; and I'd also find it useful to have runners setup for
-Gitlab CI for related things (it would be useful for the virtio-fs
-stuff);  if there are problems on other architectures then we should
-find some go wranglers to go fix it.
+I=E2=80=99ve just sent a patch: =E2=80=9Cblock/file-posix: Fix xfs_write_=
+zeroes()=E2=80=9D,
+Message-ID <20190822162618.27670-1-mreitz@redhat.com>:
+https://lists.nongnu.org/archive/html/qemu-block/2019-08/msg01148.html
 
-Dave
-
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Max
 
