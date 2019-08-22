@@ -2,61 +2,84 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5667BC3A59D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 706A8C3A59D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:54:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29F7421726
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:54:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F7421726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 351D521726
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 10:54:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fz2j4KV3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 351D521726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40569 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0kji-0001CO-3D
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 06:54:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44385)
+	id 1i0kjw-0001bH-88
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 06:54:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i0kiO-0007kN-JD
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:53:13 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0kiW-00080t-VE
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:53:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i0kiN-00041h-ED
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:53:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33108)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i0kiN-00040y-5q
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:53:11 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 68EF5307D921
- for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 10:53:10 +0000 (UTC)
-Received: from dhcp-16-132.lcy.redhat.com (unknown [10.42.16.132])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90EA5600CD;
- Thu, 22 Aug 2019 10:53:09 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 22 Aug 2019 11:53:01 +0100
-Message-Id: <20190822105302.26823-3-berrange@redhat.com>
-In-Reply-To: <20190822105302.26823-1-berrange@redhat.com>
-References: <20190822105302.26823-1-berrange@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i0kiV-00046x-D0
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:53:20 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:39433)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i0kiV-00045r-6l
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 06:53:19 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id b1so5027184otp.6
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 03:53:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1wlg6KQ9BPa72AXxau39YdE2JqQKxGIR6IITqaCDJHs=;
+ b=Fz2j4KV3cs8nX2FNEeEnbmDsHYZgxQuMgtHjrVI2YkeghjDX+H4xWrn9ixpxEQZ90A
+ /4HmSCITDJNQlqh8YnSMohPXs67PNSaDUjgPbpwR21/U2pbH/Xq+OxQwVCDUWnwZQ9Uj
+ 0tOQvmaFzzrTPyVf9zhu6URm1JunzhRU3vSTgf2mWy0Emp/fEy0oK4wKTWw8RZG7ksr1
+ loOJNB3uwwYIPajV4gp1khd8lA5vW+4LPywnB3J2m49JJ9ttZSBPYdq4ARgMJQd2XSFx
+ 9XXMbOIgfmvPSgkl2wiz3kT7Uea0z3n3sPHRqCGAyW7KYz0WV0L4mptMW5gaXzWt9Dgs
+ mT3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1wlg6KQ9BPa72AXxau39YdE2JqQKxGIR6IITqaCDJHs=;
+ b=EUXuVZ6iRv4Jf2lj51icj9KLxYji+VsP5ftGkw5PXeHAqQmkL3+UZJ/xNxSy+ZiT1v
+ boxiGILjS9p5ZxQz9m6MgGfu2Zxe6vAXPzq6EDIK+c+5t6pqY8o9kGihKyRnOiHIyk/f
+ B/uogwunqGJMdIDs6l3JdpqyG+zVhtQRKbljsodY2kwuW4CWFP3AFirn1iXkhmqszcou
+ PDNoHGSsNPuovFeYF94bvD9QTnYwQfNBzRUyEXZ+GjdU+G+QSfFbXPz6ixlKIZnRNGnc
+ BVyAAWMMqU+R4bGSCaS3hN5yZZI1WaUTYOOUG/lWxFyroyiQ/MWu2ph1vxTfxuUUQHPb
+ R0Cg==
+X-Gm-Message-State: APjAAAXhtZ3xiFohgiPfyvR0BAQjpeYx4JzIyhLwIC6J0EnWXAMKJVni
+ hSLEXJa6BsPtojftBf0S8SReDFlnC1uBT6G5mMU=
+X-Google-Smtp-Source: APXvYqxQeg1d+/6/GPx/dLl0LJa4H5j9tX4p77HgneYUbq/OGDD0O99/m6EzmHU8asjjJcRShi2f14pJKM/JW7mLX+s=
+X-Received: by 2002:a05:6830:15cc:: with SMTP id
+ j12mr29332179otr.64.1566471197122; 
+ Thu, 22 Aug 2019 03:53:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 22 Aug 2019 10:53:10 +0000 (UTC)
+References: <tencent_A4D270EBF3CC4134E8EB55BB9B541724780A@qq.com>
+ <CAL1e-=jUNzu19BBhFq0M_hjxi6BSgfmZUgQMygszTTonORVNmg@mail.gmail.com>
+ <tencent_6386EC2F24D7A13D2B753FCF@qq.com>
+In-Reply-To: <tencent_6386EC2F24D7A13D2B753FCF@qq.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 22 Aug 2019 12:53:06 +0200
+Message-ID: <CAL1e-=gtL6AxsRYPTO5bztH_F-gJDXixEEif3QRKQYo7d4XcUA@mail.gmail.com>
+To: =?UTF-8?B?56uL?= <zhlb29@foxmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32b
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 2/3] crypto: define cleanup functions for use
- with g_autoptr
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,95 +91,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow crypto structs to be used with g_autoptr, avoiding the need to
-explicitly call XXX_free() functions when variables go out of scope on
-the stack.
+On Thu, Aug 22, 2019 at 12:24 PM =E7=AB=8B <zhlb29@foxmail.com> wrote:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- include/crypto/block.h      | 2 ++
- include/crypto/cipher.h     | 2 ++
- include/crypto/hmac.h       | 2 ++
- include/crypto/ivgen.h      | 2 ++
- include/crypto/tlssession.h | 2 ++
- 5 files changed, 10 insertions(+)
+> Hi Aleksandar,
+>
+> Thank you very much for your patient explanation in the previous post. An=
+d
+> thank you for checking.
+> Your and Peter's replies in the previous post certainly helped a lot. I a=
+m
+> now looking at a git commit 7 years ago (
+> bd277fa1966bc400f1b411f868f39125cda0c403), it was a Loongson Multimedia
+> Instruction implementation done my Richard Henderson.
+>
 
-diff --git a/include/crypto/block.h b/include/crypto/block.h
-index fe12899831..d49d2c2da9 100644
---- a/include/crypto/block.h
-+++ b/include/crypto/block.h
-@@ -268,4 +268,6 @@ uint64_t qcrypto_block_get_sector_size(QCryptoBlock *=
-block);
-  */
- void qcrypto_block_free(QCryptoBlock *block);
-=20
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlock, qcrypto_block_free)
-+
- #endif /* QCRYPTO_BLOCK_H */
-diff --git a/include/crypto/cipher.h b/include/crypto/cipher.h
-index cac90b410c..5928e5ecc7 100644
---- a/include/crypto/cipher.h
-+++ b/include/crypto/cipher.h
-@@ -170,6 +170,8 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgori=
-thm alg,
-  */
- void qcrypto_cipher_free(QCryptoCipher *cipher);
-=20
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoCipher, qcrypto_cipher_free)
-+
- /**
-  * qcrypto_cipher_encrypt:
-  * @cipher: the cipher object
-diff --git a/include/crypto/hmac.h b/include/crypto/hmac.h
-index aa3c97a2ff..ad4d778416 100644
---- a/include/crypto/hmac.h
-+++ b/include/crypto/hmac.h
-@@ -65,6 +65,8 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-  */
- void qcrypto_hmac_free(QCryptoHmac *hmac);
-=20
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoHmac, qcrypto_hmac_free)
-+
- /**
-  * qcrypto_hmac_bytesv:
-  * @hmac: the hmac object
-diff --git a/include/crypto/ivgen.h b/include/crypto/ivgen.h
-index 9b4a62f7bb..e41521519c 100644
---- a/include/crypto/ivgen.h
-+++ b/include/crypto/ivgen.h
-@@ -203,4 +203,6 @@ QCryptoHashAlgorithm qcrypto_ivgen_get_hash(QCryptoIV=
-Gen *ivgen);
-  */
- void qcrypto_ivgen_free(QCryptoIVGen *ivgen);
-=20
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoIVGen, qcrypto_ivgen_free)
-+
- #endif /* QCRYPTO_IVGEN_H */
-diff --git a/include/crypto/tlssession.h b/include/crypto/tlssession.h
-index 816300cdcc..e01e1a9dc2 100644
---- a/include/crypto/tlssession.h
-+++ b/include/crypto/tlssession.h
-@@ -160,6 +160,8 @@ QCryptoTLSSession *qcrypto_tls_session_new(QCryptoTLS=
-Creds *creds,
-  */
- void qcrypto_tls_session_free(QCryptoTLSSession *sess);
-=20
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoTLSSession, qcrypto_tls_session_fre=
-e)
-+
- /**
-  * qcrypto_tls_session_check_credentials:
-  * @sess: the TLS session object
---=20
-2.21.0
+Cool, that commit is a very good staring point - it is definitely not too
+simple, and it is not too complex either. And you can discover several
+different concepts in the process of exploring the change.
+
+Documentation on instruction set extension related to the commit (found by
+Google):
+https://files.somniafabularum.com/loongson/docs/Loongson2FUserGuide.pdf
+
+Be persistent, take your time, study the details and handling of individual
+instructions, and, of course, let us know if you encounter some major
+obstacles or thorny dilemmas.
+
+Yours,
+Aleksandar
 
 
+> I think what he did is exactly what I want to do now. I got a vague view
+> of the big picture, but I need more time to figure out the details. I wil=
+l
+> certainly ask more questions about this later, but before that I need to
+> look at some other parts of the source code:) Again thank you for checkin=
+g!
+>
+> Cheers,
+> Libo
+>
+>
+> ------------------ Original message ------------------
+> *From:* "Aleksandar Markovic";
+> *Sendtime:* Thursday, Aug 22, 2019 4:23 PM
+> *To:* "=E7=AB=8B";
+> *Cc:* "qemu-devel";
+> *Subject:* Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+>
+> On Tue, Aug 20, 2019 at 12:12 PM =E7=AB=8B <zhlb29@foxmail.com> wrote:
+>
+> > I am working on a project that requires me to modify the ISA of the MIP=
+S
+> > target.
+>
+>
+> L.,
+>
+> How is it going?
+>
+> Aleksandar
+>
+>
+>
+> > I have been staring at the source code for about a week, but found it
+> > really difficult due to me being a young rookie and the sparse comments=
+.
+> > Specifically, I need to extend MIPS, by adding some new instructions an=
+d
+> > new CPU registers to the current architecture, and that sounds really
+> easy.
+> > I think the place for me to look at should be at the directory
+> > ${qemu_root}/target/mips/. With a MIPS Instruction Set Manual Release 6
+> > handy, I have difficulty finding the source code where the ISA resides.
+> Is
+> > it in op_helper.c? Or translate.c? Any guidance would be really
+> > appreciated. Thank you very much in advance.
+> >
+> >
+> > Cheers,
+> > L.
+>
