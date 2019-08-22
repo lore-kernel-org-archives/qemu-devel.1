@@ -2,64 +2,85 @@ Return-Path: <SRS0=BhOf=WS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB8AC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E363C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FB492173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:05:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB492173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A1992173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Aug 2019 13:16:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Obskk4O9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A1992173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i0mmj-0008GX-Qz
-	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 09:05:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57466)
+	id 1i0mxE-0005ce-7l
+	for qemu-devel@archiver.kernel.org; Thu, 22 Aug 2019 09:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i0mkg-0006y8-PZ
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:03:44 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i0mwH-00052d-1K
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i0mke-0006or-J9
- for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:03:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21708)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1i0mkZ-0006RX-0i; Thu, 22 Aug 2019 09:03:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1C86618C890F;
- Thu, 22 Aug 2019 13:03:17 +0000 (UTC)
-Received: from localhost (ovpn-117-251.ams2.redhat.com [10.36.117.251])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 475FC5D9E5;
- Thu, 22 Aug 2019 13:03:11 +0000 (UTC)
-Date: Thu, 22 Aug 2019 14:03:10 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190822130310.GG20491@stefanha-x1.localdomain>
-References: <20190816171503.24761-1-philmd@redhat.com>
- <3e99f7fb-9c9b-de49-0997-c1e684159d4a@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i0mwF-0007im-45
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:15:40 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38941)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i0mwE-0007hy-SY
+ for qemu-devel@nongnu.org; Thu, 22 Aug 2019 09:15:39 -0400
+Received: by mail-wm1-x344.google.com with SMTP id i63so5742677wmg.4
+ for <qemu-devel@nongnu.org>; Thu, 22 Aug 2019 06:15:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=V2nv/Uxsp/eRjcm2yZv9NXMn6rt7OMPnJeNLZd1Dp3Y=;
+ b=Obskk4O93IojLMpFd7xriHxXntHqP0lpIV2N020nuuSVcptX8Va7IbYfuCoFEX01KW
+ FZBDK+9X/F0O4sglPOLQhSEpH9yzKpBJR0gUCXO8+2gu/ZrTKTCZgXbxAFtDZl70b7ek
+ UUpNPobf4Mkd3b8oMTG423OeFlx/y/wMJbQzieYoHyt2P2EuSt9OQw8wdBsh/JgOsUYR
+ rhXGE92CRbfePHfKV71KmcCkcL6Kkmlf9vH9Z/ikqpYqkaE61Bh/0KcUHAajQBCCTT6h
+ 6neTkMiP9JG0AN7aVmXQACwa5eHm90v3995zfTvs3gEZv3EV5Li8j6xCARXwUTF1ZlRP
+ oH1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=V2nv/Uxsp/eRjcm2yZv9NXMn6rt7OMPnJeNLZd1Dp3Y=;
+ b=WhTU9i1lk6qKpNySgTKIb7I9DCfQrH2xBgzb3AMcbGWR+4Rpcm7Nmf8/CIB3kFvO93
+ E3H68LWWHIw19xLQ1rUZybfa03xNwy6orZJTze8hKdkHxBYQE+ZaM++anoqOd8g7MjAR
+ 5lYBg6jDOzelWcW2NCBcSn0hxjBzYh+cFQ5vf3OhT/M91OYmLbeAXtHJJPvLBFVPtHF0
+ zhKJDC46qI/6jJyuo9mQgM7DfFERkcFgrB4CXea4+Et7pidlipmeWjOm/WilillNM/tU
+ AqP2eHOTABSzKC01YzgNWxwS02Yk4dfvjBHsD3ozMsBFjkflINLo0odlnJER9e+4QnUn
+ sSqA==
+X-Gm-Message-State: APjAAAWDivsG7uCSTsEF10sLTPmxqy66RXaj2votmZKVukiBawhCezic
+ HCZcGLBAm5yRpDvHWNyNESGp0w==
+X-Google-Smtp-Source: APXvYqxtxXa2t+mTXFy1Nb9LhGYR+NfblypRwAn+B8V/YsP4MNqa9sV190xRju24CwwoJk+WC4gIkA==
+X-Received: by 2002:a1c:ca09:: with SMTP id a9mr6189818wmg.43.1566479736729;
+ Thu, 22 Aug 2019 06:15:36 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id p13sm30785512wrw.90.2019.08.22.06.15.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 22 Aug 2019 06:15:36 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Thu, 22 Aug 2019 14:15:34 +0100
+Message-Id: <20190822131534.16602-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="V32M1hWVjliPHW+c"
-Content-Disposition: inline
-In-Reply-To: <3e99f7fb-9c9b-de49-0997-c1e684159d4a@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Thu, 22 Aug 2019 13:03:17 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] virtio-blk: Cancel the
- pending BH when the dataplane is reset
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH] target/arm: Don't abort on M-profile exception
+ return in linux-user mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,133 +92,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Xujun Ma <xuma@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Yihuang Yu <yihyu@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Christophe Lyon <christophe.lyon@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+An attempt to do an exception-return (branch to one of the magic
+addresses) in linux-user mode for M-profile should behave like
+a normal branch, because linux-user mode is always going to be
+in 'handler' mode. This used to work, but we broke it when we added
+support for the M-profile security extension in commit d02a8698d7ae2bfed.
 
---V32M1hWVjliPHW+c
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In that commit we allowed even handler-mode calls to magic return
+values to be checked for and dealt with by causing an
+EXCP_EXCEPTION_EXIT exception to be taken, because this is
+needed for the FNC_RETURN return-from-non-secure-function-call
+handling. For system mode we added a check in do_v7m_exception_exit()
+to make any spurious calls from Handler mode behave correctly, but
+forgot that linux-user mode would also be affected.
 
-On Fri, Aug 16, 2019 at 02:35:56PM -0400, John Snow wrote:
->=20
->=20
-> On 8/16/19 1:15 PM, Philippe Mathieu-Daud=E9 wrote:
-> > When 'system_reset' is called, the main loop clear the memory
-> > region cache before the BH has a chance to execute. Later when
-> > the deferred function is called, some assumptions that were
-> > made when scheduling them are no longer true when they actually
-> > execute.
-> >=20
-> > This is what happens using a virtio-blk device (fresh RHEL7.8 install):
-> >=20
-> >  $ (sleep 12.3; echo system_reset; sleep 12.3; echo system_reset; sleep=
- 1; echo q) \
-> >    | qemu-system-x86_64 -m 4G -smp 8 -boot menu=3Don \
-> >      -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1 \
-> >      -drive file=3D/var/lib/libvirt/images/rhel78.qcow2,if=3Dnone,id=3D=
-drive_image1,format=3Dqcow2,cache=3Dnone \
-> >      -device virtio-net-pci,netdev=3Dnet0,id=3Dnic0,mac=3D52:54:00:c4:e=
-7:84 \
-> >      -netdev tap,id=3Dnet0,script=3D/bin/true,downscript=3D/bin/true,vh=
-ost=3Don \
-> >      -monitor stdio -serial null -nographic
-> >   (qemu) system_reset
-> >   (qemu) system_reset
-> >   (qemu) qemu-system-x86_64: hw/virtio/virtio.c:225: vring_get_region_c=
-aches: Assertion `caches !=3D NULL' failed.
-> >   Aborted
-> >=20
-> >   (gdb) bt
-> >   Thread 1 (Thread 0x7f109c17b680 (LWP 10939)):
-> >   #0  0x00005604083296d1 in vring_get_region_caches (vq=3D0x56040a24bdd=
-0) at hw/virtio/virtio.c:227
-> >   #1  0x000056040832972b in vring_avail_flags (vq=3D0x56040a24bdd0) at =
-hw/virtio/virtio.c:235
-> >   #2  0x000056040832d13d in virtio_should_notify (vdev=3D0x56040a240630=
-, vq=3D0x56040a24bdd0) at hw/virtio/virtio.c:1648
-> >   #3  0x000056040832d1f8 in virtio_notify_irqfd (vdev=3D0x56040a240630,=
- vq=3D0x56040a24bdd0) at hw/virtio/virtio.c:1662
-> >   #4  0x00005604082d213d in notify_guest_bh (opaque=3D0x56040a243ec0) a=
-t hw/block/dataplane/virtio-blk.c:75
-> >   #5  0x000056040883dc35 in aio_bh_call (bh=3D0x56040a243f10) at util/a=
-sync.c:90
-> >   #6  0x000056040883dccd in aio_bh_poll (ctx=3D0x560409161980) at util/=
-async.c:118
-> >   #7  0x0000560408842af7 in aio_dispatch (ctx=3D0x560409161980) at util=
-/aio-posix.c:460
-> >   #8  0x000056040883e068 in aio_ctx_dispatch (source=3D0x560409161980, =
-callback=3D0x0, user_data=3D0x0) at util/async.c:261
-> >   #9  0x00007f10a8fca06d in g_main_context_dispatch () at /lib64/libgli=
-b-2.0.so.0
-> >   #10 0x0000560408841445 in glib_pollfds_poll () at util/main-loop.c:215
-> >   #11 0x00005604088414bf in os_host_main_loop_wait (timeout=3D0) at uti=
-l/main-loop.c:238
-> >   #12 0x00005604088415c4 in main_loop_wait (nonblocking=3D0) at util/ma=
-in-loop.c:514
-> >   #13 0x0000560408416b1e in main_loop () at vl.c:1923
-> >   #14 0x000056040841e0e8 in main (argc=3D20, argv=3D0x7ffc2c3f9c58, env=
-p=3D0x7ffc2c3f9d00) at vl.c:4578
-> >=20
-> > Fix this by cancelling the BH when the virtio dataplane is stopped.
-> >=20
-> > Reported-by: Yihuang Yu <yihyu@redhat.com>
-> > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Fixes: https://bugs.launchpad.net/qemu/+bug/1839428
-> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > ---
-> >  hw/block/dataplane/virtio-blk.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >=20
-> > diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virti=
-o-blk.c
-> > index 9299a1a7c2..4030faa21d 100644
-> > --- a/hw/block/dataplane/virtio-blk.c
-> > +++ b/hw/block/dataplane/virtio-blk.c
-> > @@ -301,6 +301,8 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
-> >      /* Clean up guest notifier (irq) */
-> >      k->set_guest_notifiers(qbus->parent, nvqs, false);
-> > =20
-> > +    qemu_bh_cancel(s->bh);
-> > +
-> >      vblk->dataplane_started =3D false;
-> >      s->stopping =3D false;
-> >  }
-> >=20
->=20
-> Naive question:
->=20
-> Since we're canceling the BH here and we're stopping the device; do we
-> need to do anything like clear out batch_notify_vqs? I assume in
-> system_reset contexts that's going to be handled anyway, are there
-> non-reset contexts where it matters?
+How an attempted return-from-non-secure-function-call in linux-user
+mode should be handled is not clear -- on real hardware it would
+result in return to secure code (not to the Linux kernel) which
+could then handle the error in any way it chose. For QEMU we take
+the simple approach of treating this erroneous return the same way
+it would be handled on a CPU without the security extensions --
+treat it as a normal branch.
 
-Spurious guest notifications aren't a problem but missing notifications
-can hang the guest.  I have proposed a modified version of this code
-that ensures pending batched notifications are sent.
+The upshot of all this is that for linux-user mode we should never
+do any of the bx_excret magic, so the code change is simple.
 
-Stefan
+This ought to be a weird corner case that only affects broken guest
+code (because Linux user processes should never be attempting to do
+exception returns or NS function returns), except that the code that
+assigns addresses in RAM for the process and stack in our linux-user
+code does not attempt to avoid this magic address range, so
+legitimate code attempting to return to a trampoline routine on the
+stack can fall into this case. This change fixes those programs,
+but we should also look at restricting the range of memory we
+use for M-profile linux-user guests to the area that would be
+real RAM in hardware.
 
---V32M1hWVjliPHW+c
-Content-Type: application/pgp-signature; name="signature.asc"
+Cc: qemu-stable@nongnu.org
+Reported-by: Christophe Lyon <christophe.lyon@linaro.org>
+Fixes: https://bugs.launchpad.net/qemu/+bug/1840922
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I have no idea how we could achieve the "restrict addresses
+shown to guest for linux-user" mentioned in the last para:
+any suggestions?
+---
+ target/arm/translate.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index cbe19b7a625..98e7105ecd2 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -915,10 +915,27 @@ static inline void gen_bx(DisasContext *s, TCGv_i32 var)
+     store_cpu_field(var, thumb);
+ }
+ 
+-/* Set PC and Thumb state from var. var is marked as dead.
++/*
++ * Set PC and Thumb state from var. var is marked as dead.
+  * For M-profile CPUs, include logic to detect exception-return
+  * branches and handle them. This is needed for Thumb POP/LDM to PC, LDR to PC,
+  * and BX reg, and no others, and happens only for code in Handler mode.
++ * The Security Extension also requires us to check for the FNC_RETURN
++ * which signals a function return from non-secure state; this can happen
++ * in both Handler and Thread mode.
++ * To avoid having to do multiple comparisons in inline generated code,
++ * we make the check we do here loose, so it will match for EXC_RETURN
++ * in Thread mode. For system emulation do_v7m_exception_exit() checks
++ * for these spurious cases and returns without doing anything (giving
++ * the same behaviour as for a branch to a non-magic address).
++ *
++ * In linux-user mode it is unclear what the right behaviour for an
++ * attempted FNC_RETURN should be, because in real hardware this will go
++ * directly to Secure code (ie not the Linux kernel) which will then treat
++ * the error in any way it chooses. For QEMU we opt to make the FNC_RETURN
++ * attempt behave the way it would on a CPU without the security extension,
++ * which is to say "like a normal branch". That means we can simply treat
++ * all branches as normal with no magic address behaviour.
+  */
+ static inline void gen_bx_excret(DisasContext *s, TCGv_i32 var)
+ {
+@@ -926,10 +943,12 @@ static inline void gen_bx_excret(DisasContext *s, TCGv_i32 var)
+      * s->base.is_jmp that we need to do the rest of the work later.
+      */
+     gen_bx(s, var);
++#ifndef CONFIG_USER_ONLY
+     if (arm_dc_feature(s, ARM_FEATURE_M_SECURITY) ||
+         (s->v7m_handler_mode && arm_dc_feature(s, ARM_FEATURE_M))) {
+         s->base.is_jmp = DISAS_BX_EXCRET;
+     }
++#endif
+ }
+ 
+ static inline void gen_bx_excret_final_code(DisasContext *s)
+-- 
+2.20.1
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1eko4ACgkQnKSrs4Gr
-c8ggZAf9HVuRJKcs2n1TB/q1EYc9pQIGHCSQk9Y9TinTgwTlfc6ZJqvKttCADMo1
-ug14J2DWZJ28UdgF3Y2HOqCKYiUgqNYMdSFc4Mvbh/USpAyt4ShWbrLeFqb8ljjy
-tDaJmcbH0k4xLbNb2oG0e095//FKHzTerIev0zvHYbSBKyuYaO0i6LBBcUwDXgGY
-SgiyWCYQxmFww+xAVs33Jkx81wU/7Pmr5Hav+06vUZTN4DNzeA/tDW1PrAkDaV8n
-uaP2GMoG9y/39xPnS/lX1C2VnAciAj96P4RJpSoNg3AENvGmHqU+9q1fwEKTU/mT
-roPO9i8O4BWeIODHbBXNpaLTmdMVPQ==
-=HRiB
------END PGP SIGNATURE-----
-
---V32M1hWVjliPHW+c--
 
