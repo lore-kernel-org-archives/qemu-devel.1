@@ -2,65 +2,86 @@ Return-Path: <SRS0=NWXH=WU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A946C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53961C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:08:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 422F3206BA
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:06:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 422F3206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E09E2173E
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:08:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLrfszei"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E09E2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1JZe-0007pt-9c
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 20:06:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50629)
+	id 1i1Jbq-0002XI-4p
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 20:08:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1i1JJ9-0008Qv-5v
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:49:28 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i1JJ7-0008Mv-Fc
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:49:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1i1JJ7-00044f-RU
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:49:26 -0400
-Received: from mga05.intel.com ([192.55.52.43]:59721)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1i1JJ7-00043D-JZ
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i1JJ6-00043S-Eb
  for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:49:25 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 23 Aug 2019 16:49:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,422,1559545200"; d="scan'208";a="180821343"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga007.fm.intel.com with ESMTP; 23 Aug 2019 16:49:22 -0700
-Date: Sat, 24 Aug 2019 07:49:00 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190823234900.GA27793@richard>
-References: <20190621142739.23703-1-richardw.yang@linux.intel.com>
- <20190819112632.GA2765@work-vm>
- <20190819140828.otv7vq5lahvquczl@master>
- <12c6eab2-7988-cdb9-ab54-ae052cd45188@redhat.com>
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38818)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i1JJ2-0003yq-Bb; Fri, 23 Aug 2019 19:49:20 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r20so10288600ota.5;
+ Fri, 23 Aug 2019 16:49:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=GDZjD+DLwOQGXTvn+lxnFGRBmiGUflL7uU0HzcIxmDw=;
+ b=BLrfszeizZllNR9+cd7L8KgG5ZsJ91Tcu10IZuL5l6OnbpqOskWSkvSnE7VSlNRLrH
+ ipTIXkz1PsfuGnu4AR1pzJHphVcT3WDYtoglt070IY+9eRguhMojDHwcyygpmqJo8mCi
+ 02zeR1dlUaIU5AY430TRPAqKlfPQzi17GJgZMkGh6tW4HdzDzw86JLLv4AvtK/Nwtkbt
+ 87zb5DQZrdRmgdTIZMY9dbY0+4JmRpt9iFrWTBvKASO6uCFHvMegZV5VglyxLfieFoP9
+ 49B87HKiLVHJIKj4jy1sUXkMrH/t3tcYMrueGB3ndYaQx1BoX0abUn1RJDgL3C63W9nz
+ vvtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=GDZjD+DLwOQGXTvn+lxnFGRBmiGUflL7uU0HzcIxmDw=;
+ b=TdZEOnYPJz0cbu1eLeeOwtwjtTJxkDFvEf5wflaHpRTDCxwZ5q/CQ7T1cMhFcXg6Oe
+ +vOXBM2t260UhQaqnuq/e8gNiXAZeZ6XtPJEISmDsYLOaR2ndXUyOtMC9Q2mmAA5ExVF
+ tSyvczsHCML1hK4221iLTNc+MihHwsKsCU2B+h7jjglClgkclpOcYS6bfqA1N1w6afkc
+ 78P8kYndljiP24If63DRId8BpXkjbRnB2/kPpHGuDdUWqJjVdlrKQMstVfsO5vLI9iWe
+ UN04ejDsWyY0h1o77x7vzRlZlYSAQ5eCSQGR5ErpASm2Tdd7n1uqiImOCJc5h/M+8V4o
+ jKrQ==
+X-Gm-Message-State: APjAAAXe8MRF/WM9BFQovDr7F0uxiokMtpr/VZ3u6J6HnCPqREVMY4Ti
+ fLcJNMjh11em0AXZklv8s9vLtPJq9Ou3bq1o3dA=
+X-Google-Smtp-Source: APXvYqz8T03T+k1hn/p5CHQhDDNRR+LCEIq2wM3DkvIAPlVtG5KvCtbBMQ7afvwcZu5HliAWGDV2GmPXrsAfjE34ioA=
+X-Received: by 2002:a05:6830:15cc:: with SMTP id
+ j12mr6174900otr.64.1566604158204; 
+ Fri, 23 Aug 2019 16:49:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <12c6eab2-7988-cdb9-ab54-ae052cd45188@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 23 Aug 2019 16:49:17
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 23 Aug 2019 16:49:17
+ -0700 (PDT)
+In-Reply-To: <874l2876kx.fsf@dusky.pond.sub.org>
+References: <20190822230916.576-1-philmd@redhat.com>
+ <874l2876kx.fsf@dusky.pond.sub.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 24 Aug 2019 01:49:17 +0200
+Message-ID: <CAL1e-=hvVp4i=s_Wr0iKy5UO7kH6xw3QR0Ms4_v_tobJSM2wRA@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
-Subject: Re: [Qemu-devel] [PATCH] migrtion: define
- MigrationState/MigrationIncomingState.state as MigrationStatus
+X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 0/3] mailmap: Clean up
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,86 +93,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
- quintela@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Wei Yang <richard.weiyang@gmail.com>
+Cc: qemu-trivial@nongnu.org, alex.bennee@linaro.org,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 23, 2019 at 11:21:50AM -0500, Eric Blake wrote:
->On 8/19/19 9:08 AM, Wei Yang wrote:
->> On Mon, Aug 19, 2019 at 12:26:32PM +0100, Dr. David Alan Gilbert wrote:
->>> * Wei Yang (richardw.yang@linux.intel.com) wrote:
+23.08.2019. 08.13, "Markus Armbruster" <armbru@redhat.com> =D1=98=D0=B5 =D0=
+=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >
->Typo in the subject line: migrtion should be migration
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 >
->>>> No functional change. Add default case to fix warning.
->>>
->>> I think the problem with this is that migrate_set_state uses an
->>> atomic_cmpxchg and so we have to be careful that the type we use
->>> is compatible with that.
->>> MigrationStatus is an enum and I think compilers are allowed to
->>> choose the types of that;  so I'm not sure we're guaranteed
->>> that an enum is always OK for the atomic_cmpxchg, and if it is
->> 
->> Took a look into the definition of atomic_cmpxchg, which finally calls
->> 
->>   * __atomic_compare_exchange_n for c++11
->>   * __sync_val_compare_and_swap
+> > Trivial cleanup of .mailmap to have a nice 'git shortlog' output.
+> >
+> > Philippe Mathieu-Daud=C3=A9 (3):
+> >   mailmap: Reorder by sections
+> >   mailmap: Update philmd email address
+> >   mailmap: Add many entries to improve 'git shortlog' statistics
+> >
+> >  .mailmap | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 115 insertions(+), 8 deletions(-)
 >
->Those are compiler-defined macros, so you have to consult the compiler
->documentation to see if they state what happens when invoked on an enum
->type.  You also have to check whether our macro
->typeof_strip_qual(enum_type) produces 'int' or something else.
+> Series
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 >
->C99 doesn't specify _Atomic at all (which is why we handrolled our own
->atomic.h built on top of compiler primitives, instead of using
-><stdatomic.h>).  But reading C11, I see that 6.7.2.4 states that
->_Atomic(type) is okay except for:
->
->"The type name in an atomic type specifier shall not refer to an array
->type, a function type, an atomic type, or a qualified type."
->
->which does NOT preclude the use of _Atomic(enum_type), so presumably
->compilers have to be prepared to handle an atomic enum type.  Still,
->it's rather shaky ground if you can't prove compilers handle it correctly.
->
+> However, it increases the difference to contrib/gitdm/aliases.
 
-Sounds this is a dark area for all those compilers. I would keep the code
-untouched now.
+Alex' initial gitdm effort, as I understood it, was not meant to cover all
+history from 2007 or so, but just to give reasonable statistics for 2018
+(amd future years).
 
-Thanks
+In that light, .mailmap and gitdm aliases do not need to be equivalent.
 
+But perhaps Alex would now want gitdm to be used for all QEMU history? Is
+this desirable?
+
+Aleksandar
+
+> I'm just
+> as guilty; my recent "[PATCH 2/2] contrib/gitdm: Add armbru@pond.sub.org
+> to group-map-redhat" updates only that. and not .mailmap.
 >
->> 
->> Both of them take two pointers to compare and exchange its content.
->> 
->> Per C99 standard, http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf,
->> it mentioned:
->> 
->>   Each enumerated type shall be compatible with char, a signed integer type,
->>   or an unsigned integer type. The choice of type is implementation-defined,
->>   but shall be capable of representing the values of all the members of the
->>   enumeration.
->> 
->> Based on this, I think atomic_cmpxchg should work fine with enum.
+> Perhaps we want to keep the two in sync manually.  We should then add
+> suitable comments to each file.
 >
->What C99 says is rather weak; you really want to be basing your
->decisions on atomics based on C11 or later.
+> Could we instead teach gitdm to use .mailmap, and ditch
+> contrib/gitdm/aliases?
 >
+> aliases' format is documented in gitdm's README.  Each line maps a
+> non-canonical e-mail address to a canonical one.
 >
->-- 
->Eric Blake, Principal Software Engineer
->Red Hat, Inc.           +1-919-301-3226
->Virtualization:  qemu.org | libvirt.org
+> .mailmap's format is documented in git-shortlog(1).  It can do a bit
+> more.  Even the common part differs: it has two addresses in different
+> order *boggle*.
 >
-
-
-
-
--- 
-Wei Yang
-Help you, Help me
-
