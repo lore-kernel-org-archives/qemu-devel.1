@@ -2,93 +2,67 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60AD7C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42CEC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:22:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C80D206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:19:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oyBFknSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C80D206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B81222133F
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:22:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B81222133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1BM4-0006AR-6m
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:19:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58502)
+	id 1i1BOe-0007Xs-Tt
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:22:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i1BJg-0004YG-2W
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:17:28 -0400
+ (envelope-from <berrange@redhat.com>) id 1i1BNs-0006xy-At
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i1BJf-00055O-5F
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:17:27 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:40335)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i1BJe-00054w-TQ
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:17:27 -0400
-Received: by mail-pl1-x643.google.com with SMTP id h3so5751862pls.7
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 08:17:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nMLmHrNBrvmow7c+EnnN1MQ042yQtn7S13yBJP6CUNw=;
- b=oyBFknSFmRw3adieePrsiEc/E/zXclpECqyH71Fq+H8urZDa84l/4YBb+fDCh1+znb
- gzSDEHZfGUKyjiSBqTl8eNy19yL744oo6n2ZHVf14jzF2/yLOwEVOtFpr7Gw9wsESEn7
- jOwRDwVzIFPKBMXR5sWbpvDWbYZn2A3Emv+5JtYor653JJFDwHzUDgTZ8vPE0U4f/I/W
- eehfyJJnavHNImbk4mUjZ4q3+3GJHT664QyFVQILn7t9lG+jJPwSCB7l06Vrxf3XRNMW
- TD7F61pyBTZ4BmXWI7LUmKLtGtP5K7vSXAdTArlOJsiMzNkhWhrS9P2mh5FkIQ7Ekkhm
- E1JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nMLmHrNBrvmow7c+EnnN1MQ042yQtn7S13yBJP6CUNw=;
- b=MF7FonFTtiT9oDq0h5RwdWREJfIElR7axJi5IHkr2M2q0AlfxaCZ9tcQiwzp8VgB9f
- wo0YHtYYGSpFwngtz61d0xCw49Zyy6JjR6YsINGp/wa8x6oUxQZCmick+m+vJFe+ecB6
- CphvYlqL8muza29w/eTyuYPKqnT9E9hrZUqe5kDIHZHqR6CKo+VBlmcXqkoRKiQgmLMG
- kkIHweQaL0xJkuCnL9E4XDfpPqU/dEwMuJCYON6QNdKNELNwyCwMAGfR6B0iJb2QjSCg
- JUW3StnsuiQVRfwXZHziY1FaoCk7fimey3dlN+2afSam3g8KyXORWvGJP0/WRH7l/iAX
- XqWw==
-X-Gm-Message-State: APjAAAWLvrz7DUHzYhzRC44iHRlUd30zEV2B11JgO15LlTUe3r1/8wSM
- WzL0kC/yzEVMCAKnHey8GC2VYA==
-X-Google-Smtp-Source: APXvYqyKaKuzwoba/HMntiZBOf6uRN0VPSB94k15peqPcZmbyvNcFygPaVYzoqhIvtTrnFjtPQKDPg==
-X-Received: by 2002:a17:902:2bc7:: with SMTP id
- l65mr5153416plb.119.1566573445318; 
- Fri, 23 Aug 2019 08:17:25 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id v18sm2368892pgl.87.2019.08.23.08.17.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 23 Aug 2019 08:17:24 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190823100741.9621-1-david@redhat.com>
- <20190823100741.9621-4-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <1f59df55-d50f-ee38-883b-17a79226ee9a@linaro.org>
-Date: Fri, 23 Aug 2019 08:17:22 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <berrange@redhat.com>) id 1i1BNr-0007EE-8d
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:21:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46174)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i1BNr-0007Dr-3g
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:21:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2056630A5A70;
+ Fri, 23 Aug 2019 15:21:46 +0000 (UTC)
+Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E6CCA5D9CA;
+ Fri, 23 Aug 2019 15:21:40 +0000 (UTC)
+Date: Fri, 23 Aug 2019 16:21:37 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190823152137.GN9654@redhat.com>
+References: <20190823114157.GG9654@redhat.com> <20190823130014.GG2784@work-vm>
+ <CAJ+F1CKTsQC1fULFG-hbUZ=Ao654K-TE6Fm9c1V+eRdAjk9QRA@mail.gmail.com>
+ <20190823140948.GI2784@work-vm> <20190823142054.GK9654@redhat.com>
+ <20190823142602.GJ2784@work-vm> <20190823144052.GL9654@redhat.com>
+ <20190823145634.GK2784@work-vm> <20190823150508.GM9654@redhat.com>
+ <20190823151448.GL2784@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20190823100741.9621-4-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: Re: [Qemu-devel] [PATCH v1 3/9] tcg: Factor out CONFIG_USER_ONLY
- probe_write() from s390x code
+Content-Disposition: inline
+In-Reply-To: <20190823151448.GL2784@work-vm>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Fri, 23 Aug 2019 15:21:46 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add dbus-vmstate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,30 +74,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 3:07 AM, David Hildenbrand wrote:
-> Factor it out, we'll do some further changes/extensions to both
-> probe_write() implementations soon. Make sure to allow "size = 0".
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  accel/tcg/user-exec.c     | 16 ++++++++++++++++
->  include/exec/exec-all.h   |  4 ++--
->  target/s390x/mem_helper.c |  7 -------
->  3 files changed, 18 insertions(+), 9 deletions(-)
+On Fri, Aug 23, 2019 at 04:14:48PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > On Fri, Aug 23, 2019 at 03:56:34PM +0100, Dr. David Alan Gilbert wrot=
+e:
+> > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > > > If two helpers are running as the same user ID, then can still
+> > > > directly attack each other via things like ptrace or /proc/$PID/m=
+em,
+> > > > unless you've used SELinux to isolate them, or run each as a dist=
+inct
+> > > > user ID.  If you do the latter, then we can still easily isolate
+> > > > them using dbus.
+> > >=20
+> > > You can lock those down pretty easily though.
+> >=20
+> > How were you thinking ?
+> >=20
+> > If you're not using SELinux or separate user IDs, then AFAICT you've
+> > got a choice of using seccomp or containers.  seccomp is really hard
+> > to get a useful policy out of with QEMU, and using containers for
+> > each helper process adds a level of complexity worse than selinux
+> > or separate user IDs, so isn't an obvious win over using dbus.
+>=20
+> You can just drop the CAP_SYS_PTRACE on the whole lot for that;
+> I thought there was something for /proc/.../mem as well.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+If they're running the same user ID & not SELinux constrained, I don't
+think that trying to block PRACTE / /proc/$PID/mem offers a reassuring
+level of security separation, as there's still plenty of other files
+that will be readable & writable to both vhostuser helper daemons which
+can be leveraged as indirect attack vectors - auditing both helpers and
+every library they link to to ensure nothing can be exploited is very
+hard.
 
-
-r~
-
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
