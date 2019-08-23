@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54ADCC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:36:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C8AC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:38:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 258AF2133F
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:36:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 258AF2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 3931B21874
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:38:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3931B21874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1DUY-0003SU-B0
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:36:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59361)
+	id 1i1DWI-0005UY-BH
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:38:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59684)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i1DSk-0001lN-R7
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:35:00 -0400
+ (envelope-from <thuth@redhat.com>) id 1i1DUp-00044R-8t
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:37:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i1DSj-0006aj-P1
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:34:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34382)
+ (envelope-from <thuth@redhat.com>) id 1i1DUm-0007JX-Ts
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:37:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1i1DSh-0006Zp-Ef; Fri, 23 Aug 2019 13:34:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1i1DUk-0007IL-Gv; Fri, 23 Aug 2019 13:37:02 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 31C2A10F23E5;
- Fri, 23 Aug 2019 17:34:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A068E8A004;
+ Fri, 23 Aug 2019 17:37:01 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-83.ams2.redhat.com [10.36.116.83])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AF7295D6B2;
- Fri, 23 Aug 2019 17:34:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B851608C2;
+ Fri, 23 Aug 2019 17:36:55 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190823143249.8096-1-philmd@redhat.com>
- <20190823143249.8096-7-philmd@redhat.com>
+ <20190823143249.8096-6-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,21 +90,21 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <be40e1e8-3a1c-b7f8-4a6f-604e99f529f1@redhat.com>
-Date: Fri, 23 Aug 2019 19:34:46 +0200
+Message-ID: <35b4d238-ea7d-f719-2a61-0e420844e7ae@redhat.com>
+Date: Fri, 23 Aug 2019 19:36:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190823143249.8096-7-philmd@redhat.com>
+In-Reply-To: <20190823143249.8096-6-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Fri, 23 Aug 2019 17:34:54 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Fri, 23 Aug 2019 17:37:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] hw/net/xilinx_axi: Use
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] hw/dma/xilinx_axi: Use
  object_initialize_child for correct ref. counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,7 +127,7 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm@nongnu.org,
  Peter Chubb <peter.chubb@nicta.com.au>,
  Antony Pavlov <antonynpavlov@gmail.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-trivial@nongnu.org
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -146,21 +146,23 @@ On 8/23/19 4:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
 > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/net/xilinx_axienet.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
+> v2: fix typo ENET -> DMA in TYPE macro name
+> ---
+>  hw/dma/xilinx_axidma.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 >=20
-> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> index d8716a1f73..2c8c065401 100644
-> --- a/hw/net/xilinx_axienet.c
-> +++ b/hw/net/xilinx_axienet.c
-> @@ -994,15 +994,14 @@ static void xilinx_enet_init(Object *obj)
->      XilinxAXIEnet *s =3D XILINX_AXI_ENET(obj);
+> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> index d176df6d44..a254275b64 100644
+> --- a/hw/dma/xilinx_axidma.c
+> +++ b/hw/dma/xilinx_axidma.c
+> @@ -566,14 +566,14 @@ static void xilinx_axidma_init(Object *obj)
+>      XilinxAXIDMA *s =3D XILINX_AXI_DMA(obj);
 >      SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
 > =20
 > -    object_initialize(&s->rx_data_dev, sizeof(s->rx_data_dev),
-> -                      TYPE_XILINX_AXI_ENET_DATA_STREAM);
+> -                      TYPE_XILINX_AXI_DMA_DATA_STREAM);
 > -    object_initialize(&s->rx_control_dev, sizeof(s->rx_control_dev),
-> -                      TYPE_XILINX_AXI_ENET_CONTROL_STREAM);
+> -                      TYPE_XILINX_AXI_DMA_CONTROL_STREAM);
 > -    object_property_add_child(OBJECT(s), "axistream-connected-target",
 > -                              (Object *)&s->rx_data_dev, &error_abort)=
 ;
@@ -168,23 +170,21 @@ On 8/23/19 4:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
 target",
 > -                              (Object *)&s->rx_control_dev, &error_abo=
 rt);
-> -
 > +    object_initialize_child(OBJECT(s), "axistream-connected-target",
 > +                            &s->rx_data_dev, sizeof(s->rx_data_dev),
-> +                            TYPE_XILINX_AXI_ENET_DATA_STREAM, &error_a=
-bort,
+> +                            TYPE_XILINX_AXI_DMA_DATA_STREAM, &error_ab=
+ort,
 > +                            NULL);
 > +    object_initialize_child(OBJECT(s), "axistream-control-connected-ta=
 rget",
 > +                            &s->rx_control_dev, sizeof(s->rx_control_d=
 ev),
-> +                            TYPE_XILINX_AXI_ENET_CONTROL_STREAM, &erro=
-r_abort,
+> +                            TYPE_XILINX_AXI_DMA_CONTROL_STREAM, &error=
+_abort,
 > +                            NULL);
->      sysbus_init_irq(sbd, &s->irq);
 > =20
->      memory_region_init_io(&s->iomem, OBJECT(s), &enet_ops, s, "enet", =
-0x40000);
+>      sysbus_init_irq(sbd, &s->streams[0].irq);
+>      sysbus_init_irq(sbd, &s->streams[1].irq);
 >=20
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
