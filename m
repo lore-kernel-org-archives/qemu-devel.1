@@ -2,113 +2,93 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A864C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D686C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D322020870
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:04:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D322020870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 187B120870
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q+4HoSk6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187B120870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1B7Z-0007x4-Fh
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:04:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55937)
+	id 1i1B8k-0000rD-MH
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:06:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i1B4m-0005sK-3K
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:02:05 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i1Aso-0000JN-LI
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:49:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i1B4k-0004OE-5o
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:02:03 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:39257)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i1B4j-0004L3-LA; Fri, 23 Aug 2019 11:02:01 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N9d91-1iLXNR3Ja9-015dr3; Fri, 23 Aug 2019 17:01:48 +0200
-To: Chen Zhang <tgfbeta@me.com>, qemu-devel@nongnu.org
-References: <8E5A9C27-C76D-46CF-85B0-79121A00B05F@me.com>
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <richard.henderson@linaro.org>) id 1i1Asn-00067U-Hs
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:49:42 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33459)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i1Asn-00066s-Az
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:49:41 -0400
+Received: by mail-pl1-x642.google.com with SMTP id go14so5706562plb.0
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 07:49:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=QxO2uVfnR+ASBjD1E44tju9xARYVi3V8cmVvh6cGfKU=;
+ b=Q+4HoSk6ExxjL5qeds/YT6DBmMr0cgBP3loCMshobrahFbjq+JDOn1FT7FOi9jEcUf
+ pBro/03MTfwW1C5w1yhf9xsUnmp0KutH5kXuTkogrS9TbbuwEX7gTIJMZE8dCstjavWF
+ wx7vmn+BG9Q+7FgzuHhTDS7hqaWJWjYfLj+PfHXX6yTKIKylocgyNX6pOnVJ9fALSKsn
+ EWXUxWJclKpxB2DlXkGjw8OsI0uZR583h5UvKU+5o7WLTDOdJKD9w58bHCmJuIwax9PI
+ RHqsQ+z67X9XlriPG/7nTqyhvFwTwmN298k6+60Ou4FU+dDAA9cDL7ybuTHDl835dWl0
+ j0iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QxO2uVfnR+ASBjD1E44tju9xARYVi3V8cmVvh6cGfKU=;
+ b=fT8fMbIoVLupkVGVJaG0pUEC4erv73ozopUdiLarnRhiLhnWUDunKyQ762n+/IpZf0
+ bORToUX6PXh0kOTZHVZAwPOfhk43wURtrr6CzC7U2uolB4IE+QSnL75ciWcKcgXtMMt9
+ 2LWyhRUbzaM9C5g/gbtb7Y5hEfv5e69kbTI6xTtzTgJEZosF8XTm42VN3V5eVMf/dtp5
+ Bkc2kQu63uKpyzRgE/qDMDqhHoqozoJwoOAkIC9uG4Vrgi0ttlF4dIldEJvOi+WLpYTj
+ cF2dy/AIwMPeBEViSOYkHRUpg3nI3gPFYh2iGRhzzK9mdgjCrOwglVr8ILW13XtdlJcy
+ 9Ayw==
+X-Gm-Message-State: APjAAAV3ofsYRN38clMT92+vNhukTJH1vv+oYaZ+cJzCCIgCIlQgf+P8
+ A8N0Mduh+JXaUdfTIoqLqV89tg==
+X-Google-Smtp-Source: APXvYqzanQ9kT/4BdN5OgPUL6JfjPxbZxX4Be3SPQD8wywyW89t9/UPFrZdm5nIUoFbsg+O/eOn1uQ==
+X-Received: by 2002:a17:902:e413:: with SMTP id
+ ci19mr5296312plb.256.1566571780235; 
+ Fri, 23 Aug 2019 07:49:40 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id o4sm9068318pje.28.2019.08.23.07.49.39
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 23 Aug 2019 07:49:39 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190823100741.9621-1-david@redhat.com>
+ <20190823100741.9621-2-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <d11d786b-bd04-42a5-46f2-23191f070df4@vivier.eu>
-Date: Fri, 23 Aug 2019 17:01:46 +0200
+Message-ID: <529817b0-9109-7ec9-674f-181a32966857@linaro.org>
+Date: Fri, 23 Aug 2019 07:49:37 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <8E5A9C27-C76D-46CF-85B0-79121A00B05F@me.com>
+In-Reply-To: <20190823100741.9621-2-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:0B82HvmwNC6S/Sp5DN+hMz77JTvBzKv/MzJilF+IJsFyz/6aWQP
- 3L8nqIc9Wxwebl0h/rCh5YDMEoEKPZhIDWB8yMajiczK+XAdp+zsD6aiCtfACzUq0C6LpB8
- vhp8zpxw1m4hEZQHo2PThLJxd7J84M5id1D16t8GQepNHtWNdedJxnbuUFttkGcyrheBQe5
- hmvEUC9omJ0tFr/HXEvgQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:H19RhOfi82E=:+60eU9sYUmQVNoe8/RNsI3
- mEVH8P48OjuzcBoXZj6sIcL05aZbUtxQZJ3FCt8hk7cBPpwzfP6wL0+x9jQvSSqpBZQv+gXuM
- tgcSbDzUnmd8+T8QCVkdvjbRZPZeo2ZIa0Uc4e4muh3MBgfkf+OvEJmtGfZHzVp24Uxlm2tui
- yj6ra8HHw8Xap3oU0dfvQEi73LlGbeJkc0B0kMHOAaxzdvbeZ58eUps+qmMTW3UqYXzauuN7j
- YmH4dr6GE5mfEud3XP/HFVuv9SXE6ymO3YehsX0MolGOpb6fpBfmqD6H1xMv/2vuc8EQkEnxo
- KaTAeRPx9UBH4pq5ctTDrAnp8CqEQEC6reholIH8RC5o3WJEeofoHHkw9XeNa2cJu0VqSE5GI
- BPMBdc2180hn96PhbvnBr/1is3bxyk4jOk4X1zXa5tLXAsb4fX56m4RTJXzgof7QQu9GPWaIm
- xwDxujAXk1718lyRNet39DtFoti5Mrssk5WY254eZaLVEHEKq1pTjYUrXMdF7PurCSwAIC1ZY
- 8KR0G9J5JMQcV/I4wsBicbPATYZbQ1zmi7PPKWAe/aLFp0U7hg3KQ59L0l8uZglu/FfHWRpYI
- so7MlB5c2H4qWo26+3dp+m4TKdfA/mFBp6pZgqUKMackX0HxSChltqvRSCjJoKvOnjv382oal
- KaY8XMnKs5DGFl8gkj99I2bUe3XYxnbcETlxg5P4vbVJjMvyvXu0rPBGjL0m7rwAEkmSCqUtY
- ll546DictkeaY3UGGIkkKgyrpkcqxmSodZqcZo57OgPNttkFPn+I3A+b7/c=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] vfio: fix a typo
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH v1 1/9] s390x/tcg: Use guest_addr_valid()
+ instead of h2g_valid() in probe_write_access()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,43 +100,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 22/08/2019 à 08:49, Chen Zhang via Qemu-trivial a écrit :
-> Signed-off-by: Chen Zhang <tgfbeta@me.com>
+On 8/23/19 3:07 AM, David Hildenbrand wrote:
+> If I'm not completely wrong, we are dealing with guest addresses here
+> and not with host addresses. Use the right check.
+> 
+> Fixes: c5a7392cfb96 ("s390x/tcg: Provide probe_write_access helper")
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  hw/vfio/pci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index dc3479c..c5e6fe6 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -44,7 +44,7 @@
->  #define TYPE_VFIO_PCI "vfio-pci"
->  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
->  
-> -#define TYPE_VIFO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
-> +#define TYPE_VFIO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
->  
->  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
->  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
-> @@ -3199,7 +3199,7 @@ static void vfio_pci_nohotplug_dev_class_init(ObjectClass *klass, void *data)
->  }
->  
->  static const TypeInfo vfio_pci_nohotplug_dev_info = { 
-> -    .name = TYPE_VIFO_PCI_NOHOTPLUG,
-> +    .name = TYPE_VFIO_PCI_NOHOTPLUG,
->      .parent = TYPE_VFIO_PCI,
->      .instance_size = sizeof(VFIOPCIDevice),
->      .class_init = vfio_pci_nohotplug_dev_class_init,
-> 
+>  target/s390x/mem_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to my trivial-patches branch.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Thanks,
-Laurent
+
+r~
 
