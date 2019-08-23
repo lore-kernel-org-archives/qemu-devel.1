@@ -2,80 +2,62 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB10BC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:55:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE90C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5A75206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:55:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XKtfDzql"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A75206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D9B41206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:02:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9B41206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Bul-0005a1-Sw
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:55:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39040)
+	id 1i1C18-000894-QW
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 12:02:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i1Bss-0003wn-Gy
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:53:51 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i1ByH-0006dr-J4
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:59:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i1Bsr-0001sF-Bx
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:53:50 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44153)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i1Bsr-0001r0-6b
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:53:49 -0400
-Received: by mail-oi1-x244.google.com with SMTP id k22so7336235oiw.11
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 08:53:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wGT5CIRpmIvinPclMWr9KZrZpY0xjN+/dF52/I6pKtU=;
- b=XKtfDzql4eKufSOH5voJkiDYIpr4mf2n84DX/5SMq338k6xl7L9hhuTSUNnw27A/R7
- HlnyXK5IomPRNHWnIrvIIzEHuO+LYiw52+WJ7fHgnopB7aH6gzlzghxph27Imkgey6uT
- ct0T4MEUDWg9fokgzyCxnxeEiRBm/dGTfogl0ONYtv32wEjhIRwe2pBjf8CA9Ff+RknH
- CzqCvZH8geAnD4G/rsrFka+j6Jr3PkSHw4nSKiQA8YVv8VX1Ynk/J9qXEYw9/SQN2Si0
- G57PaIpcnX+DhJA9T/xDsyvV/e7lIltCWvy5a0S7QL03mg5rxHCUfosdxvN0pxAVK0Cx
- Px2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=wGT5CIRpmIvinPclMWr9KZrZpY0xjN+/dF52/I6pKtU=;
- b=FaouRfC0kBPTi3vUB794WzkiZDAURHZWgdkPmbnJ2uHpcYCucB4jxJLyCkVhDdxFTa
- +54CT4/IYd9XC7jKqL+PamPul6NiSSnCxtcIIKCJ0RYgLt/GaVKYqvdr2ZdYzRXOixkM
- vz83xEYb6N3BTQ1kHC4Lk3Z8i5b3C8Nt+rBE9yfKwjpikoEriZTKhX+8PiMGkkZHO3jV
- 8Ai0/qbOynNYdFyY1Yk44RVlTfWttQgVGQp7e9sy+G2Cv2HxjmGukI4vi+DR+/N4L3dg
- R0XTge4HnkDeDJ1jQSLFT129hAjwG81KL7Q4vHxYWu0/8Ebm9BTdkyoDPpYUaNstKx4I
- uHCA==
-X-Gm-Message-State: APjAAAXtPhNt73uV9A/3ldvypWgpnwjfYqHLKcvJYGw7kajd9+aHa1F9
- ce8ezN6hcFo1VBfDe2FKhhDMDjpSXJrARXILsnvpWQ==
-X-Google-Smtp-Source: APXvYqy/GPrt2Vpu52prvKKa1F843LZ5N8ny8zSW5FOypnGHlA0O3sGUd5NBNokCqR5EDWD77OjNu+qEkncEoxYurVE=
-X-Received: by 2002:a54:4718:: with SMTP id k24mr3582109oik.146.1566575628134; 
- Fri, 23 Aug 2019 08:53:48 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1i1ByG-0007IB-8a
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:59:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36560)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i1ByF-0007H7-Ll
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:59:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A3F0FC087353;
+ Fri, 23 Aug 2019 15:59:22 +0000 (UTC)
+Received: from work-vm (ovpn-117-244.ams2.redhat.com [10.36.117.244])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B737960610;
+ Fri, 23 Aug 2019 15:59:21 +0000 (UTC)
+Date: Fri, 23 Aug 2019 16:59:19 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190823155919.GO2784@work-vm>
+References: <20190802060359.16556-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-24-richard.henderson@linaro.org>
-In-Reply-To: <20190819213755.26175-24-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Aug 2019 16:53:37 +0100
-Message-ID: <CAFEAcA-p630ZSwBkdZ5ZGi+12ktjo1cJeA78EV1U9r6VSvm-jA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v2 23/68] target/arm: Convert Parallel
- addition and subtraction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190802060359.16556-1-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 23 Aug 2019 15:59:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH] migration/postcopy: enable compress
+ with postcopy
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,23 +69,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Aug 2019 at 22:38, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> This patch enable compress with postcopy.
+> 
+> This is a RFC and based on some unmerged patch
+> 
+>   "migration: extract ram_load_precopy"
+>   "migration/postcopy: skip compression when postcopy is active"
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 > ---
->  target/arm/translate.c | 229 ++++++++++++++++++++---------------------
->  target/arm/a32.decode  |  44 ++++++++
->  target/arm/t32.decode  |  44 ++++++++
->  3 files changed, 200 insertions(+), 117 deletions(-)
+>  migration/postcopy-ram.c |  3 +--
+>  migration/ram.c          | 35 +++++++++++++++++++++--------------
+>  2 files changed, 22 insertions(+), 16 deletions(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index a7e7ec9c22..70b6beb5a9 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -1252,8 +1252,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+>              }
+>              memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
+>          }
+> -        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
+> -                                   rb);
+> +        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page, rb);
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Please keep these type of cleanups separate.
 
-thanks
--- PMM
+>      }
+>  }
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index a0d3bc60b2..c1d6eadf38 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2384,16 +2384,6 @@ static bool save_page_use_compression(RAMState *rs)
+>          return false;
+>      }
+>  
+> -    /*
+> -     * The decompression threads asynchronously write into RAM
+> -     * rather than use the atomic copies needed to avoid
+> -     * userfaulting.  It should be possible to fix the decompression
+> -     * threads for compatibility in future.
+> -     */
+> -    if (migration_in_postcopy()) {
+> -        return false;
+> -    }
+> -
+>      /*
+>       * If xbzrle is on, stop using the data compression after first
+>       * round of migration even if compression is enabled. In theory,
+> @@ -3433,6 +3423,11 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+>          }
+>          i++;
+>      }
+> +
+> +    if (migrate_postcopy_ram()) {
+> +        flush_compressed_data(rs);
+> +    }
+> +
+>      rcu_read_unlock();
+>  
+>      /*
+> @@ -4019,6 +4014,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>          void *place_source = NULL;
+>          RAMBlock *block = NULL;
+>          uint8_t ch;
+> +        int len;
+>  
+>          addr = qemu_get_be64(f);
+>  
+> @@ -4036,7 +4032,8 @@ static int ram_load_postcopy(QEMUFile *f)
+>  
+>          trace_ram_load_postcopy_loop((uint64_t)addr, flags);
+>          place_needed = false;
+> -        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
+> +        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+> +                     RAM_SAVE_FLAG_COMPRESS_PAGE)) {
+>              block = ram_block_from_stream(f, flags);
+>  
+>              host = host_from_ram_block_offset(block, addr);
+> @@ -4109,6 +4106,17 @@ static int ram_load_postcopy(QEMUFile *f)
+>                                           TARGET_PAGE_SIZE);
+>              }
+>              break;
+> +        case RAM_SAVE_FLAG_COMPRESS_PAGE:
+> +            all_zero = false;
+> +            len = qemu_get_be32(f);
+> +            if (len < 0 || len > compressBound(TARGET_PAGE_SIZE)) {
+> +                error_report("Invalid compressed data length: %d", len);
+> +                ret = -EINVAL;
+> +                break;
+> +            }
+> +            decompress_data_with_multi_threads(f, page_buffer, len);
+> +            ret |= wait_for_decompress_done();
+
+I think this might work for a 4k page host; but I'm not sure it's
+safe on hugepages or ARM/Power where they have bigger pages.
+ram_load_postcopy relies on all of the pages within a single hostpage
+arriving before the last subpage and that's what then triggers the call
+to postcopy_place_page;  that relies on some ordering - but I don't
+think that the multiple compress threads on the source have any ordering
+between the threads - or am I missing something about how the multiple
+threads are organised?
+
+Dave
+
+> +            break;
+>          case RAM_SAVE_FLAG_EOS:
+>              /* normal exit */
+>              multifd_recv_sync_main();
+> @@ -4130,8 +4138,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>              void *place_dest = host + TARGET_PAGE_SIZE - block->page_size;
+>  
+>              if (all_zero) {
+> -                ret = postcopy_place_page_zero(mis, place_dest,
+> -                                               block);
+> +                ret = postcopy_place_page_zero(mis, place_dest, block);
+>              } else {
+>                  ret = postcopy_place_page(mis, place_dest,
+>                                            place_source, block);
+> @@ -4372,6 +4379,7 @@ static int ram_load_precopy(QEMUFile *f)
+>          }
+>      }
+>  
+> +    ret |= wait_for_decompress_done();
+>      return ret;
+>  }
+>  
+> @@ -4405,7 +4413,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>          ret = ram_load_precopy(f);
+>      }
+>  
+> -    ret |= wait_for_decompress_done();
+>      rcu_read_unlock();
+>      trace_ram_load_complete(ret, seq_iter);
+>  
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
