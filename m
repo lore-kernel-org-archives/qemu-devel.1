@@ -2,63 +2,66 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C90C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 06:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94205C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 06:14:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4A8A22CEC
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 06:06:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VHm17G56"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A8A22CEC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 5F87622CF7
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 06:14:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F87622CF7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i12ie-0004X5-0Q
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 02:06:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51125)
+	id 1i12qE-0008TC-Fl
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 02:14:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52500)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i12eQ-0000kP-3o
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 02:02:19 -0400
+ (envelope-from <armbru@redhat.com>) id 1i12ov-0006sy-Pc
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 02:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i12eO-0004cS-Pl
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 02:02:18 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:51565 helo=ozlabs.org)
+ (envelope-from <armbru@redhat.com>) id 1i12ou-0002TL-Gd
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 02:13:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54902)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i12eN-0004T2-Hc; Fri, 23 Aug 2019 02:02:16 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46F9lh3YP4z9sNC; Fri, 23 Aug 2019 16:02:07 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566540128;
- bh=C6ycLQNs0h3+jok8L6wQCBaQO4dmZLW+j/dFtNXjedc=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=VHm17G56s8WVORuslQtzy0wANanVydP5i32WT4k37uhNpmgwJ5xvxtROuCK2ztzx2
- GL1tcFleyCsbclsbt9I7f9Nn1KAg2NfsQ6hsVbRHD3wH7oX4Ez33mQj45L8POk0g/v
- 32dSzrTF+6NrO/FrnWQIlBabK7hwJFHq4WtOfXDY=
-Date: Fri, 23 Aug 2019 15:31:53 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <20190823053153.GB3027@umbus.fritz.box>
-References: <20190822195918.3307-1-danielhb413@gmail.com>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1i12ou-0002Sq-BK; Fri, 23 Aug 2019 02:13:08 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BE89F3082131;
+ Fri, 23 Aug 2019 06:13:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EB8CC5E1CB;
+ Fri, 23 Aug 2019 06:13:03 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 5B0431162B63; Fri, 23 Aug 2019 08:13:02 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190822230916.576-1-philmd@redhat.com>
+Date: Fri, 23 Aug 2019 08:13:02 +0200
+In-Reply-To: <20190822230916.576-1-philmd@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri, 23 Aug 2019 01:09:13
+ +0200")
+Message-ID: <874l2876kx.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="A6N2fC+uXW/VQSAv"
-Content-Disposition: inline
-In-Reply-To: <20190822195918.3307-1-danielhb413@gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 23 Aug 2019 06:13:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] spapr_pci: remove all child
- functions in function zero unplug
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] mailmap: Clean up
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,104 +73,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
---A6N2fC+uXW/VQSAv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Trivial cleanup of .mailmap to have a nice 'git shortlog' output.
+>
+> Philippe Mathieu-Daud=C3=A9 (3):
+>   mailmap: Reorder by sections
+>   mailmap: Update philmd email address
+>   mailmap: Add many entries to improve 'git shortlog' statistics
+>
+>  .mailmap | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 115 insertions(+), 8 deletions(-)
 
-On Thu, Aug 22, 2019 at 04:59:18PM -0300, Daniel Henrique Barboza wrote:
-> There is nothing wrong with how sPAPR handles multifunction PCI
-> hot unplugs. The problem is that x86 does it simpler. Instead of
-> removing each non-zero function and then removing function zero,
-> x86 can remove any function of the slot to trigger the hot unplug.
->=20
-> Libvirt will be directly impacted by this difference, in the
-> (hopefully soon) PCI Multifunction hot plug/unplug support. For
-> hot plugs, both x86 and sPAPR will operate the same way: a XML
-> with all desired functions to be added, then consecutive hotplugs
-> of all non-zero functions first, zero last. For hot unplugs, at
-> least in the current state, a XML with the devices to be removed
-> must also be provided because of how sPAPR operates - x86 does
-> not need it - since any function unplug will unplug the whole
-> PCIe slot. This difference puts extra strain in the management
-> layer, which needs to either handle both archs differently in
-> the unplug scenario or choose treat x86 like sPAPR, forcing x86
-> users to cope with sPAPR internals.
->=20
-> This patch changes spapr_pci_unplug_request to handle the
-> unplug of function zero differently. When removing function zero,
-> instead of error-ing out if there are any remaining function
-> DRCs which needs detaching, detach those. This has no effect in
-> any existing scripts that are detaching the non-zero functions
-> before function zero, and can be used by management as a shortcut
-> to remove the whole PCI multifunction device without specifying
-> each child function.
+Series
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Makes sense to me, applied to ppc-for-4.2.
+However, it increases the difference to contrib/gitdm/aliases.  I'm just
+as guilty; my recent "[PATCH 2/2] contrib/gitdm: Add armbru@pond.sub.org
+to group-map-redhat" updates only that. and not .mailmap.
 
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/ppc/spapr_pci.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index deb0b0c80c..9f176f463e 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1700,11 +1700,13 @@ static void spapr_pci_unplug_request(HotplugHandl=
-er *plug_handler,
->                  state =3D func_drck->dr_entity_sense(func_drc);
->                  if (state =3D=3D SPAPR_DR_ENTITY_SENSE_PRESENT
->                      && !spapr_drc_unplug_requested(func_drc)) {
-> -                    error_setg(errp,
-> -                               "PCI: slot %d, function %d still present.=
- "
-> -                               "Must unplug all non-0 functions first.",
-> -                               slotnr, i);
-> -                    return;
-> +                    /*
-> +                     * Attempting to remove function 0 of a multifunction
-> +                     * device will will cascade into removing all child
-> +                     * functions, even if their unplug weren't requested
-> +                     * beforehand.
-> +                     */
-> +                    spapr_drc_detach(func_drc);
->                  }
->              }
->          }
+Perhaps we want to keep the two in sync manually.  We should then add
+suitable comments to each file.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Could we instead teach gitdm to use .mailmap, and ditch
+contrib/gitdm/aliases?
 
---A6N2fC+uXW/VQSAv
-Content-Type: application/pgp-signature; name="signature.asc"
+aliases' format is documented in gitdm's README.  Each line maps a
+non-canonical e-mail address to a canonical one.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1fekkACgkQbDjKyiDZ
-s5JjJg/+N39oi8cilNtLi45NDL7nwIedmDKUkTxP4Xve7slhKLYbbJyWvjheeOUa
-l/xh05wOb+qGHYJrRIRXGNKFQL8ZJOntmnsRZZf0LqShd95HnfrUpItl7LFYociE
-XbJ+2gOSJ6Bm9OKSJwGvsU/JzJpkk9P4yfBhv7iUQGgkoahojO7KEdfqeRBAepAp
-+J2R9DwcdUppAfNGmGOq69UkhRbPD7F8P5hf7m2HPB2PFtc9iGwhM91vE4lGkiux
-kEU5MD/bE4ZkstPfGFeXpKfaN2UoBthRNzxa5p3trm7lcbiRkyUi5gLDlrX4wfKO
-w4iunnOT92GXcSEjF5BoCC2PXRpAdnxFd8J9Qc2NSTbvuriu8ObQ5j8/AD9jro6l
-O5WbkBokuue+PFjlkncsVOHcbbr3DRM5z0jXW5+Xxswm+f17jfVPkXwrYdhhYHl6
-evOhIMPSV6k9+mSg19gzaZLBlVr2o7MP60NCz36Xg42u9a33a7zhwCbUVTdf+mlY
-pHGGCh7u9vIIGdSzCnK5PuIGWuXaGlSxpFhaaLtQRBXo0Ef3YXJ4hEgWfJODHcB7
-DzrcR372wafX49hwILLSQW/GwsCC5hDRorLYCuPQ1YqjLDr6vbOFNdBakBjhveft
-WCJAHj1XEYTmp2WDQ4kDw18ivjcfpEqx8OrCaPRXif++tbE8rUc=
-=cMlh
------END PGP SIGNATURE-----
-
---A6N2fC+uXW/VQSAv--
+.mailmap's format is documented in git-shortlog(1).  It can do a bit
+more.  Even the common part differs: it has two addresses in different
+order *boggle*.
 
