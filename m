@@ -2,80 +2,60 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E69AEC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58263C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:58:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B78D721019
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:54:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uvSPmK5c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B78D721019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3181721019
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:58:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3181721019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60597 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Dm2-00080L-U5
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:54:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33959)
+	id 1i1Dpw-00032y-49
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:58:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i1Dkr-0006uq-L1
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:53:42 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i1DoB-0000xk-TB
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:57:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i1Dkq-0006rR-L5
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:53:41 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34592)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i1Dkq-0006qm-Fc
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:53:40 -0400
-Received: by mail-oi1-x244.google.com with SMTP id g128so7673954oib.1
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 10:53:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VTWQI2/bTW6uLdG6CZCLdY+s1uv1OxHm3gcyhTKtWs4=;
- b=uvSPmK5caUX6vLpGTGTPnGGpW/y6UKNkD91CweaIae7ph1Gd5Cf5vppP2bDEWnR4kp
- 5028Vbxd+tmuF5GZWDwgoh0YJhcdJbmhTHVTNDyDUAU78EQmU3KUi9gDDZfT5fYKFDYh
- s559BBA2+lDuPwWbl7MgBnxd3CQMEOsQtIhee3B/BOTwHxKJQsPRhTmC37rT1sMx2VXn
- EB5gsjlB7pfUmagz4iNir4tFGc56xHry3QIuTvAVrVHQd4lJd8URPL4mumtRUxgxFVEZ
- GQYbZI84Vt3MHK4i3h8riOqKH68h78e8CxwxqSlR/H+mfjBHFZyUQJZpYNoh1lrvj84U
- UwbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VTWQI2/bTW6uLdG6CZCLdY+s1uv1OxHm3gcyhTKtWs4=;
- b=YNxLrnwn/xVvG0pvPeloq2r8VXOUFSxBAVzjs2LkEH13RMM/s8e30q2kc7bS0EEVjw
- QaMyYUA6G+nvEoIRMuSfcAyjZH+oo95jrMzYVIVGUsNThDPpgzVWAeueawBQl+rIJ70i
- VNL0DtYz7h3NrhKgXUhTPoHqfKcRzPf0w5Yh7C7RjwgfOotrCxU5CWTscsnhWG2P7PPK
- dK5XuS3Y2XfT+K9JZXLhAJGaS57Fgh/wEQQXeZdE2HRGJqsWio6MSRARFqENpIVy9KTe
- CA25tUUdr1ZM2xIPBEfGct+zX9Cg5uTCPHy7h8ZvBNRawJRJ6cLasIc5D13AuxWk9cvZ
- DOew==
-X-Gm-Message-State: APjAAAUE6yj1hGHmVULP+QDANYKTaGd2ngsi39hei94IGjlUkVESfMiL
- ktgtuBEwtjQLRw3lAzAG6k7Te/uZGme3gqzIzo0fnA==
-X-Google-Smtp-Source: APXvYqySPumFNhopAPYGC15MPGIArCyZPTxNHDrOzvIS05sQzB3K6V0ONQNSBkwxEqwhUwPDGPzbe+ihHmJf7b4poBs=
-X-Received: by 2002:aca:4b86:: with SMTP id y128mr4033788oia.163.1566582819479; 
- Fri, 23 Aug 2019 10:53:39 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1i1DoA-0008TE-KB
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:57:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50270)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i1DoA-0008Sw-FD
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:57:06 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C67B019CF8E
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 17:57:05 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-244.ams2.redhat.com
+ [10.36.117.244])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D35611C92A;
+ Fri, 23 Aug 2019 17:56:59 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com,
+	vgoyal@redhat.com
+Date: Fri, 23 Aug 2019 18:56:55 +0100
+Message-Id: <20190823175657.12085-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-32-richard.henderson@linaro.org>
-In-Reply-To: <20190819213755.26175-32-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Aug 2019 18:53:28 +0100
-Message-ID: <CAFEAcA-Fbey3iz8Vev-hjRxmv0W61h+82BoVQfoo4k0gZikuMA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v2 31/68] target/arm: Convert B, BL,
- BLX (immediate)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 23 Aug 2019 17:57:05 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 0/2] Add virtio-fs (experimental)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,24 +67,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: virtio-fs@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Aug 2019 at 22:38, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate.c       | 133 +++++++++++++++--------------------
->  target/arm/a32-uncond.decode |   8 +++
->  target/arm/a32.decode        |   8 +++
->  target/arm/t32.decode        |  81 ++++++++++++---------
->  4 files changed, 123 insertions(+), 107 deletions(-)
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Hi,
+  This pair of patches adds the core of the virtio-fs support to qemu;
+it's marked experimental since the kernel patch and spec changes aren't
+in yet; but they're bubbling along.
 
-thanks
--- PMM
+  While the spec change is still in progress; the ID number is already
+reserved.
+
+  A future set of patches will add the optional DAX mapping support.
+
+  The actual qemu change is pretty minimal, since it's really only
+a virtio device with some queues.
+
+Some links:
+  Mailing list: https://www.redhat.com/mailman/listinfo/virtio-fs
+  Dev tree: Including filesystem daemon: https://gitlab.com/virtio-fs/qem=
+u
+  kernel: https://gitlab.com/virtio-fs/linux
+  virtio spec changes: https://lists.oasis-open.org/archives/virtio-dev/2=
+01908/msg00104.html
+
+v2:
+  Renamed num_queues to num_request_queues
+  Add a not-reached assert to vuf_handle_output
+  Kill the one bit of notification queue off
+  Use the same trick as vhost-user-scsi to calculate the number
+    of vectors for the PCI device
+
+Dr. David Alan Gilbert (2):
+  virtio: add vhost-user-fs base device
+  virtio: add vhost-user-fs-pci device
+
+ configure                                   |  13 +
+ hw/virtio/Makefile.objs                     |   2 +
+ hw/virtio/vhost-user-fs-pci.c               |  85 ++++++
+ hw/virtio/vhost-user-fs.c                   | 297 ++++++++++++++++++++
+ include/hw/virtio/vhost-user-fs.h           |  45 +++
+ include/standard-headers/linux/virtio_fs.h  |  41 +++
+ include/standard-headers/linux/virtio_ids.h |   1 +
+ 7 files changed, 484 insertions(+)
+ create mode 100644 hw/virtio/vhost-user-fs-pci.c
+ create mode 100644 hw/virtio/vhost-user-fs.c
+ create mode 100644 include/hw/virtio/vhost-user-fs.h
+ create mode 100644 include/standard-headers/linux/virtio_fs.h
+
+--=20
+2.21.0
+
 
