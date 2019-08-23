@@ -2,79 +2,96 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D145C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B55C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D222521848
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:50:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E9ljkotw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D222521848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B901A21019
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:54:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B901A21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1DhN-0005mt-Qr
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:50:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60881)
+	id 1i1Dlx-0007wW-VC
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:54:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i1DcU-0001UJ-QG
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:45:06 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i1Dkn-0006rx-Oe
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:53:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i1DcR-00035s-4p
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:45:02 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:34936)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i1DcQ-000323-Qa; Fri, 23 Aug 2019 13:44:59 -0400
-Received: by mail-lj1-x241.google.com with SMTP id l14so9637733lje.2;
- Fri, 23 Aug 2019 10:44:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5h395QyvsypISitue18ufYU4FtEvsgcX0U8BKXBDgRg=;
- b=E9ljkotwZEcfQtlIwv7E6khqDaPPsNwcuXDc/3ojCt0/F+x0ZZm5eqvB2OCnJKrTRq
- mlWQsB+bgZHvz1ShIbUeP+li8zgjlYKFwTQaNkqwHzSlx0lJeMIL5j2fEApd8qPCkX1z
- 4/q/3FIF8CXi4v2iLpeWQRpJh3zhvS6wL5XJ6GWm4Y77vFbYClXaB+LfbTXAkLNH5Gy1
- dYc34YEUdji5hpqvZSNedP3WUhYfywHUQqVrYxZcJzKLtJx0K4VVi6ZJaXLBvHi9Nfo8
- 1ARIG0GbOnEOADRe7m9FOMzBqR0X47J8Os95K6P+YuRml54bB58pjeOqmPD5NnYezsMY
- DUNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5h395QyvsypISitue18ufYU4FtEvsgcX0U8BKXBDgRg=;
- b=MPScLCgYgtj9nGZlBtDxTtCOSwSJ6QjwpRsW9qYAYw9odlef1W1uKwTxC4m5KUZ6zC
- 6baH95YLyE2CnzEDr2Ss4QpIdU39lJ1xHNZkb1gsszAnkA+U8JmNVo9H0ilyagotZX4T
- d54KRelZXfOIwQ2DdvV4prH8vezikWCAB3GLpqxyjP+St8KHEMXfky3HW6WkdVyIJt+6
- R8WFKxC25thYdtjf8FLKM2H1tNplvqal10ciKVZl4H47VDBVfq8F0YHa69EaeYRio7qR
- Eaw23mf0CVWl83RXK2CiCIrNbsjwDuMBgfQz/G+7iYItTclSfzIfmzMItB0BIScdAI+O
- lz+A==
-X-Gm-Message-State: APjAAAW++wsZEBdlVs5PNzlvAAwRerbxH0t3sjyrFi4tVnaE4QHErlgv
- HSlxIcWtXLJsRb+cA5F1R+zWrUJHhqdTpySK0jM=
-X-Google-Smtp-Source: APXvYqzGrzOBLHNJC5nMwaTmWIqLXx46jlQnMAcvd8nXOv52SFuCqVQfOLWH32/0q0DVwXSqNfL+u2P/DMz92LOX2EQ=
-X-Received: by 2002:a2e:8102:: with SMTP id d2mr3712371ljg.58.1566582297673;
- Fri, 23 Aug 2019 10:44:57 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1i1Dkm-0006oy-Ow
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:53:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32870)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i1Dkk-0006nM-F6; Fri, 23 Aug 2019 13:53:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C48C4898107;
+ Fri, 23 Aug 2019 17:53:32 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-96.brq.redhat.com
+ [10.40.204.96])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 65A531001947;
+ Fri, 23 Aug 2019 17:53:31 +0000 (UTC)
+To: Nir Soffer <nsoffer@redhat.com>
+References: <20190816212122.8816-1-nsoffer@redhat.com>
+ <86c147ef-9dd3-d35a-5005-ec53081196d7@redhat.com>
+ <CAMRbyyt3Ku0Znpfx16FDqFTYbp5oJ1-9DnyxntHnArHsbR1ing@mail.gmail.com>
+ <271a2dd3-9f2b-013d-896f-f4059c804967@redhat.com>
+ <CAMRbyytxF8r9LoX4J_7ca2QPRtnpWgdTtyaKq=p=7ZaoMu-uug@mail.gmail.com>
+ <e8db1edb-b1ee-8244-c772-8e08794181f0@redhat.com>
+ <CAMRbyytObKSo+spkrQsTurybGJEndDTWP4UJgieP0nVw=CLmag@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5a6cabf2-a284-9f63-da0e-96af26f8e0cd@redhat.com>
+Date: Fri, 23 Aug 2019 19:53:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 23 Aug 2019 10:40:51 -0700
-Message-ID: <CAKmqyKMSBWrMOMgE5B6_mRro2M78qJgHNi9qEJbSVgcEiLW1iA@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v5 00/30] riscv: sifive_u: Improve the
- emulation fidelity of sifive_u machine
+In-Reply-To: <CAMRbyytObKSo+spkrQsTurybGJEndDTWP4UJgieP0nVw=CLmag@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="jPjcCvJ0BydNzknVNd4HI3ZB0zpIkcRlo"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Fri, 23 Aug 2019 17:53:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] block: posix: Always allocate the first
+ block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,162 +103,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Nir Soffer <nirsof@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 22, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> As of today, the QEMU 'sifive_u' machine is a special target that does
-> not boot the upstream OpenSBI/U-Boot firmware images built for the real
-> SiFive HiFive Unleashed board. Hence OpenSBI supports a special platform
-> "qemu/sifive_u". For U-Boot, the sifive_fu540_defconfig is referenced
-> in the OpenSBI doc as its payload, but that does not boot at all due
-> to various issues in current QEMU 'sifive_u' machine codes.
->
-> This series aims to improve the emulation fidelity of sifive_u machine,
-> so that the upstream OpenSBI, U-Boot and kernel images built for the
-> SiFive HiFive Unleashed board can be used out of the box without any
-> special hack.
->
-> The major changes include:
-> - Heterogeneous harts creation supported, so that we can create a CPU
->   that exactly mirrors the real hardware: 1 E51 + 4 U54.
-> - Implemented a PRCI model for FU540
-> - Implemented an OTP model for FU540, primarily used for storing serial
->   number of the board
-> - Fixed GEM support that was seriously broken on sifive_u
-> - Synced device tree with upstream Linux kernel on sifive_u
->
-> OpenSBI v0.4 image built for sifive/fu540 is included as the default
-> bios image for 'sifive_u' machine.
->
-> The series is tested against OpenSBI v0.4 image for sifive/fu540
-> paltform, U-Boot v2019.10-rc1 image for sifive_fu540_defconfig,
-> and Linux kernel v5.3-rc3 image with the following patch:
->
-> macb: Update compatibility string for SiFive FU540-C000 [1]
->
-> OpenSBI + U-Boot, ping/tftpboot with U-Boot MACB driver works well.
-> Boot Linux 64-bit defconfig image, verified that system console on
-> the serial 0 and ping host work pretty well.
->
-> An OpenSBI patch [2] was sent to drop the special "qemu/sifive_u" platform
-> support in OpenSBI. The original plan was to get the drop patch applied
-> after this QEMU series is merged. However after discussion in the OpenSBI
-> mailing list, it seems the best option for us is to let OpenSBI continue
-> shipping the special "qemu/sifive_u" platform support to work with QEMU
-> version <= 4.1 and deprecate the support sometime in the future. A patch
-> will need to be sent to OpenSBI mailing list to update its document.
->
-> v4 is now rebased on Palmer's QEMU RISC-V repo "for-master" branch.
-> Dropped the following v3 patch that was already done by someone else.
-> - riscv: sifive_u: Generate an aliases node in the device tree
-> - riscv: sifive_u: Support loading initramfs
->
-> The following v3 patch was dropped too due to a different cluster approach
-> suggested by Richard Henderson is used in v4:
-> - riscv: hart: Support heterogeneous harts population
->
-> [1]: https://patchwork.kernel.org/patch/11050003/
-> [2]: http://lists.infradead.org/pipermail/opensbi/2019-August/000335.html
->
-> Changes in v5:
-> - new patch to change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
->   in various sifive models
-> - new patch to remove the unnecessary include of target/riscv/cpu.h
-> - change to use defines instead of enums
-> - change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_prci
-> - creating a 32-bit val variable and using that instead of casting
->   everywhere in sifive_u_prci_write()
-> - move all register initialization to sifive_u_prci_reset() function
-> - drop sifive_u_prci_create()
-> - s/codes that worked/code that works/g
-> - create sifive_u_prci block directly in the machine codes, instead
->   of calling sifive_u_prci_create()
-> - change to use defines instead of enums
-> - change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_otp
-> - creating a 32-bit val variable and using that instead of casting
->   everywhere in sifive_u_otp_write()
-> - move all register initialization to sifive_u_otp_reset() function
-> - drop sifive_u_otp_create()
-> - create sifive_u_otp block directly in the machine codes, instead
->   of calling sifive_u_otp_create()
-> - add the missing "local-mac-address" property in the ethernet node
->
-> Changes in v4:
-> - remove 2 more "linux,phandle" instances in sifive_u.c and spike.c
->   after rebasing on Palmer's QEMU RISC-V tree
-> - change create_fdt() to return void in sifive_u.c too, after rebasing
->   on Palmer's QEMU RISC-V tree
-> - new patch to remove executable attribute of opensbi images
-> - prefix all macros/variables/functions with SIFIVE_E/sifive_e
->   in the sifive_e_prci driver
-> - new patch to add a "hartid-base" property to RISC-V hart array
-> - changed to create clusters for each cpu type
-> - prefix all macros/variables/functions with SIFIVE_U/sifive_u
->   in the sifive_u_prci driver
-> - prefix all macros/variables/functions with SIFIVE_U/sifive_u
->   in the sifive_u_otp driver
-> - new patch to remove handcrafted clock nodes for UART and ethernet
->
-> Changes in v3:
-> - changed to use macros for management and compute cpu count
-> - use management cpu count + 1 for the min_cpus
-> - update IRQ numbers of both UARTs to match hardware as well
->
-> Changes in v2:
-> - keep the PLIC compatible string unchanged as OpenSBI uses that
->   for DT fix up
-> - drop patch "riscv: sifive: Move sifive_mmio_emulate() to a common place"
-> - new patch "riscv: sifive_e: Drop sifive_mmio_emulate()"
-> - fixed the "interrupts-extended" property size
-> - update the file header to indicate at least 2 harts are created
-> - use create_unimplemented_device() to create the GEM management
->   block instead of sifive_mmio_emulate()
-> - add "phy-handle" property to the ethernet node
->
-> Bin Meng (30):
->   riscv: hw: Remove superfluous "linux,phandle" property
->   riscv: hw: Use qemu_fdt_setprop_cell() for property with only 1 cell
->   riscv: hw: Remove not needed PLIC properties in device tree
->   riscv: hw: Change create_fdt() to return void
->   riscv: hw: Change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
->   riscv: hw: Remove the unnecessary include of target/riscv/cpu.h
->   riscv: roms: Remove executable attribute of opensbi images
->   riscv: sifive_u: Remove the unnecessary include of prci header
->   riscv: sifive: Rename sifive_prci.{c,h} to sifive_e_prci.{c,h}
->   riscv: sifive_e: prci: Fix a typo of hfxosccfg register programming
->   riscv: sifive_e: prci: Update the PRCI register block size
->   riscv: sifive_e: Drop sifive_mmio_emulate()
->   riscv: Add a sifive_cpu.h to include both E and U cpu type defines
->   riscv: hart: Extract hart realize to a separate routine
->   riscv: hart: Add a "hartid-base" property to RISC-V hart array
->   riscv: sifive_u: Update hart configuration to reflect the real FU540
->     SoC
->   riscv: sifive_u: Set the minimum number of cpus to 2
->   riscv: sifive_u: Update PLIC hart topology configuration string
->   riscv: sifive: Implement PRCI model for FU540
->   riscv: sifive_u: Generate hfclk and rtcclk nodes
->   riscv: sifive_u: Add PRCI block to the SoC
->   riscv: sifive_u: Reference PRCI clocks in UART and ethernet nodes
->   riscv: sifive_u: Update UART base addresses and IRQs
->   riscv: sifive_u: Change UART node name in device tree
->   riscv: roms: Update default bios for sifive_u machine
->   riscv: sifive: Implement a model for SiFive FU540 OTP
->   riscv: sifive_u: Instantiate OTP memory with a serial number
->   riscv: sifive_u: Fix broken GEM support
->   riscv: sifive_u: Remove handcrafted clock nodes for UART and ethernet
->   riscv: sifive_u: Update model and compatible strings in device tree
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jPjcCvJ0BydNzknVNd4HI3ZB0zpIkcRlo
+Content-Type: multipart/mixed; boundary="cJpxcVdjZW8Mq9qHOqC5aPZsSfVYrdmFJ";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: Nir Soffer <nirsof@gmail.com>, qemu-block <qemu-block@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <5a6cabf2-a284-9f63-da0e-96af26f8e0cd@redhat.com>
+Subject: Re: [PATCH] block: posix: Always allocate the first block
+References: <20190816212122.8816-1-nsoffer@redhat.com>
+ <86c147ef-9dd3-d35a-5005-ec53081196d7@redhat.com>
+ <CAMRbyyt3Ku0Znpfx16FDqFTYbp5oJ1-9DnyxntHnArHsbR1ing@mail.gmail.com>
+ <271a2dd3-9f2b-013d-896f-f4059c804967@redhat.com>
+ <CAMRbyytxF8r9LoX4J_7ca2QPRtnpWgdTtyaKq=p=7ZaoMu-uug@mail.gmail.com>
+ <e8db1edb-b1ee-8244-c772-8e08794181f0@redhat.com>
+ <CAMRbyytObKSo+spkrQsTurybGJEndDTWP4UJgieP0nVw=CLmag@mail.gmail.com>
+In-Reply-To: <CAMRbyytObKSo+spkrQsTurybGJEndDTWP4UJgieP0nVw=CLmag@mail.gmail.com>
 
-@Palmer, patches 1 - 11 are all reviewed and are good to go in. Can
-you take them in your next PR?
+--cJpxcVdjZW8Mq9qHOqC5aPZsSfVYrdmFJ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-That'll save Bin from continuing to send a 30 patch series :)
+On 23.08.19 18:48, Nir Soffer wrote:
+> On Fri, Aug 23, 2019 at 4:58 PM Max Reitz <mreitz@redhat.com
+> <mailto:mreitz@redhat.com>> wrote:
 
-Alistair
+[...]
+
+>     If you have a format layer that truncates the image to a fixed size=
+ and
+>     does not write anything into the first block itself (say because it=
+ uses
+>     a footer), then (with O_DIRECT) allocate_first_block() will fail
+>     (silently, because while it does return an error value, it is never=
+
+>     checked and there is no comment that explains why we don=E2=80=99t =
+check it)
+>=20
+>=20
+> The motivation is that this is an optimization for the special case of =
+using
+> empty image, so it does not worth failing image creation.
+> I will add a comment about that.
+
+Thanks!
+
+[...]
+
+> Thanks for the example.
+>=20
+> I will need time to play with blockdev and understand the flows when im=
+age
+> are created. Do you think is would be useful to fix now only image crea=
+tion
+> via qemu-img, and handle blockdev later?
+
+Well, it isn=E2=80=99t about blockdev, it=E2=80=99s simply about the fact=
+ that this
+function doesn=E2=80=99t work for O_DIRECT files.  I showed how to reprod=
+uce the
+issue without blockdev (namely block_resize).  Sure, that is an edge
+case, but it is a completely valid case.
+
+Also, it seems to me the fix is rather simple.  Just something like:
+
+static int allocate_first_block(int fd, int64_t max_size)
+{
+    int write_size =3D MIN(max_size, MAX_BLOCKSIZE);
+    void *buf;
+    ssize_t n;
+
+    /* Round down to power of two */
+    assert(write_size > 0);
+    write_size =3D 1 << (31 - clz32(write_size));
+
+    buf =3D qemu_memalign(MAX(getpagesize(), write_size), write_size);
+    memset(buf, 0, write_size);
+
+    do {
+        n =3D pwrite(fd, buf, write_size, 0);
+    } while (n < 0 && errno =3D=3D EINTR);
+
+    qemu_vfree(buf);
+
+    return n < 0 ? -errno : 0;
+}
+
+Wouldn=E2=80=99t that work?
+
+Max
+
+
+--cJpxcVdjZW8Mq9qHOqC5aPZsSfVYrdmFJ--
+
+--jPjcCvJ0BydNzknVNd4HI3ZB0zpIkcRlo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1gKBkACgkQ9AfbAGHV
+z0Dtcwf/RxNkfuXZ2/43zlmj62xiTZRq/VQfQFzEUTFyCXbOGi6yqdAorLIUFQaR
+8tEoV8WisGG0NNuZkr1y4jAGszKrZlwVBAV2HEt0OHv+CkCn9zYIfnhHkeJqvlSr
+8iRvICovRbUS3vATmtxkbJm1A5o2Nw4gFp4+2/7PbcaxoZdzJoXWMMPWrLoxZurn
+BOvbzDM1l4vB2PkY+YrhntxbA3EWlD0MsrXS/3x2wuTUXmV+M/IjbP3YtQSnfOjF
+1RuerbaAZjEFt0BTK78QL0yy2FPZvO3XpgfEu/rfvIK3K7z+IUG2rscPbI/3mhiN
+VC3RQXUKNB83xCjbC+yA281oNC7ejw==
+=tcWV
+-----END PGP SIGNATURE-----
+
+--jPjcCvJ0BydNzknVNd4HI3ZB0zpIkcRlo--
 
