@@ -2,87 +2,66 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF79C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 20:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 334B6C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 20:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE1942173E
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 20:06:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE1942173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E376521874
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 20:09:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E376521874
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1FpL-00047a-6m
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 16:06:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53802)
+	id 1i1Fs1-0005Vm-5i
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 16:09:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1i1FoW-0003U6-KC
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 16:05:38 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i1FrB-0004q4-I2
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 16:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1i1FoT-0007fj-SP
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 16:05:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56414)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i1FoT-0007ex-Dn
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 16:05:33 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EF5A5C0578F8
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 20:05:31 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id j10so5326465wrb.16
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 13:05:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6INyOI/wxTun7F4Qw0IuDR6D8pAn858522st8g+1P2E=;
- b=p0vLowNM+aVq6WCEy79vztL/y2tL6BjFhTX2kBBmI1ZHMAOTGkZ7eGG+fF+2IxopBv
- InIHhyz7VLrSuzMTzat13XNCt6hQQsWHKMfy/gNgtidPEPpYUBfhVOKlF1tuvDoPxfKQ
- f0GztO+1Rl/Y3doNDZsRq0oRDujezHtlxZooTy1bVCLSFiBvSbzvVIlvHPtqL+UK50IU
- 4+SkHfJBx3UTOGMpVXqFh7DgS3clONgpf3+RbCm9V1TiPT1y7s4nQvLzkwqnhSFLkEHt
- eEj27HA+euKTV+BINlrC9btzmZqIk2BfJozUP6XQhKkDXoBeHdIK64lgnV5LR4uK3wz7
- AQjw==
-X-Gm-Message-State: APjAAAXVrBet4cnrf5aSrqfIT4i/DHF16N7iH+GdsiaQb6DY1VbB/j+U
- kqPSI3H9XoTh+ThZyR8eZIo5m3aBrcswah0gzlNHxkMLBwb/XpBonJjiDwCDvCpBFeVWB9NxlHr
- 3cgd0/dS8orpiYes=
-X-Received: by 2002:a1c:200a:: with SMTP id g10mr6761857wmg.160.1566590730083; 
- Fri, 23 Aug 2019 13:05:30 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxZTSxyl8YmqQeDsK5KGS/6VI8WilK7dYiSFBxTU65HSV3TkfouTxkVKmaeCJQQmCfpJCijmA==
-X-Received: by 2002:a1c:200a:: with SMTP id g10mr6761834wmg.160.1566590729733; 
- Fri, 23 Aug 2019 13:05:29 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4566:f1b0:32e7:463f?
- ([2001:b07:6468:f312:4566:f1b0:32e7:463f])
- by smtp.gmail.com with ESMTPSA id c9sm2598670wrv.40.2019.08.23.13.05.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 23 Aug 2019 13:05:29 -0700 (PDT)
-To: Tony Nguyen <tony.nguyen@bt.com>, qemu-devel@nongnu.org
-References: <cover.1566467963.git.tony.nguyen@bt.com>
- <80a7e5f67a8c042a7311a621a2c31ac6c20a8e1e.1566467963.git.tony.nguyen@bt.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9a8024dc-3c91-dfae-3ee1-2fdc908e82eb@redhat.com>
-Date: Fri, 23 Aug 2019 22:05:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <no-reply@patchew.org>) id 1i1Fr9-0000cZ-FM
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 16:08:21 -0400
+Resent-Date: Fri, 23 Aug 2019 16:08:21 -0400
+Resent-Message-Id: <E1i1Fr9-0000cZ-FM@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21446)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i1Fr9-0000bd-7a; Fri, 23 Aug 2019 16:08:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1566590885; cv=none; d=zoho.com; s=zohoarc; 
+ b=oY47msFeeSDqQK2tTzNGlUsrXX7N3Gy63H+fwIhKXIGM8iRE+OPtANDSqIB+QkXlpoqnU61jnHtvs7By76E6M80NtmiPX8obZtKBcRsZJqQ1pahJ8CDRRcB/XoHUNNRx0lSpwf0Fr0F/BnJh+f9O6Pwfswn9E+zPJKJBLSEG7JQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1566590885;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=iHoCAeavFXWwZ0wo0TFW9sNJyp6BnLV9gD3A7P6Z9MQ=; 
+ b=GIXr8F+ApAxU6gHtxcc5CfAZ7rk7m7XCpYESOJcp+W1pVb+G51OsYqqsXsiTynTFCp0ukBWiSl7eZw01vyZWQgdFoK3QfvhHcBEomgWg5BzaFs6nqaelgH9K75Fbln+JsdVsnzOIq6yKAZeLdpc5DfVeykANvOr1ETAvSFojiaQ=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156659088311984.63575600597619;
+ Fri, 23 Aug 2019 13:08:03 -0700 (PDT)
+In-Reply-To: <20190823194927.23278-1-dmitry.fomichev@wdc.com>
+Message-ID: <156659088141.8645.12708882616899213838@5dec9699b7de>
 MIME-Version: 1.0
-In-Reply-To: <80a7e5f67a8c042a7311a621a2c31ac6c20a8e1e.1566467963.git.tony.nguyen@bt.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: dmitry.fomichev@wdc.com
+Date: Fri, 23 Aug 2019 13:08:03 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 17/17] build: Correct non-common
- common-obj-* to obj-*
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v5 0/4] virtio/block: handle zoned backing
+ devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,325 +73,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mst@redhat.com,
+ dmitry.fomichev@wdc.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ alistair.francis@wdc.com, stefanha@redhat.com, pbonzini@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for splitting this.  The good news is that most of these devices
-actually need _not_ be target-endian.  Comments are inline.
-
-Paolo
-
-On 23/08/19 20:56, Tony Nguyen wrote:
-> diff --git a/hw/audio/Makefile.objs b/hw/audio/Makefile.objs
-> index 63db383709..13133b412d 100644
-> --- a/hw/audio/Makefile.objs
-> +++ b/hw/audio/Makefile.objs
-> @@ -5,7 +5,8 @@ common-obj-$(CONFIG_AC97) += ac97.o
->  common-obj-$(CONFIG_ADLIB) += fmopl.o adlib.o
->  common-obj-$(CONFIG_GUS) += gus.o gusemu_hal.o gusemu_mixer.o
->  common-obj-$(CONFIG_CS4231A) += cs4231a.o
-> -common-obj-$(CONFIG_HDA) += intel-hda.o hda-codec.o
-> +common-obj-$(CONFIG_HDA) += hda-codec.o
-> +obj-$(CONFIG_HDA) += intel-hda.o
-
-These are certainly little endian, since they are PCI devices.
-
->  common-obj-$(CONFIG_PCSPK) += pcspk.o
->  common-obj-$(CONFIG_WM8750) += wm8750.o
-> diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-> index f5f643f0cc..04ed4d7722 100644
-> --- a/hw/block/Makefile.objs
-> +++ b/hw/block/Makefile.objs
-> @@ -1,9 +1,9 @@
->  common-obj-y += block.o cdrom.o hd-geometry.o
-> -common-obj-$(CONFIG_FDC) += fdc.o
-> +obj-$(CONFIG_FDC) += fdc.o
-
-fdctrl_mem_ops and sysbus_fdc_info are not used AFAICT and
-fdctrl_mem_strict_ops is min/max size=1 so it can be made host-endian.
-
->  common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
->  common-obj-$(CONFIG_NAND) += nand.o
-> -common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
-> -common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
-> +obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
-> +obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
->  common-obj-$(CONFIG_XEN) += xen-block.o
->  common-obj-$(CONFIG_ECC) += ecc.o
->  common-obj-$(CONFIG_ONENAND) += onenand.o
-> diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-> index 02d8a66925..215c02b752 100644
-> --- a/hw/char/Makefile.objs
-> +++ b/hw/char/Makefile.objs
-> @@ -1,7 +1,6 @@
->  common-obj-$(CONFIG_IPACK) += ipoctal232.o
->  common-obj-$(CONFIG_ESCC) += escc.o
->  common-obj-$(CONFIG_NRF51_SOC) += nrf51_uart.o
-> -common-obj-$(CONFIG_PARALLEL) += parallel.o
->  common-obj-$(CONFIG_ISA_BUS) += parallel-isa.o
->  common-obj-$(CONFIG_PL011) += pl011.o
->  common-obj-$(CONFIG_SERIAL) += serial.o
-> @@ -9,7 +8,6 @@ common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
->  common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
->  common-obj-$(CONFIG_SERIAL_PCI_MULTI) += serial-pci-multi.o
->  common-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-console.o
-> -common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
->  common-obj-$(CONFIG_XEN) += xen_console.o
->  common-obj-$(CONFIG_CADENCE) += cadence_uart.o
->  
-> @@ -21,6 +19,8 @@ obj-$(CONFIG_PSERIES) += spapr_vty.o
->  obj-$(CONFIG_DIGIC) += digic-uart.o
->  obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
->  obj-$(CONFIG_RASPI) += bcm2835_aux.o
-> +obj-$(CONFIG_PARALLEL) += parallel.o
-> +obj-$(CONFIG_XILINX) += xilinx_uartlite.o
->  
->  common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
->  common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index b49f880a0c..6ee184a6c4 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -9,7 +9,7 @@ common-obj-y += hotplug.o
->  common-obj-$(CONFIG_SOFTMMU) += nmi.o
->  common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
->  
-> -common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
-> +obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
-
-Bit bucket, just make it host endian.
-
->  common-obj-$(CONFIG_XILINX_AXI) += stream.o
->  common-obj-$(CONFIG_PTIMER) += ptimer.o
->  common-obj-$(CONFIG_SOFTMMU) += sysbus.o
-> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-> index a64998fc7b..facc1d4448 100644
-> --- a/hw/display/Makefile.objs
-> +++ b/hw/display/Makefile.objs
-> @@ -8,7 +8,7 @@ common-obj-$(CONFIG_ADS7846) += ads7846.o
->  common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
->  common-obj-$(call land,$(CONFIG_VGA_CIRRUS),$(CONFIG_VGA_ISA))+=cirrus_vga_isa.o
->  common-obj-$(CONFIG_G364FB) += g364fb.o
-> -common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
-> +obj-$(CONFIG_JAZZ_LED) += jazz_led.o
-
-min/max size is 1, make it host endian.
-
->  common-obj-$(CONFIG_PL110) += pl110.o
->  common-obj-$(CONFIG_SII9022) += sii9022.o
->  common-obj-$(CONFIG_SSD0303) += ssd0303.o
-> @@ -17,12 +17,12 @@ common-obj-$(CONFIG_XEN) += xenfb.o
->  
->  common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
->  common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
-> -common-obj-$(CONFIG_VGA_ISA_MM) += vga-isa-mm.o
-> +obj-$(CONFIG_VGA_ISA_MM) += vga-isa-mm.o
->  common-obj-$(CONFIG_VMWARE_VGA) += vmware_vga.o
->  common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
->  
->  common-obj-$(CONFIG_BLIZZARD) += blizzard.o
-> -common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
-> +obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
-
-ARM-only, can be little endian.
-
->  common-obj-$(CONFIG_FRAMEBUFFER) += framebuffer.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
->  common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
-> diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-> index b672e7a522..5b45c8b9a3 100644
-> --- a/hw/dma/Makefile.objs
-> +++ b/hw/dma/Makefile.objs
-> @@ -1,10 +1,10 @@
->  common-obj-$(CONFIG_PUV3) += puv3_dma.o
-> -common-obj-$(CONFIG_RC4030) += rc4030.o
-> +obj-$(CONFIG_RC4030) += rc4030.o
->  common-obj-$(CONFIG_PL080) += pl080.o
->  common-obj-$(CONFIG_PL330) += pl330.o
->  common-obj-$(CONFIG_I82374) += i82374.o
-> -common-obj-$(CONFIG_I8257) += i8257.o
-> -common-obj-$(CONFIG_XILINX_AXI) += xilinx_axidma.o
-> +obj-$(CONFIG_I8257) += i8257.o
-
-min/max size is 1, can be host endian.
-
-> +obj-$(CONFIG_XILINX_AXI) += xilinx_axidma.o
->  common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
->  common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
->  common-obj-$(CONFIG_STP2000) += sparc32_dma.o
-> diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-> index e5da0cb54f..319928805b 100644
-> --- a/hw/gpio/Makefile.objs
-> +++ b/hw/gpio/Makefile.objs
-> @@ -1,6 +1,6 @@
->  common-obj-$(CONFIG_MAX7310) += max7310.o
->  common-obj-$(CONFIG_PL061) += pl061.o
-> -common-obj-$(CONFIG_PUV3) += puv3_gpio.o
-> +obj-$(CONFIG_PUV3) += puv3_gpio.o
-
-Only for unicore32; little endian.
-
->  common-obj-$(CONFIG_ZAURUS) += zaurus.o
->  common-obj-$(CONFIG_E500) += mpc8xxx.o
->  common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
-> diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-> index d7073a401f..f02694927b 100644
-> --- a/hw/i2c/Makefile.objs
-> +++ b/hw/i2c/Makefile.objs
-> @@ -4,7 +4,7 @@ common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
->  common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
->  common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
->  common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
-> -common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
-> +obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
-
-ARM -> little endian.
-
->  common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
->  common-obj-$(CONFIG_ASPEED_SOC) += aspeed_i2c.o
->  common-obj-$(CONFIG_NRF51_SOC) += microbit_i2c.o
-> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-> index f726d87532..f6336bee4c 100644
-> --- a/hw/intc/Makefile.objs
-> +++ b/hw/intc/Makefile.objs
-> @@ -2,14 +2,14 @@ common-obj-$(CONFIG_HEATHROW_PIC) += heathrow_pic.o
->  common-obj-$(CONFIG_I8259) += i8259_common.o i8259.o
->  common-obj-$(CONFIG_PL190) += pl190.o
->  common-obj-$(CONFIG_PUV3) += puv3_intc.o
-> -common-obj-$(CONFIG_XILINX) += xilinx_intc.o
-> +obj-$(CONFIG_XILINX) += xilinx_intc.o
->  common-obj-$(CONFIG_XLNX_ZYNQMP_PMU) += xlnx-pmu-iomod-intc.o
->  common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-ipi.o
->  common-obj-$(CONFIG_ETRAXFS) += etraxfs_pic.o
->  common-obj-$(CONFIG_IMX) += imx_avic.o imx_gpcv2.o
->  common-obj-$(CONFIG_LM32) += lm32_pic.o
->  common-obj-$(CONFIG_REALVIEW) += realview_gic.o
-> -common-obj-$(CONFIG_SLAVIO) += slavio_intctl.o
-> +obj-$(CONFIG_SLAVIO) += slavio_intctl.o
-
-SPARC only -> big endian.
-
->  common-obj-$(CONFIG_IOAPIC) += ioapic_common.o
->  common-obj-$(CONFIG_ARM_GIC) += arm_gic_common.o
->  common-obj-$(CONFIG_ARM_GIC) += arm_gic.o
-> @@ -18,7 +18,7 @@ common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_common.o
->  common-obj-$(CONFIG_ARM_GIC) += arm_gicv3.o
->  common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_dist.o
->  common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_redist.o
-> -common-obj-$(CONFIG_ARM_GIC) += arm_gicv3_its_common.o
-> +obj-$(CONFIG_ARM_GIC) += arm_gicv3_its_common.o
-
-ARM only -> little endian.
-
->  common-obj-$(CONFIG_OPENPIC) += openpic.o
->  common-obj-y += intc.o
->  
-> diff --git a/hw/ipack/Makefile.objs b/hw/ipack/Makefile.objs
-> index 8b9bdcb549..a7c5485a46 100644
-> --- a/hw/ipack/Makefile.objs
-> +++ b/hw/ipack/Makefile.objs
-> @@ -1,2 +1,2 @@
->  common-obj-$(CONFIG_IPACK) += ipack.o
-> -common-obj-$(CONFIG_IPACK) += tpci200.o
-> +obj-$(CONFIG_IPACK) += tpci200.o
-
-PCI -> little endian.
-
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index e4aad707fb..0781a56319 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -common-obj-$(CONFIG_APPLESMC) += applesmc.o
-> +ommon-obj-$(CONFIG_APPLESMC) += applesmc.o
-
-Careful, typo.  The device can be host endian (min/max size = 1).
-
->  common-obj-$(CONFIG_MAX111X) += max111x.o
->  common-obj-$(CONFIG_TMP105) += tmp105.o
->  common-obj-$(CONFIG_TMP421) += tmp421.o
-> @@ -6,20 +6,20 @@ common-obj-$(CONFIG_ISA_DEBUG) += debugexit.o
->  common-obj-$(CONFIG_SGA) += sga.o
->  common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
->  common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
-> -common-obj-$(CONFIG_EDU) += edu.o
-> +obj-$(CONFIG_EDU) += edu.o
-
-PCI -> little endian.
-
->  common-obj-$(CONFIG_PCA9552) += pca9552.o
->  
-> -common-obj-$(CONFIG_UNIMP) += unimp.o
-> +obj-$(CONFIG_UNIMP) += unimp.o
-
-Bit bucket -> host endian.
-
->  common-obj-$(CONFIG_FW_CFG_DMA) += vmcoreinfo.o
->  
->  # ARM devices
->  common-obj-$(CONFIG_PL310) += arm_l2x0.o
-> -common-obj-$(CONFIG_INTEGRATOR_DEBUG) += arm_integrator_debug.o
-> +obj-$(CONFIG_INTEGRATOR_DEBUG) += arm_integrator_debug.o
-
-ARM -> little endian.
-
->  common-obj-$(CONFIG_A9SCU) += a9scu.o
->  common-obj-$(CONFIG_ARM11SCU) += arm11scu.o
->  
->  # Mac devices
-> -common-obj-$(CONFIG_MOS6522) += mos6522.o
-> +obj-$(CONFIG_MOS6522) += mos6522.o
-
-min/max size = 1 -> host endian.
->  
->  # PKUnity SoC devices
->  common-obj-$(CONFIG_PUV3) += puv3_pm.o
-> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-> index a9cd3e022d..02f286bd87 100644
-> --- a/hw/pci-host/Makefile.objs
-> +++ b/hw/pci-host/Makefile.objs
-> @@ -12,7 +12,7 @@ common-obj-$(CONFIG_PPCE500_PCI) += ppce500.o
->  common-obj-$(CONFIG_VERSATILE_PCI) += versatile.o
->  
->  common-obj-$(CONFIG_PCI_SABRE) += sabre.o
-> -common-obj-$(CONFIG_FULONG) += bonito.o
-> +obj-$(CONFIG_FULONG) += bonito.o
-
-FULONG is little endian.
-
->  common-obj-$(CONFIG_PCI_PIIX) += piix.o
->  common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
->  common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) += gpex.o
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 123d92c969..b27513fe14 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -12,10 +12,10 @@ ifeq ($(CONFIG_ISA_BUS),y)
->  common-obj-$(CONFIG_M48T59) += m48t59-isa.o
->  endif
->  common-obj-$(CONFIG_PL031) += pl031.o
-> -common-obj-$(CONFIG_PUV3) += puv3_ost.o
-> +obj-$(CONFIG_PUV3) += puv3_ost.o
-
-Unicore32 -> LE.
-
->  common-obj-$(CONFIG_TWL92230) += twl92230.o
-> -common-obj-$(CONFIG_XILINX) += xilinx_timer.o
-> -common-obj-$(CONFIG_SLAVIO) += slavio_timer.o
-> +obj-$(CONFIG_XILINX) += xilinx_timer.o
-> +obj-$(CONFIG_SLAVIO) += slavio_timer.o
-
-SPARC -> BE.
-
->  common-obj-$(CONFIG_ETRAXFS) += etraxfs_timer.o
->  common-obj-$(CONFIG_GRLIB) += grlib_gptimer.o
->  common-obj-$(CONFIG_IMX) += imx_epit.o
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgyMzE5NDkyNy4yMzI3
+OC0xLWRtaXRyeS5mb21pY2hldkB3ZGMuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRD
+SCB2NSAwLzRdIHZpcnRpby9ibG9jazogaGFuZGxlIHpvbmVkIGJhY2tpbmcgZGV2aWNlcwpNZXNz
+YWdlLWlkOiAyMDE5MDgyMzE5NDkyNy4yMzI3OC0xLWRtaXRyeS5mb21pY2hldkB3ZGMuY29tCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
+aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwODIzMTk0
+OTI3LjIzMjc4LTEtZG1pdHJ5LmZvbWljaGV2QHdkYy5jb20gLT4gcGF0Y2hldy8yMDE5MDgyMzE5
+NDkyNy4yMzI3OC0xLWRtaXRyeS5mb21pY2hldkB3ZGMuY29tClN1Ym1vZHVsZSAnY2Fwc3RvbmUn
+IChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvY2Fwc3RvbmUuZ2l0KSByZWdpc3RlcmVkIGZvciBw
+YXRoICdjYXBzdG9uZScKU3VibW9kdWxlICdkdGMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
+ZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpTdWJtb2R1bGUgJ3JvbXMvUWVtdU1h
+Y0RyaXZlcnMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvUWVtdU1hY0RyaXZlcnMuZ2l0KSBy
+ZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJwpTdWJtb2R1bGUgJ3JvbXMv
+U0xPRicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9TTE9GLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
+cGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvZWRrMicgKGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnL2dpdC9lZGsyLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9lZGsyJwpTdWJtb2R1
+bGUgJ3JvbXMvaXB4ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9pcHhlLmdpdCkgcmVnaXN0
+ZXJlZCBmb3IgcGF0aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmJpb3MnIChodHRw
+czovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL29wZW5iaW9zJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmhhY2t3YXJlJyAoaHR0cHM6Ly9naXQu
+cWVtdS5vcmcvZ2l0L29wZW5oYWNrd2FyZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMv
+b3BlbmhhY2t3YXJlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbnNiaScgKGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnL2dpdC9vcGVuc2JpLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuc2JpJwpT
+dWJtb2R1bGUgJ3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3Fl
+bXUtcGFsY29kZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJwpT
+dWJtb2R1bGUgJ3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9z
+LmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcycKU3VibW9kdWxlICdyb21z
+L3NlYWJpb3MtaHBwYScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLWhwcGEuZ2l0
+KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBwYScKU3VibW9kdWxlICdyb21z
+L3NnYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dhYmlvcy5naXQpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdyb21zL3NraWJvb3QnIChodHRw
+czovL2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Jv
+bXMvc2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdCcKU3VibW9k
+dWxlICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJv
+b3Qtc2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBl
+eCcKU3VibW9kdWxlICdzbGlycCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9saWJzbGlycC5n
+aXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3NsaXJwJwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2Jlcmtl
+bGV5LXNvZnRmbG9hdC0zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2JlcmtlbGV5LXNvZnRm
+bG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZs
+b2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnIChodHRwczov
+L2dpdC5xZW11Lm9yZy9naXQvYmVya2VsZXktdGVzdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZv
+ciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXlj
+b2RlbWFwZGInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVn
+aXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25l
+Jy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUnOiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRi
+ODc1MTY2NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicKQ2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1v
+ZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5
+NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdyb21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJt
+b2R1bGUgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVycyc6IGNoZWNrZWQgb3V0ICc5MGM0ODhkNWY0
+YTQwNzM0MjI0N2I5ZWE4NjlkZjFjMmQ5YzhlMjY2JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicu
+Li4KU3VibW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6IGNoZWNrZWQgb3V0ICc3YmZlNTg0ZTMyMTk0
+Njc3MTY5MjcxMWZmODNhZDJiNTg1MGRhY2E3JwpDbG9uaW5nIGludG8gJ3JvbXMvZWRrMicuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMic6IGNoZWNrZWQgb3V0ICcyMGQyZTVhMTI1ZTM0ZmM4
+NTAxMDI2NjEzYTcxNTQ5YjJhMWEzZTU0JwpTdWJtb2R1bGUgJ1NvZnRGbG9hdCcgKGh0dHBzOi8v
+Z2l0aHViLmNvbS91Y2ItYmFyL2JlcmtlbGV5LXNvZnRmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBm
+b3IgcGF0aCAnQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9h
+dC0zJwpTdWJtb2R1bGUgJ0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcgKGh0
+dHBzOi8vZ2l0aHViLmNvbS9vcGVuc3NsL29wZW5zc2wpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ0Ny
+eXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcKQ2xvbmluZyBpbnRvICdBcm1Qa2cv
+TGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL2VkazIvQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5
+LXNvZnRmbG9hdC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVl
+MDU2YjljODgwMzcnCkNsb25pbmcgaW50byAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9v
+cGVuc3NsJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09w
+ZW5zc2xMaWIvb3BlbnNzbCc6IGNoZWNrZWQgb3V0ICc1MGVhYWM5ZjMzMzc2NjcyNTlkZTcyNTQ1
+MWYyMDFlNzg0NTk5Njg3JwpTdWJtb2R1bGUgJ2JvcmluZ3NzbCcgKGh0dHBzOi8vYm9yaW5nc3Ns
+Lmdvb2dsZXNvdXJjZS5jb20vYm9yaW5nc3NsKSByZWdpc3RlcmVkIGZvciBwYXRoICdib3Jpbmdz
+c2wnClN1Ym1vZHVsZSAna3JiNScgKGh0dHBzOi8vZ2l0aHViLmNvbS9rcmI1L2tyYjUpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ2tyYjUnClN1Ym1vZHVsZSAncHljYS5jcnlwdG9ncmFwaHknIChodHRw
+czovL2dpdGh1Yi5jb20vcHljYS9jcnlwdG9ncmFwaHkuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICdweWNhLWNyeXB0b2dyYXBoeScKQ2xvbmluZyBpbnRvICdib3Jpbmdzc2wnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2Jv
+cmluZ3NzbCc6IGNoZWNrZWQgb3V0ICcyMDcwZjhhZDkxNTFkYzhmM2E3M2JmZmFhMTQ2YjVlNjkz
+N2E1ODNmJwpDbG9uaW5nIGludG8gJ2tyYjUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIv
+Q3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2tyYjUnOiBjaGVja2VkIG91dCAn
+YjlhZDZjNDk1MDVjOTZhMDg4MzI2YjYyYTUyNTY4ZTM0ODRmMjE2OCcKQ2xvbmluZyBpbnRvICdw
+eWNhLWNyeXB0b2dyYXBoeScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cv
+TGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wvcHljYS1jcnlwdG9ncmFwaHknOiBjaGVja2VkIG91
+dCAnMDk0MDMxMDBkZTJmNmYxY2RkMGQ0ODRkY2I4ZTYyMGYxYzMzNWM4ZicKQ2xvbmluZyBpbnRv
+ICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91dCAn
+ZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRvICdy
+b21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNrZWQg
+b3V0ICdjNzllMGVjYjg0ZjRmMWVlM2Y3M2Y1MjE2MjJlMjY0ZWRkMWJmMTc0JwpDbG9uaW5nIGlu
+dG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFja3dh
+cmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1NDZm
+NScKQ2xvbmluZyBpbnRvICdyb21zL29wZW5zYmknLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29w
+ZW5zYmknOiBjaGVja2VkIG91dCAnY2UyMjhlZTA5MTlkZWI5OTU3MTkyZDcyM2VlY2M4YWFhZTI2
+OTdjNicKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGgg
+J3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJ2JmMGUxMzY5ODg3MjQ1MDE2NGZhNzA0
+MGRhMzZhOTVkMmQ0YjMyNmYnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1
+bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E1Y2FiNThlOWEzZmI2ZTE2OGFi
+YTkxOWM1NjY5YmVhNDA2NTczYjQnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4u
+ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcwZjRmZTg0
+NjU4MTY1ZTk2Y2UzNTg3MGZkMTlmYzYzNGUxODJlNzdiJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dh
+YmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFl
+ZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMv
+c2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICcy
+NjFjYThlNzc5ZTUxMzg4NjlhNDVmMTc0Y2FhNDliZTZhMjc0NTAxJwpDbG9uaW5nIGludG8gJ3Jv
+bXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAn
+ZDM2ODkyNjdmOTJjNTk1NmUwOWNjN2QxYmFhNDcwMDE0MTY2MmJmZicKQ2xvbmluZyBpbnRvICdy
+b21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2
+MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1
+ODgnCkNsb25pbmcgaW50byAnc2xpcnAnLi4uClN1Ym1vZHVsZSBwYXRoICdzbGlycCc6IGNoZWNr
+ZWQgb3V0ICcxMjZjMDRhY2JhYmQ3YWQzMmMyYjAxOGZlMTBkZmFjMmEzYmMxMjEwJwpDbG9uaW5n
+IGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAn
+dGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMzMjc2
+Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJr
+ZWxleS10ZXN0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRl
+c3RmbG9hdC0zJzogY2hlY2tlZCBvdXQgJzVhNTlkY2VjMTkzMjczOTZhMDExYTE3ZmQ5MjRhZWQ0
+ZmVjNDE2YjMnCkNsb25pbmcgaW50byAndWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUgcGF0
+aCAndWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5ZDMy
+MjA1NTIyODBlZjNkODMyY2UnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmRhOGJl
+YyByYXc6IERvbid0IG9wZW4gWkJEcyBpZiBiYWNrZW5kIGNhbid0IGhhbmRsZSB0aGVtCmY2YWQ5
+YzkgYmxvY2svaWRlL3Njc2k6IFNldCBCTEtfUEVSTV9TVVBQT1JUX1pPTkVECmVjNWI1ZTMgcmF3
+OiBSZWNvZ25pemUgem9uZWQgYmFja2luZyBkZXZpY2VzCjM3NWQ4MzcgYmxvY2s6IEFkZCB6b25l
+ZCBkZXZpY2UgbW9kZWwgcHJvcGVydHkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNCBDaGVja2lu
+ZyBjb21taXQgMzc1ZDgzNzc1ZGJlIChibG9jazogQWRkIHpvbmVkIGRldmljZSBtb2RlbCBwcm9w
+ZXJ0eSkKMi80IENoZWNraW5nIGNvbW1pdCBlYzViNWUzYTk5YzYgKHJhdzogUmVjb2duaXplIHpv
+bmVkIGJhY2tpbmcgZGV2aWNlcykKMy80IENoZWNraW5nIGNvbW1pdCBmNmFkOWM5N2I4YTAgKGJs
+b2NrL2lkZS9zY3NpOiBTZXQgQkxLX1BFUk1fU1VQUE9SVF9aT05FRCkKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjY6IEZJTEU6IGh3L2Jsb2NrL2ZkYy5jOjU3MzoK
+KyAgICBeSV5JXkleSSAgICAgICBlcnJwKSkgeyQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgMTQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKNC80IENoZWNraW5nIGNvbW1pdCAyZGE4YmVjYjczN2YgKHJhdzogRG9uJ3Qgb3BlbiBaQkRz
+IGlmIGJhY2tlbmQgY2FuJ3QgaGFuZGxlIHRoZW0pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
+b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
+Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwODIzMTk0OTI3LjIzMjc4LTEtZG1pdHJ5LmZv
+bWljaGV2QHdkYy5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
