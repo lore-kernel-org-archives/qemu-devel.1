@@ -7,87 +7,88 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A226C41514
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 23:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3949C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 23:59:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A807020674
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 23:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A5DD206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 23:59:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nIKmDmav"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A807020674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AJjyQLeH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5DD206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1JQi-0007uC-9L
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 19:57:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49728)
+	id 1i1JSc-0001es-ND
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 19:59:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
- id 1i1JCK-00013n-2e
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:42:26 -0400
+ id 1i1JBy-0000qy-5Z
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
- id 1i1JCG-0000Gf-J7
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:42:23 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:38470)
+ id 1i1JBw-0000A0-D2
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:42:01 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:13670)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
- id 1i1JCG-0000G3-8N; Fri, 23 Aug 2019 19:42:20 -0400
+ id 1i1JBw-00007y-5c; Fri, 23 Aug 2019 19:42:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1566603741; x=1598139741;
+ t=1566603720; x=1598139720;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=vAN1dDLznPPg40l4N7NOvT4m5coY/hzIozIhrKnpjNA=;
- b=nIKmDmavjY5sBIwFNFSo7fyWxxgHbGKpSj3Zj79w2wv86HfFOkIt1D8A
- ZVt5gq3S7mu4dXo3Z9pAS8AqDLZu2/at9X2N1lIxeNMuIGdnfXrZWxZlT
- JXZbvAajtPhmSQNMHPuQW5+D7IWQ6t0KYQsTJk8zgfRlivXaLx5ozl+Wh
- zFnsOD1HtkoU3EhnlweC5IAiP6X9wbabiuRgCgcEqpDZ/KvZZl6Uffbb6
- vNwpdlTwQ0q8kHYD0QOo8MKG5hnshlMv9Gb/sI47ZXkO8jrxmrHW7dfSE
- ris+lfqQupEsE7n863H4wLD5uZk3BQlIRAKuyfC7LUHVdApzZDV7bE/YE g==;
-IronPort-SDR: Bem2yzEK2KW99nu8hf0R7/5YcJwiUaHIskjdtZbEQNIGKXEpIrFNsA5XBUwcCfzXnXf1ZqInf6
- KSwcmOSGXDxq/HOpUkqNOe5rvCAWq2ein364/ZeOihKYSi3VcGVVfu7FEASKbZp1qy4yHns9Y1
- jAf4kT/PuQA2Jj4UJH3oM5mPe/+0Ef8DqryRlizdY7COfHVwhagex77Hq/UYSCY5xKcGwY1aJW
- DhHdeNDKmhmIKwgzmP3sieDMGkAgZZNPQ5mJaP+II5uE2cxdMmVhFIs0wqmEgLBs5iEyKH/DGd
- CCE=
-X-IronPort-AV: E=Sophos;i="5.64,422,1559491200"; d="scan'208";a="117486899"
+ bh=Azz2ITTRRdvTER3eGckb2PBXCZpqdradly3KVxTJb48=;
+ b=AJjyQLeH/3I+i8VNsvlq7pDUcvQaOx8hrqqFBlfJfMMEnMqgNOaltv5Z
+ oJv/Mo614qke8qCZGOVI/1CbuqbmBjXW6R9Tm1pv3MNxd3lrdOd0vj3Zk
+ k/A5JSPu8RmkVuQfBSrNED8XeI7Ou/h2qa3rJGT35xlNB5MXTdBYP8sLq
+ 8s1TgESpweAVpZtcLuphWZrPtCfpeDR1VF2V208e82FXnXsQ3Zna/mmNH
+ 35s/Vy9Jim36hi7cGcAY5cqpoZhfA5E7H+imT2bxCQ2/fxfPF7ji0mRV3
+ EySljgxaqOnvCqFtGoJB2ua2/H0Sp3jYnK0bi9g/5FAysvgD2ijnO5kTS A==;
+IronPort-SDR: nJQsAu62NK4ayGMVEF7EeGcwnF01sD7NlOwusdnQum+hOX4T+niamqEPyi7UoTHxXYLdnrt0/D
+ EIUC55eHwE/44riqoJBa+lCv3BWn+yzSx3zrcYBWlNBPyPN8rtYWJhff2czjvmEKb82PiMCYkJ
+ n1R0Zt0F2wa+4HGIsMDMsF6eHD2q859TOFS6MsxDoKZ+xyO4J96mPKrcXsNh+70PlyDKOg4Et5
+ F1Ft/fIV770hoYD+e7/DMxgQrPO+KqzlALEad/EV1mCRWlye4TRFrDkULDJFK8xtSv+KOYw/il
+ dmk=
+X-IronPort-AV: E=Sophos;i="5.64,422,1559491200"; d="scan'208";a="118154417"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 24 Aug 2019 07:42:18 +0800
-IronPort-SDR: NbnQSKNJGY636EN5RmNOWEHxHPf7sxNh1hnkhT+4Defr4MtWzAOfj3TVRVvtvr5c0SsaggoYp5
- mw6H+BVoOqDwpgJIuEafZzFSZa+pdMwgwS4aY4ndfEcqrX6sYT4EzN4zECQJVhLmIr0sNbjPHO
- 7urtjQlW7EsayGcuauZ/L54gYR9mivfQrEBi/yaAA+EIv/v4ZebSLF0Knu7zXkE+1P85GhO4Hu
- rH+j5DmSM7UwS7/LrXuKYUso+PnAd70GYI5NEEPUSn6Hl//4ON3qVuL//7KKNLtqIbbWcD6YEc
- Bz8fcinuVlABIWpGIeNnEFKX
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by ob1.hgst.iphmx.com with ESMTP; 24 Aug 2019 07:41:54 +0800
+IronPort-SDR: Hp2Gcp4tmEcprc082WnhnyKxmXbKV1z1bslUTDHPjKCH9sZKOQxhmO9J3qqyAUtBZN1o7x6RQq
+ BKVHANgIhNGrGeNMph84FiIxFQA/U5Sj/YsTdn3NAB76y5Z84nKdPeTVP4PSe+rV7Yem0mPykX
+ Xuu6YSRj/2THSBBv96T+EW/4+qpX5VZ6yCBTtHXJjzW+3j4F9dAHc3xsz2okaIPhDuFwz4sExi
+ tPZMn7T+P9S57vshsaU/Wl7QCo/vW9EVv3YR/XzINhaAdcGd6+HD1TeSnU7Dm52RSLqVzccxzn
+ LyNzL5CUhLRdIm+jRKaIT9OJ
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Aug 2019 16:39:35 -0700
-IronPort-SDR: 9gORWUnr0Q9e5zFHcsXb9cIRT7Cl94Cuqd/Gh7bkYaw6utYO4fXT4TsLiHtseUh4oUtVlQdb0W
- m/0v2uzGI/nz5lMedogViKnF1AW0Mw9mDfNBeiak9sC5Jw1NUp6MG5IXLPSePeuAsqoRBIHnhV
- 3JOhVbqzh4TtPD608l3v40AHB0Bz3Wa6sgbySS9+cPlFislYERcA5G08EY++9GvAxN/IsIzKrc
- L5eF50LC5aNeH88knC8xBVlhWTEqko9H4MtMLl5a3685W/BFoODopPl4NzG2A2UT9nsRBSi1RE
- QZc=
+ 23 Aug 2019 16:39:11 -0700
+IronPort-SDR: E/8jZ10WxetFn8PF8qk42Lqc0ExPV8jDlhj6BBl6ovv/g2zszPuspv7y5Ijp615WJpRwAhZSQ4
+ P6xiKBcIL8UxWoTLvJs3mtTxx/wRqQpXR0U39wUWc/lQIP9sMUdU6MNKyJiXUk0lUw1vtgafh9
+ t9MxIkfFeTNIP+hidyk7O6zhUHhFtHEpMWx/bTKYvKzhmuVYZhX+PL9sLMJtjw52f+BCy0rH0H
+ 4QtAcPxipb2ves/n+jiV3yY98oEDhe+FhSlzSPr8EGFxELqPtm9T4hDmRB4l5vPCwhqNBtAl9/
+ XNk=
 WDCIronportException: Internal
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.157.58])
- by uls-op-cesaip01.wdc.com with ESMTP; 23 Aug 2019 16:42:18 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Aug 2019 16:41:53 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Date: Fri, 23 Aug 2019 16:38:36 -0700
-Message-Id: <d0a6c68c4af8e3f160cce19fea8bbd9f20aea0be.1566603412.git.alistair.francis@wdc.com>
+Date: Fri, 23 Aug 2019 16:38:13 -0700
+Message-Id: <01efc597b0d12ec51e6bb829b4bfe0f6c4dca2a4.1566603412.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1566603412.git.alistair.francis@wdc.com>
 References: <cover.1566603412.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.153.144
-Subject: [Qemu-devel] [PATCH v1 18/28] target/riscv: Add hfence instructions
+X-Received-From: 216.71.154.45
+Subject: [Qemu-devel] [PATCH v1 09/28] target/riscv: Add Hypervisor virtual
+ CSRs accesses
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,97 +108,169 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/insn32.decode                    | 23 ++++++-----
- .../riscv/insn_trans/trans_privileged.inc.c   | 40 +++++++++++++++++++
- 2 files changed, 54 insertions(+), 9 deletions(-)
+ target/riscv/cpu_bits.h |  11 ++++
+ target/riscv/csr.c      | 119 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 130 insertions(+)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 77f794ed70..cfd9ca6d2b 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -63,20 +63,25 @@
- @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
- @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
- 
-+@hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
-+@hfence_bvma ....... ..... .....   ... ..... ....... %rs2 %rs1
-+
- @sfence_vma ....... ..... .....   ... ..... ....... %rs2 %rs1
- @sfence_vm  ....... ..... .....   ... ..... ....... %rs1
- 
- 
- # *** Privileged Instructions ***
--ecall      000000000000     00000 000 00000 1110011
--ebreak     000000000001     00000 000 00000 1110011
--uret       0000000    00010 00000 000 00000 1110011
--sret       0001000    00010 00000 000 00000 1110011
--hret       0010000    00010 00000 000 00000 1110011
--mret       0011000    00010 00000 000 00000 1110011
--wfi        0001000    00101 00000 000 00000 1110011
--sfence_vma 0001001    ..... ..... 000 00000 1110011 @sfence_vma
--sfence_vm  0001000    00100 ..... 000 00000 1110011 @sfence_vm
-+ecall       000000000000     00000 000 00000 1110011
-+ebreak      000000000001     00000 000 00000 1110011
-+uret        0000000    00010 00000 000 00000 1110011
-+sret        0001000    00010 00000 000 00000 1110011
-+hret        0010000    00010 00000 000 00000 1110011
-+mret        0011000    00010 00000 000 00000 1110011
-+wfi         0001000    00101 00000 000 00000 1110011
-+hfence_gvma 0110001    ..... ..... 000 00000 1110011 @hfence_gvma
-+hfence_bvma 0010001    ..... ..... 000 00000 1110011 @hfence_bvma
-+sfence_vma  0001001    ..... ..... 000 00000 1110011 @sfence_vma
-+sfence_vm   0001000    00100 ..... 000 00000 1110011 @sfence_vm
- 
- # *** RV32I Base Instruction Set ***
- lui      ....................       ..... 0110111 @u
-diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
-index c5e4b3e49a..b9b5a89b52 100644
---- a/target/riscv/insn_trans/trans_privileged.inc.c
-+++ b/target/riscv/insn_trans/trans_privileged.inc.c
-@@ -108,3 +108,43 @@ static bool trans_sfence_vm(DisasContext *ctx, arg_sfence_vm *a)
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 204d9d9a79..78067901a2 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -191,6 +191,17 @@
+ #define HGATP_PPN            SATP64_PPN
  #endif
-     return false;
+ 
++/* Virtual CSRs */
++#define CSR_VSSTATUS        0x200
++#define CSR_VSIE            0x204
++#define CSR_VSTVEC          0x205
++#define CSR_VSSCRATCH       0x240
++#define CSR_VSEPC           0x241
++#define CSR_VSCAUSE         0x242
++#define CSR_VSTVAL          0x243
++#define CSR_VSIP            0x244
++#define CSR_VSATP           0x280
++
+ /* Physical Memory Protection */
+ #define CSR_PMPCFG0         0x3a0
+ #define CSR_PMPCFG1         0x3a1
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 388775d45a..e2e908fbc0 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -817,6 +817,115 @@ static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
  }
-+
-+static bool trans_hfence_gvma(DisasContext *ctx, arg_sfence_vma *a)
+ 
++/* Virtual CSR Registers */
++static int read_vsstatus(CPURISCVState *env, int csrno, target_ulong *val)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
-+        has_ext(ctx, RVH)) {
-+        /* Hpervisor extensions exist */
-+        /*
-+         * if (env->priv == PRV_M ||
-+         *   (env->priv == PRV_S &&
-+         *    !riscv_cpu_virt_enabled(env) &&
-+         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
-+         */
-+            gen_helper_tlb_flush(cpu_env);
-+            return true;
-+        /* } */
-+    }
-+#endif
-+    return false;
++    *val = env->vsstatus;
++    return 0;
 +}
 +
-+static bool trans_hfence_bvma(DisasContext *ctx, arg_sfence_vma *a)
++static int write_vsstatus(CPURISCVState *env, int csrno, target_ulong val)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
-+        has_ext(ctx, RVH)) {
-+        /* Hpervisor extensions exist */
-+        /*
-+         * if (env->priv == PRV_M ||
-+         *   (env->priv == PRV_S &&
-+         *    !riscv_cpu_virt_enabled(env) &&
-+         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
-+         */
-+            gen_helper_tlb_flush(cpu_env);
-+            return true;
-+        /* } */
-+    }
-+#endif
-+    return false;
++    env->vsstatus = val;
++    return 0;
 +}
++
++static int read_vsie(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vsie;
++    return 0;
++}
++
++static int write_vsie(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vsie = val;
++    return 0;
++}
++
++static int read_vstvec(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vstvec;
++    return 0;
++}
++
++static int write_vstvec(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vstvec = val;
++    return 0;
++}
++
++static int read_vsscratch(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vsscratch;
++    return 0;
++}
++
++static int write_vsscratch(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vsscratch = val;
++    return 0;
++}
++
++static int read_vsepc(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vsepc;
++    return 0;
++}
++
++static int write_vsepc(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vsepc = val;
++    return 0;
++}
++
++static int read_vscause(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vscause;
++    return 0;
++}
++
++static int write_vscause(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vscause = val;
++    return 0;
++}
++
++static int read_vstval(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vstval;
++    return 0;
++}
++
++static int write_vstval(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vstval = val;
++    return 0;
++}
++
++static int read_vsip(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = (target_ulong)atomic_read(&env->vsip);
++    return 0;
++}
++
++static int write_vsip(CPURISCVState *env, int csrno, target_ulong val)
++{
++    atomic_set(&env->vsip, val);
++    return 0;
++}
++
++static int read_vsatp(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vsatp;
++    return 0;
++}
++
++static int write_vsatp(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vsatp = val;
++    return 0;
++}
++
+ /* Physical Memory Protection */
+ static int read_pmpcfg(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+@@ -1018,6 +1127,16 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_HIDELEG] =             { hmode,   read_hideleg,     write_hideleg    },
+     [CSR_HGATP] =               { hmode,   read_hgatp,       write_hgatp      },
+ 
++    [CSR_VSSTATUS] =            { hmode,   read_vsstatus,    write_vsstatus   },
++    [CSR_VSIE] =                { hmode,   read_vsie,        write_vsie       },
++    [CSR_VSTVEC] =              { hmode,   read_vstvec,      write_vstvec     },
++    [CSR_VSSCRATCH] =           { hmode,   read_vsscratch,   write_vsscratch  },
++    [CSR_VSEPC] =               { hmode,   read_vsepc,       write_vsepc      },
++    [CSR_VSCAUSE] =             { hmode,   read_vscause,     write_vscause    },
++    [CSR_VSTVAL] =              { hmode,   read_vstval,      write_vstval     },
++    [CSR_VSIP] =                { hmode,   read_vsip,        write_vsip       },
++    [CSR_VSATP] =               { hmode,   read_vsatp,       write_vsatp      },
++
+     /* Physical Memory Protection */
+     [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
+     [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
 -- 
 2.22.0
 
