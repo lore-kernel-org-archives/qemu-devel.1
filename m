@@ -2,92 +2,63 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EDC0C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1284C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:31:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C941021874
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:30:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SSk87Ni7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C941021874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F77821874
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:31:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F77821874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1FGH-0005pl-8e
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:30:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47679)
+	id 1i1FH2-0006Nw-2X
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:31:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=1319249da=dmitry.fomichev@wdc.com>)
- id 1i1F7V-0005ly-3V
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:21:10 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1i1EhT-0003oC-Px
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=1319249da=dmitry.fomichev@wdc.com>)
- id 1i1F7T-0003QA-Mv
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:21:09 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:37516)
+ (envelope-from <tony.nguyen@bt.com>) id 1i1EhS-0003Sg-2M
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:54:15 -0400
+Received: from nsstlmta01p.bpe.bigpond.com ([203.38.21.1]:50842)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=1319249da=dmitry.fomichev@wdc.com>)
- id 1i1F7Q-0003Ie-B0; Fri, 23 Aug 2019 15:21:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1566588065; x=1598124065;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=WrGHKVduBl42d9CD8UFRTIZ6FP7W7UcEwBBJuvUCUsc=;
- b=SSk87Ni7Wkv9PnaWC44SGc/7oNxI6HmTeAA0O+xlp62lypnS7IQPnnIA
- LK6qTvyL/1LMsVMRmpL2UmB8JPRHzCwh8lQiK4zOo7RGqJagqoddCbaM4
- nRlUnjy7vrBWbyAMaG1q6yX48dWY9sgXGBqC1HqwZ4lEqXNRAxLmvfH48
- Wsjy9/Pem64hegVltkKcFZx6NOvbsbSHy/4q4jogaBthCkf3m1oWHqY+t
- lQxQhgUntAEE+Bc/vioaZQxFnIrA92MUW1Vl0zs2iaAJq5OVC+Aeyj1WX
- IM/H7b3cTct3gt1AL1oh9tiZwNdP5t/K6STBMQLOhq+2iYbj82cf89gRT A==;
-IronPort-SDR: 7TDxJkkY80ftGRUZDVWUKGrMO1rB06Ma78l8uZ/JVQ19vlAEW442gb9VbRk8JQ7xu/nDvUyJ1s
- 8ANHb4Dh8uhxyXWhbrxG54VTsKtQdI9SAJNP1KCzTeysZkNO4TMPMhQc6Yd6cQAuXrLBLwwUqR
- geG6TbBvk9vdc+DHH8YQWcpkK0laivfwdD8QeEZTh1CvzHd69RAYkhi+VDE/U53VLvBGyuv/eg
- cG7pWtbGh0Sd8b9Q0XlnmMtheDza6szikPurkTvlhen5kJ3LV+iIz/zl5sCjHOcGL37WSg1/qA
- 9JA=
-X-IronPort-AV: E=Sophos;i="5.64,422,1559491200"; d="scan'208";a="117476227"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 24 Aug 2019 03:21:00 +0800
-IronPort-SDR: IRIgi8xKDjfNlG7G6m9TnMNSStlPVwRkuxAyo4Nb1Ot/8Wm3deTvvFf1x6/Q9qLMwywaXKwPPK
- r17eym4OUj/TwsSuUARXCXZnhHtZnqd5/g8p+5BPpXNehq/ZwNRqJ4VJi1WUbUbJxeQqcYtxT1
- JfvydMzBu2wyTC+lQjss8P7pKGCOxJ+DwzcfmoMpjPo+CWs/KDenYnMI4Q4cgiOOJMeQhmem4F
- eHjles3kvYdeEjlbTxn/X0oQci7PWdGkDxh3nU8sTEXMJlAHqWCpEFSWVmMD4D7g9W67dzo6hu
- KIYYqHO2aifc8vZsDEN2dGMk
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Aug 2019 12:18:16 -0700
-IronPort-SDR: jur9OoZSeAp8O+ImqrN5n2zeyG8Dxi7NXzjrwIxQxrND6ITGuwYW5bHr3LRk2m4w7fBcwBKAGO
- +ZumTmoJMd8SFCPXAIY7m1jfO8iOs9o2oM8gjR/vGfw8zEM6NU5bOnnF+pbICvP5XDpCUPrb4X
- 7h0PIOMSt97hlI4nc55VScJUF75CxUtGkOI2FsfmTn5dRIQn8PfwTqqrPQ6C73wglrljxh3ohN
- I91O54xbo4sJ8FDpQ+tWZBfgZvbCmunn/O+D3WqdvYAAmQm5VJO0fRPFbNaAohCuv07i4Vdr8a
- /eo=
-WDCIronportException: Internal
-Received: from dhcp-10-88-173-43.hgst.com ([10.88.173.43])
- by uls-op-cesaip01.wdc.com with ESMTP; 23 Aug 2019 12:20:58 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
-Date: Fri, 23 Aug 2019 15:20:54 -0400
-Message-Id: <20190823192056.21091-2-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190823192056.21091-1-dmitry.fomichev@wdc.com>
-References: <20190823192056.21091-1-dmitry.fomichev@wdc.com>
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
+ id 1i1EhR-0003Og-6N; Fri, 23 Aug 2019 14:54:14 -0400
+Received: from smtp.telstra.com ([10.10.24.4])
+ by nsstlfep01p-svc.bpe.nexus.telstra.com.au with ESMTP id
+ <20190823185408.KAEC21386.nsstlfep01p-svc.bpe.nexus.telstra.com.au@smtp.telstra.com>;
+ Sat, 24 Aug 2019 04:54:08 +1000
+X-RG-Spam: Unknown
+X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgeduvddrudegkedguddvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfupfevtfgpvffgnffuvffttedpqfgfvfenuceurghilhhouhhtmecugedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefvohhnhicupfhguhihvghnuceothhonhihrdhnghhuhigvnhessghtrdgtohhmqeenucfkphepheekrddujeefrdelkedrieeknecurfgrrhgrmhephhgvlhhopegusgiirdhtvghlshhtrhgrrdgtohhmrdgruhdpihhnvghtpeehkedrudejfedrleekrdeikedpmhgrihhlfhhrohhmpeeothhonhihrdhnghhuhigvnhessghtrdgtohhmqedprhgtphhtthhopeeorghlihhsthgrihhrsegrlhhishhtrghirhdvfedrmhgvqedprhgtphhtthhopeeorghnughrvgifsegrjhdrihgurdgruheqpdhrtghpthhtohepoegrthgrrhegqhgvmhhusehgmhgrihhlrdgtohhmqedprhgtphhtthhopeeotghhohhuthgvrghusegruggrtghorhgvrdgtohhmqedprhgtphhtthhopeeotghlgheskhgrohgurdhorhhgqedprhgtphhtthhopeeovggughgrrhdrihhglhgvshhirghssehgmhgrihhlrdgtohhmqedprhgtphhtthhopeeofhhrvgguvghrihgtrdhkohhnrhgrugesrggurggtohhrvgdrtghomheqpdhrtghpthhtohepoehjohgvlhesjhhmshdrihgurdgruheq
+ pdhrtghpthhtohepoehmihgthhgrvghlseifrghllhgvrdgttgeqpdhrtghpthhtohepoehmshhtsehrvgguhhgrthdrtghomheqpdhrtghpthhtohepoehpsghonhiiihhnihesrhgvughhrghtrdgtohhmqedprhgtphhtthhopeeophgvthgvrhdrtghhuhgssgesnhhitghtrgdrtghomhdrrghuqedprhgtphhtthhopeeophgvthgvrhdrmhgrhiguvghllheslhhinhgrrhhordhorhhgqedprhgtphhtthhopeeoqhgvmhhuqdgrrhhmsehnohhnghhnuhdrohhrgheqpdhrtghpthhtohepoehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgqedprhgtphhtthhopeeoshhunhguvggvphdrlhhkmhhlsehgmhgrihhlrdgtohhmqedprhgtphhtthhopeeothhonhihrdhnghhuhigvnhessghtrdgtohhmqeenucevlhhushhtvghrufhiiigvpedutd
+X-RazorGate-Vade-Verdict: clean 0
+X-RazorGate-Vade-Classification: clean
+X-RG-VS-CLASS: clean
+X-Authentication-Info: Submitted using ID tony.nguyen.git@bigpond.com
+Received: from dbz.telstra.com.au (58.173.98.68) by smtp.telstra.com (5.8.335)
+ (authenticated as tony.nguyen.git@bigpond.com)
+ id 5D3692920C8C21E3; Sat, 24 Aug 2019 04:54:07 +1000
+From: Tony Nguyen <tony.nguyen@bt.com>
+To: qemu-devel@nongnu.org
+Date: Sat, 24 Aug 2019 04:56:37 +1000
+Message-Id: <6c4515574804b699e3a35fe3590453178fef039b.1566467963.git.tony.nguyen@bt.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <cover.1566467963.git.tony.nguyen@bt.com>
+References: <cover.1566467963.git.tony.nguyen@bt.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.153.144
-Subject: [Qemu-devel] [PATCH v4 2/4] raw: Recognize zoned backing devices
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 203.38.21.1
+Subject: [Qemu-devel] [RFC PATCH 16/17] hw/timer: Declare device little or
+ big endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,193 +70,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Tony Nguyen <tony.nguyen@bt.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>,
+ Michael Walle <michael@walle.cc>, Fabien Chouteau <chouteau@adacore.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Joel Stanley <joel@jms.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The purpose of this patch is to recognize a zoned block device (ZBD)
-when it is opened as a raw file. The new code initializes the zoned
-model propery introduced by the previous commit.
+For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
+targets from the set of target/hw/*/device.o.
 
-This commit is Linux-specific as it gets the Zoned Block Device Model
-value (none/host-managed/host-aware) from sysfs on the host.
+If the set of targets are all little or all big endian, re-declare
+the device endianness as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN
+respectively.
 
-In order to avoid code duplication in file-posix.c, a common helper
-function is added to read values of sysfs entries under
-/sys/block/<dev>/queue. This way, the existing function that reads
-the value of "max_segments" entry and the the new function that reads
-"zoned" value both share the same helper code.
+This *naive* deduction may result in genuinely native endian devices
+being incorrectly declared as little or big endian, but should not
+introduce regressions for current targets.
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+These devices should be re-declared as DEVICE_NATIVE_ENDIAN if 1) it
+has a new target with an opposite endian or 2) someone informed knows
+better =)
+
+Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- block/file-posix.c | 74 ++++++++++++++++++++++++++++++++++++++--------
- block/raw-format.c |  8 +++++
- 2 files changed, 70 insertions(+), 12 deletions(-)
+ hw/timer/a9gtimer.c         | 4 ++--
+ hw/timer/arm_mptimer.c      | 4 ++--
+ hw/timer/arm_timer.c        | 4 ++--
+ hw/timer/armv7m_systick.c   | 2 +-
+ hw/timer/aspeed_rtc.c       | 2 +-
+ hw/timer/cadence_ttc.c      | 2 +-
+ hw/timer/grlib_gptimer.c    | 2 +-
+ hw/timer/hpet.c             | 2 +-
+ hw/timer/imx_epit.c         | 2 +-
+ hw/timer/imx_gpt.c          | 2 +-
+ hw/timer/lm32_timer.c       | 2 +-
+ hw/timer/milkymist-sysctl.c | 2 +-
+ hw/timer/mss-timer.c        | 2 +-
+ hw/timer/pl031.c            | 2 +-
+ hw/timer/stm32f2xx_timer.c  | 2 +-
+ hw/timer/sun4v-rtc.c        | 2 +-
+ 16 files changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index fbeb0068db..d9f2fc5e46 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1067,15 +1067,13 @@ static int sg_get_max_transfer_length(int fd)
- #endif
- }
- 
--static int sg_get_max_segments(int fd)
-+static int hdev_read_blk_queue_entry(int fd, const char *key,
-+    char *buf, int buf_len)
- {
- #ifdef CONFIG_LINUX
--    char buf[32];
--    const char *end;
-     char *sysfspath = NULL;
-     int ret;
-     int sysfd = -1;
--    long max_segments;
-     struct stat st;
- 
-     if (fstat(fd, &st)) {
-@@ -1083,23 +1081,45 @@ static int sg_get_max_segments(int fd)
-         goto out;
-     }
- 
--    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/max_segments",
--                                major(st.st_rdev), minor(st.st_rdev));
-+    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/%s",
-+                                major(st.st_rdev), minor(st.st_rdev), key);
-     sysfd = open(sysfspath, O_RDONLY);
-     if (sysfd == -1) {
-         ret = -errno;
-         goto out;
-     }
-     do {
--        ret = read(sysfd, buf, sizeof(buf) - 1);
-+        ret = read(sysfd, buf, buf_len - 1);
-     } while (ret == -1 && errno == EINTR);
-     if (ret < 0) {
-         ret = -errno;
--        goto out;
-     } else if (ret == 0) {
-         ret = -EIO;
-+    }
-+out:
-+    if (sysfd != -1) {
-+        close(sysfd);
-+    }
-+    g_free(sysfspath);
-+    return ret;
-+#else
-+    return -ENOTSUP;
-+#endif
-+}
-+
-+static int sg_get_max_segments(int fd)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    const char *end;
-+    int ret;
-+    long max_segments;
-+
-+    ret = hdev_read_blk_queue_entry(fd, "max_segments", buf, sizeof(buf));
-+    if (ret < 0) {
-         goto out;
-     }
-+
-     buf[ret] = 0;
-     /* The file is ended with '\n', pass 'end' to accept that. */
-     ret = qemu_strtol(buf, &end, 10, &max_segments);
-@@ -1108,10 +1128,33 @@ static int sg_get_max_segments(int fd)
-     }
- 
- out:
--    if (sysfd != -1) {
--        close(sysfd);
-+    return ret;
-+#else
-+    return -ENOTSUP;
-+#endif
-+}
-+
-+static int hdev_get_zoned_model(int fd)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    int ret;
-+
-+    ret = hdev_read_blk_queue_entry(fd, "zoned", buf, sizeof(buf));
-+    if (ret < 0) {
-+        ret = BLK_ZONED_MODEL_NONE;
-+        goto out;
-     }
--    g_free(sysfspath);
-+
-+    buf[ret - 1] = 0;
-+    ret = BLK_ZONED_MODEL_NONE;
-+    if (strcmp(buf, "host-managed") == 0) {
-+        ret = BLK_ZONED_MODEL_HM;
-+    } else if (strcmp(buf, "host-aware") == 0) {
-+        ret = BLK_ZONED_MODEL_HA;
-+    }
-+
-+out:
-     return ret;
- #else
-     return -ENOTSUP;
-@@ -1121,9 +1164,10 @@ out:
- static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-+    int ret;
- 
-     if (bs->sg) {
--        int ret = sg_get_max_transfer_length(s->fd);
-+        ret = sg_get_max_transfer_length(s->fd);
- 
-         if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
-             bs->bl.max_transfer = pow2floor(ret);
-@@ -1133,6 +1177,12 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-         if (ret > 0) {
-             bs->bl.max_transfer = MIN(bs->bl.max_transfer, ret * getpagesize());
-         }
-+
-+    }
-+
-+    ret = hdev_get_zoned_model(s->fd);
-+    if (ret >= 0) {
-+        bs->bl.zoned_model = ret;
-     }
- 
-     raw_probe_alignment(bs, s->fd, errp);
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 42c28cc29a..a606e4a7fe 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -369,6 +369,13 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-     }
- }
- 
-+static void raw_get_zoned_info(BlockDriverState *bs)
-+{
-+    if (!bs->probed) {
-+        bs->bl.zoned_model = bs->file->bs->bl.zoned_model;
-+    }
-+}
-+
- static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
-                                         PreallocMode prealloc, Error **errp)
- {
-@@ -578,6 +585,7 @@ BlockDriver bdrv_raw = {
-     .create_opts          = &raw_create_opts,
-     .bdrv_has_zero_init   = &raw_has_zero_init,
-     .bdrv_has_zero_init_truncate = &raw_has_zero_init_truncate,
-+    .bdrv_get_zoned_info  = &raw_get_zoned_info,
-     .strong_runtime_opts  = raw_strong_runtime_opts,
-     .mutable_opts         = mutable_opts,
+diff --git a/hw/timer/a9gtimer.c b/hw/timer/a9gtimer.c
+index 75f1867174..ffdc78f383 100644
+--- a/hw/timer/a9gtimer.c
++++ b/hw/timer/a9gtimer.c
+@@ -258,7 +258,7 @@ static const MemoryRegionOps a9_gtimer_this_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
  };
+ 
+ static const MemoryRegionOps a9_gtimer_ops = {
+@@ -268,7 +268,7 @@ static const MemoryRegionOps a9_gtimer_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static void a9_gtimer_reset(DeviceState *dev)
+diff --git a/hw/timer/arm_mptimer.c b/hw/timer/arm_mptimer.c
+index 983e61847e..bf6295add1 100644
+--- a/hw/timer/arm_mptimer.c
++++ b/hw/timer/arm_mptimer.c
+@@ -194,7 +194,7 @@ static const MemoryRegionOps arm_thistimer_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static const MemoryRegionOps timerblock_ops = {
+@@ -204,7 +204,7 @@ static const MemoryRegionOps timerblock_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static void timerblock_reset(TimerBlock *tb)
+diff --git a/hw/timer/arm_timer.c b/hw/timer/arm_timer.c
+index c2e6211188..f95c897d05 100644
+--- a/hw/timer/arm_timer.c
++++ b/hw/timer/arm_timer.c
+@@ -267,7 +267,7 @@ static void sp804_write(void *opaque, hwaddr offset,
+ static const MemoryRegionOps sp804_ops = {
+     .read = sp804_read,
+     .write = sp804_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static const VMStateDescription vmstate_sp804 = {
+@@ -348,7 +348,7 @@ static void icp_pit_write(void *opaque, hwaddr offset,
+ static const MemoryRegionOps icp_pit_ops = {
+     .read = icp_pit_read,
+     .write = icp_pit_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static void icp_pit_init(Object *obj)
+diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
+index 85d122dbcb..b8003e2962 100644
+--- a/hw/timer/armv7m_systick.c
++++ b/hw/timer/armv7m_systick.c
+@@ -193,7 +193,7 @@ static MemTxResult systick_write(void *opaque, hwaddr addr,
+ static const MemoryRegionOps systick_ops = {
+     .read_with_attrs = systick_read,
+     .write_with_attrs = systick_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid.min_access_size = 4,
+     .valid.max_access_size = 4,
+ };
+diff --git a/hw/timer/aspeed_rtc.c b/hw/timer/aspeed_rtc.c
+index 5313017353..e3bd196dc0 100644
+--- a/hw/timer/aspeed_rtc.c
++++ b/hw/timer/aspeed_rtc.c
+@@ -131,7 +131,7 @@ static void aspeed_rtc_reset(DeviceState *d)
+ static const MemoryRegionOps aspeed_rtc_ops = {
+     .read = aspeed_rtc_read,
+     .write = aspeed_rtc_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static const VMStateDescription vmstate_aspeed_rtc = {
+diff --git a/hw/timer/cadence_ttc.c b/hw/timer/cadence_ttc.c
+index 5e3128c1e3..6155d0055f 100644
+--- a/hw/timer/cadence_ttc.c
++++ b/hw/timer/cadence_ttc.c
+@@ -391,7 +391,7 @@ static void cadence_ttc_write(void *opaque, hwaddr offset,
+ static const MemoryRegionOps cadence_ttc_ops = {
+     .read = cadence_ttc_read,
+     .write = cadence_ttc_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static void cadence_timer_reset(CadenceTimerState *s)
+diff --git a/hw/timer/grlib_gptimer.c b/hw/timer/grlib_gptimer.c
+index 32dbf870d4..df84735197 100644
+--- a/hw/timer/grlib_gptimer.c
++++ b/hw/timer/grlib_gptimer.c
+@@ -315,7 +315,7 @@ static void grlib_gptimer_write(void *opaque, hwaddr addr,
+ static const MemoryRegionOps grlib_gptimer_ops = {
+     .read = grlib_gptimer_read,
+     .write = grlib_gptimer_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_BIG_ENDIAN,
+     .valid = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+index 1ddae4e7d7..380abeb709 100644
+--- a/hw/timer/hpet.c
++++ b/hw/timer/hpet.c
+@@ -676,7 +676,7 @@ static const MemoryRegionOps hpet_ram_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static void hpet_reset(DeviceState *d)
+diff --git a/hw/timer/imx_epit.c b/hw/timer/imx_epit.c
+index f54e059910..7e605d29c7 100644
+--- a/hw/timer/imx_epit.c
++++ b/hw/timer/imx_epit.c
+@@ -284,7 +284,7 @@ static void imx_epit_cmp(void *opaque)
+ static const MemoryRegionOps imx_epit_ops = {
+     .read = imx_epit_read,
+     .write = imx_epit_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static const VMStateDescription vmstate_imx_timer_epit = {
+diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
+index 49a441f451..27bacdb758 100644
+--- a/hw/timer/imx_gpt.c
++++ b/hw/timer/imx_gpt.c
+@@ -476,7 +476,7 @@ static void imx_gpt_timeout(void *opaque)
+ static const MemoryRegionOps imx_gpt_ops = {
+     .read = imx_gpt_read,
+     .write = imx_gpt_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ 
+diff --git a/hw/timer/lm32_timer.c b/hw/timer/lm32_timer.c
+index ac3edaff4f..4c0d3275e7 100644
+--- a/hw/timer/lm32_timer.c
++++ b/hw/timer/lm32_timer.c
+@@ -146,7 +146,7 @@ static void timer_write(void *opaque, hwaddr addr,
+ static const MemoryRegionOps timer_ops = {
+     .read = timer_read,
+     .write = timer_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_BIG_ENDIAN,
+     .valid = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+diff --git a/hw/timer/milkymist-sysctl.c b/hw/timer/milkymist-sysctl.c
+index 958350767a..cb117f944e 100644
+--- a/hw/timer/milkymist-sysctl.c
++++ b/hw/timer/milkymist-sysctl.c
+@@ -223,7 +223,7 @@ static const MemoryRegionOps sysctl_mmio_ops = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+     },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_BIG_ENDIAN,
+ };
+ 
+ static void timer0_hit(void *opaque)
+diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
+index 45f1cf42f9..b9edb39837 100644
+--- a/hw/timer/mss-timer.c
++++ b/hw/timer/mss-timer.c
+@@ -200,7 +200,7 @@ timer_write(void *opaque, hwaddr offset,
+ static const MemoryRegionOps timer_ops = {
+     .read = timer_read,
+     .write = timer_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid = {
+         .min_access_size = 1,
+         .max_access_size = 4
+diff --git a/hw/timer/pl031.c b/hw/timer/pl031.c
+index 2b3e261006..7ac2a0ca37 100644
+--- a/hw/timer/pl031.c
++++ b/hw/timer/pl031.c
+@@ -178,7 +178,7 @@ static void pl031_write(void * opaque, hwaddr offset,
+ static const MemoryRegionOps pl031_ops = {
+     .read = pl031_read,
+     .write = pl031_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static void pl031_init(Object *obj)
+diff --git a/hw/timer/stm32f2xx_timer.c b/hw/timer/stm32f2xx_timer.c
+index edc557a4b9..88ae286b14 100644
+--- a/hw/timer/stm32f2xx_timer.c
++++ b/hw/timer/stm32f2xx_timer.c
+@@ -268,7 +268,7 @@ static void stm32f2xx_timer_write(void *opaque, hwaddr offset,
+ static const MemoryRegionOps stm32f2xx_timer_ops = {
+     .read = stm32f2xx_timer_read,
+     .write = stm32f2xx_timer_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static const VMStateDescription vmstate_stm32f2xx_timer = {
+diff --git a/hw/timer/sun4v-rtc.c b/hw/timer/sun4v-rtc.c
+index 54272a822f..0e831c91b1 100644
+--- a/hw/timer/sun4v-rtc.c
++++ b/hw/timer/sun4v-rtc.c
+@@ -47,7 +47,7 @@ static void sun4v_rtc_write(void *opaque, hwaddr addr,
+ static const MemoryRegionOps sun4v_rtc_ops = {
+     .read = sun4v_rtc_read,
+     .write = sun4v_rtc_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_BIG_ENDIAN,
+ };
+ 
+ void sun4v_rtc_init(hwaddr addr)
 -- 
-2.21.0
+2.23.0
 
 
