@@ -2,67 +2,94 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11518C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 994E5C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:30:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D94D32133F
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:30:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D94D32133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 662192133F
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:30:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mz89vmlI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 662192133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1BW9-0007Dy-Jk
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:30:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59809)
+	id 1i1BWJ-0007Mo-3A
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:30:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i1BQt-0001c7-8o
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:24:56 -0400
+ (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1BQr-0001bk-Pv
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i1BQr-000061-Mx
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:24:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41276)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i1BQr-00005Y-HF
+ (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1BQq-00005K-PJ
  for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:24:53 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D2AE23081CF6;
- Fri, 23 Aug 2019 15:24:52 +0000 (UTC)
-Received: from work-vm (ovpn-117-244.ams2.redhat.com [10.36.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 876436E706;
- Fri, 23 Aug 2019 15:24:47 +0000 (UTC)
-Date: Fri, 23 Aug 2019 16:24:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190823152445.GM2784@work-vm>
-References: <20190823130014.GG2784@work-vm>
- <CAJ+F1CKTsQC1fULFG-hbUZ=Ao654K-TE6Fm9c1V+eRdAjk9QRA@mail.gmail.com>
- <20190823140948.GI2784@work-vm> <20190823142054.GK9654@redhat.com>
- <20190823142602.GJ2784@work-vm> <20190823144052.GL9654@redhat.com>
- <20190823145634.GK2784@work-vm> <20190823150508.GM9654@redhat.com>
- <20190823151448.GL2784@work-vm> <20190823152137.GN9654@redhat.com>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:38171)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1BQq-0008UJ-Eh; Fri, 23 Aug 2019 11:24:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1566573892; x=1598109892;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=HavBuiu9o+dhYuPr9DtZDz8tL0ixVJOlU6zBl4mUFso=;
+ b=mz89vmlIlX7Xkn+6JJg4fSZQAINm4KoXeekfwQEszSah2BHS/Xf1NOZJ
+ i8PldDiLVBJD5HgVaLFkp4uz+WTVNOsyEbPG3POHZBxi+1y6AamxY8NIm
+ KOciwwYVNy83FrrRegarvGJTr+oYhkahLuS2dbwO9niyZdMPCtBz5/HMa
+ R74G6v1Yrbn1uwq4A1Ea6XEnNv5JP6Jay/b/LnVvzHYiuuYLOYXuqmUfp
+ SlaU3vJE8fg50XZYthrrDVE24VCHyPw+gSsYVbAAimMdwDIKsWwxoKnBK
+ KVfclNNYCGMrlmp7iez8GBh53KgaPt7K7hNRWu9ZTL8RwH1ZzEJZTE5DA w==;
+IronPort-SDR: nPCuerFax3eWZFHT5xS7sCfbCf4jNXmZDzQupxQG7ixRWY6LaIIgL+zhsQ82yNe1Eoq8WEx5Fi
+ /E24+92TEepUUEkYJr9w0j5dYMOe0WqDnz0/YTSYNrvI/Ynx5SeAW/PNU2uZMOBsLwTVG7mb5H
+ axouIOFwYb8ZmnocYSDRwi0ger1qe8ri7IokPRBAV+2OeN5qqcI36r90/6uH3OXKRMLFccrk/b
+ 48Fogdave0PrUOPaAOSTEpdh1lBexDTQ78i5t8e9Pndyd/WSuUqH98b5R2lU2mWRC4wQJrD5JW
+ Nwg=
+X-IronPort-AV: E=Sophos;i="5.64,421,1559491200"; d="scan'208";a="121112423"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Aug 2019 23:24:52 +0800
+IronPort-SDR: hGaNfzoZVxWkNRv5DVXn6psL7cSLJPxSA4eeVmp5lthWS05xhEeNiaQf3b0X45dKrHyb2/AN6z
+ lIj1KlznQUxm51vlT1iaPsJjRd4h5FftJMoLyvIqMArz8odysr9jYgjKC0Abs1SS5XTYId6ykR
+ NVZ4HSIv+U8wjozD4ruKWerWBrAWQAhATA+GXhVCAMXNPOjkjb8cRXxVCaEJ77OBZRICiEagMA
+ w+OmUNTEcHjDpPf6ryhuXUHowt5zl4KmVnQR4DM9QnwfGfeKu59fO1Evo3K8jmqlUpRkfxyBKj
+ ACbidL7steMTmtgwUiuzFCWz
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Aug 2019 08:22:09 -0700
+IronPort-SDR: qy5CXmtGjA6wMmjZ7kVjnApH0FmPBaQCnD2uBgudTehQL8lpwToVCNVYbMPxmittanRubcNuul
+ z74SK/6NnETwIwt/UnMavH7v/OqzMxPV1po0rc9eY3RXksEd6uhvp3Ari5ijI5VOli46PvwScX
+ FQY9nHftWbM5AwXJar/kMdRLdYjroKQ/95EZOkM7nwdL8jb3xpeEWZ/u/FFNqZE0tMr0TfDLDD
+ 1TwO6btDcp093TtZkKwB1UgkHdOZOcNg8K8n93rRmMkmtoj7uah7fxgJ1cL8I0OMMuJa9q7AWa
+ yRs=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.157.58])
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Aug 2019 08:24:52 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Date: Fri, 23 Aug 2019 08:21:12 -0700
+Message-Id: <f48008aade6df437a599000ca8531fbbf80b6e80.1566573576.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <cover.1566573576.git.alistair.francis@wdc.com>
+References: <cover.1566573576.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190823152137.GN9654@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 23 Aug 2019 15:24:52 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add dbus-vmstate
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.153.141
+Subject: [Qemu-devel] [PATCH v4 2/7] riscv: plic: Remove unused interrupt
+ functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,66 +101,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com,
+ bmeng.cn@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Fri, Aug 23, 2019 at 04:14:48PM +0100, Dr. David Alan Gilbert wrote:
-> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> > > On Fri, Aug 23, 2019 at 03:56:34PM +0100, Dr. David Alan Gilbert wr=
-ote:
-> > > > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> > > > > If two helpers are running as the same user ID, then can still
-> > > > > directly attack each other via things like ptrace or /proc/$PID=
-/mem,
-> > > > > unless you've used SELinux to isolate them, or run each as a di=
-stinct
-> > > > > user ID.  If you do the latter, then we can still easily isolat=
-e
-> > > > > them using dbus.
-> > > >=20
-> > > > You can lock those down pretty easily though.
-> > >=20
-> > > How were you thinking ?
-> > >=20
-> > > If you're not using SELinux or separate user IDs, then AFAICT you'v=
-e
-> > > got a choice of using seccomp or containers.  seccomp is really har=
-d
-> > > to get a useful policy out of with QEMU, and using containers for
-> > > each helper process adds a level of complexity worse than selinux
-> > > or separate user IDs, so isn't an obvious win over using dbus.
-> >=20
-> > You can just drop the CAP_SYS_PTRACE on the whole lot for that;
-> > I thought there was something for /proc/.../mem as well.
->=20
-> If they're running the same user ID & not SELinux constrained, I don't
-> think that trying to block PRACTE / /proc/$PID/mem offers a reassuring
-> level of security separation, as there's still plenty of other files
-> that will be readable & writable to both vhostuser helper daemons which
-> can be leveraged as indirect attack vectors - auditing both helpers and
-> every library they link to to ensure nothing can be exploited is very
-> hard.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Jonathan Behrens <fintelia@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
+---
+ hw/riscv/sifive_plic.c         | 12 ------------
+ include/hw/riscv/sifive_plic.h |  3 ---
+ 2 files changed, 15 deletions(-)
 
-Still, it doesn't mean we shouldn't be careful about anything new we
-add.
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+index 64a1a10380..98e4304b66 100644
+--- a/hw/riscv/sifive_plic.c
++++ b/hw/riscv/sifive_plic.c
+@@ -162,18 +162,6 @@ static void sifive_plic_update(SiFivePLICState *plic)
+     }
+ }
+ 
+-void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq)
+-{
+-    sifive_plic_set_pending(plic, irq, true);
+-    sifive_plic_update(plic);
+-}
+-
+-void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq)
+-{
+-    sifive_plic_set_pending(plic, irq, false);
+-    sifive_plic_update(plic);
+-}
+-
+ static uint32_t sifive_plic_claim(SiFivePLICState *plic, uint32_t addrid)
+ {
+     int i, j;
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+index b0edba2884..4421e81249 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -69,9 +69,6 @@ typedef struct SiFivePLICState {
+     uint32_t aperture_size;
+ } SiFivePLICState;
+ 
+-void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq);
+-void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq);
+-
+ DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+     uint32_t num_sources, uint32_t num_priorities,
+     uint32_t priority_base, uint32_t pending_base,
+-- 
+2.22.0
 
-Dave
-
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
