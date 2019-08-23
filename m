@@ -2,86 +2,93 @@ Return-Path: <SRS0=NWXH=WU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53961C3A5A4
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C73F2C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E09E2173E
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 981FF20850
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:08:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLrfszei"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E09E2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="B6EfHNDx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 981FF20850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Jbq-0002XI-4p
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 20:08:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50618)
+	id 1i1Jbr-0002YK-Nv
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 20:08:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i1JJ7-0008Mv-Fc
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:49:30 -0400
+ (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1JCa-0001Rp-PS
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i1JJ6-00043S-Eb
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:49:25 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38818)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i1JJ2-0003yq-Bb; Fri, 23 Aug 2019 19:49:20 -0400
-Received: by mail-ot1-x341.google.com with SMTP id r20so10288600ota.5;
- Fri, 23 Aug 2019 16:49:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=GDZjD+DLwOQGXTvn+lxnFGRBmiGUflL7uU0HzcIxmDw=;
- b=BLrfszeizZllNR9+cd7L8KgG5ZsJ91Tcu10IZuL5l6OnbpqOskWSkvSnE7VSlNRLrH
- ipTIXkz1PsfuGnu4AR1pzJHphVcT3WDYtoglt070IY+9eRguhMojDHwcyygpmqJo8mCi
- 02zeR1dlUaIU5AY430TRPAqKlfPQzi17GJgZMkGh6tW4HdzDzw86JLLv4AvtK/Nwtkbt
- 87zb5DQZrdRmgdTIZMY9dbY0+4JmRpt9iFrWTBvKASO6uCFHvMegZV5VglyxLfieFoP9
- 49B87HKiLVHJIKj4jy1sUXkMrH/t3tcYMrueGB3ndYaQx1BoX0abUn1RJDgL3C63W9nz
- vvtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=GDZjD+DLwOQGXTvn+lxnFGRBmiGUflL7uU0HzcIxmDw=;
- b=TdZEOnYPJz0cbu1eLeeOwtwjtTJxkDFvEf5wflaHpRTDCxwZ5q/CQ7T1cMhFcXg6Oe
- +vOXBM2t260UhQaqnuq/e8gNiXAZeZ6XtPJEISmDsYLOaR2ndXUyOtMC9Q2mmAA5ExVF
- tSyvczsHCML1hK4221iLTNc+MihHwsKsCU2B+h7jjglClgkclpOcYS6bfqA1N1w6afkc
- 78P8kYndljiP24If63DRId8BpXkjbRnB2/kPpHGuDdUWqJjVdlrKQMstVfsO5vLI9iWe
- UN04ejDsWyY0h1o77x7vzRlZlYSAQ5eCSQGR5ErpASm2Tdd7n1uqiImOCJc5h/M+8V4o
- jKrQ==
-X-Gm-Message-State: APjAAAXe8MRF/WM9BFQovDr7F0uxiokMtpr/VZ3u6J6HnCPqREVMY4Ti
- fLcJNMjh11em0AXZklv8s9vLtPJq9Ou3bq1o3dA=
-X-Google-Smtp-Source: APXvYqz8T03T+k1hn/p5CHQhDDNRR+LCEIq2wM3DkvIAPlVtG5KvCtbBMQ7afvwcZu5HliAWGDV2GmPXrsAfjE34ioA=
-X-Received: by 2002:a05:6830:15cc:: with SMTP id
- j12mr6174900otr.64.1566604158204; 
- Fri, 23 Aug 2019 16:49:18 -0700 (PDT)
+ (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1JCZ-0000P8-Ct
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:42:40 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:38476)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1JCY-0000Il-Uq; Fri, 23 Aug 2019 19:42:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1566603760; x=1598139760;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=bSg1Zkq8ZzQni09KJX5mI6uvxYi+5BNezHBmLct93A0=;
+ b=B6EfHNDx1Sc4VwaFCG5hobhghCleuZ0GnLrL5zzBcQzjNX+dL63VDtlp
+ 3mzhPpBLgsDWpNxEsS7etV4X8KlbhU6FZsLi2VrFkmfWywdHhiu8+6Nur
+ EeLNU6t2BaGMCJRO2sf6jv7luxtLfgxgNBLEGPVfhEwQRPLl1GFzk3WvH
+ ZhrUn07BwnicaFWlc1aV6gBNlYCzHTuQuP0J5Xy7SXYwu+3ODF8Xwdxql
+ 7syUSICZPeeTOJ8oDkVC1MU6z4aO6A0+Rmwuox0+OEhdtCJlOYvktzH5p
+ o+CF1GGdPM2ePOfMo+idY6A54nYmCCNTgJt/F5PlSuRa7Szxp3+rFlI+a g==;
+IronPort-SDR: +GPxtk1aj8hcLamUk9Gtix53tXVhy0dK1xn7DIc9Ia1/Nje5c4mbCUbdD44ZkDDgTkKYReg7sc
+ 2YtxlIoGzqSiap7CTlUTDZrPr6TMggEfk7Qp2WXcI1IW/bkDUGUA47b2azQi9R31XdZ2akWHE0
+ ZBXXwqGukWsvOv6QeTbzEcAjasY4L17xeoziLAMEaMYuJytaDQdsufK4H9F9TLtBmcZOwMfmrW
+ e7jKiFndvr/odok+pmj7k9KpVHGepsHpW9sjFKAJW6gG+7j8WsC2WCi5rDTgxlkKa3nb/PYQc5
+ 1Do=
+X-IronPort-AV: E=Sophos;i="5.64,422,1559491200"; d="scan'208";a="117486921"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 24 Aug 2019 07:42:39 +0800
+IronPort-SDR: JB67y5N4G6jLpu2pdu/X56DcyJikeTro3okDasopgA6HNYS0xVCwWgm6ed3pbvvUvK4FIoUTjQ
+ vTgp2o1dY3Gx4aGBHLXclJwLN+HzeFurHjqsyEaPj+ZEW1EujuJGFV1hjI+jnc4RdmOcKtcK+9
+ y+FHKe/ZfKXeeIAvHGXb3zYetD/R9ZBcfXi0xp0aK/Syhywpcgf7c47WpVt8kz2pQWw3GTZzWF
+ VGc16NdW5nktOu79jUoXOISe3mxCA8Au2deSzKr9p0fQQOQhVhaDdRvrK1TLQVFoF0r68CR7G2
+ L6CfMfPeNVqH35LQi8W2qd5N
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Aug 2019 16:39:56 -0700
+IronPort-SDR: D0w0J12ykULkSt0YsA9puseFk5LS2/430ZAZosLd2quHmfQSr71vcNjwV+M0Zugp+wQZ5A/2uy
+ vMvsFg0BMoKZRPLcZ5jkyoJSx9q8S6aqDxpF+uOMkKEFr6PEkt1ljco2WwHLq4qhpdOXmimsG6
+ P5LHn4Wft6zXVXdQ7W+UxzcMwdVPU0oOkW/IfDShPnip4OiAZULXypfhYTdcgX/N5/Z9xrbJdL
+ x7vF1hWW507mJZjvpstdxALwUZsMO7V9qDarH4vHGEYOdBBGjcMQjJyquqljVqm9oyFi1+IUMB
+ I3M=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.157.58])
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Aug 2019 16:42:38 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Date: Fri, 23 Aug 2019 16:38:58 -0700
+Message-Id: <f4e877ca1f9fece2e25f1b8bc655d6e240208ae5.1566603412.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <cover.1566603412.git.alistair.francis@wdc.com>
+References: <cover.1566603412.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 23 Aug 2019 16:49:17
- -0700 (PDT)
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 23 Aug 2019 16:49:17
- -0700 (PDT)
-In-Reply-To: <874l2876kx.fsf@dusky.pond.sub.org>
-References: <20190822230916.576-1-philmd@redhat.com>
- <874l2876kx.fsf@dusky.pond.sub.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 24 Aug 2019 01:49:17 +0200
-Message-ID: <CAL1e-=hvVp4i=s_Wr0iKy5UO7kH6xw3QR0Ms4_v_tobJSM2wRA@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 0/3] mailmap: Clean up
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.153.144
+Subject: [Qemu-devel] [PATCH v1 26/28] target/riscv: Add support for the
+ 32-bit MSTATUSH CSR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,58 +100,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, alex.bennee@linaro.org,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, Anup.Patel@wdc.com, palmer@sifive.com,
+ alistair.francis@wdc.com, Atish.Patra@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-23.08.2019. 08.13, "Markus Armbruster" <armbru@redhat.com> =D1=98=D0=B5 =D0=
-=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->
-> > Trivial cleanup of .mailmap to have a nice 'git shortlog' output.
-> >
-> > Philippe Mathieu-Daud=C3=A9 (3):
-> >   mailmap: Reorder by sections
-> >   mailmap: Update philmd email address
-> >   mailmap: Add many entries to improve 'git shortlog' statistics
-> >
-> >  .mailmap | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 115 insertions(+), 8 deletions(-)
->
-> Series
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
-> However, it increases the difference to contrib/gitdm/aliases.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/cpu.c        |  6 ++++++
+ target/riscv/cpu.h        |  7 +++++++
+ target/riscv/cpu_bits.h   |  3 +++
+ target/riscv/cpu_helper.c |  7 +++++++
+ target/riscv/csr.c        | 23 +++++++++++++++++++++++
+ target/riscv/op_helper.c  |  4 ++++
+ 6 files changed, 50 insertions(+)
 
-Alex' initial gitdm effort, as I understood it, was not meant to cover all
-history from 2007 or so, but just to give reasonable statistics for 2018
-(amd future years).
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 371d5845af..06ee551ebe 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -229,6 +229,9 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ #ifndef CONFIG_USER_ONLY
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", *env->mstatus);
++#ifdef TARGET_RISCV32
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatush ", *env->mstatush);
++#endif
+     if (riscv_has_ext(env, RVH)) {
+         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
+         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "bstatus ", env->vsstatus);
+@@ -468,6 +471,9 @@ static void riscv_cpu_init(Object *obj)
+ #ifndef CONFIG_USER_ONLY
+     env->mie = &env->mie_novirt;
+     env->mstatus = &env->mstatus_novirt;
++# ifdef TARGET_RISCV32
++    env->mstatush = &env->mstatush_novirt;
++# endif
+ #endif
+ }
+ 
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 05957f32a8..b63f1f3cdc 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -124,6 +124,10 @@ struct CPURISCVState {
+     target_ulong mhartid;
+     target_ulong *mstatus;
+ 
++#ifdef TARGET_RISCV32
++    target_ulong *mstatush;
++#endif
++
+     /*
+      * CAUTION! Unlike the rest of this struct, mip and mip_novirt is accessed
+      * asynchonously by I/O threads. It should be read with atomic_read. It should
+@@ -164,6 +168,9 @@ struct CPURISCVState {
+      */
+     target_ulong mie_novirt;
+     target_ulong mstatus_novirt;
++#ifdef TARGET_RISCV32
++    target_ulong mstatush_novirt;
++#endif
+ 
+     /* Hypervisor CSRs */
+     target_ulong hstatus;
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 353fc9a24a..55e20af6d9 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -135,6 +135,9 @@
+ #define CSR_MTVEC           0x305
+ #define CSR_MCOUNTEREN      0x306
+ 
++/* 32-bit only */
++#define CSR_MSTATUSH        0x310
++
+ /* Legacy Counter Setup (priv v1.9.1) */
+ /* Update to #define CSR_MCOUNTINHIBIT 0x320 for 1.11.0 */
+ #define CSR_MUCOUNTEREN     0x320
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 0761191f11..8c80486dd0 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -949,10 +949,17 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+             if (riscv_cpu_virt_enabled(env)) {
+                 riscv_cpu_swap_hypervisor_regs(env);
+             }
++#ifdef TARGET_RISCV32
++            *env->mstatush = set_field(*env->mstatush, MSTATUS_MPV,
++                                       riscv_cpu_virt_enabled(env));
++            *env->mstatush = set_field(*env->mstatush, MSTATUS_MTL,
++                                       riscv_cpu_force_hs_excep_enabled(env));
++#else
+             *env->mstatus = set_field(*env->mstatus, MSTATUS_MPV,
+                                       riscv_cpu_virt_enabled(env));
+             *env->mstatus = set_field(*env->mstatus, MSTATUS_MTL,
+                                       riscv_cpu_force_hs_excep_enabled(env));
++#endif
+ 
+             /* Trapping to M mode, virt is disabled */
+             riscv_cpu_set_virt_enabled(env, VIRT_OFF);
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 47be4b1d42..b7d6d009dc 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -364,6 +364,25 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
+ 
++#ifdef TARGET_RISCV32
++static int read_mstatush(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = *env->mstatush;
++    return 0;
++}
++
++static int write_mstatush(CPURISCVState *env, int csrno, target_ulong val)
++{
++    if ((val ^ *env->mstatush) & (MSTATUS_MPV)) {
++        tlb_flush(env_cpu(env));
++    }
++
++    *env->mstatush = val;
++
++    return 0;
++}
++#endif
++
+ static int read_misa(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     *val = env->misa;
+@@ -1095,6 +1114,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_MTVEC] =               { any,  read_mtvec,       write_mtvec       },
+     [CSR_MCOUNTEREN] =          { any,  read_mcounteren,  write_mcounteren  },
+ 
++#if defined(TARGET_RISCV32)
++    [CSR_MSTATUSH] =            { any,  read_mstatush,    write_mstatush    },
++#endif
++
+     /* Legacy Counter Setup (priv v1.9.1) */
+     [CSR_MUCOUNTEREN] =         { any,  read_mucounteren, write_mucounteren },
+     [CSR_MSCOUNTEREN] =         { any,  read_mscounteren, write_mscounteren },
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 5bcf5d2ff7..8dec1aee99 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -153,7 +153,11 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
+         get_field(mstatus, MSTATUS_MPIE));
+     mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
+     mstatus = set_field(mstatus, MSTATUS_MPP, 0);
++#ifdef TARGET_RISCV32
++    *env->mstatush = set_field(*env->mstatush, MSTATUS_MPV, 0);
++#else
+     mstatus = set_field(mstatus, MSTATUS_MPV, 0);
++#endif
+     *env->mstatus = mstatus;
+     riscv_cpu_set_mode(env, prev_priv);
+ 
+-- 
+2.22.0
 
-In that light, .mailmap and gitdm aliases do not need to be equivalent.
 
-But perhaps Alex would now want gitdm to be used for all QEMU history? Is
-this desirable?
-
-Aleksandar
-
-> I'm just
-> as guilty; my recent "[PATCH 2/2] contrib/gitdm: Add armbru@pond.sub.org
-> to group-map-redhat" updates only that. and not .mailmap.
->
-> Perhaps we want to keep the two in sync manually.  We should then add
-> suitable comments to each file.
->
-> Could we instead teach gitdm to use .mailmap, and ditch
-> contrib/gitdm/aliases?
->
-> aliases' format is documented in gitdm's README.  Each line maps a
-> non-canonical e-mail address to a canonical one.
->
-> .mailmap's format is documented in git-shortlog(1).  It can do a bit
-> more.  Even the common part differs: it has two addresses in different
-> order *boggle*.
->
