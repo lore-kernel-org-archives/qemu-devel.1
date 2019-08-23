@@ -2,93 +2,65 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D686C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0DCC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 187B120870
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q+4HoSk6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187B120870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B0E7620870
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0E7620870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1B8k-0000rD-MH
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:06:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53715)
+	id 1i1B9M-00027d-8a
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:06:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i1Aso-0000JN-LI
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:49:43 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1i1B7Y-0008N6-Nw
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:04:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i1Asn-00067U-Hs
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:49:42 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33459)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i1Asn-00066s-Az
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:49:41 -0400
-Received: by mail-pl1-x642.google.com with SMTP id go14so5706562plb.0
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 07:49:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=QxO2uVfnR+ASBjD1E44tju9xARYVi3V8cmVvh6cGfKU=;
- b=Q+4HoSk6ExxjL5qeds/YT6DBmMr0cgBP3loCMshobrahFbjq+JDOn1FT7FOi9jEcUf
- pBro/03MTfwW1C5w1yhf9xsUnmp0KutH5kXuTkogrS9TbbuwEX7gTIJMZE8dCstjavWF
- wx7vmn+BG9Q+7FgzuHhTDS7hqaWJWjYfLj+PfHXX6yTKIKylocgyNX6pOnVJ9fALSKsn
- EWXUxWJclKpxB2DlXkGjw8OsI0uZR583h5UvKU+5o7WLTDOdJKD9w58bHCmJuIwax9PI
- RHqsQ+z67X9XlriPG/7nTqyhvFwTwmN298k6+60Ou4FU+dDAA9cDL7ybuTHDl835dWl0
- j0iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=QxO2uVfnR+ASBjD1E44tju9xARYVi3V8cmVvh6cGfKU=;
- b=fT8fMbIoVLupkVGVJaG0pUEC4erv73ozopUdiLarnRhiLhnWUDunKyQ762n+/IpZf0
- bORToUX6PXh0kOTZHVZAwPOfhk43wURtrr6CzC7U2uolB4IE+QSnL75ciWcKcgXtMMt9
- 2LWyhRUbzaM9C5g/gbtb7Y5hEfv5e69kbTI6xTtzTgJEZosF8XTm42VN3V5eVMf/dtp5
- Bkc2kQu63uKpyzRgE/qDMDqhHoqozoJwoOAkIC9uG4Vrgi0ttlF4dIldEJvOi+WLpYTj
- cF2dy/AIwMPeBEViSOYkHRUpg3nI3gPFYh2iGRhzzK9mdgjCrOwglVr8ILW13XtdlJcy
- 9Ayw==
-X-Gm-Message-State: APjAAAV3ofsYRN38clMT92+vNhukTJH1vv+oYaZ+cJzCCIgCIlQgf+P8
- A8N0Mduh+JXaUdfTIoqLqV89tg==
-X-Google-Smtp-Source: APXvYqzanQ9kT/4BdN5OgPUL6JfjPxbZxX4Be3SPQD8wywyW89t9/UPFrZdm5nIUoFbsg+O/eOn1uQ==
-X-Received: by 2002:a17:902:e413:: with SMTP id
- ci19mr5296312plb.256.1566571780235; 
- Fri, 23 Aug 2019 07:49:40 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id o4sm9068318pje.28.2019.08.23.07.49.39
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 23 Aug 2019 07:49:39 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190823100741.9621-1-david@redhat.com>
- <20190823100741.9621-2-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <529817b0-9109-7ec9-674f-181a32966857@linaro.org>
-Date: Fri, 23 Aug 2019 07:49:37 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <ehabkost@redhat.com>) id 1i1B7W-0006UB-SZ
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:04:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50308)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i1B7W-0006Tu-LB
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:04:54 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B29AD18C427C;
+ Fri, 23 Aug 2019 15:04:53 +0000 (UTC)
+Received: from localhost (ovpn-116-73.gru2.redhat.com [10.97.116.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58954261A7;
+ Fri, 23 Aug 2019 15:04:48 +0000 (UTC)
+Date: Fri, 23 Aug 2019 12:04:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190823150446.GQ7077@habkost.net>
+References: <20181109150710.31085-1-crosa@redhat.com>
+ <20181109150710.31085-2-crosa@redhat.com>
+ <CAFEAcA86JT-3jLV=+aqLntoe1jJr77VYvg1dWn9OBVGA6cPZmQ@mail.gmail.com>
+ <20190822211636.GA23027@dhcp-17-173.bos.redhat.com>
+ <20190822215420.GO7077@habkost.net>
+ <20190823134054.GA3936@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190823100741.9621-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: Re: [Qemu-devel] [PATCH v1 1/9] s390x/tcg: Use guest_addr_valid()
- instead of h2g_valid() in probe_write_access()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190823134054.GA3936@localhost.localdomain>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Fri, 23 Aug 2019 15:04:53 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/4] configure: keep track of Python version
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,28 +72,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 3:07 AM, David Hildenbrand wrote:
-> If I'm not completely wrong, we are dealing with guest addresses here
-> and not with host addresses. Use the right check.
+On Fri, Aug 23, 2019 at 09:40:54AM -0400, Cleber Rosa wrote:
+> On Thu, Aug 22, 2019 at 06:54:20PM -0300, Eduardo Habkost wrote:
+> > On Thu, Aug 22, 2019 at 05:19:26PM -0400, Cleber Rosa wrote:
+> > > On Thu, Aug 22, 2019 at 05:48:46PM +0100, Peter Maydell wrote:
+> > > > On Fri, 9 Nov 2018 at 15:09, Cleber Rosa <crosa@redhat.com> wrote:
+> > > > >
+> > > > > Some functionality is dependent on the Python version
+> > > > > detected/configured on configure.  While it's possible to run the
+> > > > > Python version later and check for the version, doing it once is
+> > > > > preferable.  Also, it's a relevant information to keep in build logs,
+> > > > > as the overall behavior of the build can be affected by it.
+> > > > >
+> > > > > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > > > > ---
+> > > > >  configure | 6 +++++-
+> > > > >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/configure b/configure
+> > > > > index 74e313a810..67fff0290d 100755
+> > > > > --- a/configure
+> > > > > +++ b/configure
+> > > > > @@ -1740,6 +1740,9 @@ if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
+> > > > >        "Use --python=/path/to/python to specify a supported Python."
+> > > > >  fi
+> > > > >
+> > > > > +# Preserve python version since some functionality is dependent on it
+> > > > > +python_version=$($python -V 2>&1 | sed -e 's/Python\ //')
+> > > > > +
+> > > > 
+> > > > Hi. Somebody on IRC has just fallen over a problem where
+> > > > their python's "-V" output prints multiple lines, which
+> > > > means that "$python_version" here is multiple lines, which
+> > > > means that the eventual config-host.mak has invalid syntax
+> > > > because we assume here:
+> > > >
+> > > 
+> > > We've tried a number of things, and just when I thought we wouldn't be
+> > > able to make any sense out of it, I arrived at a still senseless but
+> > > precise reproducer.  TL;DR: it has to do with interactive shells and
+> > > that exact Python build.
+> > > 
+> > > Reproducer (docker may also do the trick here):
+> > > 
+> > >   $ podman run --rm -ti fedora:29 /bin/bash -c 'dnf -y install http://mirror.siena.edu/fedora/linux/releases/29/Everything/x86_64/os/Packages/p/python3-3.7.0-9.fc29.x86_64.rpm; python3 -V'
+> > >   Python 3.7.0 (default, Aug 30 2018, 14:32:33) 
+> > >   [GCC 8.2.1 20180801 (Red Hat 8.2.1-2)]
+> > > 
+> > > With an interactive shell instead:
+> > > 
+> > >   $ podman run --rm -ti fedora:29 /bin/bash -i -c 'dnf -y install http://mirror.siena.edu/fedora/linux/releases/29/Everything/x86_64/os/Packages/p/python3-3.7.0-9.fc29.x86_64.rpm; python3 -V'
+> > >   Python 3.7.0
+> > > 
+> > > How this behavior came to be, baffles me.  But, it seems to be fixed
+> > > on newer versions.
+> > > 
+> > > > > @@ -6823,6 +6826,7 @@ echo "INSTALL_DATA=$install -c -m 0644" >> $config_host_mak
+> > > > >  echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
+> > > > >  echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
+> > > > >  echo "PYTHON=$python" >> $config_host_mak
+> > > > > +echo "PYTHON_VERSION=$python_version" >> $config_host_mak
+> > > > >  echo "CC=$cc" >> $config_host_mak
+> > > > >  if $iasl -h > /dev/null 2>&1; then
+> > > > >    echo "IASL=$iasl" >> $config_host_mak
+> > > > 
+> > > > that it's only one line, and will generate bogus makefile
+> > > > syntax if it's got an embedded newline. (Problem system
+> > > > seems to be Fedora 29.)
+> > > >
+> > > 
+> > > The assumption could be guaranteed by a "head -1", and while
+> > > it's not a failproof solution, it would at least not corrupt
+> > > the makefile and the whole build system.
+> > > 
+> > > > I've reread this thread, where there seems to have been
+> > > > some discussion about just running Python itself to
+> > > > get the sys.version value (which is how we check for
+> > > > "is this python too old" earlier in the configure script).
+> > > > But I'm not really clear why trying to parse -V output is better:
+> > > > it's definitely less reliable, as demonstrated by this bug.
+> > 
+> > Agreed.
+> > 
+> > > >
+> > > > Given that the only thing as far as I can tell that we
+> > > > do with PYTHON_VERSION is use it in tests/Makefile.inc
+> > > > to suppress a bit of test functionality if we don't have
+> > > > Python 3, could we stop trying to parse -V output and run
+> > > > python to print sys.version_info instead, and/or just
+> > > > have the makefile variable track "is this python 2",
+> > > > since that's what we really care about and would mean we
+> > > > don't have to then search the string for "v2"  ?
+> > > 
+> > > Because I've been bitten way too many times with differences in Python
+> > > minor versions, I see a lot of value in keeping the version
+> > > information in the build system.  But, the same information can
+> > > certainly be obtained in a more resilient way.  Would you object something
+> > > like:
+> > > 
+> > >   python_version=$($python -c 'import sys; print(sys.version().split()[0])')
+> > 
+> > Sounds much better, but why sys.version().split() instead of
+> > sys.version_info?
+> > 
+> >   python_version=$($python -c 'import sys; print(sys.version_info[0])')
+> >
 > 
-> Fixes: c5a7392cfb96 ("s390x/tcg: Provide probe_write_access helper")
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/mem_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> I meant to capture not only the major version, but the minor and release
+> as well.  My reasoning (may not appeal more people):
+> 
+>  "Because I've been bitten way too many times with differences in Python
+>   minor versions, I see a lot of value in keeping the version
+>   information in the build system."
+> 
+> > > 
+> > > Or an even more paranoid version?  On my side, I understand the
+> > > fragility of the current approach, but I also appreciate the
+> > > information it stores.
+> > 
+> > We have only one place where $(PYTHON_VERSION) is used, and that
+> > code will be removed once we stop supporting Python 2.  I don't
+> > see the point of trying to store extra information that is not
+> > used anywhere in our makefiles.
+[...]
+> 
+> I see it being used by humans, so that brings a lot of subjetivity
+> into the matter.  IMO this is not out of place within the build
+> system, given that a lot of requirements detected by configure will
+> print out their versions (GTK, nettle, spice, etc).
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Absolutely, but are we talking about the output printed by
+./configure, or about variables in config-host.mak?
 
+config-host.mak is not for humans, it's just input for our
+makefile code.  The output printed by ./configure on stdout is
+for humans, and I'd agree completely if ./configure keeps
+printing full Python version information on stdout.
 
-r~
+> [...]
+
+-- 
+Eduardo
 
