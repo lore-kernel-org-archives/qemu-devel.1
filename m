@@ -2,116 +2,80 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E91DC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84806C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:02:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2183B21019
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:00:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2183B21019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 4D91F21019
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 17:02:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eg6/hD2A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D91F21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1CvV-00041w-2R
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:00:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53847)
+	id 1i1Cxe-0005WZ-EG
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 13:02:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i1Ctt-0003PK-49
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:58:58 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i1CvV-0004LC-Iu
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i1Ctr-0006V0-QG
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:58:56 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:49873)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i1Ctr-0006Su-HG
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:58:55 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N9doJ-1iG0ZP1tH3-015dxZ; Fri, 23 Aug 2019 18:58:46 +0200
-To: dion@linutronix.de, qemu-devel@nongnu.org
-References: <20190807135458.32440-1-dion@linutronix.de>
- <20190807135458.32440-2-dion@linutronix.de>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <7a8fa9b4-01b5-e431-be89-00e73235e3ff@vivier.eu>
-Date: Fri, 23 Aug 2019 18:58:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1i1CvU-0007HA-Bz
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:00:37 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34170)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i1CvU-0007Gu-5x
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 13:00:36 -0400
+Received: by mail-oi1-x241.google.com with SMTP id g128so7550877oib.1
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 10:00:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=3wECWcWTBB75jo4+e2zcF8qaISQpSOHbaWaV2xm/QlQ=;
+ b=eg6/hD2AtxS1XYMgIockhzsAtlBFgcsyRwesMJJC1Mx4TJdUm9lufJmtUzu6hBbAuQ
+ cXHo/N/iRVKcT7y5L3/xEgvZgpi4pmWLJnc2xriDzSf612z63f7ZuR8bC7wq472reI6j
+ OXDvB8g0Z0KlQ0U/Y4y3Rmw5iwn9K7+AW3nxJnded9JsWHjnFnxRnfQ50+/hYhLJKHXr
+ Wd0dRIM/TxPoLZjCAlRjg95aaj93Ce1J2Iog5FFAgpxEBXjSvhQarklN0mmYzUk7/VSM
+ lI1I0d8OnqJs1QGQAdb15gy4t9CfT4MyWMPuYUvyFDBypm2W+EjjXFObzSTbI2pti+Rx
+ BKpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3wECWcWTBB75jo4+e2zcF8qaISQpSOHbaWaV2xm/QlQ=;
+ b=GGutMfIG37xYayPH2zm5tl8We60gVvCbihq3oHoqz2zxJ4Lst1faWA/xhm4fSf8s1a
+ 2/Ksr5yTHwS/D72T5TdPljEbcUa1r1A7uKS25kWxT6mKEcYHjA4ykYvPYiyFEzDziob/
+ 6DueAYguEgsMxTMx/R/EZITvhbqpJktvlyqXbDbneFCHl/+RECK8KrETixSfbTJBp4le
+ 5cS80+ghzB2ruQYaN0fRdRyoDpAsNR2dlodr4aTr6Z6PVQ2UEgKAuyzpCrydE8rgcFsb
+ sqQJJO9lC3Lz64TdyOQgyUzzVI+AmfYhP4AKhLw78jtFfWYtE3U4Q+SRfxdofrZqghdf
+ OXzw==
+X-Gm-Message-State: APjAAAVDtQc39F6jZJYvemwq07HuGTLhBq2VUTS3xTcV41fUSyIav4s3
+ 4R3exXEw5KN8IwgFe/jDOrO+lY7cTK+vdudIRz2v5Q==
+X-Google-Smtp-Source: APXvYqwZkEZ6QuK3m4ixices39zmR51vWaX4oa1w54MZDW8t5TW4FR8gEeOyR931lB8+WG7O779qWSpkAxyH0TGRm/M=
+X-Received: by 2002:aca:50cb:: with SMTP id e194mr3667916oib.48.1566579635251; 
+ Fri, 23 Aug 2019 10:00:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190807135458.32440-2-dion@linutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:KFVdwPSLUjj0iDFoT8O5etZqHESXAFpF8MMVJzBvZqwKL30oU5c
- NtODmUDONaOc0mgOZk4Ka4vze4+e12aUnOY0eb/B3M8VkeYpDpk3mGP8FKHw5JKvQCSFyQk
- cTqYEQT+a8VcqF7PgshQMBELZAKEyjNRD0fabBDtezawO/oYrlLdvKnBmcDBHBrl7Zxak49
- PZxNDdGe421O1KnwQ2oNA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:YEA1tlvPaBc=:+tmcjvHiWHNoGDZSozmLpq
- SNdjeahFPJCY/H6mgVIcJAMhgBVdVlNiC0by6ZuVHpgbY1W6FeOpbC9s5IICcC2axnU8QmxJL
- xsDWvBexoMVvPh0lj7OBxNESrb+HRM3L3T5xdulE5+0JOCsNZFaECJm/moqut7vUahWmlOf46
- VcmLT3vIHPfkfhGaMtLI25cuLelkBB4n2hYkygtu9zD0lA9YW+smIYNgceAfO8aB1Vz6eXVUF
- kUV5sDFKK+jnQzbuO7qCvaKvAcTJFtG6C+rD5nPmlyA4BVdGt/dOOmJehv99IAGU87UW2yy8P
- ImtcGwLPejxKGSwc0gLLEpdyYOkqODFpAbbNVHXbLKtSeHbcaMxxYdBVceL87h4gFzcIOJRER
- MPAQWOkGKl4g7k92hncuJwCt9Jq9xAZzyYDBmrbMHvpjkuIeOlJRsQP/21pO0BMjyfxWlJqYZ
- DppxWtMYYu56kEgh1Pgt0Ar5NlKI40BwYxLCzVmJlZi9RsRBipx145qm/MRi+gf1Vb6b+WZ8h
- zXiq1ankxxJkee1G7MFCJfeETqCkjP/2EDNCTBwVS/jvm/23EJ1ccq3NxTD2YbCudAaVzaAEG
- ZgB+0+21uYAN3KpAyxsRgPG5vHDgYYMlHLkEDgxEHgXoX2hZyg3KnWuKOUfVa/y/g/+mzbh6U
- /pw4ReGz+wvIbF2XrBnleZnzkRJB/cXYFKKu9NzKj1fW3pDayNkKS7eLJXrNrAmIxkQ2lFLdc
- 2O+G3oNVRwShCFh28p0a/JWtQ1oCDmHzn4iPxUcS2RlMQ3VVCzZNq2DaT3Ejq44qxQ4VHeCsE
- mwKMEsB90DpsekC56NrB/4gdhVx3g==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
-Subject: Re: [Qemu-devel] [PATCH 1/1] linux-user: Handle /proc/self/exe in
- syscall execve
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-26-richard.henderson@linaro.org>
+In-Reply-To: <20190819213755.26175-26-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Aug 2019 18:00:24 +0100
+Message-ID: <CAFEAcA-gsP30Be2wZi-UeUUjond05A3HuFKN3znz60WmPPnCxA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v2 25/68] target/arm: Convert Signed
+ multiply, signed and unsigned divide
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,21 +87,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: john.ogness@linutronix.de
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 07/08/2019 à 15:54, dion@linutronix.de a écrit :
-> From: Olivier Dion <dion@linutronix.de>
-> 
-> If not handled, QEMU will execve itself instead of the emulated
-> process.  This could result in potential security risk.
-> 
+On Mon, 19 Aug 2019 at 22:38, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 463 ++++++++++++++++++-----------------------
+>  target/arm/a32.decode  |  22 ++
+>  target/arm/t32.decode  |  18 ++
+>  3 files changed, 247 insertions(+), 256 deletions(-)
+>
 
-Could you explain what you mean by potential security risk?
+> +static bool op_smmla(DisasContext *s, arg_rrrr *a, bool round, bool sub)
+> +{
+> +    TCGv_i32 t1, t2;
+> +
+> +    if (s->thumb
+> +        ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
+> +        : !ENABLE_ARCH_6) {
+> +        return false;
+> +    }
+> +
+> +    t1 = load_reg(s, a->rn);
+> +    t2 = load_reg(s, a->rm);
+> +    tcg_gen_muls2_i32(t2, t1, t1, t2);
+> +
+> +    if (a->ra != 15) {
+> +        TCGv_i32 t3 = load_reg(s, a->ra);
+> +        if (sub) {
+> +            tcg_gen_sub_i32(t1, t1, t3);
+> +        } else {
+> +            tcg_gen_add_i32(t1, t1, t3);
+> +        }
+> +        tcg_temp_free_i32(t3);
+> +    }
+> +    if (round) {
+> +        tcg_gen_shri_i32(t2, t2, 31);
+> +        tcg_gen_add_i32(t1, t1, t2);
 
-Thanks,
-Laurent
+Can we keep the comment the old decoder had for this case?
 
+
+> +    }
+> +    tcg_temp_free_i32(t2);
+> +    store_reg(s, a->rd, t1);
+> +    return true;
+> +}
+> +
+
+This one:
+
+> -                if (insn & (1 << 4)) {
+> -                    /*
+> -                     * Adding 0x80000000 to the 64-bit quantity
+> -                     * means that we have carry in to the high
+> -                     * word when the low word has the high bit set.
+> -                     */
+> -                    tcg_gen_shri_i32(tmp2, tmp2, 31);
+> -                    tcg_gen_add_i32(tmp, tmp, tmp2);
+> -                }
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
