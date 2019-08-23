@@ -2,94 +2,113 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3440C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A864C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DC0120870
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:03:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DN+EMb4X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DC0120870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D322020870
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:04:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D322020870
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1B6R-0006pb-Dm
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:03:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55137)
+	id 1i1B7Z-0007x4-Fh
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55937)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i1B01-0000ZM-4K
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:57:10 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i1B4m-0005sK-3K
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:02:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i1Azz-0001Z9-2Y
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:57:08 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39603)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i1Azx-0001YO-A9
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:57:06 -0400
-Received: by mail-pf1-x443.google.com with SMTP id s11so689291pfe.6
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 07:57:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xPoUhroqLSrDe34vXvIBopbUjEmLdF9oYc+YKNHlzIA=;
- b=DN+EMb4XwYAXoewykcOumDmuIswq0yvLaul2ui6EYCTRI/RwncRLyIgAXUfbqdkZY4
- WaTKRDZM3VYOjzj10NQFRWHKGaN20mW4Aj4MNbExrBq1MyVfwbCxhTv46IX6VllfAdpZ
- LytuA9OC8bn15/OsQcEkMv/jT2rayN4+UpKodCiFr4UVIgjivrl8+NSKQxeuS5s0bKCu
- YSuFtQnWOhVM/oo62B33SdtvfSMOBRKd24kqBQ0pyiukJJo2hEFFKwFbt/UBx4AAAUHa
- ducCFcB+2sDs1ymcnGLxF5H9ymcfcu5lSxgtSHnzYlkVkjerwUvn7r9MTW9c8xsmctaz
- t/Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xPoUhroqLSrDe34vXvIBopbUjEmLdF9oYc+YKNHlzIA=;
- b=JELuX6zPvAEXKwEEDj0lVjZL7ek2k2YSM/zE97xzxDqGbBCVwyH1c6b2XKjs7vus5D
- R88bJ/rMbYQXi2G17e/yl9uuOOkm9MghAQwC6BLKrL71YTEukjQLBB975w5ujFrHa3v0
- 9H5AVpCP9TJpWFMlbQP0GveEM4XAmXVW5+9QNmMuzr77uWUvuVcXbOyRqtHcB4WOs7DE
- xsnK2Efpm5JyHFbLTI6nx4hdHIQkmCSoyPLeyQpQzeDYmy8HTy2BtLB0BBKYcWbw1NlA
- WKe6FYBbiPssmCGUqUry+uSmEcqj4xjfr5iqF6aWydi/iIOTaEsQEKRxVMUXVogkdIeo
- vTUg==
-X-Gm-Message-State: APjAAAVw0UFnTZBYL0JbLzhRPQ3M5UXXW1DRsQ7kO2UfUrVTsD2SFDRe
- AyKZWOQmigo4o2usPmF55PptrQ==
-X-Google-Smtp-Source: APXvYqw0xx4KEz2YZEJnRL9VLSbkwZeYr3aQgm9C+VY1SAqyP+DJZAiR7cllMp553FrgmeVB8bz0Og==
-X-Received: by 2002:a17:90a:256f:: with SMTP id
- j102mr5943859pje.14.1566572223962; 
- Fri, 23 Aug 2019 07:57:03 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id u18sm4159714pfl.29.2019.08.23.07.57.02
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 23 Aug 2019 07:57:03 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-20-richard.henderson@linaro.org>
- <CAFEAcA8Q3ujQFtZfLXTsbKBxUQAHCPo0i_TpdX9KcmnNUY04Eg@mail.gmail.com>
- <c8809173-6b8a-afab-507f-69983ac29224@linaro.org>
- <CAFEAcA9Rq3VR3F+zUV3BiZ7zQm-gE=Ut4hv7Hi0cK3me4Vch3Q@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1i1B4k-0004OE-5o
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:02:03 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:39257)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1i1B4j-0004L3-LA; Fri, 23 Aug 2019 11:02:01 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N9d91-1iLXNR3Ja9-015dr3; Fri, 23 Aug 2019 17:01:48 +0200
+To: Chen Zhang <tgfbeta@me.com>, qemu-devel@nongnu.org
+References: <8E5A9C27-C76D-46CF-85B0-79121A00B05F@me.com>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
-Message-ID: <0548bd91-14d9-8e2b-3b9e-d5adad7a7dfb@linaro.org>
-Date: Fri, 23 Aug 2019 07:57:01 -0700
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d11d786b-bd04-42a5-46f2-23191f070df4@vivier.eu>
+Date: Fri, 23 Aug 2019 17:01:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Rq3VR3F+zUV3BiZ7zQm-gE=Ut4hv7Hi0cK3me4Vch3Q@mail.gmail.com>
+In-Reply-To: <8E5A9C27-C76D-46CF-85B0-79121A00B05F@me.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v2 19/68] target/arm: Convert T32 ADDW/SUBW
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:0B82HvmwNC6S/Sp5DN+hMz77JTvBzKv/MzJilF+IJsFyz/6aWQP
+ 3L8nqIc9Wxwebl0h/rCh5YDMEoEKPZhIDWB8yMajiczK+XAdp+zsD6aiCtfACzUq0C6LpB8
+ vhp8zpxw1m4hEZQHo2PThLJxd7J84M5id1D16t8GQepNHtWNdedJxnbuUFttkGcyrheBQe5
+ hmvEUC9omJ0tFr/HXEvgQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:H19RhOfi82E=:+60eU9sYUmQVNoe8/RNsI3
+ mEVH8P48OjuzcBoXZj6sIcL05aZbUtxQZJ3FCt8hk7cBPpwzfP6wL0+x9jQvSSqpBZQv+gXuM
+ tgcSbDzUnmd8+T8QCVkdvjbRZPZeo2ZIa0Uc4e4muh3MBgfkf+OvEJmtGfZHzVp24Uxlm2tui
+ yj6ra8HHw8Xap3oU0dfvQEi73LlGbeJkc0B0kMHOAaxzdvbeZ58eUps+qmMTW3UqYXzauuN7j
+ YmH4dr6GE5mfEud3XP/HFVuv9SXE6ymO3YehsX0MolGOpb6fpBfmqD6H1xMv/2vuc8EQkEnxo
+ KaTAeRPx9UBH4pq5ctTDrAnp8CqEQEC6reholIH8RC5o3WJEeofoHHkw9XeNa2cJu0VqSE5GI
+ BPMBdc2180hn96PhbvnBr/1is3bxyk4jOk4X1zXa5tLXAsb4fX56m4RTJXzgof7QQu9GPWaIm
+ xwDxujAXk1718lyRNet39DtFoti5Mrssk5WY254eZaLVEHEKq1pTjYUrXMdF7PurCSwAIC1ZY
+ 8KR0G9J5JMQcV/I4wsBicbPATYZbQ1zmi7PPKWAe/aLFp0U7hg3KQ59L0l8uZglu/FfHWRpYI
+ so7MlB5c2H4qWo26+3dp+m4TKdfA/mFBp6pZgqUKMackX0HxSChltqvRSCjJoKvOnjv382oal
+ KaY8XMnKs5DGFl8gkj99I2bUe3XYxnbcETlxg5P4vbVJjMvyvXu0rPBGjL0m7rwAEkmSCqUtY
+ ll546DictkeaY3UGGIkkKgyrpkcqxmSodZqcZo57OgPNttkFPn+I3A+b7/c=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.73
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] vfio: fix a typo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,38 +120,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 7:47 AM, Peter Maydell wrote:
-> On Fri, 23 Aug 2019 at 15:45, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> On 8/23/19 6:04 AM, Peter Maydell wrote:
->>>> +&ri              rd imm
->>>>  &r               rm
->>>>  &i               imm
->>>>  &msr_reg         rn r mask
->>>
->>> Should this change be in some other patch ?
->>
->> No, it's used by ADR.
->>
->>>> +  ADR            1111 0.1 0000 0 1111 0 ... rd:4 ........ \
->>>> +                 &ri imm=%imm12_26_12_0
->>
->> ... here.
+Le 22/08/2019 à 08:49, Chen Zhang via Qemu-trivial a écrit :
+> Signed-off-by: Chen Zhang <tgfbeta@me.com>
+> ---
+>  hw/vfio/pci.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> This is in t32.decode, which has its own definition of &ri.
-> The one I was asking about was the one in a32.decode -- the
-> addition of that line is the only change to a32.decode in this patch.
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index dc3479c..c5e6fe6 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -44,7 +44,7 @@
+>  #define TYPE_VFIO_PCI "vfio-pci"
+>  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+>  
+> -#define TYPE_VIFO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
+> +#define TYPE_VFIO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
+>  
+>  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+>  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> @@ -3199,7 +3199,7 @@ static void vfio_pci_nohotplug_dev_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo vfio_pci_nohotplug_dev_info = { 
+> -    .name = TYPE_VIFO_PCI_NOHOTPLUG,
+> +    .name = TYPE_VFIO_PCI_NOHOTPLUG,
+>      .parent = TYPE_VFIO_PCI,
+>      .instance_size = sizeof(VFIOPCIDevice),
+>      .class_init = vfio_pci_nohotplug_dev_class_init,
+> 
 
-a32.decode is where all of the shared argument sets are declared; t32.decode
-gets the !extern markup.  If I only put it in t32.decode now, I'd only have to
-move it later.  It will eventually be used in a32.decode by MOVW/MOVT.
+Applied to my trivial-patches branch.
 
-
-r~
+Thanks,
+Laurent
 
