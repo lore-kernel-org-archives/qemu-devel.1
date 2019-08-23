@@ -2,69 +2,91 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382ABC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A176C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:28:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E66B206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:28:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E66B206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8009206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:28:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t799YKpI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8009206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i15rh-0001ht-6X
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 05:28:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52143)
+	id 1i15rn-0001q4-03
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 05:28:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i15qJ-0000GF-Cf
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:26:48 -0400
+ (envelope-from <stefanha@gmail.com>) id 1i15pU-0007Cq-W4
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i15qH-0002xw-TR
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:26:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34182)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i15qF-0002wt-Te
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:26:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4943A30655F5;
- Fri, 23 Aug 2019 09:26:42 +0000 (UTC)
-Received: from work-vm (ovpn-117-244.ams2.redhat.com [10.36.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BCF546092D;
- Fri, 23 Aug 2019 09:26:35 +0000 (UTC)
-Date: Fri, 23 Aug 2019 10:26:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Message-ID: <20190823092633.GB2784@work-vm>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-5-git-send-email-kwankhede@nvidia.com>
- <20190711120713.GM3971@work-vm>
- <d6400fd9-5f86-b9f2-a10a-1ad53813a066@nvidia.com>
- <20190822093235.GC3277@work-vm>
- <092a9a37-d018-1d6e-7c61-7f8ada8819a7@nvidia.com>
- <20190822191303.GO3277@work-vm>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D543525@SHSMSX104.ccr.corp.intel.com>
+ (envelope-from <stefanha@gmail.com>) id 1i15pT-0002iX-LN
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:25:56 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54587)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i15pT-0002i2-EQ
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:25:55 -0400
+Received: by mail-wm1-x344.google.com with SMTP id p74so8251801wme.4
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 02:25:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=Nmde1gDUhIoxevUR9BImVk18TVlzBKWkwG2u+y8zT5A=;
+ b=t799YKpIbhoUMaNFfixxJV09wt5YYNrl5ySXPAKegCGeL35p7YwdKVzGy278FHOE2I
+ 3apMO1n78ylBiHuv6p6r4aezcL3bzlYVRb+OYGPsVy1tzB0Y6RJAyDhjWMutqjuqAYcS
+ dlMcDjbBxcbXptH6sPoLHWlA5XNAQbDIrxfE5rAoZMbsLTTridzqgyWkC5wz5k6Jd0Vv
+ RA54BGdLogJfKp4TGhCX3EhOc7yqiK1dBNcoYIaj2ykXjgp3T5W8+cUvhJaTp1vOUNiq
+ JYM6LBov5lqNLxnvqSGLOIeoG9xjU+5NZsFzSQH06+u0GLsG/Tm+d6q+ooBEdpy0LJSd
+ bl1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=Nmde1gDUhIoxevUR9BImVk18TVlzBKWkwG2u+y8zT5A=;
+ b=sjaVM/YHkCbWhp08II7UZDjG0HqoB2vJ6DC1W2XLJxKSzPtStBjfSWorSPNxEgoBwx
+ RrN/RImL4nCMbOs3Hk9k2iO4ZVILpIRbXEjlShUHt/+XERSKiY2bHhP1F9g6iO6UVbl2
+ DMnjl93KP52dWrVPhm6TnRO3tNlB92UIUfZA4/Y4QBr/YmTo05MzCrU1vTWANX/VwkX6
+ EOXzoasRv4QFmt/J35EOFQbtWPX4uJHLoxIf5KogqjiWT8/MzbK4QnSZrITQn/80gVQj
+ dP6/xYg0vCc5ZXjEFaUwghdR6i6jeohfOeKfbY8R9QFaj8846uEJ3qGzt21sZknfSM8E
+ JqGQ==
+X-Gm-Message-State: APjAAAWbo6ISNXmMODKAycLc6iu1qO6F4/zXTES09VIv4Qjl9WNZUPeC
+ KqXnoSMUhtU5PQZxzSI/wL4=
+X-Google-Smtp-Source: APXvYqw2f6reymGirp1bzKKxQVoIeiXbiQry1mPsP+thfk58M6hn+UApeYvFrxEg1aFJM0EVNsbJzA==
+X-Received: by 2002:a1c:f110:: with SMTP id p16mr3857885wmh.59.1566552353775; 
+ Fri, 23 Aug 2019 02:25:53 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id r123sm3274198wme.7.2019.08.23.02.25.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 23 Aug 2019 02:25:52 -0700 (PDT)
+Date: Fri, 23 Aug 2019 10:25:51 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190823092551.GA12092@stefanha-x1.localdomain>
+References: <20190816143321.20903-1-dgilbert@redhat.com>
+ <20190816143321.20903-2-dgilbert@redhat.com>
+ <20190818065944-mutt-send-email-mst@kernel.org>
+ <20190821191118.GN3309@work-vm>
+ <20190822085237.GA20491@stefanha-x1.localdomain>
+ <20190822111916.735fd3ce.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="J/dobhs11T7y2rNN"
 Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D543525@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <20190822111916.735fd3ce.cohuck@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 23 Aug 2019 09:26:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 04/13] vfio: Add save and load functions
- for VFIO PCI devices
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH 1/2] virtio: add vhost-user-fs base device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,174 +98,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
- Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: qemu-devel@nongnu.org, vgoyal@redhat.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Tian, Kevin (kevin.tian@intel.com) wrote:
-> > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> > Sent: Friday, August 23, 2019 3:13 AM
-> > 
-> > * Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> > >
-> > >
-> > > On 8/22/2019 3:02 PM, Dr. David Alan Gilbert wrote:
-> > > > * Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> > > >> Sorry for delay to respond.
-> > > >>
-> > > >> On 7/11/2019 5:37 PM, Dr. David Alan Gilbert wrote:
-> > > >>> * Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> > > >>>> These functions save and restore PCI device specific data - config
-> > > >>>> space of PCI device.
-> > > >>>> Tested save and restore with MSI and MSIX type.
-> > > >>>>
-> > > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > >>>> ---
-> > > >>>>  hw/vfio/pci.c                 | 114
-> > ++++++++++++++++++++++++++++++++++++++++++
-> > > >>>>  include/hw/vfio/vfio-common.h |   2 +
-> > > >>>>  2 files changed, 116 insertions(+)
-> > > >>>>
-> > > >>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > > >>>> index de0d286fc9dd..5fe4f8076cac 100644
-> > > >>>> --- a/hw/vfio/pci.c
-> > > >>>> +++ b/hw/vfio/pci.c
-> > > >>>> @@ -2395,11 +2395,125 @@ static Object
-> > *vfio_pci_get_object(VFIODevice *vbasedev)
-> > > >>>>      return OBJECT(vdev);
-> > > >>>>  }
-> > > >>>>
-> > > >>>> +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-> > > >>>> +{
-> > > >>>> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice,
-> > vbasedev);
-> > > >>>> +    PCIDevice *pdev = &vdev->pdev;
-> > > >>>> +    uint16_t pci_cmd;
-> > > >>>> +    int i;
-> > > >>>> +
-> > > >>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> > > >>>> +        uint32_t bar;
-> > > >>>> +
-> > > >>>> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i *
-> > 4, 4);
-> > > >>>> +        qemu_put_be32(f, bar);
-> > > >>>> +    }
-> > > >>>> +
-> > > >>>> +    qemu_put_be32(f, vdev->interrupt);
-> > > >>>> +    if (vdev->interrupt == VFIO_INT_MSI) {
-> > > >>>> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-> > > >>>> +        bool msi_64bit;
-> > > >>>> +
-> > > >>>> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap +
-> > PCI_MSI_FLAGS,
-> > > >>>> +                                            2);
-> > > >>>> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-> > > >>>> +
-> > > >>>> +        msi_addr_lo = pci_default_read_config(pdev,
-> > > >>>> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-> > > >>>> +        qemu_put_be32(f, msi_addr_lo);
-> > > >>>> +
-> > > >>>> +        if (msi_64bit) {
-> > > >>>> +            msi_addr_hi = pci_default_read_config(pdev,
-> > > >>>> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> > > >>>> +                                             4);
-> > > >>>> +        }
-> > > >>>> +        qemu_put_be32(f, msi_addr_hi);
-> > > >>>> +
-> > > >>>> +        msi_data = pci_default_read_config(pdev,
-> > > >>>> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 :
-> > PCI_MSI_DATA_32),
-> > > >>>> +                2);
-> > > >>>> +        qemu_put_be32(f, msi_data);
-> > > >>>> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
-> > > >>>> +        uint16_t offset;
-> > > >>>> +
-> > > >>>> +        /* save enable bit and maskall bit */
-> > > >>>> +        offset = pci_default_read_config(pdev,
-> > > >>>> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
-> > > >>>> +        qemu_put_be16(f, offset);
-> > > >>>> +        msix_save(pdev, f);
-> > > >>>> +    }
-> > > >>>> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> > > >>>> +    qemu_put_be16(f, pci_cmd);
-> > > >>>> +}
-> > > >>>> +
-> > > >>>> +static void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> > > >>>> +{
-> > > >>>> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice,
-> > vbasedev);
-> > > >>>> +    PCIDevice *pdev = &vdev->pdev;
-> > > >>>> +    uint32_t interrupt_type;
-> > > >>>> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-> > > >>>> +    uint16_t pci_cmd;
-> > > >>>> +    bool msi_64bit;
-> > > >>>> +    int i;
-> > > >>>> +
-> > > >>>> +    /* retore pci bar configuration */
-> > > >>>> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> > > >>>> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> > > >>>> +                        pci_cmd & (!(PCI_COMMAND_IO |
-> > PCI_COMMAND_MEMORY)), 2);
-> > > >>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> > > >>>> +        uint32_t bar = qemu_get_be32(f);
-> > > >>>> +
-> > > >>>> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
-> > > >>>> +    }
-> > > >>>
-> > > >>> Is it possible to validate the bar's at all?  We just had a bug on a
-> > > >>> virtual device where one version was asking for a larger bar than the
-> > > >>> other; our validation caught this in some cases so we could tell that
-> > > >>> the guest had a BAR that was aligned at the wrong alignment.
-> 
-> I'm a bit confused here. Did you mean that src and dest include
-> different versions of the virtual device which implements different
-> BAR size? If that is the case, shouldn't the migration fail at the start
-> when doing compatibility check?
 
-It was a mistake where the destination had accidentally changed the BAR
-size; checking the alignment was the only check that failed.
+--J/dobhs11T7y2rNN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > > >>>
-> > > >>
-> > > >> "Validate the bars" does that means validate size of bars?
-> > > >
-> > > > I meant validate the address programmed into the BAR against the size,
-> > > > assuming you know the size; e.g. if it's a 128MB BAR, then make sure the
-> > > > address programmed in is 128MB aligned.
-> > > >
-> > >
-> > > If this validation fails, migration resume should fail, right?
-> > 
-> > Yes I think so; if you've got a device that wants 128MB alignment and
-> > someone gives you a non-aligned address, who knows what will happen.
-> 
-> If misalignment is really caused by the guest, shouldn't we just follow
-> the hardware behavior, i.e. hard-wiring the lower bits to 0 before
-> updating the cfg space? 
+On Thu, Aug 22, 2019 at 11:19:16AM +0200, Cornelia Huck wrote:
+> On Thu, 22 Aug 2019 09:52:37 +0100
+> Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>=20
+> > On Wed, Aug 21, 2019 at 08:11:18PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Michael S. Tsirkin (mst@redhat.com) wrote: =20
+> > > > On Fri, Aug 16, 2019 at 03:33:20PM +0100, Dr. David Alan Gilbert (g=
+it) wrote: =20
+>=20
+> > > > > +static void vuf_device_realize(DeviceState *dev, Error **errp)
+> > > > > +{
+> > > > > +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+> > > > > +    VHostUserFS *fs =3D VHOST_USER_FS(dev);
+> > > > > +    unsigned int i;
+> > > > > +    size_t len;
+> > > > > +    int ret;
+> > > > > +
+> > > > > +    if (!fs->conf.chardev.chr) {
+> > > > > +        error_setg(errp, "missing chardev");
+> > > > > +        return;
+> > > > > +    }
+> > > > > +
+> > > > > +    if (!fs->conf.tag) {
+> > > > > +        error_setg(errp, "missing tag property");
+> > > > > +        return;
+> > > > > +    }
+> > > > > +    len =3D strlen(fs->conf.tag);
+> > > > > +    if (len =3D=3D 0) {
+> > > > > +        error_setg(errp, "tag property cannot be empty");
+> > > > > +        return;
+> > > > > +    }
+> > > > > +    if (len > sizeof_field(struct virtio_fs_config, tag)) {
+> > > > > +        error_setg(errp, "tag property must be %zu bytes or less=
+",
+> > > > > +                   sizeof_field(struct virtio_fs_config, tag));
+> > > > > +        return;
+> > > > > +    }
+> > > > > +
+> > > > > +    if (fs->conf.num_queues =3D=3D 0) {
+> > > > > +        error_setg(errp, "num-queues property must be larger tha=
+n 0");
+> > > > > +        return;
+> > > > > +    } =20
+> > > >=20
+> > > > The strange thing is that actual # of queues is this number + 2.
+> > > > And this affects an optimal number of vectors (see patch 2).
+> > > > Not sure what a good solution is - include the
+> > > > mandatory queues in the number?
+> > > > Needs to be documented in some way. =20
+> > >=20
+> > > Should we be doing nvectors the same way virtio-scsi-pci does it;
+> > > with a magic 'unspecified' default where it sets the nvectors based on
+> > > the number of queues?
+> > >=20
+> > > I think my preference is not to show the users the mandatory queues. =
+=20
+> >=20
+> > I agree.  Users want to control multiqueue, not on the absolute number
+> > of virtqueues including mandatory queues.
+>=20
+> I agree as well, but let me advocate again for renaming this to
+> 'num_request_queues' or similar to make it more obvious what this number
+> actually means.
 
-That should already happen on the source; but when loading a migration
-stream I try and be very untrusting; so it's good to check that the
-destination devices idea of the BAR matches what the register has.
+Good idea.
 
-Dave
+--J/dobhs11T7y2rNN
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Thanks
-> Kevin
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1fsR8ACgkQnKSrs4Gr
+c8iJCQgAvn5W7gEuUzLIwhDooyDkxG1/Nw3NODBPrMDC2TPOGHVMHbF9i/u53Ecj
+svWTz2trU3FDTdsfHVPYy/iaXN4JkenRxevJKFHktC831hU/vdvu5lOhWlLWcw2o
+wG4huti8QrKBXXV4dFdbeeGA5SR3LwcV5htIPEd/gsIOvP/3ovp9m8MIq0xORe5S
+B3bnTMd1U6fTcWkWL+iOOoQbuagwnz3+lcQcCi7kD10MvPJ0T6DaWV+l0P3lHoXO
+JevfE6pMzDlnjARnv+me/jSoX7hdTdDdUKFCK/8dgUJHTYKq1nMPI3WoCR4LAPbM
+ILASX+4R+ddtb855CnteRhitGjbRwA==
+=nvkl
+-----END PGP SIGNATURE-----
+
+--J/dobhs11T7y2rNN--
 
