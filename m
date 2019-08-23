@@ -5,84 +5,84 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8366C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C056EC3A589
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9686D22CF7
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:20:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C27621726
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:23:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFX1hSq5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9686D22CF7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kx+BhJyp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C27621726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i11zV-000371-Hd
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 01:20:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45022)
+	id 1i122n-0007Sl-69
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 01:23:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1i11rN-0004EY-Hq
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:11:38 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1i11rA-0003uT-3D
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1i11rM-0002ep-9N
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:11:37 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34322)
+ (envelope-from <bmeng.cn@gmail.com>) id 1i11r8-0002Sx-RH
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:11:23 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40562)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1i11rM-0002eI-3e; Fri, 23 Aug 2019 01:11:36 -0400
-Received: by mail-pg1-x542.google.com with SMTP id n9so5100817pgc.1;
- Thu, 22 Aug 2019 22:11:36 -0700 (PDT)
+ id 1i11r8-0002SO-Lu; Fri, 23 Aug 2019 01:11:22 -0400
+Received: by mail-pf1-x443.google.com with SMTP id w16so5647341pfn.7;
+ Thu, 22 Aug 2019 22:11:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:subject:date:message-id:in-reply-to:references;
- bh=w3+CZBUY4GZi4/tMEq4QSlu25Shg1y3L2OpYpI0AQag=;
- b=kFX1hSq59UN7lx+v0cz6IRqC995/M/TlwDljLecVXVU479focWWtCEhNxgs72/o9a0
- z3Hpglu/KOCHqW9PyzCZrOBVOarGM0eJ1Fz3DKTSGgQJdZIlb3BVAu0O8ZcpPFXZHmOn
- EZrvHC0TAUnAcq2U4u6AdFBvNvvoaz11fvn71nW4yi73ir7i9JIG1YmDN072xuTeSNEk
- 0Yu02xx8NXzWVdrjAX8XR5Y3UJOx5oQuuWuPdbxXmBb3lVHkYPDCfWFBAmdywm2+BInB
- WIz3Fz8PuJUg/gkEO0YPgTPpX5fkWUohSMOE/VeZrtLivzrw6ayyxYDkc+7wbv9Ic0+o
- tqdg==
+ bh=+zzCHFZurXByfcVb0kzc2teMVzNfQuoZt/YP0jsSzy0=;
+ b=Kx+BhJyp9dHE67BtPkaj1yMFQm2QNhsJg9tc1ORiTuCD50c4YAWyjecojOTGqp8BPm
+ /jQ1UceGMRE6snV+rylAnlRebO1XKCy1uAfOk21W/0uhdBWlnsgjMuMlm0DMrTmk7UfS
+ 8Ak7VLTrk2tBIZgjFYotznM60yertKpoMNZvUvULgoUDFiab/xvsPxE04xYnd5Jtnnl6
+ bh7InmYFVfg1vWlDFO4KPQuWxY05SZudH0PMDTTT8sU26NNb5NMHrh+1MmpoFgaS8Z+7
+ f50ZJ6HvcjJN+L+PrjFJICYGiYvJ+xW3k7PEsPRlNfsfEFCwTE5zcP5qqY/dJ5VsSvJu
+ VKxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references;
- bh=w3+CZBUY4GZi4/tMEq4QSlu25Shg1y3L2OpYpI0AQag=;
- b=Bvm/tpoUR5wa2fBYtgU8Zl9ebblJwm5Zb/dBk6vvX1qWVX4yAhxNN6c1DeIdGCjiw7
- R9g7mIfMLVWrixcOEIpJwhXz2RG0NonkxDymOg3YVGZ/8J2ErpyltK7ZwKih1HdC7m7U
- mhyPj/jnJkaRof1Bo81rQjQxv1wSRsckyOL91hmxRiEBlUJtxrbQ1HVHNaev069dHpKm
- fRC0zS6uljfVFKAzrFMoQMhwZFWVtKjJuZHcSPbq95puQuB6YK4AFcx/KwWOHkzSf+/t
- ZgT4u257wcjOTlj+rKg50xUg7N6lIsquu+8BJ9cIA7dhEuld71IwAUyf5BJNWi743I9W
- 4mPg==
-X-Gm-Message-State: APjAAAWxttn+QiPi28lFFi4HQGt8phdGPHRelNk2Ybr2tt3l6IeXJkzq
- cmh/zEdwuLweANXGXYO5DtA=
-X-Google-Smtp-Source: APXvYqyhhEseIuN1ApAxR1RNODlzhF1gc6vMKnKZnYRtDQk7SGcCfx9mwmfjpVQztNQbk9kPViusCQ==
-X-Received: by 2002:a17:90a:dc82:: with SMTP id
- j2mr3370273pjv.89.1566537095317; 
- Thu, 22 Aug 2019 22:11:35 -0700 (PDT)
+ bh=+zzCHFZurXByfcVb0kzc2teMVzNfQuoZt/YP0jsSzy0=;
+ b=gwF5+aTbHDjHzEQA/DHoaygXmVbtfNmRmEd0ql+1zBXQu0BpMLoUXlxv9BlesFhLSx
+ N/2yGRmda7Lsj0vRF76SsHmHYD5y8azDrxNIcLjO+TtDB8xaBao+CjatPU35CYA2Ceq4
+ 99nkBhL5fYWq2SfHXiYALX6AaTRrlhp/FtHBBb/eXPUnCdhr9iFVb6otKCEDG4SpCnu1
+ M5e9Ns5kwG2fq7UG9qE4I7Fu0aMWLP8CkojUvFlgcUKHO7Kls9Ktfx6zsDF+qkmmq1e/
+ xVHMqqsPdc9/5KVyTmN/P78JPLjt4NC2yQaMysNl4wmR1eFY4hKDKio+dpTHINoUAXJ+
+ d/SA==
+X-Gm-Message-State: APjAAAV3/0/ejMZgJ4TcI9+pjz9eEnJ/Sq8acss3hCMzmKGY4AZ/gk3Z
+ QRirnPgbXM7JqPwoDxj6SXE=
+X-Google-Smtp-Source: APXvYqwGA4rFUgzydq6BYm2YvpxbDQLyt/PulgO9b6WyiN/OdxS0JXOAYxfD/rhWi5nZrM/HrTUDbg==
+X-Received: by 2002:a17:90a:9f46:: with SMTP id
+ q6mr3223822pjv.110.1566537081918; 
+ Thu, 22 Aug 2019 22:11:21 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id v189sm1122527pfv.176.2019.08.22.22.11.34
+ by smtp.gmail.com with ESMTPSA id v189sm1122527pfv.176.2019.08.22.22.11.20
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Thu, 22 Aug 2019 22:11:34 -0700 (PDT)
+ Thu, 22 Aug 2019 22:11:21 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Date: Thu, 22 Aug 2019 22:10:56 -0700
-Message-Id: <1566537069-22741-18-git-send-email-bmeng.cn@gmail.com>
+Date: Thu, 22 Aug 2019 22:10:44 -0700
+Message-Id: <1566537069-22741-6-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
 References: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [PATCH v5 17/30] riscv: sifive_u: Set the minimum
- number of cpus to 2
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v5 05/30] riscv: hw: Change to use
+ qemu_log_mask(LOG_GUEST_ERROR, ...) instead
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,47 +98,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is not useful if we only have one management CPU.
+Replace the call to hw_error() with qemu_log_mask(LOG_GUEST_ERROR,...)
+in various sifive models.
 
 Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 ---
 
-Changes in v5: None
+Changes in v5:
+- new patch to change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
+  in various sifive models
+
 Changes in v4: None
-Changes in v3:
-- use management cpu count + 1 for the min_cpus
+Changes in v3: None
+Changes in v2: None
 
-Changes in v2:
-- update the file header to indicate at least 2 harts are created
+ hw/riscv/sifive_prci.c | 8 +++++---
+ hw/riscv/sifive_test.c | 5 +++--
+ hw/riscv/sifive_uart.c | 9 +++++----
+ 3 files changed, 13 insertions(+), 9 deletions(-)
 
- hw/riscv/sifive_u.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 0e5bbe7..a36cd77 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -10,8 +10,8 @@
-  * 1) CLINT (Core Level Interruptor)
-  * 2) PLIC (Platform Level Interrupt Controller)
-  *
-- * This board currently generates devicetree dynamically that indicates at most
-- * five harts.
-+ * This board currently generates devicetree dynamically that indicates at least
-+ * two harts and up to five harts.
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms and conditions of the GNU General Public License,
-@@ -485,6 +485,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
-     mc->desc = "RISC-V Board compatible with SiFive U SDK";
-     mc->init = riscv_sifive_u_init;
-     mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
-+    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
+diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
+index f406682..1ab98d4 100644
+--- a/hw/riscv/sifive_prci.c
++++ b/hw/riscv/sifive_prci.c
+@@ -20,6 +20,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
++#include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "target/riscv/cpu.h"
+ #include "hw/riscv/sifive_prci.h"
+@@ -37,7 +38,8 @@ static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
+     case SIFIVE_PRCI_PLLOUTDIV:
+         return s->plloutdiv;
+     }
+-    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: read: addr=0x%x\n",
++                  __func__, (int)addr);
+     return 0;
  }
  
- DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+@@ -65,8 +67,8 @@ static void sifive_prci_write(void *opaque, hwaddr addr,
+         s->plloutdiv = (uint32_t) val64;
+         break;
+     default:
+-        hw_error("%s: bad write: addr=0x%x v=0x%x\n",
+-                 __func__, (int)addr, (int)val64);
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%x v=0x%x\n",
++                      __func__, (int)addr, (int)val64);
+     }
+ }
+ 
+diff --git a/hw/riscv/sifive_test.c b/hw/riscv/sifive_test.c
+index cd86831..655a3d7 100644
+--- a/hw/riscv/sifive_test.c
++++ b/hw/riscv/sifive_test.c
+@@ -20,6 +20,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
++#include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "sysemu/sysemu.h"
+ #include "target/riscv/cpu.h"
+@@ -48,8 +49,8 @@ static void sifive_test_write(void *opaque, hwaddr addr,
+             break;
+         }
+     }
+-    hw_error("%s: write: addr=0x%x val=0x%016" PRIx64 "\n",
+-        __func__, (int)addr, val64);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: write: addr=0x%x val=0x%016" PRIx64 "\n",
++                  __func__, (int)addr, val64);
+ }
+ 
+ static const MemoryRegionOps sifive_test_ops = {
+diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
+index 3b3f94f..cd74043 100644
+--- a/hw/riscv/sifive_uart.c
++++ b/hw/riscv/sifive_uart.c
+@@ -18,6 +18,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ #include "hw/sysbus.h"
+ #include "chardev/char.h"
+ #include "chardev/char-fe.h"
+@@ -93,8 +94,8 @@ uart_read(void *opaque, hwaddr addr, unsigned int size)
+         return s->div;
+     }
+ 
+-    hw_error("%s: bad read: addr=0x%x\n",
+-        __func__, (int)addr);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: bad read: addr=0x%x\n",
++                  __func__, (int)addr);
+     return 0;
+ }
+ 
+@@ -125,8 +126,8 @@ uart_write(void *opaque, hwaddr addr,
+         s->div = val64;
+         return;
+     }
+-    hw_error("%s: bad write: addr=0x%x v=0x%x\n",
+-        __func__, (int)addr, (int)value);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%x v=0x%x\n",
++                  __func__, (int)addr, (int)value);
+ }
+ 
+ static const MemoryRegionOps uart_ops = {
 -- 
 2.7.4
 
