@@ -2,86 +2,67 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD7AC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EBCDC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:50:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75C7522CF7
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:47:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFckUj9b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75C7522CF7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B57B21019
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 05:50:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B57B21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i12Pp-0007zo-Do
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 01:47:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45306)
+	id 1i12TJ-0002GH-DI
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 01:50:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49499)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1i11rb-0004Xk-U6
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:11:52 -0400
+ (envelope-from <armbru@redhat.com>) id 1i12S9-0000yM-Tm
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1i11ra-0002qY-Cw
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:11:51 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45734)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1i11ra-0002q0-6j; Fri, 23 Aug 2019 01:11:50 -0400
-Received: by mail-pf1-x442.google.com with SMTP id w26so5629154pfq.12;
- Thu, 22 Aug 2019 22:11:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id:in-reply-to:references;
- bh=4/fBrUSZM2vbDjvLLKFAmPyvCRfr5pCZu6f1f6oCKKg=;
- b=UFckUj9btkM0rqXR2PcUt44WVYMZGbnICfNBAtu5ZYKXuKngL/PAo7la3IIK5n0COc
- lfmD/G1bQtpOPqg1RhAhLU9nJSuv8v5OaKZKx/ftLgbGQiZRiU/RB00DXSbeAcjsTSpW
- Xf69DGv7+RvFoawZ4prfx62xBML66LBzkdBhWW8V0WUBVUCrkxndlQ3LJwSh44tfD4hQ
- V61aW0D4GaWOyNfMWwwxNXS+CS+YW8200YLC2W7MsEhn2DMcWK1rZCiOUAevjzexLVyG
- z1KWL//hej2MsOQPs+AoowsJ/vGBS+O/d/PmFtJqCmrnzyrC56WD0dMVfbfMX97B16S2
- aRUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references;
- bh=4/fBrUSZM2vbDjvLLKFAmPyvCRfr5pCZu6f1f6oCKKg=;
- b=GR5Kcj/fG11v39LvxfOzofHgUIbvRaNSEtNlvxRMO6spCWufpINc2xTvueUBCja6t3
- Rk4163y20jNAv5XvuHf8tan/pdSgzdILS6k0hirqoJ8faPb1ZG59GyR83ksPNsfRi1z7
- vri+ai8XWhohzwQ254IWyeras9Jr6iqWxuM41FJ9hNKhxWE4fogscYcD9vX8WaaL3NkM
- uODdy648ibN5DOSyZldfKFGbF0wjZGNU+C43o/2KHi1mz0PfgacR8ZXZphhEPHGaz9/z
- TfQ/0Fbx9uIK6VuDTJT0VoOqgWdIKkRMN6n3pilLQWdFCKWHc9zm7fXcjWSdtZUh1xyl
- hrEg==
-X-Gm-Message-State: APjAAAU/c2JqStvgLkR8XGrMGiFq7ylUxLqDlRviEkriD9SSkabrzwK/
- YGfU3oLKjYorj6k6cpyXV64=
-X-Google-Smtp-Source: APXvYqxHmuXhoMyIKBVTADJoFNU93+MVlgM0m8WfqFtMqrhiyKMYbZl0DbGOFOHGMZHOdozHrKJiGQ==
-X-Received: by 2002:a65:50c5:: with SMTP id s5mr2361462pgp.368.1566537109438; 
- Thu, 22 Aug 2019 22:11:49 -0700 (PDT)
-Received: from localhost.localdomain (unknown-224-80.windriver.com.
- [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id v189sm1122527pfv.176.2019.08.22.22.11.48
- (version=TLS1 cipher=AES128-SHA bits=128/128);
- Thu, 22 Aug 2019 22:11:48 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Date: Thu, 22 Aug 2019 22:11:09 -0700
-Message-Id: <1566537069-22741-31-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
-References: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH v5 30/30] riscv: sifive_u: Update model and
- compatible strings in device tree
+ (envelope-from <armbru@redhat.com>) id 1i12S7-0006lX-5N
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:49:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35750)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i12S6-0006lF-UO
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 01:49:35 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C962610F23E0;
+ Fri, 23 Aug 2019 05:49:33 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F0231001DC0;
+ Fri, 23 Aug 2019 05:49:33 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E73CF1162B63; Fri, 23 Aug 2019 07:49:31 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+References: <20190822011620.106337-1-aik@ozlabs.ru>
+ <87wof5b7ze.fsf@dusky.pond.sub.org> <20190822144940.GV3267@redhat.com>
+Date: Fri, 23 Aug 2019 07:49:31 +0200
+In-Reply-To: <20190822144940.GV3267@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+ =?utf-8?Q?ang=C3=A9=22's?=
+ message of "Thu, 22 Aug 2019 15:49:40 +0100")
+Message-ID: <87blwg77o4.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Fri, 23 Aug 2019 05:49:33 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] qapi: Add query-memory-checksum
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,43 +74,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This updates model and compatible strings to use the same strings
-as used in the Linux kernel device tree (hifive-unleashed-a00.dts).
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> On Thu, Aug 22, 2019 at 04:16:53PM +0200, Markus Armbruster wrote:
+>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+>>=20
+>> > This returns MD5 checksum of all RAM blocks for migration debugging
+>> > as this is way faster than saving the entire RAM to a file and checking
+>> > that.
+>> >
+>> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>=20
+>> Any particular reason for MD5?  Have you measured the other choices
+>> offered by GLib?
+>>=20
+>> I understand you don't need crypto-strength here.  Both MD5 and SHA-1
+>> would be bad choices then.
+>
+> We have a tests/bench-crypto-hash test but its hardcoded for sha256.
+> I hacked it to report all algorithms and got these results for varying
+> input chunk sizes:
+>
+> /crypto/hash/md5/speed-512: 519.12 MB/sec OK
+> /crypto/hash/md5/speed-1024: 560.39 MB/sec OK
+> /crypto/hash/md5/speed-4096: 591.39 MB/sec OK
+> /crypto/hash/md5/speed-16384: 576.46 MB/sec OK
+> /crypto/hash/sha1/speed-512: 443.12 MB/sec OK
+> /crypto/hash/sha1/speed-1024: 518.82 MB/sec OK
+> /crypto/hash/sha1/speed-4096: 555.60 MB/sec OK
+> /crypto/hash/sha1/speed-16384: 568.16 MB/sec OK
+> /crypto/hash/sha224/speed-512: 221.90 MB/sec OK
+> /crypto/hash/sha224/speed-1024: 239.79 MB/sec OK
+> /crypto/hash/sha224/speed-4096: 269.37 MB/sec OK
+> /crypto/hash/sha224/speed-16384: 274.87 MB/sec OK
+> /crypto/hash/sha256/speed-512: 222.75 MB/sec OK
+> /crypto/hash/sha256/speed-1024: 253.25 MB/sec OK
+> /crypto/hash/sha256/speed-4096: 272.80 MB/sec OK
+> /crypto/hash/sha256/speed-16384: 275.59 MB/sec OK
+> /crypto/hash/sha384/speed-512: 322.73 MB/sec OK
+> /crypto/hash/sha384/speed-1024: 369.84 MB/sec OK
+> /crypto/hash/sha384/speed-4096: 406.71 MB/sec OK
+> /crypto/hash/sha384/speed-16384: 417.87 MB/sec OK
+> /crypto/hash/sha512/speed-512: 320.62 MB/sec OK
+> /crypto/hash/sha512/speed-1024: 361.93 MB/sec OK
+> /crypto/hash/sha512/speed-4096: 404.91 MB/sec OK
+> /crypto/hash/sha512/speed-16384: 418.53 MB/sec OK
+> /crypto/hash/ripemd160/speed-512: 226.45 MB/sec OK
+> /crypto/hash/ripemd160/speed-1024: 239.25 MB/sec OK
+> /crypto/hash/ripemd160/speed-4096: 251.31 MB/sec OK
+> /crypto/hash/ripemd160/speed-16384: 255.01 MB/sec OK
+>
+>
+> IOW, md5 is clearly the quickest, by a considerable margin over
+> SHA256/512. SHA1 is slightly slower.
+>
+> Assuming that we document that this command is intentionally
+> *not* trying to guarantee collision resistances we're ok.
+>
+> In fact we should not document what kind of checksum is
+> reported by query-memory-checksum. The impl should be a black
+> box from user's POV.
+>
+> If we're just aiming for debugging tool to detect accidental
+> corruption, could we even just ignore cryptographic hashs
+> entirely and do a crc32 - that'd be way faster than even
+> md5.
 
----
+Good points.
 
-Changes in v5: None
-Changes in v4: None
-Changes in v3: None
-Changes in v2: None
+The doc strings should spell out "for debugging", like the commit
+message does, and both should spell out "weak collision resistance".
 
- hw/riscv/sifive_u.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+I can't find CRC-32 in GLib, but zlib appears to provide it:
+http://refspecs.linuxbase.org/LSB_3.0.0/LSB-Core-generic/LSB-Core-generic/z=
+lib-crc32-1.html
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 1140c38..fae19fe 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -97,8 +97,9 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         exit(1);
-     }
- 
--    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
--    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
-+    qemu_fdt_setprop_string(fdt, "/", "model", "SiFive HiFive Unleashed A00");
-+    qemu_fdt_setprop_string(fdt, "/", "compatible",
-+                            "sifive,hifive-unleashed-a00");
-     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
-     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
- 
--- 
-2.7.4
-
+Care to compare its speed to MD5?
 
