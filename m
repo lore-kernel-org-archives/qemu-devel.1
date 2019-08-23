@@ -2,67 +2,92 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4C0C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:52:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F69C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF1DA20850
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:52:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF1DA20850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3FB720850
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:53:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ifOB6vc7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3FB720850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Fby-0004k6-Vd
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:52:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50962)
+	id 1i1Fcu-0005u2-T9
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i1FSh-0002XY-VD
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:43:05 -0400
+ (envelope-from <prvs=1319249da=dmitry.fomichev@wdc.com>)
+ id 1i1FZ4-0000N1-TR
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i1FSf-0003js-O0
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:43:03 -0400
-Resent-Date: Fri, 23 Aug 2019 15:43:03 -0400
-Resent-Message-Id: <E1i1FSf-0003js-O0@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21415)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i1FSf-0003jU-GO
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:43:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1566589357; cv=none; d=zoho.com; s=zohoarc; 
- b=Krdj1cc75DbCJo4/Cx3x/TlGg91FCu1Ss/bH0In5zI5SRim8WvLUeJ0k2QlhdsQo3XgLC+dVYeM5gvAK3iQHKrCNOHe/cAYoSzaf55DU/lAM2g0+5pNsG8Ife3jG9rgyyofUSrEJj6KCqOOCQis85M0LaIQkEe3wCXPzaRGlLb0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1566589357;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=voo7WljQf14A+WBH4s1n/b5/c3PxaGG/gX+c0wdXxmE=; 
- b=aeGzESlz4SQX930vjBpbdnYivvvuYRNTxadj1FhGN9vrUkXuH8G3jNu7fz3LQQipqvMClTbDLcFpqmfr/kuCTp8tWAi2WXIPTR/VXL+SRLd79Ak94kKSW4UbFca2kSYDbhjHaMh/aY+/pfYTc6W+FrHobeRyF5mbzEwBawqTEkE=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1566589352727495.4125628857379;
- Fri, 23 Aug 2019 12:42:32 -0700 (PDT)
-In-Reply-To: <cover.1566467963.git.tony.nguyen@bt.com>
-Message-ID: <156658935177.8645.9957041127260888811@5dec9699b7de>
+ (envelope-from <prvs=1319249da=dmitry.fomichev@wdc.com>)
+ id 1i1FZ3-0000ZH-Dc
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:49:38 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:47029)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=1319249da=dmitry.fomichev@wdc.com>)
+ id 1i1FYz-0000Vz-UC; Fri, 23 Aug 2019 15:49:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1566589773; x=1598125773;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=WrGHKVduBl42d9CD8UFRTIZ6FP7W7UcEwBBJuvUCUsc=;
+ b=ifOB6vc7DtOEdvBHYyR0LB8zJ70UG5mFdYJ69KK/MQWGMyRNFG1V+WXY
+ 8gS+M/JjdQhLkhcBWzjn4yYawVNFCrypfwXRXBX5uAlhxeEyRb0KgsYgb
+ YgSt168vKwrHqVNupArxJ1CCRAZ8gS2Xe0nGLLnMOHKKYPeb2G6vta0u9
+ W5giKvYHhQN9A71QZue98R6iWkwM1GJDGM7PdlNvC2rLTTr52P10VBmfN
+ OZvnjLYDtU/oDOD5qKMRvKmktzL4JeMWKuHCyWTPDLNYh2BwbHpXFnJMw
+ PPCru7lYC1XV2spjb2RNJbEh4nOOB7bb+zCYjsvTnAFPg75DSbQjJtD7Y Q==;
+IronPort-SDR: tfxG8xI3MsCnbMEhfubaz7syZCjIWqSVYjUmwkaN9BVN1CDbsGMw0pIxLDugT21glrklMEYaJw
+ 0pwABFmujW+TZXrcYLsLjgwEBg7VxE9KJE/Uz3vpBCbUw/krlGs4jCxtbO0ArtizP0y2SyaUOS
+ 1IGTu05Be12AMqC5yBPM2yF1absk62p3YvuZI0ejAeE+y3ha9jPLTfg06HALsaHGXw9yICojLw
+ X4J03UBy6yNueyONuC64b98+YDWNooD8pi8vIYnDp69wNOwefxfbzUR+7ZUJ0386ZazKfFTW4D
+ G9U=
+X-IronPort-AV: E=Sophos;i="5.64,422,1559491200"; d="scan'208";a="223162544"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 24 Aug 2019 03:49:31 +0800
+IronPort-SDR: GSIqev7wKYTasPSm4e3hmBUG21rqNX1YTMPiuRSYpP3v7W0Hs7Lc3D98rv2GrmLRXRai0yMMZP
+ ETIB95m3D+cbtzca38XzUICelQwv1sQynFu3K409yy385waPOz0xC9ohl4tfxJiXTZg+zI4fjM
+ WfLCrGuCgreoQjJdoA2xbLDv5MTgJlWrkhM3kv+iWhWe3DwwZs4oRc+/GKdQ9Nd2kkSWUFO2er
+ FQ5GFvrFhD6TZKRbsDCmSGipY9gUzKUZciY8H1rBcZSu0NGGKCaQ+IzHts4u/8+VcExKB73idU
+ UB9ebLUgMz8iXKLPFZLjkOM8
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Aug 2019 12:46:48 -0700
+IronPort-SDR: ZNIbsON233fRjxDLQGGYzjFw8FjCDlQq16etIM21Ox5MLPSBUbrEMXzD033aOsIjPnsm05J2xW
+ MTyx1JTR8ouPSZ+HCOYco/cRJYppmDk2dK5gyL95zJhgZPyYzG9VGhdwUU/35MiRmb3Vc+pkpf
+ ydBQrpOI3eFarT6jWC3/qMWmRglCnWpBb/N/OHQ3OSm9ErFOg2kNuRbpakCgYXqU6hq3piFPsf
+ 6sD4aBfr2H7DqAS0K/+8WpXZs9aYEYjU6S7OjxGIc9hnbIsTXo/DZ/+lWiPZIiS2aEUmnofM1q
+ 0NA=
+WDCIronportException: Internal
+Received: from dhcp-10-88-173-43.hgst.com ([10.88.173.43])
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Aug 2019 12:49:30 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+Date: Fri, 23 Aug 2019 15:49:25 -0400
+Message-Id: <20190823194927.23278-3-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190823194927.23278-1-dmitry.fomichev@wdc.com>
+References: <20190823194927.23278-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: tony.nguyen@bt.com
-Date: Fri, 23 Aug 2019 12:42:32 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [RFC PATCH 00/17] Declare device little or big
- endian
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 68.232.141.245
+Subject: [Qemu-devel] [PATCH v5 2/4] raw: Recognize zoned backing devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,185 +99,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: tony.nguyen@bt.com, qemu-devel@nongnu.org
+Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+ Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTY2NDY3OTYzLmdp
-dC50b255Lm5ndXllbkBidC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAw
-MC8xN10gRGVjbGFyZSBkZXZpY2UgbGl0dGxlIG9yIGJpZyBlbmRpYW4KTWVzc2FnZS1pZDogY292
-ZXIuMTU2NjQ2Nzk2My5naXQudG9ueS5uZ3V5ZW5AYnQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
-LSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3L2NvdmVyLjE1NjY0NjY5MDYuZ2l0LnRvbnkubmd1
-eWVuQGJ0LmNvbSAtPiBwYXRjaGV3L2NvdmVyLjE1NjY0NjY5MDYuZ2l0LnRvbnkubmd1eWVuQGJ0
-LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3L2NvdmVyLjE1NjY0Njc5NjMuZ2l0LnRv
-bnkubmd1eWVuQGJ0LmNvbSAtPiBwYXRjaGV3L2NvdmVyLjE1NjY0Njc5NjMuZ2l0LnRvbnkubmd1
-eWVuQGJ0LmNvbQpTdWJtb2R1bGUgJ2NhcHN0b25lJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
-L2NhcHN0b25lLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnY2Fwc3RvbmUnClN1Ym1vZHVsZSAn
-ZHRjJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
-dGggJ2R0YycKU3VibW9kdWxlICdyb21zL1FlbXVNYWNEcml2ZXJzJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L1FlbXVNYWNEcml2ZXJzLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9R
-ZW11TWFjRHJpdmVycycKU3VibW9kdWxlICdyb21zL1NMT0YnIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQvU0xPRi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvU0xPRicKU3VibW9kdWxl
-ICdyb21zL2VkazInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvZWRrMi5naXQpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ3JvbXMvZWRrMicKU3VibW9kdWxlICdyb21zL2lweGUnIChodHRwczovL2dp
-dC5xZW11Lm9yZy9naXQvaXB4ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvaXB4ZScK
-U3VibW9kdWxlICdyb21zL29wZW5iaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5i
-aW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuYmlvcycKU3VibW9kdWxlICdy
-b21zL29wZW5oYWNrd2FyZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuaGFja3dhcmUu
-Z2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5oYWNrd2FyZScKU3VibW9kdWxlICdy
-b21zL29wZW5zYmknIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbnNiaS5naXQpIHJlZ2lz
-dGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbnNiaScKU3VibW9kdWxlICdyb21zL3FlbXUtcGFsY29k
-ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9xZW11LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL3FlbXUtcGFsY29kZScKU3VibW9kdWxlICdyb21zL3NlYWJpb3MnICho
-dHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2VhYmlvcy5naXQvKSByZWdpc3RlcmVkIGZvciBwYXRo
-ICdyb21zL3NlYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zLWhwcGEnIChodHRwczovL2dp
-dC5xZW11Lm9yZy9naXQvc2VhYmlvcy1ocHBhLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9t
-cy9zZWFiaW9zLWhwcGEnClN1Ym1vZHVsZSAncm9tcy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L3NnYWJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3Mn
-ClN1Ym1vZHVsZSAncm9tcy9za2lib290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJv
-b3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9t
-cy91LWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJl
-ZCBmb3IgcGF0aCAncm9tcy91LWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgn
-IChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJl
-ZCBmb3IgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnClN1Ym1vZHVsZSAnc2xpcnAnIChodHRw
-czovL2dpdC5xZW11Lm9yZy9naXQvbGlic2xpcnAuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdz
-bGlycCcKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycgKGh0dHBzOi8v
-Z2l0LnFlbXUub3JnL2dpdC9iZXJrZWxleS1zb2Z0ZmxvYXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ3Rlc3RzL2Zw
-L2JlcmtlbGV5LXRlc3RmbG9hdC0zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2JlcmtlbGV5
-LXRlc3RmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXkt
-dGVzdGZsb2F0LTMnClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L2tleWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNv
-ZGVtYXBkYicKQ2xvbmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0
-b25lJzogY2hlY2tlZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2
-YmYnCkNsb25pbmcgaW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBv
-dXQgJzg4ZjE4OTA5ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50
-byAncm9tcy9RZW11TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0Ry
-aXZlcnMnOiBjaGVja2VkIG91dCAnOTBjNDg4ZDVmNGE0MDczNDIyNDdiOWVhODY5ZGYxYzJkOWM4
-ZTI2NicKQ2xvbmluZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NM
-T0YnOiBjaGVja2VkIG91dCAnN2JmZTU4NGUzMjE5NDY3NzE2OTI3MTFmZjgzYWQyYjU4NTBkYWNh
-NycKQ2xvbmluZyBpbnRvICdyb21zL2VkazInLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIn
-OiBjaGVja2VkIG91dCAnMjBkMmU1YTEyNWUzNGZjODUwMTAyNjYxM2E3MTU0OWIyYTFhM2U1NCcK
-U3VibW9kdWxlICdTb2Z0RmxvYXQnIChodHRwczovL2dpdGh1Yi5jb20vdWNiLWJhci9iZXJrZWxl
-eS1zb2Z0ZmxvYXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ0FybVBrZy9MaWJyYXJ5L0Fy
-bVNvZnRGbG9hdExpYi9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICdDcnlwdG9Qa2cv
-TGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wnIChodHRwczovL2dpdGh1Yi5jb20vb3BlbnNzbC9v
-cGVuc3NsKSByZWdpc3RlcmVkIGZvciBwYXRoICdDcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGli
-L29wZW5zc2wnCkNsb25pbmcgaW50byAnQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2Jl
-cmtlbGV5LXNvZnRmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0FybVBrZy9M
-aWJyYXJ5L0FybVNvZnRGbG9hdExpYi9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0
-ICdiNjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8g
-J0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcuLi4KU3VibW9kdWxlIHBhdGgg
-J3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wnOiBjaGVja2Vk
-IG91dCAnNTBlYWFjOWYzMzM3NjY3MjU5ZGU3MjU0NTFmMjAxZTc4NDU5OTY4NycKU3VibW9kdWxl
-ICdib3Jpbmdzc2wnIChodHRwczovL2JvcmluZ3NzbC5nb29nbGVzb3VyY2UuY29tL2JvcmluZ3Nz
-bCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnYm9yaW5nc3NsJwpTdWJtb2R1bGUgJ2tyYjUnIChodHRw
-czovL2dpdGh1Yi5jb20va3JiNS9rcmI1KSByZWdpc3RlcmVkIGZvciBwYXRoICdrcmI1JwpTdWJt
-b2R1bGUgJ3B5Y2EuY3J5cHRvZ3JhcGh5JyAoaHR0cHM6Ly9naXRodWIuY29tL3B5Y2EvY3J5cHRv
-Z3JhcGh5LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncHljYS1jcnlwdG9ncmFwaHknCkNsb25p
-bmcgaW50byAnYm9yaW5nc3NsJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1Br
-Zy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbC9ib3Jpbmdzc2wnOiBjaGVja2VkIG91dCAnMjA3
-MGY4YWQ5MTUxZGM4ZjNhNzNiZmZhYTE0NmI1ZTY5MzdhNTgzZicKQ2xvbmluZyBpbnRvICdrcmI1
-Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xM
-aWIvb3BlbnNzbC9rcmI1JzogY2hlY2tlZCBvdXQgJ2I5YWQ2YzQ5NTA1Yzk2YTA4ODMyNmI2MmE1
-MjU2OGUzNDg0ZjIxNjgnCkNsb25pbmcgaW50byAncHljYS1jcnlwdG9ncmFwaHknLi4uClN1Ym1v
-ZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3Ns
-L3B5Y2EtY3J5cHRvZ3JhcGh5JzogY2hlY2tlZCBvdXQgJzA5NDAzMTAwZGUyZjZmMWNkZDBkNDg0
-ZGNiOGU2MjBmMWMzMzVjOGYnCkNsb25pbmcgaW50byAncm9tcy9pcHhlJy4uLgpTdWJtb2R1bGUg
-cGF0aCAncm9tcy9pcHhlJzogY2hlY2tlZCBvdXQgJ2RlNDU2NWNiZTc2ZWE5Zjc5MTNhMDFmMzMx
-YmUzZWU5MDFiYjZlMTcnCkNsb25pbmcgaW50byAncm9tcy9vcGVuYmlvcycuLi4KU3VibW9kdWxl
-IHBhdGggJ3JvbXMvb3BlbmJpb3MnOiBjaGVja2VkIG91dCAnYzc5ZTBlY2I4NGY0ZjFlZTNmNzNm
-NTIxNjIyZTI2NGVkZDFiZjE3NCcKQ2xvbmluZyBpbnRvICdyb21zL29wZW5oYWNrd2FyZScuLi4K
-U3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJzogY2hlY2tlZCBvdXQgJ2M1NTlkYTdj
-OGVlYzVlNDVlZjFmNjc5Nzg4MjdhZjZmMGI5NTQ2ZjUnCkNsb25pbmcgaW50byAncm9tcy9vcGVu
-c2JpJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuc2JpJzogY2hlY2tlZCBvdXQgJ2NlMjI4
-ZWUwOTE5ZGViOTk1NzE5MmQ3MjNlZWNjOGFhYWUyNjk3YzYnCkNsb25pbmcgaW50byAncm9tcy9x
-ZW11LXBhbGNvZGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3FlbXUtcGFsY29kZSc6IGNoZWNr
-ZWQgb3V0ICdiZjBlMTM2OTg4NzI0NTAxNjRmYTcwNDBkYTM2YTk1ZDJkNGIzMjZmJwpDbG9uaW5n
-IGludG8gJ3JvbXMvc2VhYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcyc6IGNo
-ZWNrZWQgb3V0ICdhNWNhYjU4ZTlhM2ZiNmUxNjhhYmE5MTljNTY2OWJlYTQwNjU3M2I0JwpDbG9u
-aW5nIGludG8gJ3JvbXMvc2VhYmlvcy1ocHBhJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFi
-aW9zLWhwcGEnOiBjaGVja2VkIG91dCAnMGY0ZmU4NDY1ODE2NWU5NmNlMzU4NzBmZDE5ZmM2MzRl
-MTgyZTc3YicKQ2xvbmluZyBpbnRvICdyb21zL3NnYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdy
-b21zL3NnYWJpb3MnOiBjaGVja2VkIG91dCAnY2JhZWU1MjI4N2U1ZjMyMzczMTgxY2ZmNTBhMDBi
-NmM0YWM5MDE1YScKQ2xvbmluZyBpbnRvICdyb21zL3NraWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRo
-ICdyb21zL3NraWJvb3QnOiBjaGVja2VkIG91dCAnMjYxY2E4ZTc3OWU1MTM4ODY5YTQ1ZjE3NGNh
-YTQ5YmU2YTI3NDUwMScKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9vdCcuLi4KU3VibW9kdWxlIHBh
-dGggJ3JvbXMvdS1ib290JzogY2hlY2tlZCBvdXQgJ2QzNjg5MjY3ZjkyYzU5NTZlMDljYzdkMWJh
-YTQ3MDAxNDE2NjJiZmYnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3Qtc2FtNDYwZXgnLi4uClN1
-Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBleCc6IGNoZWNrZWQgb3V0ICc2MGIzOTE2
-ZjMzZTYxN2E4MTU5NzNjNWE2ZGY3NzA1NWIyZTNhNTg4JwpDbG9uaW5nIGludG8gJ3NsaXJwJy4u
-LgpTdWJtb2R1bGUgcGF0aCAnc2xpcnAnOiBjaGVja2VkIG91dCAnMTI2YzA0YWNiYWJkN2FkMzJj
-MmIwMThmZTEwZGZhYzJhM2JjMTIxMCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS1z
-b2Z0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9h
-dC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgw
-MzcnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnLi4uClN1Ym1v
-ZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICc1
-YTU5ZGNlYzE5MzI3Mzk2YTAxMWExN2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9uaW5nIGludG8gJ3Vp
-L2tleWNvZGVtYXBkYicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNr
-ZWQgb3V0ICc2YjNkNzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjZkNDBkZDkgYnVpbGQ6IENvcnJlY3Qgbm9uLWNvbW1v
-biBjb21tb24tb2JqLSogdG8gb2JqLSoKZjViZDRlNiBody90aW1lcjogRGVjbGFyZSBkZXZpY2Ug
-bGl0dGxlIG9yIGJpZyBlbmRpYW4KMmIyYmE4ZiBody9zc2k6IERlY2xhcmUgZGV2aWNlIGxpdHRs
-ZSBvciBiaWcgZW5kaWFuCjEwZTU3NWEgaHcvc2Q6IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBi
-aWcgZW5kaWFuCjk2NWVlMDEgaHcvcGNpLWhvc3Q6IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBi
-aWcgZW5kaWFuCjNkNDQxZDEgaHcvbmV0OiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVu
-ZGlhbgoxNzRiNjRlIGh3L21pc2M6IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBiaWcgZW5kaWFu
-CjQ4NjdiNGMgaHcvaXNhOiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbgplMWY4
-YmQwIGh3L2ludGM6IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBiaWcgZW5kaWFuCjc5YjM0YzAg
-aHcvaW5wdXQ6IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBiaWcgZW5kaWFuCjZiZDcxODggaHcv
-aTJjOiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbgo2YTBkY2YwIGh3L2dwaW86
-IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBiaWcgZW5kaWFuCjgzODc2N2EgaHcvZG1hOiBEZWNs
-YXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbgpmNmNhYTkwIGh3L2Rpc3BsYXk6IERlY2xh
-cmUgZGV2aWNlIGxpdHRsZSBvciBiaWcgZW5kaWFuCjgyMmUxZmYgaHcvY2hhcjogRGVjbGFyZSBk
-ZXZpY2UgbGl0dGxlIG9yIGJpZyBlbmRpYW4KNTExMDE4OCBody9ibG9jazogRGVjbGFyZSBkZXZp
-Y2UgbGl0dGxlIG9yIGJpZyBlbmRpYW4KZmMyMGFjNSBody9hdWRpbzogRGVjbGFyZSBkZXZpY2Ug
-bGl0dGxlIG9yIGJpZyBlbmRpYW4KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTcgQ2hlY2tpbmcg
-Y29tbWl0IGZjMjBhYzUxMDc2ZCAoaHcvYXVkaW86IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBi
-aWcgZW5kaWFuKQoyLzE3IENoZWNraW5nIGNvbW1pdCA1MTEwMTg4OTY1NTQgKGh3L2Jsb2NrOiBE
-ZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbikKMy8xNyBDaGVja2luZyBjb21taXQg
-ODIyZTFmZjM5MjEwIChody9jaGFyOiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlh
-bikKNC8xNyBDaGVja2luZyBjb21taXQgZjZjYWE5MGZkYzY4IChody9kaXNwbGF5OiBEZWNsYXJl
-IGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbikKNS8xNyBDaGVja2luZyBjb21taXQgODM4NzY3
-YTdiODBiIChody9kbWE6IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBiaWcgZW5kaWFuKQpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NjogRklMRTogaHcvZG1hL2V0
-cmF4ZnNfZG1hLmM6NzAzOgorXkkuZW5kaWFubmVzcyA9IERFVklDRV9MSVRUTEVfRU5ESUFOLCQK
-CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8x
-NyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi8xNyBDaGVja2luZyBjb21taXQgNmEwZGNm
-MDY3NzZhIChody9ncGlvOiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbikKNy8x
-NyBDaGVja2luZyBjb21taXQgNmJkNzE4ODRlZTYxIChody9pMmM6IERlY2xhcmUgZGV2aWNlIGxp
-dHRsZSBvciBiaWcgZW5kaWFuKQo4LzE3IENoZWNraW5nIGNvbW1pdCA3OWIzNGMwYThmODEgKGh3
-L2lucHV0OiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbikKOS8xNyBDaGVja2lu
-ZyBjb21taXQgZTFmOGJkMDFkMGU2IChody9pbnRjOiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3Ig
-YmlnIGVuZGlhbikKMTAvMTcgQ2hlY2tpbmcgY29tbWl0IDQ4NjdiNGM4NjU3MSAoaHcvaXNhOiBE
-ZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbikKMTEvMTcgQ2hlY2tpbmcgY29tbWl0
-IDE3NGI2NGU1MTViOSAoaHcvbWlzYzogRGVjbGFyZSBkZXZpY2UgbGl0dGxlIG9yIGJpZyBlbmRp
-YW4pCjEyLzE3IENoZWNraW5nIGNvbW1pdCAzZDQ0MWQxZTYzNjIgKGh3L25ldDogRGVjbGFyZSBk
-ZXZpY2UgbGl0dGxlIG9yIGJpZyBlbmRpYW4pCjEzLzE3IENoZWNraW5nIGNvbW1pdCA5NjVlZTAx
-YmIwYzEgKGh3L3BjaS1ob3N0OiBEZWNsYXJlIGRldmljZSBsaXR0bGUgb3IgYmlnIGVuZGlhbikK
-MTQvMTcgQ2hlY2tpbmcgY29tbWl0IDEwZTU3NWFkZjA1ZSAoaHcvc2Q6IERlY2xhcmUgZGV2aWNl
-IGxpdHRsZSBvciBiaWcgZW5kaWFuKQoxNS8xNyBDaGVja2luZyBjb21taXQgMmIyYmE4ZmUzNDU1
-IChody9zc2k6IERlY2xhcmUgZGV2aWNlIGxpdHRsZSBvciBiaWcgZW5kaWFuKQoxNi8xNyBDaGVj
-a2luZyBjb21taXQgZjViZDRlNmFlOGY2IChody90aW1lcjogRGVjbGFyZSBkZXZpY2UgbGl0dGxl
-IG9yIGJpZyBlbmRpYW4pCjE3LzE3IENoZWNraW5nIGNvbW1pdCA2ZDQwZGQ5NmFmNTcgKGJ1aWxk
-OiBDb3JyZWN0IG5vbi1jb21tb24gY29tbW9uLW9iai0qIHRvIG9iai0qKQo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
-IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9jb3Zlci4xNTY2NDY3OTYzLmdp
-dC50b255Lm5ndXllbkBidC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+The purpose of this patch is to recognize a zoned block device (ZBD)
+when it is opened as a raw file. The new code initializes the zoned
+model propery introduced by the previous commit.
+
+This commit is Linux-specific as it gets the Zoned Block Device Model
+value (none/host-managed/host-aware) from sysfs on the host.
+
+In order to avoid code duplication in file-posix.c, a common helper
+function is added to read values of sysfs entries under
+/sys/block/<dev>/queue. This way, the existing function that reads
+the value of "max_segments" entry and the the new function that reads
+"zoned" value both share the same helper code.
+
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+---
+ block/file-posix.c | 74 ++++++++++++++++++++++++++++++++++++++--------
+ block/raw-format.c |  8 +++++
+ 2 files changed, 70 insertions(+), 12 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index fbeb0068db..d9f2fc5e46 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1067,15 +1067,13 @@ static int sg_get_max_transfer_length(int fd)
+ #endif
+ }
+ 
+-static int sg_get_max_segments(int fd)
++static int hdev_read_blk_queue_entry(int fd, const char *key,
++    char *buf, int buf_len)
+ {
+ #ifdef CONFIG_LINUX
+-    char buf[32];
+-    const char *end;
+     char *sysfspath = NULL;
+     int ret;
+     int sysfd = -1;
+-    long max_segments;
+     struct stat st;
+ 
+     if (fstat(fd, &st)) {
+@@ -1083,23 +1081,45 @@ static int sg_get_max_segments(int fd)
+         goto out;
+     }
+ 
+-    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/max_segments",
+-                                major(st.st_rdev), minor(st.st_rdev));
++    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/%s",
++                                major(st.st_rdev), minor(st.st_rdev), key);
+     sysfd = open(sysfspath, O_RDONLY);
+     if (sysfd == -1) {
+         ret = -errno;
+         goto out;
+     }
+     do {
+-        ret = read(sysfd, buf, sizeof(buf) - 1);
++        ret = read(sysfd, buf, buf_len - 1);
+     } while (ret == -1 && errno == EINTR);
+     if (ret < 0) {
+         ret = -errno;
+-        goto out;
+     } else if (ret == 0) {
+         ret = -EIO;
++    }
++out:
++    if (sysfd != -1) {
++        close(sysfd);
++    }
++    g_free(sysfspath);
++    return ret;
++#else
++    return -ENOTSUP;
++#endif
++}
++
++static int sg_get_max_segments(int fd)
++{
++#ifdef CONFIG_LINUX
++    char buf[32];
++    const char *end;
++    int ret;
++    long max_segments;
++
++    ret = hdev_read_blk_queue_entry(fd, "max_segments", buf, sizeof(buf));
++    if (ret < 0) {
+         goto out;
+     }
++
+     buf[ret] = 0;
+     /* The file is ended with '\n', pass 'end' to accept that. */
+     ret = qemu_strtol(buf, &end, 10, &max_segments);
+@@ -1108,10 +1128,33 @@ static int sg_get_max_segments(int fd)
+     }
+ 
+ out:
+-    if (sysfd != -1) {
+-        close(sysfd);
++    return ret;
++#else
++    return -ENOTSUP;
++#endif
++}
++
++static int hdev_get_zoned_model(int fd)
++{
++#ifdef CONFIG_LINUX
++    char buf[32];
++    int ret;
++
++    ret = hdev_read_blk_queue_entry(fd, "zoned", buf, sizeof(buf));
++    if (ret < 0) {
++        ret = BLK_ZONED_MODEL_NONE;
++        goto out;
+     }
+-    g_free(sysfspath);
++
++    buf[ret - 1] = 0;
++    ret = BLK_ZONED_MODEL_NONE;
++    if (strcmp(buf, "host-managed") == 0) {
++        ret = BLK_ZONED_MODEL_HM;
++    } else if (strcmp(buf, "host-aware") == 0) {
++        ret = BLK_ZONED_MODEL_HA;
++    }
++
++out:
+     return ret;
+ #else
+     return -ENOTSUP;
+@@ -1121,9 +1164,10 @@ out:
+ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
++    int ret;
+ 
+     if (bs->sg) {
+-        int ret = sg_get_max_transfer_length(s->fd);
++        ret = sg_get_max_transfer_length(s->fd);
+ 
+         if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+             bs->bl.max_transfer = pow2floor(ret);
+@@ -1133,6 +1177,12 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+         if (ret > 0) {
+             bs->bl.max_transfer = MIN(bs->bl.max_transfer, ret * getpagesize());
+         }
++
++    }
++
++    ret = hdev_get_zoned_model(s->fd);
++    if (ret >= 0) {
++        bs->bl.zoned_model = ret;
+     }
+ 
+     raw_probe_alignment(bs, s->fd, errp);
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 42c28cc29a..a606e4a7fe 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -369,6 +369,13 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+     }
+ }
+ 
++static void raw_get_zoned_info(BlockDriverState *bs)
++{
++    if (!bs->probed) {
++        bs->bl.zoned_model = bs->file->bs->bl.zoned_model;
++    }
++}
++
+ static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
+                                         PreallocMode prealloc, Error **errp)
+ {
+@@ -578,6 +585,7 @@ BlockDriver bdrv_raw = {
+     .create_opts          = &raw_create_opts,
+     .bdrv_has_zero_init   = &raw_has_zero_init,
+     .bdrv_has_zero_init_truncate = &raw_has_zero_init_truncate,
++    .bdrv_get_zoned_info  = &raw_get_zoned_info,
+     .strong_runtime_opts  = raw_strong_runtime_opts,
+     .mutable_opts         = mutable_opts,
+ };
+-- 
+2.21.0
 
 
