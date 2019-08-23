@@ -2,62 +2,78 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE90C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 707DDC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:10:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9B41206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:02:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9B41206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 41FD022CE3
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:10:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YaGATZQs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41FD022CE3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1C18-000894-QW
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 12:02:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39722)
+	id 1i1C8w-0005sQ-OR
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 12:10:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41617)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i1ByH-0006dr-J4
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:59:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i1C72-0004MM-II
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:08:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i1ByG-0007IB-8a
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:59:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36560)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i1ByF-0007H7-Ll
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:59:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A3F0FC087353;
- Fri, 23 Aug 2019 15:59:22 +0000 (UTC)
-Received: from work-vm (ovpn-117-244.ams2.redhat.com [10.36.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B737960610;
- Fri, 23 Aug 2019 15:59:21 +0000 (UTC)
-Date: Fri, 23 Aug 2019 16:59:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190823155919.GO2784@work-vm>
-References: <20190802060359.16556-1-richardw.yang@linux.intel.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i1C70-0007F9-Tv
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:08:28 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38132)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i1C70-0007Bd-MP
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:08:26 -0400
+Received: by mail-oi1-x242.google.com with SMTP id q8so7108953oij.5
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 09:08:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vJN13Og6DN9PUForrtTLS5vI8rP5ub7uU0ZHUkx6x1s=;
+ b=YaGATZQsmivVFJe1C5VkG9cL/JPCHgSJoZeG0HEH/+I3RDMvRjfvTd8+rqd9IN0bGj
+ UDmh3sNdzFrZJWA6+qlpemmPbOswBkUvBCI/mpe2pvB1i2va4DXj44jJNXjKmKfGAx7R
+ cemUui97qmtKvkW7Cy6GDKofPog7o9rjwJWnupsAI22f8j7/Qbtq3wQgAZTdqX2+cSXk
+ vu0nC6x13QUtoXsAzKmPzrxbIM8cEZHMxd352jXYIalHVzEDqDffBP/YrALKl7ymPDtz
+ 11V/PuQfzBj96GhC7Q1jVO9YaQ++yiCa4T5oDEOgbUecQ/w1jmt8QvBSW+7+h2iXRH2+
+ 5ZLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vJN13Og6DN9PUForrtTLS5vI8rP5ub7uU0ZHUkx6x1s=;
+ b=UvMtRfeNfjDqNiwb60x9zDyFhIvmLolaepkK+xaNAXGh5In0/YFRDklBA6H9GgXuQd
+ LcoJYJMTCqF1ZLyVgtHKNDgUSm71kB0EjzDrz5qM/exkMBX8RLOFLcTjvV6nuMgusyGD
+ oJA551fQQM8BbNZdGTLsC5uVOPJ5LZv7FZK6NgbcnwCacTjE4EsnwzqVwo/NN2kcxxb7
+ zHUQ5j46T5IUlKTjTgFFIWGGhyRHYpdwNv7y+TA6SDdOvds8/MFarfYtAJcZI/6zI6BV
+ DoJt2PxSAuaWD6qXSuCcnAzEF8RyHiBAUl/RFq5WwO2kEQkXLUMNN/jzM3tsD+4YV3Bb
+ DiIQ==
+X-Gm-Message-State: APjAAAVjXnvutRJnxqqoHzxwrO1oivrjTXZPczdBajA1kkoSq/6vY497
+ kykvhJvzmNquDUGRpNXN3ikHLgI0c5TWYn3aR8g3cA==
+X-Google-Smtp-Source: APXvYqwkMjRLV2CWvQt8PP3hFS3GJijfKwj5JGcmFntwfnH6rCBWME0jPEkfR6RE0vWOSUII2wDd6BxPFK3pTX/KHR4=
+X-Received: by 2002:aca:4814:: with SMTP id v20mr3798918oia.98.1566576505486; 
+ Fri, 23 Aug 2019 09:08:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190802060359.16556-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 23 Aug 2019 15:59:22 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH] migration/postcopy: enable compress
- with postcopy
+References: <04703275-47e1-90c0-1b64-d2373ab48970@here.com>
+In-Reply-To: <04703275-47e1-90c0-1b64-d2373ab48970@here.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Aug 2019 17:08:14 +0100
+Message-ID: <CAFEAcA-Zc3zz8p8YnxTskkUizuEXCTRA6ejO_0VbtvGXYwjZRw@mail.gmail.com>
+To: "Bonnans, Laurent" <laurent.bonnans@here.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] Running u-boot on raspi2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,152 +85,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: "Xiang, Cheng" <ext-cheng.xiang@here.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> This patch enable compress with postcopy.
-> 
-> This is a RFC and based on some unmerged patch
-> 
->   "migration: extract ram_load_precopy"
->   "migration/postcopy: skip compression when postcopy is active"
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
->  migration/postcopy-ram.c |  3 +--
->  migration/ram.c          | 35 +++++++++++++++++++++--------------
->  2 files changed, 22 insertions(+), 16 deletions(-)
-> 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index a7e7ec9c22..70b6beb5a9 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -1252,8 +1252,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
->              }
->              memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
->          }
-> -        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
-> -                                   rb);
-> +        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page, rb);
+On Fri, 23 Aug 2019 at 16:54, Bonnans, Laurent <laurent.bonnans@here.com> wrote:
+>
+> Hi,
+>
+> We (mostly Cheng Xiang's work) have been trying to use the raspi2
+> machine to boot an image through u-boot.
+> It seems, however, that there are some missing pieces:
+>
+> The first problem is that it trips very early if we keep the cpus count
+> at 4 but will continue if we hard-patch it to be a single core.
+> Symptom is that it seems all cores are running and trying to execute
+> something, while u-boot probably has not intention of doing something
+> with SMP.
+> Our guess is that it's something related to the asm spin routine in
+> raspi.c, which is maybe awoken too soon by some event in the mbox?
 
-Please keep these type of cleanups separate.
+This is probably because your binary is not expecting to be
+run the way that QEMU is running it. QEMU supports two
+ways of starting guest code on Arm:
+ (1) Linux kernels; these boot with whatever the expected
+ boot protocol for the kernel on this board is. For raspi
+ that will be "start the primary CPU, but put the secondaries in
+ the pen waiting on the mbox". Effectively, QEMU emulates a
+ very minimal bit of the firmware, just enough to boot Linux.
+ (2) Not Linux kernels; these are booted as if they were the
+ first thing to execute on the raw hardware, which is to say
+ that all CPUs start executing at once, and it is the job of
+ the guest code to provide whatever penning of secondary CPUs
+ it wants to do. That is, your guest code has to do the work
+ of the firmware here, because it effectively is the firmware.
 
->      }
->  }
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index a0d3bc60b2..c1d6eadf38 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2384,16 +2384,6 @@ static bool save_page_use_compression(RAMState *rs)
->          return false;
->      }
->  
-> -    /*
-> -     * The decompression threads asynchronously write into RAM
-> -     * rather than use the atomic copies needed to avoid
-> -     * userfaulting.  It should be possible to fix the decompression
-> -     * threads for compatibility in future.
-> -     */
-> -    if (migration_in_postcopy()) {
-> -        return false;
-> -    }
-> -
->      /*
->       * If xbzrle is on, stop using the data compression after first
->       * round of migration even if compression is enabled. In theory,
-> @@ -3433,6 +3423,11 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->          }
->          i++;
->      }
-> +
-> +    if (migrate_postcopy_ram()) {
-> +        flush_compressed_data(rs);
-> +    }
-> +
->      rcu_read_unlock();
->  
->      /*
-> @@ -4019,6 +4014,7 @@ static int ram_load_postcopy(QEMUFile *f)
->          void *place_source = NULL;
->          RAMBlock *block = NULL;
->          uint8_t ch;
-> +        int len;
->  
->          addr = qemu_get_be64(f);
->  
-> @@ -4036,7 +4032,8 @@ static int ram_load_postcopy(QEMUFile *f)
->  
->          trace_ram_load_postcopy_loop((uint64_t)addr, flags);
->          place_needed = false;
-> -        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
-> +        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-> +                     RAM_SAVE_FLAG_COMPRESS_PAGE)) {
->              block = ram_block_from_stream(f, flags);
->  
->              host = host_from_ram_block_offset(block, addr);
-> @@ -4109,6 +4106,17 @@ static int ram_load_postcopy(QEMUFile *f)
->                                           TARGET_PAGE_SIZE);
->              }
->              break;
-> +        case RAM_SAVE_FLAG_COMPRESS_PAGE:
-> +            all_zero = false;
-> +            len = qemu_get_be32(f);
-> +            if (len < 0 || len > compressBound(TARGET_PAGE_SIZE)) {
-> +                error_report("Invalid compressed data length: %d", len);
-> +                ret = -EINVAL;
-> +                break;
-> +            }
-> +            decompress_data_with_multi_threads(f, page_buffer, len);
-> +            ret |= wait_for_decompress_done();
+We assume that you're a Linux kernel if you're a raw image,
+or a suitable uImage. If you're an ELF image we assume you're
+not a Linux kernel. (This is not exactly ideal but we're to
+some extent lumbered with it for backwards-compatibility reasons.)
 
-I think this might work for a 4k page host; but I'm not sure it's
-safe on hugepages or ARM/Power where they have bigger pages.
-ram_load_postcopy relies on all of the pages within a single hostpage
-arriving before the last subpage and that's what then triggers the call
-to postcopy_place_page;  that relies on some ordering - but I don't
-think that the multiple compress threads on the source have any ordering
-between the threads - or am I missing something about how the multiple
-threads are organised?
+> Second problem is that u-boot relies on some SoC timer for the
+> raspberrypi 2, "System Timer" in
+> https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+> It has not been added to qemu, to our knowledge but it looks like it
+> should be pretty easy to emulate.
 
-Dave
+Yeah, our emulation for this SoC's devices is still missing
+pieces. Contributions of device models are welcome. (You
+might want to check the list archives, etc -- I know there
+are some bcm283x device models floating around which haven't
+yet made it into mainline, which might be a workable base
+for cleanup and contribution.)
 
-> +            break;
->          case RAM_SAVE_FLAG_EOS:
->              /* normal exit */
->              multifd_recv_sync_main();
-> @@ -4130,8 +4138,7 @@ static int ram_load_postcopy(QEMUFile *f)
->              void *place_dest = host + TARGET_PAGE_SIZE - block->page_size;
->  
->              if (all_zero) {
-> -                ret = postcopy_place_page_zero(mis, place_dest,
-> -                                               block);
-> +                ret = postcopy_place_page_zero(mis, place_dest, block);
->              } else {
->                  ret = postcopy_place_page(mis, place_dest,
->                                            place_source, block);
-> @@ -4372,6 +4379,7 @@ static int ram_load_precopy(QEMUFile *f)
->          }
->      }
->  
-> +    ret |= wait_for_decompress_done();
->      return ret;
->  }
->  
-> @@ -4405,7 +4413,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          ret = ram_load_precopy(f);
->      }
->  
-> -    ret |= wait_for_decompress_done();
->      rcu_read_unlock();
->      trace_ram_load_complete(ret, seq_iter);
->  
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
 
