@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9959BC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4612CC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:52:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C093205C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:52:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C093205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 19CAD205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:52:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CAD205C9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Cnc-0008TZ-LA
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 12:52:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51424)
+	id 1i1Cnm-0000Fj-0J
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 12:52:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i1CkF-0005uq-1E
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:49:06 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i1Cew-0000wD-2N
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i1CkB-0002EC-4I
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:48:57 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:53749)
+ (envelope-from <laurent@vivier.eu>) id 1i1Cej-0006Jp-7S
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:43:29 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:39487)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i1CkA-0002Bv-Cb
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:48:54 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i1Cei-0006GB-GG
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:43:16 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MLz7f-1hjwyD0A0P-00Hx40; Fri, 23 Aug 2019 18:48:36 +0200
-To: Shu-Chun Weng <scw@google.com>, marcandre.lureau@gmail.com
-References: <CAFEAcA-GWR6_wGCMWkMHttU3ARJPqfADvNTnqQUU_OzcWgHHuQ@mail.gmail.com>
- <20190819180947.180725-1-scw@google.com>
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MrPRB-1iY4Z949JP-00oa72; Fri, 23 Aug 2019 18:43:01 +0200
+To: Peter Maydell <peter.maydell@linaro.org>, Shu-Chun Weng <scw@google.com>
+References: <20190816211049.57317-1-scw@google.com>
+ <CAFEAcA-GWR6_wGCMWkMHttU3ARJPqfADvNTnqQUU_OzcWgHHuQ@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,34 +82,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <66ab145d-2d5f-415c-8663-f8828041e93d@vivier.eu>
-Date: Fri, 23 Aug 2019 18:48:32 +0200
+Message-ID: <02298489-b0d0-c7d5-6f8a-7b0ff604aac6@vivier.eu>
+Date: Fri, 23 Aug 2019 18:42:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190819180947.180725-1-scw@google.com>
+In-Reply-To: <CAFEAcA-GWR6_wGCMWkMHttU3ARJPqfADvNTnqQUU_OzcWgHHuQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:YDYYpFs6RoKVk8H0Xb4z0i4/bS1GdKUw95mWd//zH5rc16BGk5v
- FlIYcvsG0vOFo+E6NsLqPmHDAJ4Ld+KWrV5DNAsBf3fmzDRKcT/9MLuNQq9wHwy8vQPCXln
- DoVeIkGsq6Z0ZgtmY+WGflNjcCyJ4TvRD8NoQAFzA9JOnFuuhHGE2bObJ5KW86vhkLPVFO6
- Jag/dIAQJPtNUMaLCywaQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DjOtMq/nv2E=:oqhacqaObyjV3nNagDdTV0
- aVr08lxfWn6SHQRls5sLoHknNxkp/Tf5aUOA5XCV7fznyzbIKqCsqIxcA3XDvEJZQHPfmS/WI
- JECSEKG6Xq4EeK6FAkLjhcIIdzz2T2+m7Fu8swlJafld3MjfUmNW+dyEjd+a+0f4n0ZVB1xAG
- hVNYAcfchLjZ8woOt8h1OkrOqQ7Zk4osuE7OecShTpxGrhJWqC/7OM5WTLcJ95k6B/pGWbH+o
- C0PUv4Pe4XTXMxbgojuSmEPzDSojm64jOqUJDBEhbg0khG3rUWNpINA8ajTC4YKISLdpxpBpO
- rGH6CciSE9TCTC0S1M63XBkDsltWRFsJaFh00RXs8yyTXjYQjUoGreRFgAUlrpPvIQSC4Dehr
- 2XXe3cUlasoaquqrICKg3j75oGjOq/PkUldyfKcyhDcPoYkwDDeR+YAInUtEkbgg128JabOEs
- oNu2UffS569bfE37a/yIr+2piI3h/I+ww1oOVSzc9EjjCNxzcr1kTwtAqYFO15kDC5k32EeRM
- wBUAOCBbmXfhPgcJ23HunF6Hj4IwI+EeivSUW4ZWfIsCvkVCXfiKMe/r35Vc8/t3+hsjiQq9h
- 5lSsbOkHWtX//06DX24q2WoRDA+rMkbh7MyeKjGWwdMYLf2huFjDU2EdvTtKtm5KXKII8ORd+
- kL21aBlApgrkzpcPChSfglXfnZVJKmwyH4bDy2u3IZirUip5f4oqyEv6zVwJv7RO6SWzC/+95
- udFt6jwF38nVOXluSUFVwjrbm6wdyc3ZeEEA+er2uICEqnjrUN0Wgmc7ni0=
+X-Provags-ID: V03:K1:NKIshjjgRCIQlsPe0HC8FIJDUpKXu3i2KnBui4r2MFgQMa2trB9
+ 4kBY7TW+UA7c4yWhPfF+fPeApD0zAEIqJEicR7hOYYuvFADJ7w8xYtYWF272HJQmyI6wc5M
+ WtLgf/gI1JJIt6ZseQhyFYuNAm8nj0fLidDns9lBv6vO0898tLa7wTK1Tu/U6IdSacqoHUL
+ fJdWCd2S6YiwkH6VK/x4A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:HnIOg69nMd0=:LbTqTfGExQVom60CIu1gk1
+ W1gEBAyXuNb1WrFB52Ntv+jPNQ8uU+cGvNnjeok8+AUK9SuLZcA6hXM2ss798NvvACky2ahvC
+ SIpYh/FWI7nZ0RyFslZFFwprWdAi/8FcPX+pLfBFLvN+jZHiYXuzyAmy9cimo1W188b/G2b38
+ vWZEIo9uUSu0+kr9uwrzvxqacI+So969h2krudcmVxQwVPGjLmA2auSIrB++1uw4SxrRBvX/i
+ o+4Ybj2FkGWLSuZk/RxYtlZiCNz3AtCGlFc9ppnjSZjeh6jOIF5K4aYsca1h3y60dybdQx7Db
+ zoQ/PpHDAlaeb2/QJ7pVkIPYDRdZBZa1tRVt5uDi5f/s0oJ0Z/4tOIfZLKktGmImtkgrodcFY
+ 3xOI7BPDR7hzuFaDhmBWmPnIWQyTqxulYWEvcr1vpa6j3vvlIY1NiMmaS3FYgNMaariwlkdBf
+ Q2E1mt1dolig+2ZmbMCqROKdbrR7C35G3BZVrD5bp8NFN4f9aCO8pXAMKym+CzGmsVix9NXZL
+ O8qM4Rv87Sn8pMET30h2WXpnQZJX1gqE3C/yNIkQpgl51fY9eFMmAsrEEF64jZRW25RhSHkXd
+ 4D9k5sFEC7KOwbgL4CPNde5T1PUIyVFMOMFILd/j20u/Ovtm7Q8PKxIvFd5SBCwtt9TUMIJCb
+ j1278cgnOLMMWH84gdHzx82zbiAe7pDRpRns3hNZD8cZ7ez7vqqVowFMh6Xd2uQTE01srTK8Q
+ aC/GkXkCHdWRv3MHMEFBNGQaoB53KMImfUztFtvaEU32YBSs98tW1mIMP/8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: add memfd_create
+X-Received-From: 212.227.17.10
+Subject: Re: [Qemu-devel] [PATCH] linux-user: add memfd_create
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,90 +121,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arunkaly@google.com, riku.voipio@iki.fi, qemu-devel@nongnu.org
+Cc: arunkaly@google.com, Riku Voipio <riku.voipio@iki.fi>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 19/08/2019 à 20:09, Shu-Chun Weng via Qemu-devel a écrit :
-> Add support for the memfd_create syscall. If the host does not have the
-> libc wrapper, translate to a direct syscall with NC-macro.
+Le 19/08/2019 à 13:56, Peter Maydell a écrit :
+> On Fri, 16 Aug 2019 at 22:28, Shu-Chun Weng via Qemu-devel
+> <qemu-devel@nongnu.org> wrote:
+>>
+>> Add support for the memfd_create syscall. If the host does not have the
+>> libc wrapper, translate to a direct syscall with NC-macro.
+>>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1734792
+>> Signed-off-by: Shu-Chun Weng <scw@google.com>
+>> ---
+>>  include/qemu/memfd.h |  4 ++++
+>>  linux-user/syscall.c | 11 +++++++++++
+>>  util/memfd.c         |  2 +-
+>>  3 files changed, 16 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/qemu/memfd.h b/include/qemu/memfd.h
+>> index d551c28b68..975b6bdb77 100644
+>> --- a/include/qemu/memfd.h
+>> +++ b/include/qemu/memfd.h
+>> @@ -32,6 +32,10 @@
+>>  #define MFD_HUGE_SHIFT 26
+>>  #endif
+>>
+>> +#if defined CONFIG_LINUX && !defined CONFIG_MEMFD
+>> +int memfd_create(const char *name, unsigned int flags);
+>> +#endif
+>> +
+>>  int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
+>>                        uint64_t hugetlbsize, unsigned int seals, Error **errp);
+>>  bool qemu_memfd_alloc_check(void);
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 8367cb138d..b506c1f40e 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -20,6 +20,7 @@
+>>  #include "qemu/osdep.h"
+>>  #include "qemu/cutils.h"
+>>  #include "qemu/path.h"
+>> +#include "qemu/memfd.h"
+>>  #include <elf.h>
+>>  #include <endian.h>
+>>  #include <grp.h>
+>> @@ -11938,6 +11939,16 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>>          /* PowerPC specific.  */
+>>          return do_swapcontext(cpu_env, arg1, arg2, arg3);
+>>  #endif
+>> +#ifdef TARGET_NR_memfd_create
+>> +    case TARGET_NR_memfd_create:
+>> +        p = lock_user_string(arg1);
+>> +        if (!p) {
+>> +            return -TARGET_EFAULT;
+>> +        }
+>> +        ret = get_errno(memfd_create(p, arg2));
 > 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1734792
-> Signed-off-by: Shu-Chun Weng <scw@google.com>
-> ---
-
-Please, next time, to help review, add an history here, something like:
-
-v3: add fd_trans_unregister()
-v2: no change
-
-And don't send new versions as a reply to the previous ones.
-
->  include/qemu/memfd.h |  4 ++++
->  linux-user/syscall.c | 12 ++++++++++++
->  util/memfd.c         |  2 +-
->  3 files changed, 17 insertions(+), 1 deletion(-)
+> I think here you may need to call
+>            fd_trans_unregister(ret);
 > 
-> diff --git a/include/qemu/memfd.h b/include/qemu/memfd.h
-> index d551c28b68..975b6bdb77 100644
-> --- a/include/qemu/memfd.h
-> +++ b/include/qemu/memfd.h
-> @@ -32,6 +32,10 @@
->  #define MFD_HUGE_SHIFT 26
->  #endif
->  
-> +#if defined CONFIG_LINUX && !defined CONFIG_MEMFD
-> +int memfd_create(const char *name, unsigned int flags);
-> +#endif
-> +
->  int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
->                        uint64_t hugetlbsize, unsigned int seals, Error **errp);
->  bool qemu_memfd_alloc_check(void);
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 8367cb138d..f3f9311e9c 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu/cutils.h"
->  #include "qemu/path.h"
-> +#include "qemu/memfd.h"
->  #include <elf.h>
->  #include <endian.h>
->  #include <grp.h>
-> @@ -11938,6 +11939,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          /* PowerPC specific.  */
->          return do_swapcontext(cpu_env, arg1, arg2, arg3);
->  #endif
-> +#ifdef TARGET_NR_memfd_create
-> +    case TARGET_NR_memfd_create:
-> +        p = lock_user_string(arg1);
-> +        if (!p) {
-> +            return -TARGET_EFAULT;
-> +        }
-> +        ret = get_errno(memfd_create(p, arg2));
-> +        fd_trans_unregister(ret);
-> +        unlock_user(p, arg1, 0);
-> +        return ret;
-> +#endif
->  
->      default:
->          qemu_log_mask(LOG_UNIMP, "Unsupported syscall: %d\n", num);
-> diff --git a/util/memfd.c b/util/memfd.c
-> index 00334e5b21..4a3c07e0be 100644
-> --- a/util/memfd.c
-> +++ b/util/memfd.c
-> @@ -35,7 +35,7 @@
->  #include <sys/syscall.h>
->  #include <asm/unistd.h>
->  
-> -static int memfd_create(const char *name, unsigned int flags)
-> +int memfd_create(const char *name, unsigned int flags)
->  {
->  #ifdef __NR_memfd_create
->      return syscall(__NR_memfd_create, name, flags);
+> since memfd_create() returns a file descriptor.
+> (This call unregisters any pre-existing hooks for "we need
+> to mangle the data for reads/writes of this file descriptor",
+> in case the fd was previously being used for a file descriptor
+> type that needed that.) This is what eg NR_open does.
 > 
+> Laurent -- do I have this right? It's not entirely clear
+> to me that we could ever be in a situation where a syscall
+> like open or memfd_create returns an fd that's got an fd_trans
+> hook active, because that would imply we'd failed to delete
+> the hook on fd-close somehow. Is this just a belt-and-braces
+> bit of coding ?
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Exactly.
+
+It's in case we missed one fd close and then to be sure an existing "fd
+translator" will not mess with data of the new one.
+
+Thanks,
+Laurent
+
+
 
