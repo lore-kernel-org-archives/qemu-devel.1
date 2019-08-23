@@ -6,88 +6,88 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D079FC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D33F2C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F452233A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BA4A21726
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 16:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d13aVcI/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F452233A2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wwlX532c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA4A21726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1CTP-0002I6-DU
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 12:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45368)
+	id 1i1CUE-00033j-8K
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 12:32:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i1CQd-0008P7-BN
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:28:44 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i1CSI-0001j4-GV
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:30:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i1CQZ-00068T-Ee
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:28:43 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34568)
+ (envelope-from <richard.henderson@linaro.org>) id 1i1CSH-00073U-Ha
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:30:26 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45380)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i1CQZ-000684-5o
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:28:39 -0400
-Received: by mail-pl1-x642.google.com with SMTP id d3so5866709plr.1
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 09:28:39 -0700 (PDT)
+ id 1i1CSH-00072u-9k
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 12:30:25 -0400
+Received: by mail-pf1-x442.google.com with SMTP id w26so6758715pfq.12
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 09:30:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nuK2lp/CodhYAyc6Wpf+jpECVEBYEi9MOcbES8SGeCI=;
- b=d13aVcI/ciBaenuqQ0Vfsj5mRmqaQpXC4qvTZh0b3nQnLJ0GqOjP6B73H2d7NriT5p
- nnvMo4O2a+HDMzbPfos6/B3Hi7uSJRMysWfloa8DExKp9VYvVxj+O+sVIPkfa3lQ8GkP
- zsI+hPRII1eizuNXBXJEzYE2Mm2ZCI/pKPjayod5JxdDb0mTIzYA9uyJHF769Z/+M12g
- 2ENKY4hzSgA26YDsKeCnYo+MIhI5cbToUicG2DTpKCyptF/bu7b+/ee3DUuo6jphteAz
- bFNCYMyLKpcUSX0n3eLI4/5nh/mwUba2LhldI/H7IDKijRqI+EH9xBW3Ky/1hwBl3qoF
- CYdQ==
+ bh=fdt9EqP0P7b27VUPh4heMoj7hsoyqjVg1Sr8Lx78roo=;
+ b=wwlX532cRNzmFiB4nfUNkgs9HBopRBq//n52798k5cXZD2RB1Q+505I+HBsZb/G6mc
+ S5ULWY94PX9d+M5b7dzl90H6G1f96BPPjw9IRA6rQog/kLcQP8UtGnYipvDcciPNqnt0
+ gTaKtpcGT+vCUI6/JWkV5nZoDNJYh3egVvoaGbUKAUs9+VhqSBiNq63SjbitRCsq80il
+ r7NdYUI0ZPw+x6rmDaTbJApSc13R33c2udMuUunmI+Tv/Ad853IpZVrhrHX6VZoJ1B7H
+ LZDOI17kvhUNgCKY1lao59kDu7YUW5raUZQ0AsDI/wlC0biyApSKOyfSTa8VUgs9eUWK
+ JORg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=nuK2lp/CodhYAyc6Wpf+jpECVEBYEi9MOcbES8SGeCI=;
- b=SsXtTEbzJaDdKeDzGAqEe7wzg7JFVuPrHja0TTyfHQ7ABGlHJNz8glAUnjvMpq4bDb
- fjZGdoznC3ai4o7oRei5ZSREIbdO/97H3tSvCy6+vw0oTX//Hk5hTwnJbVZtoZTaUnKb
- JeUEkeZKqBTDvaFpxJ2+gD6FEPswU1mnknv8ftVl5jWu3SiIxuc2fHNiDgKo/oHeGOw9
- osEatYNNZ/G0YI8+eFWkT1dPXjLMVslS9En+xhRnsjVtpLZx9uTFIIiNStJqlhLB/Pcp
- RE/50248RVID3WjHTUbRUfjYmpo8lU37lX5cYQdjxgC1BE3QqRPIFLdmaeOpcOe6eNlD
- qMdg==
-X-Gm-Message-State: APjAAAUaW5APD5fVVIVOCjm0MvFqpeasiowJgYVc49zXAQXLNzxr9az/
- dIyuXdnnOuCRsW9dwOv3wpI1TA==
-X-Google-Smtp-Source: APXvYqxuRXDOe0SzpVwwksTqxd7Xgybf1shPQ8lsH3ZDWrdneFhEl4wgCeROs3USSsSf2UK2XD0Q2g==
-X-Received: by 2002:a17:902:eb:: with SMTP id a98mr5489455pla.75.1566577718082; 
- Fri, 23 Aug 2019 09:28:38 -0700 (PDT)
+ bh=fdt9EqP0P7b27VUPh4heMoj7hsoyqjVg1Sr8Lx78roo=;
+ b=FgaPGwI/oMwpx7KPTKX05xwQVr/+nh3OBGDkTgr9Pp1ficQfwJkNa3xFmFBZL3VcUz
+ UPgajgL4UjxS005Nw+v/q31tSsRw8HcbiKK8uJodVUFrFo5Reoev6VetLDl1i/X2s8iC
+ ea2xpdCZLe4rcH9Rzhv081eL/QzYAzMHdzvaNcZtHwDKJKrvewzbeNo3IGUeeK5GiOwU
+ aNPaSz0S7NZMrgGwauCGzRAxtWxlAw0V8uTeATp1c9LDV2xcmvI+LVZstt1aCHzF4/Ox
+ /6YY5HSAMkzCVGelr98aKFpkighYRcoykXofGfL1ru6Zevc6Uug32lh35TBHi+ynpA4d
+ 8BJA==
+X-Gm-Message-State: APjAAAVkvU6dwFZamcjm8YAl6GSjBW9q8Lg500TX/1BJRrXNlFcvMSOv
+ Ta14A3E551jr/S/ZwOHUuFRZ8Q==
+X-Google-Smtp-Source: APXvYqzUnd9sFoHJRmj0Apc4B1V8HDdMSlWXWeuc1sHu2uOjpcKdUwkRujl2UBfW3C/BqkIOpYrpEw==
+X-Received: by 2002:a65:448a:: with SMTP id l10mr4642619pgq.327.1566577823992; 
+ Fri, 23 Aug 2019 09:30:23 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id u7sm3053337pfm.96.2019.08.23.09.28.36
+ by smtp.gmail.com with ESMTPSA id y194sm4213636pfg.116.2019.08.23.09.30.22
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 23 Aug 2019 09:28:37 -0700 (PDT)
+ Fri, 23 Aug 2019 09:30:23 -0700 (PDT)
 To: Peter Maydell <peter.maydell@linaro.org>
 References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-22-richard.henderson@linaro.org>
- <CAFEAcA9VyafAcmhy2t_rSLBM7LEjn7qhGzbETjcnNbFnQw0GhQ@mail.gmail.com>
+ <20190819213755.26175-23-richard.henderson@linaro.org>
+ <CAFEAcA_ctR2KvXkpw=q4mx1aZRzUJFK44kwWUHHe1XN8qsFBLA@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <8ae35689-69a2-2af6-2f5d-f2cce6aabaf3@linaro.org>
-Date: Fri, 23 Aug 2019 09:28:35 -0700
+Message-ID: <3c662805-072b-35ef-dff7-921b37b5fe89@linaro.org>
+Date: Fri, 23 Aug 2019 09:30:21 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9VyafAcmhy2t_rSLBM7LEjn7qhGzbETjcnNbFnQw0GhQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA_ctR2KvXkpw=q4mx1aZRzUJFK44kwWUHHe1XN8qsFBLA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: Re: [Qemu-devel] [PATCH v2 21/68] target/arm: Convert
- Synchronization primitives
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v2 22/68] target/arm: Convert USAD8, USADA8,
+ SBFX, UBFX, BFC, BFI, UDF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,36 +104,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 8:28 AM, Peter Maydell wrote:
->> +    gen_aa32_st_i32(s, tmp, addr, get_mem_index(s), mop | s->be_data);
->> +    disas_set_da_iss(s, mop, a->rt | ISSIsAcqRel | ISSIsWrite);
-...
->> -                                switch (op1) {
->> -                                case 0: /* stl */
->> -                                    gen_aa32_st32_iss(s, tmp, addr,
->> -                                                      get_mem_index(s),
->> -                                                      rm | ISSIsAcqRel);
->> -                                    break;
->> -                                case 2: /* stlb */
->> -                                    gen_aa32_st8_iss(s, tmp, addr,
->> -                                                     get_mem_index(s),
->> -                                                     rm | ISSIsAcqRel);
->> -                                    break;
->> -                                case 3: /* stlh */
->> -                                    gen_aa32_st16_iss(s, tmp, addr,
->> -                                                      get_mem_index(s),
->> -                                                      rm | ISSIsAcqRel);
->> -                                    break;
+On 8/23/19 8:39 AM, Peter Maydell wrote:
+>> +static bool op_bfx(DisasContext *s, arg_UBFX *a, bool u)
+>> +{
+>> +    TCGv_i32 tmp;
+>> +    int width = a->widthm1 + 1;
+>> +    int shift = a->lsb;
+>> +
+>> +    if (!ENABLE_ARCH_6T2) {
+>> +        return false;
+>> +    }
+>> +
+>> +    tmp = load_reg(s, a->rn);
+>> +    if (shift + width > 32) {
+>> +        return false;
 > 
-> Any particular reason for doing separate gen_aa32_st_i32()
-> and disas_set_da_iss() calls rather than using the _gen_aa32_st32_iss()
-> function that the old decoder did?
+> This UNDEF check should go before we
+> generate any code with the load_reg().
 
-I think gen_aa32_st_i32 with the MemOp argument is preferable to a switch
-statement that enumerates the different sizes.
-
-We don't have a version of gen_aa32_st_i32 that also passes the ISS.  While we
-could add one, a separate call seems just as easy.
+Oops, yep.
 
 
 r~
