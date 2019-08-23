@@ -2,92 +2,93 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87956C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E17AC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:37:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E08721019
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39EEF2133F
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:37:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iTbZOmp5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E08721019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jmIVx291"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39EEF2133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Bc6-0005RY-Dt
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:36:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60780)
+	id 1i1Bcf-0006KR-BW
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:37:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i1BUt-0006NC-Rl
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:29:04 -0400
+ (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1BR5-0001sS-Cv
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:25:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i1BUs-0002HO-UH
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:29:03 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42882)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i1BUs-0002Gl-Mu
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:29:02 -0400
-Received: by mail-pl1-x643.google.com with SMTP id y1so5744386plp.9
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 08:29:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xmxj/V96xc4Nk2eeI7CcokgCy1z4OBxlwAVs8OWgshQ=;
- b=iTbZOmp5q3hp00bh+z75bq+SEETahXaGkGhVridmojse5RbY1/VpN0reJYC3iNNRLM
- PY17xwm15THNbrsTnd0EWU9LeLVSaHpvTKYuf6xS2gHMguaJWZobdlfNR+RQKsvEIieB
- /1qoN8UUo8cAiuYnycQuORXbhpd6M5H/beEGFQ2ZndZ7f8QVVU7KHWspwZgCT/Ign5fk
- /Q6OLMPynyYd7npQKvuTD1sx9SnwlARYnNHU44SPk5JS8ago3S2OEFxNLu2/B09nGL/h
- QWhRmF5/INKKM+L58aGakJAb+hiSyuFTmJlv3AMF4Ms7iHVfOjPCj4Mc0GAzzajPVT9I
- 54fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xmxj/V96xc4Nk2eeI7CcokgCy1z4OBxlwAVs8OWgshQ=;
- b=Q3v5EG5qD+wC5FN+E7SAdaHGYkPIzUDtTCbYdqtTW3xU81tdIXSfEFCsRyBonPgj78
- Jhqo8+3ps64fzm8uwKbowR2f2Ud2mZB+0ffrxTHc5OV7JDx0AjrDRq9eyOzV9dyxrbM7
- J9SbUnMsjXm6L+xcXj3JjHZhDu8DjGdxgYAblLiugKSci+DJzsCI1lbAI+0O+GxvNODp
- iuktnBnjex8TfzgWrM8pACFt/6ZHqyeqSYCDEOmhA8EnivgwulDOpfPNtcjZ058CLfmI
- fhR+fsmdh0I1xuRoRUXMuMWk5zH/DEi7t98zxJIG1QZt6n5GSI1j/QR7kN9Gx21WkWkt
- K4Dw==
-X-Gm-Message-State: APjAAAVDyoEAnu+blXzn0Nzjg58KFLrJsOZaLXFbz3tVXu0fVDNdXdxU
- f8Y/Voc2QIqdXFRUXeZtUUPk2w==
-X-Google-Smtp-Source: APXvYqzaJdWi8COqV5OqxVslqcRB4+bJTSEciUeYD5Kyk16C/be13orMdgWQcWYaxIJceqlriXBzpA==
-X-Received: by 2002:a17:902:3003:: with SMTP id
- u3mr5370034plb.161.1566574141594; 
- Fri, 23 Aug 2019 08:29:01 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id b126sm6408507pfa.177.2019.08.23.08.29.00
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 23 Aug 2019 08:29:00 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190823100741.9621-1-david@redhat.com>
- <20190823100741.9621-5-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ae881524-d745-c8e1-5765-157962d2b157@linaro.org>
-Date: Fri, 23 Aug 2019 08:28:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1BR4-0000E0-FA
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:25:07 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:33705)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=1314b2cac=alistair.francis@wdc.com>)
+ id 1i1BR4-0000DR-7o; Fri, 23 Aug 2019 11:25:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1566573907; x=1598109907;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=ksFRuDOVK+nvrJfNMPopN/I2U8vPsOLgk90V/grIQdA=;
+ b=jmIVx29166JGKXRTpBmqBkacoyEqk94unEbIuEFGqOckEw/OQkb+0Fnb
+ HuVpG0hZJdKhxKCJr7/xiar8L5+gjcF6o23K2Hxjb0WuHmUi3SpMwPj72
+ G+/Y3yqoKGQhtYiEVhDBP+Rd3gIOKkflkIm0nSg5Jsf8kq4PR4WydMK4p
+ 1VyZ323gST/1m8bnx3/KKWfvx0SVg/2rkAbP8SapPWKUkdsnuJq8ARb/Z
+ sCG8ODO2wojgKm6hLjyhrGYawnBo7xAzwm/O+XbS+Mn+GI3MRsX4Z/zlI
+ bp7RmIaoWcXBX/Bi0WgVehgTe/eIyOSrpqpeHiqLpJq+yepkvKkWn1OFD w==;
+IronPort-SDR: 1VGsWPsKJg7shpFrbmJuaB00TtA/wMpcQGxWj6SuL35+er3Rl2CJNdHHHEFbZBMkD0nEh6/LUY
+ 7O5UGJDjHoIs4C7f9Y4NJMcbTF2GaWiPmpLq4yf8VIIszNuGiQUrhJltvWsQ3w0/WK+QEGHFo3
+ b5XELoadt+dXoGwgKB0A0wpJd+4VdSeUnIE/o0FdSQ4ltYcm4xCD4rXuil0Am3qIpesMtQnKXc
+ pC64Tfx7RzU1SDz/1O3AS6ER1YgtmMY8k/zGQ+3thtLJoNAwDbka01HbOh0MmF3jh7F8hI/CfN
+ JlY=
+X-IronPort-AV: E=Sophos;i="5.64,421,1559491200"; d="scan'208";a="116527778"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Aug 2019 23:25:05 +0800
+IronPort-SDR: Sp3q9CQ9++mUtzUDmnKnCbYKpJQzUFXDndxFCIaZgAdof5ROSW5tIWIjXl7AA/3CCxJOtYOWoj
+ 7DxzjwknaYuqMQDCmQjLB9ZzYxGwZvzkG0oCLU4lSqKHnNDVi7MboQX5EnGADQjGjbSXfOyrc+
+ fQWymlAL32+OThriF7fuCCgyPnKlECUZnFFZMo1D/9AA3O/S+vZqffR8sWrFKTExeYMjUmxKsb
+ L1BhS/8Ybm6U9oogj+DaaNUusotWRfyTIj6kcXPfBbVessVk1fxaE3pHWonLrJ6X4//CGwjhQM
+ Lty8Z+QcuG6QlVu1vYY+VEEk
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Aug 2019 08:22:23 -0700
+IronPort-SDR: r8mUkXi/N67n/I5pkxTK9YVjoQ7lYovu32DTi9+iFfwyaWBjzyan8ln+u0FzHihDD0mN/V/Hcf
+ I7P70KDOYcuEVGKJN39SNFvIaRAqKNssTgKu+Au9Od5Y+pGviq/4CyiSKwqRpyqyjcYUkUUtUd
+ xGDPlxwZRu/3eDZbxVgFEut12LEkR9pabH/bP9kn/KJ6eb2rcjIUn1+8EShIRYBgSlzjb+C/3E
+ 3IRoH6ld1LQpa+LUwNRhTxsBw2ujixyLyrixjhiiMvO5rqykUNuhBDpKyqL8FYzoVV/DCqI79u
+ yUo=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.157.58])
+ by uls-op-cesaip01.wdc.com with ESMTP; 23 Aug 2019 08:25:05 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Date: Fri, 23 Aug 2019 08:21:25 -0700
+Message-Id: <066a2c520c38b0c175c052d6a3385d5661764833.1566573576.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <cover.1566573576.git.alistair.francis@wdc.com>
+References: <cover.1566573576.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20190823100741.9621-5-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: Re: [Qemu-devel] [PATCH v1 4/9] tcg: Enforce single page access in
- probe_write() for !CONFIG_USER_ONLY
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.154.42
+Subject: [Qemu-devel] [PATCH v4 7/7] target/riscv: Use TB_FLAGS_MSTATUS_FS
+ for floating point
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,33 +100,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com,
+ bmeng.cn@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 3:07 AM, David Hildenbrand wrote:
-> While the CONFIG_USER_ONLY variant can handle multiple pages (no MMU), the
-> !CONFIG_USER_ONLY variant can't and won't. We'll want to convert
-> probe_write() to return a host address (similar to tlb_vaddr_to_host())
-> soon. This only works on page granularity.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  accel/tcg/cputlb.c | 2 ++
->  1 file changed, 2 insertions(+)
+Use the TB_FLAGS_MSTATUS_FS macro when enabling floating point in the tb
+flags.
 
-As I just mentioned in the previous, I think the two implementations should match.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Anyway, the "multiple pages" thing above still means exactly two, since if
-there were three pages involved we were only probing two of them, and the third
-could still be unmapped.
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index eb7b5b0af3..0347be453b 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -301,7 +301,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+ #else
+     *flags = cpu_mmu_index(env, 0);
+     if (riscv_cpu_fp_enabled(env)) {
+-        *flags |= env->mstatus & MSTATUS_FS;
++        *flags |= TB_FLAGS_MSTATUS_FS;
+     }
+ #endif
+ }
+-- 
+2.22.0
 
-
-r~
 
