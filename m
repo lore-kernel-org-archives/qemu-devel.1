@@ -2,68 +2,60 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1E7C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 14:55:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36126C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 14:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E85D322CE3
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 14:55:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E85D322CE3
+	by mail.kernel.org (Postfix) with ESMTPS id BCA8822CE3
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 14:56:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA8822CE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Ay3-0006MX-Ld
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 10:55:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52182)
+	id 1i1AzA-0007pZ-JO
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 10:56:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i1AkT-0007yN-5l
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:41:06 -0400
+ (envelope-from <eblake@redhat.com>) id 1i1AiF-00059A-DQ
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:38:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i1AkR-0008HN-Lt
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:41:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37456)
+ (envelope-from <eblake@redhat.com>) id 1i1AiD-0005mg-JD
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:38:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41568)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i1AkR-0008EZ-CH
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:41:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i1Ai9-0005fR-40; Fri, 23 Aug 2019 10:38:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C6452302C06C;
- Fri, 23 Aug 2019 14:41:01 +0000 (UTC)
-Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 19C8E5D6B2;
- Fri, 23 Aug 2019 14:40:55 +0000 (UTC)
-Date: Fri, 23 Aug 2019 15:40:52 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190823144052.GL9654@redhat.com>
-References: <20190808150325.21939-1-marcandre.lureau@redhat.com>
- <20190823112053.GE9654@redhat.com>
- <CAMxuvayoLetZkJ_HNKxC8Y0Yk33hn5pHLLn32R-XCuD7z31i=Q@mail.gmail.com>
- <20190823114157.GG9654@redhat.com> <20190823130014.GG2784@work-vm>
- <CAJ+F1CKTsQC1fULFG-hbUZ=Ao654K-TE6Fm9c1V+eRdAjk9QRA@mail.gmail.com>
- <20190823140948.GI2784@work-vm> <20190823142054.GK9654@redhat.com>
- <20190823142602.GJ2784@work-vm>
+ by mx1.redhat.com (Postfix) with ESMTPS id 821C980F7C;
+ Fri, 23 Aug 2019 14:38:40 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 10F3B60A9F;
+ Fri, 23 Aug 2019 14:38:40 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: libguestfs@redhat.com
+Date: Fri, 23 Aug 2019 09:38:36 -0500
+Message-Id: <20190823143836.27321-2-eblake@redhat.com>
+In-Reply-To: <20190823143836.27321-1-eblake@redhat.com>
+References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
+ <20190823143836.27321-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190823142602.GJ2784@work-vm>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 23 Aug 2019 14:41:01 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Fri, 23 Aug 2019 14:38:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add dbus-vmstate
+Subject: [Qemu-devel] [libnbd PATCH 1/1] api: Add support for FAST_ZERO flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,146 +67,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, nbd@other.debian.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 23, 2019 at 03:26:02PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Fri, Aug 23, 2019 at 03:09:48PM +0100, Dr. David Alan Gilbert wrot=
-e:
-> > > * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
-> > > > Hi
-> > > >=20
-> > > > On Fri, Aug 23, 2019 at 5:00 PM Dr. David Alan Gilbert
-> > > > <dgilbert@redhat.com> wrote:
-> > > > >
-> > > > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > > > >
-> > > > > <snip>
-> > > > >
-> > > > > > This means QEMU still has to iterate over every single client
-> > > > > > on the bus to identify them. If you're doing that, there's
-> > > > > > no point in owning a well known service at all. Just iterate
-> > > > > > over the unique bus names and look for the exported object
-> > > > > > path /org/qemu/VMState
-> > > > > >
-> > > > >
-> > > > > Not knowing anything about DBus security, I want to ask how do
-> > > > > we handle security here?
-> > > >=20
-> > > > First of all, we are talking about cooperative processes, and hav=
-ing a
-> > > > specific bus for each qemu instance. So some amount of security/t=
-rust
-> > > > is already assumed.
-> > >=20
-> > > Some but we need to keep it as limited as possible; for example two
-> > > reasons for having separate processes both come down to security:
-> > >=20
-> > >   a) vtpm - however screwy the qemu is, you can never get to the ke=
-ys in
-> > > the vtpm
-> >=20
-> > Processes connected to dbus can only call the DBus APIs that vtpm
-> > actually exports.  The vtpm should simply *not* export a DBus
-> > API that allows anything to fetch the keys.
-> >=20
-> > If it did want to export APIs for fetching keys, then we would
-> > have to ensure suitable dbus /selinux policy was created to
-> > prevent unwarranted access.
->=20
-> This was really just one example of where the security/trust isn't
-> assumed; however a more concrete case is migration of a vtpm, and even
-> though it's probably encrypted blob you still don't want some other
-> device to grab the migration data - or to say reinitialise the vtpm.
+Qemu was able to demonstrate that knowing whether a zero operation is
+fast is useful when copying from one image to another: there is a
+choice between bulk pre-zeroing and then revisiting the data sections
+(fewer transactions, but depends on the zeroing to be fast),
+vs. visiting every portion of the disk only once (more transactions,
+but no time lost to duplicated I/O due to slow zeroes).  As such, the
+NBD protocol is adding an extension to allow clients to request fast
+failure when zero is not efficient, from servers that advertise
+support for the new flag.
 
-That can be dealt with by the dbus security policies, provided
-you either run the vtpm as a different user ID from the other
-untrustworthy helpers, or use a different selinux context for
-vtpm. You can then express that only the user that QEMU is
-running under can talk to vtpm over dbus.
+In libnbd, this results in the addition of a new flag, a new functoin
+nbd_can_fast_zero, and the ability to use the new flag in nbd_zero
+variants.  It also enhances the testsuite to test the flag against
+new enough nbdkit, which is being patched at the same time.
 
-Where I think you could have problems is if you needed finer
-grainer control with selinux. eg if vstpm exports 2 different
-services, you can't allow access to one service, but forbid
-access to the other service.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ lib/nbd-protocol.h     |  2 ++
+ generator/generator    | 29 +++++++++++++++++++++++------
+ lib/flags.c            | 12 ++++++++++++
+ lib/protocol.c         |  1 +
+ lib/rw.c               |  9 ++++++++-
+ tests/Makefile.am      | 20 ++++++++++++++++++++
+ tests/eflags-plugin.sh |  5 +++++
+ 7 files changed, 71 insertions(+), 7 deletions(-)
 
-> > >   b) virtio-gpu, loads of complex GPU code that can't break the mai=
-n
-> > > qemu process.
-> >=20
-> > That's no problem - virtio-gpu crashes, it disappears from the dbus
-> > bus, but everything else keeps running.
->=20
-> Crashing is the easy case; assume it's malicious and you don't want it
-> getting to say a storage device provided by another vhost-user device.
+diff --git a/lib/nbd-protocol.h b/lib/nbd-protocol.h
+index 3e3fb4e..04e93d3 100644
+--- a/lib/nbd-protocol.h
++++ b/lib/nbd-protocol.h
+@@ -108,6 +108,7 @@ struct nbd_fixed_new_option_reply {
+ #define NBD_FLAG_SEND_DF           (1 << 7)
+ #define NBD_FLAG_CAN_MULTI_CONN    (1 << 8)
+ #define NBD_FLAG_SEND_CACHE        (1 << 10)
++#define NBD_FLAG_SEND_FAST_ZERO    (1 << 11)
 
-If we assume that the 2 processes can't commnuicate / access each
-other outside DBus, then the attack avenues added by use of dbus
-are most likely either:
+ /* NBD options (new style handshake only). */
+ #define NBD_OPT_EXPORT_NAME        1
+@@ -250,6 +251,7 @@ struct nbd_structured_reply_error {
+ #define NBD_EINVAL     22
+ #define NBD_ENOSPC     28
+ #define NBD_EOVERFLOW  75
++#define NBD_ENOTSUP    95
+ #define NBD_ESHUTDOWN 108
 
- - invoking some DBus method that should not be allowed due
-   to incomplete dbus security policy.=20
+ #endif /* NBD_PROTOCOL_H */
+diff --git a/generator/generator b/generator/generator
+index c509573..9b1f5d8 100755
+--- a/generator/generator
++++ b/generator/generator
+@@ -958,10 +958,11 @@ let all_enums =3D [ tls_enum ]
+ let cmd_flags =3D {
+   flag_prefix =3D "CMD_FLAG";
+   flags =3D [
+-    "FUA",     1 lsl 0;
+-    "NO_HOLE", 1 lsl 1;
+-    "DF",      1 lsl 2;
+-    "REQ_ONE", 1 lsl 3;
++    "FUA",       1 lsl 0;
++    "NO_HOLE",   1 lsl 1;
++    "DF",        1 lsl 2;
++    "REQ_ONE",   1 lsl 3;
++    "FAST_ZERO", 1 lsl 4;
+   ]
+ }
+ let all_flags =3D [ cmd_flags ]
+@@ -1389,6 +1390,19 @@ the server does not."
+ ^ non_blocking_test_call_description;
+   };
 
- - finding a crash in a dbus client library that you can somehow
-   exploit to get remote code execution in the separate process
++  "can_fast_zero", {
++    default_call with
++    args =3D []; ret =3D RBool;
++    permitted_states =3D [ Connected; Closed ];
++    shortdesc =3D "does the server support the fast zero flag?";
++    longdesc =3D "\
++Returns true if the server supports the use of the
++C<LIBNBD_CMD_FLAG_FAST_ZERO> flag to the zero command
++(see C<nbd_zero>, C<nbd_aio_zero>).  Returns false if
++the server does not."
++^ non_blocking_test_call_description;
++  };
++
+   "can_df", {
+     default_call with
+     args =3D []; ret =3D RBool;
+@@ -1668,9 +1682,12 @@ The C<flags> parameter may be C<0> for no flags, o=
+r may contain
+ C<LIBNBD_CMD_FLAG_FUA> meaning that the server should not
+ return until the data has been committed to permanent storage
+ (if that is supported - some servers cannot do this, see
+-L<nbd_can_fua(3)>), and/or C<LIBNBD_CMD_FLAG_NO_HOLE> meaning that
++L<nbd_can_fua(3)>), C<LIBNBD_CMD_FLAG_NO_HOLE> meaning that
+ the server should favor writing actual allocated zeroes over
+-punching a hole.";
++punching a hole, and/or C<LIBNBD_CMD_FLAG_FAST_ZERO> meaning
++that the server must fail quickly if writing zeroes is no
++faster than a normal write (if that is supported - some servers
++cannot do this, see L<nbd_can_fast_zero(3)>).";
+   };
 
-   I won't claim this is impossible, but I think it helps to be
-   using a standard, widely used battle tested RPC impl, rather
-   than a home grown RPC protocol.
+   "block_status", {
+diff --git a/lib/flags.c b/lib/flags.c
+index 2bcacb8..d55d10a 100644
+--- a/lib/flags.c
++++ b/lib/flags.c
+@@ -47,6 +47,12 @@ nbd_internal_set_size_and_flags (struct nbd_handle *h,
+     eflags &=3D ~NBD_FLAG_SEND_DF;
+   }
 
++  if (eflags & NBD_FLAG_SEND_FAST_ZERO &&
++      !(eflags & NBD_FLAG_SEND_WRITE_ZEROES)) {
++    debug (h, "server lacks write zeroes, ignoring claim of fast zero");
++    eflags &=3D ~NBD_FLAG_SEND_FAST_ZERO;
++  }
++
+   h->exportsize =3D exportsize;
+   h->eflags =3D eflags;
+   return 0;
+@@ -100,6 +106,12 @@ nbd_unlocked_can_zero (struct nbd_handle *h)
+   return get_flag (h, NBD_FLAG_SEND_WRITE_ZEROES);
+ }
 
++int
++nbd_unlocked_can_fast_zero (struct nbd_handle *h)
++{
++  return get_flag (h, NBD_FLAG_SEND_FAST_ZERO);
++}
++
+ int
+ nbd_unlocked_can_df (struct nbd_handle *h)
+ {
+diff --git a/lib/protocol.c b/lib/protocol.c
+index 6087887..acee203 100644
+--- a/lib/protocol.c
++++ b/lib/protocol.c
+@@ -36,6 +36,7 @@ nbd_internal_errno_of_nbd_error (uint32_t error)
+   case NBD_EINVAL: return EINVAL;
+   case NBD_ENOSPC: return ENOSPC;
+   case NBD_EOVERFLOW: return EOVERFLOW;
++  case NBD_ENOTSUP: return ENOTSUP;
+   case NBD_ESHUTDOWN: return ESHUTDOWN;
+   default: return EINVAL;
+   }
+diff --git a/lib/rw.c b/lib/rw.c
+index d427681..adb6bc2 100644
+--- a/lib/rw.c
++++ b/lib/rw.c
+@@ -426,7 +426,8 @@ nbd_unlocked_aio_zero (struct nbd_handle *h,
+     return -1;
+   }
 
-> > > > But if necessary, dbus can enforce policies on who is allowed to =
-own a
-> > > > name, or to send/receive message from. As far as I know, this is
-> > > > mostly user/group policies.
-> > > >=20
-> > > > But there is also SELinux checks to send_msg and acquire_svc (see
-> > > > dbus-daemon(1))
-> > >=20
-> > > But how does something like SELinux interact with a private dbus=20
-> > > rather than the system dbus?
-> >=20
-> > There's already two dbus-daemon's on each host - the system one and
-> > the session one, and they get different selinux contexts,
-> > system_dbus_t and unconfined_dbus_t.
-> >=20
-> > Since libvirt would be responsible for launching these private dbus
-> > daemons it would be easy to make it run  svirt_dbus_t for example.
-> > Actually it would be  svirt_dbus_t:s0:cNNN,cMMM to get uniqueness
-> > per VM.
-> >=20
-> > Will of course require us to talk to the SELinux maintainers to
-> > get some sensible policy rules created.
->=20
-> This all relies on SELinux and running privileged qemu/vhost-user pairs=
-;
-> needing to do that purely to enforce security seems wrong.
+-  if ((flags & ~(LIBNBD_CMD_FLAG_FUA | LIBNBD_CMD_FLAG_NO_HOLE)) !=3D 0)=
+ {
++  if ((flags & ~(LIBNBD_CMD_FLAG_FUA | LIBNBD_CMD_FLAG_NO_HOLE |
++                 LIBNBD_CMD_FLAG_FAST_ZERO)) !=3D 0) {
+     set_error (EINVAL, "invalid flag: %" PRIu32, flags);
+     return -1;
+   }
+@@ -437,6 +438,12 @@ nbd_unlocked_aio_zero (struct nbd_handle *h,
+     return -1;
+   }
 
-Compare to an alternative bus-less solution where each helper has
-a direct UNIX socket connection to QEMU.
++  if ((flags & LIBNBD_CMD_FLAG_FAST_ZERO) !=3D 0 &&
++      nbd_unlocked_can_fast_zero (h) !=3D 1) {
++    set_error (EINVAL, "server does not support the fast zero flag");
++    return -1;
++  }
++
+   if (count =3D=3D 0) {             /* NBD protocol forbids this. */
+     set_error (EINVAL, "count cannot be 0");
+     return -1;
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 2b4ea93..a7bc1b5 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -145,6 +145,8 @@ check_PROGRAMS +=3D \
+ 	can-not-trim-flag \
+ 	can-zero-flag \
+ 	can-not-zero-flag \
++	can-fast-zero-flag \
++	can-not-fast-zero-flag \
+ 	can-multi-conn-flag \
+ 	can-not-multi-conn-flag \
+ 	can-cache-flag \
+@@ -177,6 +179,8 @@ TESTS +=3D \
+ 	can-not-trim-flag \
+ 	can-zero-flag \
+ 	can-not-zero-flag \
++	can-fast-zero-flag \
++	can-not-fast-zero-flag \
+ 	can-multi-conn-flag \
+ 	can-not-multi-conn-flag \
+ 	can-cache-flag \
+@@ -289,6 +293,22 @@ can_not_zero_flag_CPPFLAGS =3D \
+ can_not_zero_flag_CFLAGS =3D $(WARNINGS_CFLAGS)
+ can_not_zero_flag_LDADD =3D $(top_builddir)/lib/libnbd.la
 
-If two helpers are running as the same user ID, then can still
-directly attack each other via things like ptrace or /proc/$PID/mem,
-unless you've used SELinux to isolate them, or run each as a distinct
-user ID.  If you do the latter, then we can still easily isolate
-them using dbus.
-
-
-Regards,
-Daniel
++can_fast_zero_flag_SOURCES =3D eflags.c
++can_fast_zero_flag_CPPFLAGS =3D \
++	-I$(top_srcdir)/include -Dflag=3Dcan_fast_zero \
++	-Drequire=3D'"has_can_fast_zero=3D1"' \
++	$(NULL)
++can_fast_zero_flag_CFLAGS =3D $(WARNINGS_CFLAGS)
++can_fast_zero_flag_LDADD =3D $(top_builddir)/lib/libnbd.la
++
++can_not_fast_zero_flag_SOURCES =3D eflags.c
++can_not_fast_zero_flag_CPPFLAGS =3D \
++	-I$(top_srcdir)/include -Dflag=3Dcan_fast_zero -Dvalue=3Dfalse \
++	-Drequire=3D'"has_can_fast_zero=3D1"' \
++	$(NULL)
++can_not_fast_zero_flag_CFLAGS =3D $(WARNINGS_CFLAGS)
++can_not_fast_zero_flag_LDADD =3D $(top_builddir)/lib/libnbd.la
++
+ can_multi_conn_flag_SOURCES =3D eflags.c
+ can_multi_conn_flag_CPPFLAGS =3D \
+ 	-I$(top_srcdir)/include -Dflag=3Dcan_multi_conn \
+diff --git a/tests/eflags-plugin.sh b/tests/eflags-plugin.sh
+index 8fccff8..3c4cc65 100755
+--- a/tests/eflags-plugin.sh
++++ b/tests/eflags-plugin.sh
+@@ -52,6 +52,11 @@ case "$1" in
+         # be read-only and methods like can_trim will never be called.
+         exit 0
+         ;;
++    can_zero)
++	# We have to default to answering this with true before
++	# can_fast_zero has an effect.
++	exit 0
++	;;
+     *)
+         exit 2
+         ;;
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.21.0
+
 
