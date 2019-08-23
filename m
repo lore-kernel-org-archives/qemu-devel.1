@@ -2,62 +2,93 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB9DC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B369C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9639120850
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:20:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9639120850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id 095C320850
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:20:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FklvIOcS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 095C320850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1F6R-0004Db-F2
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:20:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43056)
+	id 1i1F6c-0004EQ-PH
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:20:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45165)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1i1Eh7-0003Ii-QW
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:53:54 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i1Erh-0005wQ-D8
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1i1Eh6-0003Ft-Q5
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:53:53 -0400
-Received: from nsstlmta08p.bpe.bigpond.com ([203.38.21.8]:43255)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1i1Eh6-0003E2-6c
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:53:52 -0400
-Received: from smtp.telstra.com ([10.10.24.4])
- by nsstlfep08p-svc.bpe.nexus.telstra.com.au with ESMTP id
- <20190823185347.LDLN13678.nsstlfep08p-svc.bpe.nexus.telstra.com.au@smtp.telstra.com>;
- Sat, 24 Aug 2019 04:53:47 +1000
-X-RG-Spam: Unknown
-X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgeduvddrudegkedguddvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfupfevtfgpvffgnffuvffttedpqfgfvfenuceurghilhhouhhtmecugedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefvohhnhicupfhguhihvghnuceothhonhihrdhnghhuhigvnhessghtrdgtohhmqeenucfkphepheekrddujeefrdelkedrieeknecurfgrrhgrmhephhgvlhhopegusgiirdhtvghlshhtrhgrrdgtohhmrdgruhdpihhnvghtpeehkedrudejfedrleekrdeikedpmhgrihhlfhhrohhmpeeothhonhihrdhnghhuhigvnhessghtrdgtohhmqedprhgtphhtthhopeeorghmrghrkhhovhhitgesfigrvhgvtghomhhprdgtohhmqedprhgtphhtthhopeeorghrihhkrghlohesfigrvhgvtghomhhprdgtohhmqedprhgtphhtthhopeeoqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgheqpdhrtghpthhtohepoehtohhnhidrnhhguhihvghnsegsthdrtghomheqnecuvehluhhsthgvrhfuihiivgephe
-X-RazorGate-Vade-Verdict: clean 0
-X-RazorGate-Vade-Classification: clean
-X-RG-VS-CLASS: clean
-X-Authentication-Info: Submitted using ID tony.nguyen.git@bigpond.com
-Received: from dbz.telstra.com.au (58.173.98.68) by smtp.telstra.com (5.8.335)
- (authenticated as tony.nguyen.git@bigpond.com)
- id 5D3692920C8C1CD8; Sat, 24 Aug 2019 04:53:47 +1000
-From: Tony Nguyen <tony.nguyen@bt.com>
-To: qemu-devel@nongnu.org
-Date: Sat, 24 Aug 2019 04:56:31 +1000
-Message-Id: <2ef68c79b6b6678dcd5a67a2de6d67089d39f38c.1566467963.git.tony.nguyen@bt.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <cover.1566467963.git.tony.nguyen@bt.com>
-References: <cover.1566467963.git.tony.nguyen@bt.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1i1Erf-0001hR-6Q
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:04:48 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:35768)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i1Ere-0001g6-MB
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:04:47 -0400
+Received: by mail-pl1-x642.google.com with SMTP id gn20so6061094plb.2
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 12:04:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Me3uBy3nz24VlnsYg7ubJxvYpiVCyDYT57dyN5yHXWQ=;
+ b=FklvIOcS5eH4CtRFKKVakN0tas8V8Gutu1c/n24hKC/+d8D6+W6OZautRwUxiQADId
+ nJbHFm7ramD5VRELOezozDWEHwCOzBhk+zllh2QT1SynsAKkx76mBQLNaSNjc2Xfhkxk
+ lz/iMWJ+179tiSIuwuOcYjfXk2Mkou817ygBrSkf3FWkvaY+VNQs9/KMauU2RVqC6mBC
+ b6gOfAYP5GrEUvILNWQKwAz5vvxXfRZ3lNnCNTeaSDUggKlDoUqSPZio+3YeWII9U9EV
+ l2u+ZRK2K3dqmrOMg7/V2pR55w8KyTHlGb+BdxID7/o0sOBlSJY9yZFICZ84kMcySQ90
+ 8k9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Me3uBy3nz24VlnsYg7ubJxvYpiVCyDYT57dyN5yHXWQ=;
+ b=LwZpTh+5xF6lvBFjflZuc06pc7VcGNxAM/ee44YZn1pvcURjCXBt7j0IhMRjXRn2VS
+ TYeuz8NTf2CMNhwEC4WKmDQva4c4V/U+AAU3oDTxU8oUMBTY26MqQ2SGoWSMxMwLq7Kl
+ zoc0RLVNJybKGRYAeImMlOISRMZXunR/2eL4S0rojAf7zKDJEJ+8Hf2ZtQJ4CNj+C9PG
+ fc2KbTsN0BwKwL2kzl6Na5LkvtBe9BYGmYtiDVVUjmLzc0jRGpqbP/rgEVNec5a8uuJH
+ LaAUEzrl/N3mZFAJuR1Lt0Fe+M4Tk2phhWdvEH2ED6AV4c+tVDthVlOfcbcBWJLD5t0S
+ TQgQ==
+X-Gm-Message-State: APjAAAVboz03joqw6AUTLxlczUC5Zc0ixQM1XmJQ6r5dsIWOr6tGSaxm
+ IzVRCIFr+bkwU0vhqkNKYKqraA==
+X-Google-Smtp-Source: APXvYqyC0Js2fu2rOsc7tlBl56hJ54fndhaP5447vz08B1iVw5tAC/zALRscIuhaUJ9JMbc6k9YxvQ==
+X-Received: by 2002:a17:902:8a87:: with SMTP id
+ p7mr6501318plo.124.1566587085432; 
+ Fri, 23 Aug 2019 12:04:45 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id a5sm2901697pjs.31.2019.08.23.12.04.44
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 23 Aug 2019 12:04:44 -0700 (PDT)
+To: Tony Nguyen <tony.nguyen@bt.com>, qemu-devel@nongnu.org
+References: <cover.1566466906.git.tony.nguyen@bt.com>
+ <8066ab3eb037c0388dfadfe53c5118429dd1de3a.1566466906.git.tony.nguyen@bt.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <f0b797c8-7801-d2cc-5ad5-7bf7b46a790e@linaro.org>
+Date: Fri, 23 Aug 2019 12:04:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 203.38.21.8
-Subject: [Qemu-devel] [RFC PATCH 10/17] hw/isa: Declare device little or big
- endian
+In-Reply-To: <8066ab3eb037c0388dfadfe53c5118429dd1de3a.1566466906.git.tony.nguyen@bt.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH v9 14/20] memory: Access MemoryRegion with
+ endianness
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,46 +100,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Tony Nguyen <tony.nguyen@bt.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Collin Walling <walling@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
-targets from the set of target/hw/*/device.o.
+On 8/23/19 11:36 AM, Tony Nguyen wrote:
+> Preparation for collapsing the two byte swaps adjust_endianness and
+> handle_bswap into the former.
+> 
+> Call memory_region_dispatch_{read|write} with endianness encoded into
+> the "MemOp op" operand.
+> 
+> This patch does not change any behaviour as
+> memory_region_dispatch_{read|write} is yet to handle the endianness.
+> 
+> Once it does handle endianness, callers with byte swaps can collapse
+> them into adjust_endianness.
+> 
+> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+> ---
+>  accel/tcg/cputlb.c       |  8 ++++++--
+>  exec.c                   | 13 +++++++++++--
+>  hw/intc/armv7m_nvic.c    | 15 ++++++++-------
+>  hw/s390x/s390-pci-inst.c |  6 ++++--
+>  hw/vfio/pci-quirks.c     |  5 +++--
+>  hw/virtio/virtio-pci.c   |  6 ++++--
+>  include/exec/memory.h    |  3 +++
+>  memory.c                 | 18 ++++++++++++++++++
+>  memory_ldst.inc.c        | 24 ++++++++++++++++++------
+>  9 files changed, 75 insertions(+), 23 deletions(-)
 
-If the set of targets are all little or all big endian, re-declare
-the device endianness as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN
-respectively.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-This *naive* deduction may result in genuinely native endian devices
-being incorrectly declared as little or big endian, but should not
-introduce regressions for current targets.
 
-These devices should be re-declared as DEVICE_NATIVE_ENDIAN if 1) it
-has a new target with an opposite endian or 2) someone informed knows
-better =)
-
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
----
- hw/isa/vt82c686.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index 50bd28fa82..400f2b3c87 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -109,7 +109,7 @@ static uint64_t superio_ioport_readb(void *opaque, hwaddr addr, unsigned size)
- static const MemoryRegionOps superio_ops = {
-     .read = superio_ioport_readb,
-     .write = superio_ioport_writeb,
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-     .impl = {
-         .min_access_size = 1,
-         .max_access_size = 1,
--- 
-2.23.0
-
+r~
 
