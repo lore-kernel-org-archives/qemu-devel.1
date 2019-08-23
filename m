@@ -2,111 +2,100 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F485C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F99C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:18:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9BB221726
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:15:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9BB221726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B79A21726
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:18:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="f5PqRjSf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B79A21726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i16be-0007vG-12
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 06:15:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59733)
+	id 1i16e5-00028O-H1
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 06:18:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i16Yp-0004dU-BW
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:12:48 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1i16bd-0008Bq-4e
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:15:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i16Yo-0002fh-0m
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:12:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36800)
+ (envelope-from <anthony.perard@citrix.com>) id 1i16bb-0004Ct-UL
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:15:40 -0400
+Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:44800)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1i16Yl-0002ea-Hy; Fri, 23 Aug 2019 06:12:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DA31F793E5;
- Fri, 23 Aug 2019 10:12:42 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-236.ams2.redhat.com [10.36.116.236])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 32D1D60E1C;
- Fri, 23 Aug 2019 10:12:40 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190823084203.29734-1-thuth@redhat.com>
- <CAFEAcA9bqzoT01E3tQREeAb1U3UJU0t8rOeX3E=pjmCM3J+O0g@mail.gmail.com>
- <3ccbd1c5-b60a-eb0b-6870-f6320bcbbbae@redhat.com>
- <CAFEAcA_F9oscKx9zM=8=E55Ju7B72EQq2hLk1gptQ81zBEO_Ug@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <485cfb8a-5b0c-735b-8e81-586f6dbdceae@redhat.com>
-Date: Fri, 23 Aug 2019 12:12:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1i16bb-0004Bu-K7
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:15:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1566555339;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=9TGuM99SRVq01HqRm4swGEc23rvh9wM2Moq9R5yoqyg=;
+ b=f5PqRjSfeQIkfptn4sWfedvCHayquZOPuwy2LKuhU1NM1gNIjPvyOt7M
+ L00nwWr8QvXwNW/hhth34X+kE6QIbh2sE91PWDZmr5NWiAQfIIKtObsLs
+ YSjTJltl6CBClgOyDhBZKrlmyxHUVDX7xDikUn2bNdlBnuQwhKZ6yyzHO A=;
+Authentication-Results: esa4.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa4.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: 1cydaJSag6Xz0SyD8+gqMTtPwqF2eNre6jB6Ua+6CHOAbIL2imYZEAeKwY1FaUVV8a3GIvPU9w
+ JrCnYA9t7Kdt+G/ZZRe/2fz3d3gGSKFMRdQaSC5t5BBYZKtLGfjQ0ZAldoOtBLirh7//fSh4wO
+ B0inKx1tIH9o4iVkhqjx7PiDJx5/VbhqyBdL4Bn9/thNV5RuaRDJ4e2ABCHhRZYMH/zCfhjFtb
+ 7wKDtJzs1G3m5GC5VcbqBnj3DuuW2M0vEnERsGXkCH3E0sXlkukof4P9u23tp26ndMWv8Q9i54
+ T1M=
+X-SBRS: 2.7
+X-MesageID: 4885193
+X-Ironport-Server: esa4.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,420,1559534400"; 
+   d="scan'208";a="4885193"
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: <qemu-devel@nongnu.org>
+Date: Fri, 23 Aug 2019 11:15:32 +0100
+Message-ID: <20190823101534.465-1-anthony.perard@citrix.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_F9oscKx9zM=8=E55Ju7B72EQq2hLk1gptQ81zBEO_Ug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 23 Aug 2019 10:12:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/check-block: Skip iotests when
- sanitizers are enabled
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.155.144
+Subject: [Qemu-devel] [PATCH v2 0/2] Fix for the xen-bus driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,43 +107,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 11:53 AM, Peter Maydell wrote:
-> On Fri, 23 Aug 2019 at 10:35, Thomas Huth <thuth@redhat.com> wrote:
->>
->> On 8/23/19 11:04 AM, Peter Maydell wrote:
->>> On Fri, 23 Aug 2019 at 09:43, Thomas Huth <thuth@redhat.com> wrote:
->>>>
->>>> The sanitizers (especially the address sanitizer from Clang) are
->>>> sometimes printing out warnings or false positives - this spoils
->>>> the output of the iotests, causing some of the tests to fail.
->>>> Thus let's skip the automatic iotests during "make check" when the
->>>> user configured QEMU with --enable-sanitizers.
->>>
->>> Do you have a log of what the sanitizer is saying?
->>
->> https://patchew.org/logs/QEMU/testing.asan/?type=project
-> 
-> (I get a "Not Found" error for that URL.)
+Cheers,
 
-Looks like Paolo just disabled the asan test in patchew and thus it got
-removed.
+Anthony PERARD (2):
+  xen-bus: Fix backend state transition on device reset
+  xen-bus: Avoid rewriting identical values to xenstore
 
-Anyway, I can reproduce the issues also locally here with this configure
-line:
+ hw/xen/xen-bus.c | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
 
-configure --enable-sanitizers --target-list=x86_64-softmmu --cc=clang
---cxx=clang++
+-- 
+Anthony PERARD
 
-and then running "make check".
-
-I'm using clang version 7.0.1.
-
- Thomas
 
