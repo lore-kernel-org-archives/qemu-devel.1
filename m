@@ -6,76 +6,77 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77275C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A75C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 400B321897
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DB5A21848
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:22:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jWIGl7oO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 400B321897
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QCsr5M7k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB5A21848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i18Yi-0007MJ-93
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 08:20:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56859)
+	id 1i18Zz-00004r-5r
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 08:22:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i18Vi-0005pW-4F
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:17:42 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i18WX-0006KD-Nb
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i18Vh-0001LO-5B
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:17:41 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35255)
+ (envelope-from <peter.maydell@linaro.org>) id 1i18WW-0001dH-Kn
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:18:33 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45163)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i18Vg-0001L6-Vi
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:17:41 -0400
-Received: by mail-oi1-x241.google.com with SMTP id a127so6847812oii.2
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 05:17:40 -0700 (PDT)
+ id 1i18WU-0001bU-Mm
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:18:32 -0400
+Received: by mail-ot1-x342.google.com with SMTP id m24so8520309otp.12
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 05:18:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EDFjzMZB/tEMJxBQIka91gbQDjgWB8klAFTgQcdJ79Q=;
- b=jWIGl7oO1PMZl4HSFH0gBeuHm877eiqxDNiRFqUPsoBxBhZXKGz0H1//JtUOhFrWAK
- TwtF/FjuDTZ4XlsTz8oOw2KKyA8UETbVGXCb8gRdMeAA6EgYK+650IKuGwg61SvY2eMo
- Gd4RsOufpLmJzebPngBOvKNorPaQc0jpCdHZG83lfb0aCgx4mjvUI8Qz2cj349/p+oWz
- L+whuZNIfeWjULrjkXKvb0q/olR5+xlIIhPbZi155h1IU617+nBI8tWC1eemIq0+KPSy
- 6GgkInjjbDfbGhfGVfO//TuTUZkXRhD5hKCxyECSvsxImOH1GebgUJ+50d3uYq+W7uUH
- 0oeA==
+ :cc; bh=jZVslk/s2CGtJfOBeOGpr+pgecW/7dXqzCewqbgW2Ho=;
+ b=QCsr5M7k1qk/RIaO6no/cTiC16+cTYm/8FzRCmBltOcUATBfuC1KBoK+LWN5d2DRAv
+ kNoYgNl95870voVS+5cCC8oA7Odf4rdKvVS7YuTD3h+KtpWh2rHxS9eue4E6Tb9+Knf3
+ 7l+H8TK5f54uK8x3XRHqSzxUH248pJ7IPsDujp+9qpqjHord9YDbI8b+RaxtpqiRbJtE
+ /KiXmXTDYzpHz8rePOoS7wIcNVfnlT/iUXATp5QmycLGuXnGm1R05VdiW441QXYTq0DW
+ jBUtNY2nGr0IEdSmerrgeMyFPyxHvbdnqmHf0LNQ+IjF/RPolSq/j6Iu3pxXMYam/NvB
+ I2Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=EDFjzMZB/tEMJxBQIka91gbQDjgWB8klAFTgQcdJ79Q=;
- b=jloQpYsET071eJdT+zLz1L4GgxC0vBafW6DSrv/mXrztkqLf0H/YOqJfBPiiCGjnYw
- +gHNvIaakF6JhTdo4ZX0/gTZxmIHaMSVRHaNCjZCAdyQtseqb7HkOHYSINdrBmInqY66
- z5n64ITUTwPRtWDkbR4ncN+a9COOaTDWClljB7AO1pJw3OWLSyQmUZ0qLJoJkKmFl+ez
- gLk7vjJXmwOcCq7OfbXM60MBYoBiUeOOyR7t/is+ul0RACrxMuwghbeHVVIGeH6LcFdq
- 2+fnO0x+GfGpeB76CNJfZfux2oxOpHt81QyZ82vWeTAWHp/ttWqJYXtWxKbcTtAKpsve
- D1kQ==
-X-Gm-Message-State: APjAAAXq7HkrW0DXb6F+OZep0LXBV9JyH76HE+nuSHreg9XOM92ub9Cf
- orf0RKf1enFIu5hb1rL5LB7+G96tkp9W5YQmiBHJNQ==
-X-Google-Smtp-Source: APXvYqyhwYOvYIZNRcwulZ0j0xApH7RCyC16sAO4cxqQd49+qMIxqWxoWDVQRb3/C2rr1K2rAS/i+u1JEp4MTMf3cn0=
-X-Received: by 2002:aca:4b86:: with SMTP id y128mr2894127oia.163.1566562660102; 
- Fri, 23 Aug 2019 05:17:40 -0700 (PDT)
+ bh=jZVslk/s2CGtJfOBeOGpr+pgecW/7dXqzCewqbgW2Ho=;
+ b=XSZzm1+E+qDGv5uQXZlokaDsjGxO4zKJvBULtmelToSANh7YMVsDdiW5S+ojNmwR4a
+ 5lAa7MDySJ3s8PNGuv2PjWN35yp8qIoNAm4yFYCDPontmWArfKEZf8l8MXibOxScn5hu
+ NQAeF05FwLVNTs2EvheGrYaxmY2dxpPXcMIIgsGrZkLR2lkveptDbZmJ3jklKLL/lBoO
+ YWNzmQ5Y3YGz/DweidtYOfP0cqiVBix6CUR8+iDzPl4TPZfBrYMaJ8TGExjRGs7u/+FI
+ e74NtvZHVJ+r5DOu+veGsXHmlWQognCVHJ4i9BL+BF/o52XntUzXxrRC/CZHJeT+Kwyo
+ 8AfQ==
+X-Gm-Message-State: APjAAAVtYQJUVX7Y/ZEOElQLz1ll3TW0kwYizgHTZXfVeX/LZBMekq32
+ D6m49A6LydB29vOcH3O/nHKlQNCDxNHRR/XqQFtwRg==
+X-Google-Smtp-Source: APXvYqyd+aif0ke/gfACt6RxFMNgc7urFzkkTF8CDD5r+IseyMukUkBsrUTpYkWX+ry5rBnVJcxIcBIwFug75L57KNY=
+X-Received: by 2002:a05:6830:1015:: with SMTP id
+ a21mr4047900otp.232.1566562708591; 
+ Fri, 23 Aug 2019 05:18:28 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-5-richard.henderson@linaro.org>
-In-Reply-To: <20190819213755.26175-5-richard.henderson@linaro.org>
+ <20190819213755.26175-6-richard.henderson@linaro.org>
+In-Reply-To: <20190819213755.26175-6-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Aug 2019 13:17:29 +0100
-Message-ID: <CAFEAcA9bSxhjjY-98SoT=buAsji1oc_-dg2WEnkfu-MZV6YN_g@mail.gmail.com>
+Date: Fri, 23 Aug 2019 13:18:17 +0100
+Message-ID: <CAFEAcA8y+peVsV8gDcAxwoPoi=GuGjrVWBbZ2AsUwKHXAN-0RQ@mail.gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v2 04/68] target/arm: Convert Data
- Processing (reg-shifted-reg)
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v2 05/68] target/arm: Convert Data
+ Processing (immediate)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,16 +96,17 @@ Sender: "Qemu-devel"
 On Mon, 19 Aug 2019 at 22:38, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Convert the register shifted by register form of the data
-> processing insns.  For A32, we cannot yet remove any code
-> because the legacy decoder intertwines the immediate form.
+> Convert the modified immediate form of the data processing insns.
+> For A32, we can finally remove any code that was intertwined with
+> the register and register-shifted-register forms.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/translate.c | 74 ++++++++++++++++++++++++++++++------------
->  target/arm/a32.decode  | 27 +++++++++++++++
->  target/arm/t32.decode  |  6 ++++
->  3 files changed, 87 insertions(+), 20 deletions(-)
+>  target/arm/translate.c | 449 +++++++++++------------------------------
+>  target/arm/a32.decode  |  29 +++
+>  target/arm/t32.decode  |  42 ++++
+>  3 files changed, 186 insertions(+), 334 deletions(-)
+>
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
