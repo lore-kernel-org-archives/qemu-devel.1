@@ -2,111 +2,82 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCE5C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 07:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E0DC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 07:14:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61D4021019
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 07:13:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D4021019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8EE1221019
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 07:14:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXUIr6c0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EE1221019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i13l2-0001Ns-Gp
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 03:13:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60267)
+	id 1i13mf-0002YA-Gg
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 03:14:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i13k1-0000cL-Vk
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 03:12:10 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1i13lk-00026X-6g
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 03:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i13k0-0008HI-TR
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 03:12:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48904)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1i13jy-0008GT-5p; Fri, 23 Aug 2019 03:12:06 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 01436180158D;
- Fri, 23 Aug 2019 07:12:05 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-236.ams2.redhat.com [10.36.116.236])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 97F3F6012E;
- Fri, 23 Aug 2019 07:12:03 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20190817085443.11471-1-thuth@redhat.com>
- <20190817085443.11471-3-thuth@redhat.com>
- <60924a33-8297-0f27-4cfe-c225647290a6@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <4175e842-ba7c-a054-2ee6-8741b16416e0@redhat.com>
-Date: Fri, 23 Aug 2019 09:12:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <marcandre.lureau@gmail.com>) id 1i13lj-0000JU-3D
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 03:13:55 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39951)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1i13li-0000IZ-Qi
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 03:13:55 -0400
+Received: by mail-wr1-x442.google.com with SMTP id c3so7626002wrd.7
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 00:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=OGP2RfRUu5J/xTFavr40S0xzJkIpJ/fMjuA2W+JS8V8=;
+ b=BXUIr6c0Bj0Q29OJa1F8uDvqj95rWW7KsRHaWQdvqhZNgWOg1O0sWC8devEaY1YojT
+ 9xIVgYALxMA4wF9UBbFGQtOiTdeDwWOrdUoZOPNTo890bX05umcc9PLJPbr+lLONRJ0d
+ KwJzK/g33p6bSlkRUHV0ZX6krsBW/tbCKY8s1njvhP8FQRxIAC5eW1pvkGwEuxnp5Sql
+ tEEZ8YR8dr3LIPZQZ24m9thO6bBLDxsjokZONign40GjSy0itbMmx7uVZnwuZxMr3nJS
+ vUHnoPxAFLZ103+44STeanhc/fc4s7pFgRGJOKiTDTDcNyNofPWlRcqdIwH4RDevrEgD
+ ztLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OGP2RfRUu5J/xTFavr40S0xzJkIpJ/fMjuA2W+JS8V8=;
+ b=f6vgCYLpZ1hVSCIv3irTr6+UKP+JMpIdR315+e+2SXnlCr8gMuYu3Pd6CoZFLwlEu0
+ Fbhl30GdIhBf5UwF0iSWBV0sMmK8+Mqkj+p59RoW5RjjVGNMzWULGVtl0zOn37hZoKvX
+ u1kseLzXbxtuxM/4jRH2eKcnIVe6/d5e4QWf5Tfkukp38p2IruW1iFeln6zvNCA1cGL6
+ n3txxj3a3CGSTM8l6Px/uGnFRnlZcRtPvyRd7TIt37miykVds6KgKnMnYbXRpCDyIXzQ
+ XTlFBz9s/zFKKHrvXrIvPHoTMyqr2/dSZexb6SSuzw0F50lRwWmO/XT3l48qdpQbnyMu
+ V+dw==
+X-Gm-Message-State: APjAAAWWHO84VgXIr7ApCXb5gCsIAcJkG0L7VXMdh4/0Y19wqen4bo5E
+ L/Gz8Fy8Ri7RRoLxNVRYLgQeq+5mlIbTamFvSXE=
+X-Google-Smtp-Source: APXvYqzJCCkhS+MVRO7n96C78Ey0uEuTYuJJHXiCpr/DEZ9/ntVuCqiDtGSiTv9WpxS6P0GqPzQQld/BlHPWA9YHuT4=
+X-Received: by 2002:a5d:6744:: with SMTP id l4mr3069626wrw.186.1566544432323; 
+ Fri, 23 Aug 2019 00:13:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <60924a33-8297-0f27-4cfe-c225647290a6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 23 Aug 2019 07:12:05 +0000 (UTC)
+References: <1566495734-23297-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1566495734-23297-1-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 23 Aug 2019 11:13:40 +0400
+Message-ID: <CAJ+F1CJ9Gc9iYvQHNzbvXtiB4PpDfpbm-pkxuhF-CQkgqJeNcw@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 2/3] tests: Run the iotests during "make
- check" again
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH] modules-test: fix const cast
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,53 +89,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 12:34 AM, Paolo Bonzini wrote:
-> On 17/08/19 10:54, Thomas Huth wrote:
->> People often forget to run the iotests before submitting patches or pu=
-ll
->> requests - this is likely due to the fact that we do not run the tests
->> during our mandatory "make check" tests yet. Now that we've got a prop=
-er
->> "auto" group of iotests that should be fine to run in every environmen=
-t,
->> we can enable the iotests during "make check" again by running the "au=
-to"
->> tests by default from the check-block.sh script.
->>
->> Some cases still need to be checked first, though: iotests need bash a=
-nd
->> GNU sed (otherwise they fail), and if gprof is enabled, it spoils the
->> output of some test cases causing them to fail. So if we detect that o=
-ne
->> of the required programs is missing or that gprof is enabled, we still
->> have to skip the iotests to avoid failures.
->>
->> And finally, since we are using check-block.sh now again, this patch a=
-lso
->> removes the qemu-iotests-quick.sh script since we do not need that any=
-more
->> (and having two shell wrapper scripts around the block tests seems rat=
-her
->> confusing than helpful).
->>
->> Message-Id: <20190717111947.30356-4-thuth@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> [AJB: -makecheck to check-block.sh, move check-block to start and gate=
- it]
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
-> This breaks when sanitizers are enabled.  There are leaks reported,
-> though I'm not sure if they are real, and in additions the warning line=
-s
-> break qemu-iotests' output comparison.
+On Thu, Aug 22, 2019 at 9:42 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-D'oh, I already thought that it was too easy ;-) I'll have a look at it..=
-.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
- Thomas
+> ---
+>  tests/modules-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tests/modules-test.c b/tests/modules-test.c
+> index 3aef0e5..a8118e9 100644
+> --- a/tests/modules-test.c
+> +++ b/tests/modules-test.c
+> @@ -4,7 +4,7 @@
+>  static void test_modules_load(const void *data)
+>  {
+>      QTestState *qts;
+> -    const char **args =3D data;
+> +    const char **args =3D (const char **)data;
+>
+>      qts =3D qtest_init(NULL);
+>      qtest_module_load(qts, args[0], args[1]);
+> --
+> 1.8.3.1
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
