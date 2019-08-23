@@ -2,113 +2,81 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B28EC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1297AC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:18:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E332A21897
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:12:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E332A21897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CBF33206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 12:18:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TTfw8hiS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBF33206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i18Qv-0003WW-5p
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 08:12:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55598)
+	id 1i18WC-0005ov-LT
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 08:18:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i18Ps-0002mQ-2S
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:11:40 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i18UN-0005D8-9m
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i18Pq-0006kW-Vi
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:11:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53278)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i18Pq-0006k4-O7
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:11:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EDB9FA31CEF;
- Fri, 23 Aug 2019 12:11:37 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-236.ams2.redhat.com [10.36.116.236])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DB3FD75521;
- Fri, 23 Aug 2019 12:11:33 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <1566495734-23297-1-git-send-email-pbonzini@redhat.com>
- <9492af41-2125-9543-203a-312f0cd9087c@redhat.com>
- <CAFEAcA__BNnW4oSyv4iTAd7rsMUfcjyNJgk0nOwbkRQtmLj9jQ@mail.gmail.com>
- <dd473e9b-716d-cd9f-47bd-433d2b17687d@redhat.com>
- <CAFEAcA81qUSMqpMTCrs9-vgj7Wmji2dCDkYrQ91wxmhTiP83Xw@mail.gmail.com>
- <dd60f779-8349-1d0d-eb86-645e2e1b0808@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <860f2a0e-f49b-fa8d-9219-b832acaba20f@redhat.com>
-Date: Fri, 23 Aug 2019 14:11:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1i18UM-0000uB-9F
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:16:19 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46911)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i18UM-0000tt-4j
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 08:16:18 -0400
+Received: by mail-ot1-x341.google.com with SMTP id z17so8498867otk.13
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 05:16:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=f/Vekl7Joky49QK00944xfqovEQ1LgsQ9EZ1x5MtykI=;
+ b=TTfw8hiSKFJBAd1AoZfwrql6+bvB0drBIQNBtFpVn4VMrvNaC7fWqR+H/A+f6EEySi
+ kUQcYMHFyQamJShWnO/hK3zlHlm2Zsnk9SJY7L5euyHLKI52HD9GacnDq4IVWcn7hB65
+ huFhYJGcejALQG/oX0dgJt9D5Vxne+vnFeiZ9jaCIP6+4x2/Bm5LNVFU/MjwZgjH9IM/
+ ViwPEvR0N7Q9myKfKP97V6GuPA3vqP8UmUX6Nbc/jCqW8ITb1yZi8H+HJWve4S5Pdiof
+ NClx4WOtDlMfSEFk7PMl4mmINo78VN0J7FgQkL/bUNMzAJD+IwMAuWB3yMcJakzEPGrg
+ C1CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=f/Vekl7Joky49QK00944xfqovEQ1LgsQ9EZ1x5MtykI=;
+ b=a0g/HnDKSdSTdK9Rtk4s0nyjxndj9CMaRQsdjZtRKZKQ3RGjysRm3ApGjlwju7+lcR
+ dy9Ovvxb2WHc3KieGQKRTnVNIGMTwpVZuTGQl6s4eOl7msl0//yRXgfFCeYTbMdgo0II
+ FdyuD30mg3DFcb9orZb/euZg8s50WFEic1KKmRLMfebWndBUWB7BlW7B/QGQKpiOb7IN
+ BcfyVnIkwP7ZAO4U9aDLlptSCWCtS2NRrrAO2wa38vyltRbXLJxvfkwD/XIwV++ZhaC2
+ QoBqjlUNoVB7UTSHlxuDBRjK0c8DFFxlb4WxQ2lhi29KFQXd/WsFyk1eTL0xfwK+Y8sm
+ HMAw==
+X-Gm-Message-State: APjAAAW4Xs98fNNzkqIPW98d1DLhHdgxAtVDM/g8ktuZPL0MvToFuKzs
+ JapqiwCzo1lajIpggsWME5cnxNuqgI3W6DjPl+yykg==
+X-Google-Smtp-Source: APXvYqx1RPVVeA+PSjJF8ah7vZvO3RHHHAIBMRrrDUCbNYNp7saky7FC38VyfZWYti4R4pb3jrk8rAs9YxRrGvn7eo0=
+X-Received: by 2002:a05:6830:1015:: with SMTP id
+ a21mr4039728otp.232.1566562577292; 
+ Fri, 23 Aug 2019 05:16:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <dd60f779-8349-1d0d-eb86-645e2e1b0808@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Fri, 23 Aug 2019 12:11:37 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] modules-test: fix const cast
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-3-richard.henderson@linaro.org>
+In-Reply-To: <20190819213755.26175-3-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Aug 2019 13:16:06 +0100
+Message-ID: <CAFEAcA-Tn9D6Eobe6L2JChKy+4yOqAQBUzzV0mvjr4wZUGhp5g@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v2 02/68] target/arm: Add stubs for aa32
+ decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,28 +88,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 2:10 PM, Paolo Bonzini wrote:
-> On 23/08/19 14:07, Peter Maydell wrote:
->>> Are you going to apply this and "[PATCH] modules-test: ui-spice-app is
->>> not built as module" to qemu.git directly?
->> Is the other one also needed as a build fix ?
-> 
-> Yes, otherwise the test fails (it didn't fail in the meson tree).
-> 
->> I was planning to apply this one directly, yes, but I was
->> waiting to see if you and Thomas wanted to agree any change
->> to the commit message.
-> 
-> Just "Fix build failure with --enable-modules" would be as verbose as it
-> needs to be, I guess.
+On Mon, 19 Aug 2019 at 22:38, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Add the infrastructure that will become the new decoder.
+> No instructions adjusted so far.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Fine for me.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
- Thomas
+thanks
+-- PMM
 
