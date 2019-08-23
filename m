@@ -2,65 +2,91 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A368C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2DDC41514
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:16:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C63221848
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:11:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C63221848
+	by mail.kernel.org (Postfix) with ESMTPS id 367452339D
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:16:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 367452339D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i19Ls-0008JG-Gt
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 09:11:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36746)
+	id 1i19Qx-0001lI-5O
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 09:16:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i19Fc-0001Qu-3V
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:05:09 -0400
+ (envelope-from <philmd@redhat.com>) id 1i19PH-0000uR-QR
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i19Fa-0004ae-F6
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:05:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39252)
+ (envelope-from <philmd@redhat.com>) id 1i19PG-0002Jm-7j
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:15:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53792)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i19Fa-0004aQ-73
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:05:06 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i19PG-0002JH-0B
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:15:06 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 85F203090FC1;
- Fri, 23 Aug 2019 13:05:05 +0000 (UTC)
-Received: from work-vm (ovpn-117-244.ams2.redhat.com [10.36.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B20A69506;
- Fri, 23 Aug 2019 13:05:04 +0000 (UTC)
-Date: Fri, 23 Aug 2019 14:05:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190823130502.GH2784@work-vm>
-References: <20190731144225.3784-1-richardw.yang@linux.intel.com>
- <20190731144225.3784-3-richardw.yang@linux.intel.com>
- <20190823110609.GF2784@work-vm> <20190823113801.GF9654@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C2D102A09D3
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 13:15:04 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id m26so2975488wmc.3
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 06:15:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1bWQR+GTJVZ+EGI8+KybYEbLPBUZCRPQIaWtiXEj6DA=;
+ b=Knxq7PsrWuk6UCQM+RyM63pztNMgIOIOScCbZ8B3c6qRYFeDwn51lrqWERxQ/5e+uX
+ bi/uOKSZmPMgwhzRrM1wyoQhiRpT9L3emG6qeb1O+mO9cLx4zpaI1sOlZX/eRBN9YUze
+ baEI9bOnnPNYUKB956IwYOVveCCFuRSI/JlmAZ/Fnhjqfh5D1ZdfdqnNAuZMBAzli0ul
+ O6wh2fQH6wF38cW9P1k8NWBcMHSzJd23PME+nGRljvHCMSBdtxbIEOUg6F8PP8Lk0YGK
+ WboEMo4JL5/KM+T1wPPyOOvKxhvUTYf3HmP3lpP8AvhDsU9RldxrtXKLpZsUXS6UghnU
+ mDGw==
+X-Gm-Message-State: APjAAAXPZQLdGmXu0sZHfjOZ/VwUVuq1Ii7GaXMQ4mqk6aprr9nritpY
+ Lcv9c5Tf4a5h0ZuD8VtE1KMpPYcnsKqvLUOA3re2q0Wdb9Cp8UHErE+3jyDAomyf1Mf2G2J/lx0
+ ONA43zRVmHdbtRbg=
+X-Received: by 2002:adf:e390:: with SMTP id e16mr5395270wrm.153.1566566103493; 
+ Fri, 23 Aug 2019 06:15:03 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwY8nLNXFZ2jefnDr0eeTY7FFjRHll505CEIglUUzCqz9Pjh7tpFNevyOCBNIEHFo5JXwOs9g==
+X-Received: by 2002:adf:e390:: with SMTP id e16mr5395220wrm.153.1566566103138; 
+ Fri, 23 Aug 2019 06:15:03 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id 2sm3315811wmz.16.2019.08.23.06.15.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 23 Aug 2019 06:15:02 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <CAFEAcA8kEKVcRu62+VGDkzRj2J87QPxzjg05dCHszeBC6X76pg@mail.gmail.com>
+ <20190822114747.GS3267@redhat.com> <20190822163150.GA3332@work-vm>
+ <9caf3a64-0841-dde6-3413-a77dc80e22bd@redhat.com>
+ <20190822165045.GM3277@work-vm>
+ <b9f98b17-49c4-a227-ab87-de4a6f42f089@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <a9fdc89e-bc75-59c5-2e1a-12c50b3e92de@redhat.com>
+Date: Fri, 23 Aug 2019 15:15:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190823113801.GF9654@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 23 Aug 2019 13:05:05 +0000 (UTC)
+In-Reply-To: <b9f98b17-49c4-a227-ab87-de4a6f42f089@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration/qemu-file: fix potential buf
- waste for extra buf_index adjustment
+Subject: Re: [Qemu-devel] more automated/public CI for QEMU pullreqs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,186 +98,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Samuel Ortiz <sameo@linux.intel.com>, Kashyap Chamarthy <kchamart@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Fri, Aug 23, 2019 at 12:06:09PM +0100, Dr. David Alan Gilbert wrote:
-> > (Copying Dan in)
-> >=20
-> > * Wei Yang (richardw.yang@linux.intel.com) wrote:
-> > > In add_to_iovec(), qemu_fflush() will be called if iovec is full. I=
-f
-> > > this happens, buf_index is reset. Currently, this is not checked an=
-d
-> > > buf_index would always been adjust with buf size.
-> > >=20
-> > > This is not harmful, but will waste some space in file buffer.
-> >=20
-> > That's a nice find.
-> >=20
-> > > This patch make add_to_iovec() return 1 when it has flushed the fil=
-e.
-> > > Then the caller could check the return value to see whether it is
-> > > necessary to adjust the buf_index any more.
-> > >=20
-> > > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> >=20
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >=20
-> > (I wonder if there's a way to wrap that little add_to_iovec, check, a=
-dd
-> > to index, flush in a little wrapper).
+On 8/22/19 7:05 PM, Paolo Bonzini wrote:
+> On 22/08/19 18:50, Dr. David Alan Gilbert wrote:
+>> * Paolo Bonzini (pbonzini@redhat.com) wrote:
+>>> On 22/08/19 18:31, Dr. David Alan Gilbert wrote:
+>>>>> With both these points in mind, I think it is  pretty hard sell to
+>>>>> say we should write & maintain a custom CI system just for QEMU
+>>>>> unless it is offering major compelling functionality we can't do
+>>>>> without.
+>>
+>> (That was Dan's comment)
+>>
+>>> In theory I agree.
+>>>
+>>> In practice, the major compelling functionality is portability.  If i=
+t
+>>> is true that setting up runners is problematic even on aarch64, frank=
+ly
+>>> GitLab CI is dead on arrival.  If it is not true, then I'd be very ha=
+ppy
+>>> to use GitLab CI too.
+>>
+>> IMHO if for some weird reason Gitlab has problems on aarch64 then we
+>> just need to get that fixed.
 >=20
-> Given the name "add_to_iovec" I think it is pretty surprising
-> that it calls "qemu_flush" at all.
+> I'm sure it's just some packaging or deployment issue.  But
+> https://gitlab.com/gitlab-org/gitlab-runner/merge_requests/725 has been
+> open for more than one year; the last two messages are:
 >=20
-> It is also pretty wierd that we're checking two different
-> conditions in two different places.
+> * 1 month ago: "I hope we will be able to merge it soon"
 >=20
-> Right now the code is essentially doing this:
+> * 3 weeks ago: "Today I tried use gitlab-runner on my arm64 box, howeve=
+r
+> it kept mysteriously failing"
 >=20
->      if (f->iovcnt >=3D MAX_IOV_SIZE) {
->         qemu_fflush(f);
->      }
->      if (f->buf_index =3D=3D IO_BUF_SIZE) {
->         qemu_fflush(f);
->      }
->=20
-> Except that in the qemu_put_buffer_async() case, we're
-> only doing the first of these two checks. This feels
-> very odd indeed - I would have thought either it should
-> do both, or do neither.
+> So the question is simply who does the work.
 
-No, there's two separate types of buffers.
+IIRC Samuel Ortiz told he was using GitLab with Aarch64 runners around
+Nov 2018, but "compiling from source". Alex Benn=C3=A9e tried building it=
+ on
+our Packet server during early 2019.
+Later an (unattended?) Ubuntu upgrade installed a package that does not
+work anymore with current GitLab server. I noticed this few months ago,
+built it again and tested it, then looked at what was wrong with the
+upstream MR. The Aarch64 packaging succeed when cross-building on x86_64
+host, but fails when building natively... Since part of it is "built or
+tested in the cloud" and involving Go, I simply let a comment:
+https://gitlab.com/gitlab-org/gitlab-runner/merge_requests/725#note_18347=
+0145
 
-There's f->buf which is a single allocated buffer in the QEMUFile
-with an offset buf_index, and there are arbitrary RAM pages
-added typically via qemu_put_buffer_async.
+So to confirm what Paolo said, GitLab runners work on Aarch64
+(and we have it well tested), however there is a packaging issue,
+so it does not work "out of the box".
 
-The check for >=3D IO_BUF_SIZE is only done when adding to the f->buf,
-where as the check on f->iovcnt is done when you add an element to
-the iovec and that can happen potentially in either case.
 
-Dave
+Related to:
 
-> Assuming doing both flushs is ok for qemu_put_buffer_async
-> then I'd suggest renaming 'add_to_iovec' to 'queue_buffer'
-> and have that method do both of these qemu_fflush() calls.
->=20
-> > > ---
-> > >  migration/qemu-file.c | 42 ++++++++++++++++++++++++++++-----------=
----
-> > >  1 file changed, 28 insertions(+), 14 deletions(-)
-> > >=20
-> > > diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> > > index 35c22605dd..05d9f42ddb 100644
-> > > --- a/migration/qemu-file.c
-> > > +++ b/migration/qemu-file.c
-> > > @@ -343,8 +343,16 @@ int qemu_fclose(QEMUFile *f)
-> > >      return ret;
-> > >  }
-> > > =20
-> > > -static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t s=
-ize,
-> > > -                         bool may_free)
-> > > +/*
-> > > + * Add buf to iovec. Do flush if iovec is full.
-> > > + *
-> > > + * Return values:
-> > > + * 1 iovec is full and flushed
-> > > + * 0 iovec is not flushed
-> > > + *
-> > > + */
-> > > +static int add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t si=
-ze,
-> > > +                        bool may_free)
-> > >  {
-> > >      /* check for adjacent buffer and coalesce them */
-> > >      if (f->iovcnt > 0 && buf =3D=3D f->iov[f->iovcnt - 1].iov_base=
- +
-> > > @@ -362,7 +370,10 @@ static void add_to_iovec(QEMUFile *f, const ui=
-nt8_t *buf, size_t size,
-> > > =20
-> > >      if (f->iovcnt >=3D MAX_IOV_SIZE) {
-> > >          qemu_fflush(f);
-> > > +        return 1;
-> > >      }
-> > > +
-> > > +    return 0;
-> > >  }
-> > > =20
-> > >  void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t=
- size,
-> > > @@ -391,10 +402,11 @@ void qemu_put_buffer(QEMUFile *f, const uint8=
-_t *buf, size_t size)
-> > >          }
-> > >          memcpy(f->buf + f->buf_index, buf, l);
-> > >          f->bytes_xfer +=3D l;
-> > > -        add_to_iovec(f, f->buf + f->buf_index, l, false);
-> > > -        f->buf_index +=3D l;
-> > > -        if (f->buf_index =3D=3D IO_BUF_SIZE) {
-> > > -            qemu_fflush(f);
-> > > +        if (!add_to_iovec(f, f->buf + f->buf_index, l, false)) {
-> > > +            f->buf_index +=3D l;
-> > > +            if (f->buf_index =3D=3D IO_BUF_SIZE) {
-> > > +                qemu_fflush(f);
-> > > +            }
-> > >          }
-> > >          if (qemu_file_get_error(f)) {
-> > >              break;
-> > > @@ -412,10 +424,11 @@ void qemu_put_byte(QEMUFile *f, int v)
-> > > =20
-> > >      f->buf[f->buf_index] =3D v;
-> > >      f->bytes_xfer++;
-> > > -    add_to_iovec(f, f->buf + f->buf_index, 1, false);
-> > > -    f->buf_index++;
-> > > -    if (f->buf_index =3D=3D IO_BUF_SIZE) {
-> > > -        qemu_fflush(f);
-> > > +    if (!add_to_iovec(f, f->buf + f->buf_index, 1, false)) {
-> > > +        f->buf_index++;
-> > > +        if (f->buf_index =3D=3D IO_BUF_SIZE) {
-> > > +            qemu_fflush(f);
-> > > +        }
-> > >      }
-> > >  }
-> > > =20
-> > > @@ -717,10 +730,11 @@ ssize_t qemu_put_compression_data(QEMUFile *f=
-, z_stream *stream,
-> > >      }
-> > > =20
-> > >      qemu_put_be32(f, blen);
-> > > -    add_to_iovec(f, f->buf + f->buf_index, blen, false);
-> > > -    f->buf_index +=3D blen;
-> > > -    if (f->buf_index =3D=3D IO_BUF_SIZE) {
-> > > -        qemu_fflush(f);
-> > > +    if (!add_to_iovec(f, f->buf + f->buf_index, blen, false)) {
-> > > +        f->buf_index +=3D blen;
-> > > +        if (f->buf_index =3D=3D IO_BUF_SIZE) {
-> > > +            qemu_fflush(f);
-> > > +        }
-> > >      }
-> > >      return blen + sizeof(int32_t);
-> > >  }
-> > > --=20
-> > > 2.17.1
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  Runner compiled with Go 1.8.7 seems to not work properly with
+  multiarch support. Executing the binary built with Go 1.8.7
+  results with an error [...]
+
+There has been 1 recent fix for the go runner:
+https://bugs.launchpad.net/qemu/+bug/1838946/comments/1
+
+And there is an ongoing discussion about "patch to swap SIGRTMIN + 1
+and SIGRTMAX - 1".
 
