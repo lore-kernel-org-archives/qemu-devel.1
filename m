@@ -2,90 +2,81 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DE6C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3758C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:53:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F53C204EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:50:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F53C204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C013920673
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 09:53:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I/r04Mb5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C013920673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i16Cu-0002k3-DO
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 05:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55434)
+	id 1i16Gc-0004Z8-1t
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 05:53:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin.tian@intel.com>) id 1i16CE-0002DI-AY
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:49:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i16Fw-00041p-H2
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1i16CC-0006xR-7D
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:49:25 -0400
-Received: from mga11.intel.com ([192.55.52.93]:22807)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1i16CB-0006wK-UV
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:49:24 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 23 Aug 2019 02:49:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,420,1559545200"; d="scan'208";a="173437886"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by orsmga008.jf.intel.com with ESMTP; 23 Aug 2019 02:49:19 -0700
-Received: from fmsmsx123.amr.corp.intel.com (10.18.125.38) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 23 Aug 2019 02:49:18 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- fmsmsx123.amr.corp.intel.com (10.18.125.38) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 23 Aug 2019 02:49:18 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.112]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.163]) with mapi id 14.03.0439.000;
- Fri, 23 Aug 2019 17:49:16 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Thread-Topic: [PATCH v7 04/13] vfio: Add save and load functions for VFIO
- PCI devices
-Thread-Index: AQHVNjwCXGgcT2JZ9ESxChTH7c7tTqbEz8SAgEGH1ICAAE7jgIAAoVgAgAAA1oCAANL+EIAAG3mAgACHveA=
-Date: Fri, 23 Aug 2019 09:49:15 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D54650B@SHSMSX104.ccr.corp.intel.com>
-References: <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>
- <1562665760-26158-5-git-send-email-kwankhede@nvidia.com>
- <20190711120713.GM3971@work-vm>
- <d6400fd9-5f86-b9f2-a10a-1ad53813a066@nvidia.com>
- <20190822093235.GC3277@work-vm>
- <092a9a37-d018-1d6e-7c61-7f8ada8819a7@nvidia.com>
- <20190822191303.GO3277@work-vm>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D543525@SHSMSX104.ccr.corp.intel.com>
- <20190823092633.GB2784@work-vm>
-In-Reply-To: <20190823092633.GB2784@work-vm>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZWY1MmI1MjgtMTExZC00MTFhLTgxMzktOTc1MDY4NzU3ZjMxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiRjJxeVFtVThcL2RvdVlpWWRWREhQdFB1MUJWQlhibUUzbHFcLzY5VEV1UlBoelF4YmlmdXJQcHpiUFV1dThhb1JOIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <peter.maydell@linaro.org>) id 1i16Fv-0000Ej-1e
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:53:16 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34737)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i16Fu-0000E4-ML
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 05:53:14 -0400
+Received: by mail-ot1-x341.google.com with SMTP id c7so8264032otp.1
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 02:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1N/MPYspOOwWSZow8EBbvkmSf9GgVqTR3hgCBI3DMKA=;
+ b=I/r04Mb5ofrYOcMdmH41B6qEu6pvPW51t+t8WUQm3f1sOHxxbp/DYcsNxYN9wXOtQD
+ 94DBkKhArUW52eGAjh3ujJ0hTD6yD98yYnzNKKAbi/hkcy8cguPnoQU84fordZi9rWyv
+ oiBx0m9h1Zy09UOu+bBFfpme/PMt+zD4incADF0gAZckq0ptn7YgXzzMSKlb0FACG3i3
+ ++3I/lDWHP2j80/sFvYs9k436knbFfnDh/bf6wTWRFavI7rn+PR/EOOlvftACro6rkL8
+ f7XYQ0EOodugEXcjIHF5dfdlEeIwYU2914+yEg/y9uRpWJ8AW4o07z+QTW5Z1Rw6I54G
+ /q6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1N/MPYspOOwWSZow8EBbvkmSf9GgVqTR3hgCBI3DMKA=;
+ b=rMex0mzJbx6xcrR/iJUuVcGpkDbNknKpWI7HOAFGLuGn64o8GjeVKMH/pEixxECEud
+ AHTgb5WxKnGkcTECxRYdE1WY9vIkayHGcC8VJZu1EAWkx27Q5o1kDox0RttSwFwP1uKJ
+ fBEr647dvrwnXiqey+R1xPykvEVsUf0S6BlcAruTSZndIM0OrhPYK/fFwBvXF2nTKw6U
+ HTNEAwrhBS+sped5HA8GI+PJXc2rKQHdeRH3yGyQWlbrkscNUxUfbY3QLwFYKK128Qet
+ iUaNyp86c0beQ9zFmAqpLeezOrtxErHeulPZTpw5aEPA6Y0wdk/4RycXS7fh/Nj5BFBa
+ dDyQ==
+X-Gm-Message-State: APjAAAXJqgdeKZUZfqyq3rRrNnKuOOHa5c4yGKlFBUJ9FRV2nJt6BzpN
+ KWYVl+qpf5BRh7LzspvEDZ8j9ZLZdBbC6g3ZI3KZ1Q==
+X-Google-Smtp-Source: APXvYqx6HlMbAPnG8+ced8/1vjCnHiY9FsuLCuVUnV5D7sut+aOlDwbnBWtnzF7LL7wXoSzv5LmBaxHthzDwy97fDS4=
+X-Received: by 2002:a9d:6a94:: with SMTP id l20mr3128107otq.221.1566553993590; 
+ Fri, 23 Aug 2019 02:53:13 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190823084203.29734-1-thuth@redhat.com>
+ <CAFEAcA9bqzoT01E3tQREeAb1U3UJU0t8rOeX3E=pjmCM3J+O0g@mail.gmail.com>
+ <3ccbd1c5-b60a-eb0b-6870-f6320bcbbbae@redhat.com>
+In-Reply-To: <3ccbd1c5-b60a-eb0b-6870-f6320bcbbbae@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Aug 2019 10:53:02 +0100
+Message-ID: <CAFEAcA_F9oscKx9zM=8=E55Ju7B72EQq2hLk1gptQ81zBEO_Ug@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
-Subject: Re: [Qemu-devel] [PATCH v7 04/13] vfio: Add save and load functions
- for VFIO PCI devices
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH] tests/check-block: Skip iotests when
+ sanitizers are enabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,201 +88,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
- Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, 
- Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> Sent: Friday, August 23, 2019 5:27 PM
->=20
-> * Tian, Kevin (kevin.tian@intel.com) wrote:
-> > > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> > > Sent: Friday, August 23, 2019 3:13 AM
-> > >
-> > > * Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> > > >
-> > > >
-> > > > On 8/22/2019 3:02 PM, Dr. David Alan Gilbert wrote:
-> > > > > * Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> > > > >> Sorry for delay to respond.
-> > > > >>
-> > > > >> On 7/11/2019 5:37 PM, Dr. David Alan Gilbert wrote:
-> > > > >>> * Kirti Wankhede (kwankhede@nvidia.com) wrote:
-> > > > >>>> These functions save and restore PCI device specific data - co=
-nfig
-> > > > >>>> space of PCI device.
-> > > > >>>> Tested save and restore with MSI and MSIX type.
-> > > > >>>>
-> > > > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > > >>>> ---
-> > > > >>>>  hw/vfio/pci.c                 | 114
-> > > ++++++++++++++++++++++++++++++++++++++++++
-> > > > >>>>  include/hw/vfio/vfio-common.h |   2 +
-> > > > >>>>  2 files changed, 116 insertions(+)
-> > > > >>>>
-> > > > >>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > > > >>>> index de0d286fc9dd..5fe4f8076cac 100644
-> > > > >>>> --- a/hw/vfio/pci.c
-> > > > >>>> +++ b/hw/vfio/pci.c
-> > > > >>>> @@ -2395,11 +2395,125 @@ static Object
-> > > *vfio_pci_get_object(VFIODevice *vbasedev)
-> > > > >>>>      return OBJECT(vdev);
-> > > > >>>>  }
-> > > > >>>>
-> > > > >>>> +static void vfio_pci_save_config(VFIODevice *vbasedev,
-> QEMUFile *f)
-> > > > >>>> +{
-> > > > >>>> +    VFIOPCIDevice *vdev =3D container_of(vbasedev, VFIOPCIDev=
-ice,
-> > > vbasedev);
-> > > > >>>> +    PCIDevice *pdev =3D &vdev->pdev;
-> > > > >>>> +    uint16_t pci_cmd;
-> > > > >>>> +    int i;
-> > > > >>>> +
-> > > > >>>> +    for (i =3D 0; i < PCI_ROM_SLOT; i++) {
-> > > > >>>> +        uint32_t bar;
-> > > > >>>> +
-> > > > >>>> +        bar =3D pci_default_read_config(pdev, PCI_BASE_ADDRES=
-S_0 +
-> i *
-> > > 4, 4);
-> > > > >>>> +        qemu_put_be32(f, bar);
-> > > > >>>> +    }
-> > > > >>>> +
-> > > > >>>> +    qemu_put_be32(f, vdev->interrupt);
-> > > > >>>> +    if (vdev->interrupt =3D=3D VFIO_INT_MSI) {
-> > > > >>>> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi =3D 0, m=
-si_data;
-> > > > >>>> +        bool msi_64bit;
-> > > > >>>> +
-> > > > >>>> +        msi_flags =3D pci_default_read_config(pdev, pdev->msi=
-_cap +
-> > > PCI_MSI_FLAGS,
-> > > > >>>> +                                            2);
-> > > > >>>> +        msi_64bit =3D (msi_flags & PCI_MSI_FLAGS_64BIT);
-> > > > >>>> +
-> > > > >>>> +        msi_addr_lo =3D pci_default_read_config(pdev,
-> > > > >>>> +                                         pdev->msi_cap + PCI_=
-MSI_ADDRESS_LO, 4);
-> > > > >>>> +        qemu_put_be32(f, msi_addr_lo);
-> > > > >>>> +
-> > > > >>>> +        if (msi_64bit) {
-> > > > >>>> +            msi_addr_hi =3D pci_default_read_config(pdev,
-> > > > >>>> +                                             pdev->msi_cap + =
-PCI_MSI_ADDRESS_HI,
-> > > > >>>> +                                             4);
-> > > > >>>> +        }
-> > > > >>>> +        qemu_put_be32(f, msi_addr_hi);
-> > > > >>>> +
-> > > > >>>> +        msi_data =3D pci_default_read_config(pdev,
-> > > > >>>> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 =
-:
-> > > PCI_MSI_DATA_32),
-> > > > >>>> +                2);
-> > > > >>>> +        qemu_put_be32(f, msi_data);
-> > > > >>>> +    } else if (vdev->interrupt =3D=3D VFIO_INT_MSIX) {
-> > > > >>>> +        uint16_t offset;
-> > > > >>>> +
-> > > > >>>> +        /* save enable bit and maskall bit */
-> > > > >>>> +        offset =3D pci_default_read_config(pdev,
-> > > > >>>> +                                       pdev->msix_cap + PCI_M=
-SIX_FLAGS + 1, 2);
-> > > > >>>> +        qemu_put_be16(f, offset);
-> > > > >>>> +        msix_save(pdev, f);
-> > > > >>>> +    }
-> > > > >>>> +    pci_cmd =3D pci_default_read_config(pdev, PCI_COMMAND, 2)=
-;
-> > > > >>>> +    qemu_put_be16(f, pci_cmd);
-> > > > >>>> +}
-> > > > >>>> +
-> > > > >>>> +static void vfio_pci_load_config(VFIODevice *vbasedev,
-> QEMUFile *f)
-> > > > >>>> +{
-> > > > >>>> +    VFIOPCIDevice *vdev =3D container_of(vbasedev, VFIOPCIDev=
-ice,
-> > > vbasedev);
-> > > > >>>> +    PCIDevice *pdev =3D &vdev->pdev;
-> > > > >>>> +    uint32_t interrupt_type;
-> > > > >>>> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi =3D 0, msi_d=
-ata;
-> > > > >>>> +    uint16_t pci_cmd;
-> > > > >>>> +    bool msi_64bit;
-> > > > >>>> +    int i;
-> > > > >>>> +
-> > > > >>>> +    /* retore pci bar configuration */
-> > > > >>>> +    pci_cmd =3D pci_default_read_config(pdev, PCI_COMMAND, 2)=
-;
-> > > > >>>> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> > > > >>>> +                        pci_cmd & (!(PCI_COMMAND_IO |
-> > > PCI_COMMAND_MEMORY)), 2);
-> > > > >>>> +    for (i =3D 0; i < PCI_ROM_SLOT; i++) {
-> > > > >>>> +        uint32_t bar =3D qemu_get_be32(f);
-> > > > >>>> +
-> > > > >>>> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * =
-4, bar,
-> 4);
-> > > > >>>> +    }
-> > > > >>>
-> > > > >>> Is it possible to validate the bar's at all?  We just had a bug=
- on a
-> > > > >>> virtual device where one version was asking for a larger bar th=
-an the
-> > > > >>> other; our validation caught this in some cases so we could tel=
-l that
-> > > > >>> the guest had a BAR that was aligned at the wrong alignment.
+On Fri, 23 Aug 2019 at 10:35, Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 8/23/19 11:04 AM, Peter Maydell wrote:
+> > On Fri, 23 Aug 2019 at 09:43, Thomas Huth <thuth@redhat.com> wrote:
+> >>
+> >> The sanitizers (especially the address sanitizer from Clang) are
+> >> sometimes printing out warnings or false positives - this spoils
+> >> the output of the iotests, causing some of the tests to fail.
+> >> Thus let's skip the automatic iotests during "make check" when the
+> >> user configured QEMU with --enable-sanitizers.
 > >
-> > I'm a bit confused here. Did you mean that src and dest include
-> > different versions of the virtual device which implements different
-> > BAR size? If that is the case, shouldn't the migration fail at the star=
-t
-> > when doing compatibility check?
->=20
-> It was a mistake where the destination had accidentally changed the BAR
-> size; checking the alignment was the only check that failed.
->=20
-> > > > >>>
-> > > > >>
-> > > > >> "Validate the bars" does that means validate size of bars?
-> > > > >
-> > > > > I meant validate the address programmed into the BAR against the =
-size,
-> > > > > assuming you know the size; e.g. if it's a 128MB BAR, then make s=
-ure
-> the
-> > > > > address programmed in is 128MB aligned.
-> > > > >
-> > > >
-> > > > If this validation fails, migration resume should fail, right?
-> > >
-> > > Yes I think so; if you've got a device that wants 128MB alignment and
-> > > someone gives you a non-aligned address, who knows what will happen.
-> >
-> > If misalignment is really caused by the guest, shouldn't we just follow
-> > the hardware behavior, i.e. hard-wiring the lower bits to 0 before
-> > updating the cfg space?
->=20
-> That should already happen on the source; but when loading a migration
-> stream I try and be very untrusting; so it's good to check that the
-> destination devices idea of the BAR matches what the register has.
->=20
+> > Do you have a log of what the sanitizer is saying?
+>
+> https://patchew.org/logs/QEMU/testing.asan/?type=project
 
-OK, it makes sense.=20
+(I get a "Not Found" error for that URL.)
 
-Thanks
-Kevin
+> Example:
+>
+> +Indirect leak of 4120 byte(s) in 1 object(s) allocated from:
+> +    #0 0x562a2ffc3c4e in calloc
+> (TEST_DIR/build/x86_64-softmmu/qemu-system-x86_64+0x1a16c4e)
+> +    #1 0x7fca6acf3cf0 in g_malloc0 (/lib64/libglib-2.0.so.0+0x55cf0)
+> +    #2 0x562a3200c3d0 in bdrv_refresh_filename TEST_DIR/src/block.c:6416:12
+> +    #3 0x562a3200b8f7 in bdrv_refresh_filename TEST_DIR/src/block.c:6388:9
+> +    #4 0x562a3200b8f7 in bdrv_refresh_filename TEST_DIR/src/block.c:6388:9
+> +    #5 0x562a31ffa461 in bdrv_backing_attach TEST_DIR/src/block.c:1064:5
+> +    #6 0x562a320212c6 in bdrv_replace_child_noperm
+> TEST_DIR/src/block.c:2283:13
+> +    #7 0x562a3201ed50 in bdrv_replace_node TEST_DIR/src/block.c:4210:9
+> +    #8 0x562a32021649 in bdrv_append TEST_DIR/src/block.c:4250:5
+> +    #9 0x562a3234e573 in commit_start TEST_DIR/src/block/commit.c:307:5
+> +    #10 0x562a30cc6cce in qmp_block_commit TEST_DIR/src/blockdev.c:3480:9
+> +    #11 0x562a31dceb33 in qmp_marshal_block_commit
+> TEST_DIR/build/qapi/qapi-commands-block-core.c:407:5
+> +    #12 0x562a3260be28 in do_qmp_dispatch
+> TEST_DIR/src/qapi/qmp-dispatch.c:131:5
+> +    #13 0x562a3260b105 in qmp_dispatch
+> TEST_DIR/src/qapi/qmp-dispatch.c:174:11
+> +    #14 0x562a31cd1b15 in monitor_qmp_dispatch
+> TEST_DIR/src/monitor/qmp.c:120:11
+> +    #15 0x562a31ccfd45 in monitor_qmp_bh_dispatcher
+> TEST_DIR/src/monitor/qmp.c:209:9
+> +    #16 0x562a327a91ea in aio_bh_call TEST_DIR/src/util/async.c:89:5
+> +    #17 0x562a327a9902 in aio_bh_poll TEST_DIR/src/util/async.c:117:13
+> +    #18 0x562a327cb590 in aio_dispatch TEST_DIR/src/util/aio-posix.c:459:5
+> +    #19 0x562a327ae933 in aio_ctx_dispatch TEST_DIR/src/util/async.c:260:5
+> +    #20 0x7fca6acededc in g_main_context_dispatch
+> (/lib64/libglib-2.0.so.0+0x4fedc)
+>
+> Since there are also lots of these warnings in the output:
+>
+> +==24683==WARNING: ASan doesn't fully support makecontext/swapcontext
+> functions and may produce false positives in some cases!
+>
+> ... I'm really not sure whether it makes sense to go bug hunting here.
+
+I haven't ever seen anything that's really a false positive
+as a result of those warnings. Someday I might go and try to
+find out exactly what the makecontext/swapcontext issue is.
+
+> OK. Anyway, since there are also these "WARNING: ASan doesn't fully
+> support ..." messages in the output, it simply does not make sense to
+> run the iotests automatically in this case, since the output of the
+> tests gets spoiled and thus the tests are failing.
+
+I guess you're checking both stdout and stderr, then?
+I think it is possible to redirect sanitizer output to
+some other file with by adding log_path=somefile to
+ASAN_OPTIONS (it then writes to somefile.$PID) but
+fishing out the results again would be really annoying,
+so that sounds more trouble than it's worth. Just skipping
+the iotests seems like a simple fix for now, and we can always
+come back to this if/when we've tackled some of the leaks that
+show up in the rest of the test suite.
+
+thanks
+-- PMM
 
