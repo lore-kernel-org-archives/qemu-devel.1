@@ -2,59 +2,92 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BDBC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E19EAC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:14:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 887E122CE3
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:12:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 887E122CE3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id A8CC220850
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 19:14:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vq+Broh9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8CC220850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1EzV-0005i7-9U
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:12:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42742)
+	id 1i1F14-0007uI-1r
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 15:14:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46248)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1i1EgR-0002CE-NZ
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:53:13 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i1EzI-0005tb-C2
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1i1EgQ-0002xJ-43
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:53:11 -0400
-Received: from nsstlmta33p.bpe.bigpond.com ([203.38.21.33]:48392)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1i1EgP-0002vo-H0
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 14:53:10 -0400
-Received: from smtp.telstra.com ([10.10.24.4])
- by nsstlfep33p-svc.bpe.nexus.telstra.com.au with ESMTP id
- <20190823185303.IVQX15166.nsstlfep33p-svc.bpe.nexus.telstra.com.au@smtp.telstra.com>;
- Sat, 24 Aug 2019 04:53:03 +1000
-X-RG-Spam: Unknown
-X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgeduvddrudegkedguddvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfupfevtfgpvffgnffuvffttedpqfgfvfenuceurghilhhouhhtmecugedttdenucenucfjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepvfhonhihucfpghhuhigvnhcuoehtohhnhidrnhhguhihvghnsegsthdrtghomheqnecukfhppeehkedrudejfedrleekrdeikeenucfrrghrrghmpehhvghlohepuggsiidrthgvlhhsthhrrgdrtghomhdrrghupdhinhgvthepheekrddujeefrdelkedrieekpdhmrghilhhfrhhomhepoehtohhnhidrnhhguhihvghnsegsthdrtghomheqpdhrtghpthhtohepoehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgqedprhgtphhtthhopeeothhonhihrdhnghhuhigvnhessghtrdgtohhmqeenucevlhhushhtvghrufhiiigvpedt
-X-RazorGate-Vade-Verdict: clean 0
-X-RazorGate-Vade-Classification: clean
-X-RG-VS-CLASS: clean
-X-Authentication-Info: Submitted using ID tony.nguyen.git@bigpond.com
-Received: from dbz.telstra.com.au (58.173.98.68) by smtp.telstra.com (5.8.335)
- (authenticated as tony.nguyen.git@bigpond.com)
- id 5D3581440CDC404D; Sat, 24 Aug 2019 04:53:02 +1000
-From: Tony Nguyen <tony.nguyen@bt.com>
-To: qemu-devel@nongnu.org
-Date: Sat, 24 Aug 2019 04:56:21 +1000
-Message-Id: <cover.1566467963.git.tony.nguyen@bt.com>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <richard.henderson@linaro.org>) id 1i1EzH-000637-5j
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:12:40 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36378)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i1EzG-00062i-Va
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 15:12:39 -0400
+Received: by mail-pg1-x543.google.com with SMTP id l21so6262611pgm.3
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 12:12:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zjNKCGgc8eEH+Mj/zexRAYauoUMXDDFTTXhPK8J5dU4=;
+ b=vq+Broh9f1ht8RAJPO7c++nWB2qxIdntgdzWtPB/VMlrc+cK9dp3hQn0HBiF1jyXZw
+ +/xKZ1kZcBbAUn0p0EBG4X6/TS6gHnUe5vG9jB3E1RXtf4m/BHhDHYaammVeGhG6vFeZ
+ JLZJiMH//8j3fNOX9eJMfIkp8jnGPdeGtybL5cTowQmNdWCX5YbxO07dNBV4/uA2Qxxw
+ mzvHPoArW8r1sIkKskOsNHZ1hSZ1/dmTw1SoiPFymNCMB5N59O16AEBwxk5zb8USjwSb
+ 66T5UXLZSY8quzDojQc6Atd2fRGTvzbjJ6vJG3GUg/HvgdYnLo9tqasUqfLoBD6DJPtD
+ uQVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zjNKCGgc8eEH+Mj/zexRAYauoUMXDDFTTXhPK8J5dU4=;
+ b=lFN7ghPhdVyT7yXYUmsrX0xMHiJGF7XlNlpFPook7HpJ8s8LZdMi12PQNAz/d3EBT0
+ hzw3hdMF2sAr4eea8rH5l3KhXdh8QgzI4yDfuFrn6jD+/EudYc0vMyVeYwtUoaYw4JAw
+ 9SJJKUWVo6tyWEJVREODbzZcOwYZsk7No9Qh09xTzWzAYfy9iGoiqMPC4Jb9EO8PzpZp
+ tf3YNYm+WjZwjyQJfLWIi1jAYWPce6HeCsIgXuUm2peRYfGdhcZRiX2F1H5dd8nxkhc6
+ rvATVt4qd7yqlBErKSy3ZoFCMJLjXygnkNCxVJ29dTqymHda3aEeqA/J1eODnhDplB5c
+ dFtA==
+X-Gm-Message-State: APjAAAUZHuXQdQLoXN3tGVMrXeT1ZenRs353f6PN6D2qfaycUiILuF3k
+ 0zA8K6lEHqYItjkH2I7h+cuJ9Q==
+X-Google-Smtp-Source: APXvYqxAzpafUFiSpTiTKdFt2JYQiFbfm8X1FfsU3qnz/uFZTPP/7zrqwdLBIIxl+UykTIwnk208qg==
+X-Received: by 2002:a63:5765:: with SMTP id h37mr5169408pgm.183.1566587557490; 
+ Fri, 23 Aug 2019 12:12:37 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id n185sm2647283pga.16.2019.08.23.12.12.36
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 23 Aug 2019 12:12:36 -0700 (PDT)
+To: Tony Nguyen <tony.nguyen@bt.com>, qemu-devel@nongnu.org
+References: <cover.1566466906.git.tony.nguyen@bt.com>
+ <911ff31af11922a9afba9b7ce128af8b8b80f316.1566466906.git.tony.nguyen@bt.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <543522bf-2809-8277-1baf-0ee7656c04ac@linaro.org>
+Date: Fri, 23 Aug 2019 12:12:35 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 203.38.21.33
-Subject: [Qemu-devel] [RFC PATCH 00/17] Declare device little or big endian
+In-Reply-To: <911ff31af11922a9afba9b7ce128af8b8b80f316.1566466906.git.tony.nguyen@bt.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: Re: [Qemu-devel] [PATCH v9 16/20] memory: Single byte swap along
+ the I/O path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,164 +99,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Nguyen <tony.nguyen@bt.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series is an attempt to re-declare devices with DEVICE_NATIVE_ENDIAN as
-DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN.
+On 8/23/19 11:36 AM, Tony Nguyen wrote:
+> Now that MemOp has been pushed down into the memory API, and
+> callers are encoding endianness, we can collapse byte swaps
+> along the I/O path into the accelerator and target independent
+> adjust_endianness.
+> 
+> Collapsing byte swaps along the I/O path enables additional endian
+> inversion logic, e.g. SPARC64 Invert Endian TTE bit, with redundant
+> byte swaps cancelling out.
+> 
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+> ---
+>  accel/tcg/cputlb.c     | 42 ++--------------------------
+>  exec.c                 | 17 +++---------
+>  hw/virtio/virtio-pci.c | 10 +++----
+>  memory.c               | 33 ++++++++--------------
+>  memory_ldst.inc.c      | 63 ------------------------------------------
+>  5 files changed, 23 insertions(+), 142 deletions(-)
 
-This clean up was split out from an earlier series which collapsed byte swaps
-along the I/O path.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-On Wed, 7 Aug 2019 at 12:42, Paolo Bonzini wrote:
-> On 07/08/19 10:31, tony.nguyen@bt wrote:
->>
->> Device realizing code with MemorRegionOps endianness as
->> DEVICE_NATIVE_ENDIAN is not common code.
->> 
->> Corrected devices were identified by making the declaration of
->> DEVICE_NATIVE_ENDIAN conditional upon NEED_CPU_H and then listing
->> what failed to compile.
->
-> The general approach makes sense.  However, most of these should not be
-> DEVICE_NATIVE_ENDIAN.  I can help with some of them.
 
-An RFC as most devices I have never heard of... a collective effort is needed =)
-
-On Fri, 16 Aug 2019 at 13:02, Peter Maydell wrote:
-> OTOH it's worth noting that it's quite likely that most of
-> the implementations of these DEVICE_NATIVE_ENDIAN devices
-> picked it in an equally naive way, by just copying some other
-> device's code...
-
-I am starting off with the following *naive* approach.
-
-For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
-targets from the set of target/hw/*/device.o.
-
-If the set of targets are all little or all big endian, re-declare
-the device endianness as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN
-respectively.
-
-This *naive* deduction may result in genuinely native endian devices
-being incorrectly declared as little or big endian, but should not
-introduce regressions for current targets.
-
-Please help spot devices which are genuinely native endian.
-
-Thanks!
-
-Tony Nguyen (17):
-  hw/audio: Declare device little or big endian
-  hw/block: Declare device little or big endian
-  hw/char: Declare device little or big endian
-  hw/display: Declare device little or big endian
-  hw/dma: Declare device little or big endian
-  hw/gpio: Declare device little or big endian
-  hw/i2c: Declare device little or big endian
-  hw/input: Declare device little or big endian
-  hw/intc: Declare device little or big endian
-  hw/isa: Declare device little or big endian
-  hw/misc: Declare device little or big endian
-  hw/net: Declare device little or big endian
-  hw/pci-host: Declare device little or big endian
-  hw/sd: Declare device little or big endian
-  hw/ssi: Declare device little or big endian
-  hw/timer: Declare device little or big endian
-  build: Correct non-common common-obj-* to obj-*
-
- hw/audio/Makefile.objs      |  3 ++-
- hw/audio/cs4231.c           |  2 +-
- hw/audio/marvell_88w8618.c  |  2 +-
- hw/audio/milkymist-ac97.c   |  2 +-
- hw/audio/pl041.c            |  2 +-
- hw/block/Makefile.objs      |  6 +++---
- hw/block/onenand.c          |  2 +-
- hw/char/Makefile.objs       |  4 ++--
- hw/char/cadence_uart.c      |  2 +-
- hw/char/escc.c              |  2 +-
- hw/char/etraxfs_ser.c       |  2 +-
- hw/char/grlib_apbuart.c     |  2 +-
- hw/char/imx_serial.c        |  2 +-
- hw/char/lm32_uart.c         |  2 +-
- hw/char/milkymist-uart.c    |  2 +-
- hw/char/pl011.c             |  2 +-
- hw/core/Makefile.objs       |  2 +-
- hw/display/Makefile.objs    |  6 +++---
- hw/display/pl110.c          |  2 +-
- hw/display/tc6393xb.c       |  2 +-
- hw/dma/Makefile.objs        |  6 +++---
- hw/dma/bcm2835_dma.c        |  4 ++--
- hw/dma/etraxfs_dma.c        |  2 +-
- hw/dma/pl080.c              |  2 +-
- hw/dma/pl330.c              |  2 +-
- hw/dma/puv3_dma.c           |  2 +-
- hw/dma/sparc32_dma.c        |  2 +-
- hw/gpio/Makefile.objs       |  2 +-
- hw/gpio/pl061.c             |  2 +-
- hw/gpio/zaurus.c            |  2 +-
- hw/i2c/Makefile.objs        |  2 +-
- hw/i2c/imx_i2c.c            |  2 +-
- hw/i2c/mpc_i2c.c            |  2 +-
- hw/i2c/versatile_i2c.c      |  2 +-
- hw/input/Makefile.objs      |  2 +-
- hw/input/pl050.c            |  2 +-
- hw/intc/Makefile.objs       |  6 +++---
- hw/intc/arm_gic.c           | 12 ++++++------
- hw/intc/arm_gicv3.c         |  4 ++--
- hw/intc/etraxfs_pic.c       |  2 +-
- hw/intc/imx_avic.c          |  2 +-
- hw/intc/imx_gpcv2.c         |  2 +-
- hw/intc/pl190.c             |  2 +-
- hw/intc/puv3_intc.c         |  2 +-
- hw/ipack/Makefile.objs      |  2 +-
- hw/isa/vt82c686.c           |  2 +-
- hw/misc/Makefile.objs       | 10 +++++-----
- hw/misc/a9scu.c             |  2 +-
- hw/misc/applesmc.c          |  6 +++---
- hw/misc/arm11scu.c          |  2 +-
- hw/misc/arm_l2x0.c          |  2 +-
- hw/misc/puv3_pm.c           |  2 +-
- hw/net/Makefile.objs        |  2 +-
- hw/net/allwinner_emac.c     |  2 +-
- hw/net/imx_fec.c            |  2 +-
- hw/net/lan9118.c            |  4 ++--
- hw/net/lance.c              |  2 +-
- hw/net/smc91c111.c          |  2 +-
- hw/net/stellaris_enet.c     |  2 +-
- hw/pci-host/Makefile.objs   |  2 +-
- hw/pci-host/q35.c           |  2 +-
- hw/pci-host/versatile.c     |  4 ++--
- hw/scsi/Makefile.objs       |  2 +-
- hw/sd/pl181.c               |  2 +-
- hw/ssi/Makefile.objs        |  2 +-
- hw/ssi/mss-spi.c            |  2 +-
- hw/ssi/pl022.c              |  2 +-
- hw/ssi/stm32f2xx_spi.c      |  2 +-
- hw/ssi/xilinx_spips.c       |  2 +-
- hw/timer/Makefile.objs      |  6 +++---
- hw/timer/a9gtimer.c         |  4 ++--
- hw/timer/arm_mptimer.c      |  4 ++--
- hw/timer/arm_timer.c        |  4 ++--
- hw/timer/armv7m_systick.c   |  2 +-
- hw/timer/aspeed_rtc.c       |  2 +-
- hw/timer/cadence_ttc.c      |  2 +-
- hw/timer/grlib_gptimer.c    |  2 +-
- hw/timer/hpet.c             |  2 +-
- hw/timer/imx_epit.c         |  2 +-
- hw/timer/imx_gpt.c          |  2 +-
- hw/timer/lm32_timer.c       |  2 +-
- hw/timer/milkymist-sysctl.c |  2 +-
- hw/timer/mss-timer.c        |  2 +-
- hw/timer/pl031.c            |  2 +-
- hw/timer/stm32f2xx_timer.c  |  2 +-
- hw/timer/sun4v-rtc.c        |  2 +-
- hw/virtio/Makefile.objs     |  2 +-
- 87 files changed, 117 insertions(+), 116 deletions(-)
-
--- 
-2.23.0
+r~
 
 
