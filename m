@@ -2,83 +2,110 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFF7C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AEDC3A5A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7665122CE3
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:45:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SuTuPhyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7665122CE3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E35C722CEC
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 13:50:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E35C722CEC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i19sp-0002sK-K9
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 09:45:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42515)
+	id 1i19xz-0005Zv-2N
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 09:50:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i19ri-0002Rs-Dv
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:44:31 -0400
+ (envelope-from <lvivier@redhat.com>) id 1i19v5-0003gE-SF
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i19rh-00077g-7N
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:44:30 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46725)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i19rg-00076t-W1
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:44:29 -0400
-Received: by mail-oi1-x241.google.com with SMTP id t24so6986314oij.13
- for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 06:44:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PfS9hCzGGB/7dSZv9pdsyVCMpI/ideNQb9ilWTuAU3k=;
- b=SuTuPhyU3c+Y/Mkzfxg7RvM3+Hsh/hPm8pKkBrUf2YVQfyKsu1foepRCzaPpist3b+
- gW4+BEWlOqDTOBcGhZeKm4U+ni+kIKmgbr3OhZUXHYFFfW+5fZj/ysVv30bsZ8TVPcLO
- CmDMpccyM2HwTSbKNFvn11g66xpf2tpKE60p0+RLYtGhVY4BWru3pyXHc4gxqxn7qjqK
- ENGIvJtIRUpbsSDLszm0HfQLsTXQhK8Jbk4peCnpF96kB/Q/ZazJCmMxbH4miC/95F0/
- zKdCMe5iXU3stLIIq/9V+RKUvjlGuvEMHPtdD9Fi4pW2f+F/oc9AQiRPHQb26oMwpTjW
- r9Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PfS9hCzGGB/7dSZv9pdsyVCMpI/ideNQb9ilWTuAU3k=;
- b=dH5TAT/dDRgThyvpY8juVcqN6+PYSJX/WbVieWbg5AYobFpu1O4pmyBWdIG9H+XaZ8
- rlDDgvAl5rtNcpO48EXlB6nnfVUh/XBbx4AJAZWi2TDowB0eusBD1KLNZtPd1dgxZfg4
- mWnypIwNidE/eQNbY/aF+fxTP8wGNAvjHpE8gYkx6czKORLFBgFNVjnvUBoTAm6EDOwz
- F+xZv/JKaWoGImzLuhvzbrjB8YtONjrK3hhUMWU3gTrXq13hxMmMIhyUXGgufYwwzutD
- ePrKJxGDtfgMo8FFNoKg3Q6umvbd3tJiMKyyQuEk7wniRr5+TdHk3O9V8xYbC7yopAcZ
- oONg==
-X-Gm-Message-State: APjAAAV+xHueCo6g4cWmEf9JGuiLobGQDWa2ktH+KF1x31r+4VSGJwUL
- aZXt/TZGTO7KaAbsf9fJA/ggvdA3dsT4XfU+gVFk7Q==
-X-Google-Smtp-Source: APXvYqybZi7SrBIhs0UfK9tcgaP7P7BAI9x6Mr/LexFvbv7klpLc0T2EY3Due4/fyF5v8gmMqqQ6P9kkTw0zeVzdmBo=
-X-Received: by 2002:aca:4814:: with SMTP id v20mr3239404oia.98.1566567867115; 
- Fri, 23 Aug 2019 06:44:27 -0700 (PDT)
+ (envelope-from <lvivier@redhat.com>) id 1i19v3-0000fI-LV
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 09:47:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11266)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>)
+ id 1i19v3-0000cK-Dr; Fri, 23 Aug 2019 09:47:57 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8745DC03D478;
+ Fri, 23 Aug 2019 13:47:55 +0000 (UTC)
+Received: from [10.36.116.125] (ovpn-116-125.ams2.redhat.com [10.36.116.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83F935C578;
+ Fri, 23 Aug 2019 13:47:53 +0000 (UTC)
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190813065920.23203-1-david@gibson.dropbear.id.au>
+ <20190813065920.23203-2-david@gibson.dropbear.id.au>
+ <fe960812-9df2-4c27-8661-633dee3f4a53@redhat.com>
+ <20190823053944.GC3027@umbus.fritz.box>
+From: Laurent Vivier <lvivier@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <ab12dbd1-b925-d384-986f-151f12e3a056@redhat.com>
+Date: Fri, 23 Aug 2019 15:47:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20181109150710.31085-1-crosa@redhat.com>
- <20181109150710.31085-2-crosa@redhat.com>
- <CAFEAcA86JT-3jLV=+aqLntoe1jJr77VYvg1dWn9OBVGA6cPZmQ@mail.gmail.com>
- <20190822211636.GA23027@dhcp-17-173.bos.redhat.com>
- <20190822215420.GO7077@habkost.net>
- <20190823134054.GA3936@localhost.localdomain>
-In-Reply-To: <20190823134054.GA3936@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Aug 2019 14:44:15 +0100
-Message-ID: <CAFEAcA_dE20A+Ys4G6WSC+HfUGgQbYA65K=cmg7f3khwHWyHGg@mail.gmail.com>
-To: Cleber Rosa <crosa@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH 1/4] configure: keep track of Python version
+In-Reply-To: <20190823053944.GC3027@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 23 Aug 2019 13:47:55 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 1/2] spapr: Reset CAS & IRQ
+ subsystem after devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,34 +117,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 23 Aug 2019 at 14:41, Cleber Rosa <crosa@redhat.com> wrote:
-> I see it being used by humans, so that brings a lot of subjetivity
-> into the matter.  IMO this is not out of place within the build
-> system, given that a lot of requirements detected by configure will
-> print out their versions (GTK, nettle, spice, etc).
->
-> But I'm certainly OK with dropping it if no value is perceived by
-> anyone else.
+On 23/08/2019 07:39, David Gibson wrote:
+> On Thu, Aug 22, 2019 at 10:07:09PM +0200, Laurent Vivier wrote:
+>> On 13/08/2019 08:59, David Gibson wrote:
+>>> This fixes a nasty regression in qemu-4.1 for the 'pseries' machine,
+>>> caused by the new "dual" interrupt controller model.  Specifically,
+>>> qemu can crash when used with KVM if a 'system_reset' is requested
+>>> while there's active I/O in the guest.
+>>>
+>>> The problem is that in spapr_machine_reset() we:
+>>>
+>>> 1. Reset the CAS vector state
+>>> 	spapr_ovec_cleanup(spapr->ov5_cas);
+>>>
+>>> 2. Reset all devices
+>>> 	qemu_devices_reset()
+>>>
+>>> 3. Reset the irq subsystem
+>>> 	spapr_irq_reset();
+>>>
+>>> However (1) implicitly changes the interrupt delivery mode, because
+>>> whether we're using XICS or XIVE depends on the CAS state.  We don't
+>>> properly initialize the new irq mode until (3) though - in particular
+>>> setting up the KVM devices.
+>>>
+>>> During (2), we can temporarily drop the BQL allowing some irqs to be
+>>> delivered which will go to an irq system that's not properly set up.
+>>>
+>>> Specifically, if the previous guest was in (KVM) XIVE mode, the CAS
+>>> reset will put us back in XICS mode.  kvm_kernel_irqchip() still
+>>> returns true, because XIVE was using KVM, however XICs doesn't have
+>>> its KVM components intialized and kernel_xics_fd =3D=3D -1.  When the=
+ irq
+>>> is delivered it goes via ics_kvm_set_irq() which assert()s that
+>>> kernel_xics_fd !=3D -1.
+>>>
+>>> This change addresses the problem by delaying the CAS reset until
+>>> after the devices reset.  The device reset should quiesce all the
+>>> devices so we won't get irqs delivered while we mess around with the
+>>> IRQ.  The CAS reset and irq re-initialize should also now be under th=
+e
+>>> same BQL critical section so nothing else should be able to interrupt
+>>> it either.
+>>>
+>>> We also move the spapr_irq_msi_reset() used in one of the legacy irq
+>>> modes, since it logically makes sense at the same point as the
+>>> spapr_irq_reset() (it's essentially an equivalent operation for older
+>>> machine types).  Since we don't need to switch between different
+>>> interrupt controllers for those old machine types it shouldn't
+>>> actually be broken in those cases though.
+>>>
+>>> Cc: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>
+>>> Fixes: b2e22477 "spapr: add a 'reset' method to the sPAPR IRQ backend=
+"
+>>> Fixes: 13db0cd9 "spapr: introduce a new sPAPR IRQ backend supporting
+>>>                  XIVE and XICS"
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>> ---
+>>>  hw/ppc/spapr.c | 24 ++++++++++++------------
+>>>  1 file changed, 12 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index 821f0d4a49..12ed4b065c 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1726,6 +1726,18 @@ static void spapr_machine_reset(MachineState *=
+machine)
+>>>          spapr_setup_hpt_and_vrma(spapr);
+>>>      }
+>>> =20
+>>> +    /*
+>>> +     * NVLink2-connected GPU RAM needs to be placed on a separate NU=
+MA node.
+>>> +     * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() =
+which is
+>>> +     * called from vPHB reset handler so we initialize the counter h=
+ere.
+>>> +     * If no NUMA is configured from the QEMU side, we start from 1 =
+as GPU RAM
+>>> +     * must be equally distant from any other node.
+>>> +     * The final value of spapr->gpu_numa_id is going to be written =
+to
+>>> +     * max-associativity-domains in spapr_build_fdt().
+>>> +     */
+>>> +    spapr->gpu_numa_id =3D MAX(1, nb_numa_nodes);
+>>> +    qemu_devices_reset();
+>>> +
+>>>      /*
+>>>       * If this reset wasn't generated by CAS, we should reset our
+>>>       * negotiated options and start from scratch
+>>> @@ -1741,18 +1753,6 @@ static void spapr_machine_reset(MachineState *=
+machine)
+>>>          spapr_irq_msi_reset(spapr);
+>>>      }
+>>> =20
+>>> -    /*
+>>> -     * NVLink2-connected GPU RAM needs to be placed on a separate NU=
+MA node.
+>>> -     * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() =
+which is
+>>> -     * called from vPHB reset handler so we initialize the counter h=
+ere.
+>>> -     * If no NUMA is configured from the QEMU side, we start from 1 =
+as GPU RAM
+>>> -     * must be equally distant from any other node.
+>>> -     * The final value of spapr->gpu_numa_id is going to be written =
+to
+>>> -     * max-associativity-domains in spapr_build_fdt().
+>>> -     */
+>>> -    spapr->gpu_numa_id =3D MAX(1, nb_numa_nodes);
+>>> -    qemu_devices_reset();
+>>> -
+>>>      /*
+>>>       * This is fixing some of the default configuration of the XIVE
+>>>       * devices. To be called after the reset of the machine devices.
+>>>
+>>
+>> This commit breaks migration between POWER8 <-> POWER9 hosts:
+>>
+>> qemu-system-ppc64: error while loading state for instance 0x1 of devic=
+e 'cpu'
+>> qemu-system-ppc64: load of migration failed: Operation not permitted
+>>
+>> Using a guest with a running 4.18 kernel (RHEL 8) and "-M pseries,max-=
+cpu-compat=3Dpower8" on both sides.
+>>
+>> There is no problem if both hosts are of the same kind ( P8 <-> P8 or =
+P9 <-> P9).
+>=20
+> Crud, I was afraid there might be some subtle dependency on the
+> reverse order.
 
-I'd be happy with keeping it in the human-readable output
-that configure emits: if it's the wrong format there that's
-pretty harmless. But we shouldn't feed it into the makefiles
-unless we really need it, and we shouldn't let the format
-of whatever we do feed into the makefiles be driven by
-the desire to print something human-readable in configure's
-output -- there's no need for the two things to be the
-exact same string.
+It seems the side effect of patch in comment 5 is to add a supplementary =
+field compat_pvr in CPUs in the migration stream:
 
-thanks
--- PMM
+        {
+            "name": "cpu",
+            "instance_id": 0,
+            "vmsd_name": "cpu",
+            "version": 5,
+...
+            "subsections": [
+...
+                {
+                    "vmsd_name": "cpu/compat",
+                    "version": 1,
+                    "fields": [
+                        {
+                            "name": "compat_pvr",
+                            "type": "uint32",
+                            "size": 4
+                        }
+                    ]
+                }
+            ]
+        },
+...
+
+What seems to happen is compat_pvr is not propagated correctly to all
+ CPUs.
+
+Originally, spapr_machine_reset() calls ppc_set_compat() to set the=20
+value to max_compat_pvr for the first cpu and this was propagated to all=20
+CPUs by spapr_cpu_reset().
+Now, as spapr_cpu_reset() is called before that, the value is not=20
+propagated to all CPUs.
+
+A simple fix seems to be:
+
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1752,7 +1752,7 @@ static void spapr_machine_reset(MachineState *machi=
+ne)
+         spapr_ovec_cleanup(spapr->ov5_cas);
+         spapr->ov5_cas =3D spapr_ovec_new();
+=20
+-        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
+l);
++        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
+     }
+=20
+     /*
+
+Thanks,
+Laurent
 
