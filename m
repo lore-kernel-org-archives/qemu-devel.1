@@ -2,63 +2,63 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A87C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DEBC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:31:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAAB221726
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:21:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAAB221726
+	by mail.kernel.org (Postfix) with ESMTPS id BDB49206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 10:31:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDB49206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i16h0-0005HS-0J
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 06:21:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59345)
+	id 1i16qq-0002P3-VY
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 06:31:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34713)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i16XG-0002e9-4N
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:11:11 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i16pg-0001XL-Jt
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i16XF-0001rq-0E
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:11:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36228)
+ (envelope-from <dgilbert@redhat.com>) id 1i16pf-0004uy-9h
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:30:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43410)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i16XE-0001qI-QR
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:11:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i16pf-0004uV-41
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 06:30:11 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE0251801590;
- Fri, 23 Aug 2019 10:11:07 +0000 (UTC)
-Received: from localhost (ovpn-117-204.ams2.redhat.com [10.36.117.204])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DD8F918677;
- Fri, 23 Aug 2019 10:11:06 +0000 (UTC)
-Date: Fri, 23 Aug 2019 11:11:05 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Message-ID: <20190823101105.GE12092@stefanha-x1.localdomain>
-References: <20190822115433.12070-1-dgilbert@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id B1BA43091754;
+ Fri, 23 Aug 2019 10:30:09 +0000 (UTC)
+Received: from work-vm (ovpn-117-244.ams2.redhat.com [10.36.117.244])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BA112600CD;
+ Fri, 23 Aug 2019 10:30:08 +0000 (UTC)
+Date: Fri, 23 Aug 2019 11:30:06 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190823103006.GE2784@work-vm>
+References: <20190731144225.3784-1-richardw.yang@linux.intel.com>
+ <20190731144225.3784-2-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="lteA1dqeVaWQ9QQl"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190822115433.12070-1-dgilbert@redhat.com>
+In-Reply-To: <20190731144225.3784-2-richardw.yang@linux.intel.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 23 Aug 2019 10:11:08 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Fri, 23 Aug 2019 10:30:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] migration: register_savevm_live doesn't
- need dev
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration/qemu-file: remove check on
+ writev_buffer in qemu_put_compression_data
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,58 +70,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, jasowang@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org,
- david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> The check of writev_buffer is in qemu_fflush, which means it is not
+> harmful if it is NULL.
+> 
+> And removing it will make the code consistent since all other
+> add_to_iovec() is called without the check.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
---lteA1dqeVaWQ9QQl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+So I think the real reason here is commit 11808bb  which removed
+support for non-iovec writers.
 
-On Thu, Aug 22, 2019 at 12:54:33PM +0100, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Commit 78dd48df3 removed the last caller of register_savevm_live for an
-> instantiable device (rather than a single system wide device);
-> so trim out the parameter.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  docs/devel/migration.rst       |  3 +--
->  hw/ppc/spapr.c                 |  2 +-
->  hw/s390x/s390-skeys.c          |  2 +-
->  hw/s390x/s390-stattrib.c       |  2 +-
->  hw/s390x/tod.c                 |  2 +-
->  include/migration/register.h   |  3 +--
->  migration/block-dirty-bitmap.c |  2 +-
->  migration/block.c              |  2 +-
->  migration/ram.c                |  2 +-
->  migration/savevm.c             | 23 +----------------------
->  net/slirp.c                    |  2 +-
->  11 files changed, 11 insertions(+), 34 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---lteA1dqeVaWQ9QQl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1fu7kACgkQnKSrs4Gr
-c8hkHAf/YDVH5kanaqICh0QogEBjaYOBOxPf0Pi2VO2oriR+Jr9LLLHm9G+uQPSt
-zpAVRusTnNh8uuZPrMWhqQTq7qmhcnjHflxX+cx/vd66Zsqbv7i9Ik8FQwrq7tFu
-Ntvgc6nzJXAlzPoThSvGCm4BhfrMzU2VeoNmsHz87tOTwdWveBEpV7ZjYO2rXzUw
-oGi3/BRFdBvWtvHVNo2z/yhaEFE3eZfeQNAqsNo3v8M/TwmNI/l4geREL4uY7oKh
-q5d7lP0Pb0naIwQcTH8OlrUF722RQjFnzfN5FOX7lLBdYFWfY7n4rh7e1wRS12lJ
-ko17zxk0qv636fAXZsXrkymD21LnZQ==
-=2iri
------END PGP SIGNATURE-----
-
---lteA1dqeVaWQ9QQl--
+>  migration/qemu-file.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> index 0431585502..35c22605dd 100644
+> --- a/migration/qemu-file.c
+> +++ b/migration/qemu-file.c
+> @@ -717,9 +717,7 @@ ssize_t qemu_put_compression_data(QEMUFile *f, z_stream *stream,
+>      }
+>  
+>      qemu_put_be32(f, blen);
+> -    if (f->ops->writev_buffer) {
+> -        add_to_iovec(f, f->buf + f->buf_index, blen, false);
+> -    }
+> +    add_to_iovec(f, f->buf + f->buf_index, blen, false);
+>      f->buf_index += blen;
+>      if (f->buf_index == IO_BUF_SIZE) {
+>          qemu_fflush(f);
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
