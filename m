@@ -2,84 +2,80 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AC8C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 114CFC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E8CD21848
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:08:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E8CD21848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D061220578
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:09:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DjR//lLJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D061220578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1BAs-0004S7-2i
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:08:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54469)
+	id 1i1BCM-0006ZB-2I
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:09:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1i1Awk-0005W2-ER
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:53:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i1AxF-0006C1-V8
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:54:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1i1Awi-0008Bb-GQ
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:53:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41328)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1i1Awi-0008BH-98
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:53:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 87A123090FC1;
- Fri, 23 Aug 2019 14:53:42 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-39.ams2.redhat.com
- [10.36.117.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 77A796CE79;
- Fri, 23 Aug 2019 14:53:33 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>,
- "Kinney, Michael D" <michael.d.kinney@intel.com>,
- "rfc@edk2.groups.io" <rfc@edk2.groups.io>, "Yao, Jiewen"
- <jiewen.yao@intel.com>
-References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
- <7cb458ea-956e-c1df-33f7-025e4f0f22df@redhat.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F7600B9@shsmsx102.ccr.corp.intel.com>
- <bb6fdbe0-2a3b-e586-e9a5-93e1ac0803ec@redhat.com>
- <20190816161933.7d30a881@x1.home>
- <74D8A39837DF1E4DA445A8C0B3885C503F761B96@shsmsx102.ccr.corp.intel.com>
- <35396800-32d2-c25f-b0d0-2d7cd8438687@redhat.com>
- <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
- <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
- <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9D9D74A@ORSMSX113.amr.corp.intel.com>
- <adf3f3b8-1dc9-79e1-7411-4d9131657a1f@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9D9E82C@ORSMSX113.amr.corp.intel.com>
- <772d64f7-e153-e9e6-dd69-9f34de5bb577@redhat.com>
- <3ca65433-8aed-57d4-7f18-a2a2718a6ffe@redhat.com>
- <c96fc875-ac07-b33c-e752-35cb65fa0e5e@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <88721a95-a31a-5302-3614-17440c7eb508@redhat.com>
-Date: Fri, 23 Aug 2019 16:53:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <peter.maydell@linaro.org>) id 1i1AxC-0008VE-Hq
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:54:16 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40777)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i1AxC-0008Ux-Bb
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 10:54:14 -0400
+Received: by mail-oi1-x241.google.com with SMTP id h21so7200360oie.7
+ for <qemu-devel@nongnu.org>; Fri, 23 Aug 2019 07:54:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=S9BWm8rALYi1vE1HhrquHz4J4gBYtALXVa0h9Tsi0uk=;
+ b=DjR//lLJwOiOMeHMk8xSdZJbZFEM7Bxaw1/Hvsmc3dDyw1d6SMGRzfmgD/FZTFGP8J
+ RU3GkRsWCS8naajUENGqwyJ5aoFoBBnRgQaY5ci0xl6hbzSpKQsK026E63EPun3XC05l
+ bF9JyW17rYHGCoa5RVB4YnFShdp4fNFHAP8sYKys7dnggxGCB45BRIgfO3XkpRnuib1L
+ n3EqJTYZV6wm+OmDqjj/AG+WHCx7yHsCwFvKcIV1ko4lM4+kGhEtQWhMBZbZZ1V/sAP4
+ H4ebatXU1lwrtZYVYIhG6ddJy4QnNrNKjNfsK1jfp69WdYog+iUM2Qwe4198RQwM2npG
+ vtNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=S9BWm8rALYi1vE1HhrquHz4J4gBYtALXVa0h9Tsi0uk=;
+ b=s7qjrZjotcZMGBJpwfnZzTMaIaI2qenixXagUekVi42CuO0sA19SD3ey2ezsAKOtmB
+ R39wcqdT15sXhAL6Q61i0YdHtJfhl7ZU6HvjHIBEESJ/9OLgWi1xk7Pshd9NfUK+h1q0
+ HIrHNDwBF1Q/dCQqdLZbZ2A6Gf7njxvmbqofe7eUGs77YqxaxK5BTll3lBwUermdlvmh
+ r7I+dHZ6dcZt92eSRA8/bAx0JXZUSYtsqTlVkYimOISJcqhYu3rvsv8RMNcHNhhe65zz
+ cJ/HnSFGFF13lHD2gl1POlzl0p4G5HM+1jHuLdPK18u+PPFzQT4xZVEdvaXr4ehLsXgO
+ xQhA==
+X-Gm-Message-State: APjAAAW+H5QrhC0EXv/7j/83GVPujDONoEa1Dqj6UJM1ChHMHQVmeeUN
+ 1BVrqsAAdJHlhP6R6qCIa6H2g6iM35m+zkvgAZGu24K9
+X-Google-Smtp-Source: APXvYqy1GiDc6NFJMzbD1y9OZdYbV+XNCLPalwNwNZch8q4KGiXkG+j51blMjFXeDgbw03l6aw18r2TXbLZrWDFMHxE=
+X-Received: by 2002:aca:4a57:: with SMTP id x84mr3488992oia.170.1566572053734; 
+ Fri, 23 Aug 2019 07:54:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c96fc875-ac07-b33c-e752-35cb65fa0e5e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 23 Aug 2019 14:53:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
- QEMU+OVMF
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-21-richard.henderson@linaro.org>
+In-Reply-To: <20190819213755.26175-21-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Aug 2019 15:54:03 +0100
+Message-ID: <CAFEAcA85Ojy2u_G6frO_KL-kmTVCfpcOxsW5CCuKr=eKPcm+KQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v2 20/68] target/arm: Convert load/store
+ (register, immediate, literal)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,102 +87,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
- "devel@edk2.groups.io" <devel@edk2.groups.io>,
- Phillip Goerl <phillip.goerl@oracle.com>,
- qemu devel list <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>, "Nakajima,
- Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/22/19 20:51, Paolo Bonzini wrote:
-> On 22/08/19 20:29, Laszlo Ersek wrote:
->> On 08/22/19 08:18, Paolo Bonzini wrote:
->>> On 21/08/19 22:17, Kinney, Michael D wrote:
->>>> DMA protection of memory ranges is a chipset feature. For the current
->>>> QEMU implementation, what ranges of memory are guaranteed to be
->>>> protected from DMA?  Is it only A/B seg and TSEG?
->>>
->>> Yes.
->>
->> This thread (esp. Jiewen's and Mike's messages) are the first time that
->> I've heard about the *existence* of such RAM ranges / the chipset
->> feature. :)
->>
->> Out of interest (independently of virtualization), how is a general
->> purpose OS informed by the firmware, "never try to set up DMA to this
->> RAM area"? Is this communicated through ACPI _CRS perhaps?
->>
->> ... Ah, almost: ACPI 6.2 specifies _DMA, in "6.2.4 _DMA (Direct Memory
->> Access)". It writes,
->>
->>     For example, if a platform implements a PCI bus that cannot access
->>     all of physical memory, it has a _DMA object under that PCI bus that
->>     describes the ranges of physical memory that can be accessed by
->>     devices on that bus.
->>
->> Sorry about the digression, and also about being late to this thread,
->> continually -- I'm primarily following and learning.
-> 
-> It's much simpler: these ranges are not in e820, for example
-> 
-> kernel: BIOS-e820: [mem 0x0000000000059000-0x000000000008bfff] usable
-> kernel: BIOS-e820: [mem 0x000000000008c000-0x00000000000fffff] reserved
+On Mon, 19 Aug 2019 at 22:38, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 797 ++++++++++++++++++-----------------------
+>  target/arm/a32.decode  | 120 +++++++
+>  target/arm/t32.decode  | 141 ++++++++
+>  3 files changed, 615 insertions(+), 443 deletions(-)
 
-(1) Sorry, my _DMA quote was a detour from QEMU -- I wondered how a
-physical machine with actual RAM at 0x30000, and also chipset level
-protection against DMA to/from that RAM range, would expose the fact to
-the OS (so that the OS not innocently try to set up DMA there).
+This one is brutal to review. I got through review of all the
+decode file patterns but got bogged down when I started looking
+at the .c file changes... I might come back to it alter.
 
-(2) In case of QEMU+OVMF, "e820" is not defined at the firmware level.
-
-While
-- QEMU exports an "e820 map" (and OVMF does utilize that),
-- and Linux parses the UEFI memmap into an "e820 map" (so that dependent
-logic only need to deal with e820),
-
-in edk2 the concepts are "GCD memory space map" and "UEFI memmap".
-
-So what OVMF does is, it reserves the TSEG area in the UEFI memmap:
-
-  https://github.com/tianocore/edk2/commit/b09c1c6f2569a
-
-(This was later de-constified for the extended TSEG size, in commit
-23bfb5c0aab6, "OvmfPkg/PlatformPei: prepare for PcdQ35TsegMbytes
-becoming dynamic", 2017-07-05).
-
-This is just to say that with OVMF, TSEG is not absent from the UEFI
-memmap, it is reserved instead. (Apologies if I misunderstood and you
-didn't actually claim otherwise.)
-
-
-> The ranges are not special-cased in any way by QEMU.  Simply, AB-segs
-> and TSEG RAM are not part of the address space except when in SMM.
-
-(or when TSEG is not locked, and open; but:) yes, this matches my
-understanding.
-
-> Therefore, DMA to those ranges ends up respectively to low VGA RAM[1]
-> and to the bit bucket.  When AB-segs are open, for example, DMA to that
-> area becomes possible.
-
-Which seems to imply that, if we alias 0x30000 to the AB-segs, and rely
-on the AB-segs for CPU hotplug, OVMF should close and lock down the
-AB-segs at first boot. Correct? (Because OVMF doesn't do anything about
-AB at the moment.)
-
-Thanks
-Laszlo
-
-> 
-> Paolo
-> 
-> [1] old timers may remember DEF SEG=&HB800: BLOAD "foo.img",0.  It still
-> works with some disk device models.
-> 
-
+thanks
+-- PMM
 
