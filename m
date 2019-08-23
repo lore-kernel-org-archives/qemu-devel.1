@@ -2,65 +2,68 @@ Return-Path: <SRS0=wZWj=WT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0DCC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 183ACC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:07:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0E7620870
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:06:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0E7620870
+	by mail.kernel.org (Postfix) with ESMTPS id E22A62166E
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Aug 2019 15:07:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E22A62166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1B9M-00027d-8a
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:06:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56261)
+	id 1i1BA6-0003DK-9G
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 11:07:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56342)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1i1B7Y-0008N6-Nw
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:04:58 -0400
+ (envelope-from <berrange@redhat.com>) id 1i1B7u-0000Rg-RE
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1i1B7W-0006UB-SZ
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:04:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50308)
+ (envelope-from <berrange@redhat.com>) id 1i1B7t-0006gv-4g
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:05:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57167)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i1B7W-0006Tu-LB
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:04:54 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i1B7s-0006gQ-Sh
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 11:05:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B29AD18C427C;
- Fri, 23 Aug 2019 15:04:53 +0000 (UTC)
-Received: from localhost (ovpn-116-73.gru2.redhat.com [10.97.116.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 58954261A7;
- Fri, 23 Aug 2019 15:04:48 +0000 (UTC)
-Date: Fri, 23 Aug 2019 12:04:46 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190823150446.GQ7077@habkost.net>
-References: <20181109150710.31085-1-crosa@redhat.com>
- <20181109150710.31085-2-crosa@redhat.com>
- <CAFEAcA86JT-3jLV=+aqLntoe1jJr77VYvg1dWn9OBVGA6cPZmQ@mail.gmail.com>
- <20190822211636.GA23027@dhcp-17-173.bos.redhat.com>
- <20190822215420.GO7077@habkost.net>
- <20190823134054.GA3936@localhost.localdomain>
+ by mx1.redhat.com (Postfix) with ESMTPS id 3A7597F758;
+ Fri, 23 Aug 2019 15:05:16 +0000 (UTC)
+Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 237FE60925;
+ Fri, 23 Aug 2019 15:05:10 +0000 (UTC)
+Date: Fri, 23 Aug 2019 16:05:08 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190823150508.GM9654@redhat.com>
+References: <20190823112053.GE9654@redhat.com>
+ <CAMxuvayoLetZkJ_HNKxC8Y0Yk33hn5pHLLn32R-XCuD7z31i=Q@mail.gmail.com>
+ <20190823114157.GG9654@redhat.com> <20190823130014.GG2784@work-vm>
+ <CAJ+F1CKTsQC1fULFG-hbUZ=Ao654K-TE6Fm9c1V+eRdAjk9QRA@mail.gmail.com>
+ <20190823140948.GI2784@work-vm> <20190823142054.GK9654@redhat.com>
+ <20190823142602.GJ2784@work-vm> <20190823144052.GL9654@redhat.com>
+ <20190823145634.GK2784@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190823134054.GA3936@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20190823145634.GK2784@work-vm>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 23 Aug 2019 15:04:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.71]); Fri, 23 Aug 2019 15:05:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] configure: keep track of Python version
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add dbus-vmstate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,155 +75,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 23, 2019 at 09:40:54AM -0400, Cleber Rosa wrote:
-> On Thu, Aug 22, 2019 at 06:54:20PM -0300, Eduardo Habkost wrote:
-> > On Thu, Aug 22, 2019 at 05:19:26PM -0400, Cleber Rosa wrote:
-> > > On Thu, Aug 22, 2019 at 05:48:46PM +0100, Peter Maydell wrote:
-> > > > On Fri, 9 Nov 2018 at 15:09, Cleber Rosa <crosa@redhat.com> wrote:
-> > > > >
-> > > > > Some functionality is dependent on the Python version
-> > > > > detected/configured on configure.  While it's possible to run the
-> > > > > Python version later and check for the version, doing it once is
-> > > > > preferable.  Also, it's a relevant information to keep in build logs,
-> > > > > as the overall behavior of the build can be affected by it.
-> > > > >
-> > > > > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > > > > ---
-> > > > >  configure | 6 +++++-
-> > > > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/configure b/configure
-> > > > > index 74e313a810..67fff0290d 100755
-> > > > > --- a/configure
-> > > > > +++ b/configure
-> > > > > @@ -1740,6 +1740,9 @@ if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
-> > > > >        "Use --python=/path/to/python to specify a supported Python."
-> > > > >  fi
-> > > > >
-> > > > > +# Preserve python version since some functionality is dependent on it
-> > > > > +python_version=$($python -V 2>&1 | sed -e 's/Python\ //')
-> > > > > +
-> > > > 
-> > > > Hi. Somebody on IRC has just fallen over a problem where
-> > > > their python's "-V" output prints multiple lines, which
-> > > > means that "$python_version" here is multiple lines, which
-> > > > means that the eventual config-host.mak has invalid syntax
-> > > > because we assume here:
-> > > >
-> > > 
-> > > We've tried a number of things, and just when I thought we wouldn't be
-> > > able to make any sense out of it, I arrived at a still senseless but
-> > > precise reproducer.  TL;DR: it has to do with interactive shells and
-> > > that exact Python build.
-> > > 
-> > > Reproducer (docker may also do the trick here):
-> > > 
-> > >   $ podman run --rm -ti fedora:29 /bin/bash -c 'dnf -y install http://mirror.siena.edu/fedora/linux/releases/29/Everything/x86_64/os/Packages/p/python3-3.7.0-9.fc29.x86_64.rpm; python3 -V'
-> > >   Python 3.7.0 (default, Aug 30 2018, 14:32:33) 
-> > >   [GCC 8.2.1 20180801 (Red Hat 8.2.1-2)]
-> > > 
-> > > With an interactive shell instead:
-> > > 
-> > >   $ podman run --rm -ti fedora:29 /bin/bash -i -c 'dnf -y install http://mirror.siena.edu/fedora/linux/releases/29/Everything/x86_64/os/Packages/p/python3-3.7.0-9.fc29.x86_64.rpm; python3 -V'
-> > >   Python 3.7.0
-> > > 
-> > > How this behavior came to be, baffles me.  But, it seems to be fixed
-> > > on newer versions.
-> > > 
-> > > > > @@ -6823,6 +6826,7 @@ echo "INSTALL_DATA=$install -c -m 0644" >> $config_host_mak
-> > > > >  echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
-> > > > >  echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
-> > > > >  echo "PYTHON=$python" >> $config_host_mak
-> > > > > +echo "PYTHON_VERSION=$python_version" >> $config_host_mak
-> > > > >  echo "CC=$cc" >> $config_host_mak
-> > > > >  if $iasl -h > /dev/null 2>&1; then
-> > > > >    echo "IASL=$iasl" >> $config_host_mak
-> > > > 
-> > > > that it's only one line, and will generate bogus makefile
-> > > > syntax if it's got an embedded newline. (Problem system
-> > > > seems to be Fedora 29.)
-> > > >
-> > > 
-> > > The assumption could be guaranteed by a "head -1", and while
-> > > it's not a failproof solution, it would at least not corrupt
-> > > the makefile and the whole build system.
-> > > 
-> > > > I've reread this thread, where there seems to have been
-> > > > some discussion about just running Python itself to
-> > > > get the sys.version value (which is how we check for
-> > > > "is this python too old" earlier in the configure script).
-> > > > But I'm not really clear why trying to parse -V output is better:
-> > > > it's definitely less reliable, as demonstrated by this bug.
-> > 
-> > Agreed.
-> > 
-> > > >
-> > > > Given that the only thing as far as I can tell that we
-> > > > do with PYTHON_VERSION is use it in tests/Makefile.inc
-> > > > to suppress a bit of test functionality if we don't have
-> > > > Python 3, could we stop trying to parse -V output and run
-> > > > python to print sys.version_info instead, and/or just
-> > > > have the makefile variable track "is this python 2",
-> > > > since that's what we really care about and would mean we
-> > > > don't have to then search the string for "v2"  ?
-> > > 
-> > > Because I've been bitten way too many times with differences in Python
-> > > minor versions, I see a lot of value in keeping the version
-> > > information in the build system.  But, the same information can
-> > > certainly be obtained in a more resilient way.  Would you object something
-> > > like:
-> > > 
-> > >   python_version=$($python -c 'import sys; print(sys.version().split()[0])')
-> > 
-> > Sounds much better, but why sys.version().split() instead of
-> > sys.version_info?
-> > 
-> >   python_version=$($python -c 'import sys; print(sys.version_info[0])')
-> >
-> 
-> I meant to capture not only the major version, but the minor and release
-> as well.  My reasoning (may not appeal more people):
-> 
->  "Because I've been bitten way too many times with differences in Python
->   minor versions, I see a lot of value in keeping the version
->   information in the build system."
-> 
-> > > 
-> > > Or an even more paranoid version?  On my side, I understand the
-> > > fragility of the current approach, but I also appreciate the
-> > > information it stores.
-> > 
-> > We have only one place where $(PYTHON_VERSION) is used, and that
-> > code will be removed once we stop supporting Python 2.  I don't
-> > see the point of trying to store extra information that is not
-> > used anywhere in our makefiles.
-[...]
-> 
-> I see it being used by humans, so that brings a lot of subjetivity
-> into the matter.  IMO this is not out of place within the build
-> system, given that a lot of requirements detected by configure will
-> print out their versions (GTK, nettle, spice, etc).
+On Fri, Aug 23, 2019 at 03:56:34PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > On Fri, Aug 23, 2019 at 03:26:02PM +0100, Dr. David Alan Gilbert wrot=
+e:
+> > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > > > On Fri, Aug 23, 2019 at 03:09:48PM +0100, Dr. David Alan Gilbert =
+wrote:
+> > > > > * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+> > > > > > Hi
+> > > > > >=20
+> > > > > > On Fri, Aug 23, 2019 at 5:00 PM Dr. David Alan Gilbert
+> > > > > > <dgilbert@redhat.com> wrote:
+> > > > > > >
+> > > > > > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > > > > > >
+> > > > > > > <snip>
+> > > > > > >
+> > > > > > > > This means QEMU still has to iterate over every single cl=
+ient
+> > > > > > > > on the bus to identify them. If you're doing that, there'=
+s
+> > > > > > > > no point in owning a well known service at all. Just iter=
+ate
+> > > > > > > > over the unique bus names and look for the exported objec=
+t
+> > > > > > > > path /org/qemu/VMState
+> > > > > > > >
+> > > > > > >
+> > > > > > > Not knowing anything about DBus security, I want to ask how=
+ do
+> > > > > > > we handle security here?
+> > > > > >=20
+> > > > > > First of all, we are talking about cooperative processes, and=
+ having a
+> > > > > > specific bus for each qemu instance. So some amount of securi=
+ty/trust
+> > > > > > is already assumed.
+> > > > >=20
+> > > > > Some but we need to keep it as limited as possible; for example=
+ two
+> > > > > reasons for having separate processes both come down to securit=
+y:
+> > > > >=20
+> > > > >   a) vtpm - however screwy the qemu is, you can never get to th=
+e keys in
+> > > > > the vtpm
+> > > >=20
+> > > > Processes connected to dbus can only call the DBus APIs that vtpm
+> > > > actually exports.  The vtpm should simply *not* export a DBus
+> > > > API that allows anything to fetch the keys.
+> > > >=20
+> > > > If it did want to export APIs for fetching keys, then we would
+> > > > have to ensure suitable dbus /selinux policy was created to
+> > > > prevent unwarranted access.
+> > >=20
+> > > This was really just one example of where the security/trust isn't
+> > > assumed; however a more concrete case is migration of a vtpm, and e=
+ven
+> > > though it's probably encrypted blob you still don't want some other
+> > > device to grab the migration data - or to say reinitialise the vtpm=
+.
+> >=20
+> > That can be dealt with by the dbus security policies, provided
+> > you either run the vtpm as a different user ID from the other
+> > untrustworthy helpers, or use a different selinux context for
+> > vtpm. You can then express that only the user that QEMU is
+> > running under can talk to vtpm over dbus.
+>=20
+> The need for the extra user ID or selinux context is a pain;
+> but probably warranted for the vTPM;  in general though some of this
+> exists because of the choice of DBus and wouldn't be a problem for
+> something that had a point-to-point socket it sent everything over.
 
-Absolutely, but are we talking about the output printed by
-./configure, or about variables in config-host.mak?
+NB be careful to use s/DBus/DBus bus/
 
-config-host.mak is not for humans, it's just input for our
-makefile code.  The output printed by ./configure on stdout is
-for humans, and I'd agree completely if ./configure keeps
-printing full Python version information on stdout.
+DBus the protocol is fine to be used in a point-to-point socket
+scenario - the use of the bus is strictly optional.
 
-> [...]
+If all communication we expect is exclusively  Helper <-> QEMU,
+then I'd argue in favour of dbus in point-to-point mode.
 
--- 
-Eduardo
+The use cases Stefan brought up for virtiofsd though is what
+I think brings the idea of using the bus relevant. It is the
+desire to allow online control/mgmt of the helper, which
+introduces a 3rd party which isn't QEMU. Instead either libvirt
+or a standalone admin/debugging tool. With multiple parties
+involved I think the bus becomes relevant
+
+With p2p mode you could have 2 dbus socket for Helper <-> QEMU
+and another dbus socket for Helper <-> libvirt/debugging, but
+this isn't an obvious security win over using the bus, as you
+now need different access rules for each of the p2p sockets
+to say who can connect to which socket.=20
+
+
+> > Where I think you could have problems is if you needed finer
+> > grainer control with selinux. eg if vstpm exports 2 different
+> > services, you can't allow access to one service, but forbid
+> > access to the other service.
+> >=20
+> > > > >   b) virtio-gpu, loads of complex GPU code that can't break the=
+ main
+> > > > > qemu process.
+> > > >=20
+> > > > That's no problem - virtio-gpu crashes, it disappears from the db=
+us
+> > > > bus, but everything else keeps running.
+> > >=20
+> > > Crashing is the easy case; assume it's malicious and you don't want=
+ it
+> > > getting to say a storage device provided by another vhost-user devi=
+ce.
+> >=20
+> > If we assume that the 2 processes can't commnuicate / access each
+> > other outside DBus, then the attack avenues added by use of dbus
+> > are most likely either:
+> >=20
+> >  - invoking some DBus method that should not be allowed due
+> >    to incomplete dbus security policy.=20
+> >=20
+> >  - finding a crash in a dbus client library that you can somehow
+> >    exploit to get remote code execution in the separate process
+> >=20
+> >    I won't claim this is impossible, but I think it helps to be
+> >    using a standard, widely used battle tested RPC impl, rather
+> >    than a home grown RPC protocol.
+>=20
+> It's only the policy case I worry about; and my point here is if we
+> decide to use dbus then we have to think properly about security and
+> defined stuff.
+>=20
+> >=20
+> >=20
+> > > > > > But if necessary, dbus can enforce policies on who is allowed=
+ to own a
+> > > > > > name, or to send/receive message from. As far as I know, this=
+ is
+> > > > > > mostly user/group policies.
+> > > > > >=20
+> > > > > > But there is also SELinux checks to send_msg and acquire_svc =
+(see
+> > > > > > dbus-daemon(1))
+> > > > >=20
+> > > > > But how does something like SELinux interact with a private dbu=
+s=20
+> > > > > rather than the system dbus?
+> > > >=20
+> > > > There's already two dbus-daemon's on each host - the system one a=
+nd
+> > > > the session one, and they get different selinux contexts,
+> > > > system_dbus_t and unconfined_dbus_t.
+> > > >=20
+> > > > Since libvirt would be responsible for launching these private db=
+us
+> > > > daemons it would be easy to make it run  svirt_dbus_t for example=
+.
+> > > > Actually it would be  svirt_dbus_t:s0:cNNN,cMMM to get uniqueness
+> > > > per VM.
+> > > >=20
+> > > > Will of course require us to talk to the SELinux maintainers to
+> > > > get some sensible policy rules created.
+> > >=20
+> > > This all relies on SELinux and running privileged qemu/vhost-user p=
+airs;
+> > > needing to do that purely to enforce security seems wrong.
+> >=20
+> > Compare to an alternative bus-less solution where each helper has
+> > a direct UNIX socket connection to QEMU.
+> >=20
+> > If two helpers are running as the same user ID, then can still
+> > directly attack each other via things like ptrace or /proc/$PID/mem,
+> > unless you've used SELinux to isolate them, or run each as a distinct
+> > user ID.  If you do the latter, then we can still easily isolate
+> > them using dbus.
+>=20
+> You can lock those down pretty easily though.
+
+How were you thinking ?
+
+If you're not using SELinux or separate user IDs, then AFAICT you've
+got a choice of using seccomp or containers.  seccomp is really hard
+to get a useful policy out of with QEMU, and using containers for
+each helper process adds a level of complexity worse than selinux
+or separate user IDs, so isn't an obvious win over using dbus.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
