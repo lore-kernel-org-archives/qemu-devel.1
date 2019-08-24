@@ -2,72 +2,90 @@ Return-Path: <SRS0=NWXH=WU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3F4C3A59E
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 06:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C98C3A59E
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 07:33:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8CEB20656
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 06:48:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E531B206E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 07:33:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=grep.be header.i=@grep.be header.b="Mp1GXIgz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8CEB20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grep.be
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h+g6K5Dc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E531B206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1Pr6-0000m7-SA
-	for qemu-devel@archiver.kernel.org; Sat, 24 Aug 2019 02:48:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59769)
+	id 1i1QYY-0001Fz-5c
+	for qemu-devel@archiver.kernel.org; Sat, 24 Aug 2019 03:33:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wouter@grep.be>) id 1i1PnI-0008I1-JL
- for qemu-devel@nongnu.org; Sat, 24 Aug 2019 02:45:01 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i1QVi-0000NW-9d
+ for qemu-devel@nongnu.org; Sat, 24 Aug 2019 03:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wouter@grep.be>) id 1i1PnH-0004fx-DL
- for qemu-devel@nongnu.org; Sat, 24 Aug 2019 02:45:00 -0400
-Received: from latin.grep.be ([2a01:4f8:140:52e5::2]:57724)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wouter@grep.be>)
- id 1i1PnE-0004cl-09; Sat, 24 Aug 2019 02:44:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=grep.be;
- s=2017.latin; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
- Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
- Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
- :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=QbzStQInNB4hU8rRjd8L+RZunigs5FJZ8Dbn0BTnbJQ=; b=Mp1GXIgzLkfET1+2aVrTaZRcLR
- KVR/dALRnUaof+W4SjyubdR0p19ibFr/hl8A5oSw7c0tl0zldi8k9nMKdd6ShPKUN4/ML5siYdssB
- gL42/2Xl8NZRpuudZeD+LsK7w6cjyfIcdA3qs3Q4fJFbLA8lb5Qn1T88uW+D2HCZEhCKru67f/FXQ
- Rr9UZGUHjckumGKfPU0pogpj7bdRVnWGrNH2tt67Wxrob5npIwfxA6hO/zb/66c3kBFjJn8YfJ2x7
- svCk206ZXGDL5Fl17E5tnV5t2JT+saQf75KABfBc8NnNVfBUpAonhQUxGlfe9++HVmPNzWJ3HPyHk
- L5ZYwHkw==;
-Received: from wouter by latin.grep.be with local (Exim 4.89)
- (envelope-from <wouter@grep.be>)
- id 1i1Pn6-00089I-Sk; Sat, 24 Aug 2019 08:44:48 +0200
-Date: Sat, 24 Aug 2019 08:44:48 +0200
-From: Wouter Verhelst <wouter@grep.be>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190824064448.q62iwelqjn2safao@grep.be>
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823143426.26838-1-eblake@redhat.com>
- <20190823143426.26838-2-eblake@redhat.com>
- <20190823184834.brhsfbc4sdq5xuij@grep.be>
- <d3d1590e-e276-e449-c3da-0bdc4d4977d7@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i1QVh-0007mN-3a
+ for qemu-devel@nongnu.org; Sat, 24 Aug 2019 03:30:53 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42663)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i1QVg-0007ji-Rm
+ for qemu-devel@nongnu.org; Sat, 24 Aug 2019 03:30:53 -0400
+Received: by mail-wr1-x444.google.com with SMTP id b16so10525210wrq.9
+ for <qemu-devel@nongnu.org>; Sat, 24 Aug 2019 00:30:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Q7dE7xRWtNonIg7MYGdizMevWkr3L0SG5YEIrbJTAy0=;
+ b=h+g6K5DcdRlYKfmxnQCmjESeeiMRJ3Y+LG4TFVgYCRJPyFBM/h5lW9iRQ4MJqfp0x9
+ Hj55wCmOovdJV3MmcEgfyNIMjg3+6jxBxCYM3vyrZjneFfvhgMUkLhe/trQjNES8Xa8q
+ 4CZcD4ntkl2ic2Jift1RgGMcoQmfv0BbEEkbSImAyGFfbPmeI2v4ZiEH/S1sf6zwhxTP
+ zbQA2ibWt8mSVaofWlDpDljWpMO5v6v5wNzQMEuj6DFkIa6/iY7Zh/QqmBvfbd+OZ7fq
+ 5gJ32b39IVnzCCDhgDtlhodQ6/QM524Y6Gr+fytrGOjUONlIprhlrn1TTXwgK2+tarM3
+ t39g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Q7dE7xRWtNonIg7MYGdizMevWkr3L0SG5YEIrbJTAy0=;
+ b=uavKyx16NNx5Tph3c6Cm3ltwZ3KRkrM5eXaJSOZWQRJDF6IoLx10HB3LX2yAOI+coW
+ oODYmqQxibrAw9uY/6iUOs8aRqKS/ocIXqE3Mej+tVAYGQBRX3nx87Vc/aVJB6Gw1/7W
+ 8XhLt51kK6vQX77eDhbHSMa48edmNCmnwVOCKyT/0eyXNFSCp7HsOzikbyZ+Y1o7ItC8
+ esreD8mmu7gCD/uOLdsf+ZEBVp/o8zXhA24oJTJwJtWBqUaPrnI5OH37VTfyfWgx3OQz
+ IwDyhzWqvaTRSS0gXu/I/ePDGXCRhyUkOIzR+j2kM7PMyNi2SDJnbeFa31JaYoDWWTyA
+ tzwQ==
+X-Gm-Message-State: APjAAAWov1OZ383csxPujzIYWFjijf7Wq5xZocCY830ieIbNW2EiaZhI
+ guKWJXT707LnEnF/XJrZU4+vSQ==
+X-Google-Smtp-Source: APXvYqyy+PyOpBNQD+RuJzprbao603f/OoeLpaV4QmD4xAW+NZtuI0J76jnabUn8moUUIoiEgfC58g==
+X-Received: by 2002:adf:f646:: with SMTP id x6mr10151004wrp.18.1566631851256; 
+ Sat, 24 Aug 2019 00:30:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id b15sm4399956wrt.77.2019.08.24.00.30.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 24 Aug 2019 00:30:50 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CAEA01FF87;
+ Sat, 24 Aug 2019 08:30:49 +0100 (BST)
+References: <20190822230916.576-1-philmd@redhat.com>
+ <874l2876kx.fsf@dusky.pond.sub.org>
+ <CAL1e-=hvVp4i=s_Wr0iKy5UO7kH6xw3QR0Ms4_v_tobJSM2wRA@mail.gmail.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+In-reply-to: <CAL1e-=hvVp4i=s_Wr0iKy5UO7kH6xw3QR0Ms4_v_tobJSM2wRA@mail.gmail.com>
+Date: Sat, 24 Aug 2019 08:30:49 +0100
+Message-ID: <87a7bz2f6e.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d3d1590e-e276-e449-c3da-0bdc4d4977d7@redhat.com>
-X-Speed: Gates' Law: Every 18 months, the speed of software halves.
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a01:4f8:140:52e5::2
-Subject: Re: [Qemu-devel] [PATCH 1/1] protocol: Add NBD_CMD_FLAG_FAST_ZERO
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH 0/3] mailmap: Clean up
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,74 +97,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wouter Verhelst <w@uter.be>, libguestfs@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, nbd@other.debian.org
+Cc: qemu-trivial@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 23, 2019 at 01:58:44PM -0500, Eric Blake wrote:
-> On 8/23/19 1:48 PM, Wouter Verhelst wrote:
-> > On Fri, Aug 23, 2019 at 09:34:26AM -0500, Eric Blake wrote:
-> >> +- bit 4, `NBD_CMD_FLAG_FAST_ZERO`; valid during
-> >> +  `NBD_CMD_WRITE_ZEROES`. If set, but the server cannot perform the
-> >> +  write zeroes any faster than it would for an equivalent
-> >> +  `NBD_CMD_WRITE`,
-> > 
-> > One way of fulfilling the letter of this requirement but not its spirit
-> > could be to have background writes; that is, the server makes a note
-> > that the zeroed region should contain zeroes, makes an error-free reply
-> > to the client, and then starts updating things in the background (with
-> > proper layering so that an NBD_CMD_READ would see zeroes).
-> 
-> For writes, this should still be viable IF the server can also cancel
-> that background write of zeroes in favor of a foreground request for
-> actual data to be written to the same offset.  In other words, as long
-> as the behavior to the client is "as if" there is no duplicated I/O
-> cost, the zero appears fast, even if it kicked off a long-running async
-> process to actually accomplish it.
 
-That's kind of what I was thinking of, yeah.
+Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
 
-A background write would cause disk I/O, which *will* cause any write
-that happen concurrently with it to slow down. If we need to write
-several orders of magnitude of zeroes, then the "fast zero" will
-actually cause the following writes to slow down, which could impact
-performance.
+> 23.08.2019. 08.13, "Markus Armbruster" <armbru@redhat.com> =D1=98=D0=B5 =
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>>
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>
+>> > Trivial cleanup of .mailmap to have a nice 'git shortlog' output.
+>> >
+>> > Philippe Mathieu-Daud=C3=A9 (3):
+>> >   mailmap: Reorder by sections
+>> >   mailmap: Update philmd email address
+>> >   mailmap: Add many entries to improve 'git shortlog' statistics
+>> >
+>> >  .mailmap | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+>> >  1 file changed, 115 insertions(+), 8 deletions(-)
+>>
+>> Series
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
+>> However, it increases the difference to contrib/gitdm/aliases.
+>
+> Alex' initial gitdm effort, as I understood it, was not meant to cover all
+> history from 2007 or so, but just to give reasonable statistics for 2018
+> (amd future years).
+>
+> In that light, .mailmap and gitdm aliases do not need to be equivalent.
+>
+> But perhaps Alex would now want gitdm to be used for all QEMU history? Is
+> this desirable?
 
-The cancelling should indeed happen (otherwise ordering of writes will
-be wrong, as per the spec), but that doesn't negate the performance
-impact.
+It would be of interest historically but not something I'd want to spend
+a lot of time adding code churn for.
 
-> > This could negatively impact performance after that command to the
-> > effect that syncing the device would be slower rather than faster, if
-> > not done right.
-> 
-> Oh. I see - for flush requests, you're worried about the cost of the
-> flush forcing the I/O for the background zero to complete before flush
-> can return.
-> 
-> Perhaps that merely means that a client using fast zero requests as a
-> means of probing whether it can do a bulk pre-zero pass even though it
-> will be rewriting part of that image with data later SHOULD NOT attempt
-> to flush the disk until all other interesting write requests are also
-> ready to queue.  In the 'qemu-img convert' case which spawned this
-> discussion, that's certainly the case (qemu-img does not call flush
-> after the pre-zeroing, but only after all data is copied - and then it
-> really DOES want to wait for any remaining backgrounded zeroing to land
-> on the disk along with any normal writes when it does its final flush).
+>
+> Aleksandar
+>
+>> I'm just
+>> as guilty; my recent "[PATCH 2/2] contrib/gitdm: Add armbru@pond.sub.org
+>> to group-map-redhat" updates only that. and not .mailmap.
+>>
+>> Perhaps we want to keep the two in sync manually.  We should then add
+>> suitable comments to each file.
+>>
+>> Could we instead teach gitdm to use .mailmap, and ditch
+>> contrib/gitdm/aliases?
+>>
+>> aliases' format is documented in gitdm's README.  Each line maps a
+>> non-canonical e-mail address to a canonical one.
+>>
+>> .mailmap's format is documented in git-shortlog(1).  It can do a bit
+>> more.  Even the common part differs: it has two addresses in different
+>> order *boggle*.
+>>
 
-Not what I meant, but also a good point, thanks :)
 
-> > Do we want to keep that in consideration?
-> 
-> Ideas on how best to add what I mentioned above into the specification?
-
-Perhaps clarify that the "fast zero" flag is meant to *improve*
-performance, and that it therefore should either be implemented in a way
-that does in fact improve performance, or not at all?
-
--- 
-<Lo-lan-do> Home is where you have to wash the dishes.
-  -- #debian-devel, Freenode, 2004-09-22
+--
+Alex Benn=C3=A9e
 
