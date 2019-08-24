@@ -2,81 +2,98 @@ Return-Path: <SRS0=NWXH=WU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E99CFC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF3BC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 01:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B68B421726
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:18:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fd1P8Nds"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B68B421726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B7E4B21670
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 01:49:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7E4B21670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1JlN-000319-UE
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 20:18:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54033)
+	id 1i1LAs-0001mG-L2
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 21:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33969)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i1JkZ-0002LN-JB
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 20:17:48 -0400
+ (envelope-from <jiewen.yao@intel.com>) id 1i1LAD-0001Nf-3U
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 21:48:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i1JkY-0002vH-AY
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 20:17:47 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43574)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i1JkY-0002ux-1U; Fri, 23 Aug 2019 20:17:46 -0400
-Received: by mail-lj1-x242.google.com with SMTP id h15so10328534ljg.10;
- Fri, 23 Aug 2019 17:17:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vVXuHFjsVWI0iY1Cbauv6PMjL/r8pTrmVpNN70hUSzQ=;
- b=fd1P8Ndsl8apJj1t2G6HBxkoiyWxZKh6Y/AyUqejdZMWQ2iPYMMlZEoUME/a8qgy20
- 3+Cf9Q7V1hil4JI6wxuhoAAd8J48Th8X2NzsDR5qW9D/F3IsESVUNcXs8Xw11eB8xbIl
- qYnnUuspRed6fX/1h43dk/3fANQogEnkOcNWKCaS6RHgU5ZAlI3Y50gL03PBW+qdnL3l
- At/GkXxbuDQmKWD5+4oTI1G2umnKoq8cq/4UsbMMyw71Vw4xwawJbRTeKk0uql5eYO9c
- NbdzrtWs+jECarQQE5ZF5gyRQNZzNCplDrk0+bUPl3J4KzXLfuRlBBQI008ZBKK6rtvM
- Ieew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vVXuHFjsVWI0iY1Cbauv6PMjL/r8pTrmVpNN70hUSzQ=;
- b=Z6qmSRQIFUwHNlQPkc4wX+ZLx41XNclm1TL92oclxL552Hwk4urZoh6RdmyJcA3zwg
- f1MC3/AC2VnK1AV7A23u73ZKZgr9oW91emY4QDgvZzB3QsUgUDN/1aGvSTvMhpLhWTqY
- X0jOfGREaUgOnbC5SDlXt7XotEkWPjBSVxyPFM7N429n+Dkww4SC6C+uoYEVRq6SUy1L
- n3E41BcMuAg2Wd90rwyI2DeNNSppQLeipDQvjfPvx3cFeNkD8NrZ0w1aGkA9xQzlrJTx
- cHYBpPJJyUCayTNA8tiWoex31Hlsv9eeHQ1gxyHiTcd6wia5MfF+9L2M0vmVVqUoXV1C
- ctCg==
-X-Gm-Message-State: APjAAAXu5GAbKHJBgPvAmU1k9pzV1I3wTtqrXd7mERIDOgldDRoDG2+I
- Y08js8+idDM5lMSIxmvP7cr+r3p7BXoZGjhRKzM=
-X-Google-Smtp-Source: APXvYqwC4b8X5eFwLP7KqWS++IZu1ub0d49bbX1MrdI5mksKkDuJEcgplQx81Z2Ap47yDYsk0RbDABilz/vhUsmCj40=
-X-Received: by 2002:a05:651c:109:: with SMTP id
- a9mr4459636ljb.33.1566605864258; 
- Fri, 23 Aug 2019 17:17:44 -0700 (PDT)
+ (envelope-from <jiewen.yao@intel.com>) id 1i1LAA-0005Ct-EG
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 21:48:20 -0400
+Received: from mga04.intel.com ([192.55.52.120]:44067)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jiewen.yao@intel.com>)
+ id 1i1LAA-0005BX-4G
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 21:48:18 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 23 Aug 2019 18:48:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,422,1559545200"; d="scan'208";a="263351368"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+ by orsmga001.jf.intel.com with ESMTP; 23 Aug 2019 18:48:13 -0700
+Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 23 Aug 2019 18:48:13 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.19]) by
+ SHSMSX103.ccr.corp.intel.com ([169.254.4.139]) with mapi id 14.03.0439.000;
+ Sat, 24 Aug 2019 09:48:11 +0800
+From: "Yao, Jiewen" <jiewen.yao@intel.com>
+To: "Kinney, Michael D" <michael.d.kinney@intel.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "rfc@edk2.groups.io"
+ <rfc@edk2.groups.io>
+Thread-Topic: [edk2-rfc] [edk2-devel] CPU hotplug using SMM with QEMU+OVMF
+Thread-Index: AQHVUfF5lMVYZhTq/0GuokGqDPas2Kb6jzUA//+ZRQCAAaHSAIAAFq8AgAEuZqD//8zIAIAAiChAgABQUYCAACK6gIAAmpdAgAJgcwCAALs9d4ADuC+AgAAViICAAaFPgIAADE2AgAAXS4CAACSxAIAABA6AgAAK9oCAAB76gIAAwP3QgAAv7gCAASV6sA==
+Date: Sat, 24 Aug 2019 01:48:09 +0000
+Message-ID: <74D8A39837DF1E4DA445A8C0B3885C503F7728AB@shsmsx102.ccr.corp.intel.com>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <6f8b9507-58d0-5fbd-b827-c7194b3b2948@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
+ <7cb458ea-956e-c1df-33f7-025e4f0f22df@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F7600B9@shsmsx102.ccr.corp.intel.com>
+ <bb6fdbe0-2a3b-e586-e9a5-93e1ac0803ec@redhat.com>
+ <20190816161933.7d30a881@x1.home>
+ <74D8A39837DF1E4DA445A8C0B3885C503F761B96@shsmsx102.ccr.corp.intel.com>
+ <35396800-32d2-c25f-b0d0-2d7cd8438687@redhat.com>
+ <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
+ <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
+ <b3907432-b149-3f96-6d93-f443f215e0f8@redhat.com>
+ <2b4ba607-f0e3-efee-6712-6dcef129b310@redhat.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA209B@ORSMSX113.amr.corp.intel.com>
+ <7f2d2f1e-2dd8-6914-c55e-61067e06b142@redhat.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA218F@ORSMSX113.amr.corp.intel.com>
+ <3661c0c5-3da4-1453-a66a-3e4d4022e876@redhat.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA2346@ORSMSX113.amr.corp.intel.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F76FDAF@shsmsx102.ccr.corp.intel.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA25CC@ORSMSX113.amr.corp.intel.com>
+In-Reply-To: <E92EE9817A31E24EB0585FDF735412F5B9DA25CC@ORSMSX113.amr.corp.intel.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190821162831.27811-1-georg.kotheimer@kernkonzept.com>
-In-Reply-To: <20190821162831.27811-1-georg.kotheimer@kernkonzept.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 23 Aug 2019 17:13:37 -0700
-Message-ID: <CAKmqyKMFyjQnNqr3AdHCxx5NJsEr2Tbh0GfLQa9L++h56MHSew@mail.gmail.com>
-To: Georg Kotheimer <georg.kotheimer@kernkonzept.com>
-Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH v3] RISC-V: Select FPU gdb xml file based
- on the supported extensions
+X-Received-From: 192.55.52.120
+Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
+ QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,152 +105,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ "devel@edk2.groups.io" <devel@edk2.groups.io>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>,
+ Alex Williamson <alex.williamson@redhat.com>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, Igor
+ Mammedov <imammedo@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 21, 2019 at 9:36 AM Georg Kotheimer
-<georg.kotheimer@kernkonzept.com> wrote:
->
-> The size of the FPU registers depends solely on the floating point
-> extensions supported by the target architecture.
-> However, in the previous implementation the floating point register
-> size was derived from whether the target architecture is 32-bit or
-> 64-bit.
->
-> To allow RVF without RVD, changes to riscv_gdb_get_fpu() and
-> riscv_gdb_set_fpu() were necessary.
->
-> Signed-off-by: Georg Kotheimer <georg.kotheimer@kernkonzept.com>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->  configure              |  4 ++--
->  target/riscv/gdbstub.c | 45 ++++++++++++++++++++++++------------------
->  2 files changed, 28 insertions(+), 21 deletions(-)
->
-> diff --git a/configure b/configure
-> index 714e7fb6a1..44ee953022 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7596,14 +7596,14 @@ case "$target_name" in
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml"
-> +    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-32bit-csr.xml"
->      target_compiler=$cross_cc_riscv32
->    ;;
->    riscv64)
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
-> +    gdb_xml_files="riscv-64bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
->      target_compiler=$cross_cc_riscv64
->    ;;
->    sh4|sh4eb)
-> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-> index 27be93279b..89b2543c9d 100644
-> --- a/target/riscv/gdbstub.c
-> +++ b/target/riscv/gdbstub.c
-> @@ -303,19 +303,22 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
->  static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
->  {
->      if (n < 32) {
-> -        return gdb_get_reg64(mem_buf, env->fpr[n]);
-> +        if (env->misa & RVD) {
-> +            return gdb_get_reg64(mem_buf, env->fpr[n]);
-> +        }
-> +        return gdb_get_reg32(mem_buf, env->fpr[n]);
->      /* there is hole between ft11 and fflags in fpu.xml */
->      } else if (n < 36 && n > 32) {
->          target_ulong val = 0;
->          int result;
->          /*
-> -         * CSR_FFLAGS is at index 8 in csr_register, and gdb says it is FP
-> -         * register 33, so we recalculate the map index.
-> +         * CSR_FFLAGS is at index 1 in the csr space, and gdb says it is FP
-> +         * register 33, so we recalculate the csr index.
->           * This also works for CSR_FRM and CSR_FCSR.
->           */
-> -        result = riscv_csrrw_debug(env, n - 33 +  8, &val, 0, 0);
-> +        result = riscv_csrrw_debug(env, n - 33 + CSR_FFLAGS, &val, 0, 0);
->          if (result == 0) {
-> -            return gdb_get_regl(mem_buf, val);
-> +            return gdb_get_reg32(mem_buf, val);
->          }
->      }
->      return 0;
-> @@ -324,20 +327,25 @@ static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
->  static int riscv_gdb_set_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
->  {
->      if (n < 32) {
-> -        env->fpr[n] = ldq_p(mem_buf); /* always 64-bit */
-> -        return sizeof(uint64_t);
-> +        if (env->misa & RVD) {
-> +            env->fpr[n] = ldq_p(mem_buf);
-> +            return sizeof(uint64_t);
-> +        } else {
-> +            env->fpr[n] = ldl_p(mem_buf);
-> +            return sizeof(uint32_t);
-> +        }
->      /* there is hole between ft11 and fflags in fpu.xml */
->      } else if (n < 36 && n > 32) {
-> -        target_ulong val = ldtul_p(mem_buf);
-> +        target_ulong val = ldl_p(mem_buf);
->          int result;
->          /*
-> -         * CSR_FFLAGS is at index 8 in csr_register, and gdb says it is FP
-> -         * register 33, so we recalculate the map index.
-> +         * CSR_FFLAGS is at index 1 in the csr space, and gdb says it is FP
-> +         * register 33, so we recalculate the csr index.
->           * This also works for CSR_FRM and CSR_FCSR.
->           */
-> -        result = riscv_csrrw_debug(env, n - 33 + 8, NULL, val, -1);
-> +        result = riscv_csrrw_debug(env, n - 33 + CSR_FFLAGS, NULL, val, -1);
->          if (result == 0) {
-> -            return sizeof(target_ulong);
-> +            return sizeof(uint32_t);
->          }
->      }
->      return 0;
-> @@ -375,20 +383,19 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
->  {
->      RISCVCPU *cpu = RISCV_CPU(cs);
->      CPURISCVState *env = &cpu->env;
-> -#if defined(TARGET_RISCV32)
-> -    if (env->misa & RVF) {
-> +
-> +    if (env->misa & RVD) {
-> +        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-> +                                 36, "riscv-64bit-fpu.xml", 0);
-> +    } else if (env->misa & RVF) {
->          gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
->                                   36, "riscv-32bit-fpu.xml", 0);
->      }
->
-> +#if defined(TARGET_RISCV32)
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               4096, "riscv-32bit-csr.xml", 0);
->  #elif defined(TARGET_RISCV64)
-> -    if (env->misa & RVF) {
-> -        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-> -                                 36, "riscv-64bit-fpu.xml", 0);
-> -    }
-> -
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               4096, "riscv-64bit-csr.xml", 0);
->  #endif
-> --
-> 2.20.1
->
->
+SSBnaXZlIG15IHRob3VnaHQuDQpQYW9sbyBtYXkgYWRkIG1vcmUuDQoNCj4gLS0tLS1PcmlnaW5h
+bCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS2lubmV5LCBNaWNoYWVsIEQNCj4gU2VudDogRnJpZGF5
+LCBBdWd1c3QgMjMsIDIwMTkgMTE6MjUgUE0NCj4gVG86IFlhbywgSmlld2VuIDxqaWV3ZW4ueWFv
+QGludGVsLmNvbT47IFBhb2xvIEJvbnppbmkNCj4gPHBib256aW5pQHJlZGhhdC5jb20+OyBMYXN6
+bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPjsNCj4gcmZjQGVkazIuZ3JvdXBzLmlvOyBLaW5u
+ZXksIE1pY2hhZWwgRCA8bWljaGFlbC5kLmtpbm5leUBpbnRlbC5jb20+DQo+IENjOiBBbGV4IFdp
+bGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsgZGV2ZWxAZWRrMi5ncm91cHMu
+aW87DQo+IHFlbXUgZGV2ZWwgbGlzdCA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgSWdvciBNYW1t
+ZWRvdg0KPiA8aW1hbW1lZG9AcmVkaGF0LmNvbT47IENoZW4sIFlpbmd3ZW4gPHlpbmd3ZW4uY2hl
+bkBpbnRlbC5jb20+Ow0KPiBOYWthamltYSwgSnVuIDxqdW4ubmFrYWppbWFAaW50ZWwuY29tPjsg
+Qm9yaXMgT3N0cm92c2t5DQo+IDxib3Jpcy5vc3Ryb3Zza3lAb3JhY2xlLmNvbT47IEpvYW8gTWFy
+Y2FsIExlbW9zIE1hcnRpbnMNCj4gPGpvYW8ubS5tYXJ0aW5zQG9yYWNsZS5jb20+OyBQaGlsbGlw
+IEdvZXJsIDxwaGlsbGlwLmdvZXJsQG9yYWNsZS5jb20+DQo+IFN1YmplY3Q6IFJFOiBbZWRrMi1y
+ZmNdIFtlZGsyLWRldmVsXSBDUFUgaG90cGx1ZyB1c2luZyBTTU0gd2l0aA0KPiBRRU1VK09WTUYN
+Cj4gDQo+IEhpIEppZXdlbiwNCj4gDQo+IElmIGEgaG90IGFkZCBDUFUgbmVlZHMgdG8gcnVuIGFu
+eSBjb2RlIGJlZm9yZSB0aGUNCj4gZmlyc3QgU01JLCBJIHdvdWxkIHJlY29tbWVuZCBpcyBvbmx5
+IGV4ZWN1dGVzIGNvZGUNCj4gZnJvbSBhIHdyaXRlIHByb3RlY3RlZCBGTEFTSCByYW5nZSB3aXRo
+b3V0IGEgc3RhY2sNCj4gYW5kIHRoZW4gd2FpdCBmb3IgdGhlIGZpcnN0IFNNSS4NCltKaWV3ZW5d
+IFJpZ2h0Lg0KDQpBbm90aGVyIG9wdGlvbiBmcm9tIFBhb2xvLCB0aGUgbmV3IENQVSB3aWxsIG5v
+dCBydW4gdW50aWwgMHg3Yi4NClRvIG1pdGlnYXRlIERNQSB0aHJlYXQsIHNvbWVvbmUgbmVlZCBn
+dWFyYW50ZWUgdGhlIGxvdyBtZW1vcnkgU0lQSSB2ZWN0b3IgaXMgRE1BIHByb3RlY3RlZC4NCg0K
+Tk9URTogVGhlIExPVyBtZW1vcnkgKmNvdWxkKiBiZSBtYXBwZWQgdG8gd3JpdGUgcHJvdGVjdGVk
+IEZMQVNIIEFSRUEgdmlhIFBBTSByZWdpc3Rlci4gVGhlIEhvc3QgQ1BVIG1heSBzZXR1cCB0aGF0
+IGluIFNNTS4NCklmIHRoYXQgaXMgdGhlIGNhc2UsIHdlIGRvbuKAmXQgbmVlZCB3b3JyeSBETUEu
+DQoNCkkgY29waWVkIHRoZSBkZXRhaWwgc3RlcCBoZXJlLCBiZWNhdXNlIEkgZm91bmQgaXQgaXMg
+aGFyZCB0byBkaWcgdGhlbSBvdXQgYWdhaW4uDQo9PT09PT09PT09PT09PT09PT09PQ0KKDAxYSkg
+UUVNVTogY3JlYXRlIG5ldyBDUFUuICBUaGUgQ1BVIGFscmVhZHkgZXhpc3RzLCBidXQgaXQgZG9l
+cyBub3QNCiAgICAgc3RhcnQgcnVubmluZyBjb2RlIHVudGlsIHVucGFya2VkIGJ5IHRoZSBDUFUg
+aG90cGx1ZyBjb250cm9sbGVyLg0KDQooMDFiKSBRRU1VOiB0cmlnZ2VyIFNDSQ0KDQooMDItMDMp
+IG5vIGVxdWl2YWxlbnQNCg0KKDA0KSBIb3N0IENQVTogKE9TKSBleGVjdXRlIEdQRSBoYW5kbGVy
+IGZyb20gRFNEVA0KDQooMDUpIEhvc3QgQ1BVOiAoT1MpIFBvcnQgMHhCMiB3cml0ZSwgYWxsIENQ
+VXMgZW50ZXIgU01NIChOT1RFOiBOZXcgQ1BVDQogICAgIHdpbGwgbm90IGVudGVyIENQVSBiZWNh
+dXNlIFNNSSBpcyBkaXNhYmxlZCkNCg0KKDA2KSBIb3N0IENQVTogKFNNTSkgU2F2ZSAzODAwMCwg
+VXBkYXRlIDM4MDAwIC0tIGZpbGwgc2ltcGxlIFNNTQ0KICAgICByZWJhc2UgY29kZS4NCg0KKDA3
+YSkgSG9zdCBDUFU6IChTTU0pIFdyaXRlIHRvIENQVSBob3RwbHVnIGNvbnRyb2xsZXIgdG8gZW5h
+YmxlDQogICAgIG5ldyBDUFUNCg0KKDA3YikgSG9zdCBDUFU6IChTTU0pIFNlbmQgSU5JVC9TSVBJ
+L1NJUEkgdG8gbmV3IENQVS4NCg0KKDA4YSkgTmV3IENQVTogKExvdyBSQU0pIEVudGVyIHByb3Rl
+Y3RlZCBtb2RlLg0KDQooMDhiKSBOZXcgQ1BVOiAoRmxhc2gpIFNpZ25hbHMgaG9zdCBDUFUgdG8g
+cHJvY2VlZCBhbmQgZW50ZXIgY2xpO2hsdCBsb29wLg0KDQooMDkpIEhvc3QgQ1BVOiAoU01NKSBT
+ZW5kIFNNSSB0byB0aGUgbmV3IENQVSBvbmx5Lg0KDQooMTApIE5ldyBDUFU6IChTTU0pIFJ1biBT
+TU0gY29kZSBhdCAzODAwMCwgYW5kIHJlYmFzZSBTTUJBU0UgdG8NCiAgICAgVFNFRy4NCg0KKDEx
+KSBIb3N0IENQVTogKFNNTSkgUmVzdG9yZSAzODAwMC4NCg0KKDEyKSBIb3N0IENQVTogKFNNTSkg
+VXBkYXRlIGxvY2F0ZWQgZGF0YSBzdHJ1Y3R1cmUgdG8gYWRkIHRoZSBuZXcgQ1BVDQogICAgIGlu
+Zm9ybWF0aW9uLiAoVGhpcyBzdGVwIHdpbGwgaW52b2x2ZSBDUFVfU0VSVklDRSBwcm90b2NvbCkN
+Cg0KKDEzKSBOZXcgQ1BVOiAoRmxhc2gpIGRvIHdoYXRldmVyIG90aGVyIGluaXRpYWxpemF0aW9u
+IGlzIG5lZWRlZA0KDQooMTQpIE5ldyBDUFU6IChGbGFzaCkgRGVhZGxvb3AsIGFuZCB3YWl0IGZv
+ciBJTklULVNJUEktU0lQSS4NCg0KKDE1KSBIb3N0IENQVTogKE9TKSBTZW5kIElOSVQtU0lQSS1T
+SVBJIHRvIHB1bGwgbmV3IENQVSBpbi4uDQo9PT09PT09PT09PT09PT09PT09PQ0KDQo+IA0KPiBG
+b3IgdGhpcyBPVk1GIHVzZSBjYXNlLCBpcyBhbnkgQ1BVIGluaXQgcmVxdWlyZWQNCj4gYmVmb3Jl
+IHRoZSBmaXJzdCBTTUk/DQpbSmlld2VuXSBJIGFtIHN1cmUgd2hhdCBpcyB0aGUgZGV0YWlsIGFj
+dGlvbiBpbiAwOGIuDQpBbmQgSSBhbSBub3Qgc3VyZSB3aGF0IHlvdXIgImluaXQiIG1lYW5zIGhl
+cmU/DQpQZXJzb25hbGx5LCBJIGRvbuKAmXQgdGhpbmsgd2UgbmVlZCB0b28gbXVjaCBpbml0IHdv
+cmssIHN1Y2ggYXMgTWljcm9jb2RlIG9yIE1UUlIuDQpCdXQgd2UgbmVlZCBkZXRhaWwgaW5mby4N
+Cg0KDQoNCj4gRnJvbSBQYW9sbydzIGxpc3Qgb2Ygc3RlcHMgYXJlIHN0ZXBzICg4YSkgYW5kICg4
+YikNCj4gcmVhbGx5IHJlcXVpcmVkPyAgQ2FuIHRoZSBTTUkgbW9uYXJjaCB1c2UgdGhlIExvY2Fs
+DQo+IEFQSUMgdG8gc2VuZCBhIGRpcmVjdGVkIFNNSSB0byB0aGUgaG90IGFkZGVkIENQVT8NCj4g
+VGhlIFNNSSBtb25hcmNoIG5lZWRzIHRvIGtub3cgdGhlIEFQSUMgSUQgb2YgdGhlDQo+IGhvdCBh
+ZGRlZCBDUFUuICANCltKaWV3ZW5dIEkgdGhpbmsgaXQgZGVwZW5kIHVwb24gdmlydHVhbCBoYXJk
+d2FyZSBkZXNpZ24uDQpMZWF2ZSBxdWVzdGlvbiB0byBQYW9sby4NCg0KDQoNCkRvIHdlIGFsc28g
+bmVlZCB0byBoYW5kbGUgdGhlIGNhc2UNCj4gd2hlcmUgbXVsdGlwbGUgQ1BVcyBhcmUgYWRkZWQg
+YXQgb25jZT8gIEkgdGhpbmsgd2UNCj4gd291bGQgbmVlZCB0byBzZXJpYWxpemUgdGhlIHVzZSBv
+ZiAzMDAwOjgwMDAgZm9yIHRoZQ0KPiBTTU0gcmViYXNlIG9wZXJhdGlvbiBvbiBlYWNoIGhvdCBh
+ZGRlZCBDUFUuDQo+IEl0IHdvdWxkIGJlIHNpbXBsZXIgaWYgd2UgY2FuIGd1YXJhbnRlZSB0aGF0
+IG9ubHkNCj4gb25lIENQVSBjYW4gYmUgYWRkZWQgb3IgcmVtb3ZlZCBhdCBhIHRpbWUgYW5kIHRo
+ZQ0KPiBjb21wbGV0ZSBmbG93IG9mIGFkZGluZyBhIENQVSB0byBTTU0gYW5kIHRoZSBPUw0KPiBu
+ZWVkcyB0byBiZSBjb21wbGV0ZWQgYmVmb3JlIGFub3RoZXIgYWRkL3JlbW92ZQ0KPiBldmVudCBu
+ZWVkcyB0byBiZSBwcm9jZXNzZWQuDQpbSmlld2VuXSBSaWdodC4NCkkgdHJlYXQgdGhlIG11bHRp
+cGxlIENQVSBob3QtYWRkIGF0IHNhbWUgdGltZSBhcyBhIHBvdGVudGlhbCB0aHJlYXQuDQpXZSBk
+b27igJl0IHdhbnQgdG8gdHJ1c3QgZW5kIHVzZXIuDQpUaGUgc29sdXRpb24gY291bGQgYmU6DQox
+KSBMZXQgdHJ1c3RlZCBoYXJkd2FyZSBndWFyYW50ZWUgaG90LWFkZCBvbmUgYnkgb25lLg0KMikg
+TGV0IHRydXN0ZWQgc29mdHdhcmUgKFNNTSBhbmQgaW5pdCBjb2RlKSBndWFyYW50ZWUgU01SRUJB
+U0Ugb25lIGJ5IG9uZSAoaW5jbHVkZSBhbnkgY29kZSBydW5zIGJlZm9yZSBTTVJFQkFTRSkNCjMp
+IExldCB0cnVzdGVkIHNvZnR3YXJlIChTTU0gYW5kIGluaXQgY29kZSkgc3VwcG9ydCBTTVJFQkFT
+RSBzaW11bHRhbmVvdXNseSAoaW5jbHVkZSBhbnkgY29kZSBydW5zIGJlZm9yZSBTTVJFQkFTRSku
+DQpTb2x1dGlvbiAjMSBvciAjMiBhcmUgc2ltcGxlIHNvbHV0aW9uLg0KDQoNCj4gTWlrZQ0KPiAN
+Cj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IFlhbywgSmlld2VuDQo+
+ID4gU2VudDogVGh1cnNkYXksIEF1Z3VzdCAyMiwgMjAxOSAxMDowMCBQTQ0KPiA+IFRvOiBLaW5u
+ZXksIE1pY2hhZWwgRCA8bWljaGFlbC5kLmtpbm5leUBpbnRlbC5jb20+Ow0KPiA+IFBhb2xvIEJv
+bnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBMYXN6bG8gRXJzZWsNCj4gPiA8bGVyc2VrQHJl
+ZGhhdC5jb20+OyByZmNAZWRrMi5ncm91cHMuaW8NCj4gPiBDYzogQWxleCBXaWxsaWFtc29uIDxh
+bGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT47DQo+ID4gZGV2ZWxAZWRrMi5ncm91cHMuaW87IHFl
+bXUgZGV2ZWwgbGlzdCA8cWVtdS0NCj4gPiBkZXZlbEBub25nbnUub3JnPjsgSWdvciBNYW1tZWRv
+diA8aW1hbW1lZG9AcmVkaGF0LmNvbT47DQo+ID4gQ2hlbiwgWWluZ3dlbiA8eWluZ3dlbi5jaGVu
+QGludGVsLmNvbT47IE5ha2FqaW1hLCBKdW4NCj4gPiA8anVuLm5ha2FqaW1hQGludGVsLmNvbT47
+IEJvcmlzIE9zdHJvdnNreQ0KPiA+IDxib3Jpcy5vc3Ryb3Zza3lAb3JhY2xlLmNvbT47IEpvYW8g
+TWFyY2FsIExlbW9zIE1hcnRpbnMNCj4gPiA8am9hby5tLm1hcnRpbnNAb3JhY2xlLmNvbT47IFBo
+aWxsaXAgR29lcmwNCj4gPiA8cGhpbGxpcC5nb2VybEBvcmFjbGUuY29tPg0KPiA+IFN1YmplY3Q6
+IFJFOiBbZWRrMi1yZmNdIFtlZGsyLWRldmVsXSBDUFUgaG90cGx1ZyB1c2luZw0KPiA+IFNNTSB3
+aXRoIFFFTVUrT1ZNRg0KPiA+DQo+ID4gVGhhbmsgeW91IE1pa2UhDQo+ID4NCj4gPiBUaGF0IGlz
+IGdvb2QgcmVmZXJlbmNlIG9uIHRoZSByZWFsIGhhcmR3YXJlIGJlaGF2aW9yLg0KPiA+IChHbGFk
+IGl0IGlzIHB1YmxpYy4pDQo+ID4NCj4gPiBGb3IgdGhyZWF0IG1vZGVsLCB0aGUgdW5pcXVlIHBh
+cnQgaW4gdmlydHVhbCBlbnZpcm9ubWVudA0KPiA+IGlzIHRlbXAgUkFNLg0KPiA+IFRoZSB0ZW1w
+IFJBTSBpbiByZWFsIHBsYXRmb3JtIGlzIHBlciBDUFUgY2FjaGUsIHdoaWxlDQo+ID4gdGhlIHRl
+bXAgUkFNIGluIHZpcnR1YWwgcGxhdGZvcm0gaXMgZ2xvYmFsIG1lbW9yeS4NCj4gPiBUaGF0IGJy
+aW5ncyBvbmUgbW9yZSBwb3RlbnRpYWwgYXR0YWNrIHN1cmZhY2UgaW4gdmlydHVhbA0KPiA+IGVu
+dmlyb25tZW50LCBpZiBob3QtYWRkZWQgQ1BVIG5lZWQgcnVuIGNvZGUgd2l0aCBzdGFjaw0KPiA+
+IG9yIGhlYXAgYmVmb3JlIFNNSSByZWJhc2UuDQo+ID4NCj4gPiBPdGhlciB0aHJlYXRzLCBzdWNo
+IGFzIFNNUkFNIG9yIERNQSwgYXJlIHNhbWUuDQo+ID4NCj4gPiBUaGFuayB5b3UNCj4gPiBZYW8g
+Smlld2VuDQo+ID4NCj4gPg0KPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+
+IEZyb206IEtpbm5leSwgTWljaGFlbCBEDQo+ID4gPiBTZW50OiBGcmlkYXksIEF1Z3VzdCAyMywg
+MjAxOSA5OjAzIEFNDQo+ID4gPiBUbzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNv
+bT47IExhc3psbyBFcnNlaw0KPiA+ID4gPGxlcnNla0ByZWRoYXQuY29tPjsgcmZjQGVkazIuZ3Jv
+dXBzLmlvOyBZYW8sIEppZXdlbg0KPiA+ID4gPGppZXdlbi55YW9AaW50ZWwuY29tPjsgS2lubmV5
+LCBNaWNoYWVsIEQNCj4gPiA8bWljaGFlbC5kLmtpbm5leUBpbnRlbC5jb20+DQo+ID4gPiBDYzog
+QWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT47DQo+ID4gPiBkZXZl
+bEBlZGsyLmdyb3Vwcy5pbzsgcWVtdSBkZXZlbCBsaXN0IDxxZW11LQ0KPiA+IGRldmVsQG5vbmdu
+dS5vcmc+OyBJZ29yDQo+ID4gPiBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0LmNvbT47IENoZW4s
+IFlpbmd3ZW4NCj4gPiA+IDx5aW5nd2VuLmNoZW5AaW50ZWwuY29tPjsgTmFrYWppbWEsIEp1bg0K
+PiA+IDxqdW4ubmFrYWppbWFAaW50ZWwuY29tPjsNCj4gPiA+IEJvcmlzIE9zdHJvdnNreSA8Ym9y
+aXMub3N0cm92c2t5QG9yYWNsZS5jb20+OyBKb2FvDQo+ID4gTWFyY2FsIExlbW9zDQo+ID4gPiBN
+YXJ0aW5zIDxqb2FvLm0ubWFydGluc0BvcmFjbGUuY29tPjsgUGhpbGxpcCBHb2VybA0KPiA+ID4g
+PHBoaWxsaXAuZ29lcmxAb3JhY2xlLmNvbT4NCj4gPiA+IFN1YmplY3Q6IFJFOiBbZWRrMi1yZmNd
+IFtlZGsyLWRldmVsXSBDUFUgaG90cGx1ZyB1c2luZw0KPiA+IFNNTSB3aXRoDQo+ID4gPiBRRU1V
+K09WTUYNCj4gPiA+DQo+ID4gPiBQYW9sbywNCj4gPiA+DQo+ID4gPiBJIGZpbmQgdGhlIGZvbGxv
+d2luZyBsaW5rcyByZWxhdGVkIHRvIHRoZSBkaXNjdXNzaW9ucw0KPiA+IGhlcmUgYWxvbmcgd2l0
+aA0KPiA+ID4gb25lIGV4YW1wbGUgZmVhdHVyZSBjYWxsZWQgR0VOUFJPVFJBTkdFLg0KPiA+ID4N
+Cj4gPiA+IGh0dHBzOi8vY3NyYy5uaXN0Lmdvdi9DU1JDL21lZGlhL1ByZXNlbnRhdGlvbnMvVGhl
+LQ0KPiA+IFdob2xlLWlzLUdyZWF0ZXIvaW0NCj4gPiA+IGEgZ2VzLW1lZGlhL2RheTFfdHJ1c3Rl
+ZC1jb21wdXRpbmdfMjAwLTI1MC5wZGYNCj4gPiA+IGh0dHBzOi8vY2Fuc2Vjd2VzdC5jb20vc2xp
+ZGVzLzIwMTcvQ1NXMjAxN19DdWF1aHRlbW9jLQ0KPiA+IFJlbmVfQ1BVX0hvDQo+ID4gPiB0LUFk
+ZF9mbG93LnBkZg0KPiA+ID4gaHR0cHM6Ly93d3cubW91c2VyLmNvbS9kcy8yLzYxMi81NTIwLTU1
+MDAtY2hpcHNldC1pb2gtDQo+ID4gZGF0YXNoZWV0LTExMzENCj4gPiA+IDI5Mi5wZGYNCj4gPiA+
+DQo+ID4gPiBCZXN0IHJlZ2FyZHMsDQo+ID4gPg0KPiA+ID4gTWlrZQ0KPiA+ID4NCj4gPiA+ID4g
+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gRnJvbTogUGFvbG8gQm9uemluaSBb
+bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+ID4gPiA+IFNlbnQ6IFRodXJzZGF5LCBBdWd1
+c3QgMjIsIDIwMTkgNDoxMiBQTQ0KPiA+ID4gPiBUbzogS2lubmV5LCBNaWNoYWVsIEQgPG1pY2hh
+ZWwuZC5raW5uZXlAaW50ZWwuY29tPjsNCj4gPiBMYXN6bG8gRXJzZWsNCj4gPiA+ID4gPGxlcnNl
+a0ByZWRoYXQuY29tPjsgcmZjQGVkazIuZ3JvdXBzLmlvOyBZYW8sIEppZXdlbg0KPiA+ID4gPiA8
+amlld2VuLnlhb0BpbnRlbC5jb20+DQo+ID4gPiA+IENjOiBBbGV4IFdpbGxpYW1zb24gPGFsZXgu
+d2lsbGlhbXNvbkByZWRoYXQuY29tPjsNCj4gPiA+ID4gZGV2ZWxAZWRrMi5ncm91cHMuaW87IHFl
+bXUgZGV2ZWwgbGlzdCA8cWVtdS0NCj4gPiBkZXZlbEBub25nbnUub3JnPjsgSWdvcg0KPiA+ID4g
+PiBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0LmNvbT47IENoZW4sIFlpbmd3ZW4NCj4gPiA+ID4g
+PHlpbmd3ZW4uY2hlbkBpbnRlbC5jb20+OyBOYWthamltYSwgSnVuDQo+ID4gPGp1bi5uYWthamlt
+YUBpbnRlbC5jb20+Ow0KPiA+ID4gPiBCb3JpcyBPc3Ryb3Zza3kgPGJvcmlzLm9zdHJvdnNreUBv
+cmFjbGUuY29tPjsgSm9hbw0KPiA+IE1hcmNhbCBMZW1vcw0KPiA+ID4gPiBNYXJ0aW5zIDxqb2Fv
+Lm0ubWFydGluc0BvcmFjbGUuY29tPjsgUGhpbGxpcCBHb2VybA0KPiA+ID4gPiA8cGhpbGxpcC5n
+b2VybEBvcmFjbGUuY29tPg0KPiA+ID4gPiBTdWJqZWN0OiBSZTogW2VkazItcmZjXSBbZWRrMi1k
+ZXZlbF0gQ1BVIGhvdHBsdWcNCj4gPiB1c2luZyBTTU0gd2l0aA0KPiA+ID4gPiBRRU1VK09WTUYN
+Cj4gPiA+ID4NCj4gPiA+ID4gT24gMjMvMDgvMTkgMDA6MzIsIEtpbm5leSwgTWljaGFlbCBEIHdy
+b3RlOg0KPiA+ID4gPiA+IFBhb2xvLA0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSXQgaXMgbXkgdW5k
+ZXJzdGFuZGluZyB0aGF0IHJlYWwgSFcgaG90IHBsdWcgdXNlcw0KPiA+IHRoZQ0KPiA+ID4gPiBT
+RE0gZGVmaW5lZA0KPiA+ID4gPiA+IG1ldGhvZHMuICBNZWFuaW5nIHRoZSBpbml0aWFsIFNNSSBp
+cyB0byAzMDAwOjgwMDANCj4gPiBhbmQNCj4gPiA+ID4gdGhleSByZWJhc2UgdG8NCj4gPiA+ID4g
+PiBUU0VHIGluIHRoZSBmaXJzdCBTTUkuICBUaGV5IG11c3QgaGF2ZSBjaGlwc2V0DQo+ID4gc3Bl
+Y2lmaWMNCj4gPiA+ID4gbWV0aG9kcyB0bw0KPiA+ID4gPiA+IHByb3RlY3QgMzAwMDo4MDAwIGZy
+b20gRE1BLg0KPiA+ID4gPg0KPiA+ID4gPiBJdCB3b3VsZCBiZSBncmVhdCBpZiB5b3UgY291bGQg
+Y2hlY2suDQo+ID4gPiA+DQo+ID4gPiA+ID4gQ2FuIHdlIGFkZCBhIGNoaXBzZXQgZmVhdHVyZSB0
+byBwcmV2ZW50IERNQSB0bw0KPiA+IDY0S0INCj4gPiA+ID4gcmFuZ2UgZnJvbQ0KPiA+ID4gPiA+
+IDB4MzAwMDAtMHgzRkZGRiBhbmQgdGhlIFVFRkkgTWVtb3J5IE1hcCBhbmQgQUNQSQ0KPiA+ID4g
+PiBjb250ZW50IGNhbiBiZQ0KPiA+ID4gPiA+IHVwZGF0ZWQgc28gdGhlIEd1ZXN0IE9TIGtub3dz
+IHRvIG5vdCB1c2UgdGhhdA0KPiA+IHJhbmdlIGZvcg0KPiA+ID4gPiBETUE/DQo+ID4gPiA+DQo+
+ID4gPiA+IElmIHJlYWwgaGFyZHdhcmUgZG9lcyBpdCBhdCB0aGUgY2hpcHNldCBsZXZlbCwgd2UN
+Cj4gPiB3aWxsIHByb2JhYmx5IHVzZQ0KPiA+ID4gPiBJZ29yJ3Mgc3VnZ2VzdGlvbiBvZiBhbGlh
+c2luZyBBLXNlZyB0byAzMDAwOjAwMDAuDQo+ID4gQmVmb3JlIHN0YXJ0aW5nDQo+ID4gPiA+IHRo
+ZSBuZXcgQ1BVLCB0aGUgU01JIGhhbmRsZXIgY2FuIHByZXBhcmUgdGhlIFNNQkFTRQ0KPiA+IHJl
+bG9jYXRpb24NCj4gPiA+ID4gdHJhbXBvbGluZSBhdA0KPiA+ID4gPiBBMDAwOjgwMDAgYW5kIHRo
+ZSBob3QtcGx1Z2dlZCBDUFUgd2lsbCBmaW5kIGl0IGF0DQo+ID4gPiA+IDMwMDA6ODAwMCB3aGVu
+IGl0IHJlY2VpdmVzIHRoZSBpbml0aWFsIFNNSS4gIEJlY2F1c2UNCj4gPiB0aGlzIGlzIGJhY2tl
+ZA0KPiA+ID4gPiBieSBSQU0gYXQgMHhBMDAwMC0weEFGRkZGLCBETUEgY2Fubm90IGFjY2VzcyBp
+dCBhbmQNCj4gPiB3b3VsZCBzdGlsbCBnbw0KPiA+ID4gPiB0aHJvdWdoIHRvIFJBTSBhdCAweDMw
+MDAwLg0KPiA+ID4gPg0KPiA+ID4gPiBQYW9sbw0K
 
