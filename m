@@ -2,58 +2,59 @@ Return-Path: <SRS0=NWXH=WU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A58C3A59E
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 17:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34531C3A59E
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 17:29:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1726E21897
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 17:29:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1726E21897
+	by mail.kernel.org (Postfix) with ESMTPS id 0183920870
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 17:29:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0183920870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1ZrF-00089g-7o
-	for qemu-devel@archiver.kernel.org; Sat, 24 Aug 2019 13:29:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42381)
+	id 1i1ZrO-0008JL-1f
+	for qemu-devel@archiver.kernel.org; Sat, 24 Aug 2019 13:29:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i1Zpq-0006uX-Id
- for qemu-devel@nongnu.org; Sat, 24 Aug 2019 13:28:19 -0400
+ (envelope-from <eblake@redhat.com>) id 1i1Zps-0006uk-Uu
+ for qemu-devel@nongnu.org; Sat, 24 Aug 2019 13:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i1Zpp-0008Pw-39
- for qemu-devel@nongnu.org; Sat, 24 Aug 2019 13:28:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54652)
+ (envelope-from <eblake@redhat.com>) id 1i1Zpr-0008RQ-RU
+ for qemu-devel@nongnu.org; Sat, 24 Aug 2019 13:28:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62221)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i1Zpo-0008PJ-Uk
- for qemu-devel@nongnu.org; Sat, 24 Aug 2019 13:28:17 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i1Zpp-0008Pr-97; Sat, 24 Aug 2019 13:28:17 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B19473082126;
- Sat, 24 Aug 2019 17:28:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 94D623086246;
+ Sat, 24 Aug 2019 17:28:16 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 37CAC608A5;
- Sat, 24 Aug 2019 17:28:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1738860933;
+ Sat, 24 Aug 2019 17:28:16 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 24 Aug 2019 12:28:11 -0500
-Message-Id: <20190824172813.29720-1-eblake@redhat.com>
+Date: Sat, 24 Aug 2019 12:28:12 -0500
+Message-Id: <20190824172813.29720-2-eblake@redhat.com>
+In-Reply-To: <20190824172813.29720-1-eblake@redhat.com>
+References: <20190824172813.29720-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Sat, 24 Aug 2019 17:28:14 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Sat, 24 Aug 2019 17:28:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/2] nbd: tolerate more errors to extension
- requests
+Subject: [Qemu-devel] [PATCH v2 1/2] nbd: Use g_autofree in a few places
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,25 +66,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, rjones@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, rjones@redhat.com,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since v1;
-- new patch 1
-- adjust patch 2 to not set errp when not in strict mode
+Thanks to our recent move to use glib's g_autofree, I can join the
+bandwagon.  Getting rid of gotos is fun ;)
 
-Eric Blake (2):
-  nbd: Use g_autofree in a few places
-  nbd: Tolerate more errors to structured reply request
+There are probably more places where we could register cleanup
+functions and get rid of more gotos; this patch just focuses on the
+labels that existed merely to call g_free.
 
- block/nbd.c      | 11 +++----
- nbd/client.c     | 85 +++++++++++++++++++++++-------------------------
- nbd/server.c     | 12 +++----
- nbd/trace-events |  2 +-
- 4 files changed, 49 insertions(+), 61 deletions(-)
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/nbd.c  | 11 ++++-------
+ nbd/client.c | 22 +++++++---------------
+ nbd/server.c | 12 ++++--------
+ 3 files changed, 15 insertions(+), 30 deletions(-)
 
+diff --git a/block/nbd.c b/block/nbd.c
+index beed46fb3414..c4c91a158602 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -1374,7 +1374,7 @@ static bool nbd_has_filename_options_conflict(QDict=
+ *options, Error **errp)
+ static void nbd_parse_filename(const char *filename, QDict *options,
+                                Error **errp)
+ {
+-    char *file;
++    g_autofree char *file =3D NULL;
+     char *export_name;
+     const char *host_spec;
+     const char *unixpath;
+@@ -1396,7 +1396,7 @@ static void nbd_parse_filename(const char *filename=
+, QDict *options,
+     export_name =3D strstr(file, EN_OPTSTR);
+     if (export_name) {
+         if (export_name[strlen(EN_OPTSTR)] =3D=3D 0) {
+-            goto out;
++            return;
+         }
+         export_name[0] =3D 0; /* truncate 'file' */
+         export_name +=3D strlen(EN_OPTSTR);
+@@ -1407,11 +1407,11 @@ static void nbd_parse_filename(const char *filena=
+me, QDict *options,
+     /* extract the host_spec - fail if it's not nbd:... */
+     if (!strstart(file, "nbd:", &host_spec)) {
+         error_setg(errp, "File name string for NBD must start with 'nbd:=
+'");
+-        goto out;
++        return;
+     }
+
+     if (!*host_spec) {
+-        goto out;
++        return;
+     }
+
+     /* are we a UNIX or TCP socket? */
+@@ -1431,9 +1431,6 @@ static void nbd_parse_filename(const char *filename=
+, QDict *options,
+     out_inet:
+         qapi_free_InetSocketAddress(addr);
+     }
+-
+-out:
+-    g_free(file);
+ }
+
+ static bool nbd_process_legacy_socket_options(QDict *output_options,
+diff --git a/nbd/client.c b/nbd/client.c
+index 49bf9906f94b..a9d8d32feff7 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -247,12 +247,11 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NB=
+DOptionReply *reply,
+ static int nbd_receive_list(QIOChannel *ioc, char **name, char **descrip=
+tion,
+                             Error **errp)
+ {
+-    int ret =3D -1;
+     NBDOptionReply reply;
+     uint32_t len;
+     uint32_t namelen;
+-    char *local_name =3D NULL;
+-    char *local_desc =3D NULL;
++    g_autofree char *local_name =3D NULL;
++    g_autofree char *local_desc =3D NULL;
+     int error;
+
+     if (nbd_receive_option_reply(ioc, NBD_OPT_LIST, &reply, errp) < 0) {
+@@ -298,7 +297,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **n=
+ame, char **description,
+     local_name =3D g_malloc(namelen + 1);
+     if (nbd_read(ioc, local_name, namelen, "export name", errp) < 0) {
+         nbd_send_opt_abort(ioc);
+-        goto out;
++        return -1;
+     }
+     local_name[namelen] =3D '\0';
+     len -=3D namelen;
+@@ -306,24 +305,17 @@ static int nbd_receive_list(QIOChannel *ioc, char *=
+*name, char **description,
+         local_desc =3D g_malloc(len + 1);
+         if (nbd_read(ioc, local_desc, len, "export description", errp) <=
+ 0) {
+             nbd_send_opt_abort(ioc);
+-            goto out;
++            return -1;
+         }
+         local_desc[len] =3D '\0';
+     }
+
+     trace_nbd_receive_list(local_name, local_desc ?: "");
+-    *name =3D local_name;
+-    local_name =3D NULL;
++    *name =3D g_steal_pointer(&local_name);
+     if (description) {
+-        *description =3D local_desc;
+-        local_desc =3D NULL;
++        *description =3D g_steal_pointer(&local_desc);
+     }
+-    ret =3D 1;
+-
+- out:
+-    g_free(local_name);
+-    g_free(local_desc);
+-    return ret;
++    return 1;
+ }
+
+
+diff --git a/nbd/server.c b/nbd/server.c
+index 0fb41c6c50ea..74d205812fee 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -206,7 +206,7 @@ static int GCC_FMT_ATTR(4, 0)
+ nbd_negotiate_send_rep_verr(NBDClient *client, uint32_t type,
+                             Error **errp, const char *fmt, va_list va)
+ {
+-    char *msg;
++    g_autofree char *msg =3D NULL;
+     int ret;
+     size_t len;
+
+@@ -216,18 +216,14 @@ nbd_negotiate_send_rep_verr(NBDClient *client, uint=
+32_t type,
+     trace_nbd_negotiate_send_rep_err(msg);
+     ret =3D nbd_negotiate_send_rep_len(client, type, len, errp);
+     if (ret < 0) {
+-        goto out;
++        return ret;
+     }
+     if (nbd_write(client->ioc, msg, len, errp) < 0) {
+         error_prepend(errp, "write failed (error message): ");
+-        ret =3D -EIO;
+-    } else {
+-        ret =3D 0;
++        return -EIO;
+     }
+
+-out:
+-    g_free(msg);
+-    return ret;
++    return 0;
+ }
+
+ /* Send an error reply.
 --=20
 2.21.0
 
