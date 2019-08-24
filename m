@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2A4C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E99CFC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:18:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E934721726
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:16:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B68B421726
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Aug 2019 00:18:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NmcWoxbF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E934721726
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fd1P8Nds"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B68B421726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1JjY-0001GG-65
-	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 20:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
+	id 1i1JlN-000319-UE
+	for qemu-devel@archiver.kernel.org; Fri, 23 Aug 2019 20:18:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i1JQa-0008NO-2z
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:57:09 -0400
+ (envelope-from <alistair23@gmail.com>) id 1i1JkZ-0002LN-JB
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 20:17:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i1JQY-0003e7-PN
- for qemu-devel@nongnu.org; Fri, 23 Aug 2019 19:57:07 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:41698)
+ (envelope-from <alistair23@gmail.com>) id 1i1JkY-0002vH-AY
+ for qemu-devel@nongnu.org; Fri, 23 Aug 2019 20:17:47 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43574)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i1JQY-0003ct-Fl; Fri, 23 Aug 2019 19:57:06 -0400
-Received: by mail-lf1-x143.google.com with SMTP id 62so8271072lfa.8;
- Fri, 23 Aug 2019 16:57:06 -0700 (PDT)
+ id 1i1JkY-0002ux-1U; Fri, 23 Aug 2019 20:17:46 -0400
+Received: by mail-lj1-x242.google.com with SMTP id h15so10328534ljg.10;
+ Fri, 23 Aug 2019 17:17:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=u6H4THZtN0W3yNUCSY6CT9DMaBee0SyXiFEg6yb4GnE=;
- b=NmcWoxbFck/dkfzgKmpbLm+cNXBzGMRxcFbp03xTwuiEFJe8oB6lu2J5FnK6lTqD1j
- jNlA/JXfVMtBcDEBk9YbpgALPqgb3ePq73W18p/AJNep4tWA1UJWn6A24kkshvyebXVr
- Kr9NMkGfw47WuKSSOv4l9XK7mOnWRP3RExfLagPS+pC2Tj+x7cHlYb8WCfjUzB9G0E9f
- x4Ww8cMtAEFXFvQ6Je1DxXlx8XOaJlS4VDgaALqx33UeYd90Lyp0Tri7zm8YWsN2htYj
- sBYsPQmp+/sE8HQiikCPp+9Rq5RK++BaB2tINtLRtJ5CaovwHnhhKb50M/vUBzIDBquH
- oT0g==
+ :cc; bh=vVXuHFjsVWI0iY1Cbauv6PMjL/r8pTrmVpNN70hUSzQ=;
+ b=fd1P8Ndsl8apJj1t2G6HBxkoiyWxZKh6Y/AyUqejdZMWQ2iPYMMlZEoUME/a8qgy20
+ 3+Cf9Q7V1hil4JI6wxuhoAAd8J48Th8X2NzsDR5qW9D/F3IsESVUNcXs8Xw11eB8xbIl
+ qYnnUuspRed6fX/1h43dk/3fANQogEnkOcNWKCaS6RHgU5ZAlI3Y50gL03PBW+qdnL3l
+ At/GkXxbuDQmKWD5+4oTI1G2umnKoq8cq/4UsbMMyw71Vw4xwawJbRTeKk0uql5eYO9c
+ NbdzrtWs+jECarQQE5ZF5gyRQNZzNCplDrk0+bUPl3J4KzXLfuRlBBQI008ZBKK6rtvM
+ Ieew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=u6H4THZtN0W3yNUCSY6CT9DMaBee0SyXiFEg6yb4GnE=;
- b=pr4MqWCsx0rNRA+st2WJRduQuf2PFU5b83936chDRnsRnvLvoxfxC46zh5m3hcO5cG
- tDvIAZ+OE8q/jbDchxRPWnBoIYcIzd6NnorS4WfBp9RQ6uWx+2MVShHIuFyUnV+qzjen
- KZ1CqmYu6HSc3cY/H6fzh83ugl9/1Dtlus+ecD0uQHyu5jrqV2FyWImu4L/HtUqVq2ID
- Vm8xqad9EpLEsLtMs1O+U3doURuQsjZ9ArEkZrpjVQHl43eCkbC3rETTWxnbj5uorQKf
- nNdU2FApREAwZ2QH2iDRturVm7LhnzrJPfS9jRG1LxppJ9d55UVj5464XYrADSpaF7/l
- Tq4Q==
-X-Gm-Message-State: APjAAAUqj2xL25faMIqR8QWOjw1xzg2wC7F4SgQVy+H3c2W4xC8hNrdn
- qHwNqX53YAqe2Aw3i7VrlFhGiNjlhJd82EWnWgY=
-X-Google-Smtp-Source: APXvYqx0DWoUndgdkEyjUJglnM7iA4Z3oW0czS5R19uV05y9vN1iCPnMOmKOKQLj/Sugs+EccF19Q3ITr94iL1Ef6iY=
-X-Received: by 2002:ac2:528c:: with SMTP id q12mr3328511lfm.135.1566604625030; 
- Fri, 23 Aug 2019 16:57:05 -0700 (PDT)
+ bh=vVXuHFjsVWI0iY1Cbauv6PMjL/r8pTrmVpNN70hUSzQ=;
+ b=Z6qmSRQIFUwHNlQPkc4wX+ZLx41XNclm1TL92oclxL552Hwk4urZoh6RdmyJcA3zwg
+ f1MC3/AC2VnK1AV7A23u73ZKZgr9oW91emY4QDgvZzB3QsUgUDN/1aGvSTvMhpLhWTqY
+ X0jOfGREaUgOnbC5SDlXt7XotEkWPjBSVxyPFM7N429n+Dkww4SC6C+uoYEVRq6SUy1L
+ n3E41BcMuAg2Wd90rwyI2DeNNSppQLeipDQvjfPvx3cFeNkD8NrZ0w1aGkA9xQzlrJTx
+ cHYBpPJJyUCayTNA8tiWoex31Hlsv9eeHQ1gxyHiTcd6wia5MfF+9L2M0vmVVqUoXV1C
+ ctCg==
+X-Gm-Message-State: APjAAAXu5GAbKHJBgPvAmU1k9pzV1I3wTtqrXd7mERIDOgldDRoDG2+I
+ Y08js8+idDM5lMSIxmvP7cr+r3p7BXoZGjhRKzM=
+X-Google-Smtp-Source: APXvYqwC4b8X5eFwLP7KqWS++IZu1ub0d49bbX1MrdI5mksKkDuJEcgplQx81Z2Ap47yDYsk0RbDABilz/vhUsmCj40=
+X-Received: by 2002:a05:651c:109:: with SMTP id
+ a9mr4459636ljb.33.1566605864258; 
+ Fri, 23 Aug 2019 17:17:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
- <1566537069-22741-22-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1566537069-22741-22-git-send-email-bmeng.cn@gmail.com>
+References: <20190821162831.27811-1-georg.kotheimer@kernkonzept.com>
+In-Reply-To: <20190821162831.27811-1-georg.kotheimer@kernkonzept.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 23 Aug 2019 16:52:58 -0700
-Message-ID: <CAKmqyKOQKTj4zOvVo5zaP4EprBka7R0RfD58MV_5a7C3ON_3LQ@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
+Date: Fri, 23 Aug 2019 17:13:37 -0700
+Message-ID: <CAKmqyKMFyjQnNqr3AdHCxx5NJsEr2Tbh0GfLQa9L++h56MHSew@mail.gmail.com>
+To: Georg Kotheimer <georg.kotheimer@kernkonzept.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH v5 21/30] riscv: sifive_u: Add PRCI block
- to the SoC
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v3] RISC-V: Select FPU gdb xml file based
+ on the supported extensions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,138 +90,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
  Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 22, 2019 at 10:35 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Wed, Aug 21, 2019 at 9:36 AM Georg Kotheimer
+<georg.kotheimer@kernkonzept.com> wrote:
 >
-> Add PRCI mmio base address and size mappings to sifive_u machine,
-> and generate the corresponding device tree node.
+> The size of the FPU registers depends solely on the floating point
+> extensions supported by the target architecture.
+> However, in the previous implementation the floating point register
+> size was derived from whether the target architecture is 32-bit or
+> 64-bit.
 >
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> To allow RVF without RVD, changes to riscv_gdb_get_fpu() and
+> riscv_gdb_set_fpu() were necessary.
+>
+> Signed-off-by: Georg Kotheimer <georg.kotheimer@kernkonzept.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
->
 > ---
+>  configure              |  4 ++--
+>  target/riscv/gdbstub.c | 45 ++++++++++++++++++++++++------------------
+>  2 files changed, 28 insertions(+), 21 deletions(-)
 >
-> Changes in v5:
-> - create sifive_u_prci block directly in the machine codes, instead
->   of calling sifive_u_prci_create()
->
-> Changes in v4: None
-> Changes in v3: None
-> Changes in v2: None
->
->  hw/riscv/sifive_u.c         | 24 +++++++++++++++++++++++-
->  include/hw/riscv/sifive_u.h |  3 +++
->  2 files changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 08db741..c777d41 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -9,6 +9,7 @@
->   * 0) UART
->   * 1) CLINT (Core Level Interruptor)
->   * 2) PLIC (Platform Level Interrupt Controller)
-> + * 3) PRCI (Power, Reset, Clock, Interrupt)
->   *
->   * This board currently generates devicetree dynamically that indicates at least
->   * two harts and up to five harts.
-> @@ -61,6 +62,7 @@ static const struct MemmapEntry {
->      [SIFIVE_U_MROM] =     {     0x1000,    0x11000 },
->      [SIFIVE_U_CLINT] =    {  0x2000000,    0x10000 },
->      [SIFIVE_U_PLIC] =     {  0xc000000,  0x4000000 },
-> +    [SIFIVE_U_PRCI] =     { 0x10000000,     0x1000 },
->      [SIFIVE_U_UART0] =    { 0x10013000,     0x1000 },
->      [SIFIVE_U_UART1] =    { 0x10023000,     0x1000 },
->      [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
-> @@ -78,7 +80,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      uint32_t *cells;
->      char *nodename;
->      char ethclk_names[] = "pclk\0hclk\0tx_clk";
-> -    uint32_t plic_phandle, ethclk_phandle, phandle = 1;
-> +    uint32_t plic_phandle, prci_phandle, ethclk_phandle, phandle = 1;
->      uint32_t uartclk_phandle;
->      uint32_t hfclk_phandle, rtcclk_phandle;
->
-> @@ -189,6 +191,21 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      g_free(cells);
->      g_free(nodename);
->
-> +    prci_phandle = phandle++;
-> +    nodename = g_strdup_printf("/soc/clock-controller@%lx",
-> +        (long)memmap[SIFIVE_U_PRCI].base);
-> +    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", prci_phandle);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "#clock-cells", 0x1);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "clocks",
-> +        hfclk_phandle, rtcclk_phandle);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> +        0x0, memmap[SIFIVE_U_PRCI].base,
-> +        0x0, memmap[SIFIVE_U_PRCI].size);
-> +    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> +        "sifive,fu540-c000-prci");
-> +    g_free(nodename);
+> diff --git a/configure b/configure
+> index 714e7fb6a1..44ee953022 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7596,14 +7596,14 @@ case "$target_name" in
+>      TARGET_BASE_ARCH=riscv
+>      TARGET_ABI_DIR=riscv
+>      mttcg=yes
+> -    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml"
+> +    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-32bit-csr.xml"
+>      target_compiler=$cross_cc_riscv32
+>    ;;
+>    riscv64)
+>      TARGET_BASE_ARCH=riscv
+>      TARGET_ABI_DIR=riscv
+>      mttcg=yes
+> -    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
+> +    gdb_xml_files="riscv-64bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
+>      target_compiler=$cross_cc_riscv64
+>    ;;
+>    sh4|sh4eb)
+> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+> index 27be93279b..89b2543c9d 100644
+> --- a/target/riscv/gdbstub.c
+> +++ b/target/riscv/gdbstub.c
+> @@ -303,19 +303,22 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+>  static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+> -        return gdb_get_reg64(mem_buf, env->fpr[n]);
+> +        if (env->misa & RVD) {
+> +            return gdb_get_reg64(mem_buf, env->fpr[n]);
+> +        }
+> +        return gdb_get_reg32(mem_buf, env->fpr[n]);
+>      /* there is hole between ft11 and fflags in fpu.xml */
+>      } else if (n < 36 && n > 32) {
+>          target_ulong val = 0;
+>          int result;
+>          /*
+> -         * CSR_FFLAGS is at index 8 in csr_register, and gdb says it is FP
+> -         * register 33, so we recalculate the map index.
+> +         * CSR_FFLAGS is at index 1 in the csr space, and gdb says it is FP
+> +         * register 33, so we recalculate the csr index.
+>           * This also works for CSR_FRM and CSR_FCSR.
+>           */
+> -        result = riscv_csrrw_debug(env, n - 33 +  8, &val, 0, 0);
+> +        result = riscv_csrrw_debug(env, n - 33 + CSR_FFLAGS, &val, 0, 0);
+>          if (result == 0) {
+> -            return gdb_get_regl(mem_buf, val);
+> +            return gdb_get_reg32(mem_buf, val);
+>          }
+>      }
+>      return 0;
+> @@ -324,20 +327,25 @@ static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+>  static int riscv_gdb_set_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+> -        env->fpr[n] = ldq_p(mem_buf); /* always 64-bit */
+> -        return sizeof(uint64_t);
+> +        if (env->misa & RVD) {
+> +            env->fpr[n] = ldq_p(mem_buf);
+> +            return sizeof(uint64_t);
+> +        } else {
+> +            env->fpr[n] = ldl_p(mem_buf);
+> +            return sizeof(uint32_t);
+> +        }
+>      /* there is hole between ft11 and fflags in fpu.xml */
+>      } else if (n < 36 && n > 32) {
+> -        target_ulong val = ldtul_p(mem_buf);
+> +        target_ulong val = ldl_p(mem_buf);
+>          int result;
+>          /*
+> -         * CSR_FFLAGS is at index 8 in csr_register, and gdb says it is FP
+> -         * register 33, so we recalculate the map index.
+> +         * CSR_FFLAGS is at index 1 in the csr space, and gdb says it is FP
+> +         * register 33, so we recalculate the csr index.
+>           * This also works for CSR_FRM and CSR_FCSR.
+>           */
+> -        result = riscv_csrrw_debug(env, n - 33 + 8, NULL, val, -1);
+> +        result = riscv_csrrw_debug(env, n - 33 + CSR_FFLAGS, NULL, val, -1);
+>          if (result == 0) {
+> -            return sizeof(target_ulong);
+> +            return sizeof(uint32_t);
+>          }
+>      }
+>      return 0;
+> @@ -375,20 +383,19 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+>  {
+>      RISCVCPU *cpu = RISCV_CPU(cs);
+>      CPURISCVState *env = &cpu->env;
+> -#if defined(TARGET_RISCV32)
+> -    if (env->misa & RVF) {
 > +
->      plic_phandle = phandle++;
->      cells =  g_new0(uint32_t, ms->smp.cpus * 4 - 2);
->      for (cpu = 0; cpu < ms->smp.cpus; cpu++) {
-> @@ -411,6 +428,8 @@ static void riscv_sifive_u_soc_init(Object *obj)
->                                  "cpu-type", &error_abort);
+> +    if (env->misa & RVD) {
+> +        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+> +                                 36, "riscv-64bit-fpu.xml", 0);
+> +    } else if (env->misa & RVF) {
+>          gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+>                                   36, "riscv-32bit-fpu.xml", 0);
 >      }
 >
-> +    sysbus_init_child_obj(obj, "prci", &s->prci, sizeof(s->prci),
-> +                          TYPE_SIFIVE_U_PRCI);
->      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
->                            TYPE_CADENCE_GEM);
->  }
-> @@ -484,6 +503,9 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
->          memmap[SIFIVE_U_CLINT].size, ms->smp.cpus,
->          SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
->
-> +    object_property_set_bool(OBJECT(&s->prci), true, "realized", &err);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].base);
-> +
->      for (i = 0; i < SIFIVE_U_PLIC_NUM_SOURCES; i++) {
->          plic_gpios[i] = qdev_get_gpio_in(DEVICE(s->plic), i);
->      }
-> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> index debbf28..2a023be 100644
-> --- a/include/hw/riscv/sifive_u.h
-> +++ b/include/hw/riscv/sifive_u.h
-> @@ -21,6 +21,7 @@
->
->  #include "hw/net/cadence_gem.h"
->  #include "hw/riscv/sifive_cpu.h"
-> +#include "hw/riscv/sifive_u_prci.h"
->
->  #define TYPE_RISCV_U_SOC "riscv.sifive.u.soc"
->  #define RISCV_U_SOC(obj) \
-> @@ -36,6 +37,7 @@ typedef struct SiFiveUSoCState {
->      RISCVHartArrayState e_cpus;
->      RISCVHartArrayState u_cpus;
->      DeviceState *plic;
-> +    SiFiveUPRCIState prci;
->      CadenceGEMState gem;
->  } SiFiveUSoCState;
->
-> @@ -54,6 +56,7 @@ enum {
->      SIFIVE_U_MROM,
->      SIFIVE_U_CLINT,
->      SIFIVE_U_PLIC,
-> +    SIFIVE_U_PRCI,
->      SIFIVE_U_UART0,
->      SIFIVE_U_UART1,
->      SIFIVE_U_DRAM,
+> +#if defined(TARGET_RISCV32)
+>      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+>                               4096, "riscv-32bit-csr.xml", 0);
+>  #elif defined(TARGET_RISCV64)
+> -    if (env->misa & RVF) {
+> -        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+> -                                 36, "riscv-64bit-fpu.xml", 0);
+> -    }
+> -
+>      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+>                               4096, "riscv-64bit-csr.xml", 0);
+>  #endif
 > --
-> 2.7.4
+> 2.20.1
 >
 >
 
