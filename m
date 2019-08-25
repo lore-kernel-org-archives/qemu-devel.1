@@ -2,94 +2,98 @@ Return-Path: <SRS0=aJdJ=WV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B46C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 17:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 231FDC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C3E7206DD
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 17:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0E422080C
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:06:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tMFPxPCV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C3E7206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jo+k0Eli"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E422080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1wVo-0005Z3-Nw
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 13:41:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44528)
+	id 1i1wu0-0000Os-4k
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 14:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i1wV6-0004yA-W7
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:40:25 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1wt1-0008DQ-Qo
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:05:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i1wV5-00041A-TQ
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:40:24 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40329)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1wt0-00008U-PX
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:05:07 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:40593)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i1wV5-00040p-M1
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:40:23 -0400
-Received: by mail-pl1-x644.google.com with SMTP id h3so8669957pls.7
- for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 10:40:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
+ (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+ id 1i1wt0-000083-JQ
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:05:06 -0400
+Received: by mail-qk1-x743.google.com with SMTP id s145so12384239qke.7
+ for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 11:05:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:subject:to:cc:references:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sAmuH0M5oHYHZHUYrS2Chduuiio5yOTZOGpIGOAhDtw=;
- b=tMFPxPCVq00sKYoVY30VHzUl3V6w2YXcvcPvYzN7b8YC6wMBCLijpJJPTgwYNeuI6b
- C1AzHjYEVeadaY3QtWKwdsBS4I7qPZEPam8QAHBcAsAmWLEGhV9go6NDRBSs5znApPka
- RqLFoHHQlI6OdR53iL2ucjYE3JbRnlbsdXlzPo1oi9o18VtHnyyc1aHQ2s43/AlGldWn
- ZcWiM68wvgR9t/2vvhoFM0Q2WPd7IGQXkvMNtUyYtwCzeQiLUHIClbIREI+Jin0dju6F
- GiAMHLuKy8NMfsgzKkOI3v/5hJlaJRnnzTE4cvAMsHcfLMX1Mstvz13Mqy3NsBHd/3zS
- ixTQ==
+ bh=tDyhTTuBsg53vKE3kmibA3LjJ66riONy6Tj7Z4yO/+s=;
+ b=jo+k0Eli969wOZz4tNYu+OaT0pJbBYuwt6GmFk6kdviHulCoPqLy3WK1XdLcGsF0x8
+ eDupUS7XqI4nKP/ZYjXc8BEk6Do44oKcmh4ZVCU5k874eNQ0rzmv1i09AR3kot0EB6p4
+ Ke/+UIFfW68IM6guMvU4b+dswLSvjpZVmHKYbnFDHeY8BoThrTVkRve5tmuh0S4PmMBX
+ PciW1dxl/aQ6ebrhLEKqV124TYdGrjCESk2NPrEgQADCxB8shuQGOUckFhJJl6DG6xjU
+ LXjtyJmGeaBBEppzBfPmaLYatCh65mL8Oq5NF1A0rLA2FveBWvyxtp19/0ze1eZzv8iP
+ whQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=sAmuH0M5oHYHZHUYrS2Chduuiio5yOTZOGpIGOAhDtw=;
- b=fMVEjaPD7M4LgMGWX241ywI9EYTTi9GPLABpIHdnkwGnSQZHjyjJoKbg1Jw9bdRnAE
- JZ9AwlGU79S2HpYMXLZ0kh3tnY93UGOW30WJwfo+Lv8nhuiKIHPGgzV6gxlDyRsC2UZ0
- W76q8hiVybxMzQlXP5pWBYtKnyJhuzaGxvuKhJ8Axt49G6WK3GeldLYLdU/nTudJSEho
- 3dzMPNuriswsOimx8ze9LwJbfBwAjvuCyoUUzzcUCtmucwbGa6b+Givi756FnJ26dm2/
- fy9NDnaz/TNpUawI9wunFZeLnToZWoNMaIi8i+ZmUAjoYJFMLmXgCQIR1JAhnc2tezdE
- IpvA==
-X-Gm-Message-State: APjAAAWz6S7TS0WAynqUUXDXnQjfQLQmSW3OjLYqTgWJYbau9dwJlXEr
- iyhu4bQ+dqK1rz56rp80nuUDaq9YEaY=
-X-Google-Smtp-Source: APXvYqyF53q6usO+m8ILgoXuDC4esKLV99hfAVFSjkOXoRbmxVHTOxOE1VProEWfFU7oX7mNWSV2ZQ==
-X-Received: by 2002:a17:902:650d:: with SMTP id
- b13mr14877928plk.90.1566754822279; 
- Sun, 25 Aug 2019 10:40:22 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id r23sm10222491pfg.10.2019.08.25.10.40.20
+ bh=tDyhTTuBsg53vKE3kmibA3LjJ66riONy6Tj7Z4yO/+s=;
+ b=FnQmkpYMX1uIXQHEWviG2XsThhNskD4UNqV5rDjcFbq7mDEx5fAY2ybpBZCfHY8lUp
+ aS5nvV9APriSC6NcV3I4u4XE3EoAxYDQRThhC2PTvyfvIVD1LD+ZSOt8l/9HKpvCsuEf
+ erQdQWj8g4g+6+ksi9hsG6tatu9CSs+gsu5lgdPbkD/S+h08hXwL5xhdn976yyuT23Ye
+ AjifK6YBNGYr9olp/2hb7G85hFtOdepv6lxy+rDehm8MXVEzkOXy1v8N8HBZFK7eygEk
+ 3lkvuxKWK4oTqEeF++9mgq6rSuc8q8a7ZmOfmP3o0zaYoBiwY1nnha0ZOC0zoZPS2QLm
+ SfQg==
+X-Gm-Message-State: APjAAAVbI/euLAv9YlhFDiAUGCOdRZz9szi9/dpXWtm6CQUwwxMEQ58B
+ tueeJg793NazCPC4U626sMU=
+X-Google-Smtp-Source: APXvYqwWmiuYSJElL7Zm7wNv9BuI4ZtcVjBZDkOlu4CJL+6d+ZinY3jYX3t5mMcoVw27NzC1nUWKgw==
+X-Received: by 2002:a37:649:: with SMTP id 70mr13198521qkg.208.1566756305728; 
+ Sun, 25 Aug 2019 11:05:05 -0700 (PDT)
+Received: from ?IPv6:fd00:835b:d940:d4fc::5?
+ (2a01-036c-0113-61b1-0000-0000-0000-0005.pool6.digikabel.hu.
+ [2a01:36c:113:61b1::5])
+ by smtp.googlemail.com with ESMTPSA id a67sm5483364qkb.15.2019.08.25.11.05.03
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 25 Aug 2019 10:40:21 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-36-richard.henderson@linaro.org>
- <CAFEAcA8JGUdM5v0MCb98Jw+iJNC+ZMD5SDrPVR0dHGgtMOdk6A@mail.gmail.com>
- <162644ea-ae46-576f-7dea-6696db364c68@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <136ef143-bc7e-815e-c3bb-ade24eab7d13@linaro.org>
-Date: Sun, 25 Aug 2019 10:40:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Sun, 25 Aug 2019 11:05:05 -0700 (PDT)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
+ <DirtY.iCE.hu@gmail.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190821084113.1840-1-kraxel@redhat.com>
+ <20190821084113.1840-8-kraxel@redhat.com>
+ <01aadba9669734bfde832a01bb62f7746a57f905.camel@redhat.com>
+Message-ID: <cc1b515e-de9b-8bb0-d1e1-94f038420853@gmail.com>
+Date: Sun, 25 Aug 2019 20:05:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <162644ea-ae46-576f-7dea-6696db364c68@linaro.org>
+In-Reply-To: <01aadba9669734bfde832a01bb62f7746a57f905.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH v2 35/68] target/arm: Convert CPS
- (privileged)
+X-Received-From: 2607:f8b0:4864:20::743
+Subject: Re: [Qemu-devel] [PULL 07/15] audio: audiodev= parameters no longer
+ optional when -audiodev present
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,30 +105,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Michael Walle <michael@walle.cc>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/25/19 10:28 AM, Richard Henderson wrote:
->> CPS shouldn't exist at all for M-profile, but the legacy decoder
->> got this wrong too, so we should put that on the todo list for
->> fixing later (along, maybe, with UNDEFing on some of the
->> unpredictable combinations of M/imod/etc for A profile?).
-> Fixing m-profile is just as easy as as commenting.
-> I'll leave a TODO for the unpredictable combinations.
+On 2019-08-25 11:44, Maxim Levitsky wrote:
+> On Wed, 2019-08-21 at 10:41 +0200, Gerd Hoffmann wrote:
+>> From: Kővágó, Zoltán <dirty.ice.hu@gmail.com>
+>>
+>> This means you should probably stop using -soundhw (as it doesn't allow
+>> you to specify any options) and add the device manually with -device.
+>> The exception is pcspk, it's currently not possible to manually add it.
+>> To use it with audiodev, use something like this:
+>>
+>>     -audiodev id=foo,... -global isa-pcspk.audiodev=foo -soundhw pcspk
+> 
+> Hi!
 
-There's also a missing check for ARMv6 here.
+Hi,
 
-That got added later, with the T16 decode.  I have just added the
-following to the T16 commit message:
+> There is one corner case this breaks.
+> In qemu 4.1.0, there is no way to specify audiodev for a sound device, specifying it
+> fails with error.
+> So some of my machines have audiodev (which is miles better that using old env variables)
+> but also have sound devices without audiodev reference since this wasn't supported.
+> 
+> 
+> In what will be qemu 4.2, you must specify it, thus this kind of breaks backward compatibility.
+> Maybe we can have audiodev reference optional for a version or two?
+> 
+> This is just a minor itch, as otherwise the sound improvements are really good. The days
+> of installing that old realtek driver are finally gone :-)
 
-    target/arm: Convert T16, Change processor state
+Hmm, this is what happens when you split a patch series.  We could
+either revert this patch, or alternatively turn the error messages into
+warnings about using deprecated behavior.
 
-    Add a check for ARMv6 in trans_CPS.  We had this correct in
-    the T16 path, but had previously forgotten the check on the
-    A32 and T32 paths.
+> Another thing I noted, that there is no way for pulseaudio audiodev to specify the 'client name',
+> it always shows up in pavucontrl as the socket path to the server. 
+> Thus if I added two PA audiodevs, I can't really distinguish between them.
+> The in|out.name= seems to specify the pulseaudio source/sink to connect to, which is not the same.
 
+We currently supply the constant "qemu" as a name to pa_stream_new.
+While it's still not ideal, shouldn't this end up as a client name in
+pulseaudio instead of a socket path?
 
-r~
+Regards,
+Zoltan
 
