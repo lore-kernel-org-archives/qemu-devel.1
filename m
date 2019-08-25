@@ -3,56 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 389CDC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 07:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5756C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 07:18:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1056220850
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 07:18:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1056220850
+	by mail.kernel.org (Postfix) with ESMTPS id 9AED420850
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 07:18:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AED420850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1mn3-0003Bp-5k
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 03:18:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60776)
+	id 1i1mnH-0003Qi-EW
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 03:18:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i1mkl-0001ei-Ib
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 03:15:56 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i1mkn-0001h6-KL
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 03:15:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i1mkk-0003yR-80
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 03:15:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37698)
+ (envelope-from <mlevitsk@redhat.com>) id 1i1mkm-0003zS-BZ
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 03:15:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i1mkh-0003wb-83; Sun, 25 Aug 2019 03:15:51 -0400
+ id 1i1mkj-0003xj-Ld; Sun, 25 Aug 2019 03:15:53 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 91A033083362;
- Sun, 25 Aug 2019 07:15:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EF8CB18C891F;
+ Sun, 25 Aug 2019 07:15:52 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5BFF119C6A;
- Sun, 25 Aug 2019 07:15:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ECC7419C6A;
+ Sun, 25 Aug 2019 07:15:50 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 25 Aug 2019 10:15:40 +0300
-Message-Id: <20190825071541.10389-2-mlevitsk@redhat.com>
+Date: Sun, 25 Aug 2019 10:15:41 +0300
+Message-Id: <20190825071541.10389-3-mlevitsk@redhat.com>
 In-Reply-To: <20190825071541.10389-1-mlevitsk@redhat.com>
 References: <20190825071541.10389-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Sun, 25 Aug 2019 07:15:50 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Sun, 25 Aug 2019 07:15:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/2] block/nvme: add support for write zeros
+Subject: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,96 +74,50 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- block/nvme.c         | 72 +++++++++++++++++++++++++++++++++++++++++++-
- block/trace-events   |  1 +
- include/block/nvme.h | 19 +++++++++++-
- 3 files changed, 90 insertions(+), 2 deletions(-)
+ block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+ block/trace-events |  2 ++
+ 2 files changed, 85 insertions(+)
 
 diff --git a/block/nvme.c b/block/nvme.c
-index 5be3a39b63..f8bd11e19a 100644
+index f8bd11e19a..dd041f39c9 100644
 --- a/block/nvme.c
 +++ b/block/nvme.c
-@@ -111,6 +111,8 @@ typedef struct {
-     uint64_t max_transfer;
+@@ -112,6 +112,7 @@ typedef struct {
      bool plugged;
  
-+    bool supports_write_zeros;
-+
+     bool supports_write_zeros;
++    bool supports_discard;
+ 
      CoMutex dma_map_lock;
      CoQueue dma_flush_queue;
+@@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
  
-@@ -421,6 +423,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     NvmeIdNs *idns;
-     NvmeLBAF *lbaf;
-     uint8_t *resp;
-+    uint16_t oncs;
-     int r;
-     uint64_t iova;
-     NvmeCmd cmd = {
-@@ -458,6 +461,9 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     s->max_transfer = MIN_NON_ZERO(s->max_transfer,
-                           s->page_size / sizeof(uint64_t) * s->page_size);
+     oncs = le16_to_cpu(idctrl->oncs);
+     s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
++    s->supports_discard = (oncs & NVME_ONCS_DSM) != 0;
  
-+    oncs = le16_to_cpu(idctrl->oncs);
-+    s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
-+
      memset(resp, 0, 4096);
  
-     cmd.cdw10 = 0;
-@@ -470,6 +476,12 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     s->nsze = le64_to_cpu(idns->nsze);
-     lbaf = &idns->lbaf[NVME_ID_NS_FLBAS_INDEX(idns->flbas)];
- 
-+    if (NVME_ID_NS_DLFEAT_WRITE_ZEROS(idns->dlfeat) &&
-+            NVME_ID_NS_DLFEAT_READ_BEHAVIOR(idns->dlfeat) ==
-+                    NVME_ID_NS_DLFEAT_READ_BEHAVIOR_ZEROS) {
-+        bs->supported_write_flags |= BDRV_REQ_MAY_UNMAP;
-+    }
-+
-     if (lbaf->ms) {
-         error_setg(errp, "Namespaces with metadata are not yet supported");
-         goto out;
-@@ -764,6 +776,8 @@ static int nvme_file_open(BlockDriverState *bs, QDict *options, int flags,
-     int ret;
-     BDRVNVMeState *s = bs->opaque;
- 
-+    bs->supported_write_flags = BDRV_REQ_FUA;
-+
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &error_abort);
-     device = qemu_opt_get(opts, NVME_BLOCK_OPT_DEVICE);
-@@ -792,7 +806,6 @@ static int nvme_file_open(BlockDriverState *bs, QDict *options, int flags,
-             goto fail;
-         }
-     }
--    bs->supported_write_flags = BDRV_REQ_FUA;
-     return 0;
- fail:
-     nvme_close(bs);
-@@ -1086,6 +1099,60 @@ static coroutine_fn int nvme_co_flush(BlockDriverState *bs)
+@@ -1153,6 +1155,86 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
  }
  
  
-+static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
-+                                              int64_t offset,
-+                                              int bytes,
-+                                              BdrvRequestFlags flags)
++static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
++                                         int64_t offset,
++                                         int bytes)
 +{
 +    BDRVNVMeState *s = bs->opaque;
 +    NVMeQueuePair *ioq = s->queues[1];
 +    NVMeRequest *req;
-+
-+    uint32_t cdw12 = ((bytes >> s->blkshift) - 1) & 0xFFFF;
-+
-+    if (!s->supports_write_zeros) {
-+        return -ENOTSUP;
-+    }
++    NvmeDsmRange *buf;
++    QEMUIOVector local_qiov;
++    int ret;
 +
 +    NvmeCmd cmd = {
-+        .opcode = NVME_CMD_WRITE_ZEROS,
++        .opcode = NVME_CMD_DSM,
 +        .nsid = cpu_to_le32(s->nsid),
-+        .cdw10 = cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
-+        .cdw11 = cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFFFFF),
++        .cdw10 = cpu_to_le32(0), /*number of ranges - 0 based*/
++        .cdw11 = cpu_to_le32(1 << 2), /*deallocate bit*/
 +    };
 +
 +    NVMeCoData data = {
@@ -171,20 +125,37 @@ index 5be3a39b63..f8bd11e19a 100644
 +        .ret = -EINPROGRESS,
 +    };
 +
-+    if (flags & BDRV_REQ_MAY_UNMAP) {
-+        cdw12 |= (1 << 25);
++    if (!s->supports_discard) {
++        return -ENOTSUP;
 +    }
 +
-+    if (flags & BDRV_REQ_FUA) {
-+        cdw12 |= (1 << 30);
-+    }
-+
-+    cmd.cdw12 = cpu_to_le32(cdw12);
-+
-+    trace_nvme_write_zeros(s, offset, bytes, flags);
 +    assert(s->nr_queues > 1);
++
++    buf = qemu_try_blockalign0(bs, s->page_size);
++    if (!buf) {
++        return -ENOMEM;
++    }
++
++    buf->nlb = cpu_to_le32(bytes >> s->blkshift);
++    buf->slba = cpu_to_le64(offset >> s->blkshift);
++    buf->cattr = 0;
++
++    qemu_iovec_init(&local_qiov, 1);
++    qemu_iovec_add(&local_qiov, buf, 4096);
++
 +    req = nvme_get_free_req(ioq);
 +    assert(req);
++
++    qemu_co_mutex_lock(&s->dma_map_lock);
++    ret = nvme_cmd_map_qiov(bs, &cmd, req, &local_qiov);
++    qemu_co_mutex_unlock(&s->dma_map_lock);
++
++    if (ret) {
++        req->busy = false;
++        goto out;
++    }
++
++    trace_nvme_dsm(s, offset, bytes);
 +
 +    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
 +
@@ -193,71 +164,48 @@ index 5be3a39b63..f8bd11e19a 100644
 +        qemu_coroutine_yield();
 +    }
 +
-+    trace_nvme_rw_done(s, true, offset, bytes, data.ret);
-+    return data.ret;
++    qemu_co_mutex_lock(&s->dma_map_lock);
++    ret = nvme_cmd_unmap_qiov(bs, &local_qiov);
++    qemu_co_mutex_unlock(&s->dma_map_lock);
++
++    if (ret) {
++        goto out;
++    }
++
++    ret = data.ret;
++    trace_nvme_dsm_done(s, offset, bytes, ret);
++out:
++    qemu_iovec_destroy(&local_qiov);
++    qemu_vfree(buf);
++    return ret;
++
 +}
 +
 +
  static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
                                 BlockReopenQueue *queue, Error **errp)
  {
-@@ -1190,6 +1257,9 @@ static BlockDriver bdrv_nvme = {
- 
-     .bdrv_co_preadv           = nvme_co_preadv,
+@@ -1259,6 +1341,7 @@ static BlockDriver bdrv_nvme = {
      .bdrv_co_pwritev          = nvme_co_pwritev,
-+
-+    .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
-+
+ 
+     .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
++    .bdrv_co_pdiscard         = nvme_co_pdiscard,
+ 
      .bdrv_co_flush_to_disk    = nvme_co_flush,
      .bdrv_reopen_prepare      = nvme_reopen_prepare,
- 
 diff --git a/block/trace-events b/block/trace-events
-index 04209f058d..8209fbd0c7 100644
+index 8209fbd0c7..7d1d48b502 100644
 --- a/block/trace-events
 +++ b/block/trace-events
-@@ -149,6 +149,7 @@ nvme_submit_command_raw(int c0, int c1, int c2, int c3, int c4, int c5, int c6,
- nvme_handle_event(void *s) "s %p"
- nvme_poll_cb(void *s) "s %p"
- nvme_prw_aligned(void *s, int is_write, uint64_t offset, uint64_t bytes, int flags, int niov) "s %p is_write %d offset %"PRId64" bytes %"PRId64" flags %d niov %d"
-+nvme_write_zeros(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p offset %"PRId64" bytes %"PRId64" flags %d"
+@@ -153,6 +153,8 @@ nvme_write_zeros(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p offs
  nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
  nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
  nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 3ec8efcc43..1f5b406344 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -653,12 +653,29 @@ typedef struct NvmeIdNs {
-     uint8_t     mc;
-     uint8_t     dpc;
-     uint8_t     dps;
--    uint8_t     res30[98];
-+
-+    uint8_t     nmic;
-+    uint8_t     rescap;
-+    uint8_t     fpi;
-+    uint8_t     dlfeat;
-+
-+    uint8_t     res30[94];
-     NvmeLBAF    lbaf[16];
-     uint8_t     res192[192];
-     uint8_t     vs[3712];
- } NvmeIdNs;
- 
-+
-+/*Deallocate Logical Block Features*/
-+#define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
-+#define NVME_ID_NS_DLFEAT_WRITE_ZEROS(dlfeat)     ((dlfeat) & 0x08)
-+
-+#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR(dlfeat)     ((dlfeat) & 0x7)
-+#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR_UNDEFINED   0
-+#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR_ZEROS       1
-+#define NVME_ID_NS_DLFEAT_READ_BEHAVIOR_ONES        2
-+
-+
- #define NVME_ID_NS_NSFEAT_THIN(nsfeat)      ((nsfeat & 0x1))
- #define NVME_ID_NS_FLBAS_EXTENDED(flbas)    ((flbas >> 4) & 0x1)
- #define NVME_ID_NS_FLBAS_INDEX(flbas)       ((flbas & 0xf))
++nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset %"PRId64" bytes %"PRId64""
++nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p offset %"PRId64" bytes %"PRId64" ret %d"
+ nvme_dma_map_flush(void *s) "s %p"
+ nvme_free_req_queue_wait(void *q) "q %p"
+ nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
 -- 
 2.17.2
 
