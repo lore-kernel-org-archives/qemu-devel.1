@@ -2,65 +2,77 @@ Return-Path: <SRS0=aJdJ=WV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BFB2C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA72C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:42:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 492B2206E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:20:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 492B2206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C9C5720874
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:42:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9C5720874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i20sc-00076b-Fn
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 18:20:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34880)
+	id 1i21De-000595-Vd
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 18:42:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i20rd-0006Vr-LN
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:19:59 -0400
+ (envelope-from <nsoffer@redhat.com>) id 1i21Cl-0004dR-PY
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:41:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i20rb-00035n-NT
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:19:57 -0400
-Resent-Date: Sun, 25 Aug 2019 18:19:57 -0400
-Resent-Message-Id: <E1i20rb-00035n-NT@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21502)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i20rb-00034f-FC; Sun, 25 Aug 2019 18:19:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1566771584; cv=none; d=zoho.com; s=zohoarc; 
- b=PAIxZxxpZpNUfzUAXSFDhDqsQZxBoafFo9B7bDv6iKCHKaNjzxFoBc3gcYfbsSnSRGZO0oo3vn+h8fdYrt9TTbhx1N6NwYdHC55quffCW60wbv+62AWnnoDjXWN7Yi+maKUAnHEoz4+0mbnw/CoNx/4vgk6gTxrfhwlsAPYe2ZE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1566771584;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=LyIL3IKXdkDw4jOIxpV0tFDbuTXFdasRohspHYF3DB0=; 
- b=OyKkkpHNKPS1Dv5JMlekr4xNbhzlHw+1kJleFwtoDp8k1ccAM6c+RYq24ay3H9dTX0UblgKfZA6ugIi3HlZlU2AcDq551HTmyjCKdA/kCLuxokWcLPHi6pEYrh81EQD796JV7g/racRBlJRWl1yI34USJoTTT6RjPVBmqsPbtuM=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1566771582969432.3965178464201;
- Sun, 25 Aug 2019 15:19:42 -0700 (PDT)
-In-Reply-To: <20190825220329.7942-1-nsoffer@redhat.com>
-Message-ID: <156677158162.8645.15907983806303488167@5dec9699b7de>
+ (envelope-from <nsoffer@redhat.com>) id 1i21Cj-00059n-RN
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:41:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60554)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1i21Cj-00059H-JE
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:41:45 -0400
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AB9644E924
+ for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 22:41:44 +0000 (UTC)
+Received: by mail-ot1-f71.google.com with SMTP id c1so9132830otb.22
+ for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 15:41:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DNngUipcs3GdQZaPHnj65qLdCql6atYI42AGYOnVIWA=;
+ b=CmY3EtQNlUcYEKjnnYo4ANUYnZ+nXBOL+ixxGKrAwrPeaGg4Tmmutwirxnl8Ovorn1
+ OAVnu00FhnZPvaZxBwzJZ8G87qKhiqD530ETMsZLzNZ36vvJPhwH3H7dRRDR+wkEXlEx
+ srZL7RMKsE6hAqahu6ccYbzD9oN9q25UdPQJnZAEBWm/IREXHDnN11Ny8Pk+9b7Dv19L
+ qdMRSWy8iEeGjM7xuff/wtFFxpYPWO1QuQQx7Vim+FxCKOQRvALzN2uMEwACJoQt78n/
+ gjWLRDnGX7MpSCGG0idWR6ljfEvQgAaifWd/ZvB25oc6/rNH9/P2WAt2qa2iRuF/4a8i
+ ZVyg==
+X-Gm-Message-State: APjAAAUvtdSVf+ycSLG9c9dBUn6a2R+G/MOwNnSZooFN444HAroCt/dS
+ c6PGbq+90LwMDIyOFyRjBj+u3IqfzjIZp/jEWAWKfVczSBNnylulF8F7WdhH3SphBuNDitndgbw
+ A4OPT94I6wgNw12/9wqQQR2lcowykEmo=
+X-Received: by 2002:aca:1714:: with SMTP id j20mr9604581oii.135.1566772904082; 
+ Sun, 25 Aug 2019 15:41:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxcF8u4Pmuak7hbw9YRQKEJk6UuqyBKAbzt0ofi6o+dc/o6iqGmdxpg8OxCApOVR3OApEuNaM1sms0ICA7phP0=
+X-Received: by 2002:aca:1714:: with SMTP id j20mr9604576oii.135.1566772903737; 
+ Sun, 25 Aug 2019 15:41:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: nirsof@gmail.com
-Date: Sun, 25 Aug 2019 15:19:42 -0700 (PDT)
-X-ZohoMailClient: External
+References: <20190825220329.7942-1-nsoffer@redhat.com>
+ <20190825220329.7942-3-nsoffer@redhat.com>
+In-Reply-To: <20190825220329.7942-3-nsoffer@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Mon, 26 Aug 2019 01:41:32 +0300
+Message-ID: <CAMRbyysOt2PDxvd4=mfs58sW+Hr7+pzzOjWVdzf_GREWT+8X5Q@mail.gmail.com>
+To: Nir Soffer <nirsof@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Optimize alignment probing
+X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: Test
+ allocate_first_block() with O_DIRECT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,155 +84,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgyNTIyMDMyOS43OTQy
-LTEtbnNvZmZlckByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAw
-LzJdIE9wdGltaXplIGFsaWdubWVudCBwcm9iaW5nCk1lc3NhZ2UtaWQ6IDIwMTkwODI1MjIwMzI5
-Ljc5NDItMS1uc29mZmVyQHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBk
-YXRlXSAgICAgIHBhdGNoZXcvMjAxOTA4MTkyMTM3NTUuMjYxNzUtMS1yaWNoYXJkLmhlbmRlcnNv
-bkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTA4MTkyMTM3NTUuMjYxNzUtMS1yaWNoYXJkLmhl
-bmRlcnNvbkBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxOTA4MjUy
-MjAzMjkuNzk0Mi0xLW5zb2ZmZXJAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwODI1MjIwMzI5
-Ljc5NDItMS1uc29mZmVyQHJlZGhhdC5jb20KU3VibW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8v
-Z2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0
-b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSBy
-ZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1vZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycg
-KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQg
-Zm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0
-cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
-L1NMT0YnClN1Ym1vZHVsZSAncm9tcy9lZGsyJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2Vk
-azIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2VkazInClN1Ym1vZHVsZSAncm9tcy9p
-cHhlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBw
-YXRoICdyb21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFl
-bXUub3JnL2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJp
-b3MnClN1Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9n
-aXQvb3BlbmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dh
-cmUnClN1Ym1vZHVsZSAncm9tcy9vcGVuc2JpJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29w
-ZW5zYmkuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5zYmknClN1Ym1vZHVsZSAn
-cm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVtdS1wYWxjb2Rl
-LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1Ym1vZHVsZSAn
-cm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MuZ2l0LykgcmVn
-aXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcy1o
-cHBhJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MtaHBwYS5naXQpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJwpTdWJtb2R1bGUgJ3JvbXMvc2dhYmlvcycg
-KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZ2FiaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
-aCAncm9tcy9zZ2FiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2tpYm9vdCcgKGh0dHBzOi8vZ2l0LnFl
-bXUub3JnL2dpdC9za2lib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9za2lib290
-JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9v
-dC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290JwpTdWJtb2R1bGUgJ3JvbXMv
-dS1ib290LXNhbTQ2MGV4JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC1zYW00NjBl
-eC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JwpTdWJtb2R1
-bGUgJ3NsaXJwJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2xpYnNsaXJwLmdpdCkgcmVnaXN0
-ZXJlZCBmb3IgcGF0aCAnc2xpcnAnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZs
-b2F0LTMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvYmVya2VsZXktc29mdGZsb2F0LTMuZ2l0
-KSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3Vi
-bW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0LnFlbXUu
-b3JnL2dpdC9iZXJrZWxleS10ZXN0ZmxvYXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rl
-c3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicg
-KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZv
-ciBwYXRoICd1aS9rZXljb2RlbWFwZGInCkNsb25pbmcgaW50byAnY2Fwc3RvbmUnLi4uClN1Ym1v
-ZHVsZSBwYXRoICdjYXBzdG9uZSc6IGNoZWNrZWQgb3V0ICcyMmVhZDNlMGJmZGI4NzUxNjY1NjQ1
-MzMzNjE2MGUwYTM3YjA2NmJmJwpDbG9uaW5nIGludG8gJ2R0YycuLi4KU3VibW9kdWxlIHBhdGgg
-J2R0Yyc6IGNoZWNrZWQgb3V0ICc4OGYxODkwOWRiNzMxYTYyNzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5
-NTM2JwpDbG9uaW5nIGludG8gJ3JvbXMvUWVtdU1hY0RyaXZlcnMnLi4uClN1Ym1vZHVsZSBwYXRo
-ICdyb21zL1FlbXVNYWNEcml2ZXJzJzogY2hlY2tlZCBvdXQgJzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3
-YjllYTg2OWRmMWMyZDljOGUyNjYnCkNsb25pbmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1
-bGUgcGF0aCAncm9tcy9TTE9GJzogY2hlY2tlZCBvdXQgJzdiZmU1ODRlMzIxOTQ2NzcxNjkyNzEx
-ZmY4M2FkMmI1ODUwZGFjYTcnCkNsb25pbmcgaW50byAncm9tcy9lZGsyJy4uLgpTdWJtb2R1bGUg
-cGF0aCAncm9tcy9lZGsyJzogY2hlY2tlZCBvdXQgJzIwZDJlNWExMjVlMzRmYzg1MDEwMjY2MTNh
-NzE1NDliMmExYTNlNTQnClN1Ym1vZHVsZSAnU29mdEZsb2F0JyAoaHR0cHM6Ly9naXRodWIuY29t
-L3VjYi1iYXIvYmVya2VsZXktc29mdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdB
-cm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1v
-ZHVsZSAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJyAoaHR0cHM6Ly9naXRo
-dWIuY29tL29wZW5zc2wvb3BlbnNzbCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnQ3J5cHRvUGtnL0xp
-YnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJwpDbG9uaW5nIGludG8gJ0FybVBrZy9MaWJyYXJ5L0Fy
-bVNvZnRGbG9hdExpYi9iZXJrZWxleS1zb2Z0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Jv
-bXMvZWRrMi9Bcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0
-LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAz
-NycKQ2xvbmluZyBpbnRvICdDcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9v
-cGVuc3NsJzogY2hlY2tlZCBvdXQgJzUwZWFhYzlmMzMzNzY2NzI1OWRlNzI1NDUxZjIwMWU3ODQ1
-OTk2ODcnClN1Ym1vZHVsZSAnYm9yaW5nc3NsJyAoaHR0cHM6Ly9ib3Jpbmdzc2wuZ29vZ2xlc291
-cmNlLmNvbS9ib3Jpbmdzc2wpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2JvcmluZ3NzbCcKU3VibW9k
-dWxlICdrcmI1JyAoaHR0cHM6Ly9naXRodWIuY29tL2tyYjUva3JiNSkgcmVnaXN0ZXJlZCBmb3Ig
-cGF0aCAna3JiNScKU3VibW9kdWxlICdweWNhLmNyeXB0b2dyYXBoeScgKGh0dHBzOi8vZ2l0aHVi
-LmNvbS9weWNhL2NyeXB0b2dyYXBoeS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3B5Y2EtY3J5
-cHRvZ3JhcGh5JwpDbG9uaW5nIGludG8gJ2JvcmluZ3NzbCcuLi4KU3VibW9kdWxlIHBhdGggJ3Jv
-bXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wvYm9yaW5nc3NsJzog
-Y2hlY2tlZCBvdXQgJzIwNzBmOGFkOTE1MWRjOGYzYTczYmZmYWExNDZiNWU2OTM3YTU4M2YnCkNs
-b25pbmcgaW50byAna3JiNScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cv
-TGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wva3JiNSc6IGNoZWNrZWQgb3V0ICdiOWFkNmM0OTUw
-NWM5NmEwODgzMjZiNjJhNTI1NjhlMzQ4NGYyMTY4JwpDbG9uaW5nIGludG8gJ3B5Y2EtY3J5cHRv
-Z3JhcGh5Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09w
-ZW5zc2xMaWIvb3BlbnNzbC9weWNhLWNyeXB0b2dyYXBoeSc6IGNoZWNrZWQgb3V0ICcwOTQwMzEw
-MGRlMmY2ZjFjZGQwZDQ4NGRjYjhlNjIwZjFjMzM1YzhmJwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4
-ZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvaXB4ZSc6IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3
-NmVhOWY3OTEzYTAxZjMzMWJlM2VlOTAxYmI2ZTE3JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmJp
-b3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5iaW9zJzogY2hlY2tlZCBvdXQgJ2M3OWUw
-ZWNiODRmNGYxZWUzZjczZjUyMTYyMmUyNjRlZGQxYmYxNzQnCkNsb25pbmcgaW50byAncm9tcy9v
-cGVuaGFja3dhcmUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5oYWNrd2FyZSc6IGNoZWNr
-ZWQgb3V0ICdjNTU5ZGE3YzhlZWM1ZTQ1ZWYxZjY3OTc4ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5n
-IGludG8gJ3JvbXMvb3BlbnNiaScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbnNiaSc6IGNo
-ZWNrZWQgb3V0ICdjZTIyOGVlMDkxOWRlYjk5NTcxOTJkNzIzZWVjYzhhYWFlMjY5N2M2JwpDbG9u
-aW5nIGludG8gJ3JvbXMvcWVtdS1wYWxjb2RlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9xZW11
-LXBhbGNvZGUnOiBjaGVja2VkIG91dCAnYmYwZTEzNjk4ODcyNDUwMTY0ZmE3MDQwZGEzNmE5NWQy
-ZDRiMzI2ZicKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdy
-b21zL3NlYWJpb3MnOiBjaGVja2VkIG91dCAnYTVjYWI1OGU5YTNmYjZlMTY4YWJhOTE5YzU2Njli
-ZWE0MDY1NzNiNCcKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3MtaHBwYScuLi4KU3VibW9kdWxl
-IHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJzogY2hlY2tlZCBvdXQgJzBmNGZlODQ2NTgxNjVlOTZj
-ZTM1ODcwZmQxOWZjNjM0ZTE4MmU3N2InCkNsb25pbmcgaW50byAncm9tcy9zZ2FiaW9zJy4uLgpT
-dWJtb2R1bGUgcGF0aCAncm9tcy9zZ2FiaW9zJzogY2hlY2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYz
-MjM3MzE4MWNmZjUwYTAwYjZjNGFjOTAxNWEnCkNsb25pbmcgaW50byAncm9tcy9za2lib290Jy4u
-LgpTdWJtb2R1bGUgcGF0aCAncm9tcy9za2lib290JzogY2hlY2tlZCBvdXQgJzI2MWNhOGU3Nzll
-NTEzODg2OWE0NWYxNzRjYWE0OWJlNmEyNzQ1MDEnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3Qn
-Li4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdCc6IGNoZWNrZWQgb3V0ICdkMzY4OTI2N2Y5
-MmM1OTU2ZTA5Y2M3ZDFiYWE0NzAwMTQxNjYyYmZmJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290
-LXNhbTQ2MGV4Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnOiBjaGVj
-a2VkIG91dCAnNjBiMzkxNmYzM2U2MTdhODE1OTczYzVhNmRmNzcwNTViMmUzYTU4OCcKQ2xvbmlu
-ZyBpbnRvICdzbGlycCcuLi4KU3VibW9kdWxlIHBhdGggJ3NsaXJwJzogY2hlY2tlZCBvdXQgJzEy
-NmMwNGFjYmFiZDdhZDMyYzJiMDE4ZmUxMGRmYWMyYTNiYzEyMTAnCkNsb25pbmcgaW50byAndGVz
-dHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9i
-ZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdiNjRhZjQxYzMyNzZmOTdmMGUxODE5
-MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3Rm
-bG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMn
-OiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFhMTdmZDkyNGFlZDRmZWM0MTZiMycK
-Q2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFwZGInLi4uClN1Ym1vZHVsZSBwYXRoICd1aS9rZXlj
-b2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUyYjY0NzJlYjcxODlkMzIyMDU1MjI4MGVm
-M2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjYjdmYmFiIGlvdGVzdHM6
-IFRlc3QgYWxsb2NhdGVfZmlyc3RfYmxvY2soKSB3aXRoIE9fRElSRUNUCmIwN2FlMGYgYmxvY2s6
-IHBvc2l4OiBBbHdheXMgYWxsb2NhdGUgdGhlIGZpcnN0IGJsb2NrCgo9PT0gT1VUUFVUIEJFR0lO
-ID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IGIwN2FlMGZmYjVhYiAoYmxvY2s6IHBvc2l4OiBBbHdh
-eXMgYWxsb2NhdGUgdGhlIGZpcnN0IGJsb2NrKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMjM6IApyZW5h
-bWUgZnJvbSB0ZXN0cy9xZW11LWlvdGVzdHMvMTUwLm91dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8yIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCjIvMiBDaGVja2luZyBjb21taXQgY2I3ZmJhYjM2NzQ0IChpb3Rlc3RzOiBUZXN0IGFs
-bG9jYXRlX2ZpcnN0X2Jsb2NrKCkgd2l0aCBPX0RJUkVDVCkKRVJST1I6IE1pc3NpbmcgU2lnbmVk
-LW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0OSBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAyLzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwODI1MjIwMzI5Ljc5
-NDItMS1uc29mZmVyQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On Mon, Aug 26, 2019 at 1:03 AM Nir Soffer <nirsof@gmail.com> wrote:
 
+> Using block_resize we can test allocate_first_block() with file
+> descriptor opened with O_DIRECT, ensuring that it works for any size
+> larger than 4096 bytes.
+>
+> Testing smaller sizes is tricky as the result depends on the filesystem
+> used for testing. For example on NFS any size will work since O_DIRECT
+> does not require any alignment.
+>
 
+Forgot to add:
+
+Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+
+---
+>  tests/qemu-iotests/175     | 25 +++++++++++++++++++++++++
+>  tests/qemu-iotests/175.out |  8 ++++++++
+>  2 files changed, 33 insertions(+)
+>
+> diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+> index d54cb43c39..60cc251eb2 100755
+> --- a/tests/qemu-iotests/175
+> +++ b/tests/qemu-iotests/175
+> @@ -49,6 +49,23 @@ _filter_blocks()
+>          -e "s/blocks=$((extra_blocks + img_size /
+> 512))\\(\$\\|[^0-9]\\)/max allocation/"
+>  }
+>
+> +# Resize image using block_resize.
+> +# Parameter 1: image path
+> +# Parameter 2: new size
+> +_block_resize()
+> +{
+> +    local path=$1
+> +    local size=$2
+> +
+> +    $QEMU -qmp stdio -nographic -nodefaults \
+> +        -blockdev file,node-name=file,filename=$path,cache.direct=on \
+> +        <<EOF
+> +{'execute': 'qmp_capabilities'}
+> +{'execute': 'block_resize', 'arguments': {'node-name': 'file', 'size':
+> $size}}
+> +{'execute': 'quit'}
+> +EOF
+> +}
+> +
+>  # get standard environment, filters and checks
+>  . ./common.rc
+>  . ./common.filter
+> @@ -79,6 +96,14 @@ for mode in off full falloc; do
+>      stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks
+> $min_blocks $size
+>  done
+>
+> +for new_size in 4096 1048576; do
+> +    echo
+> +    echo "== resize empty image with block_resize =="
+> +    _make_test_img 0 | _filter_imgfmt
+> +    _block_resize $TEST_IMG $new_size >/dev/null
+> +    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks
+> $min_blocks $new_size
+> +done
+> +
+>  # success, all done
+>  echo "*** done"
+>  rm -f $seq.full
+> diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+> index 263e521262..39c2ee0f62 100644
+> --- a/tests/qemu-iotests/175.out
+> +++ b/tests/qemu-iotests/175.out
+> @@ -15,4 +15,12 @@ size=1048576, max allocation
+>  == creating image with preallocation falloc ==
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+> preallocation=falloc
+>  size=1048576, max allocation
+> +
+> +== resize empty image with block_resize ==
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
+> +size=4096, min allocation
+> +
+> +== resize empty image with block_resize ==
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
+> +size=1048576, min allocation
+>   *** done
+> --
+> 2.20.1
+>
+>
