@@ -2,87 +2,65 @@ Return-Path: <SRS0=aJdJ=WV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E842C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA68CC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:16:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26A46206E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:07:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFxo3CNv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26A46206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9CDD5206E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 22:16:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CDD5206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i20fU-0001sG-B2
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 18:07:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33146)
+	id 1i20oE-0003kG-S9
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 18:16:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nirsof@gmail.com>) id 1i20br-000722-Ff
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:03:42 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i20nU-0003L2-Ha
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nirsof@gmail.com>) id 1i20bq-0003u4-Fd
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:03:39 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40183)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nirsof@gmail.com>)
- id 1i20bq-0003tb-A5; Sun, 25 Aug 2019 18:03:38 -0400
-Received: by mail-wr1-x443.google.com with SMTP id c3so13436755wrd.7;
- Sun, 25 Aug 2019 15:03:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=GCTJEvAcTs97QcMqmmV3RVLZe4+hEjGIEVsWARwdvjo=;
- b=TFxo3CNv+GaDrjjYbPEa6y0HqS21PvOQh4NshegA9coF6sxxrctWZJX880GBm1uO1V
- Q0GNojZ4d5LkJn4iObqhPJSlQ2EihbdZOCY8q/M2P6tdYiohoK9dEZlTn8XUXOO6qnJB
- TJQmcsT3TO51c+lHU9OaM7vfLlihGcGwO8QZZNZZv1+SDZ1HVyMdw7nMem41Uqt9GQta
- Y7sx8W/hPz1P3pdjoNc8RpI/9cOuU8TFbrt5yZPJdL+vU9bBlUuFtOyosMqS6X/oJX0l
- PEyXHYfiY/VHxaXlAIPuPNBYTTSIPu06ASlIIY657MZtJGUaXAcpRuhFjF+0w3o2ua/J
- G60w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=GCTJEvAcTs97QcMqmmV3RVLZe4+hEjGIEVsWARwdvjo=;
- b=Q1diSicXm/SlbxGLoX4vSbIfb0alhhtro/hO12tqHKyB/KXXzA/H4ZL4RGF8dDpaUC
- SpnhdWCNIvPJGrBpoJWXIq5KDay8z+bO7UqZALYPxiatYXZ7tl05IIqK3fp9Mw3kuWGe
- TJXGwqbLSkLyviJQHzW9jBOPgpIsroLNDkExNYOtoAZeHSOLwr0lVKXQf/oV8UjakTnB
- 2DsgX+WDWcTQiAv8AHskRaFeFdbMIqASy20HAxOaerEf4oUSBIMZlFJaANlI3pAy2hP/
- pnam7i7P/Fq52o+hPZ5GhWL8txXix/KtXKO5sD7XeACaBv/6+Btu0Sh0TuwQ9RKQs0dQ
- hRPQ==
-X-Gm-Message-State: APjAAAUm0D75QCw+l10leguvhbbEWgoO5cZfn21HBdh4rsbTNgfP3Qp+
- nhxFtQys5jO4oRaZNuPt5OzBfhl+MqM=
-X-Google-Smtp-Source: APXvYqzTt/LmZ4UFudmBg0nx+z5gn62EHGdOwGaewuez6CPcUqPmg8ZFD/71SxnVTk+gef4wbSh5tw==
-X-Received: by 2002:a5d:568e:: with SMTP id f14mr17913867wrv.167.1566770616356; 
- Sun, 25 Aug 2019 15:03:36 -0700 (PDT)
-Received: from localhost.localdomain (93-173-200-237.bb.netvision.net.il.
- [93.173.200.237])
- by smtp.gmail.com with ESMTPSA id f134sm17578257wmg.20.2019.08.25.15.03.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 25 Aug 2019 15:03:35 -0700 (PDT)
-From: Nir Soffer <nirsof@gmail.com>
-X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 26 Aug 2019 01:03:29 +0300
-Message-Id: <20190825220329.7942-3-nsoffer@redhat.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190825220329.7942-1-nsoffer@redhat.com>
-References: <20190825220329.7942-1-nsoffer@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH v2 2/2] iotests: Test allocate_first_block()
- with O_DIRECT
+ (envelope-from <mlevitsk@redhat.com>) id 1i20nT-00018P-10
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:15:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44532)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1i20nS-00017o-QF
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 18:15:38 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7867B59451;
+ Sun, 25 Aug 2019 22:15:37 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E4B41001B13;
+ Sun, 25 Aug 2019 22:15:32 +0000 (UTC)
+Message-ID: <813e5200e860b3615e5e827bb3a761b503ef1702.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: =?UTF-8?Q?Zolt=C3=A1n_K=C5=91v=C3=A1g=C3=B3?= <dirty.ice.hu@gmail.com>, 
+ Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Date: Mon, 26 Aug 2019 01:15:31 +0300
+In-Reply-To: <cc1b515e-de9b-8bb0-d1e1-94f038420853@gmail.com>
+References: <20190821084113.1840-1-kraxel@redhat.com>
+ <20190821084113.1840-8-kraxel@redhat.com>
+ <01aadba9669734bfde832a01bb62f7746a57f905.camel@redhat.com>
+ <cc1b515e-de9b-8bb0-d1e1-94f038420853@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Sun, 25 Aug 2019 22:15:37 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 07/15] audio: audiodev= parameters no longer
+ optional when -audiodev present
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,85 +72,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Michael Walle <michael@walle.cc>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using block_resize we can test allocate_first_block() with file
-descriptor opened with O_DIRECT, ensuring that it works for any size
-larger than 4096 bytes.
+On Sun, 2019-08-25 at 20:05 +0200, Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3 wrot=
+e:
+> On 2019-08-25 11:44, Maxim Levitsky wrote:
+> > On Wed, 2019-08-21 at 10:41 +0200, Gerd Hoffmann wrote:
+> > > From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
+> > >=20
+> > > This means you should probably stop using -soundhw (as it doesn't a=
+llow
+> > > you to specify any options) and add the device manually with -devic=
+e.
+> > > The exception is pcspk, it's currently not possible to manually add=
+ it.
+> > > To use it with audiodev, use something like this:
+> > >=20
+> > >     -audiodev id=3Dfoo,... -global isa-pcspk.audiodev=3Dfoo -soundh=
+w pcspk
+> >=20
+> > Hi!
+>=20
+> Hi,
+>=20
+> > There is one corner case this breaks.
+> > In qemu 4.1.0, there is no way to specify audiodev for a sound device=
+, specifying it
+> > fails with error.
+> > So some of my machines have audiodev (which is miles better that usin=
+g old env variables)
+> > but also have sound devices without audiodev reference since this was=
+n't supported.
+> >=20
+> >=20
+> > In what will be qemu 4.2, you must specify it, thus this kind of brea=
+ks backward compatibility.
+> > Maybe we can have audiodev reference optional for a version or two?
+> >=20
+> > This is just a minor itch, as otherwise the sound improvements are re=
+ally good. The days
+> > of installing that old realtek driver are finally gone :-)
+>=20
+> Hmm, this is what happens when you split a patch series.  We could
+> either revert this patch, or alternatively turn the error messages into
+> warnings about using deprecated behavior.
+Warning would be great in this case!
+>=20
+> > Another thing I noted, that there is no way for pulseaudio audiodev t=
+o specify the 'client name',
+> > it always shows up in pavucontrl as the socket path to the server.=20
+> > Thus if I added two PA audiodevs, I can't really distinguish between =
+them.
+> > The in|out.name=3D seems to specify the pulseaudio source/sink to con=
+nect to, which is not the same.
+>=20
+> We currently supply the constant "qemu" as a name to pa_stream_new.
+> While it's still not ideal, shouldn't this end up as a client name in
+> pulseaudio instead of a socket path?
 
-Testing smaller sizes is tricky as the result depends on the filesystem
-used for testing. For example on NFS any size will work since O_DIRECT
-does not require any alignment.
----
- tests/qemu-iotests/175     | 25 +++++++++++++++++++++++++
- tests/qemu-iotests/175.out |  8 ++++++++
- 2 files changed, 33 insertions(+)
+Actually it seems that pulseaudio has two names supplied for each stream
+Maybe stream name and application name?
 
-diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-index d54cb43c39..60cc251eb2 100755
---- a/tests/qemu-iotests/175
-+++ b/tests/qemu-iotests/175
-@@ -49,6 +49,23 @@ _filter_blocks()
-         -e "s/blocks=$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\\)/max allocation/"
- }
- 
-+# Resize image using block_resize.
-+# Parameter 1: image path
-+# Parameter 2: new size
-+_block_resize()
-+{
-+    local path=$1
-+    local size=$2
-+
-+    $QEMU -qmp stdio -nographic -nodefaults \
-+        -blockdev file,node-name=file,filename=$path,cache.direct=on \
-+        <<EOF
-+{'execute': 'qmp_capabilities'}
-+{'execute': 'block_resize', 'arguments': {'node-name': 'file', 'size': $size}}
-+{'execute': 'quit'}
-+EOF
-+}
-+
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-@@ -79,6 +96,14 @@ for mode in off full falloc; do
-     stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $min_blocks $size
- done
- 
-+for new_size in 4096 1048576; do
-+    echo
-+    echo "== resize empty image with block_resize =="
-+    _make_test_img 0 | _filter_imgfmt
-+    _block_resize $TEST_IMG $new_size >/dev/null
-+    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $min_blocks $new_size
-+done
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
-index 263e521262..39c2ee0f62 100644
---- a/tests/qemu-iotests/175.out
-+++ b/tests/qemu-iotests/175.out
-@@ -15,4 +15,12 @@ size=1048576, max allocation
- == creating image with preallocation falloc ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=falloc
- size=1048576, max allocation
-+
-+== resize empty image with block_resize ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
-+size=4096, min allocation
-+
-+== resize empty image with block_resize ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
-+size=1048576, min allocation
-  *** done
--- 
-2.20.1
+This is how chromium playback looks versus qemu in pavucontrol and in gno=
+me volume control.
+
+https://imgur.com/a/I8HZhgx
+
+I do notice that 'qemu' now, in pavucontrol though.
+
+Best regards,
+	Maxim Levitsky
+
+>=20
+> Regards,
+> Zoltan
+
 
 
