@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74AEC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C20C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7D8820578
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:48:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00DEF206BA
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:49:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bWhdW2KH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7D8820578
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QcuzilRI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00DEF206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1xZ1-0002t4-El
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 14:48:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57675)
+	id 1i1xaF-00047u-K4
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 14:49:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57706)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXD-000173-9Q
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:40 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXG-0001BK-D5
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXB-0004ls-WF
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:39 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:41077)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXF-0004ng-6J
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:42 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:42397)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i1xXB-0004le-QE
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:37 -0400
-Received: by mail-qk1-x744.google.com with SMTP id g17so12419561qkk.8
- for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 11:46:37 -0700 (PDT)
+ id 1i1xXF-0004nV-1z
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:41 -0400
+Received: by mail-qk1-x743.google.com with SMTP id 201so12427582qkm.9
+ for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 11:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PqX725hKCd4GeXhxOFH/ioUfY3G+VFIRBEoc8xqQdTs=;
- b=bWhdW2KHZwxxmcOF2ZqPqFMzqzJBWvfXuzpB65vIahvU4T9qnwAeyOI7FqtQwCcXYs
- zO1KNuhyMCYgjDiVsnMoQKjt1hoxdTVAFePeezGLi97i1Dnv4y2lELSdZ4e/JD5rN37I
- fdRH2O2BeXiIdps8iltSsWWF+nd/p8iGntKPbgCL+8nFPIpPzK68IW/QuLPuZ6JghVGT
- xMNMZIxd2WaDmcr4ROY02mzCTYhw2eZIE/oPcafOPRVpmka9Pi1wSO+F4YjGPGd4mEVb
- gkYsE/5wdTt4vWcPs8fQBJqMZT63RVypreGbxjq5qqNDskaCthKp2F5eSU2SdT2hfY/3
- CbFQ==
+ bh=cz79XjdkmViVpdk1H7R3zTMM+q7tgUGQ9sdBd1DrXRo=;
+ b=QcuzilRIE/pH6kRXpxc2nxhJBJWV2PBVN7j1LjVjLeYrSlioi8R6xm3/hC0310PPeb
+ k8uzCLp8HDok/J8k28IKGGouqKa+EcHiX7RL8CwaL8bxrMhCWW18M6Q5qOTrOssn25LJ
+ mVH+QtoqT/c8gbtiQeYTChnhIoQ9qbu10/mpIGhENBRE/jVs0toXrMzJaKuzEYZ4jOyy
+ 1mZ8y428PcdYrWdFQ7suZE8uJUo+Pv2VJ01IdYrDWdGnHysJUOqZieJ/vnud64ifLnHE
+ ZF0tcHf8ZoqCfY3KwumpU1jjDzTvtdN0YCcB+vIU/o+FxLv18koOW/oH4vPtk6DRc2sS
+ xm/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PqX725hKCd4GeXhxOFH/ioUfY3G+VFIRBEoc8xqQdTs=;
- b=uWtzDh4UTohraFqT42i6zFd34oEoZUGMwRPYoXUKTVu6r4oULrkzITMkhYWIBom/sx
- +Iw9Iiqs7fKEB94twjN87RQptEpvOhTmGtzscluaqew7m9A5cByTgIJtDxhS4TkiLQ/i
- IhmbPvBJwMYGiy6BlPABPg4zH+4XwljOuJAykGXTLG6dmZg0RLm5VJCA1bKBqbDH+Mc4
- U9bsYTfRTRImRYl87FaZbNqdgcyumaH86vOu7qVu+gQ4ChhsMWBrZrsGHDW8pMS+d9LE
- gDA5jVC9NBtnZw6PZQ5bnaFfXnbAYfk7hvXTzrpn5daUPdikOhnWGNGNYEk5dI6kGl8n
- bk7Q==
-X-Gm-Message-State: APjAAAXbtkxiftkhUkYy9WQHaSHn3FMwShIWDpjs7bsbzOGJBeSQJ0yx
- oYowRlhLeAZBWnvJo4AUDk6JCM8zBuw=
-X-Google-Smtp-Source: APXvYqz/v5ybJQH+ColdfuqBbsbec9ZIoI2ARZnBJNWE4wOxFxMALn9R0lslgVT9ANA/Y6rC/0HL5g==
-X-Received: by 2002:a05:620a:15e5:: with SMTP id
- p5mr13545974qkm.409.1566758797231; 
- Sun, 25 Aug 2019 11:46:37 -0700 (PDT)
+ bh=cz79XjdkmViVpdk1H7R3zTMM+q7tgUGQ9sdBd1DrXRo=;
+ b=DM8d+FgV5NsjOxDjU49c2TWqz//giFY0pPefcUf110yBPMKYJHcdPylUhCHStDSJeS
+ ppZ5KV+bkEnxwq3MtpUf8A5yEH9gLuFrgk4bwr46lnq/nJGYxpBdr+ikm7kH/Bv709L+
+ GT/7keK8QnH6pQcDUOuQHRsrRPwnYoVIKrwzENrEDj0D+lt/SG4vQN4nSCGdNYgjHO7p
+ TMt6TtllLGWgTtlHBZzcUGi7ZFU6sWLWEzqtbURMzWEAX+P5pxKg1R7G85NYU6NrajXm
+ YMgcnM8uKPV5cs0t3qDB5vztBZY2zsv4w8czgjxx3V2aRo5JWuIDLCqlA/JF+uHBoZJE
+ OqCQ==
+X-Gm-Message-State: APjAAAVXvR2RF6dgJCVbmaUWvpCE75zMFLF97oohdupugtZAcHddN/+c
+ IjbjyeakUX+PqS6tTRUt09ITdp/hALA=
+X-Google-Smtp-Source: APXvYqyF+NSlXzCQZvZZO/29FPVRg4wVW85zDGPu/mbniFJWpzh/N7BIc14l4BPeCCS3q5/2ip6LSw==
+X-Received: by 2002:a05:620a:68b:: with SMTP id
+ f11mr7666240qkh.339.1566758800536; 
+ Sun, 25 Aug 2019 11:46:40 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-61b1-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:61b1::5])
- by smtp.gmail.com with ESMTPSA id d3sm5348870qtq.32.2019.08.25.11.46.36
+ by smtp.gmail.com with ESMTPSA id d3sm5348870qtq.32.2019.08.25.11.46.39
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 25 Aug 2019 11:46:36 -0700 (PDT)
+ Sun, 25 Aug 2019 11:46:40 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 25 Aug 2019 20:46:07 +0200
-Message-Id: <723371f5ccd5a2a58fc1fa9a375d6c508bebcc19.1566755452.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 25 Aug 2019 20:46:10 +0200
+Message-Id: <dcff895661435b76f4159d3547b60e6c08cb777c.1566755452.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
@@ -87,8 +87,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::744
-Subject: [Qemu-devel] [PATCH 05/25] noaudio: port to the new audio backend
+X-Received-From: 2607:f8b0:4864:20::743
+Subject: [Qemu-devel] [PATCH 08/25] sdlaudio: port to the new audio backend
  api
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,90 +108,133 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/noaudio.c | 39 +++++++++++++++------------------------
- 1 file changed, 15 insertions(+), 24 deletions(-)
+ audio/sdlaudio.c | 87 +++++++++++++++++++++++-------------------------
+ 1 file changed, 42 insertions(+), 45 deletions(-)
 
-diff --git a/audio/noaudio.c b/audio/noaudio.c
-index 0fb2629cf2..b054fd225b 100644
---- a/audio/noaudio.c
-+++ b/audio/noaudio.c
-@@ -41,10 +41,9 @@ typedef struct NoVoiceIn {
-     int64_t old_ticks;
- } NoVoiceIn;
+diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+index 14b11f0335..f7ac8cd101 100644
+--- a/audio/sdlaudio.c
++++ b/audio/sdlaudio.c
+@@ -41,8 +41,6 @@
  
--static size_t no_run_out(HWVoiceOut *hw, size_t live)
-+static size_t no_write(HWVoiceOut *hw, void *buf, size_t len)
- {
-     NoVoiceOut *no = (NoVoiceOut *) hw;
--    size_t decr, samples;
-     int64_t now;
-     int64_t ticks;
-     int64_t bytes;
-@@ -52,13 +51,9 @@ static size_t no_run_out(HWVoiceOut *hw, size_t live)
-     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     ticks = now - no->old_ticks;
-     bytes = muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
--    bytes = MIN(bytes, SIZE_MAX);
--    samples = bytes >> hw->info.shift;
+ typedef struct SDLVoiceOut {
+     HWVoiceOut hw;
+-    size_t live;
+-    size_t decr;
+ } SDLVoiceOut;
  
-     no->old_ticks = now;
--    decr = MIN (live, samples);
--    hw->rpos = (hw->rpos + decr) % hw->samples;
--    return decr;
-+    return MIN(len, bytes);
- }
+ static struct SDLAudioState {
+@@ -184,62 +182,59 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+     SDLVoiceOut *sdl = opaque;
+     SDLAudioState *s = &glob_sdl;
+     HWVoiceOut *hw = &sdl->hw;
+-    size_t samples = len >> hw->info.shift;
+-    size_t to_mix, decr;
  
- static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque)
-@@ -92,25 +87,21 @@ static void no_fini_in (HWVoiceIn *hw)
-     (void) hw;
- }
+-    if (s->exit || !sdl->live) {
++    if (s->exit) {
+         return;
+     }
  
--static size_t no_run_in(HWVoiceIn *hw)
-+static size_t no_read(HWVoiceIn *hw, void *buf, size_t size)
- {
-+    size_t to_clear;
-     NoVoiceIn *no = (NoVoiceIn *) hw;
--    size_t live = audio_pcm_hw_get_live_in(hw);
--    size_t dead = hw->samples - live;
--    size_t samples = 0;
+     /* dolog ("in callback samples=%zu live=%zu\n", samples, sdl->live); */
  
--    if (dead) {
--        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--        int64_t ticks = now - no->old_ticks;
--        int64_t bytes =
--            muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
-+    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    int64_t ticks = now - no->old_ticks;
-+    int64_t bytes =
-+        muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
- 
--        no->old_ticks = now;
--        bytes = MIN (bytes, SIZE_MAX);
--        samples = bytes >> hw->info.shift;
--        samples = MIN (samples, dead);
--    }
--    return samples;
-+    no->old_ticks = now;
-+    to_clear = MIN(bytes, size);
+-    to_mix = MIN(samples, sdl->live);
+-    decr = to_mix;
+-    while (to_mix) {
+-        size_t chunk = MIN(to_mix, hw->samples - hw->rpos);
+-        struct st_sample *src = hw->mix_buf + hw->rpos;
+-
+-        /* dolog ("in callback to_mix %zu, chunk %zu\n", to_mix, chunk); */
+-        hw->clip(buf, src, chunk);
+-        hw->rpos = (hw->rpos + chunk) % hw->samples;
+-        to_mix -= chunk;
+-        buf += chunk << hw->info.shift;
++    while (hw->pending_emul && len) {
++        size_t write_len;
++        ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
++        if (start < 0) {
++            start += hw->size_emul;
++        }
++        assert(start >= 0 && start < hw->size_emul);
 +
-+    audio_pcm_info_clear_buf(&hw->info, buf, to_clear >> hw->info.shift);
-+    return to_clear;
++        write_len = MIN(MIN(hw->pending_emul, len),
++                        hw->size_emul - start);
++
++        memcpy(buf, hw->buf_emul + start, write_len);
++        hw->pending_emul -= write_len;
++        len -= write_len;
++        buf += write_len;
+     }
+-    samples -= decr;
+-    sdl->live -= decr;
+-    sdl->decr += decr;
+-
+-    /* dolog ("done len=%zu\n", len); */
+ 
+-    /* SDL2 does not clear the remaining buffer for us, so do it on our own */
+-    if (samples) {
+-        memset(buf, 0, samples << hw->info.shift);
++    /* clear remaining buffer that we couldn't fill with data */
++    if (len) {
++        memset(buf, 0, len);
+     }
  }
  
- static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
-@@ -133,12 +124,12 @@ static void no_audio_fini (void *opaque)
- static struct audio_pcm_ops no_pcm_ops = {
-     .init_out = no_init_out,
-     .fini_out = no_fini_out,
--    .run_out  = no_run_out,
-+    .write    = no_write,
-     .ctl_out  = no_ctl_out,
+-static size_t sdl_run_out(HWVoiceOut *hw, size_t live)
+-{
+-    size_t decr;
+-    SDLVoiceOut *sdl = (SDLVoiceOut *) hw;
+-
+-    SDL_LockAudio();
+-
+-    if (sdl->decr > live) {
+-        ldebug ("sdl->decr %d live %d sdl->live %d\n",
+-                sdl->decr,
+-                live,
+-                sdl->live);
++#define SDL_WRAPPER_FUNC(name, ret_type, args_decl, args, fail, unlock) \
++    static ret_type glue(sdl_, name)args_decl                           \
++    {                                                                   \
++        ret_type ret;                                                   \
++                                                                        \
++        SDL_LockAudio();                                                \
++                                                                        \
++        ret = glue(audio_generic_, name)args;                           \
++                                                                        \
++        SDL_UnlockAudio();                                              \
++        return ret;                                                     \
+     }
  
-     .init_in  = no_init_in,
-     .fini_in  = no_fini_in,
--    .run_in   = no_run_in,
-+    .read     = no_read,
-     .ctl_in   = no_ctl_in
+-    decr = MIN (sdl->decr, live);
+-    sdl->decr -= decr;
++SDL_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *size),
++                 (hw, size), *size = 0, sdl_unlock)
++SDL_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
++                 (HWVoiceOut *hw, void *buf, size_t size), (hw, buf, size),
++                 /*nothing*/, sdl_unlock_and_post)
++SDL_WRAPPER_FUNC(write, size_t,
++                 (HWVoiceOut *hw, void *buf, size_t size), (hw, buf, size),
++                 /*nothing*/, sdl_unlock_and_post)
+ 
+-    sdl->live = live;
+-
+-    SDL_UnlockAudio();
+-
+-    return decr;
+-}
++#undef SDL_WRAPPER_FUNC
+ 
+ static void sdl_fini_out (HWVoiceOut *hw)
+ {
+@@ -336,7 +331,9 @@ static void sdl_audio_fini (void *opaque)
+ static struct audio_pcm_ops sdl_pcm_ops = {
+     .init_out = sdl_init_out,
+     .fini_out = sdl_fini_out,
+-    .run_out  = sdl_run_out,
++    .write    = sdl_write,
++    .get_buffer_out = sdl_get_buffer_out,
++    .put_buffer_out = sdl_put_buffer_out_nowrite,
+     .ctl_out  = sdl_ctl_out,
  };
  
 -- 
