@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C336AC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB50C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:59:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C08C206E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:58:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE213206E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 18:59:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ucbi+Blo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C08C206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m7WRWub/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE213206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1xiW-0006A0-E0
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 14:58:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57838)
+	id 1i1xjm-0007mH-SL
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 14:59:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXQ-0001OW-Qt
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:54 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXN-0001LG-7Z
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXP-0004tW-E1
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:52 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:34190)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXL-0004qp-HL
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:49 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:40350)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i1xXP-0004tD-8p
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:51 -0400
-Received: by mail-qt1-x841.google.com with SMTP id q4so15966406qtp.1
- for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 11:46:51 -0700 (PDT)
+ id 1i1xXL-0004qh-B1
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:47 -0400
+Received: by mail-qt1-x844.google.com with SMTP id g4so6097451qtq.7
+ for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 11:46:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HtHe/HNhRPSy1Ga4CbXXC+UxPAf3Na3b3iJ+6d/FVbw=;
- b=ucbi+BlohpKISbpFnNAypJZMRVYihGElviDCruzSpt/aceYchOiPH9Mf5xTwWQRup3
- RQt5+kkAtZag+A/rT/3uF7Ds0remyKj3VveUypQoKxDlZ8JizfymM/NuL0v9Ro4hN8bv
- BU+HPjNHsAZCvW3IlqrqzXKOkD/GPUqcCSicZAGddP9apUQKIhnwh/uIqgwtUmAUIKOr
- L/zAeLFwRT5BbUQ8RDeuas15LV6nHU/VARQ3nxX0SymIL70+ALTBzjn7JZmY17q02/ya
- OHSm83JVM5OaB86FHFi89k4psFVg1zwYQQHUclmtvIqFPSK1dukk6eu6+C1GDQMXUcTa
- RQ5A==
+ bh=wWAliuDu4nkJ14DxTZLWNn5dbOCETe3rvZLrjc/MvXc=;
+ b=m7WRWub/aFm2RUJIWbMCj2Vl8hlMRllBtdJSIYfuEiR3KQ5cPL2ytLBh1J+2SrBY3Z
+ Xbib11cgtiuZ2otWrZZy5CPywasf4YlxaMzKKKxQQQjq/z2078LNE4vCXeBYMjNbL7Oq
+ yaGpdHy6Do+neMZxeVfdWtr8y2wt6MBktqOze4EqYnaIBxTFgXCSv8imZ9hACdR1sO9T
+ BTZ/CIVd3KERYx0sc9j3/KKu+zBaDsp8oVMNDIV7KEhst0YpfQV5LhRDoUXZy3PRvSlt
+ lRM3ymXKUxGrB1bEKydZwAyJ5vySKWiXYJ1XgvheHcbY3XhdD81kWfeJFWlj7Io2S/dZ
+ gnQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=HtHe/HNhRPSy1Ga4CbXXC+UxPAf3Na3b3iJ+6d/FVbw=;
- b=WlVyTCRXX+EvyMwecoMtOpaOJNlUSDZJZZ40wUd5iUm1+gDDGEqFoHZI+Xak2Groxt
- NhvvedCnoNE5m2e5yJlsw8fpBjE0p/gY9CkTyxD6K+uW3geEUpZudJgAglmCHTIN9gIn
- 88rN7gGh1crQ1mLsOGIPFahe3ikqaP2ppfVry98sp9Uj5SaRvdDL1QYxuFWdAlZZEcey
- YyuZjMzM17dL/Gu51dvBu00wcSfSpvRS1hLG/8v46jZnmjMV8bPbIL+swn+isn2QJFOT
- hybxqNMsungU66J8cgAMHyuVWe3xG3rkLu2pOoDCLJt6CngK74fu0IWAxoTr6lsoNbf0
- KqJQ==
-X-Gm-Message-State: APjAAAXUpEfrbD1JG87NFK4XCLREWBM5qqdYpf1AVkQb80g+0wp2Ctb6
- T5Jc0JL5vY57b92hTCTmkWHdXAU7ZMw=
-X-Google-Smtp-Source: APXvYqxzIKf/fEyY2pGHosd3b2bg3uWIVuoE2oFdWzqQaa8aBMypYkU1WcvJMy6lfMfJGL4u9DxvUQ==
-X-Received: by 2002:ac8:60c3:: with SMTP id i3mr6228230qtm.212.1566758810437; 
- Sun, 25 Aug 2019 11:46:50 -0700 (PDT)
+ bh=wWAliuDu4nkJ14DxTZLWNn5dbOCETe3rvZLrjc/MvXc=;
+ b=YBkRzIrm6WZY0v61rDpxAcDONmYClqzXiJCQVaB16GZqF9m3gT0kQjlMvZV5KKk5u/
+ IEcn8Vki0jj/cWAuKS77Jtqsk0BSQ4cqwaGhX/aUZitetCdOl255tvWCV6mivI4SHC+N
+ FBXIjJ+R45tLcNK2SM/MGrODjTdDqD/Wt3Y26upNtOlf8YYsqx3isp69MKBkTu6YH3sW
+ bYe50fepd8WjWZfug7wO0fK0lEKpopapglnZnDs8wVyy66y/EJTTO7VMRjK1qxVSEx7L
+ EyYzBRA1XS423x51FaU3vvm8OjeF0al2q59WJcHOc7PN9jmAmzR8w/MQWG4+Kp6hT/Gr
+ 8I+w==
+X-Gm-Message-State: APjAAAXxYqEyKJA7qb13GVpMPm+MHg3rSQpksJjFN2psMj3rYklNX7Ky
+ 9SE+ceBQR9KqUNoiAJaSDYtt02WSCKQ=
+X-Google-Smtp-Source: APXvYqyhBj0/33kKsrDa+r1pOZq3BPW9UyetQtZy12K6VIjd8TGakirWfwFWDAEnKxQh12QhdJ87wA==
+X-Received: by 2002:aed:27d5:: with SMTP id m21mr14249288qtg.153.1566758806693; 
+ Sun, 25 Aug 2019 11:46:46 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-61b1-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:61b1::5])
- by smtp.gmail.com with ESMTPSA id d3sm5348870qtq.32.2019.08.25.11.46.49
+ by smtp.gmail.com with ESMTPSA id d3sm5348870qtq.32.2019.08.25.11.46.45
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 25 Aug 2019 11:46:49 -0700 (PDT)
+ Sun, 25 Aug 2019 11:46:46 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 25 Aug 2019 20:46:19 +0200
-Message-Id: <73aec2d3f3be0ba319af4fb503e3550a952cc019.1566755452.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 25 Aug 2019 20:46:16 +0200
+Message-Id: <8ba96a74a1ea771769b8f2267c7965923cacc8c8.1566755452.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
@@ -86,8 +86,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
-Subject: [Qemu-devel] [PATCH 17/25] audio: make mixeng optional
+X-Received-From: 2607:f8b0:4864:20::844
+Subject: [Qemu-devel] [PATCH 14/25] audio: common rate control code for
+ timer based outputs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,227 +105,341 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implementation of the previously added mixeng option.
+This commit removes the ad-hoc rate-limiting code from noaudio and
+wavaudio, and replaces them with a (slightly modified) code from
+spiceaudio.  This way multiple write calls (for example when the
+circular buffer wraps around) do not cause problems.
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio_template.h | 46 ++++++++++++++++-----------
- audio/audio.c          | 70 ++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 92 insertions(+), 24 deletions(-)
+ audio/audio_int.h  |  9 +++++++++
+ audio/audio.c      | 30 ++++++++++++++++++++++++++++
+ audio/noaudio.c    | 49 +++++++++++++++++++++-------------------------
+ audio/spiceaudio.c | 49 +++++++---------------------------------------
+ audio/wavaudio.c   | 21 ++++++++++----------
+ 5 files changed, 78 insertions(+), 80 deletions(-)
 
-diff --git a/audio/audio_template.h b/audio/audio_template.h
-index 8d36ab91f8..487e2a865f 100644
---- a/audio/audio_template.h
-+++ b/audio/audio_template.h
-@@ -78,26 +78,32 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 65112b490a..573a84c6e4 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -243,6 +243,15 @@ void *audio_calloc (const char *funcname, int nmemb, size_t size);
  
- static void glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
- {
--    size_t samples;
--    if (!hw->pcm_ops) {
--        /*
--         * We should only end up here when using wavcapture hmp command (and not
--         * the wavcapture audio backend).
--         * It needs a lot of samples, otherwise you'll end up with "Could not
--         * mix X bytes into a capture buffer" warnings and a garbled capture.
--         */
--        samples = 4096 * 4;
--    } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
--        samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
-+    if (glue(audio_get_pdo_, TYPE)(hw->s->dev)->mixeng) {
-+        size_t samples;
-+        if (!hw->pcm_ops) {
-+            /*
-+             * We should only end up here when using wavcapture hmp command (and
-+             * not the wavcapture audio backend).
-+             * It needs a lot of samples, otherwise you'll end up with "Could
-+             * not mix X bytes into a capture buffer" warnings and a garbled
-+             * capture.
-+             */
-+            samples = 4096 * 4;
-+        } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
-+            samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
-+        } else {
-+            samples = 1024; /* todo better default */
-+        }
+ void audio_run(AudioState *s, const char *msg);
+ 
++typedef struct RateCtl {
++    int64_t start_ticks;
++    int64_t bytes_sent;
++} RateCtl;
 +
-+        if (audio_bug(__func__, samples == 0)) {
-+            dolog("Attempted to allocate empty buffer\n");
-+        }
++void audio_rate_start(RateCtl *rate);
++size_t audio_rate_get_bytes(struct audio_pcm_info *info, RateCtl *rate,
++                            size_t bytes_avail);
 +
-+        HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
-+        HWBUF->size = samples;
-     } else {
--        samples = 1024; /* todo better default */
-+        HWBUF = NULL;
-     }
--    if (audio_bug(__func__, samples == 0)) {
--        dolog("Attempted to allocate empty buffer\n");
--    }
--
--    HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
--    HWBUF->size = samples;
- }
- 
- static void glue (audio_pcm_sw_free_resources_, TYPE) (SW *sw)
-@@ -116,6 +122,10 @@ static int glue (audio_pcm_sw_alloc_resources_, TYPE) (SW *sw)
- {
-     int samples;
- 
-+    if (!glue(audio_get_pdo_, TYPE)(sw->s->dev)->mixeng) {
-+        return 0;
-+    }
-+
-     samples = ((int64_t) sw->HWBUF->size << 32) / sw->ratio;
- 
-     sw->buf = audio_calloc(__func__, samples, sizeof(struct st_sample));
+ #define VOICE_ENABLE 1
+ #define VOICE_DISABLE 2
+ #define VOICE_VOLUME 3
 diff --git a/audio/audio.c b/audio/audio.c
-index 84b78f604e..73ace0500e 100644
+index 2b77a87823..2cec12fa54 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -838,32 +838,46 @@ static void audio_timer (void *opaque)
-  */
- size_t AUD_write(SWVoiceOut *sw, void *buf, size_t size)
- {
-+    HWVoiceOut *hw;
+@@ -2044,3 +2044,33 @@ const char *audio_get_id(QEMUSoundCard *card)
+         return "";
+     }
+ }
 +
-     if (!sw) {
-         /* XXX: Consider options */
-         return size;
-     }
-+    hw = sw->hw;
- 
--    if (!sw->hw->enabled) {
-+    if (!hw->enabled) {
-         dolog ("Writing to disabled voice %s\n", SW_NAME (sw));
-         return 0;
-     }
- 
--    return audio_pcm_sw_write(sw, buf, size);
-+    if (audio_get_pdo_out(hw->s->dev)->mixeng) {
-+        return audio_pcm_sw_write(sw, buf, size);
-+    } else {
-+        return hw->pcm_ops->write(hw, buf, size);
++void audio_rate_start(RateCtl *rate)
++{
++    memset(rate, 0, sizeof(RateCtl));
++    rate->start_ticks = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
++size_t audio_rate_get_bytes(struct audio_pcm_info *info, RateCtl *rate,
++                            size_t bytes_avail)
++{
++    int64_t now;
++    int64_t ticks;
++    int64_t bytes;
++    int64_t samples;
++    size_t ret;
++
++    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    ticks = now - rate->start_ticks;
++    bytes = muldiv64(ticks, info->bytes_per_second, NANOSECONDS_PER_SECOND);
++    samples = (bytes - rate->bytes_sent) >> info->shift;
++    if (samples < 0 || samples > 65536) {
++        AUD_log(NULL, "Resetting rate control (%" PRId64 " samples)", samples);
++        audio_rate_start(rate);
++        samples = 0;
 +    }
++
++    ret = MIN(samples << info->shift, bytes_avail);
++    rate->bytes_sent += ret;
++    return ret;
++}
+diff --git a/audio/noaudio.c b/audio/noaudio.c
+index f4b9d09d84..dc1078471a 100644
+--- a/audio/noaudio.c
++++ b/audio/noaudio.c
+@@ -33,32 +33,26 @@
+ 
+ typedef struct NoVoiceOut {
+     HWVoiceOut hw;
+-    int64_t old_ticks;
++    RateCtl rate;
+ } NoVoiceOut;
+ 
+ typedef struct NoVoiceIn {
+     HWVoiceIn hw;
+-    int64_t old_ticks;
++    RateCtl rate;
+ } NoVoiceIn;
+ 
+ static size_t no_write(HWVoiceOut *hw, void *buf, size_t len)
+ {
+     NoVoiceOut *no = (NoVoiceOut *) hw;
+-    int64_t now;
+-    int64_t ticks;
+-    int64_t bytes;
+-
+-    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-    ticks = now - no->old_ticks;
+-    bytes = muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+-
+-    no->old_ticks = now;
+-    return MIN(len, bytes);
++    return audio_rate_get_bytes(&hw->info, &no->rate, len);
  }
  
- size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
+ static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque)
  {
-+    HWVoiceIn *hw;
++    NoVoiceOut *no = (NoVoiceOut *) hw;
 +
-     if (!sw) {
-         /* XXX: Consider options */
-         return size;
-     }
-+    hw = sw->hw;
- 
--    if (!sw->hw->enabled) {
-+    if (!hw->enabled) {
-         dolog ("Reading from disabled voice %s\n", SW_NAME (sw));
-         return 0;
-     }
- 
--    return audio_pcm_sw_read(sw, buf, size);
-+    if (audio_get_pdo_in(hw->s->dev)->mixeng) {
-+        return audio_pcm_sw_read(sw, buf, size);
-+    } else {
-+        return hw->pcm_ops->read(hw, buf, size);
-+    }
+     audio_pcm_init_info (&hw->info, as);
++    audio_rate_start(&no->rate);
+     return 0;
  }
  
- int AUD_get_buffer_size_out (SWVoiceOut *sw)
-@@ -1085,6 +1099,26 @@ static void audio_run_out (AudioState *s)
-     HWVoiceOut *hw = NULL;
-     SWVoiceOut *sw;
+@@ -69,14 +63,20 @@ static void no_fini_out (HWVoiceOut *hw)
  
-+    if (!audio_get_pdo_out(s->dev)->mixeng) {
-+        while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
-+            /* there is exactly 1 sw for each hw with no mixeng */
-+            sw = hw->sw_head.lh_first;
-+
-+            if (hw->pending_disable) {
-+                hw->enabled = 0;
-+                hw->pending_disable = 0;
-+                if (hw->pcm_ops->enable_out) {
-+                    hw->pcm_ops->enable_out(hw, false);
-+                }
-+            }
-+
-+            if (sw->active) {
-+                sw->callback.fn(sw->callback.opaque, INT_MAX);
-+            }
-+        }
-+        return;
-+    }
-+
-     while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
-         size_t played, live, prev_rpos, free;
-         int nb_live, cleanup_required;
-@@ -1222,6 +1256,17 @@ static void audio_run_in (AudioState *s)
+ static int no_ctl_out (HWVoiceOut *hw, int cmd, ...)
  {
-     HWVoiceIn *hw = NULL;
- 
-+    if (!audio_get_pdo_in(s->dev)->mixeng) {
-+        while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
-+            /* there is exactly 1 sw for each hw with no mixeng */
-+            SWVoiceIn *sw = hw->sw_head.lh_first;
-+            if (sw->active) {
-+                sw->callback.fn(sw->callback.opaque, INT_MAX);
-+            }
-+        }
-+        return;
-+    }
+-    (void) hw;
+-    (void) cmd;
++    NoVoiceOut *no = (NoVoiceOut *) hw;
 +
-     while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
-         SWVoiceIn *sw;
-         size_t captured = 0, min;
-@@ -1746,6 +1791,11 @@ CaptureVoiceOut *AUD_add_capture(
-         s = audio_init(NULL, NULL);
-     }
- 
-+    if (!audio_get_pdo_out(s->dev)->mixeng) {
-+        dolog("Can't capture with mixeng disabled\n");
-+        return NULL;
++    if (cmd == VOICE_ENABLE) {
++        audio_rate_start(&no->rate);
 +    }
-+
-     if (audio_validate_settings (as)) {
-         dolog ("Invalid settings were passed when trying to add capture\n");
-         audio_print_settings (as);
-@@ -1898,9 +1948,13 @@ void audio_create_pdos(Audiodev *dev)
- static void audio_validate_per_direction_opts(
-     AudiodevPerDirectionOptions *pdo, Error **errp)
+     return 0;
+ }
+ 
+ static int no_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
  {
-+    if (!pdo->has_mixeng) {
-+        pdo->has_mixeng = true;
-+        pdo->mixeng = true;
-+    }
-     if (!pdo->has_fixed_settings) {
-         pdo->has_fixed_settings = true;
--        pdo->fixed_settings = true;
-+        pdo->fixed_settings = pdo->mixeng;
-     }
-     if (!pdo->fixed_settings &&
-         (pdo->has_frequency || pdo->has_channels || pdo->has_format)) {
-@@ -1908,6 +1962,10 @@ static void audio_validate_per_direction_opts(
-                    "You can't use frequency, channels or format with fixed-settings=off");
-         return;
-     }
-+    if (!pdo->mixeng && pdo->fixed_settings) {
-+        error_setg(errp, "You can't use fixed-settings without mixeng");
-+        return;
-+    }
++    NoVoiceIn *no = (NoVoiceIn *) hw;
++
+     audio_pcm_init_info (&hw->info, as);
++    audio_rate_start(&no->rate);
+     return 0;
+ }
  
-     if (!pdo->has_frequency) {
-         pdo->has_frequency = true;
-@@ -1919,7 +1977,7 @@ static void audio_validate_per_direction_opts(
+@@ -87,25 +87,20 @@ static void no_fini_in (HWVoiceIn *hw)
+ 
+ static size_t no_read(HWVoiceIn *hw, void *buf, size_t size)
+ {
+-    size_t to_clear;
+     NoVoiceIn *no = (NoVoiceIn *) hw;
++    int64_t bytes = audio_rate_get_bytes(&hw->info, &no->rate, size);
+ 
+-    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-    int64_t ticks = now - no->old_ticks;
+-    int64_t bytes =
+-        muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+-
+-    no->old_ticks = now;
+-    to_clear = MIN(bytes, size);
+-
+-    audio_pcm_info_clear_buf(&hw->info, buf, to_clear >> hw->info.shift);
+-    return to_clear;
++    audio_pcm_info_clear_buf(&hw->info, buf, bytes >> hw->info.shift);
++    return bytes;
+ }
+ 
+ static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+-    (void) hw;
+-    (void) cmd;
++    NoVoiceIn *no = (NoVoiceIn *) hw;
++
++    if (cmd == VOICE_ENABLE) {
++        audio_rate_start(&no->rate);
++    }
+     return 0;
+ }
+ 
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index 02e97095fc..a6b875ac36 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -40,15 +40,10 @@
+ #define LINE_IN_SAMPLES (256 * 4)
+ #endif
+ 
+-typedef struct SpiceRateCtl {
+-    int64_t               start_ticks;
+-    int64_t               bytes_sent;
+-} SpiceRateCtl;
+-
+ typedef struct SpiceVoiceOut {
+     HWVoiceOut            hw;
+     SpicePlaybackInstance sin;
+-    SpiceRateCtl          rate;
++    RateCtl               rate;
+     int                   active;
+     uint32_t              *frame;
+     uint32_t              fpos;
+@@ -58,7 +53,7 @@ typedef struct SpiceVoiceOut {
+ typedef struct SpiceVoiceIn {
+     HWVoiceIn             hw;
+     SpiceRecordInstance   sin;
+-    SpiceRateCtl          rate;
++    RateCtl               rate;
+     int                   active;
+ } SpiceVoiceIn;
+ 
+@@ -89,32 +84,6 @@ static void spice_audio_fini (void *opaque)
+     /* nothing */
+ }
+ 
+-static void rate_start (SpiceRateCtl *rate)
+-{
+-    memset (rate, 0, sizeof (*rate));
+-    rate->start_ticks = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-}
+-
+-static int rate_get_samples (struct audio_pcm_info *info, SpiceRateCtl *rate)
+-{
+-    int64_t now;
+-    int64_t ticks;
+-    int64_t bytes;
+-    int64_t samples;
+-
+-    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-    ticks = now - rate->start_ticks;
+-    bytes = muldiv64(ticks, info->bytes_per_second, NANOSECONDS_PER_SECOND);
+-    samples = (bytes - rate->bytes_sent) >> info->shift;
+-    if (samples < 0 || samples > 65536) {
+-        error_report("Resetting rate control (%" PRId64 " samples)", samples);
+-        rate_start(rate);
+-        samples = 0;
+-    }
+-    rate->bytes_sent += samples << info->shift;
+-    return samples;
+-}
+-
+ /* playback */
+ 
+ static int line_out_init(HWVoiceOut *hw, struct audsettings *as,
+@@ -158,17 +127,14 @@ static void line_out_fini (HWVoiceOut *hw)
+ static void *line_out_get_buffer(HWVoiceOut *hw, size_t *size)
+ {
+     SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
+-    size_t decr;
+ 
+     if (!out->frame) {
+         spice_server_playback_get_buffer(&out->sin, &out->frame, &out->fsize);
+         out->fpos = 0;
      }
-     if (!pdo->has_voices) {
-         pdo->has_voices = true;
--        pdo->voices = 1;
-+        pdo->voices = pdo->mixeng ? 1 : INT_MAX;
+ 
+-    decr = rate_get_samples(&hw->info, &out->rate);
+-    decr = MIN(out->fsize - out->fpos, decr);
+-
+-    *size = decr << hw->info.shift;
++    *size = audio_rate_get_bytes(&hw->info, &out->rate,
++                                 (out->fsize - out->fpos) << hw->info.shift);
+     return out->frame + out->fpos;
+ }
+ 
+@@ -197,7 +163,7 @@ static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
+             break;
+         }
+         out->active = 1;
+-        rate_start (&out->rate);
++        audio_rate_start(&out->rate);
+         spice_server_playback_start (&out->sin);
+         break;
+     case VOICE_DISABLE:
+@@ -277,8 +243,7 @@ static void line_in_fini (HWVoiceIn *hw)
+ static size_t line_in_read(HWVoiceIn *hw, void *buf, size_t len)
+ {
+     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
+-    uint64_t delta_samp = rate_get_samples(&hw->info, &in->rate);
+-    uint64_t to_read = MIN(len >> 2, delta_samp);
++    uint64_t to_read = audio_rate_get_bytes(&hw->info, &in->rate, len) >> 2;
+     size_t ready = spice_server_record_get_samples(&in->sin, buf, to_read);
+ 
+     /* XXX: do we need this? */
+@@ -300,7 +265,7 @@ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
+             break;
+         }
+         in->active = 1;
+-        rate_start (&in->rate);
++        audio_rate_start(&in->rate);
+         spice_server_record_start (&in->sin);
+         break;
+     case VOICE_DISABLE:
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index 427825c8d8..9b3bd086ae 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -35,21 +35,15 @@
+ typedef struct WAVVoiceOut {
+     HWVoiceOut hw;
+     FILE *f;
+-    int64_t old_ticks;
++    RateCtl rate;
+     int total_samples;
+ } WAVVoiceOut;
+ 
+ static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
+ {
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+-    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-    int64_t ticks = now - wav->old_ticks;
+-    int64_t bytes =
+-        muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+-
+-    bytes = MIN(bytes, len);
+-    bytes = bytes >> hw->info.shift << hw->info.shift;
+-    wav->old_ticks = now;
++    int64_t bytes = audio_rate_get_bytes(&hw->info, &wav->rate, len);
++    assert(bytes >> hw->info.shift << hw->info.shift == bytes);
+ 
+     if (bytes && fwrite(buf, bytes, 1, wav->f) != 1) {
+         dolog("wav_write_out: fwrite of %zu bytes failed\nReaons: %s\n",
+@@ -129,6 +123,8 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+                strerror(errno));
+         return -1;
      }
-     if (!pdo->has_format) {
-         pdo->has_format = true;
++
++    audio_rate_start(&wav->rate);
+     return 0;
+ }
+ 
+@@ -178,8 +174,11 @@ static void wav_fini_out (HWVoiceOut *hw)
+ 
+ static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
+ {
+-    (void) hw;
+-    (void) cmd;
++    WAVVoiceOut *wav = (WAVVoiceOut *) hw;
++
++    if (cmd == VOICE_ENABLE) {
++        audio_rate_start(&wav->rate);
++    }
+     return 0;
+ }
+ 
 -- 
 2.22.0
 
