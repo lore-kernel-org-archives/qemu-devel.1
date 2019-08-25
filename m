@@ -2,79 +2,66 @@ Return-Path: <SRS0=aJdJ=WV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF5EC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70751C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:32:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 487C6206DD
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:30:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LgoQlHN5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487C6206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 45A58206DD
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:32:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A58206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1uSy-0001P2-AQ
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 11:30:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54643)
+	id 1i1uVL-0003Di-9V
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 11:32:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i1uRx-0000fN-Ge
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:29:02 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i1uUA-0002aa-H6
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:31:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i1uRw-0007cc-95
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:29:01 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37131)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i1uRw-0007am-4z
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:29:00 -0400
-Received: by mail-ot1-x343.google.com with SMTP id f17so13008586otq.4
- for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 08:28:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4nviZyh8w2IVntWaIYBGw7aiWrNjdMO8FDaAgolaFhE=;
- b=LgoQlHN57BPxtoR86FtBsqWdEMeXAXCEZkqEKhV+7KxgqMNHLLFDoMUoQK+99P89rL
- brWk1M8ls+1ANE33s++kEe6hItFKXqYmA9a4o0Di5V1pvT9T2em0YXTbw9flZdX83krM
- gmNGWOS1VWuH37HoW5PL1Pl4NLaC0HvcCrnllnS8LiwhtW7TSoFaDJAm+D43vRwvHUrS
- 1Ii8QjbWFwhDvZ+IKZlkOwnFx0cbjllz4XzxZmJgTk9wTddVO/sEsAjXwk4+6JqNEVO9
- DXD0O5lNhlbo5IAzYj1S44cftQx38A1Y2lVKdMNHi23M4M5LIO9eGZcKI5vW9kGwq63N
- VKGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4nviZyh8w2IVntWaIYBGw7aiWrNjdMO8FDaAgolaFhE=;
- b=sdQXgjFL/2FGeUDEj4VWEPllw7bVAjVBkEhbRvklwrowxjI+5cbpbsGKyBhi/DRsAY
- jTBQ7twkq6LZVk+EFVmtux32IC5FHebYqmSGw3jLXu/ASraAUYC78qvYW/00EhDWmRi3
- rKO+aQWl33ZoFdXTZcu7TD+tQomn2GN8BBBUVApmVYTSO8I0dspUL92x0icu+my64HFp
- 01gETZwz3zs0D/YGy/UVwF/gPdZnoEnPrywen7XjYS1yYFJV+aIK29Pek46uBQ1g2ypZ
- odCC/6oAoDrralmuUqGKVJbE/ChG2Pjo0uNfUNoofvhUux//gHvUaUj03h4HUHE+3bb3
- U0Fw==
-X-Gm-Message-State: APjAAAVsMiiUnA3KQzFR7AWgST8UujIm3w/eYV8mU5NorRK0kTtqJu/Q
- Pl0lYX7TRFh/qoFyKXyQbZmT9GFU5a4BmSvsyOivlw==
-X-Google-Smtp-Source: APXvYqy2QtQ2TWjkn/VITCeUrUyDOTGe3KaBmAtPVh2fwyYWaRfMjiuEV16HspKSlYiiadlTXKjLSAipq7yJJlJO9bM=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr799906oti.135.1566746938348; 
- Sun, 25 Aug 2019 08:28:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-34-richard.henderson@linaro.org>
-In-Reply-To: <20190819213755.26175-34-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 25 Aug 2019 16:28:47 +0100
-Message-ID: <CAFEAcA-bpeJLi1O91ky8xHRvTr96p3OvMLEAuthd0-4b9vqUwQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <mlevitsk@redhat.com>) id 1i1uU9-0001D7-4I
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:31:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58578)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i1uU2-00016m-Cs; Sun, 25 Aug 2019 11:31:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4A9457F748;
+ Sun, 25 Aug 2019 15:31:08 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7FE5C19C70;
+ Sun, 25 Aug 2019 15:31:03 +0000 (UTC)
+Message-ID: <cd1bc2cf3e2748db8aa686534ae7d84c71a58e69.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>, Max Reitz
+ <mreitz@redhat.com>
+Date: Sun, 25 Aug 2019 18:31:02 +0300
+In-Reply-To: <e5e2c603c616b6a14419f9942016f7df0c177610.camel@redhat.com>
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <20190814202219.1870-6-mlevitsk@redhat.com>
+ <6019b9e3-a4a6-4780-9652-f7c2bec024a5@redhat.com>
+ <20190822104945.GJ3267@redhat.com>
+ <e5e2c603c616b6a14419f9942016f7df0c177610.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH v2 33/68] target/arm: Convert RFE and SRS
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Sun, 25 Aug 2019 15:31:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 05/13] qcrypto-luks: clear the masterkey
+ and password before freeing them always
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,68 +73,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Aug 2019 at 22:38, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate.c       | 150 ++++++++++++++---------------------
->  target/arm/a32-uncond.decode |   8 ++
->  target/arm/t32.decode        |  12 +++
->  3 files changed, 81 insertions(+), 89 deletions(-)
->
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index b6d8b7be8c..e268c5168d 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -9980,16 +9980,71 @@ static bool trans_SVC(DisasContext *s, arg_SVC *a)
->      return true;
->  }
->
-> +/*
-> + * Unconditional system instructions
-> + */
-> +
-> +static bool trans_RFE(DisasContext *s, arg_RFE *a)
-> +{
-> +    int32_t offset;
-> +    TCGv_i32 addr, t1, t2;
-> +
-> +    if (IS_USER(s) || !ENABLE_ARCH_6) {
-> +        return false;
-> +    }
+On Thu, 2019-08-22 at 13:56 +0300, Maxim Levitsky wrote:
+> On Thu, 2019-08-22 at 11:49 +0100, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, Aug 20, 2019 at 08:12:51PM +0200, Max Reitz wrote:
+> > > On 14.08.19 22:22, Maxim Levitsky wrote:
+> > > > While there are other places where these are still stored in memo=
+ry,
+> > > > this is still one less key material area that can be sniffed with
+> > > > various side channel attacks
+> > > >=20
+> > > >=20
+> > > >=20
+> > >=20
+> > > (Many empty lines here)
+> > >=20
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > >  crypto/block-luks.c | 52 ++++++++++++++++++++++++++++++++++++++-=
+------
+> > > >  1 file changed, 44 insertions(+), 8 deletions(-)
+> > >=20
+> > > Wouldn=E2=80=99t it make sense to introduce a dedicated function fo=
+r this?
+> >=20
+> > Yes, it would.
+> >=20
+> > In fact I have a series pending which bumps min glib and introduces
+> > use of auto-free functions in this code.
+> >=20
+> > It would be desirable to have a autp-free func for memset+free
+> > so we can just declare the variable
+> >=20
+> >    q_autowipefree char *password =3D NULL;
+> >=20
+> > and have it result in memset+free
+> >=20
+>=20
+> That is perfect.
+> When do you think you could post the series so that I could rebase
+> on top of it?
 
-The legacy thumb decoder for RFE and SRS also has
-"not if M profile", which we seem to be missing here ?
 
-> diff --git a/target/arm/a32-uncond.decode b/target/arm/a32-uncond.decode
-> index 573ac2cf8e..3b961233e5 100644
-> --- a/target/arm/a32-uncond.decode
-> +++ b/target/arm/a32-uncond.decode
-> @@ -29,3 +29,11 @@
->  %imm24h          0:s24 24:1 !function=times_2
->
->  BLX_i            1111 101 . ........................          &i imm=%imm24h
-> +
-> +# System Instructions
-> +
-> +&rfe             rn w pu
-> +&srs             mode w pu
-> +
-> +RFE              1111 100 pu:2 0 w:1 1 rn:4 0000 1010 0000 0000   &rfe
-> +SRS              1111 110 pu:2 1 w:1 0 1101 0000 0101 000 mode:5  &srs
+I am thinking that I will keep my patch as is, just so that code is
+consistent in memsetting the secrets (even though as Nir pointed out,
+that these will be probably optimized away anyway).
+And then when you send your patch you will just remove all
+of these memsets.
 
-Is this SRS encoding correct? The copy of the Arm ARM I'm looking at
-thinks that it starts 1111 100, the same as RFE.
+Is this all right?=20
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Best regards,
+	Maxim Levitsky
 
-thanks
--- PMM
 
