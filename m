@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9617C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 19:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77750C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 19:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 767BA206E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 19:02:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 446EA206E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 19:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jgcRdddg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 767BA206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lozeoGSI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 446EA206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1xmS-0002MX-CN
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 15:02:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57880)
+	id 1i1xna-0003DO-0b
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 15:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57935)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXV-0001Q5-9v
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:58 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXY-0001Vh-Od
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXU-0004w5-71
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:57 -0400
-Received: from mail-qk1-x733.google.com ([2607:f8b0:4864:20::733]:33088)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i1xXX-0004yE-OZ
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:47:00 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:34191)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i1xXU-0004ve-2D
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:56 -0400
-Received: by mail-qk1-x733.google.com with SMTP id w18so12481028qki.0
- for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 11:46:55 -0700 (PDT)
+ id 1i1xXX-0004y2-KS
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 14:46:59 -0400
+Received: by mail-qt1-x841.google.com with SMTP id q4so15966656qtp.1
+ for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 11:46:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+olaGUmCEjHabl5zPvWo+LBZ+w54gUP7+HUOcErgF3U=;
- b=jgcRdddgd6rcpO6JSXO5U/Y44HYcqDBKAVV1ZAKe3x+pSJVjEByfTxrBUoe6pMPFWP
- eP87Zds4XvMYUIwTgM9opHwLFDjlGB/pV4BAzB7Sr+rCd7xiXlaACVplSNfEjwE4vd9y
- UK+d2cS1E3Mjtshy/QgiueJJc5dfu3G2h+6LSSaBNlx3E5axuZva8BcM/SnnYZiX6iT9
- u2sReWKGoY1UsdHSonekdzAL+DddX2L7Z6+EcsOraf6WpcMqioO2nr2WVHP1c+VXSByJ
- dDKbe1D9hXfLf9mMxXxgDKd9IjiBMY390j4I9lUQLIEvXoyg6ENFlDEilMAXn3i2fM4P
- PF+g==
+ bh=mVyvepJpofMiXJQ4yUXovAwU9I26tBxVFmMOIPeTZIQ=;
+ b=lozeoGSIDTtpQdB81Z0mR2O98atrq8kVqAWbtYmcbQCnetzp3P4u5y04RaEKjOZ9Lj
+ 4dyUxepmK6O2H2+nzxU8Pr3T9Tr5SFuikmInCX19TOL2AIdO1m8v9lCPrWogCb2YqPWI
+ gai08Jff3Kx9nbVkYULdZ1UaJdCELP8NsPjvoVktyzvmyaSU8oKjf91mgiVVwhpoAMVe
+ bM0vwZhspBUj7moR3TjUEYsGltfJga/1a95npEXOnpErt0gnSPt2ZhcldMphBSVOqKvE
+ NxUmXuja4sFmSoQpAZPkBwIod7A3iRaeeSxFAKaJSZ2EPrl1FQlFRG8yel5k1mDnxVTd
+ xa3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+olaGUmCEjHabl5zPvWo+LBZ+w54gUP7+HUOcErgF3U=;
- b=QgXASUF1NBM9u91xF2PToaeBBdtRepdHSXztq9L3OvYYOjT7clIpwT3diLX0Gjxo82
- OFUVr0jcuSYGm3nmu9hiC6HNxubcdQoh8paWBG8c8i6R4RhhS4qkMudNTMXDH7bUJxod
- cWi+0SnkFqAk7pT+AZbGL3eXPMBqs29UFFOgI7OCgmTZqEQ/8kA7GuVS27qBUCI/t60L
- VuCWiwqu83IhGlEzk33w1coVGnCwyyJJjqZDvQAUsIJF7JzIBd/wy3epdFmx8NvBBA4u
- grWSK8zV0SV6vT5KJF+hxzHeaSu5x0mF2L3be1uqUOmkvbzkqn4zG090uOdGbJ2Tyok8
- Vbfg==
-X-Gm-Message-State: APjAAAWSEJ7+WixOu92If4ekL9q4F/m/6bp79BSreyOtHr977DW8spk6
- j+WnPVPBPC0QAe0hsNLXkeKmnKiEPN0=
-X-Google-Smtp-Source: APXvYqyrYkRCq+VXgsJ42HnyqLaWh/xh1JySOSk3afy/84eEVbpxPLRrvCbCHeeim4kbGrKCijqXOQ==
-X-Received: by 2002:ae9:ec1a:: with SMTP id h26mr13351150qkg.80.1566758814692; 
- Sun, 25 Aug 2019 11:46:54 -0700 (PDT)
+ bh=mVyvepJpofMiXJQ4yUXovAwU9I26tBxVFmMOIPeTZIQ=;
+ b=fwKc3ORZDy50d2JjS4Y0Mxp8Lp1Fdg4sN9WHfcl3j4Am+xmGbi4IRN4CwiUlp7kSCl
+ m64lo/W9YnmeGqhxpp8XiGhDJDxMChAl9sg8TFpA5HKz99IFXSsWgWBA/e6soXfoLcwc
+ +RzUpTNraTMTMjQToq9jj699W/ujQufaq8S8jijrof1C3BiOR5LiDFexxmZOGd78BJjO
+ 9cNWaU7M9snWUm1NaJPZRIeh0602dauOFDV2pTMdIooMXT64n1dQQc233uYJOsbhQ+A1
+ tNi0tSlqzSHqjPDBYQoisxQxH9gTULO7hh9f90x4WIjWazJW7t6sYPx7WqkiD7NJoDec
+ mErA==
+X-Gm-Message-State: APjAAAUyAC21Kr3HDRvDKLETS2hS6Q7MwNdu1CRGgDRwf5TUBc8khGfF
+ AZUN/BaddUnO0X7+wj846oqKcpAezJQ=
+X-Google-Smtp-Source: APXvYqyQWBGQZZrHBFwQEexwJRDKgzrlqQR1og4RQp/xJncVYnhsZOp3SNMzI8JY7jvAtkvlG8CnEw==
+X-Received: by 2002:a0c:b192:: with SMTP id v18mr12820001qvd.163.1566758819092; 
+ Sun, 25 Aug 2019 11:46:59 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-61b1-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:61b1::5])
- by smtp.gmail.com with ESMTPSA id d3sm5348870qtq.32.2019.08.25.11.46.53
+ by smtp.gmail.com with ESMTPSA id d3sm5348870qtq.32.2019.08.25.11.46.58
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 25 Aug 2019 11:46:54 -0700 (PDT)
+ Sun, 25 Aug 2019 11:46:58 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 25 Aug 2019 20:46:23 +0200
-Message-Id: <48ae407f0d7000ee0864223dfaa3c40cebe8fe20.1566755452.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 25 Aug 2019 20:46:27 +0200
+Message-Id: <e977b11c8259297cd38ada4d564c9ec31b2e4b35.1566755452.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
@@ -86,9 +86,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::733
-Subject: [Qemu-devel] [PATCH 21/25] audio: basic support for multichannel
- audio
+X-Received-From: 2607:f8b0:4864:20::841
+Subject: [Qemu-devel] [PATCH 25/25] usbaudio: change playback counters to 64
+ bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,46 +105,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Which currently only means removing some checks.  Old code won't require
-more than two channels, but new code will need it.
+With stereo playback, they need about 375 minutes of continuous audio
+playback to overflow, which is usually not a problem (as stopping and
+later resuming playback resets the counters).  But with 7.1 audio, they
+only need about 95 minutes to overflow.
+
+After the overflow, the buf->prod % USBAUDIO_PACKET_SIZE(channels)
+assertion no longer holds true, which will result in overflowing the
+buffer.  With 64 bit variables, it would take about 762000 years to
+overflow.
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/alsaaudio.c | 7 -------
- audio/audio.c     | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ hw/usb/dev-audio.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index b3b21e07a2..b201cfc736 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -495,13 +495,6 @@ static int alsa_open(bool in, struct alsa_params_req *req,
-         goto err;
+diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
+index e42bdfbdc1..ea604bbb8e 100644
+--- a/hw/usb/dev-audio.c
++++ b/hw/usb/dev-audio.c
+@@ -578,9 +578,9 @@ static const USBDesc desc_audio_multi = {
+ 
+ struct streambuf {
+     uint8_t *data;
+-    uint32_t size;
+-    uint32_t prod;
+-    uint32_t cons;
++    size_t size;
++    uint64_t prod;
++    uint64_t cons;
+ };
+ 
+ static void streambuf_init(struct streambuf *buf, uint32_t size,
+@@ -601,7 +601,7 @@ static void streambuf_fini(struct streambuf *buf)
+ 
+ static int streambuf_put(struct streambuf *buf, USBPacket *p, uint32_t channels)
+ {
+-    uint32_t free = buf->size - (buf->prod - buf->cons);
++    int64_t free = buf->size - (buf->prod - buf->cons);
+ 
+     if (free < USBAUDIO_PACKET_SIZE(channels)) {
+         return 0;
+@@ -610,6 +610,8 @@ static int streambuf_put(struct streambuf *buf, USBPacket *p, uint32_t channels)
+         return 0;
      }
  
--    if (nchannels != 1 && nchannels != 2) {
--        alsa_logerr2 (err, typ,
--                      "Can not handle obtained number of channels %d\n",
--                      nchannels);
--        goto err;
--    }
--
-     if (apdo->buffer_length) {
-         int dir = 0;
-         unsigned int btime = apdo->buffer_length;
-diff --git a/audio/audio.c b/audio/audio.c
-index f46bd5dc3d..2fc5b0ff38 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -242,7 +242,7 @@ static int audio_validate_settings (struct audsettings *as)
++    /* can happen if prod overflows */
++    assert(buf->prod % USBAUDIO_PACKET_SIZE(channels) == 0);
+     usb_packet_copy(p, buf->data + (buf->prod % buf->size),
+                     USBAUDIO_PACKET_SIZE(channels));
+     buf->prod += USBAUDIO_PACKET_SIZE(channels);
+@@ -618,10 +620,10 @@ static int streambuf_put(struct streambuf *buf, USBPacket *p, uint32_t channels)
+ 
+ static uint8_t *streambuf_get(struct streambuf *buf, size_t *len)
  {
-     int invalid;
+-    uint32_t used = buf->prod - buf->cons;
++    int64_t used = buf->prod - buf->cons;
+     uint8_t *data;
  
--    invalid = as->nchannels != 1 && as->nchannels != 2;
-+    invalid = as->nchannels < 1;
-     invalid |= as->endianness != 0 && as->endianness != 1;
- 
-     switch (as->fmt) {
+-    if (!used) {
++    if (used <= 0) {
+         *len = 0;
+         return NULL;
+     }
 -- 
 2.22.0
 
