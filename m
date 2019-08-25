@@ -2,66 +2,63 @@ Return-Path: <SRS0=aJdJ=WV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70751C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A7EC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:41:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45A58206DD
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:32:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A58206DD
+	by mail.kernel.org (Postfix) with ESMTPS id 6521F2080C
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 15:41:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6521F2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1uVL-0003Di-9V
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 11:32:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55339)
+	id 1i1udw-0005Pw-GO
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 11:41:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57102)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i1uUA-0002aa-H6
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:31:19 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i1ud6-0004xV-Eb
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:40:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i1uU9-0001D7-4I
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:31:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58578)
+ (envelope-from <mlevitsk@redhat.com>) id 1i1ud5-0007qv-7V
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 11:40:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60010)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i1uU2-00016m-Cs; Sun, 25 Aug 2019 11:31:11 -0400
+ id 1i1ud2-0007ou-GX; Sun, 25 Aug 2019 11:40:28 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4A9457F748;
- Sun, 25 Aug 2019 15:31:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BDD07189DACA;
+ Sun, 25 Aug 2019 15:40:27 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7FE5C19C70;
- Sun, 25 Aug 2019 15:31:03 +0000 (UTC)
-Message-ID: <cd1bc2cf3e2748db8aa686534ae7d84c71a58e69.camel@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C8E819C70;
+ Sun, 25 Aug 2019 15:40:23 +0000 (UTC)
+Message-ID: <ba3ddc4c3c6dd18b7a7c913e55e52ddc8c9efeb0.camel@redhat.com>
 From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>, Max Reitz
- <mreitz@redhat.com>
-Date: Sun, 25 Aug 2019 18:31:02 +0300
-In-Reply-To: <e5e2c603c616b6a14419f9942016f7df0c177610.camel@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
+Date: Sun, 25 Aug 2019 18:40:22 +0300
+In-Reply-To: <20190822110448.GK3267@redhat.com>
 References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-6-mlevitsk@redhat.com>
- <6019b9e3-a4a6-4780-9652-f7c2bec024a5@redhat.com>
- <20190822104945.GJ3267@redhat.com>
- <e5e2c603c616b6a14419f9942016f7df0c177610.camel@redhat.com>
+ <20190814202219.1870-7-mlevitsk@redhat.com>
+ <20190822110448.GK3267@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Sun, 25 Aug 2019 15:31:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.63]); Sun, 25 Aug 2019 15:40:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 05/13] qcrypto-luks: clear the masterkey
- and password before freeing them always
+Subject: Re: [Qemu-devel] [PATCH 06/13] qcrypto-luks: implement more
+ rigorous header checking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,62 +72,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-08-22 at 13:56 +0300, Maxim Levitsky wrote:
-> On Thu, 2019-08-22 at 11:49 +0100, Daniel P. Berrang=C3=A9 wrote:
-> > On Tue, Aug 20, 2019 at 08:12:51PM +0200, Max Reitz wrote:
-> > > On 14.08.19 22:22, Maxim Levitsky wrote:
-> > > > While there are other places where these are still stored in memo=
-ry,
-> > > > this is still one less key material area that can be sniffed with
-> > > > various side channel attacks
-> > > >=20
-> > > >=20
-> > > >=20
-> > >=20
-> > > (Many empty lines here)
-> > >=20
-> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > ---
-> > > >  crypto/block-luks.c | 52 ++++++++++++++++++++++++++++++++++++++-=
-------
-> > > >  1 file changed, 44 insertions(+), 8 deletions(-)
-> > >=20
-> > > Wouldn=E2=80=99t it make sense to introduce a dedicated function fo=
-r this?
+On Thu, 2019-08-22 at 12:04 +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Aug 14, 2019 at 11:22:12PM +0300, Maxim Levitsky wrote:
+> > Check that keyslots don't overlap with the data,
+> > and check that keyslots don't overlap with each other.
+> > (this is done using naive O(n^2) nested loops,
+> > but since there are just 8 keyslots, this doens't really matter.
 > >=20
-> > Yes, it would.
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  crypto/block-luks.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 42 insertions(+)
 > >=20
-> > In fact I have a series pending which bumps min glib and introduces
-> > use of auto-free functions in this code.
-> >=20
-> > It would be desirable to have a autp-free func for memset+free
-> > so we can just declare the variable
-> >=20
-> >    q_autowipefree char *password =3D NULL;
-> >=20
-> > and have it result in memset+free
+> > diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+> > index 336e633df4..1997e92fe1 100644
+> > --- a/crypto/block-luks.c
+> > +++ b/crypto/block-luks.c
+> > @@ -551,6 +551,8 @@ static int
+> >  qcrypto_block_luks_check_header(QCryptoBlockLUKS *luks, Error **errp=
+)
+> >  {
+> >      int ret;
+> > +    int i, j;
+> > +
+> > =20
+> >      if (memcmp(luks->header.magic, qcrypto_block_luks_magic,
+> >                 QCRYPTO_BLOCK_LUKS_MAGIC_LEN) !=3D 0) {
+> > @@ -566,6 +568,46 @@ qcrypto_block_luks_check_header(QCryptoBlockLUKS=
+ *luks, Error **errp)
+> >          goto fail;
+> >      }
+> > =20
+> > +    /* Check all keyslots for corruption  */
+> > +    for (i =3D 0 ; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; i++) {
+> > +
+> > +        QCryptoBlockLUKSKeySlot *slot1 =3D &luks->header.key_slots[i=
+];
+> > +        uint start1 =3D slot1->key_offset;
+> > +        uint len1 =3D splitkeylen_sectors(luks, slot1->stripes);
+>=20
+> Using 'uint' is not normal QEMU style.
+>=20
+> Either use 'unsigned int'  or if a specific size is needed
+> then one of the 'guintNN' types from glib.
+>=20
+> This applies elsewhere in this patch series too, but
+> I'll only comment here & let you find the other cases.
+
+Fixed. Sorry for the noise.
+
+>=20
+> > +
+> > +        if (slot1->stripes =3D=3D 0 ||
+> > +                (slot1->active !=3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISA=
+BLED &&
+> > +                slot1->active !=3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABL=
+ED)) {
+> > +
+>=20
+> Redundant blank line
+Fixed
+>=20
+> > +            error_setg(errp, "Keyslot %i is corrupted", i);
+>=20
+> I'd do a separate check for stripes and active fields, and then give a
+> specific error message for each. That way if this does ever trigger
+> in practice will immediately understand which check failed.
+>=20
+> Also using '%d' rather than '%i' is more common convention
+Done.
+>=20
+>=20
+> > +            ret =3D -EINVAL;
+> > +            goto fail;
+> > +        }
+> > +
+> > +        if (start1 + len1 > luks->header.payload_offset) {
+> > +            error_setg(errp,
+> > +                       "Keyslot %i is overlapping with the encrypted=
+ payload",
+> > +                       i);
+> > +            ret =3D -EINVAL;
+> > +            goto fail;
+> > +        }
+> > +
+> > +        for (j =3D i + 1 ; j < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; j+=
++) {
+> > +
+>=20
+> Redundant blank
+>=20
+> > +            QCryptoBlockLUKSKeySlot *slot2 =3D &luks->header.key_slo=
+ts[j];
+> > +            uint start2 =3D slot2->key_offset;
+> > +            uint len2 =3D splitkeylen_sectors(luks, slot2->stripes);
+> > +
+> > +            if (start1 + len1 > start2 && start2 + len2 > start1) {
+> > +                error_setg(errp,
+> > +                           "Keyslots %i and %i are overlapping in th=
+e header",
+>=20
+> %d
+Fixed.
+>=20
+> > +                           i, j);
+> > +                ret =3D -EINVAL;
+> > +                goto fail;
+> > +            }
+> > +        }
+> > +
+> > +    }
+> >      return 0;
+> >  fail:
+> >      return ret;
+> > --=20
+> > 2.17.2
 > >=20
 >=20
-> That is perfect.
-> When do you think you could post the series so that I could rebase
-> on top of it?
+> Regards,
+> Daniel
 
-
-I am thinking that I will keep my patch as is, just so that code is
-consistent in memsetting the secrets (even though as Nir pointed out,
-that these will be probably optimized away anyway).
-And then when you send your patch you will just remove all
-of these memsets.
-
-Is this all right?=20
 
 Best regards,
 	Maxim Levitsky
+
 
 
