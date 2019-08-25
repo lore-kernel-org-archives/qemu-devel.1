@@ -2,67 +2,93 @@ Return-Path: <SRS0=aJdJ=WV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E714C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 17:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C494C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 17:29:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E5012082F
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 17:17:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E5012082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 158832173E
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Aug 2019 17:29:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J/CMLLwt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 158832173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i1w8Z-0000Ll-GK
-	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 13:17:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40824)
+	id 1i1wKG-0002YF-BT
+	for qemu-devel@archiver.kernel.org; Sun, 25 Aug 2019 13:29:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i1w7X-0008H0-H9
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:16:04 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i1wJN-000210-VU
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i1w7W-00031n-Ev
- for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:16:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52118)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i1w7T-00030X-Vc; Sun, 25 Aug 2019 13:16:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1B6E7C057E9A;
- Sun, 25 Aug 2019 17:15:59 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 36A4860610;
- Sun, 25 Aug 2019 17:15:54 +0000 (UTC)
-Message-ID: <28af135f4d8974634cf27e1dcaf22b46fc57e584.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>, Max Reitz
- <mreitz@redhat.com>
-Date: Sun, 25 Aug 2019 20:15:52 +0300
-In-Reply-To: <cd1bc2cf3e2748db8aa686534ae7d84c71a58e69.camel@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-6-mlevitsk@redhat.com>
- <6019b9e3-a4a6-4780-9652-f7c2bec024a5@redhat.com>
- <20190822104945.GJ3267@redhat.com>
- <e5e2c603c616b6a14419f9942016f7df0c177610.camel@redhat.com>
- <cd1bc2cf3e2748db8aa686534ae7d84c71a58e69.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Sun, 25 Aug 2019 17:15:59 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 05/13] qcrypto-luks: clear the masterkey
- and password before freeing them always
+ (envelope-from <richard.henderson@linaro.org>) id 1i1wJM-00073P-FO
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:28:17 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40207)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i1wJM-00073A-8r
+ for qemu-devel@nongnu.org; Sun, 25 Aug 2019 13:28:16 -0400
+Received: by mail-pf1-x441.google.com with SMTP id w16so10052162pfn.7
+ for <qemu-devel@nongnu.org>; Sun, 25 Aug 2019 10:28:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=VV2xxxc22WiXjDePmylZfc03QMdFsnHN3+k11KLZ/pU=;
+ b=J/CMLLwtjwteBboyx+qHoHdufC0jYcedk6WAElyAQgdcWRr9Oe9Oo0gA3L5AQfwNBN
+ hdG71oLqbTcCDbV/AA5ceH2T1Pgt0K9wN0dPUJyEChMYPBH9YdnFgh/wIBfYIdJfatAO
+ 5nEuD+L98kj3SQohPeVS29PiUJaqa0cEOmKs7CtE0MXL2JBdtuGtS1BjfQtfhml4SIwp
+ J4VsEg7xKzyvLjRaqIAKknYPA/JlHNpxWoWXnWBrrBr4Y8/dDAvnOL4HbQbTXSXZqVji
+ ea5aT54892zqSKKoyVbrjDro1xR/RQ6rIkQdjQaFH1KjSHnMm2DAs2JOYz/30x9nOiQN
+ u1xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=VV2xxxc22WiXjDePmylZfc03QMdFsnHN3+k11KLZ/pU=;
+ b=q6KD6TC3981AMM+8irAGt6XMS9oyYWSnAi/x6PUqxRi8gC2QnJRScue3z0IPX9mqTu
+ zj2L3x26NLrceRUSz8ZyWEUSlHZNiJVU74saHHiXkBterL0p0zvzgnqBpf4xL5XJFQJo
+ AU2DMT+GJhZWQCqSxonIBf0aRDDEfhymMs4NdpSwblIHKVaBDOuwk8Pmzikxhue8DLBg
+ jv4YWZYxitTizX3pFZKaJ5YIKlc4Oe/6s0mkfWaDwjP7sYmWJtFpihfx0XObU4+MVz+3
+ nanPDGQIXQBJEF0V0KSwe54WUEnkBwH4yUyWZbdNCEnjrGTgwI9EJ3J7o1isic54FQe7
+ DrHA==
+X-Gm-Message-State: APjAAAWsJXsz9cYbmpazBop4xrhpGJUQciQHDVmHZymGitxwd9X8a2/g
+ VxIItPFGi58wJP4oOrBHktZdJtgsFio=
+X-Google-Smtp-Source: APXvYqzv4/02jq9IREq1vNDXA9Us0tBejOHBEKt8mdgfIWTr2S/QHUFjjJDe56KnJFw9Ao8i5Pm2nw==
+X-Received: by 2002:a63:6146:: with SMTP id v67mr13456645pgb.271.1566754094749; 
+ Sun, 25 Aug 2019 10:28:14 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id h20sm10167110pfq.156.2019.08.25.10.28.12
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 25 Aug 2019 10:28:13 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-36-richard.henderson@linaro.org>
+ <CAFEAcA8JGUdM5v0MCb98Jw+iJNC+ZMD5SDrPVR0dHGgtMOdk6A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <162644ea-ae46-576f-7dea-6696db364c68@linaro.org>
+Date: Sun, 25 Aug 2019 10:28:11 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8JGUdM5v0MCb98Jw+iJNC+ZMD5SDrPVR0dHGgtMOdk6A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v2 35/68] target/arm: Convert CPS
+ (privileged)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,77 +100,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 2019-08-25 at 18:31 +0300, Maxim Levitsky wrote:
-> On Thu, 2019-08-22 at 13:56 +0300, Maxim Levitsky wrote:
-> > On Thu, 2019-08-22 at 11:49 +0100, Daniel P. Berrang=C3=A9 wrote:
-> > > On Tue, Aug 20, 2019 at 08:12:51PM +0200, Max Reitz wrote:
-> > > > On 14.08.19 22:22, Maxim Levitsky wrote:
-> > > > > While there are other places where these are still stored in me=
-mory,
-> > > > > this is still one less key material area that can be sniffed wi=
-th
-> > > > > various side channel attacks
-> > > > >=20
-> > > > >=20
-> > > > >=20
-> > > >=20
-> > > > (Many empty lines here)
-> > > >=20
-> > > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > > ---
-> > > > >  crypto/block-luks.c | 52 +++++++++++++++++++++++++++++++++++++=
-+-------
-> > > > >  1 file changed, 44 insertions(+), 8 deletions(-)
-> > > >=20
-> > > > Wouldn=E2=80=99t it make sense to introduce a dedicated function =
-for this?
-> > >=20
-> > > Yes, it would.
-> > >=20
-> > > In fact I have a series pending which bumps min glib and introduces
-> > > use of auto-free functions in this code.
-> > >=20
-> > > It would be desirable to have a autp-free func for memset+free
-> > > so we can just declare the variable
-> > >=20
-> > >    q_autowipefree char *password =3D NULL;
-> > >=20
-> > > and have it result in memset+free
-> > >=20
-> >=20
-> > That is perfect.
-> > When do you think you could post the series so that I could rebase
-> > on top of it?
->=20
->=20
-> I am thinking that I will keep my patch as is, just so that code is
-> consistent in memsetting the secrets (even though as Nir pointed out,
-> that these will be probably optimized away anyway).
-> And then when you send your patch you will just remove all
-> of these memsets.
->=20
-> Is this all right?=20
+On 8/25/19 9:20 AM, Peter Maydell wrote:
+> On Mon, 19 Aug 2019 at 22:38, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/translate.c       | 87 +++++++++++++++---------------------
+>>  target/arm/a32-uncond.decode |  3 ++
+>>  target/arm/t32.decode        |  3 ++
+>>  3 files changed, 42 insertions(+), 51 deletions(-)
+>> diff --git a/target/arm/t32.decode b/target/arm/t32.decode
+>> index 18c268e712..354ad77fe6 100644
+>> --- a/target/arm/t32.decode
+>> +++ b/target/arm/t32.decode
+>> @@ -44,6 +44,7 @@
+>>  &bfi             !extern rd rn lsb msb
+>>  &sat             !extern rd rn satimm imm sh
+>>  &pkh             !extern rd rn rm imm tb
+>> +&cps             !extern mode imod M A I F
+>>
+>>  # Data-processing (register)
+>>
+>> @@ -340,6 +341,8 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+>>      SMC          1111 0111 1111 imm:4 1000 0000 0000 0000     &i
+>>      HVC          1111 0111 1110 ....  1000 .... .... ....     \
+>>                   &i imm=%imm16_16_0
+>> +    CPS          1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
+>> +                 &cps
+> 
+> In T32 the CPS insn overlaps with the hint space (hint insns have
+> bits [10:8] all-zeroes, whereas all the valid CPS insns have either
+> M set or one of the imod bits set) -- why doesn't it need to be
+> in the same insn group as the hints? If we're going to put it
+> separated in the .decode file from the insns it overlaps with
+> I guess a comment to that effect would help so it doesn't get
+> inadvertently reordered with them.
 
-I see that your series actually already got merged.
-Can I now implement the 'q_autowipefree', or do I need another glib versi=
-on bump
-for that?
+It is grouped.  It's not immediately visible in the patch because there are a
+*lot* of insns that overlap with the hints and 3 lines of context are
+insufficient to see that.
 
-Best regards,
-	Maxim Levitsky
+But the grouping is semi-visible in the indentation here.
+
+> CPS shouldn't exist at all for M-profile, but the legacy decoder
+> got this wrong too, so we should put that on the todo list for
+> fixing later (along, maybe, with UNDEFing on some of the
+> unpredictable combinations of M/imod/etc for A profile?).
+
+Fixing m-profile is just as easy as as commenting.
+I'll leave a TODO for the unpredictable combinations.
 
 
->=20
-> Best regards,
-> 	Maxim Levitsky
-
-
+r~
 
