@@ -2,91 +2,65 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C1BC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 055DBC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:56:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43A7620679
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:52:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OOjAxfmh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A7620679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8DB3A20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:56:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DB3A20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2GM1-0006EG-D9
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 10:52:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43666)
+	id 1i2GPj-0000GE-23
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 10:56:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49346)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i2Fsw-0007It-9J
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 10:22:22 -0400
+ (envelope-from <imammedo@redhat.com>) id 1i2GLa-0006Kx-QR
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 10:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i2Fsu-0003aW-Do
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 10:22:18 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44617)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i2Fsu-0003Zr-6x
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 10:22:16 -0400
-Received: by mail-pg1-x541.google.com with SMTP id i18so10708905pgl.11
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 07:22:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=kc7AH2q1bUZr62LaZVr8ME4H/0KBqzm432Og2Vs8AtU=;
- b=OOjAxfmhG8gCR3jVNdlt74CBlLFCFmiBobkOFoHAyAZbqvxMBEetMESFpj7CZNCfNJ
- +0EOk6p0ZcUdVL3wlfKBwZz7SJ+Jq4SphIa4s1zPgLo1CMt//8ElqF8jLyBvakDXLxJg
- zn2ppKm8vX5eEOHVgFWeQ0J24dKl1ApwtI2SKUeI7WEpkL1BUxk62GytPD7ADd6pML0m
- MXUpVfIQwbSvBTOxK1GKqr8LihjLtTdFHmKl0rYt2MlCY6QAhDyOpQP2nuSSKx2r5hPt
- oj2Ou7HKVkDCm7hSbMasQtm21PFN7Hnmwn+5lmAE0HYek0WSQ2ewnMwIfREqdDrtb07c
- gqBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kc7AH2q1bUZr62LaZVr8ME4H/0KBqzm432Og2Vs8AtU=;
- b=avyOLJ5davTvkBpyUXT84rGE7n53CBXCq8+JqIuyNYuCvgMyekNGzcIVm3Lk+ym3Vo
- mUZuZ7fT4/HtR1lMPdU5VbXHtQxbv2DGVXLjNDNVae/sHePJNo5qbWNcDa3dHx2dswUQ
- KarYRPlzknkUXzgb36izpG+tTM/MyjKPWiRRiVmpW+BTeY9K6WkGRGKmyGUTlSJ5NXRQ
- uR5LtB6ZKMBOePFwqrxgu+rc8I1RlTrugzgT2b89dHH1M3Co6pdABEF/veGGzLLb7wUv
- oix7cFOMZQ1gnye6bhWMDu1DfnNWvymAkNz9kO5vtJDMFHeAbosfKgucq0dV1cTIJLQU
- NU/A==
-X-Gm-Message-State: APjAAAVSwnsAEZB8m60IQEsMJEDxF0ggnetTYGoRub4P2ec+7IhDOeCK
- oGMvZ9lMo3LwrgHQQZSnkLIe2w==
-X-Google-Smtp-Source: APXvYqzSGa22bpchNFk8UumOXv//nshjwZet0/TLcMT1EtkJ+KC9VSVk8t6jpWJgA33llcnAIqIHLQ==
-X-Received: by 2002:a62:1d57:: with SMTP id d84mr19501515pfd.99.1566829335367; 
- Mon, 26 Aug 2019 07:22:15 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id a6sm11877171pjv.30.2019.08.26.07.22.14
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 26 Aug 2019 07:22:14 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190826075112.25637-1-david@redhat.com>
- <20190826075112.25637-5-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <69bc2320-c443-96c6-3a3d-df18eb34ae89@linaro.org>
-Date: Mon, 26 Aug 2019 07:22:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <imammedo@redhat.com>) id 1i2GLV-0004mx-Ey
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 10:51:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45688)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1i2GLV-0004mV-6q
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 10:51:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 45D3B190C019;
+ Mon, 26 Aug 2019 14:51:48 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9AC754C5;
+ Mon, 26 Aug 2019 14:51:37 +0000 (UTC)
+Date: Mon, 26 Aug 2019 16:51:35 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190826165135.03e97e1b@redhat.com>
+In-Reply-To: <87sgq0qprn.fsf@dusky.pond.sub.org>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
+ <20190815183803.13346-4-ehabkost@redhat.com>
+ <20190816152011.0c673027@redhat.com>
+ <20190816165635.GC3908@habkost.net>
+ <87sgq0qprn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190826075112.25637-5-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] tcg: Enforce single page access in
- probe_write()
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 26 Aug 2019 14:51:48 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties
+ mandatory unless necessary
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,27 +72,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Krempa <pkrempa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Like Xu <like.xu@linux.intel.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/26/19 12:51 AM, David Hildenbrand wrote:
-> Let's enforce the interface restriction.
+On Sat, 17 Aug 2019 08:17:48 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Eduardo Habkost <ehabkost@redhat.com> writes:
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  accel/tcg/cputlb.c    | 2 ++
->  accel/tcg/user-exec.c | 2 ++
->  2 files changed, 4 insertions(+)
+> > On Fri, Aug 16, 2019 at 03:20:11PM +0200, Igor Mammedov wrote:  
+> >> On Thu, 15 Aug 2019 15:38:03 -0300
+> >> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >>   
+> >> > We have this issue reported when using libvirt to hotplug CPUs:
+> >> > https://bugzilla.redhat.com/show_bug.cgi?id=1741451
+> >> > 
+> >> > Basically, libvirt is not copying die-id from
+> >> > query-hotpluggable-cpus, but die-id is now mandatory.  
+> >> 
+> >> this should have been gated on compat property and affect
+> >> only new machine types.
+> >> Maybe we should do just that instead of fixup so libvirt
+> >> would finally make proper handling of query-hotpluggable-cpus.
+> >> 
+> >>    
+> >> > We could blame libvirt and say it is not following the documented
+> >> > interface, because we have this buried in the QAPI schema
+> >> > documentation:  
+> >> 
+> >> I wouldn't say buried, if I understand it right QAPI schema
+> >> should be the authoritative source of interface description.
+> >> 
+> >> If I recall it's not the first time, there was similar issue
+> >> for exactly the same reason (libvirt not passing through
+> >> all properties from query-hotpluggable-cpus).
+> >> 
+> >> And we had to fix it up on QEMU side (numa_cpu_pre_plug),
+> >> but it seems 2 years later libvirt is still broken the same way :(
+> >> 
+> >> Should we really do fixups or finaly fix it on libvirt side?  
+> >
+> > Is it truly a bug in libvirt?  Making QEMU behave differently
+> > when getting exactly the same input sounds like a bad idea, even
+> > if we documented that at the QAPI documentation.
+> >
+> > My suggestion is to instead drop the comment below from the QAPI
+> > documentation.  New properties shouldn't become mandatory.  
+> 
+> The "comment below" is this one, in qapi/machine.json:
+> 
+> >> > > Note: currently there are 5 properties that could be present
+> >> > > but management should be prepared to pass through other
+> >> > > properties with device_add command to allow for future
+> >> > > interface extension. This also requires the filed names to be kept in
+> >> > > sync with the properties passed to -device/device_add.    
+> 
+> Goes back to commit d4633541ee0, v2.7.0.  @die-id was the first such
+> interface extension.
+> 
+> A rule like "to use command C, you must pass it whatever you get from
+> command Q" punches a hole into the "QMP is a stable interface" promise.
+> Retroactively tacking it onto an existing interface like device-add
+> some-existing-device is even more problematic than specifying it for a
+> new interface.  Mind, this is not a categorical "can't ever do that".
+> It's more like "you better show this is less bad than all the
+> alternatives we can think of, and we've thought pretty hard".
+> Since this particular hole failed us the first time anybody actually
+> tried to wiggle through it, I think Eduardo has a point when he calls
+> for filling it in by deleting the comment.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+That was a consensus we were able to reach when discussing cpu hotplug
+QMP interface. If I recall correctly idea was that it should work for
+different targets (cpu topology properties target specific) and be
+extensible without breaking old mgmt stack  or requiring its update
+in lock step.
 
+If implemented correctly mgmt would not only query from QEMU/machine
+possible CPUs (with properties and valid values needed to plug it in,
+which it does already) but also 'keep' them around and pass back to
+device_add. In that case it would have worked as designed just fine.
 
-r~
+But this also shows a problem that we still need versioned machine type
+to keep old set of properties for old machine types anyway and we can
+miss it during review as tests we have might be not enough
+(tests/cpu-plug-test didn't detect it for some reason).
+
+ 
+> By the way, the line preceding the comment
+> 
+>      # @core-id: core number within die the CPU belongs to# @thread-id: thread number within core the CPU belongs to
+> 
+> is actually two lines run together.  Messed up when @die-id was added
+> (commit 176d2cda0de).  Minor review fail (I didn't look even though I
+> was cc'ed on v2; I wasn't on v3).  Let's fix that, too.
+> 
+> >> > But I don't think this would be reasonable from us.  We can just
+> >> > make QEMU more flexible and let CPU properties to be omitted when
+> >> > there's no ambiguity.  This will allow us to keep compatibility
+> >> > with existing libvirt versions.  
+> >> 
+> >> I don't really like making rule from exceptions so I'd suggest doing
+> >> it only for  die_id if we have to do fix it up (with fat comment
+> >> like in numa_cpu_pre_plug).
+> >> The rest are working fine as is.  
+> >
+> > I will insist we make it consistent for all properties, but I
+> > don't want this discussion to hold the bug fix.  So I'll do this:
+> >
+> > I will submit a new patch that makes only die-id optional, and CC
+> > qemu-stable.
+> >
+> > After that, i will submit this patch again, and we can discuss
+> > whether we should make all properties optional.  
+> 
+> Makes sense, go ahead.
+
 
