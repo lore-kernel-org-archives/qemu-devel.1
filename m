@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 461DFC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA04DC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12DBE2342D
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:30:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6C4F2342E
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:32:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Pf4vLNQq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12DBE2342D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="DrOJzD62"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C4F2342E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2KhP-0007Yi-7I
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:30:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39237)
+	id 1i2KjC-0000ki-OQ
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1i2Kaz-0007z1-Jx
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:06 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1i2Kbj-0000Xj-N7
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1i2Kay-0000P4-6W
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:05 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:18341)
+ (envelope-from <kwankhede@nvidia.com>) id 1i2Kbi-0000Zg-Ae
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:51 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:8008)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1i2Kax-0000Or-7e
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:03 -0400
+ id 1i2Kbi-0000ZQ-0X
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:50 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d6431d30001>; Mon, 26 Aug 2019 12:24:03 -0700
+ hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d6432020000>; Mon, 26 Aug 2019 12:24:50 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Mon, 26 Aug 2019 12:24:02 -0700
+ Mon, 26 Aug 2019 12:24:48 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Mon, 26 Aug 2019 12:24:02 -0700
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
- 2019 19:24:01 +0000
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
- 2019 19:24:01 +0000
+ by hqpgpgate101.nvidia.com on Mon, 26 Aug 2019 12:24:48 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
+ 2019 19:24:48 +0000
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
+ 2019 19:24:48 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 26 Aug 2019 19:23:54 +0000
+ Transport; Mon, 26 Aug 2019 19:24:42 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Date: Tue, 27 Aug 2019 00:25:44 +0530
-Message-ID: <1566845753-18993-5-git-send-email-kwankhede@nvidia.com>
+Date: Tue, 27 Aug 2019 00:25:51 +0530
+Message-ID: <1566845753-18993-12-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
 References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
@@ -64,20 +64,20 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1566847444; bh=F/gSqJlPYGHDCoClM8Z1x0XD6giuMs0/6cGvJHDBlCk=;
+ t=1566847490; bh=NwuR0TkehEcZoxqXKBOA2Ls3JpArCV3XrxkVSVtJzXk=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=Pf4vLNQq5lbYQV/LTcUJEXCC5Qw/zJfeLNT1zwlpcE5/qzPtegsfZoiPYpdNXt3nm
- t2p7kVlyC+JiFkkFL1k+N7qW5Zicg+hQuNK85UeUFZJ1H+SBYY4J8tVC4zoEBikDQa
- hE2ZfrOqTL4oNKuV+uU5VtN/8jS6tRObsU7gHdn/EcIyXf5b2PCI1bhgxZ5TLsIDJN
- 4oAM+qmk8h6TtlYaOz8O0Aw6Q89BrSnarmtIMbAoNJNm/F/FbmiKVBKRH5dxjPGbRH
- 05ns6oj6TprBFkNggDOWmBZY9HjLjcQRyHEkobOUJNhwU2iIq2cgLdRJdL1lSdDnqP
- I4H5MU4Nh/XMg==
+ b=DrOJzD62VOJz5YdfQ6jW30MumT6w5zRTCbt898R3SbRRazriodXmlh+DhJsaNCDtU
+ 67GzdE6C75P0bB0m/MUaC/1zaOlaMgAr1A8auX4tPwaW5OCkAmjJi1TCXX7cSSO00y
+ S1k+GEe7YB1erDEsvEPu58lXYzR4QJo4z6zzbHcGvapfL1BeMlZc6LTvhZ50XF6M2C
+ aXqRONrGKs+aRxIUDe95QalqulTcmGxvMDJGEHAc5LYhpvSGEWn83qdeAr3xz6HDDt
+ 9hftUPUB/lST9/bnHgTv8YDt0KPK6FJpBWk5yae8wt/yx5XE10p7Y5kAFFzniGTFQf
+ FfC1SxVXjAzdQ==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.64
-Subject: [Qemu-devel] [PATCH v8 04/13] vfio: Add save and load functions for
- VFIO PCI devices
+X-Received-From: 216.228.121.65
+Subject: [Qemu-devel] [PATCH v8 11/13] vfio: Add function to get dirty page
+ list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,228 +100,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These functions save and restore PCI device specific data - config
-space of PCI device.
-Tested save and restore with MSI and MSIX type.
+Dirty page tracking (.log_sync) is part of RAM copying state, where
+vendor driver provides the bitmap of pages which are dirtied by vendor
+driver through migration region and as part of RAM copy, those pages
+gets copied to file stream.
+
+To get dirty page bitmap:
+- write start address, page_size and pfn count.
+- read count of pfns copied. Vendor driver should take one of the below action:
+    - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if driver
+      doesn't have any page to report dirty in given range or rest of the range
+    - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to mark all pages
+      dirty for given range or rest of the range.
+    - Vendor driver should return copied_pfns and provide bitmap for copied_pfn
+      in migration region.
+- read data_offset, where vendor driver has written bitmap.
+- read bitmap from from the migration region from data_offset.
+- Iterate above steps till page bitmap for all requested pfns are copied.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- hw/vfio/pci.c                 | 168 ++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/migration.c           | 123 ++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events          |   1 +
  include/hw/vfio/vfio-common.h |   2 +
- 2 files changed, 170 insertions(+)
+ 3 files changed, 126 insertions(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 56166cae824f..161068286592 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -40,6 +40,7 @@
- #include "pci.h"
- #include "trace.h"
- #include "qapi/error.h"
-+#include "migration/qemu-file.h"
- 
- #define TYPE_VFIO_PCI "vfio-pci"
- #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
-@@ -1618,6 +1619,55 @@ static void vfio_bars_prepare(VFIOPCIDevice *vdev)
-     }
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index 765015fdc2dd..eff4b2a4a6e8 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -276,6 +276,129 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
+     return qemu_file_get_error(f);
  }
  
-+static int vfio_bar_validate(VFIOPCIDevice *vdev, int nr)
++void vfio_get_dirty_page_list(VFIODevice *vbasedev,
++                              uint64_t start_pfn,
++                              uint64_t pfn_count,
++                              uint64_t page_size)
 +{
-+    PCIDevice *pdev = &vdev->pdev;
-+    VFIOBAR *bar = &vdev->bars[nr];
-+    uint64_t addr;
-+    uint32_t addr_lo, addr_hi = 0;
++    VFIOMigration *migration = vbasedev->migration;
++    VFIORegion *region = &migration->region;
++    uint64_t count = 0;
++    int64_t copied_pfns = 0;
++    int64_t total_pfns = pfn_count;
++    int ret;
 +
-+    /* Skip unimplemented BARs and the upper half of 64bit BARS. */
-+    if (!bar->size) {
-+        return 0;
-+    }
++    qemu_mutex_lock(&migration->lock);
 +
-+    /* skip IO BAR */
-+    if (bar->ioport) {
-+        return 0;
-+    }
++    while (total_pfns > 0) {
++        uint64_t bitmap_size, data_offset = 0;
++        uint64_t start = start_pfn + count;
++        void *buf = NULL;
++        bool buffer_mmaped = false;
 +
-+    addr_lo = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + nr * 4, 4);
++        ret = pwrite(vbasedev->fd, &start, sizeof(start),
++                 region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                              start_pfn));
++        if (ret < 0) {
++            error_report("%s: Failed to set dirty pages start address %d %s",
++                         vbasedev->name, ret, strerror(errno));
++            goto dpl_unlock;
++        }
 +
-+    addr_lo = addr_lo & (bar->ioport ? PCI_BASE_ADDRESS_IO_MASK :
-+                                       PCI_BASE_ADDRESS_MEM_MASK);
-+    if (bar->type == PCI_BASE_ADDRESS_MEM_TYPE_64) {
-+        addr_hi = pci_default_read_config(pdev,
-+                                         PCI_BASE_ADDRESS_0 + (nr + 1) * 4, 4);
-+    }
++        ret = pwrite(vbasedev->fd, &page_size, sizeof(page_size),
++                 region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                              page_size));
++        if (ret < 0) {
++            error_report("%s: Failed to set dirty page size %d %s",
++                         vbasedev->name, ret, strerror(errno));
++            goto dpl_unlock;
++        }
 +
-+    addr = ((uint64_t)addr_hi << 32) | addr_lo;
++        ret = pwrite(vbasedev->fd, &total_pfns, sizeof(total_pfns),
++                 region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                              total_pfns));
++        if (ret < 0) {
++            error_report("%s: Failed to set dirty page total pfns %d %s",
++                         vbasedev->name, ret, strerror(errno));
++            goto dpl_unlock;
++        }
 +
-+    if (!QEMU_IS_ALIGNED(addr, bar->size)) {
-+        return -EINVAL;
-+    }
++        /* Read copied dirty pfns */
++        ret = pread(vbasedev->fd, &copied_pfns, sizeof(copied_pfns),
++                region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                             copied_pfns));
++        if (ret < 0) {
++            error_report("%s: Failed to get dirty pages bitmap count %d %s",
++                         vbasedev->name, ret, strerror(errno));
++            goto dpl_unlock;
++        }
 +
-+    return 0;
-+}
++        if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_NONE) {
++            /*
++             * copied_pfns could be 0 if driver doesn't have any page to
++             * report dirty in given range
++             */
++            break;
++        } else if (copied_pfns == VFIO_DEVICE_DIRTY_PFNS_ALL) {
++            /* Mark all pages dirty for this range */
++            cpu_physical_memory_set_dirty_range(start * page_size,
++                                                total_pfns * page_size,
++                                                DIRTY_MEMORY_MIGRATION);
++            break;
++        }
 +
-+static int vfio_bars_validate(VFIOPCIDevice *vdev)
-+{
-+    int i, ret;
++        bitmap_size = BITS_TO_LONGS(copied_pfns) * sizeof(unsigned long);
 +
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        ret = vfio_bar_validate(vdev, i);
-+        if (ret) {
-+            error_report("vfio: BAR address %d validation failed", i);
-+            return ret;
++        ret = pread(vbasedev->fd, &data_offset, sizeof(data_offset),
++                region->fd_offset + offsetof(struct vfio_device_migration_info,
++                                             data_offset));
++        if (ret != sizeof(data_offset)) {
++            error_report("%s: Failed to get migration buffer data offset %d",
++                         vbasedev->name, ret);
++            goto dpl_unlock;
++        }
++
++        if (region->mmaps) {
++            buf = find_data_region(region, data_offset, bitmap_size);
++        }
++
++        buffer_mmaped = (buf != NULL) ? true : false;
++
++        if (!buffer_mmaped) {
++            buf = g_try_malloc0(bitmap_size);
++            if (!buf) {
++                error_report("%s: Error allocating buffer ", __func__);
++                goto dpl_unlock;
++            }
++
++            ret = pread(vbasedev->fd, buf, bitmap_size,
++                        region->fd_offset + data_offset);
++            if (ret != bitmap_size) {
++                error_report("%s: Failed to get dirty pages bitmap %d",
++                             vbasedev->name, ret);
++                g_free(buf);
++                goto dpl_unlock;
++            }
++        }
++
++        cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
++                                               start * page_size,
++                                               copied_pfns);
++        count      += copied_pfns;
++        total_pfns -= copied_pfns;
++
++        if (!buffer_mmaped) {
++            g_free(buf);
 +        }
 +    }
-+    return 0;
++
++    trace_vfio_get_dirty_page_list(vbasedev->name, start_pfn, pfn_count,
++                                   page_size);
++
++dpl_unlock:
++    qemu_mutex_unlock(&migration->lock);
 +}
 +
- static void vfio_bar_register(VFIOPCIDevice *vdev, int nr)
- {
-     VFIOBAR *bar = &vdev->bars[nr];
-@@ -2400,11 +2450,129 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
-     return OBJECT(vdev);
- }
+ /* ---------------------------------------------------------------------- */
  
-+static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-+{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-+    PCIDevice *pdev = &vdev->pdev;
-+    uint16_t pci_cmd;
-+    int i;
-+
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        uint32_t bar;
-+
-+        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
-+        qemu_put_be32(f, bar);
-+    }
-+
-+    qemu_put_be32(f, vdev->interrupt);
-+    if (vdev->interrupt == VFIO_INT_MSI) {
-+        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-+        bool msi_64bit;
-+
-+        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-+                                            2);
-+        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-+
-+        msi_addr_lo = pci_default_read_config(pdev,
-+                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-+        qemu_put_be32(f, msi_addr_lo);
-+
-+        if (msi_64bit) {
-+            msi_addr_hi = pci_default_read_config(pdev,
-+                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-+                                             4);
-+        }
-+        qemu_put_be32(f, msi_addr_hi);
-+
-+        msi_data = pci_default_read_config(pdev,
-+                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-+                2);
-+        qemu_put_be32(f, msi_data);
-+    } else if (vdev->interrupt == VFIO_INT_MSIX) {
-+        uint16_t offset;
-+
-+        /* save enable bit and maskall bit */
-+        offset = pci_default_read_config(pdev,
-+                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
-+        qemu_put_be16(f, offset);
-+        msix_save(pdev, f);
-+    }
-+    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-+    qemu_put_be16(f, pci_cmd);
-+}
-+
-+static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-+{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-+    PCIDevice *pdev = &vdev->pdev;
-+    uint32_t interrupt_type;
-+    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-+    uint16_t pci_cmd;
-+    bool msi_64bit;
-+    int i, ret;
-+
-+    /* retore pci bar configuration */
-+    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-+    vfio_pci_write_config(pdev, PCI_COMMAND,
-+                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        uint32_t bar = qemu_get_be32(f);
-+
-+        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
-+    }
-+
-+    ret = vfio_bars_validate(vdev);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    interrupt_type = qemu_get_be32(f);
-+
-+    if (interrupt_type == VFIO_INT_MSI) {
-+        /* restore msi configuration */
-+        msi_flags = pci_default_read_config(pdev,
-+                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
-+        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-+
-+        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-+                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
-+
-+        msi_addr_lo = qemu_get_be32(f);
-+        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
-+                              msi_addr_lo, 4);
-+
-+        msi_addr_hi = qemu_get_be32(f);
-+        if (msi_64bit) {
-+            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-+                                  msi_addr_hi, 4);
-+        }
-+        msi_data = qemu_get_be32(f);
-+        vfio_pci_write_config(pdev,
-+                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-+                msi_data, 2);
-+
-+        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-+                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
-+    } else if (interrupt_type == VFIO_INT_MSIX) {
-+        uint16_t offset = qemu_get_be16(f);
-+
-+        /* load enable bit and maskall bit */
-+        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
-+                              offset, 2);
-+        msix_load(pdev, f);
-+    }
-+    pci_cmd = qemu_get_be16(f);
-+    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
-+    return 0;
-+}
-+
- static VFIODeviceOps vfio_pci_ops = {
-     .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
-     .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
-     .vfio_eoi = vfio_intx_eoi,
-     .vfio_get_object = vfio_pci_get_object,
-+    .vfio_save_config = vfio_pci_save_config,
-+    .vfio_load_config = vfio_pci_load_config,
- };
- 
- int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+ static int vfio_save_setup(QEMUFile *f, void *opaque)
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index ac065b559f4e..414a5e69ec5e 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -160,3 +160,4 @@ vfio_save_complete_precopy(char *name) " (%s)"
+ vfio_load_device_config_state(char *name) " (%s)"
+ vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
+ vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
++vfio_get_dirty_page_list(char *name, uint64_t start, uint64_t pfn_count, uint64_t page_size) " (%s) start 0x%"PRIx64" pfn_count 0x%"PRIx64 " page size 0x%"PRIx64
 diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 771b6d59a3db..6ea4898c4d7e 100644
+index dcab8a4ae0f9..41ff5ebba27d 100644
 --- a/include/hw/vfio/vfio-common.h
 +++ b/include/hw/vfio/vfio-common.h
-@@ -120,6 +120,8 @@ struct VFIODeviceOps {
-     int (*vfio_hot_reset_multi)(VFIODevice *vdev);
-     void (*vfio_eoi)(VFIODevice *vdev);
-     Object *(*vfio_get_object)(VFIODevice *vdev);
-+    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
-+    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
- };
+@@ -219,5 +219,7 @@ int vfio_spapr_remove_window(VFIOContainer *container,
  
- typedef struct VFIOGroup {
+ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
+ void vfio_migration_finalize(VFIODevice *vbasedev);
++void vfio_get_dirty_page_list(VFIODevice *vbasedev, uint64_t start_pfn,
++                               uint64_t pfn_count, uint64_t page_size);
+ 
+ #endif /* HW_VFIO_VFIO_COMMON_H */
 -- 
 2.7.0
 
