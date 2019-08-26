@@ -2,90 +2,92 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA0AC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4E1C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:28:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0FF62080C
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:27:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IshpynXs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0FF62080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id ABEFC21852
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:28:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABEFC21852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2HqL-0002ZD-OC
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:27:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38593)
+	id 1i2HrV-0003UQ-Sh
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:28:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38191)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i2Hn4-0000WF-Iv
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:24:25 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2HjP-0005xk-TR
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i2Hn0-00071L-2o
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:24:21 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34456)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i2Hmu-0006yE-S7
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:24:13 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s18so15960090wrn.1
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 09:24:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=V7nehTfNBRDtYYVfb4T3FnHfeZzbZftCZ2XfbyBu86k=;
- b=IshpynXsLVBv4xI+xNKrg3oRHgFXGNaTcAnzcldPmtSsfCJ5kCCPt8uVE4WN4C534j
- 19Cj+bQdajBKnyZXCyfCgD8RYDZU/oTnEw0l1vFvghDHwepaQxwUJCFFmYWX5uSb8RFy
- Jxg121uZggDaAN/kwX7gs5oAOKw/ULvUcqHpFH9awxrEL9aoWEIuspoQic0Iq1yed5k4
- HLuIAkL8WePtGpVvFrBDy220pQf4x00pWiYc5MrKGxDvfJClfQqeneoaz7IZWe9YpcAL
- YoPbQdo2o82lB61HDHrk0irA2yMqpbXIrCK88EvCvmO/QGfGkU4EUhVrDxnzGHUTEQoP
- iY3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=V7nehTfNBRDtYYVfb4T3FnHfeZzbZftCZ2XfbyBu86k=;
- b=DSJ1yt8mz1ijf3vupYo1xdcX16iPNP60yjXmFv9L6OejmM2fY8Pd9NE7aOz/f94iZM
- 14+ouE1qXMkoQlu2f8cR7XETY5ZY2N1Rwyd40Y45xXb2Nur+0W9CN5WOMBDu6V+BLRwt
- cQSCRX2rm1PY1WbUg06u/CkOrd757XEFI/1wz7ZmdMjXk/hOZoJ+CBIAmYApXXSCqqOV
- 0qRI4/SYLXX8F2ESeZwm2p7iRGJCoEwDbYny7lwKqqxfvGavDg8dR3UTS5cmYdCGb/C+
- Ued2rjJNw/WVegi5jeDGJGNSfKACsaNZF2OBTRPSv8za1aC+LwFSmmgLAMrTjPBiumcu
- ciNw==
-X-Gm-Message-State: APjAAAUjsxqhPXp+nfQnYu6vjynSDcMjvH/WrWmBwMxP/7C8lZUYBbS6
- MQxuGT40oVRgomrZvD+AiUirug==
-X-Google-Smtp-Source: APXvYqwebTZD5PgkC1518awJAkD+O+sbizOyyDoBQDEzFSHveiwbzKXxM9wlWfqAuRK/oXIEMup9qQ==
-X-Received: by 2002:adf:f7cd:: with SMTP id a13mr23516770wrq.165.1566836649724; 
- Mon, 26 Aug 2019 09:24:09 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 6sm12799211wmf.23.2019.08.26.09.24.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Aug 2019 09:24:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 55EAC1FF87;
- Mon, 26 Aug 2019 17:24:08 +0100 (BST)
-References: <20190821172329.2062-1-vandersonmr2@gmail.com>
- <20190821172329.2062-2-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: vandersonmr <vandersonmr2@gmail.com>
-In-reply-to: <20190821172329.2062-2-vandersonmr2@gmail.com>
-Date: Mon, 26 Aug 2019 17:24:08 +0100
-Message-ID: <87h863zyhj.fsf@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1i2HjO-00052x-Oy
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:20:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50180)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i2HjK-00051S-N2; Mon, 26 Aug 2019 12:20:30 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0B41688309;
+ Mon, 26 Aug 2019 16:20:30 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A233F19D7A;
+ Mon, 26 Aug 2019 16:20:28 +0000 (UTC)
+To: Nir Soffer <nirsof@gmail.com>
+References: <20190825220329.7942-1-nsoffer@redhat.com>
+ <20190825220329.7942-2-nsoffer@redhat.com>
+ <e4e45496-b867-4e57-5b25-d0f1425d4824@redhat.com>
+ <CAMr-obvF9d=ed0hxa0FRCqFU93U8Mi21nZ6zoraYm2EfpgpQag@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b6c4c33e-2b02-6cbc-6a5e-bb024258e889@redhat.com>
+Date: Mon, 26 Aug 2019 18:20:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v6 01/10] accel: introducing TBStatistics
- structure
+In-Reply-To: <CAMr-obvF9d=ed0hxa0FRCqFU93U8Mi21nZ6zoraYm2EfpgpQag@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Q543Tb5c1S578Aq7LyDfqq12QN1s39nbW"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Mon, 26 Aug 2019 16:20:30 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: posix: Always allocate the
+ first block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,145 +99,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Q543Tb5c1S578Aq7LyDfqq12QN1s39nbW
+Content-Type: multipart/mixed; boundary="uPRJLhd5ppD49UpwlUutbritbrTcA5NTt";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Nir Soffer <nirsof@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Nir Soffer <nsoffer@redhat.com>
+Message-ID: <b6c4c33e-2b02-6cbc-6a5e-bb024258e889@redhat.com>
+Subject: Re: [PATCH v2 1/2] block: posix: Always allocate the first block
+References: <20190825220329.7942-1-nsoffer@redhat.com>
+ <20190825220329.7942-2-nsoffer@redhat.com>
+ <e4e45496-b867-4e57-5b25-d0f1425d4824@redhat.com>
+ <CAMr-obvF9d=ed0hxa0FRCqFU93U8Mi21nZ6zoraYm2EfpgpQag@mail.gmail.com>
+In-Reply-To: <CAMr-obvF9d=ed0hxa0FRCqFU93U8Mi21nZ6zoraYm2EfpgpQag@mail.gmail.com>
 
-vandersonmr <vandersonmr2@gmail.com> writes:
+--uPRJLhd5ppD49UpwlUutbritbrTcA5NTt
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> To store statistics for each TB, we created a TBStatistics structure
-> which is linked with the TBs. TBStatistics can stay alive after
-> tb_flush and be relinked to a regenerated TB. So the statistics can
-> be accumulated even through flushes.
->
-> The goal is to have all present and future qemu/tcg statistics and
-> meta-data stored in this new structure.
->
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
-> ---
->  accel/tcg/Makefile.objs      |  2 +-
->  accel/tcg/perf/Makefile.objs |  1 +
->  accel/tcg/tb-stats.c         | 39 ++++++++++++++++++++++++
->  accel/tcg/translate-all.c    | 57 ++++++++++++++++++++++++++++++++++++
->  include/exec/exec-all.h      | 15 +++-------
->  include/exec/tb-context.h    | 12 ++++++++
->  include/exec/tb-hash.h       |  7 +++++
->  include/exec/tb-stats.h      | 43 +++++++++++++++++++++++++++
->  util/log.c                   |  2 ++
->  9 files changed, 166 insertions(+), 12 deletions(-)
->  create mode 100644 accel/tcg/perf/Makefile.objs
->  create mode 100644 accel/tcg/tb-stats.c
->  create mode 100644 include/exec/tb-stats.h
->
-> diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-> index d381a02f34..49ffe81b5d 100644
-> --- a/accel/tcg/Makefile.objs
-> +++ b/accel/tcg/Makefile.objs
-> @@ -2,7 +2,7 @@ obj-$(CONFIG_SOFTMMU) +=3D tcg-all.o
->  obj-$(CONFIG_SOFTMMU) +=3D cputlb.o
->  obj-y +=3D tcg-runtime.o tcg-runtime-gvec.o
->  obj-y +=3D cpu-exec.o cpu-exec-common.o translate-all.o
-> -obj-y +=3D translator.o
-> +obj-y +=3D translator.o tb-stats.o
->
->  obj-$(CONFIG_USER_ONLY) +=3D user-exec.o
->  obj-$(call lnot,$(CONFIG_SOFTMMU)) +=3D user-exec-stub.o
-> diff --git a/accel/tcg/perf/Makefile.objs b/accel/tcg/perf/Makefile.objs
-> new file mode 100644
-> index 0000000000..f82fba35e5
-> --- /dev/null
-> +++ b/accel/tcg/perf/Makefile.objs
-> @@ -0,0 +1 @@
-> +obj-y +=3D jitdump.o
-> diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
-> new file mode 100644
-> index 0000000000..02844717cb
-> --- /dev/null
-> +++ b/accel/tcg/tb-stats.c
-> @@ -0,0 +1,39 @@
+On 26.08.19 17:41, Nir Soffer wrote:
+> On Mon, Aug 26, 2019 at 3:31 PM Max Reitz <mreitz@redhat.com> wrote:
+>>
+>> On 26.08.19 00:03, Nir Soffer wrote:
+> ...
+>>> +/*
+>>> + * Help alignment probing by allocating the first block.
+>>> + *
+>>> + * When reading with direct I/O from unallocated area on Gluster bac=
+ked by XFS,
+>>> + * reading succeeds regardless of request length. In this case we fa=
+llback to
+>>> + * safe alignment which is not optimal. Allocating the first block a=
+voids this
+>>> + * fallback.
+>>> + *
+>>> + * fd may be opened with O_DIRECT, but we don't know the buffer alig=
+nment or
+>>> + * request alignment, so we use safe values.
+>>> + *
+>>> + * Returns: 0 on success, -errno on failure. Since this is an optimi=
+zation,
+>>> + * caller may ignore failures.
+>>> + */
+>>> +static int allocate_first_block(int fd, size_t max_size)
+>>> +{
+>>> +    size_t write_size =3D MIN(MAX_BLOCKSIZE, max_size);
+>>
+>> Hm, well, there was a reason why I proposed rounding this down to the
+>> next power of two.  If max_size is not a power of two but below
+>> MAX_BLOCKSIZE, write_size will not be a power of two, and thus the wri=
+te
+>> below may fail even if write_size exceeds the physical block size.
+>>
+>> You can see that in the test case you add by using e.g. 768 as the
+>> destination size (provided your test filesystem has a block size of 51=
+2).
+>>
+>> Now I would like to say that it=E2=80=99s stupid to resize an O_DIRECT=
+ file to a
+>> size that is not a multiple of the block size; but I=E2=80=99ve had a =
+bug
+>> assigned to me before because that didn=E2=80=99t work.
+>>
+>> But maybe it=E2=80=99s actually better if it doesn=E2=80=99t work.  I =
+don=E2=80=99t know.
+>=20
+> I tried to avoid complexity that is unlikely to help anyone, but we
+> can make the (typical)
+> case of 512 bytes sector size work with this:
+>=20
+>     size_t write_size =3D (max_size < MAX_BLOCKSIZE)
+>         ? BDRV_SECTOR_SIZE
+>         : MAX_BLOCKSIZE;
+>=20
+> Unfortunately testing max_size < 4096 will not be reliable since we don=
+'t know
+> that underlying storage sector size.
 
-I should have picked up on this last time but you need a copyright
-header for you new files.
+Hm, well, why not, actually.  That=E2=80=99s simple enough and it should =
+work in
+all common configurations.
 
-> +#include "qemu/osdep.h"
-> +
-> +#include "disas/disas.h"
-> +
-> +#include "exec/tb-stats.h"
-> +
-<snip>
-> diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-> new file mode 100644
-> index 0000000000..cc8f8a6ce6
-> --- /dev/null
-> +++ b/include/exec/tb-stats.h
-> @@ -0,0 +1,43 @@
-
-And a copyright header here as well.
-
-> +#ifndef TB_STATS_H
-> +
-> +#define TB_STATS_H
-> +
-> +#include "exec/cpu-common.h"
-> +#include "exec/tb-context.h"
-> +#include "tcg.h"
-> +
-> +typedef struct TBStatistics TBStatistics;
-> +
-> +/*
-> + * This struct stores statistics such as execution count of the
-> + * TranslationBlocks. Each sets of TBs for a given phys_pc/pc/flags
-> + * has its own TBStatistics which will persist over tb_flush.
-> + *
-> + * We include additional counters to track number of translations as
-> + * well as variants for compile flags.
-> + */
-> +struct TBStatistics {
-> +    tb_page_addr_t phys_pc;
-> +    target_ulong pc;
-> +    uint32_t     flags;
-> +    /* cs_base isn't included in the hash but we do check for matches */
-> +    target_ulong cs_base;
-> +    /* current TB linked to this TBStatistics */
-> +    TranslationBlock *tb;
-> +};
-> +
-> +bool tb_stats_cmp(const void *ap, const void *bp);
-> +
-> +void init_tb_stats_htable_if_not(void);
-> +
-> +/* TBStatistic collection controls */
-> +enum TBStatsStatus { TB_STATS_RUNNING, TB_STATS_PAUSED, TB_STATS_STOPPED=
- };
-> +extern int tcg_collect_tb_stats;
-> +
-> +void enable_collect_tb_stats(void);
-> +void disable_collect_tb_stats(void);
-> +void pause_collect_tb_stats(void);
-> +bool tb_stats_collection_enabled(void);
-> +bool tb_stats_collection_paused(void);
-> +
-> +#endif
-> diff --git a/util/log.c b/util/log.c
-> index 1d1b33f7d9..393a17115b 100644
-> --- a/util/log.c
-> +++ b/util/log.c
-> @@ -31,6 +31,8 @@ int qemu_loglevel;
->  static int log_append =3D 0;
->  static GArray *debug_regions;
->
-> +int tcg_collect_tb_stats;
-> +
->  /* Return the number of characters emitted.  */
->  int qemu_log(const char *fmt, ...)
->  {
+Max
 
 
---
-Alex Benn=C3=A9e
+--uPRJLhd5ppD49UpwlUutbritbrTcA5NTt--
+
+--Q543Tb5c1S578Aq7LyDfqq12QN1s39nbW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1kBssACgkQ9AfbAGHV
+z0A/AQgAg7VWz+H9Mmbtqob/gtq9ZAoDXl3bO9pmVF0ttYm6mE4fb5wxGcOC3MzZ
+qvDjjHzuqP6VJFskc6w+P8c4eshZNvZhUOpo/4BC2G1Z3cEF4Vh7FdflpQ9NWJed
+V4DvjwmkQhPcTkpaGK86YlS7OXiWL7y3kNuKG4eM1/HkgwDgvKYhjyOkKwoIG2qs
+DAbOD8jYi2ypoYFi35e/jInNOrtnSXi1EIdlczhfpeFPjG+GNuJCF6N3QjvYlfXO
+XkKbU/wItnJ4DtyWaU/0qTziN4ZjYsZ3WP9GbtTpUmkCvoKlqWj89fPqow1qUSai
+AbeB81B7sFZnQ1xi5YpWalMOnXqrpw==
+=zTLi
+-----END PGP SIGNATURE-----
+
+--Q543Tb5c1S578Aq7LyDfqq12QN1s39nbW--
 
