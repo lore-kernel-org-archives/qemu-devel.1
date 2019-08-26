@@ -2,83 +2,63 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F5AC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54589C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:34:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED29323405
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:31:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED29323405
+	by mail.kernel.org (Postfix) with ESMTPS id 240E7217F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:34:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 240E7217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2GyN-0000Nu-2r
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:31:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57675)
+	id 1i2H0Y-0001Mw-BG
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:34:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57978)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1i2GxH-0008Nd-Hj
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:30:52 -0400
+ (envelope-from <cohuck@redhat.com>) id 1i2GzG-0000uT-4K
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:32:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1i2GxF-0000nZ-FD
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:30:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44796)
+ (envelope-from <cohuck@redhat.com>) id 1i2GzE-0001jv-Ly
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:32:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1i2GxF-0000n4-7L
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:30:49 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1i2GzE-0001jT-E0
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:32:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C996F307D915;
- Mon, 26 Aug 2019 15:30:47 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-34.ams2.redhat.com
- [10.36.117.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C05391001944;
- Mon, 26 Aug 2019 15:30:44 +0000 (UTC)
-To: "Kinney, Michael D" <michael.d.kinney@intel.com>,
- "Yao, Jiewen" <jiewen.yao@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "rfc@edk2.groups.io" <rfc@edk2.groups.io>
-References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
- <bb6fdbe0-2a3b-e586-e9a5-93e1ac0803ec@redhat.com>
- <20190816161933.7d30a881@x1.home>
- <74D8A39837DF1E4DA445A8C0B3885C503F761B96@shsmsx102.ccr.corp.intel.com>
- <35396800-32d2-c25f-b0d0-2d7cd8438687@redhat.com>
- <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
- <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
- <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
- <b3907432-b149-3f96-6d93-f443f215e0f8@redhat.com>
- <2b4ba607-f0e3-efee-6712-6dcef129b310@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA209B@ORSMSX113.amr.corp.intel.com>
- <7f2d2f1e-2dd8-6914-c55e-61067e06b142@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA218F@ORSMSX113.amr.corp.intel.com>
- <3661c0c5-3da4-1453-a66a-3e4d4022e876@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA2346@ORSMSX113.amr.corp.intel.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F76FDAF@shsmsx102.ccr.corp.intel.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA25CC@ORSMSX113.amr.corp.intel.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ea0330f1-cb6a-2a45-f8e7-3de19b117e77@redhat.com>
-Date: Mon, 26 Aug 2019 17:30:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mx1.redhat.com (Postfix) with ESMTPS id C393A3082E55
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 15:32:51 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B5FF85C1B2;
+ Mon, 26 Aug 2019 15:32:44 +0000 (UTC)
+Date: Mon, 26 Aug 2019 17:32:42 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Message-ID: <20190826173242.4d9f1f70.cohuck@redhat.com>
+In-Reply-To: <20190823175657.12085-2-dgilbert@redhat.com>
+References: <20190823175657.12085-1-dgilbert@redhat.com>
+ <20190823175657.12085-2-dgilbert@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <E92EE9817A31E24EB0585FDF735412F5B9DA25CC@ORSMSX113.amr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Mon, 26 Aug 2019 15:30:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 26 Aug 2019 15:32:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
- QEMU+OVMF
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] virtio: add vhost-user-fs base
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,84 +70,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
- "devel@edk2.groups.io" <devel@edk2.groups.io>,
- Phillip Goerl <phillip.goerl@oracle.com>,
- qemu devel list <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>, "Nakajima,
- Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/23/19 17:25, Kinney, Michael D wrote:
-> Hi Jiewen,
+On Fri, 23 Aug 2019 18:56:56 +0100
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> If a hot add CPU needs to run any code before the
-> first SMI, I would recommend is only executes code
-> from a write protected FLASH range without a stack
-> and then wait for the first SMI.
+> The virtio-fs virtio device provides shared file system access using
+> the FUSE protocol carried ovew virtio.
+> The actual file server is implemented in an external vhost-user-fs device
+> backend process.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  configure                                   |  13 +
+>  hw/virtio/Makefile.objs                     |   1 +
+>  hw/virtio/vhost-user-fs.c                   | 297 ++++++++++++++++++++
+>  include/hw/virtio/vhost-user-fs.h           |  45 +++
+>  include/standard-headers/linux/virtio_fs.h  |  41 +++
+>  include/standard-headers/linux/virtio_ids.h |   1 +
+>  6 files changed, 398 insertions(+)
+>  create mode 100644 hw/virtio/vhost-user-fs.c
+>  create mode 100644 include/hw/virtio/vhost-user-fs.h
+>  create mode 100644 include/standard-headers/linux/virtio_fs.h
+> 
 
-"without a stack" looks very risky to me. Even if we manage to implement
-the guest code initially, we'll be trapped without a stack, should we
-ever need to add more complex stuff there.
+> diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
+> new file mode 100644
+> index 0000000000..72e270d869
+> --- /dev/null
+> +++ b/hw/virtio/vhost-user-fs.c
+> @@ -0,0 +1,297 @@
+> +/*
+> + * Vhost-user filesystem virtio device
+> + *
+> + * Copyright 2018 Red Hat, Inc.
 
+Should that be 2018, 2019? (Also for vhost-user-fs.h.)
 
-> For this OVMF use case, is any CPU init required
-> before the first SMI?
+> + *
+> + * Authors:
+> + *  Stefan Hajnoczi <stefanha@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + */
+> +
 
-I expressed a preference for that too: "I wish we could simply wake the
-new CPU [...] with an SMI".
+(...)
 
-http://mid.mail-archive.com/398b3327-0820-95af-a34d-1a4a1d50cf35@redhat.com
+> +static void vuf_start(VirtIODevice *vdev)
+> +{
+> +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> +    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> +    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> +    int ret;
+> +    int i;
+> +
+> +    if (!k->set_guest_notifiers) {
+> +        error_report("binding does not support guest notifiers");
+> +        return;
+> +    }
+> +
+> +    ret = vhost_dev_enable_notifiers(&fs->vhost_dev, vdev);
+> +    if (ret < 0) {
+> +        error_report("Error enabling host notifiers: %d", -ret);
+> +        return;
+> +    }
+> +
+> +    ret = k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, true);
+> +    if (ret < 0) {
+> +        error_report("Error binding guest notifier: %d", -ret);
+> +        goto err_host_notifiers;
+> +    }
+> +
+> +    fs->vhost_dev.acked_features = vdev->guest_features;
+> +    ret = vhost_dev_start(&fs->vhost_dev, vdev);
+> +    if (ret < 0) {
+> +        error_report("Error starting vhost: %d", -ret);
+> +        goto err_guest_notifiers;
+> +    }
+> +
+> +    /*
+> +     * guest_notifier_mask/pending not used yet, so just unmask
+> +     * everything here.  virtio-pci will do the right thing by
+> +     * enabling/disabling irqfd.
 
+I still think referring to virtio-pci doing the right thing is not the
+right thing here :) Can you spell out _what_ the right thing actually
+is?
 
-> From Paolo's list of steps are steps (8a) and (8b) 
-> really required?
+> +     */
+> +    for (i = 0; i < fs->vhost_dev.nvqs; i++) {
+> +        vhost_virtqueue_mask(&fs->vhost_dev, vdev, i, false);
+> +    }
+> +
+> +    return;
+> +
+> +err_guest_notifiers:
+> +    k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, false);
+> +err_host_notifiers:
+> +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
+> +}
+> +
 
-See again my message linked above -- just after the quoted sentence, I
-wrote, "IOW, if we could excise steps 07b, 08a, 08b".
+(...)
 
-But, I obviously defer to Paolo and Igor on that.
+> diff --git a/include/standard-headers/linux/virtio_fs.h b/include/standard-headers/linux/virtio_fs.h
+> new file mode 100644
+> index 0000000000..00bd7a6fa7
+> --- /dev/null
+> +++ b/include/standard-headers/linux/virtio_fs.h
 
-(I do believe we have a dilemma here. In QEMU, we probably prefer to
-emulate physical hardware as faithfully as possible. However, we do not
-have Cache-As-RAM (nor do we intend to, IIUC). Does that justify other
-divergences from physical hardware too, such as waking just by virtue of
-an SMI?)
+This will probably be imported from the Linux source code, right? If
+yes, this should go into a separate patch (and the headers update patch
+probably needs an update.)
 
+> @@ -0,0 +1,41 @@
+> +#ifndef _LINUX_VIRTIO_FS_H
+> +#define _LINUX_VIRTIO_FS_H
+> +/* This header is BSD licensed so anyone can use the definitions to implement
+> + * compatible drivers/servers.
+> + *
+> + * Redistribution and use in source and binary forms, with or without
+> + * modification, are permitted provided that the following conditions
+> + * are met:
+> + * 1. Redistributions of source code must retain the above copyright
+> + *    notice, this list of conditions and the following disclaimer.
+> + * 2. Redistributions in binary form must reproduce the above copyright
+> + *    notice, this list of conditions and the following disclaimer in the
+> + *    documentation and/or other materials provided with the distribution.
+> + * 3. Neither the name of IBM nor the names of its contributors
+> + *    may be used to endorse or promote products derived from this software
+> + *    without specific prior written permission.
+> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
+> + * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> + * ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR CONTRIBUTORS BE LIABLE
+> + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+> + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+> + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+> + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+> + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+> + * SUCH DAMAGE. */
+> +#include "standard-headers/linux/types.h"
+> +#include "standard-headers/linux/virtio_ids.h"
+> +#include "standard-headers/linux/virtio_config.h"
+> +#include "standard-headers/linux/virtio_types.h"
+> +
+> +struct virtio_fs_config {
+> +	/* Filesystem name (UTF-8, not NUL-terminated, padded with NULs) */
+> +	uint8_t tag[36];
+> +
+> +	/* Number of request queues */
+> +	uint32_t num_request_queues;
+> +} QEMU_PACKED;
+> +
+> +#endif /* _LINUX_VIRTIO_FS_H */
+> diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
+> index 32b2f94d1f..73fc004807 100644
+> --- a/include/standard-headers/linux/virtio_ids.h
+> +++ b/include/standard-headers/linux/virtio_ids.h
 
-> Can the SMI monarch use the Local
-> APIC to send a directed SMI to the hot added CPU?
-> The SMI monarch needs to know the APIC ID of the
-> hot added CPU.  Do we also need to handle the case
-> where multiple CPUs are added at once?  I think we
-> would need to serialize the use of 3000:8000 for the
-> SMM rebase operation on each hot added CPU.
+This should also go into that separate patch.
 
-I agree this would be a huge help.
+> @@ -43,6 +43,7 @@
+>  #define VIRTIO_ID_INPUT        18 /* virtio input */
+>  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+>  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> +#define VIRTIO_ID_FS           26 /* virtio filesystem */
+>  #define VIRTIO_ID_PMEM         27 /* virtio pmem */
+>  
+>  #endif /* _LINUX_VIRTIO_IDS_H */
 
-
-> It would be simpler if we can guarantee that only
-> one CPU can be added or removed at a time and the 
-> complete flow of adding a CPU to SMM and the OS
-> needs to be completed before another add/remove
-> event needs to be processed.
-
-I don't know if the QEMU monitor command in question can guarantee this
-serialization. I think such a request/response pattern is generally
-implementable between QEMU and guest code.
-
-But, AIUI, the "device-add" monitor command is quite generic, and used
-for hot-plugging a number of other (non-CPU) device models. I'm unsure
-if the pattern in question can be squeezed into "device-add". (It's not
-a dedicated command for CPU hotplug.)
-
-... Apologies that I didn't add much information to the thread, just
-now. I'd like to keep the discussion going.
-
-Thanks
-Laszlo
+Otherwise, looks good to me.
 
