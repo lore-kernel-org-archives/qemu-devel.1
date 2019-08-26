@@ -2,80 +2,82 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A95C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48478C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:59:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F38932184D
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:54:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11395206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:59:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yedh92U2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F38932184D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aELsTISK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11395206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2L4L-0002wI-6K
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:54:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46040)
+	id 1i2L8r-0004d0-9p
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:59:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i2L2J-00017z-Na
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:52:20 -0400
+ (envelope-from <jcmvbkbc@gmail.com>) id 1i2L88-00048G-VB
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:58:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i2L2I-00063C-Ny
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:52:19 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37517)
+ (envelope-from <jcmvbkbc@gmail.com>) id 1i2L87-0000Ft-IM
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:58:20 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43820)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i2L2I-00062x-Hj
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:52:18 -0400
-Received: by mail-oi1-x243.google.com with SMTP id b25so13111672oib.4
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 12:52:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wsQSsDSjnsZdMZjo0xkidElZrPufq2mB/NuD5hpzyXs=;
- b=yedh92U2qt1mqgFz9E39m85vTwfHGFBp+qOYfs2OohBGe72iKcAWC//hdrk72Oepcx
- 3EcV9WqR8/mhn41b1iAhrgj3mk4+Gag+0woPOuJcQ7+tQQ2a50JwkPcA81pLbFWGXaMt
- NFamtPhFKvJn3nXfJCFohcQrGPnOIziv85CKOSPktmIj+724DHcDH8hS5T1ydJXIaTwA
- yghYiy2MKO95xwzNvQgT0LdmAm68tf4k+hEETEdX/hpIgkTEpQkSSMSMXxeGPPQy1/o7
- TbTp5/G0zARlln8WK9mKYA+ij7+LXwp6MQeR2BGZfhtUniOws4aOVgq6Y1ghH2fHMSWw
- cCMA==
+ (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1i2L87-0000Dk-AH
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:58:19 -0400
+Received: by mail-lj1-x243.google.com with SMTP id h15so16221527ljg.10
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 12:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=J9Rzk0r0q9DaVzm4NE0J/46AyVyU96JGwvfkeFkqlec=;
+ b=aELsTISKTwoHXr7iLJZgVU+JLhsoEJFdr7js4lulrDp0IyzVlntpEwsf0XsmGvL3Vu
+ le82+QiNkyo9ObQ4ewkP3OiJ6v4K+msfAOmkchelUoedOT9i9IPY3WIOWBjo2pSVyOEI
+ F8aE07TimBmnsMhv3BPgKIIGS1ssPSriYdhSeLawOnNk3zT6e2qS3i5O4u/S16z8JQKb
+ LmlLWTp4SNiRHkqgVM3v99dHzVI9nb0C7g00WU5VklLTnvJleO+qbx7sD5Tqy0GInKfD
+ zX5p7xPXJ8ZwIctjadjW06CR4JorxMMKsAuI2feioG7nC96vdsc47u2fdV5MQjqb+Jo1
+ +8Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=wsQSsDSjnsZdMZjo0xkidElZrPufq2mB/NuD5hpzyXs=;
- b=S5XruKF7YWdX/wxXllMsot27HrCYXeC2ya4OjBrABvm5IBTUpoB2DxHAUlRUjbdTZJ
- w596+dUiccdt9gu185Z3BAqCDXdKBMFwWWcBc+614zaPfUpUR52pkPxSMXMoNPfbq95s
- HXvnD0sAU6xmgQ58hR7Rxn7VdoJ1pS290bLfBYEcM9Rr4WEBqkgRLCDXyB+CqAPU05hZ
- stZTe8oijNdIVacKQpLoI6hn76xOnVeqHfXQX6sSMuhAZoccId0B/fbUYU+vDjsFE/2T
- vAEnMtSd15lKU/SKR/iZ541HAaXLbCEHrIGrkr6gaNWljo25Zmcr3cRzIrvyh9KMzHp0
- +W+w==
-X-Gm-Message-State: APjAAAV6nQEEt1gijWKBPF9x2JaLOlXimAUusAM/ZJXJLfyXOTvrb+j0
- 8uKibugPNY6J+sTqUyfP5cKUZXj0w8DHxFTb0C+Sjw==
-X-Google-Smtp-Source: APXvYqwPuFHxRhQFkHlLNNUlVAod6baOc7X/wledYYYbsn7O0IC0ZfzYxZnudjyr+nkAZ8BL75lkVW3UXHG+2skCyGk=
-X-Received: by 2002:a54:4718:: with SMTP id k24mr13169665oik.146.1566849137740; 
- Mon, 26 Aug 2019 12:52:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-62-richard.henderson@linaro.org>
-In-Reply-To: <20190819213755.26175-62-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Aug 2019 20:52:06 +0100
-Message-ID: <CAFEAcA8N_X28ADZgoaWhj1wHjD5Rg48pfU+bYicZw4NmDW8DdA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=J9Rzk0r0q9DaVzm4NE0J/46AyVyU96JGwvfkeFkqlec=;
+ b=R82OzoJ/sY0nWlSWJKPj4QIw6unhBtu1bPSk4eVHJaEQd6wIHUE1ic351UCJoUrrnP
+ mc9iGIf/MXNlAzWVHvdUp4Dqa4Ew8hsUjbqX6KWizbOyuSxkMFB56XP4E7tVaL4OkP2l
+ SUuJS6MTStj8jXpnqwOn7xLgasol4K7x9v03akOCPCDlufoO44LlStb/kf1/MhQ+eq/5
+ ws2mSUFc6hx3CaGVnjpA6qFe4wcsuvpzZUb/ac/A7+b2dRVLF2lo4TyvWznVUEXONsPI
+ vN3ItlMkHOHiDj87YaYk6FUwJRp39vXGtuoRyz4wwMAA3HP2DVHJP9zgK1S21DE2ScFs
+ dkNg==
+X-Gm-Message-State: APjAAAUw2P+1CH/x9lpwrK6eSWy08rg1TY0epaT/iHdH/VghwmtWZOug
+ pWeawZuDqmktVHO8kwfVMsPjUCpuois=
+X-Google-Smtp-Source: APXvYqwMEYPR/dUrqcroxXupMela2x942aWhJhoPirtjWWCzXws+vNAnadKfFswFVMgenc5OwK0NRQ==
+X-Received: by 2002:a05:651c:1104:: with SMTP id
+ d4mr11343760ljo.90.1566849497186; 
+ Mon, 26 Aug 2019 12:58:17 -0700 (PDT)
+Received: from octofox.cadence.com
+ (jcmvbkbc-1-pt.tunnel.tserv24.sto1.ipv6.he.net. [2001:470:27:1fa::2])
+ by smtp.gmail.com with ESMTPSA id b11sm2263542lfi.91.2019.08.26.12.58.14
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 26 Aug 2019 12:58:15 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 26 Aug 2019 12:58:06 -0700
+Message-Id: <20190826195806.15998-1-jcmvbkbc@gmail.com>
+X-Mailer: git-send-email 2.11.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH v2 61/68] target/arm: Convert T16,
- Conditional branches, Supervisor call
+X-Received-From: 2a00:1450:4864:20::243
+Subject: [Qemu-devel] [PATCH v3] target/xtensa: linux-user: add call0 ABI
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,22 +89,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Aug 2019 at 22:39, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate.c | 26 +++-----------------------
->  target/arm/t16.decode  | 12 ++++++++++++
->  2 files changed, 15 insertions(+), 23 deletions(-)
+Xtensa binaries built for call0 ABI don't rotate register window on
+function calls and returns. Invocation of signal handlers from the
+kernel is therefore different in windowed and call0 ABIs.
+There's currently no way to determine xtensa ELF binary ABI from the
+binary itself. Add handler for the -xtensa-abi-call0 command line
+parameter/QEMU_XTENSA_ABI_CALL0 envitonment variable to the qemu-user
+and record ABI choice. Use it to initialize PS.WOE in xtensa_cpu_reset.
+Check PS.WOE in setup_rt_frame to determine how a signal should be
+delivered.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+Changes v2->v3:
 
-thanks
--- PMM
+- revert to checking PS.WOE in the setup_rt_frame
+
+Changes v1->v2:
+
+- move handling of QEMU_XTENSA_ABI_CALL0 to linux-user/main.c
+- check xtensa_abi_call0 instead of PS.WOE in the setup_rt_frame
+
+ linux-user/main.c          | 17 +++++++++++++++++
+ linux-user/xtensa/signal.c | 25 +++++++++++++++++--------
+ target/xtensa/cpu.c        | 24 ++++++++++++++++++++----
+ target/xtensa/cpu.h        |  3 +++
+ 4 files changed, 57 insertions(+), 12 deletions(-)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 47917bbb20fc..9e50b2d2a92f 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -393,6 +393,13 @@ static void handle_arg_trace(const char *arg)
+     trace_file = trace_opt_parse(arg);
+ }
+ 
++#if defined(TARGET_XTENSA)
++static void handle_arg_abi_call0(const char *arg)
++{
++    xtensa_set_abi_call0();
++}
++#endif
++
+ struct qemu_argument {
+     const char *argv;
+     const char *env;
+@@ -446,6 +453,10 @@ static const struct qemu_argument arg_table[] = {
+      "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
+     {"version",    "QEMU_VERSION",     false, handle_arg_version,
+      "",           "display version information and exit"},
++#if defined(TARGET_XTENSA)
++    {"xtensa-abi-call0", "QEMU_XTENSA_ABI_CALL0", false, handle_arg_abi_call0,
++     "",           "assume CALL0 Xtensa ABI"},
++#endif
+     {NULL, NULL, false, NULL, NULL, NULL}
+ };
+ 
+@@ -710,6 +721,12 @@ int main(int argc, char **argv, char **envp)
+         }
+     }
+ 
++#if defined(TARGET_XTENSA)
++    if (getenv("QEMU_XTENSA_ABI_CALL0")) {
++        xtensa_set_abi_call0();
++    }
++#endif
++
+     target_environ = envlist_to_environ(envlist, NULL);
+     envlist_free(envlist);
+ 
+diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
+index 8d54ef3ae34b..590f0313ffe9 100644
+--- a/linux-user/xtensa/signal.c
++++ b/linux-user/xtensa/signal.c
+@@ -134,6 +134,8 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+     abi_ulong frame_addr;
+     struct target_rt_sigframe *frame;
+     uint32_t ra;
++    bool abi_call0;
++    unsigned base;
+     int i;
+ 
+     frame_addr = get_sigframe(ka, env, sizeof(*frame));
+@@ -182,20 +184,27 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+         __put_user(0x00, &frame->retcode[5]);
+ #endif
+     }
+-    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
+-    if (xtensa_option_enabled(env->config, XTENSA_OPTION_WINDOWED_REGISTER)) {
+-        env->sregs[PS] |= PS_WOE | (1 << PS_CALLINC_SHIFT);
+-    }
+     memset(env->regs, 0, sizeof(env->regs));
+     env->pc = ka->_sa_handler;
+     env->regs[1] = frame_addr;
+     env->sregs[WINDOW_BASE] = 0;
+     env->sregs[WINDOW_START] = 1;
+ 
+-    env->regs[4] = (ra & 0x3fffffff) | 0x40000000;
+-    env->regs[6] = sig;
+-    env->regs[7] = frame_addr + offsetof(struct target_rt_sigframe, info);
+-    env->regs[8] = frame_addr + offsetof(struct target_rt_sigframe, uc);
++    abi_call0 = (env->sregs[PS] & PS_WOE) == 0;
++    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
++
++    if (abi_call0) {
++        base = 0;
++        env->regs[base] = ra;
++    } else {
++        env->sregs[PS] |= PS_WOE | (1 << PS_CALLINC_SHIFT);
++        base = 4;
++        env->regs[base] = (ra & 0x3fffffff) | 0x40000000;
++    }
++    env->regs[base + 2] = sig;
++    env->regs[base + 3] = frame_addr + offsetof(struct target_rt_sigframe,
++                                                info);
++    env->regs[base + 4] = frame_addr + offsetof(struct target_rt_sigframe, uc);
+     unlock_user_struct(frame, frame_addr, 1);
+     return;
+ 
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index 76db1741a796..c65dcf9dd782 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -53,6 +53,20 @@ static bool xtensa_cpu_has_work(CPUState *cs)
+ #endif
+ }
+ 
++#ifdef CONFIG_USER_ONLY
++static bool abi_call0;
++
++void xtensa_set_abi_call0(void)
++{
++    abi_call0 = true;
++}
++
++bool xtensa_abi_call0(void)
++{
++    return abi_call0;
++}
++#endif
++
+ /* CPUClass::reset() */
+ static void xtensa_cpu_reset(CPUState *s)
+ {
+@@ -70,10 +84,12 @@ static void xtensa_cpu_reset(CPUState *s)
+             XTENSA_OPTION_INTERRUPT) ? 0x1f : 0x10;
+     env->pending_irq_level = 0;
+ #else
+-    env->sregs[PS] =
+-        (xtensa_option_enabled(env->config,
+-                               XTENSA_OPTION_WINDOWED_REGISTER) ? PS_WOE : 0) |
+-        PS_UM | (3 << PS_RING_SHIFT);
++    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
++    if (xtensa_option_enabled(env->config,
++                              XTENSA_OPTION_WINDOWED_REGISTER) &&
++        !xtensa_abi_call0()) {
++        env->sregs[PS] |= PS_WOE;
++    }
+ #endif
+     env->sregs[VECBASE] = env->config->vecbase;
+     env->sregs[IBREAKENABLE] = 0;
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index 0459243e6bb1..b363ffcf1066 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -673,6 +673,9 @@ static inline MemoryRegion *xtensa_get_er_region(CPUXtensaState *env)
+ {
+     return env->system_er;
+ }
++#else
++void xtensa_set_abi_call0(void);
++bool xtensa_abi_call0(void);
+ #endif
+ 
+ static inline uint32_t xtensa_replicate_windowstart(CPUXtensaState *env)
+-- 
+2.11.0
+
 
