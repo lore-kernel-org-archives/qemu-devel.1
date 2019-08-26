@@ -6,44 +6,46 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D90C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A35C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:51:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4B95217F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:48:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4B95217F5
+	by mail.kernel.org (Postfix) with ESMTPS id 8B536217F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:51:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B536217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2FMU-0006Um-Qb
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 09:48:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37179)
+	id 1i2FOr-0007hH-II
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 09:51:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37738)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i2FKG-0005vv-3K
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:46:28 -0400
+ (envelope-from <eblake@redhat.com>) id 1i2FNX-00076q-TX
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:49:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i2FKF-0003Do-2Z
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:46:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43060)
+ (envelope-from <eblake@redhat.com>) id 1i2FNW-0005De-SX
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:49:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i2FKC-0003As-9n; Mon, 26 Aug 2019 09:46:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i2FNU-0005C1-L8; Mon, 26 Aug 2019 09:49:48 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 030263082B43;
- Mon, 26 Aug 2019 13:46:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F414318012F0;
+ Mon, 26 Aug 2019 13:49:47 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4943B5D9CD;
- Mon, 26 Aug 2019 13:46:22 +0000 (UTC)
-To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 714C25C207;
+ Mon, 26 Aug 2019 13:49:47 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, Nir Soffer <nirsof@gmail.com>,
+ qemu-devel@nongnu.org
 References: <20190825220329.7942-1-nsoffer@redhat.com>
  <20190825220329.7942-2-nsoffer@redhat.com>
+ <e4e45496-b867-4e57-5b25-d0f1425d4824@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,18 +72,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <65085dba-f180-8a4e-8464-65e91323b69b@redhat.com>
-Date: Mon, 26 Aug 2019 08:46:21 -0500
+Message-ID: <8a5eef62-27eb-9936-3db7-08d06532add7@redhat.com>
+Date: Mon, 26 Aug 2019 08:49:46 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190825220329.7942-2-nsoffer@redhat.com>
+In-Reply-To: <e4e45496-b867-4e57-5b25-d0f1425d4824@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="YTj0oZNE5HcNsOPilnzzqWriS3UfpewsV"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 26 Aug 2019 13:46:23 +0000 (UTC)
+ boundary="v2Cz1QLGB7Hi5CHKayelHjAs7zTj3bvk7"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Mon, 26 Aug 2019 13:49:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: posix: Always allocate the
@@ -98,74 +100,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YTj0oZNE5HcNsOPilnzzqWriS3UfpewsV
-Content-Type: multipart/mixed; boundary="i4l5PyZtRVjhkhQCMB3570w2ZChm5Ki5B";
+--v2Cz1QLGB7Hi5CHKayelHjAs7zTj3bvk7
+Content-Type: multipart/mixed; boundary="U1UhuXtfyvGRbcUdCp5TSKReSJs4BnUF2";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, Nir Soffer <nirsof@gmail.com>,
+ qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <65085dba-f180-8a4e-8464-65e91323b69b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: posix: Always allocate the
- first block
+ qemu-block@nongnu.org
+Message-ID: <8a5eef62-27eb-9936-3db7-08d06532add7@redhat.com>
+Subject: Re: [PATCH v2 1/2] block: posix: Always allocate the first block
 References: <20190825220329.7942-1-nsoffer@redhat.com>
  <20190825220329.7942-2-nsoffer@redhat.com>
-In-Reply-To: <20190825220329.7942-2-nsoffer@redhat.com>
+ <e4e45496-b867-4e57-5b25-d0f1425d4824@redhat.com>
+In-Reply-To: <e4e45496-b867-4e57-5b25-d0f1425d4824@redhat.com>
 
---i4l5PyZtRVjhkhQCMB3570w2ZChm5Ki5B
+--U1UhuXtfyvGRbcUdCp5TSKReSJs4BnUF2
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/25/19 5:03 PM, Nir Soffer wrote:
-> When creating an image with preallocation "off" or "falloc", the first
-> block of the image is typically not allocated. When using Gluster
-> storage backed by XFS filesystem, reading this block using direct I/O
-> succeeds regardless of request length, fooling alignment detection.
+On 8/26/19 7:31 AM, Max Reitz wrote:
+
+>>  # the file size.  This function hides the resulting difference in the=
+
+>>  # stat -c '%b' output.
+>>  # Parameter 1: Number of blocks an empty file occupies
+>> -# Parameter 2: Image size in bytes
+>> +# Parameter 2: Minimal number of blocks in an image
+>> +# Parameter 3: Image size in bytes
+>>  _filter_blocks()
+>>  {
+>>      extra_blocks=3D$1
+>> -    img_size=3D$2
+>> +    min_blocks=3D$2
+>> +    img_size=3D$3
+>> =20
+>> -    sed -e "s/blocks=3D$extra_blocks\\(\$\\|[^0-9]\\)/nothing allocat=
+ed/" \
+>> -        -e "s/blocks=3D$((extra_blocks + img_size / 512))\\(\$\\|[^0-=
+9]\\)/everything allocated/"
+>> +    sed -e "s/blocks=3D$((min_blocks))\\(\$\\|[^0-9]\\)/min allocatio=
+n/" \
 >=20
-> In this case we fallback to a safe value (4096) instead of the optimal
-> value (512), which may lead to unneeded data copying when aligning
-> requests.  Allocating the first block avoids the fallback.
->=20
+> Superfluous parentheses ($(())), but not wrong.
 
-> Here is a table comparing the total time spent:
->=20
-> Type    Before(s)   After(s)    Diff(%)
-> ---------------------------------------
-> real      530.028    469.123      -11.4
-> user       17.204     10.768      -37.4
-> sys        17.881      7.011      -60.7
->=20
-> We can see very clear improvement in CPU usage.
-
-Nice justification.
-
-
-> +/*
-> + * Help alignment probing by allocating the first block.
-> + *
-
-> +    do {
-> +        n =3D pwrite(fd, buf, write_size, 0);
-> +    } while (n =3D=3D -1 && errno =3D=3D EINTR);
-> +
-> +    qemu_vfree(buf);
-
-qemu_vfree() can corrupt errno...
-
-> +
-> +    return (n =3D=3D -1) ? -errno : 0;
-
-=2E..which means you may be returning an unexpected value here.
-
-Either we should patch qemu_vfree() to guarantee that errno is
-preserved, or you locally capture errno before calling it here.
+Note that $((..)) has a purpose: it can convert any variable content
+into decimal.  I can write min_blocks=3D0x1000, and $((min_blocks))
+results in 4096 while $min_blocks is still 0x1000.  But I'd need more
+context as to what the callers expect to pass as to whether the $((...))
+is superfluous here.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -173,24 +163,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---i4l5PyZtRVjhkhQCMB3570w2ZChm5Ki5B--
+--U1UhuXtfyvGRbcUdCp5TSKReSJs4BnUF2--
 
---YTj0oZNE5HcNsOPilnzzqWriS3UfpewsV
+--v2Cz1QLGB7Hi5CHKayelHjAs7zTj3bvk7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1j4q0ACgkQp6FrSiUn
-Q2rlAQgAmVqFA4jZNywuLmrqI6OwWfZ4jPYy0bELI7c46qisseXwFMAlyrrpP8vd
-4S/uyWDG5RWFyjXfaC4otN9IFn2rrvKwnu11Jx7N7IvTnURYlK5sfWbsXzoX49+L
-fVvAAdkEJtzsGyJ1tdgRApqTQKFu/jcwptWRHWvqb8bHVIOs5q3q2S9gp0Mprtw/
-njGWyAu5ArEoAdiVeasrKkGLSe+ZM8DJ/vMqh5fQn4m0Ku/u7AF7sdQOVpKclEsl
-DHrtMy+o8GYbwQysp0qfiuvtSAr53qqJU3Y0Um6RDHm0Xjs9Su/WTATXfkb26x/y
-lETweizTKPrpxnckIrlnfAnRq6czyQ==
-=IGU/
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1j43oACgkQp6FrSiUn
+Q2pJhQf/VEdQGuN1LCFUfF49DIjaZ8kAf1DyB3A3nmmZ0bewb2ZDlGF5olHUrEx5
+ZU0YuAmEYMfttQo8yp3OJDHW4UvHymL44Fl+oycdcsldLRpdJ+wx9rQguJEE9/R7
+rPA5cKN4Y6HThKc7NYvRwv3PWXtAE9ZAQYEQZ7CTXNu8A+rYKZTZ/OyFkTT3Olal
+n+gBi19JOTC82WnG7rq3ssxRyJ7mNMS9Fi37aTNFMC6KFotfTqlUcT+gFEsaCYyy
+uWp3adJEy4TIzdSNDYwUDUXmuQyIwOQHSjg1q/ej3RCsh/usF2JgsKWCnM38/mH9
+fSppBUgGydQ9QBlEg3wUicQFDqggEw==
+=I3+A
 -----END PGP SIGNATURE-----
 
---YTj0oZNE5HcNsOPilnzzqWriS3UfpewsV--
+--v2Cz1QLGB7Hi5CHKayelHjAs7zTj3bvk7--
 
