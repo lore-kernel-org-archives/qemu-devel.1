@@ -2,71 +2,84 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1C5C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 208DFC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:17:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FA4020874
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:06:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA4020874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E229720828
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:17:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AEuyW1+l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E229720828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2GZq-0006PB-LZ
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:06:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52569)
+	id 1i2Gke-0002AF-Oq
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:17:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i2GYv-0005wV-Pv
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:05:43 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i2Gib-0000uH-Fz
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i2GYr-0003Ci-BB
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:05:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44626)
+ (envelope-from <richard.henderson@linaro.org>) id 1i2Gia-0008F0-AW
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:15:41 -0400
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:42630)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i2GYo-0003Ad-K3
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:05:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i2GYm-0003My-10
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 15:05:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 029BD2E80C7
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 15:05:32 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Aug 2019 15:00:00 -0000
-From: Paul Clarke <pc@us.ibm.com>
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i2Gia-0008EH-3s
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:15:40 -0400
+Received: by mail-pl1-x62a.google.com with SMTP id y1so10155869plp.9
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 08:15:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=XM4xt9aY/yIC8PkPmYKvB3+Fq7o3bJINztaMO4zIW2k=;
+ b=AEuyW1+lqfIDyhZE+AVfb9KMkvkU85g7gPfkRlk83spBpW8g2gOgl16vCnNInAkzoJ
+ sCzV6D0EBT9gGtO1gDCE75HXs3dW1Gezv/wxdprd4lZxqGP9yEH/aI+PPpKdsfEkUoV4
+ 5GmajDbOulOAw3MIHjw/pUJyzEqXn0yYXVwHwU/avtVKJxe7ueF9HNMGsoCjCkYg54hR
+ GsL4fb4b5TEhVLXbIR+SjH8V3ivsNIx0HQ72xgkvWbGwQaRj7tU299jr8zisgdplW/i9
+ WlYxH8MIR2uM7Qd3OI02HhRu/ElqkWmdkneqyROBge4mHY/F9e0mvc/03G7k0rXFKtqf
+ 97LQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=XM4xt9aY/yIC8PkPmYKvB3+Fq7o3bJINztaMO4zIW2k=;
+ b=ssYMlHjC5UmcclosmgVWibpgM2LvkIyvXHhoklAEa5yVa2UapuIZYHOG+tMG67pHvf
+ 9wmg1QxNtO735hEcAz4I83aDW2mN2Ge+Gkpmmnudx/aJNaR81+OvLkE3EuZa3/PowC/n
+ 6GbKBP7TM4jKsuK4mrJ1i8JGbgJRArfoG1ObHTtigRs3+AZkIMy5gETvR/NSETzoHXh7
+ 0Kvvc2j7YT6+/i2kGegHAyRIGf4Bc8ER/eVpBEN/WkwVBb3UNWi1CFhlnadT8KekBPl5
+ Ta1ctCLF0EuidmhvK9PQFrRRVtZE7ww4x7gqGtG3nAfnONjnSfUr/GkbrwYmEq5jbEMv
+ FySA==
+X-Gm-Message-State: APjAAAVEDwOxYb6+VkLbW8mnKbuzIs9Re7HKSqAEq+HrM18+kEu47lNC
+ tSW/RjNlkGlPahBkyWFe5CQTf6Xbvs0=
+X-Google-Smtp-Source: APXvYqzsQ50v2xmrTGmGN3ptjZCnf+nyvdOaO0k7PoO7yKKC6hubQo7F/wLIA20/AjXlqQoYw5Cm1g==
+X-Received: by 2002:a17:902:9895:: with SMTP id
+ s21mr19305645plp.255.1566832538451; 
+ Mon, 26 Aug 2019 08:15:38 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id q4sm13563612pff.183.2019.08.26.08.15.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 26 Aug 2019 08:15:37 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
-Message-Id: <156683160080.31851.8159878323909291412.malonedeb@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19031";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 9f687332f796d5488c7e72bb788e6e2a6a891e32
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1841442] [NEW] floating point emulation can fail
- to set FE_INEXACT
+Date: Mon, 26 Aug 2019 08:15:34 -0700
+Message-Id: <20190826151536.6771-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::62a
+Subject: [Qemu-devel] [PATCH 0/2] target/arm: Fix aarch64 illegal opcode
+ exceptions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,154 +88,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841442 <1841442@bugs.launchpad.net>
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+As Laurent pointed out, gen_exception_insn is very different
+between aarch64 and aarch32, so we shouldn't accidentally
+redirect one to the other.
 
-Floating point emulation can fail to set FE_INEXACT in some
-circumstances. This shows up quite often in glibc's "math" tests.  A
-similar test is attached.
 
-On ppc64le native:
---
-$ gcc nextafter.c -o nextafter -lm
-$ ./nextafter $(./nextafter)
-0x0000000000000001 0.000000
-0x0
+r~
 
-0xa000000
-FE_INEXACT FE_UNDERFLOW
-0x0000000000000000 0.000000
---
 
-On x86_64:
---
-$ gcc nextafter.c -o nextafter -lm
-$ ./nextafter $(./nextafter)
-0x0000000000000001 0.000000
-0x0
+Richard Henderson (2):
+  Revert "target/arm: Use unallocated_encoding for aarch32"
+  target/arm: Factor out unallocated_encoding for aarch32
 
-0x30
-FE_INEXACT FE_UNDERFLOW =
+ target/arm/translate-a64.h | 2 ++
+ target/arm/translate.h     | 2 --
+ target/arm/translate-a64.c | 7 +++++++
+ target/arm/translate.c     | 2 +-
+ 4 files changed, 10 insertions(+), 3 deletions(-)
 
-0x0000000000000000 0.000000
---
+-- 
+2.17.1
 
-Using qemu-system-ppc64
---
-$ ./nextafter $(./nextafter)
-0x0000000000000001 0.000000
-0x0
-
-0x8000000
-FE_UNDERFLOW =
-
-0x0000000000000000 0.000000
---
-
-Using qemu-x86_64:
---
-$ ./nextafter $(./nextafter)
-0x0000000000000001 0.000000
-0x0
-
-0x0
-
-0x0000000000000000 0.000000
---
-
-QEMU versions vary, but not too much, and are pretty close to git HEAD:
-- 586f3dced9 (HEAD -> master, origin/master, origin/HEAD) Merge remote-trac=
-king branch 'remotes/cohuck/tags/s390x-20190822' into staging
-- 864ab31 Update version for v4.1.0-rc4 release
-
-Since the issue happens nearly identically on different targets, I
-suspect the issue lies somewhere in fpu/softfloat.c.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "testcase reporting exceptions set by nextafter"
-   https://bugs.launchpad.net/bugs/1841442/+attachment/5284718/+files/nexta=
-fter.c
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841442
-
-Title:
-  floating point emulation can fail to set FE_INEXACT
-
-Status in QEMU:
-  New
-
-Bug description:
-  Floating point emulation can fail to set FE_INEXACT in some
-  circumstances. This shows up quite often in glibc's "math" tests.  A
-  similar test is attached.
-
-  On ppc64le native:
-  --
-  $ gcc nextafter.c -o nextafter -lm
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0xa000000
-  FE_INEXACT FE_UNDERFLOW
-  0x0000000000000000 0.000000
-  --
-
-  On x86_64:
-  --
-  $ gcc nextafter.c -o nextafter -lm
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0x30
-  FE_INEXACT FE_UNDERFLOW =
-
-  0x0000000000000000 0.000000
-  --
-
-  Using qemu-system-ppc64
-  --
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0x8000000
-  FE_UNDERFLOW =
-
-  0x0000000000000000 0.000000
-  --
-
-  Using qemu-x86_64:
-  --
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0x0
-
-  0x0000000000000000 0.000000
-  --
-
-  QEMU versions vary, but not too much, and are pretty close to git HEAD:
-  - 586f3dced9 (HEAD -> master, origin/master, origin/HEAD) Merge remote-tr=
-acking branch 'remotes/cohuck/tags/s390x-20190822' into staging
-  - 864ab31 Update version for v4.1.0-rc4 release
-
-  Since the issue happens nearly identically on different targets, I
-  suspect the issue lies somewhere in fpu/softfloat.c.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841442/+subscriptions
 
