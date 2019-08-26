@@ -2,81 +2,79 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EA0C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA61FC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:34:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F10D02186A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:34:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D2882186A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:34:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wYLgeuOg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F10D02186A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qYpqMjNF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2882186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Kl3-0002eY-WF
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:34:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39585)
+	id 1i2KlF-0002sV-ID
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:34:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i2KcR-0001YJ-Er
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:25:36 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1i2KbI-0008Kn-Gr
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i2KcQ-00012D-37
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:25:35 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35266)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i2KcP-0000yE-TQ
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:25:34 -0400
-Received: by mail-oi1-x243.google.com with SMTP id a127so13037157oii.2
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 12:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0zxdry1BkfHAqau/H/9feepTNjFxh/DYdr86EaL4hL4=;
- b=wYLgeuOgNwUBEs80yhYdzEJlrAL0AFCvpWHnH440DavpwdpKxO7IKTJIlYaW6MV2Co
- pz+wm1y58HJ8mgKirsG1PiRNMYEu/9Dx7HhrE+ucAPJoGg+eaM2mks8eq9bWxs1ybhAf
- sZNwUInTwIQvk9CZIveMxovLHQN7i7518R9fCUoIa+6KUAZYrhmbf4HXiv0SoTPptG6K
- JtK1NHyqT+qffiXZXZSyWoAztAoEvhWlybY1USgg8s2BxJml8r/Pp+krbOENKpNeNvjA
- mYo08V/eYQFhkSt9h16Ucn7m9D1UXmfYfd46GvOVRPrNcGhlv0B38Wd8IbvfNBEFIiLs
- eKcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0zxdry1BkfHAqau/H/9feepTNjFxh/DYdr86EaL4hL4=;
- b=XxX23lcPt0S+9YErQr5uWjZizwWVi+lYFKoZpLApvUbQtAqtNjo7CuFh0P30ln74gi
- Hd2b6TsvaoAKI0zmo9SG/rCUBUrY/xvdaZYiin3viheNdqctXKpjF/9TVPdCLtiH7Jf6
- o2zXLbQAAm1sHY/sILPz6pmUPgH5icuJOqFIX2bC4G/oGS3h9VJ0wklHm+OIor1DgOoT
- l6LHjdg+1A4m1Tq6XiMxnB10lctCiSlVDnLs86i/DTdgRfKo4+H6pzxmIGcYMdhVQTd5
- eWdfAnA+Lo9VxKyu90s59x7fGoC6YjYA6MtTRUHo9jraAI3nLqjRlelWiHbgqYbBosSS
- wSQQ==
-X-Gm-Message-State: APjAAAWbAtOH6sT+yN/B8dODbcdU5z6O9AVk/+3iqy1jnA2MnoSs5pwM
- nVq41ye2YzgPl3tGvayGevX0BINVj4/bTBzwoYKlvQ==
-X-Google-Smtp-Source: APXvYqxumVfsK7IqF94lFLxgQInGFf07s7VCLVGocRf6Lb53XQrGDCw+jRfFGhmrGyxs/LCncojifX3f/JGMJE9FGog=
-X-Received: by 2002:a54:4718:: with SMTP id k24mr13106294oik.146.1566847532685; 
- Mon, 26 Aug 2019 12:25:32 -0700 (PDT)
+ (envelope-from <kwankhede@nvidia.com>) id 1i2KbH-0000U1-B6
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:24 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:7983)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1i2KbH-0000To-3j
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:23 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5d6431e60000>; Mon, 26 Aug 2019 12:24:22 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Mon, 26 Aug 2019 12:24:21 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate102.nvidia.com on Mon, 26 Aug 2019 12:24:21 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
+ 2019 19:24:21 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 26 Aug 2019 19:24:15 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Date: Tue, 27 Aug 2019 00:25:47 +0530
+Message-ID: <1566845753-18993-8-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
+References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-57-richard.henderson@linaro.org>
-In-Reply-To: <20190819213755.26175-57-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Aug 2019 20:25:21 +0100
-Message-ID: <CAFEAcA-9JAhPA44_PuoOgNFfhHZHTSxkCLbizN00GtaDKt=sxQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH v2 56/68] target/arm: Convert T16,
- Change processor state
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1566847463; bh=ky3f2uX7iY70D+zE35elXzKJwKwLZyaubsOYn3Y9tZI=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ In-Reply-To:References:X-NVConfidentiality:MIME-Version:
+ Content-Type;
+ b=qYpqMjNFyTN9EBL+E1B5FRqITV3RtACTchSOjEvw40cb0fXKG8eYs4jcr1n9+6pQZ
+ sa/w9PCdN7jsSFRoj+4fAbKgQxjVjx4fvHRMOPo0o1miJfmyg0pMpVqRlJcfIPgBH1
+ qhBJEEy3WWr8loAl9uDU1e/6y27P0kXZecphcAVShK2U3WGMsOOkbp6OiqR3ee014V
+ iBQT4w3nnc8rHdx/77d5jDMxiqhTxLNjkRDX7EfAbV7T5/z7WUBkekYK3B/L+hL7mO
+ 0/OjEv4tVsPqgcXIFJolY7qWlNFmtXLC5q+9/S+xVx4n8ZnM1cZZuRTRsRmTunZVZ0
+ Mh/N+WNmKXHiQ==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 216.228.121.65
+Subject: [Qemu-devel] [PATCH v8 07/13] vfio: Add migration state change
+ notifier
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,107 +86,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, Kirti Wankhede <kwankhede@nvidia.com>,
+ eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Aug 2019 at 22:39, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate.c | 85 ++++++++++++++++++++----------------------
->  target/arm/t16.decode  | 12 ++++++
->  2 files changed, 52 insertions(+), 45 deletions(-)
->
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 414c562fb3..368f0ab147 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -7474,6 +7474,11 @@ static int negate(DisasContext *s, int x)
->      return -x;
->  }
->
-> +static int plus_2(DisasContext *s, int x)
-> +{
-> +    return x + 2;
-> +}
-> +
->  static int times_2(DisasContext *s, int x)
->  {
->      return x * 2;
-> @@ -10152,6 +10157,9 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
->  {
->      uint32_t mask, val;
->
-> +    if (ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M)) {
-> +        return false;
-> +    }
+Added migration state change notifier to get notification on migration state
+change. These states are translated to VFIO device state and conveyed to vendor
+driver.
 
-I don't think this condition is quite right. We want to
-do two things:
- (1) this is the A/R-profile CPS, so it shouldn't
-be decoded for any ARM_FEATURE_M CPU
- (2) for A/R-profile, all the CPS instructions are v6-or-better
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+---
+ hw/vfio/migration.c           | 28 ++++++++++++++++++++++++++++
+ hw/vfio/trace-events          |  1 +
+ include/hw/vfio/vfio-common.h |  1 +
+ 3 files changed, 30 insertions(+)
 
-(All M-profile CPUs are at v6-or-better, which is why the
-legacy decoder gets away with doing its ARCH(6) check
-up front rather than only in the A/R-profile arm of its
-if statement.)
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index 83057d909d49..e97f1b0fe803 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -134,6 +134,26 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
+     }
+ }
+ 
++static void vfio_migration_state_notifier(Notifier *notifier, void *data)
++{
++    MigrationState *s = data;
++    VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
++    int ret;
++
++    trace_vfio_migration_state_notifier(vbasedev->name, s->state);
++
++    switch (s->state) {
++    case MIGRATION_STATUS_CANCELLING:
++    case MIGRATION_STATUS_CANCELLED:
++    case MIGRATION_STATUS_FAILED:
++        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING,
++                       VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING);
++        if (ret) {
++            error_report("%s: Failed to set state RUNNING", vbasedev->name);
++        }
++    }
++}
++
+ static int vfio_migration_init(VFIODevice *vbasedev,
+                                struct vfio_region_info *info)
+ {
+@@ -152,6 +172,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+     vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+                                                           vbasedev);
+ 
++    vbasedev->migration_state.notify = vfio_migration_state_notifier;
++    add_migration_state_change_notifier(&vbasedev->migration_state);
++
+     return 0;
+ }
+ 
+@@ -190,6 +213,11 @@ add_blocker:
+ 
+ void vfio_migration_finalize(VFIODevice *vbasedev)
+ {
++
++    if (vbasedev->migration_state.notify) {
++        remove_migration_state_change_notifier(&vbasedev->migration_state);
++    }
++
+     if (vbasedev->vm_state) {
+         qemu_del_vm_change_state_handler(vbasedev->vm_state);
+     }
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 3d15bacd031a..69503228f20e 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -148,3 +148,4 @@ vfio_display_edid_write_error(void) ""
+ vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
+ vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
+ vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
++vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 15be0358845b..dcab8a4ae0f9 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -125,6 +125,7 @@ typedef struct VFIODevice {
+     uint32_t device_state;
+     VMChangeStateEntry *vm_state;
+     int vm_running;
++    Notifier migration_state;
+ } VFIODevice;
+ 
+ struct VFIODeviceOps {
+-- 
+2.7.0
 
->      if (IS_USER(s)) {>          /* Implemented as NOP in user mode.  */
->          return true;
-> @@ -10182,6 +10190,36 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
->      return true;
->  }
->
-> +static bool trans_CPS_v6m(DisasContext *s, arg_CPS_v6m *a)
-> +{
-> +    TCGv_i32 tmp, addr;
-> +
-> +    if (!(ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M))) {
-> +        return false;
-> +    }
-
-Similarly, this one need not check ENABLE_ARCH_6.
-That is, this is the generic M-profile CPS, it's
-not specific to v6M, and FEATURE_M always implies
-ARCH_6 anyway. Usually we name M-profile specific
-functions _v7m, not _v6m, for mostly historical
-reasons relating to our having implemented v7m first,
-so maybe we should follow that here. I have made
-a bit of an inconsistent hash of this with the v8M
-support, where sometimes I use _v8m because the
-function is only in v8M and not v7M, and sometimes
-_v7m because it's an M-profile function even if it
-happens that it only kicks in or is called for
-v8M CPUs. But we do not curretly have any functions
-with a _v6m suffix so we should probably go with _v7m here.
-
-> +    if (IS_USER(s)) {
-> +        /* Implemented as NOP in user mode.  */
-> +        return true;
-> +    }
-> +
-> +    tmp = tcg_const_i32(a->im);
-> +    /* FAULTMASK */
-> +    if (a->F) {
-> +        addr = tcg_const_i32(19);
-> +        gen_helper_v7m_msr(cpu_env, addr, tmp);
-> +        tcg_temp_free_i32(addr);
-> +    }
-> +    /* PRIMASK */
-> +    if (a->I) {
-> +        addr = tcg_const_i32(16);
-> +        gen_helper_v7m_msr(cpu_env, addr, tmp);
-> +        tcg_temp_free_i32(addr);
-> +    }
-> +    tcg_temp_free_i32(tmp);
-> +    gen_lookup_tb(s);
-> +    return true;
-> +}
-
-thanks
--- PMM
 
