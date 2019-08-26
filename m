@@ -2,73 +2,54 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEB1C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC1BC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4301221848
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:39:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4301221848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D8EF0206BA
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:40:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8EF0206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2I1z-0002sU-Fp
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:39:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38854)
+	id 1i2I2o-0003nb-Tr
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:40:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i2HoI-0001UD-Ea
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:25:39 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i2Hcw-0000vj-3D
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:13:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i2HoH-0007cK-2o
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:25:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53324)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i2HoG-0007bH-Pe
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:25:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i2HoD-0002Uv-R5
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 16:25:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AF4462E80CC
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 16:25:33 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Aug 2019 16:11:35 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc ajbennee rth
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <156683160080.31851.8159878323909291412.malonedeb@soybean.canonical.com>
- <156683348223.2485.3705708265196858485.malone@chaenomeles.canonical.com>
-Message-Id: <87imqjzz2g.fsf@linaro.org>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19031";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 90c944bfb2cfb19e7fcdb7c4a6241f7c4b15f411
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: Re: [Qemu-devel] [Bug 1841442] Re: floating point emulation can
- fail to set FE_INEXACT
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i2Hcs-00019L-52
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:13:54 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44758)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i2Hch-0000lo-Cm; Mon, 26 Aug 2019 12:13:39 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i2HcI-0006QJ-KO; Mon, 26 Aug 2019 19:13:14 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Mon, 26 Aug 2019 19:13:06 +0300
+Message-Id: <20190826161312.489398-8-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190826161312.489398-1-vsementsov@virtuozzo.com>
+References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v9 07/13] iotests: prepare 124 and 257 bitmap
+ querying for backup-top filter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,116 +58,1527 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841442 <1841442@bugs.launchpad.net>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ wencongyang2@huawei.com, xiechanglong.d@gmail.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com, den@openvz.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190826161135.bGvmDUwj6tYI9duua0YTSXqDY6xLm_j6vCDBRlhsrBk@z>
 
-Richard Henderson <rth@twiddle.net> writes:
+After backup-top filter appearing it's not possible to see dirty
+bitmaps in top node, so use node-name instead.
 
-> Well, maybe yes and maybe no.  What you've done is choose two targets
-> whose floating point emulation have not been well maintained.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/124        |   3 +-
+ tests/qemu-iotests/257        |  39 +---
+ tests/qemu-iotests/257.out    | 364 +++++++++++++---------------------
+ tests/qemu-iotests/iotests.py |  22 ++
+ 4 files changed, 173 insertions(+), 255 deletions(-)
 
-So this is a failure on the x86_64 and ppc64 frontends to correctly set
-the softfloat modes when their appropriate registers are set?
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+index 3440f54781..8b6024769c 100755
+--- a/tests/qemu-iotests/124
++++ b/tests/qemu-iotests/124
+@@ -749,8 +749,7 @@ class TestIncrementalBackupBlkdebug(TestIncrementalBackupBase):
+ 
+         # Bitmap Status Check
+         query = self.vm.qmp('query-block')
+-        ret = [bmap for bmap in query['return'][0]['dirty-bitmaps']
+-               if bmap.get('name') == bitmap.name][0]
++        ret = self.vm.get_bitmap(None, drive0['id'], bitmap.name)
+         self.assert_qmp(ret, 'count', 458752)
+         self.assert_qmp(ret, 'granularity', 65536)
+         self.assert_qmp(ret, 'status', 'frozen')
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index c2a72c577a..8c3e96a7fc 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -188,25 +188,6 @@ class Drive:
+         self.size = size
+         self.node = name
+ 
+-def query_bitmaps(vm):
+-    res = vm.qmp("query-block")
+-    return {"bitmaps": {device['device'] or device['qdev']:
+-                        device.get('dirty-bitmaps', []) for
+-                        device in res['return']}}
+-
+-def get_bitmap(bitmaps, drivename, name, recording=None):
+-    """
+-    get a specific bitmap from the object returned by query_bitmaps.
+-    :param recording: If specified, filter results by the specified value.
+-    """
+-    for bitmap in bitmaps['bitmaps'][drivename]:
+-        if bitmap.get('name', '') == name:
+-            if recording is None:
+-                return bitmap
+-            elif bitmap.get('recording') == recording:
+-                return bitmap
+-    return None
+-
+ def blockdev_backup(vm, device, target, sync, **kwargs):
+     # Strip any arguments explicitly nulled by the caller:
+     kwargs = {key: val for key, val in kwargs.items() if val is not None}
+@@ -249,7 +230,7 @@ def perform_writes(drive, n):
+             pattern.size)
+         log(cmd)
+         log(drive.vm.hmp_qemu_io(drive.name, cmd))
+-    bitmaps = query_bitmaps(drive.vm)
++    bitmaps = drive.vm.query_bitmaps()
+     log(bitmaps, indent=2)
+     log('')
+     return bitmaps
+@@ -370,7 +351,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+         # 1 - Writes and Reference Backup
+         bitmaps = perform_writes(drive0, 1)
+         ebitmap.dirty_group(1)
+-        bitmap = get_bitmap(bitmaps, drive0.device, 'bitmap0')
++        bitmap = vm.get_bitmap(bitmaps, drive0.node, 'bitmap0')
+         ebitmap.compare(bitmap)
+         reference_backup(drive0, 1, fbackup1)
+ 
+@@ -388,11 +369,11 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+             log('')
+             bitmaps = perform_writes(drive0, 2)
+             # Named bitmap (static, should be unchanged)
+-            ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'))
++            ebitmap.compare(vm.get_bitmap(bitmaps, drive0.node, 'bitmap0'))
+             # Anonymous bitmap (dynamic, shows new writes)
+             anonymous = EmulatedBitmap()
+             anonymous.dirty_group(2)
+-            anonymous.compare(get_bitmap(bitmaps, drive0.device, '',
++            anonymous.compare(vm.get_bitmap(bitmaps, drive0.node, '',
+                                          recording=True))
+ 
+             # Simulate the order in which this will happen:
+@@ -405,7 +386,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+         vm.run_job(job, auto_dismiss=True, auto_finalize=False,
+                    pre_finalize=_callback,
+                    cancel=(failure == 'simulated'))
+-        bitmaps = query_bitmaps(vm)
++        bitmaps = vm.query_bitmaps()
+         log(bitmaps, indent=2)
+         log('')
+ 
+@@ -423,29 +404,29 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+                 ebitmap.clear()
+                 ebitmap.dirty_bits(range(fail_bit, SIZE // GRANULARITY))
+ 
+-        ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'))
++        ebitmap.compare(vm.get_bitmap(bitmaps, drive0.node, 'bitmap0'))
+ 
+         # 2 - Writes and Reference Backup
+         bitmaps = perform_writes(drive0, 3)
+         ebitmap.dirty_group(3)
+-        ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'))
++        ebitmap.compare(vm.get_bitmap(bitmaps, drive0.node, 'bitmap0'))
+         reference_backup(drive0, 2, fbackup2)
+ 
+         # 2 - Bitmap Backup (In failure modes, this is a recovery.)
+         job = backup(drive0, 2, bsync2, "bitmap",
+                      bitmap="bitmap0", bitmap_mode=bsync_mode)
+         vm.run_job(job, auto_dismiss=True, auto_finalize=False)
+-        bitmaps = query_bitmaps(vm)
++        bitmaps = vm.query_bitmaps()
+         log(bitmaps, indent=2)
+         log('')
+         if bsync_mode != 'never':
+             ebitmap.clear()
+-        ebitmap.compare(get_bitmap(bitmaps, drive0.device, 'bitmap0'))
++        ebitmap.compare(vm.get_bitmap(bitmaps, drive0.node, 'bitmap0'))
+ 
+         log('--- Cleanup ---\n')
+         vm.qmp_log("block-dirty-bitmap-remove",
+                    node=drive0.name, name="bitmap0")
+-        log(query_bitmaps(vm), indent=2)
++        log(vm.query_bitmaps(), indent=2)
+         vm.shutdown()
+         log('')
+ 
+diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
+index 84b79d7bfe..c9b4b68232 100644
+--- a/tests/qemu-iotests/257.out
++++ b/tests/qemu-iotests/257.out
+@@ -19,9 +19,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -55,7 +53,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -111,7 +109,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -153,7 +151,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 393216, "offset": 393216, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 655360,
+@@ -182,7 +180,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 983040,
+@@ -231,7 +229,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"data": {"device": "backup_2", "len": 983040, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 983040,
+@@ -253,9 +251,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -285,9 +281,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -321,7 +315,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -370,7 +364,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"data": {"device": "backup_1", "error": "Input/output error", "len": 393216, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -399,7 +393,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 917504,
+@@ -448,7 +442,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"data": {"device": "backup_2", "len": 917504, "offset": 917504, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 917504,
+@@ -470,9 +464,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -502,9 +494,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -538,7 +528,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -594,7 +584,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -636,7 +626,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 393216, "offset": 393216, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 655360,
+@@ -665,7 +655,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 983040,
+@@ -714,7 +704,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"data": {"device": "backup_2", "len": 983040, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 983040,
+@@ -736,9 +726,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -768,9 +756,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -804,7 +790,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -860,7 +846,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -902,7 +888,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 393216, "offset": 393216, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 655360,
+@@ -931,7 +917,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 983040,
+@@ -980,7 +966,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"data": {"device": "backup_2", "len": 983040, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -1002,9 +988,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -1034,9 +1018,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -1070,7 +1052,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -1119,7 +1101,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"data": {"device": "backup_1", "error": "Input/output error", "len": 393216, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -1148,7 +1130,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 917504,
+@@ -1197,7 +1179,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"data": {"device": "backup_2", "len": 917504, "offset": 917504, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -1219,9 +1201,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -1251,9 +1231,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -1287,7 +1265,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -1343,7 +1321,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -1385,7 +1363,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 393216, "offset": 393216, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -1414,7 +1392,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -1463,7 +1441,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -1485,9 +1463,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -1517,9 +1493,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -1553,7 +1527,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -1609,7 +1583,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -1651,7 +1625,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 393216, "offset": 393216, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -1680,7 +1654,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -1729,7 +1703,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -1751,9 +1725,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -1783,9 +1755,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -1819,7 +1789,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -1868,7 +1838,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"data": {"device": "backup_1", "error": "Input/output error", "len": 393216, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 327680,
+@@ -1897,7 +1867,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 851968,
+@@ -1946,7 +1916,7 @@ expecting 13 dirty sectors; have 13. OK!
+ {"data": {"device": "backup_2", "len": 851968, "offset": 851968, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -1968,9 +1938,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -2000,9 +1968,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -2036,7 +2002,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -2092,7 +2058,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -2134,7 +2100,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 393216, "offset": 393216, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -2163,7 +2129,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -2212,7 +2178,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -2234,9 +2200,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -2266,9 +2230,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -2302,7 +2264,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -2358,7 +2320,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -2400,7 +2362,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 655360,
+@@ -2429,7 +2391,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 983040,
+@@ -2478,7 +2440,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"data": {"device": "backup_2", "len": 983040, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -2500,9 +2462,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -2532,9 +2492,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -2568,7 +2526,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -2617,7 +2575,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"data": {"device": "backup_1", "error": "Input/output error", "len": 67108864, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -2646,7 +2604,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 917504,
+@@ -2695,7 +2653,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"data": {"device": "backup_2", "len": 917504, "offset": 917504, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -2717,9 +2675,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -2749,9 +2705,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -2785,7 +2739,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -2841,7 +2795,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -2883,7 +2837,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -2912,7 +2866,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -2961,7 +2915,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -2983,9 +2937,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -3015,9 +2967,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -3051,7 +3001,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -3107,7 +3057,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -3149,7 +3099,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -3178,7 +3128,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -3227,7 +3177,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -3249,9 +3199,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -3281,9 +3229,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -3317,7 +3263,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -3366,7 +3312,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"data": {"device": "backup_1", "error": "Input/output error", "len": 67108864, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 66125824,
+@@ -3395,7 +3341,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 66453504,
+@@ -3444,7 +3390,7 @@ expecting 1014 dirty sectors; have 1014. OK!
+ {"data": {"device": "backup_2", "len": 66453504, "offset": 66453504, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -3466,9 +3412,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -3498,9 +3442,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -3534,7 +3476,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -3590,7 +3532,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -3632,7 +3574,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -3661,7 +3603,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -3710,7 +3652,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -3732,9 +3674,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -3764,9 +3704,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -3800,7 +3738,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -3856,7 +3794,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -3898,7 +3836,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 458752, "offset": 458752, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 655360,
+@@ -3927,7 +3865,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 983040,
+@@ -3976,7 +3914,7 @@ expecting 15 dirty sectors; have 15. OK!
+ {"data": {"device": "backup_2", "len": 983040, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -3998,9 +3936,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -4030,9 +3966,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -4066,7 +4000,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -4115,7 +4049,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"data": {"device": "backup_1", "error": "Input/output error", "len": 458752, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -4144,7 +4078,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 917504,
+@@ -4193,7 +4127,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"data": {"device": "backup_2", "len": 917504, "offset": 917504, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -4215,9 +4149,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -4247,9 +4179,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -4283,7 +4213,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -4339,7 +4269,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -4381,7 +4311,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 458752, "offset": 458752, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -4410,7 +4340,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -4459,7 +4389,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -4481,9 +4411,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -4513,9 +4441,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -4549,7 +4475,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -4605,7 +4531,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -4647,7 +4573,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 458752, "offset": 458752, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_CANCELLED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -4676,7 +4602,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -4725,7 +4651,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -4747,9 +4673,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -4779,9 +4703,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -4815,7 +4737,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -4864,7 +4786,7 @@ expecting 6 dirty sectors; have 6. OK!
+ {"data": {"device": "backup_1", "error": "Input/output error", "len": 458752, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -4893,7 +4815,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 917504,
+@@ -4942,7 +4864,7 @@ expecting 14 dirty sectors; have 14. OK!
+ {"data": {"device": "backup_2", "len": 917504, "offset": 917504, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -4964,9 +4886,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+@@ -4996,9 +4916,7 @@ write -P0x6f 0x2000000 0x10000
+ write -P0x76 0x3ff0000 0x10000
+ {"return": ""}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Reference Backup #0 ---
+@@ -5032,7 +4950,7 @@ write -P0x69 0x3fe0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 393216,
+@@ -5088,7 +5006,7 @@ write -P0x67 0x3fe0000 0x20000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -5130,7 +5048,7 @@ expecting 7 dirty sectors; have 7. OK!
+ {"data": {"device": "backup_1", "len": 458752, "offset": 458752, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 458752,
+@@ -5159,7 +5077,7 @@ write -P0xdd 0x3fc0000 0x10000
+ {"return": ""}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 786432,
+@@ -5208,7 +5126,7 @@ expecting 12 dirty sectors; have 12. OK!
+ {"data": {"device": "backup_2", "len": 786432, "offset": 786432, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {
+   "bitmaps": {
+-    "device0": [
++    "drive0": [
+       {
+         "busy": false,
+         "count": 0,
+@@ -5230,9 +5148,7 @@ expecting 0 dirty sectors; have 0. OK!
+ {"execute": "block-dirty-bitmap-remove", "arguments": {"name": "bitmap0", "node": "drive0"}}
+ {"return": {}}
+ {
+-  "bitmaps": {
+-    "device0": []
+-  }
++  "bitmaps": {}
+ }
+ 
+ --- Verification ---
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 84438e837c..9381964d9f 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -643,6 +643,28 @@ class VM(qtest.QEMUQtestMachine):
+                 return x
+         return None
+ 
++    def query_bitmaps(self):
++        res = self.qmp("query-named-block-nodes")
++        return {"bitmaps": {device['node-name']: device['dirty-bitmaps']
++                                for device in res['return']
++                                    if 'dirty-bitmaps' in device}}
++
++    def get_bitmap(self, bitmaps, node_name, name, recording=None):
++        """
++        get a specific bitmap from the object returned by query_bitmaps.
++        :param recording: If specified, filter results by the specified value.
++        """
++        if bitmaps is None:
++            bitmaps = self.query_bitmaps()
++
++        for bitmap in bitmaps['bitmaps'][node_name]:
++            if bitmap.get('name', '') == name:
++                if recording is None:
++                    return bitmap
++                elif bitmap.get('recording') == recording:
++                    return bitmap
++        return None
++
+ 
+ index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
+ 
+-- 
+2.18.0
 
->
-> If I try this same test on aarch64, it passes:
->
-> $ ~/a.out 0x0000000000000001
-> 0x0000000000000001 0.000000
-> 0x0
->
-> 0x18
-> FE_INEXACT FE_UNDERFLOW
-> 0x0000000000000000 0.000000
->
-> $ ./aarch64-linux-user/qemu-aarch64 ~/a.out 0x0000000000000001
-> 0x0000000000000001 0.000000
-> 0x0
->
-> 0x18
-> FE_INEXACT FE_UNDERFLOW
-> 0x0000000000000000 0.000000
-
-
---
-Alex Benn=C3=A9e
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841442
-
-Title:
-  floating point emulation can fail to set FE_INEXACT
-
-Status in QEMU:
-  New
-
-Bug description:
-  Floating point emulation can fail to set FE_INEXACT in some
-  circumstances. This shows up quite often in glibc's "math" tests.  A
-  similar test is attached.
-
-  On ppc64le native:
-  --
-  $ gcc nextafter.c -o nextafter -lm
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0xa000000
-  FE_INEXACT FE_UNDERFLOW
-  0x0000000000000000 0.000000
-  --
-
-  On x86_64:
-  --
-  $ gcc nextafter.c -o nextafter -lm
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0x30
-  FE_INEXACT FE_UNDERFLOW =
-
-  0x0000000000000000 0.000000
-  --
-
-  Using qemu-system-ppc64
-  --
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0x8000000
-  FE_UNDERFLOW =
-
-  0x0000000000000000 0.000000
-  --
-
-  Using qemu-x86_64:
-  --
-  $ ./nextafter $(./nextafter)
-  0x0000000000000001 0.000000
-  0x0
-
-  0x0
-
-  0x0000000000000000 0.000000
-  --
-
-  QEMU versions vary, but not too much, and are pretty close to git HEAD:
-  - 586f3dced9 (HEAD -> master, origin/master, origin/HEAD) Merge remote-tr=
-acking branch 'remotes/cohuck/tags/s390x-20190822' into staging
-  - 864ab31 Update version for v4.1.0-rc4 release
-
-  Since the issue happens nearly identically on different targets, I
-  suspect the issue lies somewhere in fpu/softfloat.c.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841442/+subscriptions
 
