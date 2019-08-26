@@ -2,48 +2,109 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA29BC3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 04:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37094C3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 05:40:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B09322173E
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 04:33:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B09322173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 0A6322190F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 05:40:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6322190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i26hF-0001xB-SP
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 00:33:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47059)
+	id 1i27k5-0002Hg-3s
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 01:40:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1i26fi-00010U-B6
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 00:32:03 -0400
+ (envelope-from <thuth@redhat.com>) id 1i27j7-0001p2-C7
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 01:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1i26fg-0007rE-ON
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 00:32:02 -0400
-Received: from ozlabs.ru ([107.173.13.209]:34210)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>)
- id 1i26fg-0007qw-H3; Mon, 26 Aug 2019 00:32:00 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id A25C0AE80011;
- Mon, 26 Aug 2019 00:31:07 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-Date: Mon, 26 Aug 2019 14:31:26 +1000
-Message-Id: <20190826043126.11589-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 107.173.13.209
-Subject: [Qemu-devel] [PATCH qemu] spapr: Render full FDT on ibm,
- client-architecture-support
+ (envelope-from <thuth@redhat.com>) id 1i27j4-0000nJ-Sf
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 01:39:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50352)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i27j4-0000mr-La
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 01:39:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A839418C426C;
+ Mon, 26 Aug 2019 05:39:32 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4EF3E5D6A5;
+ Mon, 26 Aug 2019 05:39:28 +0000 (UTC)
+To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+References: <20190824184635.34192-1-mrolnik@gmail.com>
+ <20190824184635.34192-9-mrolnik@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <a324bbce-814d-d363-7baa-db50f565618d@redhat.com>
+Date: Mon, 26 Aug 2019 07:39:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190824184635.34192-9-mrolnik@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Mon, 26 Aug 2019 05:39:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v29 8/8] target/avr: Add tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -55,174 +116,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: philmd@redhat.com, imammedo@redhat.com, richard.henderson@linaro.org,
+ dovgaluk@ispras.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ibm,client-architecture-support call is a way for the guest to
-negotiate capabilities with a hypervisor. It is implemented as:
-- the guest calls SLOF via client interface;
-- SLOF calls QEMU (H_CAS hypercall) with an options vector from the guest;
-- QEMU returns a device tree diff (which uses FDT format with
-an additional header before it);
-- SLOF walks through the partial diff tree and updates its internal tree
-with the values from the diff.
+On 24/08/2019 20.46, Michael Rolnik wrote:
+> 1. Avocado test
+>     The test is based on
+>     https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/De=
+mo
+>     demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX'=
+ out.
+>     it also demostrates that timer and IRQ are working
+>=20
+> 2. Boot serial test
+>     Prinit out 'T' through serial port
+>=20
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/Makefile.include           |  2 ++
+>  tests/acceptance/machine_avr6.py | 36 ++++++++++++++++++++++++++++++++
+>  tests/boot-serial-test.c         | 10 +++++++++
+>  3 files changed, 48 insertions(+)
+>  create mode 100644 tests/acceptance/machine_avr6.py
+>=20
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 49684fd4f4..dbaeb87572 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -202,6 +202,8 @@ check-qtest-i386-y +=3D tests/test-x86-cpuid-compat=
+$(EXESUF)
+>  check-qtest-i386-y +=3D tests/numa-test$(EXESUF)
+>  check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
+> =20
+> +check-qtest-avr-y +=3D tests/boot-serial-test$(EXESUF)
+> +
+>  check-qtest-alpha-y +=3D tests/boot-serial-test$(EXESUF)
+>  check-qtest-alpha-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
+> =20
+> diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machin=
+e_avr6.py
+> new file mode 100644
+> index 0000000000..0601080b01
+> --- /dev/null
+> +++ b/tests/acceptance/machine_avr6.py
+> @@ -0,0 +1,36 @@
+> +import logging
+> +import time
+> +import distutils.spawn
+> +
+> +from avocado import skipUnless
+> +from avocado_qemu import Test
+> +from avocado.utils import process
+> +
+> +class AVR6Machine(Test):
+> +    timeout =3D 5
+> +
+> +    def test_freertos(self):
+> +        """
+> +        :avocado: tags=3Darch:avr
+> +        :avocado: tags=3Dmachine:sample
+> +        """
+> +        """
+> +        https://github.com/seharris/qemu-avr-tests/raw/master/free-rto=
+s/Demo/AVR_ATMega2560_GCC/demo.elf
+> +        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNO=
+PQRSTUVWX'
+> +        """
+> +        rom_url =3D 'https://github.com/seharris/qemu-avr-tests'
+> +        rom_url +=3D '/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/de=
+mo.elf'
+> +        rom_hash =3D '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
+> +        rom_path =3D self.fetch_asset(rom_url, asset_hash=3Drom_hash)
+> +
+> +        self.vm.set_machine('sample')
+> +        self.vm.add_args('-bios', rom_path)
+> +        self.vm.add_args('-nographic')
+> +        self.vm.launch()
+> +
+> +        time.sleep(2)
+> +        self.vm.shutdown()
+> +
+> +        match =3D 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
+> +
+> +        self.assertIn(match, self.vm.get_log())
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index 24852d4c7d..22cbaccc1b 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -16,6 +16,15 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> =20
+> +static const uint8_t bios_avr[] =3D {
+> +    0x88, 0xe0,             /* ldi r24, 0x08   */
+> +    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
+> +    0x86, 0xe0,             /* ldi r24, 0x06   */
+> +    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to =
+8 */
+> +    0x84, 0xe5,             /* ldi r24, 0x54   */
+> +    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
+> +};
+> +
+>  static const uint8_t kernel_mcf5208[] =3D {
+>      0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+>      0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+> @@ -92,6 +101,7 @@ typedef struct testdef {
+> =20
+>  static testdef_t tests[] =3D {
+>      { "alpha", "clipper", "", "PCI:" },
+> +    { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
+>      { "ppc", "ppce500", "", "U-Boot" },
+>      { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+>      { "ppc", "g3beige", "", "PowerPC,750" },
+>=20
 
-This changes QEMU to simply re-render the entire tree and send it as
-an update. SLOF can handle this already mostly, [1] is needed before this
-can be applied.
-
-The benefit is reduced code size as there is no need for another set of
-DT rendering helpers such as spapr_fixup_cpu_dt().
-
-The downside is that the updates are bigger now (as they include all
-nodes and properties) but the difference on a '-smp 256,threads=1' system
-before/after is 2.35s vs. 2.5s.
-
-While at this, add a missing g_free(fdt) if the resulting tree is bigger
-than the space allocated by SLOF. Also, store the resulting tree in
-the spapr machine to have the latest valid FDT copy possible (this should
-not matter much as H_UPDATE_DT happens right after that but nevertheless).
-
-[1] https://patchwork.ozlabs.org/patch/1152915/
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- hw/ppc/spapr.c | 90 ++++++--------------------------------------------
- 1 file changed, 10 insertions(+), 80 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index baedadf20b8c..6dea5947afbc 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -295,65 +295,6 @@ static void spapr_populate_pa_features(SpaprMachineState *spapr,
-     _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
- }
- 
--static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
--{
--    MachineState *ms = MACHINE(spapr);
--    int ret = 0, offset, cpus_offset;
--    CPUState *cs;
--    char cpu_model[32];
--    uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu = POWERPC_CPU(cs);
--        DeviceClass *dc = DEVICE_GET_CLASS(cs);
--        int index = spapr_get_vcpu_id(cpu);
--        int compat_smt = MIN(ms->smp.threads, ppc_compat_max_vthreads(cpu));
--
--        if (!spapr_is_thread0_in_vcore(spapr, cpu)) {
--            continue;
--        }
--
--        snprintf(cpu_model, 32, "%s@%x", dc->fw_name, index);
--
--        cpus_offset = fdt_path_offset(fdt, "/cpus");
--        if (cpus_offset < 0) {
--            cpus_offset = fdt_add_subnode(fdt, 0, "cpus");
--            if (cpus_offset < 0) {
--                return cpus_offset;
--            }
--        }
--        offset = fdt_subnode_offset(fdt, cpus_offset, cpu_model);
--        if (offset < 0) {
--            offset = fdt_add_subnode(fdt, cpus_offset, cpu_model);
--            if (offset < 0) {
--                return offset;
--            }
--        }
--
--        ret = fdt_setprop(fdt, offset, "ibm,pft-size",
--                          pft_size_prop, sizeof(pft_size_prop));
--        if (ret < 0) {
--            return ret;
--        }
--
--        if (nb_numa_nodes > 1) {
--            ret = spapr_fixup_cpu_numa_dt(fdt, offset, cpu);
--            if (ret < 0) {
--                return ret;
--            }
--        }
--
--        ret = spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt);
--        if (ret < 0) {
--            return ret;
--        }
--
--        spapr_populate_pa_features(spapr, cpu, fdt, offset,
--                                   spapr->cas_legacy_guest_workaround);
--    }
--    return ret;
--}
--
- static hwaddr spapr_node0_size(MachineState *machine)
- {
-     if (nb_numa_nodes) {
-@@ -983,11 +924,13 @@ static bool spapr_hotplugged_dev_before_cas(void)
-     return false;
- }
- 
-+static void *spapr_build_fdt(SpaprMachineState *spapr);
-+
- int spapr_h_cas_compose_response(SpaprMachineState *spapr,
-                                  target_ulong addr, target_ulong size,
-                                  SpaprOptionVector *ov5_updates)
- {
--    void *fdt, *fdt_skel;
-+    void *fdt;
-     SpaprDeviceTreeUpdateHeader hdr = { .version_id = 1 };
- 
-     if (spapr_hotplugged_dev_before_cas()) {
-@@ -1003,28 +946,11 @@ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
- 
-     size -= sizeof(hdr);
- 
--    /* Create skeleton */
--    fdt_skel = g_malloc0(size);
--    _FDT((fdt_create(fdt_skel, size)));
--    _FDT((fdt_finish_reservemap(fdt_skel)));
--    _FDT((fdt_begin_node(fdt_skel, "")));
--    _FDT((fdt_end_node(fdt_skel)));
--    _FDT((fdt_finish(fdt_skel)));
--    fdt = g_malloc0(size);
--    _FDT((fdt_open_into(fdt_skel, fdt, size)));
--    g_free(fdt_skel);
--
--    /* Fixup cpu nodes */
--    _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
--
--    if (spapr_dt_cas_updates(spapr, fdt, ov5_updates)) {
--        return -1;
--    }
--
--    /* Pack resulting tree */
-+    fdt = spapr_build_fdt(spapr);
-     _FDT((fdt_pack(fdt)));
- 
-     if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
-+        g_free(fdt);
-         trace_spapr_cas_failed(size);
-         return -1;
-     }
-@@ -1032,7 +958,11 @@ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
-     cpu_physical_memory_write(addr, &hdr, sizeof(hdr));
-     cpu_physical_memory_write(addr + sizeof(hdr), fdt, fdt_totalsize(fdt));
-     trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
--    g_free(fdt);
-+
-+    g_free(spapr->fdt_blob);
-+    spapr->fdt_size = fdt_totalsize(fdt);
-+    spapr->fdt_initial_size = spapr->fdt_size;
-+    spapr->fdt_blob = fdt;
- 
-     return 0;
- }
--- 
-2.17.1
-
+Acked-by: Thomas Huth <thuth@redhat.com>
 
