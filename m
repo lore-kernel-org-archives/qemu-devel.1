@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C80C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54561C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:24:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D143620828
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:21:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 149AF2173E
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:24:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t0vnUGtC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D143620828
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="riPRxBwY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 149AF2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Go7-00054a-0v
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:21:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55609)
+	id 1i2Gqy-00075p-7S
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nirsof@gmail.com>) id 1i2Gmg-00045V-PV
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:19:55 -0400
+ (envelope-from <nirsof@gmail.com>) id 1i2Gpy-0006WL-Sn
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nirsof@gmail.com>) id 1i2Gmf-0001kk-6t
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:19:54 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:36483)
+ (envelope-from <nirsof@gmail.com>) id 1i2Gpy-0004Cx-0w
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:23:18 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:33021)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nirsof@gmail.com>)
- id 1i2Gmf-0001kV-2b; Mon, 26 Aug 2019 11:19:53 -0400
-Received: by mail-io1-xd44.google.com with SMTP id o9so38175013iom.3;
- Mon, 26 Aug 2019 08:19:53 -0700 (PDT)
+ id 1i2Gpx-0004Cl-RA; Mon, 26 Aug 2019 11:23:17 -0400
+Received: by mail-io1-xd42.google.com with SMTP id z3so38280326iog.0;
+ Mon, 26 Aug 2019 08:23:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NtvB7jmh0tvli2E79VHxmPm+zatFlmL75lfW57MuVbE=;
- b=t0vnUGtCHjk+QOhbthvo9GoTr4SzgPyPAY7bXCIgFuQcoG1PYvr2Yka8BAWqe8oamS
- obMfdlP5Dz+RySb34dG3IgeFas7jS/UmQ5QkkUto2wUke4c1w7HQdv5Q/z1ZiQRYumlp
- htnDpMGRwO+c+7myoopZXon+yrtK3YV7qQOZBx2F7ZmiVLUSSNGW+HDWUMFUAtGo/Cwj
- 43C9MRBZ5lfKytAK9TmKDKXOOnXIxlHnH/Y9sZhUlADhy6FzryKx2TIRRrocPf4oENXa
- 9Gu2UbncCrgIyqply42+GXFDmkpn8dQzz6a5f9Fr1GauHSRDtXUT2PsDhrnc9U8rMX7/
- WDSg==
+ :cc; bh=ifPruSZoUrpwYrEPs5mld7U5CubNc5EqUmXA//4Zk/o=;
+ b=riPRxBwYy1JYDHRZutb9pvBeoibmipTPFD5zQZnE9ICxS+Wp+UQWHDYjU+aUGSZp8I
+ Ntb62cqsnsMREevP9Md0KTipxSB8vG97fw/5OVDZ7HX6P7UiS5brbIVaP8K7NrhiA/Be
+ nn5Itk9sqY38lb3ToB96iwQ7OgN59Kus0w3PjX2RYYwhncPGoy4ycDxkS1sK2ygYZacC
+ pBv529Ak4CHkuSarAWE0gJCgpaeVnLM9NCE3Do5ZB1KjFwSAGJDCaVlETqQLdAhuKbwj
+ wWSAeFjtR2gqVtNie0hsdYucKWth4NxXJupxgrX2Lg5Cpnes8RxdylaU9mNWQZCAqKef
+ s5kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=NtvB7jmh0tvli2E79VHxmPm+zatFlmL75lfW57MuVbE=;
- b=IC35LOLqE5IWcsrHYa1MZpUEUDqT2xYLq6HYzcPRhjzXKfzy1gELhWKR2efdr4QDI8
- DfTqZefLgcsDfW+1RyyHV7pnjw19T6DnwPL4UXU7cLQTAGO7YsB0/mG43jF/Y32rbClc
- TKQ/CY5NuzoBYVtqlmB4seF9DCH5JxnM4riwXabRY/bdcxvX9SuelQpKEkpAGKNby1z1
- XA29Js5AUCgsG76jfq/PFgYxZVyNmraIT8yUxkLvirsrwPHHf5tODxTJgAuTv8uVvrKf
- uXUdx3xXEa1VKIZ7u5kYqeFweAcddK6VZQatUqYNodrOfeUQ0cMwx4KPVJKJm7NOAkQU
- Itaw==
-X-Gm-Message-State: APjAAAWNncNHfA+inwmo0cvOzp6EimNTNNiVohWNEMAZKfSFSAI/GbpO
- zyPbqjH9AlXZPBk+gyAawFo6pLp7hGhqMOeFKFM=
-X-Google-Smtp-Source: APXvYqx3U6QsBzGcDy8Q0R41475pSVyOva+4yBAeCpZFMwTwogdRnUgJ2YucNbckA2DVrB+1Jg0K4GjYfruCTS0A0kM=
-X-Received: by 2002:a6b:8e8b:: with SMTP id q133mr3040191iod.165.1566832792102; 
- Mon, 26 Aug 2019 08:19:52 -0700 (PDT)
+ bh=ifPruSZoUrpwYrEPs5mld7U5CubNc5EqUmXA//4Zk/o=;
+ b=RqOEuaUtw63i9Z73HVDcxLmmVfQxz7coUisLc7W7/tlgs06Nq/Wg5GufS2FCMLw3n5
+ wsCeOWyFVAe+WzOKDpr0ZyEPeNu0fXLcWjDj2tTiUkEG51Mn1E4RoQxHrXl699ygaslL
+ EAm5FzX7GjQg1gxDmZhIetnk/rFednjpGVXXjxx75P2c+ICTSCweijp34TF4jpbxWkUr
+ mAPtWgAR+ZvQWlS093CX0uYKYWxj/H1qemNgJ+DEfkPTRcqu+cPjFYNKR38RHmfoBtQs
+ MQ5CdzgCjR21mpV0RSGh6KKfeWCLF4Q5902/G3wNBHib4mDxJzueNJ+uigc7HmNrKn3N
+ EaBg==
+X-Gm-Message-State: APjAAAVMKZm6h64rT2BLlktVwNGOIUDzEXaD/+UN1paQEj2MJSmwZHvx
+ Pnpu9z+AsjVAP2Pw5NF70zbTIJ2mBVW9nbGeEIE=
+X-Google-Smtp-Source: APXvYqw/ITsTJUTejmkMnrH1eYlGCQq1qL0nksVa7PXohvIPf1mWRYPvJ+a6WuZfDCwtzWmSsnh9kknlCDqVVenHCU8=
+X-Received: by 2002:a5d:8353:: with SMTP id q19mr319973ior.59.1566832997019;
+ Mon, 26 Aug 2019 08:23:17 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190825220329.7942-1-nsoffer@redhat.com>
  <20190825220329.7942-2-nsoffer@redhat.com>
- <65085dba-f180-8a4e-8464-65e91323b69b@redhat.com>
-In-Reply-To: <65085dba-f180-8a4e-8464-65e91323b69b@redhat.com>
+ <e4e45496-b867-4e57-5b25-d0f1425d4824@redhat.com>
+ <8a5eef62-27eb-9936-3db7-08d06532add7@redhat.com>
+In-Reply-To: <8a5eef62-27eb-9936-3db7-08d06532add7@redhat.com>
 From: Nir Soffer <nirsof@gmail.com>
-Date: Mon, 26 Aug 2019 18:19:35 +0300
-Message-ID: <CAMr-obvapP0fcjrQafvdi+vDuyEDMnwG9cBC1HYmW1gwH=JrUw@mail.gmail.com>
+Date: Mon, 26 Aug 2019 18:23:00 +0300
+Message-ID: <CAMr-obsWo0YiJR=mE8tLfuka_WQT-81RaYtSijvtRx1AFYD_rw@mail.gmail.com>
 To: Eric Blake <eblake@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
+X-Received-From: 2607:f8b0:4864:20::d42
 Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: posix: Always allocate the
  first block
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,57 +96,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 26, 2019 at 4:46 PM Eric Blake <eblake@redhat.com> wrote:
+On Mon, Aug 26, 2019 at 4:49 PM Eric Blake <eblake@redhat.com> wrote:
 >
-> On 8/25/19 5:03 PM, Nir Soffer wrote:
-> > When creating an image with preallocation "off" or "falloc", the first
-> > block of the image is typically not allocated. When using Gluster
-> > storage backed by XFS filesystem, reading this block using direct I/O
-> > succeeds regardless of request length, fooling alignment detection.
+> On 8/26/19 7:31 AM, Max Reitz wrote:
+>
+> >>  # the file size.  This function hides the resulting difference in the
+> >>  # stat -c '%b' output.
+> >>  # Parameter 1: Number of blocks an empty file occupies
+> >> -# Parameter 2: Image size in bytes
+> >> +# Parameter 2: Minimal number of blocks in an image
+> >> +# Parameter 3: Image size in bytes
+> >>  _filter_blocks()
+> >>  {
+> >>      extra_blocks=$1
+> >> -    img_size=$2
+> >> +    min_blocks=$2
+> >> +    img_size=$3
+> >>
+> >> -    sed -e "s/blocks=$extra_blocks\\(\$\\|[^0-9]\\)/nothing allocated/" \
+> >> -        -e "s/blocks=$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\\)/everything allocated/"
+> >> +    sed -e "s/blocks=$((min_blocks))\\(\$\\|[^0-9]\\)/min allocation/" \
 > >
-> > In this case we fallback to a safe value (4096) instead of the optimal
-> > value (512), which may lead to unneeded data copying when aligning
-> > requests.  Allocating the first block avoids the fallback.
-> >
+> > Superfluous parentheses ($(())), but not wrong.
 >
-> > Here is a table comparing the total time spent:
-> >
-> > Type    Before(s)   After(s)    Diff(%)
-> > ---------------------------------------
-> > real      530.028    469.123      -11.4
-> > user       17.204     10.768      -37.4
-> > sys        17.881      7.011      -60.7
-> >
-> > We can see very clear improvement in CPU usage.
->
-> Nice justification.
->
->
-> > +/*
-> > + * Help alignment probing by allocating the first block.
-> > + *
->
-> > +    do {
-> > +        n = pwrite(fd, buf, write_size, 0);
-> > +    } while (n == -1 && errno == EINTR);
-> > +
-> > +    qemu_vfree(buf);
->
-> qemu_vfree() can corrupt errno...
->
-> > +
-> > +    return (n == -1) ? -errno : 0;
->
-> ...which means you may be returning an unexpected value here.
->
-> Either we should patch qemu_vfree() to guarantee that errno is
-> preserved, or you locally capture errno before calling it here.
+> Note that $((..)) has a purpose: it can convert any variable content
+> into decimal.  I can write min_blocks=0x1000, and $((min_blocks))
+> results in 4096 while $min_blocks is still 0x1000.  But I'd need more
+> context as to what the callers expect to pass as to whether the $((...))
+> is superfluous here.
 
-qemu_vfree() returns void like free(), so changing errno is unexpected, but
-other code using it should not be effected, so preserving errno here seems
-like a better change.
-
-Thanks!
+In this case min_blocks is computed and always use base 10, so we don't
+need the $(()).
 
 Nir
 
