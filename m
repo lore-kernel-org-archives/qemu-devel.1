@@ -2,90 +2,56 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DD9C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 11:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5639C3A5A8
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 12:20:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 597EA205C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 11:23:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 597EA205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A07F523407
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 12:20:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A07F523407
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2D5V-0002ri-Gj
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 07:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45616)
+	id 1i2Dyo-0001IU-Ka
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 08:20:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2D4Z-0002Lu-EZ
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 07:22:08 -0400
+ (envelope-from <dovgaluk@ispras.ru>) id 1i2Dy6-0000tS-1N
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 08:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2D4Y-0002Hn-Fn
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 07:22:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58828)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2D4U-0002Dq-2E; Mon, 26 Aug 2019 07:22:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 10C2A3082126;
- Mon, 26 Aug 2019 11:21:59 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.14])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C1D9C5D9CC;
- Mon, 26 Aug 2019 11:21:57 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190824100740.61635-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <01661ed8-9bf5-4d1e-5637-2669d4df23a3@redhat.com>
-Date: Mon, 26 Aug 2019 13:21:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <dovgaluk@ispras.ru>) id 1i2Dy4-0005NC-L5
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 08:19:29 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:34846)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>)
+ id 1i2Dy1-0005Kz-AT; Mon, 26 Aug 2019 08:19:25 -0400
+Received: from mail.ispras.ru (localhost [127.0.0.1])
+ by mail.ispras.ru (Postfix) with ESMTPSA id D2EC654006A;
+ Mon, 26 Aug 2019 15:19:22 +0300 (MSK)
 MIME-Version: 1.0
-In-Reply-To: <20190824100740.61635-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="3bBy8MIRVd9SvPeWhIdIgMviZl1GGZPgb"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 26 Aug 2019 11:21:59 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] block: fix permission update in
- bdrv_replace_node
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Mon, 26 Aug 2019 15:19:22 +0300
+From: dovgaluk <dovgaluk@ispras.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>, pavel.dovgaluk@ispras.ru
+In-Reply-To: <1566284395-30287-16-git-send-email-pbonzini@redhat.com>
+References: <1566284395-30287-1-git-send-email-pbonzini@redhat.com>
+ <1566284395-30287-16-git-send-email-pbonzini@redhat.com>
+Message-ID: <46af8966edd45c163d7d0bd974f557cd@ispras.ru>
+X-Sender: dovgaluk@ispras.ru
+User-Agent: Roundcube Webmail/1.1.2
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Subject: Re: [Qemu-devel] [PULL 15/36] memory: fix race between TCG and
+ accesses to dirty bitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,82 +63,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: Qemu-devel <qemu-devel-bounces+importer=patchew.org@nongnu.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3bBy8MIRVd9SvPeWhIdIgMviZl1GGZPgb
-Content-Type: multipart/mixed; boundary="lFbcgS04Sa7ipkChBAyfHAXJyfNBqUSvg";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com
-Message-ID: <01661ed8-9bf5-4d1e-5637-2669d4df23a3@redhat.com>
-Subject: Re: [PATCH] block: fix permission update in bdrv_replace_node
-References: <20190824100740.61635-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190824100740.61635-1-vsementsov@virtuozzo.com>
+This patch breaks the execution recording.
+While vCPU tries to lock replay mutex in main while loop,
+vga causes dirty memory sync and do_run_on_cpu call.
+This call waits for vCPU to process the work queue.
 
---lFbcgS04Sa7ipkChBAyfHAXJyfNBqUSvg
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Pavel Dovgalyuk
 
-On 24.08.19 12:07, Vladimir Sementsov-Ogievskiy wrote:
-> It's wrong to OR shared permissions. It may lead to crash on further
-> permission updates.
-> Also, no needs to consider previously calculated permissions, as at
-> this point we already bind all new parents and bdrv_get_cumulative_perm=
-
-> result is enough. So fix the bug by just set permissions by
-> bdrv_get_cumulative_perm result.
+Paolo Bonzini =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2019-08-20 09:59:
+> There is a race between TCG and accesses to the dirty log:
 >=20
-> Bug was introduced in long ago 234ac1a9025, in 2.9.
+>       vCPU thread                  reader thread
+>       -----------------------      -----------------------
+>       TLB check -> slow path
+>         notdirty_mem_write
+>           write to RAM
+>           set dirty flag
+>                                    clear dirty flag
+>       TLB check -> fast path
+>                                    read memory
+>         write to RAM
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Fortunately, in order to fix it, no change is required to the
+> vCPU thread.  However, the reader thread must delay the read after
+> the vCPU thread has finished the write.  This can be approximated
+> conservatively by run_on_cpu, which waits for the end of the current
+> translation block.
+>=20
+> A similar technique is used by KVM, which has to do a synchronous TLB
+> flush after doing a test-and-clear of the dirty-page flags.
+>=20
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
+>  exec.c                | 31 +++++++++++++++++++++++++++++++
+>  include/exec/memory.h | 12 ++++++++++++
+>  memory.c              | 10 +++++++++-
+>  migration/ram.c       |  1 +
+>  4 files changed, 53 insertions(+), 1 deletion(-)
 >=20
-> Hi all!
+> diff --git a/exec.c b/exec.c
+> index 3e78de3..ae68f72 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -198,6 +198,7 @@ typedef struct subpage_t {
 >=20
-> I found this bug during my work around backup-top filter. It happens th=
-at
-> on filter removing, bdrv_replace_node() breaks permissions in graph whi=
-ch
-> lead to bdrv_set_backing_hd(new backing: NULL) on
-> assert(tighten_restrictions =3D=3D false).
+>  static void io_mem_init(void);
+>  static void memory_map_init(void);
+> +static void tcg_log_global_after_sync(MemoryListener *listener);
+>  static void tcg_commit(MemoryListener *listener);
 >=20
->  block.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  static MemoryRegion io_mem_watch;
+> @@ -906,6 +907,7 @@ void cpu_address_space_init(CPUState *cpu, int=20
+> asidx,
+>      newas->cpu =3D cpu;
+>      newas->as =3D as;
+>      if (tcg_enabled()) {
+> +        newas->tcg_as_listener.log_global_after_sync =3D
+> tcg_log_global_after_sync;
+>          newas->tcg_as_listener.commit =3D tcg_commit;
+>          memory_listener_register(&newas->tcg_as_listener, as);
+>      }
+> @@ -3143,6 +3145,35 @@ void=20
+> address_space_dispatch_free(AddressSpaceDispatch *d)
+>      g_free(d);
+>  }
+>=20
+> +static void do_nothing(CPUState *cpu, run_on_cpu_data d)
+> +{
+> +}
+> +
+> +static void tcg_log_global_after_sync(MemoryListener *listener)
+> +{while (1) {
+         qemu_mutex_unlock_iothread();
+         replay_mutex_lock();
+         qemu_mutex_lock_i
+> +    CPUAddressSpace *cpuas;
+> +
+> +    /* Wait for the CPU to end the current TB.  This avoids the=20
+> following
+> +     * incorrect race:
+> +     *
+> +     *      vCPU                         migration
+> +     *      ----------------------       -------------------------
+> +     *      TLB check -> slow path
+> +     *        notdirty_mem_write
+> +     *          write to RAM
+> +     *          mark dirty
+> +     *                                   clear dirty flag
+> +     *      TLB check -> fast path
+> +     *                                   read memory
+> +     *        write to RAM
+> +     *
+> +     * by pushing the migration thread's memory read after the vCPU=20
+> thread has
+> +     * written the memory.
+> +     */
+> +    cpuas =3D container_of(listener, CPUAddressSpace, tcg_as_listener)=
+;
+> +    run_on_cpu(cpuas->cpu, do_nothing, RUN_ON_CPU_NULL);
+> +}
+> +
+>  static void tcg_commit(MemoryListener *listener)
+>  {
+>      CPUAddressSpace *cpuas;
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index bb0961d..b6bcf31 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -419,6 +419,7 @@ struct MemoryListener {
+>      void (*log_clear)(MemoryListener *listener, MemoryRegionSection=20
+> *section);
+>      void (*log_global_start)(MemoryListener *listener);
+>      void (*log_global_stop)(MemoryListener *listener);
+> +    void (*log_global_after_sync)(MemoryListener *listener);
+>      void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection=20
+> *section,
+>                          bool match_data, uint64_t data, EventNotifier=20
+> *e);
+>      void (*eventfd_del)(MemoryListener *listener, MemoryRegionSection=20
+> *section,
+> @@ -1682,6 +1683,17 @@ MemoryRegionSection=20
+> memory_region_find(MemoryRegion *mr,
+>  void memory_global_dirty_log_sync(void);
+>=20
+>  /**
+> + * memory_global_dirty_log_sync: synchronize the dirty log for all=20
+> memory
+> + *
+> + * Synchronizes the vCPUs with a thread that is reading the dirty=20
+> bitmap.
+> + * This function must be called after the dirty log bitmap is cleared,=
+=20
+> and
+> + * before dirty guest memory pages are read.  If you are using
+> + * #DirtyBitmapSnapshot, memory_region_snapshot_and_clear_dirty()=20
+> takes
+> + * care of doing this.
+> + */
+> +void memory_global_after_dirty_log_sync(void);
+> +
+> +/**
+>   * memory_region_transaction_begin: Start a transaction.
+>   *
+>   * During a transaction, changes will be accumulated and made visible
+> diff --git a/memory.c b/memory.c
+> index e42d63a..edd0c13 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2127,9 +2127,12 @@ DirtyBitmapSnapshot
+> *memory_region_snapshot_and_clear_dirty(MemoryRegion *mr,
+>                                                              hwaddr=20
+> size,
+>                                                              unsigned=20
+> client)
+>  {
+> +    DirtyBitmapSnapshot *snapshot;
+>      assert(mr->ram_block);
+>      memory_region_sync_dirty_bitmap(mr);
+> -    return cpu_physical_memory_snapshot_and_clear_dirty(mr, addr,
+> size, client);
+> +    snapshot =3D cpu_physical_memory_snapshot_and_clear_dirty(mr, addr=
+,
+> size, client);
+> +    memory_global_after_dirty_log_sync();
+> +    return snapshot;
+>  }
+>=20
+>  bool memory_region_snapshot_get_dirty(MemoryRegion *mr,
+> DirtyBitmapSnapshot *snap,
+> @@ -2620,6 +2623,11 @@ void memory_global_dirty_log_sync(void)
+>      memory_region_sync_dirty_bitmap(NULL);
+>  }
+>=20
+> +void memory_global_after_dirty_log_sync(void)
+> +{
+> +    MEMORY_LISTENER_CALL_GLOBAL(log_global_after_sync, Forward);
+> +}
+> +
+>  static VMChangeStateEntry *vmstate_change;
+>=20
+>  void memory_global_dirty_log_start(void)
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 889148d..4e3a6ae 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1847,6 +1847,7 @@ static void migration_bitmap_sync(RAMState *rs)
+>      rcu_read_unlock();
+>      qemu_mutex_unlock(&rs->bitmap_mutex);
+>=20
+> +    memory_global_after_dirty_log_sync();
+>      trace_migration_bitmap_sync_end(rs->num_dirty_pages_period);
+>=20
+>      end_time =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
 
-Thanks, that makes sense.
-
-Applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---lFbcgS04Sa7ipkChBAyfHAXJyfNBqUSvg--
-
---3bBy8MIRVd9SvPeWhIdIgMviZl1GGZPgb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1jwNMACgkQ9AfbAGHV
-z0DY+Qf9Ga8+1SWx+WF2CC/nRCKMCEk6+am37ME3xeFR/fE0hT2B9t8eRGzsclko
-6w9wps7vQC7tFFjzP61B01j+QhLikW754JGyjG8BA9xD9y+XSDG6MbjeLkXX8PRQ
-nxtK+tq74K3YE/fQ/aTD+AnTpEEtcpqZOT9967NfF4eejEdpZC+ekna9Gga0tJmB
-U6Job5k/e+qmq1JoDa21t8O/4Uyio5Jj45roOtpEYvzjq9knvwx9eB3vVNAE1Iv/
-88ad7gcHyZ5HCoOO07bS8YE+R3BNNy63/bkIvj5nCa+iSfnK/bxN1vnDQyVf5e7N
-lLX9/xH4TnNkgy/VkUI+8sp0VNsckQ==
-=vZ3G
------END PGP SIGNATURE-----
-
---3bBy8MIRVd9SvPeWhIdIgMviZl1GGZPgb--
 
