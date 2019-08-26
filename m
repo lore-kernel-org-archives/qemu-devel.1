@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDCCC3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 07:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0E3C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 07:55:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C807320874
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 07:55:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C807320874
+	by mail.kernel.org (Postfix) with ESMTPS id 3659220874
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 07:55:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3659220874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i29r0-000566-JX
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 03:55:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42016)
+	id 1i29r4-00056F-6B
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 03:55:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41986)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i29my-0000Aq-UJ
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 03:51:45 -0400
+ (envelope-from <david@redhat.com>) id 1i29mv-000083-2T
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 03:51:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i29mx-0002qe-2d
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 03:51:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60654)
+ (envelope-from <david@redhat.com>) id 1i29mt-0002ol-3H
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 03:51:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i29mw-0002qB-TI; Mon, 26 Aug 2019 03:51:43 -0400
+ id 1i29mr-0002nX-Oq; Mon, 26 Aug 2019 03:51:39 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2425410576DD;
- Mon, 26 Aug 2019 07:51:42 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-227.ams2.redhat.com [10.36.116.227])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DBD1260C80;
+ by mx1.redhat.com (Postfix) with ESMTPS id 90FD085540;
  Mon, 26 Aug 2019 07:51:36 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-227.ams2.redhat.com [10.36.116.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C9B1160C80;
+ Mon, 26 Aug 2019 07:51:30 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 26 Aug 2019 09:51:09 +0200
-Message-Id: <20190826075112.25637-5-david@redhat.com>
+Date: Mon, 26 Aug 2019 09:51:08 +0200
+Message-Id: <20190826075112.25637-4-david@redhat.com>
 In-Reply-To: <20190826075112.25637-1-david@redhat.com>
 References: <20190826075112.25637-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 26 Aug 2019 07:51:42 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Mon, 26 Aug 2019 07:51:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 4/7] tcg: Enforce single page access in
- probe_write()
+Subject: [Qemu-devel] [PATCH v2 3/7] tcg: Factor out CONFIG_USER_ONLY
+ probe_write() from s390x code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,42 +77,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's enforce the interface restriction.
+Factor it out into common code. Similar to the !CONFIG_USER_ONLY variant,
+let's not allow to cross page boundaries.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/tcg/cputlb.c    | 2 ++
- accel/tcg/user-exec.c | 2 ++
- 2 files changed, 4 insertions(+)
+ accel/tcg/user-exec.c     | 15 +++++++++++++++
+ include/exec/exec-all.h   |  4 ++--
+ target/s390x/mem_helper.c |  7 -------
+ 3 files changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 7fc7aa9482..09fe4cdcc4 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1088,6 +1088,8 @@ void probe_write(CPUArchState *env, target_ulong ad=
-dr, int size, int mmu_idx,
-     CPUTLBEntry *entry =3D tlb_entry(env, mmu_idx, addr);
-     target_ulong tlb_addr =3D tlb_addr_write(entry);
-=20
-+    g_assert(-(addr | TARGET_PAGE_MASK) >=3D size);
-+
-     if (unlikely(!tlb_hit(tlb_addr, addr))) {
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
-             tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
 diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 68f4425cbc..b25a342eaa 100644
+index 897d1571c4..68f4425cbc 100644
 --- a/accel/tcg/user-exec.c
 +++ b/accel/tcg/user-exec.c
-@@ -194,6 +194,8 @@ void probe_write(CPUArchState *env, target_ulong addr=
-, int size, int mmu_idx,
-     CPUState *cpu =3D env_cpu(env);
-     CPUClass *cc;
+@@ -188,6 +188,21 @@ static inline int handle_cpu_signal(uintptr_t pc, si=
+ginfo_t *info,
+     g_assert_not_reached();
+ }
 =20
-+    g_assert(-(addr | TARGET_PAGE_MASK) >=3D size);
++void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu=
+_idx,
++                 uintptr_t retaddr)
++{
++    CPUState *cpu =3D env_cpu(env);
++    CPUClass *cc;
 +
-     if (!guest_addr_valid(addr) ||
-         page_check_range(addr, size, PAGE_WRITE) < 0) {
-         cc =3D CPU_GET_CLASS(cpu);
++    if (!guest_addr_valid(addr) ||
++        page_check_range(addr, size, PAGE_WRITE) < 0) {
++        cc =3D CPU_GET_CLASS(cpu);
++        cc->tlb_fill(cpu, addr, size, MMU_DATA_STORE, MMU_USER_IDX, fals=
+e,
++                     retaddr);
++        g_assert_not_reached();
++    }
++}
++
+ #if defined(__i386__)
+=20
+ #if defined(__NetBSD__)
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 135aeaab0d..cbcc85add3 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -260,8 +260,6 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ul=
+ong vaddr,
+ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
+                   hwaddr paddr, int prot,
+                   int mmu_idx, target_ulong size);
+-void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu=
+_idx,
+-                 uintptr_t retaddr);
+ #else
+ static inline void tlb_init(CPUState *cpu)
+ {
+@@ -312,6 +310,8 @@ static inline void tlb_flush_by_mmuidx_all_cpus_synce=
+d(CPUState *cpu,
+ {
+ }
+ #endif
++void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu=
+_idx,
++                 uintptr_t retaddr);
+=20
+ #define CODE_GEN_ALIGN           16 /* must be >=3D of the size of a ica=
+che line */
+=20
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 4b43440e89..fdff60ce5d 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -2615,12 +2615,6 @@ uint32_t HELPER(cu42)(CPUS390XState *env, uint32_t=
+ r1, uint32_t r2, uint32_t m3)
+ void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
+                         uintptr_t ra)
+ {
+-#ifdef CONFIG_USER_ONLY
+-    if (!guest_addr_valid(addr) || !guest_addr_valid(addr + len - 1) ||
+-        page_check_range(addr, len, PAGE_WRITE) < 0) {
+-        s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
+-    }
+-#else
+     /* test the actual access, not just any access to the page due to LA=
+P */
+     while (len) {
+         const uint64_t pagelen =3D -(addr | TARGET_PAGE_MASK);
+@@ -2630,7 +2624,6 @@ void probe_write_access(CPUS390XState *env, uint64_=
+t addr, uint64_t len,
+         addr =3D wrap_address(env, addr + curlen);
+         len -=3D curlen;
+     }
+-#endif
+ }
+=20
+ void HELPER(probe_write_access)(CPUS390XState *env, uint64_t addr, uint6=
+4_t len)
 --=20
 2.21.0
 
