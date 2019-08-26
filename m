@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4DCC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7192BC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:29:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 079952342A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EA9D2342D
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:29:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qhlHByQu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 079952342A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="AMxUzi+V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA9D2342D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Kf1-0004aO-VT
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:28:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39189)
+	id 1i2Kfw-0005gw-8h
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:29:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1i2Kak-0007j2-Qh
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:23:52 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1i2Kbp-0000ei-CA
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1i2Kaj-0000Kb-Lf
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:23:50 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:18321)
+ (envelope-from <kwankhede@nvidia.com>) id 1i2Kbo-0000bB-C0
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:57 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:18431)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1i2Kaj-0000KP-EH
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:23:49 -0400
+ id 1i2Kbo-0000au-39
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:56 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
  hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d6431c60000>; Mon, 26 Aug 2019 12:23:50 -0700
+ id <B5d6432080000>; Mon, 26 Aug 2019 12:24:56 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Mon, 26 Aug 2019 12:23:48 -0700
+ Mon, 26 Aug 2019 12:24:55 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Mon, 26 Aug 2019 12:23:48 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
- 2019 19:23:47 +0000
+ by hqpgpgate101.nvidia.com on Mon, 26 Aug 2019 12:24:55 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
+ 2019 19:24:54 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 26 Aug 2019 19:23:41 +0000
+ Transport; Mon, 26 Aug 2019 19:24:48 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Date: Tue, 27 Aug 2019 00:25:42 +0530
-Message-ID: <1566845753-18993-3-git-send-email-kwankhede@nvidia.com>
+Date: Tue, 27 Aug 2019 00:25:52 +0530
+Message-ID: <1566845753-18993-13-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
 References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
@@ -61,20 +61,20 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1566847430; bh=zv0cRgomBehIscTp38KHY4l1CIrFXev0R5A+7fbmkeg=;
+ t=1566847496; bh=VNBoijvbVbDligMDlBqEL+uJ/JlmENfg37uoXMnQj5w=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=qhlHByQuGX9my+Xb4mrzPNKbhK9w9VyH3HkSvMa3Ujo9/RGFcHE7zjQRR0K1aiZFC
- wOq1Yq+xlsvAypRitHA0L68vLTm4dy75oAw9PcypU5i4WvcIWK3O4Cfrdyv9NPAsKb
- k98GC6IArjRlEQKzY5fy9nwDDUDZoWTTzusdIxWQGCEwyOcGsYWXSb+S9/WI6gg9yd
- 2zE/HZAQ0LF1ZL03gJnCo2ai1fqqcZqgqyu7qkCFNcZA/HxoxxoczmWUbCo3Mmun7m
- GEogcm8Xd9y0do9gJ10E+SPBUebdlsF5PwfZMNZpvZZEHL4a+KttbdHiKbU4/fweyB
- 3EwXA3R0j4byQ==
+ b=AMxUzi+VUH4MzM05erKm+lFxVJk+l1OByXHAHnwiQ1vfCYo91h3ag2MHvsUU8/wsH
+ H1q96bQXYkwj+D/5jK6wMDdEbYQN7hXtRXD/ddgOuyNwINW5svendAYQjCLe8A67sH
+ RAkQH+2sQc3toAqMGWjnvV6QnFmfPhKIC0JizDqrXvzAGe1fRUB2gKYU4ymUrikeVs
+ yRqeUEPW6QQ/A3eDYobFiauJ2DvJ5OnFUQebc0uZNoakRx++geH9Odid3ChEmkMeo4
+ fy+xlSwm0P11w/t7Q8KhprG26nSkaAVnuEvmXhCW0fq4v3n3n8WDQ2JfORwwTKhJgZ
+ YK/Y+DzH9SybQ==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
 X-Received-From: 216.228.121.64
-Subject: [Qemu-devel] [PATCH v8 02/13] vfio: Add function to unmap VFIO
- region
+Subject: [Qemu-devel] [PATCH v8 12/13] vfio: Add vfio_listener_log_sync to
+ mark dirty pages
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,74 +97,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function will be used for migration region.
-Migration region is mmaped when migration starts and will be unmapped when
-migration is complete.
+vfio_listener_log_sync gets list of dirty pages from vendor driver and mark
+those pages dirty when in _SAVING state.
+Return early for the RAM block section of mapped MMIO region.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/vfio/common.c              | 20 ++++++++++++++++++++
- hw/vfio/trace-events          |  1 +
- include/hw/vfio/vfio-common.h |  1 +
- 3 files changed, 22 insertions(+)
+ hw/vfio/common.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 3e03c495d868..c33c6684c06f 100644
+index c33c6684c06f..23f3d3c7c46a 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -966,6 +966,26 @@ int vfio_region_mmap(VFIORegion *region)
-     return 0;
+@@ -38,6 +38,7 @@
+ #include "sysemu/reset.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "migration/migration.h"
+ 
+ VFIOGroupList vfio_group_list =
+     QLIST_HEAD_INITIALIZER(vfio_group_list);
+@@ -796,9 +797,43 @@ static void vfio_listener_region_del(MemoryListener *listener,
+     }
  }
  
-+void vfio_region_unmap(VFIORegion *region)
++static void vfio_listerner_log_sync(MemoryListener *listener,
++        MemoryRegionSection *section)
 +{
-+    int i;
++    uint64_t start_addr, size, pfn_count;
++    VFIOGroup *group;
++    VFIODevice *vbasedev;
 +
-+    if (!region->mem) {
++    if (memory_region_is_ram_device(section->mr)) {
 +        return;
 +    }
 +
-+    for (i = 0; i < region->nr_mmaps; i++) {
-+        trace_vfio_region_unmap(memory_region_name(&region->mmaps[i].mem),
-+                                region->mmaps[i].offset,
-+                                region->mmaps[i].offset +
-+                                region->mmaps[i].size - 1);
-+        memory_region_del_subregion(region->mem, &region->mmaps[i].mem);
-+        munmap(region->mmaps[i].mmap, region->mmaps[i].size);
-+        object_unparent(OBJECT(&region->mmaps[i].mem));
-+        region->mmaps[i].mmap = NULL;
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            if (vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) {
++                continue;
++            } else {
++                return;
++            }
++        }
++    }
++
++    start_addr = TARGET_PAGE_ALIGN(section->offset_within_address_space);
++    size = int128_get64(section->size);
++    pfn_count = size >> TARGET_PAGE_BITS;
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            vfio_get_dirty_page_list(vbasedev, start_addr >> TARGET_PAGE_BITS,
++                                     pfn_count, TARGET_PAGE_SIZE);
++        }
 +    }
 +}
 +
- void vfio_region_exit(VFIORegion *region)
- {
-     int i;
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index b1ef55a33ffd..8cdc27946cb8 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -111,6 +111,7 @@ vfio_region_mmap(const char *name, unsigned long offset, unsigned long end) "Reg
- vfio_region_exit(const char *name, int index) "Device %s, region %d"
- vfio_region_finalize(const char *name, int index) "Device %s, region %d"
- vfio_region_mmaps_set_enabled(const char *name, bool enabled) "Region %s mmaps enabled: %d"
-+vfio_region_unmap(const char *name, unsigned long offset, unsigned long end) "Region %s unmap [0x%lx - 0x%lx]"
- vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Device %s region %d: %d sparse mmap entries"
- vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
- vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 9107bd41c030..93493891ba40 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -171,6 +171,7 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
-                       int index, const char *name);
- int vfio_region_mmap(VFIORegion *region);
- void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
-+void vfio_region_unmap(VFIORegion *region);
- void vfio_region_exit(VFIORegion *region);
- void vfio_region_finalize(VFIORegion *region);
- void vfio_reset_handler(void *opaque);
+ static const MemoryListener vfio_memory_listener = {
+     .region_add = vfio_listener_region_add,
+     .region_del = vfio_listener_region_del,
++    .log_sync = vfio_listerner_log_sync,
+ };
+ 
+ static void vfio_listener_release(VFIOContainer *container)
 -- 
 2.7.0
 
