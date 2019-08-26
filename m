@@ -2,109 +2,56 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6084CC3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 06:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4101C3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 07:10:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 323A121848
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 06:02:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 323A121848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9684620874
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 07:10:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9684620874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i285L-0005Od-AY
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 02:02:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56575)
+	id 1i299I-000639-OA
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 03:10:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i284M-0004xO-57
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 02:01:35 -0400
+ (envelope-from <dovgaluk@ispras.ru>) id 1i298I-0005Ws-5H
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 03:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i284J-00011u-Vp
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 02:01:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53842)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i284J-000113-Mi
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 02:01:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7575E18C891F;
- Mon, 26 Aug 2019 06:01:29 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9477D5D6A5;
- Mon, 26 Aug 2019 06:01:24 +0000 (UTC)
-To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+ (envelope-from <dovgaluk@ispras.ru>) id 1i298G-0000C2-23
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 03:09:41 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:58640)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>) id 1i298F-00008n-M5
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 03:09:40 -0400
+Received: from PASHAISP (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 133CA54006B;
+ Mon, 26 Aug 2019 10:09:36 +0300 (MSK)
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+To: "'Michael Rolnik'" <mrolnik@gmail.com>,
+	<qemu-devel@nongnu.org>
 References: <20190824184635.34192-1-mrolnik@gmail.com>
- <20190824184635.34192-8-mrolnik@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <173c5b02-638e-3523-48ad-34bc85c580d4@redhat.com>
-Date: Mon, 26 Aug 2019 08:01:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+In-Reply-To: <20190824184635.34192-1-mrolnik@gmail.com>
+Date: Mon, 26 Aug 2019 10:09:35 +0300
+Message-ID: <000001d55bdd$37f3eb10$a7dbc130$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20190824184635.34192-8-mrolnik@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain;
+	charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Mon, 26 Aug 2019 06:01:29 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v29 7/8] target/avr: Register AVR support
- with the rest of QEMU, the build system, and the MAINTAINERS file
+X-Mailer: Microsoft Office Outlook 12.0
+Content-Language: ru
+Thread-Index: AdVarEVAllANoOqlTBOPobeeNQmTrQBMOBQw
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Subject: Re: [Qemu-devel] [PATCH v29 0/8] QEMU AVR 8 bit cores
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,201 +63,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, philmd@redhat.com, dovgaluk@ispras.ru,
+Cc: philmd@redhat.com, thuth@redhat.com, richard.henderson@linaro.org,
  imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/08/2019 20.46, Michael Rolnik wrote:
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> ---
->  MAINTAINERS                     |  6 ++++++
->  arch_init.c                     |  2 ++
->  configure                       |  7 +++++++
->  default-configs/avr-softmmu.mak |  5 +++++
->  include/disas/dis-asm.h         |  6 ++++++
->  include/sysemu/arch_init.h      |  1 +
->  qapi/machine.json               |  3 ++-
->  target/avr/Makefile.objs        | 33 +++++++++++++++++++++++++++++++++
->  tests/machine-none-test.c       |  1 +
->  9 files changed, 63 insertions(+), 1 deletion(-)
+Hi!
+
+Can you provide a link to the repository for easier testing of your code?
+
+Pavel Dovgalyuk
+
+> -----Original Message-----
+> From: Michael Rolnik [mailto:mrolnik@gmail.com]
+> Sent: Saturday, August 24, 2019 9:46 PM
+> To: qemu-devel@nongnu.org
+> Cc: richard.henderson@linaro.org; philmd@redhat.com; thuth@redhat.com; dovgaluk@ispras.ru;
+> imammedo@redhat.com; Michael Rolnik
+> Subject: [PATCH v29 0/8] QEMU AVR 8 bit cores
+> 
+> This series of patches adds 8bit AVR cores to QEMU.
+> All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully tested yet.
+> However I was able to execute simple code with functions. e.g fibonacci calculation.
+> This series of patches include a non real, sample board.
+> No fuses support yet. PC is set to 0 at reset.
+> 
+> the patches include the following
+> 1. just a basic 8bit AVR CPU, without instruction decoding or translation
+> 2. CPU features which allow define the following 8bit AVR cores
+>      avr1
+>      avr2 avr25
+>      avr3 avr31 avr35
+>      avr4
+>      avr5 avr51
+>      avr6
+>      xmega2 xmega4 xmega5 xmega6 xmega7
+> 3. a definition of sample machine with SRAM, FLASH and CPU which allows to execute simple code
+> 4. encoding for all AVR instructions
+> 5. interrupt handling
+> 6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
+> 7. a decoder which given an opcode decides what istruction it is
+> 8. translation of AVR instruction into TCG
+> 9. all features together
+> 
+> changes since v3
+> 1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) for faster address
+> manipulaton
+> 2. ffs changed to ctz32
+> 3. duplicate code removed at avr_cpu_do_interrupt
+> 4. using andc instead of not + and
+> 5. fixing V flag calculation in varios instructions
+> 6. freeing local variables in PUSH
+> 7. tcg_const_local_i32 -> tcg_const_i32
+> 8. using sextract32 instead of my implementation
+> 9. fixing BLD instruction
+> 10.xor(r) instead of 0xff - r at COM
+> 11.fixing MULS/MULSU not to modify inputs' content
+> 12.using SUB for NEG
+> 13.fixing tcg_gen_qemu_ld/st call in XCH
+> 
+> changes since v4
+> 1. target is now defined as big endian in order to optimize push_ret/pop_ret
+> 2. all style warnings are fixed
+> 3. adding cpu_set/get_sreg functions
+> 4. simplifying gen_goto_tb as there is no real paging
+> 5. env->pc -> env->pc_w
+> 6. making flag dump more compact
+> 7. more spacing
+> 8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
+> 9. removing avr_set_feature
+> 10. SPL/SPH set bug fix
+> 11. switching stb_phys to cpu_stb_data
+> 12. cleaning up avr_decode
+> 13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
+> 14. saving CPU features (savevm)
+> 
+> changes since v5
+> 1. BLD bug fix
+> 2. decoder generator is added
+> 
+> chages since v6
+> 1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_cpu_gdb_write_register
+> 2. configure the target as little endian because otherwise GDB does not work
+> 3. fixing and testing gen_push_ret/gen_pop_ret
+> 
+> changes since v7
+> 1. folding back v6
+> 2. logging at helper_outb and helper_inb are done for non supported yet registers only
+> 3. MAINTAINERS updated
+> 
+> changes since v8
+> 1. removing hw/avr from hw/Makefile.obj as it should not be built for all
+> 2. making linux compilable
+> 3. testing on
+>     a. Mac, Apple LLVM version 7.0.0
+>     b. Ubuntu 12.04, gcc 4.9.2
+>     c. Fedora 23, gcc 5.3.1
+> 4. folding back some patches
+> 5. translation bug fixes for ORI, CPI, XOR instructions
+> 6. propper handling of cpu register writes though memory
+> 
+> changes since v9
+> 1. removing forward declarations of static functions
+> 2. disabling debug prints
+> 3. switching to case range instead of if else if ...
+> 4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any device
+> 5. commenst about sample board and sample IO device added
+> 6. sample board description is more descriptive now
+> 7. memory_region_allocate_system_memory is used to create RAM
+> 8. now there are helper_fullrd & helper_fullwr when LD/ST try to access registers
+> 
+> changes since v10
+> 1. movig back fullwr & fullrd into the commit where outb and inb were introduced
+> 2. changing tlb_fill function signature
+> 3. adding empty line between functions
+> 4. adding newline on the last line of the file
+> 5. using tb->flags to generae full access ST/LD instructions
+> 6. fixing SBRC bug
+> 7. folding back 10th commit
+> 8. whenever a new file is introduced it's added to Makefile.objs
+> 
+> changes since v11
+> 1. updating to v2.7.0-rc
+> 2. removing assignment to env->fullacc from gen_intermediate_code
+> 
+> changes since v12
+> 1. fixing spacing
+> 2. fixing get/put_segment functions
+> 3. removing target-avr/machine.h file
+> 4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
+> 5. comment spelling
+> 6. removing hw/avr/sample_io.c
+> 7. char const* -> const char*
+> 8. proper ram allocation
+> 9. fixing breakpoint functionality.
+> 10.env1 -> env
+> 11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
+> 12.any cpu is removed
+> 12.feature bits are not saved into vm state
+> 
+> changes since v13
+> 1. rebasing to v2.7.0-rc1
+> 
+> changes since v14
+> 1. I made self review with git gui tool. (I did not know such a thing exists)
+> 2. removing all double/tripple spaces
+> 3. removing comment reference to SampleIO
+> 4. folding back some changes, so there is not deleted lines in my code
+> 5. moving avr configuration, within configure file, before chris
+> 
+> changes since v15
+> 1. removing IO registers cache from CPU
+> 2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
+> 3. implementing CBIC/SBIC as read(helper_inb), check, branch
+> 4. adding missing tcg_temp_free_i32 for tcg_const_i32
+> 
+> changes since v16
+> 1. removing EXT IO registers knoledge from CPU. These registers are accessible
+>    by LD/ST only. CPU has no interest in them
+> 
+> changes since v17 (by Richard Henderson)
+> This is Michael's v17, with some adjustments of my own:
+> 
+> 1. Fix the whitespace errors reported by "git am",
+> 2. Replace the utf-8 characters with normal ascii,
+> 3. Ditch the separate compilation of translate.c.
+> 
+> I retained the two separate files that could be regenerated
+> from the included cpugen program, but merged in translate-insn.c.
+> Not that it matters, but the code generated is about 3k smaller.
+> 
+> changes since v18
+> 1.  moving target-avr into target/avr
+> 2.  do not call cpu_exec_initfn function from avr_cpu_initfn
+> 3.  call cpu_exec_realizefn avr_cpu_realizefn
+> 4.  do not fail sample machine creation if no rom is suplied
+> 5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
+> 6.  fix a register getters/setters in machine.c
+> 7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
+> 
+> changes since v19
+> 1.  use decodetree.py tool to decode instructions
+> 2.  adding USART
+> 3.  adding 16 bit timer peripherals
+> 4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
+> 5.  renaming tlb_fill to avr_cpu_tlb_fill
+> 
+> changes since v20
+> 1.  use one CPU naming convention
+> 2.  merging insn16.decode & insn32.decode files
+> 3.  modifying skip next instruction mechanizm
+> 4.  translate BREAK as NOP for now
+> 
+> changes since v21
+> 1.  Reorganize bstate.
+>     This will make transition to <exec/translator.h> easier, and fixes a couple of bugs wrt
+> single stepping
+>     by richard.henderson@linaro.org
+> 2.  Drop cpc and fix page cross condition.
+>     by richard.henderson@linaro.org
+> 3.  Refactor checking supported/unsupported instructions
+> 4.  Add gdb-xml/avr-cpu.xml
+> 
+> changes since v22
+> 1.  Rebase
+> 2.  Split long comment
+> 
+> changes since v23
+> 1.  remove avr_cpu_list_compare function
+> 2.  modify avr_cpu_class_by_name function
+> 3.  modify avr_cpu_list_entry function
+> 4.  modify avr_cpu_list function
+> 
+> changes since v24
+> 1.  remove AVR_CPU_TYPE_NAME macro
+> 
+> changes since v25
+> 1.  fix patches. every file belong to one patch only
+> 2.  change copyright year from 2016 to 2019
+> 3.  create mask device to emulate prr0/prr1
+> 
+> changes since v26
+> 1.  add avocado acceptence test
+> 2.  add boot serial test
+> 
+> changes since v27
+> 1.  list atmel2560 devices as unimplemented
+> 2.  fix sram base/size
+> 
+> changes since v28
+> 1.  rebase
+> 2.  fix includes & build
+> 
+> Michael Rolnik (4):
+>   target/avr: Add instruction decoding
+>   target/avr: Add instruction translation
+>   target/avr: Register AVR support with the rest of QEMU, the build
+>     system, and the MAINTAINERS file
+>   target/avr: Add tests
+> 
+> Sarah Harris (4):
+>   target/avr: Add outward facing interfaces and core CPU logic
+>   target/avr: Add instruction helpers
+>   target/avr: Add limited support for USART and 16 bit timer peripherals
+>   target/avr: Add example board configuration
+> 
+>  MAINTAINERS                      |    6 +
+>  arch_init.c                      |    2 +
+>  configure                        |    7 +
+>  default-configs/avr-softmmu.mak  |    5 +
+>  gdb-xml/avr-cpu.xml              |   49 +
+>  hw/Kconfig                       |    1 +
+>  hw/avr/Kconfig                   |    6 +
+>  hw/avr/Makefile.objs             |    1 +
+>  hw/avr/sample.c                  |  282 +++
+>  hw/char/Kconfig                  |    3 +
+>  hw/char/Makefile.objs            |    1 +
+>  hw/char/avr_usart.c              |  324 ++++
+>  hw/misc/Kconfig                  |    3 +
+>  hw/misc/Makefile.objs            |    2 +
+>  hw/misc/avr_mask.c               |  112 ++
+>  hw/timer/Kconfig                 |    3 +
+>  hw/timer/Makefile.objs           |    1 +
+>  hw/timer/avr_timer16.c           |  605 +++++++
+>  include/disas/dis-asm.h          |    6 +
+>  include/hw/char/avr_usart.h      |   97 +
+>  include/hw/misc/avr_mask.h       |   47 +
+>  include/hw/timer/avr_timer16.h   |   97 +
+>  include/sysemu/arch_init.h       |    1 +
+>  qapi/machine.json                |    3 +-
+>  target/avr/Makefile.objs         |   33 +
+>  target/avr/cpu-param.h           |   37 +
+>  target/avr/cpu-qom.h             |   54 +
+>  target/avr/cpu.c                 |  576 ++++++
+>  target/avr/cpu.h                 |  254 +++
+>  target/avr/gdbstub.c             |   85 +
+>  target/avr/helper.c              |  354 ++++
+>  target/avr/helper.h              |   29 +
+>  target/avr/insn.decode           |  175 ++
+>  target/avr/machine.c             |  121 ++
+>  target/avr/translate.c           | 2888 ++++++++++++++++++++++++++++++
+>  tests/Makefile.include           |    2 +
+>  tests/acceptance/machine_avr6.py |   36 +
+>  tests/boot-serial-test.c         |   10 +
+>  tests/machine-none-test.c        |    1 +
+>  39 files changed, 6318 insertions(+), 1 deletion(-)
 >  create mode 100644 default-configs/avr-softmmu.mak
+>  create mode 100644 gdb-xml/avr-cpu.xml
+>  create mode 100644 hw/avr/Kconfig
+>  create mode 100644 hw/avr/Makefile.objs
+>  create mode 100644 hw/avr/sample.c
+>  create mode 100644 hw/char/avr_usart.c
+>  create mode 100644 hw/misc/avr_mask.c
+>  create mode 100644 hw/timer/avr_timer16.c
+>  create mode 100644 include/hw/char/avr_usart.h
+>  create mode 100644 include/hw/misc/avr_mask.h
+>  create mode 100644 include/hw/timer/avr_timer16.h
 >  create mode 100644 target/avr/Makefile.objs
+>  create mode 100644 target/avr/cpu-param.h
+>  create mode 100644 target/avr/cpu-qom.h
+>  create mode 100644 target/avr/cpu.c
+>  create mode 100644 target/avr/cpu.h
+>  create mode 100644 target/avr/gdbstub.c
+>  create mode 100644 target/avr/helper.c
+>  create mode 100644 target/avr/helper.h
+>  create mode 100644 target/avr/insn.decode
+>  create mode 100644 target/avr/machine.c
+>  create mode 100644 target/avr/translate.c
+>  create mode 100644 tests/acceptance/machine_avr6.py
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ef6c01084b..763370e6ff 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -163,6 +163,12 @@ S: Maintained
->  F: hw/arm/smmu*
->  F: include/hw/arm/smmu*
->  
-> +AVR TCG CPUs
-> +M: Michael Rolnik <mrolnik@gmail.com>
-> +S: Maintained
-> +F: target/avr/
-> +F: hw/avr/
-> +
->  CRIS TCG CPUs
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->  S: Maintained
-> diff --git a/arch_init.c b/arch_init.c
-> index 0a1531124c..fb308aa802 100644
-> --- a/arch_init.c
-> +++ b/arch_init.c
-> @@ -85,6 +85,8 @@ int graphic_depth = 32;
->  #define QEMU_ARCH QEMU_ARCH_UNICORE32
->  #elif defined(TARGET_XTENSA)
->  #define QEMU_ARCH QEMU_ARCH_XTENSA
-> +#elif defined(TARGET_AVR)
-> +#define QEMU_ARCH QEMU_ARCH_AVR
->  #endif
->  
->  const uint32_t arch_type = QEMU_ARCH;
-> diff --git a/configure b/configure
-> index e44e454c43..1dbecba329 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7510,6 +7510,10 @@ case "$target_name" in
->      target_compiler=$cross_cc_aarch64
->      eval "target_compiler_cflags=\$cross_cc_cflags_${target_name}"
->    ;;
-> +  avr)
-> +	gdb_xml_files="avr-cpu.xml"
+> --
+> 2.17.2 (Apple Git-113)
 
-Nit: Above line uses a tab instead of spaces.
 
-> +    target_compiler=$cross_cc_avr
-> +  ;;
->    cris)
->      target_compiler=$cross_cc_cris
->    ;;
-> @@ -7790,6 +7794,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
->        disas_config "ARM_A64"
->      fi
->    ;;
-> +  avr)
-> +    disas_config "AVR"
-> +  ;;
->    cris)
->      disas_config "CRIS"
->    ;;
-> diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
-> new file mode 100644
-> index 0000000000..d1e1c28118
-> --- /dev/null
-> +++ b/default-configs/avr-softmmu.mak
-> @@ -0,0 +1,5 @@
-> +# Default configuration for avr-softmmu
-> +
-> +# Boards:
-> +#
-> +CONFIG_AVR_SAMPLE=y
-> diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-> index e9c7dd8eb4..8bedce17ac 100644
-> --- a/include/disas/dis-asm.h
-> +++ b/include/disas/dis-asm.h
-> @@ -211,6 +211,12 @@ enum bfd_architecture
->  #define bfd_mach_m32r          0  /* backwards compatibility */
->    bfd_arch_mn10200,    /* Matsushita MN10200 */
->    bfd_arch_mn10300,    /* Matsushita MN10300 */
-> +  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-> +#define bfd_mach_avr1          1
-> +#define bfd_mach_avr2          2
-> +#define bfd_mach_avr3          3
-> +#define bfd_mach_avr4          4
-> +#define bfd_mach_avr5          5
->    bfd_arch_cris,       /* Axis CRIS */
->  #define bfd_mach_cris_v0_v10   255
->  #define bfd_mach_cris_v32      32
-> diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-> index 62c6fe4cf1..893df26ce2 100644
-> --- a/include/sysemu/arch_init.h
-> +++ b/include/sysemu/arch_init.h
-> @@ -24,6 +24,7 @@ enum {
->      QEMU_ARCH_NIOS2 = (1 << 17),
->      QEMU_ARCH_HPPA = (1 << 18),
->      QEMU_ARCH_RISCV = (1 << 19),
-> +    QEMU_ARCH_AVR = (1 << 20),
->  };
->  
->  extern const uint32_t arch_type;
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index de5c742d72..a82ba088f4 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -21,11 +21,12 @@
->  #        is true even for "qemu-system-x86_64".
->  #
->  # ppcemb: dropped in 3.1
-> +# avr: addin in 4.2
-
-Please use "since 4.2" because that's the word that we use in most spots
-in the QAPI documentation.
-
->  # Since: 3.0
->  ##
->  { 'enum' : 'SysEmuTarget',
-> -  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-> +  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', 'lm32',
->               'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
->               'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
->               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-> diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
-> new file mode 100644
-> index 0000000000..2976affd95
-> --- /dev/null
-> +++ b/target/avr/Makefile.objs
-> @@ -0,0 +1,33 @@
-> +#
-> +#  QEMU AVR CPU
-> +#
-> +#  Copyright (c) 2019 Michael Rolnik
-> +#
-> +#  This library is free software; you can redistribute it and/or
-> +#  modify it under the terms of the GNU Lesser General Public
-> +#  License as published by the Free Software Foundation; either
-> +#  version 2.1 of the License, or (at your option) any later version.
-> +#
-> +#  This library is distributed in the hope that it will be useful,
-> +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> +#  Lesser General Public License for more details.
-> +#
-> +#  You should have received a copy of the GNU Lesser General Public
-> +#  License along with this library; if not, see
-> +#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-> +#
-> +
-> +DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-> +decode-y = $(SRC_PATH)/target/avr/insn.decode
-> +
-> +target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
-> +	$(call quiet-command, \
-> +	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
-> +	  "GEN", $(TARGET_DIR)$@)
-> +
-> +target/avr/translate.o: target/avr/decode_insn.inc.c
-> +
-> +obj-y += translate.o cpu.o helper.o
-> +obj-y += gdbstub.o
-> +obj-$(CONFIG_SOFTMMU) += machine.o
-> diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-> index 5953d31755..3e5c74e73e 100644
-> --- a/tests/machine-none-test.c
-> +++ b/tests/machine-none-test.c
-> @@ -27,6 +27,7 @@ static struct arch2cpu cpus_map[] = {
->      /* tested targets list */
->      { "arm", "cortex-a15" },
->      { "aarch64", "cortex-a57" },
-> +    { "avr", "avr6-avr-cpu" },
->      { "x86_64", "qemu64,apic-id=0" },
->      { "i386", "qemu32,apic-id=0" },
->      { "alpha", "ev67" },
-> 
-
-Apart from the two small nits, the patch looks fine to me.
-
- Thomas
 
