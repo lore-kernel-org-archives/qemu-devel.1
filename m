@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33A6C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4524AC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:04:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B20B20673
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:03:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B20B20673
+	by mail.kernel.org (Postfix) with ESMTPS id 16F9B20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 14:04:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16F9B20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2FaX-0001gN-Aj
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 10:03:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38353)
+	id 1i2FbO-00023k-Dv
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 10:04:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i2FQ4-0000Et-0L
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:52:29 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i2FQJ-0000Vq-6y
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i2FQ2-0007LE-2X
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:52:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46256)
+ (envelope-from <mlevitsk@redhat.com>) id 1i2FQH-0007Uw-UY
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:52:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45020)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i2FPy-0007Gd-3I; Mon, 26 Aug 2019 09:52:22 -0400
+ id 1i2FQE-0007Pl-4d; Mon, 26 Aug 2019 09:52:38 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5683E8980F1;
- Mon, 26 Aug 2019 13:52:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7489D190C019;
+ Mon, 26 Aug 2019 13:52:31 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E2E0E5D704;
- Mon, 26 Aug 2019 13:52:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4EEC55D6C8;
+ Mon, 26 Aug 2019 13:52:27 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 26 Aug 2019 16:51:00 +0300
-Message-Id: <20190826135103.22410-11-mlevitsk@redhat.com>
+Date: Mon, 26 Aug 2019 16:51:03 +0300
+Message-Id: <20190826135103.22410-14-mlevitsk@redhat.com>
 In-Reply-To: <20190826135103.22410-1-mlevitsk@redhat.com>
 References: <20190826135103.22410-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 26 Aug 2019 13:52:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Mon, 26 Aug 2019 13:52:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 10/13] qcrypto-luks: refactoring: extract
- store key function
+Subject: [Qemu-devel] [PATCH v2 13/13] qcrypto-luks: implement more rigorous
+ header checking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,375 +74,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function will be used later to store
-new keys to the luks metadata
+Check that keyslots don't overlap with the data,
+and check that keyslots don't overlap with each other.
+(this is done using naive O(n^2) nested loops,
+but since there are just 8 keyslots, this doesn't really matter.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- crypto/block-luks.c | 310 ++++++++++++++++++++++++++------------------
- 1 file changed, 184 insertions(+), 126 deletions(-)
+ crypto/block-luks.c | 46 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index cc9a52c9af..d713125925 100644
+index db0fb764b4..fdf4c41f8a 100644
 --- a/crypto/block-luks.c
 +++ b/crypto/block-luks.c
-@@ -650,6 +650,176 @@ out:
+@@ -541,12 +541,12 @@ fail:
+ static int
+ qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **errp)
+ {
+-    int ret;
++    int ret = -EINVAL;
++    size_t i, j;
  
- }
- 
-+/*
-+ * Given a key slot,  user password, and the master key,
-+ * will store the encrypted master key there, and update the
-+ * in-memory header. User must then write the in-memory header
-+ *
-+ * Returns:
-+ *    0 if the keyslot was written successfully
-+ *      with the provided password
-+ *   -1 if a fatal error occurred while storing the key
-+ */
-+static int
-+qcrypto_block_luks_store_key(QCryptoBlock *block,
-+                             unsigned int slot_idx,
-+                             const char *password,
-+                             uint8_t *masterkey,
-+                             uint64_t iter_time,
-+                             QCryptoBlockWriteFunc writefunc,
-+                             void *opaque,
-+                             Error **errp)
-+{
-+    QCryptoBlockLUKS *luks = block->opaque;
-+    QCryptoBlockLUKSKeySlot *slot = &luks->header.key_slots[slot_idx];
-+    g_autofree uint8_t *splitkey = NULL;
-+    size_t splitkeylen;
-+    g_autofree uint8_t *slotkey = NULL;
-+    g_autoptr(QCryptoCipher) cipher = NULL;
-+    g_autoptr(QCryptoIVGen) ivgen = NULL;
-+    Error *local_err = NULL;
-+    uint64_t iters;
-+    int ret = -1;
-+
-+    if (qcrypto_random_bytes(slot->salt,
-+                             QCRYPTO_BLOCK_LUKS_SALT_LEN,
-+                             errp) < 0) {
-+        goto cleanup;
-+    }
-+
-+    splitkeylen = luks->header.master_key_len * slot->stripes;
-+
-+    /*
-+     * Determine how many iterations are required to
-+     * hash the user password while consuming 1 second of compute
-+     * time
-+     */
-+    iters = qcrypto_pbkdf2_count_iters(luks->hash_alg,
-+                                       (uint8_t *)password, strlen(password),
-+                                       slot->salt,
-+                                       QCRYPTO_BLOCK_LUKS_SALT_LEN,
-+                                       luks->header.master_key_len,
-+                                       &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto cleanup;
-+    }
-+
-+    if (iters > (ULLONG_MAX / iter_time)) {
-+        error_setg_errno(errp, ERANGE,
-+                         "PBKDF iterations %llu too large to scale",
-+                         (unsigned long long)iters);
-+        goto cleanup;
-+    }
-+
-+    /* iter_time was in millis, but count_iters reported for secs */
-+    iters = iters * iter_time / 1000;
-+
-+    if (iters > UINT32_MAX) {
-+        error_setg_errno(errp, ERANGE,
-+                         "PBKDF iterations %llu larger than %u",
-+                         (unsigned long long)iters, UINT32_MAX);
-+        goto cleanup;
-+    }
-+
-+    slot->iterations =
-+        MAX(iters, QCRYPTO_BLOCK_LUKS_MIN_SLOT_KEY_ITERS);
-+
-+
-+    /*
-+     * Generate a key that we'll use to encrypt the master
-+     * key, from the user's password
-+     */
-+    slotkey = g_new0(uint8_t, luks->header.master_key_len);
-+    if (qcrypto_pbkdf2(luks->hash_alg,
-+                       (uint8_t *)password, strlen(password),
-+                       slot->salt,
-+                       QCRYPTO_BLOCK_LUKS_SALT_LEN,
-+                       slot->iterations,
-+                       slotkey, luks->header.master_key_len,
-+                       errp) < 0) {
-+        goto cleanup;
-+    }
-+
-+
-+    /*
-+     * Setup the encryption objects needed to encrypt the
-+     * master key material
-+     */
-+    cipher = qcrypto_cipher_new(luks->cipher_alg,
-+                                luks->cipher_mode,
-+                                slotkey, luks->header.master_key_len,
-+                                errp);
-+    if (!cipher) {
-+        goto cleanup;
-+    }
-+
-+    ivgen = qcrypto_ivgen_new(luks->ivgen_alg,
-+                              luks->ivgen_cipher_alg,
-+                              luks->ivgen_hash_alg,
-+                              slotkey, luks->header.master_key_len,
-+                              errp);
-+    if (!ivgen) {
-+        goto cleanup;
-+    }
-+
-+    /*
-+     * Before storing the master key, we need to vastly
-+     * increase its size, as protection against forensic
-+     * disk data recovery
-+     */
-+    splitkey = g_new0(uint8_t, splitkeylen);
-+
-+    if (qcrypto_afsplit_encode(luks->hash_alg,
-+                               luks->header.master_key_len,
-+                               slot->stripes,
-+                               masterkey,
-+                               splitkey,
-+                               errp) < 0) {
-+        goto cleanup;
-+    }
-+
-+    /*
-+     * Now we encrypt the split master key with the key generated
-+     * from the user's password, before storing it
-+     */
-+    if (qcrypto_block_cipher_encrypt_helper(cipher, block->niv, ivgen,
-+                                            QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
-+                                            0,
-+                                            splitkey,
-+                                            splitkeylen,
-+                                            errp) < 0) {
-+        goto cleanup;
-+    }
-+
-+    /* Write out the slot's master key material. */
-+    if (writefunc(block,
-+                  slot->key_offset_sector *
-+                  QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
-+                  splitkey, splitkeylen,
-+                  opaque,
-+                  errp) != splitkeylen) {
-+        goto cleanup;
-+    }
-+
-+    slot->active = QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED;
-+
-+    if (qcrypto_block_luks_store_header(block,  writefunc, opaque, errp)) {
-+        goto cleanup;
-+    }
-+
-+    ret = 0;
-+
-+cleanup:
-+    if (slotkey) {
-+        memset(slotkey, 0, luks->header.master_key_len);
-+    }
-+    if (splitkey) {
-+        memset(splitkey, 0, splitkeylen);
-+    }
-+    return ret;
-+}
-+
- /*
-  * Given a key slot, and user password, this will attempt to unlock
-  * the master encryption key from the key slot.
-@@ -981,13 +1151,9 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     QCryptoBlockCreateOptionsLUKS luks_opts;
-     Error *local_err = NULL;
-     g_autofree uint8_t *masterkey = NULL;
--    g_autofree uint8_t *slotkey = NULL;
--    g_autofree uint8_t *splitkey = NULL;
-     size_t splitkeylen = 0;
-     size_t i;
--    g_autoptr(QCryptoCipher) cipher = NULL;
--    g_autoptr(QCryptoIVGen) ivgen = NULL;
--    g_autofree char *password = NULL;
-+    g_autofree char *password;
-     const char *cipher_alg;
-     const char *cipher_mode;
-     const char *ivgen_alg;
-@@ -1209,9 +1375,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-      * to use the first key slot */
-     splitkeylen = luks->header.master_key_len * QCRYPTO_BLOCK_LUKS_STRIPES;
-     for (i = 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
--        luks->header.key_slots[i].active = i == 0 ?
--            QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED :
--            QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED;
-+        luks->header.key_slots[i].active = QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED;
-         luks->header.key_slots[i].stripes = QCRYPTO_BLOCK_LUKS_STRIPES;
- 
-         /* This calculation doesn't match that shown in the spec,
-@@ -1225,107 +1389,6 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-                        QCRYPTO_BLOCK_LUKS_SECTOR_SIZE)) * i);
+     if (memcmp(luks->header.magic, qcrypto_block_luks_magic,
+                QCRYPTO_BLOCK_LUKS_MAGIC_LEN) != 0) {
+         error_setg(errp, "Volume is not in LUKS format");
+-        ret = -EINVAL;
+         goto fail;
      }
  
--    if (qcrypto_random_bytes(luks->header.key_slots[0].salt,
--                             QCRYPTO_BLOCK_LUKS_SALT_LEN,
--                             errp) < 0) {
--        goto error;
--    }
--
--    /* Again we determine how many iterations are required to
--     * hash the user password while consuming 1 second of compute
--     * time */
--    iters = qcrypto_pbkdf2_count_iters(luks_opts.hash_alg,
--                                       (uint8_t *)password, strlen(password),
--                                       luks->header.key_slots[0].salt,
--                                       QCRYPTO_BLOCK_LUKS_SALT_LEN,
--                                       luks->header.master_key_len,
--                                       &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto error;
--    }
--
--    if (iters > (ULLONG_MAX / luks_opts.iter_time)) {
--        error_setg_errno(errp, ERANGE,
--                         "PBKDF iterations %llu too large to scale",
--                         (unsigned long long)iters);
--        goto error;
--    }
--
--    /* iter_time was in millis, but count_iters reported for secs */
--    iters = iters * luks_opts.iter_time / 1000;
--
--    if (iters > UINT32_MAX) {
--        error_setg_errno(errp, ERANGE,
--                         "PBKDF iterations %llu larger than %u",
--                         (unsigned long long)iters, UINT32_MAX);
--        goto error;
--    }
--
--    luks->header.key_slots[0].iterations =
--        MAX(iters, QCRYPTO_BLOCK_LUKS_MIN_SLOT_KEY_ITERS);
--
--
--    /* Generate a key that we'll use to encrypt the master
--     * key, from the user's password
--     */
--    slotkey = g_new0(uint8_t, luks->header.master_key_len);
--    if (qcrypto_pbkdf2(luks_opts.hash_alg,
--                       (uint8_t *)password, strlen(password),
--                       luks->header.key_slots[0].salt,
--                       QCRYPTO_BLOCK_LUKS_SALT_LEN,
--                       luks->header.key_slots[0].iterations,
--                       slotkey, luks->header.master_key_len,
--                       errp) < 0) {
--        goto error;
--    }
--
--
--    /* Setup the encryption objects needed to encrypt the
--     * master key material
--     */
--    cipher = qcrypto_cipher_new(luks_opts.cipher_alg,
--                                luks_opts.cipher_mode,
--                                slotkey, luks->header.master_key_len,
--                                errp);
--    if (!cipher) {
--        goto error;
--    }
--
--    ivgen = qcrypto_ivgen_new(luks_opts.ivgen_alg,
--                              luks->ivgen_cipher_alg,
--                              luks_opts.ivgen_hash_alg,
--                              slotkey, luks->header.master_key_len,
--                              errp);
--    if (!ivgen) {
--        goto error;
--    }
--
--    /* Before storing the master key, we need to vastly
--     * increase its size, as protection against forensic
--     * disk data recovery */
--    splitkey = g_new0(uint8_t, splitkeylen);
--
--    if (qcrypto_afsplit_encode(luks_opts.hash_alg,
--                               luks->header.master_key_len,
--                               luks->header.key_slots[0].stripes,
--                               masterkey,
--                               splitkey,
--                               errp) < 0) {
--        goto error;
--    }
--
--    /* Now we encrypt the split master key with the key generated
--     * from the user's password, before storing it */
--    if (qcrypto_block_cipher_encrypt_helper(cipher, block->niv, ivgen,
--                                            QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
--                                            0,
--                                            splitkey,
--                                            splitkeylen,
--                                            errp) < 0) {
--        goto error;
--    }
--
- 
-     /* The total size of the LUKS headers is the partition header + key
-      * slot headers, rounded up to the nearest sector, combined with
-@@ -1350,33 +1413,28 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-         goto error;
+@@ -557,6 +557,48 @@ qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **errp)
+         goto fail;
      }
  
--    if (qcrypto_block_luks_store_header(block,  writefunc, opaque, errp)) {
--        goto error;
--    }
- 
--    /* Write out the master key material, starting at the
--     * sector immediately following the partition header. */
--    if (writefunc(block,
--                  luks->header.key_slots[0].key_offset_sector *
--                  QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
--                  splitkey, splitkeylen,
--                  opaque,
--                  errp) != splitkeylen) {
-+    /* populate the slot 0 with the password encrypted master key*/
-+    /* This will also store the header */
-+    if (qcrypto_block_luks_store_key(block,
-+                                     0,
-+                                     password,
-+                                     masterkey,
-+                                     luks_opts.iter_time,
-+                                     writefunc,
-+                                     opaque,
-+                                     errp)) {
-         goto error;
--    }
-+     }
- 
--    memset(masterkey, 0, luks->header.master_key_len);
--    memset(slotkey, 0, luks->header.master_key_len);
- 
-+    memset(masterkey, 0, luks->header.master_key_len);
++    /* Check all keyslots for corruption  */
++    for (i = 0 ; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; i++) {
++
++        const QCryptoBlockLUKSKeySlot *slot1 = &luks->header.key_slots[i];
++        unsigned int start1 = slot1->key_offset_sector;
++        unsigned int len1 =
++            qcrypto_block_luks_splitkeylen_sectors(luks, slot1->stripes);
++
++        if (slot1->stripes == 0) {
++            error_setg(errp, "Keyslot %zu is corrupted (stripes == 0)", i);
++            goto fail;
++        }
++
++        if (slot1->active != QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED &&
++                slot1->active != QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED) {
++            error_setg(errp,
++                       "Keyslot %zu state (active/disable) is corrupted", i);
++            goto fail;
++        }
++
++        if (start1 + len1 > luks->header.payload_offset_sector) {
++            error_setg(errp,
++                       "Keyslot %zu is overlapping with the encrypted payload",
++                       i);
++            goto fail;
++        }
++
++        for (j = i + 1 ; j < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; j++) {
++            const QCryptoBlockLUKSKeySlot *slot2 = &luks->header.key_slots[j];
++            unsigned int start2 = slot2->key_offset_sector;
++            unsigned int len2 =
++                qcrypto_block_luks_splitkeylen_sectors(luks, slot2->stripes);
++
++            if (start1 + len1 > start2 && start2 + len2 > start1) {
++                error_setg(errp,
++                           "Keyslots %zu and %zu are overlapping in the header",
++                           i, j);
++                goto fail;
++            }
++        }
++
++    }
      return 0;
- 
-  error:
-     if (masterkey) {
-         memset(masterkey, 0, luks->header.master_key_len);
-     }
--    if (slotkey) {
--        memset(slotkey, 0, luks->header.master_key_len);
--    }
- 
-     qcrypto_block_free_cipher(block);
-     qcrypto_ivgen_free(block->ivgen);
+ fail:
+     return ret;
 -- 
 2.17.2
 
