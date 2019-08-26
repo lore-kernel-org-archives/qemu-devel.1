@@ -2,52 +2,49 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3400BC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 208E8C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:36:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 098692053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:33:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098692053B
+	by mail.kernel.org (Postfix) with ESMTPS id EC2682053B
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 13:36:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC2682053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2F7D-0000NN-8v
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 09:32:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34706)
+	id 1i2FAq-0001Zl-4e
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 09:36:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35408)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i2F6F-0008CB-PU
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:32:01 -0400
+ (envelope-from <eblake@redhat.com>) id 1i2FAC-00018Y-Dg
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i2F6E-0003j7-O5
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:31:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39500)
+ (envelope-from <eblake@redhat.com>) id 1i2FAB-0005wm-AM
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:36:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59216)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i2F6A-0003gk-Lx; Mon, 26 Aug 2019 09:31:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i2FAA-0005w3-Vl
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 09:36:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1056E8980EB;
- Mon, 26 Aug 2019 13:31:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E3F4A2A09BF;
+ Mon, 26 Aug 2019 13:36:01 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB2775D9E2;
- Mon, 26 Aug 2019 13:31:49 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-7-mlevitsk@redhat.com>
- <20190822110448.GK3267@redhat.com>
- <ba3ddc4c3c6dd18b7a7c913e55e52ddc8c9efeb0.camel@redhat.com>
- <cd92c8fe167d241255b3f61aca39b693364bf225.camel@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1195600CE;
+ Mon, 26 Aug 2019 13:35:58 +0000 (UTC)
+To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>,
+ qemu-devel@nongnu.org
+References: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
+ <76a0c0fda2f78cfb5f2234aa7e28073aa3e8bd95.1566755452.git.DirtY.iCE.hu@gmail.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -74,22 +71,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <0cd8b90e-db47-676d-bb5a-25c70a1c1598@redhat.com>
-Date: Mon, 26 Aug 2019 08:31:48 -0500
+Message-ID: <1e59409e-1754-543f-28e1-03db2b01d634@redhat.com>
+Date: Mon, 26 Aug 2019 08:35:57 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <cd92c8fe167d241255b3f61aca39b693364bf225.camel@redhat.com>
+In-Reply-To: <76a0c0fda2f78cfb5f2234aa7e28073aa3e8bd95.1566755452.git.DirtY.iCE.hu@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="j6dbvEKOYIEM2KqdSht76ZJcmcHLpvlPI"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 26 Aug 2019 13:31:53 +0000 (UTC)
+ boundary="S4FxbDTb0Ni3CzwGSX1Px4DW63z6nx595"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Mon, 26 Aug 2019 13:36:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 06/13] qcrypto-luks: implement more
- rigorous header checking
+Subject: Re: [Qemu-devel] [PATCH 16/25] audio: add mixeng option
+ (documentation)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,58 +98,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---j6dbvEKOYIEM2KqdSht76ZJcmcHLpvlPI
-Content-Type: multipart/mixed; boundary="vc40jumCzOMvLZDcKoMh8LVRVIxzUExm3";
+--S4FxbDTb0Ni3CzwGSX1Px4DW63z6nx595
+Content-Type: multipart/mixed; boundary="ZeOlu5R21SFT47yokY24Bka7NYS1ujJyF";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <0cd8b90e-db47-676d-bb5a-25c70a1c1598@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/13] qcrypto-luks: implement more rigorous
- header checking
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-7-mlevitsk@redhat.com>
- <20190822110448.GK3267@redhat.com>
- <ba3ddc4c3c6dd18b7a7c913e55e52ddc8c9efeb0.camel@redhat.com>
- <cd92c8fe167d241255b3f61aca39b693364bf225.camel@redhat.com>
-In-Reply-To: <cd92c8fe167d241255b3f61aca39b693364bf225.camel@redhat.com>
+To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>,
+ qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <1e59409e-1754-543f-28e1-03db2b01d634@redhat.com>
+Subject: Re: [PATCH 16/25] audio: add mixeng option (documentation)
+References: <cover.1566755452.git.DirtY.iCE.hu@gmail.com>
+ <76a0c0fda2f78cfb5f2234aa7e28073aa3e8bd95.1566755452.git.DirtY.iCE.hu@gmail.com>
+In-Reply-To: <76a0c0fda2f78cfb5f2234aa7e28073aa3e8bd95.1566755452.git.DirtY.iCE.hu@gmail.com>
 
---vc40jumCzOMvLZDcKoMh8LVRVIxzUExm3
+--ZeOlu5R21SFT47yokY24Bka7NYS1ujJyF
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/25/19 11:08 AM, Maxim Levitsky wrote:
-
->>> I'd do a separate check for stripes and active fields, and then give =
-a
->>> specific error message for each. That way if this does ever trigger
->>> in practice will immediately understand which check failed.
->>>
->>> Also using '%d' rather than '%i' is more common convention
->>
->> Done.
+On 8/25/19 1:46 PM, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n wrote:
+> This will allow us to disable mixeng when we use a decent backend.
 >=20
-> Note that I switched i,j to be size_t since you said that you prefer th=
-is,
-> and to print this I apparently need %lu.
+> Disabling mixeng have a few advantages:
+> * we no longer convert the audio output from one format to another, whe=
+n
+>   the underlying audio system would just convert it to a third format.
+>   We no longer convert, only the underlying system, when needed.
+> * the underlying system probably has better resampling and sample forma=
+t
+>   converting methods anyway...
+> * we may support formats that the mixeng currently does not support (S2=
+4
+>   or float samples, more than two channels)
+> * when using an audio server (like pulseaudio) different sound card
+>   outputs will show up as separate streams, even if we use only one
+>   backend
+>=20
+> Disadvantages:
+> * audio capturing no longer works (wavcapture, and vnc audio extension)=
 
-Actually, for size_t, you need %zu. %lu/size_t will cause warnings on
-32-bit platforms.
+> * some backends only support a single playback stream or very picky
+>   about the audio format.  In this case we can't disable mixeng.
+>=20
+> However mixeng is not removed, only made optional, so this shouldn't be=
 
+> a big concern.
+>=20
+> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.c=
+om>
+> ---
+>  qapi/audio.json | 5 +++++
+>  qemu-options.hx | 6 ++++++
+>  2 files changed, 11 insertions(+)
+>=20
+> diff --git a/qapi/audio.json b/qapi/audio.json
+> index 9fefdf5186..dc7f9cb1e2 100644
+> --- a/qapi/audio.json
+> +++ b/qapi/audio.json
+> @@ -11,6 +11,10 @@
+>  # General audio backend options that are used for both playback and
+>  # recording.
+>  #
+> +# @mixeng: use QEMU's mixing engine to mix all streams inside QEMU. Wh=
+en set to
+> +#          off, fixed-settings must be also off. Not every backend com=
+patible
+> +#          with the off setting (default on, since 4.2)
+> +#
+
+'mixeng' looks like an accidental typo, when 3 words later is 'mixing'.
+Would 'mix-eng' or 'mix-engine' be more obvious?
+
+
+>  ##
+>  { 'struct': 'AudiodevPerDirectionOptions',
+>    'data': {
+> +    '*mixeng':         'bool',
+>      '*fixed-settings': 'bool',
+
+And the very next member is an example that QAPI doesn't have to use
+abbreviations.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -160,24 +191,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---vc40jumCzOMvLZDcKoMh8LVRVIxzUExm3--
+--ZeOlu5R21SFT47yokY24Bka7NYS1ujJyF--
 
---j6dbvEKOYIEM2KqdSht76ZJcmcHLpvlPI
+--S4FxbDTb0Ni3CzwGSX1Px4DW63z6nx595
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1j30QACgkQp6FrSiUn
-Q2oP/wgAqh1zfh8g3axhcqUWUUe8PjNwydXGvh7c++RvHKgT50ktncL5aTZdQLCX
-FXof8Aa2DWxKwiggtkBdi4OGhaP8cJUcBTh+cDHAGOUZeAxg4qXmko+9PsbUC3Ui
-RDibqRRLqaPP+2fp6tiQNczxMvK3tnNJpw77/ccxAzUYm1dHJ74kMVvRa7y9zgC/
-k7ek0WLIF0FXw5fqhCHL+HMjtG5IY+6q98DQf3lOcQwjx+dqTpHmjZDHeTKQNjgI
-2Yt9aVh5t3urZrVvPSN0SteFB0A/QdXnfqi7Q6VKPCO/yWNZ1b9S/uW3PZwZCm/y
-C3ba8zbXkg3Pj96ixsUedQZUUQi4xQ==
-=FNVT
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1j4D0ACgkQp6FrSiUn
+Q2oKawf/ZuMiDgBe+llJfbq+rgEnB0NtgFR5cLYWVYEkDH2W+FSaF4vOOwo8/t5c
+qIwZyIafaP5Tq1dNNJkzTZ8Q5Ng7DmJvvfH8VNz63lIXiVLPi2uboBciJq2j6s9x
+PiiFxlO04Z17GYVIQDWxcoacoopwo45IgMtKoO8eAGmaNLr8SBHcyf9BYlrlrH9D
+xQh55KQKKnrGABFtn4r/uVDlNJdfSOYx4Hjb2N5Xh8w55Pu/tmSUfCvkurO8oeuU
+9k9wS/9UIoyaTWoqlpL36wyYePVVgWVyIY+IyMnuAIfrzgSbbdMpZOT5DhWirejf
+9xJoq6UYbEjQDe6tCmPlSrEdrdzBPA==
+=tCjY
 -----END PGP SIGNATURE-----
 
---j6dbvEKOYIEM2KqdSht76ZJcmcHLpvlPI--
+--S4FxbDTb0Ni3CzwGSX1Px4DW63z6nx595--
 
