@@ -2,82 +2,73 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB73C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 776DFC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:12:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1563C2184D
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:09:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PbmslqeK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1563C2184D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 496AF2184D
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:12:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496AF2184D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2KMU-00034K-8z
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:09:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36385)
+	id 1i2KQ3-0004yI-DA
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:12:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i2KLi-0002VQ-Ip
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:08:19 -0400
+ (envelope-from <bounces@canonical.com>) id 1i2KOk-0004Wp-9o
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i2KLh-0003Xu-Ei
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:08:18 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43540)
+ (envelope-from <bounces@canonical.com>) id 1i2KOj-0004tr-8L
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:11:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53064)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i2KLh-0003XN-8Y
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:08:17 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e12so16244719otp.10
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 12:08:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vCJU9i8aqvr04aQ6i0EfwlW8XMIwknWX/OBeWiLEgC0=;
- b=PbmslqeKsaVBe1CBmhxvtwz6/k0hW+4DZXSZ1PMobVAZHyIKPtwEPjKeBJ4OA5RgIG
- 1/KTKjjRXvJ+XJUbbU4WbJ5AN1gBey8hOUuS0jtez409/nTtIQsJ96A8uGFMMuafDa2n
- Xf7+NgF4xenakd8+Ld6z1C08Hp8FcFGFXH75vdJHbp5nysEYAmcUhNfJU0Q/6pLdSliQ
- tkTcZ9Rr8HQF5R7fzCcleaumZUVD9SVRruRPOPDVQdAMkAQ1cIZlA0dW0z3lP6qVvzAI
- eJ51afBD93EHt/8YLfjMzzvBlAzYuYbl8nKapZuG9Ibot7zB+7frS50PECLvvvYqgUjr
- EtWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vCJU9i8aqvr04aQ6i0EfwlW8XMIwknWX/OBeWiLEgC0=;
- b=n4rdAhuCzkYRyuTb2171dFCPKid3m8//tHeEmW3NyWKNKmxEd1gpPOvnZYtX4sytKN
- 35gauZhSLGhfWdR70LaGboJrO0xaOWZZqWIpGS7Zs/xrVyqqoEWOjvHvz1dOELQwHrYA
- 2kuZptF0u4zrEMdFGLKE2ZuQetpc/aQAVPpQHakGLoc/HzwSXSP/RY94G/guYmPozuPT
- /tuM/fL5/ywaNF7uPgoW2/PGhEnj0EDkVEyT8paQTBTcVwL79hN8/1rBueyYNI3VPlSv
- 9hCbT4VUztkC5JK3EB17AIB0aiME1j5NCVLYcOvpd0Gy9fu2k3o7skkK8X4XXZdCHvMh
- Jakg==
-X-Gm-Message-State: APjAAAWqjfwrEHJuGLKNea4vrHysekdwSL+//pILd5xhKMXpkHM1/Elv
- NBzMDkJ2lLKdnZjcgw56gIlWXhK9d/mtz/DuoMDRAQ==
-X-Google-Smtp-Source: APXvYqy32cS6JuaZ6xrP6Ob5jimCLMNKtv1q9B8FQ9xr9JtItJvVPGG4udB1DYK/gpcdrC6a481YrT38g3M8WmVMpos=
-X-Received: by 2002:a9d:6a94:: with SMTP id l20mr16022310otq.221.1566846496219; 
- Mon, 26 Aug 2019 12:08:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i2KOj-0004tM-3K
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:11:25 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i2KOg-0003H8-6W
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 19:11:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1F1C32E80CB
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 19:11:22 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-56-richard.henderson@linaro.org>
-In-Reply-To: <20190819213755.26175-56-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Aug 2019 20:08:05 +0100
-Message-ID: <CAFEAcA9OxF20x_aBv-D4GUMx44LWUn8wgwLQPm=ZkQBZ7oyZmQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 55/68] target/arm: Convert T16, extract
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Aug 2019 19:02:31 -0000
+From: Idar Lund <1839060@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: idarlund spheenik
+X-Launchpad-Bug-Reporter: Martin Schrodt (spheenik)
+X-Launchpad-Bug-Modifier: Idar Lund (idarlund)
+References: <156507518934.25260.15982229597694445610.malonedeb@soybean.canonical.com>
+Message-Id: <156684615154.6632.11941863890978210002.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19031";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: e5d1af1b9d5c8d0f82e56e72d1bdf4fa71185235
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1839060] Re: HDA device non functional in Windows
+ 10 1903
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,22 +77,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1839060 <1839060@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Aug 2019 at 22:39, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate.c | 14 +-------------
->  target/arm/t16.decode  | 10 ++++++++++
->  2 files changed, 11 insertions(+), 13 deletions(-)
+Created Windows feedback as instructed by Andre:
+https://aka.ms/AA5wlk7
+Please upvote this to get attention by Microsoft.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+-- =
 
-thanks
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1839060
+
+Title:
+  HDA device non functional in Windows 10 1903
+
+Status in QEMU:
+  New
+
+Bug description:
+  I made the update to 1903, and the HDA device stopped working.
+
+  The driver says the device is working correctly, but it does not.
+  When I try to open the Windows sound configuration, the dialog hangs and =
+never shows it's content.
+
+  Several people reported this back in May:
+
+  https://windowsreport.com/windows-10-v1903-ich6-ich9-virtio/
+
+  I can confirm I have exactly the same problem.
+
+  Host is Arch Linux, current (5.2.5) kernel, QEMU 4.0.
+
+  I enabled HDA debug output and compared an older, working Windows
+  version to 1903, but could not see the difference. The driver seems to
+  issue the same verbs.
+
+  I am happy to provide additional information if needed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1839060/+subscriptions
 
