@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B798C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DFCC3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FE672173E
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:20:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FE672173E
+	by mail.kernel.org (Postfix) with ESMTPS id 262B92173E
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:21:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 262B92173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Hjj-0005xM-1L
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:20:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36821)
+	id 1i2Hjp-00067P-41
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:21:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i2HcS-0000RL-Gt
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:13:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i2HcT-0000SV-GX
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i2HcR-0000qx-56
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:13:24 -0400
-Received: from relay.sw.ru ([185.231.240.75]:44754)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i2HcR-0000rf-Nh
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:13:25 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44744)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i2HcN-0000lt-Sj; Mon, 26 Aug 2019 12:13:20 -0400
+ id 1i2HcN-0000lq-NC; Mon, 26 Aug 2019 12:13:19 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1i2HcH-0006QJ-NZ; Mon, 26 Aug 2019 19:13:13 +0300
+ id 1i2HcJ-0006QJ-Cd; Mon, 26 Aug 2019 19:13:15 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Mon, 26 Aug 2019 19:13:00 +0300
-Message-Id: <20190826161312.489398-2-vsementsov@virtuozzo.com>
+Date: Mon, 26 Aug 2019 19:13:10 +0300
+Message-Id: <20190826161312.489398-12-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190826161312.489398-1-vsementsov@virtuozzo.com>
 References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v9 01/13] block/backup: fix
- backup_cow_with_offload for last cluster
+Subject: [Qemu-devel] [PATCH v9 11/13] block: add lock/unlock range functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,26 +65,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We shouldn't try to copy bytes beyond EOF. Fix it.
+From: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Introduce lock/unlock range functionality, based on serialized
+requests. This is needed to refactor backup, dropping local
+tracked-request-like synchronization.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
 ---
- block/backup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/block/block_int.h |  4 ++++
+ block/io.c                | 44 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 2baf7bed65..33b144305f 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -161,7 +161,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index ceec8c2f56..0307cc78c6 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -65,6 +65,7 @@ enum BdrvTrackedRequestType {
+     BDRV_TRACKED_WRITE,
+     BDRV_TRACKED_DISCARD,
+     BDRV_TRACKED_TRUNCATE,
++    BDRV_TRACKED_LOCK,
+ };
  
-     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
--    nbytes = MIN(job->copy_range_size, end - start);
-+    nbytes = MIN(job->copy_range_size, MIN(end - start, job->len - start));
-     nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
-     bdrv_reset_dirty_bitmap(job->copy_bitmap, start,
-                             job->cluster_size * nr_clusters);
+ typedef struct BdrvTrackedRequest {
+@@ -947,6 +948,9 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
++void *coroutine_fn bdrv_co_try_lock(BlockDriverState *bs,
++                                    int64_t offset, unsigned int bytes);
++void coroutine_fn bdrv_co_unlock(void *opaque);
+ 
+ static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
+     int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flags)
+diff --git a/block/io.c b/block/io.c
+index 378180b274..cd88b17e6b 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -785,6 +785,15 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
+     bdrv_wakeup(bs);
+ }
+ 
++static bool ignore_intersection(BdrvTrackedRequest *a, BdrvTrackedRequest *b)
++{
++    return a == b || (!a->serialising && !b->serialising) ||
++        (a->type == BDRV_TRACKED_LOCK && b->type == BDRV_TRACKED_READ &&
++         !b->serialising) ||
++        (b->type == BDRV_TRACKED_LOCK && a->type == BDRV_TRACKED_READ &&
++         !a->serialising);
++}
++
+ static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
+                                                       bool wait)
+ {
+@@ -801,7 +810,7 @@ static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
+         retry = false;
+         qemu_co_mutex_lock(&bs->reqs_lock);
+         QLIST_FOREACH(req, &bs->tracked_requests, list) {
+-            if (req == self || (!req->serialising && !self->serialising)) {
++            if (ignore_intersection(self, req)) {
+                 continue;
+             }
+             if (tracked_request_overlaps(req, self->overlap_offset,
+@@ -839,6 +848,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+     return do_wait_serialising_requests(self, true);
+ }
+ 
++static bool coroutine_fn should_wait_serialising_requests(
++        BdrvTrackedRequest *self)
++{
++    return do_wait_serialising_requests(self, false);
++}
++
+ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
+                                    size_t size)
+ {
+@@ -3271,3 +3286,30 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
+ 
+     return tco.ret;
+ }
++
++void *coroutine_fn bdrv_co_try_lock(BlockDriverState *bs,
++                                    int64_t offset, unsigned int bytes)
++{
++    BdrvTrackedRequest *req = g_new(BdrvTrackedRequest, 1);
++
++    tracked_request_begin(req, bs, offset, bytes, BDRV_TRACKED_LOCK);
++    mark_request_serialising(req, bdrv_get_cluster_size(bs));
++
++    if (should_wait_serialising_requests(req)) {
++        tracked_request_end(req);
++        g_free(req);
++        return NULL;
++    }
++
++    return req;
++}
++
++void coroutine_fn bdrv_co_unlock(void *opaque)
++{
++    BdrvTrackedRequest *req = opaque;
++
++    assert(req->type == BDRV_TRACKED_LOCK);
++
++    tracked_request_end(req);
++    g_free(req);
++}
 -- 
 2.18.0
 
