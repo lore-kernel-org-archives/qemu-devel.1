@@ -2,51 +2,50 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91001C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CE7C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:54:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C9EA21848
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:52:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C9EA21848
+	by mail.kernel.org (Postfix) with ESMTPS id 2E70620828
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 15:54:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E70620828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2HIF-0000JR-2y
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:52:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60882)
+	id 1i2HKD-000361-Aq
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 11:54:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i2HGN-00073D-F8
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i2HGN-00073B-Fn
  for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:50:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i2HGM-0004Sy-7J
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:50:35 -0400
-Received: from relay.sw.ru ([185.231.240.75]:44104)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i2HGL-0004Sc-Q3
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:50:34 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44124)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1i2HGL-0004Ra-Ti; Mon, 26 Aug 2019 11:50:34 -0400
+ id 1i2HGL-0004Rd-J2; Mon, 26 Aug 2019 11:50:33 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1i2HGJ-0006N5-9G; Mon, 26 Aug 2019 18:50:31 +0300
+ id 1i2HGI-0006N5-FF; Mon, 26 Aug 2019 18:50:30 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Mon, 26 Aug 2019 18:50:27 +0300
-Message-Id: <1566834628-485525-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Mon, 26 Aug 2019 18:50:22 +0300
+Message-Id: <1566834628-485525-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1566834628-485525-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1566834628-485525-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v6 5/6] iotests: extended timeout under Valgrind
+Subject: [Qemu-devel] [PATCH v6 0/6] Allow Valgrind checking all QEMU
+ processes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,75 +63,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As the iotests run longer under the Valgrind, the QEMU_COMM_TIMEOUT is
-to be increased in the test cases 028, 183 and 192 when running under
-the Valgrind.
+In the current implementation of the QEMU bash iotests, only qemu-io
+processes may be run under the Valgrind, which is a useful tool for
+finding memory usage issues. Let's allow the common.rc bash script
+runing all the QEMU processes, such as qemu-kvm, qemu-img, qemu-ndb
+and qemu-vxhs, under the Valgrind tool.
 
-Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/028 | 6 +++++-
- tests/qemu-iotests/183 | 9 ++++++++-
- tests/qemu-iotests/192 | 6 +++++-
- 3 files changed, 18 insertions(+), 3 deletions(-)
+v6:
+  01: The possibility was added for a user to exclude particular processes
+      from running under the Valgrind to speed up the test run (suggested
+      by John).
+  02: The shim function _NO_VALGRIND() was introduced as a workaround for
+      the Valgrind bug that hangs QEMU killed process (suggested by John).
+  03: The comments were amended in the commit messages and common.rc file.
 
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 01f4959..71301ec 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -110,7 +110,11 @@ echo
- qemu_comm_method="monitor"
- _launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},id=disk
- h=$QEMU_HANDLE
--QEMU_COMM_TIMEOUT=1
-+if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    QEMU_COMM_TIMEOUT=7
-+else
-+    QEMU_COMM_TIMEOUT=1
-+fi
- 
- # Silence output since it contains the disk image path and QEMU's readline
- # character echoing makes it very hard to filter the output. Plus, there
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index fbe5a99..04fb344 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -94,8 +94,15 @@ if echo "$reply" | grep "compiled without old-style" > /dev/null; then
-     _notrun "migrate -b support not compiled in"
- fi
- 
--QEMU_COMM_TIMEOUT=0.1 qemu_cmd_repeat=50 silent=yes \
-+timeout_comm=$QEMU_COMM_TIMEOUT
-+if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    QEMU_COMM_TIMEOUT=4
-+else
-+    QEMU_COMM_TIMEOUT=0.1
-+fi
-+qemu_cmd_repeat=50 silent=yes \
-     _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" '"status": "completed"'
-+QEMU_COMM_TIMEOUT=$timeout_comm
- _send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
- 
- echo
-diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-index 6193257..0344322 100755
---- a/tests/qemu-iotests/192
-+++ b/tests/qemu-iotests/192
-@@ -60,7 +60,11 @@ fi
- qemu_comm_method="monitor"
- _launch_qemu -drive $DRIVE_ARG -incoming defer
- h=$QEMU_HANDLE
--QEMU_COMM_TIMEOUT=1
-+if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    QEMU_COMM_TIMEOUT=7
-+else
-+    QEMU_COMM_TIMEOUT=1
-+fi
- 
- _send_qemu_cmd $h "nbd_server_start unix:$TEST_DIR/nbd" "(qemu)"
- _send_qemu_cmd $h "nbd_server_add -w drive0" "(qemu)"
+  Discussed in the email threads with the message IDs:
+  <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+  <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+
+Andrey Shinkevich (6):
+  iotests: allow Valgrind checking all QEMU processes
+  iotests: exclude killed processes from running under Valgrind
+  iotests: Add casenotrun report to bash tests
+  iotests: Valgrind fails with nonexistent directory
+  iotests: extended timeout under Valgrind
+  iotests: extend sleeping time under Valgrind
+
+ tests/qemu-iotests/028       |   6 ++-
+ tests/qemu-iotests/039       |   5 ++
+ tests/qemu-iotests/039.out   |  30 ++---------
+ tests/qemu-iotests/051       |   4 ++
+ tests/qemu-iotests/061       |   2 +
+ tests/qemu-iotests/061.out   |  12 +----
+ tests/qemu-iotests/137       |   1 +
+ tests/qemu-iotests/137.out   |   6 +--
+ tests/qemu-iotests/183       |   9 +++-
+ tests/qemu-iotests/192       |   6 ++-
+ tests/qemu-iotests/247       |   6 ++-
+ tests/qemu-iotests/common.rc | 124 ++++++++++++++++++++++++++++++++++++-------
+ 12 files changed, 149 insertions(+), 62 deletions(-)
+
 -- 
 1.8.3.1
 
