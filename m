@@ -2,97 +2,67 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0428AC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C496C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:46:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C33912070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:43:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bT8WUmX6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C33912070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 319CC21848
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:46:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 319CC21848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Ktn-0004Xy-K3
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:43:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40682)
+	id 1i2Kwv-000736-D8
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:46:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i2Kfm-00062t-PQ
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:29:03 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i2Kue-0005UC-U6
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:44:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i2Kfl-0002ix-97
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:29:02 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:36791)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i2Kfl-0002ig-4G
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:29:01 -0400
-Received: by mail-qk1-x743.google.com with SMTP id d23so15068851qko.3
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 12:29:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xIT0ESiLlCaULfyeMiqg9mmteZK4nFwTDji/sT0Tixg=;
- b=bT8WUmX6UTpKgVRIN3lXsfSis6nxbdS9lf4szsDDELJ1iDwMq+kQ6c5B2bZjKhk+8t
- Uy8+fc1QMMu5t02+4mV+sXZiFBW4HqkA5VXETLtFmwcpyH9bTgNLM9MVpAH4dY+fh3hN
- C+SAIwwH43mf9vS5UoVpO/DJ//iP2H75H9DFQtoFdnjZqbSNlAPxCVboJZEFl+eQ/8ct
- zjbgb+CDlFYhgHdoaRqHxKgiwqeJg/NMbBa79YsHuRlis+QjM7zuKo/5KDIK+LrmmXAG
- qea5j/geKjjzwG/wjp+Zm/v/vMF8YmdHAYHVPIrGL6uxYAGDqto6igOAEtZsLPdDBqHO
- 45Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xIT0ESiLlCaULfyeMiqg9mmteZK4nFwTDji/sT0Tixg=;
- b=UjlvE5V6qiO854I9tSCVPz1dQlkki+I8XPJZ75l5f3UO2f//XGR/0ePMz4R8Mzc7lz
- 1rz2Lo09QV3NjxF72UuXxOgjn+UmQHhAORUfI32KFRxEzMFt+0cZVFvlAKprgHK0RUSu
- 9aZbE0OqQFJH6JBJ+UFWFnyQPtYdOlmjjHV9eX6oz5IVMJk1G06SZL5ycfeg3v+lHWlU
- U6lNqbCNOGtelLyY+Jw3HSmRHwbq9JsVLeyMKBnHeR0RFyrS7uKNy6VlF2QrbC5ZWeDh
- UZEW3EpnhIrdRRwfsjuIKk8MyDNseh4OYVQzzTZJGQLJM+8Np1MCeXWuaq5J0IuLFI8+
- nO/g==
-X-Gm-Message-State: APjAAAVTZj3yT1He1c/KxA56gSjilBkCFzfd685pyRpYTZ4tcg6YM6qp
- ROKIAG+T51dIHoGWpVmDTXE=
-X-Google-Smtp-Source: APXvYqyXcnwXQSC8kgkSZOS1KT3rAWxUCadMkTGtANLcI8wu+FXP0s+LECEUZHHNqLoz89kCilkD/Q==
-X-Received: by 2002:a37:63d1:: with SMTP id
- x200mr17396114qkb.131.1566847740206; 
- Mon, 26 Aug 2019 12:29:00 -0700 (PDT)
-Received: from ?IPv6:fd00:835b:d940:d4fc::5?
- (2a01-036c-0113-61b1-0000-0000-0000-0005.pool6.digikabel.hu.
- [2a01:36c:113:61b1::5])
- by smtp.googlemail.com with ESMTPSA id u45sm8119409qta.13.2019.08.26.12.28.59
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 26 Aug 2019 12:28:59 -0700 (PDT)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
- <DirtY.iCE.hu@gmail.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <cover.1566779143.git.DirtY.iCE.hu@gmail.com>
- <9db7233c490836c221bab463305d08e34db9f037.1566779143.git.DirtY.iCE.hu@gmail.com>
- <117a307ac9ec4169d173eb80e68288a89d181386.camel@redhat.com>
-Message-ID: <8ca01890-b337-6590-c415-48563ca938d1@gmail.com>
-Date: Mon, 26 Aug 2019 21:28:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <no-reply@patchew.org>) id 1i2Kua-0003I9-59
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:44:22 -0400
+Resent-Date: Mon, 26 Aug 2019 15:44:21 -0400
+Resent-Message-Id: <E1i2Kua-0003I9-59@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21479)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i2KuX-0003Hf-US
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:44:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1566848631; cv=none; d=zoho.com; s=zohoarc; 
+ b=diUSYosgdrlyYnRDbbVSEEFHeClXCBLVIBg8e6XrYWDEsb6AYitfFnn+wWFWqndvoFPkfTRFBk+cxbruP19Objnx9sUN7Zm426OxgRRoKIGu7vNlYNu6ZNfEjPivnMeeS+KTFGIz3UJ5tFeXuIELCxngCMh7YAPPSFoM6vbju3k=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1566848631;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=sgrfpD78TwoZS7lzinW24ZW0lxuB9LvHCeDzBmvnTP8=; 
+ b=eOnC9r/sCDhDPEEoTYeh9INy6abd4ZExiHVhF/lerSkF/ocL9oV3n+UgF69+S1m/czYeTSv0ZNXaHK9xYx22jlhzUQRHhZIRIsoXlteN1fq3aVe47Do9WegWZXsd3VBwpIibeudGrVlIxtkKHPB8Siy7DdbgVIjBiMVi/mi313c=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1566848624365304.30781536638904;
+ Mon, 26 Aug 2019 12:43:44 -0700 (PDT)
+In-Reply-To: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
+Message-ID: <156684862078.8645.17844959654259899849@5dec9699b7de>
 MIME-Version: 1.0
-In-Reply-To: <117a307ac9ec4169d173eb80e68288a89d181386.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::743
-Subject: Re: [Qemu-devel] [PATCH 2/3] audio: paaudio: fix client name
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kwankhede@nvidia.com
+Date: Mon, 26 Aug 2019 12:43:44 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH v8 00/13] Add migration support for VFIO
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,57 +74,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com,
+ ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, alex.williamson@redhat.com,
+ changpeng.liu@intel.com, cohuck@redhat.com, zhi.a.wang@intel.com,
+ jonathan.davies@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-08-26 10:21, Maxim Levitsky wrote:
-> On Mon, 2019-08-26 at 02:29 +0200, Kővágó, Zoltán wrote:
->> pa_context_new expects a client name, not a server socket path.
->>
->> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->> ---
->>  audio/paaudio.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/audio/paaudio.c b/audio/paaudio.c
->> index bfef9acaad..777b8e4718 100644
->> --- a/audio/paaudio.c
->> +++ b/audio/paaudio.c
->> @@ -866,7 +866,7 @@ static void *qpa_conn_init(const char *server)
->>      }
->>  
->>      c->context = pa_context_new(pa_threaded_mainloop_get_api(c->mainloop),
->> -                                server);
->> +                                "qemu");
->>      if (!c->context) {
->>          goto fail;
->>      }
-> 
-> Also tested, and this works.
-> 
-> May I suggest though to make this configurable as well, for the sake of
-> usability since gnome sound settings show only the client name, and it
-> is per each sound card.
-> Although on the other thing the client name is qemu.
-
-There is a small problem with that.  Currently we only open one
-connection to pa, even with multiple -audiodevs (they will just create
-different streams), which means we can only use a single client name per
-qemu process.  Because of that, I wouldn't turn this into an audiodev
-property.  Some other kind of global setting could work, but I'm not
-sure whether it's worth it or not.
-
-Regards,
-Zoltan
-
-> 
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY2ODQ1NzUzLTE4OTkzLTEt
+Z2l0LXNlbmQtZW1haWwta3dhbmtoZWRlQG52aWRpYS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
+c2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxv
+dyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNTY2ODQ1
+NzUzLTE4OTkzLTEtZ2l0LXNlbmQtZW1haWwta3dhbmtoZWRlQG52aWRpYS5jb20KU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCB2OCAwMC8xM10gQWRkIG1pZ3JhdGlvbiBzdXBwb3J0IGZvciBW
+RklPIGRldmljZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2
+LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0
+Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwowYWViYTM4IHZmaW86IE1ha2UgdmZpby1wY2kgZGV2aWNlIG1pZ3Jh
+dGlvbiBjYXBhYmxlLgphY2MwZDJiIHZmaW86IEFkZCB2ZmlvX2xpc3RlbmVyX2xvZ19zeW5jIHRv
+IG1hcmsgZGlydHkgcGFnZXMKY2IxMWNkNiB2ZmlvOiBBZGQgZnVuY3Rpb24gdG8gZ2V0IGRpcnR5
+IHBhZ2UgbGlzdAo2ZDQ2MDQyIHZmaW86IEFkZCBsb2FkIHN0YXRlIGZ1bmN0aW9ucyB0byBTYXZl
+Vk1IYW5kbGVycwoxZjg4NDI4IHZmaW86IEFkZCBzYXZlIHN0YXRlIGZ1bmN0aW9ucyB0byBTYXZl
+Vk1IYW5kbGVycwpkMGZiZjE4IHZmaW86IFJlZ2lzdGVyIFNhdmVWTUhhbmRsZXJzIGZvciBWRklP
+IGRldmljZQowNDA5N2UxIHZmaW86IEFkZCBtaWdyYXRpb24gc3RhdGUgY2hhbmdlIG5vdGlmaWVy
+CmMzYjk4NTcgdmZpbzogQWRkIFZNIHN0YXRlIGNoYW5nZSBoYW5kbGVyIHRvIGtub3cgc3RhdGUg
+b2YgVk0KYTcxMmEzYSB2ZmlvOiBBZGQgbWlncmF0aW9uIHJlZ2lvbiBpbml0aWFsaXphdGlvbiBh
+bmQgZmluYWxpemUgZnVuY3Rpb24KNzhiNjkyMCB2ZmlvOiBBZGQgc2F2ZSBhbmQgbG9hZCBmdW5j
+dGlvbnMgZm9yIFZGSU8gUENJIGRldmljZXMKMDMyZDI3MiB2ZmlvOiBBZGQgdmZpb19nZXRfb2Jq
+ZWN0IGNhbGxiYWNrIHRvIFZGSU9EZXZpY2VPcHMKOTU4MTdlZCB2ZmlvOiBBZGQgZnVuY3Rpb24g
+dG8gdW5tYXAgVkZJTyByZWdpb24KZWFmNWJlNSB2ZmlvOiBLQUJJIGZvciBtaWdyYXRpb24gaW50
+ZXJmYWNlCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEzIENoZWNraW5nIGNvbW1pdCBlYWY1YmU1
+Yjk0ZjMgKHZmaW86IEtBQkkgZm9yIG1pZ3JhdGlvbiBpbnRlcmZhY2UpCjIvMTMgQ2hlY2tpbmcg
+Y29tbWl0IDk1ODE3ZWRjNDJmOSAodmZpbzogQWRkIGZ1bmN0aW9uIHRvIHVubWFwIFZGSU8gcmVn
+aW9uKQozLzEzIENoZWNraW5nIGNvbW1pdCAwMzJkMjcyY2EzMTEgKHZmaW86IEFkZCB2ZmlvX2dl
+dF9vYmplY3QgY2FsbGJhY2sgdG8gVkZJT0RldmljZU9wcykKNC8xMyBDaGVja2luZyBjb21taXQg
+NzhiNjkyMDgyODg0ICh2ZmlvOiBBZGQgc2F2ZSBhbmQgbG9hZCBmdW5jdGlvbnMgZm9yIFZGSU8g
+UENJIGRldmljZXMpCjUvMTMgQ2hlY2tpbmcgY29tbWl0IGE3MTJhM2E3NDcxMyAodmZpbzogQWRk
+IG1pZ3JhdGlvbiByZWdpb24gaW5pdGlhbGl6YXRpb24gYW5kIGZpbmFsaXplIGZ1bmN0aW9uKQpX
+QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
+IG5lZWQgdXBkYXRpbmc/CiMyOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZ19mcmVl
+KE5VTEwpIGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3QgcmVxdWlyZWQKIzE3MTog
+RklMRTogaHcvdmZpby9taWdyYXRpb24uYzoxMzg6CisgICAgaWYgKHZiYXNlZGV2LT5taWdyYXRp
+b24pIHsKKyAgICAgICAgZ19mcmVlKHZiYXNlZGV2LT5taWdyYXRpb24pOwoKdG90YWw6IDEgZXJy
+b3JzLCAxIHdhcm5pbmdzLCAxNzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8xMyBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKNi8xMyBDaGVja2luZyBjb21taXQgYzNiOTg1NzVlMzliICh2Zmlv
+OiBBZGQgVk0gc3RhdGUgY2hhbmdlIGhhbmRsZXIgdG8ga25vdyBzdGF0ZSBvZiBWTSkKNy8xMyBD
+aGVja2luZyBjb21taXQgMDQwOTdlMTY3YzhiICh2ZmlvOiBBZGQgbWlncmF0aW9uIHN0YXRlIGNo
+YW5nZSBub3RpZmllcikKOC8xMyBDaGVja2luZyBjb21taXQgZDBmYmYxODFiOWRiICh2ZmlvOiBS
+ZWdpc3RlciBTYXZlVk1IYW5kbGVycyBmb3IgVkZJTyBkZXZpY2UpCjkvMTMgQ2hlY2tpbmcgY29t
+bWl0IDFmODg0MjhhODM0MCAodmZpbzogQWRkIHNhdmUgc3RhdGUgZnVuY3Rpb25zIHRvIFNhdmVW
+TUhhbmRsZXJzKQoxMC8xMyBDaGVja2luZyBjb21taXQgNmQ0NjA0MjE0M2I5ICh2ZmlvOiBBZGQg
+bG9hZCBzdGF0ZSBmdW5jdGlvbnMgdG8gU2F2ZVZNSGFuZGxlcnMpCjExLzEzIENoZWNraW5nIGNv
+bW1pdCBjYjExY2Q2MjI5ZjggKHZmaW86IEFkZCBmdW5jdGlvbiB0byBnZXQgZGlydHkgcGFnZSBs
+aXN0KQoxMi8xMyBDaGVja2luZyBjb21taXQgYWNjMGQyYmFhYzdkICh2ZmlvOiBBZGQgdmZpb19s
+aXN0ZW5lcl9sb2dfc3luYyB0byBtYXJrIGRpcnR5IHBhZ2VzKQoxMy8xMyBDaGVja2luZyBjb21t
+aXQgMGFlYmEzODQ0NDdiICh2ZmlvOiBNYWtlIHZmaW8tcGNpIGRldmljZSBtaWdyYXRpb24gY2Fw
+YWJsZS4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
+LzE1NjY4NDU3NTMtMTg5OTMtMS1naXQtc2VuZC1lbWFpbC1rd2Fua2hlZGVAbnZpZGlhLmNvbS90
+ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
