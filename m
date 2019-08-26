@@ -2,81 +2,62 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B463C3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 21:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AC4C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 21:44:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52DDF217F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 21:39:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOJOoBds"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52DDF217F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C7EFF217F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 21:44:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7EFF217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Mi5-0007zS-Ii
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 17:39:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40745)
+	id 1i2MnB-00019C-Sq
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 17:44:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i2Mgc-00079S-Ne
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 17:38:04 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i2MmS-0000fT-9v
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 17:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i2Mga-00069p-EY
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 17:38:02 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:46459)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i2MgZ-000695-WF; Mon, 26 Aug 2019 17:38:00 -0400
-Received: by mail-lf1-x144.google.com with SMTP id n19so13422664lfe.13;
- Mon, 26 Aug 2019 14:37:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3Rq7L7ilQxNbqdFyMjnApckz9Tkj2P/y4nOMdJya2Bw=;
- b=WOJOoBdsKmOIXlep6e51OjmzTdCI8oPdwuQmA7YWUce9lRlgwjT5nCOQYpdHTmG8rR
- s79vXwzEoh5HqxoDCUIc8lHVw4s7Efr5QPaYmkeLQrMuyBO7F64JgzwQZ5Uc2KXGVBm0
- G6IjevwOhT6VOdux46s8q2w5ODixryX6X8XRv5ZoBEf3SREUukjcv2ljNAqcy7TVljj8
- Hj/xIMBussAdxvQWDB3dfA75uEz1ie5+e8joDz3W2cMhcW8v3IBCRbxcyvi16sTkG62D
- Lq3cyRy5KapJCc0jY8y5rQIumbkkB6zauvtBmft5wzRKISWyy3wALzO+4SvzxL2gByCk
- T7Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3Rq7L7ilQxNbqdFyMjnApckz9Tkj2P/y4nOMdJya2Bw=;
- b=tf5upq7geX6ImTcahkROweeXpZpJmVplR6U6sT+D0Urm0ZpDvc5xkWeenuxupmKqzk
- hlM44ZdpTm+yCTU2+Cqi9NalN6WX5scmKwBjIFxO0SvNn74+oIpDc800Alz384pUUFfh
- uvtQpX7M/NbJzcCntaXp7MRlbIyyccwBdULXqISXdv925vHxNx2SQd+ulePh6YreBNHW
- GQDjK8pEfKEFq20Jb7ezcVYMD7LnR4kMrCZVmplT+3eb1vc9yKooqvSE15NEAgrRG+aw
- fWoIS5PkSyzPsLbeQ6Z8IVk5hJ208a5Z09dn4MtJeh0G8vp3Shl+uuxN5k51NxRJY3q4
- Ra2g==
-X-Gm-Message-State: APjAAAX8uiPJq9cIJs/1FqvSh3s1dRUPqYHMH6ss044ecxDDBthGf4K+
- n7cGXKlUZD/scPPGY53d5YPvU909g5BSUuCC9NQ=
-X-Google-Smtp-Source: APXvYqzq5FGo95PzTdJHpaQiZ2ww8UPqwUJMNi5c5T/ZCm45LmVvekCS2uhsdgQKf55at/wR8v21W1s4kSSrBGsyNIY=
-X-Received: by 2002:ac2:563c:: with SMTP id b28mr11965495lff.93.1566855478148; 
- Mon, 26 Aug 2019 14:37:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <1566537069-22741-1-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKOnEtyzW-=Lpe3kWPkQ2OwwPShtC7E=wmaUGRmns97D2w@mail.gmail.com>
- <CAEUhbmXMdXgM15tfZ1eyUzxU4ycMzWa5hPsqLHnxvxQocjvT8A@mail.gmail.com>
-In-Reply-To: <CAEUhbmXMdXgM15tfZ1eyUzxU4ycMzWa5hPsqLHnxvxQocjvT8A@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 26 Aug 2019 14:33:53 -0700
-Message-ID: <CAKmqyKOxqgUec6u9DH1uB=i732vwDpmNB3Yw67p9cHV4JORzhw@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
+ (envelope-from <mlevitsk@redhat.com>) id 1i2MmQ-0008Sg-4x
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 17:44:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45722)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1i2MmP-0008S3-Vv
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 17:44:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7D011307D965;
+ Mon, 26 Aug 2019 21:44:00 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F2415D6C8;
+ Mon, 26 Aug 2019 21:43:59 +0000 (UTC)
+Message-ID: <241fe64c8cfca92597e865c31981964ecd25229b.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: =?UTF-8?Q?K=C5=91v=C3=A1g=C3=B3=2C_Zolt=C3=A1n?=
+ <dirty.ice.hu@gmail.com>,  qemu-devel@nongnu.org
+Date: Tue, 27 Aug 2019 00:43:58 +0300
+In-Reply-To: <cover.1566847960.git.DirtY.iCE.hu@gmail.com>
+References: <cover.1566847960.git.DirtY.iCE.hu@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH v5 00/30] riscv: sifive_u: Improve the
- emulation fidelity of sifive_u machine
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Mon, 26 Aug 2019 21:44:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Audio: misc fixes for "Audio
+ 20190821 patches"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,184 +69,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 23, 2019 at 10:08 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Alistair,
->
-> On Sat, Aug 24, 2019 at 1:29 AM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Thu, Aug 22, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > As of today, the QEMU 'sifive_u' machine is a special target that does
-> > > not boot the upstream OpenSBI/U-Boot firmware images built for the real
-> > > SiFive HiFive Unleashed board. Hence OpenSBI supports a special platform
-> > > "qemu/sifive_u". For U-Boot, the sifive_fu540_defconfig is referenced
-> > > in the OpenSBI doc as its payload, but that does not boot at all due
-> > > to various issues in current QEMU 'sifive_u' machine codes.
-> > >
-> > > This series aims to improve the emulation fidelity of sifive_u machine,
-> > > so that the upstream OpenSBI, U-Boot and kernel images built for the
-> > > SiFive HiFive Unleashed board can be used out of the box without any
-> > > special hack.
-> > >
-> > > The major changes include:
-> > > - Heterogeneous harts creation supported, so that we can create a CPU
-> > >   that exactly mirrors the real hardware: 1 E51 + 4 U54.
-> > > - Implemented a PRCI model for FU540
-> > > - Implemented an OTP model for FU540, primarily used for storing serial
-> > >   number of the board
-> > > - Fixed GEM support that was seriously broken on sifive_u
-> > > - Synced device tree with upstream Linux kernel on sifive_u
-> > >
-> > > OpenSBI v0.4 image built for sifive/fu540 is included as the default
-> > > bios image for 'sifive_u' machine.
-> > >
-> > > The series is tested against OpenSBI v0.4 image for sifive/fu540
-> > > paltform, U-Boot v2019.10-rc1 image for sifive_fu540_defconfig,
-> > > and Linux kernel v5.3-rc3 image with the following patch:
-> > >
-> > > macb: Update compatibility string for SiFive FU540-C000 [1]
-> > >
-> > > OpenSBI + U-Boot, ping/tftpboot with U-Boot MACB driver works well.
-> > > Boot Linux 64-bit defconfig image, verified that system console on
-> > > the serial 0 and ping host work pretty well.
-> > >
-> > > An OpenSBI patch [2] was sent to drop the special "qemu/sifive_u" platform
-> > > support in OpenSBI. The original plan was to get the drop patch applied
-> > > after this QEMU series is merged. However after discussion in the OpenSBI
-> > > mailing list, it seems the best option for us is to let OpenSBI continue
-> > > shipping the special "qemu/sifive_u" platform support to work with QEMU
-> > > version <= 4.1 and deprecate the support sometime in the future. A patch
-> > > will need to be sent to OpenSBI mailing list to update its document.
-> > >
-> > > v4 is now rebased on Palmer's QEMU RISC-V repo "for-master" branch.
-> > > Dropped the following v3 patch that was already done by someone else.
-> > > - riscv: sifive_u: Generate an aliases node in the device tree
-> > > - riscv: sifive_u: Support loading initramfs
-> > >
-> > > The following v3 patch was dropped too due to a different cluster approach
-> > > suggested by Richard Henderson is used in v4:
-> > > - riscv: hart: Support heterogeneous harts population
-> > >
-> > > [1]: https://patchwork.kernel.org/patch/11050003/
-> > > [2]: http://lists.infradead.org/pipermail/opensbi/2019-August/000335.html
-> > >
-> > > Changes in v5:
-> > > - new patch to change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
-> > >   in various sifive models
-> > > - new patch to remove the unnecessary include of target/riscv/cpu.h
-> > > - change to use defines instead of enums
-> > > - change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_prci
-> > > - creating a 32-bit val variable and using that instead of casting
-> > >   everywhere in sifive_u_prci_write()
-> > > - move all register initialization to sifive_u_prci_reset() function
-> > > - drop sifive_u_prci_create()
-> > > - s/codes that worked/code that works/g
-> > > - create sifive_u_prci block directly in the machine codes, instead
-> > >   of calling sifive_u_prci_create()
-> > > - change to use defines instead of enums
-> > > - change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_otp
-> > > - creating a 32-bit val variable and using that instead of casting
-> > >   everywhere in sifive_u_otp_write()
-> > > - move all register initialization to sifive_u_otp_reset() function
-> > > - drop sifive_u_otp_create()
-> > > - create sifive_u_otp block directly in the machine codes, instead
-> > >   of calling sifive_u_otp_create()
-> > > - add the missing "local-mac-address" property in the ethernet node
-> > >
-> > > Changes in v4:
-> > > - remove 2 more "linux,phandle" instances in sifive_u.c and spike.c
-> > >   after rebasing on Palmer's QEMU RISC-V tree
-> > > - change create_fdt() to return void in sifive_u.c too, after rebasing
-> > >   on Palmer's QEMU RISC-V tree
-> > > - new patch to remove executable attribute of opensbi images
-> > > - prefix all macros/variables/functions with SIFIVE_E/sifive_e
-> > >   in the sifive_e_prci driver
-> > > - new patch to add a "hartid-base" property to RISC-V hart array
-> > > - changed to create clusters for each cpu type
-> > > - prefix all macros/variables/functions with SIFIVE_U/sifive_u
-> > >   in the sifive_u_prci driver
-> > > - prefix all macros/variables/functions with SIFIVE_U/sifive_u
-> > >   in the sifive_u_otp driver
-> > > - new patch to remove handcrafted clock nodes for UART and ethernet
-> > >
-> > > Changes in v3:
-> > > - changed to use macros for management and compute cpu count
-> > > - use management cpu count + 1 for the min_cpus
-> > > - update IRQ numbers of both UARTs to match hardware as well
-> > >
-> > > Changes in v2:
-> > > - keep the PLIC compatible string unchanged as OpenSBI uses that
-> > >   for DT fix up
-> > > - drop patch "riscv: sifive: Move sifive_mmio_emulate() to a common place"
-> > > - new patch "riscv: sifive_e: Drop sifive_mmio_emulate()"
-> > > - fixed the "interrupts-extended" property size
-> > > - update the file header to indicate at least 2 harts are created
-> > > - use create_unimplemented_device() to create the GEM management
-> > >   block instead of sifive_mmio_emulate()
-> > > - add "phy-handle" property to the ethernet node
-> > >
-> > > Bin Meng (30):
-> > >   riscv: hw: Remove superfluous "linux,phandle" property
-> > >   riscv: hw: Use qemu_fdt_setprop_cell() for property with only 1 cell
-> > >   riscv: hw: Remove not needed PLIC properties in device tree
-> > >   riscv: hw: Change create_fdt() to return void
-> > >   riscv: hw: Change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
-> > >   riscv: hw: Remove the unnecessary include of target/riscv/cpu.h
-> > >   riscv: roms: Remove executable attribute of opensbi images
-> > >   riscv: sifive_u: Remove the unnecessary include of prci header
-> > >   riscv: sifive: Rename sifive_prci.{c,h} to sifive_e_prci.{c,h}
-> > >   riscv: sifive_e: prci: Fix a typo of hfxosccfg register programming
-> > >   riscv: sifive_e: prci: Update the PRCI register block size
-> > >   riscv: sifive_e: Drop sifive_mmio_emulate()
-> > >   riscv: Add a sifive_cpu.h to include both E and U cpu type defines
-> > >   riscv: hart: Extract hart realize to a separate routine
-> > >   riscv: hart: Add a "hartid-base" property to RISC-V hart array
-> > >   riscv: sifive_u: Update hart configuration to reflect the real FU540
-> > >     SoC
-> > >   riscv: sifive_u: Set the minimum number of cpus to 2
-> > >   riscv: sifive_u: Update PLIC hart topology configuration string
-> > >   riscv: sifive: Implement PRCI model for FU540
-> > >   riscv: sifive_u: Generate hfclk and rtcclk nodes
-> > >   riscv: sifive_u: Add PRCI block to the SoC
-> > >   riscv: sifive_u: Reference PRCI clocks in UART and ethernet nodes
-> > >   riscv: sifive_u: Update UART base addresses and IRQs
-> > >   riscv: sifive_u: Change UART node name in device tree
-> > >   riscv: roms: Update default bios for sifive_u machine
-> > >   riscv: sifive: Implement a model for SiFive FU540 OTP
-> > >   riscv: sifive_u: Instantiate OTP memory with a serial number
-> > >   riscv: sifive_u: Fix broken GEM support
-> > >   riscv: sifive_u: Remove handcrafted clock nodes for UART and ethernet
-> > >   riscv: sifive_u: Update model and compatible strings in device tree
-> >
-> > I can't see patch 12 and it looks like it didn't make it to the list either:
-> >
-> > https://patchew.org/QEMU/1566537069-22741-1-git-send-email-bmeng.cn@gmail.com/
-> >
->
-> Yes, it did not arrive at the mailing list for some weird unknown
-> reason. This was seen in previous version too. Suspect there is
-> something wrong with the QEMU mailing list.
->
-> But I think you should be able to find that in your inbox. I "bcc"
-> another email address of mine when sending patches and confirmed all
-> the patches in the series were received.
-
-Ah, you are right. I didn't check my work email for the patch.
-
-I have reviewed the patch.
-
-Alistair
-
->
+On Mon, 2019-08-26 at 21:59 +0200, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n wro=
+te:
+> Hi,
+>=20
+> This is the second iteration of my "random fixes" patchset.  Compared t=
+o
+> v1, this has a new patch, fixing the memory error caused by an invalid
+> malloc.
+>=20
 > Regards,
-> Bin
+> Zoltan
+>=20
+> K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n (4):
+>   audio: fix invalid malloc size in audio_create_pdos
+>   audio: omitting audiodev=3D parameter is only deprecated
+>   audio: paaudio: fix client name
+>   audio: paaudio: ability to specify stream name
+>=20
+>  qemu-deprecated.texi |  7 +++++++
+>  qapi/audio.json      |  6 ++++++
+>  audio/audio.c        | 10 +++++-----
+>  audio/paaudio.c      |  6 +++---
+>  4 files changed, 21 insertions(+), 8 deletions(-)
+>=20
+
+With that patch series everything works as expected.
+No more heap corruption when I don't use audiodev.
+Thanks!
+
+
+Best regards,
+	Maxim Levitsky
+
 
