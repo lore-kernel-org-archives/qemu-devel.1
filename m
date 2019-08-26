@@ -2,79 +2,81 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E327AC3A59F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EA0C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:34:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB3902342D
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:33:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F10D02186A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 19:34:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="LPs4uyD8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3902342D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wYLgeuOg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F10D02186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Kjd-00019O-SU
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:33:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39259)
+	id 1i2Kl3-0002eY-WF
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 15:34:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1i2Kb7-000874-0S
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:14 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i2KcR-0001YJ-Er
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1i2Kb4-0000Rb-BW
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:12 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:18361)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1i2Kb3-0000R9-Oi
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:24:10 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5d6431da0000>; Mon, 26 Aug 2019 12:24:10 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate102.nvidia.com (PGP Universal service);
- Mon, 26 Aug 2019 12:24:08 -0700
-X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Mon, 26 Aug 2019 12:24:08 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Aug
- 2019 19:24:08 +0000
-Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 26 Aug 2019 19:24:01 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Date: Tue, 27 Aug 2019 00:25:45 +0530
-Message-ID: <1566845753-18993-6-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
-References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (envelope-from <peter.maydell@linaro.org>) id 1i2KcQ-00012D-37
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:25:35 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35266)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i2KcP-0000yE-TQ
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 15:25:34 -0400
+Received: by mail-oi1-x243.google.com with SMTP id a127so13037157oii.2
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 12:25:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0zxdry1BkfHAqau/H/9feepTNjFxh/DYdr86EaL4hL4=;
+ b=wYLgeuOgNwUBEs80yhYdzEJlrAL0AFCvpWHnH440DavpwdpKxO7IKTJIlYaW6MV2Co
+ pz+wm1y58HJ8mgKirsG1PiRNMYEu/9Dx7HhrE+ucAPJoGg+eaM2mks8eq9bWxs1ybhAf
+ sZNwUInTwIQvk9CZIveMxovLHQN7i7518R9fCUoIa+6KUAZYrhmbf4HXiv0SoTPptG6K
+ JtK1NHyqT+qffiXZXZSyWoAztAoEvhWlybY1USgg8s2BxJml8r/Pp+krbOENKpNeNvjA
+ mYo08V/eYQFhkSt9h16Ucn7m9D1UXmfYfd46GvOVRPrNcGhlv0B38Wd8IbvfNBEFIiLs
+ eKcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0zxdry1BkfHAqau/H/9feepTNjFxh/DYdr86EaL4hL4=;
+ b=XxX23lcPt0S+9YErQr5uWjZizwWVi+lYFKoZpLApvUbQtAqtNjo7CuFh0P30ln74gi
+ Hd2b6TsvaoAKI0zmo9SG/rCUBUrY/xvdaZYiin3viheNdqctXKpjF/9TVPdCLtiH7Jf6
+ o2zXLbQAAm1sHY/sILPz6pmUPgH5icuJOqFIX2bC4G/oGS3h9VJ0wklHm+OIor1DgOoT
+ l6LHjdg+1A4m1Tq6XiMxnB10lctCiSlVDnLs86i/DTdgRfKo4+H6pzxmIGcYMdhVQTd5
+ eWdfAnA+Lo9VxKyu90s59x7fGoC6YjYA6MtTRUHo9jraAI3nLqjRlelWiHbgqYbBosSS
+ wSQQ==
+X-Gm-Message-State: APjAAAWbAtOH6sT+yN/B8dODbcdU5z6O9AVk/+3iqy1jnA2MnoSs5pwM
+ nVq41ye2YzgPl3tGvayGevX0BINVj4/bTBzwoYKlvQ==
+X-Google-Smtp-Source: APXvYqxumVfsK7IqF94lFLxgQInGFf07s7VCLVGocRf6Lb53XQrGDCw+jRfFGhmrGyxs/LCncojifX3f/JGMJE9FGog=
+X-Received: by 2002:a54:4718:: with SMTP id k24mr13106294oik.146.1566847532685; 
+ Mon, 26 Aug 2019 12:25:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1566847450; bh=t0m0/KZq+eedxu6mQvZ0GKVBlAAw38+09LX0dUohT/o=;
- h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- In-Reply-To:References:X-NVConfidentiality:MIME-Version:
- Content-Type;
- b=LPs4uyD8r/SM1PiXHEbQJQr8iwBKLWibYJVUuR8sUrzMT0jn/LW3cUxeCeom9Ib4i
- Uq0wAs4X4WN2D1CFrxpFt51q1F+1un0JbYHtDU7uXVvUYyqR8G7QiG0Ow2vAtw53eD
- Fai0kXG6gZKgTs4tMNl+ovjAS/FerOaYVecyHqPGpHF+Vrhryx6xclkiMoKmK6R3uL
- ZAPV8ZIaITwUIUfYXbXdPsm/6eT8XVuo3s4ntOlX7ukE3idxqOeyACP3P9JdJJZelP
- dvdz2ZiJSiEKyzdmiOkT+EW1p+qiO4cD/Fq4JLT4EAyqdMUV1sYZZHbs5QCeOOiFFo
- oZniI3gnDqhqw==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
-X-Received-From: 216.228.121.64
-Subject: [Qemu-devel] [PATCH v8 05/13] vfio: Add migration region
- initialization and finalize function
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-57-richard.henderson@linaro.org>
+In-Reply-To: <20190819213755.26175-57-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 26 Aug 2019 20:25:21 +0100
+Message-ID: <CAFEAcA-9JAhPA44_PuoOgNFfhHZHTSxkCLbizN00GtaDKt=sxQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v2 56/68] target/arm: Convert T16,
+ Change processor state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,236 +88,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, Kirti Wankhede <kwankhede@nvidia.com>,
- eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com,
- changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-- Migration functions are implemented for VFIO_DEVICE_TYPE_PCI device in this
-  patch series.
-- VFIO device supports migration or not is decided based of migration region
-  query. If migration region query is successful and migration region
-  initialization is successful then migration is supported else migration is
-  blocked.
+On Mon, 19 Aug 2019 at 22:39, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 85 ++++++++++++++++++++----------------------
+>  target/arm/t16.decode  | 12 ++++++
+>  2 files changed, 52 insertions(+), 45 deletions(-)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 414c562fb3..368f0ab147 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -7474,6 +7474,11 @@ static int negate(DisasContext *s, int x)
+>      return -x;
+>  }
+>
+> +static int plus_2(DisasContext *s, int x)
+> +{
+> +    return x + 2;
+> +}
+> +
+>  static int times_2(DisasContext *s, int x)
+>  {
+>      return x * 2;
+> @@ -10152,6 +10157,9 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
+>  {
+>      uint32_t mask, val;
+>
+> +    if (ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M)) {
+> +        return false;
+> +    }
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
----
- hw/vfio/Makefile.objs         |   2 +-
- hw/vfio/migration.c           | 140 ++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/trace-events          |   3 +
- include/hw/vfio/vfio-common.h |  11 ++++
- 4 files changed, 155 insertions(+), 1 deletion(-)
- create mode 100644 hw/vfio/migration.c
+I don't think this condition is quite right. We want to
+do two things:
+ (1) this is the A/R-profile CPS, so it shouldn't
+be decoded for any ARM_FEATURE_M CPU
+ (2) for A/R-profile, all the CPS instructions are v6-or-better
 
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index abad8b818c9b..36033d1437c5 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += common.o spapr.o
-+obj-y += common.o spapr.o migration.o
- obj-$(CONFIG_VFIO_PCI) += pci.o pci-quirks.o display.o
- obj-$(CONFIG_VFIO_CCW) += ccw.o
- obj-$(CONFIG_VFIO_PLATFORM) += platform.o
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-new file mode 100644
-index 000000000000..a1feeb7e1a5a
---- /dev/null
-+++ b/hw/vfio/migration.c
-@@ -0,0 +1,140 @@
-+/*
-+ * Migration support for VFIO devices
-+ *
-+ * Copyright NVIDIA, Inc. 2019
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2. See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <linux/vfio.h>
-+
-+#include "hw/vfio/vfio-common.h"
-+#include "cpu.h"
-+#include "migration/migration.h"
-+#include "migration/qemu-file.h"
-+#include "migration/register.h"
-+#include "migration/blocker.h"
-+#include "migration/misc.h"
-+#include "qapi/error.h"
-+#include "exec/ramlist.h"
-+#include "exec/ram_addr.h"
-+#include "pci.h"
-+#include "trace.h"
-+
-+static void vfio_migration_region_exit(VFIODevice *vbasedev)
-+{
-+    VFIOMigration *migration = vbasedev->migration;
-+
-+    if (!migration) {
-+        return;
-+    }
-+
-+    if (migration->region.size) {
-+        vfio_region_exit(&migration->region);
-+        vfio_region_finalize(&migration->region);
-+    }
-+}
-+
-+static int vfio_migration_region_init(VFIODevice *vbasedev, int index)
-+{
-+    VFIOMigration *migration = vbasedev->migration;
-+    Object *obj = NULL;
-+    int ret = -EINVAL;
-+
-+    if (!vbasedev->ops || !vbasedev->ops->vfio_get_object) {
-+        return ret;
-+    }
-+
-+    obj = vbasedev->ops->vfio_get_object(vbasedev);
-+    if (!obj) {
-+        return ret;
-+    }
-+
-+    ret = vfio_region_setup(obj, vbasedev, &migration->region, index,
-+                            "migration");
-+    if (ret) {
-+        error_report("%s: Failed to setup VFIO migration region %d: %s",
-+                     vbasedev->name, index, strerror(-ret));
-+        goto err;
-+    }
-+
-+    if (!migration->region.size) {
-+        ret = -EINVAL;
-+        error_report("%s: Invalid region size of VFIO migration region %d: %s",
-+                     vbasedev->name, index, strerror(-ret));
-+        goto err;
-+    }
-+
-+    return 0;
-+
-+err:
-+    vfio_migration_region_exit(vbasedev);
-+    return ret;
-+}
-+
-+static int vfio_migration_init(VFIODevice *vbasedev,
-+                               struct vfio_region_info *info)
-+{
-+    int ret;
-+
-+    vbasedev->migration = g_new0(VFIOMigration, 1);
-+
-+    ret = vfio_migration_region_init(vbasedev, info->index);
-+    if (ret) {
-+        error_report("%s: Failed to initialise migration region",
-+                     vbasedev->name);
-+        g_free(vbasedev->migration);
-+        return ret;
-+    }
-+
-+    return 0;
-+}
-+
-+/* ---------------------------------------------------------------------- */
-+
-+int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
-+{
-+    struct vfio_region_info *info;
-+    Error *local_err = NULL;
-+    int ret;
-+
-+    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
-+                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
-+    if (ret) {
-+        goto add_blocker;
-+    }
-+
-+    ret = vfio_migration_init(vbasedev, info);
-+    if (ret) {
-+        goto add_blocker;
-+    }
-+
-+    trace_vfio_migration_probe(vbasedev->name, info->index);
-+    return 0;
-+
-+add_blocker:
-+    error_setg(&vbasedev->migration_blocker,
-+               "VFIO device doesn't support migration");
-+    ret = migrate_add_blocker(vbasedev->migration_blocker, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_free(vbasedev->migration_blocker);
-+    }
-+    return ret;
-+}
-+
-+void vfio_migration_finalize(VFIODevice *vbasedev)
-+{
-+    if (vbasedev->migration_blocker) {
-+        migrate_del_blocker(vbasedev->migration_blocker);
-+        error_free(vbasedev->migration_blocker);
-+    }
-+
-+    vfio_migration_region_exit(vbasedev);
-+
-+    if (vbasedev->migration) {
-+        g_free(vbasedev->migration);
-+    }
-+}
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 8cdc27946cb8..191a726a1312 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -143,3 +143,6 @@ vfio_display_edid_link_up(void) ""
- vfio_display_edid_link_down(void) ""
- vfio_display_edid_update(uint32_t prefx, uint32_t prefy) "%ux%u"
- vfio_display_edid_write_error(void) ""
-+
-+# migration.c
-+vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 6ea4898c4d7e..f80e04e26e1f 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -57,6 +57,12 @@ typedef struct VFIORegion {
-     uint8_t nr; /* cache the region number for debug */
- } VFIORegion;
- 
-+typedef struct VFIOMigration {
-+    VFIORegion region;
-+    uint64_t pending_bytes;
-+    QemuMutex lock;
-+} VFIOMigration;
-+
- typedef struct VFIOAddressSpace {
-     AddressSpace *as;
-     QLIST_HEAD(, VFIOContainer) containers;
-@@ -113,6 +119,8 @@ typedef struct VFIODevice {
-     unsigned int num_irqs;
-     unsigned int num_regions;
-     unsigned int flags;
-+    VFIOMigration *migration;
-+    Error *migration_blocker;
- } VFIODevice;
- 
- struct VFIODeviceOps {
-@@ -204,4 +212,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
- int vfio_spapr_remove_window(VFIOContainer *container,
-                              hwaddr offset_within_address_space);
- 
-+int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
-+void vfio_migration_finalize(VFIODevice *vbasedev);
-+
- #endif /* HW_VFIO_VFIO_COMMON_H */
--- 
-2.7.0
+(All M-profile CPUs are at v6-or-better, which is why the
+legacy decoder gets away with doing its ARCH(6) check
+up front rather than only in the A/R-profile arm of its
+if statement.)
 
+>      if (IS_USER(s)) {>          /* Implemented as NOP in user mode.  */
+>          return true;
+> @@ -10182,6 +10190,36 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
+>      return true;
+>  }
+>
+> +static bool trans_CPS_v6m(DisasContext *s, arg_CPS_v6m *a)
+> +{
+> +    TCGv_i32 tmp, addr;
+> +
+> +    if (!(ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M))) {
+> +        return false;
+> +    }
+
+Similarly, this one need not check ENABLE_ARCH_6.
+That is, this is the generic M-profile CPS, it's
+not specific to v6M, and FEATURE_M always implies
+ARCH_6 anyway. Usually we name M-profile specific
+functions _v7m, not _v6m, for mostly historical
+reasons relating to our having implemented v7m first,
+so maybe we should follow that here. I have made
+a bit of an inconsistent hash of this with the v8M
+support, where sometimes I use _v8m because the
+function is only in v8M and not v7M, and sometimes
+_v7m because it's an M-profile function even if it
+happens that it only kicks in or is called for
+v8M CPUs. But we do not curretly have any functions
+with a _v6m suffix so we should probably go with _v7m here.
+
+> +    if (IS_USER(s)) {
+> +        /* Implemented as NOP in user mode.  */
+> +        return true;
+> +    }
+> +
+> +    tmp = tcg_const_i32(a->im);
+> +    /* FAULTMASK */
+> +    if (a->F) {
+> +        addr = tcg_const_i32(19);
+> +        gen_helper_v7m_msr(cpu_env, addr, tmp);
+> +        tcg_temp_free_i32(addr);
+> +    }
+> +    /* PRIMASK */
+> +    if (a->I) {
+> +        addr = tcg_const_i32(16);
+> +        gen_helper_v7m_msr(cpu_env, addr, tmp);
+> +        tcg_temp_free_i32(addr);
+> +    }
+> +    tcg_temp_free_i32(tmp);
+> +    gen_lookup_tb(s);
+> +    return true;
+> +}
+
+thanks
+-- PMM
 
