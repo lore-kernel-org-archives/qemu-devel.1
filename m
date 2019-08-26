@@ -2,63 +2,72 @@ Return-Path: <SRS0=7Gz3=WW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C14AC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77083C3A59F
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:09:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35A7F20828
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:01:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35A7F20828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C5DF20828
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Aug 2019 16:09:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C5DF20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2HQp-0007Tb-5A
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:01:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34263)
+	id 1i2HYC-00052n-3o
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 12:09:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i2HOB-00061a-BN
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:58:40 -0400
+ (envelope-from <bounces@canonical.com>) id 1i2HV6-0002bo-Bi
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:05:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i2HO8-0008Ew-TS
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:58:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34028)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i2HO8-0008Ea-OU
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 11:58:36 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0B7D9105786B;
- Mon, 26 Aug 2019 15:58:36 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-124-81.rdu2.redhat.com
- [10.10.124.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EDC1D1001F43;
- Mon, 26 Aug 2019 15:58:34 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Aug 2019 11:58:32 -0400
-Message-Id: <20190826155832.17427-1-crosa@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1i2HV0-0003rs-GI
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:05:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i2HV0-0003q2-A0
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 12:05:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i2HUv-0005sq-H8
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 16:05:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7F8492E80C7
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 16:05:37 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 26 Aug 2019 15:58:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Aug 2019 15:57:08 -0000
+From: Paul Clarke <pc@us.ibm.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 7-pc rth
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
+References: <156683160080.31851.8159878323909291412.malonedeb@soybean.canonical.com>
+Message-Id: <156683502854.32141.11207589947109873446.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19031";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 1ea3be905f74ec03fcf4b8304868e127994ef191
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] configure: more resilient Python version
- capture
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1841442] Re: floating point emulation can fail to
+ set FE_INEXACT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,82 +76,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julio Montes <julio.montes@intel.com>, tony.nguyen@bt.com,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Reply-To: Bug 1841442 <1841442@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current approach to capture the Python version is fragile, as it
-was demonstrated by a very specific build of Python 3 on Fedora 29
-that, under non-interactive shells would print multiline version
-information.
+Interesting. Did you run qemu-aarch64 on aarch64? If so, it may have
+been using "hardfloat".  I ran "qemu-system-ppc64" on x86_64 and "qemu-
+x86_64" on ppc64le to ensure I was using "softfloat".
 
-The (badly) stripped version output would be sent to config-host.mak,
-producing bad syntax and rendering the makefiles unusable.  Now, the
-Python versions is printed by configure, but only a simple (and better
-controlled variable) indicating whether the build system is using
-Python 2 is kept on config-host.mak.
+-- =
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1841442
 
----
-v2: Use python from '$python' variable instead of hardcoded 'python2'
----
- configure              | 5 +++--
- tests/Makefile.include | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+Title:
+  floating point emulation can fail to set FE_INEXACT
 
-diff --git a/configure b/configure
-index e44e454c43..95134c0180 100755
---- a/configure
-+++ b/configure
-@@ -1864,7 +1864,7 @@ if ! $python -c 'import sys; sys.exit(sys.version_i=
-nfo < (2,7))'; then
- fi
-=20
- # Preserve python version since some functionality is dependent on it
--python_version=3D$($python -V 2>&1 | sed -e 's/Python\ //')
-+python_version=3D$($python -c 'import sys; print("%d.%d.%d" % (sys.versi=
-on_info[0], sys.version_info[1], sys.version_info[2]))' 2>/dev/null)
-=20
- # Suppress writing compiled files
- python=3D"$python -B"
-@@ -6511,6 +6511,7 @@ if ! $python -c 'import sys; sys.exit(sys.version_i=
-nfo < (3,0))'; then
-   echo
-   echo "warning: Python 2 support is deprecated" >&2
-   echo "warning: Python 3 will be required for building future versions =
-of QEMU" >&2
-+  python2=3D"y"
- fi
-=20
- config_host_mak=3D"config-host.mak"
-@@ -7333,7 +7334,7 @@ echo "INSTALL_DATA=3D$install -c -m 0644" >> $confi=
-g_host_mak
- echo "INSTALL_PROG=3D$install -c -m 0755" >> $config_host_mak
- echo "INSTALL_LIB=3D$install -c -m 0644" >> $config_host_mak
- echo "PYTHON=3D$python" >> $config_host_mak
--echo "PYTHON_VERSION=3D$python_version" >> $config_host_mak
-+echo "PYTHON2=3D$python2" >> $config_host_mak
- echo "CC=3D$cc" >> $config_host_mak
- if $iasl -h > /dev/null 2>&1; then
-   echo "IASL=3D$iasl" >> $config_host_mak
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 49684fd4f4..f5ac09549c 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1135,7 +1135,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
- AVOCADO_SHOW=3Dapp
- AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARG=
-ET_DIRS)))
-=20
--ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
-+ifneq ($(PYTHON2),y)
- $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
- 	$(call quiet-command, \
-             $(PYTHON) -m venv --system-site-packages $@, \
---=20
-2.21.0
+Status in QEMU:
+  New
 
+Bug description:
+  Floating point emulation can fail to set FE_INEXACT in some
+  circumstances. This shows up quite often in glibc's "math" tests.  A
+  similar test is attached.
+
+  On ppc64le native:
+  --
+  $ gcc nextafter.c -o nextafter -lm
+  $ ./nextafter $(./nextafter)
+  0x0000000000000001 0.000000
+  0x0
+
+  0xa000000
+  FE_INEXACT FE_UNDERFLOW
+  0x0000000000000000 0.000000
+  --
+
+  On x86_64:
+  --
+  $ gcc nextafter.c -o nextafter -lm
+  $ ./nextafter $(./nextafter)
+  0x0000000000000001 0.000000
+  0x0
+
+  0x30
+  FE_INEXACT FE_UNDERFLOW =
+
+  0x0000000000000000 0.000000
+  --
+
+  Using qemu-system-ppc64
+  --
+  $ ./nextafter $(./nextafter)
+  0x0000000000000001 0.000000
+  0x0
+
+  0x8000000
+  FE_UNDERFLOW =
+
+  0x0000000000000000 0.000000
+  --
+
+  Using qemu-x86_64:
+  --
+  $ ./nextafter $(./nextafter)
+  0x0000000000000001 0.000000
+  0x0
+
+  0x0
+
+  0x0000000000000000 0.000000
+  --
+
+  QEMU versions vary, but not too much, and are pretty close to git HEAD:
+  - 586f3dced9 (HEAD -> master, origin/master, origin/HEAD) Merge remote-tr=
+acking branch 'remotes/cohuck/tags/s390x-20190822' into staging
+  - 864ab31 Update version for v4.1.0-rc4 release
+
+  Since the issue happens nearly identically on different targets, I
+  suspect the issue lies somewhere in fpu/softfloat.c.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1841442/+subscriptions
 
