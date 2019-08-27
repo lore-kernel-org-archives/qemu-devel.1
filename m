@@ -2,80 +2,109 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 149E0C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB87C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:13:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8D7A206BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:11:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MGWEMIXk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D7A206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 910FE2186A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:13:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 910FE2186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2e4F-0000LO-RS
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:11:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59324)
+	id 1i2e63-0002IF-P5
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:13:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59232)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i2e1y-0006rs-Ks
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:15 -0400
+ (envelope-from <david@redhat.com>) id 1i2e1r-0006hj-PE
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i2e1x-00041q-7n
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:14 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43722)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i2e1x-00041M-3T
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:13 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e12so19176450otp.10
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 09:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WXplowyUpocu+OrbQx46F/GL5CgBCu++9nmAgG1PNWE=;
- b=MGWEMIXkG6mwbfOa6A6VEDYKZ1Co9c5ly89GCsLfE2crlWRLTBZ2Z38eeLDWufPUsb
- s0QYXX5qgS5rKUEjr+DH5p8RdNTpxmC1cEdZgIAkmwLrRfyNlN1SKq9pBgikmew8BAsG
- Mvbl66WmHIW83l6W8q5pATPY6gB2sItJmRopWi4xrDxlYLpK1/20aB6ltWFnc4V7b/9l
- CdJZJf++nCEA+2XJs6RwzuwrgAzDwvCHYol8SMItKfRm/RXJenyybnKhxCh5mZoD7zx6
- KVP0YnQvnArp8fYN22XpvaGxfYbGfkeVBWJlTZYepWKsoGTVG6MYj1Em3rMiuLpPmPS+
- P6dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WXplowyUpocu+OrbQx46F/GL5CgBCu++9nmAgG1PNWE=;
- b=Y9RsuX4cSmD+rEw4ECFjwbsb6fNkEODC7uVrX97Pz14SbSCBLYx0nqvUhrps5s9Pke
- KN0iKkm1zbJeO3nfrAzZ4yM8OiM//tG0n/EMOE6vrQ2xfPZJQ/LBmX1kvb7+CJPizhDm
- cjgzlquC7iwtXWg3ND8cM/6pzcTxklAl79hsuGzMLcg2SYI7qc6eps3zrX/K5T6d9noV
- B9I8uZr1VgqJafA2KWqUis5ZQlc+7sM992ax2XgRd2mkVCTd5Vz36ZBnKDP5w+PjD2pz
- Dlo4f5jrWl6sSE3TezXvgI9S5auG2cQqtTBbmNUWZLMCcebnTm85voWr0k4usfqMM1NF
- ii/A==
-X-Gm-Message-State: APjAAAV4HUxBB4q5uwEbwPnYpkTPEOw6Gqj50UaJinSAjMr2JS3zYOQq
- Q7SSbf7Jt6XP6acfKysWgZYZxfI6Jd5hdKAM3PLfUYgKu10=
-X-Google-Smtp-Source: APXvYqwJUYfdNnLUekHX77BImwlIT3a8MTfhotVHHGbPzkJoF3Vdm0flfmuR20CRkLnnT9oyIR03Ieebjsa80N/tgdE=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr9698539oti.135.1566922151050; 
- Tue, 27 Aug 2019 09:09:11 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1i2e1q-0003yT-01
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45912)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1i2e1p-0003wC-M5; Tue, 27 Aug 2019 12:09:05 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 947A1A53260;
+ Tue, 27 Aug 2019 16:09:03 +0000 (UTC)
+Received: from [10.36.116.77] (ovpn-116-77.ams2.redhat.com [10.36.116.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E80DB1001948;
+ Tue, 27 Aug 2019 16:09:00 +0000 (UTC)
+To: qemu-devel@nongnu.org
+References: <20190826075112.25637-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <97734c60-12ef-274e-96ea-ebaa48e01935@redhat.com>
+Date: Tue, 27 Aug 2019 18:09:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190809054341.24728-1-andrew@aj.id.au>
-In-Reply-To: <20190809054341.24728-1-andrew@aj.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Aug 2019 17:08:59 +0100
-Message-ID: <CAFEAcA9dEKLneH5GJJsX84LTW_p9qBrGmr6yMxAYcNo-2EzHZg@mail.gmail.com>
-To: Andrew Jeffery <andrew@aj.id.au>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v2] target-arm: Make the counter tick
- relative to cntfrq
+In-Reply-To: <20190826075112.25637-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Tue, 27 Aug 2019 16:09:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 0/7] tcg: probe_write()
+ refactorings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,84 +116,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 9 Aug 2019 at 06:43, Andrew Jeffery <andrew@aj.id.au> wrote:
->
-> The use of GTIMER_SCALE assumes the clock feeding the generic timer is
-> 62.5MHz for all platforms. This is untrue in general, for example the
-> ASPEED AST2600 feeds the counter with either an 800 or 1200MHz clock,
-> and CNTFRQ is configured appropriately by u-boot.
->
-> To cope with these values we need to take care of the quantization
-> caused by the clock scaling in terms of nanoseconds per clock by
-> calculating an effective frequency such that NANOSECONDS_PER_SECOND is
-> an integer multiple of the effective frequency. Failing to account for
-> the quantisation leads to sticky behaviour in the VM as the guest timer
-> subsystems account for the difference between delay time and the counter
-> value.
->
-> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
-> ---
-> v2:
-> 1. Removed the user-mode change that broke v1
-> 2. Rearranged the implementation as a consequence of 1.
->
->  target/arm/helper.c | 51 ++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 48 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index b74c23a9bc08..166a54daf278 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -2277,6 +2277,34 @@ static const ARMCPRegInfo v6k_cp_reginfo[] = {
->
->  #ifndef CONFIG_USER_ONLY
->
-> +static void gt_recalc_timer(ARMCPU *cpu, int timeridx);
-> +static void gt_cntfrq_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> +                            uint64_t value)
-> +{
-> +    uint64_t scale;
-> +    ARMCPU *cpu;
-> +    int i;
-> +
-> +    raw_write(env, ri, value);
-> +
-> +    /* Fix up the timer scaling */
-> +    cpu = env_archcpu(env);
-> +    scale = MAX(1, NANOSECONDS_PER_SECOND / value);
-> +    for (i = 0; i < NUM_GTIMERS; i++) {
-> +        if (!cpu->gt_timer[i]) {
-> +            continue;
-> +        }
-> +
-> +        cpu->gt_timer[i]->scale = scale;
+On 26.08.19 09:51, David Hildenbrand wrote:
+> Based on tcg-next. The last two patches from v1 are now part of
+> "[PATCH 0/6] exec: Cleanup watchpoints" from richard.
+> 
+> Fix and refactore some things around probe_write() in s390x code. Introduce
+> probe_write() for CONFIG_USER_ONLY.
+> 
+> This is the first step of some changes necessary to handle fault-safe
+> access accross multiple pages on s390x. The next step is making
+> probe_write() return an address, similar to tlb_vaddr_to_host(), and
+> introduing probe_read().
+> 
+> v1 -> v2:
+> - "tcg: Factor out CONFIG_USER_ONLY probe_write() from s390x code"
+> -- Perform only a single !guest_addr_valid(addr) check.
+> - "tcg: Enforce single page access in probe_write()"
+> -- Also add the check for CONFIG_USER_ONLY
+> 
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> 
+> David Hildenbrand (7):
+>   s390x/tcg: Use guest_addr_valid() instead of h2g_valid() in
+>     probe_write_access()
+>   s390x/tcg: Fix length calculation in probe_write_access()
+>   tcg: Factor out CONFIG_USER_ONLY probe_write() from s390x code
+>   tcg: Enforce single page access in probe_write()
+>   mips/tcg: Call probe_write() for CONFIG_USER_ONLY as well
+>   hppa/tcg: Call probe_write() also for CONFIG_USER_ONLY
+>   s390x/tcg: Pass a size to probe_write() in do_csst()
+> 
+>  accel/tcg/cputlb.c        |  2 ++
+>  accel/tcg/user-exec.c     | 17 +++++++++++++++++
+>  include/exec/exec-all.h   |  4 ++--
+>  target/hppa/op_helper.c   |  2 --
+>  target/mips/op_helper.c   |  8 +++-----
+>  target/s390x/mem_helper.c | 13 ++-----------
+>  6 files changed, 26 insertions(+), 20 deletions(-)
+> 
 
-Reaching into the internals of a QEMUTimer and changing
-the 'scale' value seems like a bad idea. If QEMUTimer doesn't
-have a facility for changing the frequency and we need one
-then we should add one at that API layer.
+Richard, in case there is no more feedback, will you take these patches
+via your tree?
 
-Also, this isn't how the hardware works, I'm pretty sure.
-In hardware the timers tick at whatever frequency they're
-set up to tick, and CNTFRQ is just a reads-as-written register
-that firmware can fill in with an appropriate value that it's
-determined from somewhere for the benefit of other software.
+-- 
 
-If on ASPEED SoCs the timer frequency is different, then we
-should model that by having CPU properties for timer frequency
-and having the SoC set those properties, I think.
+Thanks,
 
-> +        gt_recalc_timer(cpu, i);
-> +    }
-> +}
-
-thanks
--- PMM
+David / dhildenb
 
