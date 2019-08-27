@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8FEC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6688C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:42:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 066C3206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:42:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 066C3206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 80A49206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:42:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80A49206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2bjU-0004Qw-79
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:42:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33315)
+	id 1i2bjb-0004WO-G4
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:42:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33313)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i2biO-0003Wp-Gp
+ (envelope-from <bounces@canonical.com>) id 1i2biO-0003Wi-Dw
  for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i2biN-0007mA-7a
+ (envelope-from <bounces@canonical.com>) id 1i2biN-0007mN-9V
  for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:40:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46202)
+Received: from indium.canonical.com ([91.189.90.7]:46212)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i2biN-0007lv-2A
+ id 1i2biN-0007ly-34
  for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:40:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i2biL-0000L2-LG
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 13:40:49 +0000
+ id 1i2biM-0000Kv-Bl
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 13:40:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9787A2E80CC
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 13:40:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 57C4B2E80C7
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 13:40:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Aug 2019 13:21:33 -0000
+Date: Tue, 27 Aug 2019 13:26:40 -0000
 From: Paul Clarke <pc@us.ibm.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,17 +54,18 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: 7-pc
 X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
 X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
-Message-Id: <156691209320.18814.746226319480624520.malonedeb@soybean.canonical.com>
+References: <156691209320.18814.746226319480624520.malonedeb@soybean.canonical.com>
+Message-Id: <156691240007.5168.326712007969197233.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19034";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 408cc6b25026592ba29db07b19bb1f5ecfb810e8
+X-Launchpad-Hash: 14db4dc359edb0fad579e2bad29532ccfdfd3c67
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1841592] [NEW] ppc: softfloat float
- implementation issues
+Subject: [Qemu-devel] [Bug 1841592] Re: ppc: softfloat float implementation
+ issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -80,57 +81,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+-- ppc64le native:
+$ gcc -c -O2 ffma.c
+$ gcc -O2 test-ffma.c ffma.o -lm -o test-ffma
+$ ./test-ffma $(./test-ffma)
+ffma(0x1p-149, 0x1p-149, 0x1p-149)
+0x0
 
-Per bug #1841491, Richard Henderson (rth) said:
-> The float test failure is part of a larger problem for target/powerpc
-> in which all float routines are implemented incorrectly. They are all
-> implemented as double operations with rounding to float as a second
-> step. Which not only produces incorrect exceptions, as in this case,
-> but incorrect numerical results from the double rounding.
->
-> This should probably be split to a separate bug...
+0xa000000
+FE_INEXACT FE_UNDERFLOW =
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+0x1p-149
 
-** Attachment added: "float test case"
-   https://bugs.launchpad.net/bugs/1841592/+attachment/5284928/+files/test-=
+-- qemu-system-ppc64:
+$ ./test-ffma $(./test-ffma)
+ffma(0x1p-149, 0x1p-149, 0x1p-149)
+0x0
+
+0x2000000
+FE_INEXACT =
+
+0x1p-149
+
+
+** Attachment added: "2nd file of float test case"
+   https://bugs.launchpad.net/qemu/+bug/1841592/+attachment/5284931/+files/=
 ffma.c
-
-** Description changed:
-
-  Per bug #1841491, Richard Henderson (rth) said:
-- > The float test failure is part of a larger problem for target/powerpc i=
-n which all float =
-
-- > routines are implemented incorrectly. They are all implemented as doubl=
-e operations with
-- > rounding to float as a second step. Which not only produces incorrect e=
-xceptions, as in
-- > this case, but incorrect > numerical results from the double rounding.
-- > =
-
-+ > The float test failure is part of a larger problem for target/powerpc
-+ > in which all float routines are implemented incorrectly. They are all
-+ > implemented as double operations with rounding to float as a second
-+ > step. Which not only produces incorrect exceptions, as in this case,
-+ > but incorrect > numerical results from the double rounding.
-+ >
-  > This should probably be split to a separate bug...
-
-** Description changed:
-
-  Per bug #1841491, Richard Henderson (rth) said:
-  > The float test failure is part of a larger problem for target/powerpc
-  > in which all float routines are implemented incorrectly. They are all
-  > implemented as double operations with rounding to float as a second
-  > step. Which not only produces incorrect exceptions, as in this case,
-- > but incorrect > numerical results from the double rounding.
-+ > but incorrect numerical results from the double rounding.
-  >
-  > This should probably be split to a separate bug...
 
 -- =
 
