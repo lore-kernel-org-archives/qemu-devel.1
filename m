@@ -2,91 +2,85 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38FC6C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9931DC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0595B2184D
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:40:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 647A420578
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:44:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cQRvZ4+E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0595B2184D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Ur69P5qg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 647A420578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2daM-0003xM-0j
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 11:40:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53653)
+	id 1i2ddu-00070B-I8
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 11:44:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i2dX4-0000f9-Fk
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:37:19 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1i2dNt-0007nW-I8
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i2dX3-0006d9-0P
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:37:18 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46317)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i2dX2-0006cm-Px
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:37:16 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t24so15259635oij.13
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 08:37:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=t5I3HKsguqHeB727TvHpayH/w/G2mmJD9HCQWuDpFC0=;
- b=cQRvZ4+ElY5CWnkv4GxSJqqTeKSnzToVRc6Ez414WNgQsfrYnqu7GgpxKJEcdd7PMJ
- JZSJ6Z5HVY9CGoNjXU6sd/uCvOAcDIM/jw65poN98s3+OZsPnu1499aHryP9+rnIkVJh
- NyY+LqgImCSJRtdvz6l9Mc7h+0sYA70XF/do1Wz7pFmpr6jBezXJyoo2poSA3O/jZYUb
- sQMhOVvTgfl1ZhSGJvFo3NXKe89vBp+TkPC66tn5MdtujLGy/ulFaHEzGugCfhQX3ni7
- U4tGZqvkoKRTp7SKchGvQXrVfeOs5uu4tuDFK0BPcpTKu9lhvMrjH3/HvVc7F7OEiPVg
- wN8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=t5I3HKsguqHeB727TvHpayH/w/G2mmJD9HCQWuDpFC0=;
- b=FKdW1rno2dMSE6E/Qk4cYVTDqgi/kL0HVdbAQu9ZYwBqTiOEPYEcn0K9FZCMC6OulT
- nPd+ngogUWRFcNtzx+EyOAuipcl7s6c91dD4oFBNLOlvuM7vFwa2TKhiLf11QQawm7IO
- wFWxFSxoHwve4hZybyDxJj+r/NMIPj1Kv1PTt6714kh0Zf3D5MvwxZB0q5ytaH9CZ1+C
- xSv6Xau1JlzxJXhEwikSdFRkwZtIASgn2J/CpRpQe+a+YTWDaSL2eI+AYvF94hu5M+te
- YJA9l2CMEAByosHzRbF7MFNeuc6jwVfQHBhlkedopdSkBwxDCRpQWA2DI6bSiMBNecrD
- YbUQ==
-X-Gm-Message-State: APjAAAUvm1T+jmB7o5t9AJP7dhccfgA64JKc79wSmT/MBtRneyR/gjgJ
- 5cu3Exn+GsyKV/8/zTHWP3MyVQJxw3d3i/shkJxwMw==
-X-Google-Smtp-Source: APXvYqyZH/h9akaN8che0lajVeoWjeRlK6CWKCx8L7FNL3d1y+DS+w6Ky7ahxH5rVUcWwWTAcQhqd3y2DuBSFOQct0U=
-X-Received: by 2002:aca:4814:: with SMTP id v20mr16737854oia.98.1566920235745; 
- Tue, 27 Aug 2019 08:37:15 -0700 (PDT)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1i2dNr-0002CB-CP
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:27:49 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:41230)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1i2dNr-00029X-30
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:27:47 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 89F9A2E07C1;
+ Tue, 27 Aug 2019 18:27:43 +0300 (MSK)
+Received: from localhost (localhost [::1])
+ by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ cNd939K7nK-RhQSddMl; Tue, 27 Aug 2019 18:27:43 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1566919663; bh=uptfYJFlShDaAhHHgE+FaNihFxpXkEBKj2z+DcWwvU4=;
+ h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
+ b=Ur69P5qgKC74cSTNIV+v3UZ5OVGwMzinevZ9IKVFBaaOyhQjGaw94KmYEqdVZopV1
+ a8z/khfmhdNsdNlKQEsSdoVtJqWTcWEm4dEc4IsXz43Bp3ShfWauRTT3lM7hiiYKbG
+ efppL4eyGN7jS0swbOA1UgzhW+5Z+OxeuEPmLlOI=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+X-Yandex-Sender-Uid: 1120000000071945
+X-Yandex-Avir: 1
+Received: from mxbackcorp1j.mail.yandex.net (localhost [::1])
+ by mxbackcorp1j.mail.yandex.net with LMTP id 7HsU3T0WGL-8NZO89dI
+ for <yury-kotov@yandex-team.ru>; Tue, 27 Aug 2019 18:27:33 +0300
+Received: by sas2-ae5b5c0d8595.qloud-c.yandex.net with HTTP;
+ Tue, 27 Aug 2019 18:27:33 +0300
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Dr. David Alan Gilbert <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <e377939e-ffa0-9000-88bf-45410611ded6@redhat.com>
+References: <20190827120221.15725-1-yury-kotov@yandex-team.ru>
+ <20190827120221.15725-3-yury-kotov@yandex-team.ru>
+ <e377939e-ffa0-9000-88bf-45410611ded6@redhat.com>
 MIME-Version: 1.0
-References: <20190704055150.4899-1-clg@kaod.org>
- <cd1f8a48-27cb-5cc5-1fd2-46f1597a7094@redhat.com>
- <20190704101345.GC1609@stefanha-x1.localdomain>
- <b304e4bd-1315-b1be-6c48-add99df92626@redhat.com>
- <CACPK8XdFUO6+Fx17Dry0D2QFhM885DugdvOkWnhgjxPc9VgG2Q@mail.gmail.com>
- <CACPK8XfZq1FvMBXLgS-WHoJy4s_L9k19hLW-XgBNoiY-DhGhWA@mail.gmail.com>
- <f5ed785c-027d-66fe-aba2-d03001b44162@redhat.com>
- <CACPK8XcG4JRq0hAUPu4+vv-j1TFNwwsu5iv6X9M-qAgm0atTRA@mail.gmail.com>
-In-Reply-To: <CACPK8XcG4JRq0hAUPu4+vv-j1TFNwwsu5iv6X9M-qAgm0atTRA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Aug 2019 16:37:04 +0100
-Message-ID: <CAFEAcA_zt-=BKZa3CnnP0XNjurxwd1svsda5LnsJ+YsKHdRL_Q@mail.gmail.com>
-To: Joel Stanley <joel@jms.id.au>
-Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Tue, 27 Aug 2019 18:27:43 +0300
+Message-Id: <850541566919653@sas2-ae5b5c0d8595.qloud-c.yandex.net>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH for 4.1] aspeed/timer: Provide
- back-pressure information for short periods
+X-Received-From: 2a02:6b8:0:1619::183
+Subject: Re: [Qemu-devel] [PATCH 2/3] tests/libqtest: Allow to set expected
+ exit status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,62 +89,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 21 Aug 2019 at 04:16, Joel Stanley <joel@jms.id.au> wrote:
+27.08.2019, 17:04, "Eric Blake" <eblake@redhat.com>:
+> On 8/27/19 7:02 AM, Yury Kotov wrote:
 >
-> On Tue, 16 Jul 2019 at 07:02, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
-> > On 7/16/19 9:00 AM, Joel Stanley wrote:
-> > > On Tue, 16 Jul 2019 at 06:54, Joel Stanley <joel@jms.id.au> wrote:
-> > >> On Thu, 4 Jul 2019 at 12:26, Paolo Bonzini <pbonzini@redhat.com> wro=
-te:
-> > >>> On 04/07/19 12:13, Stefan Hajnoczi wrote:
-> > >>>> On Thu, Jul 04, 2019 at 11:26:53AM +0200, Philippe Mathieu-Daud=C3=
-=A9 wrote:
-> > >>>>> CC'ing Stefan & Paolo for a non-ARM view on this...
-> > >>>>
-> > >>>> I'm not familiar with the various clock smoothing techniques imple=
-mented
-> > >>>> in QEMU and KVM, but this looks okay given that Linux guests expec=
-t
-> > >>>> this.
-> > >>>
-> > >>> Yeah, even KVM applies a minimum period of 200us to the x86 LAPIC t=
-imer.
-> > >>
-> > >> Can we please merge this so guests can boot on 4.1?
-> > >
-> > > C=C3=A9dric pointed out this lacks my reviewed by. I had not provided=
- it in
-> > > the past as I wondered if we could come up with a better fix. However=
-,
-> > > I consider this a good fix for 4.1, and if sometime finds time to
-> > > further rework the timer model in the future then we can do that work
-> > > later.
-> >
-> > Agreed.
-> >
-> > >
-> > > Reviewed-by: Joel Stanley <joel@jms.id.au>
-> > > Tested-by: Joel Stanley <joel@jms.id.au>
-> >
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> In the subject: 'Allow to $verb' is not idiomatic; either 'Allow
+> $subject to $verb' or 'Allow ${verb}ing' sound better. In this case,
+> I'd go with:
 >
-> HI Peter,
+> tests/libqtest: Allow setting expected exit status
 >
-> Is this one still in your queue?
 
+Ok, thanks. I'll fix it in v2
 
+>> =C2=A0Add qtest_set_expected_status function to set expected exit stat=
+us of
+>> =C2=A0child process. By default expected exit status is 0.
+>
+>> =C2=A0@@ -130,11 +136,12 @@ static void kill_qemu(QTestState *s)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* fishy and should be logged=
+ with as much detail as possible.
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wstatus =3D s->wstatus;
+>> =C2=A0- if (wstatus) {
+>> =C2=A0+ if (WEXITSTATUS(wstatus) !=3D s->expected_status) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (WIFEXI=
+TED(wstatus)) {
+>
+> Wrong ordering. WEXITSTATUS() is not reliable unless WIFEXITED() is tru=
+e.
+>
 
-Applied to target-arm.next, thanks.
+Yes, it's a bug.. I'll fix it in v2
 
--- PMM
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc. +1-919-301-3226
+> Virtualization: qemu.org | libvirt.org
+
+Regards,
+Yury
 
