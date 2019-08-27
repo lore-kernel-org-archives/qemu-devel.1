@@ -2,64 +2,82 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13046C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4145AC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE57320578
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:44:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE57320578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C86220578
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:45:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Pbw28nsf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C86220578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2deA-0007KQ-1r
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 11:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54625)
+	id 1i2dfR-0000P5-8h
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 11:45:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54846)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rjones@redhat.com>) id 1i2ddA-0006U4-9q
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:43:37 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1i2deL-0007s9-CN
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:44:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rjones@redhat.com>) id 1i2dd9-0002HG-1S
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:43:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35864)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rjones@redhat.com>)
- id 1i2dd5-0002FV-Br; Tue, 27 Aug 2019 11:43:31 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AB0294D2E6;
- Tue, 27 Aug 2019 15:43:30 +0000 (UTC)
-Received: from localhost (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F6D41001B09;
- Tue, 27 Aug 2019 15:43:27 +0000 (UTC)
-Date: Tue, 27 Aug 2019 16:43:27 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190827154327.GA7304@redhat.com>
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823144054.27420-1-eblake@redhat.com>
- <20190823144054.27420-4-eblake@redhat.com>
+ (envelope-from <chihmin.chao@sifive.com>) id 1i2deJ-0002hI-LE
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:44:49 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:40361)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1i2deJ-0002gw-Ed
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:44:47 -0400
+Received: by mail-io1-xd43.google.com with SMTP id t6so47402725ios.7
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 08:44:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UarSeKdjXeP1aEn4NbIhtQ+AJ2Bkzel/hw44s/Uvjb8=;
+ b=Pbw28nsf1wDO2DEFCpbvd/AE6rM+HdspTqOrFKRGbaeui28q3al6z+W+1/dCRR8Aup
+ 4H2+i946vNFAmh0YmKzkVVAUXAliFkON67gdac7IjFrZotuFIcJOFBEqeNzAneJWgRej
+ 7tzp/3YwUNwlH3aEQEsTBbh9wKvMoOhJwhKGRjdjW+stbguAJqYXoGT4Mh6zkOZQ9TMz
+ Q46NLkMnCAc/XJQwDKdVtiH4q2twitYb6O1Gom4KjqtkU9773z7/fQ2ZlVPEbBGgdKvh
+ C0BjeiHlsifb537WoB9ziNCYoD1dKXBBFLY2yGBZ6UAO0boMwAE92vHDAMm6lmF4dt8z
+ d3kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UarSeKdjXeP1aEn4NbIhtQ+AJ2Bkzel/hw44s/Uvjb8=;
+ b=b/Rph4Qh9A4cbFp4IKzo/RKrNLtoFYJSZ7pRhSc2yx4nRqtxAhL8ZzqXlJOFWX9k/S
+ mCin3N+3GI5KTkT8vLRJmgwy1FVK8p1KTS4dYQxMzqcWYQQyaKRP/TPDs9LVRBb9/IG5
+ VoPVYHhVLacN1stTAWlMKfl5ZYurr+vu3g+1C+QDLNMnDmnDvH6meIbk2HoU9FkZbGRA
+ JNLOw3Rqduiooeyezs1sd0ujDMMiHEiT6CrnL5BQfTnc6m4zrHORBBRNAvlCg6NlFVTH
+ Z/U8P00ABDWj3/5wxXso4ofezMz1ZllcUnURRRsvI4y8UNk/h0YBqXheJGuExYlVH/Sk
+ maYA==
+X-Gm-Message-State: APjAAAVXiqqiZDKCF5x2h7o/IfoLPjfDIdMSsVKo41EYghpV60rZ2r/S
+ wTCOXbaBOmqV+bf7x9HDRqNjZxGlScHw93r1c/KvVA==
+X-Google-Smtp-Source: APXvYqxPZ3feSA3jyOqNui6ns2lLucOERcjLwPVojkTQUNRMPtAIpyvJwlEs+TNXNot2LToimQG+1mxq32yLnTBZi68=
+X-Received: by 2002:a5e:a70b:: with SMTP id b11mr1302609iod.286.1566920686428; 
+ Tue, 27 Aug 2019 08:44:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190823144054.27420-4-eblake@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 27 Aug 2019 15:43:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Libguestfs] [nbdkit PATCH 3/3] plugins: Add
- .can_fast_zero hook
+References: <cover.1566603412.git.alistair.francis@wdc.com>
+ <1c1d359caa6633349158debc38e07156a10b63e8.1566603412.git.alistair.francis@wdc.com>
+In-Reply-To: <1c1d359caa6633349158debc38e07156a10b63e8.1566603412.git.alistair.francis@wdc.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Tue, 27 Aug 2019 23:44:35 +0800
+Message-ID: <CAEiOBXUeKnPyZd7i5Aqw5+G2G9M-OeWxsBqTsF0MTV_abkDe5A@mail.gmail.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH v1 02/28] target/riscv: Add
+ the virtulisation mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,21 +89,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, libguestfs@redhat.com,
- nbd@other.debian.org
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup.Patel@wdc.com,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish.Patra@wdc.com, Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Sat, Aug 24, 2019 at 7:41 AM Alistair Francis <alistair.francis@wdc.com>
+wrote:
 
-The nbdkit series looks fine too, so ACK again.
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/cpu.h        |  4 ++++
+>  target/riscv/cpu_bits.h   |  6 ++++++
+>  target/riscv/cpu_helper.c | 23 +++++++++++++++++++++++
+>  3 files changed, 33 insertions(+)
+>
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 7f54fb8c87..0ef1ecb0e0 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -117,6 +117,8 @@ struct CPURISCVState {
+>
+>  #ifndef CONFIG_USER_ONLY
+>      target_ulong priv;
+> +    /* This contains QEMU specific information about the virt state. */
+> +    target_ulong virt;
+>      target_ulong resetvec;
+>
+>      target_ulong mhartid;
+> @@ -257,6 +259,8 @@ int riscv_cpu_gdb_read_register(CPUState *cpu, uint8_t
+> *buf, int reg);
+>  int riscv_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+>  bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request);
+>  bool riscv_cpu_fp_enabled(CPURISCVState *env);
+> +bool riscv_cpu_virt_enabled(CPURISCVState *env);
+> +void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable);
+>  int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
+>  hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+>  void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+> index e99834856c..1fbde516be 100644
+> --- a/target/riscv/cpu_bits.h
+> +++ b/target/riscv/cpu_bits.h
+> @@ -422,6 +422,12 @@
+>  #define PRV_H 2 /* Reserved */
+>  #define PRV_M 3
+>
+> +/* Virtulisation modes */
+> +#define VIRT_OFF            0
+> +#define VIRT_ON             1
+> +#define VIRT_MODE_SHIFT     0
+> +#define VIRT_MODE_MASK      (1 << VIRT_MODE_SHIFT)
+> +
+>
+ /* RV32 satp CSR field masks */
+>  #define SATP32_MODE         0x80000000
+>  #define SATP32_ASID         0x7fc00000
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 225e407cff..7b0bb14c01 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -81,6 +81,29 @@ bool riscv_cpu_fp_enabled(CPURISCVState *env)
+>      return false;
+>  }
+>
+> +bool riscv_cpu_virt_enabled(CPURISCVState *env)
+> +{
+> +    bool tmp;
+> +
+> +    if (!riscv_has_ext(env, RVH)) {
+> +        return false;
+> +    }
+> +
+> +    tmp = (env->virt & VIRT_MODE_MASK) >> VIRT_MODE_SHIFT;
+> +
+> +    return tmp == VIRT_ON;
+> +}
+> +
+> +void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable)
+> +{
+> +    if (!riscv_has_ext(env, RVH)) {
+> +        return;
+> +    }
+> +
+> +    env->virt &= ~VIRT_MODE_MASK;
+> +    env->virt |= enable << VIRT_MODE_SHIFT;
+> +}
+> +
+>  int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+>  {
+>      CPURISCVState *env = &cpu->env;
+> --
+> 2.22.0
+>
+> Why not to use get_field and set_field though it is not a real register
+but an internal state
 
-Rich.
+#define VIRT_ONOFF            0x01
+#define VIRT_OFF             0
+#define VIRT_ON             1
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+access
+       get_field(env->virt, VIRT_ONOFF);
+       set_field(env->virt, VIRT_ONOFF, enable);
 
+
+chihmin
