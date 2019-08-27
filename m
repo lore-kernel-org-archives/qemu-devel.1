@@ -2,72 +2,65 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E55A4C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9B7C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:21:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B27A5206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:18:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27A5206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB0842186A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:21:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Ko1as5jj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB0842186A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Svv-0002Sn-UB
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 00:18:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60629)
+	id 1i2SzW-0004Ba-0D
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 00:21:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i2StP-0000ui-3X
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:15:40 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i2SyD-00037S-DK
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i2StN-0002gu-VV
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:15:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40386)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i2StN-0002gV-Q5
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:15:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i2StL-0002Fl-U8
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 04:15:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E26912E802D
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 04:15:35 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1i2SyB-0003q9-Pr
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:20:37 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44991 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1i2SyA-0003pJ-IN; Tue, 27 Aug 2019 00:20:35 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46HbJY3YP3z9sBp; Tue, 27 Aug 2019 14:20:29 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1566879629;
+ bh=OYz68tk1JX1UxE1vRSPi6VOjfRxeQr4mWC4mDkVQvFA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Ko1as5jj9urdn+8br6Ljo37qUQRo/6GEu3mpbMs8o+3ZCVBx2c2JEVKRhn1T789Mg
+ R2rlbTrkTz2bKAoyrYuMCXqD7fWtUJ2XKZmMAQmM5teMpoLv0nhMu1yDtc3glGRf1M
+ hxtzj0ucq620is1r6cYFjdbVCMVNRu27F1lrgXpM=
+Date: Tue, 27 Aug 2019 13:45:19 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <20190827034519.GB10107@umbus.fritz.box>
+References: <20190826090812.19080-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Aug 2019 04:06:38 -0000
-From: Paul Clarke <pc@us.ibm.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
-References: <156686849716.6431.16425651381928336460.malonedeb@gac.canonical.com>
-Message-Id: <156687879834.4807.16452132471732559890.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19031";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 4419450b03b43853c35b62e962bb01e32683f001
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="1LKvkjL3sHcu1TtY"
+Content-Disposition: inline
+In-Reply-To: <20190826090812.19080-1-lvivier@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1841491] Re: floating point emulation can fail to
- set FE_UNDERFLOW
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH] pseries: Fix compat_pvr on reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,76 +69,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841491 <1841491@bugs.launchpad.net>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Responding to the patch https://lists.nongnu.org/archive/html/qemu-
-ppc/2019-08/msg00404.html, it seems to work for "double", but not for
-"float". Test case attached.
 
-** Attachment added: "float testcase"
-   https://bugs.launchpad.net/qemu/+bug/1841491/+attachment/5284810/+files/=
-test-ffma.c
+--1LKvkjL3sHcu1TtY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Mon, Aug 26, 2019 at 11:08:12AM +0200, Laurent Vivier wrote:
+> If we a migrate P8 machine to a P9 machine, the migration fails on
+> destination with:
+>=20
+>   error while loading state for instance 0x1 of device 'cpu'
+>   load of migration failed: Operation not permitted
+>=20
+> This is caused because the compat_pvr field is only present for the first
+> CPU.
+> Originally, spapr_machine_reset() calls ppc_set_compat() to set the value
+> max_compat_pvr for the first cpu and this was propagated to all CPUs by
+> spapr_cpu_reset().  Now, as spapr_cpu_reset() is called before that, the
+> value is not propagated to all CPUs and the migration fails.
+>=20
+> To fix that, propagate the new value to all CPUs in spapr_machine_reset().
+>=20
+> Fixes: 25c9780d38d4 ("spapr: Reset CAS & IRQ subsystem after devices")
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841491
+Applied to ppc-for-4.2, thanks.
 
-Title:
-  floating point emulation can fail to set FE_UNDERFLOW
+> ---
+>  hw/ppc/spapr.c          | 8 +++++++-
+>  hw/ppc/spapr_cpu_core.c | 2 ++
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index baedadf20b8c..d063312a3b2a 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1752,7 +1752,13 @@ static void spapr_machine_reset(MachineState *mach=
+ine)
+>          spapr_ovec_cleanup(spapr->ov5_cas);
+>          spapr->ov5_cas =3D spapr_ovec_new();
+> =20
+> -        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fata=
+l);
+> +        /*
+> +         * reset compat_pvr for all CPUs
+> +         * as qemu_devices_reset() is called before this,
+> +         * it can't be propagated by spapr_cpu_reset()
+> +         * from the first CPU to all the others
+> +         */
+> +        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
+>      }
+> =20
+>      /*
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index bf47fbdf6f7f..45e2f2747ffc 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -43,6 +43,8 @@ static void spapr_cpu_reset(void *opaque)
+> =20
+>      /* Set compatibility mode to match the boot CPU, which was either set
+>       * by the machine reset code or by CAS. This should never fail.
+> +     * At startup the value is already set for all the CPUs
+> +     * but we need this when we hotplug a new CPU
+>       */
+>      ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort=
+);
+> =20
 
-Status in QEMU:
-  New
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Bug description:
-  Floating point emulation can fail to set FE_UNDERFLOW in some
-  circumstances. This shows up often in glibc's "math" tests. A similar
-  test is attached.
+--1LKvkjL3sHcu1TtY
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  This is similar to bug #1841442, but not the same problem, and I don't
-  think the fix will be in the same code.
+-----BEGIN PGP SIGNATURE-----
 
-  On ppc64le native:
-  --
-  $ gcc -c -O2 fma.c
-  $ gcc -O2 test-fma.c fma.o -lm -o test-fma
-  $ ./test-fma $(./test-fma)
-  fma(0x1.ffffffffffffcp-1022, 0x1.0000000000001p-1, 0x0.0000000000001p-102=
-2)
-  0x0
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1kp04ACgkQbDjKyiDZ
+s5JjChAAhbYHCU59+LwKTC6bWcsC9VlRLESFIigKB4WyreUA0xiVT+bMWpn2iHSZ
+zni9Oicn6yYLyMObVbxjFWTQLRs1YvurNRwYTJ0XiJ+FSFQntESeiq7lV9xcSGhG
+ds0gbWlMUPkoFmadBmnLDXGrHMVVLIFFdJbOvlVpvmP/uaS3JSe7nYt4k26sF8d4
+dUJVJx8NtpGBau0vCk4wVJO+pM6G7yc81wO633Tip3PcTBCrrTidDxZtpkdErvOk
+6XBRNAb1JwBkh7iIkTIkhvMhYBPopK/7tlPfaXvVEblVmZydq0LvFHhYeSMkhbPB
+4/U0rIPxM65HnFZpkbPJEqHcEziBOPBZjODaBRnK1wMrm2kRxrngfqa5hmas3k2V
+TTNoZBaLYsRPXpNd6LGbw++SvThX8TY/iyw9U0Db9RI+8KQWQsMWiIwbM0SGE8DE
+eX9d9J7vg+N+u+2gYzlwXEEbhdTMHyRGCLVCTj9anXgC6LUZ6ufwBzkDD/zf2hEo
+WsfxiQafr5TIzRcWKnoM3L4hVvMoIYTSREKs1n676XMyU/A5vsbMLpPq+6ZVfD4d
+mTI5OPqlp5XXJKHMC3oGa/MbE3SKflzl7wk03lm6UKz+dvpihNxeHQt/H8OeIyXH
+izUfWFlAkvnwhT5NLqbPEp9IbFeKM2/BCYvAdaY5x3MdF6wSI1s=
+=SaA0
+-----END PGP SIGNATURE-----
 
-  0xa000000
-  FE_INEXACT FE_UNDERFLOW =
-
-  0x1p-1022
-  --
-
-  On qemu-system-ppc64:
-  --
-  $ ./test-fma $(./test-fma)
-  fma(0x1.ffffffffffffcp-1022, 0x1.0000000000001p-1, 0x0.0000000000001p-102=
-2)
-  0x0
-
-  0x2000000
-  FE_INEXACT =
-
-  0x1p-1022
-  --
-
-  QEMU versions vary, but not too much, and are pretty close to git HEAD:
-  - 586f3dced9 (HEAD -> master, origin/master, origin/HEAD) Merge remote-tr=
-acking branch 'remotes/cohuck/tags/s390x-20190822' into staging
-  - 864ab31 Update version for v4.1.0-rc4 release
-
-  There are worse symptoms on qemu-x86_64, but this is apparently not
-  surprising per
-  https://bugs.launchpad.net/qemu/+bug/1841442/comments/6.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841491/+subscriptions
+--1LKvkjL3sHcu1TtY--
 
