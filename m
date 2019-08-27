@@ -2,57 +2,82 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC8EC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0467AC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:09:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84F0B217F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:06:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84F0B217F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4E982173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:09:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wPyu6NnX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4E982173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2WUj-0005oo-PG
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 04:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33977)
+	id 1i2WXj-00072s-12
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 04:09:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fangying1@huawei.com>) id 1i2WTo-0005MV-26
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:05:29 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i2WWt-0006Pd-6e
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:08:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fangying1@huawei.com>) id 1i2WTm-00009g-MK
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:05:27 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:47930 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fangying1@huawei.com>)
- id 1i2WTm-00007e-A8
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:05:26 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 9822B10AC53E6A66FB6C;
- Tue, 27 Aug 2019 16:05:22 +0800 (CST)
-Received: from localhost (10.133.205.53) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Tue, 27 Aug 2019
- 16:05:16 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <qemu-devel@nongnu.org>, <dgilbert@redhat.com>, <quintela@redhat.com>
-Date: Tue, 27 Aug 2019 16:05:12 +0800
-Message-ID: <20190827080512.2417-1-fangying1@huawei.com>
-X-Mailer: git-send-email 2.22.0.windows.1
+ (envelope-from <peter.maydell@linaro.org>) id 1i2WWs-0001Zq-4z
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:08:39 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38879)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i2WWr-0001Z2-VJ
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:08:38 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r20so17841325ota.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 01:08:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=RiAzpzzr3+1GCbXuk+91ty8sppWP/KZ5taFt9exx4G4=;
+ b=wPyu6NnXRuSTUEkm9B4QtgKVsNYdpoc6qZz32I7f9JZzd6Tm9drReixh6FgvvrNbMf
+ TYwUiRnG4bsoVXXf5E0HUZDlEGF10U0Wu82pRcypCX7vtSnBe00E2Vn6uvezCMTuj/51
+ 9ifJ3Aj8Ml4lny1cvOZvmKNlzxsoL4O2SWmjNAAZqr4jhta1V/t+tJo3r8yo3uOM5TY9
+ gjK5Gc9K/hGGB5qVHLQQ6rLeR0xw8dgWk0P9VyuDfhWvuvNScj8JhF4aGq5H0KtxdQYY
+ lKd/lUzNwykt+ga8+dYMWpQn1dQo76DE7a5vH5e6wMKCUwSvn+9RSIY+SWZ0809ActtH
+ RGjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=RiAzpzzr3+1GCbXuk+91ty8sppWP/KZ5taFt9exx4G4=;
+ b=bdBJv8waK+od39zn5lTopRNWIcJc2p1aGVbkkgiylg7RlleMEJyCkt0hMJUBXMrrBw
+ O6/wejxKzqik8XYQzEFBA1+ydA0Bdc6QQor7yBEvfwgd0OOt6Hwd4P+mQnb2TdIMlTkI
+ 1tWCNQbO0KI2WtNIbkNcWO61kNKecuvC47Pm24mVUh+j3Nl+J4Ku1US2A3iBd1MR6DU9
+ YoR/1AC2jpl0IiwM+mYBAnixwk9k8sJ/DKJuDmxwitiz3f9nYcfUUep1wrwIL01xWn0O
+ WY2oJKbdmYKyH4mNoLvaMnihW8F+Z7+ToJsY5gX/aukStd/92PNxybyX6haj4dfjyTQf
+ aS/g==
+X-Gm-Message-State: APjAAAW0sEdVRIBLoHk7Wi2IqgNoZKv0xOCQUp/xLUulVDL3DLPaIHi6
+ goHA2jv+o9G7xl9A31TFoRxhk7wzaykQLw1g80wB+N+qHh0=
+X-Google-Smtp-Source: APXvYqxDXObk3zt8G4+hwfjhUM0epWIF3JOOu1BDQ9KDpKtXZ276Mv9cO32ZAGE30iVXXSKo3tZ37LHnhkuUIMU07rM=
+X-Received: by 2002:a9d:5e10:: with SMTP id d16mr2224889oti.91.1566893317285; 
+ Tue, 27 Aug 2019 01:08:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.205.53]
-X-CFilter-Loop: Reflected
+References: <CADgy-2vznasvwaUwNSi96Sy=ucPC=-3e=O9irqc5DSpV_uhWUg@mail.gmail.com>
+ <abf5f3b6-7c05-a85b-051f-9905b8f50041@vivier.eu>
+ <CADgy-2va2xVmO_a1gDwg+zkpNcLJTW5D1j=2kk1TnRMxyPaLMg@mail.gmail.com>
+In-Reply-To: <CADgy-2va2xVmO_a1gDwg+zkpNcLJTW5D1j=2kk1TnRMxyPaLMg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Aug 2019 09:08:26 +0100
+Message-ID: <CAFEAcA_9G9WVhqozgJb1zUxkf_botd-Wq_=X26U3JdwCtMu4+g@mail.gmail.com>
+To: Josh Kunz <jkz@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: [Qemu-devel] [PATCH] qmp: Fix memory leak in
- migrate_params_test_apply
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] patch to swap SIGRTMIN + 1 and SIGRTMAX - 1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,77 +89,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lcf.lichaofeng@huawei.com, Ying Fang <fangying1@huawei.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>, zhouyibo3@huawei.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Marlies Ruck <marlies.ruck@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <milos.stojanovic@rt-rk.com>,
+ Shu-Chun Weng <scw@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Address Sanitizer shows memory leak in migrate_params_test_apply
-migration/migration.c:1253 and the stack is as bellow:
+On Mon, 26 Aug 2019 at 22:10, Josh Kunz <jkz@google.com> wrote:
+> That said, overall, fixing the SIGRTMIN+1 issue using a more-generic sign=
+al-multiplexing mechanism doesn't seem *that* much better to me. It adds a =
+lot of complexity, and only saves a single signal (assuming glibc doesn't a=
+dd more reserved signals). The "big win" is additional emulation features, =
+like those introduced in MUX patch (being able to utilize signals outside o=
+f the host range). If having those features in QEMU warrants the additional=
+ complexity, then re-working this patch on-top of that infrastructure seems=
+ like a good idea.
 
-Direct leak of 45 byte(s) in 9 object(s) allocated from:
-    #0 0xffffbd7fc1db in __interceptor_malloc (/lib64/libasan.so.4+0xd31d=
-b)
-    #1 0xffffbd514163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
-    #2 0xffffbd52f43b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
-    #3 0xaaaadfa4d623 in migrate_params_test_apply migration/migration.c:=
-1253
-    #4 0xaaaadfa4d623 in qmp_migrate_set_parameters migration/migration.c=
-:1422
-    #5 0xaaaadfa963f3 in hmp_migrate_set_parameter monitor/hmp-cmds.c:186=
-7
-    #6 0xaaaadfa8afe3 in handle_hmp_command monitor/hmp.c:1082
-    #7 0xaaaadf479c57 in qmp_human_monitor_command monitor/misc.c:140
-    #8 0xaaaadfadf87b in qmp_marshal_human_monitor_command qapi/qapi-comm=
-ands-misc.c:1024
-    #9 0xaaaadfc7797b in do_qmp_dispatch qapi/qmp-dispatch.c:131
-    #10 0xaaaadfc7797b in qmp_dispatch qapi/qmp-dispatch.c:174
-    #11 0xaaaadfa84fff in monitor_qmp_dispatch monitor/qmp.c:120
-    #12 0xaaaadfa85bbf in monitor_qmp_bh_dispatcher monitor/qmp.c:209
-    #13 0xaaaadfd2228f in aio_bh_call util/async.c:89
-    #14 0xaaaadfd2228f in aio_bh_poll util/async.c:117
-    #15 0xaaaadfd29bc3 in aio_dispatch util/aio-posix.c:459
-    #16 0xaaaadfd21ff7 in aio_ctx_dispatch util/async.c:260
-    #17 0xffffbd50e2f7 in g_main_context_dispatch (/lib64/libglib-2.0.so.=
-0+0x512f7)
-    #18 0xaaaadfd278d7 in glib_pollfds_poll util/main-loop.c:218
-    #19 0xaaaadfd278d7 in os_host_main_loop_wait util/main-loop.c:241
-    #20 0xaaaadfd278d7 in main_loop_wait util/main-loop.c:517
-    #21 0xaaaadf67b5e7 in main_loop vl.c:1806
-    #22 0xaaaadf15d453 in main vl.c:4488
+It has the huge advantage that it doesn't break existing working
+binaries. That's the main reason we've never applied the 'just
+swap another couple of signals' patch. The other possible
+approach for avoiding binary breakage would be to silently
+ignore attempts to set handlers for the signals QEMU uses,
+rather than failing them. I'm not sure what fallout that
+might have, though...
 
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- migration/migration.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index 8b9f2fe30a..05e44ff7cc 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1250,11 +1250,17 @@ static void migrate_params_test_apply(MigrateSetP=
-arameters *params,
-=20
-     if (params->has_tls_creds) {
-         assert(params->tls_creds->type =3D=3D QTYPE_QSTRING);
-+        if (dest->tls_creds) {
-+            g_free(dest->tls_creds);
-+        }
-         dest->tls_creds =3D g_strdup(params->tls_creds->u.s);
-     }
-=20
-     if (params->has_tls_hostname) {
-         assert(params->tls_hostname->type =3D=3D QTYPE_QSTRING);
-+        if (dest->tls_hostname) {
-+            g_free(dest->tls_hostname);
-+        }
-         dest->tls_hostname =3D g_strdup(params->tls_hostname->u.s);
-     }
-=20
---=20
-2.19.1
-
-
+thanks
+-- PMM
 
