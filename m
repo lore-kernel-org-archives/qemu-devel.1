@@ -2,54 +2,62 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A57BAC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E61C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:16:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E1A62186A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:15:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E1A62186A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
+	by mail.kernel.org (Postfix) with ESMTPS id B93A420673
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:16:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B93A420673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50681 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2aNQ-0002ip-H3
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 08:15:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48025)
+	id 1i2aOc-0003lX-Va
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 08:16:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1i2aMB-000205-Hc
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:13:52 -0400
+ (envelope-from <rjones@redhat.com>) id 1i2aNF-0002nu-K1
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1i2aMA-000774-BI
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:13:51 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:45208
- helo=sipsolutions.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1i2aMA-00076D-52
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:13:50 -0400
-Received: by sipsolutions.net with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <johannes@sipsolutions.net>)
- id 1i2aM4-0007h2-R0; Tue, 27 Aug 2019 14:13:44 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: qemu-devel@nongnu.org
-Date: Tue, 27 Aug 2019 15:13:39 +0300
-Message-Id: <20190827121339.15815-1-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <rjones@redhat.com>) id 1i2aNE-0007RR-9w
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:14:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49322)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rjones@redhat.com>)
+ id 1i2aNA-0007Q7-8L; Tue, 27 Aug 2019 08:14:52 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E6A3C2F366C;
+ Tue, 27 Aug 2019 12:14:50 +0000 (UTC)
+Received: from localhost (ovpn-116-117.ams2.redhat.com [10.36.116.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 86B381001B11;
+ Tue, 27 Aug 2019 12:14:50 +0000 (UTC)
+Date: Tue, 27 Aug 2019 13:14:49 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190827121449.GX7304@redhat.com>
+References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:191:4433::2
-Subject: [Qemu-devel] [PATCH v2] libvhost-user-glib: fix VugDev main fd
- cleanup
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 27 Aug 2019 12:14:50 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Libguestfs] cross-project patches: Add NBD Fast
+ Zero support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,116 +69,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Johannes Berg <johannes.berg@intel.com>
+Cc: libguestfs@redhat.com, QEMU <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, nbd@other.debian.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Fri, Aug 23, 2019 at 09:30:36AM -0500, Eric Blake wrote:
+> I've run several tests to demonstrate why this is useful, as well as
+> prove that because I have multiple interoperable projects, it is worth
+> including in the NBD standard.  The original proposal was here:
+> https://lists.debian.org/nbd/2019/03/msg00004.html
+> where I stated:
+> 
+> > I will not push this without both:
+> > - a positive review (for example, we may decide that burning another
+> > NBD_FLAG_* is undesirable, and that we should instead have some sort
+> > of NBD_OPT_ handshake for determining when the server supports
+> > NBD_CMF_FLAG_FAST_ZERO)
+> > - a reference client and server implementation (probably both via qemu,
+> > since it was qemu that raised the problem in the first place)
 
-If you try to make a device implementation that can handle multiple
-connections and allow disconnections (which requires overriding the
-VHOST_USER_NONE handling), then glib will warn that we remove a src
-while it's still on the mainloop, and will poll() an FD that doesn't
-exist anymore.
+Is the plan to wait until NBD_CMF_FLAG_FAST_ZERO gets into the NBD
+protocol doc before doing the rest?  Also I would like to release both
+libnbd 1.0 and nbdkit 1.14 before we introduce any large new features.
+Both should be released this week, in fact maybe even today or
+tomorrow.
 
-Fix this by making vug_source_new() require pairing with the new
-vug_source_destroy() so we can keep the GSource referenced in the
-meantime.
+[...]
+> First, I had to create a scenario where falling back to writes is
+> noticeably slower than performing a zero operation, and where
+> pre-zeroing also shows an effect.  My choice: let's test 'qemu-img
+> convert' on an image that is half-sparse (every other megabyte is a
+> hole) to an in-memory nbd destination.  Then I use a series of nbdkit
+> filters to force the destination to behave in various manners:
+>  log logfile=>(sed ...|uniq -c) (track how many normal/fast zero
+> requests the client makes)
+>  nozero $params (fine-tune how zero requests behave - the parameters
+> zeromode and fastzeromode are the real drivers of my various tests)
+>  blocksize maxdata=256k (allows large zero requests, but forces large
+> writes into smaller chunks, to magnify the effects of write delays and
+> allow testing to provide obvious results with a smaller image)
+>  delay delay-write=20ms delay-zero=5ms (also to magnify the effects on a
+> smaller image, with writes penalized more than zeroing)
+>  stats statsfile=/dev/stderr (to track overall time and a decent summary
+> of how much I/O occurred).
+>  noextents (forces the entire image to report that it is allocated,
+> which eliminates any testing variability based on whether qemu-img uses
+> that to bypass a zeroing operation [1])
 
-Note that this requires calling the new API in vhost-user-input.
-vhost-user-gpu also uses vug_source_new(), but never seems to free
-the result at all, so I haven't changed anything there.
+I can't help thinking that a sh plugin might have been simpler ...
 
-Fixes: 8bb7ddb78a1c ("libvhost-user: add glib source helper")
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- contrib/libvhost-user/libvhost-user-glib.c | 14 +++++++++++---
- contrib/libvhost-user/libvhost-user-glib.h |  1 +
- contrib/vhost-user-input/main.c            |  6 ++----
- 3 files changed, 14 insertions(+), 7 deletions(-)
+> I hope you enjoyed reading this far, and agree with my interpretation of
+> the numbers about why this feature is useful!
 
-diff --git a/contrib/libvhost-user/libvhost-user-glib.c b/contrib/libvhost-user/libvhost-user-glib.c
-index 99edd2f3de45..3e902ccd2efb 100644
---- a/contrib/libvhost-user/libvhost-user-glib.c
-+++ b/contrib/libvhost-user/libvhost-user-glib.c
-@@ -91,7 +91,6 @@ vug_source_new(VugDev *gdev, int fd, GIOCondition cond,
-     g_source_add_poll(gsrc, &src->gfd);
-     id = g_source_attach(gsrc, NULL);
-     g_assert(id);
--    g_source_unref(gsrc);
- 
-     return gsrc;
- }
-@@ -131,6 +130,15 @@ static void vug_watch(VuDev *dev, int condition, void *data)
-     }
- }
- 
-+void vug_source_destroy(GSource *src)
-+{
-+    if (!src)
-+        return;
-+
-+    g_source_unref(src);
-+    g_source_destroy(src);
-+}
-+
- bool
- vug_init(VugDev *dev, uint16_t max_queues, int socket,
-          vu_panic_cb panic, const VuDevIface *iface)
-@@ -144,7 +152,7 @@ vug_init(VugDev *dev, uint16_t max_queues, int socket,
-     }
- 
-     dev->fdmap = g_hash_table_new_full(NULL, NULL, NULL,
--                                       (GDestroyNotify) g_source_destroy);
-+                                       (GDestroyNotify) vug_source_destroy);
- 
-     dev->src = vug_source_new(dev, socket, G_IO_IN, vug_watch, NULL);
- 
-@@ -157,5 +165,5 @@ vug_deinit(VugDev *dev)
-     g_assert(dev);
- 
-     g_hash_table_unref(dev->fdmap);
--    g_source_unref(dev->src);
-+    vug_source_destroy(dev->src);
- }
-diff --git a/contrib/libvhost-user/libvhost-user-glib.h b/contrib/libvhost-user/libvhost-user-glib.h
-index 64d539d93aba..1a79a4916ef2 100644
---- a/contrib/libvhost-user/libvhost-user-glib.h
-+++ b/contrib/libvhost-user/libvhost-user-glib.h
-@@ -31,5 +31,6 @@ void vug_deinit(VugDev *dev);
- 
- GSource *vug_source_new(VugDev *dev, int fd, GIOCondition cond,
-                         vu_watch_cb vu_cb, gpointer data);
-+void vug_source_destroy(GSource *src);
- 
- #endif /* LIBVHOST_USER_GLIB_H */
-diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/main.c
-index 449fd2171a5a..7d6b0f9d80cc 100644
---- a/contrib/vhost-user-input/main.c
-+++ b/contrib/vhost-user-input/main.c
-@@ -187,7 +187,7 @@ vi_queue_set_started(VuDev *dev, int qidx, bool started)
-     }
- 
-     if (!started && vi->evsrc) {
--        g_source_destroy(vi->evsrc);
-+        vug_source_destroy(vi->evsrc);
-         vi->evsrc = NULL;
-     }
- }
-@@ -401,9 +401,7 @@ main(int argc, char *argv[])
- 
-     vug_deinit(&vi.dev);
- 
--    if (vi.evsrc) {
--        g_source_unref(vi.evsrc);
--    }
-+    vugg_source_destroy(vi.evsrc);
-     g_array_free(vi.config, TRUE);
-     g_free(vi.queue);
-     return 0;
+Yes it seems reasonable.
+
+The only thought I had is whether the qemu block layer does or should
+combine requests in flight so that a write-zero (offset) followed by a
+write-data (same offset) would erase the earlier request.  In some
+circumstances that might provide a performance improvement without
+needing any changes to protocols.
+
+> - NBD should have a way to advertise (probably via NBD_INFO_ during
+> NBD_OPT_GO) if the initial image is known to begin life with all zeroes
+> (if that is the case, qemu-img can skip the extents calls and
+> pre-zeroing pass altogether)
+
+Yes, I really think we should do this one as well.
+
+Rich.
+
 -- 
-2.23.0
-
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
 
