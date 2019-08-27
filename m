@@ -2,64 +2,94 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8CCFC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F19C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:02:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F5132070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:54:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F5132070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D08F2070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:02:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l1DnHRFN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D08F2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2dna-0004bS-S2
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 11:54:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56567)
+	id 1i2dvr-00084L-5Y
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:02:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57462)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i2dmp-00046Q-9V
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:53:37 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i2dt0-00061P-80
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:59:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i2dmm-0006hr-MT
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:53:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37010)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1i2dmm-0006hH-Do; Tue, 27 Aug 2019 11:53:32 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A1DDDA53265;
- Tue, 27 Aug 2019 15:53:14 +0000 (UTC)
-Received: from dhcp-17-173.bos.redhat.com (dhcp-17-173.bos.redhat.com
- [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB55E6012D;
- Tue, 27 Aug 2019 15:53:08 +0000 (UTC)
-Date: Tue, 27 Aug 2019 11:53:07 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: sathnaga@linux.vnet.ibm.com
-Message-ID: <20190827155307.GA25965@dhcp-17-173.bos.redhat.com>
-References: <20190819082840.14873-1-sathnaga@linux.vnet.ibm.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i2dsy-0000IQ-K1
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:59:57 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55910)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i2dsy-0000I7-BV
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:59:56 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f72so3655741wmf.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 08:59:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=wro+KVUh19bMF+YIEPirzD72NpB5PGcgzoPg5Po78GA=;
+ b=l1DnHRFNZMvrqATEfhyZRqFbCFSrUQFG0VLGQ0YfIV59w5emo0GubnBbGLzZrqTO5r
+ L4+jRQ43YkyXZfv44ufd5FsmuC6r+1a2TxqCw0o5E1Z08875ikf7ZJn8vFrSwD1XPC1X
+ aV2GIzPHKqu8t67mQH9mTJjw/5gLokLlIaSdCXpUlT4btys4RB/7pdJoPxLPpT58Yqsy
+ lPZTa7CoAi8nc46yT0FcNfjEk9qipQjU/6iWd3DqbyYOEZ9BQ9kJ92mfeUix7WjybX4D
+ /sHXW5VRi0EldsrOFoa6DxXlQKiRAftGXZ64gW2bHjiZtD1/ldgFejMnM9N9Y9V1GL3C
+ sN9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=wro+KVUh19bMF+YIEPirzD72NpB5PGcgzoPg5Po78GA=;
+ b=PQ15qzVRvjEDc/mLQn2wec9WeoiXJxCTfW8KA/XKQySmaFTiSMuC/ME3ubLm75Hf77
+ CA9EEEVOEOU6bdKYMaXSO2kMTo9jplCQ9x/i9Udesfp3lsdyioXbcPCNnlrLULo4sp8A
+ EAkCx+4YnTr980laSSxK+oyaEBjyf7EHS+AUOuPco282F1UxCRT2iNE9rppFoNHOs3Bs
+ Hf9KQ6M8nuqQQJZ/cmnDFRTrjYor5SL/b5av0VEcue3orWZiW8wa1D1jLHIYAMkXydmM
+ gp1A+UAbiCA1PadjWeldasySIS4UgEKIwGVpKyXj/xeEzQ9IROveX4UTruLgqnIaCINv
+ q/eA==
+X-Gm-Message-State: APjAAAXKfDmdKdI9U9az6BjWvsz5so/8DSRUmSpohazA+B2ZtIFFZSdK
+ UmQp1xgKptc6YfqYpR08k0im+1aSpHo=
+X-Google-Smtp-Source: APXvYqzOuFL0ZgWtymSBc6nUqHid73jrQhzdM7GdxXl94lltc1BgayAFGves0J7DPvq8oGn/LCmoOA==
+X-Received: by 2002:a05:600c:228f:: with SMTP id
+ 15mr27862132wmf.160.1566921594633; 
+ Tue, 27 Aug 2019 08:59:54 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c15sm52143272wrb.80.2019.08.27.08.59.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Aug 2019 08:59:54 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 4EE2A1FF87;
+ Tue, 27 Aug 2019 16:59:53 +0100 (BST)
+References: <1564481593-776647-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <573f907d-5016-60c1-c727-c5444a418e1b@virtuozzo.com>
+ <8736i5ntlp.fsf@linaro.org>
+ <af72d680-f169-bdba-3b6e-d2da6b820aea@virtuozzo.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+In-reply-to: <af72d680-f169-bdba-3b6e-d2da6b820aea@virtuozzo.com>
+Date: Tue, 27 Aug 2019 16:59:53 +0100
+Message-ID: <87mufu61l2.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190819082840.14873-1-sathnaga@linux.vnet.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 27 Aug 2019 15:53:30 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH V2 2/2]
- tests.acceptance.boot_linux_console: Add pseries linux boot console test
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH] Fix: fp-test uninitialized member
+ floatX::exp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,237 +101,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, groug@kaod.org, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, clg@kaod.org, david@gibson.dropbear.id.au
+Cc: Denis Lunev <den@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "jhauser@eecs.berkeley.edu" <jhauser@eecs.berkeley.edu>,
+ "cota@braap.org" <cota@braap.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 19, 2019 at 01:58:40PM +0530, sathnaga@linux.vnet.ibm.com wro=
-te:
-> From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
->=20
-> Add pseries linux boot console test
->=20
-> $avocado --show=3Dconsole run -t arch:ppc64le boot_linux_console.py
-> console: SLOF *********************************************************=
-*************
-> console: QEMU Starting
-> console:  Build Date =3D Jul  3 2019 12:26:14
-> console: FW Version =3D git-ba1ab360eebe6338
-> console: Press "s" to enter Open Firmware.
-> console: C0000
-> console: C0100
-> console: C0120
-> console: C0140
-> console: C0200
-> console: C0240
-> console: C0260
-> console: C02E0
-> console: C0300
-> console: C0320
-> console: C0340
-> console: C0360
-> console: C0370
-> console: C0380
-> console: C0371
-> console: C0372
-> console: C0373
-> console: C0374
-> console: C03F0
-> console: C0400
-> console: C0480
-> console: C04C0
-> console: C04D0
-> console: C0500
-> console: Populating /vdevice methods
-> console: Populating /vdevice/vty@71000000
-> console: Populating /vdevice/nvram@71000001
-> console: Populating /vdevice/l-lan@71000002
-> console: Populating /vdevice/v-scsi@71000003
-> console: SCSI: Looking for devices
-> console: 8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-> console: C05A0
-> console: Populating /pci@800000020000000
-> console: C0600
-> console: C06C0
-> console: C0700
-> console: C0800
-> console: C0880
-> console: No NVRAM common partition, re-initializing...
-> console: C0890
-> console: C08A0
-> console: C08A8
-> console: C08B0
-> console: Scanning USB
-> console: C08C0
-> console: C08D0
-> console: Using default console: /vdevice/vty@71000000
-> console: C08E0
-> console: C08E8
-> console: Detected RAM kernel at 400000 (1a57b38 bytes)
-> console: C08FF
-> console: Welcome to Open Firmware
-> console: Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
-> console: This program and the accompanying materials are made available
-> console: under the terms of the BSD License available at
-> console: http://www.opensource.org/licenses/bsd-license.php
-> console: Booting from memory...
-> console: OF stdout device is: /vdevice/vty@71000000
-> console: Preparing to boot Linux version 4.15.0-50-generic (buildd@bos0=
-2-ppc64el-006) (gcc version 7.3.0 (Ubuntu 7.3.0-16ubuntu3)) #54-Ubuntu SM=
-P Mon May 6 18:55:18 UTC 2019 (Ubuntu 4.15.0-50.54-generic 4.15.18)
-> console: Detected machine type: 0000000000000101
-> console: command line: printk.time=3D0 console=3Dhvc0
-> console: Max number of cores passed to firmware: u (NR_CPUS =3D 2048)
-> console: Calling ibm,client-architecture-support... done
-> console: memory layout at init:
-> console: memory_limit : 0000000000000000 (16 MB aligned)
-> console: alloc_bottom : 0000000001e70000
-> console: alloc_top    : 0000000020000000
-> console: alloc_top_hi : 0000000020000000
-> console: rmo_top      : 0000000020000000
-> console: ram_top      : 0000000020000000
-> console: instantiating rtas at 0x000000001daf0000... done
-> console: prom_hold_cpus: skipped
-> console: copying OF device tree...
-> console: Building dt strings...
-> console: Building dt structure...
-> console: Device tree strings 0x0000000001e80000 -> 0x0000000001e80a46
-> console: Device tree struct  0x0000000001e90000 -> 0x0000000001ea0000
-> console: Quiescing Open Firmware ...
-> console: Booting Linux via __start() @ 0x0000000000400000 ...
-> console: [    0.000000] hash-mmu: Page sizes from device-tree:
-> console: [    0.000000] hash-mmu: base_shift=3D12: shift=3D12, sllp=3D0=
-x0000, avpnm=3D0x00000000, tlbiel=3D1, penc=3D0
-> console: [    0.000000] hash-mmu: base_shift=3D16: shift=3D16, sllp=3D0=
-x0110, avpnm=3D0x00000000, tlbiel=3D1, penc=3D1
-> console: [    0.000000] Using 1TB segments
-> console: [    0.000000] hash-mmu: Initializing hash mmu with SLB
-> console: [    0.000000] Linux version 4.15.0-50-generic (buildd@bos02-p=
-pc64el-006) (gcc version 7.3.0 (Ubuntu 7.3.0-16ubuntu3)) #54-Ubuntu SMP M=
-on May 6 18:55:18 UTC 2019 (Ubuntu 4.15.0-50.54-generic 4.15.18)
-> console: [    0.000000] Using pSeries machine description
-> console: [    0.000000] bootconsole [udbg0] enabled
-> console: [    0.000000] Partition configured for 1 cpus.
-> console: [    0.000000] CPU maps initialized for 1 thread per core
-> console: -> smp_release_cpus()
-> console: spinning_secondaries =3D 0
-> console: <- smp_release_cpus()
-> console: [    0.000000] -----------------------------------------------=
-------
-> console: [    0.000000] ppc64_pft_size    =3D 0x16
-> console: [    0.000000] phys_mem_size     =3D 0x20000000
-> console: [    0.000000] dcache_bsize      =3D 0x80
-> console: [    0.000000] icache_bsize      =3D 0x80
-> console: [    0.000000] cpu_features      =3D 0x000000eb8f4d91a7
-> console: [    0.000000]   possible        =3D 0x0000fffbfffff1af
-> console: [    0.000000]   always          =3D 0x00000000000001a0
-> console: [    0.000000] cpu_user_features =3D 0xdc0065c2 0xae000000
-> console: [    0.000000] mmu_features      =3D 0x78006001
-> console: [    0.000000] firmware_features =3D 0x00000001455a445f
-> console: [    0.000000] htab_hash_mask    =3D 0x7fff
-> console: [    0.000000] -----------------------------------------------=
-------
-> console: [    0.000000] numa:   NODE_DATA [mem 0x1ffc3c80-0x1ffcffff]
-> console: [    0.000000] rfi-flush: fallback displacement flush availabl=
-e
-> console: [    0.000000] rfi-flush: ori type flush available
-> console: [    0.000000] rfi-flush: mttrig type flush available
-> console: [    0.000000] count-cache-flush: full software flush sequence=
- enabled.
-> console: [    0.000000] stf-barrier: hwsync barrier available
-> console: [    0.000000] PCI host bridge /pci@800000020000000  ranges:
-> console: [    0.000000]   IO 0x0000200000000000..0x000020000000ffff -> =
-0x0000000000000000
-> console: [    0.000000]  MEM 0x0000200080000000..0x00002000ffffffff -> =
-0x0000000080000000
-> console: [    0.000000]  MEM 0x0000210000000000..0x000021ffffffffff -> =
-0x0000210000000000
-> console: [    0.000000] PPC64 nvram contains 65536 bytes
-> console: [    0.000000] barrier-nospec: using ORI speculation barrier
-> console: [    0.000000] Zone ranges:
-> console: [    0.000000]   DMA      [mem 0x0000000000000000-0x000000001f=
-ffffff]
-> console: [    0.000000]   DMA32    empty
-> console: [    0.000000]   Normal   empty
-> console: [    0.000000]   Device   empty
-> console: [    0.000000] Movable zone start for each node
-> console: [    0.000000] Early memory node ranges
-> console: [    0.000000]   node   0: [mem 0x0000000000000000-0x000000001=
-fffffff]
-> console: [    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x=
-000000001fffffff]
-> console: [    0.000000] percpu: Embedded 4 pages/cpu @        (ptrval) =
-s171032 r0 d91112 u1048576
-> console: [    0.000000] Built 1 zonelists, mobility grouping on.  Total=
- pages: 8184
-> console: [    0.000000] Policy zone: DMA
-> console: [    0.000000] Kernel command line: printk.time=3D0 console=3D=
-hvc0
->=20
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-> Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> ---
->  tests/acceptance/boot_linux_console.py | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index 32159503e9..b808245273 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -90,6 +90,26 @@ class BootLinuxConsole(Test):
->          console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
->          self.wait_for_console_pattern(console_pattern)
-> =20
-> +    def test_ppc64le_pseries(self):
-> +        """
-> +        :avocado: tags=3Darch:ppc64le
-> +        :avocado: tags=3Dmachine:pseries
-> +        """
-> +        kernel_url =3D ('http://ports.ubuntu.com/ubuntu-ports/'
-> +                      'dists/bionic-updates/main/installer-ppc64el/'
-> +                      'current/images/netboot/ubuntu-installer/ppc64el=
-/vmlinux')
-> +        kernel_hash =3D '2b8f6dae700aaee44a1371e878570bc9d4b77fa3'
-> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> +
-> +        self.vm.set_machine('pseries')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'con=
-sole=3Dhvc0'
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', kernel_command_line, '-enable-kvm'=
-)
-> +        self.vm.launch()
-> +        console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
-> +        self.wait_for_console_pattern(console_pattern)
-> +
->      def test_mips_malta(self):
->          """
->          :avocado: tags=3Darch:mips
-> --=20
-> 2.21.0
->=20
->=20
 
-This seems almost identical to:
+Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
 
-   https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg01583.html
+> On 13/08/2019 15:21, Alex Benn=C3=A9e wrote:
+>>
+>> Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
+>>
+>>> PINGING...
+>>
+>> Sorry about the delay. I did attempt see if the existing code threw up
+>> any errors when built with clang's undefined sanitizer. I think this is
+>> because xPtr->exp will only get read if none of the xPtr->isFOO returns
+>> false. In all those cases xPtr->exp is set.
+>>
+>> What pointed you towards this missing initialisations?
+>>
+>
+> I am sorry about missing the message. It appeared in other email thread
+> where I didn't expect. So, I missed the response.
+> When I ran the fp-tests under the Valgrind, I got lots of reports about
+> using uninitialized memory. They all disappeared after applying this
+> patch. I concluded that there are paths that use xPtr->exp uninitialized.
+>
+> $ /usr/bin/valgrind --leak-check=3Dno --trace-children=3Dyes
+> --keep-stacktraces=3Dalloc-and-free --track-origins=3Dyes
+> --log-file=3Dmyqemu-%p.log make check-softfloat
 
-The differences being:
+It would be useful to know what tests are being run (V=3D1 will show you).
+I can't replicate the failure with:
 
-  1) the use of "arch:ppc64" instead of "arch:ppc64le"
-  2) the use of a fedora based kernel, which matches most other similar
-     tests.
+  valgrind --leak-check=3Dno --trace-children=3Dyes --keep-stacktraces=3Dal=
+loc-and-free --track-origins=3Dyes ./fp-test -s -l 2 -r all  f16_to_f32 f16=
+_to_f64 f16_to_f128 f32_to_f16 f32_to_f64
 
-If you agree, I can fold you change regarding #1 into that patch,
-while keeping #2.  Let me what you think.
+>
+> =3D=3D720268=3D=3D Conditional jump or move depends on uninitialised valu=
+e(s)
+> =3D=3D720268=3D=3D    at 0x112C72: floatXRoundToInt (slowfloat.c:1371)
+> =3D=3D720268=3D=3D    by 0x115920: slow_f16_roundToInt (slowfloat.c:2408)
+> =3D=3D720268=3D=3D    by 0x133A87: test_az_f16_rx (test_az_f16_rx.c:73)
+> =3D=3D720268=3D=3D    by 0x10E635: do_testfloat (fp-test.c:304)
+> =3D=3D720268=3D=3D    by 0x10FD02: run_test (fp-test.c:1003)
+> =3D=3D720268=3D=3D    by 0x10FDA4: main (fp-test.c:1017)
+> =3D=3D720268=3D=3D  Uninitialised value was created by a stack allocation
+> =3D=3D720268=3D=3D    at 0x1158D3: slow_f16_roundToInt (slowfloat.c:2404)
+>
+> =3D=3D720311=3D=3D Conditional jump or move depends on uninitialised valu=
+e(s)
+> =3D=3D720311=3D=3D    at 0x112E54: floatXAdd (slowfloat.c:1411)
+> =3D=3D720311=3D=3D    by 0x115A2D: slow_f16_sub (slowfloat.c:2431)
+> =3D=3D720311=3D=3D    by 0x133CEC: test_abz_f16 (test_abz_f16.c:70)
+> =3D=3D720311=3D=3D    by 0x10E6D5: do_testfloat (fp-test.c:326)
+> =3D=3D720311=3D=3D    by 0x10FD02: run_test (fp-test.c:1003)
+> =3D=3D720311=3D=3D    by 0x10FDA4: main (fp-test.c:1017)
+> =3D=3D720311=3D=3D  Uninitialised value was created by a stack allocation
+> =3D=3D720311=3D=3D    at 0x1159C0: slow_f16_sub (slowfloat.c:2425)
+>
+> =3D=3D720273=3D=3D Conditional jump or move depends on uninitialised valu=
+e(s)
+> =3D=3D720273=3D=3D    at 0x113D54: floatXEq (slowfloat.c:1661)
+> =3D=3D720273=3D=3D    by 0x115EAD: slow_f16_eq_signaling (slowfloat.c:253=
+8)
+> =3D=3D720273=3D=3D    by 0x1341D3: test_ab_f16_z_bool (test_ab_f16_z_bool=
+.c:71)
+> =3D=3D720273=3D=3D    by 0x10E7DE: do_testfloat (fp-test.c:358)
+> =3D=3D720273=3D=3D    by 0x10FD02: run_test (fp-test.c:1003)
+> =3D=3D720273=3D=3D    by 0x10FDA4: main (fp-test.c:1017)
+> =3D=3D720273=3D=3D  Uninitialised value was created by a stack allocation
+> =3D=3D720273=3D=3D    at 0x115E38: slow_f16_eq_signaling (slowfloat.c:253=
+0)
+>
+> Even if Valgrind is wrong, the purpose of the patch is to reduce the
+> number of error reports from the Valgrind to locate other memory serious
+> issues, if any.
+>
+> Andrey
+>
+>>>
+>>> On 30/07/2019 13:13, Andrey Shinkevich wrote:
+>>>> Not all the paths in the functions, such as f16ToFloatX(), initialize
+>>>> the member 'exp' of the structure floatX.
+>>>>
+>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>>> ---
+>>>>    source/slowfloat.c | 4 ++++
+>>>>    1 file changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/tests/fp/berkeley-testfloat-3/source/slowfloat.c b/tests/=
+fp/berkeley-testfloat-3/source/slowfloat.c
+>>>> index 4e84656..6e0f0a6 100644
+>>>> --- a/tests/fp/berkeley-testfloat-3/source/slowfloat.c
+>>>> +++ b/tests/fp/berkeley-testfloat-3/source/slowfloat.c
+>>>> @@ -623,6 +623,7 @@ static void f16ToFloatX( float16_t a, struct float=
+X *xPtr )
+>>>>        xPtr->isInf =3D false;
+>>>>        xPtr->isZero =3D false;
+>>>>        xPtr->sign =3D ((uiA & 0x8000) !=3D 0);
+>>>> +    xPtr->exp =3D 0;
+>>>>        exp =3D uiA>>10 & 0x1F;
+>>>>        sig64 =3D uiA & 0x03FF;
+>>>>        sig64 <<=3D 45;
+>>>> @@ -759,6 +760,7 @@ static void f32ToFloatX( float32_t a, struct float=
+X *xPtr )
+>>>>        xPtr->isInf =3D false;
+>>>>        xPtr->isZero =3D false;
+>>>>        xPtr->sign =3D ((uiA & 0x80000000) !=3D 0);
+>>>> +    xPtr->exp =3D 0;
+>>>>        exp =3D uiA>>23 & 0xFF;
+>>>>        sig64 =3D uiA & 0x007FFFFF;
+>>>>        sig64 <<=3D 32;
+>>>> @@ -895,6 +897,7 @@ static void f64ToFloatX( float64_t a, struct float=
+X *xPtr )
+>>>>        xPtr->isInf =3D false;
+>>>>        xPtr->isZero =3D false;
+>>>>        xPtr->sign =3D ((uiA & UINT64_C( 0x8000000000000000 )) !=3D 0);
+>>>> +    xPtr->exp =3D 0;
+>>>>        exp =3D uiA>>52 & 0x7FF;
+>>>>        sig64 =3D uiA & UINT64_C( 0x000FFFFFFFFFFFFF );
+>>>>        if ( exp =3D=3D 0x7FF ) {
+>>>> @@ -1220,6 +1223,7 @@ static void f128MToFloatX( const float128_t *aPt=
+r, struct floatX *xPtr )
+>>>>        xPtr->isZero =3D false;
+>>>>        uiA64 =3D uiAPtr->v64;
+>>>>        xPtr->sign =3D ((uiA64 & UINT64_C( 0x8000000000000000 )) !=3D 0=
+);
+>>>> +    xPtr->exp =3D 0;
+>>>>        exp =3D uiA64>>48 & 0x7FFF;
+>>>>        sig.v64 =3D uiA64 & UINT64_C( 0x0000FFFFFFFFFFFF );
+>>>>        sig.v0  =3D uiAPtr->v0;
+>>>>
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
 
-Thanks,
-- Cleber.
+
+--
+Alex Benn=C3=A9e
 
