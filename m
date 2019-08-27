@@ -8,84 +8,84 @@ X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21AB3C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5BAC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:44:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E44312077B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:44:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8D872070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lbVan9pX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E44312077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uqZlUnvu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D872070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2TKt-0008RW-N6
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 00:44:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34950)
+	id 1i2TLe-00010d-ES
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 00:44:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35154)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shorne@gmail.com>) id 1i2THt-0006C1-O3
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:40:58 -0400
+ (envelope-from <shorne@gmail.com>) id 1i2TJq-0007sM-6l
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shorne@gmail.com>) id 1i2THs-0004BV-U9
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:40:57 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39773)
+ (envelope-from <shorne@gmail.com>) id 1i2TJp-0004xr-8c
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:42:58 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37328)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <shorne@gmail.com>) id 1i2THs-0004B2-Oj
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:40:56 -0400
-Received: by mail-pl1-x644.google.com with SMTP id z3so11158094pln.6
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 21:40:56 -0700 (PDT)
+ (Exim 4.71) (envelope-from <shorne@gmail.com>) id 1i2TJp-0004xd-3E
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:42:57 -0400
+Received: by mail-pl1-x642.google.com with SMTP id bj8so11130975plb.4
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 21:42:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=2OleW7eQd+x/8bAnH0mS0XUOvvfisfmBO5OlBKh23wo=;
- b=lbVan9pXFp6J6zGaIQp2JZgSwWxt0ngTADJnR5xrq7pFmvz3tYQ6aeXYIqQpi1jDN2
- /CrZNHU34vT8VGgFV2coNpnAHc2LxUg2WCrbOP2zsTraMv7KQOYk69CpYRv7n8VedKfi
- L3uVAzSsxEchnE3XG8HJYN0EG9f2qBHEVtTv+2zcBqO/ovLmMt7ypyA7zTNE+eivJm0i
- AzmfLp8E5IhkrHUGPsG2vYU4nI8andbJEszGwBlaIWzvlTUDULp1SJzHQM62LoXLHHcQ
- wl5LJhbTZDAQSJwAoLvN2aJduJgoYPU8qaFxGhoGZ45cMByYr6uPLXHDV89UKcuW8Gdz
- ggZw==
+ bh=omk7DMGTX8FTDM3axsDfykAg+gac++3WQv7gXxihH7o=;
+ b=uqZlUnvu1/P43kmPXiMlwUIZDk4NZZMycPcsAB4tO73ZTsnQZfTirqoCk3gTz7Y+Rl
+ 4y7nfhtegx5k4a5BYqSBWlk+NpI5y3ViLFCjm6lrqsOPl24co6Mn0skOC/weYTRw4TjK
+ m9IGAlPYIqmmmjdqEvNL0UET/CzYGpJEFfqW9QdF7pWxHVsZ6XjuTqoTY8zCbljlaVSk
+ ugFLdWnNL0n87dRER2XlsU0eu1ejNf/PIFfk5ct9yXjtfPcANVjD6WIE0ca59RfBCy7a
+ Xe5tV49Mcoe+i92R+id+llkeFo2IUDBeixuAf78jM9FMvcJh57S+7XVWY9jGW4HGablF
+ Biuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=2OleW7eQd+x/8bAnH0mS0XUOvvfisfmBO5OlBKh23wo=;
- b=RwruAcchJze4JqNf9FySWOMmSTMTENvQfbevYjuNvgv5BRmpCiXZUrDp6VAC5p/Mbu
- oUrAA5c8d1EbzHKZri8zcpCuEU1598engbl4XaBZIW0xlRqJh8xVgi8RN30VqXDdKkMY
- H8ZFsLGORT1z0v2WxQJuUmwLDGqunQL38ad2veKo2xyfRu3NUzpKIv3rpDmR04vMP6bn
- Fcky5FkXs2obLcYP+N8G2PbWIppQedCFM+HSRmoPFLrj1TKcDsl7vlRXAjv5jUH6JphG
- EviysFp8HrRR1ZE7rhNVOuGq02LdtllF86FYVO0CkqPpZPf73McNNhfwv5+Kg6fZgogZ
- 1T9A==
-X-Gm-Message-State: APjAAAWTeSmQGrgX/OAToXrTVH60WjQ2SmS5nSIF+7RNc3V5LbBjRCc+
- BtrdACuHH7m8tbzteHBTLYU=
-X-Google-Smtp-Source: APXvYqyw1YdC+s6dpYpd11AGDevVNFeg2J9+yZqKPAY2rGH3VjRvuvHVJ1A30jyvzxpkq4x2Uzo2Pw==
-X-Received: by 2002:a17:902:43:: with SMTP id
- 61mr22909991pla.145.1566880855571; 
- Mon, 26 Aug 2019 21:40:55 -0700 (PDT)
+ bh=omk7DMGTX8FTDM3axsDfykAg+gac++3WQv7gXxihH7o=;
+ b=piK/1BckkgLQSwT8/zNxezkxvQ5ieUINpJAvPN+E26ZZrpmie85bjlMKTM39/RBCtx
+ 7EQrS49yxVjH0g+itHENiZ/oxXfs0uNYNQexgUVw0XEZezoNrh0PGSUnnAkZ+v1b6+wx
+ sGqXufKZ2hoG4mUtu9APmPHwN8OLxYm4dhGu3on93nIzT8RjIHk5dLrsUBlXjTdF/vlo
+ ZgGhrX61Rd5bV4IioAyucsRecAVuconJAdTIabmEySXH/Gk7mOeJAoC1XCfKgcJ3ldZT
+ FqWjewR9/x02tojzWb+fgqbUrJSYf+eKqIPtWEIEj+OM40XynBSRdelZiCXSj1k6VAy1
+ OvYg==
+X-Gm-Message-State: APjAAAV9WxMbhtVP1K0+SfMBiO+xVjzrpTgAvcxULCGKJUZMBO5ctTV0
+ n7apfTHlNB2Ea9g+VQKNLbyHAvvo
+X-Google-Smtp-Source: APXvYqzm7XqZJn/WGsOsXdiokMK4zhdBFdbuk/yFw8geAZikcp8eN61LZom6V2mittqU5eEwAupELg==
+X-Received: by 2002:a17:902:d888:: with SMTP id
+ b8mr8877083plz.115.1566880976160; 
+ Mon, 26 Aug 2019 21:42:56 -0700 (PDT)
 Received: from localhost (g75.222-224-160.ppp.wakwak.ne.jp. [222.224.160.75])
  by smtp.gmail.com with ESMTPSA id
- n70sm1051457pjc.3.2019.08.26.21.40.54
+ 185sm17498101pff.54.2019.08.26.21.42.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Aug 2019 21:40:55 -0700 (PDT)
-Date: Tue, 27 Aug 2019 13:40:53 +0900
+ Mon, 26 Aug 2019 21:42:55 -0700 (PDT)
+Date: Tue, 27 Aug 2019 13:42:53 +0900
 From: Stafford Horne <shorne@gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190827044053.GN24874@lianli.shorne-pla.net>
+Message-ID: <20190827044253.GP24874@lianli.shorne-pla.net>
 References: <20190827000745.19645-1-richard.henderson@linaro.org>
- <20190827000745.19645-10-richard.henderson@linaro.org>
+ <20190827000745.19645-12-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190827000745.19645-10-richard.henderson@linaro.org>
+In-Reply-To: <20190827000745.19645-12-richard.henderson@linaro.org>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH 09/13] target/openrisc: Add support for
- ORFPX64A32
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH 11/13] target/openrisc: Implement move
+ to/from FPCSR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,11 +102,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 26, 2019 at 05:07:41PM -0700, Richard Henderson wrote:
-> This is hardware support for double-precision floating-point
-> using pairs of 32-bit registers.  Fix a latent bug in the
-> heretofore unused helper_itofd.  Include the bit for cpu "any".
-> 
+On Mon, Aug 26, 2019 at 05:07:43PM -0700, Richard Henderson wrote:
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Stafford Horne <shorne@gmail.com>
