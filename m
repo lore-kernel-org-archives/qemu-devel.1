@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134C0C3A5A3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA30C41514
 	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:41:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD9E0206BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:41:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD9E0206BF
+	by mail.kernel.org (Postfix) with ESMTPS id 12FFF20828
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:41:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12FFF20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2gPh-0002Kd-VX
+	id 1i2gPi-0002Km-5c
 	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:41:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53413)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2g87-00031f-Tu
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:44 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2g8G-0003E3-SS
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2g86-0005Yj-Rl
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50974)
+ (envelope-from <mreitz@redhat.com>) id 1i2g8F-0005gy-4l
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55904)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2g84-0005Vs-KW; Tue, 27 Aug 2019 14:23:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i2g8B-0005cQ-LG; Tue, 27 Aug 2019 14:23:47 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ECD153D95A;
- Tue, 27 Aug 2019 18:23:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DD92A18C4266;
+ Tue, 27 Aug 2019 18:23:46 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8563E600D1;
- Tue, 27 Aug 2019 18:23:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 762FA5D6B0;
+ Tue, 27 Aug 2019 18:23:46 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 27 Aug 2019 20:23:08 +0200
-Message-Id: <20190827182313.25983-11-mreitz@redhat.com>
+Date: Tue, 27 Aug 2019 20:23:11 +0200
+Message-Id: <20190827182313.25983-14-mreitz@redhat.com>
 In-Reply-To: <20190827182313.25983-1-mreitz@redhat.com>
 References: <20190827182313.25983-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 27 Aug 2019 18:23:40 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 27 Aug 2019 18:23:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 10/15] iotests: Disable 110 for
- vmdk.twoGbMaxExtentSparse
+Subject: [Qemu-devel] [PULL 13/15] iotests: Check for enabled drivers before
+ testing them
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,38 +73,162 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The error message for the test case where we have a quorum node for
-which no directory name can be generated is different: For
-twoGbMaxExtentSparse, it complains that it cannot open the extent file.
-For other (sub)formats, it just notes that it cannot determine the
-backing file path.  Both are fine, but just disable twoGbMaxExtentSparse
-for simplicity's sake.
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190815153638.4600-7-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
+It is possible to enable only a subset of the block drivers with the
+"--block-drv-rw-whitelist" option of the "configure" script. All other
+drivers are marked as unusable (or only included as read-only with the
+"--block-drv-ro-whitelist" option). If an iotest is now using such a
+disabled block driver, it is failing - which is bad, since at least the
+tests in the "auto" group should be able to deal with this situation.
+Thus let's introduce a "_require_drivers" function that can be used by
+the shell tests to check for the availability of certain drivers first,
+and marks the test as "not run" if one of the drivers is missing.
+
+This patch mainly targets the test in the "auto" group which should
+never fail in such a case, but also improves some of the other tests
+along the way. Note that we also assume that the "qcow2" and "file"
+drivers are always available - otherwise it does not make sense to
+run "make check-block" at all (which only tests with qcow2 by default).
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20190823133552.11680-1-thuth@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/110 | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/071       |  1 +
+ tests/qemu-iotests/081       |  4 +---
+ tests/qemu-iotests/099       |  1 +
+ tests/qemu-iotests/120       |  1 +
+ tests/qemu-iotests/162       |  4 +---
+ tests/qemu-iotests/184       |  1 +
+ tests/qemu-iotests/186       |  1 +
+ tests/qemu-iotests/common.rc | 14 ++++++++++++++
+ 8 files changed, 21 insertions(+), 6 deletions(-)
 
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index 2cdc7c8a72..2ef516baf1 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -40,7 +40,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- # Any format supporting backing files
- _supported_fmt qed qcow qcow2 vmdk
+diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
+index 1cca9233d0..fab526666b 100755
+--- a/tests/qemu-iotests/071
++++ b/tests/qemu-iotests/071
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt qcow2
  _supported_proto file
--_unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
-xtentFlat"
-+_unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
++_require_drivers blkdebug blkverify
+=20
+ do_run_qemu()
+ {
+diff --git a/tests/qemu-iotests/081 b/tests/qemu-iotests/081
+index c418bab093..85acdf76d4 100755
+--- a/tests/qemu-iotests/081
++++ b/tests/qemu-iotests/081
+@@ -41,6 +41,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
++_require_drivers quorum
+=20
+ do_run_qemu()
+ {
+@@ -55,9 +56,6 @@ run_qemu()
+                           | _filter_qemu_io | _filter_generated_node_ids
+ }
+=20
+-test_quorum=3D$($QEMU_IMG --help|grep quorum)
+-[ "$test_quorum" =3D "" ] && _supported_fmt quorum
+-
+ quorum=3D"driver=3Draw,file.driver=3Dquorum,file.vote-threshold=3D2"
+ quorum=3D"$quorum,file.children.0.file.filename=3D$TEST_DIR/1.raw"
+ quorum=3D"$quorum,file.children.1.file.filename=3D$TEST_DIR/2.raw"
+diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
+index ae02f27afe..c3cf66798a 100755
+--- a/tests/qemu-iotests/099
++++ b/tests/qemu-iotests/099
+@@ -42,6 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow qcow2 qed vdi vhdx vmdk vpc
+ _supported_proto file
+ _supported_os Linux
++_require_drivers blkdebug blkverify
+ _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
 xtentFlat" \
-+                     "subformat=3DtwoGbMaxExtentSparse"
+     "subformat=3DtwoGbMaxExtentSparse"
 =20
- TEST_IMG_REL=3D$(basename "$TEST_IMG")
+diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
+index e9b4fbb009..2931a7550f 100755
+--- a/tests/qemu-iotests/120
++++ b/tests/qemu-iotests/120
+@@ -40,6 +40,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt generic
+ _supported_proto file
+ _unsupported_fmt luks
++_require_drivers raw
 =20
+ _make_test_img 64M
+=20
+diff --git a/tests/qemu-iotests/162 b/tests/qemu-iotests/162
+index 4e5ed74fd5..2d719afbed 100755
+--- a/tests/qemu-iotests/162
++++ b/tests/qemu-iotests/162
+@@ -39,9 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.filter
+=20
+ _supported_fmt generic
+-
+-test_ssh=3D$($QEMU_IMG --help | grep '^Supported formats:.* ssh\( \|$\)'=
+)
+-[ "$test_ssh" =3D "" ] && _notrun "ssh support required"
++_require_drivers ssh
+=20
+ echo
+ echo '=3D=3D=3D NBD =3D=3D=3D'
+diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
+index cb0c181228..33dd8d2a4f 100755
+--- a/tests/qemu-iotests/184
++++ b/tests/qemu-iotests/184
+@@ -33,6 +33,7 @@ trap "exit \$status" 0 1 2 3 15
+ . ./common.filter
+=20
+ _supported_os Linux
++_require_drivers throttle
+=20
+ do_run_qemu()
+ {
+diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
+index 5f6b18c150..3ea0442d44 100755
+--- a/tests/qemu-iotests/186
++++ b/tests/qemu-iotests/186
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt qcow2
+ _supported_proto file
++_require_drivers null-co
+=20
+ if [ "$QEMU_DEFAULT_MACHINE" !=3D "pc" ]; then
+     _notrun "Requires a PC machine"
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 5502c3da2f..ee20be8920 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -520,5 +520,19 @@ _require_command()
+     [ -x "$c" ] || _notrun "$1 utility required, skipped this test"
+ }
+=20
++# Check that a set of drivers has been whitelisted in the QEMU binary
++#
++_require_drivers()
++{
++    available=3D$($QEMU -drive format=3Dhelp | \
++                sed -e '/Supported formats:/!d' -e 's/Supported formats:=
+//')
++    for driver
++    do
++        if ! echo "$available" | grep -q " $driver\( \|$\)"; then
++            _notrun "$driver not available"
++        fi
++    done
++}
++
+ # make sure this script returns success
+ true
 --=20
 2.21.0
 
