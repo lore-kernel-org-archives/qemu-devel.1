@@ -2,68 +2,79 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 913F6C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C529C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 635022070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:58:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 635022070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB2022173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:03:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DBTVI4tv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB2022173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2XIo-0001NP-L4
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 04:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41615)
+	id 1i2XNZ-0002rM-0h
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 05:03:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i2XH0-0007S8-UR
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:56:20 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i2XLQ-00028t-U5
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:00:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i2XGz-0000MS-Fi
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:56:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41753)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1i2XGv-0000Kt-K1; Tue, 27 Aug 2019 04:56:13 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D3286811A9;
- Tue, 27 Aug 2019 08:56:12 +0000 (UTC)
-Received: from redhat.com (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B1CE194B2;
- Tue, 27 Aug 2019 08:56:07 +0000 (UTC)
-Date: Tue, 27 Aug 2019 09:56:04 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190827085604.GD16500@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <20190814202219.1870-7-mlevitsk@redhat.com>
- <20190822110448.GK3267@redhat.com>
- <ba3ddc4c3c6dd18b7a7c913e55e52ddc8c9efeb0.camel@redhat.com>
- <cd92c8fe167d241255b3f61aca39b693364bf225.camel@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i2XLP-0001r1-LR
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:00:52 -0400
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:38002)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i2XLP-0001qa-EL
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:00:51 -0400
+Received: by mail-oi1-x22d.google.com with SMTP id q8so14077952oij.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 02:00:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zFOM/UOkYmKF9itF+B1AVpc75PISfF5VoW/Mxv57QAY=;
+ b=DBTVI4tvfbDka1453dI2m/YD2WrBYE4Md+wo0AbJ2sTRUgK8zdIi6qZdN1mxKYBo2o
+ UynSqx81DCTCCh/RycKqh9AdW2ipOAOWi8XuMegPP+CCDgROh9wj51dNtOqalJWl+fib
+ Z4krZYAO8IWz5ISHJ4D5xcbA/9/vdYK61nq4HyWgdwhgLisbsOMhC1+M1DHxcZFFjmqf
+ f+Fpxo95zcHu1/Rnxh8Drzo0WVQVo0SIjPHsLVj6KDy3w6GpNC2GfhrvO8dbNGQfT4WZ
+ pualE5Zf4z3E2s8PtoXQYw4Ry1TKy6uJWpUAHoyyRMuLwj/AK/z5pYmXel2BeE4PItjp
+ s2Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zFOM/UOkYmKF9itF+B1AVpc75PISfF5VoW/Mxv57QAY=;
+ b=BWkRmpErXIiCMcuQMG+oTDa24mFm2o2OizPmzA1yIzxKvooyBUgfCnoZy2ysxMC6To
+ LTWPi/XlOEIzjsIFsp2yN73uDZ99v32beArXtBaJOs9JjhFBNEXFDtJEeTaDlcbC4HW1
+ pOVbcOTo8RcRS+l0apDPTYLIyezTq5cfyl8YP3SuMwFzRCApcPpL4vPTEc9L32zxlwxg
+ gg/hAcPuyIlI9bTM/pvaCVAVMzzmx60rqMejYQoBlNnvnyWdvM4zRj8HxwGqaNhWh7HB
+ cldmTJQZDJ97oycTJ4YCSF8102BRjB+/A5a1LSNvYB9TMF68Sd2wLex6ZIVWqypGgQoT
+ +6ig==
+X-Gm-Message-State: APjAAAU3ZM1+cDdmsIu8IYqO4gFvFenYmHP8ZHuIr8ae7OkTTveHbOgZ
+ bu8BF74iqXxMo2738K7GOZ9pQmduVj15y+lPUeNBfg==
+X-Google-Smtp-Source: APXvYqykR4sSnt7m/oSJmQ/NaYSSt1lBUj3zVhJi6oH69UHiDOEGFfTh4rm64ZGNOcIEO7OvkF69qPh/y6S6ffJqwIs=
+X-Received: by 2002:aca:4a57:: with SMTP id x84mr15582831oia.170.1566896450471; 
+ Tue, 27 Aug 2019 02:00:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cd92c8fe167d241255b3f61aca39b693364bf225.camel@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 27 Aug 2019 08:56:12 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 06/13] qcrypto-luks: implement more
- rigorous header checking
+References: <20190822155302.20916-1-stefanha@redhat.com>
+In-Reply-To: <20190822155302.20916-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Aug 2019 10:00:39 +0100
+Message-ID: <CAFEAcA_S8TEPXQmgu8DWzD5E1_0Uqof=DFUGQXGKjxmyGQe=GA@mail.gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22d
+Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,105 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Aug 25, 2019 at 07:08:00PM +0300, Maxim Levitsky wrote:
-> On Sun, 2019-08-25 at 18:40 +0300, Maxim Levitsky wrote:
-> > On Thu, 2019-08-22 at 12:04 +0100, Daniel P. Berrang=C3=A9 wrote:
-> > > On Wed, Aug 14, 2019 at 11:22:12PM +0300, Maxim Levitsky wrote:
-> > > > Check that keyslots don't overlap with the data,
-> > > > and check that keyslots don't overlap with each other.
-> > > > (this is done using naive O(n^2) nested loops,
-> > > > but since there are just 8 keyslots, this doens't really matter.
-> > > >=20
-> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > ---
-> > > >  crypto/block-luks.c | 42 +++++++++++++++++++++++++++++++++++++++=
-+++
-> > > >  1 file changed, 42 insertions(+)
-> > > >=20
-> > > > diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> > > > index 336e633df4..1997e92fe1 100644
-> > > > --- a/crypto/block-luks.c
-> > > > +++ b/crypto/block-luks.c
-> > > > @@ -551,6 +551,8 @@ static int
-> > > >  qcrypto_block_luks_check_header(QCryptoBlockLUKS *luks, Error **=
-errp)
-> > > >  {
-> > > >      int ret;
-> > > > +    int i, j;
-> > > > +
-> > > > =20
-> > > >      if (memcmp(luks->header.magic, qcrypto_block_luks_magic,
-> > > >                 QCRYPTO_BLOCK_LUKS_MAGIC_LEN) !=3D 0) {
-> > > > @@ -566,6 +568,46 @@ qcrypto_block_luks_check_header(QCryptoBlock=
-LUKS *luks, Error **errp)
-> > > >          goto fail;
-> > > >      }
-> > > > =20
-> > > > +    /* Check all keyslots for corruption  */
-> > > > +    for (i =3D 0 ; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; i++) {
-> > > > +
-> > > > +        QCryptoBlockLUKSKeySlot *slot1 =3D &luks->header.key_slo=
-ts[i];
-> > > > +        uint start1 =3D slot1->key_offset;
-> > > > +        uint len1 =3D splitkeylen_sectors(luks, slot1->stripes);
-> > >=20
-> > > Using 'uint' is not normal QEMU style.
-> > >=20
-> > > Either use 'unsigned int'  or if a specific size is needed
-> > > then one of the 'guintNN' types from glib.
-> > >=20
-> > > This applies elsewhere in this patch series too, but
-> > > I'll only comment here & let you find the other cases.
-> >=20
-> > Fixed. Sorry for the noise.
-> >=20
-> > >=20
-> > > > +
-> > > > +        if (slot1->stripes =3D=3D 0 ||
-> > > > +                (slot1->active !=3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_=
-DISABLED &&
-> > > > +                slot1->active !=3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_E=
-NABLED)) {
-> > > > +
-> > >=20
-> > > Redundant blank line
-> >=20
-> > Fixed
-> > >=20
-> > > > +            error_setg(errp, "Keyslot %i is corrupted", i);
-> > >=20
-> > > I'd do a separate check for stripes and active fields, and then giv=
-e a
-> > > specific error message for each. That way if this does ever trigger
-> > > in practice will immediately understand which check failed.
-> > >=20
-> > > Also using '%d' rather than '%i' is more common convention
-> >=20
-> > Done.
->=20
-> Note that I switched i,j to be size_t since you said that you prefer th=
-is,
-> and to print this I apparently need %lu.
-
-For size_t, you need %zu to be 32/64-bit agnostic  (ssize_t is %zd)
+On Thu, 22 Aug 2019 at 16:53, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> The following changes since commit 33f18cf7dca7741d3647d514040904ce83edd73d:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20190821-pull-request' into staging (2019-08-21 15:18:50 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 5d4c1ed3d46d7e2010b389fe5f3376f605182ab0:
+>
+>   vhost-user-scsi: prevent using uninitialized vqs (2019-08-22 16:52:23 +0100)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
