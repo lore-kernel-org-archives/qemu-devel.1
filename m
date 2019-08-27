@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9F4C3A59F
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 00:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7613C3A59F
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 00:23:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 957E620850
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 00:22:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80EDA2080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 00:23:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pC3OgrB7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 957E620850
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h9vig0vb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80EDA2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2PFR-0001GC-PB
-	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 20:22:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33695)
+	id 1i2PGb-0002Xf-NN
+	for qemu-devel@archiver.kernel.org; Mon, 26 Aug 2019 20:23:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i2P1n-000893-4a
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 20:08:04 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i2P1p-0008Ba-Vg
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 20:08:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i2P1l-00077w-Kz
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 20:08:02 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37186)
+ (envelope-from <richard.henderson@linaro.org>) id 1i2P1n-00079N-U2
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 20:08:04 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45440)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i2P1l-00077Y-FA
- for qemu-devel@nongnu.org; Mon, 26 Aug 2019 20:08:01 -0400
-Received: by mail-pf1-x444.google.com with SMTP id y9so12493597pfl.4
- for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 17:08:01 -0700 (PDT)
+ id 1i2P1n-00078s-OK
+ for qemu-devel@nongnu.org; Mon, 26 Aug 2019 20:08:03 -0400
+Received: by mail-pf1-x443.google.com with SMTP id w26so12838537pfq.12
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 17:08:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=VMVNHtG8xLt0ZpdZqzxYszuIzxm6Ie0YlfmnzhGbWKg=;
- b=pC3OgrB7e7eAqtTParyN0fdZq7RKDzBGYLiinj1l6X1YtJRL99rKpHt1owW7/k10hD
- b7ol2oKPdaaLf5Yc3lErsUiZua/K3VnR7uWZ5SuYAmr898z+NRq+05k8tBKRVzDpzEbx
- 5svkvkUe8yRMiXBkTm15nDl2tROT+KD5HGBDO8E2050+uuzlY3k6Ry8RPnmpYTUIOAqu
- Eh4umaOzFgM3e1xjYSKtnptioSwLuR0EqnuVdvrUHipsYEwXr0bUsNmOfHp4smWTW4u6
- Q0sV7ZlIoERWANVmb3GVUbFobG9QOLDswzGoIu4QXnonGgIhYQVZOHC7wajRpDStfZfE
- e0Mw==
+ bh=/XFbLeboaSoNQ/ccFxUcDwe/zAUd/IKOGwT/LITW6bI=;
+ b=h9vig0vbvh29Xz8hO6gKVTJBDADbGW53iQOLRHkc0l9TvHqjXwgnXZPWF9zB91avov
+ 7TcFNr4ligGApRZ5O5o/XaiPWdBGacnMR9IqiwIAvnH7J3J0HWkNiKHqoWidHBL6+ydi
+ BdR0to3hCHCSv1V114WA7vT2RFMlU20GJbNgq4x1bH3iQ8Ksj7mbW3IoE8P4Tbl87W90
+ 0x5DzOrRltfhjqFsAxN8XsSSF3rQu5pF5+n2TbH9XT7MxQW/2JNP1vM3qbX8RLdWRVaI
+ p3GTmaHN2r5j0Zsv9JGygm2sb3lEj9a4unPdsWwo1i5AOXdJq/x9PVSk+gFQS2GQlqWj
+ cq4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=VMVNHtG8xLt0ZpdZqzxYszuIzxm6Ie0YlfmnzhGbWKg=;
- b=nXwD8YjWAua3M79XdxC8QhJQVJ5xRnF5ePMoZs4k+n7YBnbMnjWyL/fPuWYP3Cf3BM
- bdgPnepIC7BGM++0KHwz0kcsYtA8/QUjDE0iS/fu4O8Y3mJoirjlsdrNiWn4Vqwi6DEz
- G1Q7KXA7B2Toet3UPom126ew1ODuN6jRUAmpV82LGzSay693IVFAJYnbgac9IuykuZX8
- GOJYy6umx2g1SCmRjsnddXP1CvwMofdStSop1PiBYRIfvlr8bW2LVvdMna5urqwK4Mwa
- fXfqrA76AQP3jfxk58pUDIdkPfkI4qJKfjAZ1oC9sWI9+iri9EPiiRIOlvgSW/spV3SE
- 0VCQ==
-X-Gm-Message-State: APjAAAUsbIs+7sq1oSDO6GQaDLoKycSG2NPXQ97VpAq9QpuB8xMHnYrH
- 4aMs7UVdk2rMvDq2+U3gfLxj2tRoDD0=
-X-Google-Smtp-Source: APXvYqwPoSTUH5a26Pf1j//sz1XvDOlJY1wjMe51fG3EXnjvIYoDflto4H3O8s2Fc+S5fpJfYLzRCg==
-X-Received: by 2002:a63:1046:: with SMTP id 6mr19226689pgq.111.1566864480061; 
- Mon, 26 Aug 2019 17:08:00 -0700 (PDT)
+ bh=/XFbLeboaSoNQ/ccFxUcDwe/zAUd/IKOGwT/LITW6bI=;
+ b=MtKGf4zzP5eI4fjbKCGkPzDwLsWaLwR+m/Ez82hirSAg2BUodzAx9WkhopUkpiAEeo
+ DoGgsVMfPLjB2Ae5yLSqcnRCAIBNsIhNBxMCdytqPqsyOGg7t5XcewdAMQ/YZjyNRCMy
+ ZbYI38pb2AscpoI4P8IglCi+ENGKRGz7ajUJQFQRZ8ub177ULa8jDzhrgIe6OmWB0Uoa
+ DeRCyJcQRGUG9nbBTjqk2CQgFLEkpjgO7qr9Lf1eoLbYm3w4LM40y7HZ6x6J0IBLWtKV
+ qMIPURQXI9rbE86B+ypF8QZxf2LJgjBBwr5jbNBu1r9jDKmHkG+bqWEKDyeNEDug2nxH
+ +t6g==
+X-Gm-Message-State: APjAAAVmRxRf1KUMCIN0sMFXR7SZCDugpstucGkeidABJ3BpVl3Ku6Y9
+ MXcTMbIjFzsVT74Y2luWTgtNKRC7IjU=
+X-Google-Smtp-Source: APXvYqyy62DkV+kWeRrzj6IQs1d/T5EU8xQR0WvhBaTuKzwGXSSYxeyvIAzVc4d7w8f4UCtjBy8TeQ==
+X-Received: by 2002:aa7:8488:: with SMTP id u8mr23494563pfn.229.1566864482486; 
+ Mon, 26 Aug 2019 17:08:02 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id e189sm11691067pgc.15.2019.08.26.17.07.59
+ by smtp.gmail.com with ESMTPSA id e189sm11691067pgc.15.2019.08.26.17.08.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Aug 2019 17:07:59 -0700 (PDT)
+ Mon, 26 Aug 2019 17:08:01 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 26 Aug 2019 17:07:43 -0700
-Message-Id: <20190827000745.19645-12-richard.henderson@linaro.org>
+Date: Mon, 26 Aug 2019 17:07:45 -0700
+Message-Id: <20190827000745.19645-14-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190827000745.19645-1-richard.henderson@linaro.org>
 References: <20190827000745.19645-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH 11/13] target/openrisc: Implement move to/from
- FPCSR
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH 13/13] target/openrisc: Update cpu "any" to v1.3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,148 +95,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Now that the two updates from v3.1 are implemented,
+update the "any" cpu to enable it.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/cpu.h        |  2 ++
- target/openrisc/cpu.c        |  1 +
- target/openrisc/fpu_helper.c | 13 +++++++++++++
- target/openrisc/machine.c    | 11 +++++++++++
- target/openrisc/sys_helper.c | 18 ++++++++++++------
- 5 files changed, 39 insertions(+), 6 deletions(-)
+ target/openrisc/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 71c5959828..0ad02eab79 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -413,6 +413,8 @@ static inline void cpu_set_sr(CPUOpenRISCState *env, uint32_t val)
-     env->sr = (val & ~(SR_F | SR_CY | SR_OV)) | SR_FO;
- }
- 
-+void cpu_set_fpcsr(CPUOpenRISCState *env, uint32_t val);
-+
- #define CPU_INTERRUPT_TIMER   CPU_INTERRUPT_TGT_INT_0
- 
- #endif /* OPENRISC_CPU_H */
 diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index b931605e62..f96a69e278 100644
+index f96a69e278..506aec6bfb 100644
 --- a/target/openrisc/cpu.c
 +++ b/target/openrisc/cpu.c
-@@ -55,6 +55,7 @@ static void openrisc_cpu_reset(CPUState *s)
-     cpu->env.sr = SR_FO | SR_SM;
-     cpu->env.lock_addr = -1;
-     s->exception_index = -1;
-+    cpu_set_fpcsr(&cpu->env, 0);
+@@ -129,7 +129,7 @@ static void openrisc_any_initfn(Object *obj)
  
- #ifndef CONFIG_USER_ONLY
-     cpu->env.picmr = 0x00000000;
-diff --git a/target/openrisc/fpu_helper.c b/target/openrisc/fpu_helper.c
-index 7bcef9dc53..59e1413279 100644
---- a/target/openrisc/fpu_helper.c
-+++ b/target/openrisc/fpu_helper.c
-@@ -61,6 +61,19 @@ void HELPER(update_fpcsr)(CPUOpenRISCState *env)
-     }
- }
+     cpu->env.vr = 0x13000040;   /* Obsolete VER + UVRP for new SPRs */
+     cpu->env.vr2 = 0;           /* No version specific id */
+-    cpu->env.avr = 0x01010000;  /* Architecture v1.1 */
++    cpu->env.avr = 0x01030000;  /* Architecture v1.3 */
  
-+void cpu_set_fpcsr(CPUOpenRISCState *env, uint32_t val)
-+{
-+    static const int rm_to_sf[] = {
-+        float_round_nearest_even,
-+        float_round_to_zero,
-+        float_round_up,
-+        float_round_down
-+    };
-+
-+    env->fpcsr = val & 0x7ff;
-+    set_float_rounding_mode(rm_to_sf[extract32(val, 1, 2)], &env->fp_status);
-+}
-+
- uint64_t HELPER(itofd)(CPUOpenRISCState *env, uint64_t val)
- {
-     return int64_to_float64(val, &env->fp_status);
-diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
-index 0a96404dc6..b92985d99b 100644
---- a/target/openrisc/machine.c
-+++ b/target/openrisc/machine.c
-@@ -121,10 +121,21 @@ static const VMStateDescription vmstate_env = {
-     }
- };
- 
-+static int cpu_post_load(void *opaque, int version_id)
-+{
-+    OpenRISCCPU *cpu = opaque;
-+    CPUOpenRISCState *env = &cpu->env;
-+
-+    /* Update env->fp_status to match env->fpcsr.  */
-+    cpu_set_fpcsr(env, env->fpcsr);
-+    return 0;
-+}
-+
- const VMStateDescription vmstate_openrisc_cpu = {
-     .name = "cpu",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_CPU(),
-         VMSTATE_STRUCT(env, OpenRISCCPU, 1, vmstate_env, CPUOpenRISCState),
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index cf8e637b08..d9fe6c5948 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -37,8 +37,10 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-     CPUState *cs = env_cpu(env);
-     target_ulong mr;
-     int idx;
-+#endif
- 
-     switch (spr) {
-+#ifndef CONFIG_USER_ONLY
-     case TO_SPR(0, 11): /* EVBAR */
-         env->evbar = rb;
-         break;
-@@ -179,10 +181,12 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         }
-         cpu_openrisc_timer_update(cpu);
-         break;
--    default:
-+#endif
-+
-+    case TO_SPR(0, 20): /* FPCSR */
-+        cpu_set_fpcsr(env, rb);
-         break;
-     }
--#endif
- }
- 
- target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-@@ -193,8 +197,10 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-     OpenRISCCPU *cpu = env_archcpu(env);
-     CPUState *cs = env_cpu(env);
-     int idx;
-+#endif
- 
-     switch (spr) {
-+#ifndef CONFIG_USER_ONLY
-     case TO_SPR(0, 0): /* VR */
-         return env->vr;
- 
-@@ -303,12 +309,12 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-     case TO_SPR(10, 1): /* TTCR */
-         cpu_openrisc_count_update(cpu);
-         return cpu_openrisc_count_get(cpu);
--
--    default:
--        break;
--    }
- #endif
- 
-+    case TO_SPR(0, 20): /* FPCSR */
-+        return env->fpcsr;
-+    }
-+
-     /* for rd is passed in, if rd unchanged, just keep it back.  */
-     return rd;
- }
+     cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP | UPR_PMP;
+     cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_OF32S |
 -- 
 2.17.1
 
