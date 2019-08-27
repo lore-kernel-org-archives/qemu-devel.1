@@ -2,65 +2,61 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B373C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A95D7C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11C822186A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:05:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11C822186A
+	by mail.kernel.org (Postfix) with ESMTPS id 818DD206BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:07:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 818DD206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2dy2-00025K-2R
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:05:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57627)
+	id 1i2e0X-0004Ri-D5
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:07:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i2dtm-0006gd-8Y
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:00:47 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1i2dz1-0003Bf-SW
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i2dtg-0000iM-Hg
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:00:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47038)
+ (envelope-from <eric.auger@redhat.com>) id 1i2dz0-0002Dn-NK
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:06:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36380)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1i2dtg-0000h4-9L; Tue, 27 Aug 2019 12:00:40 -0400
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1i2dyx-0002Cj-WE; Tue, 27 Aug 2019 12:06:08 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1236519CF7A;
- Tue, 27 Aug 2019 16:00:39 +0000 (UTC)
-Received: from dhcp-17-173.bos.redhat.com (dhcp-17-173.bos.redhat.com
- [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FFFA1001B13;
- Tue, 27 Aug 2019 16:00:38 +0000 (UTC)
-Date: Tue, 27 Aug 2019 12:00:36 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190827160036.GB25965@dhcp-17-173.bos.redhat.com>
-References: <20190819082820.14817-1-sathnaga@linux.vnet.ibm.com>
- <20190824093255.GI3027@umbus.fritz.box>
+ by mx1.redhat.com (Postfix) with ESMTPS id 425D57BDB0;
+ Tue, 27 Aug 2019 16:06:07 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-105.ams2.redhat.com [10.36.116.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A4541001B17;
+ Tue, 27 Aug 2019 16:06:03 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org
+Date: Tue, 27 Aug 2019 18:05:53 +0200
+Message-Id: <20190827160554.30995-3-eric.auger@redhat.com>
+In-Reply-To: <20190827160554.30995-1-eric.auger@redhat.com>
+References: <20190827160554.30995-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190824093255.GI3027@umbus.fritz.box>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 27 Aug 2019 16:00:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 27 Aug 2019 16:06:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH V2 1/2] tests.acceptance.avocado_qemu: Add
- support for powerpc
+Subject: [Qemu-devel] [RFC 2/3] intc/arm_gic: Support PPI injection for more
+ than 256 vpus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,63 +68,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, groug@kaod.org, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, clg@kaod.org, sathnaga@linux.vnet.ibm.com
+Cc: yuzenghui@huawei.com, maz@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 24, 2019 at 07:32:55PM +1000, David Gibson wrote:
-> On Mon, Aug 19, 2019 at 01:58:20PM +0530, sathnaga@linux.vnet.ibm.com w=
-rote:
-> > From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> >=20
-> > Current acceptance test will not run properly in powerpc
-> > environment due qemu target is different from arch, this
-> > usually matches, except with bi-endian architectures like ppc64.
-> > uname would return `ppc64` or `ppc64le` based `big` or `little`
-> > endian but qemu `target` is always `ppc64`. Let's handle it.
-> >=20
-> > Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-> > Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> I sent a similar patch a little while back, but it seems it got lost.
->=20
->=20
-> > ---
-> >  tests/acceptance/avocado_qemu/__init__.py | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >=20
-> > diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/accept=
-ance/avocado_qemu/__init__.py
-> > index aee5d820ed..bd41e0443c 100644
-> > --- a/tests/acceptance/avocado_qemu/__init__.py
-> > +++ b/tests/acceptance/avocado_qemu/__init__.py
-> > @@ -39,6 +39,9 @@ def pick_default_qemu_bin(arch=3DNone):
-> >      """
-> >      if arch is None:
-> >          arch =3D os.uname()[4]
-> > +    # qemu binary path does not match arch for powerpc, handle it
-> > +    if 'ppc64le' in arch:
-> > +        arch =3D 'ppc64'
-> >      qemu_bin_relative_path =3D os.path.join("%s-softmmu" % arch,
-> >                                            "qemu-system-%s" % arch)
-> >      if is_readable_executable_file(qemu_bin_relative_path):
->=20
-> --=20
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _oth=
-er_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+Host kernels that expose the KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 capability
+allow injection of PPIs along with vcpu ids larger than 255. Let's
+encode the vpcu id on 12 bits according to the upgraded KVM_IRQ_LINE
+ABI when needed.
 
-Yes, I remember that.  I have the feeling the discussion evolved into
-"let's do it for all other arch differences", because I found a patch
-here about that.  Anyway, sorry about that.
+Without that patch qemu exits with "kvm_set_irq: Invalid argument"
+message.
 
-I've queued this one.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+ hw/intc/arm_gic_kvm.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-- Cleber.
+diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+index b56fda144f..889293e97f 100644
+--- a/hw/intc/arm_gic_kvm.c
++++ b/hw/intc/arm_gic_kvm.c
+@@ -56,6 +56,7 @@ void kvm_arm_gic_set_irq(uint32_t num_irq, int irq, int=
+ level)
+      * CPU number and interrupt number.
+      */
+     int kvm_irq, irqtype, cpu;
++    int cpu_idx1 =3D 0, cpu_idx2 =3D 0;
+=20
+     if (irq < (num_irq - GIC_INTERNAL)) {
+         /* External interrupt. The kernel numbers these like the GIC
+@@ -63,17 +64,20 @@ void kvm_arm_gic_set_irq(uint32_t num_irq, int irq, i=
+nt level)
+          * internal ones.
+          */
+         irqtype =3D KVM_ARM_IRQ_TYPE_SPI;
+-        cpu =3D 0;
+         irq +=3D GIC_INTERNAL;
+     } else {
+         /* Internal interrupt: decode into (cpu, interrupt id) */
+         irqtype =3D KVM_ARM_IRQ_TYPE_PPI;
+         irq -=3D (num_irq - GIC_INTERNAL);
+         cpu =3D irq / GIC_INTERNAL;
++        cpu_idx2 =3D cpu / 256;
++        cpu_idx1 =3D cpu % 256;
+         irq %=3D GIC_INTERNAL;
+     }
+-    kvm_irq =3D (irqtype << KVM_ARM_IRQ_TYPE_SHIFT)
+-        | (cpu << KVM_ARM_IRQ_VCPU_SHIFT) | irq;
++    kvm_irq =3D (irqtype << KVM_ARM_IRQ_TYPE_SHIFT) |
++              (cpu_idx1 << KVM_ARM_IRQ_VCPU_SHIFT) |
++              ((cpu_idx2 & KVM_ARM_IRQ_VCPU2_MASK) << KVM_ARM_IRQ_VCPU2_=
+SHIFT) |
++              irq;
+=20
+     kvm_set_irq(kvm_state, kvm_irq, !!level);
+ }
+--=20
+2.20.1
+
 
