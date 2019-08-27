@@ -2,59 +2,60 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E623C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71931C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:41:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 437A6204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:39:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 437A6204EC
+	by mail.kernel.org (Postfix) with ESMTPS id 4755421881
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:41:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4755421881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54021 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2eVL-00082w-5H
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:39:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35015)
+	id 1i2eXd-00020t-5S
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:41:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35133)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2eQq-0003YP-8r
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:34:57 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2eR1-0003n9-Ml
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:35:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2eQp-0000Hm-3f
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:34:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38498)
+ (envelope-from <mreitz@redhat.com>) id 1i2eR0-0000RA-Jn
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:35:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5238)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2eQm-0000GX-L0; Tue, 27 Aug 2019 12:34:52 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i2eQw-0000Mk-Nm; Tue, 27 Aug 2019 12:35:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E0CE0807062;
- Tue, 27 Aug 2019 16:34:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1237C107DD04;
+ Tue, 27 Aug 2019 16:35:02 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74ADC19D7A;
- Tue, 27 Aug 2019 16:34:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B10AA5D6B0;
+ Tue, 27 Aug 2019 16:34:57 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 27 Aug 2019 18:34:37 +0200
-Message-Id: <20190827163439.16686-5-mreitz@redhat.com>
+Date: Tue, 27 Aug 2019 18:34:39 +0200
+Message-Id: <20190827163439.16686-7-mreitz@redhat.com>
 In-Reply-To: <20190827163439.16686-1-mreitz@redhat.com>
 References: <20190827163439.16686-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 27 Aug 2019 16:34:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Tue, 27 Aug 2019 16:35:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 4/6] curl: Report only ready sockets
+Subject: [Qemu-devel] [PATCH 6/6] curl: Check curl_multi_add_handle()'s
+ return code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,59 +73,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of reporting all sockets to cURL, only report the one that has
-caused curl_multi_do_locked() to be called.  This lets us get rid of the
-QLIST_FOREACH_SAFE() list, which was actually wrong: SAFE foreaches are
-only safe when the current element is removed in each iteration.  If it
-possible for the list to be concurrently modified, we cannot guarantee
-that only the current element will be removed.  Therefore, we must not
-use QLIST_FOREACH_SAFE() here.
+If we had done that all along, debugging would have been much simpler.
+(Also, I/O errors are better than hangs.)
 
-Fixes: ff5ca1664af85b24a4180d595ea6873fd3deac57
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/curl.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ block/curl.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/block/curl.c b/block/curl.c
-index 05f77a38c2..bc70f39fcb 100644
+index 5e0cca601d..4a7aff02a6 100644
 --- a/block/curl.c
 +++ b/block/curl.c
-@@ -394,24 +394,19 @@ static void curl_multi_check_completion(BDRVCURLSta=
-te *s)
- }
+@@ -894,7 +894,13 @@ static void curl_setup_preadv(BlockDriverState *bs, =
+CURLAIOCB *acb)
+     trace_curl_setup_preadv(acb->bytes, start, state->range);
+     curl_easy_setopt(state->curl, CURLOPT_RANGE, state->range);
 =20
- /* Called with s->mutex held.  */
--static void curl_multi_do_locked(CURLSocket *ready_socket)
-+static void curl_multi_do_locked(CURLSocket *socket)
- {
--    CURLSocket *socket, *next_socket;
--    CURLState *s =3D socket->state;
-+    BDRVCURLState *s =3D socket->state->s;
-     int running;
-     int r;
+-    curl_multi_add_handle(s->multi, state->curl);
++    if (curl_multi_add_handle(s->multi, state->curl) !=3D CURLM_OK) {
++        state->acb[0] =3D NULL;
++        acb->ret =3D -EIO;
++
++        curl_clean_state(state);
++        goto out;
++    }
 =20
--    if (!s->s->multi) {
-+    if (!s->multi) {
-         return;
-     }
-=20
--    /* Need to use _SAFE because curl_multi_socket_action() may trigger
--     * curl_sock_cb() which might modify this list */
--    QLIST_FOREACH_SAFE(socket, &s->sockets, next, next_socket) {
--        do {
--            r =3D curl_multi_socket_action(s->s->multi, socket->fd, 0, &=
-running);
--        } while (r =3D=3D CURLM_CALL_MULTI_PERFORM);
--    }
-+    do {
-+        r =3D curl_multi_socket_action(s->multi, socket->fd, 0, &running=
-);
-+    } while (r =3D=3D CURLM_CALL_MULTI_PERFORM);
- }
-=20
- static void curl_multi_do(void *arg)
+     /* Tell curl it needs to kick things off */
+     curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running)=
+;
 --=20
 2.21.0
 
