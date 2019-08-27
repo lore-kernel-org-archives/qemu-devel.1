@@ -2,66 +2,53 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF0AC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0B2DC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C33BE20828
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C33BE20828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id AA0802077B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 12:50:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA0802077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2aoQ-0007Xn-Td
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 08:43:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53077)
+	id 1i2avC-0001Rn-Sq
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 08:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i2anX-000764-UC
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:42:09 -0400
+ (envelope-from <johannes@sipsolutions.net>) id 1i2auU-0000wc-5A
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i2anW-0005h0-85
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:42:07 -0400
-Resent-Date: Tue, 27 Aug 2019 08:42:07 -0400
-Resent-Message-Id: <E1i2anW-0005h0-85@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21426)
+ (envelope-from <johannes@sipsolutions.net>) id 1i2auS-00016u-Ts
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:49:18 -0400
+Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:45912
+ helo=sipsolutions.net)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i2anW-0005et-0h
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:42:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1566909710; cv=none; d=zoho.com; s=zohoarc; 
- b=auK11OA8CdksHLV1kSXMv/DVESrJsI+QLpz/M/cV/pWiDQ8hfJZo+O595DV9w3i8z16vkDQniPsgROMHatoc58m20FmJQxVplLtR+IWQ5zVzykSi7R4JNNYRJurTN93TwJnTc7IbAbyZazdPXoDwXjegLhtLs4s9YrD0KiL3ylo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1566909710;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=lP6eZjZ0dm0uL9WMM1+8INXdxoHeYIE+6ydEI8gp8CI=; 
- b=RHyWFjWQ/90QH7U9stkSikKVkw1pDuw8QDlrsDtv1dFsG/+GvjFXh/o9ufbfRIlwCii3OtfLHh7ghf94BFF3d8FrfBjox+FNkMGZFTt7sA0YVT/rapKlZ5auf7+rGaYSHjyhlXlo0vulgyXgN8FlO6M9kQJ2CoYWB1uLDihkOrU=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1566909707951183.06626194914588;
- Tue, 27 Aug 2019 05:41:47 -0700 (PDT)
-In-Reply-To: <20190827121339.15815-1-johannes@sipsolutions.net>
-Message-ID: <156690970685.15196.10082634235049405155@5dec9699b7de>
+ (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
+ id 1i2auS-000163-NH
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 08:49:16 -0400
+Received: by sipsolutions.net with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <johannes@sipsolutions.net>)
+ id 1i2auN-0008R3-Gk; Tue, 27 Aug 2019 14:49:11 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: qemu-devel@nongnu.org
+Date: Tue, 27 Aug 2019 15:49:09 +0300
+Message-Id: <20190827124909.16824-1-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: johannes@sipsolutions.net
-Date: Tue, 27 Aug 2019 05:41:47 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v2] libvhost-user-glib: fix VugDev main fd
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:4f8:191:4433::2
+Subject: [Qemu-devel] [PATCH v3] libvhost-user-glib: fix VugDev main fd
  cleanup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,37 +61,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, johannes.berg@intel.com
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Johannes Berg <johannes.berg@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgyNzEyMTMzOS4xNTgx
-NS0xLWpvaGFubmVzQHNpcHNvbHV0aW9ucy5uZXQvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
-dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
-bW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwODI3MTIxMzM5LjE1ODE1LTEtam9o
-YW5uZXNAc2lwc29sdXRpb25zLm5ldApTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBs
-aWJ2aG9zdC11c2VyLWdsaWI6IGZpeCBWdWdEZXYgbWFpbiBmZCBjbGVhbnVwClR5cGU6IHNlcmll
-cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJh
-c2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0JwozZjk3YzU2IGxpYnZob3N0LXVzZXItZ2xpYjogZml4IFZ1Z0RldiBtYWluIGZkIGNs
-ZWFudXAKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2Fy
-eSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzQzOiBGSUxFOiBjb250cmliL2xpYnZo
-b3N0LXVzZXIvbGlidmhvc3QtdXNlci1nbGliLmM6MTM1OgorICAgIGlmICghc3JjKQpbLi4uXQoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA2MCBsaW5lcyBjaGVja2VkCgpDb21taXQgM2Y5
-N2M1NjZkMTBmIChsaWJ2aG9zdC11c2VyLWdsaWI6IGZpeCBWdWdEZXYgbWFpbiBmZCBjbGVhbnVw
-KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDgyNzEyMTMzOS4xNTgxNS0xLWpvaGFubmVzQHNp
-cHNvbHV0aW9ucy5uZXQvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+From: Johannes Berg <johannes.berg@intel.com>
+
+If you try to make a device implementation that can handle multiple
+connections and allow disconnections (which requires overriding the
+VHOST_USER_NONE handling), then glib will warn that we remove a src
+while it's still on the mainloop, and will poll() an FD that doesn't
+exist anymore.
+
+Fix this by making vug_source_new() require pairing with the new
+vug_source_destroy() so we can keep the GSource referenced in the
+meantime.
+
+Note that this requires calling the new API in vhost-user-input.
+vhost-user-gpu also uses vug_source_new(), but never seems to free
+the result at all, so I haven't changed anything there.
+
+Fixes: 8bb7ddb78a1c ("libvhost-user: add glib source helper")
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ contrib/libvhost-user/libvhost-user-glib.c | 15 ++++++++++++---
+ contrib/libvhost-user/libvhost-user-glib.h |  1 +
+ contrib/vhost-user-input/main.c            |  6 ++----
+ 3 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/contrib/libvhost-user/libvhost-user-glib.c b/contrib/libvhost-user/libvhost-user-glib.c
+index 99edd2f3de45..eaf88b8aa749 100644
+--- a/contrib/libvhost-user/libvhost-user-glib.c
++++ b/contrib/libvhost-user/libvhost-user-glib.c
+@@ -91,7 +91,6 @@ vug_source_new(VugDev *gdev, int fd, GIOCondition cond,
+     g_source_add_poll(gsrc, &src->gfd);
+     id = g_source_attach(gsrc, NULL);
+     g_assert(id);
+-    g_source_unref(gsrc);
+ 
+     return gsrc;
+ }
+@@ -131,6 +130,16 @@ static void vug_watch(VuDev *dev, int condition, void *data)
+     }
+ }
+ 
++void vug_source_destroy(GSource *src)
++{
++    if (!src) {
++        return;
++    }
++
++    g_source_unref(src);
++    g_source_destroy(src);
++}
++
+ bool
+ vug_init(VugDev *dev, uint16_t max_queues, int socket,
+          vu_panic_cb panic, const VuDevIface *iface)
+@@ -144,7 +153,7 @@ vug_init(VugDev *dev, uint16_t max_queues, int socket,
+     }
+ 
+     dev->fdmap = g_hash_table_new_full(NULL, NULL, NULL,
+-                                       (GDestroyNotify) g_source_destroy);
++                                       (GDestroyNotify) vug_source_destroy);
+ 
+     dev->src = vug_source_new(dev, socket, G_IO_IN, vug_watch, NULL);
+ 
+@@ -157,5 +166,5 @@ vug_deinit(VugDev *dev)
+     g_assert(dev);
+ 
+     g_hash_table_unref(dev->fdmap);
+-    g_source_unref(dev->src);
++    vug_source_destroy(dev->src);
+ }
+diff --git a/contrib/libvhost-user/libvhost-user-glib.h b/contrib/libvhost-user/libvhost-user-glib.h
+index 64d539d93aba..1a79a4916ef2 100644
+--- a/contrib/libvhost-user/libvhost-user-glib.h
++++ b/contrib/libvhost-user/libvhost-user-glib.h
+@@ -31,5 +31,6 @@ void vug_deinit(VugDev *dev);
+ 
+ GSource *vug_source_new(VugDev *dev, int fd, GIOCondition cond,
+                         vu_watch_cb vu_cb, gpointer data);
++void vug_source_destroy(GSource *src);
+ 
+ #endif /* LIBVHOST_USER_GLIB_H */
+diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/main.c
+index 449fd2171a5a..7d6b0f9d80cc 100644
+--- a/contrib/vhost-user-input/main.c
++++ b/contrib/vhost-user-input/main.c
+@@ -187,7 +187,7 @@ vi_queue_set_started(VuDev *dev, int qidx, bool started)
+     }
+ 
+     if (!started && vi->evsrc) {
+-        g_source_destroy(vi->evsrc);
++        vug_source_destroy(vi->evsrc);
+         vi->evsrc = NULL;
+     }
+ }
+@@ -401,9 +401,7 @@ main(int argc, char *argv[])
+ 
+     vug_deinit(&vi.dev);
+ 
+-    if (vi.evsrc) {
+-        g_source_unref(vi.evsrc);
+-    }
++    vugg_source_destroy(vi.evsrc);
+     g_array_free(vi.config, TRUE);
+     g_free(vi.queue);
+     return 0;
+-- 
+2.23.0
 
 
