@@ -2,83 +2,87 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 198B6C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5403EC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:33:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA8E0217F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C3D5206BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 15:33:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Ivj+tsW2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA8E0217F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uO/kyRMb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C3D5206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2dQn-0001tE-AI
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 11:30:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51584)
+	id 1i2dT9-00043j-Ra
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 11:33:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chihmin.chao@sifive.com>) id 1i2dMX-00061C-8a
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:26:26 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1i2cwZ-0003bO-BA
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 10:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1i2dMV-0001al-PD
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:26:24 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:43936)
+ (envelope-from <bmeng.cn@gmail.com>) id 1i2cwS-0003r6-8a
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 10:59:34 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41543)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1i2dMV-0001ZT-FC
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 11:26:23 -0400
-Received: by mail-io1-xd42.google.com with SMTP id 18so47162685ioe.10
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 08:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zV5inUbU33HGE+HXpm/uIphCXvdIrmc/8bmS9Jcq9yg=;
- b=Ivj+tsW2+DcgSLNglj+8V3nPgfXJH7F1EZNmI/D7uJx/JhHZCXGScye3IGSYzuIkXk
- eOGoND+LRP3CmGsKByO/tf9Ha5FdQpfCBE0VUaPFTaxPbhThs2BcNcDUOVozcDq+icO9
- C7p9uHyKssRfaRGtslJ6NIIpVP3h+YBwz8VvgtwHEigTWYlwYyVtz58EfiDxIhd3oG9s
- pz3WULgsdE+eB1ogSlAp4rnHBMf4SmjrGwdzghtz5ow+r1JpUY91qIl6L/UKF+rUfylA
- fGVntlCIp+G077UkcauCbPGn7Z4DGi+IUE/QNZ308VizohlFZT/47QO7FD5G2/dxg48v
- x19Q==
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1i2cwQ-0003j6-W9; Tue, 27 Aug 2019 10:59:27 -0400
+Received: by mail-pl1-x644.google.com with SMTP id m9so11909920pls.8;
+ Tue, 27 Aug 2019 07:59:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id:in-reply-to:references;
+ bh=vywFFA5HTD3v/PWfCWvmPMIAZW9Ejl9yuZmXMqlf1pI=;
+ b=uO/kyRMbRLwK6e3Q4oNj8TgmBEnrX7qzExjeAZdAxLyt07x7SGA+ALXjqdu2wloKup
+ TQlhXOIa6l2BSJAdK7Fa+GGF3DohUU/XGTNqMvzor3413JT/SXFf/OQ8Nhtzks4osRYK
+ oLUia7B5DVC1BXrUScgZSZGB8omFSd4n5u44AZ0PwOGUXVhWmqFQbiMPsbqI1/8VEF4h
+ Yw8+lyRdAUYMh6kGaxQhjlhGM15WFDkovuFzO3S2HPG7/K+QQC6//+z6Fpy+Qz4MCxvI
+ 4GTsc/WZ117ytC4MF/a4xf/LPA0B/0gIj/YGdoWYjYBBtpOmwlh2nM2cdOWxxphJmfks
+ NGKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zV5inUbU33HGE+HXpm/uIphCXvdIrmc/8bmS9Jcq9yg=;
- b=ssp9EVT/t3x8awNTtJqpkILQtPgSl5L39IyCLagiM1dYTnlWI6Rli4RgwuY77Z3Z78
- lI7bBAz5vA/UALfBluzVAlp+llNbGT1QCxP6Bd/0+hr5CL1kVgz49Pw+5UqaKqzyRBWS
- tKp0i2KGn0MTuy7s0JcmojogswRU6pLdOJLhi9caTAauPa9Mg54MNLFSeyacBEBvJJtg
- vXLDRSobEwbhEltHaRwfTsF106TkKaKNxba9Nt1iJBxCn/qrTIf1uytcKxJ9Uo7h5l6v
- 5p1KLo3yVx/VKZrIFEHCd/kG2rKLkdZPqUfaMvuJKhxtMA2YmZGHSJzvF/fZ2vzVIW4D
- tGiw==
-X-Gm-Message-State: APjAAAW3StCzTXYU7GbDk89alJ4ptRaqLt0mNR6W92Wz0PGAvc6nqdVi
- mCyNXFJ9iQkAwVvO4xw1MTFkBi8OLeHQdcS/T5vlog==
-X-Google-Smtp-Source: APXvYqwUgWARfrXJuuD5WeBhhqjV7tEoACo0pwyoiyXA+6wMWhcZwWg6nCgEJ3oOiWbqczxYo42f/XDimKCiM7ZfNAI=
-X-Received: by 2002:a05:6602:228e:: with SMTP id
- d14mr2207927iod.85.1566919582525; 
- Tue, 27 Aug 2019 08:26:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1566603412.git.alistair.francis@wdc.com>
- <008eba3fe3b65cc5d37a1ced51d3631b23bef330.1566603412.git.alistair.francis@wdc.com>
-In-Reply-To: <008eba3fe3b65cc5d37a1ced51d3631b23bef330.1566603412.git.alistair.francis@wdc.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Tue, 27 Aug 2019 23:26:11 +0800
-Message-ID: <CAEiOBXUz6Ng-9scF62XsiU-tcA58sj8P=tNwLpiphm+uGARVmA@mail.gmail.com>
-To: Alistair Francis <alistair.francis@wdc.com>
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references;
+ bh=vywFFA5HTD3v/PWfCWvmPMIAZW9Ejl9yuZmXMqlf1pI=;
+ b=EF6eeZzejtyQpIk0g2yZwoFdTMnlIhdm1Fgq1YlRVZwARZXCpTlDwLINHGDfucmkaZ
+ hfk3bx+S3b5m+Gy4zgACIsdnXzxA7tYQg0fSn1YjmZLE2RaGnC2Un7IoRU30jc5tr5pM
+ MvC6Gb/PWHrVxRRuXIrowpkeMgrHaiZrWasAXiqt5PRBvgbb5lc58OO8aSE8BudRZnZN
+ 4a/9ICAiMyL50XOJwySDiyt7ReGi7hr1X41GIyIJwpEQ5M1e4LYBXnz9uVi5r62dXg+i
+ +yYechlmevgnOLYlt8M9RrUU3R0Mb317xUntG0Bj0uCEag8Xg5Gxy8IHzv26mYQvycWH
+ c3pA==
+X-Gm-Message-State: APjAAAVI5Dq1j9NCRkfbnVrcHVd7s65vRHvuEOkUCkUijjHJPnFoHrjH
+ 3DmQyBwFC+z07Ai05EMyg54=
+X-Google-Smtp-Source: APXvYqzJEwSjXzsSsn4vTxf1mWl5HFRJzhdtW1At7rUvbCfHSQLCEXpO7re8k2afD+QoefADfHKAvA==
+X-Received: by 2002:a17:902:e48d:: with SMTP id
+ cj13mr24538419plb.177.1566917946802; 
+ Tue, 27 Aug 2019 07:59:06 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id j15sm14839344pfr.146.2019.08.27.07.59.05
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Tue, 27 Aug 2019 07:59:06 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Date: Tue, 27 Aug 2019 07:58:28 -0700
+Message-Id: <1566917919-25381-20-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1566917919-25381-1-git-send-email-bmeng.cn@gmail.com>
+References: <1566917919-25381-1-git-send-email-bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v1 01/28] target/riscv: Add the Hypervisor
- extension
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH v6 19/30] riscv: sifive: Implement PRCI model
+ for FU540
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,36 +94,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@sifive.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup.Patel@wdc.com,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish.Patra@wdc.com, Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 24, 2019 at 7:42 AM Alistair Francis <alistair.francis@wdc.com>
-wrote:
+This adds a simple PRCI model for FU540 (sifive_u). It has different
+register layout from the existing PRCI model for FE310 (sifive_e).
 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/cpu.h | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 124ed33ee4..7f54fb8c87 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -67,6 +67,7 @@
->  #define RVC RV('C')
->  #define RVS RV('S')
->  #define RVU RV('U')
-> +#define RVH RV('H')
->
->  /* S extension denotes that Supervisor mode exists, however it is possible
->     to have a core that support S mode but does not have an MMU and there
-> --
-> 2.22.0
->
->
-> Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+---
+
+Changes in v6:
+- fix incorrectly indented comment lines
+- remove unneeded brackets around assignment
+
+Changes in v5:
+- change to use defines instead of enums
+- change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_prci
+- creating a 32-bit val variable and using that instead of casting
+  everywhere in sifive_u_prci_write()
+- move all register initialization to sifive_u_prci_reset() function
+- drop sifive_u_prci_create()
+- s/codes that worked/code that works/g
+
+Changes in v4:
+- prefix all macros/variables/functions with SIFIVE_U/sifive_u
+  in the sifive_u_prci driver
+
+Changes in v3: None
+Changes in v2: None
+
+ hw/riscv/Makefile.objs           |   1 +
+ hw/riscv/sifive_u_prci.c         | 169 +++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_u_prci.h |  81 +++++++++++++++++++
+ 3 files changed, 251 insertions(+)
+ create mode 100644 hw/riscv/sifive_u_prci.c
+ create mode 100644 include/hw/riscv/sifive_u_prci.h
+
+diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+index c859697..b95bbd5 100644
+--- a/hw/riscv/Makefile.objs
++++ b/hw/riscv/Makefile.objs
+@@ -8,6 +8,7 @@ obj-$(CONFIG_SIFIVE) += sifive_gpio.o
+ obj-$(CONFIG_SIFIVE) += sifive_plic.o
+ obj-$(CONFIG_SIFIVE) += sifive_test.o
+ obj-$(CONFIG_SIFIVE_U) += sifive_u.o
++obj-$(CONFIG_SIFIVE_U) += sifive_u_prci.o
+ obj-$(CONFIG_SIFIVE) += sifive_uart.o
+ obj-$(CONFIG_SPIKE) += spike.o
+ obj-$(CONFIG_RISCV_VIRT) += virt.o
+diff --git a/hw/riscv/sifive_u_prci.c b/hw/riscv/sifive_u_prci.c
+new file mode 100644
+index 0000000..ade2a1c
+--- /dev/null
++++ b/hw/riscv/sifive_u_prci.c
+@@ -0,0 +1,169 @@
++/*
++ * QEMU SiFive U PRCI (Power, Reset, Clock, Interrupt)
++ *
++ * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
++ *
++ * Simple model of the PRCI to emulate register reads made by the SDK BSP
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "qemu/log.h"
++#include "qemu/module.h"
++#include "hw/riscv/sifive_u_prci.h"
++
++static uint64_t sifive_u_prci_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    SiFiveUPRCIState *s = opaque;
++
++    switch (addr) {
++    case SIFIVE_U_PRCI_HFXOSCCFG:
++        return s->hfxosccfg;
++    case SIFIVE_U_PRCI_COREPLLCFG0:
++        return s->corepllcfg0;
++    case SIFIVE_U_PRCI_DDRPLLCFG0:
++        return s->ddrpllcfg0;
++    case SIFIVE_U_PRCI_DDRPLLCFG1:
++        return s->ddrpllcfg1;
++    case SIFIVE_U_PRCI_GEMGXLPLLCFG0:
++        return s->gemgxlpllcfg0;
++    case SIFIVE_U_PRCI_GEMGXLPLLCFG1:
++        return s->gemgxlpllcfg1;
++    case SIFIVE_U_PRCI_CORECLKSEL:
++        return s->coreclksel;
++    case SIFIVE_U_PRCI_DEVICESRESET:
++        return s->devicesreset;
++    case SIFIVE_U_PRCI_CLKMUXSTATUS:
++        return s->clkmuxstatus;
++    }
++
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: read: addr=0x%x\n",
++                  __func__, (int)addr);
++
++    return 0;
++}
++
++static void sifive_u_prci_write(void *opaque, hwaddr addr,
++                                uint64_t val64, unsigned int size)
++{
++    SiFiveUPRCIState *s = opaque;
++    uint32_t val32 = (uint32_t)val64;
++
++    switch (addr) {
++    case SIFIVE_U_PRCI_HFXOSCCFG:
++        s->hfxosccfg = val32;
++        /* OSC stays ready */
++        s->hfxosccfg |= SIFIVE_U_PRCI_HFXOSCCFG_RDY;
++        break;
++    case SIFIVE_U_PRCI_COREPLLCFG0:
++        s->corepllcfg0 = val32;
++        /* internal feedback */
++        s->corepllcfg0 |= SIFIVE_U_PRCI_PLLCFG0_FSE;
++        /* PLL stays locked */
++        s->corepllcfg0 |= SIFIVE_U_PRCI_PLLCFG0_LOCK;
++        break;
++    case SIFIVE_U_PRCI_DDRPLLCFG0:
++        s->ddrpllcfg0 = val32;
++        /* internal feedback */
++        s->ddrpllcfg0 |= SIFIVE_U_PRCI_PLLCFG0_FSE;
++        /* PLL stays locked */
++        s->ddrpllcfg0 |= SIFIVE_U_PRCI_PLLCFG0_LOCK;
++        break;
++    case SIFIVE_U_PRCI_DDRPLLCFG1:
++        s->ddrpllcfg1 = val32;
++        break;
++    case SIFIVE_U_PRCI_GEMGXLPLLCFG0:
++        s->gemgxlpllcfg0 = val32;
++        /* internal feedback */
++        s->gemgxlpllcfg0 |= SIFIVE_U_PRCI_PLLCFG0_FSE;
++        /* PLL stays locked */
++        s->gemgxlpllcfg0 |= SIFIVE_U_PRCI_PLLCFG0_LOCK;
++        break;
++    case SIFIVE_U_PRCI_GEMGXLPLLCFG1:
++        s->gemgxlpllcfg1 = val32;
++        break;
++    case SIFIVE_U_PRCI_CORECLKSEL:
++        s->coreclksel = val32;
++        break;
++    case SIFIVE_U_PRCI_DEVICESRESET:
++        s->devicesreset = val32;
++        break;
++    case SIFIVE_U_PRCI_CLKMUXSTATUS:
++        s->clkmuxstatus = val32;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%x v=0x%x\n",
++                      __func__, (int)addr, (int)val64);
++    }
++}
++
++static const MemoryRegionOps sifive_u_prci_ops = {
++    .read = sifive_u_prci_read,
++    .write = sifive_u_prci_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
++};
++
++static void sifive_u_prci_realize(DeviceState *dev, Error **errp)
++{
++    SiFiveUPRCIState *s = SIFIVE_U_PRCI(dev);
++
++    memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_prci_ops, s,
++                          TYPE_SIFIVE_U_PRCI, SIFIVE_U_PRCI_REG_SIZE);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
++}
++
++static void sifive_u_prci_reset(DeviceState *dev)
++{
++    SiFiveUPRCIState *s = SIFIVE_U_PRCI(dev);
++
++    /* Initialize register to power-on-reset values */
++    s->hfxosccfg = SIFIVE_U_PRCI_HFXOSCCFG_RDY | SIFIVE_U_PRCI_HFXOSCCFG_EN;
++    s->corepllcfg0 = SIFIVE_U_PRCI_PLLCFG0_DIVR | SIFIVE_U_PRCI_PLLCFG0_DIVF |
++                     SIFIVE_U_PRCI_PLLCFG0_DIVQ | SIFIVE_U_PRCI_PLLCFG0_FSE |
++                     SIFIVE_U_PRCI_PLLCFG0_LOCK;
++    s->ddrpllcfg0 = SIFIVE_U_PRCI_PLLCFG0_DIVR | SIFIVE_U_PRCI_PLLCFG0_DIVF |
++                    SIFIVE_U_PRCI_PLLCFG0_DIVQ | SIFIVE_U_PRCI_PLLCFG0_FSE |
++                    SIFIVE_U_PRCI_PLLCFG0_LOCK;
++    s->gemgxlpllcfg0 = SIFIVE_U_PRCI_PLLCFG0_DIVR | SIFIVE_U_PRCI_PLLCFG0_DIVF |
++                       SIFIVE_U_PRCI_PLLCFG0_DIVQ | SIFIVE_U_PRCI_PLLCFG0_FSE |
++                       SIFIVE_U_PRCI_PLLCFG0_LOCK;
++    s->coreclksel = SIFIVE_U_PRCI_CORECLKSEL_HFCLK;
++}
++
++static void sifive_u_prci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = sifive_u_prci_realize;
++    dc->reset = sifive_u_prci_reset;
++}
++
++static const TypeInfo sifive_u_prci_info = {
++    .name          = TYPE_SIFIVE_U_PRCI,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SiFiveUPRCIState),
++    .class_init    = sifive_u_prci_class_init,
++};
++
++static void sifive_u_prci_register_types(void)
++{
++    type_register_static(&sifive_u_prci_info);
++}
++
++type_init(sifive_u_prci_register_types)
+diff --git a/include/hw/riscv/sifive_u_prci.h b/include/hw/riscv/sifive_u_prci.h
+new file mode 100644
+index 0000000..60a2eab
+--- /dev/null
++++ b/include/hw/riscv/sifive_u_prci.h
+@@ -0,0 +1,81 @@
++/*
++ * QEMU SiFive U PRCI (Power, Reset, Clock, Interrupt) interface
++ *
++ * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef HW_SIFIVE_U_PRCI_H
++#define HW_SIFIVE_U_PRCI_H
++
++#define SIFIVE_U_PRCI_HFXOSCCFG     0x00
++#define SIFIVE_U_PRCI_COREPLLCFG0   0x04
++#define SIFIVE_U_PRCI_DDRPLLCFG0    0x0C
++#define SIFIVE_U_PRCI_DDRPLLCFG1    0x10
++#define SIFIVE_U_PRCI_GEMGXLPLLCFG0 0x1C
++#define SIFIVE_U_PRCI_GEMGXLPLLCFG1 0x20
++#define SIFIVE_U_PRCI_CORECLKSEL    0x24
++#define SIFIVE_U_PRCI_DEVICESRESET  0x28
++#define SIFIVE_U_PRCI_CLKMUXSTATUS  0x2C
++
++/*
++ * Current FU540-C000 manual says ready bit is at bit 29, but
++ * freedom-u540-c000-bootloader codes (ux00prci.h) says it is at bit 31.
++ * We have to trust the actual code that works.
++ *
++ * see https://github.com/sifive/freedom-u540-c000-bootloader
++ */
++
++#define SIFIVE_U_PRCI_HFXOSCCFG_EN  (1 << 30)
++#define SIFIVE_U_PRCI_HFXOSCCFG_RDY (1 << 31)
++
++/* xxxPLLCFG0 register bits */
++#define SIFIVE_U_PRCI_PLLCFG0_DIVR  (1 << 0)
++#define SIFIVE_U_PRCI_PLLCFG0_DIVF  (31 << 6)
++#define SIFIVE_U_PRCI_PLLCFG0_DIVQ  (3 << 15)
++#define SIFIVE_U_PRCI_PLLCFG0_FSE   (1 << 25)
++#define SIFIVE_U_PRCI_PLLCFG0_LOCK  (1 << 31)
++
++/* xxxPLLCFG1 register bits */
++#define SIFIVE_U_PRCI_PLLCFG1_CKE   (1 << 24)
++
++/* coreclksel register bits */
++#define SIFIVE_U_PRCI_CORECLKSEL_HFCLK  (1 << 0)
++
++
++#define SIFIVE_U_PRCI_REG_SIZE  0x1000
++
++#define TYPE_SIFIVE_U_PRCI      "riscv.sifive.u.prci"
++
++#define SIFIVE_U_PRCI(obj) \
++    OBJECT_CHECK(SiFiveUPRCIState, (obj), TYPE_SIFIVE_U_PRCI)
++
++typedef struct SiFiveUPRCIState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion mmio;
++    uint32_t hfxosccfg;
++    uint32_t corepllcfg0;
++    uint32_t ddrpllcfg0;
++    uint32_t ddrpllcfg1;
++    uint32_t gemgxlpllcfg0;
++    uint32_t gemgxlpllcfg1;
++    uint32_t coreclksel;
++    uint32_t devicesreset;
++    uint32_t clkmuxstatus;
++} SiFiveUPRCIState;
++
++#endif /* HW_SIFIVE_U_PRCI_H */
+-- 
+2.7.4
+
+
