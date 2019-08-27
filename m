@@ -2,60 +2,60 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA4CC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01805C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:37:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 765F82070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765F82070B
+	by mail.kernel.org (Postfix) with ESMTPS id CC7702070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:37:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC7702070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2gJs-0003zj-Co
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:35:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53491)
+	id 1i2gL3-0004vM-R9
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:37:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2g8B-00036m-BK
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:48 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2g8H-0003Es-H4
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2g8A-0005bt-8S
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55886)
+ (envelope-from <mreitz@redhat.com>) id 1i2g8G-0005i5-7p
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40984)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2g86-0005YE-TT; Tue, 27 Aug 2019 14:23:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1i2g8D-0005f7-TP; Tue, 27 Aug 2019 14:23:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4290418C426D;
- Tue, 27 Aug 2019 18:23:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3816786663;
+ Tue, 27 Aug 2019 18:23:49 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D170960A35;
- Tue, 27 Aug 2019 18:23:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C5A155D9CC;
+ Tue, 27 Aug 2019 18:23:48 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 27 Aug 2019 20:23:09 +0200
-Message-Id: <20190827182313.25983-12-mreitz@redhat.com>
+Date: Tue, 27 Aug 2019 20:23:12 +0200
+Message-Id: <20190827182313.25983-15-mreitz@redhat.com>
 In-Reply-To: <20190827182313.25983-1-mreitz@redhat.com>
 References: <20190827182313.25983-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Tue, 27 Aug 2019 18:23:42 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Tue, 27 Aug 2019 18:23:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 11/15] iotests: Disable 126 for flat vmdk
- subformats
+Subject: [Qemu-devel] [PULL 14/15] tests/check-block: Skip iotests when
+ sanitizers are enabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,33 +73,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-iotest 126 requires backing file support, which flat vmdks cannot offer.
-Skip this test for such subformats.
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190815153638.4600-8-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
+The sanitizers (especially the address sanitizer from Clang) are
+sometimes printing out warnings or false positives - this spoils
+the output of the iotests, causing some of the tests to fail.
+Thus let's skip the automatic iotests during "make check" when the
+user configured QEMU with --enable-sanitizers.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20190823084203.29734-1-thuth@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/126 | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/check-block.sh | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
-index 9b0dcf9255..b7fce1e59d 100755
---- a/tests/qemu-iotests/126
-+++ b/tests/qemu-iotests/126
-@@ -33,6 +33,8 @@ status=3D1	# failure is the default!
+diff --git a/tests/check-block.sh b/tests/check-block.sh
+index c8b6cec3f6..679aedec50 100755
+--- a/tests/check-block.sh
++++ b/tests/check-block.sh
+@@ -21,6 +21,11 @@ if grep -q "TARGET_GPROF=3Dy" *-softmmu/config-target.=
+mak 2>/dev/null ; then
+     exit 0
+ fi
 =20
- # Needs backing file support
- _supported_fmt qcow qcow2 qed vmdk
-+_unsupported_imgopts "subformat=3DmonolithicFlat" \
-+                     "subformat=3DtwoGbMaxExtentFlat"
- # This is the default protocol (and we want to test the difference betwe=
-en
- # colons which separate a protocol prefix from the rest and colons which=
- are
- # just part of the filename, so we cannot test protocols which require a=
- prefix)
++if grep -q "CFLAGS.*-fsanitize" config-host.mak 2>/dev/null ; then
++    echo "Sanitizers are enabled =3D=3D> Not running the qemu-iotests."
++    exit 0
++fi
++
+ if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
+     echo "No qemu-system binary available =3D=3D> Not running the qemu-i=
+otests."
+     exit 0
 --=20
 2.21.0
 
