@@ -2,56 +2,81 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E8BC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D50EC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD36020828
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:42:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD36020828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC0F42053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:43:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E49CJOPT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC0F42053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Xzk-0005Yw-2k
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 05:42:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50537)
+	id 1i2Y0l-0006Yq-4w
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 05:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50682)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1i2XwJ-0001dL-Oa
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:39:01 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i2XxP-0002pq-1v
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:40:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1i2XwI-00050K-3Z
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:38:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54765 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1i2XwH-0004eP-Po
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:38:58 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id ACEFD1A1FCF;
- Tue, 27 Aug 2019 11:37:52 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw870-lin.domain.local (rtrkw870-lin.domain.local
- [10.10.13.132])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 78DF21A204A;
- Tue, 27 Aug 2019 11:37:52 +0200 (CEST)
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 27 Aug 2019 11:37:42 +0200
-Message-Id: <1566898663-25858-3-git-send-email-stefan.brankovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1566898663-25858-1-git-send-email-stefan.brankovic@rt-rk.com>
-References: <1566898663-25858-1-git-send-email-stefan.brankovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v6 2/3] target/ppc: Optimize emulation of vclzh
- and vclzb instructions
+ (envelope-from <peter.maydell@linaro.org>) id 1i2XxN-0005Dr-Vv
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:40:06 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34433)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i2XxN-0005CK-Qe
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:40:05 -0400
+Received: by mail-oi1-x241.google.com with SMTP id g128so14471512oib.1
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 02:40:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=53esGyujJRuHZyT+DpRlIP9dK5qVt+dzLS4r6AGzimY=;
+ b=E49CJOPT+Sr+e+FwXAssfLIxdPSYIRjmNBIf9H1Dfn53O6OFvPGCXDORLFuumqgNqp
+ oIRXmEFqEMwWslupVoK6sdvlBdT4ooB9AwyU3SMzGtbj9xSzx2MxjuoAsIfPE8FItFt2
+ CXr59dpaIX/9rxDGiUxnR1BQDXcbqbZhVNx3oUhxqejpkfkh8Sg4M2UY6ZEJ6jkgTpeO
+ rLLXAsxeCSN+mMuhC2DMtPyL5oeUcIrRFkBLGTB5k2lbh3XIntsiw7hw98ju6dTBMD63
+ 4Dp/iMH0d+mjkhT+qh+7/Z5sCTe1KkDO70ExcBVSpDZjIeBiNny5JkFaG1qlJy/XegkS
+ suHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=53esGyujJRuHZyT+DpRlIP9dK5qVt+dzLS4r6AGzimY=;
+ b=alcumXieUIW0Jrdo7apf3tI6chSzVLwqctPXS47UuaBBUuzD3p2Wb0D8S97RtWT5Kv
+ FhCywy78IDSHYDxai33/7Mvr0LNVDM5zUwbKPKFJa+7r4rlpt2zFs3AJl1l+Gl3sjrlf
+ NxxJSxqr86H9WldtJ4OkNJNqpFBiftItnV0Yx7GJ3JoineAiR6gRV0PcDYL7QK3QDAp6
+ YFn6t89jZjlslN65aCQrKrVaadSRgg5Pws8DmkiUuzn24U50WyTNB7zjy3KbSneDLB5s
+ XDu5J7xBxXSkkA0zVtIgzb+1lIFqSxopXsjZTqvhEsfo541Bw4HhTzDPLfQRLXnzsg0r
+ ig+w==
+X-Gm-Message-State: APjAAAUrfZI6kXcxuER1AFCL2k9gOV8Tu4JIx2w8DvZ97XSzRyalZ/4D
+ 5Gh6n9yIUHlKqLn/yoYOJRE12OgzRT+Hk+PiklE1La6kDiU=
+X-Google-Smtp-Source: APXvYqx2LKWTGjPhlfY8+woMScJDhz4yI+8PVa1Vnb3cH8hiJUyY2udhgqpJoVVh59XkP0IdUcmPWc5G7VV6TrVTF+Y=
+X-Received: by 2002:aca:4b86:: with SMTP id
+ y128mr15510966oia.163.1566898804926; 
+ Tue, 27 Aug 2019 02:40:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-69-richard.henderson@linaro.org>
+In-Reply-To: <20190819213755.26175-69-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Aug 2019 10:39:54 +0100
+Message-ID: <CAFEAcA9dJ_5ZxXwoH3ngRGxzmrkrev1BgjpSz2zBzi23ABGCpg@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v2 68/68] target/arm: Inline gen_bx_im into
+ callers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,240 +88,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, david@gibson.dropbear.id.au
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Optimize Altivec instruction vclzh (Vector Count Leading Zeros Halfword).
-This instruction counts the number of leading zeros of each halfword element
-in source register and places result in the appropriate halfword element of
-destination register.
+On Mon, 19 Aug 2019 at 22:39, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> There are only two remaining uses of gen_bx_im.  In each case, we
+> know the destination mode -- not changing in the case of gen_jmp
+> or changing in the case of trans_BLX_i.  Use this to simplify the
+> surrounding code.
+>
+> For trans_BLX_i, use gen_jmp for the actual branch.  For gen_jmp,
+> use gen_set_pc_im to set up the single-step.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 
-In each iteration of outer for loop count operation is performed on one
-doubleword element of source register vB. In the first iteration, higher
-doubleword element of vB is placed in variable avr, and then counting
-for every halfword element is performed by  using tcg_gen_clzi_i64.
-Since it counts leading zeros on 64 bit lenght, ith byte element has to
-be moved to the highest 16 bits of tmp, or-ed with mask(in order to get all
-ones in lowest 48 bits), then perform tcg_gen_clzi_i64 and move it's result
-in appropriate halfword element of result. This is done in inner for loop.
-After the operation is finished, the result is saved in the appropriate
-doubleword element of destination register vD. The same sequence of orders
-is to be applied again for the  lower doubleword element of vB.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Optimize Altivec instruction vclzb (Vector Count Leading Zeros Byte).
-This instruction counts the number of leading zeros of each byte element
-in source register and places result in the appropriate byte element of
-destination register.
-
-In each iteration of the outer for loop, counting operation is done on one
-doubleword element of source register vB. In the first iteration, the
-higher doubleword element of vB is placed in variable avr, and then counting
-for every byte element is performed using tcg_gen_clzi_i64. Since it counts
-leading zeros on 64 bit lenght, ith byte element has to be moved to the highest
-8 bits of variable  tmp, or-ed with mask(in order to get all ones in the lowest
-56 bits), then perform tcg_gen_clzi_i64 and move it's result in the appropriate
-byte element of result. This is done in inner for loop. After the operation is
-finished, the result is saved in the  appropriate doubleword element of destination
-register vD. The same sequence of orders is to be applied again for the lower
-doubleword element of vB.
-
-Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
----
- target/ppc/helper.h                 |   2 -
- target/ppc/int_helper.c             |   9 ---
- target/ppc/translate/vmx-impl.inc.c | 136 +++++++++++++++++++++++++++++++++++-
- 3 files changed, 134 insertions(+), 13 deletions(-)
-
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 940a115..39c202f 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -307,8 +307,6 @@ DEF_HELPER_4(vcfsx, void, env, avr, avr, i32)
- DEF_HELPER_4(vctuxs, void, env, avr, avr, i32)
- DEF_HELPER_4(vctsxs, void, env, avr, avr, i32)
- 
--DEF_HELPER_2(vclzb, void, avr, avr)
--DEF_HELPER_2(vclzh, void, avr, avr)
- DEF_HELPER_2(vctzb, void, avr, avr)
- DEF_HELPER_2(vctzh, void, avr, avr)
- DEF_HELPER_2(vctzw, void, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 9ff3b03..65a9387 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1796,15 +1796,6 @@ VUPK(lsw, s64, s32, UPKLO)
-         }                                                               \
-     }
- 
--#define clzb(v) ((v) ? clz32((uint32_t)(v) << 24) : 8)
--#define clzh(v) ((v) ? clz32((uint32_t)(v) << 16) : 16)
--
--VGENERIC_DO(clzb, u8)
--VGENERIC_DO(clzh, u16)
--
--#undef clzb
--#undef clzh
--
- #define ctzb(v) ((v) ? ctz32(v) : 8)
- #define ctzh(v) ((v) ? ctz32(v) : 16)
- #define ctzw(v) ctz32((v))
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 456666a..e8a0fb6 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -840,6 +840,138 @@ static void trans_vgbbd(DisasContext *ctx)
- }
- 
- /*
-+ * vclzb VRT,VRB - Vector Count Leading Zeros Byte
-+ *
-+ * Counting the number of leading zero bits of each byte element in source
-+ * register and placing result in appropriate byte element of destination
-+ * register.
-+ */
-+static void trans_vclzb(DisasContext *ctx)
-+{
-+    int VT = rD(ctx->opcode);
-+    int VB = rB(ctx->opcode);
-+    TCGv_i64 avr = tcg_temp_new_i64();
-+    TCGv_i64 result = tcg_temp_new_i64();
-+    TCGv_i64 result1 = tcg_temp_new_i64();
-+    TCGv_i64 result2 = tcg_temp_new_i64();
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+    TCGv_i64 mask = tcg_const_i64(0xffffffffffffffULL);
-+    int i, j;
-+
-+    for (i = 0; i < 2; i++) {
-+        if (i == 0) {
-+            /* Get high doubleword of vB in avr. */
-+            get_avr64(avr, VB, true);
-+        } else {
-+            /* Get low doubleword of vB in avr. */
-+            get_avr64(avr, VB, false);
-+        }
-+        /*
-+         * Perform count for every byte element using tcg_gen_clzi_i64.
-+         * Since it counts leading zeros on 64 bit lenght, we have to move
-+         * ith byte element to highest 8 bits of tmp, or it with mask(so we get
-+         * all ones in lowest 56 bits), then perform tcg_gen_clzi_i64 and move
-+         * it's result in appropriate byte element of result.
-+         */
-+        tcg_gen_shli_i64(tmp, avr, 56);
-+        tcg_gen_or_i64(tmp, tmp, mask);
-+        tcg_gen_clzi_i64(result, tmp, 64);
-+        for (j = 1; j < 7; j++) {
-+            tcg_gen_shli_i64(tmp, avr, (7 - j) * 8);
-+            tcg_gen_or_i64(tmp, tmp, mask);
-+            tcg_gen_clzi_i64(tmp, tmp, 64);
-+            tcg_gen_deposit_i64(result, result, tmp, j * 8, 8);
-+        }
-+        tcg_gen_or_i64(tmp, avr, mask);
-+        tcg_gen_clzi_i64(tmp, tmp, 64);
-+        tcg_gen_deposit_i64(result, result, tmp, 56, 8);
-+        if (i == 0) {
-+            /* Place result in high doubleword element of vD. */
-+            tcg_gen_mov_i64(result1, result);
-+        } else {
-+            /* Place result in low doubleword element of vD. */
-+            tcg_gen_mov_i64(result2, result);
-+        }
-+    }
-+
-+    set_avr64(VT, result1, true);
-+    set_avr64(VT, result2, false);
-+
-+    tcg_temp_free_i64(avr);
-+    tcg_temp_free_i64(result);
-+    tcg_temp_free_i64(result1);
-+    tcg_temp_free_i64(result2);
-+    tcg_temp_free_i64(tmp);
-+    tcg_temp_free_i64(mask);
-+}
-+
-+/*
-+ * vclzh VRT,VRB - Vector Count Leading Zeros Halfword
-+ *
-+ * Counting the number of leading zero bits of each halfword element in source
-+ * register and placing result in appropriate halfword element of destination
-+ * register.
-+ */
-+static void trans_vclzh(DisasContext *ctx)
-+{
-+    int VT = rD(ctx->opcode);
-+    int VB = rB(ctx->opcode);
-+    TCGv_i64 avr = tcg_temp_new_i64();
-+    TCGv_i64 result = tcg_temp_new_i64();
-+    TCGv_i64 result1 = tcg_temp_new_i64();
-+    TCGv_i64 result2 = tcg_temp_new_i64();
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+    TCGv_i64 mask = tcg_const_i64(0xffffffffffffULL);
-+    int i, j;
-+
-+    for (i = 0; i < 2; i++) {
-+        if (i == 0) {
-+            /* Get high doubleword element of vB in avr. */
-+            get_avr64(avr, VB, true);
-+        } else {
-+            /* Get low doubleword element of vB in avr. */
-+            get_avr64(avr, VB, false);
-+        }
-+        /*
-+         * Perform count for every halfword element using tcg_gen_clzi_i64.
-+         * Since it counts leading zeros on 64 bit lenght, we have to move
-+         * ith byte element to highest 16 bits of tmp, or it with mask(so we get
-+         * all ones in lowest 48 bits), then perform tcg_gen_clzi_i64 and move
-+         * it's result in appropriate halfword element of result.
-+         */
-+        tcg_gen_shli_i64(tmp, avr, 48);
-+        tcg_gen_or_i64(tmp, tmp, mask);
-+        tcg_gen_clzi_i64(result, tmp, 64);
-+        for (j = 1; j < 3; j++) {
-+            tcg_gen_shli_i64(tmp, avr, (3 - j) * 16);
-+            tcg_gen_or_i64(tmp, tmp, mask);
-+            tcg_gen_clzi_i64(tmp, tmp, 64);
-+            tcg_gen_deposit_i64(result, result, tmp, j * 16, 16);
-+        }
-+        tcg_gen_or_i64(tmp, avr, mask);
-+        tcg_gen_clzi_i64(tmp, tmp, 64);
-+        tcg_gen_deposit_i64(result, result, tmp, 48, 16);
-+        if (i == 0) {
-+            /* Place result in high doubleword element of vD. */
-+            tcg_gen_mov_i64(result1, result);
-+        } else {
-+            /* Place result in low doubleword element of vD. */
-+            tcg_gen_mov_i64(result2, result);
-+        }
-+    }
-+
-+    set_avr64(VT, result1, true);
-+    set_avr64(VT, result2, false);
-+
-+    tcg_temp_free_i64(avr);
-+    tcg_temp_free_i64(result);
-+    tcg_temp_free_i64(result1);
-+    tcg_temp_free_i64(result2);
-+    tcg_temp_free_i64(tmp);
-+    tcg_temp_free_i64(mask);
-+}
-+
-+/*
-  * vclzw VRT,VRB - Vector Count Leading Zeros Word
-  *
-  * Counting the number of leading zero bits of each word element in source
-@@ -1404,8 +1536,8 @@ GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20)
- GEN_VAFORM_PAIRED(vsel, vperm, 21)
- GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23)
- 
--GEN_VXFORM_NOA(vclzb, 1, 28)
--GEN_VXFORM_NOA(vclzh, 1, 29)
-+GEN_VXFORM_TRANS(vclzb, 1, 28)
-+GEN_VXFORM_TRANS(vclzh, 1, 29)
- GEN_VXFORM_TRANS(vclzw, 1, 30)
- GEN_VXFORM_TRANS(vclzd, 1, 31)
- GEN_VXFORM_NOA_2(vnegw, 1, 24, 6)
--- 
-2.7.4
-
+thanks
+-- PMM
 
