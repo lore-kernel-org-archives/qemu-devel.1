@@ -2,49 +2,56 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9D2C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 06:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DDEC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:03:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1941206BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 06:57:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1941206BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id B9655206BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:03:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9655206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2VQM-000741-VE
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 02:57:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52446)
+	id 1i2WSM-0004am-Vf
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 04:03:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1i2VPY-0006Vn-BW
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 02:57:01 -0400
+ (envelope-from <fangying1@huawei.com>) id 1i2WQz-0003XT-1k
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:02:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1i2VPW-00029o-Ex
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 02:56:59 -0400
-Received: from ozlabs.ru ([107.173.13.209]:46758)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>)
- id 1i2VPW-00028b-8Y; Tue, 27 Aug 2019 02:56:58 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id DD5E2AE80016;
- Tue, 27 Aug 2019 02:56:32 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 27 Aug 2019 16:56:50 +1000
-Message-Id: <20190827065650.107319-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 107.173.13.209
-Subject: [Qemu-devel] [GIT PULL for qemu-pseries] spapr: Render full FDT on
- ibm, client-architecture-support
+ (envelope-from <fangying1@huawei.com>) id 1i2WQx-0007dI-P8
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:02:32 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2188 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <fangying1@huawei.com>)
+ id 1i2WQx-0007YV-EA
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:02:31 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 673D5E0A6AA544E42E0F;
+ Tue, 27 Aug 2019 16:02:19 +0800 (CST)
+Received: from localhost (10.133.205.53) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 27 Aug 2019
+ 16:02:11 +0800
+From: Ying Fang <fangying1@huawei.com>
+To: <qemu-devel@nongnu.org>, <kraxel@redhat.com>
+Date: Tue, 27 Aug 2019 16:02:09 +0800
+Message-ID: <20190827080209.2365-1-fangying1@huawei.com>
+X-Mailer: git-send-email 2.22.0.windows.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.133.205.53]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.190
+Subject: [Qemu-devel] [PATCH] xhci: Fix memory leak in xhci_address_slot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,31 +63,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: lcf.lichaofeng@huawei.com, Ying Fang <fangying1@huawei.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>, zhouyibo3@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit d6bb8b27204eaa58f1da948b65454e3a598ab2a4:
+Address Sanitizer shows memory leak in xhci_address_slot
+hw/usb/hcd-xhci.c:2156 and the stack is as bellow:
 
-  pseries: Update SLOF firmware image (2019-08-27 16:47:04 +1000)
+Direct leak of 64 byte(s) in 4 object(s) allocated from:
+    #0 0xffff91c6f5ab in realloc (/lib64/libasan.so.4+0xd35ab)
+    #1 0xffff91987243 in g_realloc (/lib64/libglib-2.0.so.0+0x57243)
+    #2 0xaaaab0b26a1f in qemu_iovec_add util/iov.c:296
+    #3 0xaaaab07e5ce3 in xhci_address_slot hw/usb/hcd-xhci.c:2156
+    #4 0xaaaab07e5ce3 in xhci_process_commands hw/usb/hcd-xhci.c:2493
+    #5 0xaaaab00058d7 in memory_region_write_accessor qemu/memory.c:507
+    #6 0xaaaab0000d87 in access_with_adjusted_size memory.c:573
+    #7 0xaaaab000abcf in memory_region_dispatch_write memory.c:1516
+    #8 0xaaaaaff59947 in flatview_write_continue exec.c:3367
+    #9 0xaaaaaff59c33 in flatview_write exec.c:3406
+    #10 0xaaaaaff63b3b in address_space_write exec.c:3496
+    #11 0xaaaab002f263 in kvm_cpu_exec accel/kvm/kvm-all.c:2288
+    #12 0xaaaaaffee427 in qemu_kvm_cpu_thread_fn cpus.c:1290
+    #13 0xaaaab0b1a943 in qemu_thread_start util/qemu-thread-posix.c:502
+    #14 0xffff908ce8bb in start_thread (/lib64/libpthread.so.0+0x78bb)
+    #15 0xffff908165cb in thread_start (/lib64/libc.so.6+0xd55cb)
 
-are available in the Git repository at:
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
+---
+ hw/usb/hcd-xhci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-  git@github.com:aik/qemu.git tags/qemu-slof-20190827
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index f578264948..471759cd4c 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -2161,6 +2161,7 @@ static TRBCCode xhci_address_slot(XHCIState *xhci, =
+unsigned int slotid,
+                                   DeviceOutRequest | USB_REQ_SET_ADDRESS=
+,
+                                   slotid, 0, 0, NULL);
+         assert(p.status !=3D USB_RET_ASYNC);
++        usb_packet_cleanup(&p);
+     }
+=20
+     res =3D xhci_enable_ep(xhci, slotid, 1, octx+32, ep0_ctx);
+--=20
+2.19.1
 
-for you to fetch changes up to da9960a5aaa25d27c9798c3d94c7b4c2d8af31ac:
 
-  spapr: Render full FDT on ibm,client-architecture-support (2019-08-27 16:47:46 +1000)
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      spapr: Render full FDT on ibm,client-architecture-support
-
- hw/ppc/spapr.c | 90 +++++++---------------------------------------------------
- 1 file changed, 10 insertions(+), 80 deletions(-)
-
-
-*** Note: this is not for master, this is for pseries
 
