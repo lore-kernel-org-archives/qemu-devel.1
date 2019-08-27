@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C925AC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 20:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CD1C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 20:20:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A182D20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 20:19:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A182D20679
+	by mail.kernel.org (Postfix) with ESMTPS id DFCE020679
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 20:20:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFCE020679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2hwK-0007rn-81
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 16:19:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51252)
+	id 1i2hxK-0000pa-V2
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 16:20:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i2htz-0005vc-3f
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 16:17:16 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i2huL-00069h-FD
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 16:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i2htx-0000gd-5h
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 16:17:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44694)
+ (envelope-from <stefanha@redhat.com>) id 1i2huK-0000ov-Ct
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 16:17:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42432)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1i2htt-0000fB-8p; Tue, 27 Aug 2019 16:17:09 -0400
+ id 1i2huH-0000nP-OP; Tue, 27 Aug 2019 16:17:33 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A56418B3D84;
- Tue, 27 Aug 2019 20:17:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1141210F23E7;
+ Tue, 27 Aug 2019 20:17:33 +0000 (UTC)
 Received: from localhost (ovpn-116-148.ams2.redhat.com [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC38860CC0;
- Tue, 27 Aug 2019 20:16:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1A80E6E700;
+ Tue, 27 Aug 2019 20:17:26 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 27 Aug 2019 21:16:29 +0100
-Message-Id: <20190827201639.30368-3-stefanha@redhat.com>
+Date: Tue, 27 Aug 2019 21:16:32 +0100
+Message-Id: <20190827201639.30368-6-stefanha@redhat.com>
 In-Reply-To: <20190827201639.30368-1-stefanha@redhat.com>
 References: <20190827201639.30368-1-stefanha@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Tue, 27 Aug 2019 20:17:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.66]); Tue, 27 Aug 2019 20:17:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 02/12] util/iov: improve qemu_iovec_is_zero
+Subject: [Qemu-devel] [PULL 05/12] block/io: bdrv_co_do_copy_on_readv: use
+ and support qiov_offset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,104 +77,92 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-We'll need to check a part of qiov soon, so implement it now.
-
-Optimization with align down to 4 * sizeof(long) is dropped due to:
-1. It is strange: it aligns length of the buffer, but where is a
-   guarantee that buffer pointer is aligned itself?
-2. buffer_is_zero() is a better place for optimizations and it has
-   them.
+Use and support new API in bdrv_co_do_copy_on_readv. Note that in case
+of allocated-in-top we need to shrink read size to MIN(..) by hand, as
+pre-patch this was actually done implicitly by qemu_iovec_concat (and
+we used local_qiov.size).
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20190604161514.262241-3-vsementsov@virtuozzo.com
-Message-Id: <20190604161514.262241-3-vsementsov@virtuozzo.com>
+Message-id: 20190604161514.262241-6-vsementsov@virtuozzo.com
+Message-Id: <20190604161514.262241-6-vsementsov@virtuozzo.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/qemu/iov.h |  2 +-
- block/io.c         |  2 +-
- util/iov.c         | 31 +++++++++++++++++++------------
- 3 files changed, 21 insertions(+), 14 deletions(-)
+ block/io.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-index f3787a0cf7..29957c8a72 100644
---- a/include/qemu/iov.h
-+++ b/include/qemu/iov.h
-@@ -212,7 +212,7 @@ void qemu_iovec_concat(QEMUIOVector *dst,
- size_t qemu_iovec_concat_iov(QEMUIOVector *dst,
-                              struct iovec *src_iov, unsigned int src_cnt=
-,
-                              size_t soffset, size_t sbytes);
--bool qemu_iovec_is_zero(QEMUIOVector *qiov);
-+bool qemu_iovec_is_zero(QEMUIOVector *qiov, size_t qiov_offeset, size_t =
-bytes);
- void qemu_iovec_destroy(QEMUIOVector *qiov);
- void qemu_iovec_reset(QEMUIOVector *qiov);
- size_t qemu_iovec_to_buf(QEMUIOVector *qiov, size_t offset,
 diff --git a/block/io.c b/block/io.c
-index 56bbf195bb..f656fb2dce 100644
+index fd2fc7d5ff..5817bb9405 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -1722,7 +1722,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvCh=
-ild *child,
+@@ -1227,7 +1227,7 @@ bdrv_driver_pwritev_compressed(BlockDriverState *bs=
+, uint64_t offset,
 =20
-     if (!ret && bs->detect_zeroes !=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_OF=
-F &&
-         !(flags & BDRV_REQ_ZERO_WRITE) && drv->bdrv_co_pwrite_zeroes &&
--        qemu_iovec_is_zero(qiov)) {
-+        qemu_iovec_is_zero(qiov, 0, qiov->size)) {
-         flags |=3D BDRV_REQ_ZERO_WRITE;
-         if (bs->detect_zeroes =3D=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMA=
-P) {
-             flags |=3D BDRV_REQ_MAY_UNMAP;
-diff --git a/util/iov.c b/util/iov.c
-index 366ff9cdd1..9ac0261853 100644
---- a/util/iov.c
-+++ b/util/iov.c
-@@ -451,23 +451,30 @@ void qemu_iovec_init_extended(
- }
-=20
- /*
-- * Check if the contents of the iovecs are all zero
-+ * Check if the contents of subrange of qiov data is all zeroes.
-  */
--bool qemu_iovec_is_zero(QEMUIOVector *qiov)
-+bool qemu_iovec_is_zero(QEMUIOVector *qiov, size_t offset, size_t bytes)
+ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+         int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+-        int flags)
++        size_t qiov_offset, int flags)
  {
--    int i;
--    for (i =3D 0; i < qiov->niov; i++) {
--        size_t offs =3D QEMU_ALIGN_DOWN(qiov->iov[i].iov_len, 4 * sizeof=
-(long));
--        uint8_t *ptr =3D qiov->iov[i].iov_base;
--        if (offs && !buffer_is_zero(qiov->iov[i].iov_base, offs)) {
-+    struct iovec *iov;
-+    size_t current_offset;
-+
-+    assert(offset + bytes <=3D qiov->size);
-+
-+    iov =3D iov_skip_offset(qiov->iov, offset, &current_offset);
-+
-+    while (bytes) {
-+        uint8_t *base =3D (uint8_t *)iov->iov_base + current_offset;
-+        size_t len =3D MIN(iov->iov_len - current_offset, bytes);
-+
-+        if (!buffer_is_zero(base, len)) {
-             return false;
-         }
--        for (; offs < qiov->iov[i].iov_len; offs++) {
--            if (ptr[offs]) {
--                return false;
--            }
--        }
-+
-+        current_offset =3D 0;
-+        bytes -=3D len;
-+        iov++;
-     }
-+
-     return true;
- }
+     BlockDriverState *bs =3D child->bs;
 =20
+@@ -1239,7 +1239,6 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(Bd=
+rvChild *child,
+     void *bounce_buffer;
+=20
+     BlockDriver *drv =3D bs->drv;
+-    QEMUIOVector local_qiov;
+     int64_t cluster_offset;
+     int64_t cluster_bytes;
+     size_t skip_bytes;
+@@ -1302,6 +1301,8 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(Bd=
+rvChild *child,
+         assert(skip_bytes < pnum);
+=20
+         if (ret <=3D 0) {
++            QEMUIOVector local_qiov;
++
+             /* Must copy-on-read; use the bounce buffer */
+             pnum =3D MIN(pnum, MAX_BOUNCE_BUFFER);
+             qemu_iovec_init_buf(&local_qiov, bounce_buffer, pnum);
+@@ -1339,16 +1340,15 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(=
+BdrvChild *child,
+             }
+=20
+             if (!(flags & BDRV_REQ_PREFETCH)) {
+-                qemu_iovec_from_buf(qiov, progress, bounce_buffer + skip=
+_bytes,
++                qemu_iovec_from_buf(qiov, qiov_offset + progress,
++                                    bounce_buffer + skip_bytes,
+                                     pnum - skip_bytes);
+             }
+         } else if (!(flags & BDRV_REQ_PREFETCH)) {
+             /* Read directly into the destination */
+-            qemu_iovec_init(&local_qiov, qiov->niov);
+-            qemu_iovec_concat(&local_qiov, qiov, progress, pnum - skip_b=
+ytes);
+-            ret =3D bdrv_driver_preadv(bs, offset + progress, local_qiov=
+.size,
+-                                     &local_qiov, 0, 0);
+-            qemu_iovec_destroy(&local_qiov);
++            ret =3D bdrv_driver_preadv(bs, offset + progress,
++                                     MIN(pnum - skip_bytes, bytes - prog=
+ress),
++                                     qiov, qiov_offset + progress, 0);
+             if (ret < 0) {
+                 goto err;
+             }
+@@ -1422,7 +1422,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChi=
+ld *child,
+         }
+=20
+         if (!ret || pnum !=3D bytes) {
+-            ret =3D bdrv_co_do_copy_on_readv(child, offset, bytes, qiov,=
+ flags);
++            ret =3D bdrv_co_do_copy_on_readv(child, offset, bytes, qiov,=
+ 0, flags);
+             goto out;
+         } else if (flags & BDRV_REQ_PREFETCH) {
+             goto out;
 --=20
 2.21.0
 
