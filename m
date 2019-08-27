@@ -2,78 +2,93 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8ABAC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5928C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F59E2070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:44:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F59E2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 9B9332184D
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:51:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B9332184D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2blt-0006Ji-Sa
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:44:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33835)
+	id 1i2bsi-0000Bm-NT
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:51:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1i2bl0-0005i9-Vl
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:43:36 -0400
+ (envelope-from <eblake@redhat.com>) id 1i2brW-00083G-Rq
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1i2bky-0000ty-Lt
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:43:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56430)
+ (envelope-from <eblake@redhat.com>) id 1i2brV-0000hE-RI
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:50:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55596)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1i2bky-0000sh-Ee
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:43:32 -0400
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i2brQ-0000PJ-Qc; Tue, 27 Aug 2019 09:50:13 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5CC0E91762
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 13:43:30 +0000 (UTC)
-Received: by mail-ot1-f71.google.com with SMTP id c25so11905362otp.15
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 06:43:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=exJLbOqq35XiPgsDG6Umhc0CpHyNr+XZvpR88d8Lwug=;
- b=PAe/sdx5sXt1G97kT7lq7+cTBogAM8xhpUq9M+sXhYAqrucDabDWrBAjPW4Fua57bl
- Vs8UIoN+jOKxevIykzlnFmA4Dz6f7fjMkivAhYYlBkvWeCCWWqCHvw5tGcAAvY94sNd+
- 0c5EV950JIUE97RwdBm6W+FLDxSQuYT2L76bvn98sXqvzI2VXx55/+66BBa+H5VgN+gx
- /zyd+ej3qkxcA7JoJ4zgOV84ynwxsBxtetdoR5EZ544lf7c6xdF7gqziuKTqBuqhkD7/
- QDPUAhLryu9b9GhLHsBAa8fENCHOGIxR/yE8riygEKbBhabN6cu7sNhP4dQaxDdWRE9+
- d2MQ==
-X-Gm-Message-State: APjAAAWL4M2mbm3RehyP9k8+TxqmYIUjcGRfWAdLeAcdJvbBAyxmNB6W
- n+b+DFN5arykRZCFjIEWu2v2t1mpj7LchgN2Cqvb2wnVYIu2VjUBVyfG5tItWr5Iu1ziMp0MDV5
- ssVf5hZppZq8uoJuu/zUrIVMQJxcPyZY=
-X-Received: by 2002:a05:6830:1e96:: with SMTP id
- n22mr4833476otr.368.1566913409841; 
- Tue, 27 Aug 2019 06:43:29 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzTR4a42jWAhocWSTVj73zrZzY0rQC0XM4GaXqgyreaCfODVG5g9+46KyV9HADEXxCRySI4n4ySPNw1TGil/pg=
-X-Received: by 2002:a05:6830:1e96:: with SMTP id
- n22mr4833461otr.368.1566913409567; 
- Tue, 27 Aug 2019 06:43:29 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id ACCD88980F8;
+ Tue, 27 Aug 2019 13:50:10 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B72FE60C05;
+ Tue, 27 Aug 2019 13:50:04 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <1566498661-53008-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <218c5855-a8dc-df50-23cb-ebd1a1cd259c@redhat.com>
+ <8a642371-bbd7-26bd-f54b-576ce49c05d2@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <2ed4f9de-9e2d-0b6f-0248-c213c1ac9668@redhat.com>
+Date: Tue, 27 Aug 2019 08:50:03 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190827124909.16824-1-johannes@sipsolutions.net>
-In-Reply-To: <20190827124909.16824-1-johannes@sipsolutions.net>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 27 Aug 2019 17:43:18 +0400
-Message-ID: <CAMxuvaykLW7U5gppHe8Z2zCg6bcGxeVuBMrkKk8Eh9V3oQAY6w@mail.gmail.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <8a642371-bbd7-26bd-f54b-576ce49c05d2@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="fTcYjovHNDAyJVnVPN4pgVphcyrPfJyRz"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Tue, 27 Aug 2019 13:50:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] libvhost-user-glib: fix VugDev main fd
- cleanup
+Subject: Re: [Qemu-devel] [PATCH] block: workaround for unaligned byte range
+ in fallocate()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,130 +100,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Johannes Berg <johannes.berg@intel.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fTcYjovHNDAyJVnVPN4pgVphcyrPfJyRz
+Content-Type: multipart/mixed; boundary="R1ioQcvUlkrJjSSyjISEdJw3A1hE3iJ0g";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>, "fam@euphon.net"
+ <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2ed4f9de-9e2d-0b6f-0248-c213c1ac9668@redhat.com>
+Subject: Re: [PATCH] block: workaround for unaligned byte range in fallocate()
+References: <1566498661-53008-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <218c5855-a8dc-df50-23cb-ebd1a1cd259c@redhat.com>
+ <8a642371-bbd7-26bd-f54b-576ce49c05d2@virtuozzo.com>
+In-Reply-To: <8a642371-bbd7-26bd-f54b-576ce49c05d2@virtuozzo.com>
 
-On Tue, Aug 27, 2019 at 4:49 PM Johannes Berg <johannes@sipsolutions.net> wrote:
->
-> From: Johannes Berg <johannes.berg@intel.com>
->
-> If you try to make a device implementation that can handle multiple
-> connections and allow disconnections (which requires overriding the
-> VHOST_USER_NONE handling), then glib will warn that we remove a src
-> while it's still on the mainloop, and will poll() an FD that doesn't
-> exist anymore.
->
-> Fix this by making vug_source_new() require pairing with the new
-> vug_source_destroy() so we can keep the GSource referenced in the
-> meantime.
->
-> Note that this requires calling the new API in vhost-user-input.
-> vhost-user-gpu also uses vug_source_new(), but never seems to free
-> the result at all, so I haven't changed anything there.
->
-> Fixes: 8bb7ddb78a1c ("libvhost-user: add glib source helper")
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-> ---
->  contrib/libvhost-user/libvhost-user-glib.c | 15 ++++++++++++---
->  contrib/libvhost-user/libvhost-user-glib.h |  1 +
->  contrib/vhost-user-input/main.c            |  6 ++----
->  3 files changed, 15 insertions(+), 7 deletions(-)
->
-> diff --git a/contrib/libvhost-user/libvhost-user-glib.c b/contrib/libvhost-user/libvhost-user-glib.c
-> index 99edd2f3de45..eaf88b8aa749 100644
-> --- a/contrib/libvhost-user/libvhost-user-glib.c
-> +++ b/contrib/libvhost-user/libvhost-user-glib.c
-> @@ -91,7 +91,6 @@ vug_source_new(VugDev *gdev, int fd, GIOCondition cond,
->      g_source_add_poll(gsrc, &src->gfd);
->      id = g_source_attach(gsrc, NULL);
->      g_assert(id);
-> -    g_source_unref(gsrc);
->
->      return gsrc;
->  }
-> @@ -131,6 +130,16 @@ static void vug_watch(VuDev *dev, int condition, void *data)
->      }
->  }
->
-> +void vug_source_destroy(GSource *src)
-> +{
-> +    if (!src) {
-> +        return;
-> +    }
-> +
-> +    g_source_unref(src);
-> +    g_source_destroy(src);
+--R1ioQcvUlkrJjSSyjISEdJw3A1hE3iJ0g
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I would call destroy() (detach) before unref().
+On 8/27/19 7:39 AM, Andrey Shinkevich wrote:
+>=20
+>=20
 
-> +}
-> +
->  bool
->  vug_init(VugDev *dev, uint16_t max_queues, int socket,
->           vu_panic_cb panic, const VuDevIface *iface)
-> @@ -144,7 +153,7 @@ vug_init(VugDev *dev, uint16_t max_queues, int socket,
->      }
->
->      dev->fdmap = g_hash_table_new_full(NULL, NULL, NULL,
-> -                                       (GDestroyNotify) g_source_destroy);
-> +                                       (GDestroyNotify) vug_source_destroy);
->
->      dev->src = vug_source_new(dev, socket, G_IO_IN, vug_watch, NULL);
->
-> @@ -157,5 +166,5 @@ vug_deinit(VugDev *dev)
->      g_assert(dev);
->
->      g_hash_table_unref(dev->fdmap);
-> -    g_source_unref(dev->src);
-> +    vug_source_destroy(dev->src);
->  }
-> diff --git a/contrib/libvhost-user/libvhost-user-glib.h b/contrib/libvhost-user/libvhost-user-glib.h
-> index 64d539d93aba..1a79a4916ef2 100644
-> --- a/contrib/libvhost-user/libvhost-user-glib.h
-> +++ b/contrib/libvhost-user/libvhost-user-glib.h
-> @@ -31,5 +31,6 @@ void vug_deinit(VugDev *dev);
->
->  GSource *vug_source_new(VugDev *dev, int fd, GIOCondition cond,
->                          vu_watch_cb vu_cb, gpointer data);
-> +void vug_source_destroy(GSource *src);
->
->  #endif /* LIBVHOST_USER_GLIB_H */
-> diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/main.c
-> index 449fd2171a5a..7d6b0f9d80cc 100644
-> --- a/contrib/vhost-user-input/main.c
-> +++ b/contrib/vhost-user-input/main.c
-> @@ -187,7 +187,7 @@ vi_queue_set_started(VuDev *dev, int qidx, bool started)
->      }
->
->      if (!started && vi->evsrc) {
-> -        g_source_destroy(vi->evsrc);
-> +        vug_source_destroy(vi->evsrc);
->          vi->evsrc = NULL;
->      }
->  }
-> @@ -401,9 +401,7 @@ main(int argc, char *argv[])
->
->      vug_deinit(&vi.dev);
->
-> -    if (vi.evsrc) {
-> -        g_source_unref(vi.evsrc);
-> -    }
-> +    vugg_source_destroy(vi.evsrc);
+>>>
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+> Eric,
+> If you are good to take this patch to your branch with your corrections=
+,=20
+> please let us know. Otherwise, I will send the v2 with your corrections=
+=2E
 
-typo
+Since I based my fast-zero patches on top of this, I'm fine making the
+corrections locally and queuing this patch through my NBD tree.
 
->      g_array_free(vi.config, TRUE);
->      g_free(vi.queue);
->      return 0;
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-vhost-user-input calls g_source_destroy(), please replace it too with
-vug_source_destroy().
 
-vhost-user-gpu "renderer_source" leaks, not this patch fault, but
-worth to mention in the commit. Feel free to add a second commit to
-fix that too.
+--R1ioQcvUlkrJjSSyjISEdJw3A1hE3iJ0g--
+
+--fTcYjovHNDAyJVnVPN4pgVphcyrPfJyRz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1lNQwACgkQp6FrSiUn
+Q2q+9wf+Pjv0TZaJF/KCRWBucN5hVAaOUhae5xepbPb+z6A93bulUnB1+ufdwbdH
+wbxGnkrzcaWX6CdvPzaGT+aU/7An5KuSM0Gxhv3IZCOyZ44snM5uUXPpycU6rTBF
+Nonajj/DzUAOnAEpwC/BK2BRepyEhPBketcYjufuAI0f2B3z8GtzG7gPct0YBzbd
+sTyNISLJEKMWOGsRC7tR1hhiSQNRMc+F8q9vGOcT0ar8RhMSJEScleeIwSbxiwML
+J4+TMWfWy+D+lxsvHn9NPQJqtrkML9NMPJY/AI8Sk0l4X8T6mmIjGubFglFlcCQl
+d+3dzMqhaYNB48n+DehLOHnzmG0yhg==
+=u1RS
+-----END PGP SIGNATURE-----
+
+--fTcYjovHNDAyJVnVPN4pgVphcyrPfJyRz--
 
