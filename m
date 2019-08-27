@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4319FC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7DDC41514
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:27:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D2B9217F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:26:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D2B9217F5
+	by mail.kernel.org (Postfix) with ESMTPS id 981DB21881
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:27:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 981DB21881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2gAu-0004bQ-FL
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:26:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53071)
+	id 1i2gBP-00052b-FJ
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:27:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53102)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2g7n-0002Y3-He
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:25 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2g7q-0002a2-0A
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2g7m-0005IN-1j
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38809)
+ (envelope-from <mreitz@redhat.com>) id 1i2g7n-0005Jm-RX
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59180)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2g7j-0005GY-7h; Tue, 27 Aug 2019 14:23:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i2g7l-0005Hq-Dh; Tue, 27 Aug 2019 14:23:21 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6DB4318C8917;
- Tue, 27 Aug 2019 18:23:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C0C2A8980EA;
+ Tue, 27 Aug 2019 18:23:20 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0631C5D9E2;
- Tue, 27 Aug 2019 18:23:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 56D48600D1;
+ Tue, 27 Aug 2019 18:23:20 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 27 Aug 2019 20:22:59 +0200
-Message-Id: <20190827182313.25983-2-mreitz@redhat.com>
+Date: Tue, 27 Aug 2019 20:23:00 +0200
+Message-Id: <20190827182313.25983-3-mreitz@redhat.com>
 In-Reply-To: <20190827182313.25983-1-mreitz@redhat.com>
 References: <20190827182313.25983-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Tue, 27 Aug 2019 18:23:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.67]); Tue, 27 Aug 2019 18:23:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 01/15] qemu-io: add pattern file for write
- command
+Subject: [Qemu-devel] [PULL 02/15] block: fix permission update in
+ bdrv_replace_node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,190 +73,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-The patch allows to provide a pattern file for write
-command. There was no similar ability before.
+It's wrong to OR shared permissions. It may lead to crash on further
+permission updates.
+Also, no needs to consider previously calculated permissions, as at
+this point we already bind all new parents and bdrv_get_cumulative_perm
+result is enough. So fix the bug by just set permissions by
+bdrv_get_cumulative_perm result.
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-id: 20190820164616.4072-1-dplotnikov@virtuozzo.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[mreitz: Keep optstring in alphabetical order]
+Bug was introduced in long ago 234ac1a9025, in 2.9.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190824100740.61635-1-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-io-cmds.c | 99 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 93 insertions(+), 6 deletions(-)
+ block.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 8904733961..d46fa166d3 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -350,6 +350,79 @@ static void qemu_io_free(void *p)
-     qemu_vfree(p);
- }
-=20
-+/*
-+ * qemu_io_alloc_from_file()
-+ *
-+ * Allocates the buffer and populates it with the content of the given f=
-ile
-+ * up to @len bytes. If the file length is less than @len, then the buff=
-er
-+ * is populated with the file content cyclically.
-+ *
-+ * @blk - the block backend where the buffer content is going to be writ=
-ten to
-+ * @len - the buffer length
-+ * @file_name - the file to read the content from
-+ *
-+ * Returns: the buffer pointer on success
-+ *          NULL on error
-+ */
-+static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
-+                                     const char *file_name)
-+{
-+    char *buf, *buf_origin;
-+    FILE *f =3D fopen(file_name, "r");
-+    int pattern_len;
-+
-+    if (!f) {
-+        perror(file_name);
-+        return NULL;
-+    }
-+
-+    if (qemuio_misalign) {
-+        len +=3D MISALIGN_OFFSET;
-+    }
-+
-+    buf_origin =3D buf =3D blk_blockalign(blk, len);
-+
-+    if (qemuio_misalign) {
-+        buf_origin +=3D MISALIGN_OFFSET;
-+        buf +=3D MISALIGN_OFFSET;
-+        len -=3D MISALIGN_OFFSET;
-+    }
-+
-+    pattern_len =3D fread(buf_origin, 1, len, f);
-+
-+    if (ferror(f)) {
-+        perror(file_name);
-+        goto error;
-+    }
-+
-+    if (pattern_len =3D=3D 0) {
-+        fprintf(stderr, "%s: file is empty\n", file_name);
-+        goto error;
-+    }
-+
-+    fclose(f);
-+
-+    if (len > pattern_len) {
-+        len -=3D pattern_len;
-+        buf +=3D pattern_len;
-+
-+        while (len > 0) {
-+            size_t len_to_copy =3D MIN(pattern_len, len);
-+
-+            memcpy(buf, buf_origin, len_to_copy);
-+
-+            len -=3D len_to_copy;
-+            buf +=3D len_to_copy;
-+        }
-+    }
-+
-+    return buf_origin;
-+
-+error:
-+    qemu_io_free(buf_origin);
-+    return NULL;
-+}
-+
- static void dump_buffer(const void *buffer, int64_t offset, int64_t len)
+diff --git a/block.c b/block.c
+index 874a29a983..5944124845 100644
+--- a/block.c
++++ b/block.c
+@@ -4165,7 +4165,6 @@ void bdrv_replace_node(BlockDriverState *from, Bloc=
+kDriverState *to,
  {
-     uint64_t i;
-@@ -948,6 +1021,7 @@ static void write_help(void)
- " -n, -- with -z, don't allow slow fallback\n"
- " -p, -- ignored for backwards compatibility\n"
- " -P, -- use different pattern to fill file\n"
-+" -s, -- use a pattern file to fill the write buffer\n"
- " -C, -- report statistics in a machine parsable format\n"
- " -q, -- quiet mode, do not show I/O statistics\n"
- " -u, -- with -z, allow unmapping\n"
-@@ -964,7 +1038,7 @@ static const cmdinfo_t write_cmd =3D {
-     .perm       =3D BLK_PERM_WRITE,
-     .argmin     =3D 2,
-     .argmax     =3D -1,
--    .args       =3D "[-bcCfnquz] [-P pattern] off len",
-+    .args       =3D "[-bcCfnquz] [-P pattern | -s source_file] off len",
-     .oneline    =3D "writes a number of bytes at a specified offset",
-     .help       =3D write_help,
- };
-@@ -973,7 +1047,7 @@ static int write_f(BlockBackend *blk, int argc, char=
- **argv)
- {
-     struct timespec t1, t2;
-     bool Cflag =3D false, qflag =3D false, bflag =3D false;
--    bool Pflag =3D false, zflag =3D false, cflag =3D false;
-+    bool Pflag =3D false, zflag =3D false, cflag =3D false, sflag =3D fa=
-lse;
-     int flags =3D 0;
-     int c, cnt, ret;
-     char *buf =3D NULL;
-@@ -982,8 +1056,9 @@ static int write_f(BlockBackend *blk, int argc, char=
- **argv)
-     /* Some compilers get confused and warn if this is not initialized. =
- */
-     int64_t total =3D 0;
-     int pattern =3D 0xcd;
-+    const char *file_name =3D NULL;
+     BdrvChild *c, *next;
+     GSList *list =3D NULL, *p;
+-    uint64_t old_perm, old_shared;
+     uint64_t perm =3D 0, shared =3D BLK_PERM_ALL;
+     int ret;
 =20
--    while ((c =3D getopt(argc, argv, "bcCfnpP:quz")) !=3D -1) {
-+    while ((c =3D getopt(argc, argv, "bcCfnpP:qs:uz")) !=3D -1) {
-         switch (c) {
-         case 'b':
-             bflag =3D true;
-@@ -1013,6 +1088,10 @@ static int write_f(BlockBackend *blk, int argc, ch=
-ar **argv)
-         case 'q':
-             qflag =3D true;
-             break;
-+        case 's':
-+            sflag =3D true;
-+            file_name =3D optarg;
-+            break;
-         case 'u':
-             flags |=3D BDRV_REQ_MAY_UNMAP;
-             break;
-@@ -1050,8 +1129,9 @@ static int write_f(BlockBackend *blk, int argc, cha=
-r **argv)
-         return -EINVAL;
+@@ -4211,8 +4210,8 @@ void bdrv_replace_node(BlockDriverState *from, Bloc=
+kDriverState *to,
+         bdrv_unref(from);
      }
 =20
--    if (zflag && Pflag) {
--        printf("-z and -P cannot be specified at the same time\n");
-+    if (zflag + Pflag + sflag > 1) {
-+        printf("Only one of -z, -P, and -s "
-+               "can be specified at the same time\n");
-         return -EINVAL;
-     }
+-    bdrv_get_cumulative_perm(to, &old_perm, &old_shared);
+-    bdrv_set_perm(to, old_perm | perm, old_shared | shared);
++    bdrv_get_cumulative_perm(to, &perm, &shared);
++    bdrv_set_perm(to, perm, shared);
 =20
-@@ -1087,7 +1167,14 @@ static int write_f(BlockBackend *blk, int argc, ch=
-ar **argv)
-     }
-=20
-     if (!zflag) {
--        buf =3D qemu_io_alloc(blk, count, pattern);
-+        if (sflag) {
-+            buf =3D qemu_io_alloc_from_file(blk, count, file_name);
-+            if (!buf) {
-+                return -EINVAL;
-+            }
-+        } else {
-+            buf =3D qemu_io_alloc(blk, count, pattern);
-+        }
-     }
-=20
-     clock_gettime(CLOCK_MONOTONIC, &t1);
+ out:
+     g_slist_free(list);
 --=20
 2.21.0
 
