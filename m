@@ -2,144 +2,62 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0917EC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A294FC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:49:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D262E20674
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:46:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D262E20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 76E2320674
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:49:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76E2320674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2hQM-0006I6-1l
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 15:46:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39727)
+	id 1i2hTY-0008Hc-QG
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 15:49:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i2hPT-0005or-Oa
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:45:44 -0400
+ (envelope-from <Sandra_Loosemore@mentor.com>) id 1i2hSr-0007pk-At
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:49:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i2hPS-0007JU-Hn
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:45:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46200)
+ (envelope-from <Sandra_Loosemore@mentor.com>) id 1i2hSp-00019o-Ii
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:49:12 -0400
+Received: from esa3.mentor.iphmx.com ([68.232.137.180]:16672)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i2hPQ-0007Hj-2a; Tue, 27 Aug 2019 15:45:40 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 61984107DD00;
- Tue, 27 Aug 2019 19:45:39 +0000 (UTC)
-Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88E6C3CCC;
- Tue, 27 Aug 2019 19:45:38 +0000 (UTC)
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563553816-148827-5-git-send-email-andrey.shinkevich@virtuozzo.com>
- <8b68a897-4ff9-5517-d7ad-3f7a18f12be7@redhat.com>
- <4b77f137-07c2-94ea-ec72-3d8d5c0ad5f7@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <7715daea-104e-eca8-bdd3-c61b3ffb26a5@redhat.com>
-Date: Tue, 27 Aug 2019 15:45:38 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <Sandra_Loosemore@mentor.com>)
+ id 1i2hSp-00018N-AM
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:49:11 -0400
+IronPort-SDR: 8I5F0v+UP/FF+34I5pZd5iGwyHeiU8oAwgAgxETTF+gOQBfJtD+YfZ9nd+6VWBATytybZUmtxw
+ TFuQkuAcKsvF9apBY1LY4oHcdTWI68nOLJyJpPuxNg3o/DBSHy0S2RAjRMd/LAAV2EEZPwEX24
+ 5VFHuNhYocV3kR2xCSX8WK41YBjM/j88bSiM/aAUspGEbh71ezxHyCPGDGv1s+5sjUXIDJQYUo
+ QY+/698pACmQMmdXAIO42Jhlw2MFq0zm1Vpvpugk79iw6pBnlAvs5JehFzH4YtF/vwpaKIvDzX
+ pOw=
+X-IronPort-AV: E=Sophos;i="5.64,438,1559548800"; d="scan'208";a="40811136"
+Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
+ by esa3.mentor.iphmx.com with ESMTP; 27 Aug 2019 11:49:06 -0800
+IronPort-SDR: EVsW9KEHt0Wvn/tWc+u16rEtB3hmBpGKt8tTyI1wxTS+DygSgF/yL0FT7SHiLwiV0eBYf41sBv
+ WwFk06Dd8ZoA1YXI1ZttKNubBusEfNKf0PSlIRrFyMtAO4NyLy4biKkuhclRodzJJIxJayA2TO
+ AP/9F4JqkndcxkfxY8JcWHg0KrZwoUSt4HLOshe/Wad8ecb1KX/FEATgY/hkYjMxVmB8a1w83w
+ BetWKWrdqQ6WstZUKWIHU0RqJu2iWZM0hyQdctLT8qj9MyKqzUSASERQWG18OvvB911uhfKgDy
+ MSY=
+From: Sandra Loosemore <sandra@codesourcery.com>
+To: <qemu-devel@nongnu.org>
+Date: Tue, 27 Aug 2019 13:48:49 -0600
+Message-ID: <20190827194849.7076-1-sandra@codesourcery.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <4b77f137-07c2-94ea-ec72-3d8d5c0ad5f7@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Tue, 27 Aug 2019 19:45:39 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 4/6] iotests: Valgrind
- fails with nonexistent directory
+Content-Type: text/plain
+X-ClientProxiedBy: SVR-ORW-MBX-05.mgc.mentorg.com (147.34.90.205) To
+ svr-orw-mbx-03.mgc.mentorg.com (147.34.90.203)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 68.232.137.180
+Subject: [Qemu-devel] [PATCH] gdbstub: Fix handler for 'F' packet
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,80 +69,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Handling of the 'F' packet has been broken since commit
+4b20fab101b9e2d0fb47454209637a17fc7a13d5, which converted it to use
+the new packet parsing infrastructure.  Per the GDB RSP specification
 
+https://sourceware.org/gdb/current/onlinedocs/gdb/The-F-Reply-Packet.html
 
-On 8/25/19 11:24 AM, Andrey Shinkevich wrote:
-> 
-> 
-> On 16/08/2019 03:55, John Snow wrote:
->>
->>
->> On 7/19/19 12:30 PM, Andrey Shinkevich wrote:
->>> The Valgrind uses the exported variable TMPDIR and fails if the
->>> directory does not exist. Let us exclude such a test case from
->>> being run under the Valgrind and notify the user of it.
->>>
->>> Suggested-by: Kevin Wolf <kwolf@redhat.com>
->>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>> ---
->>>   tests/qemu-iotests/051 | 4 ++++
->>>   1 file changed, 4 insertions(+)
->>>
->>> diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
->>> index ce942a5..f8141ca 100755
->>> --- a/tests/qemu-iotests/051
->>> +++ b/tests/qemu-iotests/051
->>> @@ -377,6 +377,10 @@ printf %b "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id\n" |
->>>   $QEMU_IO -c "read -P 0x33 0 4k" "$TEST_IMG" | _filter_qemu_io
->>>   
->>>   # Using snapshot=on with a non-existent TMPDIR
->>> +if [ "${VALGRIND_QEMU}" == "y" ]; then
->>> +    _casenotrun "Valgrind needs a valid TMPDIR for itself"
->>> +fi
->>> +VALGRIND_QEMU="" \
->>>   TMPDIR=/nonexistent run_qemu -drive driver=null-co,snapshot=on
->>>   
->>>   # Using snapshot=on together with read-only=on
->>>
->>
->> The only other way around this would be a complicated mechanism to set
->> the TMPDIR for valgrind's sub-processes only, with e.g.
->>
->> valgrind ... env TMPDIR=/nonexistent qemu ...
->>
->> ... It's probably not worth trying to concoct such a thing; but I
->> suppose it is possible. You'd have to set up a generic layer for setting
->> environment variables, then in the qemu shim, you could either set them
->> directly (non-valgrind invocation) or set them as part of the valgrind
->> command-line.
->>
->> Or you could just take my R-B:
->>
->> Reviewed-by: John Snow <jsnow@redhat.com>
->>
-> 
-> Thanks again John for your review and the advice.
-> Probably, it doesn't worth efforts to manage that case because QEMU 
-> should fail anyway with the error message "Could not get temporary 
-> filename: No such file or directory". So, we would not benefit much from 
-> that run. We have other test cases that cover the main functionality. 
-> It's just to check the QEMU error path for possible memory issues. Shall we?
-> 
-> Andrey
-> 
+the second parameter may be omitted, but the rewritten implementation
+was failing to recognize this case.  The result was that QEMU was
+repeatedly resending the fileio request and ignoring GDB's replies of
+successful completion.  This patch restores the behavior of the
+previous code in allowing the errno parameter to be omitted and
+passing 0 to the callback in that case.
 
-Yeah, don't bother with this for now. I just have a personal compulsion
-to try to concretely measure how much work it would take to avoid a
-"hack" and then make my decision.
+Signed-off-by: Sandra Loosemore <sandra@codesourcery.com>
+---
+ gdbstub.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-You're free to just take the R-B :)
+diff --git a/gdbstub.c b/gdbstub.c
+index b92ba59..141568a 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1820,11 +1820,15 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+ 
+ static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
+ {
+-    if (gdb_ctx->num_params >= 2 && gdb_ctx->s->current_syscall_cb) {
++    if (gdb_ctx->num_params >= 1 && gdb_ctx->s->current_syscall_cb) {
+         target_ulong ret, err;
+ 
+         ret = (target_ulong)gdb_ctx->params[0].val_ull;
+-        err = (target_ulong)gdb_ctx->params[1].val_ull;
++        if (gdb_ctx->num_params >= 2 ) {
++            err = (target_ulong)gdb_ctx->params[1].val_ull;
++        } else {
++            err = 0;
++        }
+         gdb_ctx->s->current_syscall_cb(gdb_ctx->s->c_cpu, ret, err);
+         gdb_ctx->s->current_syscall_cb = NULL;
+     }
+-- 
+2.8.1
 
---js
 
