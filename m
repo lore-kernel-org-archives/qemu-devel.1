@@ -2,70 +2,96 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D33C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C684C41514
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78C80206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:18:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C80206E0
+	by mail.kernel.org (Postfix) with ESMTPS id EB7F922CF4
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:20:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB7F922CF4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2eAg-00050J-DH
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:18:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60260)
+	id 1i2eCi-0006Xy-Vd
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:20:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60558)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i2e8Y-0003z4-85
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:16:05 -0400
+ (envelope-from <eblake@redhat.com>) id 1i2eAb-0005EW-2M
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:18:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i2e8V-0006oq-VY
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:16:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20448)
+ (envelope-from <eblake@redhat.com>) id 1i2eAZ-0007pQ-0E
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:18:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51664)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i2e8V-0006o2-Mp
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:15:59 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i2eAY-0007oz-Dl
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:18:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6F0448AC6E1;
- Tue, 27 Aug 2019 16:15:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D342860600;
- Tue, 27 Aug 2019 16:15:54 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 47D9A1165361; Tue, 27 Aug 2019 18:15:53 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190815183803.13346-1-ehabkost@redhat.com>
- <20190815183803.13346-4-ehabkost@redhat.com>
- <20190816152011.0c673027@redhat.com>
- <20190816165635.GC3908@habkost.net>
- <87sgq0qprn.fsf@dusky.pond.sub.org>
- <20190826165135.03e97e1b@redhat.com>
-Date: Tue, 27 Aug 2019 18:15:53 +0200
-In-Reply-To: <20190826165135.03e97e1b@redhat.com> (Igor Mammedov's message of
- "Mon, 26 Aug 2019 16:51:35 +0200")
-Message-ID: <87ftlmeg92.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 71194A53260;
+ Tue, 27 Aug 2019 16:18:05 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 812285D9E1;
+ Tue, 27 Aug 2019 16:18:04 +0000 (UTC)
+To: Yury Kotov <yury-kotov@yandex-team.ru>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20190827120221.15725-1-yury-kotov@yandex-team.ru>
+ <20190827120221.15725-2-yury-kotov@yandex-team.ru>
+ <fb324ab9-b7a2-d56e-a0d1-9f4ae86791ce@redhat.com>
+ <1097381566920178@vla1-6bb9290e4d68.qloud-c.yandex.net>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <ff0428a4-6600-7b41-e246-7858e58e5507@redhat.com>
+Date: Tue, 27 Aug 2019 11:18:03 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <1097381566920178@vla1-6bb9290e4d68.qloud-c.yandex.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Of3eZHcyuNs6tmhRbxgYsJx2SSTrLde9M"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Tue, 27 Aug 2019 16:15:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Tue, 27 Aug 2019 16:18:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties
- mandatory unless necessary
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Add x-validate-uuid
+ capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,118 +103,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Like Xu <like.xu@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Igor Mammedov <imammedo@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Of3eZHcyuNs6tmhRbxgYsJx2SSTrLde9M
+Content-Type: multipart/mixed; boundary="VtvBD7JUBrKKrMlY6Brg6YpoqlsT5dME7";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
+Message-ID: <ff0428a4-6600-7b41-e246-7858e58e5507@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Add x-validate-uuid
+ capability
+References: <20190827120221.15725-1-yury-kotov@yandex-team.ru>
+ <20190827120221.15725-2-yury-kotov@yandex-team.ru>
+ <fb324ab9-b7a2-d56e-a0d1-9f4ae86791ce@redhat.com>
+ <1097381566920178@vla1-6bb9290e4d68.qloud-c.yandex.net>
+In-Reply-To: <1097381566920178@vla1-6bb9290e4d68.qloud-c.yandex.net>
 
-> On Sat, 17 Aug 2019 08:17:48 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
->
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > On Fri, Aug 16, 2019 at 03:20:11PM +0200, Igor Mammedov wrote:  
->> >> On Thu, 15 Aug 2019 15:38:03 -0300
->> >> Eduardo Habkost <ehabkost@redhat.com> wrote:
->> >>   
->> >> > We have this issue reported when using libvirt to hotplug CPUs:
->> >> > https://bugzilla.redhat.com/show_bug.cgi?id=1741451
->> >> > 
->> >> > Basically, libvirt is not copying die-id from
->> >> > query-hotpluggable-cpus, but die-id is now mandatory.  
->> >> 
->> >> this should have been gated on compat property and affect
->> >> only new machine types.
->> >> Maybe we should do just that instead of fixup so libvirt
->> >> would finally make proper handling of query-hotpluggable-cpus.
->> >> 
->> >>    
->> >> > We could blame libvirt and say it is not following the documented
->> >> > interface, because we have this buried in the QAPI schema
->> >> > documentation:  
->> >> 
->> >> I wouldn't say buried, if I understand it right QAPI schema
->> >> should be the authoritative source of interface description.
->> >> 
->> >> If I recall it's not the first time, there was similar issue
->> >> for exactly the same reason (libvirt not passing through
->> >> all properties from query-hotpluggable-cpus).
->> >> 
->> >> And we had to fix it up on QEMU side (numa_cpu_pre_plug),
->> >> but it seems 2 years later libvirt is still broken the same way :(
->> >> 
->> >> Should we really do fixups or finaly fix it on libvirt side?  
->> >
->> > Is it truly a bug in libvirt?  Making QEMU behave differently
->> > when getting exactly the same input sounds like a bad idea, even
->> > if we documented that at the QAPI documentation.
->> >
->> > My suggestion is to instead drop the comment below from the QAPI
->> > documentation.  New properties shouldn't become mandatory.  
->> 
->> The "comment below" is this one, in qapi/machine.json:
->> 
->> >> > > Note: currently there are 5 properties that could be present
->> >> > > but management should be prepared to pass through other
->> >> > > properties with device_add command to allow for future
->> >> > > interface extension. This also requires the filed names to be kept in
->> >> > > sync with the properties passed to -device/device_add.    
->> 
->> Goes back to commit d4633541ee0, v2.7.0.  @die-id was the first such
->> interface extension.
->> 
->> A rule like "to use command C, you must pass it whatever you get from
->> command Q" punches a hole into the "QMP is a stable interface" promise.
->> Retroactively tacking it onto an existing interface like device-add
->> some-existing-device is even more problematic than specifying it for a
->> new interface.  Mind, this is not a categorical "can't ever do that".
->> It's more like "you better show this is less bad than all the
->> alternatives we can think of, and we've thought pretty hard".
->> Since this particular hole failed us the first time anybody actually
->> tried to wiggle through it, I think Eduardo has a point when he calls
->> for filling it in by deleting the comment.
->
-> That was a consensus we were able to reach when discussing cpu hotplug
-> QMP interface. If I recall correctly idea was that it should work for
-> different targets (cpu topology properties target specific) and be
-> extensible without breaking old mgmt stack  or requiring its update
-> in lock step.
->
-> If implemented correctly mgmt would not only query from QEMU/machine
-> possible CPUs (with properties and valid values needed to plug it in,
-> which it does already) but also 'keep' them around and pass back to
-> device_add. In that case it would have worked as designed just fine.
->
-> But this also shows a problem that we still need versioned machine type
-> to keep old set of properties for old machine types anyway and we can
-> miss it during review as tests we have might be not enough
-> (tests/cpu-plug-test didn't detect it for some reason).
+--VtvBD7JUBrKKrMlY6Brg6YpoqlsT5dME7
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I think the lesson to learn here is "non-trivial rules on correct
-interface use need to be backed by integration tests".
+On 8/27/19 10:36 AM, Yury Kotov wrote:
+> 27.08.2019, 17:02, "Eric Blake" <eblake@redhat.com>:
+>> On 8/27/19 7:02 AM, Yury Kotov wrote:
+>>> =C2=A0This capability realizes simple source validation by UUID.
+>>> =C2=A0It's useful for live migration between hosts.
+>>>
 
-The rule in question is "a CPU hot-plug with device_add must specify all
-the properties returned by query-hotpluggable-cpus".
+>>
+>> Any reason why this is marked experimental? It seems useful enough tha=
+t
+>> we could probably just add it as a fully-supported feature (dropping t=
+he
+>> x- prefix) - but I'll leave that up to the migration maintainers.
+>>
+>=20
+> I thought that all new capabilities have x- prefix... May be it's reall=
+y
+> unnecessary here, I'm not sure.
 
-Sadly, stipulating such rules does not change the de facto API.  Case in
-point: libvirt did not obey this one, and even though it's been in place
-for years, yet we're (rightly!) unwilling to blame libvirt for the
-regression.  The stipulation was futile.
+New features that need some testing or possible changes to behavior need
+x- to mark them as experimental, so we can make those changes without
+worrying about breaking back-compat.  But new features that are outright
+useful and presumably in their final form, with no further
+experimentation needed, can skip going through an x- phase.
 
-How could we increase our chances that management applications pick up
-such rules?  I can see only one promising way: make tests fail unless
-they do.  Add some arbitray dummy property, fail the hot plug unless
-it's given.  Of course, we can't do that, because it's exactly the
-breakage we're trying to avoid.  So do it only when QEMU is run with
---future, then have integration tests run it that way.
+>=20
+>> In fact, do we even need this to be a tunable feature? Why not just
+>> always enable it? As long as the UUID is sent in a way that new->old
+>> doesn't break the old qemu from receiving the migration stream, and th=
+at
+>> old->new copes with UUID being absent, then new->new will always benef=
+it
+>> from the additional safety check.
+>>
+>=20
+> In such case we couldn't migrate from e.g. 4.2 to 3.1
 
-Aside: I'm afraid "# TODO: Better documentation; currently there is
-none" didn't exactly help with query-hotpluggable-cpus uptake.
+I don't know the migration format enough to know if there is a way for
+4.2 to unconditionally send a UUID as a subsection such that a receiving
+3.1 will ignore the unknown subsection. If so, then you don't need a
+knob; if not, then you need something to say whether sending the
+subsection is safe (perhaps default on in new machine types, but default
+off for machine types that might still be migrated back to 3.1).  That's
+where I'm hoping the migration experts will chime in.
 
-[...]
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--VtvBD7JUBrKKrMlY6Brg6YpoqlsT5dME7--
+
+--Of3eZHcyuNs6tmhRbxgYsJx2SSTrLde9M
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1lV7sACgkQp6FrSiUn
+Q2qYgQf/Y0D8QYjzU40mawstk+HHMCeclIeMXJVEB7tnavfeeVeCgfzBe+LGm25h
+g+AgU2EEsnec5jxmSVptp6TQW+SXPYut6pjw4IOXmEaqA4Qty7z69uWNt7kaqmBi
+Ac1b+lHZpy9J9DBAMYY5TZBhPbx+VMiQN24+gghimv04PxS/qflOzBWJT2s9Xlpz
+fjahXMUsJKykOsD6dMT9yDrR+skKt0cMpX22O5K+RuFUfQfnkh0hHozch6QQwAhJ
+g+2QM+eQKCieFKD9LnZ6Il6deObOo84iZfmmURQ1z1dODBS5ryB6cQuvNwatwDW2
+S/AqpHY7TMiLsATna9+wplZ3+SvCPQ==
+=IPtI
+-----END PGP SIGNATURE-----
+
+--Of3eZHcyuNs6tmhRbxgYsJx2SSTrLde9M--
 
