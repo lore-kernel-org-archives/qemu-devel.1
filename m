@@ -2,57 +2,62 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 258A9C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 11:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68645C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 11:25:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F15A420828
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 11:17:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F15A420828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35ACD2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 11:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35ACD2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2ZU6-00067Q-4T
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 07:17:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39372)
+	id 1i2Zbi-0007nw-BY
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 07:25:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fangying1@huawei.com>) id 1i2ZTK-0005ex-EW
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 07:17:12 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i2Zaf-0007DW-6l
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 07:24:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fangying1@huawei.com>) id 1i2ZTJ-0000q9-2Z
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 07:17:10 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:35144 helo=huawei.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1i2Zae-00043U-6W
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 07:24:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35814)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fangying1@huawei.com>)
- id 1i2ZTH-0000mD-Nz
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 07:17:08 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id DD410C7D137D923A6F31;
- Tue, 27 Aug 2019 19:16:59 +0800 (CST)
-Received: from localhost (10.133.205.53) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 27 Aug 2019
- 19:16:51 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <qemu-devel@nongnu.org>, <quintela@redhat.com>
-Date: Tue, 27 Aug 2019 19:16:50 +0800
-Message-ID: <20190827111650.1436-1-fangying1@huawei.com>
-X-Mailer: git-send-email 2.22.0.windows.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.205.53]
-X-CFilter-Loop: Reflected
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i2Zaa-00040z-N5; Tue, 27 Aug 2019 07:24:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0086DC057F88;
+ Tue, 27 Aug 2019 11:24:39 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 761295C1B2;
+ Tue, 27 Aug 2019 11:24:32 +0000 (UTC)
+Message-ID: <165d58ab7e9fe07835c233b2b1347d763be819a8.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
+Date: Tue, 27 Aug 2019 14:24:30 +0300
+In-Reply-To: <20190827105226.GI16500@redhat.com>
+References: <20190826135103.22410-1-mlevitsk@redhat.com>
+ <20190826135103.22410-2-mlevitsk@redhat.com>
+ <20190827105226.GI16500@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Tue, 27 Aug 2019 11:24:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.32
-Subject: [Qemu-devel] [PATCH] qmp: Fix memory leak in
- migrate_params_test_apply
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 01/13] introduce g_autowipe
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,73 +69,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lcf.lichaofeng@huawei.com, Ying Fang <fangying1@huawei.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>, zhouyibo3@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Address Sanitizer shows memory leak in migrate_params_test_apply
-migration/migration.c:1253 and the stack is as bellow:
+On Tue, 2019-08-27 at 11:52 +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Mon, Aug 26, 2019 at 04:50:51PM +0300, Maxim Levitsky wrote:
+> > Marking a pointer with g_autowipe, will
+> > not only free it at the scope exit, but also
+> > erase the data it points to just prior to freeing it.
+> >=20
+> > This is first attempt to implement this feature,
+> > as suggested by Daniel and Nir.
+> >=20
+> > The things that need to be verified prior to merging this is
+> >=20
+> > 1. Can we just always use memset_s (defined in C++)
+> >  or some alternative.
+> >=20
+> > 2. is it portable enought for us to use malloc_usable_size
+> > to get the size of malloced pointer in the autofree callback?
+> > This function is aviable in glibc (but no wrapper in glib).
+>=20
+> Urgh, no, we can't rely on that.
+>=20
+> I completely forgot that we would need to know the size during
+> the deallocate function.  The portable way to deal with this
+> will be to change all our code that handles passwords to use
+> GString instead, since that is a struct carrying around the
+> allocated size.
+>=20
+> As mentioned in v1, I'm fine if you just let this series use
+> memset as this is a pre-existing problem & we can fix it
+> in separate yseries.
 
-Direct leak of 45 byte(s) in 9 object(s) allocated from:
-    #0 0xffffbd7fc1db in __interceptor_malloc (/lib64/libasan.so.4+0xd31d=
-b)
-    #1 0xffffbd514163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
-    #2 0xffffbd52f43b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
-    #3 0xaaaadfa4d623 in migrate_params_test_apply migration/migration.c:=
-1253
-    #4 0xaaaadfa4d623 in qmp_migrate_set_parameters migration/migration.c=
-:1422
-    #5 0xaaaadfa963f3 in hmp_migrate_set_parameter monitor/hmp-cmds.c:186=
-7
-    #6 0xaaaadfa8afe3 in handle_hmp_command monitor/hmp.c:1082
-    #7 0xaaaadf479c57 in qmp_human_monitor_command monitor/misc.c:140
-    #8 0xaaaadfadf87b in qmp_marshal_human_monitor_command qapi/qapi-comm=
-ands-misc.c:1024
-    #9 0xaaaadfc7797b in do_qmp_dispatch qapi/qmp-dispatch.c:131
-    #10 0xaaaadfc7797b in qmp_dispatch qapi/qmp-dispatch.c:174
-    #11 0xaaaadfa84fff in monitor_qmp_dispatch monitor/qmp.c:120
-    #12 0xaaaadfa85bbf in monitor_qmp_bh_dispatcher monitor/qmp.c:209
-    #13 0xaaaadfd2228f in aio_bh_call util/async.c:89
-    #14 0xaaaadfd2228f in aio_bh_poll util/async.c:117
-    #15 0xaaaadfd29bc3 in aio_dispatch util/aio-posix.c:459
-    #16 0xaaaadfd21ff7 in aio_ctx_dispatch util/async.c:260
-    #17 0xffffbd50e2f7 in g_main_context_dispatch (/lib64/libglib-2.0.so.=
-0+0x512f7)
-    #18 0xaaaadfd278d7 in glib_pollfds_poll util/main-loop.c:218
-    #19 0xaaaadfd278d7 in os_host_main_loop_wait util/main-loop.c:241
-    #20 0xaaaadfd278d7 in main_loop_wait util/main-loop.c:517
-    #21 0xaaaadf67b5e7 in main_loop vl.c:1806
-    #22 0xaaaadf15d453 in main vl.c:4488
+All right, I *was* afraid of that, but I guess it was worth a try anyway.
+So I think I'll keep that patch that adds few missing memsets,=20
+just to consistency/documentation purposes since anyway
+in addtion to these there are lot of other places that keys are kept,
+like the ciphers itself, secrets (which aren't even freed  usually
+as long as VM is running)
 
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- migration/migration.c | 2 ++
- 1 file changed, 2 insertions(+)
+The purpose was that I just that memsetting caught my eye and
+I wanted to make it at least consistent.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 8b9f2fe30a..d60dda2b9c 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1250,11 +1250,13 @@ static void migrate_params_test_apply(MigrateSetP=
-arameters *params,
-=20
-     if (params->has_tls_creds) {
-         assert(params->tls_creds->type =3D=3D QTYPE_QSTRING);
-+        g_free(dest->tls_creds);
-         dest->tls_creds =3D g_strdup(params->tls_creds->u.s);
-     }
-=20
-     if (params->has_tls_hostname) {
-         assert(params->tls_hostname->type =3D=3D QTYPE_QSTRING);
-+        g_free(dest->tls_hostname);
-         dest->tls_hostname =3D g_strdup(params->tls_hostname->u.s);
-     }
-=20
---=20
-2.19.1
+Thanks for the review,
+	Best regards,
+		Maxim Levitsky
 
 
 
