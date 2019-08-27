@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BCAC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA4CC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D21222070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21222070B
+	by mail.kernel.org (Postfix) with ESMTPS id 765F82070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765F82070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2gJV-0003hO-HD
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:35:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53169)
+	id 1i2gJs-0003zj-Co
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:35:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2g7u-0002g5-Bl
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:31 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2g8B-00036m-BK
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2g7s-0005NI-VD
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45180)
+ (envelope-from <mreitz@redhat.com>) id 1i2g8A-0005bt-8S
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55886)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2g7q-0005Kr-8y; Tue, 27 Aug 2019 14:23:26 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1i2g86-0005YE-TT; Tue, 27 Aug 2019 14:23:43 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9AA23308FB9D;
- Tue, 27 Aug 2019 18:23:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4290418C426D;
+ Tue, 27 Aug 2019 18:23:42 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3304C10016EB;
- Tue, 27 Aug 2019 18:23:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D170960A35;
+ Tue, 27 Aug 2019 18:23:41 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 27 Aug 2019 20:23:02 +0200
-Message-Id: <20190827182313.25983-5-mreitz@redhat.com>
+Date: Tue, 27 Aug 2019 20:23:09 +0200
+Message-Id: <20190827182313.25983-12-mreitz@redhat.com>
 In-Reply-To: <20190827182313.25983-1-mreitz@redhat.com>
 References: <20190827182313.25983-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 27 Aug 2019 18:23:25 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 27 Aug 2019 18:23:42 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 04/15] iotests: Test allocate_first_block() with
- O_DIRECT
+Subject: [Qemu-devel] [PULL 11/15] iotests: Disable 126 for flat vmdk
+ subformats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,101 +73,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nir Soffer <nirsof@gmail.com>
+iotest 126 requires backing file support, which flat vmdks cannot offer.
+Skip this test for such subformats.
 
-Using block_resize we can test allocate_first_block() with file
-descriptor opened with O_DIRECT, ensuring that it works for any size
-larger than 4096 bytes.
-
-Testing smaller sizes is tricky as the result depends on the filesystem
-used for testing. For example on NFS any size will work since O_DIRECT
-does not require any alignment.
-
-Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190827010528.8818-3-nsoffer@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190815153638.4600-8-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/175     | 28 ++++++++++++++++++++++++++++
- tests/qemu-iotests/175.out |  8 ++++++++
- 2 files changed, 36 insertions(+)
+ tests/qemu-iotests/126 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-index 7ba28b3c1b..55db2803ed 100755
---- a/tests/qemu-iotests/175
-+++ b/tests/qemu-iotests/175
-@@ -49,6 +49,23 @@ _filter_blocks()
-         -e "s/blocks=3D$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\=
-\)/max allocation/"
- }
+diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
+index 9b0dcf9255..b7fce1e59d 100755
+--- a/tests/qemu-iotests/126
++++ b/tests/qemu-iotests/126
+@@ -33,6 +33,8 @@ status=3D1	# failure is the default!
 =20
-+# Resize image using block_resize.
-+# Parameter 1: image path
-+# Parameter 2: new size
-+_block_resize()
-+{
-+    local path=3D$1
-+    local size=3D$2
-+
-+    $QEMU -qmp stdio -nographic -nodefaults \
-+        -blockdev file,node-name=3Dfile,filename=3D$path,cache.direct=3D=
-on \
-+        <<EOF
-+{'execute': 'qmp_capabilities'}
-+{'execute': 'block_resize', 'arguments': {'node-name': 'file', 'size': $=
-size}}
-+{'execute': 'quit'}
-+EOF
-+}
-+
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-@@ -57,6 +74,9 @@ _supported_fmt raw
- _supported_proto file
- _supported_os Linux
-=20
-+_default_cache_mode none
-+_supported_cache_modes none directsync
-+
- size=3D$((1 * 1024 * 1024))
-=20
- touch "$TEST_DIR/empty"
-@@ -79,6 +99,14 @@ for mode in off full falloc; do
-     stat -c "size=3D%s, blocks=3D%b" $TEST_IMG | _filter_blocks $extra_b=
-locks $min_blocks $size
- done
-=20
-+for new_size in 4096 1048576; do
-+    echo
-+    echo "=3D=3D resize empty image with block_resize =3D=3D"
-+    _make_test_img 0 | _filter_imgfmt
-+    _block_resize $TEST_IMG $new_size >/dev/null
-+    stat -c "size=3D%s, blocks=3D%b" $TEST_IMG | _filter_blocks $extra_b=
-locks $min_blocks $new_size
-+done
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
-index 263e521262..39c2ee0f62 100644
---- a/tests/qemu-iotests/175.out
-+++ b/tests/qemu-iotests/175.out
-@@ -15,4 +15,12 @@ size=3D1048576, max allocation
- =3D=3D creating image with preallocation falloc =3D=3D
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 preallocatio=
-n=3Dfalloc
- size=3D1048576, max allocation
-+
-+=3D=3D resize empty image with block_resize =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D0
-+size=3D4096, min allocation
-+
-+=3D=3D resize empty image with block_resize =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D0
-+size=3D1048576, min allocation
-  *** done
+ # Needs backing file support
+ _supported_fmt qcow qcow2 qed vmdk
++_unsupported_imgopts "subformat=3DmonolithicFlat" \
++                     "subformat=3DtwoGbMaxExtentFlat"
+ # This is the default protocol (and we want to test the difference betwe=
+en
+ # colons which separate a protocol prefix from the rest and colons which=
+ are
+ # just part of the filename, so we cannot test protocols which require a=
+ prefix)
 --=20
 2.21.0
 
