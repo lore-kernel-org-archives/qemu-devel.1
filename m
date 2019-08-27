@@ -2,58 +2,80 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC91FC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 149E0C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:11:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A184C206BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:11:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A184C206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8D7A206BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 16:11:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MGWEMIXk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D7A206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2e4D-0000I9-36
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:11:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58450)
+	id 1i2e4F-0000LO-RS
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 12:11:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59324)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1i2dyz-00037r-BI
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:06:11 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i2e1y-0006rs-Ks
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1i2dyw-0002CQ-Q0
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:06:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44218)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1i2dyq-00029L-RG; Tue, 27 Aug 2019 12:06:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0338D49;
- Tue, 27 Aug 2019 16:06:00 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-105.ams2.redhat.com [10.36.116.105])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 234351001B13;
- Tue, 27 Aug 2019 16:05:57 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org
-Date: Tue, 27 Aug 2019 18:05:51 +0200
-Message-Id: <20190827160554.30995-1-eric.auger@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i2e1x-00041q-7n
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:14 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43722)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i2e1x-00041M-3T
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 12:09:13 -0400
+Received: by mail-ot1-x342.google.com with SMTP id e12so19176450otp.10
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 09:09:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=WXplowyUpocu+OrbQx46F/GL5CgBCu++9nmAgG1PNWE=;
+ b=MGWEMIXkG6mwbfOa6A6VEDYKZ1Co9c5ly89GCsLfE2crlWRLTBZ2Z38eeLDWufPUsb
+ s0QYXX5qgS5rKUEjr+DH5p8RdNTpxmC1cEdZgIAkmwLrRfyNlN1SKq9pBgikmew8BAsG
+ Mvbl66WmHIW83l6W8q5pATPY6gB2sItJmRopWi4xrDxlYLpK1/20aB6ltWFnc4V7b/9l
+ CdJZJf++nCEA+2XJs6RwzuwrgAzDwvCHYol8SMItKfRm/RXJenyybnKhxCh5mZoD7zx6
+ KVP0YnQvnArp8fYN22XpvaGxfYbGfkeVBWJlTZYepWKsoGTVG6MYj1Em3rMiuLpPmPS+
+ P6dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WXplowyUpocu+OrbQx46F/GL5CgBCu++9nmAgG1PNWE=;
+ b=Y9RsuX4cSmD+rEw4ECFjwbsb6fNkEODC7uVrX97Pz14SbSCBLYx0nqvUhrps5s9Pke
+ KN0iKkm1zbJeO3nfrAzZ4yM8OiM//tG0n/EMOE6vrQ2xfPZJQ/LBmX1kvb7+CJPizhDm
+ cjgzlquC7iwtXWg3ND8cM/6pzcTxklAl79hsuGzMLcg2SYI7qc6eps3zrX/K5T6d9noV
+ B9I8uZr1VgqJafA2KWqUis5ZQlc+7sM992ax2XgRd2mkVCTd5Vz36ZBnKDP5w+PjD2pz
+ Dlo4f5jrWl6sSE3TezXvgI9S5auG2cQqtTBbmNUWZLMCcebnTm85voWr0k4usfqMM1NF
+ ii/A==
+X-Gm-Message-State: APjAAAV4HUxBB4q5uwEbwPnYpkTPEOw6Gqj50UaJinSAjMr2JS3zYOQq
+ Q7SSbf7Jt6XP6acfKysWgZYZxfI6Jd5hdKAM3PLfUYgKu10=
+X-Google-Smtp-Source: APXvYqwJUYfdNnLUekHX77BImwlIT3a8MTfhotVHHGbPzkJoF3Vdm0flfmuR20CRkLnnT9oyIR03Ieebjsa80N/tgdE=
+X-Received: by 2002:a9d:5e11:: with SMTP id d17mr9698539oti.135.1566922151050; 
+ Tue, 27 Aug 2019 09:09:11 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Tue, 27 Aug 2019 16:06:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC 0/3] KVM/ARM: Fix >256 vcpus
+References: <20190809054341.24728-1-andrew@aj.id.au>
+In-Reply-To: <20190809054341.24728-1-andrew@aj.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Aug 2019 17:08:59 +0100
+Message-ID: <CAFEAcA9dEKLneH5GJJsX84LTW_p9qBrGmr6yMxAYcNo-2EzHZg@mail.gmail.com>
+To: Andrew Jeffery <andrew@aj.id.au>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v2] target-arm: Make the counter tick
+ relative to cntfrq
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,80 +87,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yuzenghui@huawei.com, maz@kernel.org
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since 4.18, KVM/ARM exposes a KVM_MAX_VCPUS equal to 512. However it was
-reported [1] that a VM with more than 256 vcpus cannot be launched. 5.4
-is about to fix the situation with 2 patches:
-- one upgrade of the KVM_IRQ_LINE API [2] supporting a vcpu id encoded
-  on 12 bits,
-- the reduction of KVM IO devices consumed by each GICv3 redistributor [3=
-]
+On Fri, 9 Aug 2019 at 06:43, Andrew Jeffery <andrew@aj.id.au> wrote:
+>
+> The use of GTIMER_SCALE assumes the clock feeding the generic timer is
+> 62.5MHz for all platforms. This is untrue in general, for example the
+> ASPEED AST2600 feeds the counter with either an 800 or 1200MHz clock,
+> and CNTFRQ is configured appropriately by u-boot.
+>
+> To cope with these values we need to take care of the quantization
+> caused by the clock scaling in terms of nanoseconds per clock by
+> calculating an effective frequency such that NANOSECONDS_PER_SECOND is
+> an integer multiple of the effective frequency. Failing to account for
+> the quantisation leads to sticky behaviour in the VM as the guest timer
+> subsystems account for the difference between delay time and the counter
+> value.
+>
+> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+> ---
+> v2:
+> 1. Removed the user-mode change that broke v1
+> 2. Rearranged the implementation as a consequence of 1.
+>
+>  target/arm/helper.c | 51 ++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 48 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b74c23a9bc08..166a54daf278 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -2277,6 +2277,34 @@ static const ARMCPRegInfo v6k_cp_reginfo[] = {
+>
+>  #ifndef CONFIG_USER_ONLY
+>
+> +static void gt_recalc_timer(ARMCPU *cpu, int timeridx);
+> +static void gt_cntfrq_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                            uint64_t value)
+> +{
+> +    uint64_t scale;
+> +    ARMCPU *cpu;
+> +    int i;
+> +
+> +    raw_write(env, ri, value);
+> +
+> +    /* Fix up the timer scaling */
+> +    cpu = env_archcpu(env);
+> +    scale = MAX(1, NANOSECONDS_PER_SECOND / value);
+> +    for (i = 0; i < NUM_GTIMERS; i++) {
+> +        if (!cpu->gt_timer[i]) {
+> +            continue;
+> +        }
+> +
+> +        cpu->gt_timer[i]->scale = scale;
 
-This series uses the new KVM_IRQ_LINE API and also checks the associated
-capability (KVM_CAP_ARM_IRQ_LINE_LAYOUT_2) in machvirt.
+Reaching into the internals of a QEMUTimer and changing
+the 'scale' value seems like a bad idea. If QEMUTimer doesn't
+have a facility for changing the frequency and we need one
+then we should add one at that API layer.
 
-Without the series, as soon as the -smp arguments exceeds 256, QEMU exits
-with "kvm_set_irq: Invalid argument".
+Also, this isn't how the hardware works, I'm pretty sure.
+In hardware the timers tick at whatever frequency they're
+set up to tick, and CNTFRQ is just a reads-as-written register
+that firmware can fill in with an appropriate value that it's
+determined from somewhere for the benefit of other software.
 
-Best Regards
+If on ASPEED SoCs the timer frequency is different, then we
+should model that by having CPU properties for timer frequency
+and having the SoC set those properties, I think.
 
-Eric
+> +        gt_recalc_timer(cpu, i);
+> +    }
+> +}
 
-References:
-[1] Can we boot a 512U kvm guest?
-    https://patchwork.kernel.org/patch/11091501/
-[2] [PATCH] KVM: arm/arm64: vgic: Allow more than 256 vcpus for KVM_IRQ_L=
-INE
-    https://patchwork.kernel.org/patch/11099609/
-[3] [PATCH] KVM: arm/arm64: vgic: Use a single IO device per redistributo=
-r
-    https://patchwork.kernel.org/patch/11112141/
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/v4.1.0-256fix-rfc-v1
-
-Eric Auger (3):
-  linux headers: update for KVM_CAP_ARM_IRQ_LINE_LAYOUT_2
-  intc/arm_gic: Support PPI injection for more than 256 vpus
-  virt: Check KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for smp_cpus > 256
-
- hw/arm/virt.c                                |  7 +++++
- hw/intc/arm_gic_kvm.c                        | 10 ++++---
- include/standard-headers/asm-x86/bootparam.h |  2 ++
- include/standard-headers/asm-x86/kvm_para.h  |  1 +
- include/standard-headers/linux/ethtool.h     |  2 ++
- include/standard-headers/linux/pci_regs.h    |  4 +++
- include/standard-headers/linux/virtio_ids.h  |  1 +
- include/standard-headers/linux/virtio_pmem.h |  6 ++---
- linux-headers/asm-arm/kvm.h                  | 16 ++++++++++-
- linux-headers/asm-arm/unistd-common.h        |  2 ++
- linux-headers/asm-arm64/kvm.h                | 21 ++++++++++++++-
- linux-headers/asm-generic/mman-common.h      | 15 ++++++-----
- linux-headers/asm-generic/mman.h             | 10 +++----
- linux-headers/asm-generic/unistd.h           |  8 +++++-
- linux-headers/asm-mips/unistd_n32.h          |  1 +
- linux-headers/asm-mips/unistd_n64.h          |  1 +
- linux-headers/asm-mips/unistd_o32.h          |  1 +
- linux-headers/asm-powerpc/mman.h             |  6 +----
- linux-headers/asm-powerpc/unistd_32.h        |  2 ++
- linux-headers/asm-powerpc/unistd_64.h        |  2 ++
- linux-headers/asm-s390/unistd_32.h           |  2 ++
- linux-headers/asm-s390/unistd_64.h           |  2 ++
- linux-headers/asm-x86/kvm.h                  | 28 +++++++++++++++-----
- linux-headers/asm-x86/unistd_32.h            |  2 ++
- linux-headers/asm-x86/unistd_64.h            |  2 ++
- linux-headers/asm-x86/unistd_x32.h           |  2 ++
- linux-headers/linux/kvm.h                    | 12 ++++++---
- linux-headers/linux/psp-sev.h                |  5 +---
- target/arm/kvm.c                             |  7 +++++
- target/arm/kvm_arm.h                         | 13 +++++++++
- 30 files changed, 153 insertions(+), 40 deletions(-)
-
---=20
-2.20.1
-
+thanks
+-- PMM
 
