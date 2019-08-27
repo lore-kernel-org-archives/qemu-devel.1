@@ -6,49 +6,48 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF1BC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0917EC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6665205C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:44:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6665205C9
+	by mail.kernel.org (Postfix) with ESMTPS id D262E20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 19:46:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D262E20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2hNr-00051f-1V
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 15:44:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39230)
+	id 1i2hQM-0006I6-1l
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 15:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i2hMz-0004VQ-Ph
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:43:10 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i2hPT-0005or-Oa
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i2hMy-00065H-Pf
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:43:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33708)
+ (envelope-from <jsnow@redhat.com>) id 1i2hPS-0007JU-Hn
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 15:45:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46200)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i2hMq-00060e-Tt; Tue, 27 Aug 2019 15:43:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1i2hPQ-0007Hj-2a; Tue, 27 Aug 2019 15:45:40 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3207018B3D82;
- Tue, 27 Aug 2019 19:42:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 61984107DD00;
+ Tue, 27 Aug 2019 19:45:39 +0000 (UTC)
 Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 491CE1001B1A;
- Tue, 27 Aug 2019 19:42:58 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88E6C3CCC;
+ Tue, 27 Aug 2019 19:45:38 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563553816-148827-7-git-send-email-andrey.shinkevich@virtuozzo.com>
- <083ece64-0178-fe4a-45df-331257a115fb@redhat.com>
- <350a5dee-7bc7-cfa0-e5b4-0c0f2202d119@virtuozzo.com>
+ <1563553816-148827-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <8b68a897-4ff9-5517-d7ad-3f7a18f12be7@redhat.com>
+ <4b77f137-07c2-94ea-ec72-3d8d5c0ad5f7@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -125,22 +124,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <27a1a3e5-3ebd-2e64-a36e-e8e4728b2b6d@redhat.com>
-Date: Tue, 27 Aug 2019 15:42:57 -0400
+Message-ID: <7715daea-104e-eca8-bdd3-c61b3ffb26a5@redhat.com>
+Date: Tue, 27 Aug 2019 15:45:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <350a5dee-7bc7-cfa0-e5b4-0c0f2202d119@virtuozzo.com>
+In-Reply-To: <4b77f137-07c2-94ea-ec72-3d8d5c0ad5f7@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Tue, 27 Aug 2019 19:42:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Tue, 27 Aug 2019 19:45:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 6/6] iotests: extend
- sleeping time under Valgrind
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 4/6] iotests: Valgrind
+ fails with nonexistent directory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,69 +151,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/23/19 11:27 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 16.08.2019 4:01, John Snow wrote:
+On 8/25/19 11:24 AM, Andrey Shinkevich wrote:
+> 
+> 
+> On 16/08/2019 03:55, John Snow wrote:
 >>
 >>
 >> On 7/19/19 12:30 PM, Andrey Shinkevich wrote:
->>> To synchronize the time when QEMU is running longer under the Valgrind,
->>> increase the sleeping time in the test 247.
+>>> The Valgrind uses the exported variable TMPDIR and fails if the
+>>> directory does not exist. Let us exclude such a test case from
+>>> being run under the Valgrind and notify the user of it.
 >>>
+>>> Suggested-by: Kevin Wolf <kwolf@redhat.com>
 >>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >>> ---
->>>   tests/qemu-iotests/247 | 6 +++++-
->>>   1 file changed, 5 insertions(+), 1 deletion(-)
+>>>   tests/qemu-iotests/051 | 4 ++++
+>>>   1 file changed, 4 insertions(+)
 >>>
->>> diff --git a/tests/qemu-iotests/247 b/tests/qemu-iotests/247
->>> index 546a794..c853b73 100755
->>> --- a/tests/qemu-iotests/247
->>> +++ b/tests/qemu-iotests/247
->>> @@ -57,7 +57,11 @@ TEST_IMG="$TEST_IMG.4" _make_test_img $size
->>>   {"execute":"block-commit",
->>>    "arguments":{"device":"format-4", "top-node": "format-2", "base-node":"format-0", "job-id":"job0"}}
->>>   EOF
->>> -sleep 1
+>>> diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
+>>> index ce942a5..f8141ca 100755
+>>> --- a/tests/qemu-iotests/051
+>>> +++ b/tests/qemu-iotests/051
+>>> @@ -377,6 +377,10 @@ printf %b "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id\n" |
+>>>   $QEMU_IO -c "read -P 0x33 0 4k" "$TEST_IMG" | _filter_qemu_io
+>>>   
+>>>   # Using snapshot=on with a non-existent TMPDIR
 >>> +if [ "${VALGRIND_QEMU}" == "y" ]; then
->>> +    sleep 10
->>> +else
->>> +    sleep 1
+>>> +    _casenotrun "Valgrind needs a valid TMPDIR for itself"
 >>> +fi
->>>   echo '{"execute":"quit"}'
->>>   ) | $QEMU -qmp stdio -nographic -nodefaults \
->>>       -blockdev file,node-name=file-0,filename=$TEST_IMG.0,auto-read-only=on \
+>>> +VALGRIND_QEMU="" \
+>>>   TMPDIR=/nonexistent run_qemu -drive driver=null-co,snapshot=on
+>>>   
+>>>   # Using snapshot=on together with read-only=on
 >>>
 >>
->> This makes me nervous, though. Won't this race terribly? (Wait, why
->> doesn't it race already?)
+>> The only other way around this would be a complicated mechanism to set
+>> the TMPDIR for valgrind's sub-processes only, with e.g.
+>>
+>> valgrind ... env TMPDIR=/nonexistent qemu ...
+>>
+>> ... It's probably not worth trying to concoct such a thing; but I
+>> suppose it is possible. You'd have to set up a generic layer for setting
+>> environment variables, then in the qemu shim, you could either set them
+>> directly (non-valgrind invocation) or set them as part of the valgrind
+>> command-line.
+>>
+>> Or you could just take my R-B:
+>>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
 >>
 > 
-> Hmm, however it works somehow. I'm afraid that everything with "sleep" is definitely racy..
-> Or what do you mean?
+> Thanks again John for your review and the advice.
+> Probably, it doesn't worth efforts to manage that case because QEMU 
+> should fail anyway with the error message "Could not get temporary 
+> filename: No such file or directory". So, we would not benefit much from 
+> that run. We have other test cases that cover the main functionality. 
+> It's just to check the QEMU error path for possible memory issues. Shall we?
+> 
+> Andrey
 > 
 
-Right -- anything with a sleep is already at risk for racing.
+Yeah, don't bother with this for now. I just have a personal compulsion
+to try to concretely measure how much work it would take to avoid a
+"hack" and then make my decision.
 
-What I am picking up on here is that with valgrind, there is an even
-greater computational overhead that's much harder to predict, so I was
-wondering how these values were determined.
-
-(I wouldn't withhold an RB for that alone -- the sleeps are existing
-problems.)
-
-What I moved on to wondering in particular is why test 247 doesn't
-already have race problems, because it looks quite fragile.
-
-Neither of these are really Andrey's problems; I was just surprised
-momentarily that I don't see 247 fail more often already, as-is.
+You're free to just take the R-B :)
 
 --js
 
