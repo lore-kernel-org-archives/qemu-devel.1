@@ -2,47 +2,52 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3264AC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A371C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 14:02:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0704D2070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:57:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0704D2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 3BC55206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 14:02:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BC55206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2byW-0004vp-7b
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:57:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35709)
+	id 1i2c3d-0006b6-Eu
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 10:02:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i2bxD-0003nz-HO
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:56:12 -0400
+ (envelope-from <eblake@redhat.com>) id 1i2c2S-00068t-1V
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 10:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i2bxC-0000HG-EC
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:56:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14414)
+ (envelope-from <eblake@redhat.com>) id 1i2c2Q-0004qy-Q8
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 10:01:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57718)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i2bxC-0000Fo-2L
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:56:10 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i2c2Q-0004qi-Fd
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 10:01:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 48C74308212D;
- Tue, 27 Aug 2019 13:56:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 309C520ABB;
+ Tue, 27 Aug 2019 14:01:33 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 012A71001B09;
- Tue, 27 Aug 2019 13:56:08 +0000 (UTC)
-To: qemu-devel@nongnu.org
-References: <20190824172813.29720-1-eblake@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D918D5D6B0;
+ Tue, 27 Aug 2019 14:01:21 +0000 (UTC)
+To: Yury Kotov <yury-kotov@yandex-team.ru>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20190827120221.15725-1-yury-kotov@yandex-team.ru>
+ <20190827120221.15725-2-yury-kotov@yandex-team.ru>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -69,22 +74,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <737fe8bc-1cbd-e968-919d-74142f0b2e6d@redhat.com>
-Date: Tue, 27 Aug 2019 08:56:08 -0500
+Message-ID: <fb324ab9-b7a2-d56e-a0d1-9f4ae86791ce@redhat.com>
+Date: Tue, 27 Aug 2019 09:01:20 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190824172813.29720-1-eblake@redhat.com>
+In-Reply-To: <20190827120221.15725-2-yury-kotov@yandex-team.ru>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="t4u5CBug3Z9tdyIOtMmrQHdsbrKW8K9Df"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 27 Aug 2019 13:56:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Tue, 27 Aug 2019 14:01:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] nbd: tolerate more errors to
- extension requests
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Add x-validate-uuid
+ capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,39 +101,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, rjones@redhat.com
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf
-Content-Type: multipart/mixed; boundary="8kG1PaE8fGzQn127YWoPffUoAqvJocKxk";
+--t4u5CBug3Z9tdyIOtMmrQHdsbrKW8K9Df
+Content-Type: multipart/mixed; boundary="g8mo5Zp2iemZreYNhFgEik9FZTqYukKYF";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, rjones@redhat.com
-Message-ID: <737fe8bc-1cbd-e968-919d-74142f0b2e6d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] nbd: tolerate more errors to
- extension requests
-References: <20190824172813.29720-1-eblake@redhat.com>
-In-Reply-To: <20190824172813.29720-1-eblake@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ yc-core@yandex-team.ru
+Message-ID: <fb324ab9-b7a2-d56e-a0d1-9f4ae86791ce@redhat.com>
+Subject: Re: [PATCH 1/3] migration: Add x-validate-uuid capability
+References: <20190827120221.15725-1-yury-kotov@yandex-team.ru>
+ <20190827120221.15725-2-yury-kotov@yandex-team.ru>
+In-Reply-To: <20190827120221.15725-2-yury-kotov@yandex-team.ru>
 
---8kG1PaE8fGzQn127YWoPffUoAqvJocKxk
+--g8mo5Zp2iemZreYNhFgEik9FZTqYukKYF
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/24/19 12:28 PM, Eric Blake wrote:
-> Since v1;
-> - new patch 1
-> - adjust patch 2 to not set errp when not in strict mode
+On 8/27/19 7:02 AM, Yury Kotov wrote:
+> This capability realizes simple source validation by UUID.
+> It's useful for live migration between hosts.
 >=20
-> Eric Blake (2):
->   nbd: Use g_autofree in a few places
->   nbd: Tolerate more errors to structured reply request
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> ---
+>  migration/migration.c |  9 +++++++++
+>  migration/migration.h |  1 +
+>  migration/savevm.c    | 45 +++++++++++++++++++++++++++++++++++++++++++=
 
-I'm queuing this through my NBD tree.
+>  qapi/migration.json   |  5 ++++-
+>  4 files changed, 59 insertions(+), 1 deletion(-)
+
+Any reason why this is marked experimental?  It seems useful enough that
+we could probably just add it as a fully-supported feature (dropping the
+x- prefix) - but I'll leave that up to the migration maintainers.
+
+In fact, do we even need this to be a tunable feature?  Why not just
+always enable it?  As long as the UUID is sent in a way that new->old
+doesn't break the old qemu from receiving the migration stream, and that
+old->new copes with UUID being absent, then new->new will always benefit
+from the additional safety check.
+
+> +++ b/qapi/migration.json
+> @@ -415,6 +415,9 @@
+>  #
+>  # @x-ignore-shared: If enabled, QEMU will not migrate shared memory (s=
+ince 4.0)
+>  #
+> +# @x-validate-uuid: Check whether the UUID is the same on both sides o=
+r not.
+> +#                   (since 4.2)
+
+Maybe:
+
+@x-validate-uuid: Send the UUID of the source to allow the destination
+to ensure it is the same.
+
+if we even need a tunable capability.
+
+> +#
+>  # Since: 1.2
+>  ##
+>  { 'enum': 'MigrationCapability',
+> @@ -422,7 +425,7 @@
+>             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
+m',
+>             'block', 'return-path', 'pause-before-switchover', 'multifd=
+',
+>             'dirty-bitmaps', 'postcopy-blocktime', 'late-block-activate=
+',
+> -           'x-ignore-shared' ] }
+> +           'x-ignore-shared', 'x-validate-uuid' ] }
+> =20
+>  ##
+>  # @MigrationCapabilityStatus:
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -136,24 +194,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---8kG1PaE8fGzQn127YWoPffUoAqvJocKxk--
+--g8mo5Zp2iemZreYNhFgEik9FZTqYukKYF--
 
---X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf
+--t4u5CBug3Z9tdyIOtMmrQHdsbrKW8K9Df
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1lNngACgkQp6FrSiUn
-Q2runAf+K2R7VnkU8tFpIUTqW64uUIX4fd8JAZVwRZj/PKNCufvGhnxpKl4hqYaW
-0+UKZYDXnjuZ1KolEMYww/Ii8NEPtRVsxXQm5LFOo7A+1n8NNkkpJ5VkJhMKEw2Z
-y/PbnV/7pwV5FiRjXk+uI+0MDpQmXiJX9CuqfCzwe0uAETO52U0uhZM26vU2YjZ8
-tjaTg6hO5E17hQy5AXzUB8yBM7GRIlDAzCBf4M5QUE/tfRgPtNkhf9OvH6DmZrk0
-a+hJSjBGC1jhfqX4I9B7AhzEufSMrJj2xsh/cKYl1f5C+NiS+fJjWVsnYf1rmUM7
-xZNQJK+fH5X5bHU6WxYz0G1w0FJyvQ==
-=DD2/
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1lN7AACgkQp6FrSiUn
+Q2r3RggAgbDhGjnCkVYd1X/W2vBNqpRHCrTtZsCUF23n3BUXsyRQiDF/MgrbBLAc
+2VH13DeumdX3e11/AA2QCj6ycDLQ0R42Vs73gqkgeMSE0JSHP3NxmJxcybRyg1hP
+8IHK4G8Np4Z9YDg8sa8luVjsjUVd511bh6v/JAwyuw/nf1Zvz2aRzVKbn2GiFbSo
+NaPIftUrNclwbrrThduMwI6rWkZIaxKG7IVAghxDPHx3WF8Q+CQ779ugJ1vuS4zl
+FA/uzyjAsINO7ILZOPAmlENQq15sWgTRshpw77L9LVhad1W+jHssYnjZ/JXG69yh
+efTYOkqnS+iENtkTUM86a+1OzsnGuw==
+=8/jv
 -----END PGP SIGNATURE-----
 
---X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf--
+--t4u5CBug3Z9tdyIOtMmrQHdsbrKW8K9Df--
 
