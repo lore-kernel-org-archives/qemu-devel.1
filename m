@@ -2,48 +2,47 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5FEC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3264AC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2500E2070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:56:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2500E2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 0704D2070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:57:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0704D2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2bxu-0004IQ-9u
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:56:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35583)
+	id 1i2byW-0004vp-7b
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:57:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35709)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i2bwq-0003P9-Rr
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:55:50 -0400
+ (envelope-from <eblake@redhat.com>) id 1i2bxD-0003nz-HO
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i2bwo-0008Pp-LB
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:55:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51478)
+ (envelope-from <eblake@redhat.com>) id 1i2bxC-0000HG-EC
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:56:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14414)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i2bwm-0008NK-8B; Tue, 27 Aug 2019 09:55:44 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i2bxC-0000Fo-2L
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:56:10 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3B0213084244;
- Tue, 27 Aug 2019 13:55:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 48C74308212D;
+ Tue, 27 Aug 2019 13:56:09 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A45E10016EB;
- Tue, 27 Aug 2019 13:55:36 +0000 (UTC)
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <1566913973-15490-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 012A71001B09;
+ Tue, 27 Aug 2019 13:56:08 +0000 (UTC)
+To: qemu-devel@nongnu.org
+References: <20190824172813.29720-1-eblake@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +69,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <4b240066-60b7-0f9b-9f17-d5da43b9da84@redhat.com>
-Date: Tue, 27 Aug 2019 08:55:35 -0500
+Message-ID: <737fe8bc-1cbd-e968-919d-74142f0b2e6d@redhat.com>
+Date: Tue, 27 Aug 2019 08:56:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1566913973-15490-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <20190824172813.29720-1-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="SL1tXdzHX123eXBIg0qoL6DaACG61ydUn"
+ boundary="X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 27 Aug 2019 13:55:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Tue, 27 Aug 2019 13:56:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] block: workaround for unaligned byte
- range in fallocate()
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] nbd: tolerate more errors to
+ extension requests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,50 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: vsementsov@virtuozzo.com, rjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SL1tXdzHX123eXBIg0qoL6DaACG61ydUn
-Content-Type: multipart/mixed; boundary="PZo87jdMNbtWW3aNdniyjsBjngjyUmBlm";
+--X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf
+Content-Type: multipart/mixed; boundary="8kG1PaE8fGzQn127YWoPffUoAqvJocKxk";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, fam@euphon.net,
- den@openvz.org, vsementsov@virtuozzo.com
-Message-ID: <4b240066-60b7-0f9b-9f17-d5da43b9da84@redhat.com>
-Subject: Re: [PATCH v2] block: workaround for unaligned byte range in
- fallocate()
-References: <1566913973-15490-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1566913973-15490-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, rjones@redhat.com
+Message-ID: <737fe8bc-1cbd-e968-919d-74142f0b2e6d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] nbd: tolerate more errors to
+ extension requests
+References: <20190824172813.29720-1-eblake@redhat.com>
+In-Reply-To: <20190824172813.29720-1-eblake@redhat.com>
 
---PZo87jdMNbtWW3aNdniyjsBjngjyUmBlm
+--8kG1PaE8fGzQn127YWoPffUoAqvJocKxk
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/27/19 8:52 AM, Andrey Shinkevich wrote:
-> Revert the commit 118f99442d 'block/io.c: fix for the allocation failur=
-e'
-> and use better error handling for file systems that do not support
-> fallocate() for an unaligned byte range. Allow falling back to pwrite
-> in case fallocate() returns EINVAL.
+On 8/24/19 12:28 PM, Eric Blake wrote:
+> Since v1;
+> - new patch 1
+> - adjust patch 2 to not set errp when not in strict mode
 >=20
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/file-posix.c | 7 +++++++
->  block/io.c         | 2 +-
->  2 files changed, 8 insertions(+), 1 deletion(-)
+> Eric Blake (2):
+>   nbd: Use g_autofree in a few places
+>   nbd: Tolerate more errors to structured reply request
 
-Queuing this in my NBD tree (as I performed testing on top of it when
-working on NBD fast-zero).
+I'm queuing this through my NBD tree.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -148,24 +136,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---PZo87jdMNbtWW3aNdniyjsBjngjyUmBlm--
+--8kG1PaE8fGzQn127YWoPffUoAqvJocKxk--
 
---SL1tXdzHX123eXBIg0qoL6DaACG61ydUn
+--X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1lNlcACgkQp6FrSiUn
-Q2qtBAgAqQwDDcbEc5lbirhAb/ssr57qmNBdH1JqEFC1dRWQpNrG+q4qTbZIhBW7
-OWNIVnIZtGCNISGrB3ke+e4P43fbYIzjDlY1wZ9v2WewvhVToW9Zs/olA71VJIKo
-IbDNrnVvtrLH6KJc4z7FMsv/20XvUeLCSoGaHVHb8sA/VqQyYnndczrd2g54dU1U
-w3TLNmVc2DIWX1KzsWe4FmlBzerObA7xKU4MPiVhuR2PAY7DOlGaLNjnbZ/HA9T2
-JvgMyVBCSQf3lGYiEHT2KVBDeMwZ2QeDqPRj0qLVqFGnNzeSQaPiDGJInmwpd6Sp
-8GV71XXZpG4xnwsFiqmERc3aahvkXA==
-=O/BY
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1lNngACgkQp6FrSiUn
+Q2runAf+K2R7VnkU8tFpIUTqW64uUIX4fd8JAZVwRZj/PKNCufvGhnxpKl4hqYaW
+0+UKZYDXnjuZ1KolEMYww/Ii8NEPtRVsxXQm5LFOo7A+1n8NNkkpJ5VkJhMKEw2Z
+y/PbnV/7pwV5FiRjXk+uI+0MDpQmXiJX9CuqfCzwe0uAETO52U0uhZM26vU2YjZ8
+tjaTg6hO5E17hQy5AXzUB8yBM7GRIlDAzCBf4M5QUE/tfRgPtNkhf9OvH6DmZrk0
+a+hJSjBGC1jhfqX4I9B7AhzEufSMrJj2xsh/cKYl1f5C+NiS+fJjWVsnYf1rmUM7
+xZNQJK+fH5X5bHU6WxYz0G1w0FJyvQ==
+=DD2/
 -----END PGP SIGNATURE-----
 
---SL1tXdzHX123eXBIg0qoL6DaACG61ydUn--
+--X6U2sHNadvFWM4dQyPxC00YRdkCYnqIcf--
 
