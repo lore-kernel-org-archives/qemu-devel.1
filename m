@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD8FC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B34C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:58:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 620AF206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:57:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620AF206BA
+	by mail.kernel.org (Postfix) with ESMTPS id DE028206BB
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:58:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE028206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2YEC-0007Ay-FB
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 05:57:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53310)
+	id 1i2YFF-00007B-2K
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 05:58:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i2YBq-0004IH-Vn
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:55:03 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i2YCH-0004o0-F2
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i2YBp-0004lu-Pu
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:55:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44690)
+ (envelope-from <stefanha@redhat.com>) id 1i2YCG-00054s-Ht
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:55:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33986)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i2YBp-0004le-KG
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:55:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i2YCG-00054d-CE
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:55:28 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DCE983D962
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 09:55:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B2E4E5AFF8
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 09:55:27 +0000 (UTC)
 Received: from localhost (ovpn-116-148.ams2.redhat.com [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 874455D70D;
- Tue, 27 Aug 2019 09:54:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F7E05C220;
+ Tue, 27 Aug 2019 09:55:16 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: virtio-fs@redhat.com,
 	qemu-devel@nongnu.org
-Date: Tue, 27 Aug 2019 10:54:34 +0100
-Message-Id: <20190827095437.18819-2-stefanha@redhat.com>
+Date: Tue, 27 Aug 2019 10:54:36 +0100
+Message-Id: <20190827095437.18819-4-stefanha@redhat.com>
 In-Reply-To: <20190827095437.18819-1-stefanha@redhat.com>
 References: <20190827095437.18819-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 27 Aug 2019 09:55:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Tue, 27 Aug 2019 09:55:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/4] virtiofsd: make -f (foreground) the default
+Subject: [Qemu-devel] [PATCH 3/4] virtiofsd: install virtiofsd in libexec
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,48 +74,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to vhost-user.rst "Backend program conventions", backend
-programs should run in the foregound by default.  Follow the
-conventions so libvirt and other management tools can control virtiofsd
-in a standard way.
+Build and install virtiofsd on Linux hosts.  This is also how
+vhost-user-gpu is handled.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- contrib/virtiofsd/helper.c | 3 +++
- 1 file changed, 3 insertions(+)
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/contrib/virtiofsd/helper.c b/contrib/virtiofsd/helper.c
-index 4c71452080..8d8bca889b 100644
---- a/contrib/virtiofsd/helper.c
-+++ b/contrib/virtiofsd/helper.c
-@@ -42,6 +42,7 @@ static const struct fuse_opt fuse_helper_opts[] =3D {
- 	FUSE_OPT_KEY("-d",		FUSE_OPT_KEY_KEEP),
- 	FUSE_OPT_KEY("debug",		FUSE_OPT_KEY_KEEP),
- 	FUSE_HELPER_OPT("-f",		foreground),
-+	FUSE_HELPER_OPT_VALUE("--daemonize", foreground, 0),
- 	FUSE_HELPER_OPT("-s",		singlethread),
- 	FUSE_HELPER_OPT("fsname=3D",	nodefault_subtype),
- 	FUSE_OPT_KEY("fsname=3D",		FUSE_OPT_KEY_KEEP),
-@@ -139,6 +140,7 @@ void fuse_cmdline_help(void)
- 	       "    -d   -o debug              enable debug output (implies -f)=
-\n"
- 	       "    --syslog                   log to syslog (default stderr)\n=
-"
- 	       "    -f                         foreground operation\n"
-+	       "    --daemonize                run in background\n"
- 	       "    -s                         disable multi-threaded operation=
-\n"
- 	       "    -o clone_fd                use separate fuse device fd for =
-each thread\n"
- 	       "                               (may improve performance)\n"
-@@ -171,6 +173,7 @@ int fuse_parse_cmdline(struct fuse_args *args,
- 	memset(opts, 0, sizeof(struct fuse_cmdline_opts));
+diff --git a/Makefile b/Makefile
+index a3dfdd6fa8..ef6eca07cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -317,6 +317,8 @@ HELPERS-y =3D
+ HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D qemu-bridge-h=
+elper$(EXESUF)
 =20
- 	opts->max_idle_threads =3D 10;
-+	opts->foreground =3D 1;
-=20
- 	if (fuse_opt_parse(args, opts, fuse_helper_opts,
- 			   fuse_helper_opt_proc) =3D=3D -1)
+ ifdef CONFIG_LINUX
++HELPERS-y +=3D virtiofsd$(EXESUF)
++
+ ifdef CONFIG_VIRGL
+ ifdef CONFIG_GBM
+ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
 --=20
 2.21.0
 
