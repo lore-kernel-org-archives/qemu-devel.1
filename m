@@ -2,82 +2,92 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5BD0C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCB8CC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 05:00:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D056217F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5DB2217F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 05:00:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gEj2MMjt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D056217F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a8G95aiW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5DB2217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2TZE-0007G1-QL
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 00:58:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36843)
+	id 1i2Tax-00089H-O6
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 01:00:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37029)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sjitindarsingh@gmail.com>) id 1i2TYW-0006hv-Ja
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:58:09 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i2TaA-0007jq-E8
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sjitindarsingh@gmail.com>) id 1i2TYV-0004hw-EU
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:58:08 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36786)
+ (envelope-from <richard.henderson@linaro.org>) id 1i2Ta9-0005ft-9B
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:59:50 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33924)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
- id 1i2TYS-0004e7-Id; Tue, 27 Aug 2019 00:58:04 -0400
-Received: by mail-pl1-x641.google.com with SMTP id f19so11146657plr.3;
- Mon, 26 Aug 2019 21:58:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=P25ICHlvC9T2Gq4NKXejplGEdwCcHrENc9J7umEtneY=;
- b=gEj2MMjtrUKk35Id62KIdE4iZ3VhdM6oF+p5AqVXcEtWOJtyIztJPz+5rTrg4429VX
- TwraiyUA0OVQXBYi/U84KWf6G1LbUGXSrtnEPKerbrtKOXCVQ9hNQkNSiBg1SWeZ1JQr
- vt1tdR65IqIKqt7Ou+0X1USSpvJUXrQEvZ279bZkum5Oy8fg0hN7hrt0elm6Ui7aijQg
- 4BBzkZB0M9NIQUC8y6yktevXikEzyf8Jka1puUwAuTY0S73P2eHzi1ovEsrVtxSPxmpW
- 9eQ4sPUkXUNgCP3HMMC7OzQ2SeW/jVDLOL1GA7pt6DiQ5/6t1fvIj+axbu/W1r+cr12n
- XUxw==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i2Ta8-0005fF-VZ
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:59:49 -0400
+Received: by mail-pg1-x542.google.com with SMTP id n9so11940376pgc.1
+ for <qemu-devel@nongnu.org>; Mon, 26 Aug 2019 21:59:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zI/uto9yxNnWrFZoRkgTLQ8QKcp/Nqa91bO4oFtL9fk=;
+ b=a8G95aiW7qxrfs64PVcYOMykLJ9lbCTV6JxU/QKvVQmfCkOmwf0ww4XsvxF8KIsWzK
+ Gw6UZ0M0k/wUdTl/kQ3AWGwtbRWcxJ7gcWW0+IsJiIo2Q7MsydwjjlriDeVN/7Wx9pNI
+ Pp5FUvY1aURhj1z1sjqQZnLDzQXWHL/l2x+aB4uw+44/6Wh5emrpRl0ZNrS0Zn0lbCV9
+ 6HR9+mixjUqL2JcXbxvm4YZCr25ZAX77T4zGxkn7yJH2+Ww57sfv+viNG6/d8Y07imLF
+ c2xOcPQksABdI0w9kMH6HKls3nbSsWGgUZbsaORRrSJwmYg4vWLj4VD60sdGYGdboAAB
+ t9LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=P25ICHlvC9T2Gq4NKXejplGEdwCcHrENc9J7umEtneY=;
- b=EK8ASxUQ8iDOWkARu4pVUlI/sCR+ZKe3Vai3tjvc3ioFl/lHeVRfkLIQwu1TmmuM7e
- O9lgDNKcHQnql/cL5aell9IWrNgEGivIB3i023qyKwHOdnDXrH2+OvrB6wt3FmNkRWI5
- cFT3O6WH6pZb1Va6l12zekcYI+BNztG9wjPXekDnsu/Cx3o5WbbSpc2dDQhUDc5Vu6J1
- ebPvH6W+zdEZV2RoYqz/zqQD15ZhrPcdF6jJMw3FW2Wt8Ed7SmSQ3KWbfb2RSZoSvLNA
- 8scFZAt1M7nmP3oxvM9Uqb63QiRTjfxqcr4RhJf0vVAkhWTi0EagAMfhSiugVENggdMk
- n0FQ==
-X-Gm-Message-State: APjAAAWq1Dh5DzADP+3Sp1ExuIiblkohUMJGXUXOkRm+rZHyQLuDvXFX
- JlAKJSlkkWQ3ninU8/0Ejc/KTdPC
-X-Google-Smtp-Source: APXvYqxeP5e+pEEzTAsCdlsa8i7Ma5v0KK2GnWtla/b3XyWV7wVtK3DhN5QN6Xq/Hf69mV/unS6SAw==
-X-Received: by 2002:a17:902:a410:: with SMTP id
- p16mr22519249plq.150.1566881882515; 
- Mon, 26 Aug 2019 21:58:02 -0700 (PDT)
-Received: from localhost.majoof.com (150.24.220.111.sta.wbroadband.net.au.
- [111.220.24.150])
- by smtp.gmail.com with ESMTPSA id t189sm14535883pfd.58.2019.08.26.21.58.00
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 26 Aug 2019 21:58:01 -0700 (PDT)
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To: qemu-ppc@nongnu.org
-Date: Tue, 27 Aug 2019 14:57:51 +1000
-Message-Id: <20190827045751.22123-1-sjitindarsingh@gmail.com>
-X-Mailer: git-send-email 2.13.6
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zI/uto9yxNnWrFZoRkgTLQ8QKcp/Nqa91bO4oFtL9fk=;
+ b=KVDpUqLVKA0APZsdYFJpTebNe6Ov8L59RXpeJTfLvYOqxO3MuKW4XRxda51BDwFP4U
+ MglzNsPfCZmSjvvzslZ8zYbV8yF5FEYWdhEVxmh0NFut1GzkaoXIgcMEO/rw/+CeZj4B
+ Ytzcbrbaa1VW65XfQlY6qPPbjgasTB2lmfEYh3rP4F2QDMpmOwRRWDkNQg/dC8ScKJXG
+ aGZkM/+GqdL8ORcgCPSeSfH8CuusUJMFAVe6rpPZU7IHNCvt/FuZgphSG6MxzOEItHV4
+ 9cdswLNaLBzntpUAnlcjEAckzEt3XAJ8TBSAyID5xKK7+lcDkHsLu3P6wJ1yA5ige1U+
+ GQ4Q==
+X-Gm-Message-State: APjAAAVSXqPbbSvU71+mdjckRsVKXgSaYNcpGhv0Izw3+wb/oHHvS2TY
+ iKjo6Ln+kYRXu0BlEZR0WYMcWVdmWws=
+X-Google-Smtp-Source: APXvYqyzBdDyW7e4iLq3nKDBDnFJz9h6dnlhBkg27tazEsbyl6gDRj4nLUm5tdEsbsHdGPHF3dBZvA==
+X-Received: by 2002:a63:e14d:: with SMTP id h13mr19504020pgk.431.1566881987162; 
+ Mon, 26 Aug 2019 21:59:47 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id v22sm11231209pgk.69.2019.08.26.21.59.46
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 26 Aug 2019 21:59:46 -0700 (PDT)
+To: Stafford Horne <shorne@gmail.com>
+References: <20190827000745.19645-1-richard.henderson@linaro.org>
+ <20190827000745.19645-7-richard.henderson@linaro.org>
+ <20190827043624.GK24874@lianli.shorne-pla.net>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <38002440-429f-33cb-abe5-db3bb5efb562@linaro.org>
+Date: Mon, 26 Aug 2019 21:59:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190827043624.GK24874@lianli.shorne-pla.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V4] powerpc/spapr: Add host threads
- parameter to ibm, get_system_parameter
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH 06/13] target/openrisc: Add VR2 and AVR
+ special processor registers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,110 +99,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
- david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ibm,get_system_parameter rtas call is used by the guest to retrieve
-data relating to certain parameters of the system. The SPLPAR
-characteristics option (token 20) is used to determine characteristics of
-the environment in which the lpar will run.
+On 8/26/19 9:36 PM, Stafford Horne wrote:
+>>      /* Fields from here on are preserved across CPU reset. */
+>>      uint32_t vr;              /* Version register */
+>> +    uint32_t vr2;             /* Version register 2 */
+>> +    uint32_t avr;             /* Architecture version register */
+> 
+> Do you need to update the serialization in machine.c?
 
-It may be useful for a guest to know the number of physical host threads
-present on the underlying system where it is being run. Add the
-characteristic "HostThrs" to the SPLPAR Characteristics
-ibm,get_system_parameter rtas call to expose this information to a
-guest. Add a n_host_threads property to the processor class which is
-then used to retrieve this information and define it for POWER8 and
-POWER9. Other processors will default to 0 and the charateristic won't
-be added.
+I don't think so, because these are invariant for the cpu type.  It is not
+valid to migrate state to a different cpu.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+The VR, DMMUCFGR, IMMUCFGR entries that you pointed out wrt the previous patch
+wouldn't need to be in the serialization if they weren't already there.
 
----
 
-V1 -> V2:
-- Take into account that the core may be operating in split core mode
-  meaning a single core may be split into multiple subcores.
-V2 -> V3:
-- Add curly braces for single line if statements
-V3 -> V4;
-- Add a host threads property to the processor class and use this to
-  derive the information rather than the device tree.
----
- hw/ppc/spapr_rtas.c             | 15 +++++++++++++++
- target/ppc/cpu-qom.h            |  1 +
- target/ppc/translate_init.inc.c |  2 ++
- 3 files changed, 18 insertions(+)
-
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 526b489297..bee3835214 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -266,6 +266,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-                                           target_ulong args,
-                                           uint32_t nret, target_ulong rets)
- {
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-     MachineState *ms = MACHINE(qdev_get_machine());
-     unsigned int max_cpus = ms->smp.max_cpus;
-     target_ulong parameter = rtas_ld(args, 0);
-@@ -283,6 +284,20 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
-                                           current_machine->ram_size / MiB,
-                                           ms->smp.cpus,
-                                           max_cpus);
-+        if (pcc->n_host_threads > 0) {
-+            char *hostthr_val, *old = param_val;
-+
-+            /*
-+             * Add HostThrs property. This property is not present in PAPR but
-+             * is expected by some guests to communicate the number of physical
-+             * host threads per core on the system so that they can scale
-+             * information which varies based on the thread configuration.
-+             */
-+            hostthr_val = g_strdup_printf(",HostThrs=%d", pcc->n_host_threads);
-+            param_val = g_strconcat(param_val, hostthr_val, NULL);
-+            g_free(hostthr_val);
-+            g_free(old);
-+        }
-         ret = sysparm_st(buffer, length, param_val, strlen(param_val) + 1);
-         g_free(param_val);
-         break;
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index 7ffdb0a706..e499575dc8 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -191,6 +191,7 @@ typedef struct PowerPCCPUClass {
-     const PPCHash64Options *hash64_opts;
-     struct ppc_radix_page_info *radix_page_info;
-     uint32_t lrg_decr_bits;
-+    int n_host_threads;
-     void (*init_proc)(CPUPPCState *env);
-     int  (*check_pow)(CPUPPCState *env);
-     int (*handle_mmu_fault)(PowerPCCPU *cpu, vaddr eaddr, int rwx, int mmu_idx);
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 4a21ed7289..41f77b7ef8 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8770,6 +8770,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
-     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-     pcc->hash64_opts = &ppc_hash64_opts_POWER7;
-     pcc->lrg_decr_bits = 32;
-+    pcc->n_host_threads = 8;
- #endif
-     pcc->excp_model = POWERPC_EXCP_POWER8;
-     pcc->bus_model = PPC_FLAGS_INPUT_POWER7;
-@@ -8981,6 +8982,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-     pcc->hash64_opts = &ppc_hash64_opts_POWER7;
-     pcc->radix_page_info = &POWER9_radix_page_info;
-     pcc->lrg_decr_bits = 56;
-+    pcc->n_host_threads = 4;
- #endif
-     pcc->excp_model = POWERPC_EXCP_POWER9;
-     pcc->bus_model = PPC_FLAGS_INPUT_POWER9;
--- 
-2.13.6
-
+r~
 
