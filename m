@@ -2,95 +2,72 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2775C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2555BC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:16:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ED692080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:14:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED692080C
+	by mail.kernel.org (Postfix) with ESMTPS id E91BD2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 04:16:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E91BD2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Ssk-0000FH-MS
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 00:14:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60482)
+	id 1i2SuT-0001QM-5h
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 00:16:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60627)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pc@us.ibm.com>) id 1i2Ss1-00089n-Mz
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:14:15 -0400
+ (envelope-from <bounces@canonical.com>) id 1i2StP-0000uY-0P
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pc@us.ibm.com>) id 1i2Ss0-0002Dy-Kn
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:14:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18726
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pc@us.ibm.com>)
- id 1i2Srv-0002BU-ML; Tue, 27 Aug 2019 00:14:07 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x7R4CWAR015863; Tue, 27 Aug 2019 00:14:00 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2umt9qwgj3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 27 Aug 2019 00:14:00 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7R4BhYo002128;
- Tue, 27 Aug 2019 04:13:59 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma03dal.us.ibm.com with ESMTP id 2umpct8nac-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 27 Aug 2019 04:13:59 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x7R4DwqC53412314
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 27 Aug 2019 04:13:58 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 81DB72805A;
- Tue, 27 Aug 2019 04:13:58 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2DDB828058;
- Tue, 27 Aug 2019 04:13:58 +0000 (GMT)
-Received: from oc3272150783.ibm.com (unknown [9.85.174.130])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTPS;
- Tue, 27 Aug 2019 04:13:58 +0000 (GMT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190827020013.27154-1-richard.henderson@linaro.org>
-From: Paul Clarke <pc@us.ibm.com>
-Message-ID: <9cecc98f-59dc-0abf-b537-ef41ad0c08c5@us.ibm.com>
-Date: Mon, 26 Aug 2019 23:13:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bounces@canonical.com>) id 1i2StN-0002gn-Ow
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:15:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40398)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i2StN-0002gY-JF
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 00:15:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i2StM-0002Hf-GJ
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 04:15:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 723492E80C7
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 04:15:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190827020013.27154-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-08-26_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908270046
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Set
- float_tininess_before_rounding at cpu reset
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 27 Aug 2019 04:08:07 -0000
+From: Paul Clarke <pc@us.ibm.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 7-pc
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
+References: <156686849716.6431.16425651381928336460.malonedeb@gac.canonical.com>
+Message-Id: <156687888782.6965.1367413426931573379.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19031";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 69fb8119a49652948b4117b4153cdd156350d889
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1841491] Re: floating point emulation can fail to
+ set FE_UNDERFLOW
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,41 +76,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Reply-To: Bug 1841491 <1841491@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/26/19 9:00 PM, Richard Henderson wrote:
-> As defined in Power 3.0 section 4.4.4 "Underflow Exception",
-> a tiny result is detected before rounding.
+** Attachment added: "2nd file of float testcase"
+   https://bugs.launchpad.net/qemu/+bug/1841491/+attachment/5284821/+files/=
+ffma.c
 
-Responded in the bug:
-https://bugs.launchpad.net/qemu/+bug/1841491/comments/3
+-- =
 
-In my testing, this works for "double", but not "float".
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1841491
 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1841491 
-> Reported-by: Paul Clarke <pc@us.ibm.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/ppc/translate_init.inc.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-> index 4a21ed7289..023138c2f9 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -10461,6 +10461,10 @@ static void ppc_cpu_reset(CPUState *s)
->      s->exception_index = POWERPC_EXCP_NONE;
->      env->error_code = 0;
->  
-> +    /* tininess for underflow is detected before rounding */
-> +    set_float_detect_tininess(float_tininess_before_rounding,
-> +                              &env->fp_status);
-> +
->      for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
->          ppc_spr_t *spr = &env->spr_cb[i];
+Title:
+  floating point emulation can fail to set FE_UNDERFLOW
 
-PC
+Status in QEMU:
+  New
+
+Bug description:
+  Floating point emulation can fail to set FE_UNDERFLOW in some
+  circumstances. This shows up often in glibc's "math" tests. A similar
+  test is attached.
+
+  This is similar to bug #1841442, but not the same problem, and I don't
+  think the fix will be in the same code.
+
+  On ppc64le native:
+  --
+  $ gcc -c -O2 fma.c
+  $ gcc -O2 test-fma.c fma.o -lm -o test-fma
+  $ ./test-fma $(./test-fma)
+  fma(0x1.ffffffffffffcp-1022, 0x1.0000000000001p-1, 0x0.0000000000001p-102=
+2)
+  0x0
+
+  0xa000000
+  FE_INEXACT FE_UNDERFLOW =
+
+  0x1p-1022
+  --
+
+  On qemu-system-ppc64:
+  --
+  $ ./test-fma $(./test-fma)
+  fma(0x1.ffffffffffffcp-1022, 0x1.0000000000001p-1, 0x0.0000000000001p-102=
+2)
+  0x0
+
+  0x2000000
+  FE_INEXACT =
+
+  0x1p-1022
+  --
+
+  QEMU versions vary, but not too much, and are pretty close to git HEAD:
+  - 586f3dced9 (HEAD -> master, origin/master, origin/HEAD) Merge remote-tr=
+acking branch 'remotes/cohuck/tags/s390x-20190822' into staging
+  - 864ab31 Update version for v4.1.0-rc4 release
+
+  There are worse symptoms on qemu-x86_64, but this is apparently not
+  surprising per
+  https://bugs.launchpad.net/qemu/+bug/1841442/comments/6.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1841491/+subscriptions
 
