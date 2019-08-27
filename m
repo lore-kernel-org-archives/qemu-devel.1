@@ -2,101 +2,88 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E52C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A91EC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:40:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E188206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:38:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D90E4206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 13:40:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="TeY8K8ZQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E188206BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkNZAi3i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D90E4206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2bfw-00023V-6T
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:38:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60225)
+	id 1i2bhf-00031N-35
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 09:40:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthony.perard@citrix.com>) id 1i2bb5-0006Fj-DO
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:33:20 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1i2bgl-0002W1-Ol
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:39:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1i2bb0-0004ss-HR
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:33:19 -0400
-Received: from esa6.hc3370-68.iphmx.com ([216.71.155.175]:9216)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1i2bb0-0004rj-6j
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:33:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1566912794;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=E7lWg8VZF/1XKaFjN4EjgBKL9WTiyqP571uFJ5cbJcI=;
- b=TeY8K8ZQJ3JmFxVhkYundsEgnaJf/oPeuLjYlngrrsSyIedj6X/eEITU
- vcnWqSkjqu8rXJrRge9OjNADLfjXMKG1CNUCPNW30A+czY/c/6vBPE9mt
- hqCkqfd06DlWbvEZrNJzcTWtWZHaVDdbsYOmrP3XRlWgSg6+OqknYOIGx s=;
-Authentication-Results: esa6.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=anthony.perard@citrix.com;
- spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa6.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- anthony.perard@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible
-Received-SPF: Pass (esa6.hc3370-68.iphmx.com: domain of
- anthony.perard@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa6.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: emSXTKiNX2gORp3QuaplSz8KP+U+6F+AP0AX9vjAyXYS9qsG22RdAtqZD3oy/Ore8jVf8QVPUI
- drhUX4MNGTm9jPwnd0kSqZYWUOBNxzjaVvHUkOg2k9C+b9amuOMwX0/JV0NkfPe8IS+CWKMAnR
- QtWwhUdvmJWNDH1oM8bf1ur/T4HszN9c+Vn3dbNDRSACh75GUNUdlFVGqzd5mBHmBRtdRkLnx5
- WQ0PxWBkgnRyubR6QzO5pncwYT14IfMDAWyHj20e6JIQ2g67FzECX4Z99XGBLY+/TKMoDFRwJt
- JfU=
-X-SBRS: 2.7
-X-MesageID: 4987739
-X-Ironport-Server: esa6.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,437,1559534400"; 
-   d="scan'208";a="4987739"
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: <qemu-devel@nongnu.org>
-Date: Tue, 27 Aug 2019 14:32:55 +0100
-Message-ID: <20190827133259.32084-1-anthony.perard@citrix.com>
-X-Mailer: git-send-email 2.22.0
+ (envelope-from <marcandre.lureau@gmail.com>) id 1i2bgi-0006yj-Ov
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:39:09 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40961)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1i2bgi-0006y4-H2
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 09:39:08 -0400
+Received: by mail-wr1-x443.google.com with SMTP id j16so18834165wrr.8
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 06:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=6nMO4AGoGhQn6/ZJr8niYpnNPKzJXRd82lgEZJBb4zo=;
+ b=nkNZAi3iGsF3VMuFZg2gkxudAFZw0YINbrgnkmFzG0c0Erdf1xMFVqCcvvyEqw5M0M
+ rreSkhxBuYtZFwOvLA0jrAPkFVGS+nuxNWcX+G/5qvJmOyUYyvjFZMTlM7gkhEIs+qiz
+ BynxS8OXJ4byuM7SIu4eLbAm0moVosFYIX6csfunTPUrGZ/nIJoZXplGptd70OpCPJK8
+ 6cesAjKjlssTW7TSPS4kAYQMkSugYU57KQQ8xsBTJMU4FnpY0UISjA0dJkPZr0zFWVde
+ qB+0/T0f5l6xjeMK9V7WWVr63cwVTSGDaXqYdUbajuQurDpMXeQhWcHCHzPCT7NllZWr
+ Xgqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=6nMO4AGoGhQn6/ZJr8niYpnNPKzJXRd82lgEZJBb4zo=;
+ b=nNztbhqQ1vgr4hNjiLq/wXLl+lzOgFhj7cpcv1hcgqpCjO/8bBQ/E3JWtHlRxFd/uX
+ e5BgMDZdUwZ+SOY2McTIUAg+czQvXBZnl6ijapvghKeqHQcTbwEaPdctWMrZk9EKfcZt
+ 5rdcBt4CXc35lmFSxj3JY0Ht+/q+Oxi0uB+qJ4b350IxnbXflHVLREzHNmJ8OjYwIV+1
+ r9uws1hEQOHzbza3mPKhXs4XdMxvZveQU7chNNiyICc1HcE7DfjkhpwC6/stnB1IlRv7
+ msiorSyOsrkQuDzxfb3RbcPQQ/aEOBDp0bF5CZgnpQSh/PH/cmNXJyxuyQsfFncF3DeC
+ 7o8g==
+X-Gm-Message-State: APjAAAUH2L2qrqqV0aNeIB1LwspFfcF3WA9d6IsFtr4yvipL6CIVHEat
+ DQEGIEq8LDsJTMWvz9xztNKB9cOdOSxZYad63Cs=
+X-Google-Smtp-Source: APXvYqxNi4q36BxQDA4jV6TrzINmle1VvIm1Eecvi503fyUCGDRVUH5hku+4Ra7EEFBBp7aSIIu6yXKHke3qOgfPIH0=
+X-Received: by 2002:a05:6000:1284:: with SMTP id
+ f4mr30500555wrx.89.1566913147055; 
+ Tue, 27 Aug 2019 06:39:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.175
-Subject: [Qemu-devel] [PULL 0/4] xen queue 2019-08-27
+References: <1566495734-23297-1-git-send-email-pbonzini@redhat.com>
+ <9492af41-2125-9543-203a-312f0cd9087c@redhat.com>
+ <CAFEAcA__BNnW4oSyv4iTAd7rsMUfcjyNJgk0nOwbkRQtmLj9jQ@mail.gmail.com>
+ <dd473e9b-716d-cd9f-47bd-433d2b17687d@redhat.com>
+ <CAFEAcA81qUSMqpMTCrs9-vgj7Wmji2dCDkYrQ91wxmhTiP83Xw@mail.gmail.com>
+ <dd60f779-8349-1d0d-eb86-645e2e1b0808@redhat.com>
+ <CAFEAcA9i1p6XR8Bc83uHD88EWrtmU-aN_PsuZYNAAFgpgWoZgQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9i1p6XR8Bc83uHD88EWrtmU-aN_PsuZYNAAFgpgWoZgQ@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 27 Aug 2019 17:38:54 +0400
+Message-ID: <CAJ+F1CL6dXxH2MgZU=DaCeqHFu2LtDiYsve+gwsJym5APDH9kw@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH] modules-test: fix const cast
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,41 +95,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit dac03af5d5482ec7ee9c23db467bb7230b33c0d9:
+Hi
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-axp-20190825' into staging (2019-08-27 10:00:51 +0100)
+On Tue, Aug 27, 2019 at 4:02 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Fri, 23 Aug 2019 at 13:10, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 23/08/19 14:07, Peter Maydell wrote:
+> > >> Are you going to apply this and "[PATCH] modules-test: ui-spice-app =
+is
+> > >> not built as module" to qemu.git directly?
+> > > Is the other one also needed as a build fix ?
+> >
+> > Yes, otherwise the test fails (it didn't fail in the meson tree).
+>
+> Both this fix and the ui-spice-app one are now in master, but
+> the 'enable-modules' Travis build still seems to be consistently
+> failing -- could somebody take a look, please?
+>
 
-are available in the Git repository at:
+I am looking at, it seems to be related to default machine
 
-  https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20190827
+MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+QTEST_QEMU_BINARY=3Daarch64-softmmu/qemu-system-aarch64
+QTEST_QEMU_IMG=3Dqemu-img tests/modules-test -m=3Dquick -k --tap <
+/dev/null | ./scripts/tap-driver.pl --test-name=3D"modules-test"
 
-for you to fetch changes up to 705be570941b38cd1cbebc68f7f671ce7532ecb0:
+qemu-system-aarch64: -machine accel=3Dqtest: No machine specified, and
+there is no default
 
-  xen-bus: Avoid rewriting identical values to xenstore (2019-08-27 14:18:28 +0100)
+Use -machine help to list supported machines
 
-----------------------------------------------------------------
-Xen queue
+  TEST    iotest-qcow2: 159
 
-* Fixes for xen-bus and exit cleanup.
-* Build fix.
+socket_accept failed: Resource temporarily unavailable
 
-----------------------------------------------------------------
-Anthony PERARD (3):
-      xen: Fix ring.h header
-      xen-bus: Fix backend state transition on device reset
-      xen-bus: Avoid rewriting identical values to xenstore
+**
 
-Igor Druzhinin (1):
-      xen: cleanup IOREQ server on exit
+ERROR:tests/libqtest.c:268:qtest_init_without_qmp_handshake: assertion
+failed: (s->fd >=3D 0 && s->qmp_fd >=3D 0)
 
- hw/i386/xen/xen-hvm.c              |  2 ++
- hw/xen/xen-bus.c                   | 34 +++++++++++++++++++++++++++-------
- include/hw/xen/interface/io/ring.h | 13 +++++++------
- 3 files changed, 36 insertions(+), 13 deletions(-)
+tests/libqtest.c:137: kill_qemu() tried to terminate QEMU process but
+encountered exit status 1
+
+Aborted (core dumped)
+
+ERROR - too few tests run (expected 9, got 0)
+
+/home/travis/build/elmarco/qemu/tests/Makefile.include:900: recipe for
+target 'check-qtest-arm' failed
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
