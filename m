@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24785C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BCAC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF9FC2070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:33:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9FC2070B
+	by mail.kernel.org (Postfix) with ESMTPS id D21222070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:35:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21222070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2gHN-0001u1-01
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:33:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53231)
+	id 1i2gJV-0003hO-HD
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:35:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53169)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2g7x-0002mP-Ht
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2g7u-0002g5-Bl
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2g7v-0005PZ-SR
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50928)
+ (envelope-from <mreitz@redhat.com>) id 1i2g7s-0005NI-VD
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45180)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2g7s-0005Mj-Jo; Tue, 27 Aug 2019 14:23:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1i2g7q-0005Kr-8y; Tue, 27 Aug 2019 14:23:26 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ED5653D962;
- Tue, 27 Aug 2019 18:23:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9AA23308FB9D;
+ Tue, 27 Aug 2019 18:23:25 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 83C6D60C05;
- Tue, 27 Aug 2019 18:23:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3304C10016EB;
+ Tue, 27 Aug 2019 18:23:25 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 27 Aug 2019 20:23:03 +0200
-Message-Id: <20190827182313.25983-6-mreitz@redhat.com>
+Date: Tue, 27 Aug 2019 20:23:02 +0200
+Message-Id: <20190827182313.25983-5-mreitz@redhat.com>
 In-Reply-To: <20190827182313.25983-1-mreitz@redhat.com>
 References: <20190827182313.25983-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 27 Aug 2019 18:23:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Tue, 27 Aug 2019 18:23:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/15] iotests: Fix _filter_img_create()
+Subject: [Qemu-devel] [PULL 04/15] iotests: Test allocate_first_block() with
+ O_DIRECT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,123 +73,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fe646693acc changed qemu-img create's output so that it no longer prints
-single quotes around parameter values.  The subformat and adapter_type
-filters in _filter_img_create() have never been adapted to that change.
+From: Nir Soffer <nirsof@gmail.com>
 
-Fixes: fe646693acc13ac48b98435d14149ab04dc597bc
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190815153638.4600-2-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
+Using block_resize we can test allocate_first_block() with file
+descriptor opened with O_DIRECT, ensuring that it works for any size
+larger than 4096 bytes.
+
+Testing smaller sizes is tricky as the result depends on the filesystem
+used for testing. For example on NFS any size will work since O_DIRECT
+does not require any alignment.
+
+Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190827010528.8818-3-nsoffer@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/059.out       | 16 ++++++++--------
- tests/qemu-iotests/common.filter |  4 ++--
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/175     | 28 ++++++++++++++++++++++++++++
+ tests/qemu-iotests/175.out |  8 ++++++++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/tests/qemu-iotests/059.out b/tests/qemu-iotests/059.out
-index fe3f861f3c..b2e718d29f 100644
---- a/tests/qemu-iotests/059.out
-+++ b/tests/qemu-iotests/059.out
-@@ -13,17 +13,17 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D6=
-7108864
- qemu-io: can't open device TEST_DIR/t.vmdk: L1 size too big
+diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+index 7ba28b3c1b..55db2803ed 100755
+--- a/tests/qemu-iotests/175
++++ b/tests/qemu-iotests/175
+@@ -49,6 +49,23 @@ _filter_blocks()
+         -e "s/blocks=3D$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\=
+\)/max allocation/"
+ }
 =20
- =3D=3D=3D Testing monolithicFlat creation and opening =3D=3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648 subformat=
-=3DmonolithicFlat
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648
- image: TEST_DIR/t.IMGFMT
- file format: IMGFMT
- virtual size: 2 GiB (2147483648 bytes)
++# Resize image using block_resize.
++# Parameter 1: image path
++# Parameter 2: new size
++_block_resize()
++{
++    local path=3D$1
++    local size=3D$2
++
++    $QEMU -qmp stdio -nographic -nodefaults \
++        -blockdev file,node-name=3Dfile,filename=3D$path,cache.direct=3D=
+on \
++        <<EOF
++{'execute': 'qmp_capabilities'}
++{'execute': 'block_resize', 'arguments': {'node-name': 'file', 'size': $=
+size}}
++{'execute': 'quit'}
++EOF
++}
++
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+@@ -57,6 +74,9 @@ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
 =20
- =3D=3D=3D Testing monolithicFlat with zeroed_grain =3D=3D=3D
- qemu-img: TEST_DIR/t.IMGFMT: Flat image can't enable zeroed grain
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648 subformat=
-=3DmonolithicFlat
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648
++_default_cache_mode none
++_supported_cache_modes none directsync
++
+ size=3D$((1 * 1024 * 1024))
 =20
- =3D=3D=3D Testing big twoGbMaxExtentFlat =3D=3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824000 subfor=
-mat=3DtwoGbMaxExtentFlat
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824000
- image: TEST_DIR/t.vmdk
- file format: vmdk
- virtual size: 0.977 TiB (1073741824000 bytes)
-@@ -2038,7 +2038,7 @@ Format specific information:
- qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Invalid extent line: RW 12=
-582912 VMFS "dummy.IMGFMT" 1
+ touch "$TEST_DIR/empty"
+@@ -79,6 +99,14 @@ for mode in off full falloc; do
+     stat -c "size=3D%s, blocks=3D%b" $TEST_IMG | _filter_blocks $extra_b=
+locks $min_blocks $size
+ done
 =20
- =3D=3D=3D Testing truncated sparse =3D=3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D107374182400 subform=
-at=3DmonolithicSparse
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D107374182400
- qemu-img: Could not open 'TEST_DIR/t.IMGFMT': File truncated, expecting =
-at least 13172736 bytes
-=20
- =3D=3D=3D Converting to streamOptimized from image with small cluster si=
-ze=3D=3D=3D
-@@ -2049,7 +2049,7 @@ wrote 512/512 bytes at offset 10240
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-=20
- =3D=3D=3D Testing monolithicFlat with internally generated JSON file nam=
-e =3D=3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 subformat=3D=
-monolithicFlat
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
- qemu-io: can't open: Cannot use relative extent paths with VMDK descript=
-or file 'json:{"image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT=
-"}, "driver": "blkdebug", "inject-error.0.event": "read_aio"}'
-=20
- =3D=3D=3D Testing version 3 =3D=3D=3D
-@@ -2259,7 +2259,7 @@ read 512/512 bytes at offset 64931328
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-=20
- =3D=3D=3D Testing 4TB monolithicFlat creation and IO =3D=3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4398046511104 subfor=
-mat=3DmonolithicFlat
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4398046511104
- image: TEST_DIR/t.IMGFMT
- file format: IMGFMT
- virtual size: 4 TiB (4398046511104 bytes)
-@@ -2333,7 +2333,7 @@ read 1024/1024 bytes at offset 966367641600
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-=20
- =3D=3D=3D Testing qemu-img map on extents =3D=3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544 subforma=
-t=3DmonolithicSparse
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544
- wrote 1024/1024 bytes at offset 65024
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 1024/1024 bytes at offset 2147483136
-@@ -2344,7 +2344,7 @@ Offset          Length          Mapped to       Fil=
-e
- 0               0x20000         0x3f0000        TEST_DIR/t.vmdk
- 0x7fff0000      0x20000         0x410000        TEST_DIR/t.vmdk
- 0x140000000     0x10000         0x430000        TEST_DIR/t.vmdk
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544 subforma=
-t=3DtwoGbMaxExtentSparse
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544
- wrote 1024/1024 bytes at offset 65024
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 1024/1024 bytes at offset 2147483136
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
-.filter
-index 8e9235d6fe..445a1c23e0 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -130,8 +130,8 @@ _filter_img_create()
-         -e "s# compat6=3D\\(on\\|off\\)##g" \
-         -e "s# static=3D\\(on\\|off\\)##g" \
-         -e "s# zeroed_grain=3D\\(on\\|off\\)##g" \
--        -e "s# subformat=3D'[^']*'##g" \
--        -e "s# adapter_type=3D'[^']*'##g" \
-+        -e "s# subformat=3D[^ ]*##g" \
-+        -e "s# adapter_type=3D[^ ]*##g" \
-         -e "s# hwversion=3D[^ ]*##g" \
-         -e "s# lazy_refcounts=3D\\(on\\|off\\)##g" \
-         -e "s# block_size=3D[0-9]\\+##g" \
++for new_size in 4096 1048576; do
++    echo
++    echo "=3D=3D resize empty image with block_resize =3D=3D"
++    _make_test_img 0 | _filter_imgfmt
++    _block_resize $TEST_IMG $new_size >/dev/null
++    stat -c "size=3D%s, blocks=3D%b" $TEST_IMG | _filter_blocks $extra_b=
+locks $min_blocks $new_size
++done
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+index 263e521262..39c2ee0f62 100644
+--- a/tests/qemu-iotests/175.out
++++ b/tests/qemu-iotests/175.out
+@@ -15,4 +15,12 @@ size=3D1048576, max allocation
+ =3D=3D creating image with preallocation falloc =3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 preallocatio=
+n=3Dfalloc
+ size=3D1048576, max allocation
++
++=3D=3D resize empty image with block_resize =3D=3D
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D0
++size=3D4096, min allocation
++
++=3D=3D resize empty image with block_resize =3D=3D
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D0
++size=3D1048576, min allocation
+  *** done
 --=20
 2.21.0
 
