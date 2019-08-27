@@ -2,89 +2,80 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A97C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 17:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738BEC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:26:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 434162184D
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 17:44:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434162184D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 41062217F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 18:26:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6rr5qAA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41062217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2fVr-0005nr-AU
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 13:44:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44048)
+	id 1i2gAV-00045i-1o
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 14:26:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2fUr-0005Ik-EY
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 13:43:10 -0400
+ (envelope-from <nirsof@gmail.com>) id 1i2g7Y-0002Ly-MI
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2fUq-0000Ze-BJ
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 13:43:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38934)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2fUo-0000Wp-3H; Tue, 27 Aug 2019 13:43:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 426CC10F23E8;
- Tue, 27 Aug 2019 17:43:05 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 109EC194B9;
- Tue, 27 Aug 2019 17:43:03 +0000 (UTC)
-To: Nir Soffer <nsoffer@redhat.com>
+ (envelope-from <nirsof@gmail.com>) id 1i2g7X-0005AR-CI
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 14:23:08 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:33508)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nirsof@gmail.com>)
+ id 1i2g7X-0005A9-8P; Tue, 27 Aug 2019 14:23:07 -0400
+Received: by mail-io1-xd43.google.com with SMTP id z3so484465iog.0;
+ Tue, 27 Aug 2019 11:23:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=w8yY0OFfbc3YxG9n5Dn+LNxL5AoCkqUrnmktVS2lDM8=;
+ b=G6rr5qAAD+zuJgqORsj35djrAw71okScTOdo8GrcLae8lNf4lQFLU5AOt6W2zmfVsH
+ YFGF6h9l1AlFZzjJh6j5w8Nj/uD2+KAN0ajksHLSbU8bFsWgUYXSqQqGUSaA+ZB9xk5A
+ Ykl9v+BYCK1P2i6TMpPMRvSz6j6I0YYmPFCm6Z0wtmyZLxKSDaLwQO31W4fj2HebUkcj
+ zWpFnMVkEVbxgxeLdjQf7ciLRc3bDikup+IHqOc8EO+pTkjOVWl1iGyYMBPQkaKnme6x
+ 68FZnTiL7AFppA9mpX9QLoUJipwOsT2lHFURn8mLGOfvphIzsdxqZKQiH7ERIDYxawCL
+ 8anA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=w8yY0OFfbc3YxG9n5Dn+LNxL5AoCkqUrnmktVS2lDM8=;
+ b=G2Tw11IlKM/h6RGRRnO8Y27h9CSeoPON3CRimmk56GiU8Dv/enmoBzb0ie4uPzHvUW
+ xshqYrEhXhfssyzwoIF7LFnVskvO/BsJjHWZlkEIbWgYEsP6ZMLXGS3KyKAIQaB2ip7J
+ wBtwBoYS6ooVCA3eoQYn0w45bo1c3+WnnmpPvG8+Srw8hg8UA3xV5rSmlUCh9iL+baK0
+ f1EuWkO6kWHKnHX6hl8fWWln8HPcw0zXET3czRc4y0jFwSyDSpgKX9ygVs4mPqpmsk0e
+ E/eUrTZlIyk1GFmm1FobThuZj4b6PTaLtBT8D/9BWONe8iwmNGQ5X2Jw6hAjqqnfOsTS
+ m9pg==
+X-Gm-Message-State: APjAAAWH9NZMT45kraQjnXMMnOE6uCmMXTGhRTTAeMWZMZVyu9Jh7u4G
+ L7SubI0cSA7L07HbAzrnu/dbk7gVR6gJrn+dHAw=
+X-Google-Smtp-Source: APXvYqwL5WpM+hN1WgOrflzTC/d/I4XyZ5kcAI64nlcudyt7b52J5o+eOHiPzhxuDfeAehzYHlSqNxp46sjtbYYvXKc=
+X-Received: by 2002:a5d:9555:: with SMTP id a21mr7573493ios.299.1566930186433; 
+ Tue, 27 Aug 2019 11:23:06 -0700 (PDT)
+MIME-Version: 1.0
 References: <20190827173432.7656-1-nsoffer@redhat.com>
  <80a6d9bc-1f5d-2bee-c761-978835f70e27@redhat.com>
  <CAMRbyyugLygGoa_GwkZSgiOfBK6b_zS4wbpgmG90dj4ysG-Trg@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <55e399e3-78a2-5df0-49d7-fe2a3a19aa9e@redhat.com>
-Date: Tue, 27 Aug 2019 19:43:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAMRbyyugLygGoa_GwkZSgiOfBK6b_zS4wbpgmG90dj4ysG-Trg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="v68URSdtzlpgQ3x7j11mAgP3UIQcFwpFD"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 27 Aug 2019 17:43:05 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ <55e399e3-78a2-5df0-49d7-fe2a3a19aa9e@redhat.com>
+In-Reply-To: <55e399e3-78a2-5df0-49d7-fe2a3a19aa9e@redhat.com>
+From: Nir Soffer <nirsof@gmail.com>
+Date: Tue, 27 Aug 2019 21:22:50 +0300
+Message-ID: <CAMr-obuEvj8CA3Zpn965_U4GGYfyfq3edopW3_ig-2px2qDDoA@mail.gmail.com>
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
 Subject: Re: [Qemu-devel] [PATCH] iotests: Unify cache mode quoting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,76 +88,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Nir Soffer <nirsof@gmail.com>
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---v68URSdtzlpgQ3x7j11mAgP3UIQcFwpFD
-Content-Type: multipart/mixed; boundary="FOZ8cikGnInTzq50iEEVWHyJRQuXzRdHl";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Nir Soffer <nsoffer@redhat.com>
-Cc: Nir Soffer <nirsof@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <55e399e3-78a2-5df0-49d7-fe2a3a19aa9e@redhat.com>
-Subject: Re: [PATCH] iotests: Unify cache mode quoting
-References: <20190827173432.7656-1-nsoffer@redhat.com>
- <80a6d9bc-1f5d-2bee-c761-978835f70e27@redhat.com>
- <CAMRbyyugLygGoa_GwkZSgiOfBK6b_zS4wbpgmG90dj4ysG-Trg@mail.gmail.com>
-In-Reply-To: <CAMRbyyugLygGoa_GwkZSgiOfBK6b_zS4wbpgmG90dj4ysG-Trg@mail.gmail.com>
+On Tue, Aug 27, 2019 at 8:43 PM Max Reitz <mreitz@redhat.com> wrote:
+>
+> On 27.08.19 19:38, Nir Soffer wrote:
+> > On Tue, Aug 27, 2019 at 8:36 PM Max Reitz <mreitz@redhat.com
+> > <mailto:mreitz@redhat.com>> wrote:
+> >
+> >     On 27.08.19 19:34, Nir Soffer wrote:
+> >     > Quoting cache mode is not needed, and most tests use unquoted values.
+> >     > Unify all test to use the same style.
+> >
+> >     S-o-b is missing, shall I add it?
+> >
+> >
+> > Thanks!
+> >
+> > Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+>
+> Thanks, applied to my block branch:
+>
+> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+>
+> (By the way, did you set your author email address to an @gmail address
+> on purpose?)
 
---FOZ8cikGnInTzq50iEEVWHyJRQuXzRdHl
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I configured my gmail address nowhere, I think this is a side affect of using
+gmail to send the patches.
 
-On 27.08.19 19:38, Nir Soffer wrote:
-> On Tue, Aug 27, 2019 at 8:36 PM Max Reitz <mreitz@redhat.com
-> <mailto:mreitz@redhat.com>> wrote:
->=20
->     On 27.08.19 19:34, Nir Soffer wrote:
->     > Quoting cache mode is not needed, and most tests use unquoted val=
-ues.
->     > Unify all test to use the same style.
->=20
->     S-o-b is missing, shall I add it?
->=20
->=20
-> Thanks!
->=20
-> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-(By the way, did you set your author email address to an @gmail address
-on purpose?)
-
-Max
-
-
---FOZ8cikGnInTzq50iEEVWHyJRQuXzRdHl--
-
---v68URSdtzlpgQ3x7j11mAgP3UIQcFwpFD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1la6YACgkQ9AfbAGHV
-z0AJtgf+MNrwRxcy8RSNXeSkVgwcNDrqHCqaBtpaTugGK7mlZDodOavbVzQ94+bB
-6VJQQZ5PsLo9IqWskp8HWWscuh/dJ2Djm0lu+8h8DPNqBwZfgMIAh5fCgWJEPkSm
-TqH1rvGYkvlIAkIpzXVV+bKibt4bei+m4kOhS1yY1RXjOm9RdNcEkO4AHXTOs233
-/qvux81DlbRppTo1bd128mFLKxj6yDmECiu8+k8pj4A+fGxJySgZn0KyANdtOjW6
-7moPv80eD3cKapC7BQNOF4iJQFyTYJoe6DEU5dpYaMzBzgLH5VCPWRyzWrNJluKx
-n82UcwNy6Up7qzXIPkyiRHPSGwohSA==
-=GX/I
------END PGP SIGNATURE-----
-
---v68URSdtzlpgQ3x7j11mAgP3UIQcFwpFD--
+>
+> Max
+>
 
