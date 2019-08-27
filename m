@@ -2,80 +2,84 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7344C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5F3C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5BBC217F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:26:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 894DF2184D
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 08:26:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="AgAjgUXG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5BBC217F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ZllCg2Rb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 894DF2184D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Wo2-0006BD-5E
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 04:26:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36579)
+	id 1i2WoJ-0006Yr-Gv
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 04:26:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36685)
  by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
- <3yehkXQYKCiAO6IAE9CKKCHA.8KIMAIQ-9ARAHJKJCJQ.KNC@flex--sameid.bounces.google.com>)
- id 1i2WmS-0004Vn-Se
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:24:46 -0400
+ <32ehkXQYKCjAeMYQUPSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--sameid.bounces.google.com>)
+ id 1i2Wmi-0004pQ-4F
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:25:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from
- <3yehkXQYKCiAO6IAE9CKKCHA.8KIMAIQ-9ARAHJKJCJQ.KNC@flex--sameid.bounces.google.com>)
- id 1i2WmR-0007jh-F2
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:24:44 -0400
-Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:42887)
+ <32ehkXQYKCjAeMYQUPSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--sameid.bounces.google.com>)
+ id 1i2Wmg-0007p1-TR
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:25:00 -0400
+Received: from mail-qk1-x74a.google.com ([2607:f8b0:4864:20::74a]:42462)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from
- <3yehkXQYKCiAO6IAE9CKKCHA.8KIMAIQ-9ARAHJKJCJQ.KNC@flex--sameid.bounces.google.com>)
- id 1i2WmR-0007jA-2V
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:24:43 -0400
-Received: by mail-yb1-xb4a.google.com with SMTP id l8so4993040ybm.9
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 01:24:42 -0700 (PDT)
+ <32ehkXQYKCjAeMYQUPSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--sameid.bounces.google.com>)
+ id 1i2Wmg-0007oY-QB
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 04:24:58 -0400
+Received: by mail-qk1-x74a.google.com with SMTP id b143so1759396qkg.9
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 01:24:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=oPzGYCfz6fB+LQmTo0GVew/IPrjI9h3/dbHxHOhwq/Y=;
- b=AgAjgUXGhwvJpVzQCVsyeyVV88SpqvLv1YnaY7G5S9Zmi0U/n3D5KmZjTB6GW8aN4/
- 5TEFk2zPVaM5s7P3VozcbXlBJIM9dfFDh/Px5ZMcZpczNkRlwav/16mS7dW+KJ5zI2ye
- c5iFepzJQ2B6Xo+ZX6kn/ERiMV6ndWHss0xqjOVuz7LKl+wKe8aOZd0GUQlPf+XKoTy5
- pU87pgB6NtEtr4zdnhX+M2/os4QKuoF7Ef4jU0bDFMAEPJ1HnwEY2HGLFNTp/w59NUbR
- BNXSJGzcthB1l40QQJYtIMsPTQryTwagQevsZtLWVJ1Jp/R65QU1lek89a7uvVYnT2ZA
- QLVw==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=AHiYmk3G3VP6+xQ4SnXZuYPSma1xOEV081sAD4q4MI0=;
+ b=ZllCg2RbxXR9TfCTCXxBwylJghLBs/fqrOUInGlFuT6puckrSmNDjpAOYeCFzbGXL2
+ gTlPQCODIEePYi9iczsECP88pLiAydnerIqwL1oUHYSJJsXTokLKTIJ3356M3qlRImue
+ 2y56ThB/Ou3M5+623fdKwbnr0evG17OlBMoJlzzCSyLEnUUr/7NcYqEQq5GExxXTwGlD
+ sONueYEkgoKiuASkdVthnof8qvicd3Kpj0Rt8CUl70ZWx5U/YvGLJrfQU6G1CivB6Ea7
+ 5pcssY7BtqOBiNC+Jrw2qtjrf3PwCItwshiV3qHrArcoFnNHo0cyYh/2qsjz9ky7xa6L
+ 6icQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=oPzGYCfz6fB+LQmTo0GVew/IPrjI9h3/dbHxHOhwq/Y=;
- b=YJhC291Ybtj4wxavnLbaMrkNxOsC10jWJw42/EQiJ0XwBHH30IfwJQlYph2luQa5eT
- D+vPNCegU9soE+XTME+nqJAM6yjn/rFIIH7tWM68V79S/H9vukAC3xfLov9Dg4svGKWz
- ZTgFuK7BNS/e5Lb0NcEFxRSYaDfYJY4ftRJ5lEkkmMtPQTJQf77V2ajgKp/2znr2tONQ
- fxYL1NtOTUF8KkBstmPIHs+Vsp6fbr3AkCXwuqMczD+xtW4ofa1sjHNwfYx4Zrr5Jl3T
- a1WQricoyHn2TsZx26POMpUPZniPoCRnPWewinWK6QBBXV3EV52TCenHKxRNDzntwoCo
- TUBw==
-X-Gm-Message-State: APjAAAWUJqiw43nzp7daiOWEQOMrO74Ii7z16w22GfswuxeL8D/fOWGG
- SmeZmVc6DscB/5+44RyVJPMQoyQ16e2VgPLOV26mDG/fsaywqOdDl2LMb81+0e+PXF2gTx17Bwh
- 8VUbNcz3M7RoVskYWtC01x0iRfZxmoJadN8t50z+FXwnXkuRROm7P3BwFEoIa
-X-Google-Smtp-Source: APXvYqxcnKrr8OWQgYIsiWQ7avk5ef1k4lh6igl1m+oAnkE3RtzEQdLtPk6uHmMqbWD6SJKykDuEF3cGrvE=
-X-Received: by 2002:a81:7a06:: with SMTP id v6mr14651442ywc.450.1566894281951; 
- Tue, 27 Aug 2019 01:24:41 -0700 (PDT)
-Date: Tue, 27 Aug 2019 11:24:19 +0300
-Message-Id: <20190827082427.64280-1-sameid@google.com>
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=AHiYmk3G3VP6+xQ4SnXZuYPSma1xOEV081sAD4q4MI0=;
+ b=hYEqrsf00bY6bZbA1IL6o9RvmXaqKpNNgHBaOBpuauaiLYq7cQYfVY9dxA0SYp6lGJ
+ uhmpg9hFxISW0+dlSayf/2q/jHLXS4As1S/RZi30AOH1MqLOwM2gIec4HVxPnmxVdyWf
+ o6pJOKZ9cojp/IKku0uqD3I+lZKtn3qhWZ7NpQJQRcjuGYqQUv+/0B+PQcOp1uqHTsI3
+ mYnUphfaXaqgJT1nI45mZHuMmqNbKMVX/HMzcLmy7F5dyJWQGjh0+H6SC8Zv0XC9oZ+M
+ DtoPtbynnEEY/pk2sfDTZxbiHNgzChcs6WkMSjIa0isM2XZd5/z3PHvyw+jKbXcg2nyd
+ 8pQA==
+X-Gm-Message-State: APjAAAXOEBKrh7VwmOlPBQ/aalTo43xwHtr6Dw1jej14c8JTibaGtK+e
+ cV9CjFnmHf0qJW02MgCIuf5HKaE4RvnXxMANkBDuaq6xgrer/Tj5BankPCE+IYd86Zf07JS+y36
+ u3Rr2CnrkVnDD1e6IY8O58K64FIkFlsbg/CwSwCPqpfFttOalhkBDCXwKuoJC
+X-Google-Smtp-Source: APXvYqw/lGcoY5et+aEJyK9fWVS4bOPoXK/gMQDPOoxvDALF0GqY5FERAPOJPg36+xsn3NkKu/GeauDHMSw=
+X-Received: by 2002:a0c:eccf:: with SMTP id o15mr18214744qvq.15.1566894297664; 
+ Tue, 27 Aug 2019 01:24:57 -0700 (PDT)
+Date: Tue, 27 Aug 2019 11:24:22 +0300
+In-Reply-To: <20190827082427.64280-1-sameid@google.com>
+Message-Id: <20190827082427.64280-4-sameid@google.com>
 Mime-Version: 1.0
+References: <20190827082427.64280-1-sameid@google.com>
 X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
 To: qemu-devel@nongnu.org
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b4a
-Subject: [Qemu-devel] [PATCH v6 0/8] Add Qemu to SeaBIOS LCHS interface
+X-Received-From: 2607:f8b0:4864:20::74a
+Subject: [Qemu-devel] [PATCH v6 3/8] bootdevice: Add interface to gather LCHS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,86 +93,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 From: Sam Eiderman via Qemu-devel <qemu-devel@nongnu.org>
 Reply-To: Sam Eiderman <sameid@google.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, seabios@seabios.org,
- kevin@koconnor.net, liran.alon@oracle.com, kraxel@redhat.com,
- sameid@google.com, karl.heubaum@oracle.com
+Cc: kwolf@redhat.com, qemu-block@nongnu.org,
+ Arbel Moshe <arbel.moshe@oracle.com>, seabios@seabios.org, kevin@koconnor.net,
+ liran.alon@oracle.com, kraxel@redhat.com,
+ Sam Eiderman <shmuel.eiderman@oracle.com>, sameid@google.com,
+ karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v1:
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
-Non-standard logical geometries break under QEMU.
+Add an interface to provide direct logical CHS values for boot devices.
+We will use this interface in the next commits.
 
-A virtual disk which contains an operating system which depends on
-logical geometries (consistent values being reported from BIOS INT13
-AH=08) will most likely break under QEMU/SeaBIOS if it has non-standard
-logical geometries - for example 56 SPT (sectors per track).
-No matter what QEMU will guess - SeaBIOS, for large enough disks - will
-use LBA translation, which will report 63 SPT instead.
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+---
+ bootdevice.c            | 55 +++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/sysemu.h |  3 +++
+ 2 files changed, 58 insertions(+)
 
-In addition we can not enforce SeaBIOS to rely on phyiscal geometries at
-all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
-report more than 16 physical heads when moved to an IDE controller, the
-ATA spec allows a maximum of 16 heads - this is an artifact of
-virtualization.
-
-By supplying the logical geometies directly we are able to support such
-"exotic" disks.
-
-We will use fw_cfg to do just that.
-
-v2:
-
-Fix missing parenthesis check in
-    "hd-geo-test: Add tests for lchs override"
-
-v3:
-
-* Rename fw_cfg key to "bios-geometry".
-* Remove "extendible" interface.
-* Add cpu_to_le32 fix as Laszlo suggested or big endian hosts
-* Fix last qtest commit - automatic docker tester for some reason does not have qemu-img set
-
-v4:
-
-* Change fw_cfg interface from mixed textual/binary to textual only
-
-v5:
-
-* Fix line > 80 chars in tests/hd-geo-test.c
-
-v6:
-
-* Small fixes for issues pointed by Max
-* (&conf->conf)->lcyls to conf->conf.lcyls and so on
-* Remove scsi_unrealize from everything other than scsi-hd
-* Add proper include to sysemu.h
-* scsi_device_unrealize() after scsi_device_purge_requests()
-
-Sam Eiderman (8):
-  block: Refactor macros - fix tabbing
-  block: Support providing LCHS from user
-  bootdevice: Add interface to gather LCHS
-  scsi: Propagate unrealize() callback to scsi-hd
-  bootdevice: Gather LCHS from all relevant devices
-  bootdevice: Refactor get_boot_devices_list
-  bootdevice: FW_CFG interface for LCHS values
-  hd-geo-test: Add tests for lchs override
-
- bootdevice.c             | 148 ++++++++--
- hw/block/virtio-blk.c    |   6 +
- hw/ide/qdev.c            |   7 +-
- hw/nvram/fw_cfg.c        |  14 +-
- hw/scsi/scsi-bus.c       |  16 ++
- hw/scsi/scsi-disk.c      |  12 +
- include/hw/block/block.h |  22 +-
- include/hw/scsi/scsi.h   |   1 +
- include/sysemu/sysemu.h  |   4 +
- tests/Makefile.include   |   2 +-
- tests/hd-geo-test.c      | 582 +++++++++++++++++++++++++++++++++++++++
- 11 files changed, 773 insertions(+), 41 deletions(-)
-
+diff --git a/bootdevice.c b/bootdevice.c
+index 1d225202f9..bc5e1c2de4 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -343,3 +343,58 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+     /* initialize devices' bootindex property to -1 */
+     object_property_set_int(obj, -1, name, NULL);
+ }
++
++typedef struct FWLCHSEntry FWLCHSEntry;
++
++struct FWLCHSEntry {
++    QTAILQ_ENTRY(FWLCHSEntry) link;
++    DeviceState *dev;
++    char *suffix;
++    uint32_t lcyls;
++    uint32_t lheads;
++    uint32_t lsecs;
++};
++
++static QTAILQ_HEAD(, FWLCHSEntry) fw_lchs =
++    QTAILQ_HEAD_INITIALIZER(fw_lchs);
++
++void add_boot_device_lchs(DeviceState *dev, const char *suffix,
++                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs)
++{
++    FWLCHSEntry *node;
++
++    if (!lcyls && !lheads && !lsecs) {
++        return;
++    }
++
++    assert(dev != NULL || suffix != NULL);
++
++    node = g_malloc0(sizeof(FWLCHSEntry));
++    node->suffix = g_strdup(suffix);
++    node->dev = dev;
++    node->lcyls = lcyls;
++    node->lheads = lheads;
++    node->lsecs = lsecs;
++
++    QTAILQ_INSERT_TAIL(&fw_lchs, node, link);
++}
++
++void del_boot_device_lchs(DeviceState *dev, const char *suffix)
++{
++    FWLCHSEntry *i;
++
++    if (dev == NULL) {
++        return;
++    }
++
++    QTAILQ_FOREACH(i, &fw_lchs, link) {
++        if ((!suffix || !g_strcmp0(i->suffix, suffix)) &&
++             i->dev == dev) {
++            QTAILQ_REMOVE(&fw_lchs, i, link);
++            g_free(i->suffix);
++            g_free(i);
++
++            break;
++        }
++    }
++}
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index d2c38f611a..1a33f25a5a 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -105,6 +105,9 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+                                    DeviceState *dev, Error **errp);
+ void restore_boot_order(void *opaque);
+ void validate_bootdevices(const char *devices, Error **errp);
++void add_boot_device_lchs(DeviceState *dev, const char *suffix,
++                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs);
++void del_boot_device_lchs(DeviceState *dev, const char *suffix);
+ 
+ /* handler to set the boot_device order for a specific type of MachineClass */
+ typedef void QEMUBootSetHandler(void *opaque, const char *boot_order,
 -- 
 2.23.0.187.g17f5b7556c-goog
 
