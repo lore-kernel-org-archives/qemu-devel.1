@@ -2,62 +2,80 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F25A9C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C3FC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:15:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C894F20828
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:14:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C894F20828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6BC4D20828
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 09:15:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oHHCQaN1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC4D20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2XYi-0008JW-0g
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 05:14:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44040)
+	id 1i2XZt-0001KS-Jm
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 05:15:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44228)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fangying1@huawei.com>) id 1i2XXm-0007VV-VM
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:13:40 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i2XZ0-0000Lp-0B
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fangying1@huawei.com>) id 1i2XXl-0006uo-K4
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:13:38 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2189 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fangying1@huawei.com>)
- id 1i2XXl-0006rA-96
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:13:37 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 10C4CC48D94F9F2AE002;
- Tue, 27 Aug 2019 17:13:29 +0800 (CST)
-Received: from [127.0.0.1] (10.133.205.53) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Tue, 27 Aug 2019
- 17:13:21 +0800
-To: Li Qiang <liq3ea@gmail.com>
-References: <20190827080512.2417-1-fangying1@huawei.com>
- <CAKXe6SK1pZRdrigiEO1-7eONEKnfXSzhtz-EC43uWhndxFJERg@mail.gmail.com>
-From: fangying <fangying1@huawei.com>
-Message-ID: <f7bc839e-0e27-80b4-69a2-11e2cddd806a@huawei.com>
-Date: Tue, 27 Aug 2019 17:13:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1i2XYz-0007Gm-1j
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:14:53 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46357)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i2XYy-0007GR-Rz
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 05:14:52 -0400
+Received: by mail-oi1-x242.google.com with SMTP id t24so14354959oij.13
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 02:14:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Ka3LXG9PjTwvkfqrQm4tf7mp2fvvzx49GuSdIesR6cQ=;
+ b=oHHCQaN1dKogmrLFK0ShxYvqV7BjVp6wS4HIWu3thM1bVqELm0sU5WY8lx2Sdz8bHz
+ bnap4//+ooVwgEy9qA3KTawYAwo6JwXVvni+ogf6iEjW8HEwScSZoK8ffGOxMGqumFoC
+ YDtZzYsVAYvdCjl2JY4/yQDrBX4P5/EViAIEL28cB4pSoHCceLMsh2qo5sQIbKIhyp3g
+ z/AjpiUFyqQa3FDJ+OazytrkFn1JYfAkkhPshylkBwJ9pRJ30fWKvWTdD43df48dRk2G
+ jfarw+RBodE0uVn7SadVsE3sIpGv1wKj+E8eIRtzv7+BXgyw7R5l0VSKpzusGz39g8qk
+ GXew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Ka3LXG9PjTwvkfqrQm4tf7mp2fvvzx49GuSdIesR6cQ=;
+ b=Lh3jM0xzGIxDRpezGD5+Y6YsJctSZkS3amlMCAQcZdyd5xSPAlojrfpEmZB5MrQ6CJ
+ dzRqILG3Z7WWRObM7dQs9tEqWQaNJznJmepeNWSAg4Djwb6x80ijmQL7ltgi3Z57X7fr
+ 5WMeyz3AHOkRYQIxrDAARY22PoZIo1HjGOVcN+Mezj4tCVpH6wkvnhyfDQzHHVVy2AN5
+ GiR6+E4po/zU5IVeTVpssyFpLwBI8zXc+HCKw/WAJ6Rzel0blzWPFHHFl0osYe32Hg/0
+ BB2oV2CIwCn/Fgta6Dq0tlMrUmNwiImQM3agV8MOlU54P6naui2HuYBWpdmTirbpCAVr
+ hVVw==
+X-Gm-Message-State: APjAAAUhH2zn8B4o5yW1LpnA7BHWIhtjF8ChiEz0lDJQ5A/p45EkjJg1
+ +V1abFc3I9vMPn2KWExAwhjC5jfC/ZfJ1mX5lpxrmw==
+X-Google-Smtp-Source: APXvYqyRvy06MZEC4aovdJEuRYwETeoeLRktuf7oo6mEcxo1tdNRdNYgpVbquV2PTYl1wXl4RynjbYEadOoKA/xrL8Q=
+X-Received: by 2002:a54:4718:: with SMTP id k24mr42115oik.146.1566897292122;
+ Tue, 27 Aug 2019 02:14:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SK1pZRdrigiEO1-7eONEKnfXSzhtz-EC43uWhndxFJERg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-X-Originating-IP: [10.133.205.53]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: Re: [Qemu-devel] [PATCH] qmp: Fix memory leak in
- migrate_params_test_apply
+References: <20190819213755.26175-1-richard.henderson@linaro.org>
+ <20190819213755.26175-66-richard.henderson@linaro.org>
+In-Reply-To: <20190819213755.26175-66-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Aug 2019 10:14:41 +0100
+Message-ID: <CAFEAcA9Zgw+LH5yVBHYgotUcEG2Je83ejAFkp-aSwAv7V=-V8g@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v2 65/68] target/arm: Convert T16,
+ Unconditional branch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,121 +87,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Juan Quintela <quintela@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
- zhouyibo3@huawei.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- lcf.lichaofeng@huawei.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 19 Aug 2019 at 22:39, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 9 ++-------
+>  target/arm/t16.decode  | 6 ++++++
+>  2 files changed, 8 insertions(+), 7 deletions(-)
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 2019/8/27 16:38, Li Qiang wrote:
->=20
->=20
-> Ying Fang <fangying1@huawei.com <mailto:fangying1@huawei.com>> =E4=BA=8E=
-2019=E5=B9=B48=E6=9C=8827=E6=97=A5=E5=91=A8=20
-> =E4=BA=8C =E4=B8=8B=E5=8D=884:06=E5=86=99=E9=81=93=EF=BC=9A
->=20
->     Address Sanitizer shows memory leak in migrate_params_test_apply
->     migration/migration.c:1253 and the stack is as bellow:
->=20
->     Direct leak of 45 byte(s) in 9 object(s) allocated from:
->      =C2=A0 =C2=A0 #0 0xffffbd7fc1db in __interceptor_malloc (/lib64/li=
-basan.so.4+0xd31db)
->      =C2=A0 =C2=A0 #1 0xffffbd514163 in g_malloc (/lib64/libglib-2.0.so=
-.0+0x57163)
->      =C2=A0 =C2=A0 #2 0xffffbd52f43b in g_strdup (/lib64/libglib-2.0.so=
-.0+0x7243b)
->      =C2=A0 =C2=A0 #3 0xaaaadfa4d623 in migrate_params_test_apply migra=
-tion/migration.c:1253
->      =C2=A0 =C2=A0 #4 0xaaaadfa4d623 in qmp_migrate_set_parameters migr=
-ation/migration.c:1422
->      =C2=A0 =C2=A0 #5 0xaaaadfa963f3 in hmp_migrate_set_parameter monit=
-or/hmp-cmds.c:1867
->      =C2=A0 =C2=A0 #6 0xaaaadfa8afe3 in handle_hmp_command monitor/hmp.=
-c:1082
->      =C2=A0 =C2=A0 #7 0xaaaadf479c57 in qmp_human_monitor_command monit=
-or/misc.c:140
->      =C2=A0 =C2=A0 #8 0xaaaadfadf87b in qmp_marshal_human_monitor_comma=
-nd
->     qapi/qapi-commands-misc.c:1024
->      =C2=A0 =C2=A0 #9 0xaaaadfc7797b in do_qmp_dispatch qapi/qmp-dispat=
-ch.c:131
->      =C2=A0 =C2=A0 #10 0xaaaadfc7797b in qmp_dispatch qapi/qmp-dispatch=
-.c:174
->      =C2=A0 =C2=A0 #11 0xaaaadfa84fff in monitor_qmp_dispatch monitor/q=
-mp.c:120
->      =C2=A0 =C2=A0 #12 0xaaaadfa85bbf in monitor_qmp_bh_dispatcher moni=
-tor/qmp.c:209
->      =C2=A0 =C2=A0 #13 0xaaaadfd2228f in aio_bh_call util/async.c:89
->      =C2=A0 =C2=A0 #14 0xaaaadfd2228f in aio_bh_poll util/async.c:117
->      =C2=A0 =C2=A0 #15 0xaaaadfd29bc3 in aio_dispatch util/aio-posix.c:=
-459
->      =C2=A0 =C2=A0 #16 0xaaaadfd21ff7 in aio_ctx_dispatch util/async.c:=
-260
->      =C2=A0 =C2=A0 #17 0xffffbd50e2f7 in g_main_context_dispatch
->     (/lib64/libglib-2.0.so.0+0x512f7)
->      =C2=A0 =C2=A0 #18 0xaaaadfd278d7 in glib_pollfds_poll util/main-lo=
-op.c:218
->      =C2=A0 =C2=A0 #19 0xaaaadfd278d7 in os_host_main_loop_wait util/ma=
-in-loop.c:241
->      =C2=A0 =C2=A0 #20 0xaaaadfd278d7 in main_loop_wait util/main-loop.=
-c:517
->      =C2=A0 =C2=A0 #21 0xaaaadf67b5e7 in main_loop vl.c:1806
->      =C2=A0 =C2=A0 #22 0xaaaadf15d453 in main vl.c:4488
->=20
->     Cc: zhanghailiang <zhang.zhanghailiang@huawei.com
->     <mailto:zhang.zhanghailiang@huawei.com>>
->     Signed-off-by: Ying Fang <fangying1@huawei.com <mailto:fangying1@hu=
-awei.com>>
->     ---
->      =C2=A0migration/migration.c | 6 ++++++
->      =C2=A01 file changed, 6 insertions(+)
->=20
->     diff --git a/migration/migration.c b/migration/migration.c
->     index 8b9f2fe30a..05e44ff7cc 100644
->     --- a/migration/migration.c
->     +++ b/migration/migration.c
->     @@ -1250,11 +1250,17 @@ static void
->     migrate_params_test_apply(MigrateSetParameters *params,
->=20
->      =C2=A0 =C2=A0 =C2=A0if (params->has_tls_creds) {
->      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0assert(params->tls_creds->type =3D=
-=3D QTYPE_QSTRING);
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (dest->tls_creds) {
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(dest->tls_creds);
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->=20
->=20
-> g_free can handle NULL, no need to do the NULL check.
-
-Thanks for your remind, we can call g_free here directly.
-I'll send a v2 later.
->=20
-> Thanks,
-> Li Qiang
->=20
->      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dest->tls_creds =3D g_strdup(par=
-ams->tls_creds->u.s);
->      =C2=A0 =C2=A0 =C2=A0}
->=20
->      =C2=A0 =C2=A0 =C2=A0if (params->has_tls_hostname) {
->      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0assert(params->tls_hostname->typ=
-e =3D=3D QTYPE_QSTRING);
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (dest->tls_hostname) {
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(dest->tls_hostnam=
-e);
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->      =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dest->tls_hostname =3D g_strdup(=
-params->tls_hostname->u.s);
->      =C2=A0 =C2=A0 =C2=A0}
->=20
->     --=20
->     2.19.1
->=20
->=20
->=20
-
+thanks
+-- PMM
 
