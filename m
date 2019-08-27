@@ -2,47 +2,47 @@ Return-Path: <SRS0=HeXf=WX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E10DAC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 17:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E87F6C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 17:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B75E12070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 17:17:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B75E12070B
+	by mail.kernel.org (Postfix) with ESMTPS id C0A54206BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 17:26:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A54206BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2f6K-0004OL-Tf
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 13:17:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40511)
+	id 1i2fEP-00069a-UF
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 13:26:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41519)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2f5O-0003o8-Gn
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 13:16:51 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2fDF-0005Qh-OD
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 13:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2f5N-0001rO-LB
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 13:16:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56810)
+ (envelope-from <mreitz@redhat.com>) id 1i2fDE-0006UV-NB
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 13:24:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35564)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2f5J-0001o3-Kg; Tue, 27 Aug 2019 13:16:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1i2fDC-0006S8-2P; Tue, 27 Aug 2019 13:24:54 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B9A831026FEA;
- Tue, 27 Aug 2019 17:16:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 50C1918012FA;
+ Tue, 27 Aug 2019 17:24:53 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 321545D6B0;
- Tue, 27 Aug 2019 17:16:36 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190815153638.4600-1-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E30560468;
+ Tue, 27 Aug 2019 17:24:49 +0000 (UTC)
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20190827101328.4062-1-stefanha@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -69,21 +69,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f5caf55b-a5be-64b9-c341-b77b5ace4369@redhat.com>
-Date: Tue, 27 Aug 2019 19:16:33 +0200
+Message-ID: <21c580bc-c4c7-ede5-b35b-701391697063@redhat.com>
+Date: Tue, 27 Aug 2019 19:24:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190815153638.4600-1-mreitz@redhat.com>
+In-Reply-To: <20190827101328.4062-1-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="PXwsNE6QN96s4H5nMDSEOaQ7xeSm3lU6z"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="KQ7dUPPCLCUen2DSNFZ3gsXbuRtjGLSdq"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 27 Aug 2019 17:16:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.63]); Tue, 27 Aug 2019 17:24:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] vmdk: Misc fixes
+Subject: Re: [Qemu-devel] [PATCH] file-posix: fix request_alignment typo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,65 +95,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-trivial@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PXwsNE6QN96s4H5nMDSEOaQ7xeSm3lU6z
-Content-Type: multipart/mixed; boundary="eoTpUzl1N97FSOP1HPeDtUgbC6cEInknC";
+--KQ7dUPPCLCUen2DSNFZ3gsXbuRtjGLSdq
+Content-Type: multipart/mixed; boundary="kEPR9glWcdyS3Hw4a0UY4nWIPS2QP7EwB";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <f5caf55b-a5be-64b9-c341-b77b5ace4369@redhat.com>
-Subject: Re: [PATCH v2 0/7] vmdk: Misc fixes
-References: <20190815153638.4600-1-mreitz@redhat.com>
-In-Reply-To: <20190815153638.4600-1-mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-trivial@nongnu.org
+Message-ID: <21c580bc-c4c7-ede5-b35b-701391697063@redhat.com>
+Subject: Re: [PATCH] file-posix: fix request_alignment typo
+References: <20190827101328.4062-1-stefanha@redhat.com>
+In-Reply-To: <20190827101328.4062-1-stefanha@redhat.com>
 
---eoTpUzl1N97FSOP1HPeDtUgbC6cEInknC
+--kEPR9glWcdyS3Hw4a0UY4nWIPS2QP7EwB
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 15.08.19 17:36, Max Reitz wrote:
-> I made the mistake of trying to run the iotests with all non-default
-> subformats our vmdk driver has to offer:
-> - monolithicFlat
-> - twoGbMaxExtentSparse
-> - twoGbMaxExtentFlat
-> - streamOptimized
->=20
-> Many things broke, so this series fixes what I found.  It=E2=80=99s mos=
-tly just
-> iotest fixes, but there are actually two real fixes in here.
+On 27.08.19 12:13, Stefan Hajnoczi wrote:
+> Fixes: a6b257a08e3d72219f03e461a52152672fec0612
+>        ("file-posix: Handle undetectable alignment")
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  block/file-posix.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for the review, applied to my block branch.
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
 Max
 
 
---eoTpUzl1N97FSOP1HPeDtUgbC6cEInknC--
+--kEPR9glWcdyS3Hw4a0UY4nWIPS2QP7EwB--
 
---PXwsNE6QN96s4H5nMDSEOaQ7xeSm3lU6z
+--KQ7dUPPCLCUen2DSNFZ3gsXbuRtjGLSdq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1lZXIACgkQ9AfbAGHV
-z0Cacwf/Z2subfwyL8ExdQ2RFH5naW6dK7qdqisAD//1FreBqpe+FGZHHXmtrXxv
-nOXjZcIWthSOlTS6ISw+/ErhDMRcAD1N0+dTZNiFbF9HsLnXr5s6pzWwDONyK1Us
-a2keUZRv0Po+zBa3Yeg0YZvKU5eh6O+pKj82pf2b4KWE9HynwrBGutGgmxd5+ZLw
-gAFgf4B7lk9rmP7wBRMl6MnHV+YZqentzu0a0cCVyHyfNYLipg5IP4rdX9Uc3qIv
-q+TXtT/U+jNLLOpKxOkQAeWaHM+SHpCztBfhamzER7l6FeJAmyWsBfN2TCo4LUy4
-G9xZ2lqTutGjjSNyXvMrxECmvyfKmA==
-=tVpZ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1lZ18ACgkQ9AfbAGHV
+z0A6xQf+IUxK0oOHYAjx4vY3Gx2eFcgQGS8PiE0LA8wGc1EReivmi048FOalq883
+yOcKQ1bBHMp53dhTzcNpTNbkqcIgDRiLh66mbwPna5NnuQ5+aNUfd/rF1jkxE5BT
+Exnr1SCCjjfLyiBzBPJjM+9z4ovlVdgrwqfHdLLS83sq/iZiiWReZSgkkuxm8ImV
+dfd7h8eu/qQVT1uRVyBdyjDiWA8ypfUTm12wwg9AQdlzIQZkZJNMC4TjkYK2aCzc
+0ZTn2o34CU6vv/jkZmKVSqV5JkOoa73zZTNP/9hdp62uszTJNDvNvuux8N6lHuzU
+7NY5PkLtzPJQapzLz2npEvNOQmCupQ==
+=W6/Q
 -----END PGP SIGNATURE-----
 
---PXwsNE6QN96s4H5nMDSEOaQ7xeSm3lU6z--
+--KQ7dUPPCLCUen2DSNFZ3gsXbuRtjGLSdq--
 
