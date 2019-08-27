@@ -3,62 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5939C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 10:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B6DC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 10:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B3E4204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 10:46:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B3E4204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC6F7205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Aug 2019 10:49:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC6F7205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2Z03-0002an-3U
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 06:46:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34183)
+	id 1i2Z2j-0004VF-Rq
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 06:49:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i2YyL-0001H2-H4
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 06:45:10 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1i2Z0J-000358-EM
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 06:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i2YyJ-0001AU-6S
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 06:45:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43348)
+ (envelope-from <tony.nguyen@bt.com>) id 1i2Z0G-0002N0-Lg
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 06:47:10 -0400
+Received: from nsstlmta27p.bpe.bigpond.com ([203.38.21.27]:41403)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i2YyJ-0001AG-0f
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 06:45:07 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E72A510C696B;
- Tue, 27 Aug 2019 10:45:05 +0000 (UTC)
-Received: from localhost (ovpn-116-148.ams2.redhat.com [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 767991001DC0;
- Tue, 27 Aug 2019 10:45:05 +0000 (UTC)
-Date: Tue, 27 Aug 2019 11:45:04 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jan Bobek <jan.bobek@gmail.com>
-Message-ID: <20190827104504.GB4290@stefanha-x1.localdomain>
-References: <9d60daf6-f4e3-37cd-799f-9f840b1b7ba1@gmail.com>
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
+ id 1i2Z0F-0002F4-Ko; Tue, 27 Aug 2019 06:47:08 -0400
+Received: from smtp.telstra.com ([10.10.24.4])
+ by nsstlfep27p-svc.bpe.nexus.telstra.com.au with ESMTP id
+ <20190827104659.YENC27545.nsstlfep27p-svc.bpe.nexus.telstra.com.au@smtp.telstra.com>;
+ Tue, 27 Aug 2019 20:46:59 +1000
+X-RG-Spam: Unknown
+X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgeduvddrudehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfupfevtfgpvffgnffuvffttedpqfgfvfenuceurghilhhouhhtmecugedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfhfgggtuggjfgesthdtredttdervdenucfhrhhomhepvfhonhihucfpghhuhigvnhcuoehtohhnhidrnhhguhihvghnsegsthdrtghomheqnecukfhppeehkedrudejfedrleekrdeikeenucfrrghrrghmpehhvghlohepihhmrggtrdhlohgtrghlpdhinhgvthepheekrddujeefrdelkedrieekpdhmrghilhhfrhhomhepoehtohhnhidrnhhguhihvghnsegsthdrtghomheqpdhrtghpthhtohepoegrrhhmsghruhesrhgvughhrghtrdgtohhmqedprhgtphhtthhopeeosggvrhhrrghnghgvsehrvgguhhgrthdrtghomheqpdhrtghpthhtohepoehfrghmsegvuhhphhhonhdrnhgvtheqpdhrtghpthhtohepoehkfiholhhfsehrvgguhhgrthdrtghomheqpdhrtghpthhtohepoehmlhgvvhhithhskhesrhgvughhrghtrdgtohhmqedprhgtphhtthhopeeomhhrvghithiisehrvgguhhgrthdrtghomheqpdhrtghpthhtohepoehqvghmuhdqsghlohgtkhesnhhonhhgnhhurdhorhhgqedprhgtphhtthhopeeoqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgheqpdhrtghpthhtohepoehsthgvfhgrnhhhrgesrhgv
+ ughhrghtrdgtohhmqeenucevlhhushhtvghrufhiiigvpedt
+X-RazorGate-Vade-Verdict: clean 0
+X-RazorGate-Vade-Classification: clean
+X-RG-VS-CLASS: clean
+X-Authentication-Info: Submitted using ID tony.nguyen.git@bigpond.com
+Received: from imac.local (58.173.98.68) by smtp.telstra.com (5.8.335)
+ (authenticated as tony.nguyen.git@bigpond.com)
+ id 5D3581440E3A0E39; Tue, 27 Aug 2019 20:46:59 +1000
+Date: Tue, 27 Aug 2019 20:46:53 +1000
+From: Tony Nguyen <tony.nguyen@bt.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Message-ID: <20190827104653.GA73303@imac.local>
+References: <20190826135103.22410-1-mlevitsk@redhat.com>
+ <20190826135103.22410-2-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="wq9mPyueHGvFACwf"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9d60daf6-f4e3-37cd-799f-9f840b1b7ba1@gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 27 Aug 2019 10:45:06 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [GSOC] Support for AVX within TCG: Work Product
- Submission
+In-Reply-To: <20190826135103.22410-2-mlevitsk@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 203.38.21.27
+Subject: Re: [Qemu-devel] [PATCH v2 01/13] introduce g_autowipe
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,54 +71,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Maxim,
 
---wq9mPyueHGvFACwf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Aug 26, 2019 at 04:50:51PM +0300, Maxim Levitsky wrote:
+> 2. is it portable enought for us to use malloc_usable_size
+> to get the size of malloced pointer in the autofree callback?
+> This function is aviable in glibc (but no wrapper in glib).
 
-On Sun, Aug 25, 2019 at 03:30:49PM -0400, Jan Bobek wrote:
-> Hi folks,
->=20
-> those of you who have been keeping up with Google Summer of Code
-> this year might know that it's nearly over -- meaning that it's
-> time for me to summarize all the work that I have done as a
-> participant. Without further ado, you can find the summary
-> attached below.
->=20
-> Huge thanks to everyone who made this possible!
->=20
-> Best,
-> -Jan Bobek
+We will also need to consider host portability: malloc_usable_size
+for Linux, malloc_size for MacOS, _msize for Windows, etc.
 
-Thanks for your contributions, Jan!
+[...]
 
-If you have the opportunity to attend KVM Forum 2019 in Lyon, France it
-would allow you to meet many members of the QEMU community:
-https://events.linuxfoundation.org/events/kvm-forum-2019/
+> +#include <stddef.h>
+> +#include <malloc.h>
 
-Stefan
+Again host portability, <malloc.h> is not present on MacOS.
 
---wq9mPyueHGvFACwf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1lCbAACgkQnKSrs4Gr
-c8jlywf+Napeh+uvoYFpnRAvKdVvZSI+qc/dpr5qQ9bje+NmD5y5DU1b+LjPryuG
-EZnXBWyhNVdPtw6QHKY77qV+E2f+9blOMFIspxF01e9QjM11Z8T6mofs4Viq6Yi4
-4DBrOycLH+AOYGsRAn9OuXRR7Ffy9WW24XfcDIQLhKzrdfvu6yHcT6lk5NjZKCaz
-jZpM9jkBdH5Cu1YIdK/Njd+ZKTHqrRXC9id3R4t+yDA7yjod50Z1QUaGfQQD/M+e
-EKJyj4UCPA4DdO6FfGtnthuEaQskkm7LMa5Zi+bl/88Kwka8hGvb1icnMvjJ4JJw
-4zgxsbylI3muy7Bld3o6Y3kJ3H+y2A==
-=kq7H
------END PGP SIGNATURE-----
-
---wq9mPyueHGvFACwf--
+Regards,
+Tony
 
