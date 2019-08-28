@@ -7,80 +7,78 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9150AC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90343C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4923A208C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:32:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58653217F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RZth7B6j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4923A208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EuZDt+Ia"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58653217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i33fo-0004Hs-DR
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 15:32:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37926)
+	id 1i33h9-00051Q-70
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 15:33:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i33GC-0003ay-0I
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:40 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i33GU-0003oD-Vq
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i33G8-0000Bl-Iw
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:35 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45025)
+ (envelope-from <richard.henderson@linaro.org>) id 1i33GS-0000Ot-S9
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:54 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41815)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i33G8-0000BE-65
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:32 -0400
-Received: by mail-pl1-x641.google.com with SMTP id t14so383636plr.11
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:05:32 -0700 (PDT)
+ id 1i33GS-0000Lg-FX
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:52 -0400
+Received: by mail-pf1-x442.google.com with SMTP id 196so383047pfz.8
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:05:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=mep0vFi11PfcusdAY5maYxXY8aLjJHFKL1U21aZXTOg=;
- b=RZth7B6juJFncpqwfSyTvZXJKkUcJDLliad6DODdhGqx0HPEWv8DdXFA2wiP404hol
- QhzRN5ioUy09Tcoteb7j/aQ6FlVBaVntjgNgP9/x6uS/xE8gtmjGLSb7miac2BO+JoaV
- Xsiagld4OCfQk8qPP8TYNdz0jVDDCpoviz0BDmi+iELEQPdweVsMPspRO/jHF98V2dGW
- KSq5z0caT/p2qPw3MYnCVlaiBFS1iKzkDbMYnHYmKdKafGOQvHyTZQFApOpbVR62bmd6
- Iks25DqkTnCKwU39n0obUqlsxwX8ioIVL9SoZ2vKKmG1ViLG4z2RjEazORJOOoQRtZrk
- ZRcw==
+ bh=0UvFhmNUqeBm7S5PhfAWHzrVJNihnGpoWwY5zvTyQDs=;
+ b=EuZDt+IatzaWgfhJhmSkmKy0ATcSDm4jLpqyZEuVA3aDJrnwSPtsHRHq4FuMGhpYDk
+ Y+IEWriZzphYgE8T30UOQt5hUQbyG8Bx5/1EEXSGcq3oI75Bg+gmcYxV4d/qa83A4o/G
+ ZcMEzr3YwngwUYoRFDYv0oGhPTAUzz4DOCXtxXtivxg7fVgQJpp7d7Z3UeL/BhmhkliM
+ hY0VTvoIVf+ZIU21alKPuPsthyP3JUxbIEOzeeI3nb/JOaRA/UENtjqrtYnJ8DwT/odq
+ 6TRvAc9Y3jIHE46XR5Aw9o1crMpUy1ADkHZVTZwqgZ8z+FssHm1pXJqgtXYa5DqFyrAI
+ PmVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=mep0vFi11PfcusdAY5maYxXY8aLjJHFKL1U21aZXTOg=;
- b=DmH3elWA4gKXefinAHjYPSgIcEL3zIHHuiRw6Ai0bDA/KvsPYclxcED1+g8azJV6FK
- WtNTMjLnYkLqN06hfs8TqUrHhKUg6AbQkwt/XFb4DyYT0pToT+3piE/4vSPNFiQmT4Dg
- rmOl8lDk3Rkn5AwEcB81evqDnjiwZIEKrss7c1JHe1PHNK5dPefmrSYmrU4hpP/A5nv9
- 4MP0N9/rdCInzkqrMONv+LC3hrFtTfUBH7ma0HS4YCL6JRrbkMka0n8qDuxAsSesmnMK
- 0oS+N/Gteb6X0RuHIph3T9+8PV3vVU5KBbjpVtFCGx1n4FiB1qV/oOKQcoRPgTkEevM3
- 5PTg==
-X-Gm-Message-State: APjAAAWgs6TMOUjR+J74WS6Hxa07+R1+CY7wZXuoUuAmGCJkOqplT4rO
- /+Yz0qFh1qiwE4ko2g+v4FlxA75cIXo=
-X-Google-Smtp-Source: APXvYqynWzROJR/UvsziSNsB1CjdAjkNGFNBuJ9Act1K8ROr/dNR6mqcfteo8hyZAc6S1CgGSK+o3g==
-X-Received: by 2002:a17:902:20e3:: with SMTP id
- v32mr5593817plg.142.1567019130643; 
- Wed, 28 Aug 2019 12:05:30 -0700 (PDT)
+ bh=0UvFhmNUqeBm7S5PhfAWHzrVJNihnGpoWwY5zvTyQDs=;
+ b=g2oy7BmG1fT8PEHunm4UyxzvkD0KsqHWgGT+fH/+zoIRbtShO7vvtbgaHUTY3JKEIR
+ d8CWqLQZeqPZD4chAnbVec49aEHq3tc3b+wnjOrtsQ7FBju9vtxGT+145GRsp4TL3qM8
+ pBfoRiPBeyZPeWElvKXihmzhVTjzqlQDh6JshZY8hmKH/5kFj2EHSp9nycElQsx5EL4N
+ 750V6bXOLLXh6Ueh3Mb/8JVWy81DSdEusZQEKq7PbTZM+NRaMDsrwkhH3FVxPrc52tEC
+ hPi/r6GETanDBYnaLYliAyp3+KLP9aqFY6UgFIaokEEAzA2yglBRsnrKvTFItX2q70Pl
+ 38/Q==
+X-Gm-Message-State: APjAAAX12IDWf1VYCDp+glaC9hcUhSwrqvy6qkbjT5OcOcMqCslMovlZ
+ xit7ubojShu72KpdHIkXGi42VuWQRDw=
+X-Google-Smtp-Source: APXvYqwwfmCxA6nxq4geT+4G2n5D36xEhSf6Asbe8O8FHJ4Mf4mgNJsYf9t2LHdkMgdsOlHs67i7HQ==
+X-Received: by 2002:a17:90a:feb:: with SMTP id 98mr5455811pjz.55.1567019146203; 
+ Wed, 28 Aug 2019 12:05:46 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.05.29
+ by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.05.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Aug 2019 12:05:29 -0700 (PDT)
+ Wed, 28 Aug 2019 12:05:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 12:04:11 -0700
-Message-Id: <20190828190456.30315-25-richard.henderson@linaro.org>
+Date: Wed, 28 Aug 2019 12:04:23 -0700
+Message-Id: <20190828190456.30315-37-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190828190456.30315-1-richard.henderson@linaro.org>
 References: <20190828190456.30315-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v3 24/69] target/arm: Convert Parallel addition
- and subtraction
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PATCH v3 36/69] target/arm: Convert CPS (privileged)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,376 +98,177 @@ Sender: "Qemu-devel"
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 229 ++++++++++++++++++++---------------------
- target/arm/a32.decode  |  44 ++++++++
- target/arm/t32.decode  |  44 ++++++++
- 3 files changed, 200 insertions(+), 117 deletions(-)
+v3: Reject for m-profile; add TODO for unpredictable arguments.
+    Sort the T32 decode adjacent to the hint space.
+---
+ target/arm/translate.c       | 91 ++++++++++++++++--------------------
+ target/arm/a32-uncond.decode |  3 ++
+ target/arm/t32.decode        |  5 ++
+ 3 files changed, 48 insertions(+), 51 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index adc0a0f022..eb9d1d71ce 100644
+index 003b8ac414..e8764a88ae 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -648,99 +648,6 @@ static inline void gen_arm_shift_reg(TCGv_i32 var, int shiftop,
-     tcg_temp_free_i32(shift);
- }
- 
--#define PAS_OP(pfx) \
--    switch (op2) {  \
--    case 0: gen_pas_helper(glue(pfx,add16)); break; \
--    case 1: gen_pas_helper(glue(pfx,addsubx)); break; \
--    case 2: gen_pas_helper(glue(pfx,subaddx)); break; \
--    case 3: gen_pas_helper(glue(pfx,sub16)); break; \
--    case 4: gen_pas_helper(glue(pfx,add8)); break; \
--    case 7: gen_pas_helper(glue(pfx,sub8)); break; \
--    }
--static void gen_arm_parallel_addsub(int op1, int op2, TCGv_i32 a, TCGv_i32 b)
--{
--    TCGv_ptr tmp;
--
--    switch (op1) {
--#define gen_pas_helper(name) glue(gen_helper_,name)(a, a, b, tmp)
--    case 1:
--        tmp = tcg_temp_new_ptr();
--        tcg_gen_addi_ptr(tmp, cpu_env, offsetof(CPUARMState, GE));
--        PAS_OP(s)
--        tcg_temp_free_ptr(tmp);
--        break;
--    case 5:
--        tmp = tcg_temp_new_ptr();
--        tcg_gen_addi_ptr(tmp, cpu_env, offsetof(CPUARMState, GE));
--        PAS_OP(u)
--        tcg_temp_free_ptr(tmp);
--        break;
--#undef gen_pas_helper
--#define gen_pas_helper(name) glue(gen_helper_,name)(a, a, b)
--    case 2:
--        PAS_OP(q);
--        break;
--    case 3:
--        PAS_OP(sh);
--        break;
--    case 6:
--        PAS_OP(uq);
--        break;
--    case 7:
--        PAS_OP(uh);
--        break;
--#undef gen_pas_helper
--    }
--}
--#undef PAS_OP
--
--/* For unknown reasons Arm and Thumb-2 use arbitrarily different encodings.  */
--#define PAS_OP(pfx) \
--    switch (op1) {  \
--    case 0: gen_pas_helper(glue(pfx,add8)); break; \
--    case 1: gen_pas_helper(glue(pfx,add16)); break; \
--    case 2: gen_pas_helper(glue(pfx,addsubx)); break; \
--    case 4: gen_pas_helper(glue(pfx,sub8)); break; \
--    case 5: gen_pas_helper(glue(pfx,sub16)); break; \
--    case 6: gen_pas_helper(glue(pfx,subaddx)); break; \
--    }
--static void gen_thumb2_parallel_addsub(int op1, int op2, TCGv_i32 a, TCGv_i32 b)
--{
--    TCGv_ptr tmp;
--
--    switch (op2) {
--#define gen_pas_helper(name) glue(gen_helper_,name)(a, a, b, tmp)
--    case 0:
--        tmp = tcg_temp_new_ptr();
--        tcg_gen_addi_ptr(tmp, cpu_env, offsetof(CPUARMState, GE));
--        PAS_OP(s)
--        tcg_temp_free_ptr(tmp);
--        break;
--    case 4:
--        tmp = tcg_temp_new_ptr();
--        tcg_gen_addi_ptr(tmp, cpu_env, offsetof(CPUARMState, GE));
--        PAS_OP(u)
--        tcg_temp_free_ptr(tmp);
--        break;
--#undef gen_pas_helper
--#define gen_pas_helper(name) glue(gen_helper_,name)(a, a, b)
--    case 1:
--        PAS_OP(q);
--        break;
--    case 2:
--        PAS_OP(sh);
--        break;
--    case 5:
--        PAS_OP(uq);
--        break;
--    case 6:
--        PAS_OP(uh);
--        break;
--#undef gen_pas_helper
--    }
--}
--#undef PAS_OP
--
- /*
-  * Generate a conditional based on ARM condition code cc.
-  * This is common between ARM and Aarch64 targets.
-@@ -9292,6 +9199,114 @@ static bool trans_UDF(DisasContext *s, arg_UDF *a)
+@@ -10122,6 +10122,44 @@ static bool trans_SRS(DisasContext *s, arg_SRS *a)
      return true;
  }
  
-+/*
-+ * Parallel addition and subtraction
-+ */
-+
-+static bool op_par_addsub(DisasContext *s, arg_rrr *a,
-+                          void (*gen)(TCGv_i32, TCGv_i32, TCGv_i32))
++static bool trans_CPS(DisasContext *s, arg_CPS *a)
 +{
-+    TCGv_i32 t0, t1;
++    uint32_t mask, val;
 +
-+    if (s->thumb
-+        ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
-+        : !ENABLE_ARCH_6) {
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
 +        return false;
 +    }
-+
-+    t0 = load_reg(s, a->rn);
-+    t1 = load_reg(s, a->rm);
-+
-+    gen(t0, t0, t1);
-+
-+    tcg_temp_free_i32(t1);
-+    store_reg(s, a->rd, t0);
-+    return true;
-+}
-+
-+static bool op_par_addsub_ge(DisasContext *s, arg_rrr *a,
-+                             void (*gen)(TCGv_i32, TCGv_i32,
-+                                         TCGv_i32, TCGv_ptr))
-+{
-+    TCGv_i32 t0, t1;
-+    TCGv_ptr ge;
-+
-+    if (s->thumb
-+        ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
-+        : !ENABLE_ARCH_6) {
-+        return false;
++    if (IS_USER(s)) {
++        /* Implemented as NOP in user mode.  */
++        return true;
 +    }
++    /* TODO: There are quite a lot of UNPREDICTABLE argument combinations. */
 +
-+    t0 = load_reg(s, a->rn);
-+    t1 = load_reg(s, a->rm);
-+
-+    ge = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(ge, cpu_env, offsetof(CPUARMState, GE));
-+    gen(t0, t0, t1, ge);
-+
-+    tcg_temp_free_ptr(ge);
-+    tcg_temp_free_i32(t1);
-+    store_reg(s, a->rd, t0);
++    mask = val = 0;
++    if (a->imod & 2) {
++        if (a->A) {
++            mask |= CPSR_A;
++        }
++        if (a->I) {
++            mask |= CPSR_I;
++        }
++        if (a->F) {
++            mask |= CPSR_F;
++        }
++        if (a->imod & 1) {
++            val |= mask;
++        }
++    }
++    if (a->M) {
++        mask |= CPSR_M;
++        val |= a->mode;
++    }
++    if (mask) {
++        gen_set_psr_im(s, mask, 0, val);
++    }
 +    return true;
 +}
-+
-+#define DO_PAR_ADDSUB(NAME, helper) \
-+static bool trans_##NAME(DisasContext *s, arg_rrr *a)   \
-+{                                                       \
-+    return op_par_addsub(s, a, helper);                 \
-+}
-+
-+#define DO_PAR_ADDSUB_GE(NAME, helper) \
-+static bool trans_##NAME(DisasContext *s, arg_rrr *a)   \
-+{                                                       \
-+    return op_par_addsub_ge(s, a, helper);              \
-+}
-+
-+DO_PAR_ADDSUB_GE(SADD16, gen_helper_sadd16)
-+DO_PAR_ADDSUB_GE(SASX, gen_helper_saddsubx)
-+DO_PAR_ADDSUB_GE(SSAX, gen_helper_ssubaddx)
-+DO_PAR_ADDSUB_GE(SSUB16, gen_helper_ssub16)
-+DO_PAR_ADDSUB_GE(SADD8, gen_helper_sadd8)
-+DO_PAR_ADDSUB_GE(SSUB8, gen_helper_ssub8)
-+
-+DO_PAR_ADDSUB_GE(UADD16, gen_helper_uadd16)
-+DO_PAR_ADDSUB_GE(UASX, gen_helper_uaddsubx)
-+DO_PAR_ADDSUB_GE(USAX, gen_helper_usubaddx)
-+DO_PAR_ADDSUB_GE(USUB16, gen_helper_usub16)
-+DO_PAR_ADDSUB_GE(UADD8, gen_helper_uadd8)
-+DO_PAR_ADDSUB_GE(USUB8, gen_helper_usub8)
-+
-+DO_PAR_ADDSUB(QADD16, gen_helper_qadd16)
-+DO_PAR_ADDSUB(QASX, gen_helper_qaddsubx)
-+DO_PAR_ADDSUB(QSAX, gen_helper_qsubaddx)
-+DO_PAR_ADDSUB(QSUB16, gen_helper_qsub16)
-+DO_PAR_ADDSUB(QADD8, gen_helper_qadd8)
-+DO_PAR_ADDSUB(QSUB8, gen_helper_qsub8)
-+
-+DO_PAR_ADDSUB(UQADD16, gen_helper_uqadd16)
-+DO_PAR_ADDSUB(UQASX, gen_helper_uqaddsubx)
-+DO_PAR_ADDSUB(UQSAX, gen_helper_uqsubaddx)
-+DO_PAR_ADDSUB(UQSUB16, gen_helper_uqsub16)
-+DO_PAR_ADDSUB(UQADD8, gen_helper_uqadd8)
-+DO_PAR_ADDSUB(UQSUB8, gen_helper_uqsub8)
-+
-+DO_PAR_ADDSUB(SHADD16, gen_helper_shadd16)
-+DO_PAR_ADDSUB(SHASX, gen_helper_shaddsubx)
-+DO_PAR_ADDSUB(SHSAX, gen_helper_shsubaddx)
-+DO_PAR_ADDSUB(SHSUB16, gen_helper_shsub16)
-+DO_PAR_ADDSUB(SHADD8, gen_helper_shadd8)
-+DO_PAR_ADDSUB(SHSUB8, gen_helper_shsub8)
-+
-+DO_PAR_ADDSUB(UHADD16, gen_helper_uhadd16)
-+DO_PAR_ADDSUB(UHASX, gen_helper_uhaddsubx)
-+DO_PAR_ADDSUB(UHSAX, gen_helper_uhsubaddx)
-+DO_PAR_ADDSUB(UHSUB16, gen_helper_uhsub16)
-+DO_PAR_ADDSUB(UHADD8, gen_helper_uhadd8)
-+DO_PAR_ADDSUB(UHSUB8, gen_helper_uhsub8)
-+
-+#undef DO_PAR_ADDSUB
-+#undef DO_PAR_ADDSUB_GE
 +
  /*
-  * Legacy decoder.
+  * Clear-Exclusive, Barriers
   */
-@@ -9604,16 +9619,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 rs = (insn >> 8) & 0xf;
-                 switch ((insn >> 23) & 3) {
-                 case 0: /* Parallel add/subtract.  */
--                    op1 = (insn >> 20) & 7;
--                    tmp = load_reg(s, rn);
--                    tmp2 = load_reg(s, rm);
--                    sh = (insn >> 5) & 7;
--                    if ((op1 & 3) == 0 || sh == 5 || sh == 6)
--                        goto illegal_op;
--                    gen_arm_parallel_addsub(op1, sh, tmp, tmp2);
--                    tcg_temp_free_i32(tmp2);
--                    store_reg(s, rd, tmp);
--                    break;
-+                    /* Done by decodetree */
-+                    goto illegal_op;
-                 case 1:
-                     if ((insn & 0x00700020) == 0) {
-                         /* Halfword pack.  */
-@@ -10397,20 +10404,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-             }
-             store_reg(s, rd, tmp);
-             break;
--        case 2: /* SIMD add/subtract.  */
--            if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)) {
--                goto illegal_op;
+@@ -10298,31 +10336,6 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             ARCH(5TE);
+         } else if ((insn & 0x0f000010) == 0x0e000010) {
+             /* Additional coprocessor register transfer.  */
+-        } else if ((insn & 0x0ff10020) == 0x01000000) {
+-            uint32_t mask;
+-            uint32_t val;
+-            /* cps (privileged) */
+-            if (IS_USER(s))
+-                return;
+-            mask = val = 0;
+-            if (insn & (1 << 19)) {
+-                if (insn & (1 << 8))
+-                    mask |= CPSR_A;
+-                if (insn & (1 << 7))
+-                    mask |= CPSR_I;
+-                if (insn & (1 << 6))
+-                    mask |= CPSR_F;
+-                if (insn & (1 << 18))
+-                    val |= mask;
 -            }
--            op = (insn >> 20) & 7;
--            shift = (insn >> 4) & 7;
--            if ((op & 3) == 3 || (shift & 3) == 3)
--                goto illegal_op;
--            tmp = load_reg(s, rn);
--            tmp2 = load_reg(s, rm);
--            gen_thumb2_parallel_addsub(op, shift, tmp, tmp2);
--            tcg_temp_free_i32(tmp2);
--            store_reg(s, rd, tmp);
--            break;
-+        case 2: /* SIMD add/subtract, in decodetree */
-+            goto illegal_op;
-         case 3: /* Other data processing.  */
-             op = ((insn >> 17) & 0x38) | ((insn >> 4) & 7);
-             if (op < 4) {
-diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index 285c08ca22..4dfd8133f7 100644
---- a/target/arm/a32.decode
-+++ b/target/arm/a32.decode
-@@ -410,3 +410,47 @@ BFCI             ---- 0111 110 msb:5 rd:4 lsb:5 001 rn:4      &bfi
- # While we could get UDEF by not including this, add the pattern for
- # documentation and to conflict with any other typos in this file.
- UDF              1110 0111 1111 ---- ---- ---- 1111 ----
-+
-+# Parallel addition and subtraction
-+
-+SADD16           .... 0110 0001 .... .... 1111 0001 ....      @rndm
-+SASX             .... 0110 0001 .... .... 1111 0011 ....      @rndm
-+SSAX             .... 0110 0001 .... .... 1111 0101 ....      @rndm
-+SSUB16           .... 0110 0001 .... .... 1111 0111 ....      @rndm
-+SADD8            .... 0110 0001 .... .... 1111 1001 ....      @rndm
-+SSUB8            .... 0110 0001 .... .... 1111 1111 ....      @rndm
-+
-+QADD16           .... 0110 0010 .... .... 1111 0001 ....      @rndm
-+QASX             .... 0110 0010 .... .... 1111 0011 ....      @rndm
-+QSAX             .... 0110 0010 .... .... 1111 0101 ....      @rndm
-+QSUB16           .... 0110 0010 .... .... 1111 0111 ....      @rndm
-+QADD8            .... 0110 0010 .... .... 1111 1001 ....      @rndm
-+QSUB8            .... 0110 0010 .... .... 1111 1111 ....      @rndm
-+
-+SHADD16          .... 0110 0011 .... .... 1111 0001 ....      @rndm
-+SHASX            .... 0110 0011 .... .... 1111 0011 ....      @rndm
-+SHSAX            .... 0110 0011 .... .... 1111 0101 ....      @rndm
-+SHSUB16          .... 0110 0011 .... .... 1111 0111 ....      @rndm
-+SHADD8           .... 0110 0011 .... .... 1111 1001 ....      @rndm
-+SHSUB8           .... 0110 0011 .... .... 1111 1111 ....      @rndm
-+
-+UADD16           .... 0110 0101 .... .... 1111 0001 ....      @rndm
-+UASX             .... 0110 0101 .... .... 1111 0011 ....      @rndm
-+USAX             .... 0110 0101 .... .... 1111 0101 ....      @rndm
-+USUB16           .... 0110 0101 .... .... 1111 0111 ....      @rndm
-+UADD8            .... 0110 0101 .... .... 1111 1001 ....      @rndm
-+USUB8            .... 0110 0101 .... .... 1111 1111 ....      @rndm
-+
-+UQADD16          .... 0110 0110 .... .... 1111 0001 ....      @rndm
-+UQASX            .... 0110 0110 .... .... 1111 0011 ....      @rndm
-+UQSAX            .... 0110 0110 .... .... 1111 0101 ....      @rndm
-+UQSUB16          .... 0110 0110 .... .... 1111 0111 ....      @rndm
-+UQADD8           .... 0110 0110 .... .... 1111 1001 ....      @rndm
-+UQSUB8           .... 0110 0110 .... .... 1111 1111 ....      @rndm
-+
-+UHADD16          .... 0110 0111 .... .... 1111 0001 ....      @rndm
-+UHASX            .... 0110 0111 .... .... 1111 0011 ....      @rndm
-+UHSAX            .... 0110 0111 .... .... 1111 0101 ....      @rndm
-+UHSUB16          .... 0110 0111 .... .... 1111 0111 ....      @rndm
-+UHADD8           .... 0110 0111 .... .... 1111 1001 ....      @rndm
-+UHSUB8           .... 0110 0111 .... .... 1111 1111 ....      @rndm
+-            if (insn & (1 << 17)) {
+-                mask |= CPSR_M;
+-                val |= (insn & 0x1f);
+-            }
+-            if (mask) {
+-                gen_set_psr_im(s, mask, 0, val);
+-            }
+-            return;
+         }
+         goto illegal_op;
+     }
+@@ -10431,7 +10444,6 @@ static bool thumb_insn_is_16bit(DisasContext *s, uint32_t pc, uint32_t insn)
+ /* Translate a 32-bit thumb instruction. */
+ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+ {
+-    uint32_t imm, offset;
+     uint32_t rd, rn, rm, rs;
+     TCGv_i32 tmp;
+     TCGv_i32 addr;
+@@ -10707,31 +10719,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     case 0: /* msr cpsr, in decodetree  */
+                     case 1: /* msr spsr, in decodetree  */
+                         goto illegal_op;
+-                    case 2: /* cps, nop-hint.  */
+-                        /* nop hints in decodetree */
+-                        /* Implemented as NOP in user mode.  */
+-                        if (IS_USER(s))
+-                            break;
+-                        offset = 0;
+-                        imm = 0;
+-                        if (insn & (1 << 10)) {
+-                            if (insn & (1 << 7))
+-                                offset |= CPSR_A;
+-                            if (insn & (1 << 6))
+-                                offset |= CPSR_I;
+-                            if (insn & (1 << 5))
+-                                offset |= CPSR_F;
+-                            if (insn & (1 << 9))
+-                                imm = CPSR_A | CPSR_I | CPSR_F;
+-                        }
+-                        if (insn & (1 << 8)) {
+-                            offset |= 0x1f;
+-                            imm |= (insn & 0x1f);
+-                        }
+-                        if (offset) {
+-                            gen_set_psr_im(s, offset, 0, imm);
+-                        }
+-                        break;
++                    case 2: /* cps, nop-hint, in decodetree */
++                        goto illegal_op;
+                     case 3: /* Special control operations, in decodetree */
+                     case 4: /* bxj, in decodetree */
+                         goto illegal_op;
+diff --git a/target/arm/a32-uncond.decode b/target/arm/a32-uncond.decode
+index c7e9df8030..de611e8aff 100644
+--- a/target/arm/a32-uncond.decode
++++ b/target/arm/a32-uncond.decode
+@@ -35,9 +35,12 @@ BLX_i            1111 101 . ........................          &i imm=%imm24h
+ 
+ &rfe             rn w pu
+ &srs             mode w pu
++&cps             mode imod M A I F
+ 
+ RFE              1111 100 pu:2 0 w:1 1 rn:4 0000 1010 0000 0000   &rfe
+ SRS              1111 100 pu:2 1 w:1 0 1101 0000 0101 000 mode:5  &srs
++CPS              1111 0001 0000 imod:2 M:1 0 0000 000 A:1 I:1 F:1 0 mode:5 \
++                 &cps
+ 
+ # Clear-Exclusive, Barriers
+ 
 diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index 682fc5c2c4..c899c56766 100644
+index 18c268e712..fc3e7db4b5 100644
 --- a/target/arm/t32.decode
 +++ b/target/arm/t32.decode
-@@ -457,3 +457,47 @@ LDAEXD_t32       1110 1000 1101 .... .... .... 1111 1111      @ldrex_d
- LDA              1110 1000 1101 .... .... 1111 1010 1111      @ldrex_0
- LDAB             1110 1000 1101 .... .... 1111 1000 1111      @ldrex_0
- LDAH             1110 1000 1101 .... .... 1111 1001 1111      @ldrex_0
+@@ -44,6 +44,7 @@
+ &bfi             !extern rd rn lsb msb
+ &sat             !extern rd rn satimm imm sh
+ &pkh             !extern rd rn rm imm tb
++&cps             !extern mode imod M A I F
+ 
+ # Data-processing (register)
+ 
+@@ -306,6 +307,10 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+       NOP        1111 0011 1010 1111 1000 0000 ---- ----
+     }
+ 
++    # If imod == '00' && M == '0' then SEE "Hint instructions", above.
++    CPS          1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
++                 &cps
 +
-+# Parallel addition and subtraction
-+
-+SADD8            1111 1010 1000 .... 1111 .... 0000 ....      @rndm
-+QADD8            1111 1010 1000 .... 1111 .... 0001 ....      @rndm
-+SHADD8           1111 1010 1000 .... 1111 .... 0010 ....      @rndm
-+UADD8            1111 1010 1000 .... 1111 .... 0100 ....      @rndm
-+UQADD8           1111 1010 1000 .... 1111 .... 0101 ....      @rndm
-+UHADD8           1111 1010 1000 .... 1111 .... 0110 ....      @rndm
-+
-+SADD16           1111 1010 1001 .... 1111 .... 0000 ....      @rndm
-+QADD16           1111 1010 1001 .... 1111 .... 0001 ....      @rndm
-+SHADD16          1111 1010 1001 .... 1111 .... 0010 ....      @rndm
-+UADD16           1111 1010 1001 .... 1111 .... 0100 ....      @rndm
-+UQADD16          1111 1010 1001 .... 1111 .... 0101 ....      @rndm
-+UHADD16          1111 1010 1001 .... 1111 .... 0110 ....      @rndm
-+
-+SASX             1111 1010 1010 .... 1111 .... 0000 ....      @rndm
-+QASX             1111 1010 1010 .... 1111 .... 0001 ....      @rndm
-+SHASX            1111 1010 1010 .... 1111 .... 0010 ....      @rndm
-+UASX             1111 1010 1010 .... 1111 .... 0100 ....      @rndm
-+UQASX            1111 1010 1010 .... 1111 .... 0101 ....      @rndm
-+UHASX            1111 1010 1010 .... 1111 .... 0110 ....      @rndm
-+
-+SSUB8            1111 1010 1100 .... 1111 .... 0000 ....      @rndm
-+QSUB8            1111 1010 1100 .... 1111 .... 0001 ....      @rndm
-+SHSUB8           1111 1010 1100 .... 1111 .... 0010 ....      @rndm
-+USUB8            1111 1010 1100 .... 1111 .... 0100 ....      @rndm
-+UQSUB8           1111 1010 1100 .... 1111 .... 0101 ....      @rndm
-+UHSUB8           1111 1010 1100 .... 1111 .... 0110 ....      @rndm
-+
-+SSUB16           1111 1010 1101 .... 1111 .... 0000 ....      @rndm
-+QSUB16           1111 1010 1101 .... 1111 .... 0001 ....      @rndm
-+SHSUB16          1111 1010 1101 .... 1111 .... 0010 ....      @rndm
-+USUB16           1111 1010 1101 .... 1111 .... 0100 ....      @rndm
-+UQSUB16          1111 1010 1101 .... 1111 .... 0101 ....      @rndm
-+UHSUB16          1111 1010 1101 .... 1111 .... 0110 ....      @rndm
-+
-+SSAX             1111 1010 1110 .... 1111 .... 0000 ....      @rndm
-+QSAX             1111 1010 1110 .... 1111 .... 0001 ....      @rndm
-+SHSAX            1111 1010 1110 .... 1111 .... 0010 ....      @rndm
-+USAX             1111 1010 1110 .... 1111 .... 0100 ....      @rndm
-+UQSAX            1111 1010 1110 .... 1111 .... 0101 ....      @rndm
-+UHSAX            1111 1010 1110 .... 1111 .... 0110 ....      @rndm
+     # Miscelaneous control
+     {
+       CLREX      1111 0011 1011 1111 1000 1111 0010 1111
 -- 
 2.17.1
 
