@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D97C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 045F3C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:54:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05C69217F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:52:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05C69217F5
+	by mail.kernel.org (Postfix) with ESMTPS id BA2C92070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:54:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA2C92070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34vl-0003L0-WE
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:52:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55626)
+	id 1i34x6-0004ep-0G
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:54:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1i34uC-0002FP-RN
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:51:02 -0400
+ (envelope-from <armbru@redhat.com>) id 1i34Wo-0003hC-2P
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1i34u9-0007vy-Kd
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:50:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45392)
+ (envelope-from <armbru@redhat.com>) id 1i34Wk-0002oE-Jl
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41574)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1i34u9-0007uM-CY
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:50:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i34Wk-0002mx-9c
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6E6EA107DD00;
- Wed, 28 Aug 2019 20:50:55 +0000 (UTC)
-Received: from x1.home (ovpn-116-131.phx2.redhat.com [10.3.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 36ABE600CD;
- Wed, 28 Aug 2019 20:50:50 +0000 (UTC)
-Date: Wed, 28 Aug 2019 14:50:45 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <20190828145045.20f2a7b3@x1.home>
-In-Reply-To: <1566845753-18993-2-git-send-email-kwankhede@nvidia.com>
-References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
- <1566845753-18993-2-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+ by mx1.redhat.com (Postfix) with ESMTPS id 9609D10F23EA;
+ Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DC7660BF7;
+ Wed, 28 Aug 2019 20:26:44 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7E2D61165614; Wed, 28 Aug 2019 22:26:41 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 28 Aug 2019 22:26:38 +0200
+Message-Id: <20190828202641.24752-7-armbru@redhat.com>
+In-Reply-To: <20190828202641.24752-1-armbru@redhat.com>
+References: <20190828202641.24752-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Wed, 28 Aug 2019 20:50:55 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.66]); Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 01/13] vfio: KABI for migration interface
+Subject: [Qemu-devel] [PATCH 6/9] docs/devel/qapi-code-gen: Reorder sections
+ for readability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,318 +70,517 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 27 Aug 2019 00:25:41 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Section "QMP/Guest agent schema" starts with a brief introduction,
+then subsection "Comments", then subsection "Schema overview" (more
+elaborate introduction), and only then talks about schema entities
+like types, commands, and so forth.
 
-> - Defined MIGRATION region type and sub-type.
-> - Used 3 bits to define VFIO device states.
->     Bit 0 => _RUNNING
->     Bit 1 => _SAVING
->     Bit 2 => _RESUMING
->     Combination of these bits defines VFIO device's state during migration
->     _STOPPED => All bits 0 indicates VFIO device stopped.
->     _RUNNING => Normal VFIO device running state.
->     _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
->                           saving state of device i.e. pre-copy state
->     _SAVING  => vCPUs are stoppped, VFIO device should be stopped, and
->                           save device state,i.e. stop-n-copy state
->     _RESUMING => VFIO device resuming state.
->     _SAVING | _RESUMING => Invalid state if _SAVING and _RESUMING bits are set
->     Bits 3 - 31 are reserved for future use. User should perform
->     read-modify-write operation on this field.
-> - Defined vfio_device_migration_info structure which will be placed at 0th
->   offset of migration region to get/set VFIO device related information.
->   Defined members of structure and usage on read/write access:
->     * device_state: (read/write)
->         To convey VFIO device state to be transitioned to. Only 3 bits are used
->         as of now, Bits 3 - 31 are reserved for future use.
->     * pending bytes: (read only)
->         To get pending bytes yet to be migrated for VFIO device.
->     * data_offset: (read only)
->         To get data offset in migration region from where data exist during
->         _SAVING, from where data should be written by user space application
->         during _RESUMING state and while read dirty pages bitmap.
->     * data_size: (read/write)
->         To get and set size of data copied in migration region during _SAVING
->         and _RESUMING state.
->     * start_pfn, page_size, total_pfns: (write only)
->         To get bitmap of dirty pages from vendor driver from given
->         start address for total_pfns.
->     * copied_pfns: (read only)
->         To get number of pfns bitmap copied in migration region.
->         Vendor driver should copy the bitmap with bits set only for
->         pages to be marked dirty in migration region. Vendor driver
->         should return VFIO_DEVICE_DIRTY_PFNS_NONE if there are 0 pages dirty in
->         requested range. Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL
->         to mark all pages in the section as dirty.
-> 
-> Migration region looks like:
->  ------------------------------------------------------------------
-> |vfio_device_migration_info|    data section                      |
-> |                          |     ///////////////////////////////  |
->  ------------------------------------------------------------------
->  ^                              ^                              ^
->  offset 0-trapped part        data_offset                 data_size
-> 
-> Data section is always followed by vfio_device_migration_info
-> structure in the region, so data_offset will always be non-0.
-> Offset from where data is copied is decided by kernel driver, data
-> section can be trapped or mapped depending on how kernel driver
-> defines data section. If mmapped, then data_offset should be page
-> aligned, where as initial section which contain vfio_device_migration_info
-> structure might not end at offset which is page aligned.
-> Data_offset can be same or different for device data and dirty pages bitmap.
-> Vendor driver should decide whether to partition data section and how to
-> partition the data section. Vendor driver should return data_offset
-> accordingly.
-> 
-> For user application, data is opaque. User should write data in the same
-> order as received.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  linux-headers/linux/vfio.h | 148 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 148 insertions(+)
-> 
-> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> index 24f505199f83..4bc0236b0898 100644
-> --- a/linux-headers/linux/vfio.h
-> +++ b/linux-headers/linux/vfio.h
-> @@ -372,6 +372,154 @@ struct vfio_region_gfx_edid {
->   */
->  #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
->  
-> +/* Migration region type and sub-type */
-> +#define VFIO_REGION_TYPE_MIGRATION	        (3)
-> +#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
-> +
-> +/**
-> + * Structure vfio_device_migration_info is placed at 0th offset of
-> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
-> + * information. Field accesses from this structure are only supported at their
-> + * native width and alignment, otherwise the result is undefined and vendor
-> + * drivers should return an error.
-> + *
-> + * device_state: (read/write)
-> + *      To indicate vendor driver the state VFIO device should be transitioned
-> + *      to. If device state transition fails, write on this field return error.
-> + *      It consists of 3 bits:
-> + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
-> + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
-> + *        device before write() returns.
-> + *      - If bit 1 set, indicates _SAVING state.
-> + *      - If bit 2 set, indicates _RESUMING state.
-> + *      Bits 3 - 31 are reserved for future use. User should perform
-> + *      read-modify-write operation on this field.
-> + *      _SAVING and _RESUMING bits set at the same time is invalid state.
-> + *
-> + * pending bytes: (read only)
-> + *      Number of pending bytes yet to be migrated from vendor driver
-> + *
-> + * data_offset: (read only)
-> + *      User application should read data_offset in migration region from where
-> + *      user application should read device data during _SAVING state or write
-> + *      device data during _RESUMING state or read dirty pages bitmap. See below
-> + *      for detail of sequence to be followed.
-> + *
-> + * data_size: (read/write)
-> + *      User application should read data_size to get size of data copied in
-> + *      migration region during _SAVING state and write size of data copied in
-> + *      migration region during _RESUMING state.
-> + *
-> + * start_pfn: (write only)
-> + *      Start address pfn to get bitmap of dirty pages from vendor driver duing
-> + *      _SAVING state.
-> + *
-> + * page_size: (write only)
-> + *      User application should write the page_size of pfn.
-> + *
-> + * total_pfns: (write only)
-> + *      Total pfn count from start_pfn for which dirty bitmap is requested.
-> + *
-> + * copied_pfns: (read only)
-> + *      pfn count for which dirty bitmap is copied to migration region.
-> + *      Vendor driver should copy the bitmap with bits set only for pages to be
-> + *      marked dirty in migration region.
-> + *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if none of the
-> + *        pages are dirty in requested range or rest of the range.
-> + *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to mark all
-> + *        pages dirty in the given range or rest of the range.
-> + *      - Vendor driver should return pfn count for which bitmap is written in
-> + *        the region.
-> + *
-> + * Migration region looks like:
-> + *  ------------------------------------------------------------------
-> + * |vfio_device_migration_info|    data section                      |
-> + * |                          |     ///////////////////////////////  |
-> + * ------------------------------------------------------------------
-> + *   ^                              ^                             ^
-> + *  offset 0-trapped part        data_offset                 data_size
-> + *
-> + * Data section is always followed by vfio_device_migration_info structure
-> + * in the region, so data_offset will always be non-0. Offset from where data
-> + * is copied is decided by kernel driver, data section can be trapped or
-> + * mapped or partitioned, depending on how kernel driver defines data section.
-> + * Data section partition can be defined as mapped by sparse mmap capability.
-> + * If mmapped, then data_offset should be page aligned, where as initial section
-> + * which contain vfio_device_migration_info structure might not end at offset
-> + * which is page aligned.
-> + * Data_offset can be same or different for device data and dirty pages bitmap.
-> + * Vendor driver should decide whether to partition data section and how to
-> + * partition the data section. Vendor driver should return data_offset
-> + * accordingly.
-> + *
-> + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
-> + * and for _SAVING device state or stop-and-copy phase:
-> + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
-> + * b. read data_offset, indicates kernel driver to write data to staging buffer.
-> + * c. read data_size, amount of data in bytes written by vendor driver in
-> + *    migration region.
-> + * d. read data_size bytes of data from data_offset in the migration region.
-> + * e. process data.
-> + * f. Loop through a to e.
+Subsection "Comments" is long and tiring: almost 500 words, mostly
+about doc comments.  Move the doc comment part to its own subsection
+"Documentation comments" at the very end of "QMP/Guest agent schema".
 
-Something needs to be said here about the availability of the data, for
-example, what indicates to the vendor driver that the above operation is
-complete?  Is the data immutable?
+Subsection "Schema overview" explains naming rules at considerable
+length: 250 words.  Move this part to its own subsection "Naming rules
+and reserved names" right after the subsections on schema entities.
 
-> + *
-> + * To copy system memory content during migration, vendor driver should be able
-> + * to report system memory pages which are dirtied by that driver. For such
-> + * dirty page reporting, user application should query for a range of GFNs
-> + * relative to device address space (IOVA), then vendor driver should provide
-> + * the bitmap of pages from this range which are dirtied by him through
-> + * migration region where each bit represents a page and bit set to 1 represents
-> + * that the page is dirty.
-> + * User space application should take care of copying content of system memory
-> + * for those pages.
+Subsection "Enumeration types" is wedged between "Struct types" and
+"Union types".  Move it before "Struct types".
 
-Can we say that device state and dirty pfn operations on the data
-area may be intermixed in any order the user chooses?
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ docs/devel/qapi-code-gen.txt | 434 ++++++++++++++++++-----------------
+ 1 file changed, 220 insertions(+), 214 deletions(-)
 
-Should we specify that bits accumulate since EITHER a) _SAVING state is
-enabled or b) a given pfn was last reported via the below sequence (ie.
-dirty bits are cleared once reported)?
-
-How does QEMU handle the fact that IOVAs are potentially dynamic while
-performing the live portion of a migration?  For example, each time a
-guest driver calls dma_map_page() or dma_unmap_page(), a
-MemoryRegionSection pops in or out of the AddressSpace for the device
-(I'm assuming a vIOMMU where the device AddressSpace is not
-system_memory).  I don't see any QEMU code that intercepts that change
-in the AddressSpace such that the IOVA dirty pfns could be recorded and
-translated to GFNs.  The vendor driver can't track these beyond getting
-an unmap notification since it only knows the IOVA pfns, which can be
-re-used with different GFN backing.  Once the DMA mapping is torn down,
-it seems those dirty pfns are lost in the ether.  If this works in QEMU,
-please help me find the code that handles it.
-
-> + *
-> + * Steps to get dirty page bitmap:
-> + * a. write start_pfn, page_size and total_pfns.
-
-This is not well specified.  Is it intended that the user write all
-three of these on every iteration, or could they write start_pfn=0,
-page_size=4K, total_pfns=1, complete the steps below, then write
-start_pfn=1 and immediately begin the next iteration?  They've written
-all three, though not all on the current iteration, does that count?
-Furthermore, could the user simple re-read copied_pfns to determine if
-anything in the previously setup range has been re-dirtied?
-
-IOW, are these three "registers" sticky or do the below operations
-invalidate them?  If they're invalidated, then there needs to be a
-mechanism to generate an error, such as below.
-
-> + * b. read copied_pfns. Vendor driver should take one of the below action:
-> + *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if driver
-> + *       doesn't have any page to report dirty in given range or rest of the
-> + *       range. Exit the loop.
-> + *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to mark all
-> + *       pages dirty for given range or rest of the range. User space
-> + *       application mark all pages in the range as dirty and exit the loop.
-> + *     - Vendor driver should return copied_pfns and provide bitmap for
-> + *       copied_pfn in migration region.
-
-Read returns errno if the pre-requisite registers are not valid?
-
-> + * c. read data_offset, where vendor driver has written bitmap.
-> + * d. read bitmap from the migration region from data_offset.
-> + * e. Iterate through steps a to d while (total copied_pfns < total_pfns)
-
-It seems like the intent here is that the user effectively does:
-
-start_pfn += copied_pfns
-total_pfns -= copied_pfns
-page_size = page_size?
-
-But are they under any obligation to do so?
-
-Also same question above regarding data availability/life-cycle.  Is
-the vendor driver responsible for making the data available
-indefinitely?  Seems it's only released at the next iteration, or
-re-use of the data area for another operation, or clearing of the
-_SAVING state bit.
-
-> + * Sequence to be followed while _RESUMING device state:
-> + * While data for this device is available, repeat below steps:
-> + * a. read data_offset from where user application should write data.
-> + * b. write data of data_size to migration region from data_offset.
-> + * c. write data_size which indicates vendor driver that data is written in
-> + *    staging buffer.
-> + *
-> + * For user application, data is opaque. User should write data in the same
-> + * order as received.
-
-Additionally, implicit synchronization between _SAVING and _RESUMING
-ends within the vendor driver is assumed.
-
-Are there any assumptions we haven't covered with respect to mmaps?
-For instance, can the user setup mmaps at any time or only during
-certain device states?  Are there recommended best practices for users
-to only setup mmaps during _SAVING or _RESUMING?  If we had a revoke
-mechanism, it might be nice to use it when either of these bits are
-cleared.  Thanks,
-
-Alex
-
-> + */
-> +
-> +struct vfio_device_migration_info {
-> +        __u32 device_state;         /* VFIO device state */
-> +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
-> +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
-> +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
-> +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
-> +                                     VFIO_DEVICE_STATE_SAVING | \
-> +                                     VFIO_DEVICE_STATE_RESUMING)
-> +#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_SAVING | \
-> +                                     VFIO_DEVICE_STATE_RESUMING)
-> +        __u32 reserved;
-> +        __u64 pending_bytes;
-> +        __u64 data_offset;
-> +        __u64 data_size;
-> +        __u64 start_pfn;
-> +        __u64 page_size;
-> +        __u64 total_pfns;
-> +        __u64 copied_pfns;
-> +#define VFIO_DEVICE_DIRTY_PFNS_NONE     (0)
-> +#define VFIO_DEVICE_DIRTY_PFNS_ALL      (~0ULL)
-> +} __attribute__((packed));
-> +
->  /*
->   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
->   * which allows direct access to non-MSIX registers which happened to be within
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 0373c1322c..ca9915e5f0 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -50,147 +50,6 @@ schema requires the use of JSON numbers or null.
+ Comments are allowed; anything between an unquoted # and the following
+ newline is ignored.
+=20
+-A multi-line comment that starts and ends with a '##' line is a
+-documentation comment.  These are parsed by the documentation
+-generator, which recognizes certain markup detailed below.
+-
+-
+-=3D=3D=3D=3D Documentation markup =3D=3D=3D=3D
+-
+-Comment text starting with '=3D' is a section title:
+-
+-    # =3D Section title
+-
+-Double the '=3D' for a subsection title:
+-
+-    # =3D=3D Subsection title
+-
+-'|' denotes examples:
+-
+-    # | Text of the example, may span
+-    # | multiple lines
+-
+-'*' starts an itemized list:
+-
+-    # * First item, may span
+-    #   multiple lines
+-    # * Second item
+-
+-You can also use '-' instead of '*'.
+-
+-A decimal number followed by '.' starts a numbered list:
+-
+-    # 1. First item, may span
+-    #    multiple lines
+-    # 2. Second item
+-
+-The actual number doesn't matter.  You could even use '*' instead of
+-'2.' for the second item.
+-
+-Lists can't be nested.  Blank lines are currently not supported within
+-lists.
+-
+-Additional whitespace between the initial '#' and the comment text is
+-permitted.
+-
+-*foo* and _foo_ are for strong and emphasis styles respectively (they
+-do not work over multiple lines). @foo is used to reference a name in
+-the schema.
+-
+-Example:
+-
+-##
+-# =3D Section
+-# =3D=3D Subsection
+-#
+-# Some text foo with *strong* and _emphasis_
+-# 1. with a list
+-# 2. like that
+-#
+-# And some code:
+-# | $ echo foo
+-# | -> do this
+-# | <- get that
+-#
+-##
+-
+-
+-=3D=3D=3D=3D Expression documentation =3D=3D=3D=3D
+-
+-Expressions other than include and pragma directives may be preceded
+-by a documentation block.  Such blocks are called expression
+-documentation blocks.
+-
+-When documentation is required (see pragma 'doc-required'), expression
+-documentation blocks are mandatory.
+-
+-The documentation block consists of a first line naming the
+-expression, an optional overview, a description of each argument (for
+-commands and events) or member (for structs, unions and alternates),
+-and optional tagged sections.
+-
+-FIXME: the parser accepts these things in almost any order.
+-
+-Extensions added after the expression was first released carry a
+-'(since x.y.z)' comment.
+-
+-A tagged section starts with one of the following words:
+-"Note:"/"Notes:", "Since:", "Example"/"Examples", "Returns:", "TODO:".
+-The section ends with the start of a new section.
+-
+-A 'Since: x.y.z' tagged section lists the release that introduced the
+-expression.
+-
+-For example:
+-
+-##
+-# @BlockStats:
+-#
+-# Statistics of a virtual block device or a block backing device.
+-#
+-# @device: If the stats are for a virtual block device, the name
+-#          corresponding to the virtual block device.
+-#
+-# @node-name: The node name of the device. (since 2.3)
+-#
+-# ... more members ...
+-#
+-# Since: 0.14.0
+-##
+-{ 'struct': 'BlockStats',
+-  'data': {'*device': 'str', '*node-name': 'str',
+-           ... more members ... } }
+-
+-##
+-# @query-blockstats:
+-#
+-# Query the @BlockStats for all virtual block devices.
+-#
+-# @query-nodes: If true, the command will query all the
+-#               block nodes ... explain, explain ...  (since 2.3)
+-#
+-# Returns: A list of @BlockStats for each virtual block devices.
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "query-blockstats" }
+-# <- {
+-#      ... lots of output ...
+-#    }
+-#
+-##
+-{ 'command': 'query-blockstats',
+-  'data': { '*query-nodes': 'bool' },
+-  'returns': ['BlockStats'] }
+-
+-=3D=3D=3D=3D Free-form documentation =3D=3D=3D=3D
+-
+-A documentation block that isn't an expression documentation block is
+-a free-form documentation block.  These may be used to provide
+-additional text and structuring content.
+-
+=20
+ =3D=3D=3D Schema overview =3D=3D=3D
+=20
+@@ -217,42 +76,6 @@ refers to a single-dimension array of that type; mult=
+i-dimension
+ arrays are not directly supported (although an array of a complex
+ struct that contains an array member is possible).
+=20
+-All names must begin with a letter, and contain only ASCII letters,
+-digits, hyphen, and underscore.  There are two exceptions: enum values
+-may start with a digit, and names that are downstream extensions (see
+-section Downstream extensions) start with underscore.
+-
+-Names beginning with 'q_' are reserved for the generator, which uses
+-them for munging QMP names that resemble C keywords or other
+-problematic strings.  For example, a member named "default" in qapi
+-becomes "q_default" in the generated C code.
+-
+-Types, commands, and events share a common namespace.  Therefore,
+-generally speaking, type definitions should always use CamelCase for
+-user-defined type names, while built-in types are lowercase.
+-
+-Type names ending with 'Kind' or 'List' are reserved for the
+-generator, which uses them for implicit union enums and array types,
+-respectively.
+-
+-Command names, and member names within a type, should be all lower
+-case with words separated by a hyphen.  However, some existing older
+-commands and complex types use underscore; when extending such
+-expressions, consistency is preferred over blindly avoiding
+-underscore.
+-
+-Event names should be ALL_CAPS with words separated by underscore.
+-
+-Member names starting with 'has-' or 'has_' are reserved for the
+-generator, which uses them for tracking optional members.
+-
+-Any name (command, event, type, member, or enum value) beginning with
+-"x-" is marked experimental, and may be withdrawn or changed
+-incompatibly in a future release.
+-
+-Pragma 'name-case-whitelist' lets you violate the rules on use of
+-upper and lower case.  Use for new code is strongly discouraged.
+-
+ In the rest of this document, usage lines are given for each
+ expression type, with literal strings written in lower case and
+ placeholders written in capitals.  If a literal string includes a
+@@ -327,6 +150,43 @@ Pragma 'name-case-whitelist' takes a list of names t=
+hat may violate
+ rules on use of upper- vs. lower-case letters.  Default is none.
+=20
+=20
++=3D=3D=3D Enumeration types =3D=3D=3D
++
++Usage: { 'enum': STRING, 'data': ARRAY-OF-STRING }
++       { 'enum': STRING, '*prefix': STRING, 'data': ARRAY-OF-STRING }
++
++An enumeration type is a dictionary containing a single 'data' key
++whose value is a list of strings.  An example enumeration is:
++
++ { 'enum': 'MyEnum', 'data': [ 'value1', 'value2', 'value3' ] }
++
++The strings must be distinct.
++
++Nothing prevents an empty enumeration, although it is probably not
++useful.
++
++The enum constants will be named by using a heuristic to turn the
++type name into a set of underscore separated words. For the example
++above, 'MyEnum' will turn into 'MY_ENUM' giving a constant name
++of 'MY_ENUM_VALUE1' for the first value. If the default heuristic
++does not result in a desirable name, the optional 'prefix' member
++can be used when defining the enum.
++
++The enumeration values are passed as strings over the Client JSON
++Protocol, but are encoded as C enum integral values in generated code.
++While the C code starts numbering at 0, it is better to use explicit
++comparisons to enum values than implicit comparisons to 0; the C code
++will also include a generated enum member ending in _MAX for tracking
++the size of the enum, useful when using common functions for
++converting between strings and enum values.  Since the wire format
++always passes by name, it is acceptable to reorder or add new
++enumeration members in any location without breaking clients of Client
++JSON Protocol; however, removing enum values would break
++compatibility.  For any struct that has a member that will only contain
++a finite set of string values, using an enum type for that member is
++better than open-coding the member to be type 'str'.
++
++
+ =3D=3D=3D Struct types =3D=3D=3D
+=20
+ Usage: { 'struct': STRING, 'data': DICT, '*base': STRUCT-NAME }
+@@ -388,43 +248,6 @@ both members like this:
+    "backing": "/some/place/my-backing-file" }
+=20
+=20
+-=3D=3D=3D Enumeration types =3D=3D=3D
+-
+-Usage: { 'enum': STRING, 'data': ARRAY-OF-STRING }
+-       { 'enum': STRING, '*prefix': STRING, 'data': ARRAY-OF-STRING }
+-
+-An enumeration type is a dictionary containing a single 'data' key
+-whose value is a list of strings.  An example enumeration is:
+-
+- { 'enum': 'MyEnum', 'data': [ 'value1', 'value2', 'value3' ] }
+-
+-The strings must be distinct.
+-
+-Nothing prevents an empty enumeration, although it is probably not
+-useful.
+-
+-The enum constants will be named by using a heuristic to turn the
+-type name into a set of underscore separated words. For the example
+-above, 'MyEnum' will turn into 'MY_ENUM' giving a constant name
+-of 'MY_ENUM_VALUE1' for the first value. If the default heuristic
+-does not result in a desirable name, the optional 'prefix' member
+-can be used when defining the enum.
+-
+-The enumeration values are passed as strings over the Client JSON
+-Protocol, but are encoded as C enum integral values in generated code.
+-While the C code starts numbering at 0, it is better to use explicit
+-comparisons to enum values than implicit comparisons to 0; the C code
+-will also include a generated enum member ending in _MAX for tracking
+-the size of the enum, useful when using common functions for
+-converting between strings and enum values.  Since the wire format
+-always passes by name, it is acceptable to reorder or add new
+-enumeration members in any location without breaking clients of Client
+-JSON Protocol; however, removing enum values would break
+-compatibility.  For any struct that has a member that will only contain
+-a finite set of string values, using an enum type for that member is
+-better than open-coding the member to be type 'str'.
+-
+-
+ =3D=3D=3D Union types =3D=3D=3D
+=20
+ Usage: { 'union': STRING, 'data': DICT }
+@@ -744,6 +567,45 @@ This expanded form is necessary if you want to make =
+the feature
+ conditional (see below in "Configuring the schema").
+=20
+=20
++=3D=3D=3D Naming rules and reserved names =3D=3D=3D
++
++All names must begin with a letter, and contain only ASCII letters,
++digits, hyphen, and underscore.  There are two exceptions: enum values
++may start with a digit, and names that are downstream extensions (see
++section Downstream extensions) start with underscore.
++
++Names beginning with 'q_' are reserved for the generator, which uses
++them for munging QMP names that resemble C keywords or other
++problematic strings.  For example, a member named "default" in qapi
++becomes "q_default" in the generated C code.
++
++Types, commands, and events share a common namespace.  Therefore,
++generally speaking, type definitions should always use CamelCase for
++user-defined type names, while built-in types are lowercase.
++
++Type names ending with 'Kind' or 'List' are reserved for the
++generator, which uses them for implicit union enums and array types,
++respectively.
++
++Command names, and member names within a type, should be all lower
++case with words separated by a hyphen.  However, some existing older
++commands and complex types use underscore; when extending such
++expressions, consistency is preferred over blindly avoiding
++underscore.
++
++Event names should be ALL_CAPS with words separated by underscore.
++
++Member names starting with 'has-' or 'has_' are reserved for the
++generator, which uses them for tracking optional members.
++
++Any name (command, event, type, member, or enum value) beginning with
++"x-" is marked experimental, and may be withdrawn or changed
++incompatibly in a future release.
++
++Pragma 'name-case-whitelist' lets you violate the rules on use of
++upper and lower case.  Use for new code is strongly discouraged.
++
++
+ =3D=3D=3D Downstream extensions =3D=3D=3D
+=20
+ QAPI schema names that are externally visible, say in the Client JSON
+@@ -814,6 +676,150 @@ The presence of 'if' keys in the schema is reflecte=
+d through to the
+ introspection output depending on the build configuration.
+=20
+=20
++=3D=3D=3D Documentation comments =3D=3D=3D
++
++A multi-line comment that starts and ends with a '##' line is a
++documentation comment.  These are parsed by the documentation
++generator, which recognizes certain markup detailed below.
++
++
++=3D=3D=3D=3D Documentation markup =3D=3D=3D=3D
++
++Comment text starting with '=3D' is a section title:
++
++    # =3D Section title
++
++Double the '=3D' for a subsection title:
++
++    # =3D=3D Subsection title
++
++'|' denotes examples:
++
++    # | Text of the example, may span
++    # | multiple lines
++
++'*' starts an itemized list:
++
++    # * First item, may span
++    #   multiple lines
++    # * Second item
++
++You can also use '-' instead of '*'.
++
++A decimal number followed by '.' starts a numbered list:
++
++    # 1. First item, may span
++    #    multiple lines
++    # 2. Second item
++
++The actual number doesn't matter.  You could even use '*' instead of
++'2.' for the second item.
++
++Lists can't be nested.  Blank lines are currently not supported within
++lists.
++
++Additional whitespace between the initial '#' and the comment text is
++permitted.
++
++*foo* and _foo_ are for strong and emphasis styles respectively (they
++do not work over multiple lines).  @foo is used to reference a name in
++the schema.
++
++Example:
++
++##
++# =3D Section
++# =3D=3D Subsection
++#
++# Some text foo with *strong* and _emphasis_
++# 1. with a list
++# 2. like that
++#
++# And some code:
++# | $ echo foo
++# | -> do this
++# | <- get that
++#
++##
++
++
++=3D=3D=3D=3D Expression documentation =3D=3D=3D=3D
++
++Expressions other than include and pragma directives may be preceded
++by a documentation block.  Such blocks are called expression
++documentation blocks.
++
++When documentation is required (see pragma 'doc-required'), expression
++documentation blocks are mandatory.
++
++The documentation block consists of a first line naming the
++expression, an optional overview, a description of each argument (for
++commands and events) or member (for structs, unions and alternates),
++and optional tagged sections.
++
++FIXME: the parser accepts these things in almost any order.
++
++Extensions added after the expression was first released carry a
++'(since x.y.z)' comment.
++
++A tagged section starts with one of the following words:
++"Note:"/"Notes:", "Since:", "Example"/"Examples", "Returns:", "TODO:".
++The section ends with the start of a new section.
++
++A 'Since: x.y.z' tagged section lists the release that introduced the
++expression.
++
++For example:
++
++##
++# @BlockStats:
++#
++# Statistics of a virtual block device or a block backing device.
++#
++# @device: If the stats are for a virtual block device, the name
++#          corresponding to the virtual block device.
++#
++# @node-name: The node name of the device. (since 2.3)
++#
++# ... more members ...
++#
++# Since: 0.14.0
++##
++{ 'struct': 'BlockStats',
++  'data': {'*device': 'str', '*node-name': 'str',
++           ... more members ... } }
++
++##
++# @query-blockstats:
++#
++# Query the @BlockStats for all virtual block devices.
++#
++# @query-nodes: If true, the command will query all the
++#               block nodes ... explain, explain ...  (since 2.3)
++#
++# Returns: A list of @BlockStats for each virtual block devices.
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "query-blockstats" }
++# <- {
++#      ... lots of output ...
++#    }
++#
++##
++{ 'command': 'query-blockstats',
++  'data': { '*query-nodes': 'bool' },
++  'returns': ['BlockStats'] }
++
++=3D=3D=3D=3D Free-form documentation =3D=3D=3D=3D
++
++A documentation block that isn't an expression documentation block is
++a free-form documentation block.  These may be used to provide
++additional text and structuring content.
++
++
+ =3D=3D Client JSON Protocol introspection =3D=3D
+=20
+ Clients of a Client JSON Protocol commonly need to figure out what
+--=20
+2.21.0
 
 
