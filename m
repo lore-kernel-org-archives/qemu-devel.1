@@ -2,64 +2,95 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91BC6C3A5A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 02:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DDBC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 03:02:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D84220674
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 02:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D396E217F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 03:02:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="THNfhBDG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D84220674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qv3SPbjL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D396E217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2o5A-000183-IA
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 22:53:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43690)
+	id 1i2oE7-0002pW-34
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 23:02:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i2o1i-0005Cz-5y
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 22:49:40 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i2oD9-0002Nf-5b
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 23:01:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i2o1g-00073Z-TG
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 22:49:37 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:55925)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i2o1g-000700-66; Tue, 27 Aug 2019 22:49:36 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46J9F45HLnz9sN6; Wed, 28 Aug 2019 12:49:28 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1566960568;
- bh=rVWe3RaYZcno4etKutHxIkb/uQtL4gwqCtQe4h2S2xU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=THNfhBDGMgrHn8SQJUvJ8WoGauJ3z4WJURRfF3hQEwfhZagC5djgIf9QqvKS8P9DI
- bMv8XnfdMA1wYbzpd69muyrueBPQPwVlidbzd/xr4VndZepLURuhEkos6Uqkmpfp6C
- qpxzbF6BCp3Cwz9WeoPnSykTUGJ0re7UwhmRRzN8=
-Date: Wed, 28 Aug 2019 10:46:34 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <20190828004634.GB16825@umbus.fritz.box>
-References: <20190827065650.107319-1-aik@ozlabs.ru>
+ (envelope-from <richard.henderson@linaro.org>) id 1i2oD7-00037B-RO
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 23:01:27 -0400
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:41907)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i2oD7-0002zI-Fv
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 23:01:25 -0400
+Received: by mail-pf1-x42b.google.com with SMTP id 196so683901pfz.8
+ for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 20:01:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=vCVDjAbSsjSkZ3TeaYzenDdUXVRaFUtXG/QDVXsmvFo=;
+ b=qv3SPbjLfYnfjYvoakrAz/e9vdnEdZPjwLJfOh2TBB85qCy5rTa8Qs54RTX5vqCvko
+ cR8748uW4HjPEn37a3K8L+Bryd13W2tuEp7LEGfwpZhSB6IDYz+D0j4vjrpQvD9Ie0wP
+ wmL+Zdd3C+1T3TUEY4BiNKxDaupjsNXbZECjKyVlvWKz420KI3PWwl3ID4BfMrn2TF2P
+ 1ai3ZsF/VVXGuymnQ/vgGIimDBHV4dc30fjaIfbnd157GHE1tP3+gsGUSDCIYt+C9vun
+ SgQhR7Txno1eYGyIlnnXmSEs0jFywZ80YEkrchWOIwZV8inZQwx89Qx37VGaVkI7pr3c
+ f+Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vCVDjAbSsjSkZ3TeaYzenDdUXVRaFUtXG/QDVXsmvFo=;
+ b=XnKacK6KLEzFd8/39XkPq9CgMYXpTbdyuKiKaRIfN4AxvqH9tE5MdkaZAZW4v8AAE9
+ 6U3fCMR2vkDDabt2NQdoT2GPZ+NHBIE91gDHLjlZKF0iHUyRaGRYzOMcitlem6w072aI
+ AVSdi596PNeUdYtpSoqOvZ/2baJiJqmAo/41mydR8/TgZrA/kr9zQUw8qGZJkpZLQKfm
+ +AiJh5G69e6eLjTZkuovHMfsYi9WDyhnaxCKR4eTL79nyJJ9YpA9xQaNah2yfU2UjGkn
+ /iBZHYomoxZqxeYNsRy3jdHlWOTtjFV6Ty7OEOGgfb2X1kNHApfqG7uV6jBlUBa7LL3o
+ lDCA==
+X-Gm-Message-State: APjAAAWyG3DBny/9f+poHD50ezyL/m7ECjrXmvt9gFGUEmMKoxq6WJ4+
+ EYPSrwJqcOMKJ92Ecb1FPEnjTQ==
+X-Google-Smtp-Source: APXvYqzoRsIa4Ow+X6JcVOOMlRizyHyc941qD/WwEhyQ+ER/Y5tAYHx6g6djEfXMLIIKvl3qlpy+4w==
+X-Received: by 2002:a63:4042:: with SMTP id n63mr1450149pga.75.1566961280038; 
+ Tue, 27 Aug 2019 20:01:20 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id r3sm742928pfr.101.2019.08.27.20.01.18
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 27 Aug 2019 20:01:19 -0700 (PDT)
+To: Sandra Loosemore <sandra@codesourcery.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <81a8c0ca-c5fb-fc3d-cc7b-00c4da31d621@codesourcery.com>
+ <6ee9f4b4-39ff-f36a-9430-3e7a5de7a2de@linaro.org>
+ <49104914-988e-d446-6b38-3ff26b7da7fa@codesourcery.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <b9645a79-b331-b911-f51f-1352c8c5fa20@linaro.org>
+Date: Tue, 27 Aug 2019 20:01:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="1UWUbFP1cBYEclgG"
-Content-Disposition: inline
-In-Reply-To: <20190827065650.107319-1-aik@ozlabs.ru>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <49104914-988e-d446-6b38-3ff26b7da7fa@codesourcery.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] spapr: Render full FDT
- on ibm, client-architecture-support
+X-Received-From: 2607:f8b0:4864:20::42b
+Subject: Re: [Qemu-devel] libvhost-user: undefined reference to
+ MADV_NOHUGEPAGE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,71 +102,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 8/27/19 6:42 PM, Sandra Loosemore wrote:
+> Sorry if that was not clear.  The target is aarch64-none-elf with the provided
+> semihosting facilities in QEMU.  The host is x86_64-linux-gnu. We deliberately
+> link against a pretty old glibc sysroot (looks like version 2.11.1), but we did
+> that for last year's 3.0 release as well, and haven't made any other changes in
+> the configure options etc that we use to build QEMU for this target.
 
---1UWUbFP1cBYEclgG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Still not clear.
 
-On Tue, Aug 27, 2019 at 04:56:50PM +1000, Alexey Kardashevskiy wrote:
-> The following changes since commit d6bb8b27204eaa58f1da948b65454e3a598ab2=
-a4:
->=20
->   pseries: Update SLOF firmware image (2019-08-27 16:47:04 +1000)
->=20
-> are available in the Git repository at:
->=20
->   git@github.com:aik/qemu.git tags/qemu-slof-20190827
->=20
-> for you to fetch changes up to da9960a5aaa25d27c9798c3d94c7b4c2d8af31ac:
->=20
->   spapr: Render full FDT on ibm,client-architecture-support (2019-08-27 1=
-6:47:46 +1000)
->=20
-> ----------------------------------------------------------------
-> Alexey Kardashevskiy (1):
->       spapr: Render full FDT on ibm,client-architecture-support
->=20
->  hw/ppc/spapr.c | 90 +++++++---------------------------------------------=
-------
->  1 file changed, 10 insertions(+), 80 deletions(-)
->=20
->=20
-> *** Note: this is not for master, this is for pseries
->=20
+The combination "glibc" and "qemu semihosting" doesn't make sense.  The triplet
+"aarch64-none-elf" is a gcc thing and has no referent in qemu.
 
-Merged, thanks.
+Are you building qemu-system-aarch64 for x86_64-linux, using an old x86_64 sysroot?
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+In any case, glibc 2.11.1 is definitely out of support.  Even CentOS 6 used
+2.12 and we don't support that anymore either.  Of the current
+long-term-support distros, I believe the oldest version of glibc is CentOS 7
+with 2.17.
 
---1UWUbFP1cBYEclgG
-Content-Type: application/pgp-signature; name="signature.asc"
+As recently mentioned in
 
------BEGIN PGP SIGNATURE-----
+  https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg04514.html
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1lzukACgkQbDjKyiDZ
-s5KBFBAA1hlZVSB+SjMBhdz6vtXWUme305CMCDdEqHunI3po7BKzGNM5itL8AbCj
-QvoWcvLSGqpfdvvQNG1l3XQ3JpbBHjJj8R6DRGpoLunMrG3lF+JBCuIFTgSI0GiX
-l4Jba8kP/UDBrk3hSLxbrY5DUOMciW8c8zGD88FGDsdbOJG8YcSdcMuBdQylbvDW
-xNf2q4tGphqKvvhtBzStH0GGkyjAa7EISTYZE+xs3q33EhYOBLPkgw0QNllA417O
-Zo01Jki89mKRtttroFvyhG0hiiVNIYLMz4gWD/QlhmMMYtrcGMTi7HYV6tiRToDg
-31QEg9uOsh7jed4ynNl+bI9r9/OIHcNKWSzbzeKipmvKCu76WpasrxlWy4h25g4p
-kW2GqakB+/e3rSk4qNlQuN/BlGrbMsEr4wxUBw/Ta4A1K+CPkHi2hTbtpN+eBK/f
-Hc/F2GlLpVEJJ7o+1Kxm9TLryTIDTTD+aKLEJPOB8QEqcF3A3zD4x0Cex5D/7UHo
-URAu2vFJCic/eOc9w51DJDav65vrRCjmQWRC4i1Aj4t/l8B4V1jU+lmzM+x/aDkB
-UPqWz0mzChwUGXvRAE/QfLzj7j50DAd3JV1tyeL0P6gt+YglDIiy12E9Wa03RWU5
-ytgKgI8rxgyq0TPTSu6a0/Zh1rqWZYFJkBmq4SQzhH0dLo3ILXc=
-=SUQY
------END PGP SIGNATURE-----
+we may accept a small patch with a large comment, but there are no guarantees
+how long we will keep such workarounds.
 
---1UWUbFP1cBYEclgG--
+I encourage you to re-examine why you're carrying around a 10 year old glibc.
+
+
+r~
 
