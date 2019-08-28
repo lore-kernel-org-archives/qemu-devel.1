@@ -2,62 +2,66 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A2FC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F03A5C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33BCA214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:06:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33BCA214DA
+	by mail.kernel.org (Postfix) with ESMTPS id C687C20856
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:08:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C687C20856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2ttv-0006j7-Il
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 05:05:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37219)
+	id 1i2twh-0000Sk-Vz
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 05:08:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37934)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i2trb-0004pq-Pc
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:03:37 -0400
+ (envelope-from <kraxel@redhat.com>) id 1i2tvq-00084d-H2
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i2tra-0007MP-EJ
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:03:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48042)
+ (envelope-from <kraxel@redhat.com>) id 1i2tvp-0001N5-Fm
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:07:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49964)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i2trX-0007K5-GV; Wed, 28 Aug 2019 05:03:31 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i2tvp-0001MT-AW
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:07:57 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CF84E308123B;
- Wed, 28 Aug 2019 09:03:30 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0356860BEC;
- Wed, 28 Aug 2019 09:03:26 +0000 (UTC)
-Message-ID: <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 12:03:25 +0300
-In-Reply-To: <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
-References: <20190825071541.10389-1-mlevitsk@redhat.com>
- <20190825071541.10389-3-mlevitsk@redhat.com>
- <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ by mx1.redhat.com (Postfix) with ESMTPS id 935D01027012;
+ Wed, 28 Aug 2019 09:07:56 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-95.ams2.redhat.com
+ [10.36.116.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18FB060CC0;
+ Wed, 28 Aug 2019 09:07:54 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0DCEE1747D; Wed, 28 Aug 2019 11:07:53 +0200 (CEST)
+Date: Wed, 28 Aug 2019 11:07:53 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <20190828090753.ho2stm7ppzej4zcb@sirius.home.kraxel.org>
+References: <20190827192526.21780-1-laurent@vivier.eu>
+ <20190828061103.u4l4inomwfvbodtn@sirius.home.kraxel.org>
+ <79ea4476-f2ae-4b6f-1f65-48de3b0ffebd@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <79ea4476-f2ae-4b6f-1f65-48de3b0ffebd@vivier.eu>
+User-Agent: NeoMutt/20180716
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 28 Aug 2019 09:03:30 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Wed, 28 Aug 2019 09:07:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
+Subject: Re: [Qemu-devel] [RFC,Draft] ui: add an embedded Barrier client
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,167 +73,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2019-08-27 at 18:29 -0400, John Snow wrote:
-> 
-> On 8/25/19 3:15 AM, Maxim Levitsky wrote:
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  block/trace-events |  2 ++
-> >  2 files changed, 85 insertions(+)
+  Hi,
+
+> >> +        p = write_short(ib, p, 1920); /* width */
+> >> +        p = write_short(ib, p, 1080); /* height */
 > > 
-> > diff --git a/block/nvme.c b/block/nvme.c
-> > index f8bd11e19a..dd041f39c9 100644
-> > --- a/block/nvme.c
-> > +++ b/block/nvme.c
-> > @@ -112,6 +112,7 @@ typedef struct {
-> >      bool plugged;
-> >  
-> >      bool supports_write_zeros;
-> > +    bool supports_discard;
-> >  
-> >      CoMutex dma_map_lock;
-> >      CoQueue dma_flush_queue;
-> > @@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-> >  
-> >      oncs = le16_to_cpu(idctrl->oncs);
-> >      s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
-> > +    s->supports_discard = (oncs & NVME_ONCS_DSM) != 0;
-> 
-> Same comment -- checking !!(register & FIELD) is nicer than the
-> negative. (I'm actually not sure even the !! is needed, but it seems to
-> be a QEMU-ism and I've caught myself using it...)
-
-All right, no problem to use !!
-
-> 
-> Rest looks good to me on a skim, but I'm not very well-versed in NVME.
-Thanks!
-
-
-> 
-> >  
-> >      memset(resp, 0, 4096);
-> >  
-> > @@ -1153,6 +1155,86 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
-> >  }
-> >  
-> >  
-> > +static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-> > +                                         int64_t offset,
-> > +                                         int bytes)
-> > +{
-> > +    BDRVNVMeState *s = bs->opaque;
-> > +    NVMeQueuePair *ioq = s->queues[1];
-> > +    NVMeRequest *req;
-> > +    NvmeDsmRange *buf;
-> > +    QEMUIOVector local_qiov;
-> > +    int ret;
-> > +
-> > +    NvmeCmd cmd = {
-> > +        .opcode = NVME_CMD_DSM,
-> > +        .nsid = cpu_to_le32(s->nsid),
-> > +        .cdw10 = cpu_to_le32(0), /*number of ranges - 0 based*/
-> > +        .cdw11 = cpu_to_le32(1 << 2), /*deallocate bit*/
-> > +    };
-> > +
-> > +    NVMeCoData data = {
-> > +        .ctx = bdrv_get_aio_context(bs),
-> > +        .ret = -EINPROGRESS,
-> > +    };
-> > +
-> > +    if (!s->supports_discard) {
-> > +        return -ENOTSUP;
-> > +    }
-> > +
-> > +    assert(s->nr_queues > 1);
-> > +
-> > +    buf = qemu_try_blockalign0(bs, s->page_size);
-> > +    if (!buf) {
-> > +        return -ENOMEM;
-> > +    }
-> > +
-> > +    buf->nlb = cpu_to_le32(bytes >> s->blkshift);
-> > +    buf->slba = cpu_to_le64(offset >> s->blkshift);
-> > +    buf->cattr = 0;
-> > +
-> > +    qemu_iovec_init(&local_qiov, 1);
-> > +    qemu_iovec_add(&local_qiov, buf, 4096);
-> > +
-> > +    req = nvme_get_free_req(ioq);
-> > +    assert(req);
-> > +
-> > +    qemu_co_mutex_lock(&s->dma_map_lock);
-> > +    ret = nvme_cmd_map_qiov(bs, &cmd, req, &local_qiov);
-> > +    qemu_co_mutex_unlock(&s->dma_map_lock);
-> > +
-> > +    if (ret) {
-> > +        req->busy = false;
-> > +        goto out;
-> > +    }
-> > +
-> > +    trace_nvme_dsm(s, offset, bytes);
-> > +
-> > +    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
-> > +
-> > +    data.co = qemu_coroutine_self();
-> > +    while (data.ret == -EINPROGRESS) {
-> > +        qemu_coroutine_yield();
-> > +    }
-> > +
-> > +    qemu_co_mutex_lock(&s->dma_map_lock);
-> > +    ret = nvme_cmd_unmap_qiov(bs, &local_qiov);
-> > +    qemu_co_mutex_unlock(&s->dma_map_lock);
-> > +
-> > +    if (ret) {
-> > +        goto out;
-> > +    }
-> > +
-> > +    ret = data.ret;
-> > +    trace_nvme_dsm_done(s, offset, bytes, ret);
-> > +out:
-> > +    qemu_iovec_destroy(&local_qiov);
-> > +    qemu_vfree(buf);
-> > +    return ret;
-> > +
-> > +}
-> > +
-> > +
-> >  static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
-> >                                 BlockReopenQueue *queue, Error **errp)
-> >  {
-> > @@ -1259,6 +1341,7 @@ static BlockDriver bdrv_nvme = {
-> >      .bdrv_co_pwritev          = nvme_co_pwritev,
-> >  
-> >      .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
-> > +    .bdrv_co_pdiscard         = nvme_co_pdiscard,
-> >  
-> >      .bdrv_co_flush_to_disk    = nvme_co_flush,
-> >      .bdrv_reopen_prepare      = nvme_reopen_prepare,
-> > diff --git a/block/trace-events b/block/trace-events
-> > index 8209fbd0c7..7d1d48b502 100644
-> > --- a/block/trace-events
-> > +++ b/block/trace-events
-> > @@ -153,6 +153,8 @@ nvme_write_zeros(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p offs
-> >  nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
-> >  nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
-> >  nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
-> > +nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset %"PRId64" bytes %"PRId64""
-> > +nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p offset %"PRId64" bytes %"PRId64" ret %d"
-> >  nvme_dma_map_flush(void *s) "s %p"
-> >  nvme_free_req_queue_wait(void *q) "q %p"
-> >  nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
+> > Hmm.
 > > 
+> > This is the screen size I guess?  Which you don't know ...
+> > What this is used for?
+> > Should we maybe use INPUT_EVENT_ABS_MAX here?
+> > 
+> 
+> Yes, it's screen size but we can't use INPUT_EVENT_ABS_MAX.
+> 
+> In fact Barrier can manage more than 2 displays:
+> 
+>    0            x1           x2           x3
+> 
+> 0  +------------+------------+------------+---
+>    |            |            |            |
+>    |  localhost |    VM-1    |   VM-2     |
+>    |            |            |            |
+> y1 +------------+------------+------------+---
+>    |            |            |            |
+>    | remotehost |            |            |
+>    |            |            |            |
+> y2 +------------+------------+------------+---
+>    |            |            |            |
+> 
+> So Barrier will send events to localhost while x(mouse) is between 0 and
+> x1, to VM-1 while it is between x1 and x2, and to VM-2 between x2 and
+> x3. So we need to know the size of the display to have x2.
 
+Ok, I see.
 
-Best regards,
-	Maxim Levitsky
+> Normally when the barrier client runs into an OS it intercepts the
+> screen resizing information and send them to the server. In our case we
+> cannot (for instance if we use a vfio display)
+
+Yes, for the vfio case we can't (unless it is a vgpu).
+
+Otherwise looking up the DisplaySurface (via QemuConsole) and checking
+the size should work.  Not a priority given that vfio is probably the
+most interesting use case.
+
+How does barrier send input events to physical machines btw?
+
+> but I plan to add
+> properties to the input-barrier object to provide the information at
+> least statically.
+
+Makes sense.
+
+> The barrier server runs only on the machine with the mouse and the
+> keyboard. Other machines have normally the barrier client daemon to
+> inject the mouse and keyboard events in the OS.
+
+Ok.
+
+> I will try to add a keyboard remapping as we have with VNC because it
+> doesn't work well with my french keyboard (AZERTY). Or perhaps I can use
+> the "button" id instead of the keyid but I don't now how to map the
+> value to a qcode.
+
+Depends on how the button id is defined.  If it is one of the usual
+keycodes it should be easy and should work better than reverse mapping.
+
+cheers,
+  Gerd
 
 
