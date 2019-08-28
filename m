@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B01DC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D444C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:46:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 154FC208CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:46:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 154FC208CB
+	by mail.kernel.org (Postfix) with ESMTPS id 65576208CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:46:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65576208CB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i315j-0000Iw-Kr
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 12:46:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34742)
+	id 1i315n-0000L5-8w
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 12:46:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30n5-0007BN-89
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:25 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30mz-00076w-1D
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30mz-000835-28
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:21 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:55651 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30mx-00080B-60
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:16 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55328 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i30my-0007oq-Cz
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:16 -0400
+ id 1i30mw-0007mV-PA
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:15 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id C75961A22BF;
+ by mail.rt-rk.com (Postfix) with ESMTP id 6A7BC1A22BC;
  Wed, 28 Aug 2019 18:27:00 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 7FCD01A22D4;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 14A761A22A0;
  Wed, 28 Aug 2019 18:27:00 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 18:26:46 +0200
-Message-Id: <1567009614-12438-23-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 28 Aug 2019 18:26:37 +0200
+Message-Id: <1567009614-12438-14-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1567009614-12438-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1567009614-12438-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 22/30] target/mips: Clean up handling of CP0
- register 23
+Subject: [Qemu-devel] [PATCH v2 13/30] target/mips: Clean up handling of CP0
+ register 12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,246 +70,152 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up handling of CP0 register 23.
+Clean up handling of CP0 register 12.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |   6 +++
- target/mips/translate.c | 126 +++++++++++++++++++++++++++++++-----------------
- 2 files changed, 89 insertions(+), 43 deletions(-)
+ target/mips/cpu.h       |  3 +++
+ target/mips/translate.c | 32 ++++++++++++++++----------------
+ 2 files changed, 19 insertions(+), 16 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index f809759..19a1b78 100644
+index 42f3c77..ec7285d 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -407,6 +407,12 @@ typedef struct mips_def_t mips_def_t;
- /* CP0 Register 22 */
- /* CP0 Register 23 */
- #define CP0_REG23__DEBUG           0
-+#define CP0_REG23__TRACECONTROL    1
-+#define CP0_REG23__TRACECONTROL2   2
-+#define CP0_REG23__USERTRACEDATA1  3
-+#define CP0_REG23__TRACEIBPC       4
-+#define CP0_REG23__TRACEDBPC       5
-+#define CP0_REG23__DEBUG2          6
- /* CP0 Register 24 */
- #define CP0_REG24__DEPC            0
- /* CP0 Register 25 */
+@@ -352,6 +352,9 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG12__STATUS          0
+ #define CP0_REG12__INTCTL          1
+ #define CP0_REG12__SRSCTL          2
++#define CP0_REG12__SRSMAP          3
++#define CP0_REG12__VIEW_IPL        4
++#define CP0_REG12__SRSMAP2         5
+ #define CP0_REG12__GUESTCTL0       6
+ #define CP0_REG12__GTOFFSET        7
+ /* CP0 Register 13 */
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 8c560d8..0605721 100644
+index d92bb07..3240d25 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -7419,25 +7419,34 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -7225,21 +7225,21 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_23:
+     case CP0_REGISTER_12:
          switch (sel) {
 -        case 0:
-+        case CP0_REG23__DEBUG:
-             gen_helper_mfc0_debug(arg, cpu_env); /* EJTAG support */
-             register_name = "Debug";
++        case CP0_REG12__STATUS:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Status));
+             register_name = "Status";
              break;
 -        case 1:
--//            gen_helper_mfc0_tracecontrol(arg); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL:
-+            /* PDtrace support */
-+            /* gen_helper_mfc0_tracecontrol(arg);  */
-             register_name = "TraceControl";
-             goto cp0_unimplemented;
++        case CP0_REG12__INTCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_IntCtl));
+             register_name = "IntCtl";
+             break;
 -        case 2:
--//            gen_helper_mfc0_tracecontrol2(arg); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL2:
-+            /* PDtrace support */
-+            /* gen_helper_mfc0_tracecontrol2(arg); */
-             register_name = "TraceControl2";
-             goto cp0_unimplemented;
++        case CP0_REG12__SRSCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSCtl));
+             register_name = "SRSCtl";
+             break;
 -        case 3:
--//            gen_helper_mfc0_usertracedata(arg); /* PDtrace support */
--            register_name = "UserTraceData";
-+        case CP0_REG23__USERTRACEDATA1:
-+            /* PDtrace support */
-+            /* gen_helper_mfc0_usertracedata1(arg);*/
-+            register_name = "UserTraceData1";
-             goto cp0_unimplemented;
--        case 4:
--//            gen_helper_mfc0_tracebpc(arg); /* PDtrace support */
--            register_name = "TraceBPC";
-+        case CP0_REG23__TRACEIBPC:
-+            /* PDtrace support */
-+            /* gen_helper_mfc0_traceibpc(arg);     */
-+            register_name = "TraceIBPC";
-+            goto cp0_unimplemented;
-+        case CP0_REG23__TRACEDBPC:
-+            /* PDtrace support */
-+            /* gen_helper_mfc0_tracedbpc(arg);     */
-+            register_name = "TraceDBPC";
-             goto cp0_unimplemented;
-         default:
-             goto cp0_unimplemented;
-@@ -8158,38 +8167,49 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
++        case CP0_REG12__SRSMAP:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
+             register_name = "SRSMap";
+@@ -7946,7 +7946,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_23:
+     case CP0_REGISTER_12:
          switch (sel) {
 -        case 0:
-+        case CP0_REG23__DEBUG:
-             gen_helper_mtc0_debug(cpu_env, arg); /* EJTAG support */
++        case CP0_REG12__STATUS:
+             save_cpu_state(ctx, 1);
+             gen_helper_mtc0_status(cpu_env, arg);
              /* DISAS_STOP isn't good enough here, hflags may have changed. */
-             gen_save_pc(ctx->base.pc_next + 4);
+@@ -7954,21 +7954,21 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
              ctx->base.is_jmp = DISAS_EXIT;
-             register_name = "Debug";
+             register_name = "Status";
              break;
 -        case 1:
--//            gen_helper_mtc0_tracecontrol(cpu_env, arg); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_tracecontrol(cpu_env, arg);  */
-             register_name = "TraceControl";
++        case CP0_REG12__INTCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_helper_mtc0_intctl(cpu_env, arg);
              /* Stop translation as we may have switched the execution mode */
              ctx->base.is_jmp = DISAS_STOP;
-             goto cp0_unimplemented;
+             register_name = "IntCtl";
+             break;
 -        case 2:
--//            gen_helper_mtc0_tracecontrol2(cpu_env, arg); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL2:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_tracecontrol2(cpu_env, arg); */
-             register_name = "TraceControl2";
++        case CP0_REG12__SRSCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_helper_mtc0_srsctl(cpu_env, arg);
              /* Stop translation as we may have switched the execution mode */
              ctx->base.is_jmp = DISAS_STOP;
-             goto cp0_unimplemented;
+             register_name = "SRSCtl";
+             break;
 -        case 3:
-+        case CP0_REG23__USERTRACEDATA1:
++        case CP0_REG12__SRSMAP:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
              /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
--//            gen_helper_mtc0_usertracedata(cpu_env, arg); /* PDtrace support */
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_usertracedata1(cpu_env, arg);*/
-             register_name = "UserTraceData";
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             goto cp0_unimplemented;
--        case 4:
--//            gen_helper_mtc0_tracebpc(cpu_env, arg); /* PDtrace support */
-+        case CP0_REG23__TRACEIBPC:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_traceibpc(cpu_env, arg);     */
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
--            register_name = "TraceBPC";
-+            register_name = "TraceIBPC";
-+            goto cp0_unimplemented;
-+        case CP0_REG23__TRACEDBPC:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_tracedbpc(cpu_env, arg);     */
-+            /* Stop translation as we may have switched the execution mode */
-+            ctx->base.is_jmp = DISAS_STOP;
-+            register_name = "TraceDBPC";
-             goto cp0_unimplemented;
-         default:
-             goto cp0_unimplemented;
-@@ -8902,25 +8922,34 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -8714,21 +8714,21 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_23:
+     case CP0_REGISTER_12:
          switch (sel) {
 -        case 0:
-+        case CP0_REG23__DEBUG:
-             gen_helper_mfc0_debug(arg, cpu_env); /* EJTAG support */
-             register_name = "Debug";
++        case CP0_REG12__STATUS:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Status));
+             register_name = "Status";
              break;
 -        case 1:
--//            gen_helper_dmfc0_tracecontrol(arg, cpu_env); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL:
-+            /* PDtrace support */
-+            /* gen_helper_dmfc0_tracecontrol(arg, cpu_env);  */
-             register_name = "TraceControl";
-             goto cp0_unimplemented;
++        case CP0_REG12__INTCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_IntCtl));
+             register_name = "IntCtl";
+             break;
 -        case 2:
--//            gen_helper_dmfc0_tracecontrol2(arg, cpu_env); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL2:
-+            /* PDtrace support */
-+            /* gen_helper_dmfc0_tracecontrol2(arg, cpu_env); */
-             register_name = "TraceControl2";
-             goto cp0_unimplemented;
++        case CP0_REG12__SRSCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSCtl));
+             register_name = "SRSCtl";
+             break;
 -        case 3:
--//            gen_helper_dmfc0_usertracedata(arg, cpu_env); /* PDtrace support */
--            register_name = "UserTraceData";
-+        case CP0_REG23__USERTRACEDATA1:
-+            /* PDtrace support */
-+            /* gen_helper_dmfc0_usertracedata1(arg, cpu_env);*/
-+            register_name = "UserTraceData1";
-             goto cp0_unimplemented;
--        case 4:
--//            gen_helper_dmfc0_tracebpc(arg, cpu_env); /* PDtrace support */
--            register_name = "TraceBPC";
-+        case CP0_REG23__TRACEIBPC:
-+            /* PDtrace support */
-+            /* gen_helper_dmfc0_traceibpc(arg, cpu_env);     */
-+            register_name = "TraceIBPC";
-+            goto cp0_unimplemented;
-+        case CP0_REG23__TRACEDBPC:
-+            /* PDtrace support */
-+            /* gen_helper_dmfc0_tracedbpc(arg, cpu_env);     */
-+            register_name = "TraceDBPC";
-             goto cp0_unimplemented;
-         default:
-             goto cp0_unimplemented;
-@@ -9624,36 +9653,47 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
++        case CP0_REG12__SRSMAP:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
+             register_name = "SRSMap";
+@@ -9423,7 +9423,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_23:
+     case CP0_REGISTER_12:
          switch (sel) {
 -        case 0:
-+        case CP0_REG23__DEBUG:
-             gen_helper_mtc0_debug(cpu_env, arg); /* EJTAG support */
++        case CP0_REG12__STATUS:
+             save_cpu_state(ctx, 1);
+             gen_helper_mtc0_status(cpu_env, arg);
              /* DISAS_STOP isn't good enough here, hflags may have changed. */
-             gen_save_pc(ctx->base.pc_next + 4);
+@@ -9431,21 +9431,21 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
              ctx->base.is_jmp = DISAS_EXIT;
-             register_name = "Debug";
+             register_name = "Status";
              break;
 -        case 1:
--//            gen_helper_mtc0_tracecontrol(cpu_env, arg); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_tracecontrol(cpu_env, arg);  */
++        case CP0_REG12__INTCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_helper_mtc0_intctl(cpu_env, arg);
              /* Stop translation as we may have switched the execution mode */
              ctx->base.is_jmp = DISAS_STOP;
-             register_name = "TraceControl";
-             goto cp0_unimplemented;
+             register_name = "IntCtl";
+             break;
 -        case 2:
--//            gen_helper_mtc0_tracecontrol2(cpu_env, arg); /* PDtrace support */
-+        case CP0_REG23__TRACECONTROL2:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_tracecontrol2(cpu_env, arg); */
++        case CP0_REG12__SRSCTL:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_helper_mtc0_srsctl(cpu_env, arg);
              /* Stop translation as we may have switched the execution mode */
              ctx->base.is_jmp = DISAS_STOP;
-             register_name = "TraceControl2";
-             goto cp0_unimplemented;
+             register_name = "SRSCtl";
+             break;
 -        case 3:
--//            gen_helper_mtc0_usertracedata(cpu_env, arg); /* PDtrace support */
-+        case CP0_REG23__USERTRACEDATA1:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_usertracedata1(cpu_env, arg);*/
++        case CP0_REG12__SRSMAP:
+             check_insn(ctx, ISA_MIPS32R2);
+             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
              /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
--            register_name = "UserTraceData";
-+            register_name = "UserTraceData1";
-             goto cp0_unimplemented;
--        case 4:
--//            gen_helper_mtc0_tracebpc(cpu_env, arg); /* PDtrace support */
-+        case CP0_REG23__TRACEIBPC:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_traceibpc(cpu_env, arg);     */
-+            /* Stop translation as we may have switched the execution mode */
-+            ctx->base.is_jmp = DISAS_STOP;
-+            register_name = "TraceIBPC";
-+            goto cp0_unimplemented;
-+        case CP0_REG23__TRACEDBPC:
-+            /* PDtrace support */
-+            /* gen_helper_mtc0_tracedbpc(cpu_env, arg);     */
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
--            register_name = "TraceBPC";
-+            register_name = "TraceDBPC";
-             goto cp0_unimplemented;
-         default:
-             goto cp0_unimplemented;
 -- 
 2.7.4
 
