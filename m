@@ -2,63 +2,111 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 045F3C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:54:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F35BEC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:56:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA2C92070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:54:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA2C92070B
+	by mail.kernel.org (Postfix) with ESMTPS id C04972070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:56:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C04972070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34x6-0004ep-0G
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:54:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51885)
+	id 1i34zA-0005o4-19
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:56:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i34Wo-0003hC-2P
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:52 -0400
+ (envelope-from <david@redhat.com>) id 1i34ac-0007bT-NF
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i34Wk-0002oE-Jl
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41574)
+ (envelope-from <david@redhat.com>) id 1i34ab-00062L-EQ
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:30:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54430)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i34Wk-0002mx-9c
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:46 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1i34ab-00061q-75; Wed, 28 Aug 2019 16:30:45 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9609D10F23EA;
- Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DC7660BF7;
- Wed, 28 Aug 2019 20:26:44 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7E2D61165614; Wed, 28 Aug 2019 22:26:41 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 22:26:38 +0200
-Message-Id: <20190828202641.24752-7-armbru@redhat.com>
-In-Reply-To: <20190828202641.24752-1-armbru@redhat.com>
-References: <20190828202641.24752-1-armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 2C7A618C426B;
+ Wed, 28 Aug 2019 20:30:44 +0000 (UTC)
+Received: from [10.36.117.166] (ovpn-117-166.ams2.redhat.com [10.36.117.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 13EF31001959;
+ Wed, 28 Aug 2019 20:30:41 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190828111004.28013-1-david@redhat.com>
+ <20190828111004.28013-3-david@redhat.com>
+ <b9eb6e23-bcde-e987-048a-e174070d975c@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <c8402a95-7e09-481c-7aba-c9d425e5b71d@redhat.com>
+Date: Wed, 28 Aug 2019 22:30:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <b9eb6e23-bcde-e987-048a-e174070d975c@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.62]); Wed, 28 Aug 2019 20:30:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 6/9] docs/devel/qapi-code-gen: Reorder sections
- for readability
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] tcg: Factor out probe_write() logic
+ into probe_access()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,517 +118,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Section "QMP/Guest agent schema" starts with a brief introduction,
-then subsection "Comments", then subsection "Schema overview" (more
-elaborate introduction), and only then talks about schema entities
-like types, commands, and so forth.
+On 28.08.19 16:52, Richard Henderson wrote:
+> On 8/28/19 4:10 AM, David Hildenbrand wrote:
+>> +void *probe_access(CPUArchState *env, target_ulong addr, int size,
+>> +                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+>>  {
+>>      CPUState *cpu = env_cpu(env);
+>>      CPUClass *cc;
+>> +    int flags;
+>>  
+>>      g_assert(-(addr | TARGET_PAGE_MASK) >= size);
+>> +    g_assert(mmu_idx == MMU_USER_IDX);
+> 
+> We ignore mmu_idx pretty much everywhere else.
+> Why bother now?
 
-Subsection "Comments" is long and tiring: almost 500 words, mostly
-about doc comments.  Move the doc comment part to its own subsection
-"Documentation comments" at the very end of "QMP/Guest agent schema".
+Also true, I can drop this and simply use MMU_USER_IDX below.
 
-Subsection "Schema overview" explains naming rules at considerable
-length: 250 words.  Move this part to its own subsection "Naming rules
-and reserved names" right after the subsections on schema entities.
+-- 
 
-Subsection "Enumeration types" is wedged between "Struct types" and
-"Union types".  Move it before "Struct types".
+Thanks,
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- docs/devel/qapi-code-gen.txt | 434 ++++++++++++++++++-----------------
- 1 file changed, 220 insertions(+), 214 deletions(-)
-
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 0373c1322c..ca9915e5f0 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -50,147 +50,6 @@ schema requires the use of JSON numbers or null.
- Comments are allowed; anything between an unquoted # and the following
- newline is ignored.
-=20
--A multi-line comment that starts and ends with a '##' line is a
--documentation comment.  These are parsed by the documentation
--generator, which recognizes certain markup detailed below.
--
--
--=3D=3D=3D=3D Documentation markup =3D=3D=3D=3D
--
--Comment text starting with '=3D' is a section title:
--
--    # =3D Section title
--
--Double the '=3D' for a subsection title:
--
--    # =3D=3D Subsection title
--
--'|' denotes examples:
--
--    # | Text of the example, may span
--    # | multiple lines
--
--'*' starts an itemized list:
--
--    # * First item, may span
--    #   multiple lines
--    # * Second item
--
--You can also use '-' instead of '*'.
--
--A decimal number followed by '.' starts a numbered list:
--
--    # 1. First item, may span
--    #    multiple lines
--    # 2. Second item
--
--The actual number doesn't matter.  You could even use '*' instead of
--'2.' for the second item.
--
--Lists can't be nested.  Blank lines are currently not supported within
--lists.
--
--Additional whitespace between the initial '#' and the comment text is
--permitted.
--
--*foo* and _foo_ are for strong and emphasis styles respectively (they
--do not work over multiple lines). @foo is used to reference a name in
--the schema.
--
--Example:
--
--##
--# =3D Section
--# =3D=3D Subsection
--#
--# Some text foo with *strong* and _emphasis_
--# 1. with a list
--# 2. like that
--#
--# And some code:
--# | $ echo foo
--# | -> do this
--# | <- get that
--#
--##
--
--
--=3D=3D=3D=3D Expression documentation =3D=3D=3D=3D
--
--Expressions other than include and pragma directives may be preceded
--by a documentation block.  Such blocks are called expression
--documentation blocks.
--
--When documentation is required (see pragma 'doc-required'), expression
--documentation blocks are mandatory.
--
--The documentation block consists of a first line naming the
--expression, an optional overview, a description of each argument (for
--commands and events) or member (for structs, unions and alternates),
--and optional tagged sections.
--
--FIXME: the parser accepts these things in almost any order.
--
--Extensions added after the expression was first released carry a
--'(since x.y.z)' comment.
--
--A tagged section starts with one of the following words:
--"Note:"/"Notes:", "Since:", "Example"/"Examples", "Returns:", "TODO:".
--The section ends with the start of a new section.
--
--A 'Since: x.y.z' tagged section lists the release that introduced the
--expression.
--
--For example:
--
--##
--# @BlockStats:
--#
--# Statistics of a virtual block device or a block backing device.
--#
--# @device: If the stats are for a virtual block device, the name
--#          corresponding to the virtual block device.
--#
--# @node-name: The node name of the device. (since 2.3)
--#
--# ... more members ...
--#
--# Since: 0.14.0
--##
--{ 'struct': 'BlockStats',
--  'data': {'*device': 'str', '*node-name': 'str',
--           ... more members ... } }
--
--##
--# @query-blockstats:
--#
--# Query the @BlockStats for all virtual block devices.
--#
--# @query-nodes: If true, the command will query all the
--#               block nodes ... explain, explain ...  (since 2.3)
--#
--# Returns: A list of @BlockStats for each virtual block devices.
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "query-blockstats" }
--# <- {
--#      ... lots of output ...
--#    }
--#
--##
--{ 'command': 'query-blockstats',
--  'data': { '*query-nodes': 'bool' },
--  'returns': ['BlockStats'] }
--
--=3D=3D=3D=3D Free-form documentation =3D=3D=3D=3D
--
--A documentation block that isn't an expression documentation block is
--a free-form documentation block.  These may be used to provide
--additional text and structuring content.
--
-=20
- =3D=3D=3D Schema overview =3D=3D=3D
-=20
-@@ -217,42 +76,6 @@ refers to a single-dimension array of that type; mult=
-i-dimension
- arrays are not directly supported (although an array of a complex
- struct that contains an array member is possible).
-=20
--All names must begin with a letter, and contain only ASCII letters,
--digits, hyphen, and underscore.  There are two exceptions: enum values
--may start with a digit, and names that are downstream extensions (see
--section Downstream extensions) start with underscore.
--
--Names beginning with 'q_' are reserved for the generator, which uses
--them for munging QMP names that resemble C keywords or other
--problematic strings.  For example, a member named "default" in qapi
--becomes "q_default" in the generated C code.
--
--Types, commands, and events share a common namespace.  Therefore,
--generally speaking, type definitions should always use CamelCase for
--user-defined type names, while built-in types are lowercase.
--
--Type names ending with 'Kind' or 'List' are reserved for the
--generator, which uses them for implicit union enums and array types,
--respectively.
--
--Command names, and member names within a type, should be all lower
--case with words separated by a hyphen.  However, some existing older
--commands and complex types use underscore; when extending such
--expressions, consistency is preferred over blindly avoiding
--underscore.
--
--Event names should be ALL_CAPS with words separated by underscore.
--
--Member names starting with 'has-' or 'has_' are reserved for the
--generator, which uses them for tracking optional members.
--
--Any name (command, event, type, member, or enum value) beginning with
--"x-" is marked experimental, and may be withdrawn or changed
--incompatibly in a future release.
--
--Pragma 'name-case-whitelist' lets you violate the rules on use of
--upper and lower case.  Use for new code is strongly discouraged.
--
- In the rest of this document, usage lines are given for each
- expression type, with literal strings written in lower case and
- placeholders written in capitals.  If a literal string includes a
-@@ -327,6 +150,43 @@ Pragma 'name-case-whitelist' takes a list of names t=
-hat may violate
- rules on use of upper- vs. lower-case letters.  Default is none.
-=20
-=20
-+=3D=3D=3D Enumeration types =3D=3D=3D
-+
-+Usage: { 'enum': STRING, 'data': ARRAY-OF-STRING }
-+       { 'enum': STRING, '*prefix': STRING, 'data': ARRAY-OF-STRING }
-+
-+An enumeration type is a dictionary containing a single 'data' key
-+whose value is a list of strings.  An example enumeration is:
-+
-+ { 'enum': 'MyEnum', 'data': [ 'value1', 'value2', 'value3' ] }
-+
-+The strings must be distinct.
-+
-+Nothing prevents an empty enumeration, although it is probably not
-+useful.
-+
-+The enum constants will be named by using a heuristic to turn the
-+type name into a set of underscore separated words. For the example
-+above, 'MyEnum' will turn into 'MY_ENUM' giving a constant name
-+of 'MY_ENUM_VALUE1' for the first value. If the default heuristic
-+does not result in a desirable name, the optional 'prefix' member
-+can be used when defining the enum.
-+
-+The enumeration values are passed as strings over the Client JSON
-+Protocol, but are encoded as C enum integral values in generated code.
-+While the C code starts numbering at 0, it is better to use explicit
-+comparisons to enum values than implicit comparisons to 0; the C code
-+will also include a generated enum member ending in _MAX for tracking
-+the size of the enum, useful when using common functions for
-+converting between strings and enum values.  Since the wire format
-+always passes by name, it is acceptable to reorder or add new
-+enumeration members in any location without breaking clients of Client
-+JSON Protocol; however, removing enum values would break
-+compatibility.  For any struct that has a member that will only contain
-+a finite set of string values, using an enum type for that member is
-+better than open-coding the member to be type 'str'.
-+
-+
- =3D=3D=3D Struct types =3D=3D=3D
-=20
- Usage: { 'struct': STRING, 'data': DICT, '*base': STRUCT-NAME }
-@@ -388,43 +248,6 @@ both members like this:
-    "backing": "/some/place/my-backing-file" }
-=20
-=20
--=3D=3D=3D Enumeration types =3D=3D=3D
--
--Usage: { 'enum': STRING, 'data': ARRAY-OF-STRING }
--       { 'enum': STRING, '*prefix': STRING, 'data': ARRAY-OF-STRING }
--
--An enumeration type is a dictionary containing a single 'data' key
--whose value is a list of strings.  An example enumeration is:
--
-- { 'enum': 'MyEnum', 'data': [ 'value1', 'value2', 'value3' ] }
--
--The strings must be distinct.
--
--Nothing prevents an empty enumeration, although it is probably not
--useful.
--
--The enum constants will be named by using a heuristic to turn the
--type name into a set of underscore separated words. For the example
--above, 'MyEnum' will turn into 'MY_ENUM' giving a constant name
--of 'MY_ENUM_VALUE1' for the first value. If the default heuristic
--does not result in a desirable name, the optional 'prefix' member
--can be used when defining the enum.
--
--The enumeration values are passed as strings over the Client JSON
--Protocol, but are encoded as C enum integral values in generated code.
--While the C code starts numbering at 0, it is better to use explicit
--comparisons to enum values than implicit comparisons to 0; the C code
--will also include a generated enum member ending in _MAX for tracking
--the size of the enum, useful when using common functions for
--converting between strings and enum values.  Since the wire format
--always passes by name, it is acceptable to reorder or add new
--enumeration members in any location without breaking clients of Client
--JSON Protocol; however, removing enum values would break
--compatibility.  For any struct that has a member that will only contain
--a finite set of string values, using an enum type for that member is
--better than open-coding the member to be type 'str'.
--
--
- =3D=3D=3D Union types =3D=3D=3D
-=20
- Usage: { 'union': STRING, 'data': DICT }
-@@ -744,6 +567,45 @@ This expanded form is necessary if you want to make =
-the feature
- conditional (see below in "Configuring the schema").
-=20
-=20
-+=3D=3D=3D Naming rules and reserved names =3D=3D=3D
-+
-+All names must begin with a letter, and contain only ASCII letters,
-+digits, hyphen, and underscore.  There are two exceptions: enum values
-+may start with a digit, and names that are downstream extensions (see
-+section Downstream extensions) start with underscore.
-+
-+Names beginning with 'q_' are reserved for the generator, which uses
-+them for munging QMP names that resemble C keywords or other
-+problematic strings.  For example, a member named "default" in qapi
-+becomes "q_default" in the generated C code.
-+
-+Types, commands, and events share a common namespace.  Therefore,
-+generally speaking, type definitions should always use CamelCase for
-+user-defined type names, while built-in types are lowercase.
-+
-+Type names ending with 'Kind' or 'List' are reserved for the
-+generator, which uses them for implicit union enums and array types,
-+respectively.
-+
-+Command names, and member names within a type, should be all lower
-+case with words separated by a hyphen.  However, some existing older
-+commands and complex types use underscore; when extending such
-+expressions, consistency is preferred over blindly avoiding
-+underscore.
-+
-+Event names should be ALL_CAPS with words separated by underscore.
-+
-+Member names starting with 'has-' or 'has_' are reserved for the
-+generator, which uses them for tracking optional members.
-+
-+Any name (command, event, type, member, or enum value) beginning with
-+"x-" is marked experimental, and may be withdrawn or changed
-+incompatibly in a future release.
-+
-+Pragma 'name-case-whitelist' lets you violate the rules on use of
-+upper and lower case.  Use for new code is strongly discouraged.
-+
-+
- =3D=3D=3D Downstream extensions =3D=3D=3D
-=20
- QAPI schema names that are externally visible, say in the Client JSON
-@@ -814,6 +676,150 @@ The presence of 'if' keys in the schema is reflecte=
-d through to the
- introspection output depending on the build configuration.
-=20
-=20
-+=3D=3D=3D Documentation comments =3D=3D=3D
-+
-+A multi-line comment that starts and ends with a '##' line is a
-+documentation comment.  These are parsed by the documentation
-+generator, which recognizes certain markup detailed below.
-+
-+
-+=3D=3D=3D=3D Documentation markup =3D=3D=3D=3D
-+
-+Comment text starting with '=3D' is a section title:
-+
-+    # =3D Section title
-+
-+Double the '=3D' for a subsection title:
-+
-+    # =3D=3D Subsection title
-+
-+'|' denotes examples:
-+
-+    # | Text of the example, may span
-+    # | multiple lines
-+
-+'*' starts an itemized list:
-+
-+    # * First item, may span
-+    #   multiple lines
-+    # * Second item
-+
-+You can also use '-' instead of '*'.
-+
-+A decimal number followed by '.' starts a numbered list:
-+
-+    # 1. First item, may span
-+    #    multiple lines
-+    # 2. Second item
-+
-+The actual number doesn't matter.  You could even use '*' instead of
-+'2.' for the second item.
-+
-+Lists can't be nested.  Blank lines are currently not supported within
-+lists.
-+
-+Additional whitespace between the initial '#' and the comment text is
-+permitted.
-+
-+*foo* and _foo_ are for strong and emphasis styles respectively (they
-+do not work over multiple lines).  @foo is used to reference a name in
-+the schema.
-+
-+Example:
-+
-+##
-+# =3D Section
-+# =3D=3D Subsection
-+#
-+# Some text foo with *strong* and _emphasis_
-+# 1. with a list
-+# 2. like that
-+#
-+# And some code:
-+# | $ echo foo
-+# | -> do this
-+# | <- get that
-+#
-+##
-+
-+
-+=3D=3D=3D=3D Expression documentation =3D=3D=3D=3D
-+
-+Expressions other than include and pragma directives may be preceded
-+by a documentation block.  Such blocks are called expression
-+documentation blocks.
-+
-+When documentation is required (see pragma 'doc-required'), expression
-+documentation blocks are mandatory.
-+
-+The documentation block consists of a first line naming the
-+expression, an optional overview, a description of each argument (for
-+commands and events) or member (for structs, unions and alternates),
-+and optional tagged sections.
-+
-+FIXME: the parser accepts these things in almost any order.
-+
-+Extensions added after the expression was first released carry a
-+'(since x.y.z)' comment.
-+
-+A tagged section starts with one of the following words:
-+"Note:"/"Notes:", "Since:", "Example"/"Examples", "Returns:", "TODO:".
-+The section ends with the start of a new section.
-+
-+A 'Since: x.y.z' tagged section lists the release that introduced the
-+expression.
-+
-+For example:
-+
-+##
-+# @BlockStats:
-+#
-+# Statistics of a virtual block device or a block backing device.
-+#
-+# @device: If the stats are for a virtual block device, the name
-+#          corresponding to the virtual block device.
-+#
-+# @node-name: The node name of the device. (since 2.3)
-+#
-+# ... more members ...
-+#
-+# Since: 0.14.0
-+##
-+{ 'struct': 'BlockStats',
-+  'data': {'*device': 'str', '*node-name': 'str',
-+           ... more members ... } }
-+
-+##
-+# @query-blockstats:
-+#
-+# Query the @BlockStats for all virtual block devices.
-+#
-+# @query-nodes: If true, the command will query all the
-+#               block nodes ... explain, explain ...  (since 2.3)
-+#
-+# Returns: A list of @BlockStats for each virtual block devices.
-+#
-+# Since: 0.14.0
-+#
-+# Example:
-+#
-+# -> { "execute": "query-blockstats" }
-+# <- {
-+#      ... lots of output ...
-+#    }
-+#
-+##
-+{ 'command': 'query-blockstats',
-+  'data': { '*query-nodes': 'bool' },
-+  'returns': ['BlockStats'] }
-+
-+=3D=3D=3D=3D Free-form documentation =3D=3D=3D=3D
-+
-+A documentation block that isn't an expression documentation block is
-+a free-form documentation block.  These may be used to provide
-+additional text and structuring content.
-+
-+
- =3D=3D Client JSON Protocol introspection =3D=3D
-=20
- Clients of a Client JSON Protocol commonly need to figure out what
---=20
-2.21.0
-
+David / dhildenb
 
