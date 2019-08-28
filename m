@@ -2,80 +2,84 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51EAEC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED94C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 189FD20679
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:19:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDC5F20679
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gk+Hrn0/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 189FD20679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D0VYwNye"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDC5F20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i37DY-0005qI-Ri
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 19:19:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52272)
+	id 1i37Dd-0005u8-LP
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 19:19:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52285)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i37BQ-0004AK-De
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:16:57 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i37BR-0004AQ-Gy
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:16:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i37BP-0008F5-6M
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:16:56 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37505)
+ (envelope-from <richard.henderson@linaro.org>) id 1i37BQ-0008FV-Eo
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:16:57 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:41571)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i37BO-0008Ez-W8
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:16:55 -0400
-Received: by mail-pl1-x644.google.com with SMTP id bj8so660125plb.4
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 16:16:54 -0700 (PDT)
+ id 1i37BQ-0008FJ-9W
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:16:56 -0400
+Received: by mail-pg1-x543.google.com with SMTP id x15so506652pgg.8
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 16:16:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=+7ek5yyanNbWwpydzYMNQsQs/w7ABBrAnwWJJRR1ihI=;
- b=gk+Hrn0/DSkSUjCAwWyKbsq3I3Hqnk22PZOhzaYIMsulgu1TO7ueIRRAyyCziwdiwO
- DbPFqAkI6UtL+m95xqNNfouQV48lP6R09OIgprVAj2PhbidYrutVDLwnJnsqHUaPkmXc
- a0guKQYSoyU0T5yLtvGYYfLJuZp14hK/xAfSm0kCkGsA8qAZIOTp8fHE9kFKIrMTLhOJ
- 3u1wlhdbuMp/TQQ4J3vLlLeLZV97pXHYgeUgMICPkaTBXQFUmoCxi/XbT3qSC6R/d5yd
- cDEMGJPmeH4Fvj/tWt4Sx0yu/zjochh4gc+GcgSZXZb65nKXTfic5s/E45wwj2ZWbyqZ
- CWag==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=tDJarBQckpHfmmZQqSzy2ha1vD1pFwdD3YsUtk0RotI=;
+ b=D0VYwNye3al5GsUig7yHFzdRrwlPr/RYP7Wa3kgkSvxJq4NbC0cwOtBQOgRIvYJn7M
+ oNzT7HCtyEoCIX2JATPuONq9G2SRy5Q3SoH2et2++HU336Heg139AreD9x5hhRzmP0O5
+ Tau+9xYiPhFhzws4P7PpvHMuFf35Lw4dixeSTTlR3Fp4jBFvpRuFENVpWcjvurbdNpOs
+ pkffJsJpuv0tAFQ7ag3beAubHExhEX/kcczlB9PXI+pklvDZLKUQBwcG06A5yt/ewbAh
+ zxBqZli8bZOUNWBSmjyxMghsuayTDbNMneiCTNcmkPUCFSVip67nB3UwLtqk5HfBKx/1
+ Thrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=+7ek5yyanNbWwpydzYMNQsQs/w7ABBrAnwWJJRR1ihI=;
- b=KNLwM3xu+yO5po6792rxSnl9ItdAfxmREt0hjmITCR4dTslhqlNoqd2OlSfkbwy0f+
- sjJHCOlEzu1HMOapSaNyAdy+uu+MIPrI6lCl5rDGFWx2pSS9/bg1NJAxsyoTr0m4Ti1e
- VPyUXsI9F84ApwzgFsbXFcyDPPIWbgMhoMqRqpEazjVGBJDsE0JUeXAXm7qDw82wk0jY
- vN8YqDzV9uQ3Z1IqjPRuhSAypkNnYbrpt4gzoxTIBJovlI8zlEIrWJoI+ykSQjplOKgj
- GJUwKXh0TFUldjb4HsdzXISPZ1m8CB+TVn42XGp9Y5cIgCZXmLFn6/30GRWY3o2ZhYq3
- 6CEA==
-X-Gm-Message-State: APjAAAVKCJNmkoYLruIlM1xyovTQiRyJgQQv3mrtBqi6INkDZG0Xufl5
- mKXWhGWAeju1sZ4/AC+8l9iVhMw41Kg=
-X-Google-Smtp-Source: APXvYqyDx7q52s8Jjxx/b2vkwFPvQcMRB6bXDdIK3jVWjIEfsYU0ebLIZbYpuZqu2vvhErHbgc41/w==
-X-Received: by 2002:a17:902:4303:: with SMTP id
- i3mr7170334pld.30.1567034213584; 
- Wed, 28 Aug 2019 16:16:53 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=tDJarBQckpHfmmZQqSzy2ha1vD1pFwdD3YsUtk0RotI=;
+ b=rP5deIwUkTgyI40gIEbZxy7doU4Nkz9hWAjNvMb5H7TTy+ZLzSYYqa89DHxSL40WO5
+ gGzwJl1ejWp1tKUwFw0MoxTx12PZPg1sFZSW+uLLCrN6qGUV9h/ixEVjIPVEkY4Kj0km
+ Ittg8X2Il4L9Efqfu5smxnLFHqkOA43oJNFIGnIA1fLfSIgYWq0hGnJVvZkgr94VnwYG
+ j+Toi3UnClLXdcSdhHd/iHwXMf6PN48hTfr0of7KQ6GdNxRLbylSZynXmWcNbKt8UF25
+ IEh8I9pjyFodfZuc6cQ/Ixq9J4uObeK5WiR6r7kosRip4b56z+bzP7xQDI9OslJsKe4a
+ 7sQg==
+X-Gm-Message-State: APjAAAU6/zWf4fdstuG8BDuf3ykzn6OogufZ3iUuCsYDuRjk98Qq7tG+
+ Mt+5y1KF9fC43Y5KpmdpherXR5+A5Xc=
+X-Google-Smtp-Source: APXvYqyjPBW5QKcYAte+6fH6xVT0pSkbiENVKWqqMC/3taH4DQYDP5cwkVSsn/Nbohy2cT4qJcXonA==
+X-Received: by 2002:a65:5584:: with SMTP id j4mr5571598pgs.258.1567034214749; 
+ Wed, 28 Aug 2019 16:16:54 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id s5sm485197pfm.97.2019.08.28.16.16.52
+ by smtp.gmail.com with ESMTPSA id s5sm485197pfm.97.2019.08.28.16.16.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Aug 2019 16:16:52 -0700 (PDT)
+ Wed, 28 Aug 2019 16:16:54 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 16:16:43 -0700
-Message-Id: <20190828231651.17176-1-richard.henderson@linaro.org>
+Date: Wed, 28 Aug 2019 16:16:44 -0700
+Message-Id: <20190828231651.17176-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190828231651.17176-1-richard.henderson@linaro.org>
+References: <20190828231651.17176-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PATCH v2 0/8] exec: Cleanup watchpoints
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH v2 1/8] exec: Move user-only watchpoint stubs
+ inline
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,46 +96,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Changes from v1:
-  * Split out some minor fixes to separate patches.
-  * Reload tlb_addr2 after tlb_fill for page2 in patch 7.
+Let the user-only watchpoint stubs resolve to empty inline functions.
 
-Blurb from v1:
-As discussed with David earlier this week, the current implementation
-of watchpoints cannot work, at least reliably.  We are raising an
-exception out of the middle of the i/o access path which does not
-even attempt to unwind the guest cpu state, nor does it have the
-information required to do so.
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/hw/core/cpu.h | 23 +++++++++++++++++++++++
+ exec.c                | 26 ++------------------------
+ 2 files changed, 25 insertions(+), 24 deletions(-)
 
-This moves the implementation to the cputlb helpers.  This is a point
-at which we can and do raise exceptions properly.
-
-In addition, this fixes a bug in that unaligned stores were detecting
-watchpoints in the middle of the byte-by-byte operation, which means
-that we didn't signal the watchpoint early enough to avoid state change.
-
-
-r~
-
-
-David Hildenbrand (2):
-  exec: Factor out core logic of check_watchpoint()
-  tcg: Check for watchpoints in probe_write()
-
-Richard Henderson (6):
-  exec: Move user-only watchpoint stubs inline
-  cputlb: Fold TLB_RECHECK into TLB_INVALID_MASK
-  exec: Factor out cpu_watchpoint_address_matches
-  cputlb: Fix size operand for tlb_fill on unaligned store
-  cputlb: Remove double-alignment in store_helper
-  cputlb: Handle watchpoints via TLB_WATCHPOINT
-
- include/exec/cpu-all.h |   8 +-
- include/hw/core/cpu.h  |  37 +++++++++
- accel/tcg/cputlb.c     | 166 +++++++++++++++++++++++++---------------
- exec.c                 | 167 +++++++++--------------------------------
- 4 files changed, 179 insertions(+), 199 deletions(-)
-
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 77fca95a40..6de688059d 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -1070,12 +1070,35 @@ static inline bool cpu_breakpoint_test(CPUState *cpu, vaddr pc, int mask)
+     return false;
+ }
+ 
++#ifdef CONFIG_USER_ONLY
++static inline int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
++                                        int flags, CPUWatchpoint **watchpoint)
++{
++    return -ENOSYS;
++}
++
++static inline int cpu_watchpoint_remove(CPUState *cpu, vaddr addr,
++                                        vaddr len, int flags)
++{
++    return -ENOSYS;
++}
++
++static inline void cpu_watchpoint_remove_by_ref(CPUState *cpu,
++                                                CPUWatchpoint *wp)
++{
++}
++
++static inline void cpu_watchpoint_remove_all(CPUState *cpu, int mask)
++{
++}
++#else
+ int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
+                           int flags, CPUWatchpoint **watchpoint);
+ int cpu_watchpoint_remove(CPUState *cpu, vaddr addr,
+                           vaddr len, int flags);
+ void cpu_watchpoint_remove_by_ref(CPUState *cpu, CPUWatchpoint *watchpoint);
+ void cpu_watchpoint_remove_all(CPUState *cpu, int mask);
++#endif
+ 
+ /**
+  * cpu_get_address_space:
+diff --git a/exec.c b/exec.c
+index 53a15b7ad7..31fb75901f 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1062,28 +1062,7 @@ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+ }
+ #endif
+ 
+-#if defined(CONFIG_USER_ONLY)
+-void cpu_watchpoint_remove_all(CPUState *cpu, int mask)
+-
+-{
+-}
+-
+-int cpu_watchpoint_remove(CPUState *cpu, vaddr addr, vaddr len,
+-                          int flags)
+-{
+-    return -ENOSYS;
+-}
+-
+-void cpu_watchpoint_remove_by_ref(CPUState *cpu, CPUWatchpoint *watchpoint)
+-{
+-}
+-
+-int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
+-                          int flags, CPUWatchpoint **watchpoint)
+-{
+-    return -ENOSYS;
+-}
+-#else
++#ifndef CONFIG_USER_ONLY
+ /* Add a watchpoint.  */
+ int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
+                           int flags, CPUWatchpoint **watchpoint)
+@@ -1173,8 +1152,7 @@ static inline bool cpu_watchpoint_address_matches(CPUWatchpoint *wp,
+ 
+     return !(addr > wpend || wp->vaddr > addrend);
+ }
+-
+-#endif
++#endif /* !CONFIG_USER_ONLY */
+ 
+ /* Add a breakpoint.  */
+ int cpu_breakpoint_insert(CPUState *cpu, vaddr pc, int flags,
 -- 
 2.17.1
 
