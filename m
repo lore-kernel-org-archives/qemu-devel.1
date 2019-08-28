@@ -2,72 +2,67 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AC1C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 05:16:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 649D8C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 05:59:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41C20217F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 05:16:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41C20217F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2CCEE2189D
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 05:59:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="X+S/N+KY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CCEE2189D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2qK3-0007EW-FM
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 01:16:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33811)
+	id 1i2qzJ-0003fy-5o
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 01:59:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38435)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Sandra_Loosemore@mentor.com>) id 1i2qJL-0006nA-NP
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 01:16:00 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i2qxz-0003ES-7Q
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 01:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Sandra_Loosemore@mentor.com>) id 1i2qJJ-00008Z-PN
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 01:15:58 -0400
-Received: from esa4.mentor.iphmx.com ([68.232.137.252]:17811)
+ (envelope-from <dgibson@ozlabs.org>) id 1i2qxx-0007hg-Iw
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 01:57:58 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:55803)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Sandra_Loosemore@mentor.com>)
- id 1i2qJJ-00006p-Gz
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 01:15:57 -0400
-IronPort-SDR: nJ7Wwcb+78h+HxF4zxjInkfHSWbyl78gNC9/uV3FsQ9OQR1Xg4oB97K/6+jYQiPF2jPbIZ83Pe
- PuxfUEZLfoG3qEixWLqD3u+z9hkwVt8FPA8YlrgYkkZPeqW9WbNNFLUWpYs7CryraLFsyyU6a4
- XR91Xe1l+U2yKXrGXZLzLbs/6AwBxhShTMUT54MgxRsBe3uKFL2pYENf7HY1/Qh2FlVUxa7kYZ
- Hy7AWVSb2T51MfDiE22qE3C3eXoYmb93hZlBoyLHV/fKO0g0ViXIxs5ljTwJJvSvpBdLENwotp
- WiM=
-X-IronPort-AV: E=Sophos;i="5.64,440,1559548800"; d="scan'208";a="40831204"
-Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
- by esa4.mentor.iphmx.com with ESMTP; 27 Aug 2019 21:15:54 -0800
-IronPort-SDR: FMzxC+/np1aeW9NWtEbh1mvk2yKVyKNh1826czTV/slb2Y7a7oSoqkyLR72+vf12cm4ZZ8Fdc6
- c+/gLLmKwy23KgmXg159wppFmViNE+wRIAmehxPmlYDpFur5lPxpMb8EHqaI7S7fQWUVZyoe0I
- uwIPi1zFfEYZdEEboTFDfSUP0IENkg5SZ/17QI82cdEUB6A2J56WKXZLcNr15WbZq3m0UOYVwL
- 9uLxTaI3XtHgNRdhQ1LXCxUn6IeMy1ogIEKcIRaDB7DXcXzRJ1C238jKmLBTackgrQKDOS2KH4
- tDo=
-To: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers
- <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
-References: <81a8c0ca-c5fb-fc3d-cc7b-00c4da31d621@codesourcery.com>
- <6ee9f4b4-39ff-f36a-9430-3e7a5de7a2de@linaro.org>
- <49104914-988e-d446-6b38-3ff26b7da7fa@codesourcery.com>
- <b9645a79-b331-b911-f51f-1352c8c5fa20@linaro.org>
-From: Sandra Loosemore <sandra@codesourcery.com>
-Message-ID: <0ded5548-7798-3cd5-6192-f54dd42c32ee@codesourcery.com>
-Date: Tue, 27 Aug 2019 23:15:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1i2qxt-0007eN-Qr; Wed, 28 Aug 2019 01:57:57 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46JFQM2DXNz9sNF; Wed, 28 Aug 2019 15:57:47 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1566971867;
+ bh=XMr7wF/kTBNuE9Ze9uqimQetmhXcP1E9XfkaZhZQFS8=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=X+S/N+KYcbwfX890pf58He5vw5NdvHhzT7PVe7l1WTmcC2zbkdqS4gRmYqVh9X5Yl
+ 42tiYLh8qcekJlxh7vumvCF1czyp+HgBLb/oJBtLOi9O3XzCrzLQz3hCctMQt/IkaE
+ 4Bi5X2hTxmAxfdfN5flVHsRwwHi1jNu37QYKHkXg=
+Date: Wed, 28 Aug 2019 15:57:40 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <20190828055740.GG16825@umbus.fritz.box>
+References: <20190827065650.107319-1-aik@ozlabs.ru>
+ <20190828004634.GB16825@umbus.fritz.box>
+ <20190828021237.GD16825@umbus.fritz.box>
+ <2ee9df47-1536-f2e3-9892-b4868ec359c2@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <b9645a79-b331-b911-f51f-1352c8c5fa20@linaro.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: svr-orw-mbx-03.mgc.mentorg.com (147.34.90.203) To
- svr-orw-mbx-03.mgc.mentorg.com (147.34.90.203)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 68.232.137.252
-Subject: Re: [Qemu-devel] libvhost-user: undefined reference to
- MADV_NOHUGEPAGE
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="fCcDWlUEdh43YKr8"
+Content-Disposition: inline
+In-Reply-To: <2ee9df47-1536-f2e3-9892-b4868ec359c2@ozlabs.ru>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] spapr: Render full FDT
+ on ibm, client-architecture-support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,54 +74,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/27/19 9:01 PM, Richard Henderson wrote:
-> On 8/27/19 6:42 PM, Sandra Loosemore wrote:
->> Sorry if that was not clear.  The target is aarch64-none-elf with the provided
->> semihosting facilities in QEMU.  The host is x86_64-linux-gnu. We deliberately
->> link against a pretty old glibc sysroot (looks like version 2.11.1), but we did
->> that for last year's 3.0 release as well, and haven't made any other changes in
->> the configure options etc that we use to build QEMU for this target.
-> 
-> Still not clear.
-> 
-> The combination "glibc" and "qemu semihosting" doesn't make sense.  The triplet
-> "aarch64-none-elf" is a gcc thing and has no referent in qemu.
-> 
-> Are you building qemu-system-aarch64 for x86_64-linux, using an old x86_64 sysroot?
 
-Yes.  We only use this configuration of QEMU as an instruction-set 
-simulator so that we can test cross-compilers and gdb for bare-metal 
-aarch64-none-elf target, using newlib as the target C library and the 
-GDB semihosting support in QEMU for low-level fileio primitives.
+--fCcDWlUEdh43YKr8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-BTW, I did not run into this undefined-symbol error when building the 
-equivalent configuration for bare-metal nios2-elf target with the same 
-sysroot and host setup.  That target does not build libvhost-user at all.
+On Wed, Aug 28, 2019 at 01:27:35PM +1000, Alexey Kardashevskiy wrote:
+>=20
+>=20
+> On 28/08/2019 12:12, David Gibson wrote:
+> > On Wed, Aug 28, 2019 at 10:46:34AM +1000, David Gibson wrote:
+> > > On Tue, Aug 27, 2019 at 04:56:50PM +1000, Alexey Kardashevskiy wrote:
+> > > > The following changes since commit d6bb8b27204eaa58f1da948b65454e3a=
+598ab2a4:
+> > > >=20
+> > > >    pseries: Update SLOF firmware image (2019-08-27 16:47:04 +1000)
+> > > >=20
+> > > > are available in the Git repository at:
+> > > >=20
+> > > >    git@github.com:aik/qemu.git tags/qemu-slof-20190827
+> > > >=20
+> > > > for you to fetch changes up to da9960a5aaa25d27c9798c3d94c7b4c2d8af=
+31ac:
+> > > >=20
+> > > >    spapr: Render full FDT on ibm,client-architecture-support (2019-=
+08-27 16:47:46 +1000)
+> > > >=20
+> > > > ----------------------------------------------------------------
+> > > > Alexey Kardashevskiy (1):
+> > > >        spapr: Render full FDT on ibm,client-architecture-support
+> > > >=20
+> > > >   hw/ppc/spapr.c | 90 +++++++--------------------------------------=
+-------------
+> > > >   1 file changed, 10 insertions(+), 80 deletions(-)
+> > > >=20
+> > > >=20
+> > > > *** Note: this is not for master, this is for pseries
+> > > >=20
+> > >=20
+> > > Merged, thanks.
+> >=20
+> > Urgh.  And the qemu change is now un-merged.  Alas, as soon as we had
+> > a CAS reboot for XIVE the guest didn't boot on the second attempt.
+> > Haven't had a chance to investigate yet.
+>=20
+> QEMU command line, guest kernel version? I'd give it a try.
 
-> In any case, glibc 2.11.1 is definitely out of support.  Even CentOS 6 used
-> 2.12 and we don't support that anymore either.  Of the current
-> long-term-support distros, I believe the oldest version of glibc is CentOS 7
-> with 2.17.
-> 
-> As recently mentioned in
-> 
->    https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg04514.html
-> 
-> we may accept a small patch with a large comment, but there are no guarantees
-> how long we will keep such workarounds.
+RHEL8.1 in guest and host, booting via GRUB into a XIVE capable
+kernel.
 
-I wouldn't mind just applying a local patch to fix the build.  What I'm 
-really trying to do is just get help in understanding what broke this, 
-so I can come up with such a patch to un-break it again.
+I've now been able to investigate, dumping the dtb at H_UPDATE_DT
+time.  Comparing before and after the fully-render-dt change, I get:
 
-> I encourage you to re-examine why you're carrying around a 10 year old glibc.
+@@ -24,13 +24,13 @@
+        };
+=20
+        chosen {
+-               bootargs =3D "BOOT_IMAGE=3D/vmlinuz-4.18.0-137.el8.ppc64le =
+root=3D/dev/mapper/rhel-root ro crashkernel=3Dauto rd.lvm.lv=3Drhel/root rd=
+=2Elvm.lv=3Drhel/swap";
++               bootargs =3D [00];
+                bootpath =3D "/pci@800000020000000/scsi@0";
+                cpu =3D <0xe45ee80>;
+                ibm,arch-vec-5-platform-support =3D <0x17801880 0x19001a40>;
+                ibm,architecture-vec-5 =3D [19 00 20 00 00 80 05 00 00 00 0=
+0 00 00 00 00 00 00 00 00 00 00 00 80 40 40 00 40];
+-               linux,initrd-end =3D <0x00 0x588ed7d>;
+-               linux,initrd-start =3D <0x00 0x3c00000>;
++               linux,initrd-end =3D <0x00>;
++               linux,initrd-start =3D <0x00>;
+                linux,pci-probe-only =3D <0x00>;
+                linux,stdout-package =3D <0xe733a70>;
+                linux,stdout-path =3D "/vdevice/vty@71000001";
+@@ -252,7 +252,7 @@
+                used-by-rtas;
+=20
+                ethernet@1 {
+-                       assigned-addresses =3D <0x82000830 0x00 0x80040000 =
+0x00 0x40000 0x81000810 0x00 0x100 0x00 0x20 0x82000814 0x00 0x80010000 0x0=
+0 0x1000 0xc3000820 0x2100 0x10000 0x00 0x4000>;
++                       assigned-addresses;
+                        cache-line-size =3D <0x00>;
+                        class-code =3D <0x20000>;
+                        device-id =3D <0x1000>;
+@@ -274,7 +274,7 @@
+                };
+=20
+                scsi@0 {
+-                       assigned-addresses =3D <0x81000010 0x00 0x80 0x00 0=
+x80 0x82000014 0x00 0x80000000 0x00 0x1000 0xc3000020 0x2100 0x00 0x00 0x40=
+00>;
++                       assigned-addresses;
+                        cache-line-size =3D <0x00>;
+                        class-code =3D <0x10000>;
+                        device-id =3D <0x1001>;
 
-We update our host build environment infrequently, and we've still had 
-customers requiring CentOS 6 support until quite recently.
+So basically the bootargs, initrd params and assigned-addresses have
+been lost.
 
--Sandra
+For bootargs and initrd, I think what's happening is that because qemu
+isn't setting those (with no -kernel parameter) SLOF is creating them,
+but they're now being overwritten by qemu's post-CAS DT.
+
+I'm not sure what's going on with assigned-addresses.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--fCcDWlUEdh43YKr8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1mF9EACgkQbDjKyiDZ
+s5JpNg//WlmTr01DWnIAom4aUAjcSAl8Z6x0+hdqUw+3w34CFXj94kconEfkIBQE
+vGIfjwbQZdJMawD7Cx78zol6VV/wA0FGVzk6tndmatffox/0fdl3fsbKKc12dqgf
+UykHV3VyTJuaNUpn/qkbv//PreqP/zdqRCOBi85vTmzODB1cfZSm1iC3mxzSa2yV
+eDJvDa1Y/d14B0WSI/AXAc/p82xnPSecZDPk285AUYGM2qNcBZFTKFe2bnojYvmT
+WYQUFtQq1wz5TFEodGF15+I6aFgtkQQ/tsUFDSj6FfJ8wM2F28nH+2nu2nNUg8tE
+ssTzjZQzmOiff1wputopLQbLOMEtono7J+Bt88TIkQwYoKuletOExC79ZC/xWQx4
+LDGq85pYGm1vVIBlY+H29VTS80NvkvqwVopcdLF9/xjCcEUDsEpuzyOqR/AP3S+h
+OnNkQMAceUMZQwv+EaYHVI8sqSon89pp1CHpWLZRl0svGWpT2KQyNVI6ETqyShmN
+kpDVUgbtHReZ8rysH0YZVkbjGiqm8wDDjQ9lOIFf4ffnFBXb8Kt1kxEZSvoSng6e
+lfYWgAFdnUO0OzIvZNOB7Ft1ubADhXP5hWZm80QCFY/aoXvA/SrwhPbIlbfCLEft
+VIaEh9qoz6tfrFMiUzko2ajUj8f9N2INESiP0YjROGEia3UnDBs=
+=7KlS
+-----END PGP SIGNATURE-----
+
+--fCcDWlUEdh43YKr8--
 
