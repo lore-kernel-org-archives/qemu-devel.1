@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B56AC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF77FC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24AFA208C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89B21208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YVuwxS6X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24AFA208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MRDdq8v/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89B21208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i33WT-0002OB-UV
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 15:22:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37982)
+	id 1i33Wq-0002hk-9i
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 15:22:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37563)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i33GF-0003fK-RK
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:43 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i33Fs-00038Z-1O
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i33GD-0000Em-5B
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:39 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36093)
+ (envelope-from <richard.henderson@linaro.org>) id 1i33Fo-0008I6-Ol
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:15 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35413)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i33GC-0000E3-CF
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:36 -0400
-Received: by mail-pf1-x443.google.com with SMTP id w2so399214pfi.3
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:05:36 -0700 (PDT)
+ id 1i33Fn-0008FN-Qz
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:12 -0400
+Received: by mail-pg1-x541.google.com with SMTP id n4so231310pgv.2
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=LP98tMkuEY1Am6pgEun6YWYPwcU15PtWb8SPF+FrpSw=;
- b=YVuwxS6X4hRvLJ7uZxos4XDF5x3AYjKrLl+zni7Bcc5SaiwVv0Wh0C2l+YOHf3F3o1
- dI+kPad05p7rPWoEnCQoyywZblETJZnGjSCwu6K9NmaG/LXy5CXvsbz/kQ2jt6AoLLk0
- dlbLYW6+/Im6hnA0xPa1UFqDaOyHyV8Vvj2w8tEB1Ljs00gjU3vyb62IC+rlTdHhM66G
- MKcDYSh+c9tlAflv/wcyvdoR1vo7TgSiUQlo5GpJfFx9alJTDtzpcbXRK0KFZqWsqrHN
- zlZfT7tUT1tjJ/p5K0Y7tLCmwnLNUmhPdlmPN/zP81zwXUl4Z7qmNIgkp9u3zFOuyHMg
- 8xEA==
+ bh=ry+lSTRq65PFYdHQdRgdWT07MSGGQsMfz5o03ct2Dk0=;
+ b=MRDdq8v/UL5afQxMK7wydPmMSWqK1qu6cyaDAPacQcZW74vU1s25iNKUp/D5xxtVuy
+ NEbt+Nw7rK9WdWlhwhNozd3OghCwf/8RNgIt3cFKKzvnuro1T99DDWnQ+NYcZHWaZxc/
+ OlfWkvpxDFM2mMasM5Ishd8TbkqHIcFWGNJwIRx17DEKkp+SCsy3oa/5wD3nBujPaAca
+ D2WnJeSWdpoCN9A2GbnnIsITzT88/hZ2L7q+NJ/YK04yPHs4XCTbQVyaOl5PblmWcqSZ
+ IIjJf/HUCCpsr+K6PGVMTE7Qry4eyPnKd9o0uvKd6t1Ev5ICO/lfbCjHsCb9+8j26Xj3
+ 9PQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=LP98tMkuEY1Am6pgEun6YWYPwcU15PtWb8SPF+FrpSw=;
- b=iK8Xy7IX0A94y1kOI7Y5z58x1lGvBkscjQXqOIOTl8yEmXOV1IN/iU3okUpaTGpIbb
- JiT0PtYwnQxz0eIosKWm7avYzOV0QP7VBWqKvC8vswl9bpVErC4eowac3bSuBYtEtMCj
- kIX3rOaO5cAZQqnmrPB12M14razjrER/RWVPdL4vCqtGX25rWkc1ey1aY9HsZ9Pg0Yyl
- U2hKbzH8PYmhWH3h98UQS0ZQNBQNWv7iMmYeBETPVQsd8aZLxSdizuBWZuNxjkN9ltpz
- xQuYwAKued/h377bSNDyOr1zFYKZXOC85UMb+OhCOEI3Ep7JdP+tKQ7fiRiX/WkxXgbD
- +HDQ==
-X-Gm-Message-State: APjAAAV6UN7IsUgwtqOee6lzMg2WrLxUCQe71hEk6Cw1s9/PJafYSFwV
- ywmJgpGEKHfi//h1nHG79B6Sy1fqlv0=
-X-Google-Smtp-Source: APXvYqxGORjZMHIKz4PfdxZip1QpVvU9FdBfNMPHIXyKsgjbhEDBPXnOYukL4xZwzlNbkg+Qpfai8A==
-X-Received: by 2002:a17:90a:7783:: with SMTP id
- v3mr5583940pjk.109.1567019134967; 
- Wed, 28 Aug 2019 12:05:34 -0700 (PDT)
+ bh=ry+lSTRq65PFYdHQdRgdWT07MSGGQsMfz5o03ct2Dk0=;
+ b=pD7FzZUKriFo1THa2u2Gm+ddneS1RTtlBsH+FZ5oJkHk/ozATn8RHDVviurHqlXmiA
+ EHms3gSyGSZj2NVvw7PpoE20VrS+GFjstzDwuMSRzJ3eZKQ6cI9ggwJl2qAVJxGlXRQj
+ r5j4Zr3Wrl3kA+k4tgN5RU0VYf+eUMb5k43i7gU7Ge3ZTxIyitlfI+FEGNuTVOQyCXoR
+ IxJ3xikVZlSvjFojdiB4hmtPfK+SD8i3Iu+nRJ6GhilEHpe+Q/B5V0SuTicpf2Ik7tDL
+ dvGNRkQbnosMuCQ4BVxQ2JgUM5tgev6RZsaqytarowpoQi4xgFirA79bJihuanL42FCD
+ P5sQ==
+X-Gm-Message-State: APjAAAXPu4wTJpt9tTxu2NnSdaWOlfcBr0Z72REelueehZu3vaHQBper
+ rtL3krt734Fvks+Fsa5l80JwZWXOlkY=
+X-Google-Smtp-Source: APXvYqwlTq2rhnU3cVajZg7VfNJ3y79lO861BubpKQMyt6575Zl0wyFFcAQcfgYGlLqU3MQnXKUGMA==
+X-Received: by 2002:a17:90a:e2d2:: with SMTP id
+ fr18mr5646063pjb.98.1567019110154; 
+ Wed, 28 Aug 2019 12:05:10 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.05.33
+ by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.05.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Aug 2019 12:05:34 -0700 (PDT)
+ Wed, 28 Aug 2019 12:05:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 12:04:14 -0700
-Message-Id: <20190828190456.30315-28-richard.henderson@linaro.org>
+Date: Wed, 28 Aug 2019 12:03:56 -0700
+Message-Id: <20190828190456.30315-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190828190456.30315-1-richard.henderson@linaro.org>
 References: <20190828190456.30315-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH v3 27/69] target/arm: Convert MOVW, MOVT
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v3 09/69] target/arm: Convert Halfword multiply
+ and multiply accumulate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,170 +100,366 @@ Sender: "Qemu-devel"
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 89 ++++++++++++++++--------------------------
- target/arm/a32.decode  |  6 +++
- target/arm/t32.decode  |  9 +++++
- 3 files changed, 48 insertions(+), 56 deletions(-)
+ target/arm/translate.c | 218 +++++++++++++++++++++++------------------
+ target/arm/a32.decode  |  20 ++++
+ target/arm/t32.decode  |  29 ++++++
+ 3 files changed, 170 insertions(+), 97 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9e47c2e0c4..6cbf34b424 100644
+index 70bbad48fc..58983ccf88 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -7844,6 +7844,34 @@ static bool trans_ADR(DisasContext *s, arg_ri *a)
-     return true;
- }
+@@ -8144,6 +8144,117 @@ DO_QADDSUB(QDSUB, false, true)
  
-+static bool trans_MOVW(DisasContext *s, arg_MOVW *a)
-+{
-+    TCGv_i32 tmp;
+ #undef DO_QADDSUB
+ 
++/*
++ * Halfword multiply and multiply accumulate
++ */
 +
-+    if (!ENABLE_ARCH_6T2) {
++static bool op_smlaxxx(DisasContext *s, arg_rrrr *a,
++                       int add_long, bool nt, bool mt)
++{
++    TCGv_i32 t0, t1;
++    TCGv_i64 t64;
++
++    if (s->thumb
++        ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
++        : !ENABLE_ARCH_5TE) {
 +        return false;
 +    }
 +
-+    tmp = tcg_const_i32(a->imm);
-+    store_reg(s, a->rd, tmp);
++    t0 = load_reg(s, a->rn);
++    t1 = load_reg(s, a->rm);
++    gen_mulxy(t0, t1, nt, mt);
++    tcg_temp_free_i32(t1);
++
++    switch (add_long) {
++    case 0:
++        store_reg(s, a->rd, t0);
++        break;
++    case 1:
++        t1 = load_reg(s, a->ra);
++        gen_helper_add_setq(t0, cpu_env, t0, t1);
++        tcg_temp_free_i32(t1);
++        store_reg(s, a->rd, t0);
++        break;
++    case 2:
++        t64 = tcg_temp_new_i64();
++        tcg_gen_ext_i32_i64(t64, t0);
++        tcg_temp_free_i32(t0);
++        gen_addq(s, t64, a->ra, a->rd);
++        gen_storeq_reg(s, a->ra, a->rd, t64);
++        tcg_temp_free_i64(t64);
++        break;
++    default:
++        g_assert_not_reached();
++    }
 +    return true;
 +}
 +
-+static bool trans_MOVT(DisasContext *s, arg_MOVW *a)
-+{
-+    TCGv_i32 tmp;
++#define DO_SMLAX(NAME, add, nt, mt) \
++static bool trans_##NAME(DisasContext *s, arg_rrrr *a)     \
++{                                                          \
++    return op_smlaxxx(s, a, add, nt, mt);                  \
++}
 +
-+    if (!ENABLE_ARCH_6T2) {
++DO_SMLAX(SMULBB, 0, 0, 0)
++DO_SMLAX(SMULBT, 0, 0, 1)
++DO_SMLAX(SMULTB, 0, 1, 0)
++DO_SMLAX(SMULTT, 0, 1, 1)
++
++DO_SMLAX(SMLABB, 1, 0, 0)
++DO_SMLAX(SMLABT, 1, 0, 1)
++DO_SMLAX(SMLATB, 1, 1, 0)
++DO_SMLAX(SMLATT, 1, 1, 1)
++
++DO_SMLAX(SMLALBB, 2, 0, 0)
++DO_SMLAX(SMLALBT, 2, 0, 1)
++DO_SMLAX(SMLALTB, 2, 1, 0)
++DO_SMLAX(SMLALTT, 2, 1, 1)
++
++#undef DO_SMLAX
++
++static bool op_smlawx(DisasContext *s, arg_rrrr *a, bool add, bool mt)
++{
++    TCGv_i32 t0, t1;
++    TCGv_i64 t64;
++
++    if (!ENABLE_ARCH_5TE) {
 +        return false;
 +    }
 +
-+    tmp = load_reg(s, a->rd);
-+    tcg_gen_ext16u_i32(tmp, tmp);
-+    tcg_gen_ori_i32(tmp, tmp, a->imm << 16);
-+    store_reg(s, a->rd, tmp);
++    t0 = load_reg(s, a->rn);
++    t1 = load_reg(s, a->rm);
++    if (mt) {
++        tcg_gen_sari_i32(t1, t1, 16);
++    } else {
++        gen_sxth(t1);
++    }
++    t64 = gen_muls_i64_i32(t0, t1);
++    tcg_gen_shri_i64(t64, t64, 16);
++    t1 = tcg_temp_new_i32();
++    tcg_gen_extrl_i64_i32(t1, t64);
++    tcg_temp_free_i64(t64);
++    if (add) {
++        t0 = load_reg(s, a->ra);
++        gen_helper_add_setq(t1, cpu_env, t1, t0);
++        tcg_temp_free_i32(t0);
++    }
++    store_reg(s, a->rd, t1);
 +    return true;
 +}
++
++#define DO_SMLAWX(NAME, add, mt) \
++static bool trans_##NAME(DisasContext *s, arg_rrrr *a)     \
++{                                                          \
++    return op_smlawx(s, a, add, mt);                       \
++}
++
++DO_SMLAWX(SMULWB, 0, 0)
++DO_SMLAWX(SMULWT, 0, 1)
++DO_SMLAWX(SMLAWB, 1, 0)
++DO_SMLAWX(SMLAWT, 1, 1)
++
++#undef DO_SMLAWX
 +
  /*
-  * Multiply and multiply accumulate
+  * Legacy decoder.
   */
-@@ -9729,7 +9757,7 @@ static bool trans_UDIV(DisasContext *s, arg_rrr *a)
- 
- static void disas_arm_insn(DisasContext *s, unsigned int insn)
- {
--    unsigned int cond, val, op1, i, rn, rd;
-+    unsigned int cond, val, op1, i, rn;
-     TCGv_i32 tmp;
-     TCGv_i32 tmp2;
-     TCGv_i32 addr;
-@@ -9978,26 +10006,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-     /* fall back to legacy decoder */
- 
-     if ((insn & 0x0f900000) == 0x03000000) {
--        if ((insn & (1 << 21)) == 0) {
--            ARCH(6T2);
--            rd = (insn >> 12) & 0xf;
--            val = ((insn >> 4) & 0xf000) | (insn & 0xfff);
--            if ((insn & (1 << 22)) == 0) {
--                /* MOVW */
--                tmp = tcg_temp_new_i32();
--                tcg_gen_movi_i32(tmp, val);
--            } else {
--                /* MOVT */
--                tmp = load_reg(s, rd);
--                tcg_gen_ext16u_i32(tmp, tmp);
--                tcg_gen_ori_i32(tmp, tmp, val << 16);
--            }
--            store_reg(s, rd, tmp);
--        } else {
--            /* MSR (immediate) and hints */
--            /* All done in decodetree.  Illegal ops already signalled.  */
--            g_assert_not_reached();
--        }
-+        /* All done in decodetree.  Illegal ops reach here.  */
-+        goto illegal_op;
-     } else if ((insn & 0x0f900000) == 0x01000000
-                && (insn & 0x00000090) != 0x00000090) {
-         /* miscellaneous instructions */
-@@ -10732,42 +10742,9 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-             /*
-              * 0b1111_0xxx_xxxx_0xxx_xxxx_xxxx
-              *  - Data-processing (modified immediate, plain binary immediate)
-+             * All in decodetree.
-              */
--            if (insn & (1 << 25)) {
--                /*
--                 * 0b1111_0x1x_xxxx_0xxx_xxxx_xxxx
--                 *  - Data-processing (plain binary immediate)
--                 */
--                if (insn & (1 << 24)) {
--                    /* Bitfield/Saturate, in decodetree */
--                    goto illegal_op;
--                } else {
--                    imm = ((insn & 0x04000000) >> 15)
--                          | ((insn & 0x7000) >> 4) | (insn & 0xff);
--                    if (insn & (1 << 22)) {
--                        /* 16-bit immediate.  */
--                        imm |= (insn >> 4) & 0xf000;
--                        if (insn & (1 << 23)) {
--                            /* movt */
--                            tmp = load_reg(s, rd);
--                            tcg_gen_ext16u_i32(tmp, tmp);
--                            tcg_gen_ori_i32(tmp, tmp, imm << 16);
--                        } else {
--                            /* movw */
--                            tmp = tcg_temp_new_i32();
--                            tcg_gen_movi_i32(tmp, imm);
--                        }
--                        store_reg(s, rd, tmp);
--                    } else {
--                        /* Add/sub 12-bit immediate, in decodetree */
--                        goto illegal_op;
--                    }
--                }
--            } else {
--                /* Data-processing (modified immediate) */
--                /* All done in decodetree.  Reach here for illegal ops.  */
--                goto illegal_op;
--            }
-+            goto illegal_op;
+@@ -8610,56 +8721,13 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             }
+             break;
          }
-         break;
-     case 12:
+-        case 0x8: /* signed multiply */
++        case 0x8:
+         case 0xa:
+         case 0xc:
+         case 0xe:
+-            ARCH(5TE);
+-            rs = (insn >> 8) & 0xf;
+-            rn = (insn >> 12) & 0xf;
+-            rd = (insn >> 16) & 0xf;
+-            if (op1 == 1) {
+-                /* (32 * 16) >> 16 */
+-                tmp = load_reg(s, rm);
+-                tmp2 = load_reg(s, rs);
+-                if (sh & 4)
+-                    tcg_gen_sari_i32(tmp2, tmp2, 16);
+-                else
+-                    gen_sxth(tmp2);
+-                tmp64 = gen_muls_i64_i32(tmp, tmp2);
+-                tcg_gen_shri_i64(tmp64, tmp64, 16);
+-                tmp = tcg_temp_new_i32();
+-                tcg_gen_extrl_i64_i32(tmp, tmp64);
+-                tcg_temp_free_i64(tmp64);
+-                if ((sh & 2) == 0) {
+-                    tmp2 = load_reg(s, rn);
+-                    gen_helper_add_setq(tmp, cpu_env, tmp, tmp2);
+-                    tcg_temp_free_i32(tmp2);
+-                }
+-                store_reg(s, rd, tmp);
+-            } else {
+-                /* 16 * 16 */
+-                tmp = load_reg(s, rm);
+-                tmp2 = load_reg(s, rs);
+-                gen_mulxy(tmp, tmp2, sh & 2, sh & 4);
+-                tcg_temp_free_i32(tmp2);
+-                if (op1 == 2) {
+-                    tmp64 = tcg_temp_new_i64();
+-                    tcg_gen_ext_i32_i64(tmp64, tmp);
+-                    tcg_temp_free_i32(tmp);
+-                    gen_addq(s, tmp64, rn, rd);
+-                    gen_storeq_reg(s, rn, rd, tmp64);
+-                    tcg_temp_free_i64(tmp64);
+-                } else {
+-                    if (op1 == 0) {
+-                        tmp2 = load_reg(s, rn);
+-                        gen_helper_add_setq(tmp, cpu_env, tmp, tmp2);
+-                        tcg_temp_free_i32(tmp2);
+-                    }
+-                    store_reg(s, rd, tmp);
+-                }
+-            }
+-            break;
++            /* Halfword multiply and multiply accumulate.  */
++            /* All done in decodetree.  Reach here for illegal ops.  */
++            goto illegal_op;
+         default:
+             goto illegal_op;
+         }
+@@ -10108,13 +10176,14 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             break;
+         case 4: case 5: /* 32-bit multiply.  Sum of absolute differences.  */
+             switch ((insn >> 20) & 7) {
+-            case 0: /* 32 x 32 -> 32, in decodetree */
++            case 0: /* 32 x 32 -> 32 */
++            case 1: /* 16 x 16 -> 32 */
++            case 3: /* 32 * 16 -> 32msb */
++                /* in decodetree */
+                 goto illegal_op;
+             case 7: /* Unsigned sum of absolute differences.  */
+                 break;
+-            case 1: /* 16 x 16 -> 32 */
+             case 2: /* Dual multiply add.  */
+-            case 3: /* 32 * 16 -> 32msb */
+             case 4: /* Dual multiply subtract.  */
+             case 5: case 6: /* 32 * 32 -> 32msb (SMMUL, SMMLA, SMMLS) */
+                 if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)) {
+@@ -10126,15 +10195,6 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             tmp = load_reg(s, rn);
+             tmp2 = load_reg(s, rm);
+             switch ((insn >> 20) & 7) {
+-            case 1: /* 16 x 16 -> 32 */
+-                gen_mulxy(tmp, tmp2, op & 2, op & 1);
+-                tcg_temp_free_i32(tmp2);
+-                if (rs != 15) {
+-                    tmp2 = load_reg(s, rs);
+-                    gen_helper_add_setq(tmp, cpu_env, tmp, tmp2);
+-                    tcg_temp_free_i32(tmp2);
+-                }
+-                break;
+             case 2: /* Dual multiply add.  */
+             case 4: /* Dual multiply subtract.  */
+                 if (op)
+@@ -10158,23 +10218,6 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     tcg_temp_free_i32(tmp2);
+                   }
+                 break;
+-            case 3: /* 32 * 16 -> 32msb */
+-                if (op)
+-                    tcg_gen_sari_i32(tmp2, tmp2, 16);
+-                else
+-                    gen_sxth(tmp2);
+-                tmp64 = gen_muls_i64_i32(tmp, tmp2);
+-                tcg_gen_shri_i64(tmp64, tmp64, 16);
+-                tmp = tcg_temp_new_i32();
+-                tcg_gen_extrl_i64_i32(tmp, tmp64);
+-                tcg_temp_free_i64(tmp64);
+-                if (rs != 15)
+-                  {
+-                    tmp2 = load_reg(s, rs);
+-                    gen_helper_add_setq(tmp, cpu_env, tmp, tmp2);
+-                    tcg_temp_free_i32(tmp2);
+-                  }
+-                break;
+             case 5: case 6: /* 32 * 32 -> 32msb (SMMUL, SMMLA, SMMLS) */
+                 tcg_gen_muls2_i32(tmp2, tmp, tmp, tmp2);
+                 if (rs != 15) {
+@@ -10248,29 +10291,10 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                 gen_storeq_reg(s, rs, rd, tmp64);
+                 tcg_temp_free_i64(tmp64);
+             } else {
+-                if ((op & 0x20) || !(op & 8)) {
+-                    /* Signed/unsigned 64-bit multiply, in decodetree */
+-                    tcg_temp_free_i32(tmp2);
+-                    tcg_temp_free_i32(tmp);
+-                    goto illegal_op;
+-                }
+-                /* smlalxy */
+-                if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)) {
+-                    tcg_temp_free_i32(tmp2);
+-                    tcg_temp_free_i32(tmp);
+-                    goto illegal_op;
+-                }
+-                gen_mulxy(tmp, tmp2, op & 2, op & 1);
++                /* Signed/unsigned 64-bit multiply, in decodetree */
+                 tcg_temp_free_i32(tmp2);
+-                tmp64 = tcg_temp_new_i64();
+-                tcg_gen_ext_i32_i64(tmp64, tmp);
+                 tcg_temp_free_i32(tmp);
+-                if (op & 0x40) {
+-                    /* 64-bit accumulate.  */
+-                    gen_addq(s, tmp64, rs, rd);
+-                }
+-                gen_storeq_reg(s, rs, rd, tmp64);
+-                tcg_temp_free_i64(tmp64);
++                goto illegal_op;
+             }
+             break;
+         }
 diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index d7a333b90b..341882e637 100644
+index 7791be5590..19d12e726b 100644
 --- a/target/arm/a32.decode
 +++ b/target/arm/a32.decode
-@@ -73,6 +73,12 @@ MOV_rxri         .... 000 1101 . 0000 .... ..... .. 0 ....    @s_rxr_shi
- BIC_rrri         .... 000 1110 . .... .... ..... .. 0 ....    @s_rrr_shi
- MVN_rxri         .... 000 1111 . 0000 .... ..... .. 0 ....    @s_rxr_shi
+@@ -114,6 +114,7 @@ MVN_rxi          .... 001 1111 . 0000 .... ............       @s_rxi_rot
+ @s_rdamn         ---- .... ... s:1 rd:4 ra:4 rm:4 .... rn:4   &s_rrrr
+ @s_rd0mn         ---- .... ... s:1 rd:4 .... rm:4 .... rn:4   &s_rrrr ra=0
+ @rdamn           ---- .... ... .   rd:4 ra:4 rm:4 .... rn:4   &rrrr
++@rd0mn           ---- .... ... .   rd:4 .... rm:4 .... rn:4   &rrrr ra=0
  
-+%imm16           16:4 0:12
-+@mov16           ---- .... .... .... rd:4 ............        &ri imm=%imm16
+ MUL              .... 0000 000 . .... 0000 .... 1001 ....     @s_rd0mn
+ MLA              .... 0000 001 . .... .... .... 1001 ....     @s_rdamn
+@@ -132,3 +133,22 @@ QADD             .... 0001 0000 .... .... 0000 0101 ....      @rndm
+ QSUB             .... 0001 0010 .... .... 0000 0101 ....      @rndm
+ QDADD            .... 0001 0100 .... .... 0000 0101 ....      @rndm
+ QDSUB            .... 0001 0110 .... .... 0000 0101 ....      @rndm
 +
-+MOVW             .... 0011 0000 .... .... ............        @mov16
-+MOVT             .... 0011 0100 .... .... ............        @mov16
++# Halfword multiply and multiply accumulate
 +
- # Data-processing (register-shifted register)
- 
- @s_rrr_shr       ---- ... .... s:1 rn:4 rd:4 rs:4 . shty:2 . rm:4 \
++SMLABB           .... 0001 0000 .... .... .... 1000 ....      @rdamn
++SMLABT           .... 0001 0000 .... .... .... 1100 ....      @rdamn
++SMLATB           .... 0001 0000 .... .... .... 1010 ....      @rdamn
++SMLATT           .... 0001 0000 .... .... .... 1110 ....      @rdamn
++SMLAWB           .... 0001 0010 .... .... .... 1000 ....      @rdamn
++SMULWB           .... 0001 0010 .... 0000 .... 1010 ....      @rd0mn
++SMLAWT           .... 0001 0010 .... .... .... 1100 ....      @rdamn
++SMULWT           .... 0001 0010 .... 0000 .... 1110 ....      @rd0mn
++SMLALBB          .... 0001 0100 .... .... .... 1000 ....      @rdamn
++SMLALBT          .... 0001 0100 .... .... .... 1100 ....      @rdamn
++SMLALTB          .... 0001 0100 .... .... .... 1010 ....      @rdamn
++SMLALTT          .... 0001 0100 .... .... .... 1110 ....      @rdamn
++SMULBB           .... 0001 0110 .... 0000 .... 1000 ....      @rd0mn
++SMULBT           .... 0001 0110 .... 0000 .... 1100 ....      @rd0mn
++SMULTB           .... 0001 0110 .... 0000 .... 1010 ....      @rd0mn
++SMULTT           .... 0001 0110 .... 0000 .... 1110 ....      @rd0mn
 diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index 677acb698d..f315fde0f4 100644
+index 7c6226e0af..122a0537ed 100644
 --- a/target/arm/t32.decode
 +++ b/target/arm/t32.decode
-@@ -150,6 +150,15 @@ RSB_rri          1111 0.0 1110 . .... 0 ... .... ........     @s_rri_rot
-   SUB_rri        1111 0.1 0101 0 .... 0 ... .... ........     @s0_rri_12
- }
+@@ -118,6 +118,7 @@ RSB_rri          1111 0.0 1110 . .... 0 ... .... ........     @s_rri_rot
+ @s0_rnadm        .... .... .... rn:4 ra:4 rd:4 .... rm:4      &s_rrrr s=0
+ @s0_rn0dm        .... .... .... rn:4 .... rd:4 .... rm:4      &s_rrrr ra=0 s=0
+ @rnadm           .... .... .... rn:4 ra:4 rd:4 .... rm:4      &rrrr
++@rn0dm           .... .... .... rn:4 .... rd:4 .... rm:4      &rrrr ra=0
+ @rndm            .... .... .... rn:4 .... rd:4 .... rm:4      &rrr
  
-+# Move Wide
-+
-+%imm16_26_16_12_0 16:4 26:1 12:3 0:8
-+@mov16           .... .... .... .... .... rd:4 .... .... \
-+                 &ri imm=%imm16_26_16_12_0
-+
-+MOVW             1111 0.10 0100 .... 0 ... .... ........      @mov16
-+MOVT             1111 0.10 1100 .... 0 ... .... ........      @mov16
-+
- # Saturate, bitfield
+ {
+@@ -130,6 +131,34 @@ UMULL            1111 1011 1010 .... .... .... 0000 ....      @s0_rnadm
+ SMLAL            1111 1011 1100 .... .... .... 0000 ....      @s0_rnadm
+ UMLAL            1111 1011 1110 .... .... .... 0000 ....      @s0_rnadm
+ UMAAL            1111 1011 1110 .... .... .... 0110 ....      @rnadm
++{
++  SMULWB         1111 1011 0011 .... 1111 .... 0000 ....      @rn0dm
++  SMLAWB         1111 1011 0011 .... .... .... 0000 ....      @rnadm
++}
++{
++  SMULWT         1111 1011 0011 .... 1111 .... 0001 ....      @rn0dm
++  SMLAWT         1111 1011 0011 .... .... .... 0001 ....      @rnadm
++}
++{
++  SMULBB         1111 1011 0001 .... 1111 .... 0000 ....      @rn0dm
++  SMLABB         1111 1011 0001 .... .... .... 0000 ....      @rnadm
++}
++{
++  SMULBT         1111 1011 0001 .... 1111 .... 0001 ....      @rn0dm
++  SMLABT         1111 1011 0001 .... .... .... 0001 ....      @rnadm
++}
++{
++  SMULTB         1111 1011 0001 .... 1111 .... 0010 ....      @rn0dm
++  SMLATB         1111 1011 0001 .... .... .... 0010 ....      @rnadm
++}
++{
++  SMULTT         1111 1011 0001 .... 1111 .... 0011 ....      @rn0dm
++  SMLATT         1111 1011 0001 .... .... .... 0011 ....      @rnadm
++}
++SMLALBB          1111 1011 1100 .... .... .... 1000 ....      @rnadm
++SMLALBT          1111 1011 1100 .... .... .... 1001 ....      @rnadm
++SMLALTB          1111 1011 1100 .... .... .... 1010 ....      @rnadm
++SMLALTT          1111 1011 1100 .... .... .... 1011 ....      @rnadm
  
- @sat             .... .... .. sh:1 . rn:4 . ... rd:4 .. . satimm:5 \
+ # Data-processing (two source registers)
+ 
 -- 
 2.17.1
 
