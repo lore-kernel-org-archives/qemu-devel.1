@@ -2,48 +2,48 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C998C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C54C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:44:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEF7520828
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:41:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF7520828
+	by mail.kernel.org (Postfix) with ESMTPS id 6B89B208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:44:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B89B208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34l0-0002xE-Vp
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:41:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49972)
+	id 1i34oG-0005Gp-HD
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:44:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i34Nf-00013b-4r
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:17:24 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i34Oh-00029L-4C
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:18:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i34Nc-0004nb-Vw
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:17:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47618)
+ (envelope-from <jsnow@redhat.com>) id 1i34Oe-0006aq-Mb
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:18:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57406)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i34NX-0004dx-9u; Wed, 28 Aug 2019 16:17:15 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i34Oa-0006Xe-Hn; Wed, 28 Aug 2019 16:18:20 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 58EF5308AA11;
- Wed, 28 Aug 2019 20:17:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DA4DDC04BD48;
+ Wed, 28 Aug 2019 20:18:19 +0000 (UTC)
 Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8DD34600CD;
- Wed, 28 Aug 2019 20:17:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 13CC9196B2;
+ Wed, 28 Aug 2019 20:18:18 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190823130341.21550-1-mreitz@redhat.com>
- <20190823130341.21550-2-mreitz@redhat.com>
+ <20190823130341.21550-3-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <04c875e6-a468-fa57-3cb0-5f9782680834@redhat.com>
-Date: Wed, 28 Aug 2019 16:17:12 -0400
+Message-ID: <04050bf0-e02d-dbea-cd97-c24a4b98d367@redhat.com>
+Date: Wed, 28 Aug 2019 16:18:18 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190823130341.21550-2-mreitz@redhat.com>
+In-Reply-To: <20190823130341.21550-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 28 Aug 2019 20:17:13 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.31]); Wed, 28 Aug 2019 20:18:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] block/file-posix: Reduce
- xfsctl() use
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] iotests: Test reverse
+ sub-cluster qcow2 writes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -157,40 +157,115 @@ Sender: "Qemu-devel"
 
 
 On 8/23/19 9:03 AM, Max Reitz wrote:
-> This patch removes xfs_write_zeroes() and xfs_discard().  Both function=
-s
-> have been added just before the same feature was present through
-> fallocate():
->=20
-> - fallocate() has supported PUNCH_HOLE for XFS since Linux 2.6.38 (Marc=
-h
->   2011); xfs_discard() was added in December 2010.
->=20
-> - fallocate() has supported ZERO_RANGE for XFS since Linux 3.15 (June
->   2014); xfs_write_zeroes() was added in November 2013.
->=20
-> Nowadays, all systems that qemu runs on should support both fallocate()
-> features (RHEL 7's kernel does).
->=20
-> xfsctl() is still useful for getting the request alignment for O_DIRECT=
-,
-> so this patch does not remove our dependency on it completely.
->=20
-> Note that xfs_write_zeroes() had a bug: It calls ftruncate() when the
-> file is shorter than the specified range (because ZERO_RANGE does not
-> increase the file length).  ftruncate() may yield and then discard data
-> that parallel write requests have written past the EOF in the meantime.
-> Dropping the function altogether fixes the bug.
->=20
-
-And I assume getting rid of discard is just then simply convenient, so
-why not.
-
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Fixes: 50ba5b2d994853b38fed10e0841b119da0f8b8e5
-> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> Cc: qemu-stable@nongnu.org
+> This exercises the regression introduced in commit
+> 50ba5b2d994853b38fed10e0841b119da0f8b8e5.  On my machine, it has close
+> to a 50 % false-negative rate, but that should still be sufficient to
+> test the fix.
+> 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/265     | 67 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/265.out |  6 ++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 74 insertions(+)
+>  create mode 100755 tests/qemu-iotests/265
+>  create mode 100644 tests/qemu-iotests/265.out
+> 
+> diff --git a/tests/qemu-iotests/265 b/tests/qemu-iotests/265
+> new file mode 100755
+> index 0000000000..dce6f77be3
+> --- /dev/null
+> +++ b/tests/qemu-iotests/265
+> @@ -0,0 +1,67 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test reverse-ordered qcow2 writes on a sub-cluster level
+> +#
+> +# Copyright (C) 2019 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +seq=$(basename $0)
+> +echo "QA output created by $seq"
+> +
+> +status=1	# failure is the default!
+> +
+> +_cleanup()
+> +{
+> +    _cleanup_test_img
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +# qcow2-specific test
+> +_supported_fmt qcow2
+> +_supported_proto file
+> +_supported_os Linux
+> +
+> +echo '--- Writing to the image ---'
+> +
+> +# Reduce cluster size so we get more and quicker I/O
+> +IMGOPTS='cluster_size=4096' _make_test_img 1M
+> +(for ((kb = 1024 - 4; kb >= 0; kb -= 4)); do \
+> +     echo "aio_write -P 42 $((kb + 1))k 2k"; \
+> + done) \
+> + | $QEMU_IO "$TEST_IMG" > /dev/null
+> +
+> +echo '--- Verifying its content ---'
+> +
+> +(for ((kb = 0; kb < 1024; kb += 4)); do \
+> +    echo "read -P 0 ${kb}k 1k"; \
+> +    echo "read -P 42 $((kb + 1))k 2k"; \
+> +    echo "read -P 0 $((kb + 3))k 1k"; \
+> + done) \
+> + | $QEMU_IO "$TEST_IMG" | _filter_qemu_io | grep 'verification'
+> +
+> +# Status of qemu-io
+> +if [ ${PIPESTATUS[1]} = 0 ]; then
+> +    echo 'Content verified.'
+> +fi
+> +
+> +# success, all done
+> +echo "*** done"
+> +rm -f $seq.full
+> +status=0
+> diff --git a/tests/qemu-iotests/265.out b/tests/qemu-iotests/265.out
+> new file mode 100644
+> index 0000000000..6eac620f25
+> --- /dev/null
+> +++ b/tests/qemu-iotests/265.out
+> @@ -0,0 +1,6 @@
+> +QA output created by 265
+> +--- Writing to the image ---
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+> +--- Verifying its content ---
+> +Content verified.
+> +*** done
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index d95d556414..0c129c1644 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -274,3 +274,4 @@
+>  257 rw
+>  258 rw quick
+>  262 rw quick migration
+> +265 rw auto quick
+> 
 
 Tested-by: John Snow <jsnow@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
