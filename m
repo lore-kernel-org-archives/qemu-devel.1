@@ -2,60 +2,62 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D883C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A2FC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6474C214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:05:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6474C214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 33BCA214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 09:06:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33BCA214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2ttP-00063F-Gk
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 05:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37039)
+	id 1i2ttv-0006j7-Il
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 05:05:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1i2trD-0004Q5-7Z
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:03:12 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i2trb-0004pq-Pc
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1i2trC-0006tt-57
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:03:11 -0400
-Received: from 5.mo177.mail-out.ovh.net ([46.105.39.154]:56986)
+ (envelope-from <mlevitsk@redhat.com>) id 1i2tra-0007MP-EJ
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:03:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48042)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i2trB-0006hC-W4
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 05:03:10 -0400
-Received: from player755.ha.ovh.net (unknown [10.108.42.174])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 8FE47108B22
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 11:02:59 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player755.ha.ovh.net (Postfix) with ESMTPSA id 18E809477446;
- Wed, 28 Aug 2019 09:02:53 +0000 (UTC)
-Date: Wed, 28 Aug 2019 11:02:51 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <20190828110251.44ded1f5@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190826090812.19080-1-lvivier@redhat.com>
-References: <20190826090812.19080-1-lvivier@redhat.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i2trX-0007K5-GV; Wed, 28 Aug 2019 05:03:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CF84E308123B;
+ Wed, 28 Aug 2019 09:03:30 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0356860BEC;
+ Wed, 28 Aug 2019 09:03:26 +0000 (UTC)
+Message-ID: <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Date: Wed, 28 Aug 2019 12:03:25 +0300
+In-Reply-To: <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
+References: <20190825071541.10389-1-mlevitsk@redhat.com>
+ <20190825071541.10389-3-mlevitsk@redhat.com>
+ <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 4846717627017763110
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudeitddgudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Wed, 28 Aug 2019 09:03:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.39.154
-Subject: Re: [Qemu-devel] [PATCH] pseries: Fix compat_pvr on reset
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,83 +69,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, clg@kaod.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 26 Aug 2019 11:08:12 +0200
-Laurent Vivier <lvivier@redhat.com> wrote:
-
-> If we a migrate P8 machine to a P9 machine, the migration fails on
-> destination with:
+On Tue, 2019-08-27 at 18:29 -0400, John Snow wrote:
 > 
->   error while loading state for instance 0x1 of device 'cpu'
->   load of migration failed: Operation not permitted
+> On 8/25/19 3:15 AM, Maxim Levitsky wrote:
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  block/trace-events |  2 ++
+> >  2 files changed, 85 insertions(+)
+> > 
+> > diff --git a/block/nvme.c b/block/nvme.c
+> > index f8bd11e19a..dd041f39c9 100644
+> > --- a/block/nvme.c
+> > +++ b/block/nvme.c
+> > @@ -112,6 +112,7 @@ typedef struct {
+> >      bool plugged;
+> >  
+> >      bool supports_write_zeros;
+> > +    bool supports_discard;
+> >  
+> >      CoMutex dma_map_lock;
+> >      CoQueue dma_flush_queue;
+> > @@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+> >  
+> >      oncs = le16_to_cpu(idctrl->oncs);
+> >      s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
+> > +    s->supports_discard = (oncs & NVME_ONCS_DSM) != 0;
 > 
-> This is caused because the compat_pvr field is only present for the first
-> CPU.
-> Originally, spapr_machine_reset() calls ppc_set_compat() to set the value
-> max_compat_pvr for the first cpu and this was propagated to all CPUs by
-> spapr_cpu_reset().  Now, as spapr_cpu_reset() is called before that, the
-> value is not propagated to all CPUs and the migration fails.
+> Same comment -- checking !!(register & FIELD) is nicer than the
+> negative. (I'm actually not sure even the !! is needed, but it seems to
+> be a QEMU-ism and I've caught myself using it...)
+
+All right, no problem to use !!
+
 > 
-> To fix that, propagate the new value to all CPUs in spapr_machine_reset().
+> Rest looks good to me on a skim, but I'm not very well-versed in NVME.
+Thanks!
+
+
 > 
+> >  
+> >      memset(resp, 0, 4096);
+> >  
+> > @@ -1153,6 +1155,86 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
+> >  }
+> >  
+> >  
+> > +static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
+> > +                                         int64_t offset,
+> > +                                         int bytes)
+> > +{
+> > +    BDRVNVMeState *s = bs->opaque;
+> > +    NVMeQueuePair *ioq = s->queues[1];
+> > +    NVMeRequest *req;
+> > +    NvmeDsmRange *buf;
+> > +    QEMUIOVector local_qiov;
+> > +    int ret;
+> > +
+> > +    NvmeCmd cmd = {
+> > +        .opcode = NVME_CMD_DSM,
+> > +        .nsid = cpu_to_le32(s->nsid),
+> > +        .cdw10 = cpu_to_le32(0), /*number of ranges - 0 based*/
+> > +        .cdw11 = cpu_to_le32(1 << 2), /*deallocate bit*/
+> > +    };
+> > +
+> > +    NVMeCoData data = {
+> > +        .ctx = bdrv_get_aio_context(bs),
+> > +        .ret = -EINPROGRESS,
+> > +    };
+> > +
+> > +    if (!s->supports_discard) {
+> > +        return -ENOTSUP;
+> > +    }
+> > +
+> > +    assert(s->nr_queues > 1);
+> > +
+> > +    buf = qemu_try_blockalign0(bs, s->page_size);
+> > +    if (!buf) {
+> > +        return -ENOMEM;
+> > +    }
+> > +
+> > +    buf->nlb = cpu_to_le32(bytes >> s->blkshift);
+> > +    buf->slba = cpu_to_le64(offset >> s->blkshift);
+> > +    buf->cattr = 0;
+> > +
+> > +    qemu_iovec_init(&local_qiov, 1);
+> > +    qemu_iovec_add(&local_qiov, buf, 4096);
+> > +
+> > +    req = nvme_get_free_req(ioq);
+> > +    assert(req);
+> > +
+> > +    qemu_co_mutex_lock(&s->dma_map_lock);
+> > +    ret = nvme_cmd_map_qiov(bs, &cmd, req, &local_qiov);
+> > +    qemu_co_mutex_unlock(&s->dma_map_lock);
+> > +
+> > +    if (ret) {
+> > +        req->busy = false;
+> > +        goto out;
+> > +    }
+> > +
+> > +    trace_nvme_dsm(s, offset, bytes);
+> > +
+> > +    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
+> > +
+> > +    data.co = qemu_coroutine_self();
+> > +    while (data.ret == -EINPROGRESS) {
+> > +        qemu_coroutine_yield();
+> > +    }
+> > +
+> > +    qemu_co_mutex_lock(&s->dma_map_lock);
+> > +    ret = nvme_cmd_unmap_qiov(bs, &local_qiov);
+> > +    qemu_co_mutex_unlock(&s->dma_map_lock);
+> > +
+> > +    if (ret) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    ret = data.ret;
+> > +    trace_nvme_dsm_done(s, offset, bytes, ret);
+> > +out:
+> > +    qemu_iovec_destroy(&local_qiov);
+> > +    qemu_vfree(buf);
+> > +    return ret;
+> > +
+> > +}
+> > +
+> > +
+> >  static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
+> >                                 BlockReopenQueue *queue, Error **errp)
+> >  {
+> > @@ -1259,6 +1341,7 @@ static BlockDriver bdrv_nvme = {
+> >      .bdrv_co_pwritev          = nvme_co_pwritev,
+> >  
+> >      .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
+> > +    .bdrv_co_pdiscard         = nvme_co_pdiscard,
+> >  
+> >      .bdrv_co_flush_to_disk    = nvme_co_flush,
+> >      .bdrv_reopen_prepare      = nvme_reopen_prepare,
+> > diff --git a/block/trace-events b/block/trace-events
+> > index 8209fbd0c7..7d1d48b502 100644
+> > --- a/block/trace-events
+> > +++ b/block/trace-events
+> > @@ -153,6 +153,8 @@ nvme_write_zeros(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p offs
+> >  nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
+> >  nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
+> >  nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
+> > +nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset %"PRId64" bytes %"PRId64""
+> > +nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p offset %"PRId64" bytes %"PRId64" ret %d"
+> >  nvme_dma_map_flush(void *s) "s %p"
+> >  nvme_free_req_queue_wait(void *q) "q %p"
+> >  nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
+> > 
 
-Yeah, the assumption that compat_pvr would be set for the boot CPU before
-device reset was rather fragile. It makes a lot of sense to do this explicitly
-from the core machine code.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-And now, ppc_set_compat() ends up being called twice for every CPU at
-machine reset. It isn't a great performance penalty but I think the
-case of hotplugged CPUs could be better handled by calling ppc_set_compat()
-from spapr_core_plug(). This would also be cleaner to have the compat_pvr
-stuff to be handled in spapr.c only rather than in two separate files IMHO.
-
-I'll send a patch.
-
-> Fixes: 25c9780d38d4 ("spapr: Reset CAS & IRQ subsystem after devices")
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  hw/ppc/spapr.c          | 8 +++++++-
->  hw/ppc/spapr_cpu_core.c | 2 ++
->  2 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index baedadf20b8c..d063312a3b2a 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1752,7 +1752,13 @@ static void spapr_machine_reset(MachineState *machine)
->          spapr_ovec_cleanup(spapr->ov5_cas);
->          spapr->ov5_cas = spapr_ovec_new();
->  
-> -        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
-> +        /*
-> +         * reset compat_pvr for all CPUs
-> +         * as qemu_devices_reset() is called before this,
-> +         * it can't be propagated by spapr_cpu_reset()
-> +         * from the first CPU to all the others
-> +         */
-> +        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
->      }
->  
->      /*
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index bf47fbdf6f7f..45e2f2747ffc 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -43,6 +43,8 @@ static void spapr_cpu_reset(void *opaque)
->  
->      /* Set compatibility mode to match the boot CPU, which was either set
->       * by the machine reset code or by CAS. This should never fail.
-> +     * At startup the value is already set for all the CPUs
-> +     * but we need this when we hotplug a new CPU
->       */
->      ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort);
->  
+Best regards,
+	Maxim Levitsky
 
 
