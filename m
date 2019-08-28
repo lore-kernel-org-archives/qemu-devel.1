@@ -2,57 +2,91 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAE4C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 17:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C83FAC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 17:02:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A186F22CF5
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 17:02:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A186F22CF5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9533222CF5
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 17:02:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iOveHdMf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9533222CF5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i31LC-0000Ac-8l
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 13:02:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34811)
+	id 1i31LL-0000Il-0R
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 13:02:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30nF-0007HB-1L
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:34 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i31CE-0007ii-0U
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:53:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30nC-0008Ed-Vw
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:32 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57947 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i30n9-00080E-2F
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:29 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id F1CF81A22D4;
- Wed, 28 Aug 2019 18:27:00 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 9E9F21A22C7;
- Wed, 28 Aug 2019 18:27:00 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i31CA-0000ww-4f
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:53:19 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:34644)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i31C6-0000rm-B2
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:53:16 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id y135so103936wmc.1
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 09:53:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=HmgqT/HIUKoP+z/2ztUMKoEQehWucsoXeXun56Y0Jjg=;
+ b=iOveHdMfubhWEClABqTNbEnkLUAAZdKqSKIkZmQA0Wl0Wx9+coWlIO4eA9Sj96DyDf
+ xmFw0GW0vbfBAvcn3ehVTSp4pqifLqsLHWUEzW6tqp9CRfLIuwBvSvsahSYDBEfQ0Mw8
+ wcFh75B/B4KBroW7c408iv5S+hdqzKdNA+azcFc0jghXQEFvoUoAd1UROFo0lNqrp54d
+ OW5eP1Hqb8Zylfrw6/9aBZldUz7XP081tspSMi5QyBxdFl7e26CgtWCPFvni8L+dY3m+
+ RaoqFvl1ouy9kj4QBS8/wn4QY4P4i+Q9pTTd9WFyagPZVqsdEPvUb0wd7c1hneacqumU
+ hcQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=HmgqT/HIUKoP+z/2ztUMKoEQehWucsoXeXun56Y0Jjg=;
+ b=debOsNX9v5uXZOk6NmgTeXKCI3KIeHKIH9BNCNwiQM5/CTIoreQpkqYrX3+c9Y0+JH
+ YmYqnHlbTQGkgGOwTUketPcVDOKLbPynB1aUV3P7jwRwxk/bQ1uOYWzM8Md+TW0EUh8o
+ PClB9zQr1PvzozDxuy/8h8Pw8OE575Ykh1qngmUGWiwTr0Dzq5Ncnd4HgY0wRf/Mzd8P
+ tAGjMkG1zoMI5hFtKOFyn/nNmwPc4SjxxSwo6QUJOGjTPqCp7Rq+on9w4mVnCNjpAoTS
+ vOEUQpvLGO1xBCIoTaCcwzQRP8nbz7GnS3lQ6ANS95hk4V4UowCPyzNYMgMEp3tOB4j6
+ X1mA==
+X-Gm-Message-State: APjAAAXA1kabFriYKy0CxAGnGQPka+P6lWw3/P6a8CV0wlt7SF/c/kxd
+ m6ArqR/iLalxHrueDa448iGwOg==
+X-Google-Smtp-Source: APXvYqyarmep8enJEr45W6yxhIZbFzi+eKT6IhicPL/z2LRsAVHhBXD58WT3MRsrMX3E0OH/amiXAg==
+X-Received: by 2002:a05:600c:1087:: with SMTP id
+ e7mr6103029wmd.19.1567011192043; 
+ Wed, 28 Aug 2019 09:53:12 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r16sm6048320wrc.81.2019.08.28.09.53.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Aug 2019 09:53:10 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DDDB51FF93;
+ Wed, 28 Aug 2019 17:53:07 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 18:26:49 +0200
-Message-Id: <1567009614-12438-26-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1567009614-12438-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1567009614-12438-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 25/30] target/mips: Clean up handling of CP0
- register 26
+Date: Wed, 28 Aug 2019 17:53:04 +0100
+Message-Id: <20190828165307.18321-7-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190828165307.18321-1-alex.bennee@linaro.org>
+References: <20190828165307.18321-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32b
+Subject: [Qemu-devel] [PATCH v1 6/9] tcg/README: fix typo
+ s/afterwise/afterwards/
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,75 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ "Emilio G. Cota" <cota@braap.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: "Emilio G. Cota" <cota@braap.org>
 
-Clean up handling of CP0 register 26.
+Afterwise is "wise after the fact", as in "hindsight".
+Here we meant "afterwards" (as in "subsequently"). Fix it.
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/mips/cpu.h       | 2 +-
- target/mips/translate.c | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ tcg/README | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 19a1b78..9b15b09 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -425,7 +425,7 @@ typedef struct mips_def_t mips_def_t;
- #define CP0_REG25__PERFCTL3        6
- #define CP0_REG25__PERFCNT3        7
- /* CP0 Register 26 */
--#define CP0_REG00__ERRCTL          0
-+#define CP0_REG26__ERRCTL          0
- /* CP0 Register 27 */
- #define CP0_REG27__CACHERR         0
- /* CP0 Register 28 */
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index df6aa9e..d7776fa 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -7504,7 +7504,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_26:
-         switch (sel) {
--        case 0:
-+        case CP0_REG26__ERRCTL:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_ErrCtl));
-             register_name = "ErrCtl";
-             break;
-@@ -8266,7 +8266,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-        break;
-     case CP0_REGISTER_26:
-         switch (sel) {
--        case 0:
-+        case CP0_REG26__ERRCTL:
-             gen_helper_mtc0_errctl(cpu_env, arg);
-             ctx->base.is_jmp = DISAS_STOP;
-             register_name = "ErrCtl";
-@@ -9006,7 +9006,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_26:
-         switch (sel) {
--        case 0:
-+        case CP0_REG26__ERRCTL:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_ErrCtl));
-             register_name = "ErrCtl";
-             break;
-@@ -9750,7 +9750,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_26:
-         switch (sel) {
--        case 0:
-+        case CP0_REG26__ERRCTL:
-             gen_helper_mtc0_errctl(cpu_env, arg);
-             ctx->base.is_jmp = DISAS_STOP;
-             register_name = "ErrCtl";
+diff --git a/tcg/README b/tcg/README
+index 21fcdf737ff..ef9be5ba90e 100644
+--- a/tcg/README
++++ b/tcg/README
+@@ -101,7 +101,7 @@ This can be overridden using the following function modifiers:
+   canonical locations before calling the helper.
+ - TCG_CALL_NO_WRITE_GLOBALS means that the helper does not modify any globals.
+   They will only be saved to their canonical location before calling helpers,
+-  but they won't be reloaded afterwise.
++  but they won't be reloaded afterwards.
+ - TCG_CALL_NO_SIDE_EFFECTS means that the call to the function is removed if
+   the return value is not used.
+ 
 -- 
-2.7.4
+2.20.1
 
 
