@@ -2,56 +2,57 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C92C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D76C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF6E9208C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:50:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF6E9208C2
+	by mail.kernel.org (Postfix) with ESMTPS id 1B8B9214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:52:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B8B9214DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i319u-0004dm-KL
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 12:50:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34813)
+	id 1i31BC-0006FE-8M
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 12:52:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30nF-0007HE-38
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30nF-0007HH-6C
  for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30nC-0008EV-Vx
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i30nD-0008EX-1k
  for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:32 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57967 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:57916 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i30n9-00080R-1Q
+ id 1i30n9-0007zs-1g
  for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:27:29 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 0802F1A22C7;
- Wed, 28 Aug 2019 18:27:01 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id ED3B71A22C2;
+ Wed, 28 Aug 2019 18:27:00 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 945871A22A9;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id BA61B1A22D7;
  Wed, 28 Aug 2019 18:27:00 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 18:26:48 +0200
-Message-Id: <1567009614-12438-25-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 28 Aug 2019 18:26:52 +0200
+Message-Id: <1567009614-12438-29-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1567009614-12438-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1567009614-12438-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 24/30] target/mips: Clean up handling of CP0
- register 25
+Subject: [Qemu-devel] [PATCH v2 28/30] target/mips: Clean up handling of CP0
+ register 29
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,193 +71,162 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up handling of CP0 register 25.
+Clean up handling of CP0 register 29.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
+ target/mips/cpu.h       | 22 ++++++++++-------
  target/mips/translate.c | 64 ++++++++++++++++++++++++-------------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ 2 files changed, 46 insertions(+), 40 deletions(-)
 
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index b71b6f4..d309ad8 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -235,12 +235,12 @@ typedef struct mips_def_t mips_def_t;
+  *
+  * 0   DataLo            DataHi            ErrorEPC          DESAVE
+  * 1   TagLo             TagHi
+- * 2   DataLo1           DataHi                              KScratch<n>
+- * 3   TagLo1            TagHi                               KScratch<n>
+- * 4   DataLo2           DataHi                              KScratch<n>
+- * 5   TagLo2            TagHi                               KScratch<n>
+- * 6   DataLo3           DataHi                              KScratch<n>
+- * 7   TagLo3            TagHi                               KScratch<n>
++ * 2   DataLo1           DataHi1                             KScratch<n>
++ * 3   TagLo1            TagHi1                              KScratch<n>
++ * 4   DataLo2           DataHi2                             KScratch<n>
++ * 5   TagLo2            TagHi2                              KScratch<n>
++ * 6   DataLo3           DataHi3                             KScratch<n>
++ * 7   TagLo3            TagHi3                              KScratch<n>
+  *
+  */
+ #define CP0_REGISTER_00     0
+@@ -438,8 +438,14 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG28__TAGLO3          6
+ #define CP0_REG28__DATALO3         7
+ /* CP0 Register 29 */
+-#define CP0_REG29__IDATAHI         1
+-#define CP0_REG29__DDATAHI         3
++#define CP0_REG29__TAGHI           0
++#define CP0_REG29__DATAHI          1
++#define CP0_REG29__TAGHI1          2
++#define CP0_REG29__DATAHI1         3
++#define CP0_REG29__TAGHI2          4
++#define CP0_REG29__DATAHI2         5
++#define CP0_REG29__TAGHI3          6
++#define CP0_REG29__DATAHI3         7
+ /* CP0 Register 30 */
+ #define CP0_REG30__ERROREPC        0
+ /* CP0 Register 31 */
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 732b38d..df6aa9e 100644
+index 807151b..2cb132a 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -7466,35 +7466,35 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -7549,17 +7549,17 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_25:
+     case CP0_REGISTER_29:
          switch (sel) {
 -        case 0:
-+        case CP0_REG25__PERFCTL0:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Performance0));
-             register_name = "Performance0";
+-        case 2:
+-        case 4:
+-        case 6:
++        case CP0_REG29__TAGHI:
++        case CP0_REG29__TAGHI1:
++        case CP0_REG29__TAGHI2:
++        case CP0_REG29__TAGHI3:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_TagHi));
+             register_name = "TagHi";
              break;
 -        case 1:
-+        case CP0_REG25__PERFCNT0:
-             /* gen_helper_mfc0_performance1(arg); */
-             register_name = "Performance1";
-             goto cp0_unimplemented;
--        case 2:
-+        case CP0_REG25__PERFCTL1:
-             /* gen_helper_mfc0_performance2(arg); */
-             register_name = "Performance2";
-             goto cp0_unimplemented;
 -        case 3:
-+        case CP0_REG25__PERFCNT1:
-             /* gen_helper_mfc0_performance3(arg); */
-             register_name = "Performance3";
-             goto cp0_unimplemented;
--        case 4:
-+        case CP0_REG25__PERFCTL2:
-             /* gen_helper_mfc0_performance4(arg); */
-             register_name = "Performance4";
-             goto cp0_unimplemented;
 -        case 5:
-+        case CP0_REG25__PERFCNT2:
-             /* gen_helper_mfc0_performance5(arg); */
-             register_name = "Performance5";
-             goto cp0_unimplemented;
--        case 6:
-+        case CP0_REG25__PERFCTL3:
-             /* gen_helper_mfc0_performance6(arg); */
-             register_name = "Performance6";
-             goto cp0_unimplemented;
 -        case 7:
-+        case CP0_REG25__PERFCNT3:
-             /* gen_helper_mfc0_performance7(arg); */
-             register_name = "Performance7";
-             goto cp0_unimplemented;
-@@ -8228,35 +8228,35 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
++        case CP0_REG29__DATAHI:
++        case CP0_REG29__DATAHI1:
++        case CP0_REG29__DATAHI2:
++        case CP0_REG29__DATAHI3:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_DataHi));
+             register_name = "DataHi";
+             break;
+@@ -8304,17 +8304,17 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_25:
+     case CP0_REGISTER_29:
          switch (sel) {
 -        case 0:
-+        case CP0_REG25__PERFCTL0:
-             gen_helper_mtc0_performance0(cpu_env, arg);
-             register_name = "Performance0";
+-        case 2:
+-        case 4:
+-        case 6:
++        case CP0_REG29__TAGHI:
++        case CP0_REG29__TAGHI1:
++        case CP0_REG29__TAGHI2:
++        case CP0_REG29__TAGHI3:
+             gen_helper_mtc0_taghi(cpu_env, arg);
+             register_name = "TagHi";
              break;
 -        case 1:
-+        case CP0_REG25__PERFCNT0:
-             /* gen_helper_mtc0_performance1(arg); */
-             register_name = "Performance1";
-             goto cp0_unimplemented;
--        case 2:
-+        case CP0_REG25__PERFCTL1:
-             /* gen_helper_mtc0_performance2(arg); */
-             register_name = "Performance2";
-             goto cp0_unimplemented;
 -        case 3:
-+        case CP0_REG25__PERFCNT1:
-             /* gen_helper_mtc0_performance3(arg); */
-             register_name = "Performance3";
-             goto cp0_unimplemented;
--        case 4:
-+        case CP0_REG25__PERFCTL2:
-             /* gen_helper_mtc0_performance4(arg); */
-             register_name = "Performance4";
-             goto cp0_unimplemented;
 -        case 5:
-+        case CP0_REG25__PERFCNT2:
-             /* gen_helper_mtc0_performance5(arg); */
-             register_name = "Performance5";
-             goto cp0_unimplemented;
--        case 6:
-+        case CP0_REG25__PERFCTL3:
-             /* gen_helper_mtc0_performance6(arg); */
-             register_name = "Performance6";
-             goto cp0_unimplemented;
 -        case 7:
-+        case CP0_REG25__PERFCNT3:
-             /* gen_helper_mtc0_performance7(arg); */
-             register_name = "Performance7";
-             goto cp0_unimplemented;
-@@ -8968,35 +8968,35 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
++        case CP0_REG29__DATAHI:
++        case CP0_REG29__DATAHI1:
++        case CP0_REG29__DATAHI2:
++        case CP0_REG29__DATAHI3:
+             gen_helper_mtc0_datahi(cpu_env, arg);
+             register_name = "DataHi";
+             break;
+@@ -9041,17 +9041,17 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_25:
+     case CP0_REGISTER_29:
          switch (sel) {
 -        case 0:
-+        case CP0_REG25__PERFCTL0:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Performance0));
-             register_name = "Performance0";
+-        case 2:
+-        case 4:
+-        case 6:
++        case CP0_REG29__TAGHI:
++        case CP0_REG29__TAGHI1:
++        case CP0_REG29__TAGHI2:
++        case CP0_REG29__TAGHI3:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_TagHi));
+             register_name = "TagHi";
              break;
 -        case 1:
-+        case CP0_REG25__PERFCNT0:
-             /* gen_helper_dmfc0_performance1(arg); */
-             register_name = "Performance1";
-             goto cp0_unimplemented;
--        case 2:
-+        case CP0_REG25__PERFCTL1:
-             /* gen_helper_dmfc0_performance2(arg); */
-             register_name = "Performance2";
-             goto cp0_unimplemented;
 -        case 3:
-+        case CP0_REG25__PERFCNT1:
-             /* gen_helper_dmfc0_performance3(arg); */
-             register_name = "Performance3";
-             goto cp0_unimplemented;
--        case 4:
-+        case CP0_REG25__PERFCTL2:
-             /* gen_helper_dmfc0_performance4(arg); */
-             register_name = "Performance4";
-             goto cp0_unimplemented;
 -        case 5:
-+        case CP0_REG25__PERFCNT2:
-             /* gen_helper_dmfc0_performance5(arg); */
-             register_name = "Performance5";
-             goto cp0_unimplemented;
--        case 6:
-+        case CP0_REG25__PERFCTL3:
-             /* gen_helper_dmfc0_performance6(arg); */
-             register_name = "Performance6";
-             goto cp0_unimplemented;
 -        case 7:
-+        case CP0_REG25__PERFCNT3:
-             /* gen_helper_dmfc0_performance7(arg); */
-             register_name = "Performance7";
-             goto cp0_unimplemented;
-@@ -9712,35 +9712,35 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
++        case CP0_REG29__DATAHI:
++        case CP0_REG29__DATAHI1:
++        case CP0_REG29__DATAHI2:
++        case CP0_REG29__DATAHI3:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_DataHi));
+             register_name = "DataHi";
+             break;
+@@ -9782,17 +9782,17 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_25:
+     case CP0_REGISTER_29:
          switch (sel) {
 -        case 0:
-+        case CP0_REG25__PERFCTL0:
-             gen_helper_mtc0_performance0(cpu_env, arg);
-             register_name = "Performance0";
+-        case 2:
+-        case 4:
+-        case 6:
++        case CP0_REG29__TAGHI:
++        case CP0_REG29__TAGHI1:
++        case CP0_REG29__TAGHI2:
++        case CP0_REG29__TAGHI3:
+             gen_helper_mtc0_taghi(cpu_env, arg);
+             register_name = "TagHi";
              break;
 -        case 1:
-+        case CP0_REG25__PERFCNT0:
-             /* gen_helper_mtc0_performance1(cpu_env, arg); */
-             register_name = "Performance1";
-             goto cp0_unimplemented;
--        case 2:
-+        case CP0_REG25__PERFCTL1:
-             /* gen_helper_mtc0_performance2(cpu_env, arg); */
-             register_name = "Performance2";
-             goto cp0_unimplemented;
 -        case 3:
-+        case CP0_REG25__PERFCNT1:
-             /* gen_helper_mtc0_performance3(cpu_env, arg); */
-             register_name = "Performance3";
-             goto cp0_unimplemented;
--        case 4:
-+        case CP0_REG25__PERFCTL2:
-             /* gen_helper_mtc0_performance4(cpu_env, arg); */
-             register_name = "Performance4";
-             goto cp0_unimplemented;
 -        case 5:
-+        case CP0_REG25__PERFCNT2:
-             /* gen_helper_mtc0_performance5(cpu_env, arg); */
-             register_name = "Performance5";
-             goto cp0_unimplemented;
--        case 6:
-+        case CP0_REG25__PERFCTL3:
-             /* gen_helper_mtc0_performance6(cpu_env, arg); */
-             register_name = "Performance6";
-             goto cp0_unimplemented;
 -        case 7:
-+        case CP0_REG25__PERFCNT3:
-             /* gen_helper_mtc0_performance7(cpu_env, arg); */
-             register_name = "Performance7";
-             goto cp0_unimplemented;
++        case CP0_REG29__DATAHI:
++        case CP0_REG29__DATAHI1:
++        case CP0_REG29__DATAHI2:
++        case CP0_REG29__DATAHI3:
+             gen_helper_mtc0_datahi(cpu_env, arg);
+             register_name = "DataHi";
+             break;
 -- 
 2.7.4
 
