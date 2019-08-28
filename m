@@ -2,111 +2,64 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B62CDC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36916C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:01:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 860182070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 860182070B
+	by mail.kernel.org (Postfix) with ESMTPS id 0801F217F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:01:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0801F217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i350r-0007Xt-Om
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:57:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52994)
+	id 1i354W-0001Au-OT
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 17:01:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i34eY-00040y-VP
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:34:51 -0400
+ (envelope-from <crosa@redhat.com>) id 1i351L-00080U-DY
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i34eX-0008ST-Vp
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:34:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55508)
+ (envelope-from <crosa@redhat.com>) id 1i351J-0003tq-Or
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:58:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37612)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i34eX-0008SA-OQ; Wed, 28 Aug 2019 16:34:49 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i351J-0003rs-Fw
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:58:21 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 09C5210C696D;
- Wed, 28 Aug 2019 20:34:49 +0000 (UTC)
-Received: from [10.36.117.166] (ovpn-117-166.ams2.redhat.com [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EEBAB19D70;
- Wed, 28 Aug 2019 20:34:46 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190828111004.28013-1-david@redhat.com>
- <20190828111004.28013-2-david@redhat.com>
- <07f892a0-c8d8-9960-1536-082121cf2618@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <d3fad340-1ed1-fa9c-483f-7762b423d564@redhat.com>
-Date: Wed, 28 Aug 2019 22:34:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id C2D3C44BD7;
+ Wed, 28 Aug 2019 20:58:17 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-242.rdu2.redhat.com
+ [10.10.123.242])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B1D82600CD;
+ Wed, 28 Aug 2019 20:58:16 +0000 (UTC)
+Date: Wed, 28 Aug 2019 16:58:14 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Message-ID: <20190828205749.GA11512@localhost.localdomain>
+References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1564760158-27536-2-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-In-Reply-To: <07f892a0-c8d8-9960-1536-082121cf2618@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 28 Aug 2019 20:34:49 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1564760158-27536-2-git-send-email-aleksandar.markovic@rt-rk.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Wed, 28 Aug 2019 20:58:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] tcg: Make probe_write() return a
- pointer to the host page
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/acceptance: Refactor and improve
+ reporting in linux_ssh_mips_malta.py
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,40 +71,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: cohuck@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org,
+ amarkovic@wavecomp.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.08.19 16:44, Richard Henderson wrote:
-> On 8/28/19 4:10 AM, David Hildenbrand wrote:
->> + * If the access is permitted, returns the host address similar to
->> + * tlb_vaddr_to_host(). Returns NULL in case direct access to the host page
->> + * is not allowed or if the size is 0.
+On Fri, Aug 02, 2019 at 05:35:57PM +0200, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> Maybe we can find some better language -- "not allowed" sounds like a
-> permissions check, and we longjmp out on permission check failures.
+> This patch restructures code organization around the test case
+> executions. At the same time, rather than outputing a cryptic message:
 > 
-> Perhaps "if the page requires i/o access"?
-
-Yeah, and NOTDIRTY, emulated via i/o access. I will rephrase.
-
+> FAIL: True not found in [False],
 > 
-> Why are you returning NULL for size 0?  Just because the caller hasn't
-> committed to a size and thus we haven't checked watchpoints?
+> the following will be reported too, if the command output does not meet
+> specified expectations:
+> 
+> 'lspci -d 11ab:4620' output doesn't contain the word 'GT-64120'
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  tests/acceptance/linux_ssh_mips_malta.py | 36 +++++++++++++++++++-------------
+>  1 file changed, 21 insertions(+), 15 deletions(-)
+> 
+> diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
+> index aafb0c3..8368e1f 100644
+> --- a/tests/acceptance/linux_ssh_mips_malta.py
+> +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> @@ -145,27 +145,33 @@ class LinuxSSH(Test):
+>          self.ssh_disconnect_vm()
+>          self.wait_for_console_pattern('Power down')
+>  
+> -    def run_common_commands(self):
+> -        stdout, stderr = self.ssh_command('lspci -d 11ab:4620')
+> -        self.assertIn(True, ["GT-64120" in line for line in stdout])
+> -
+> -        stdout, stderr = self.ssh_command('cat /sys/bus/i2c/devices/i2c-0/name')
+> -        self.assertIn(True, ["SMBus PIIX4 adapter" in line
+> -                             for line in stdout])
+> -
+> -        stdout, stderr = self.ssh_command('cat /proc/mtd')
+> -        self.assertIn(True, ["YAMON" in line
+> -                             for line in stdout])
+> +    def ssh_command_output_contains(self, cmd, exp):
+> +        stdout, _ = self.ssh_command(cmd)
+> +        for line in stdout:
+> +            if exp in line:
+> +                break
+> +        else:
+> +            self.fail('"%s" output does not contain "%s"' % (cmd, exp))
+>  
+> +    def run_common_commands(self):
+> +        self.ssh_command_output_contains(
+> +            'lspci -d 11ab:4620',
+> +            'GT-64120')
+> +        self.ssh_command_output_contains(
+> +            'cat /sys/bus/i2c/devices/i2c-0/name',
+> +            'SMBus PIIX4 adapter')
+> +        self.ssh_command_output_contains(
+> +            'cat /proc/mtd',
+> +            'YAMON')
+>          # Empty 'Board Config'
+> -        stdout, stderr = self.ssh_command('md5sum /dev/mtd2ro')
+> -        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in line
+> -                             for line in stdout])
+> +        self.ssh_command_output_contains(
+> +            'md5sum /dev/mtd2ro',
+> +            '0dfbe8aa4c20b52e1b8bf3cb6cbdf193')
+>  
+>      def do_test_mips_malta(self, endianess, kernel_path, uname_m):
+>          self.boot_debian_wheezy_image_and_ssh_login(endianess, kernel_path)
+>  
+> -        stdout, stderr = self.ssh_command('uname -a')
+> +        stdout, _ = self.ssh_command('uname -a')
+>          self.assertIn(True, [uname_m + " GNU/Linux" in line for line in stdout])
 
-Yes, I think it's the right thing to do. Watchpoints are one part of the
-story, the other part is TLB_RECHECK (a.k.a. TLB_INVALID_MASK or
-"subpage protection"). Allowing access could lead to hidden BUGs.
+This should also make use of ssh_command_output_contains(), that is:
 
-I consider somebody wanting to get access to a host page with an access
-size of zero an interface violation.
+        self.ssh_command_output_contains('uname -a',
+                                         uname_m + " GNU/Linux")
 
--- 
+Other than that, it LGTM.
 
-Thanks,
+- Cleber.
 
-David / dhildenb
+>  
+>          self.run_common_commands()
+> -- 
+> 2.7.4
+> 
 
