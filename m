@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A296C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51EA0C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:23:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2FFE2189D
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:09:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2FFE2189D
+	by mail.kernel.org (Postfix) with ESMTPS id 252F72080F
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:23:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 252F72080F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2ydW-0007Gt-0X
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 10:09:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48868)
+	id 1i2yr9-0001gv-62
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 10:23:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54135)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i2yck-0006hb-Ja
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:08:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2yqH-0001DR-IA
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i2ycj-0006up-N6
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:08:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47664)
+ (envelope-from <mreitz@redhat.com>) id 1i2yqG-0008BB-Ky
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:22:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51774)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i2ych-0006tI-Ed; Wed, 28 Aug 2019 10:08:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1i2yqD-00088s-6I; Wed, 28 Aug 2019 10:22:29 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E291E86668;
- Wed, 28 Aug 2019 14:08:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7A49785545;
+ Wed, 28 Aug 2019 14:22:22 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-32.brq.redhat.com
  [10.40.204.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C4665C1D6;
- Wed, 28 Aug 2019 14:08:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 34BBC6012D;
+ Wed, 28 Aug 2019 14:22:13 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
- <20190826161312.489398-2-vsementsov@virtuozzo.com>
+ <20190826161312.489398-3-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c07fc397-debb-42bf-4e15-fa9a680eb129@redhat.com>
-Date: Wed, 28 Aug 2019 16:08:19 +0200
+Message-ID: <6c22ee44-4875-92e5-273b-53276cdec860@redhat.com>
+Date: Wed, 28 Aug 2019 16:22:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190826161312.489398-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190826161312.489398-3-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="lmsmAayjcelYJaQtItct1jCoFAevHShlR"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="XqnZ7lt1SJ6eHcTehx64GSFMwu3hO4dcu"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 28 Aug 2019 14:08:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Wed, 28 Aug 2019 14:22:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 01/13] block/backup: fix
- backup_cow_with_offload for last cluster
+Subject: Re: [Qemu-devel] [PATCH v9 02/13] block/backup: split shareable
+ copying part from backup_do_cow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,8 +107,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lmsmAayjcelYJaQtItct1jCoFAevHShlR
-Content-Type: multipart/mixed; boundary="dE393h8SeqBki91MOxFqadAsWqFDLzxr8";
+--XqnZ7lt1SJ6eHcTehx64GSFMwu3hO4dcu
+Content-Type: multipart/mixed; boundary="oxd6zX0qINs2ObUFAtXjJQ0Kn424tXHOV";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
@@ -116,68 +116,93 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
 Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com,
  xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
  stefanha@redhat.com, jsnow@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <c07fc397-debb-42bf-4e15-fa9a680eb129@redhat.com>
-Subject: Re: [PATCH v9 01/13] block/backup: fix backup_cow_with_offload for
- last cluster
+Message-ID: <6c22ee44-4875-92e5-273b-53276cdec860@redhat.com>
+Subject: Re: [PATCH v9 02/13] block/backup: split shareable copying part from
+ backup_do_cow
 References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
- <20190826161312.489398-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190826161312.489398-2-vsementsov@virtuozzo.com>
+ <20190826161312.489398-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190826161312.489398-3-vsementsov@virtuozzo.com>
 
---dE393h8SeqBki91MOxFqadAsWqFDLzxr8
+--oxd6zX0qINs2ObUFAtXjJQ0Kn424tXHOV
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 26.08.19 18:13, Vladimir Sementsov-Ogievskiy wrote:
-> We shouldn't try to copy bytes beyond EOF. Fix it.
+> Split copying logic which will be shared with backup-top filter.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/backup.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  block/backup.c | 47 ++++++++++++++++++++++++++++++++---------------
+>  1 file changed, 32 insertions(+), 15 deletions(-)
 >=20
 > diff --git a/block/backup.c b/block/backup.c
-> index 2baf7bed65..33b144305f 100644
+> index 33b144305f..13a1d80157 100644
 > --- a/block/backup.c
 > +++ b/block/backup.c
-> @@ -161,7 +161,7 @@ static int coroutine_fn backup_cow_with_offload(Bac=
-kupBlockJob *job,
+> @@ -248,26 +248,18 @@ static int64_t backup_bitmap_reset_unallocated(Ba=
+ckupBlockJob *s,
+>      return ret;
+>  }
 > =20
->      assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
->      assert(QEMU_IS_ALIGNED(start, job->cluster_size));
-> -    nbytes =3D MIN(job->copy_range_size, end - start);
-> +    nbytes =3D MIN(job->copy_range_size, MIN(end - start, job->len - s=
-tart));
+> -static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+> -                                      int64_t offset, uint64_t bytes,
+> -                                      bool *error_is_read,
+> -                                      bool is_write_notifier)
+> +static int coroutine_fn backup_do_copy(BackupBlockJob *job,
+> +                                       int64_t offset, uint64_t bytes,=
 
-Might be easier to read as MIN(end, job->len) - start, but either way:
+> +                                       bool *error_is_read,
+> +                                       bool is_write_notifier)
+>  {
+> -    CowRequest cow_request;
+>      int ret =3D 0;
+> -    int64_t start, end; /* bytes */
+> +    int64_t start =3D offset, end =3D bytes + offset; /* bytes */
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Maybe just rename the =E2=80=9Coffset=E2=80=9D parameter to =E2=80=9Cstar=
+t=E2=80=9D, replace the =E2=80=9Cbytes=E2=80=9D
+parameter by an =E2=80=9Cend=E2=80=9D parameter, and drop this line?
 
->      nr_clusters =3D DIV_ROUND_UP(nbytes, job->cluster_size);
->      bdrv_reset_dirty_bitmap(job->copy_bitmap, start,
->                              job->cluster_size * nr_clusters);
->=20
+Max
+
+>      void *bounce_buffer =3D NULL;
+>      int64_t status_bytes;
+> =20
+> -    qemu_co_rwlock_rdlock(&job->flush_rwlock);
+> -
+> -    start =3D QEMU_ALIGN_DOWN(offset, job->cluster_size);
+> -    end =3D QEMU_ALIGN_UP(bytes + offset, job->cluster_size);
+> -
+> -    trace_backup_do_cow_enter(job, start, offset, bytes);
+> -
+> -    wait_for_overlapping_requests(job, start, end);
+> -    cow_request_begin(&cow_request, job, start, end);
+> +    assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+> +    assert(QEMU_IS_ALIGNED(end, job->cluster_size));
+> =20
+>      while (start < end) {
+>          int64_t dirty_end;
 
 
+--oxd6zX0qINs2ObUFAtXjJQ0Kn424tXHOV--
 
---dE393h8SeqBki91MOxFqadAsWqFDLzxr8--
-
---lmsmAayjcelYJaQtItct1jCoFAevHShlR
+--XqnZ7lt1SJ6eHcTehx64GSFMwu3hO4dcu
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1mitMACgkQ9AfbAGHV
-z0Aw8Qf/fPDSfkdTA9vZ7R7dwKjGK4+MjBP7/Q2E60+9byh+W2RjaA03l3Pb5fDg
-7xjiJQFXsj0r3YYxRT2sAccMO+WMKnBjXFSlttaAJJ5wfqb3h+xcjegvKkU7KZ80
-a76J2GWVT7oVPV8w1VdlAf10RYI55sfwBLXvWRoKRtFkaVyo7KSEsYlk8xlhTqik
-2gss23eFC8Y4gSyA/DhPEROl7TLEVW2faSjG3U4N0picNArp/WZcz0LzWwD/9/7D
-8x3iiy0wACI0eXBYyOTBEpf1zShF+q0sV7QTQhYa06OxVdkl1oXXq4FLGtpwAiyq
-DK5g9BaXm4hDYAJ95zingTwkrqvkgA==
-=GS1h
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1mjhMACgkQ9AfbAGHV
+z0BSqQf9FyvWpfsTLR8wQvMO1WeUlaQjFk7pEl3ZQ35VGmqMqALkQD+s+2N5psIg
+8aE5v6ogguwpinO0Whjx/4WcX/ma36IogodkMB2e7wy7bmoHk7TYclpuJd5wmcem
+D4QPHoJg0rv73+z4AYvNHhaWz0cFsag/5cYoeasiKtUfO84V2EkMv46bBHXzRZJf
+UcCVwNI7rxCCcyjjOkiPr0DDpdbkFZsTroWxZFdz5yb765FdkstCWJEses+yCV5D
+9py0K5FB9tXrKsSSQu++K7dwWQtE0iadmepEew9cxev30rQVKnt350A8/SbTibZ4
+vlcA2B+ScDCLtP44zHJRnl4jkCa+Ww==
+=Kfb8
 -----END PGP SIGNATURE-----
 
---lmsmAayjcelYJaQtItct1jCoFAevHShlR--
+--XqnZ7lt1SJ6eHcTehx64GSFMwu3hO4dcu--
 
