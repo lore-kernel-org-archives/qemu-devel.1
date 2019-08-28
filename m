@@ -2,84 +2,61 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F293AC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D6CC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:29:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB60420856
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:27:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J1SVYWC6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB60420856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1985320856
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:29:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1985320856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34XS-0003m3-BP
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:27:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38970)
+	id 1i34Z8-0005NV-Cz
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:29:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i33H0-000438-Vv
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:06:28 -0400
+ (envelope-from <armbru@redhat.com>) id 1i34Wk-0003cK-KV
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i33Gz-0000nH-87
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:06:26 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:36817)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i33Gw-0000kk-Pz
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:06:23 -0400
-Received: by mail-pf1-x431.google.com with SMTP id w2so400411pfi.3
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:06:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=2MBl6t7fQ79zFUU8tID/KaTtAuG5wuFc4KjmST5JIXA=;
- b=J1SVYWC6O+5LMr/nog7k+yMdGYHf2GPrGz8HlPCj7AspXnRxU6r7aEmtPciJPNQZMj
- Uv6c5+fOnFCWBKMFugK9WUpgts9e4XUWJ4SAlPxrFzmOzObFbvqos2qBwee6x+bM4iQm
- pmcwUC++EbL4lMKb8vmWvbhiOdugnXfJPZ/3SY8p4MMDf4muk+u5jLHjf7JjL1ZA4gN+
- s7fzhTR2KE3Sf0o0WRr2Z0lR7dt9+XtW/Dcr/lLngWcBtsrOH7sQo6O7zuU3MJ1KLj3K
- KRa0v+/IRmWb7Yb6ZWvHAmevysEGnIdSK1NAE3XMgaPkzGXphVlOU0j3IQaYkmlNTq4t
- mx1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=2MBl6t7fQ79zFUU8tID/KaTtAuG5wuFc4KjmST5JIXA=;
- b=ZJ/YBmoZv9jfaiJVG7iZ+FpsgVC02ZJwgMgGcoWopWOOwaWZrBSNP3hIuNLj/avS0z
- KkVuUCmdb4vMpFtuO4NwPRp5Q8GUxiU6hWXWHsa77e5th2F1GarA9+SJgl4sJC8snyr8
- hG7FYAGU6ghb9gze1rnmqcTMCp5hRQfCXJQ5gKq+VHF6oeTEySHDN3T5qCCP3uMINtZ5
- 0uZ4vZcEUtIofUCBL5XT85cdgA4Wge02d+SS5hdYggWwqlElzudE48ecfsgZfzKhKzsA
- +1cctIqfmJGh/oCJW31nEN/jJ1FdgherpeCoV40oBXu2dkvbc8kOFEO+mqGY8cgA9ueH
- Gt2w==
-X-Gm-Message-State: APjAAAXRaynYqMZDompEh1CDIc7zKHLwhjK1DQA0T8+LqFrhjEwk/yPI
- 7S7OP3sgBiMdOzdt2otbqEkmsO+by5c=
-X-Google-Smtp-Source: APXvYqyvigOVIAOoTD+DG8qEI/vRALTF2gglxhGvd8C5x/p8bfQMHRfDJ8WR9h0EOs+0+hr8qqQQFg==
-X-Received: by 2002:a62:f204:: with SMTP id m4mr6714467pfh.7.1567019179701;
- Wed, 28 Aug 2019 12:06:19 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.06.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Aug 2019 12:06:18 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1i34Wi-0002lt-ST
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50740)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i34Wi-0002l7-Mx
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:44 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 32E52793E5;
+ Wed, 28 Aug 2019 20:26:43 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F39BE19D70;
+ Wed, 28 Aug 2019 20:26:42 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 6BB141165361; Wed, 28 Aug 2019 22:26:41 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 12:04:50 -0700
-Message-Id: <20190828190456.30315-64-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190828190456.30315-1-richard.henderson@linaro.org>
-References: <20190828190456.30315-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::431
-Subject: [Qemu-devel] [PATCH v3 63/69] target/arm: Convert T16,
- Miscellaneous 16-bit instructions
+Date: Wed, 28 Aug 2019 22:26:32 +0200
+Message-Id: <20190828202641.24752-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 28 Aug 2019 20:26:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 0/9] qapi: Schema language cleanups & doc
+ improvements
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,209 +68,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v3: Split firstcond & mask within trans_IT.
----
- target/arm/translate.c | 111 +++++++++++++----------------------------
- target/arm/t16.decode  |  29 +++++++----
- 2 files changed, 54 insertions(+), 86 deletions(-)
+Markus Armbruster (9):
+  qapi: Drop check_type()'s redundant parameter @allow_optional
+  qapi: Drop support for boxed alternate for commands, events
+  docs/devel/qapi-code-gen: Minor specification fixes
+  qapi: Outlaw control characters in strings
+  tests/qapi-schema: Consistently name string tests string-FOO
+  docs/devel/qapi-code-gen: Reorder sections for readability
+  docs/devel/qapi-code-gen: Rewrite compatibility considerations
+  docs/devel/qapi-code-gen: Rewrite introduction to schema
+  docs/devel/qapi-code-gen: Improve QAPI schema language doc
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 854c9fe10d..5fb0e2066b 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -10163,6 +10163,18 @@ static bool trans_TBH(DisasContext *s, arg_tbranch *a)
-     return op_tbranch(s, a, true);
- }
- 
-+static bool trans_CBZ(DisasContext *s, arg_CBZ *a)
-+{
-+    TCGv_i32 tmp = load_reg(s, a->rn);
-+
-+    arm_gen_condlabel(s);
-+    tcg_gen_brcondi_i32(a->nz ? TCG_COND_EQ : TCG_COND_NE,
-+                        tmp, 0, s->condlabel);
-+    tcg_temp_free_i32(tmp);
-+    gen_jmp(s, read_pc(s) + a->imm);
-+    return true;
-+}
-+
- /*
-  * Supervisor call
-  */
-@@ -10394,6 +10406,27 @@ static bool trans_PLI(DisasContext *s, arg_PLD *a)
-     return ENABLE_ARCH_7;
- }
- 
-+/*
-+ * If-then
-+ */
-+
-+static bool trans_IT(DisasContext *s, arg_IT *a)
-+{
-+    int cond_mask = a->cond_mask;
-+
-+    /*
-+     * No actual code generated for this insn, just setup state.
-+     *
-+     * Combinations of firstcond and mask which set up an 0b1111
-+     * condition are UNPREDICTABLE; we take the CONSTRAINED
-+     * UNPREDICTABLE choice to treat 0b1111 the same as 0b1110,
-+     * i.e. both meaning "execute always".
-+     */
-+    s->condexec_cond = (cond_mask >> 4) & 0xe;
-+    s->condexec_mask = cond_mask & 0x1f;
-+    return true;
-+}
-+
- /*
-  * Legacy decoder.
-  */
-@@ -10760,83 +10793,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-     case 8: /* load/store halfword immediate offset, in decodetree */
-     case 9: /* load/store from stack, in decodetree */
-     case 10: /* add PC/SP (immediate), in decodetree */
-+    case 11: /* misc, in decodetree */
-     case 12: /* load/store multiple, in decodetree */
--        goto illegal_op;
--
--    case 11:
--        /* misc */
--        op = (insn >> 8) & 0xf;
--        switch (op) {
--        case 0: /* add/sub (sp, immediate), in decodetree */
--        case 2: /* sign/zero extend, in decodetree */
--            goto illegal_op;
--
--        case 4: case 5: case 0xc: case 0xd:
--            /* push/pop, in decodetree */
--            goto illegal_op;
--
--        case 1: case 3: case 9: case 11: /* czb */
--            rm = insn & 7;
--            tmp = load_reg(s, rm);
--            arm_gen_condlabel(s);
--            if (insn & (1 << 11))
--                tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, s->condlabel);
--            else
--                tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, s->condlabel);
--            tcg_temp_free_i32(tmp);
--            offset = ((insn & 0xf8) >> 2) | (insn & 0x200) >> 3;
--            gen_jmp(s, read_pc(s) + offset);
--            break;
--
--        case 15: /* IT, nop-hint.  */
--            if ((insn & 0xf) == 0) {
--                goto illegal_op; /* nop hint, in decodetree */
--            }
--            /*
--             * IT (If-Then)
--             *
--             * Combinations of firstcond and mask which set up an 0b1111
--             * condition are UNPREDICTABLE; we take the CONSTRAINED
--             * UNPREDICTABLE choice to treat 0b1111 the same as 0b1110,
--             * i.e. both meaning "execute always".
--             */
--            s->condexec_cond = (insn >> 4) & 0xe;
--            s->condexec_mask = insn & 0x1f;
--            /* No actual code generated for this insn, just setup state.  */
--            break;
--
--        case 0xe: /* bkpt */
--        {
--            int imm8 = extract32(insn, 0, 8);
--            ARCH(5);
--            gen_exception_bkpt_insn(s, syn_aa32_bkpt(imm8, true));
--            break;
--        }
--
--        case 0xa: /* rev, and hlt */
--        {
--            int op1 = extract32(insn, 6, 2);
--
--            if (op1 == 2) {
--                /* HLT */
--                int imm6 = extract32(insn, 0, 6);
--
--                gen_hlt(s, imm6);
--                break;
--            }
--
--            /* Otherwise this is rev, in decodetree */
--            goto illegal_op;
--        }
--
--        case 6: /* setend, cps; in decodetree */
--            goto illegal_op;
--
--        default:
--            goto undef;
--        }
--        break;
--
-     case 13: /* conditional branch or swi, in decodetree */
-         goto illegal_op;
- 
-@@ -10892,7 +10850,6 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-     }
-     return;
- illegal_op:
--undef:
-     unallocated_encoding(s);
- }
- 
-diff --git a/target/arm/t16.decode b/target/arm/t16.decode
-index cbc64f4e48..f128110dee 100644
---- a/target/arm/t16.decode
-+++ b/target/arm/t16.decode
-@@ -211,19 +211,30 @@ REVSH           1011 1010 11 ... ...            @rdm
- # Hints
- 
- {
--  YIELD         1011 1111 0001 0000
--  WFE           1011 1111 0010 0000
--  WFI           1011 1111 0011 0000
-+  {
-+    YIELD       1011 1111 0001 0000
-+    WFE         1011 1111 0010 0000
-+    WFI         1011 1111 0011 0000
- 
--  # TODO: Implement SEV, SEVL; may help SMP performance.
--  # SEV         1011 1111 0100 0000
--  # SEVL        1011 1111 0101 0000
-+    # TODO: Implement SEV, SEVL; may help SMP performance.
-+    # SEV       1011 1111 0100 0000
-+    # SEVL      1011 1111 0101 0000
- 
--  # The canonical nop has the second nibble as 0000, but the whole of the
--  # rest of the space is a reserved hint, behaves as nop.
--  NOP           1011 1111 ---- 0000
-+    # The canonical nop has the second nibble as 0000, but the whole of the
-+    # rest of the space is a reserved hint, behaves as nop.
-+    NOP         1011 1111 ---- 0000
-+  }
-+  IT            1011 1111 cond_mask:8
- }
- 
-+# Miscellaneous 16-bit instructions
-+
-+%imm6_9_3       9:1 3:5 !function=times_2
-+
-+HLT             1011 1010 10 imm:6              &i
-+BKPT            1011 1110 imm:8                 &i
-+CBZ             1011 nz:1 0.1 ..... rn:3        imm=%imm6_9_3
-+
- # Push and Pop
- 
- %push_list      0:9 !function=t16_push_list
--- 
-2.17.1
+ docs/devel/qapi-code-gen.txt                  | 1048 ++++++++++-------
+ tests/qapi-schema/qapi-schema-test.json       |    2 +-
+ tests/qapi-schema/string-control.json         |    2 +
+ ...losed-string.json =3D> string-unclosed.json} |    0
+ .../{unicode-str.json =3D> string-unicode.json} |    0
+ scripts/qapi/common.py                        |   27 +-
+ tests/Makefile.include                        |    5 +-
+ tests/qapi-schema/qapi-schema-test.out        |    2 +-
+ tests/qapi-schema/string-control.err          |    1 +
+ ...closed-string.exit =3D> string-control.exit} |    0
+ ...unclosed-string.out =3D> string-control.out} |    0
+ tests/qapi-schema/string-unclosed.err         |    1 +
+ ...{unicode-str.exit =3D> string-unclosed.exit} |    0
+ .../{unicode-str.out =3D> string-unclosed.out}  |    0
+ tests/qapi-schema/string-unicode.err          |    1 +
+ tests/qapi-schema/string-unicode.exit         |    1 +
+ tests/qapi-schema/string-unicode.out          |    0
+ tests/qapi-schema/unclosed-string.err         |    1 -
+ tests/qapi-schema/unicode-str.err             |    1 -
+ 19 files changed, 622 insertions(+), 470 deletions(-)
+ create mode 100644 tests/qapi-schema/string-control.json
+ rename tests/qapi-schema/{unclosed-string.json =3D> string-unclosed.json=
+} (100%)
+ rename tests/qapi-schema/{unicode-str.json =3D> string-unicode.json} (10=
+0%)
+ create mode 100644 tests/qapi-schema/string-control.err
+ rename tests/qapi-schema/{unclosed-string.exit =3D> string-control.exit}=
+ (100%)
+ rename tests/qapi-schema/{unclosed-string.out =3D> string-control.out} (=
+100%)
+ create mode 100644 tests/qapi-schema/string-unclosed.err
+ rename tests/qapi-schema/{unicode-str.exit =3D> string-unclosed.exit} (1=
+00%)
+ rename tests/qapi-schema/{unicode-str.out =3D> string-unclosed.out} (100=
+%)
+ create mode 100644 tests/qapi-schema/string-unicode.err
+ create mode 100644 tests/qapi-schema/string-unicode.exit
+ create mode 100644 tests/qapi-schema/string-unicode.out
+ delete mode 100644 tests/qapi-schema/unclosed-string.err
+ delete mode 100644 tests/qapi-schema/unicode-str.err
+
+--=20
+2.21.0
 
 
