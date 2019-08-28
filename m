@@ -2,67 +2,89 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F857C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF24C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:48:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45DF322CF8
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:43:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45DF322CF8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3906E22CF8
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:48:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vGuBL2Dm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3906E22CF8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i35iv-0008Qq-Ec
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 17:43:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35416)
+	id 1i35nx-0001j0-Ch
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 17:48:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i35i5-0007xR-UZ
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:42:35 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i35mu-0001Ex-Rm
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i35i4-0003pX-AO
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:42:33 -0400
-Resent-Date: Wed, 28 Aug 2019 17:42:33 -0400
-Resent-Message-Id: <E1i35i4-0003pX-AO@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21513)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i35i4-0003pN-5O
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:42:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1567028546; cv=none; d=zoho.com; s=zohoarc; 
- b=Dh0Hwms7mec7ZBxg+bUJE+hUS2Hq7Q3qNwZcoajBbkj4xid1sVJq1XH2WA3swMyiYjm6NCeGQobazojNWGAPIxYdLFtAM1rBogH8nz7j9AxUzJ4X/kHrbds1gEvFa2+LVdtzndZ2IudEGOSlQuXpHdyYA3Jj5R/vOR94m4eXgfc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1567028546;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=/RBVGpqS2D5B8rbpTqD4mEkGZYsdJS4oCr43z3B1hcM=; 
- b=WgWBQD5Pqf50wgVdh0BzuxbuH7N/sgALWhD0pcRQW3Id+p9IgMg56q6EpFA/RrZJ3VeoEEOMA65sq2ZLFjDVZrdM1Vy/A/0178lxCeQxf+mWvNEVZ/MFf4iOHt+rbaAorbuGQTwpai/KauJNxON4e4CRjX1g5MrSvjQKpSE+yek=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1567028545329832.4630157284366;
- Wed, 28 Aug 2019 14:42:25 -0700 (PDT)
-In-Reply-To: <20190828202641.24752-1-armbru@redhat.com>
-Message-ID: <156702854444.27053.5959737036943166523@5dec9699b7de>
+ (envelope-from <richard.henderson@linaro.org>) id 1i35mt-00057r-Hm
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:47:32 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40349)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i35ms-00057b-Pn
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:47:31 -0400
+Received: by mail-pl1-x641.google.com with SMTP id h3so562152pls.7
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 14:47:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=rQoVG1rtUXmHb8EaSqHytkHb3hwTI/ksBdXXJjm8lvg=;
+ b=vGuBL2DmZWQ7xrB4EyY6KFRYDkCDzwOUO0REy31tt4N8AMSGgOylKd2jXzrIbydyER
+ BPoP/WpY6ggyhiq+0cbmrJVv2JnJKKW1zn+qnnEiNV+ake/BMnBFAsv9AoYlaEL/HPb5
+ nxnD1/cjUkwV7lmmSn9+R/Xb6dJRXCjy8MiqH8AiBOuDsIpzekgg6YnJQOFb6/2uHhXl
+ YAeJTD6px6P75KpbBhXaimcSnGJk5zpuBMZYkJtcMM3UjHgOSUQ94PLx2ZOy3nL2WmDZ
+ nozdnCe1aH0voEtKEW5inbnz7618txClXYf1eq8aGWLM/XOCJFMydmK58csf4chIo/6h
+ IgEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rQoVG1rtUXmHb8EaSqHytkHb3hwTI/ksBdXXJjm8lvg=;
+ b=nbSIBTJ0IG7g7YloquuFbrGgInPsBSV+vvB8h2eQf4riCa+OYgpy4CZpiwyh9+u/xE
+ /hTR8AmM1oJr+TMgynINauqkyULJFTI1YY0jDlX/QRjqzxJ7J+XZ67hPMhdL7oKOCHiZ
+ E8wX+U6bb6YGMmz4oe//7C2LyXtjJH5/kwKz9fruWvBmV1so2aLWc4VyLe80O2kLIPF1
+ dQjkGZoeVmJmXC89uGaHo1ttTZY1VKkKbFbRVUragfyTv7axg/Ovyhff9ytjRWKnrLf3
+ kRAxwEHGxxbKwEUjRVopAyEZj1lVVjHbE+Cfjm8uy+5v0OhYMllrSuxiO21GCI5fVqfy
+ iHdQ==
+X-Gm-Message-State: APjAAAVVqleQm3VwR6YlpSTsWLY3ENMbb0VIgA89DM0IUsPGYlrbf1de
+ aLhqoYk0D4flGxoBmkolQ5Y90A==
+X-Google-Smtp-Source: APXvYqx000l8j8c4n+NUsUv0NJ3wBLXO8PB7l0RfLuF161/K+2VAIZRt4ricKBhxWPMDBllSgwXHRA==
+X-Received: by 2002:a17:902:d:: with SMTP id 13mr6340078pla.226.1567028849212; 
+ Wed, 28 Aug 2019 14:47:29 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d6sm125231pgf.55.2019.08.28.14.47.27
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 28 Aug 2019 14:47:28 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+References: <20190824213451.31118-1-richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c67a2220-3800-5ac7-1398-d1fd1615cce8@linaro.org>
+Date: Wed, 28 Aug 2019 14:47:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Wed, 28 Aug 2019 14:42:25 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH 0/9] qapi: Schema language cleanups & doc
- improvements
+In-Reply-To: <20190824213451.31118-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH 0/6] exec: Cleanup watchpoints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,71 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+Cc: peter.maydell@linaro.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgyODIwMjY0MS4yNDc1
-Mi0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvOV0gcWFwaTogU2NoZW1h
-IGxhbmd1YWdlIGNsZWFudXBzICYgZG9jIGltcHJvdmVtZW50cwpNZXNzYWdlLWlkOiAyMDE5MDgy
-ODIwMjY0MS4yNDc1Mi0xLWFybWJydUByZWRoYXQuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251
-bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNl
-Li4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMjdj
-YzI5IGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogSW1wcm92ZSBRQVBJIHNjaGVtYSBsYW5ndWFn
-ZSBkb2MKNzIzOTdmNiBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJld3JpdGUgaW50cm9kdWN0
-aW9uIHRvIHNjaGVtYQo2MmIwMmZiIGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmV3cml0ZSBj
-b21wYXRpYmlsaXR5IGNvbnNpZGVyYXRpb25zCjk3YmYyM2YgZG9jcy9kZXZlbC9xYXBpLWNvZGUt
-Z2VuOiBSZW9yZGVyIHNlY3Rpb25zIGZvciByZWFkYWJpbGl0eQpkZmQxM2UyIHRlc3RzL3FhcGkt
-c2NoZW1hOiBDb25zaXN0ZW50bHkgbmFtZSBzdHJpbmcgdGVzdHMgc3RyaW5nLUZPTwo1ZTIxYzNi
-IHFhcGk6IE91dGxhdyBjb250cm9sIGNoYXJhY3RlcnMgaW4gc3RyaW5ncwoxY2QzNGY4IGRvY3Mv
-ZGV2ZWwvcWFwaS1jb2RlLWdlbjogTWlub3Igc3BlY2lmaWNhdGlvbiBmaXhlcwphYjZhYjI5IHFh
-cGk6IERyb3Agc3VwcG9ydCBmb3IgYm94ZWQgYWx0ZXJuYXRlIGZvciBjb21tYW5kcywgZXZlbnRz
-CjI5ZGYzYTUgcWFwaTogRHJvcCBjaGVja190eXBlKCkncyByZWR1bmRhbnQgcGFyYW1ldGVyIEBh
-bGxvd19vcHRpb25hbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS85IENoZWNraW5nIGNvbW1pdCAy
-OWRmM2E1NGU1M2UgKHFhcGk6IERyb3AgY2hlY2tfdHlwZSgpJ3MgcmVkdW5kYW50IHBhcmFtZXRl
-ciBAYWxsb3dfb3B0aW9uYWwpCjIvOSBDaGVja2luZyBjb21taXQgYWI2YWIyOWQ4MGUwIChxYXBp
-OiBEcm9wIHN1cHBvcnQgZm9yIGJveGVkIGFsdGVybmF0ZSBmb3IgY29tbWFuZHMsIGV2ZW50cykK
-My85IENoZWNraW5nIGNvbW1pdCAxY2QzNGY4Y2JkMGUgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdl
-bjogTWlub3Igc3BlY2lmaWNhdGlvbiBmaXhlcykKNC85IENoZWNraW5nIGNvbW1pdCA1ZTIxYzNi
-YmM2ZDMgKHFhcGk6IE91dGxhdyBjb250cm9sIGNoYXJhY3RlcnMgaW4gc3RyaW5ncykKV0FSTklO
-RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
-IHVwZGF0aW5nPwojNTI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IEludmFsaWQgVVRG
-LTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBzaG91bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAoj
-NzI6IEZJTEU6IHRlc3RzL3FhcGktc2NoZW1hL3N0cmluZy1jb250cm9sLmpzb246MjoKK3sgJ2Nv
-bW1hbmQnOiAn4oymCuKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gAonIH0KICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMCBs
-aW5lcyBjaGVja2VkCgpQYXRjaCA0LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvOSBD
-aGVja2luZyBjb21taXQgZGZkMTNlMmIzZGVjICh0ZXN0cy9xYXBpLXNjaGVtYTogQ29uc2lzdGVu
-dGx5IG5hbWUgc3RyaW5nIHRlc3RzIHN0cmluZy1GT08pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
-ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMzOiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTggbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggNS85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjYvOSBDaGVj
-a2luZyBjb21taXQgOTdiZjIzZmQ5YTBkIChkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJlb3Jk
-ZXIgc2VjdGlvbnMgZm9yIHJlYWRhYmlsaXR5KQo3LzkgQ2hlY2tpbmcgY29tbWl0IDYyYjAyZmI3
-YTY3NSAoZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBSZXdyaXRlIGNvbXBhdGliaWxpdHkgY29u
-c2lkZXJhdGlvbnMpCjgvOSBDaGVja2luZyBjb21taXQgNzIzOTdmNjMzNWQ4IChkb2NzL2RldmVs
-L3FhcGktY29kZS1nZW46IFJld3JpdGUgaW50cm9kdWN0aW9uIHRvIHNjaGVtYSkKOS85IENoZWNr
-aW5nIGNvbW1pdCBkMjdjYzI5MjgyNmUgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogSW1wcm92
-ZSBRQVBJIHNjaGVtYSBsYW5ndWFnZSBkb2MpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwODI4MjAyNjQxLjI0NzUyLTEtYXJtYnJ1QHJlZGhh
-dC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Ping for 5/6, as yet unreviewed.
+
+
+r~
+
+On 8/24/19 2:34 PM, Richard Henderson wrote:
+> As discussed with David earlier this week, the current implementation
+> of watchpoints cannot work, at least reliably.  We are raising an
+> exception out of the middle of the i/o access path which does not
+> even attempt to unwind the guest cpu state, nor does it have the
+> information required to do so.
+> 
+> This moves the implementation to the cputlb helpers.  This is a point
+> at which we can and do raise exceptions properly.
+> 
+> In addition, this fixes a bug in that unaligned stores were detecting
+> watchpoints in the middle of the byte-by-byte operation, which means
+> that we didn't signal the watchpoint early enough to avoid state change.
+> 
+> 
+> r~
+> 
+> 
+> David Hildenbrand (2):
+>   exec: Factor out core logic of check_watchpoint()
+>   tcg: Check for watchpoints in probe_write()
+> 
+> Richard Henderson (4):
+>   exec: Move user-only watchpoint stubs inline
+>   cputlb: Fold TLB_RECHECK into TLB_INVALID_MASK
+>   exec: Factor out cpu_watchpoint_address_matches
+>   cputlb: Handle watchpoints via TLB_WATCHPOINT
+> 
+>  include/exec/cpu-all.h |   8 +-
+>  include/hw/core/cpu.h  |  37 +++++++++
+>  accel/tcg/cputlb.c     | 156 ++++++++++++++++++++++++--------------
+>  exec.c                 | 167 +++++++++--------------------------------
+>  4 files changed, 173 insertions(+), 195 deletions(-)
+> 
 
 
