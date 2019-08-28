@@ -2,124 +2,67 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF9DC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 15:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA302C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 15:28:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 197A722CED
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 15:25:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="arFTXj+q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197A722CED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 809FF2077B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 15:28:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809FF2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2zoh-0003Lr-4Z
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 11:24:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43030)
+	id 1i2zsA-0004zD-O9
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 11:28:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i2zns-0002kk-5L
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 11:24:09 -0400
+ (envelope-from <imammedo@redhat.com>) id 1i2zrS-0004aP-6Q
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 11:27:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i2znr-0001j5-4b
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 11:24:08 -0400
-Received: from mail-eopbgr130103.outbound.protection.outlook.com
- ([40.107.13.103]:6118 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1i2znn-0001dj-IL; Wed, 28 Aug 2019 11:24:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H9RYDasKoG1Pwctevftn4GqkH6D5KsqqrWIR8Mf/InLl+Zlb41dg2md1ZnzVpdp2B9+Z0MmNZ3d3fm709XKxnJm/EhZjZTbGazeYpi2unW1nqBfxVZZHAyUJp49Ni2sruF8qzf28QLtBvqo8nUNWbtIVYq7diw32gEQJDq+95uAYubr1GY6r7xnFkru6nFysFSMjDmWmKBR9zeruhSNUeqZrxGBiQrMoJTaDxtaQJduIEn50yjHy2gLTgDcWaf0Cww/IRdoRf5d83k5ucIU3+77wNyuYEEgilelVGwDVi+3jf6jTBRZM4Q6hlsrcTfKxx6lNqY/JRJoS81jinvBJ/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RsmlJ168AcjhjPmFMZFe5W03H/GyxF80nxzNEi7erAI=;
- b=NByBe+3ISt3CimJ+MMolRs3PGQYpU7LNayhUBgD0UTgSAqPzKMb/pZn8KuYi5XEMcEmQdr4qoKXRenBBuPT4LpCpefhuuViIte0/qPzU01ilAsMU8C0IBB0D3/POL7bQF/82Qd1QwhFHGXTq9ig6+bM/CUtj/Ko+cu8eV3wB+TtcFv9WMyQIKo2PrmDwQqrYYVemOMVU/KZwXisX4qizgUJKboElwHEaTRod9HZj2+jvtdqH1lPFi1vAkNy7kI23Apqxu/2n/jTUgTB9DlNNBXOiJAz41LtpVtC9bCaju5okZs53MpkPVB+91xlizOP1Ps485OemCG2QN5rZMbaqSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RsmlJ168AcjhjPmFMZFe5W03H/GyxF80nxzNEi7erAI=;
- b=arFTXj+qWh0IK86/6Tw3vNufhjJSRTAZ6RF8SDIiL3P3RUs13UWhSv8P3fV90mICqhvlJKVQAR42c0GBDyiu574lZqBH2gFOUNFeB7YMzilWoVcA5o3AWlqtrVA86MJ6C1spK1qyHP29lGE7xybR5P8apR9c1Pd8/QeVrCb6ziI=
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com (20.179.28.141) by
- VI1PR08MB4526.eurprd08.prod.outlook.com (20.179.26.14) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2199.21; Wed, 28 Aug 2019 15:24:00 +0000
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::5542:8398:f1bd:f8c7]) by VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::5542:8398:f1bd:f8c7%6]) with mapi id 15.20.2199.021; Wed, 28 Aug 2019
- 15:24:00 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy
- <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [Qemu-block] [PATCH v5 6/6] iotests: extend sleeping time under
- Valgrind
-Thread-Index: AQHVPk9L+aGW2bt4m0G0OQXEvFC84qb9H8GAgAvyDoCABpDSgIABSfkA
-Date: Wed, 28 Aug 2019 15:24:00 +0000
-Message-ID: <421d92ed-0eb1-6e45-f080-0198c1739e17@virtuozzo.com>
-References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563553816-148827-7-git-send-email-andrey.shinkevich@virtuozzo.com>
- <083ece64-0178-fe4a-45df-331257a115fb@redhat.com>
- <350a5dee-7bc7-cfa0-e5b4-0c0f2202d119@virtuozzo.com>
- <27a1a3e5-3ebd-2e64-a36e-e8e4728b2b6d@redhat.com>
-In-Reply-To: <27a1a3e5-3ebd-2e64-a36e-e8e4728b2b6d@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0502CA0006.eurprd05.prod.outlook.com
- (2603:10a6:3:e3::16) To VI1PR08MB4399.eurprd08.prod.outlook.com
- (2603:10a6:803:102::13)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ab559526-a405-44fa-16f7-08d72bcbc06a
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:VI1PR08MB4526; 
-x-ms-traffictypediagnostic: VI1PR08MB4526:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR08MB4526384E26E90F5D6DDAFBF3F4A30@VI1PR08MB4526.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:386;
-x-forefront-prvs: 014304E855
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(346002)(396003)(39850400004)(376002)(366004)(199004)(189003)(3846002)(305945005)(6116002)(2501003)(186003)(7736002)(11346002)(478600001)(31696002)(2906002)(14454004)(446003)(99286004)(52116002)(486006)(76176011)(86362001)(66066001)(2616005)(476003)(229853002)(316002)(26005)(44832011)(31686004)(110136005)(54906003)(2201001)(386003)(81166006)(8936002)(25786009)(14444005)(81156014)(256004)(64756008)(66446008)(66946007)(66476007)(102836004)(8676002)(66556008)(6506007)(107886003)(6486002)(5660300002)(4326008)(53546011)(36756003)(53936002)(6512007)(71190400001)(71200400001)(6246003)(6436002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB4526;
- H:VI1PR08MB4399.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: BxgVFZQc959RBi9wF0NH7eXFvGvoclPV0zv4IfoxtXuSh7fcsfaJI4miOOWl04+vvklYqS330/GO2pC5733Ci9dnFVtu7Xpl0GTyOHjg6TCZJ22WczM2ocGu2j6xBNs3TrW9ABthCrSmNkkD2ZOp9CxmumTwYkoyVzvbIesm5LuQ/ctBn8bPUAwEnqzd93/CSH9/K5FU5N3/XfjG87lPpgUKKD+U5IqnR2nkO2Egzlxq8/4Mh0JxMoiOY4FpFQIaTVaNvONx4wlScN4T5N/FYSiy2xOL5kgMXntMY0G7Bq5O0dSqn/mF7X1oHVThjry+KA/aA5sOroYucoXoiihufQlCAoiwEy6MW+NB0KlHvy3qXPLY4vuolP+Rt1iQ0CCCXCOJr+OxfbvRegHBatx4u+HXasm0OelLfA+3YqrIWIs=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9893305C2703164E873BB84600321CD9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <imammedo@redhat.com>) id 1i2zrQ-0004GJ-Fu
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 11:27:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36148)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1i2zrQ-0004Ft-8Q
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 11:27:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4198B308FBA6;
+ Wed, 28 Aug 2019 15:27:47 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 903B75DC18;
+ Wed, 28 Aug 2019 15:27:40 +0000 (UTC)
+Date: Wed, 28 Aug 2019 17:27:38 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190828172738.7c09e114@redhat.com>
+In-Reply-To: <87ftlmeg92.fsf@dusky.pond.sub.org>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
+ <20190815183803.13346-4-ehabkost@redhat.com>
+ <20190816152011.0c673027@redhat.com>
+ <20190816165635.GC3908@habkost.net>
+ <87sgq0qprn.fsf@dusky.pond.sub.org>
+ <20190826165135.03e97e1b@redhat.com>
+ <87ftlmeg92.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab559526-a405-44fa-16f7-08d72bcbc06a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2019 15:24:00.4347 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NbXaxfs68/sXWuVbYovsztrXAtvg9sI45ukDTl95mkrh/VY88a7sFKCJp5eKSfbc3s+KloOap+WmqPtbgxcFiMcrdDq0nv6o/0XKLwT4oBU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB4526
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.13.103
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 6/6] iotests: extend
- sleeping time under Valgrind
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Wed, 28 Aug 2019 15:27:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties
+ mandatory unless necessary
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,55 +74,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Like Xu <like.xu@linux.intel.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCk9uIDI3LzA4LzIwMTkgMjI6NDIsIEpvaG4gU25vdyB3cm90ZToNCj4gDQo+IA0KPiBPbiA4
-LzIzLzE5IDExOjI3IEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4g
-MTYuMDguMjAxOSA0OjAxLCBKb2huIFNub3cgd3JvdGU6DQo+Pj4NCj4+Pg0KPj4+IE9uIDcvMTkv
-MTkgMTI6MzAgUE0sIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4+PiBUbyBzeW5jaHJvbml6
-ZSB0aGUgdGltZSB3aGVuIFFFTVUgaXMgcnVubmluZyBsb25nZXIgdW5kZXIgdGhlIFZhbGdyaW5k
-LA0KPj4+PiBpbmNyZWFzZSB0aGUgc2xlZXBpbmcgdGltZSBpbiB0aGUgdGVzdCAyNDcuDQo+Pj4+
-DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmlj
-aEB2aXJ0dW96em8uY29tPg0KPj4+PiBSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9n
-aWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+Pj4gICAgdGVz
-dHMvcWVtdS1pb3Rlc3RzLzI0NyB8IDYgKysrKystDQo+Pj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCA1
-IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4+Pj4NCj4+Pj4gZGlmZiAtLWdpdCBhL3Rl
-c3RzL3FlbXUtaW90ZXN0cy8yNDcgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQ3DQo+Pj4+IGluZGV4
-IDU0NmE3OTQuLmM4NTNiNzMgMTAwNzU1DQo+Pj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8y
-NDcNCj4+Pj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Nw0KPj4+PiBAQCAtNTcsNyArNTcs
-MTEgQEAgVEVTVF9JTUc9IiRURVNUX0lNRy40IiBfbWFrZV90ZXN0X2ltZyAkc2l6ZQ0KPj4+PiAg
-ICB7ImV4ZWN1dGUiOiJibG9jay1jb21taXQiLA0KPj4+PiAgICAgImFyZ3VtZW50cyI6eyJkZXZp
-Y2UiOiJmb3JtYXQtNCIsICJ0b3Atbm9kZSI6ICJmb3JtYXQtMiIsICJiYXNlLW5vZGUiOiJmb3Jt
-YXQtMCIsICJqb2ItaWQiOiJqb2IwIn19DQo+Pj4+ICAgIEVPRg0KPj4+PiAtc2xlZXAgMQ0KPj4+
-PiAraWYgWyAiJHtWQUxHUklORF9RRU1VfSIgPT0gInkiIF07IHRoZW4NCj4+Pj4gKyAgICBzbGVl
-cCAxMA0KPj4+PiArZWxzZQ0KPj4+PiArICAgIHNsZWVwIDENCj4+Pj4gK2ZpDQo+Pj4+ICAgIGVj
-aG8gJ3siZXhlY3V0ZSI6InF1aXQifScNCj4+Pj4gICAgKSB8ICRRRU1VIC1xbXAgc3RkaW8gLW5v
-Z3JhcGhpYyAtbm9kZWZhdWx0cyBcDQo+Pj4+ICAgICAgICAtYmxvY2tkZXYgZmlsZSxub2RlLW5h
-bWU9ZmlsZS0wLGZpbGVuYW1lPSRURVNUX0lNRy4wLGF1dG8tcmVhZC1vbmx5PW9uIFwNCj4+Pj4N
-Cj4+Pg0KPj4+IFRoaXMgbWFrZXMgbWUgbmVydm91cywgdGhvdWdoLiBXb24ndCB0aGlzIHJhY2Ug
-dGVycmlibHk/IChXYWl0LCB3aHkNCj4+PiBkb2Vzbid0IGl0IHJhY2UgYWxyZWFkeT8pDQo+Pj4N
-Cj4+DQo+PiBIbW0sIGhvd2V2ZXIgaXQgd29ya3Mgc29tZWhvdy4gSSdtIGFmcmFpZCB0aGF0IGV2
-ZXJ5dGhpbmcgd2l0aCAic2xlZXAiIGlzIGRlZmluaXRlbHkgcmFjeS4uDQo+PiBPciB3aGF0IGRv
-IHlvdSBtZWFuPw0KPj4NCj4gDQo+IFJpZ2h0IC0tIGFueXRoaW5nIHdpdGggYSBzbGVlcCBpcyBh
-bHJlYWR5IGF0IHJpc2sgZm9yIHJhY2luZy4NCj4gDQo+IFdoYXQgSSBhbSBwaWNraW5nIHVwIG9u
-IGhlcmUgaXMgdGhhdCB3aXRoIHZhbGdyaW5kLCB0aGVyZSBpcyBhbiBldmVuDQo+IGdyZWF0ZXIg
-Y29tcHV0YXRpb25hbCBvdmVyaGVhZCB0aGF0J3MgbXVjaCBoYXJkZXIgdG8gcHJlZGljdCwgc28g
-SSB3YXMNCj4gd29uZGVyaW5nIGhvdyB0aGVzZSB2YWx1ZXMgd2VyZSBkZXRlcm1pbmVkLg0KPiAN
-Cg0KSSBqdXN0IGZvbGxvd2VkIHRoZSB0cmVuZCBhbmQgZXh0ZW5kZWQgdGhlIHNsZWVwaW5nIHRp
-bWUgd2l0aCBhIGdyYXRlciANCnRvbGVyYW5jZSBzbyB0aGF0IHRoZSB0ZXN0IGNvdWxkIHBhc3Mg
-b24gc3lzdGVtcyB3aGVyZSB0aGUgJ3NsZWVwIDEnIA0KY29tbWFuZCBoZWxwcyB0byBwYXNzIHdp
-dGhvdXQgVmFsZ3JpbmQuIFdlIGNvdWxkIHJld3JpdGUgdGhlIHRlc3QgMjQ3IGluIA0KUHl0aG9u
-IGluIGEgc2VwYXJhdGUgc2VyaWVzLCBzaGFsbCB3ZT8NCg0KQW5kcmV5DQoNCj4gKEkgd291bGRu
-J3Qgd2l0aGhvbGQgYW4gUkIgZm9yIHRoYXQgYWxvbmUgLS0gdGhlIHNsZWVwcyBhcmUgZXhpc3Rp
-bmcNCj4gcHJvYmxlbXMuKQ0KPiANCj4gV2hhdCBJIG1vdmVkIG9uIHRvIHdvbmRlcmluZyBpbiBw
-YXJ0aWN1bGFyIGlzIHdoeSB0ZXN0IDI0NyBkb2Vzbid0DQo+IGFscmVhZHkgaGF2ZSByYWNlIHBy
-b2JsZW1zLCBiZWNhdXNlIGl0IGxvb2tzIHF1aXRlIGZyYWdpbGUuDQo+IA0KPiBOZWl0aGVyIG9m
-IHRoZXNlIGFyZSByZWFsbHkgQW5kcmV5J3MgcHJvYmxlbXM7IEkgd2FzIGp1c3Qgc3VycHJpc2Vk
-DQo+IG1vbWVudGFyaWx5IHRoYXQgSSBkb24ndCBzZWUgMjQ3IGZhaWwgbW9yZSBvZnRlbiBhbHJl
-YWR5LCBhcy1pcy4NCj4gDQo+IC0tanMNCj4gDQoNCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRz
-LA0KQW5kcmV5IFNoaW5rZXZpY2gNCg==
+On Tue, 27 Aug 2019 18:15:53 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Igor Mammedov <imammedo@redhat.com> writes:
+> 
+> > On Sat, 17 Aug 2019 08:17:48 +0200
+> > Markus Armbruster <armbru@redhat.com> wrote:
+> >  
+> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+> >>   
+> >> > On Fri, Aug 16, 2019 at 03:20:11PM +0200, Igor Mammedov wrote:    
+> >> >> On Thu, 15 Aug 2019 15:38:03 -0300
+> >> >> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >> >>     
+> >> >> > We have this issue reported when using libvirt to hotplug CPUs:
+> >> >> > https://bugzilla.redhat.com/show_bug.cgi?id=1741451
+> >> >> > 
+> >> >> > Basically, libvirt is not copying die-id from
+> >> >> > query-hotpluggable-cpus, but die-id is now mandatory.    
+> >> >> 
+> >> >> this should have been gated on compat property and affect
+> >> >> only new machine types.
+> >> >> Maybe we should do just that instead of fixup so libvirt
+> >> >> would finally make proper handling of query-hotpluggable-cpus.
+> >> >> 
+> >> >>      
+> >> >> > We could blame libvirt and say it is not following the documented
+> >> >> > interface, because we have this buried in the QAPI schema
+> >> >> > documentation:    
+> >> >> 
+> >> >> I wouldn't say buried, if I understand it right QAPI schema
+> >> >> should be the authoritative source of interface description.
+> >> >> 
+> >> >> If I recall it's not the first time, there was similar issue
+> >> >> for exactly the same reason (libvirt not passing through
+> >> >> all properties from query-hotpluggable-cpus).
+> >> >> 
+> >> >> And we had to fix it up on QEMU side (numa_cpu_pre_plug),
+> >> >> but it seems 2 years later libvirt is still broken the same way :(
+> >> >> 
+> >> >> Should we really do fixups or finaly fix it on libvirt side?    
+> >> >
+> >> > Is it truly a bug in libvirt?  Making QEMU behave differently
+> >> > when getting exactly the same input sounds like a bad idea, even
+> >> > if we documented that at the QAPI documentation.
+> >> >
+> >> > My suggestion is to instead drop the comment below from the QAPI
+> >> > documentation.  New properties shouldn't become mandatory.    
+> >> 
+> >> The "comment below" is this one, in qapi/machine.json:
+> >>   
+> >> >> > > Note: currently there are 5 properties that could be present
+> >> >> > > but management should be prepared to pass through other
+> >> >> > > properties with device_add command to allow for future
+> >> >> > > interface extension. This also requires the filed names to be kept in
+> >> >> > > sync with the properties passed to -device/device_add.      
+> >> 
+> >> Goes back to commit d4633541ee0, v2.7.0.  @die-id was the first such
+> >> interface extension.
+> >> 
+> >> A rule like "to use command C, you must pass it whatever you get from
+> >> command Q" punches a hole into the "QMP is a stable interface" promise.
+> >> Retroactively tacking it onto an existing interface like device-add
+> >> some-existing-device is even more problematic than specifying it for a
+> >> new interface.  Mind, this is not a categorical "can't ever do that".
+> >> It's more like "you better show this is less bad than all the
+> >> alternatives we can think of, and we've thought pretty hard".
+> >> Since this particular hole failed us the first time anybody actually
+> >> tried to wiggle through it, I think Eduardo has a point when he calls
+> >> for filling it in by deleting the comment.  
+> >
+> > That was a consensus we were able to reach when discussing cpu hotplug
+> > QMP interface. If I recall correctly idea was that it should work for
+> > different targets (cpu topology properties target specific) and be
+> > extensible without breaking old mgmt stack  or requiring its update
+> > in lock step.
+> >
+> > If implemented correctly mgmt would not only query from QEMU/machine
+> > possible CPUs (with properties and valid values needed to plug it in,
+> > which it does already) but also 'keep' them around and pass back to
+> > device_add. In that case it would have worked as designed just fine.
+> >
+> > But this also shows a problem that we still need versioned machine type
+> > to keep old set of properties for old machine types anyway and we can
+> > miss it during review as tests we have might be not enough
+> > (tests/cpu-plug-test didn't detect it for some reason).  
+> 
+> I think the lesson to learn here is "non-trivial rules on correct
+> interface use need to be backed by integration tests".
+> 
+> The rule in question is "a CPU hot-plug with device_add must specify all
+> the properties returned by query-hotpluggable-cpus".
+> 
+> Sadly, stipulating such rules does not change the de facto API.  Case in
+> point: libvirt did not obey this one, and even though it's been in place
+> for years, yet we're (rightly!) unwilling to blame libvirt for the
+> regression.  The stipulation was futile.
+it will be futile while we continue fixing up QEMU.
+practice shows there will be nothing to motivate fixing
+client side for years (really, why even bother???).
+
+> How could we increase our chances that management applications pick up
+> such rules?  I can see only one promising way: make tests fail unless
+> they do.  Add some arbitray dummy property, fail the hot plug unless
+> it's given.  Of course, we can't do that, because it's exactly the
+> breakage we're trying to avoid.  So do it only when QEMU is run with
+> --future, then have integration tests run it that way.
+Unfortunately it didn't work this time,
+it was too late when integration tests caught die-id issue.
+Adding random property would ensure that client won't be able
+to implement only 'dummy' instead of copying all properties,
+but too late detected bug issue would remain the same.
+
+PS:
+it's also me to blame not paying much attention to series and
+breaking tests/cpu-plug-test, which allowed this issue to sip
+through without any notice. We had test_plug_with_device_add_x86()
+which would caught issue if it was run and I did break it with
+commit bc1fb850a31. /me looking into fixing it/
+
+ 
+> Aside: I'm afraid "# TODO: Better documentation; currently there is
+> none" didn't exactly help with query-hotpluggable-cpus uptake.
+> [...]
+
 
