@@ -2,69 +2,64 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92AE5C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 18:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E981C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 18:42:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66EC420644
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 18:23:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EC420644
+	by mail.kernel.org (Postfix) with ESMTPS id 5DF642080F
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 18:42:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DF642080F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i32bK-0006b3-JO
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 14:23:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58595)
+	id 1i32te-0003LH-UZ
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 14:42:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33192)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mtosatti@redhat.com>) id 1i32aR-0005td-Hl
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 14:22:28 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1i32rx-0001oJ-QV
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 14:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mtosatti@redhat.com>) id 1i32aP-0000fd-Di
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 14:22:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44726)
+ (envelope-from <ehabkost@redhat.com>) id 1i32rw-0003JD-4s
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 14:40:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52844)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1i32aP-0000d3-8s
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 14:22:25 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i32rv-0003Im-Vc
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 14:40:32 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5576F30821DF;
- Wed, 28 Aug 2019 18:22:23 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 10A73100194E;
- Wed, 28 Aug 2019 18:22:23 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
- by amt.cnet (Postfix) with ESMTP id 46A86105140;
- Wed, 28 Aug 2019 15:22:08 -0300 (BRT)
-Received: (from marcelo@localhost)
- by amt.cnet (8.14.7/8.14.7/Submit) id x7SIM3hP021933;
- Wed, 28 Aug 2019 15:22:03 -0300
-Date: Wed, 28 Aug 2019 15:22:03 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: Mark Kanda <mark.kanda@oracle.com>
-Message-ID: <20190828182202.GA21924@amt.cnet>
-References: <1563374298-17323-1-git-send-email-mark.kanda@oracle.com>
- <277b5916-4e46-1aef-6368-a414de4d2149@oracle.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 321B17F746;
+ Wed, 28 Aug 2019 18:40:31 +0000 (UTC)
+Received: from localhost (ovpn-116-60.gru2.redhat.com [10.97.116.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B2849600CD;
+ Wed, 28 Aug 2019 18:40:30 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <rth@twiddle.net>,
+ Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Aug 2019 15:40:15 -0300
+Message-Id: <20190828184026.5840-2-ehabkost@redhat.com>
+In-Reply-To: <20190828184026.5840-1-ehabkost@redhat.com>
+References: <20190828184026.5840-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <277b5916-4e46-1aef-6368-a414de4d2149@oracle.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 28 Aug 2019 18:22:23 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Wed, 28 Aug 2019 18:40:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v2] Only enable the halt poll
- control MSR if it is supported by the host
+Subject: [Qemu-devel] [PULL v6 01/12] includes: remove stale [smp|max]_cpus
+ externs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,45 +71,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 28, 2019 at 12:22:59PM -0500, Mark Kanda wrote:
-> Gentle ping - I would like to confirm this patch is acceptable.
-> 
-> Thanks/regards,
-> -Mark
+From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-ACK
+Commit a5e0b3311 removed these in favour of querying machine
+properties. Remove the extern declarations as well.
 
-> 
-> On 7/17/2019 9:38 AM, Mark Kanda wrote:
-> >The halt poll control MSR should only be enabled on hosts which
-> >support it.
-> >
-> >Fixes: ("kvm: i386: halt poll control MSR support")
-> >
-> >Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-> >
-> >---
-> >v2: Remove unnecessary hunks which break migration with older hosts (Paolo)
-> >---
-> >  target/i386/cpu.c | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> >diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> >index a8bafdb8b9..543bc25f64 100644
-> >--- a/target/i386/cpu.c
-> >+++ b/target/i386/cpu.c
-> >@@ -2838,7 +2838,6 @@ static PropValue kvm_default_props[] = {
-> >      { "kvm-asyncpf", "on" },
-> >      { "kvm-steal-time", "on" },
-> >      { "kvm-pv-eoi", "on" },
-> >-    { "kvm-poll-control", "on" },
-> >      { "kvmclock-stable-bit", "on" },
-> >      { "x2apic", "on" },
-> >      { "acpi", "off" },
-> >
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Cc: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190711130546.18578-1-alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Like Xu <like.xu@linux.intel.com>
+Fixes: a5e0b331193a ("vl.c: Replace smp global variables with smp machine=
+ properties")
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/sysemu/sysemu.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index d2c38f611a..44f18eb739 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -42,8 +42,6 @@ extern const char *keyboard_layout;
+ extern int win2k_install_hack;
+ extern int alt_grab;
+ extern int ctrl_grab;
+-extern int smp_cpus;
+-extern unsigned int max_cpus;
+ extern int cursor_hide;
+ extern int graphic_rotate;
+ extern int no_quit;
+--=20
+2.21.0
+
 
