@@ -2,61 +2,139 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91639C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E04BC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FBE320856
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:26:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FBE320856
+	by mail.kernel.org (Postfix) with ESMTPS id 3ADEC20856
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ADEC20856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34Wd-000301-7Z
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:26:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44192)
+	id 1i34Wi-000375-8a
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:26:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i33kK-0000AE-E4
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:36:45 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i33QB-0005Rs-KM
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i33kJ-0001pP-1r
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:36:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52524)
+ (envelope-from <jsnow@redhat.com>) id 1i33QA-0005nl-HY
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:15:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52928)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i33kI-0001p4-QX
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:36:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i33Q2-0005e5-F5; Wed, 28 Aug 2019 15:15:46 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 290EE308FC20
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 19:36:42 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-123-242.rdu2.redhat.com
- [10.10.123.242])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A7D6260F82;
- Wed, 28 Aug 2019 19:36:38 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 15:36:28 -0400
-Message-Id: <20190828193628.7687-4-crosa@redhat.com>
-In-Reply-To: <20190828193628.7687-1-crosa@redhat.com>
-References: <20190828193628.7687-1-crosa@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id BE0B28B5FF0;
+ Wed, 28 Aug 2019 19:15:45 +0000 (UTC)
+Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BDA91196B2;
+ Wed, 28 Aug 2019 19:15:42 +0000 (UTC)
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+References: <20190827185913.27427-1-nsoffer@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <f75165f2-7b48-560e-13aa-059fdb00a1c0@redhat.com>
+Date: Wed, 28 Aug 2019 15:15:41 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Wed, 28 Aug 2019 19:36:42 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190827185913.27427-1-nsoffer@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Wed, 28 Aug 2019 19:15:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/3] Acceptance test x86_cpu_model_versions:
- split into smaller tests
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] Alignment checks
+ cleanup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,137 +146,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The justifications being automatic destruction of the vm instances
-when no longer needed and more compact test naming under a common
-class.
 
-Besides those, a smaller test makes the one and only assertion rather
-obvious, which suggests that we could even get rid of the more verbose
-(and manual) error messages (to be decided).
 
-Naming of the tests tries to follow the following pattern:
+On 8/27/19 2:59 PM, Nir Soffer wrote:
+> While working on 4k support, I noticed that there is lot of code using
+> BDRV_SECTOR_SIZE (512) for checking alignment. I wonder how this can work with
+> 4k storage.
+> 
+> Lets start by cleaning up to make the code easier to understand:
+> - Use QEMU_IS_ALIGNED macro to check alignment
+> - Remove unneeded masks based on BDRV_SECTOR_SIZE
+> 
+> Nir Soffer (2):
+>   block: Use QEMU_IS_ALIGNED
+>   block: Remove unused masks
+> 
+>  block/bochs.c         | 4 ++--
+>  block/cloop.c         | 4 ++--
+>  block/dmg.c           | 4 ++--
+>  block/io.c            | 8 ++++----
+>  block/qcow2-cluster.c | 4 ++--
+>  block/qcow2.c         | 4 ++--
+>  block/vvfat.c         | 8 ++++----
+>  include/block/block.h | 2 --
+>  migration/block.c     | 2 +-
+>  qemu-img.c            | 2 +-
+>  10 files changed, 20 insertions(+), 22 deletions(-)
+> 
 
- test_($cpu_version)_($no_arch_capabitilies_set_or_unset)_($machine_versi=
-on)
+V2 changelog?
 
-The presence of each naming component is optional, depending on
-whether the test manually sets it or not.
+(Looks like adding patch 2 as a result of changing away users from the
+BDRV_SECTOR_MASK.)
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/acceptance/x86_cpu_model_versions.py | 23 ++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
-
-diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
-e/x86_cpu_model_versions.py
-index 220d18f68d..5fc9ca4bc6 100644
---- a/tests/acceptance/x86_cpu_model_versions.py
-+++ b/tests/acceptance/x86_cpu_model_versions.py
-@@ -234,7 +234,14 @@ class X86CPUModelAliases(avocado_qemu.Test):
-=20
-         self.validate_aliases(cpus)
-=20
--    def test_Cascadelake_arch_capabilities_result(self):
-+
-+class CascadelakeArchCapabilities(avocado_qemu.Test):
-+    """
-+    Validation of Cascadelake arch-capabilities
-+
-+    :avocado: tags=3Darch:x86_64
-+    """
-+    def test_4_1(self):
-         # machine-type only:
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-@@ -243,8 +250,8 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.launch()
-         self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.1 + Cascadelake-Server should not =
-have arch-capabilities')
--        vm.shutdown()
-=20
-+    def test_4_0(self):
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-         vm.set_machine('pc-i440fx-4.0')
-@@ -252,8 +259,8 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.launch()
-         self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.0 + Cascadelake-Server should not =
-have arch-capabilities')
--        vm.shutdown()
-=20
-+    def test_set_4_0(self):
-         # command line must override machine-type if CPU model is not ve=
-rsioned:
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-@@ -262,8 +269,8 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.launch()
-         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-                         'pc-i440fx-4.0 + Cascadelake-Server,+arch-capabi=
-lities should have arch-capabilities')
--        vm.shutdown()
-=20
-+    def test_unset_4_1(self):
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-         vm.set_machine('pc-i440fx-4.1')
-@@ -271,8 +278,8 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.launch()
-         self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.1 + Cascadelake-Server,-arch-capab=
-ilities should not have arch-capabilities')
--        vm.shutdown()
-=20
-+    def test_v1_4_0(self):
-         # versioned CPU model overrides machine-type:
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-@@ -281,8 +288,8 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.launch()
-         self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.0 + Cascadelake-Server-v1 should n=
-ot have arch-capabilities')
--        vm.shutdown()
-=20
-+    def test_v2_4_0(self):
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-         vm.set_machine('pc-i440fx-4.0')
-@@ -290,8 +297,8 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.launch()
-         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.0 + Cascadelake-Server-v2 should h=
-ave arch-capabilities')
--        vm.shutdown()
-=20
-+    def test_v1_set_4_0(self):
-         # command line must override machine-type and versioned CPU mode=
-l:
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-@@ -300,8 +307,8 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.launch()
-         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.0 + Cascadelake-Server-v1,+arch-ca=
-pabilities should have arch-capabilities')
--        vm.shutdown()
-=20
-+    def test_v2_unset_4_1(self):
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-         vm.set_machine('pc-i440fx-4.1')
---=20
-2.21.0
-
+Reviewed-by: John Snow <jsnow@redhat.com>
 
