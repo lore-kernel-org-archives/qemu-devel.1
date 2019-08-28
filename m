@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E3EC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D17F9C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D33B217F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98F18208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 19:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zmt8tJW6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D33B217F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DBgsO1/x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F18208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i33cT-0001BB-O7
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 15:28:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38166)
+	id 1i33cs-0001hr-6p
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 15:29:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37813)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i33GQ-0003kg-El
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:52 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i33G4-0003Qd-G8
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i33GK-0000JJ-KO
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:48 -0400
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:45248)
+ (envelope-from <richard.henderson@linaro.org>) id 1i33G1-0008Vc-6B
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:28 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42123)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i33GK-0000IQ-8g
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:44 -0400
-Received: by mail-pl1-x630.google.com with SMTP id y8so379312plr.12
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:05:43 -0700 (PDT)
+ id 1i33G0-0008U0-O1
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:05:24 -0400
+Received: by mail-pg1-x541.google.com with SMTP id p3so210587pgb.9
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:05:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=2z7Ln/9N4XB/zpfp9+WV/L8Yn7I2nO4gdCcvWAyiB/s=;
- b=Zmt8tJW6frf8+peKagExJljxGKBy66T4l+AJH6ShMG5qztZr/oLtAwEiWJ53LuqFN+
- x+klBSvLmEPL1SSe/G2bjs27s3W8PlorfOLoolAeqTaaZnTbdDSxlWeq4Nf4IVUo62ag
- Ozyh2/5+i2NtkHznMbshJXxNOE6teMxUgHCalAZfngVy0P1+BjR6FRVhBkJ7Tmqrl8tI
- XL+gEGrX1gf5Vr9wo9CQkfq00G5N3YJLD8orAjAh+rbbEJuylGTDoFkIr2iu47x93t6D
- GFcpI6AMzR1cSb607R48wp9ncbkpqZFFcRX1a66710t3Gc6PqyNoqSIGqmUT1oq5TPno
- W+yw==
+ bh=M4p7h/i/Z1XZ25OuZSRZK70uUr5w+EGNQy0NQKl5v38=;
+ b=DBgsO1/xWzgPpKNvrbG+YB3HQ4JL62aYAPH+viDgSpAf8VLn0Hmybnp7Q4hGMd2R1d
+ Vy1kibEJdR9rtiKYrkr3iD9xBEuT0RAv1Z8VGUUEidmeSdEgy8HhYlvX6EvMKt4xCWTI
+ md5hSQIOwO9c3wAc4bA4gEWKBqEt31AQM3miIANLGY24Kt7Vc97ecx/xVtBUYpTsYfCl
+ +jwHKBt5opkh2vvacJ/xg1ic+++cPUKUFWG4/MQ1EHQxaZL8UifQV2GxHtL8uO60JZhr
+ C8Hwh9v42qHzLEat7EoFdrfs2f3zsJhZrccGTjdkv667+xWJHY3KG3D8Odf58lRP68xk
+ TVjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=2z7Ln/9N4XB/zpfp9+WV/L8Yn7I2nO4gdCcvWAyiB/s=;
- b=OUA+WVpxF8Y8GHcLa8JB+FO6laDpL08qacgrp3Y7L2eJddXaHr8sZARt4/LBomnSnn
- h/NhyNiz+ml7sXFE6ERCIWPJzw9IIEhgAb/lgke+esdGDVErXJiMjXB1gNLP3eqHXI0F
- E1rXmbeEf8s+oitWVbcc4jWB5zt8hOkGGkUZL7rpBKp8Xi2IkfVmJfrnYCINQUiNFQ/R
- lw+okAsP5WXG/hC8vH7+3RKg8x4PZkZfwSpH/UcFtfctxTov2wy7L72rdqk8rs1iikxC
- XZ5jYh1f18NimeufGp9+S8wU8Phq8dnp1jRqcukzb0UfsodDjOoZzEURYQhGI3vxNrJI
- utfw==
-X-Gm-Message-State: APjAAAWf0fEf3frJ6tLbLKdcfXYH2mNMluns8G7uVhb0TpAkpXGXakXg
- xjOqogYfzaFbBUiot76yjt/CORPwJ18=
-X-Google-Smtp-Source: APXvYqxYqvXKAzZMCBQ01YDrbv7SOCjuQgQ/6yjBMbKWPdUF9L6evTC//ITdF4g5zjjQF908xgN1xA==
-X-Received: by 2002:a17:902:bcc2:: with SMTP id
- o2mr5891739pls.127.1567019141391; 
- Wed, 28 Aug 2019 12:05:41 -0700 (PDT)
+ bh=M4p7h/i/Z1XZ25OuZSRZK70uUr5w+EGNQy0NQKl5v38=;
+ b=A0+Cj6jgSBqk1wD3gDqU7OUF2p5/zfD688ky/cQV2VkqZFVXfBIFvN6NqT3q+W7j4L
+ Q459fN1tMIONu8l+3HZRgOdjQTH9C+Hxn4D7237plHOb+/EIMu1qWyyS4Zmf0VCA7Yaj
+ LjzLnvXj4vQN8dKAVh+tV3is2KmnzUpA5RWyXvmnviwDC1fJrqrciZ1O3rroEX7i4snG
+ FPaUzErzapW1ETNgvUlxOlodZtZXavg3p9pDooYDCo1oH3A3NFNoZ06O0QC+xiSX75en
+ arUz91ubDWcr7Qtoh32Rpn+lWMv+tH+yCYY3ablhpwwFY6eYZZ5LochHK8Lrhbp4rYwK
+ xX9Q==
+X-Gm-Message-State: APjAAAUWEVbtFNHEeOFYitWHe3Zja5DWaEB5OOsR86hgBd8Kk9YfnqMm
+ bBrOXxY4EsL8RVhgX5vXG3nVd7vkSW4=
+X-Google-Smtp-Source: APXvYqzN+e/5c+9N5Wjrn6GgzH99rmyRWRjKrMDuWtoDykAaACpqHMnbOo0okSJg0HOx8EmVB1thfQ==
+X-Received: by 2002:a63:2043:: with SMTP id r3mr4797328pgm.311.1567019123045; 
+ Wed, 28 Aug 2019 12:05:23 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.05.40
+ by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.05.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Aug 2019 12:05:40 -0700 (PDT)
+ Wed, 28 Aug 2019 12:05:22 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 12:04:19 -0700
-Message-Id: <20190828190456.30315-33-richard.henderson@linaro.org>
+Date: Wed, 28 Aug 2019 12:04:05 -0700
+Message-Id: <20190828190456.30315-19-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190828190456.30315-1-richard.henderson@linaro.org>
 References: <20190828190456.30315-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::630
-Subject: [Qemu-devel] [PATCH v3 32/69] target/arm: Convert B, BL,
- BLX (immediate)
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v3 18/69] target/arm: Convert the rest of A32
+ Miscelaneous instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,336 +99,226 @@ Sender: "Qemu-devel"
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c       | 133 +++++++++++++++--------------------
- target/arm/a32-uncond.decode |   8 +++
- target/arm/a32.decode        |   8 +++
- target/arm/t32.decode        |  81 ++++++++++++---------
- 4 files changed, 123 insertions(+), 107 deletions(-)
+v3: Call unallocated_encoding for IS_USER.
+---
+ target/arm/translate.c | 127 +++++++++++++++--------------------------
+ target/arm/a32.decode  |   8 +++
+ target/arm/t32.decode  |   5 ++
+ 3 files changed, 58 insertions(+), 82 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 812ce5037f..fb0e875917 100644
+index 203b6160da..ad4b3c55c6 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -7519,6 +7519,14 @@ static int t32_expandimm_imm(DisasContext *s, int x)
-     return imm;
+@@ -8498,6 +8498,47 @@ static bool trans_ERET(DisasContext *s, arg_ERET *a)
+     return true;
  }
  
-+static int t32_branch24(DisasContext *s, int x)
++static bool trans_HLT(DisasContext *s, arg_HLT *a)
 +{
-+    /* Convert J1:J2 at x[22:21] to I2:I1, which involves I=J^~S.  */
-+    x ^= !(x < 0) * (3 << 21);
-+    /* Append the final zero.  */
-+    return x << 1;
-+}
-+
- /*
-  * Include the generated decoders.
-  */
-@@ -9997,13 +10005,56 @@ static bool trans_LDM_t32(DisasContext *s, arg_ldst_block *a)
-     return do_ldm(s, a, 2);
- }
- 
-+/*
-+ * Branch, branch with link
-+ */
-+
-+static bool trans_B(DisasContext *s, arg_i *a)
-+{
-+    gen_jmp(s, read_pc(s) + a->imm);
++    gen_hlt(s, a->imm);
 +    return true;
 +}
 +
-+static bool trans_B_cond_thumb(DisasContext *s, arg_ci *a)
++static bool trans_BKPT(DisasContext *s, arg_BKPT *a)
 +{
-+    /* This has cond from encoding, required to be outside IT block.  */
-+    if (a->cond >= 0xe) {
++    if (!ENABLE_ARCH_5) {
 +        return false;
 +    }
-+    if (s->condexec_mask) {
++    gen_exception_bkpt_insn(s, syn_aa32_bkpt(a->imm, false));
++    return true;
++}
++
++static bool trans_HVC(DisasContext *s, arg_HVC *a)
++{
++    if (!ENABLE_ARCH_7 || arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
++    }
++    if (IS_USER(s)) {
 +        unallocated_encoding(s);
-+        return true;
++    } else {
++        gen_hvc(s, a->imm);
 +    }
-+    arm_skip_unless(s, a->cond);
-+    gen_jmp(s, read_pc(s) + a->imm);
 +    return true;
 +}
 +
-+static bool trans_BL(DisasContext *s, arg_i *a)
++static bool trans_SMC(DisasContext *s, arg_SMC *a)
 +{
-+    tcg_gen_movi_i32(cpu_R[14], s->base.pc_next | s->thumb);
-+    gen_jmp(s, read_pc(s) + a->imm);
-+    return true;
-+}
-+
-+static bool trans_BLX_i(DisasContext *s, arg_BLX_i *a)
-+{
-+    /* For A32, ARCH(5) is checked near the start of the uncond block. */
-+    if (s->thumb && (a->imm & 2)) {
++    if (!ENABLE_ARCH_6K || arm_dc_feature(s, ARM_FEATURE_M)) {
 +        return false;
 +    }
-+    tcg_gen_movi_i32(cpu_R[14], s->base.pc_next | s->thumb);
-+    gen_bx_im(s, (read_pc(s) & ~3) + a->imm + !s->thumb);
++    if (IS_USER(s)) {
++        unallocated_encoding(s);
++    } else {
++        gen_smc(s);
++    }
 +    return true;
 +}
 +
  /*
   * Legacy decoder.
   */
- 
- static void disas_arm_insn(DisasContext *s, unsigned int insn)
- {
--    unsigned int cond, val, op1, i, rn;
-+    unsigned int cond, op1, i, rn;
-     TCGv_i32 tmp;
-     TCGv_i32 tmp2;
-     TCGv_i32 addr;
-@@ -10171,21 +10222,6 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             }
-             gen_rfe(s, tmp, tmp2);
-             return;
--        } else if ((insn & 0x0e000000) == 0x0a000000) {
--            /* branch link and change to thumb (blx <offset>) */
--            int32_t offset;
--
--            tmp = tcg_temp_new_i32();
--            tcg_gen_movi_i32(tmp, s->base.pc_next);
--            store_reg(s, 14, tmp);
--            /* Sign-extend the 24-bit offset */
--            offset = (((int32_t)insn) << 8) >> 8;
--            val = read_pc(s);
--            /* offset * 4 + bit24 * 2 + (thumb bit) */
--            val += (offset << 2) | ((insn >> 23) & 2) | 1;
--            /* protected by ARCH(5); above, near the start of uncond block */
--            gen_bx_im(s, val);
--            return;
-         } else if ((insn & 0x0e000f00) == 0x0c000100) {
-             if (arm_dc_feature(s, ARM_FEATURE_IWMMXT)) {
-                 /* iWMMXt register transfer.  */
-@@ -10277,23 +10313,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-         case 0x7:
-         case 0x08:
-         case 0x09:
+@@ -8778,68 +8819,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+     } else if ((insn & 0x0f900000) == 0x01000000
+                && (insn & 0x00000090) != 0x00000090) {
+         /* miscellaneous instructions */
+-        op1 = (insn >> 21) & 3;
+-        sh = (insn >> 4) & 0xf;
+-        rm = insn & 0xf;
+-        switch (sh) {
+-        case 0x0:
+-            /* MSR/MRS (banked/register) */
+-            /* All done in decodetree.  Illegal ops already signalled.  */
+-            g_assert_not_reached();
+-        case 0x1: /* bx, clz */
+-        case 0x2: /* bxj */
+-        case 0x3: /* blx */
+-        case 0x4: /* crc32 */
+-            /* All done in decodetree.  Illegal ops reach here.  */
+-            goto illegal_op;
+-        case 0x5: /* Saturating addition and subtraction.  */
+-        case 0x6: /* ERET */
 -            /* All done in decodetree.  Reach here for illegal ops.  */
 -            goto illegal_op;
-         case 0xa:
-         case 0xb:
--            {
--                int32_t offset;
--
--                /* branch (and link) */
--                if (insn & (1 << 24)) {
--                    tmp = tcg_temp_new_i32();
--                    tcg_gen_movi_i32(tmp, s->base.pc_next);
--                    store_reg(s, 14, tmp);
+-        case 7:
+-        {
+-            int imm16 = extract32(insn, 0, 4) | (extract32(insn, 8, 12) << 4);
+-            switch (op1) {
+-            case 0:
+-                /* HLT */
+-                gen_hlt(s, imm16);
+-                break;
+-            case 1:
+-                /* bkpt */
+-                ARCH(5);
+-                gen_exception_bkpt_insn(s, syn_aa32_bkpt(imm16, false));
+-                break;
+-            case 2:
+-                /* Hypervisor call (v7) */
+-                ARCH(7);
+-                if (IS_USER(s)) {
+-                    goto illegal_op;
 -                }
--                offset = sextract32(insn << 2, 0, 26);
--                gen_jmp(s, read_pc(s) + offset);
+-                gen_hvc(s, imm16);
+-                break;
+-            case 3:
+-                /* Secure monitor call (v6+) */
+-                ARCH(6K);
+-                if (IS_USER(s)) {
+-                    goto illegal_op;
+-                }
+-                gen_smc(s);
+-                break;
+-            default:
+-                g_assert_not_reached();
 -            }
 -            break;
-+            /* All done in decodetree.  Reach here for illegal ops.  */
-+            goto illegal_op;
-         case 0xc:
-         case 0xd:
-         case 0xe:
-@@ -10660,32 +10683,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-         if (insn & (1 << 15)) {
-             /* Branches, misc control.  */
-             if (insn & 0x5000) {
--                /* Unconditional branch.  */
--                /* signextend(hw1[10:0]) -> offset[:12].  */
--                offset = ((int32_t)insn << 5) >> 9 & ~(int32_t)0xfff;
--                /* hw1[10:0] -> offset[11:1].  */
--                offset |= (insn & 0x7ff) << 1;
--                /* (~hw2[13, 11] ^ offset[24]) -> offset[23,22]
--                   offset[24:22] already have the same value because of the
--                   sign extension above.  */
--                offset ^= ((~insn) & (1 << 13)) << 10;
--                offset ^= ((~insn) & (1 << 11)) << 11;
--
--                if (insn & (1 << 14)) {
--                    /* Branch and link.  */
--                    tcg_gen_movi_i32(cpu_R[14], s->base.pc_next | 1);
--                }
--
--                offset += read_pc(s);
--                if (insn & (1 << 12)) {
--                    /* b/bl */
--                    gen_jmp(s, offset);
--                } else {
--                    /* blx */
--                    offset &= ~(uint32_t)2;
--                    /* thumb2 bx, no need to check */
--                    gen_bx_im(s, offset);
--                }
-+                /* Unconditional branch, in decodetree */
-+                goto illegal_op;
-             } else if (((insn >> 23) & 7) == 7) {
-                 /* Misc control */
-                 if (insn & (1 << 13))
-@@ -10771,24 +10770,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                     }
-                 }
-             } else {
--                /* Conditional branch.  */
--                op = (insn >> 22) & 0xf;
--                /* Generate a conditional jump to next instruction.  */
--                arm_skip_unless(s, op);
--
--                /* offset[11:1] = insn[10:0] */
--                offset = (insn & 0x7ff) << 1;
--                /* offset[17:12] = insn[21:16].  */
--                offset |= (insn & 0x003f0000) >> 4;
--                /* offset[31:20] = insn[26].  */
--                offset |= ((int32_t)((insn << 5) & 0x80000000)) >> 11;
--                /* offset[18] = insn[13].  */
--                offset |= (insn & (1 << 13)) << 5;
--                /* offset[19] = insn[11].  */
--                offset |= (insn & (1 << 11)) << 8;
--
--                /* jump to the offset */
--                gen_jmp(s, read_pc(s) + offset);
-+                /* Conditional branch, in decodetree */
-+                goto illegal_op;
-             }
-         } else {
-             /*
-diff --git a/target/arm/a32-uncond.decode b/target/arm/a32-uncond.decode
-index 8dee26d3b6..573ac2cf8e 100644
---- a/target/arm/a32-uncond.decode
-+++ b/target/arm/a32-uncond.decode
-@@ -21,3 +21,11 @@
- # All insns that have 0xf in insn[31:28] are decoded here.
- # All of those that have a COND field in insn[31:28] are in a32.decode
- #
-+
-+&i               !extern imm
-+
-+# Branch with Link and Exchange
-+
-+%imm24h          0:s24 24:1 !function=times_2
-+
-+BLX_i            1111 101 . ........................          &i imm=%imm24h
+-        }
+-        case 0x8:
+-        case 0xa:
+-        case 0xc:
+-        case 0xe:
+-            /* Halfword multiply and multiply accumulate.  */
+-            /* All done in decodetree.  Reach here for illegal ops.  */
+-            goto illegal_op;
+-        default:
+-            goto illegal_op;
+-        }
++        /* All done in decodetree.  Illegal ops reach here.  */
++        goto illegal_op;
+     } else if (((insn & 0x0e000000) == 0 &&
+                 (insn & 0x00000090) != 0x90) ||
+                ((insn & 0x0e000000) == (1 << 25))) {
+@@ -10497,26 +10478,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     goto illegal_op;
+ 
+                 if (insn & (1 << 26)) {
+-                    if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-                        goto illegal_op;
+-                    }
+-                    if (!(insn & (1 << 20))) {
+-                        /* Hypervisor call (v7) */
+-                        int imm16 = extract32(insn, 16, 4) << 12
+-                            | extract32(insn, 0, 12);
+-                        ARCH(7);
+-                        if (IS_USER(s)) {
+-                            goto illegal_op;
+-                        }
+-                        gen_hvc(s, imm16);
+-                    } else {
+-                        /* Secure monitor call (v6+) */
+-                        ARCH(6K);
+-                        if (IS_USER(s)) {
+-                            goto illegal_op;
+-                        }
+-                        gen_smc(s);
+-                    }
++                    /* hvc, smc, in decodetree */
++                    goto illegal_op;
+                 } else {
+                     op = (insn >> 20) & 7;
+                     switch (op) {
 diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index 1267a689e2..62c6f8562e 100644
+index 52a66dd1d5..c7f156be6d 100644
 --- a/target/arm/a32.decode
 +++ b/target/arm/a32.decode
-@@ -520,3 +520,11 @@ SMMLSR           .... 0111 0101 .... .... .... 1111 ....      @rdamn
+@@ -31,6 +31,7 @@
+ &rrr             rd rn rm
+ &rr              rd rm
+ &r               rm
++&i               imm
+ &msr_reg         rn r mask
+ &mrs_reg         rd r
+ &msr_bank        rn r sysm
+@@ -196,9 +197,11 @@ CRC32CW          .... 0001 0100 .... .... 0010 0100 ....      @rndm
+ # Miscellaneous instructions
  
- STM              ---- 100 b:1 i:1 u:1 w:1 0 rn:4 list:16   &ldst_block
- LDM_a32          ---- 100 b:1 i:1 u:1 w:1 1 rn:4 list:16   &ldst_block
+ %sysm            8:1 16:4
++%imm16_8_0       8:12 0:4
+ 
+ @rm              ---- .... .... .... .... .... .... rm:4      &r
+ @rdm             ---- .... .... .... rd:4 .... .... rm:4      &rr
++@i16             ---- .... .... .... .... .... .... ....      &i imm=%imm16_8_0
+ 
+ MRS_bank         ---- 0001 0 r:1 00 .... rd:4 001. 0000 0000  &mrs_bank %sysm
+ MSR_bank         ---- 0001 0 r:1 10 .... 1111 001. 0000 rn:4  &msr_bank %sysm
+@@ -213,3 +216,8 @@ BLX_r            .... 0001 0010 1111 1111 1111 0011 ....      @rm
+ CLZ              .... 0001 0110 1111 .... 1111 0001 ....      @rdm
+ 
+ ERET             ---- 0001 0110 0000 0000 0000 0110 1110
 +
-+# Branch, branch with link
-+
-+%imm26           0:s24  !function=times_4
-+@branch          ---- .... ........................           &i imm=%imm26
-+
-+B                .... 1010 ........................           @branch
-+BL               .... 1011 ........................           @branch
++HLT              .... 0001 0000 .... .... .... 0111 ....      @i16
++BKPT             .... 0001 0010 .... .... .... 0111 ....      @i16
++HVC              .... 0001 0100 .... .... .... 0111 ....      @i16
++SMC              ---- 0001 0110 0000 0000 0000 0111 imm:4     &i
 diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index f1e2b934f8..ebc92f2c28 100644
+index 6236d28b99..5116c6165a 100644
 --- a/target/arm/t32.decode
 +++ b/target/arm/t32.decode
-@@ -284,47 +284,55 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+@@ -28,6 +28,7 @@
+ &rrr             !extern rd rn rm
+ &rr              !extern rd rm
+ &r               !extern rm
++&i               !extern imm
+ &msr_reg         !extern rn r mask
+ &mrs_reg         !extern rd r
+ &msr_bank        !extern rn r sysm
+@@ -189,6 +190,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+ 
  %msr_sysm        4:1 8:4
  %mrs_sysm        4:1 16:4
- %imm16_16_0      16:4 0:12
-+%imm21           26:s1 11:1 13:1 16:6 0:11 !function=times_2
-+&ci              cond imm
++%imm16_16_0      16:4 0:12
  
  {
-+  # Group insn[25:23] = 111, which is cond=111x for the branch below,
-+  # or unconditional, which would be illegal for the branch.
    {
--    YIELD        1111 0011 1010 1111 1000 0000 0000 0001
--    WFE          1111 0011 1010 1111 1000 0000 0000 0010
--    WFI          1111 0011 1010 1111 1000 0000 0000 0011
-+    # Hints
-+    {
-+      YIELD      1111 0011 1010 1111 1000 0000 0000 0001
-+      WFE        1111 0011 1010 1111 1000 0000 0000 0010
-+      WFI        1111 0011 1010 1111 1000 0000 0000 0011
- 
--    # TODO: Implement SEV, SEVL; may help SMP performance.
--    # SEV        1111 0011 1010 1111 1000 0000 0000 0100
--    # SEVL       1111 0011 1010 1111 1000 0000 0000 0101
-+      # TODO: Implement SEV, SEVL; may help SMP performance.
-+      # SEV      1111 0011 1010 1111 1000 0000 0000 0100
-+      # SEVL     1111 0011 1010 1111 1000 0000 0000 0101
- 
--    # The canonical nop ends in 0000 0000, but the whole rest
--    # of the space is "reserved hint, behaves as nop".
--    NOP          1111 0011 1010 1111 1000 0000 ---- ----
--  }
--  # Note that the v7m insn overlaps both the normal and banked insn.
--  {
--    MRS_bank     1111 0011 111 r:1 .... 1000 rd:4   001. 0000  \
-+      # The canonical nop ends in 0000 0000, but the whole rest
-+      # of the space is "reserved hint, behaves as nop".
-+      NOP        1111 0011 1010 1111 1000 0000 ---- ----
-+    }
-+    # Note that the v7m insn overlaps both the normal and banked insn.
-+    {
-+      MRS_bank   1111 0011 111 r:1 .... 1000 rd:4   001. 0000  \
-                  &mrs_bank sysm=%mrs_sysm
--    MRS_reg      1111 0011 111 r:1 1111 1000 rd:4   0000 0000  &mrs_reg
--    MRS_v7m      1111 0011 111 0   1111 1000 rd:4   sysm:8
--  }
--  {
--    MSR_bank     1111 0011 100 r:1 rn:4 1000 ....   001. 0000  \
-+      MRS_reg    1111 0011 111 r:1 1111 1000 rd:4   0000 0000  &mrs_reg
-+      MRS_v7m    1111 0011 111 0   1111 1000 rd:4   sysm:8
-+    }
-+    {
-+      MSR_bank   1111 0011 100 r:1 rn:4 1000 ....   001. 0000  \
-                  &msr_bank sysm=%msr_sysm
--    MSR_reg      1111 0011 100 r:1 rn:4 1000 mask:4 0000 0000  &msr_reg
--    MSR_v7m      1111 0011 100 0   rn:4 1000 mask:2 00 sysm:8
--  }
--  BXJ            1111 0011 1100 rm:4 1000 1111 0000 0000      &r
--  {
--    # At v6T2, this is the T5 encoding of SUBS PC, LR, #IMM, and works as for
--    # every other encoding of SUBS.  With v7VE, IMM=0 is redefined as ERET.
--    # The distinction between the two only matters for Hyp mode.
--    ERET         1111 0011 1101 1110 1000 1111 0000 0000
--    SUB_rri      1111 0011 1101 1110 1000 1111 imm:8 \
-+      MSR_reg    1111 0011 100 r:1 rn:4 1000 mask:4 0000 0000  &msr_reg
-+      MSR_v7m    1111 0011 100 0   rn:4 1000 mask:2 00 sysm:8
-+    }
-+    BXJ          1111 0011 1100 rm:4 1000 1111 0000 0000      &r
-+    {
-+      # At v6T2, this is the T5 encoding of SUBS PC, LR, #IMM, and works as for
-+      # every other encoding of SUBS.  With v7VE, IMM=0 is redefined as ERET.
-+      # The distinction between the two only matters for Hyp mode.
-+      ERET       1111 0011 1101 1110 1000 1111 0000 0000
-+      SUB_rri    1111 0011 1101 1110 1000 1111 imm:8 \
+@@ -226,4 +228,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+     SUB_rri      1111 0011 1101 1110 1000 1111 imm:8 \
                   &s_rri_rot rot=0 s=1 rd=15 rn=14
--  }
--  SMC            1111 0111 1111 imm:4 1000 0000 0000 0000     &i
--  HVC            1111 0111 1110 ....  1000 .... .... ....     \
-+    }
-+    SMC          1111 0111 1111 imm:4 1000 0000 0000 0000     &i
-+    HVC          1111 0111 1110 ....  1000 .... .... ....     \
-                  &i imm=%imm16_16_0
--  UDF            1111 0111 1111 ---- 1010 ---- ---- ----
-+    UDF          1111 0111 1111 ----  1010 ---- ---- ----
-+  }
-+  B_cond_thumb   1111 0. cond:4 ...... 10.0 ............      &ci imm=%imm21
+   }
++  SMC            1111 0111 1111 imm:4 1000 0000 0000 0000     &i
++  HVC            1111 0111 1110 ....  1000 .... .... ....     \
++                 &i imm=%imm16_16_0
  }
- 
- # Load/store (register, immediate, literal)
-@@ -573,3 +581,12 @@ STM_t32          1110 1000 10.0 .... ................         @ldstm i=1 b=0
- STM_t32          1110 1001 00.0 .... ................         @ldstm i=0 b=1
- LDM_t32          1110 1000 10.1 .... ................         @ldstm i=1 b=0
- LDM_t32          1110 1001 00.1 .... ................         @ldstm i=0 b=1
-+
-+# Branches
-+
-+%imm24           26:s1 13:1 11:1 16:10 0:11 !function=t32_branch24
-+@branch24        ................................             &i imm=%imm24
-+
-+B                1111 0. .......... 10.1 ............         @branch24
-+BL               1111 0. .......... 11.1 ............         @branch24
-+BLX_i            1111 0. .......... 11.0 ............         @branch24
 -- 
 2.17.1
 
