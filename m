@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB6CC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E3EC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8ECB22CF8
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:33:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8ECB22CF8
+	by mail.kernel.org (Postfix) with ESMTPS id DAB9522CED
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:34:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAB9522CED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34dC-0001EC-JA
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:33:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44158)
+	id 1i34e9-0002gv-KI
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42065)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i33kG-0008WQ-EW
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:36:41 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1i33Xv-0004o4-O1
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:23:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i33kF-0001o6-9L
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:36:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43682)
+ (envelope-from <ehabkost@redhat.com>) id 1i33Xu-0002QY-EY
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:23:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5806)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i33kF-0001nm-4i
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:36:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i33Xu-0002PY-2x
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:23:54 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7D196C0021D7
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 19:36:38 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-123-242.rdu2.redhat.com
- [10.10.123.242])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F6DE6107E;
- Wed, 28 Aug 2019 19:36:37 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 28 Aug 2019 15:36:27 -0400
-Message-Id: <20190828193628.7687-3-crosa@redhat.com>
-In-Reply-To: <20190828193628.7687-1-crosa@redhat.com>
-References: <20190828193628.7687-1-crosa@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5DA8A3084045;
+ Wed, 28 Aug 2019 19:23:53 +0000 (UTC)
+Received: from localhost (ovpn-116-60.gru2.redhat.com [10.97.116.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B23B9100194E;
+ Wed, 28 Aug 2019 19:23:43 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>
+Date: Wed, 28 Aug 2019 16:23:39 -0300
+Message-Id: <20190828192340.14025-2-ehabkost@redhat.com>
+In-Reply-To: <20190828192340.14025-1-ehabkost@redhat.com>
+References: <20190828192340.14025-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 28 Aug 2019 19:36:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 28 Aug 2019 19:23:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 2/3] Acceptance test x86_cpu_model_versions:
- fix mismatches between test and messages
+Subject: [Qemu-devel] [PULL 1/2] BootLinuxSshTest: Only use 'test' for
+ unittest.TestCase method names
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,64 +69,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes a few mismatches between the test and the error messages
-produced in case of failures.
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+In commit f6e501a28ef9, Eduardo started to use "check_" as a
+prefix for methods of similar purpose. Follow this prior art,
+since it might become the conventions when writting Avocado
+tests.
+
+Suggested-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607174953.22342-1-philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/acceptance/x86_cpu_model_versions.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/acceptance/linux_ssh_mips_malta.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
-e/x86_cpu_model_versions.py
-index e6c76b0d4c..220d18f68d 100644
---- a/tests/acceptance/x86_cpu_model_versions.py
-+++ b/tests/acceptance/x86_cpu_model_versions.py
-@@ -280,7 +280,7 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=3Don=
-,check=3Doff,enforce=3Doff')
-         vm.launch()
-         self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
--                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should n=
-ot have arch-capabilities')
-+                         'pc-i440fx-4.0 + Cascadelake-Server-v1 should n=
-ot have arch-capabilities')
-         vm.shutdown()
+diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/=
+linux_ssh_mips_malta.py
+index aafb0c39f6..134f10cac3 100644
+--- a/tests/acceptance/linux_ssh_mips_malta.py
++++ b/tests/acceptance/linux_ssh_mips_malta.py
+@@ -162,7 +162,7 @@ class LinuxSSH(Test):
+         self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in line
+                              for line in stdout])
 =20
-         vm =3D self.get_vm()
-@@ -289,14 +289,14 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.add_args('-cpu', 'Cascadelake-Server-v2,x-force-features=3Don=
-,check=3Doff,enforce=3Doff')
-         vm.launch()
-         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
--                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should h=
-ave arch-capabilities')
-+                         'pc-i440fx-4.0 + Cascadelake-Server-v2 should h=
-ave arch-capabilities')
-         vm.shutdown()
+-    def do_test_mips_malta(self, endianess, kernel_path, uname_m):
++    def check_mips_malta(self, endianess, kernel_path, uname_m):
+         self.boot_debian_wheezy_image_and_ssh_login(endianess, kernel_pa=
+th)
 =20
-         # command line must override machine-type and versioned CPU mode=
-l:
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-         vm.set_machine('pc-i440fx-4.0')
--        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
-eck=3Doff,enforce=3Doff,+arch-capabilities')
-+        vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=3Don=
-,check=3Doff,enforce=3Doff,+arch-capabilities')
-         vm.launch()
-         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.0 + Cascadelake-Server-v1,+arch-ca=
-pabilities should have arch-capabilities')
+         stdout, stderr =3D self.ssh_command('uname -a')
+@@ -184,7 +184,7 @@ class LinuxSSH(Test):
+         kernel_hash =3D '592e384a4edc16dade52a6cd5c785c637bcbc9ad'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+=20
+-        self.do_test_mips_malta('be', kernel_path, 'mips')
++        self.check_mips_malta('be', kernel_path, 'mips')
+=20
+     @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
+     def test_mips_malta32el_kernel3_2_0(self):
+@@ -199,7 +199,7 @@ class LinuxSSH(Test):
+         kernel_hash =3D 'a66bea5a8adaa2cb3d36a1d4e0ccdb01be8f6c2a'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+=20
+-        self.do_test_mips_malta('le', kernel_path, 'mips')
++        self.check_mips_malta('le', kernel_path, 'mips')
+=20
+     @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
+     def test_mips_malta64eb_kernel3_2_0(self):
+@@ -213,7 +213,7 @@ class LinuxSSH(Test):
+                       'vmlinux-3.2.0-4-5kc-malta')
+         kernel_hash =3D 'db6eea7de35d36c77d8c165b6bcb222e16eb91db'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+-        self.do_test_mips_malta('be', kernel_path, 'mips64')
++        self.check_mips_malta('be', kernel_path, 'mips64')
+=20
+     @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
+     def test_mips_malta64el_kernel3_2_0(self):
+@@ -227,4 +227,4 @@ class LinuxSSH(Test):
+                       'vmlinux-3.2.0-4-5kc-malta')
+         kernel_hash =3D '6a7f77245acf231415a0e8b725d91ed2f3487794'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+-        self.do_test_mips_malta('le', kernel_path, 'mips64')
++        self.check_mips_malta('le', kernel_path, 'mips64')
 --=20
 2.21.0
 
