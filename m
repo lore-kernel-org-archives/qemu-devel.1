@@ -2,92 +2,92 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E51FC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A296C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:09:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62EF62064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:06:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62EF62064A
+	by mail.kernel.org (Postfix) with ESMTPS id D2FFE2189D
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 14:09:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2FFE2189D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2yaY-0005pp-G6
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 10:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48308)
+	id 1i2ydW-0007Gt-0X
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 10:09:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i2yZZ-0005FD-Hi
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:05:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i2yck-0006hb-Ja
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:08:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i2yZX-0005Mh-32
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:05:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40768)
+ (envelope-from <mreitz@redhat.com>) id 1i2ycj-0006up-N6
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:08:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47664)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i2yZW-0005LZ-QW
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 10:05:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i2ych-0006tI-Ed; Wed, 28 Aug 2019 10:08:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CA59181129;
- Wed, 28 Aug 2019 14:05:12 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E5F15D6B0;
- Wed, 28 Aug 2019 14:05:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E291E86668;
+ Wed, 28 Aug 2019 14:08:29 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-32.brq.redhat.com
+ [10.40.204.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C4665C1D6;
+ Wed, 28 Aug 2019 14:08:21 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823143726.27062-1-eblake@redhat.com>
- <9d2ee7ad-a575-dc33-a7c7-dcaceea63792@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
+ qemu-block@nongnu.org
+References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
+ <20190826161312.489398-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <e0dd8b33-8711-8591-25f3-60ff626989b3@redhat.com>
-Date: Wed, 28 Aug 2019 09:05:06 -0500
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <c07fc397-debb-42bf-4e15-fa9a680eb129@redhat.com>
+Date: Wed, 28 Aug 2019 16:08:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <9d2ee7ad-a575-dc33-a7c7-dcaceea63792@virtuozzo.com>
+In-Reply-To: <20190826161312.489398-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="I9Jaf7Cxo1Cy6si1BfRsSYHzYBBmerqeM"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="lmsmAayjcelYJaQtItct1jCoFAevHShlR"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Wed, 28 Aug 2019 14:05:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Wed, 28 Aug 2019 14:08:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/5] Add NBD fast zero support to qemu
- client and server
+Subject: Re: [Qemu-devel] [PATCH v9 01/13] block/backup: fix
+ backup_cow_with_offload for last cluster
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,78 +99,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "libguestfs@redhat.com" <libguestfs@redhat.com>,
- "nbd@other.debian.org" <nbd@other.debian.org>
+Cc: fam@euphon.net, kwolf@redhat.com, wencongyang2@huawei.com,
+ xiechanglong.d@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ jsnow@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---I9Jaf7Cxo1Cy6si1BfRsSYHzYBBmerqeM
-Content-Type: multipart/mixed; boundary="sxdxhjp3YoqaiqLPWDoosiMeTVtq8x53N";
+--lmsmAayjcelYJaQtItct1jCoFAevHShlR
+Content-Type: multipart/mixed; boundary="dE393h8SeqBki91MOxFqadAsWqFDLzxr8";
  protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "libguestfs@redhat.com" <libguestfs@redhat.com>,
- "nbd@other.debian.org" <nbd@other.debian.org>
-Message-ID: <e0dd8b33-8711-8591-25f3-60ff626989b3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] Add NBD fast zero support to qemu client
- and server
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823143726.27062-1-eblake@redhat.com>
- <9d2ee7ad-a575-dc33-a7c7-dcaceea63792@virtuozzo.com>
-In-Reply-To: <9d2ee7ad-a575-dc33-a7c7-dcaceea63792@virtuozzo.com>
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com,
+ xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
+ stefanha@redhat.com, jsnow@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <c07fc397-debb-42bf-4e15-fa9a680eb129@redhat.com>
+Subject: Re: [PATCH v9 01/13] block/backup: fix backup_cow_with_offload for
+ last cluster
+References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
+ <20190826161312.489398-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190826161312.489398-2-vsementsov@virtuozzo.com>
 
---sxdxhjp3YoqaiqLPWDoosiMeTVtq8x53N
+--dE393h8SeqBki91MOxFqadAsWqFDLzxr8
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/28/19 8:55 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 23.08.2019 17:37, Eric Blake wrote:
->> See the cross-post cover letter for more details:
->> https://www.redhat.com/archives/libguestfs/2019-August/msg00322.html
->>
->> Based-on: https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg048=
-05.html
->> [Andrey Shinkevich block: workaround for unaligned byte range in fallo=
-cate()]
+On 26.08.19 18:13, Vladimir Sementsov-Ogievskiy wrote:
+> We shouldn't try to copy bytes beyond EOF. Fix it.
 >=20
-> I assume, I can look at git://repo.or.cz/qemu/ericb.git fast-zero branc=
-h?
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/block/backup.c b/block/backup.c
+> index 2baf7bed65..33b144305f 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -161,7 +161,7 @@ static int coroutine_fn backup_cow_with_offload(Bac=
+kupBlockJob *job,
+> =20
+>      assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
+>      assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+> -    nbytes =3D MIN(job->copy_range_size, end - start);
+> +    nbytes =3D MIN(job->copy_range_size, MIN(end - start, job->len - s=
+tart));
 
-Yes, I posted a fast-zero branch for all four projects that I touched
-(with the obvious similar URLs). They might have non-fast-forward
-changes as I rebase things (for example, the nbdkit stuff needs to
-s/1.13.9/1.15.0/ in docs about which version introduced things), but
-should be sufficient to reproduce experiments with the feature supported.=
+Might be easier to read as MIN(end, job->len) - start, but either way:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+>      nr_clusters =3D DIV_ROUND_UP(nbytes, job->cluster_size);
+>      bdrv_reset_dirty_bitmap(job->copy_bitmap, start,
+>                              job->cluster_size * nr_clusters);
+>=20
 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
+--dE393h8SeqBki91MOxFqadAsWqFDLzxr8--
 
---sxdxhjp3YoqaiqLPWDoosiMeTVtq8x53N--
-
---I9Jaf7Cxo1Cy6si1BfRsSYHzYBBmerqeM
+--lmsmAayjcelYJaQtItct1jCoFAevHShlR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1mihIACgkQp6FrSiUn
-Q2pzigf/dCScJNRFxs3jJbSAeoqaKWwyGFKKiMtuIZ2slOJRkXM7scMQWUyDdLFf
-OLJ36NjX51aTo5pChRf72URUQSUiinffjmvn6aemJhBYx/tqWRGp03pQoXQpQ0LZ
-W8307KWwvvWo3llD08BRLgtlbtthXCMkB3QVAB3LpGKkLKzhVki7kHCwgu/HioDa
-RbjjgeejVltcRG478gH5zyVQYEWBcYF5hpq3xtrWZObdTG4TRNvnIKB7ONNqCr1k
-thrfoQvOUOMeDaOGT9fe4yDWsAxiUao2WF8L7oEIuLiLZYn7gO5xr5LfvjUoG6sc
-FY/jrk60hSudvKYZlOi1qWB0NMFXwA==
-=JzmC
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1mitMACgkQ9AfbAGHV
+z0Aw8Qf/fPDSfkdTA9vZ7R7dwKjGK4+MjBP7/Q2E60+9byh+W2RjaA03l3Pb5fDg
+7xjiJQFXsj0r3YYxRT2sAccMO+WMKnBjXFSlttaAJJ5wfqb3h+xcjegvKkU7KZ80
+a76J2GWVT7oVPV8w1VdlAf10RYI55sfwBLXvWRoKRtFkaVyo7KSEsYlk8xlhTqik
+2gss23eFC8Y4gSyA/DhPEROl7TLEVW2faSjG3U4N0picNArp/WZcz0LzWwD/9/7D
+8x3iiy0wACI0eXBYyOTBEpf1zShF+q0sV7QTQhYa06OxVdkl1oXXq4FLGtpwAiyq
+DK5g9BaXm4hDYAJ95zingTwkrqvkgA==
+=GS1h
 -----END PGP SIGNATURE-----
 
---I9Jaf7Cxo1Cy6si1BfRsSYHzYBBmerqeM--
+--lmsmAayjcelYJaQtItct1jCoFAevHShlR--
 
