@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7921C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF773C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:17:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A148C2077B
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:08:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A148C2077B
+	by mail.kernel.org (Postfix) with ESMTPS id A66C32173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 16:17:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A66C32173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i30UU-0000TM-Pc
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 12:08:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55992)
+	id 1i30dg-0002v7-Mw
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 12:17:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58878)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i30TE-0007gD-Gg
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:06:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i30ci-0002Ok-8f
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:16:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i30TD-0002UN-Ie
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:06:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35336)
+ (envelope-from <mreitz@redhat.com>) id 1i30ch-00005R-9F
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 12:16:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i30T9-0002RZ-Hu; Wed, 28 Aug 2019 12:06:48 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1i30cd-0008TI-W4; Wed, 28 Aug 2019 12:16:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A265210C6968;
- Wed, 28 Aug 2019 16:06:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E82C581F01;
+ Wed, 28 Aug 2019 16:16:34 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-32.brq.redhat.com
  [10.40.204.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DF7A360BF7;
- Wed, 28 Aug 2019 16:06:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B26B5C1D6;
+ Wed, 28 Aug 2019 16:16:31 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
- <20190826161312.489398-5-vsementsov@virtuozzo.com>
+ <20190826161312.489398-6-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <985a9ae7-8dfd-a59d-0872-85b425100d8a@redhat.com>
-Date: Wed, 28 Aug 2019 18:06:32 +0200
+Message-ID: <e43a3824-1b1f-98c4-b04e-fba1f4a4c188@redhat.com>
+Date: Wed, 28 Aug 2019 18:16:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190826161312.489398-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20190826161312.489398-6-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="7s2RrCTfmTcA1LYk3toCGfcIMfL6R268J"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 28 Aug 2019 16:06:45 +0000 (UTC)
+ boundary="GWtCcIzMmoCveyg6G6OWrPjBdIsL5KQaY"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 28 Aug 2019 16:16:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 04/13] block/backup: adjust block-copy
- functions style
+Subject: Re: [Qemu-devel] [PATCH v9 05/13] block: move block_copy from
+ block/backup.c to separate file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,8 +107,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7s2RrCTfmTcA1LYk3toCGfcIMfL6R268J
-Content-Type: multipart/mixed; boundary="M3aqqSdh0GYFhEYJQTINQrNC4dAI818U2";
+--GWtCcIzMmoCveyg6G6OWrPjBdIsL5KQaY
+Content-Type: multipart/mixed; boundary="4XNklkr7CIq5pVFKJ22mSn9QFdtiumFWX";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
@@ -116,50 +116,61 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
 Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com,
  xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
  stefanha@redhat.com, jsnow@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <985a9ae7-8dfd-a59d-0872-85b425100d8a@redhat.com>
-Subject: Re: [PATCH v9 04/13] block/backup: adjust block-copy functions style
+Message-ID: <e43a3824-1b1f-98c4-b04e-fba1f4a4c188@redhat.com>
+Subject: Re: [PATCH v9 05/13] block: move block_copy from block/backup.c to
+ separate file
 References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
- <20190826161312.489398-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20190826161312.489398-5-vsementsov@virtuozzo.com>
+ <20190826161312.489398-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190826161312.489398-6-vsementsov@virtuozzo.com>
 
---M3aqqSdh0GYFhEYJQTINQrNC4dAI818U2
+--4XNklkr7CIq5pVFKJ22mSn9QFdtiumFWX
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 26.08.19 18:13, Vladimir Sementsov-Ogievskiy wrote:
-> Fix comment style and reflow arguments in same manner like
-> block_copy_state_new.
+> Split block_copy to separate file, to be cleanly shared with backup-top=
 
-I like the current function header style better.
-
-Max
-
+> filter driver in further commits.
+>=20
+> It's a clean movement, the only change is drop "static" from interface
+> functions.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/backup.c | 40 +++++++++++++++++++---------------------
->  1 file changed, 19 insertions(+), 21 deletions(-)
+>  include/block/block-copy.h |  59 +++++++
+>  block/backup.c             | 313 +------------------------------------=
+
+>  block/block-copy.c         | 307 ++++++++++++++++++++++++++++++++++++
+>  block/Makefile.objs        |   1 +
+>  block/trace-events         |   2 +
+>  5 files changed, 370 insertions(+), 312 deletions(-)
+>  create mode 100644 include/block/block-copy.h
+>  create mode 100644 block/block-copy.c
+
+May change depending on changes to the preceding patches, but FWIW
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---M3aqqSdh0GYFhEYJQTINQrNC4dAI818U2--
+--4XNklkr7CIq5pVFKJ22mSn9QFdtiumFWX--
 
---7s2RrCTfmTcA1LYk3toCGfcIMfL6R268J
+--GWtCcIzMmoCveyg6G6OWrPjBdIsL5KQaY
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1mpogACgkQ9AfbAGHV
-z0CGGwf+MrDr7RuN4kOjN/pn2wJUJcq+PfZ2R6A1L3PFtFWxVL3vHf1AhQlou0Q3
-SpXHN4Ms4JZxEtT/OKv3yG6Ek3S5AUOrHnKRqD36p1fzm+pMc7yuQyKTdX18yrIK
-zU0vyKW1m505pViuDx93iTZtm8Fgt2cVRkthEkaGoiMXa5lBTTfGiDU2d03+PXcG
-EzvvvZDPpVCYoFiDIV/b4VznUSZC9uHsLbqN1vwZw4ZDHWc4B9hP1KSaur2lLn62
-z0uYK/TXoB3HTF1bmidzaz0U+SFDC9oqKdsvyobW0U1hvmOYonceYBOplcO6C3YS
-VulOu+0QcgOxM0QBmDzp0kfyGWVLMA==
-=OCeY
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1mqN4ACgkQ9AfbAGHV
+z0Bjhwf/WiTk3DMVBk7uI+deEBUxWbv/JoSQ3iCcoAEsXNh4Hb6oye92qkWG0Y82
+ikSbK1qHjIs3ljkEN6pPLK25ZwmUDtmTxpz/X8lmcnPx7PQ/WGc3t3bNIBxN6ru4
+W3laHUiqG2jE29Lh9XS4mgR1zN9mDPR6QmXCULx7oROrQGjIs9Y4Rg1lMCizG7Dj
+sTTVpp4VNmcOl+tFzKOtmEvhP1S51o9bNGxuKSGe3afOZzyGCgX+jyIfDxRkoAQy
+0Em9mxKg0WzmEji39w6C1MnluEuGNztb6KREIRMqYBOYqVNKr6gm3L9B2g2PFQCy
+yJI4T1vfeIEGjfL9MnM0gyWs+HnoVA==
+=Mwh4
 -----END PGP SIGNATURE-----
 
---7s2RrCTfmTcA1LYk3toCGfcIMfL6R268J--
+--GWtCcIzMmoCveyg6G6OWrPjBdIsL5KQaY--
 
