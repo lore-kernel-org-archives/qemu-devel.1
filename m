@@ -2,111 +2,67 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35BEC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F42CC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C04972070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:56:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C04972070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4ECFC2070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:57:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ECFC2070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34zA-0005o4-19
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:56:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52393)
+	id 1i350L-0006so-C2
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:57:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56329)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i34ac-0007bT-NF
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:30:47 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i34zP-000601-K8
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:56:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i34ab-00062L-EQ
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:30:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54430)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i34ab-00061q-75; Wed, 28 Aug 2019 16:30:45 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2C7A618C426B;
- Wed, 28 Aug 2019 20:30:44 +0000 (UTC)
-Received: from [10.36.117.166] (ovpn-117-166.ams2.redhat.com [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 13EF31001959;
- Wed, 28 Aug 2019 20:30:41 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190828111004.28013-1-david@redhat.com>
- <20190828111004.28013-3-david@redhat.com>
- <b9eb6e23-bcde-e987-048a-e174070d975c@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
- BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
- 8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
- xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
- jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
- s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
- m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
- MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
- z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
- dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
- UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
- 7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
- uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
- 0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
- 2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
- xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
- 8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
- hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
- u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
- gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
- rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
- BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
- KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
- NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
- YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
- lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
- qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
- C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
- W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
- TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
- +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <c8402a95-7e09-481c-7aba-c9d425e5b71d@redhat.com>
-Date: Wed, 28 Aug 2019 22:30:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <no-reply@patchew.org>) id 1i34zN-0002ZK-8V
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:56:22 -0400
+Resent-Date: Wed, 28 Aug 2019 16:56:22 -0400
+Resent-Message-Id: <E1i34zN-0002ZK-8V@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21412)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i34zI-0002X4-EZ
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:56:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1567025765; cv=none; d=zoho.com; s=zohoarc; 
+ b=X+c0lBibFUULt5ywFolFsC6FDfvJR9iurk8EKunQEh7VFLT+XOnjzMXS6NImWSBAENTZb+gY3YakxyQJMIgsxIVGGWweEcK+xLT7FNLzlonpWQ310V8l0T1Sekd8IJNf4kHwSmUtVRu6w0csJefLQdGtuLcnXTkoQEhBF2LKEn4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1567025765;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=3YqoaWwP/XS0orBb0M/cksXtiXDK8NhJnygpFVACygw=; 
+ b=Cw7jLv8wdqZSzv/gB5r0MjK3CDAj+18/MbrLzRh1PtwLBSyHTxhbLMYyic3V9p66cjDUNZNlmiRsCgCnQ29btTKnTNgvrP5mD8fMe6x04MCXX2FvrfiVeAJ2i4yE0xFvbKiU3uvoDLt7EQp7uPMRtECl5UY58mVSTx8zomcCMdc=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1567025764418638.4416941810907;
+ Wed, 28 Aug 2019 13:56:04 -0700 (PDT)
+In-Reply-To: <20190828193628.7687-1-crosa@redhat.com>
+Message-ID: <156702576316.26945.12238021410252316609@5dec9699b7de>
 MIME-Version: 1.0
-In-Reply-To: <b9eb6e23-bcde-e987-048a-e174070d975c@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Wed, 28 Aug 2019 20:30:44 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: crosa@redhat.com
+Date: Wed, 28 Aug 2019 13:56:04 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] tcg: Factor out probe_write() logic
- into probe_access()
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH 0/3] Acceptance test
+ x86_cpu_model_versions: fixes and minor improvements
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,33 +74,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, wainersm@redhat.com,
+ wrampazz@redhat.com, crosa@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.08.19 16:52, Richard Henderson wrote:
-> On 8/28/19 4:10 AM, David Hildenbrand wrote:
->> +void *probe_access(CPUArchState *env, target_ulong addr, int size,
->> +                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
->>  {
->>      CPUState *cpu = env_cpu(env);
->>      CPUClass *cc;
->> +    int flags;
->>  
->>      g_assert(-(addr | TARGET_PAGE_MASK) >= size);
->> +    g_assert(mmu_idx == MMU_USER_IDX);
-> 
-> We ignore mmu_idx pretty much everywhere else.
-> Why bother now?
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgyODE5MzYyOC43Njg3
+LTEtY3Jvc2FAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzNdIEFjY2VwdGFuY2UgdGVz
+dCB4ODZfY3B1X21vZGVsX3ZlcnNpb25zOiBmaXhlcyBhbmQgbWlub3IgaW1wcm92ZW1lbnRzCk1l
+c3NhZ2UtaWQ6IDIwMTkwODI4MTkzNjI4Ljc2ODctMS1jcm9zYUByZWRoYXQuY29tClR5cGU6IHNl
+cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
+IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
+bmNoICd0ZXN0JwoyYTU3MTQ3IEFjY2VwdGFuY2UgdGVzdCB4ODZfY3B1X21vZGVsX3ZlcnNpb25z
+OiBzcGxpdCBpbnRvIHNtYWxsZXIgdGVzdHMKMzBjNjc4MiBBY2NlcHRhbmNlIHRlc3QgeDg2X2Nw
+dV9tb2RlbF92ZXJzaW9uczogZml4IG1pc21hdGNoZXMgYmV0d2VlbiB0ZXN0IGFuZCBtZXNzYWdl
+cwpmNjNiNjBmIEFjY2VwdGFuY2UgdGVzdCB4ODZfY3B1X21vZGVsX3ZlcnNpb25zOiBzaHV0ZG93
+biBWTXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMyBDaGVja2luZyBjb21taXQgZjYzYjYwZjQ5
+ZTdhIChBY2NlcHRhbmNlIHRlc3QgeDg2X2NwdV9tb2RlbF92ZXJzaW9uczogc2h1dGRvd24gVk1z
+KQoyLzMgQ2hlY2tpbmcgY29tbWl0IDMwYzY3ODI3NzAwMSAoQWNjZXB0YW5jZSB0ZXN0IHg4Nl9j
+cHVfbW9kZWxfdmVyc2lvbnM6IGZpeCBtaXNtYXRjaGVzIGJldHdlZW4gdGVzdCBhbmQgbWVzc2Fn
+ZXMpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjI6IEZJTEU6IHRlc3RzL2FjY2Vw
+dGFuY2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyODM6CisgICAgICAgICAgICAgICAgICAg
+ICAgICAgJ3BjLWk0NDBmeC00LjAgKyBDYXNjYWRlbGFrZS1TZXJ2ZXItdjEgc2hvdWxkIG5vdCBo
+YXZlIGFyY2gtY2FwYWJpbGl0aWVzJykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MzE6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyOTI6
+CisgICAgICAgICAgICAgICAgICAgICAgICAgJ3BjLWk0NDBmeC00LjAgKyBDYXNjYWRlbGFrZS1T
+ZXJ2ZXItdjIgc2hvdWxkIGhhdmUgYXJjaC1jYXBhYmlsaXRpZXMnKQoKRVJST1I6IGxpbmUgb3Zl
+ciA5MCBjaGFyYWN0ZXJzCiMzOTogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVs
+X3ZlcnNpb25zLnB5OjI5OToKKyAgICAgICAgdm0uYWRkX2FyZ3MoJy1jcHUnLCAnQ2FzY2FkZWxh
+a2UtU2VydmVyLXYxLHgtZm9yY2UtZmVhdHVyZXM9b24sY2hlY2s9b2ZmLGVuZm9yY2U9b2ZmLCth
+cmNoLWNhcGFiaWxpdGllcycpCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDI0IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDIvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8zIENoZWNr
+aW5nIGNvbW1pdCAyYTU3MTQ3YTg2MmIgKEFjY2VwdGFuY2UgdGVzdCB4ODZfY3B1X21vZGVsX3Zl
+cnNpb25zOiBzcGxpdCBpbnRvIHNtYWxsZXIgdGVzdHMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwODI4MTkzNjI4Ljc2ODctMS1jcm9zYUBy
+ZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-Also true, I can drop this and simply use MMU_USER_IDX below.
-
--- 
-
-Thanks,
-
-David / dhildenb
 
