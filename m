@@ -6,60 +6,64 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6CFEC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 06:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 028D9C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 06:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 915802173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 06:12:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 915802173E
+	by mail.kernel.org (Postfix) with ESMTPS id D20F922CF4
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 06:20:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D20F922CF4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2rBX-0006Yc-Ih
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 02:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39840)
+	id 1i2rJZ-0008Nv-W8
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 02:20:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40808)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1i2rAj-00067C-KE
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 02:11:10 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1i2rIi-0007jY-K9
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 02:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1i2rAi-00052J-L9
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 02:11:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33818)
+ (envelope-from <eric.auger@redhat.com>) id 1i2rIh-0008I7-E4
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 02:19:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48746)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i2rAi-000524-FI
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 02:11:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1i2rIf-0008G7-2E; Wed, 28 Aug 2019 02:19:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 08FF810C6963;
- Wed, 28 Aug 2019 06:11:07 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-95.ams2.redhat.com
- [10.36.116.95])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5FC615DA21;
- Wed, 28 Aug 2019 06:11:04 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 6F41216E05; Wed, 28 Aug 2019 08:11:03 +0200 (CEST)
-Date: Wed, 28 Aug 2019 08:11:03 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <20190828061103.u4l4inomwfvbodtn@sirius.home.kraxel.org>
-References: <20190827192526.21780-1-laurent@vivier.eu>
+ by mx1.redhat.com (Postfix) with ESMTPS id F288D3DE04;
+ Wed, 28 Aug 2019 06:19:19 +0000 (UTC)
+Received: from [10.36.116.105] (ovpn-116-105.ams2.redhat.com [10.36.116.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5C056060D;
+ Wed, 28 Aug 2019 06:19:17 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>,
+ eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ peter.maydell@linaro.org
+References: <20190827160554.30995-1-eric.auger@redhat.com>
+ <20190827160554.30995-4-eric.auger@redhat.com>
+ <7d012631-1fe3-c040-eaf7-87ba274657c5@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8779e6f0-b8d8-7ec8-a77a-860d8be97e5f@redhat.com>
+Date: Wed, 28 Aug 2019 08:19:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190827192526.21780-1-laurent@vivier.eu>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 28 Aug 2019 06:11:07 +0000 (UTC)
+In-Reply-To: <7d012631-1fe3-c040-eaf7-87ba274657c5@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Wed, 28 Aug 2019 06:19:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC,Draft] ui: add an embedded Barrier client
+Subject: Re: [Qemu-devel] [RFC 3/3] virt: Check
+ KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for smp_cpus > 256
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,108 +75,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: yuzenghui@huawei.com, maz@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+Hi Richard,
 
-> For instance:
+On 8/28/19 5:28 AM, Richard Henderson wrote:
+> On 8/27/19 9:05 AM, Eric Auger wrote:
+>> +++ b/target/arm/kvm_arm.h
+>> @@ -233,6 +233,14 @@ bool kvm_arm_pmu_supported(CPUState *cs);
+>>   */
+>>  int kvm_arm_get_max_vm_ipa_size(MachineState *ms);
+>>  
+>> +/**
+>> + * kvm_arm_irq_line_layout_2 - Returns whether more than 256
+>> + * vcpus are supported by KVM_IRQ_LINE
+>> + *
+>> + * @ms: Machine state handle
+>> + */
+>> +bool kvm_arm_irq_line_layout_2(MachineState *ms);
+>> +
+>>  /**
+>>   * kvm_arm_sync_mpstate_to_kvm
+>>   * @cpu: ARMCPU
+>> @@ -280,6 +288,11 @@ static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+>>      return -ENOENT;
+>>  }
+>>  
+>> +static inline int kvm_arm_irq_line_layout_2(MachineState *ms)
+>> +{
+>> +    return -ENOENT;
+>> +}
+>> +
 > 
->   section: screens
->       localhost:
->           ...
->       VM-1:
->           ...
->       end
+> These signatures don't match.
+thanks for spotting this. I will fix it.
+
+Best Regards
+
+Eric
 > 
->   section: links
->       localhost:
->           right = VM-1
->       VM-1:
->           left = localhost
->   end
 > 
-> Then on the QEMU command line:
+> r~
 > 
->     ... -object input-barrier,id=barrie0,name=VM-1 ...
-> 
-> When the mouse will move out of the screen of the local host on
-> the right, the mouse and the keyboard will be grabbed and all
-> related events will be send to the guest OS.
-
-Put that into docs/ ?
-
-> +#define BARRIER_VERSION_MAJOR 1
-> +#define BARRIER_VERSION_MINOR 6
-> +
-> +enum cmdids {
-> +    MSG_CNoop,
-> +    MSG_CClose,
-> +    MSG_CEnter,
-> +    MSG_CLeave,
-> +    MSG_CClipboard,
-> +    MSG_CScreenSaver,
-> +    MSG_CResetOptions,
-> +    MSG_CInfoAck,
-> +    MSG_CKeepAlive,
-> +    MSG_DKeyDown,
-> +    MSG_DKeyRepeat,
-> +    MSG_DKeyUp,
-> +    MSG_DMouseDown,
-> +    MSG_DMouseUp,
-> +    MSG_DMouseMove,
-> +    MSG_DMouseRelMove,
-> +    MSG_DMouseWheel,
-> +    MSG_DClipboard,
-> +    MSG_DInfo,
-> +    MSG_DSetOptions,
-> +    MSG_DFileTransfer,
-> +    MSG_DDragInfo,
-> +    MSG_QInfo,
-> +    MSG_EIncompatible,
-> +    MSG_EBusy,
-> +    MSG_EUnknown,
-> +    MSG_EBad,
-> +    /* connection sequence */
-> +    MSG_Hello,
-> +    MSG_HelloBack,
-> +};
-
-Put that into a barrier-protocol header file?
-
-> +    case MSG_QInfo:
-> +        p = write_cmd(ib, p, MSG_DInfo);
-> +        p = write_short(ib, p, 0);    /* x origin */
-> +        p = write_short(ib, p, 0);    /* y origin */
-> +        p = write_short(ib, p, 1920); /* width */
-> +        p = write_short(ib, p, 1080); /* height */
-
-Hmm.
-
-This is the screen size I guess?  Which you don't know ...
-What this is used for?
-Should we maybe use INPUT_EVENT_ABS_MAX here?
-
-
-> +    case MSG_DMouseMove:
-> +        qemu_input_queue_abs(NULL, INPUT_AXIS_X, msg.mousepos.x, 0, 1920);
-> +        qemu_input_queue_abs(NULL, INPUT_AXIS_Y, msg.mousepos.y, 0, 1080);
-
-... and here too of course.
-
-> +    addr.type = SOCKET_ADDRESS_TYPE_INET;
-> +    addr.u.inet.host = g_strdup("localhost");
-> +    addr.u.inet.port = g_strdup("24800");
-
-Does it make sens to allow connecting to other machines?
-Or will the barrier daemon run on every machine anyway?
-
-Looks reasonable overall.
-
-cheers,
-  Gerd
-
 
