@@ -2,89 +2,109 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3DBC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC2FC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 13:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE00120828
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQO6PRVD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE00120828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 87DC920828
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 13:43:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87DC920828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2yB1-0002NU-27
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 09:39:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40348)
+	id 1i2yEQ-0003cM-OO
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 09:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chmeeedalf@gmail.com>) id 1i2y9q-0001i1-1i
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 09:38:42 -0400
+ (envelope-from <thuth@redhat.com>) id 1i2yDj-0003CS-6Y
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 09:42:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chmeeedalf@gmail.com>) id 1i2y9p-0007DK-2q
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 09:38:41 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:39656)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chmeeedalf@gmail.com>)
- id 1i2y9o-0007Cy-Sd
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 09:38:41 -0400
-Received: by mail-io1-xd43.google.com with SMTP id l7so5899216ioj.6
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 06:38:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=azcl882/GAyeOD6HVhSHzybbPZYHtCGBSzH49KriDQk=;
- b=bQO6PRVDUPppOerAeKfsPV2WtQ+BPxc9hvzTD91otx/8YWmu7x3PPaWuywiVmggNay
- RFPYRBo+j60PbRDK783Oqa2KuFAiqgsAyyYvMkjdw6/u5YJHx8vvkh3b2eubDp056dV+
- mYWIPHw75cF9FVmOAhsiHQdrruILwIWtJ/2Imw5+bGpsjp03QhLna8EdIDwrccfDehT/
- /rK2UDQxwPAncz2NeHs6zDlfsSmu53MxR6e2AfOhX4wg+CiwD0kATzyoTqz8Wp1XzC3M
- teGWYRZ7xqjx4CUkH7vm4yirYmasdP5c670A1lBZdVK9eNAFUNLJ1kDIbMm1ocGBu3GZ
- GvSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=azcl882/GAyeOD6HVhSHzybbPZYHtCGBSzH49KriDQk=;
- b=q5V0tPy37X0l5F23h6utHQIvIIYOM/6/+6/BfJIBTGMZXILMoMaBMP1BswPQd2kZB1
- rwtSxFKJiqJ5tOzqd5wF8RwUkQX+TbyApnNQrACPZPOp9t6mJ+YUMizbXQuzF5YGLjsb
- pXL70y1tgTKIPRAPdA6L1eFZzd++ZtmlIKeaJOMZ9faZUSyKW/hGoI5avT4zIIzNoHI4
- y5NkpOqxff4d/FB15aa/WMnBwtFJLv3oc946wgEabRmPow2BRbQUpyikkgowsuAkOvNu
- NmoWFXedGEm5/+lXVDEnEorUXhGZEVEjyJS2POrqLMyggsKEFuE5ztHE3WZ6DWIf0Ki6
- ws/A==
-X-Gm-Message-State: APjAAAV57VJ15tAeHckvMa15+xoJcaI7WKjuXdaQ8nco0FhFqlIPmLqp
- FKZsM0z1eL1iP/Y2hkD7gWI=
-X-Google-Smtp-Source: APXvYqyRzJaJFyjySzrXi2LT0OSs3S+3RAF77B3em9aF2mJiv2e+tgi08kixztphP9otAFQjvUxfig==
-X-Received: by 2002:a05:6638:3af:: with SMTP id
- z15mr4376797jap.39.1566999519929; 
- Wed, 28 Aug 2019 06:38:39 -0700 (PDT)
-Received: from ralga.knownspace (173-25-245-129.client.mchsi.com.
- [173.25.245.129])
- by smtp.gmail.com with ESMTPSA id q3sm2081013ios.70.2019.08.28.06.38.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Aug 2019 06:38:39 -0700 (PDT)
-Date: Wed, 28 Aug 2019 08:38:34 -0500
-From: Justin Hibbits <chmeeedalf@gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <20190828083834.09e01232@ralga.knownspace>
-In-Reply-To: <20190821082546.5252-1-laurent@vivier.eu>
-References: <20190821082546.5252-1-laurent@vivier.eu>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; powerpc64-portbld-freebsd13.0)
+ (envelope-from <thuth@redhat.com>) id 1i2yDh-0001fX-4q
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 09:42:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34750)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1i2yDg-0001f9-TU; Wed, 28 Aug 2019 09:42:41 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C7F22308212A;
+ Wed, 28 Aug 2019 13:42:39 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-90.ams2.redhat.com [10.36.116.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F79C196AE;
+ Wed, 28 Aug 2019 13:42:38 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+References: <20190828123343.8343-1-thuth@redhat.com>
+ <15276e6d-cd9d-825a-befa-65e5f4c91e5d@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <f213c73c-61d8-6333-edb8-c8f988a5bd9a@redhat.com>
+Date: Wed, 28 Aug 2019 15:42:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <15276e6d-cd9d-825a-befa-65e5f4c91e5d@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d43
-Subject: Re: [Qemu-devel] [PATCH 0/1] Fix cacheline detection on
- FreeBSD/powerpc
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Wed, 28 Aug 2019 13:42:39 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: Do not pre-initialize
+ empty array
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,36 +116,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 21 Aug 2019 10:25:45 +0200
-Laurent Vivier <laurent@vivier.eu> wrote:
-
-> This is the patch originally sent by Justin, modified
-> to change the parameter size on FreeBSD only.
+On 28/08/2019 15.27, Christian Borntraeger wrote:
+> On 28.08.19 14:33, Thomas Huth wrote:
+>> We're clearing the BSS in start.S now, so there is no need to
+>> pre-initialize the loadparm_str array with zeroes anymore.
 > 
-> Justin, could you review and test on FreeBSD?
-> Peter, could you run "make check" on your MacOS X host?
-> 
-> Thanks,
-> Laurent
-> 
-> Justin Hibbits (1):
->   Fix cacheline detection on FreeBSD/powerpc.
-> 
->  util/cacheinfo.c | 23 +++++++++++++----------
->  1 file changed, 13 insertions(+), 10 deletions(-)
-> 
+> Can you add a link to the commit that does the bss clearing?
 
-Hi Laurent,
+Sure, I'll change the description to:
 
-I applied the patch against the FreeBSD emulators/qemu-devel (qemu
-3.1.0) port, and it was successful.
+"
+Since commit 339686a358b11a231aa5b6d1424e7a1460d7f277 ("pc-bios/s390-ccw:
+zero out bss section"), we are clearing now the BSS in start.S, so there
+is no need to pre-initialize the loadparm_str array with zeroes anymore.
+"
 
-All good on this end!
-
-- Justin
+ Thomas
 
