@@ -2,62 +2,63 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E3EC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4389CC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:36:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAB9522CED
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:34:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAB9522CED
+	by mail.kernel.org (Postfix) with ESMTPS id 136CB22CED
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:36:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 136CB22CED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34e9-0002gv-KI
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:34:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42065)
+	id 1i34fe-0004eh-3X
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:35:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51859)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1i33Xv-0004o4-O1
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:23:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1i34Wm-0003ex-7v
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1i33Xu-0002QY-EY
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:23:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5806)
+ (envelope-from <armbru@redhat.com>) id 1i34Wj-0002nF-Uq
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44466)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i33Xu-0002PY-2x
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:23:54 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i34Wj-0002mP-LK
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 16:26:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5DA8A3084045;
- Wed, 28 Aug 2019 19:23:53 +0000 (UTC)
-Received: from localhost (ovpn-116-60.gru2.redhat.com [10.97.116.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B23B9100194E;
- Wed, 28 Aug 2019 19:23:43 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>
-Date: Wed, 28 Aug 2019 16:23:39 -0300
-Message-Id: <20190828192340.14025-2-ehabkost@redhat.com>
-In-Reply-To: <20190828192340.14025-1-ehabkost@redhat.com>
-References: <20190828192340.14025-1-ehabkost@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id F0DBD30842A8;
+ Wed, 28 Aug 2019 20:26:44 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90008600CD;
+ Wed, 28 Aug 2019 20:26:44 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 84D491165616; Wed, 28 Aug 2019 22:26:41 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 28 Aug 2019 22:26:40 +0200
+Message-Id: <20190828202641.24752-9-armbru@redhat.com>
+In-Reply-To: <20190828202641.24752-1-armbru@redhat.com>
+References: <20190828202641.24752-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 28 Aug 2019 19:23:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/2] BootLinuxSshTest: Only use 'test' for
- unittest.TestCase method names
+Subject: [Qemu-devel] [PATCH 8/9] docs/devel/qapi-code-gen: Rewrite
+ introduction to schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,81 +70,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+The introduction to the QAPI schema is somewhat rambling.  Rewrite for
+clarity.
 
-In commit f6e501a28ef9, Eduardo started to use "check_" as a
-prefix for methods of similar purpose. Follow this prior art,
-since it might become the conventions when writting Avocado
-tests.
-
-Suggested-by: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607174953.22342-1-philmd@redhat.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/acceptance/linux_ssh_mips_malta.py | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ docs/devel/qapi-code-gen.txt | 106 ++++++++++++++++-------------------
+ 1 file changed, 47 insertions(+), 59 deletions(-)
 
-diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/=
-linux_ssh_mips_malta.py
-index aafb0c39f6..134f10cac3 100644
---- a/tests/acceptance/linux_ssh_mips_malta.py
-+++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -162,7 +162,7 @@ class LinuxSSH(Test):
-         self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in line
-                              for line in stdout])
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 5c9146c92e..4502502531 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -16,65 +16,53 @@ well as the QEMU Guest Agent (QGA) for communicating =
+with the guest.
+ The remainder of this document uses "Client JSON Protocol" when
+ referring to the wire contents of a QMP or QGA connection.
 =20
--    def do_test_mips_malta(self, endianess, kernel_path, uname_m):
-+    def check_mips_malta(self, endianess, kernel_path, uname_m):
-         self.boot_debian_wheezy_image_and_ssh_login(endianess, kernel_pa=
-th)
+-To map Client JSON Protocol interfaces to the native C QAPI
+-implementations, a JSON-based schema is used to define types and
+-function signatures, and a set of scripts is used to generate types,
+-signatures, and marshaling/dispatch code. This document will describe
+-how the schemas, scripts, and resulting code are used.
+-
+-
+-=3D=3D QMP/Guest agent schema =3D=3D
+-
+-A QAPI schema file is designed to be loosely based on JSON
+-(http://www.ietf.org/rfc/rfc8259.txt) with changes for quoting style
+-and the use of comments; a QAPI schema file is then parsed by a python
+-code generation program.  A valid QAPI schema consists of a series of
+-top-level expressions, with no commas between them.  Where
+-dictionaries (JSON objects) are used, they are parsed as python
+-OrderedDicts so that ordering is preserved (for predictable layout of
+-generated C structs and parameter lists).  Ordering doesn't matter
+-between top-level expressions or the keys within an expression, but
+-does matter within dictionary values for 'data' and 'returns' members
+-of a single expression.  QAPI schema input is written using 'single
+-quotes' instead of JSON's "double quotes" (in contrast, Client JSON
+-Protocol uses no comments, and while input accepts 'single quotes' as
+-an extension, output is strict JSON using only "double quotes").  As
+-in JSON, trailing commas are not permitted in arrays or dictionaries.
+-Input must be ASCII (although QMP supports full Unicode strings, the
+-QAPI parser does not).  At present, there is no place where a QAPI
+-schema requires the use of JSON numbers or null.
+-
+-
+-=3D=3D=3D Comments =3D=3D=3D
+-
+-Comments are allowed; anything between an unquoted # and the following
+-newline is ignored.
+-
+-
+-=3D=3D=3D Schema overview =3D=3D=3D
+-
+-The schema sets up a series of types, as well as commands and events
+-that will use those types.  Forward references are allowed: the parser
+-scans in two passes, where the first pass learns all type names, and
+-the second validates the schema and generates the code.  This allows
+-the definition of complex structs that can have mutually recursive
+-types, and allows for indefinite nesting of Client JSON Protocol that
+-satisfies the schema.  A type name should not be defined more than
+-once.  It is permissible for the schema to contain additional types
+-not used by any commands or events in the Client JSON Protocol, for
+-the side effect of generated C code used internally.
+-
+-There are eight top-level expressions recognized by the parser:
+-'include', 'pragma', 'command', 'struct', 'enum', 'union',
+-'alternate', and 'event'.  There are several groups of types: simple
+-types (a number of built-in types, such as 'int' and 'str'; as well as
+-enumerations), complex types (structs and two flavors of unions), and
+-alternate types (a choice between other types).  The 'command' and
+-'event' expressions can refer to existing types by name, or list an
+-anonymous type as a dictionary. Listing a type name inside an array
+-refers to a single-dimension array of that type; multi-dimension
+-arrays are not directly supported (although an array of a complex
+-struct that contains an array member is possible).
++To map between Client JSON Protocol interfaces and the native C API,
++we generate C code from a QAPI schema.  This document describes the
++QAPI schema language, and how it gets mapped to the Client JSON
++Protocol and to C.  It additionally provides guidance on maintaining
++Client JSON Protocol compatibility.
++
++
++=3D=3D The QAPI schema language =3D=3D
++
++The QAPI schema defines the Client JSON Protocol's commands and
++events, as well as types used by them.  Forward references are
++allowed.
++
++It is permissible for the schema to contain additional types not used
++by any commands or events, for the side effect of generated C code
++used internally.
++
++There are several kinds of types: simple types (a number of built-in
++types, such as 'int' and 'str'; as well as enumerations), arrays,
++complex types (structs and two flavors of unions), and alternate types
++(a choice between other types).
++
++
++=3D=3D=3D Schema syntax =3D=3D=3D
++
++Syntax is loosely based on JSON (http://www.ietf.org/rfc/rfc8259.txt).
++Differences:
++
++* Comments: start with a hash character (#) that is not part of a
++  string, and extend to the end of the line.
++
++* Strings are enclosed in 'single quotes', not "double quotes".
++
++* Strings are restricted to ASCII.  All control characters must be
++  escaped, even DEL.
++
++* Numbers are not supported.
++
++A QAPI schema consists of a series of top-level expressions (JSON
++objects).  Their order does not matter.
++
++The order of keys within JSON objects does not matter unless
++explicitly noted.
++
++There are eight kinds of top-level expressions: 'include', 'pragma',
++'command', 'struct', 'enum', 'union', 'alternate', and 'event'.  These
++are discussed in detail below.
 =20
-         stdout, stderr =3D self.ssh_command('uname -a')
-@@ -184,7 +184,7 @@ class LinuxSSH(Test):
-         kernel_hash =3D '592e384a4edc16dade52a6cd5c785c637bcbc9ad'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
--        self.do_test_mips_malta('be', kernel_path, 'mips')
-+        self.check_mips_malta('be', kernel_path, 'mips')
-=20
-     @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-     def test_mips_malta32el_kernel3_2_0(self):
-@@ -199,7 +199,7 @@ class LinuxSSH(Test):
-         kernel_hash =3D 'a66bea5a8adaa2cb3d36a1d4e0ccdb01be8f6c2a'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
--        self.do_test_mips_malta('le', kernel_path, 'mips')
-+        self.check_mips_malta('le', kernel_path, 'mips')
-=20
-     @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-     def test_mips_malta64eb_kernel3_2_0(self):
-@@ -213,7 +213,7 @@ class LinuxSSH(Test):
-                       'vmlinux-3.2.0-4-5kc-malta')
-         kernel_hash =3D 'db6eea7de35d36c77d8c165b6bcb222e16eb91db'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
--        self.do_test_mips_malta('be', kernel_path, 'mips64')
-+        self.check_mips_malta('be', kernel_path, 'mips64')
-=20
-     @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-     def test_mips_malta64el_kernel3_2_0(self):
-@@ -227,4 +227,4 @@ class LinuxSSH(Test):
-                       'vmlinux-3.2.0-4-5kc-malta')
-         kernel_hash =3D '6a7f77245acf231415a0e8b725d91ed2f3487794'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
--        self.do_test_mips_malta('le', kernel_path, 'mips64')
-+        self.check_mips_malta('le', kernel_path, 'mips64')
+ In the rest of this document, usage lines are given for each
+ expression type, with literal strings written in lower case and
 --=20
 2.21.0
 
