@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE574C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:56:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71417C3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:58:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE66A204FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:56:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AB6D204FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 23:58:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EdK/g3Qw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE66A204FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nnNq9SEY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AB6D204FD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i37ny-0005PQ-Sy
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 19:56:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57804)
+	id 1i37pZ-0006xZ-Fg
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 19:58:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i37mh-0004GK-DX
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:55:29 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i37mj-0004Ik-7L
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i37me-0004tT-Pa
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:55:26 -0400
-Received: from ozlabs.org ([203.11.71.1]:49035)
+ (envelope-from <dgibson@ozlabs.org>) id 1i37mg-0004uG-VN
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 19:55:29 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:36717)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i37md-0004sh-Tb; Wed, 28 Aug 2019 19:55:24 -0400
+ id 1i37md-0004si-UO; Wed, 28 Aug 2019 19:55:25 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46JjKf0CrSz9sNx; Thu, 29 Aug 2019 09:55:17 +1000 (AEST)
+ id 46JjKd6kMDz9sN6; Thu, 29 Aug 2019 09:55:17 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1567036518;
- bh=JXR+O5SPrLydjTVymXVQCDVD1x4rB0/B3f6Wfw8tsec=;
+ d=gibson.dropbear.id.au; s=201602; t=1567036517;
+ bh=yHriESBGs4YegJQ89oXi8Yi1S3nsAHrdA75b5OqN+zY=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=EdK/g3Qwo+a4hmDuG8O/Hj5GMKFyQVDwpSNZIkNyPNqINA7A92QNB/tzOVt5Fgr7H
- 5QKh8H/kAMW7J9dm/tGX1i0fLqw9deO9S3n/nP1V1oy1PJkTeJzLFWZwzQm58IxMxk
- aZejaar4Bpg6RnJ54/D0ygM92j6ZkoSjkmjCOYu8=
-Date: Thu, 29 Aug 2019 09:29:20 +1000
+ b=nnNq9SEYM+3XIysV9DFgoYPgGPgdYgucorxd0vZBZjybBxiW8UGWFniXoiSKIFR5B
+ K7YZc3QryB1RDUL5tgySDyMQG5u1cK0Q7LZfMi03gEC89+VUK6ZB+dwagySqBnNylc
+ kNf2Yx+fiEfIbgLb6YdALrlwvftGPyzUGo9bVKjY=
+Date: Thu, 29 Aug 2019 09:42:26 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190828232920.GB16342@umbus.fritz.box>
-References: <156701644465.505236.2850655823182656869.stgit@bahia.lan>
+Message-ID: <20190828234226.GC16342@umbus.fritz.box>
+References: <156701285312.499757.7807417667750711711.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="98e8jtXdkpgskNou"
+ protocol="application/pgp-signature"; boundary="V88s5gaDVPzZ0KCq"
 Content-Disposition: inline
-In-Reply-To: <156701644465.505236.2850655823182656869.stgit@bahia.lan>
+In-Reply-To: <156701285312.499757.7807417667750711711.stgit@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] spapr/pci: Convert types to QEMU coding
- style
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH] spapr: Set compat mode in spapr_core_plug()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,375 +70,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---98e8jtXdkpgskNou
+--V88s5gaDVPzZ0KCq
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 28, 2019 at 08:20:44PM +0200, Greg Kurz wrote:
-> The QEMU coding style requires:
-> - to typedef structured types (HACKING)
-> - to use CamelCase for types and structure names (CODING_STYLE)
+On Wed, Aug 28, 2019 at 07:20:53PM +0200, Greg Kurz wrote:
+> A recent change in spapr_machine_reset() showed that resetting the compat
+> mode in spapr_machine_reset() for the boot vCPU and in spapr_cpu_reset()
+> for all other vCPUs was fragile. The fix was thus to reset the compat mode
+> for all vCPUs in spapr_machine_reset(), but we still have to propagate
+> it to hot-plugged CPUs. This is still performed from spapr_cpu_reset(),
+> hence resulting in ppc_set_compat() being called twice for every vCPU at
+> machine reset. Apart from wasting cycles, which isn't really an issue
+> during machine reset, this seems to indicate that spapr_cpu_reset() isn't
+> the best place to set the compat mode.
 >=20
-> Do that for PCI and Nvlink2 code.
+> A natural candidate for CPU-hotplug specific code is spapr_core_plug().
+> Also, it sits in the same file as spapr_machine_reset() : this makes
+> it easier for someone who wants to know when the compat PVR is set.
+>=20
+> Call ppc_set_compat() from there. This doesn't need to be done for
+> initial vCPUs since the compat PVR is 0 and spapr_machine_reset() sets
+> the appropriate value later. No need to do this on manually added vCPUS
+> on the destination QEMU during migration since the compat PVR is
+> part of the migrated vCPU state. Both conditions can be checked with
+> spapr_drc_hotplugged().
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
 Applied, thanks.
 
 > ---
->  hw/ppc/spapr_pci.c          |   28 ++++++++++++++--------------
->  hw/ppc/spapr_pci_nvlink2.c  |   40 +++++++++++++++++++++----------------=
----
->  include/hw/pci-host/spapr.h |   24 ++++++++++++++----------
->  3 files changed, 49 insertions(+), 43 deletions(-)
+>  hw/ppc/spapr.c          |   24 ++++++++++++++++--------
+>  hw/ppc/spapr_cpu_core.c |    7 -------
+>  2 files changed, 16 insertions(+), 15 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 9f176f463e76..a777fb3e7ff6 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -280,7 +280,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, Spap=
-rMachineState *spapr,
->      unsigned int irq, max_irqs =3D 0;
->      SpaprPhbState *phb =3D NULL;
->      PCIDevice *pdev =3D NULL;
-> -    spapr_pci_msi *msi;
-> +    SpaprPciMsi *msi;
->      int *config_addr_key;
->      Error *err =3D NULL;
->      int i;
-> @@ -328,7 +328,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, Spap=
-rMachineState *spapr,
->          return;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 447fb5c4eaaf..ea56499b4b3e 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1758,12 +1758,6 @@ static void spapr_machine_reset(MachineState *mach=
+ine)
+>          spapr_ovec_cleanup(spapr->ov5_cas);
+>          spapr->ov5_cas =3D spapr_ovec_new();
+> =20
+> -        /*
+> -         * reset compat_pvr for all CPUs
+> -         * as qemu_devices_reset() is called before this,
+> -         * it can't be propagated by spapr_cpu_reset()
+> -         * from the first CPU to all the others
+> -         */
+>          ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
 >      }
 > =20
-> -    msi =3D (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_addr=
-);
-> +    msi =3D (SpaprPciMsi *) g_hash_table_lookup(phb->msi, &config_addr);
+> @@ -3841,6 +3835,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+>      CPUArchId *core_slot;
+>      int index;
+>      bool hotplugged =3D spapr_drc_hotplugged(dev);
+> +    int i;
 > =20
->      /* Releasing MSIs */
->      if (!req_num) {
-> @@ -415,7 +415,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, Spap=
-rMachineState *spapr,
->                       irq, req_num);
+>      core_slot =3D spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id,=
+ &index);
+>      if (!core_slot) {
+> @@ -3874,13 +3869,26 @@ static void spapr_core_plug(HotplugHandler *hotpl=
+ug_dev, DeviceState *dev,
+>      core_slot->cpu =3D OBJECT(dev);
 > =20
->      /* Add MSI device to cache */
-> -    msi =3D g_new(spapr_pci_msi, 1);
-> +    msi =3D g_new(SpaprPciMsi, 1);
->      msi->first_irq =3D irq;
->      msi->num =3D req_num;
->      config_addr_key =3D g_new(int, 1);
-> @@ -446,7 +446,7 @@ static void rtas_ibm_query_interrupt_source_number(Po=
-werPCCPU *cpu,
->      unsigned int intr_src_num =3D -1, ioa_intr_num =3D rtas_ld(args, 3);
->      SpaprPhbState *phb =3D NULL;
->      PCIDevice *pdev =3D NULL;
-> -    spapr_pci_msi *msi;
-> +    SpaprPciMsi *msi;
-> =20
->      /* Find SpaprPhbState */
->      phb =3D spapr_pci_find_phb(spapr, buid);
-> @@ -459,7 +459,7 @@ static void rtas_ibm_query_interrupt_source_number(Po=
-werPCCPU *cpu,
+>      if (smc->pre_2_10_has_unused_icps) {
+> -        int i;
+> -
+>          for (i =3D 0; i < cc->nr_threads; i++) {
+>              cs =3D CPU(core->threads[i]);
+>              pre_2_10_vmstate_unregister_dummy_icp(cs->cpu_index);
+>          }
 >      }
-> =20
->      /* Find device descriptor and start IRQ */
-> -    msi =3D (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_addr=
-);
-> +    msi =3D (SpaprPciMsi *) g_hash_table_lookup(phb->msi, &config_addr);
->      if (!msi || !msi->first_irq || !msi->num || (ioa_intr_num >=3D msi->=
-num)) {
->          trace_spapr_pci_msi("Failed to return vector", config_addr);
->          rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> @@ -1806,7 +1806,7 @@ static void spapr_phb_destroy_msi(gpointer opaque)
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> -    spapr_pci_msi *msi =3D opaque;
-> +    SpaprPciMsi *msi =3D opaque;
-> =20
->      if (!smc->legacy_irq_allocation) {
->          spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
-> @@ -2120,7 +2120,7 @@ static const VMStateDescription vmstate_spapr_pci_l=
-si =3D {
->      .version_id =3D 1,
->      .minimum_version_id =3D 1,
->      .fields =3D (VMStateField[]) {
-> -        VMSTATE_UINT32_EQUAL(irq, struct spapr_pci_lsi, NULL),
-> +        VMSTATE_UINT32_EQUAL(irq, SpaprPciLsi, NULL),
-> =20
->          VMSTATE_END_OF_LIST()
->      },
-> @@ -2131,9 +2131,9 @@ static const VMStateDescription vmstate_spapr_pci_m=
-si =3D {
->      .version_id =3D 1,
->      .minimum_version_id =3D 1,
->      .fields =3D (VMStateField []) {
-> -        VMSTATE_UINT32(key, spapr_pci_msi_mig),
-> -        VMSTATE_UINT32(value.first_irq, spapr_pci_msi_mig),
-> -        VMSTATE_UINT32(value.num, spapr_pci_msi_mig),
-> +        VMSTATE_UINT32(key, SpaprPciMsiMig),
-> +        VMSTATE_UINT32(value.first_irq, SpaprPciMsiMig),
-> +        VMSTATE_UINT32(value.num, SpaprPciMsiMig),
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> @@ -2165,12 +2165,12 @@ static int spapr_pci_pre_save(void *opaque)
->      if (!sphb->msi_devs_num) {
->          return 0;
->      }
-> -    sphb->msi_devs =3D g_new(spapr_pci_msi_mig, sphb->msi_devs_num);
-> +    sphb->msi_devs =3D g_new(SpaprPciMsiMig, sphb->msi_devs_num);
-> =20
->      g_hash_table_iter_init(&iter, sphb->msi);
->      for (i =3D 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
->          sphb->msi_devs[i].key =3D *(uint32_t *) key;
-> -        sphb->msi_devs[i].value =3D *(spapr_pci_msi *) value;
-> +        sphb->msi_devs[i].value =3D *(SpaprPciMsi *) value;
->      }
-> =20
->      return 0;
-> @@ -2217,10 +2217,10 @@ static const VMStateDescription vmstate_spapr_pci=
- =3D {
->          VMSTATE_UINT64_TEST(mig_io_win_addr, SpaprPhbState, pre_2_8_migr=
-ation),
->          VMSTATE_UINT64_TEST(mig_io_win_size, SpaprPhbState, pre_2_8_migr=
-ation),
->          VMSTATE_STRUCT_ARRAY(lsi_table, SpaprPhbState, PCI_NUM_PINS, 0,
-> -                             vmstate_spapr_pci_lsi, struct spapr_pci_lsi=
-),
-> +                             vmstate_spapr_pci_lsi, SpaprPciLsi),
->          VMSTATE_INT32(msi_devs_num, SpaprPhbState),
->          VMSTATE_STRUCT_VARRAY_ALLOC(msi_devs, SpaprPhbState, msi_devs_nu=
-m, 0,
-> -                                    vmstate_spapr_pci_msi, spapr_pci_msi=
-_mig),
-> +                                    vmstate_spapr_pci_msi, SpaprPciMsiMi=
-g),
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
-> index eda8c752aa22..4aa89ede23e6 100644
-> --- a/hw/ppc/spapr_pci_nvlink2.c
-> +++ b/hw/ppc/spapr_pci_nvlink2.c
-> @@ -39,11 +39,7 @@
-> =20
->  #define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
-> =20
-> -struct spapr_phb_pci_nvgpu_config {
-> -    uint64_t nv2_ram_current;
-> -    uint64_t nv2_atsd_current;
-> -    int num; /* number of non empty (i.e. tgt!=3D0) entries in slots[] */
-> -    struct spapr_phb_pci_nvgpu_slot {
-> +typedef struct SpaprPhbPciNvGpuSlot {
->          uint64_t tgt;
->          uint64_t gpa;
->          unsigned numa_id;
-> @@ -54,12 +50,18 @@ struct spapr_phb_pci_nvgpu_config {
->              PCIDevice *npdev;
->              uint32_t link_speed;
->          } links[NVGPU_MAX_LINKS];
-> -    } slots[NVGPU_MAX_NUM];
-> +} SpaprPhbPciNvGpuSlot;
 > +
-> +struct SpaprPhbPciNvGpuConfig {
-> +    uint64_t nv2_ram_current;
-> +    uint64_t nv2_atsd_current;
-> +    int num; /* number of non empty (i.e. tgt!=3D0) entries in slots[] */
-> +    SpaprPhbPciNvGpuSlot slots[NVGPU_MAX_NUM];
->      Error *errp;
->  };
-> =20
-> -static struct spapr_phb_pci_nvgpu_slot *
-> -spapr_nvgpu_get_slot(struct spapr_phb_pci_nvgpu_config *nvgpus, uint64_t=
- tgt)
-> +static SpaprPhbPciNvGpuSlot *
-> +spapr_nvgpu_get_slot(SpaprPhbPciNvGpuConfig *nvgpus, uint64_t tgt)
->  {
->      int i;
-> =20
-> @@ -81,13 +83,13 @@ spapr_nvgpu_get_slot(struct spapr_phb_pci_nvgpu_confi=
-g *nvgpus, uint64_t tgt)
->      return &nvgpus->slots[i];
+> +    /*
+> +     * Set compatibility mode to match the boot CPU, which was either set
+> +     * by the machine reset code or by CAS.
+> +     */
+> +    if (hotplugged) {
+> +        for (i =3D 0; i < cc->nr_threads; i++) {
+> +            ppc_set_compat(core->threads[i], POWERPC_CPU(first_cpu)->com=
+pat_pvr,
+> +                           &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                return;
+> +            }
+> +        }
+> +    }
 >  }
 > =20
-> -static void spapr_pci_collect_nvgpu(struct spapr_phb_pci_nvgpu_config *n=
-vgpus,
-> +static void spapr_pci_collect_nvgpu(SpaprPhbPciNvGpuConfig *nvgpus,
->                                      PCIDevice *pdev, uint64_t tgt,
->                                      MemoryRegion *mr, Error **errp)
->  {
->      MachineState *machine =3D MACHINE(qdev_get_machine());
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(machine);
-> -    struct spapr_phb_pci_nvgpu_slot *nvslot =3D spapr_nvgpu_get_slot(nvg=
-pus, tgt);
-> +    SpaprPhbPciNvGpuSlot *nvslot =3D spapr_nvgpu_get_slot(nvgpus, tgt);
+>  static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState=
+ *dev,
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 45e2f2747ffc..1d93de8161f3 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -41,13 +41,6 @@ static void spapr_cpu_reset(void *opaque)
+>       * using an RTAS call */
+>      cs->halted =3D 1;
 > =20
->      if (!nvslot) {
->          error_setg(errp, "Found too many GPUs per vPHB");
-> @@ -102,11 +104,11 @@ static void spapr_pci_collect_nvgpu(struct spapr_ph=
-b_pci_nvgpu_config *nvgpus,
->      ++spapr->gpu_numa_id;
->  }
+> -    /* Set compatibility mode to match the boot CPU, which was either set
+> -     * by the machine reset code or by CAS. This should never fail.
+> -     * At startup the value is already set for all the CPUs
+> -     * but we need this when we hotplug a new CPU
+> -     */
+> -    ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort=
+);
+> -
+>      env->spr[SPR_HIOR] =3D 0;
 > =20
-> -static void spapr_pci_collect_nvnpu(struct spapr_phb_pci_nvgpu_config *n=
-vgpus,
-> +static void spapr_pci_collect_nvnpu(SpaprPhbPciNvGpuConfig *nvgpus,
->                                      PCIDevice *pdev, uint64_t tgt,
->                                      MemoryRegion *mr, Error **errp)
->  {
-> -    struct spapr_phb_pci_nvgpu_slot *nvslot =3D spapr_nvgpu_get_slot(nvg=
-pus, tgt);
-> +    SpaprPhbPciNvGpuSlot *nvslot =3D spapr_nvgpu_get_slot(nvgpus, tgt);
->      int j;
-> =20
->      if (!nvslot) {
-> @@ -138,7 +140,7 @@ static void spapr_phb_pci_collect_nvgpu(PCIBus *bus, =
-PCIDevice *pdev,
-> =20
->      if (tgt) {
->          Error *local_err =3D NULL;
-> -        struct spapr_phb_pci_nvgpu_config *nvgpus =3D opaque;
-> +        SpaprPhbPciNvGpuConfig *nvgpus =3D opaque;
->          Object *mr_gpu =3D object_property_get_link(po, "nvlink2-mr[0]",=
- NULL);
->          Object *mr_npu =3D object_property_get_link(po, "nvlink2-atsd-mr=
-[0]",
->                                                    NULL);
-> @@ -177,7 +179,7 @@ void spapr_phb_nvgpu_setup(SpaprPhbState *sphb, Error=
- **errp)
->          return;
->      }
-> =20
-> -    sphb->nvgpus =3D g_new0(struct spapr_phb_pci_nvgpu_config, 1);
-> +    sphb->nvgpus =3D g_new0(SpaprPhbPciNvGpuConfig, 1);
->      sphb->nvgpus->nv2_ram_current =3D sphb->nv2_gpa_win_addr;
->      sphb->nvgpus->nv2_atsd_current =3D sphb->nv2_atsd_win_addr;
-> =20
-> @@ -194,7 +196,7 @@ void spapr_phb_nvgpu_setup(SpaprPhbState *sphb, Error=
- **errp)
->      /* Add found GPU RAM and ATSD MRs if found */
->      for (i =3D 0, valid_gpu_num =3D 0; i < sphb->nvgpus->num; ++i) {
->          Object *nvmrobj;
-> -        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->slots=
-[i];
-> +        SpaprPhbPciNvGpuSlot *nvslot =3D &sphb->nvgpus->slots[i];
-> =20
->          if (!nvslot->gpdev) {
->              continue;
-> @@ -242,7 +244,7 @@ void spapr_phb_nvgpu_free(SpaprPhbState *sphb)
->      }
-> =20
->      for (i =3D 0; i < sphb->nvgpus->num; ++i) {
-> -        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->slots=
-[i];
-> +        SpaprPhbPciNvGpuSlot *nvslot =3D &sphb->nvgpus->slots[i];
->          Object *nv_mrobj =3D object_property_get_link(OBJECT(nvslot->gpd=
-ev),
->                                                      "nvlink2-mr[0]", NUL=
-L);
-> =20
-> @@ -276,7 +278,7 @@ void spapr_phb_nvgpu_populate_dt(SpaprPhbState *sphb,=
- void *fdt, int bus_off,
->      }
-> =20
->      for (i =3D 0; (i < sphb->nvgpus->num) && (atsdnum < ARRAY_SIZE(atsd)=
-); ++i) {
-> -        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->slots=
-[i];
-> +        SpaprPhbPciNvGpuSlot *nvslot =3D &sphb->nvgpus->slots[i];
-> =20
->          if (!nvslot->gpdev) {
->              continue;
-> @@ -354,7 +356,7 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *s=
-phb, void *fdt)
-> =20
->      /* Add memory nodes for GPU RAM and mark them unusable */
->      for (i =3D 0; i < sphb->nvgpus->num; ++i) {
-> -        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->slots=
-[i];
-> +        SpaprPhbPciNvGpuSlot *nvslot =3D &sphb->nvgpus->slots[i];
->          Object *nv_mrobj =3D object_property_get_link(OBJECT(nvslot->gpd=
-ev),
->                                                      "nvlink2-mr[0]", NUL=
-L);
->          uint32_t associativity[] =3D {
-> @@ -398,7 +400,7 @@ void spapr_phb_nvgpu_populate_pcidev_dt(PCIDevice *de=
-v, void *fdt, int offset,
->      }
-> =20
->      for (i =3D 0; i < sphb->nvgpus->num; ++i) {
-> -        struct spapr_phb_pci_nvgpu_slot *nvslot =3D &sphb->nvgpus->slots=
-[i];
-> +        SpaprPhbPciNvGpuSlot *nvslot =3D &sphb->nvgpus->slots[i];
-> =20
->          /* Skip "slot" without attached GPU */
->          if (!nvslot->gpdev) {
-> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> index 1b61162f918e..abd87605b270 100644
-> --- a/include/hw/pci-host/spapr.h
-> +++ b/include/hw/pci-host/spapr.h
-> @@ -34,15 +34,21 @@
-> =20
->  typedef struct SpaprPhbState SpaprPhbState;
-> =20
-> -typedef struct spapr_pci_msi {
-> +typedef struct SpaprPciMsi {
->      uint32_t first_irq;
->      uint32_t num;
-> -} spapr_pci_msi;
-> +} SpaprPciMsi;
-> =20
-> -typedef struct spapr_pci_msi_mig {
-> +typedef struct SpaprPciMsiMig {
->      uint32_t key;
-> -    spapr_pci_msi value;
-> -} spapr_pci_msi_mig;
-> +    SpaprPciMsi value;
-> +} SpaprPciMsiMig;
-> +
-> +typedef struct SpaprPciLsi {
-> +    uint32_t irq;
-> +} SpaprPciLsi;
-> +
-> +typedef struct SpaprPhbPciNvGpuConfig SpaprPhbPciNvGpuConfig;
-> =20
->  struct SpaprPhbState {
->      PCIHostState parent_obj;
-> @@ -63,14 +69,12 @@ struct SpaprPhbState {
->      AddressSpace iommu_as;
->      MemoryRegion iommu_root;
-> =20
-> -    struct spapr_pci_lsi {
-> -        uint32_t irq;
-> -    } lsi_table[PCI_NUM_PINS];
-> +    SpaprPciLsi lsi_table[PCI_NUM_PINS];
-> =20
->      GHashTable *msi;
->      /* Temporary cache for migration purposes */
->      int32_t msi_devs_num;
-> -    spapr_pci_msi_mig *msi_devs;
-> +    SpaprPciMsiMig *msi_devs;
-> =20
->      QLIST_ENTRY(SpaprPhbState) list;
-> =20
-> @@ -89,7 +93,7 @@ struct SpaprPhbState {
->      hwaddr mig_io_win_addr, mig_io_win_size;
->      hwaddr nv2_gpa_win_addr;
->      hwaddr nv2_atsd_win_addr;
-> -    struct spapr_phb_pci_nvgpu_config *nvgpus;
-> +    SpaprPhbPciNvGpuConfig *nvgpus;
->  };
-> =20
->  #define SPAPR_PCI_MEM_WIN_BUS_OFFSET 0x80000000ULL
+>      lpcr =3D env->spr[SPR_LPCR];
 >=20
 
 --=20
@@ -447,25 +200,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---98e8jtXdkpgskNou
+--V88s5gaDVPzZ0KCq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1nDk8ACgkQbDjKyiDZ
-s5KrvhAAsHMppqpEPyXQ8LdDZ4mdDk2LJuH8fj5WSDJbiMT5+cIsJjfHwY3hgssN
-kZO7XnH/w55mSizyv6fPhC8JEc1eelRxMLNJnLRwhYQI2pbnR455t3wZInCPDT0S
-7sca3T4JEOAnXYYKB1VAiJrNDGUVem8o6R8O2PjpXg1LmO1aDD0G3pUdWxSJdG/Z
-tSeJj6Q3FcL18q/2XLMs9SILldX317pgfGR4I4s3Gv/MUaHcOuzWIJxzdznYAqLi
-K8b2nUnwS6ceg2UUp+AEsZaqknnO/Jdr4Qc/C/eTL3sz2/KpixM6f3mUsFYqDNDr
-qaOPrtABQCKhJE6zV2AKn/rU6C/VEJcGNGyoZwGrtgqONlKLrns1Xy2hjHCVOyE7
-UO1d/Asi+RDbC80GH3Iey3Sr+8BjpOIPQepeOUtBQ5CWhowLAWWclQ0QgZv/Sb6B
-wrVPrtc1dOCTvY2dE8MPPYhzYctWlpVs6b8jp5ioIFG/qoj9pxsRjgdBg+gnFRrX
-ZDi9kACiYbXd+V11/f+RF/xvTDvGsdU0Cw8e80NL/QY/rKKqT9H+T8xxDghsjssG
-HUrEmmSp88aoU22WNoaSzkZU7OvCNKtkU345Ud+05EuZwnFUzswR9QYsQqceaabq
-WWHA7BuhdXqIuYU6lHO0S3bD3bVcCM5wvvJ/NnNV26hG+27fdQQ=
-=LOt6
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1nEVwACgkQbDjKyiDZ
+s5LAvg/6AlgOt0e93z+igWCwOHH9L3K0MRl10g5Y6O2r4sm8C8er88ku5kdJbfc3
+olwv51gdOrGod3S7k9z66hBQW6mUf94ToWTojbNC3fBT4dt+/aaAFfNntMn9cMFA
+2ZI+B9Lonev7JOZx2+c3FI0WZgjF02UU4elTfMEA0F0c22GBhISyBbXn0TpP9+9k
+pgndoq0c+hsb3qO+oECt1O50e3gxEoMKPspy02Vik3xkGfmEmnjVxFiJrviSEuyQ
+CxYYGOVNZsHFSlagJCanbOrR6zJd8dR4sA8f0L0hyAFwCQb/46KCtdGfta8+AwJn
+DB9rLxm5qb3gXjm3LhgfzaZPuMsrjofqxqp5h2FyCKL6s2ksPd6TFEr31SVeoPs8
+wJ8vGySOZb/gvPMgtTvvW2Uvl0VAFgTHzuS2jlgKrZni5nLxeJf3CmIMUB08izoY
+jJQ7sq1BjUcgatzs9x18e2wEdoiFpU3/drGaQGfWGZk2XUKSoGIYlMBLPOkZF3EE
+qqeBjHpo50T0V9evgKkyACtoKXjBcw8whIGc7CLrDpOc72voyGevh9K8v94FxEFz
+/YOCBCE4vQasIH0keGg76d3hNE43zCTZSlghGcRat7IkPk0lNMCTX1+8U4p7i70Q
+43hw/oLks/Nsdkac2kIUs+0w0IROqVDOkAdArDmRla24VfUYuG4=
+=SpYR
 -----END PGP SIGNATURE-----
 
---98e8jtXdkpgskNou--
+--V88s5gaDVPzZ0KCq--
 
