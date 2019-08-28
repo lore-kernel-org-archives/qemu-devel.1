@@ -2,139 +2,84 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E04BC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F293AC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:27:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ADEC20856
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:26:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ADEC20856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB60420856
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 20:27:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J1SVYWC6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB60420856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i34Wi-000375-8a
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:26:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40826)
+	id 1i34XS-0003m3-BP
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 16:27:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38970)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i33QB-0005Rs-KM
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:15:56 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i33H0-000438-Vv
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i33QA-0005nl-HY
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:15:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52928)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i33Q2-0005e5-F5; Wed, 28 Aug 2019 15:15:46 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE0B28B5FF0;
- Wed, 28 Aug 2019 19:15:45 +0000 (UTC)
-Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BDA91196B2;
- Wed, 28 Aug 2019 19:15:42 +0000 (UTC)
-To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
-References: <20190827185913.27427-1-nsoffer@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f75165f2-7b48-560e-13aa-059fdb00a1c0@redhat.com>
-Date: Wed, 28 Aug 2019 15:15:41 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190827185913.27427-1-nsoffer@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Wed, 28 Aug 2019 19:15:45 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] Alignment checks
- cleanup
+ (envelope-from <richard.henderson@linaro.org>) id 1i33Gz-0000nH-87
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:06:26 -0400
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:36817)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i33Gw-0000kk-Pz
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 15:06:23 -0400
+Received: by mail-pf1-x431.google.com with SMTP id w2so400411pfi.3
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 12:06:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=2MBl6t7fQ79zFUU8tID/KaTtAuG5wuFc4KjmST5JIXA=;
+ b=J1SVYWC6O+5LMr/nog7k+yMdGYHf2GPrGz8HlPCj7AspXnRxU6r7aEmtPciJPNQZMj
+ Uv6c5+fOnFCWBKMFugK9WUpgts9e4XUWJ4SAlPxrFzmOzObFbvqos2qBwee6x+bM4iQm
+ pmcwUC++EbL4lMKb8vmWvbhiOdugnXfJPZ/3SY8p4MMDf4muk+u5jLHjf7JjL1ZA4gN+
+ s7fzhTR2KE3Sf0o0WRr2Z0lR7dt9+XtW/Dcr/lLngWcBtsrOH7sQo6O7zuU3MJ1KLj3K
+ KRa0v+/IRmWb7Yb6ZWvHAmevysEGnIdSK1NAE3XMgaPkzGXphVlOU0j3IQaYkmlNTq4t
+ mx1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=2MBl6t7fQ79zFUU8tID/KaTtAuG5wuFc4KjmST5JIXA=;
+ b=ZJ/YBmoZv9jfaiJVG7iZ+FpsgVC02ZJwgMgGcoWopWOOwaWZrBSNP3hIuNLj/avS0z
+ KkVuUCmdb4vMpFtuO4NwPRp5Q8GUxiU6hWXWHsa77e5th2F1GarA9+SJgl4sJC8snyr8
+ hG7FYAGU6ghb9gze1rnmqcTMCp5hRQfCXJQ5gKq+VHF6oeTEySHDN3T5qCCP3uMINtZ5
+ 0uZ4vZcEUtIofUCBL5XT85cdgA4Wge02d+SS5hdYggWwqlElzudE48ecfsgZfzKhKzsA
+ +1cctIqfmJGh/oCJW31nEN/jJ1FdgherpeCoV40oBXu2dkvbc8kOFEO+mqGY8cgA9ueH
+ Gt2w==
+X-Gm-Message-State: APjAAAXRaynYqMZDompEh1CDIc7zKHLwhjK1DQA0T8+LqFrhjEwk/yPI
+ 7S7OP3sgBiMdOzdt2otbqEkmsO+by5c=
+X-Google-Smtp-Source: APXvYqyvigOVIAOoTD+DG8qEI/vRALTF2gglxhGvd8C5x/p8bfQMHRfDJ8WR9h0EOs+0+hr8qqQQFg==
+X-Received: by 2002:a62:f204:: with SMTP id m4mr6714467pfh.7.1567019179701;
+ Wed, 28 Aug 2019 12:06:19 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id f27sm2967944pgm.60.2019.08.28.12.06.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Aug 2019 12:06:18 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 28 Aug 2019 12:04:50 -0700
+Message-Id: <20190828190456.30315-64-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190828190456.30315-1-richard.henderson@linaro.org>
+References: <20190828190456.30315-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::431
+Subject: [Qemu-devel] [PATCH v3 63/69] target/arm: Convert T16,
+ Miscellaneous 16-bit instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,46 +91,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v3: Split firstcond & mask within trans_IT.
+---
+ target/arm/translate.c | 111 +++++++++++++----------------------------
+ target/arm/t16.decode  |  29 +++++++----
+ 2 files changed, 54 insertions(+), 86 deletions(-)
 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 854c9fe10d..5fb0e2066b 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10163,6 +10163,18 @@ static bool trans_TBH(DisasContext *s, arg_tbranch *a)
+     return op_tbranch(s, a, true);
+ }
+ 
++static bool trans_CBZ(DisasContext *s, arg_CBZ *a)
++{
++    TCGv_i32 tmp = load_reg(s, a->rn);
++
++    arm_gen_condlabel(s);
++    tcg_gen_brcondi_i32(a->nz ? TCG_COND_EQ : TCG_COND_NE,
++                        tmp, 0, s->condlabel);
++    tcg_temp_free_i32(tmp);
++    gen_jmp(s, read_pc(s) + a->imm);
++    return true;
++}
++
+ /*
+  * Supervisor call
+  */
+@@ -10394,6 +10406,27 @@ static bool trans_PLI(DisasContext *s, arg_PLD *a)
+     return ENABLE_ARCH_7;
+ }
+ 
++/*
++ * If-then
++ */
++
++static bool trans_IT(DisasContext *s, arg_IT *a)
++{
++    int cond_mask = a->cond_mask;
++
++    /*
++     * No actual code generated for this insn, just setup state.
++     *
++     * Combinations of firstcond and mask which set up an 0b1111
++     * condition are UNPREDICTABLE; we take the CONSTRAINED
++     * UNPREDICTABLE choice to treat 0b1111 the same as 0b1110,
++     * i.e. both meaning "execute always".
++     */
++    s->condexec_cond = (cond_mask >> 4) & 0xe;
++    s->condexec_mask = cond_mask & 0x1f;
++    return true;
++}
++
+ /*
+  * Legacy decoder.
+  */
+@@ -10760,83 +10793,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     case 8: /* load/store halfword immediate offset, in decodetree */
+     case 9: /* load/store from stack, in decodetree */
+     case 10: /* add PC/SP (immediate), in decodetree */
++    case 11: /* misc, in decodetree */
+     case 12: /* load/store multiple, in decodetree */
+-        goto illegal_op;
+-
+-    case 11:
+-        /* misc */
+-        op = (insn >> 8) & 0xf;
+-        switch (op) {
+-        case 0: /* add/sub (sp, immediate), in decodetree */
+-        case 2: /* sign/zero extend, in decodetree */
+-            goto illegal_op;
+-
+-        case 4: case 5: case 0xc: case 0xd:
+-            /* push/pop, in decodetree */
+-            goto illegal_op;
+-
+-        case 1: case 3: case 9: case 11: /* czb */
+-            rm = insn & 7;
+-            tmp = load_reg(s, rm);
+-            arm_gen_condlabel(s);
+-            if (insn & (1 << 11))
+-                tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, s->condlabel);
+-            else
+-                tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, s->condlabel);
+-            tcg_temp_free_i32(tmp);
+-            offset = ((insn & 0xf8) >> 2) | (insn & 0x200) >> 3;
+-            gen_jmp(s, read_pc(s) + offset);
+-            break;
+-
+-        case 15: /* IT, nop-hint.  */
+-            if ((insn & 0xf) == 0) {
+-                goto illegal_op; /* nop hint, in decodetree */
+-            }
+-            /*
+-             * IT (If-Then)
+-             *
+-             * Combinations of firstcond and mask which set up an 0b1111
+-             * condition are UNPREDICTABLE; we take the CONSTRAINED
+-             * UNPREDICTABLE choice to treat 0b1111 the same as 0b1110,
+-             * i.e. both meaning "execute always".
+-             */
+-            s->condexec_cond = (insn >> 4) & 0xe;
+-            s->condexec_mask = insn & 0x1f;
+-            /* No actual code generated for this insn, just setup state.  */
+-            break;
+-
+-        case 0xe: /* bkpt */
+-        {
+-            int imm8 = extract32(insn, 0, 8);
+-            ARCH(5);
+-            gen_exception_bkpt_insn(s, syn_aa32_bkpt(imm8, true));
+-            break;
+-        }
+-
+-        case 0xa: /* rev, and hlt */
+-        {
+-            int op1 = extract32(insn, 6, 2);
+-
+-            if (op1 == 2) {
+-                /* HLT */
+-                int imm6 = extract32(insn, 0, 6);
+-
+-                gen_hlt(s, imm6);
+-                break;
+-            }
+-
+-            /* Otherwise this is rev, in decodetree */
+-            goto illegal_op;
+-        }
+-
+-        case 6: /* setend, cps; in decodetree */
+-            goto illegal_op;
+-
+-        default:
+-            goto undef;
+-        }
+-        break;
+-
+     case 13: /* conditional branch or swi, in decodetree */
+         goto illegal_op;
+ 
+@@ -10892,7 +10850,6 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     }
+     return;
+ illegal_op:
+-undef:
+     unallocated_encoding(s);
+ }
+ 
+diff --git a/target/arm/t16.decode b/target/arm/t16.decode
+index cbc64f4e48..f128110dee 100644
+--- a/target/arm/t16.decode
++++ b/target/arm/t16.decode
+@@ -211,19 +211,30 @@ REVSH           1011 1010 11 ... ...            @rdm
+ # Hints
+ 
+ {
+-  YIELD         1011 1111 0001 0000
+-  WFE           1011 1111 0010 0000
+-  WFI           1011 1111 0011 0000
++  {
++    YIELD       1011 1111 0001 0000
++    WFE         1011 1111 0010 0000
++    WFI         1011 1111 0011 0000
+ 
+-  # TODO: Implement SEV, SEVL; may help SMP performance.
+-  # SEV         1011 1111 0100 0000
+-  # SEVL        1011 1111 0101 0000
++    # TODO: Implement SEV, SEVL; may help SMP performance.
++    # SEV       1011 1111 0100 0000
++    # SEVL      1011 1111 0101 0000
+ 
+-  # The canonical nop has the second nibble as 0000, but the whole of the
+-  # rest of the space is a reserved hint, behaves as nop.
+-  NOP           1011 1111 ---- 0000
++    # The canonical nop has the second nibble as 0000, but the whole of the
++    # rest of the space is a reserved hint, behaves as nop.
++    NOP         1011 1111 ---- 0000
++  }
++  IT            1011 1111 cond_mask:8
+ }
+ 
++# Miscellaneous 16-bit instructions
++
++%imm6_9_3       9:1 3:5 !function=times_2
++
++HLT             1011 1010 10 imm:6              &i
++BKPT            1011 1110 imm:8                 &i
++CBZ             1011 nz:1 0.1 ..... rn:3        imm=%imm6_9_3
++
+ # Push and Pop
+ 
+ %push_list      0:9 !function=t16_push_list
+-- 
+2.17.1
 
-On 8/27/19 2:59 PM, Nir Soffer wrote:
-> While working on 4k support, I noticed that there is lot of code using
-> BDRV_SECTOR_SIZE (512) for checking alignment. I wonder how this can work with
-> 4k storage.
-> 
-> Lets start by cleaning up to make the code easier to understand:
-> - Use QEMU_IS_ALIGNED macro to check alignment
-> - Remove unneeded masks based on BDRV_SECTOR_SIZE
-> 
-> Nir Soffer (2):
->   block: Use QEMU_IS_ALIGNED
->   block: Remove unused masks
-> 
->  block/bochs.c         | 4 ++--
->  block/cloop.c         | 4 ++--
->  block/dmg.c           | 4 ++--
->  block/io.c            | 8 ++++----
->  block/qcow2-cluster.c | 4 ++--
->  block/qcow2.c         | 4 ++--
->  block/vvfat.c         | 8 ++++----
->  include/block/block.h | 2 --
->  migration/block.c     | 2 +-
->  qemu-img.c            | 2 +-
->  10 files changed, 20 insertions(+), 22 deletions(-)
-> 
-
-V2 changelog?
-
-(Looks like adding patch 2 as a result of changing away users from the
-BDRV_SECTOR_MASK.)
-
-Reviewed-by: John Snow <jsnow@redhat.com>
 
