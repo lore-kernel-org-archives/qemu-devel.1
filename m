@@ -2,64 +2,93 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B573C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F36BC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:30:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D00EA2189D
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:29:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D00EA2189D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C7AA62189D
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 21:30:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X74RCDyZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7AA62189D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i35V1-00034P-Uq
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 17:29:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33067)
+	id 1i35W5-00048L-VO
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 17:30:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i35Tl-0002Yj-7z
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:27:46 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i35Uc-00034K-9W
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i35Tk-0002yO-8K
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:27:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43276)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i35Tk-0002xo-0p
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:27:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3D72B18C4266;
- Wed, 28 Aug 2019 21:27:43 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-242.rdu2.redhat.com
- [10.10.123.242])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E96D5D9CA;
- Wed, 28 Aug 2019 21:27:42 +0000 (UTC)
-Date: Wed, 28 Aug 2019 17:27:40 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Message-ID: <20190828212726.GC11512@localhost.localdomain>
-References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1564760158-27536-3-git-send-email-aleksandar.markovic@rt-rk.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1i35Ua-0003LD-Un
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:28:37 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:46306)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i35Ua-0003Kw-NV
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 17:28:36 -0400
+Received: by mail-pl1-x641.google.com with SMTP id o3so529406plb.13
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 14:28:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=wjg0xlXJIX8qztizzqID0rdk7WOO7Bus9Jg0yc3r8lI=;
+ b=X74RCDyZtOAbZ5r6Y/s7S/7UJDSKNj/d7hnmR3is47FeCiGDA1mfiKaXcBAlrTI6XV
+ wgkTd05pONw6I3GmZf3/LNpqv1TqhPlvyyfqQurunW58x83TQC1+t+4CAKD9i/nVKkxh
+ F9gfJlDESdvo6O9p/78AM1Hm8yIkehzxEei/6cDSv6E8ebbWcJgx4vcjetKr9K3lM+j6
+ jeFRSzvU9bFj1FTMV5osJapucK8YSmwFyzYufnI9rnx4AyFwrt7HP1cdsKJtbEmd5Esf
+ jelwluoyEUDQP6zt2xEArtBKFykwFqP9U6KOwC7gsrEl1XeEwy+NVMymoar7SIIrli7b
+ 9uZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wjg0xlXJIX8qztizzqID0rdk7WOO7Bus9Jg0yc3r8lI=;
+ b=R98BG4Md6QLjSNIKrIf4C+5/2ydhPCHMBz1p9u7Ot5fZSNGDPKTKz0Dy+ddhs0ulqh
+ f2uyMTJ7Epr6AGnJeMt5citbvovCPVtOmNsSbWdoOxlVsM3wGDajqSiwa32/AnkJhbI5
+ lmX++xKwUfGe3qRUeLw2gvd8Np2W9GVAP6NZo2fiacoP5yCnug9KGZqr1YZ1fjp2WIh6
+ l7b9I5QnMRgiekBRDGQpvZTxNwZqjNn/N12hhJAxAmoLXg7UqeNwCVmiUsI9Be3l2DF0
+ g5T0J1IJaWvbI/4X6vd+jgEztvjvXl1obTOck6Bfv0oOr3uTaVlEiFoN+FimifeeAxAr
+ E5xA==
+X-Gm-Message-State: APjAAAU+iU3knxPLXx8meZ9d+TonAc5SCtxIvQiNQwhbg8k0DKZzpR46
+ O0b7vgB/OKE9PS720ZsOJKiGuw==
+X-Google-Smtp-Source: APXvYqzTl99Y7SV8N/fOIx5I6VNfK1Yh2Ay1UZz+s1c4atOXluiYzhwwMHEnmEO8Xt57bZOdbDHLWA==
+X-Received: by 2002:a17:902:ff03:: with SMTP id
+ f3mr1315132plj.134.1567027715578; 
+ Wed, 28 Aug 2019 14:28:35 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id j1sm294563pfh.174.2019.08.28.14.28.34
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 28 Aug 2019 14:28:34 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190824213451.31118-1-richard.henderson@linaro.org>
+ <20190824213451.31118-5-richard.henderson@linaro.org>
+ <77c9af3e-4c18-a20f-137e-468d04583241@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <a699d74e-c257-0abb-7680-1bd2038f1c88@linaro.org>
+Date: Wed, 28 Aug 2019 14:28:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1564760158-27536-3-git-send-email-aleksandar.markovic@rt-rk.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Wed, 28 Aug 2019 21:27:43 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests/acceptance: Add new test cases
- in linux_ssh_mips_malta.py
+In-Reply-To: <77c9af3e-4c18-a20f-137e-468d04583241@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH 4/6] exec: Factor out
+ cpu_watchpoint_address_matches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,93 +100,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: f4bug@amsat.org, cohuck@redhat.com, qemu-devel@nongnu.org,
- amarkovic@wavecomp.com, ehabkost@redhat.com
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 02, 2019 at 05:35:58PM +0200, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 8/26/19 1:41 AM, David Hildenbrand wrote:
+>> -    /* Make accesses to pages with watchpoints go via the
+>> -       watchpoint trap routines.  */
+>> -    QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+>> -        if (cpu_watchpoint_address_matches(wp, vaddr, TARGET_PAGE_SIZE)) {
+>> -            /* Avoid trapping reads of pages with a write breakpoint. */
+>> -            if ((prot & PAGE_WRITE) || (wp->flags & BP_MEM_READ)) {
+>> -                iotlb = PHYS_SECTION_WATCH + paddr;
+>> -                *address |= TLB_MMIO;
+>> -                break;
+> In the old code, we were able to break once we found a hit ...
 > 
-> Add 15 new tests cases. They all rely on simple commands used for
-> detecting hardware configuration information.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  tests/acceptance/linux_ssh_mips_malta.py | 45 ++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
-> 
-> diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
-> index 8368e1f..c153c41 100644
-> --- a/tests/acceptance/linux_ssh_mips_malta.py
-> +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> @@ -155,6 +155,51 @@ class LinuxSSH(Test):
->  
->      def run_common_commands(self):
->          self.ssh_command_output_contains(
-> +            'cat /proc/cpuinfo',
-> +            '24Kc')
-> +        self.ssh_command_output_contains(
-> +            'uname -m',
-> +            'mips')
-> +        self.ssh_command_output_contains(
-> +            'uname -r',
-> +            '3.2.0-4-4kc-malta')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/interrupts',
-> +            'timer')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/interrupts',
-> +            'i8042')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/interrupts',
-> +            'serial')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/interrupts',
-> +            'ata_piix')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/interrupts',
-> +            'eth0')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/interrupts',
-> +            'eth0')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/devices',
-> +            'input')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/devices',
-> +            'usb')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/devices',
-> +            'fb')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/ioports',
-> +            'serial')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/ioports',
-> +            'ata_piix')
-> +        self.ssh_command_output_contains(
-> +            'cat /proc/ioports',
-> +            'piix4_smbus')
-> +        self.ssh_command_output_contains(
->              'lspci -d 11ab:4620',
->              'GT-64120')
->          self.ssh_command_output_contains(
-> -- 
-> 2.7.4
-> 
-> 
+>> -            }
+>> -        }
+>> +    /* Avoid trapping reads of pages with a write breakpoint. */
+>> +    match = (prot & PAGE_READ ? BP_MEM_READ : 0)
+>> +          | (prot & PAGE_WRITE ? BP_MEM_WRITE : 0);
+>> +    flags = cpu_watchpoint_address_matches(cpu, vaddr, TARGET_PAGE_SIZE);
+>> +    if (flags & match) {
+> ... now you cannot break early anymore. Maybe pass in the match to
+> cpu_watchpoint_address_matches() ?
 
-This is fine, although using a loop would probably result in better
-readability.  Something like:
+Hmm, yes, perhaps.
 
-   for cmd, exp in [('cat /proc/cpuinfo', '24Kc'),
-                    ('uname -m', 'mips'),
-                    ...]
-      self.ssh_command_output_contains(cmd, exp)
+OTOH, summing a bitmask is a very quick operation.  Depending on the total
+number of watchpoints, of course...
 
-Either way:
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+r~
 
