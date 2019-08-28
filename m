@@ -2,92 +2,82 @@ Return-Path: <SRS0=QQWF=WY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FEFCC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 00:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CB9C3A5A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 00:13:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 309E62173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 00:08:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E55A2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Aug 2019 00:13:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TXDjcjWc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 309E62173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NET2Y47J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E55A2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i2lVe-0005r8-9i
-	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 20:08:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55267)
+	id 1i2laC-0007ND-Lv
+	for qemu-devel@archiver.kernel.org; Tue, 27 Aug 2019 20:13:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i2lUf-0005KF-74
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 20:07:22 -0400
+ (envelope-from <alistair23@gmail.com>) id 1i2lZL-0006eA-O8
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 20:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i2lUe-0005sI-06
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 20:07:20 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:37588)
+ (envelope-from <alistair23@gmail.com>) id 1i2lZK-0000JH-LO
+ for qemu-devel@nongnu.org; Tue, 27 Aug 2019 20:12:11 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:37022)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i2lUd-0005qw-PF
- for qemu-devel@nongnu.org; Tue, 27 Aug 2019 20:07:19 -0400
-Received: by mail-pf1-x442.google.com with SMTP id y9so444426pfl.4
- for <qemu-devel@nongnu.org>; Tue, 27 Aug 2019 17:07:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=n8q8YNKPvXrkleM20QsMvRxgJbJG7dT0flX7RMl6O6U=;
- b=TXDjcjWcQzT67pb+dJ85bq2u/1CP2jnNTZHp8mkDlOzvBsbz9NIx8PvDvfHS6OjuII
- xCV45R8UvVbkcZJoRln5JR+PSbceGaGrfcUGStU0oetrcTHJLkU4XfFb0st5GGDGBd24
- TjSwcAUdLJTyyJ9M2dFuV0LPOddtT4Q3iTQd4Dy5FCPZBT3o9pnGEBIa4Jq3G4hHGITB
- GdyhBdiifpGg1DL+6hlm2Imo2pGyGpxtRz6xdMM2hBrzfMr4tuopuI0AtwZzTaV0mWJo
- /cTuotmJTtZLL65GjsJ8bTtINfSMpIlNb+2stlU8V/7JKdcKFD2XmQ+ozJOzC5yg5BSm
- Sx6g==
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1i2lZK-0000Io-Di; Tue, 27 Aug 2019 20:12:10 -0400
+Received: by mail-lf1-x142.google.com with SMTP id w67so515436lff.4;
+ Tue, 27 Aug 2019 17:12:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4hRlrmFP06/1JRTRiJ5WRR6Ii0rh/52IH0rpBQCRJqg=;
+ b=NET2Y47JUrmXL06CzWELiaWwVCNGpcWJbGnQqrEVw0XhWqyxKtzSBYc3c9ClxM+cbl
+ 72+mqRWy685faoF8r49skbIC9AYI2oHD8NDYc9CutQX4+EcLVqyJs6wUowsGBKF1m60s
+ lp+Uzz+B0TuZVgBC9n5ilMpkq68tDrbcZ9byKyVOLCTQOj3AMT4m7gQz3x7Qxr3kj+JT
+ SVFcW6R6mXaPYKeTilLPm2ImtzxisMKHhTp+kD8jFTAD+usomJgbQspVFcgy0yc3vFZY
+ XxyvdH30+8tFbRNiDvjtjIAA5kiCttrUv69i28eb8b31512Ech91eTu6Sj264N28gL/b
+ Ul/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=n8q8YNKPvXrkleM20QsMvRxgJbJG7dT0flX7RMl6O6U=;
- b=jVXzI6FRzqGkGzn5zd7Z6+sZeZ15gY5Q49miUBqt4za56id8H1IZEn1NJamiSNylT4
- iwBCpy4IoJnc9Oabj+sCavkGLa0Wo1rQqabZceOtbTTJGh6lGfY+Hd3TvTIuzxnGJ6cG
- TAfgiKn1frss1f16qYaOxdN3bQHGIOwDX6wpqmzIqTyI8cH7HJ+y2OnfJzcA44b/ub2B
- iEBawatDrm0vM6alERJCKEOYG7Twm8bkA4PqyoqBsaW/OpNp9C8pUWT97tW90Ccelq+5
- HrR+4Vf3ecl2YlwaW7/hhIvRbocIIqZ/bbrztolrW/yuqlVmBpB/ZucTjWav/4u7Ku1n
- jWHw==
-X-Gm-Message-State: APjAAAUBNCDY0gqWDaBVtPYRfOj0pwSqMEspZnsnUmsSTUavS1RI4Zqb
- HSRRudAWXUH3RKyU6Kx9UEvYTw==
-X-Google-Smtp-Source: APXvYqynL3dm9149OMTleoW49rUAT7U1fzVKvJT/3IDNn8DRi11TBXoHfoCLPRJsqypAISRjq0mM4g==
-X-Received: by 2002:a63:7e17:: with SMTP id z23mr1025474pgc.14.1566950836668; 
- Tue, 27 Aug 2019 17:07:16 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id a16sm477679pfk.5.2019.08.27.17.07.14
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 27 Aug 2019 17:07:15 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190819213755.26175-1-richard.henderson@linaro.org>
- <20190819213755.26175-67-richard.henderson@linaro.org>
- <CAFEAcA9AbEzR97-2gvpPAbGrGHx_AxGgVhh4-BDufTQUX0gM1w@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <7f4eac6e-486a-3d99-b533-5fd4ac41864d@linaro.org>
-Date: Tue, 27 Aug 2019 17:07:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4hRlrmFP06/1JRTRiJ5WRR6Ii0rh/52IH0rpBQCRJqg=;
+ b=Ypl1zoqYNn326KYsv9s6By8+5v/sQFJ/OYgQkCPtOkAoIEfUcYDlM6BtlkifKRgFTh
+ BfCR065u/nP4U65A1+Y8V+TWrVKO8Y+Yf5lAm3s/5+UZFZekeunicMfYszoKizMB20XI
+ W5C9/hX15TC2iQm1wa0B9xqBhNGEHSeVBdJ1coxyoapYPexm7ey+Yx+cw3fFnWgc/QIQ
+ 2mR5R2Jl+/CNJMoGUHoYzUeT2GE5cTX/f6cVDzpHjFVKEEvbrX9/9McvuehXvw2BeiK/
+ 35pGadn/bQeN+R7PMpSBVyHFIT5/soWPzVDm+TEyYp9MOJvbTmsSng4iMm1V/Bbzs9Di
+ kMQg==
+X-Gm-Message-State: APjAAAV/Nfb0v79kMWZ2Fzs+Du2GdAuHxj8Wbn+9jNywmSQFqkszmpC9
+ Ka4piML5Z9Rzgx47cfIGkhW5H3KOow/FoXqCffE=
+X-Google-Smtp-Source: APXvYqx+bDfLSO9UCawx4Zm0+uZev+Vr2kNk9UIX/Tr9q0DnnrtD/yKE3Oa4FCFU6ESYtcGUIOKWwhdYT3MTTdHZxmQ=
+X-Received: by 2002:ac2:528c:: with SMTP id q12mr650739lfm.135.1566951128667; 
+ Tue, 27 Aug 2019 17:12:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9AbEzR97-2gvpPAbGrGHx_AxGgVhh4-BDufTQUX0gM1w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <cover.1566603412.git.alistair.francis@wdc.com>
+ <1c1d359caa6633349158debc38e07156a10b63e8.1566603412.git.alistair.francis@wdc.com>
+ <CAEiOBXUeKnPyZd7i5Aqw5+G2G9M-OeWxsBqTsF0MTV_abkDe5A@mail.gmail.com>
+In-Reply-To: <CAEiOBXUeKnPyZd7i5Aqw5+G2G9M-OeWxsBqTsF0MTV_abkDe5A@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 27 Aug 2019 17:08:02 -0700
+Message-ID: <CAKmqyKOphhLWZfbDPdPU3EPy8rsgpL5GzqTtdpFBA+rOxTSYsA@mail.gmail.com>
+To: Chih-Min Chao <chihmin.chao@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v2 66/68] target/arm: Convert T16,
- long branches
+X-Received-From: 2a00:1450:4864:20::142
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH v1 02/28] target/riscv: Add
+ the virtulisation mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,38 +89,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup.Patel@wdc.com,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/27/19 2:34 AM, Peter Maydell wrote:
->> +    tcg_gen_andi_i32(tmp, tmp, -4);
-> 
-> Minor nit, but can we use 0xfffffffc like the old code did,
-> to avoid the reader having to do 2s-complement arithmetic
-> in their head to figure out that we're clearing the low 2 bits?
+On Tue, Aug 27, 2019 at 8:44 AM Chih-Min Chao <chihmin.chao@sifive.com> wrote:
+>
+>
+>
+> On Sat, Aug 24, 2019 at 7:41 AM Alistair Francis <alistair.francis@wdc.com> wrote:
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  target/riscv/cpu.h        |  4 ++++
+>>  target/riscv/cpu_bits.h   |  6 ++++++
+>>  target/riscv/cpu_helper.c | 23 +++++++++++++++++++++++
+>>  3 files changed, 33 insertions(+)
+>>
+>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> index 7f54fb8c87..0ef1ecb0e0 100644
+>> --- a/target/riscv/cpu.h
+>> +++ b/target/riscv/cpu.h
+>> @@ -117,6 +117,8 @@ struct CPURISCVState {
+>>
+>>  #ifndef CONFIG_USER_ONLY
+>>      target_ulong priv;
+>> +    /* This contains QEMU specific information about the virt state. */
+>> +    target_ulong virt;
+>>      target_ulong resetvec;
+>>
+>>      target_ulong mhartid;
+>> @@ -257,6 +259,8 @@ int riscv_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+>>  int riscv_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+>>  bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request);
+>>  bool riscv_cpu_fp_enabled(CPURISCVState *env);
+>> +bool riscv_cpu_virt_enabled(CPURISCVState *env);
+>> +void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable);
+>>  int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
+>>  hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+>>  void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+>> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+>> index e99834856c..1fbde516be 100644
+>> --- a/target/riscv/cpu_bits.h
+>> +++ b/target/riscv/cpu_bits.h
+>> @@ -422,6 +422,12 @@
+>>  #define PRV_H 2 /* Reserved */
+>>  #define PRV_M 3
+>>
+>> +/* Virtulisation modes */
+>> +#define VIRT_OFF            0
+>> +#define VIRT_ON             1
+>> +#define VIRT_MODE_SHIFT     0
+>> +#define VIRT_MODE_MASK      (1 << VIRT_MODE_SHIFT)
+>> +
+>>
+>>  /* RV32 satp CSR field masks */
+>>  #define SATP32_MODE         0x80000000
+>>  #define SATP32_ASID         0x7fc00000
+>> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+>> index 225e407cff..7b0bb14c01 100644
+>> --- a/target/riscv/cpu_helper.c
+>> +++ b/target/riscv/cpu_helper.c
+>> @@ -81,6 +81,29 @@ bool riscv_cpu_fp_enabled(CPURISCVState *env)
+>>      return false;
+>>  }
+>>
+>> +bool riscv_cpu_virt_enabled(CPURISCVState *env)
+>> +{
+>> +    bool tmp;
+>> +
+>> +    if (!riscv_has_ext(env, RVH)) {
+>> +        return false;
+>> +    }
+>> +
+>> +    tmp = (env->virt & VIRT_MODE_MASK) >> VIRT_MODE_SHIFT;
+>> +
+>> +    return tmp == VIRT_ON;
+>> +}
+>> +
+>> +void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable)
+>> +{
+>> +    if (!riscv_has_ext(env, RVH)) {
+>> +        return;
+>> +    }
+>> +
+>> +    env->virt &= ~VIRT_MODE_MASK;
+>> +    env->virt |= enable << VIRT_MODE_SHIFT;
+>> +}
+>> +
+>>  int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+>>  {
+>>      CPURISCVState *env = &cpu->env;
+>> --
+>> 2.22.0
+>>
+> Why not to use get_field and set_field though it is not a real register but an internal state
+>
+> #define VIRT_ONOFF            0x01
+> #define VIRT_OFF             0
+> #define VIRT_ON             1
+>
+> access
+>        get_field(env->virt, VIRT_ONOFF);
+>        set_field(env->virt, VIRT_ONOFF, enable);
 
-I always preferred "x & -c" for exactly the same reason:
-to avoid the reader having to do 2s compliment arithmetic
-in their head to figure out that we're aligning to c.
+Good idea, I have updated this.
 
-But, sure, if you like.
+Alistair
 
-> This would be a good place to put a comment equivalent to that
-> in the old decoder:
-> 
-> # thumb_insn_is_16bit() ensures we won't be decoding these as
-> # T16 instructions for a Thumb2 CPU, so these patterns must be
-> # a Thumb1 split BL/BLX.
-> 
->> +BLX_suffix      11101 imm:11                    &i
->> +BL_BLX_prefix   11110 imm:s11                   &i
->> +BL_suffix       11111 imm:11                    &i
-
-I had placed that with trans_BL_BLX_prefix, but I suppose this
-is a better place.
-
-
-r~
+>
+>
+> chihmin
 
