@@ -2,71 +2,69 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C2FC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 13:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F701C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 13:49:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40D092189D
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 13:47:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D092189D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 461E52189D
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 13:49:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 461E52189D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Kle-0001Q6-0w
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 09:47:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58195)
+	id 1i3Kna-0002m3-BM
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 09:49:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1i3Kk9-0000qH-6s
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 09:45:42 -0400
+ (envelope-from <pkrempa@redhat.com>) id 1i3KlX-0001WJ-9n
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 09:47:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1i3Kk8-0007z2-3E
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 09:45:41 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:45436 helo=huawei.com)
+ (envelope-from <pkrempa@redhat.com>) id 1i3KlU-00011X-V4
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 09:47:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55790)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1i3Kk5-0007uY-Ij; Thu, 29 Aug 2019 09:45:37 -0400
-Received: from LHREML714-CAH.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id 97C3896467875FF8B1EB;
- Thu, 29 Aug 2019 14:45:33 +0100 (IST)
-Received: from LHREML524-MBS.china.huawei.com ([169.254.2.92]) by
- LHREML714-CAH.china.huawei.com ([10.201.108.37]) with mapi id 14.03.0415.000; 
- Thu, 29 Aug 2019 14:45:24 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>)
+ id 1i3KlU-00010Z-O7; Thu, 29 Aug 2019 09:47:04 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 802893084031;
+ Thu, 29 Aug 2019 13:47:03 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.43.2.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B3AE26107E;
+ Thu, 29 Aug 2019 13:46:42 +0000 (UTC)
+Date: Thu, 29 Aug 2019 15:46:40 +0200
+From: Peter Krempa <pkrempa@redhat.com>
 To: Igor Mammedov <imammedo@redhat.com>
-Thread-Topic: [PATCH-for-4.2 v9 01/12] hw/acpi: Make ACPI IO address space
- configurable
-Thread-Index: AQHVXkYfh6DcS0TZ1kGZvays3xLkbacR8aaAgAAORQCAACK90A==
-Date: Thu, 29 Aug 2019 13:45:23 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F3A23B5@lhreml524-mbs.china.huawei.com>
-References: <20190813210539.31164-1-shameerali.kolothum.thodi@huawei.com>
- <20190813210539.31164-2-shameerali.kolothum.thodi@huawei.com>
- <5FC3163CFD30C246ABAA99954A238FA83F36E598@lhreml524-mbs.china.huawei.com>
- <20190829104518.0995e7c5@redhat.com>
- <5FC3163CFD30C246ABAA99954A238FA83F3A2027@lhreml524-mbs.china.huawei.com>
- <20190829143810.1dc33818@redhat.com>
-In-Reply-To: <20190829143810.1dc33818@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <20190829134640.GK13714@angien.pipo.sk>
+References: <20190816170750.23910-1-ehabkost@redhat.com>
+ <871rx5eq8j.fsf@dusky.pond.sub.org>
+ <20190828143524.GA7642@habkost.net>
+ <20190828185718.0e4eced8@redhat.com>
+ <20190829131225.GJ13714@angien.pipo.sk>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="+278g007AL/ykmV8"
+Content-Disposition: inline
+In-Reply-To: <20190829131225.GJ13714@angien.pipo.sk>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 29 Aug 2019 13:47:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 185.176.76.210
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v9 01/12] hw/acpi: Make ACPI IO
- address space configurable
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] pc: Don't make die-id mandatory unless
+ necessary
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,81 +76,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "sameo@linux.intel.com" <sameo@linux.intel.com>,
- "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>,
+ Vanderson Martins do Rosario <vandersonmr2@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Like Xu <like.xu@linux.intel.com>,
+ Erik Skultety <eskultet@redhat.com>, qemu-stable@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--+278g007AL/ykmV8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Igor Mammedov [mailto:imammedo@redhat.com]
-> Sent: 29 August 2019 13:38
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
-> eric.auger@redhat.com; peter.maydell@linaro.org; sameo@linux.intel.com;
-> ard.biesheuvel@linaro.org; Linuxarm <linuxarm@huawei.com>;
-> shannon.zhaosl@gmail.com; sebastien.boeuf@intel.com; lersek@redhat.com
-> Subject: Re: [PATCH-for-4.2 v9 01/12] hw/acpi: Make ACPI IO address space
-> configurable
->=20
-> On Thu, 29 Aug 2019 11:04:27 +0000
-> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On Thu, Aug 29, 2019 at 15:12:33 +0200, Peter Krempa wrote:
+> On Wed, Aug 28, 2019 at 18:57:18 +0200, Igor Mammedov wrote:
+> > On Wed, 28 Aug 2019 11:35:24 -0300
 
 [...]
 
-> >
-> > I think what happens is since we are now passing the memhp_io_base
-> directly into the
-> > build_memory_hotplug_aml() and removed the "static uint16_t
-> memhp_io_base", on
-> > x86, memory hotplug aml code is always built by default irrespective of
-> whether
-> > acpi_memory_hotplug_init() is invoked or not.
-> >
-> > I could either reintroduce a check in build_memory_hotplug_aml() to mak=
-e
-> sure
-> > acpi_memory_hotplug_init() is called, or could do something like below,
+> > Also if we would need to change implicit values logic down the road
+> > it would be a pain like with any default parameters in QEMU, which is
+> > a good reason against relaxing rule.
+>=20
+> Hi,
+>=20
+> after a discussion with Igor I'm preparing patches which take the
+> 'props' verbatim and use it for hotplug. It's a fairly simple change in
+> libvirt. Originally I've opted to reconstruct the props from internal
+> data since it was simpler as the values were already parsed into
+> internal structures anyways.
+>=20
+> With some persuation we could even get it into libvirt during the freeze
+> so that with new libvirt the released stuff will not break any more.
 
-> fix looks fine to me, see minor comment below
+https://www.redhat.com/archives/libvir-list/2019-August/msg01322.html
 
-Ok
-=20
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index 3995f9a40f..17756c2191 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -1873,9 +1873,12 @@ build_dsdt(GArray *table_data, BIOSLinker
-> *linker,
-> >          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
-> >                         "\\_SB.PCI0", "\\_GPE._E02");
-> >      }
-> > -    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0",
-> > -                             "\\_GPE._E03", AML_SYSTEM_IO,
-> > -                             pcms->memhp_io_base);
-> > +
-> > +    if (acpi_enabled && pcms->acpi_dev && nr_mem) {
-> double-check call path and see if
->   acpi_enabled && pcms->acpi_dev
-> is really necessary
 
-Right, looks like those are always true. I will remove those.
+--+278g007AL/ykmV8
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Also appreciate if you could take a look at rest of the series and then I c=
-an
-re-spin along with this.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-Shameer
-=20
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAl1n1z0ACgkQHGwCByjY
+1GoZ7g/8DhHcLxun10rHBzM0xesojn3bgKmsP4A+h8CeEvZxHNAZ3qXc/6hZRRD3
+izfSLmhEtT0OoRwZh/10V5OAtVSXPC1sqDd/JmjxWpkymhXddujKrWMcjPf0wZlA
+xFJBCgse9g7ErYmy2UgZr6twVRrCC7uqi5gSKlyl3QoBJiB1EXibrKX6kn1jFzZx
+mgntbS36wul9Y2kXUBmUm2UC0GXjhZfYyOeBupItlqmlU6FinrdIqAGQykbhsmge
+HhU962eemL57njM6bfLl0FZ2IiWl424a16U24PGr/YeHrG31yH76dAD2fI958kXl
+qFXQYar7zDsEOiw6EFwEP2PYDV/UIXYJhOweByMAdxoW/bU4rTvzzJyK995t0/NP
+QeOqJrDkMecDdbdrQK2K4uKI7Wh7CMNWM3cFbBmjOSxBz53fHOjsunHO8sm2EAJR
+Pf5WSI37t5T+GgcRR/hq/qUDhDmkmW639aWHFrlvIhj4JTQjjLKMDZllYk5fXayo
+p9Nt9bzzj31clb539uan7fO4jOotblbaShAyFGpUN+ZChAY+WMaPEA8jCQUN9lTn
+h1TR1u8TAT7R/5I/3JAGV0qJfMErnyWscMMGneKIPKVSp/9kQAJ1fquMAqXm/bWo
+wHVd5OsmZqv2oYBL1lvVS/hK/3wLZP7fGT3deAEnSax54MkpI8A=
+=gNUl
+-----END PGP SIGNATURE-----
+
+--+278g007AL/ykmV8--
 
