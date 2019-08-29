@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76612C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D585CC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:06:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FF3D208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:06:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FF3D208C2
+	by mail.kernel.org (Postfix) with ESMTPS id AB45D208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:06:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB45D208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i38ta-0004IK-A3
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 21:06:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43171)
+	id 1i38tb-0004Iz-GM
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 21:06:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i38rb-0002nS-B0
+ (envelope-from <crosa@redhat.com>) id 1i38rb-0002nQ-AL
  for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:04:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i38rZ-0004rz-9i
+ (envelope-from <crosa@redhat.com>) id 1i38rZ-0004s9-BA
  for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:04:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58912)
+Received: from mx1.redhat.com ([209.132.183.28]:40488)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i38rT-0004ne-Cz
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:04:29 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i38rV-0004oM-G3
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:04:31 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D1ED6307D88D;
- Thu, 29 Aug 2019 01:04:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 34CF2106E288;
+ Thu, 29 Aug 2019 01:04:26 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-123-242.rdu2.redhat.com
  [10.10.123.242])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11A2F70582;
- Thu, 29 Aug 2019 01:04:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EE7D60BF7;
+ Thu, 29 Aug 2019 01:04:24 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 28 Aug 2019 21:03:37 -0400
-Message-Id: <20190829010340.28873-3-crosa@redhat.com>
+Date: Wed, 28 Aug 2019 21:03:38 -0400
+Message-Id: <20190829010340.28873-4-crosa@redhat.com>
 In-Reply-To: <20190829010340.28873-1-crosa@redhat.com>
 References: <20190829010340.28873-1-crosa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 29 Aug 2019 01:04:24 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Thu, 29 Aug 2019 01:04:26 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 2/5] tests/requirements.txt: pin paramiko
- version requirement
+Subject: [Qemu-devel] [PULL 3/5] Acceptance tests: drop left over usage of
+ ":avocado: enable"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,33 +79,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's a good practice (I'd really say a must) to pin as much as
-possible of the software versions used during test, so let's apply
-that to paramiko.
+Commit 9531d26c10 removed all of ":avocado: enable" tags, but then
+a new entry was added with the introduction of migration.py.
 
-According to https://pypi.org/project/paramiko/, 2.4.2 is the latest
-released version.  It's also easily obtainable on systems such as
-Fedora 30.
+Let's remove it for consistency.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607152223.9467-3-crosa@redhat.com>
+Message-Id: <20190607152223.9467-4-crosa@redhat.com>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/requirements.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/acceptance/migration.py | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/tests/requirements.txt b/tests/requirements.txt
-index 3ae0e29ad7..bd1f7590ed 100644
---- a/tests/requirements.txt
-+++ b/tests/requirements.txt
-@@ -2,4 +2,4 @@
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
- avocado-framework=3D=3D68.0
--paramiko
-+paramiko=3D=3D2.4.2
+diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.p=
+y
+index 6115cf6c24..a44c1ae58f 100644
+--- a/tests/acceptance/migration.py
++++ b/tests/acceptance/migration.py
+@@ -17,9 +17,6 @@ from avocado.utils import wait
+=20
+=20
+ class Migration(Test):
+-    """
+-    :avocado: enable
+-    """
+=20
+     timeout =3D 10
+=20
 --=20
 2.21.0
 
