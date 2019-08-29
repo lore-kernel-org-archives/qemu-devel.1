@@ -2,88 +2,141 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CC6C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6247BC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:19:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A6532173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:16:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A6532173E
+	by mail.kernel.org (Postfix) with ESMTPS id 38BF62173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:19:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38BF62173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3O1z-0003YA-DS
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:16:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53980)
+	id 1i3O5D-0004sc-Dx
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:19:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i3O13-0002yR-IN
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:15:23 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i3O4P-0004Gm-Qv
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:18:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i3O10-0003do-0F
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:15:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56092)
+ (envelope-from <jsnow@redhat.com>) id 1i3O4N-0005qw-TJ
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:18:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54660)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i3O0x-0003bw-V3
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:15:17 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i3O4L-0005nn-9y; Thu, 29 Aug 2019 13:18:45 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AC99B8667D
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 17:15:13 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id f14so1419391wmh.7
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 10:15:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=VBHxqTN4KqhNz8Z5dIATlUGypx9Twn4bpoTGB1dkEZ4=;
- b=O49aF8ZM/QEinqJI/kqcy32Ha80nDPjbyXwIWRMgfUa/9WiTB+VSueut8jKreSHaTZ
- UHy2rFt29hW0tm/MpRUAav2BylTm0cQyzY+BumkiJLbC2lqx5fE4nRjZ+SjNEzQnK2j+
- YTeRYFkGxkmm2o3HBUHB3hr7tn/IHksDFA5jRIYqwJCP+TFb229yh1fKm5Wg5Uuo9XSE
- PQ1GJa/knzvdEkAF4sNX3EhvljGoA+rmBbgq6odUI5tDGeIEJ2ZMa189zxgR0lk771aY
- y7qM54DY0ms63BvQCTb1qqzeJbmOZi5KrpWM7BLzfFVYZYArtlT99O1rnWOBmXlvsWjW
- vrBg==
-X-Gm-Message-State: APjAAAU2kGRoPtKUxJtJTQwpb3S+Ff3e8dugVLSLYBWb2X7/ho17HxCC
- q67rzPJ9IpWZOu/0WKA+FWiNV5UMck6Z0bc9yYWj7iMELJ9ACZFm7YLxejt1Lu40gXLIJIVWb8r
- eiuI6kAxyqdJiFlo=
-X-Received: by 2002:a1c:2d4:: with SMTP id 203mr12971428wmc.105.1567098912336; 
- Thu, 29 Aug 2019 10:15:12 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwbqnTCLNrryM8FsMsl5Yv8aG/C8u/+Gk5O9G7XG5qbCveH5nbV0LqRBEEk8OuvC7lKQ7bJYA==
-X-Received: by 2002:a1c:2d4:: with SMTP id 203mr12971388wmc.105.1567098911978; 
- Thu, 29 Aug 2019 10:15:11 -0700 (PDT)
-Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id x10sm4519150wrn.39.2019.08.29.10.15.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 29 Aug 2019 10:15:11 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190828231651.17176-1-richard.henderson@linaro.org>
- <20190828231651.17176-8-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <406aec5e-20e0-4aba-a889-b089128b9b93@redhat.com>
-Date: Thu, 29 Aug 2019 19:15:10 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 8E674821CB;
+ Thu, 29 Aug 2019 17:18:44 +0000 (UTC)
+Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AAF81001944;
+ Thu, 29 Aug 2019 17:18:38 +0000 (UTC)
+To: Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
+References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
+ <20190814100735.24234-3-vsementsov@virtuozzo.com>
+ <3eded188-0161-d494-194c-9d67da644eb1@redhat.com> <m1mufsdktq.fsf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c9c2386e-e27e-ac63-235f-ee996dd60446@redhat.com>
+Date: Thu, 29 Aug 2019 13:18:37 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190828231651.17176-8-richard.henderson@linaro.org>
+In-Reply-To: <m1mufsdktq.fsf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Thu, 29 Aug 2019 17:18:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] cputlb: Handle watchpoints via
- TLB_WATCHPOINT
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qapi: deprecate implicit
+ filters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,428 +148,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, libvir-list@redhat.com, armbru@redhat.com,
+ mreitz@redhat.com, abologna@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/29/19 1:16 AM, Richard Henderson wrote:
-> The raising of exceptions from check_watchpoint, buried inside
-> of the I/O subsystem, is fundamentally broken.  We do not have
-> the helper return address with which we can unwind guest state.
->=20
-> Replace PHYS_SECTION_WATCH and io_mem_watch with TLB_WATCHPOINT.
-> Move the call to cpu_check_watchpoint into the cputlb helpers
-> where we do have the helper return address.
->=20
-> This also allows us to handle watchpoints on RAM to bypass the
-> full i/o access path.
 
-Yay!
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 8/29/19 11:59 AM, Christophe de Dinechin wrote:
+> 
+> John Snow writes:
+> [...]
+>>
+>> This might be OK to do right away, though.
+>>
+>> I asked Markus this not too long ago; do we want to amend the QAPI
+>> schema specification to allow commands to return with "Warning" strings,
+>> or "Deprecated" stings to allow in-band deprecation notices for cases
+>> like these?
+>>
+>> example:
+>>
+>> { "return": {},
+>>   "deprecated": True,
+>>   "warning": "Omitting filter-node-name parameter is deprecated, it will
+>> be required in the future"
+>> }
+>>
+>> There's no "error" key, so this should be recognized as success by
+>> compatible clients, but they'll definitely see the extra information.
+>>
+>> Part of my motivation is to facilitate a more aggressive deprecation of
+>> legacy features by ensuring that we are able to rigorously notify users
+>> through any means that they need to adjust their scripts.
+> 
+> I like this approach even if there is no consumer today. It does not
+> hurt, and it is indeed a motivation to develop consumers that care.
+> 
+> I personally find this much easier to swallow than any kind of crash on
+> deprecation, which already at the BoF seemed like a really big hammer to
+> kill a fly.
+> 
+> CC'ing Andrea as well, because we discussed recently about how to deal
+> with error checking in general, and if a new error checking framework is
+> being put in place, adding deprecation to the thinking could be a good
+> idea.
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/exec/cpu-all.h |   5 +-
->  accel/tcg/cputlb.c     |  89 ++++++++++++++++++++++++++++----
->  exec.c                 | 114 +++--------------------------------------
->  3 files changed, 90 insertions(+), 118 deletions(-)
->=20
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index 8d07ae23a5..d2d443c4f9 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -329,11 +329,14 @@ CPUArchState *cpu_copy(CPUArchState *env);
->  #define TLB_NOTDIRTY        (1 << (TARGET_PAGE_BITS - 2))
->  /* Set if TLB entry is an IO callback.  */
->  #define TLB_MMIO            (1 << (TARGET_PAGE_BITS - 3))
-> +/* Set if TLB entry contains a watchpoint.  */
-> +#define TLB_WATCHPOINT      (1 << (TARGET_PAGE_BITS - 4))
-> =20
->  /* Use this mask to check interception with an alignment mask
->   * in a TCG backend.
->   */
-> -#define TLB_FLAGS_MASK  (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO)
-> +#define TLB_FLAGS_MASK \
-> +    (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO | TLB_WATCHPOINT)
-> =20
->  /**
->   * tlb_hit_page: return true if page aligned @addr is a hit against th=
-e
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index d0f8db33a2..9a9a626938 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -710,6 +710,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
-ulong vaddr,
->      hwaddr iotlb, xlat, sz, paddr_page;
->      target_ulong vaddr_page;
->      int asidx =3D cpu_asidx_from_attrs(cpu, attrs);
-> +    int wp_flags;
-> =20
->      assert_cpu_is_self(cpu);
-> =20
-> @@ -752,6 +753,8 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
-ulong vaddr,
->      code_address =3D address;
->      iotlb =3D memory_region_section_get_iotlb(cpu, section, vaddr_page=
-,
->                                              paddr_page, xlat, prot, &a=
-ddress);
-> +    wp_flags =3D cpu_watchpoint_address_matches(cpu, vaddr_page,
-> +                                              TARGET_PAGE_SIZE);
-> =20
->      index =3D tlb_index(env, mmu_idx, vaddr_page);
->      te =3D tlb_entry(env, mmu_idx, vaddr_page);
-> @@ -805,6 +808,9 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
-ulong vaddr,
->      tn.addend =3D addend - vaddr_page;
->      if (prot & PAGE_READ) {
->          tn.addr_read =3D address;
-> +        if (wp_flags & BP_MEM_READ) {
-> +            tn.addr_read |=3D TLB_WATCHPOINT;
-> +        }
->      } else {
->          tn.addr_read =3D -1;
->      }
-> @@ -831,6 +837,9 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
-ulong vaddr,
->          if (prot & PAGE_WRITE_INV) {
->              tn.addr_write |=3D TLB_INVALID_MASK;
->          }
-> +        if (wp_flags & BP_MEM_WRITE) {
-> +            tn.addr_write |=3D TLB_WATCHPOINT;
-> +        }
->      }
-> =20
->      copy_tlb_helper_locked(te, &tn);
-> @@ -1264,13 +1273,33 @@ load_helper(CPUArchState *env, target_ulong add=
-r, TCGMemOpIdx oi,
->          tlb_addr &=3D ~TLB_INVALID_MASK;
->      }
-> =20
-> -    /* Handle an IO access.  */
-> +    /* Handle anything that isn't just a straight memory access.  */
->      if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
-> +        CPUIOTLBEntry *iotlbentry;
-> +
-> +        /* For anything that is unaligned, recurse through full_load. =
- */
->          if ((addr & (size - 1)) !=3D 0) {
->              goto do_unaligned_access;
->          }
-> -        return io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
-> -                        mmu_idx, addr, retaddr, access_type, op);
-> +
-> +        iotlbentry =3D &env_tlb(env)->d[mmu_idx].iotlb[index];
-> +
-> +        /* Handle watchpoints.  */
-> +        if (unlikely(tlb_addr & TLB_WATCHPOINT)) {
-> +            /* On watchpoint hit, this will longjmp out.  */
-> +            cpu_check_watchpoint(env_cpu(env), addr, size,
-> +                                 iotlbentry->attrs, BP_MEM_READ, retad=
-dr);
-> +
-> +            /* The backing page may or may not require I/O.  */
-> +            tlb_addr &=3D ~TLB_WATCHPOINT;
-> +            if ((tlb_addr & ~TARGET_PAGE_MASK) =3D=3D 0) {
-> +                goto do_aligned_access;
-> +            }
-> +        }
-> +
-> +        /* Handle I/O access.  */
-> +        return io_readx(env, iotlbentry, mmu_idx, addr,
-> +                        retaddr, access_type, op);
->      }
-> =20
->      /* Handle slow unaligned access (it spans two pages or IO).  */
-> @@ -1297,6 +1326,7 @@ load_helper(CPUArchState *env, target_ulong addr,=
- TCGMemOpIdx oi,
->          return res & MAKE_64BIT_MASK(0, size * 8);
->      }
-> =20
-> + do_aligned_access:
->      haddr =3D (void *)((uintptr_t)addr + entry->addend);
->      switch (op) {
->      case MO_UB:
-> @@ -1486,13 +1516,32 @@ store_helper(CPUArchState *env, target_ulong ad=
-dr, uint64_t val,
->          tlb_addr =3D tlb_addr_write(entry) & ~TLB_INVALID_MASK;
->      }
-> =20
-> -    /* Handle an IO access.  */
-> +    /* Handle anything that isn't just a straight memory access.  */
->      if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
-> +        CPUIOTLBEntry *iotlbentry;
-> +
-> +        /* For anything that is unaligned, recurse through byte stores=
-.  */
->          if ((addr & (size - 1)) !=3D 0) {
->              goto do_unaligned_access;
->          }
-> -        io_writex(env, &env_tlb(env)->d[mmu_idx].iotlb[index], mmu_idx=
-,
-> -                  val, addr, retaddr, op);
-> +
-> +        iotlbentry =3D &env_tlb(env)->d[mmu_idx].iotlb[index];
-> +
-> +        /* Handle watchpoints.  */
-> +        if (unlikely(tlb_addr & TLB_WATCHPOINT)) {
-> +            /* On watchpoint hit, this will longjmp out.  */
-> +            cpu_check_watchpoint(env_cpu(env), addr, size,
-> +                                 iotlbentry->attrs, BP_MEM_WRITE, reta=
-ddr);
-> +
-> +            /* The backing page may or may not require I/O.  */
-> +            tlb_addr &=3D ~TLB_WATCHPOINT;
-> +            if ((tlb_addr & ~TARGET_PAGE_MASK) =3D=3D 0) {
-> +                goto do_aligned_access;
-> +            }
-> +        }
-> +
-> +        /* Handle I/O access.  */
-> +        io_writex(env, iotlbentry, mmu_idx, val, addr, retaddr, op);
->          return;
->      }
-> =20
-> @@ -1517,10 +1566,29 @@ store_helper(CPUArchState *env, target_ulong ad=
-dr, uint64_t val,
->          index2 =3D tlb_index(env, mmu_idx, page2);
->          entry2 =3D tlb_entry(env, mmu_idx, page2);
->          tlb_addr2 =3D tlb_addr_write(entry2);
-> -        if (!tlb_hit_page(tlb_addr2, page2)
-> -            && !victim_tlb_hit(env, mmu_idx, index2, tlb_off, page2)) =
-{
-> -            tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
-> -                     mmu_idx, retaddr);
-> +        if (!tlb_hit_page(tlb_addr2, page2)) {
-> +            if (!victim_tlb_hit(env, mmu_idx, index2, tlb_off, page2))=
- {
-> +                tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
-> +                         mmu_idx, retaddr);
-> +                index2 =3D tlb_index(env, mmu_idx, page2);
-> +                entry2 =3D tlb_entry(env, mmu_idx, page2);
-> +            }
-> +            tlb_addr2 =3D tlb_addr_write(entry2);
-> +        }
-> +
-> +        /*
-> +         * Handle watchpoints.  Since this may trap, all checks
-> +         * must happen before any store.
-> +         */
-> +        if (unlikely(tlb_addr & TLB_WATCHPOINT)) {
-> +            cpu_check_watchpoint(env_cpu(env), addr, size - size2,
-> +                                 env_tlb(env)->d[mmu_idx].iotlb[index]=
-.attrs,
-> +                                 BP_MEM_WRITE, retaddr);
-> +        }
-> +        if (unlikely(tlb_addr2 & TLB_WATCHPOINT)) {
-> +            cpu_check_watchpoint(env_cpu(env), page2, size2,
-> +                                 env_tlb(env)->d[mmu_idx].iotlb[index2=
-].attrs,
-> +                                 BP_MEM_WRITE, retaddr);
->          }
-> =20
->          /*
-> @@ -1542,6 +1610,7 @@ store_helper(CPUArchState *env, target_ulong addr=
-, uint64_t val,
->          return;
->      }
-> =20
-> + do_aligned_access:
->      haddr =3D (void *)((uintptr_t)addr + entry->addend);
->      switch (op) {
->      case MO_UB:
-> diff --git a/exec.c b/exec.c
-> index 8575ce51ad..ad0f4a598f 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -193,15 +193,12 @@ typedef struct subpage_t {
->  #define PHYS_SECTION_UNASSIGNED 0
->  #define PHYS_SECTION_NOTDIRTY 1
->  #define PHYS_SECTION_ROM 2
-> -#define PHYS_SECTION_WATCH 3
-> =20
->  static void io_mem_init(void);
->  static void memory_map_init(void);
->  static void tcg_log_global_after_sync(MemoryListener *listener);
->  static void tcg_commit(MemoryListener *listener);
-> =20
-> -static MemoryRegion io_mem_watch;
-> -
->  /**
->   * CPUAddressSpace: all the information a CPU needs about an AddressSp=
-ace
->   * @cpu: the CPU whose AddressSpace this is
-> @@ -1472,7 +1469,6 @@ hwaddr memory_region_section_get_iotlb(CPUState *=
-cpu,
->                                         target_ulong *address)
->  {
->      hwaddr iotlb;
-> -    int flags, match;
-> =20
->      if (memory_region_is_ram(section->mr)) {
->          /* Normal RAM.  */
-> @@ -1490,19 +1486,6 @@ hwaddr memory_region_section_get_iotlb(CPUState =
-*cpu,
->          iotlb +=3D xlat;
->      }
-> =20
-> -    /* Avoid trapping reads of pages with a write breakpoint. */
-> -    match =3D (prot & PAGE_READ ? BP_MEM_READ : 0)
-> -          | (prot & PAGE_WRITE ? BP_MEM_WRITE : 0);
-> -    flags =3D cpu_watchpoint_address_matches(cpu, vaddr, TARGET_PAGE_S=
-IZE);
-> -    if (flags & match) {
-> -        /*
-> -         * Make accesses to pages with watchpoints go via the
-> -         * watchpoint trap routines.
-> -         */
-> -        iotlb =3D PHYS_SECTION_WATCH + paddr;
-> -        *address |=3D TLB_MMIO;
-> -    }
-> -
->      return iotlb;
->  }
->  #endif /* defined(CONFIG_USER_ONLY) */
-> @@ -2810,10 +2793,14 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr =
-addr, vaddr len,
-> =20
->      assert(tcg_enabled());
->      if (cpu->watchpoint_hit) {
-> -        /* We re-entered the check after replacing the TB. Now raise
-> -         * the debug interrupt so that is will trigger after the
-> -         * current instruction. */
-> +        /*
-> +         * We re-entered the check after replacing the TB.
-> +         * Now raise the debug interrupt so that it will
-> +         * trigger after the current instruction.
-> +         */
-> +        qemu_mutex_lock_iothread();
->          cpu_interrupt(cpu, CPU_INTERRUPT_DEBUG);
-> +        qemu_mutex_unlock_iothread();
->          return;
->      }
-> =20
-> @@ -2858,88 +2845,6 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr a=
-ddr, vaddr len,
->      }
->  }
-> =20
-> -static void check_watchpoint(int offset, int len, MemTxAttrs attrs, in=
-t flags)
-> -{
-> -    CPUState *cpu =3D current_cpu;
-> -    vaddr addr =3D (cpu->mem_io_vaddr & TARGET_PAGE_MASK) + offset;
-> -
-> -    cpu_check_watchpoint(cpu, addr, len, attrs, flags, 0);
-> -}
-> -
-> -/* Watchpoint access routines.  Watchpoints are inserted using TLB tri=
-cks,
-> -   so these check for a hit then pass through to the normal out-of-lin=
-e
-> -   phys routines.  */
-> -static MemTxResult watch_mem_read(void *opaque, hwaddr addr, uint64_t =
-*pdata,
-> -                                  unsigned size, MemTxAttrs attrs)
-> -{
-> -    MemTxResult res;
-> -    uint64_t data;
-> -    int asidx =3D cpu_asidx_from_attrs(current_cpu, attrs);
-> -    AddressSpace *as =3D current_cpu->cpu_ases[asidx].as;
-> -
-> -    check_watchpoint(addr & ~TARGET_PAGE_MASK, size, attrs, BP_MEM_REA=
-D);
-> -    switch (size) {
-> -    case 1:
-> -        data =3D address_space_ldub(as, addr, attrs, &res);
-> -        break;
-> -    case 2:
-> -        data =3D address_space_lduw(as, addr, attrs, &res);
-> -        break;
-> -    case 4:
-> -        data =3D address_space_ldl(as, addr, attrs, &res);
-> -        break;
-> -    case 8:
-> -        data =3D address_space_ldq(as, addr, attrs, &res);
-> -        break;
-> -    default: abort();
-> -    }
-> -    *pdata =3D data;
-> -    return res;
-> -}
-> -
-> -static MemTxResult watch_mem_write(void *opaque, hwaddr addr,
-> -                                   uint64_t val, unsigned size,
-> -                                   MemTxAttrs attrs)
-> -{
-> -    MemTxResult res;
-> -    int asidx =3D cpu_asidx_from_attrs(current_cpu, attrs);
-> -    AddressSpace *as =3D current_cpu->cpu_ases[asidx].as;
-> -
-> -    check_watchpoint(addr & ~TARGET_PAGE_MASK, size, attrs, BP_MEM_WRI=
-TE);
-> -    switch (size) {
-> -    case 1:
-> -        address_space_stb(as, addr, val, attrs, &res);
-> -        break;
-> -    case 2:
-> -        address_space_stw(as, addr, val, attrs, &res);
-> -        break;
-> -    case 4:
-> -        address_space_stl(as, addr, val, attrs, &res);
-> -        break;
-> -    case 8:
-> -        address_space_stq(as, addr, val, attrs, &res);
-> -        break;
-> -    default: abort();
-> -    }
-> -    return res;
-> -}
-> -
-> -static const MemoryRegionOps watch_mem_ops =3D {
-> -    .read_with_attrs =3D watch_mem_read,
-> -    .write_with_attrs =3D watch_mem_write,
-> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> -    .valid =3D {
-> -        .min_access_size =3D 1,
-> -        .max_access_size =3D 8,
-> -        .unaligned =3D false,
-> -    },
-> -    .impl =3D {
-> -        .min_access_size =3D 1,
-> -        .max_access_size =3D 8,
-> -        .unaligned =3D false,
-> -    },
-> -};
-> -
->  static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
->                                   MemTxAttrs attrs, uint8_t *buf, hwadd=
-r len);
->  static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttr=
-s attrs,
-> @@ -3115,9 +3020,6 @@ static void io_mem_init(void)
->      memory_region_init_io(&io_mem_notdirty, NULL, &notdirty_mem_ops, N=
-ULL,
->                            NULL, UINT64_MAX);
->      memory_region_clear_global_locking(&io_mem_notdirty);
-> -
-> -    memory_region_init_io(&io_mem_watch, NULL, &watch_mem_ops, NULL,
-> -                          NULL, UINT64_MAX);
->  }
-> =20
->  AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv)
-> @@ -3131,8 +3033,6 @@ AddressSpaceDispatch *address_space_dispatch_new(=
-FlatView *fv)
->      assert(n =3D=3D PHYS_SECTION_NOTDIRTY);
->      n =3D dummy_section(&d->map, fv, &io_mem_rom);
->      assert(n =3D=3D PHYS_SECTION_ROM);
-> -    n =3D dummy_section(&d->map, fv, &io_mem_watch);
-> -    assert(n =3D=3D PHYS_SECTION_WATCH);
-> =20
->      d->phys_map  =3D (PhysPageEntry) { .ptr =3D PHYS_MAP_NODE_NIL, .sk=
-ip =3D 1 };
-> =20
+The most convincing argument against deprecation notices like this is
+not that they won't be consumed, but that they are difficult to plumb
+through the C infrastructure.
+
+Sadly, I think I have to agree there -- we can't even really model it
+like hints, because these are cases where there was no /error/ but
+instead a success -- but our error propagation doesn't work on those
+terms generally and we'd need a rather extensive audit to allow warnings.
+
+We could always fudge it with a kind of global warning log: clear the
+log at the beginning of a QMP interaction and if the log is non-empty
+when we return, amend the return with that information.
+
+That's not really the nicest thing to do in a multi-process,
+multi-threaded, multi-stacked application, though, so...
+
+--js
 
