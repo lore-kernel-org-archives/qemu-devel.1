@@ -2,65 +2,87 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9445C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6A4C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:49:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F4C72070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:47:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F4C72070B
+	by mail.kernel.org (Postfix) with ESMTPS id D6A3B2077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:49:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A3B2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3NZl-0005OO-Jm
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 12:47:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45358)
+	id 1i3NcE-0007Tf-FW
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 12:49:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dinechin@redhat.com>) id 1i3NYR-0004kk-W2
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:45:49 -0400
+ (envelope-from <philmd@redhat.com>) id 1i3Nae-00060X-IC
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dinechin@redhat.com>) id 1i3NYQ-0004jw-KI
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:45:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52866)
+ (envelope-from <philmd@redhat.com>) id 1i3Nad-0005v1-Ci
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57806)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dinechin@redhat.com>)
- id 1i3NYN-0004hs-Cd; Thu, 29 Aug 2019 12:45:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i3Nad-0005uU-5s
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:03 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D582B8980E7;
- Thu, 29 Aug 2019 16:45:40 +0000 (UTC)
-Received: from ptitpuce (ovpn-116-165.ams2.redhat.com [10.36.116.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE7F160C80;
- Thu, 29 Aug 2019 16:45:32 +0000 (UTC)
-References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
- <20190814100735.24234-3-vsementsov@virtuozzo.com>
- <3eded188-0161-d494-194c-9d67da644eb1@redhat.com>
- <20190815104928.GC7415@linux.fritz.box>
- <20190815114553.GQ300@andariel.pipo.sk> <87d0h6zfrt.fsf@dusky.pond.sub.org>
-User-agent: mu4e 1.3.2; emacs 26.2
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: qemu-devel@nongnu.org
-In-reply-to: <87d0h6zfrt.fsf@dusky.pond.sub.org>
-Date: Thu, 29 Aug 2019 18:45:29 +0200
-Message-ID: <m1lfvbex92.fsf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4425158569
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 16:48:02 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id w11so2384851wru.17
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 09:48:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zuL/XyDgUlA/aOanDRF95eRwovOtyEV7KQN+/PkovAU=;
+ b=I+Uxd1Mhat2iQWgj1Y81nvJEcWbwCAzS5Txm/Q2HmAt09az99MbRtbf85eKamvhVCM
+ 2Q5ezd42DNvFwqi9HQWdOhGFqlUSQO4AP1E63BFV8sEzpkaxd8ZylSlspouNcRyNG714
+ HOiZzRHsLdHU9LX+Y5RllJJQI8CE0OWO6vw0RtV2iZUgGxOiEI9Gip+xOCDfmR4Y7Q6m
+ 1OgJU5fxpkf8n2B+l9Dk9WFGC9Nsy/TblUC2HZzF9iXvXi3YqQQbYmAhxaZV5taiAoEI
+ 4DLiySElzs32AAsaiiTS5jaRKzQJCG7xoiI0jJ92axMKBpZTj9fFbw8I3B04i7j4SmUd
+ V81g==
+X-Gm-Message-State: APjAAAVsgMdutCgRtxhHxuXSk6eSJWrj5igPiybMqSLPQTxrJnAindrj
+ e5kuDIvsdz7aN7FbRmdocbdKs6Dqy/Lg/7xf73mLX13UOtiy8Hl1eW1EjscHb7yDU7qZKSgPiZZ
+ SzaP10xnzHaMG0JE=
+X-Received: by 2002:adf:e8c2:: with SMTP id k2mr9811866wrn.198.1567097280696; 
+ Thu, 29 Aug 2019 09:48:00 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqykRGuEuLOwp0yf1q7fBYtqgIr3zFEL+4/KY/NVMDBhyvZ0781hZUAhQ0G+9CwF1+nIajZgoQ==
+X-Received: by 2002:adf:e8c2:: with SMTP id k2mr9811841wrn.198.1567097280538; 
+ Thu, 29 Aug 2019 09:48:00 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id o17sm3813876wrx.60.2019.08.29.09.47.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 29 Aug 2019 09:48:00 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190828190456.30315-1-richard.henderson@linaro.org>
+ <20190828190456.30315-57-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <184f0a09-c850-91e1-3af8-904dbf44fc0c@redhat.com>
+Date: Thu, 29 Aug 2019 18:47:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Thu, 29 Aug 2019 16:45:41 +0000 (UTC)
+In-Reply-To: <20190828190456.30315-57-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 2/2] qapi: deprecate implicit
- filters
+Subject: Re: [Qemu-devel] [PATCH v3 56/69] target/arm: Convert T16, extract
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,110 +94,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- libvir-list@redhat.com, mreitz@redhat.com, den@openvz.org,
- John Snow <jsnow@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 8/28/19 9:04 PM, Richard Henderson wrote:
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Markus Armbruster writes:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> Peter Krempa <pkrempa@redhat.com> writes:
->
-[...]
->> From my experience users report non-fatal messages mostly only if it is
->> spamming the system log. One of instances are very unlikely to be
->> noticed.
->>
->> In my experience it's better to notify us in libvirt of such change and
->> we will try our best to fix it.
->
-> How to best alert the layers above QEMU was one of the topic of the KVM
-> Forum 2018 BoF on deprecating stuff.  Minutes:
->
->     Message-ID: <87mur0ls8o.fsf@dusky.pond.sub.org>
->     https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg05828.html
->
-> Relevant part:
->
-> * We need to communicate "you're using something that is deprecated".
->   How?  Right now, we print a deprecation message.  Okay when humans use
->   QEMU directly in a shell.  However, when QEMU sits at the bottom of a
->   software stack, the message will likely end up in a log file that is
->   effectively write-only.
->
->   - The one way to get people read log files is crashing their
->     application.  A command line option --future could make QEMU crash
->     right after printing a deprecation message.  This could help with
->     finding use of deprecated features in a testing environment.
->
->   - A less destructive way to grab people's attention is to make things
->     run really, really slow: have QEMU go to sleep for a while after
->     printing a deprecation message.
->
->   - We can also pass the buck to the next layer up: emit a QMP event.
->
->     Sadly, by the time the next layer connects to QMP, plenty of stuff
->     already happened.  We'd have to buffer deprecation events somehow.
->
->     What would libvirt do with such an event?  Log it, taint the domain,
->     emit a (libvirt) event to pass it on to the next layer up.
->
->   - A completely different idea is to have a configuratin linter.  To
->     support doing this at the libvirt level, QEMU could expose "is
->     deprecated" in interface introspection.  Feels feasible for QMP,
->     where we already have sufficiently expressive introspection.  For
->     CLI, we'd first have to provide that (but we want that anyway).
->
->   - We might also want to dispay deprecation messages in QEMU's GUI
->     somehow, or on serial consoles.
-
-Sorry for catching up late, this mail thread happened during my PTO.
-
-I remember bringing up at the time [1] that the correct solution needs
-to take into account usage models that vary from
-
-- a workstation case, where displaying an error box is easy and
-  convenient,
-
-- to local headless VMs where system-level notification would do the job
-  better, allowing us to leverage things like system-wide email notifications
-
-- to large-scale collections of VMs managed by some layered product,
-  where the correct reporting would be through something like Insights,
-  i.e. you don't scan individual logs, you want something like "913 VMs
-  are using deprecated X"
-
-To me, that implies that we need to have a clear division of roles, with
-a standard way to
-
-a) produce the errors,
-b) propagate them,
-c) consume them (at least up to libvirt)
-
-Notice that this work has already been done for "real" errors,
-i.e. there is a real QAPI notion of "errors". AFAICT, warn_report does
-not connect to it, though, it goes through error_vprintf which is really
-just basic logging.
-
-So would it make sense to:
-
-1. Add a deprecation_report() alongside warn_report()?
-
-2. Connect warn_report() and all the error_vprintf output to QAPI,
-   e.g. using John's suggestion of adding the messages using some
-   "warning" or "deprecated" tag?
-
-3. Teach libvirt how to consume that new tag and pass it along?
-
-
-[1] https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg06131.html
-
-
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
+> ---
+>  target/arm/translate.c | 14 +-------------
+>  target/arm/t16.decode  | 10 ++++++++++
+>  2 files changed, 11 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index b7e2c72f35..d06ec48ab9 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -10743,21 +10743,9 @@ static void disas_thumb_insn(DisasContext *s, =
+uint32_t insn)
+>          op =3D (insn >> 8) & 0xf;
+>          switch (op) {
+>          case 0: /* add/sub (sp, immediate), in decodetree */
+> +        case 2: /* sign/zero extend, in decodetree */
+>              goto illegal_op;
+> =20
+> -        case 2: /* sign/zero extend.  */
+> -            ARCH(6);
+> -            rd =3D insn & 7;
+> -            rm =3D (insn >> 3) & 7;
+> -            tmp =3D load_reg(s, rm);
+> -            switch ((insn >> 6) & 3) {
+> -            case 0: gen_sxth(tmp); break;
+> -            case 1: gen_sxtb(tmp); break;
+> -            case 2: gen_uxth(tmp); break;
+> -            case 3: gen_uxtb(tmp); break;
+> -            }
+> -            store_reg(s, rd, tmp);
+> -            break;
+>          case 4: case 5: case 0xc: case 0xd:
+>              /*
+>               * 0b1011_x10x_xxxx_xxxx
+> diff --git a/target/arm/t16.decode b/target/arm/t16.decode
+> index b425b86795..b5b5086e8a 100644
+> --- a/target/arm/t16.decode
+> +++ b/target/arm/t16.decode
+> @@ -23,6 +23,7 @@
+>  &s_rrr_shr       !extern s rn rd rm rs shty
+>  &s_rri_rot       !extern s rn rd imm rot
+>  &s_rrrr          !extern s rd rn rm ra
+> +&rrr_rot         !extern rd rn rm rot
+>  &ri              !extern rd imm
+>  &r               !extern rm
+>  &ldst_rr         !extern p w u rn rt rm shimm shtype
+> @@ -173,3 +174,12 @@ BX              0100 0111 0 .... 000            @b=
+ranchr
+>  BLX_r           0100 0111 1 .... 000            @branchr
+>  BXNS            0100 0111 0 .... 100            @branchr
+>  BLXNS           0100 0111 1 .... 100            @branchr
+> +
+> +# Extend
+> +
+> +@extend         .... .... .. rm:3 rd:3          &rrr_rot rn=3D15 rot=3D=
+0
+> +
+> +SXTAH           1011 0010 00 ... ...            @extend
+> +SXTAB           1011 0010 01 ... ...            @extend
+> +UXTAH           1011 0010 10 ... ...            @extend
+> +UXTAB           1011 0010 11 ... ...            @extend
+>=20
 
