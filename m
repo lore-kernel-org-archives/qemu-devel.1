@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 297F7C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F127FC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6469215EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:58:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6469215EA
+	by mail.kernel.org (Postfix) with ESMTPS id C81B222CF5
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C81B222CF5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3ENf-00066C-Rg
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 02:58:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41418)
+	id 1i3EO8-0006WG-Rs
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 02:58:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i3EMl-0005Rg-RR
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:57:08 -0400
+ (envelope-from <david@redhat.com>) id 1i3EN1-0005fE-B4
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i3EMj-0002y4-RN
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:57:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50768)
+ (envelope-from <david@redhat.com>) id 1i3EN0-000352-CK
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:57:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52082)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1i3EMj-0002xS-Jj
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:57:05 -0400
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1i3EN0-00034k-4O
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:57:22 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5978E30821DF;
- Thu, 29 Aug 2019 06:57:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7465118B3D83;
+ Thu, 29 Aug 2019 06:57:21 +0000 (UTC)
 Received: from [10.36.117.166] (ovpn-117-166.ams2.redhat.com [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9D567600C1;
- Thu, 29 Aug 2019 06:57:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C00506012E;
+ Thu, 29 Aug 2019 06:57:20 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190828231651.17176-1-richard.henderson@linaro.org>
- <20190828231651.17176-6-richard.henderson@linaro.org>
+ <20190828231651.17176-7-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,22 +90,22 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <30ef0e0e-9a7c-00d8-7ba1-f2c7713deff9@redhat.com>
-Date: Thu, 29 Aug 2019 08:57:02 +0200
+Message-ID: <49248309-9abc-cfba-3539-77d6ef15b238@redhat.com>
+Date: Thu, 29 Aug 2019 08:57:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190828231651.17176-6-richard.henderson@linaro.org>
+In-Reply-To: <20190828231651.17176-7-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 29 Aug 2019 06:57:04 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Thu, 29 Aug 2019 06:57:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 5/8] cputlb: Fix size operand for
- tlb_fill on unaligned store
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] cputlb: Remove double-alignment in
+ store_helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,50 +122,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 29.08.19 01:16, Richard Henderson wrote:
-> We are currently passing the size of the full write to
-> the tlb_fill for the second page.  Instead pass the real
-> size of the write to that page.
-> 
-> This argument is unused within all tlb_fill, except to be
-> logged via tracing, so in practice this makes no difference.
-> 
-> But in a moment we'll need the value of size2 for watchpoints,
-> and if we've computed the value we might as well use it.
+> We have already aligned page2 to the start of the next page.
+> There is no reason to do that a second time.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  accel/tcg/cputlb.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  accel/tcg/cputlb.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
 > diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index c9576bebcf..7fb67d2f05 100644
+> index 7fb67d2f05..d0f8db33a2 100644
 > --- a/accel/tcg/cputlb.c
 > +++ b/accel/tcg/cputlb.c
-> @@ -1504,6 +1504,8 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
->          uintptr_t index2;
->          CPUTLBEntry *entry2;
->          target_ulong page2, tlb_addr2;
-> +        size_t size2;
-> +
->      do_unaligned_access:
->          /*
->           * Ensure the second page is in the TLB.  Note that the first page
-> @@ -1511,13 +1513,14 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
->           * cannot evict the first.
->           */
->          page2 = (addr + size) & TARGET_PAGE_MASK;
-> +        size2 = (addr + size) & ~TARGET_PAGE_MASK;
->          index2 = tlb_index(env, mmu_idx, page2);
+> @@ -1518,8 +1518,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
 >          entry2 = tlb_entry(env, mmu_idx, page2);
 >          tlb_addr2 = tlb_addr_write(entry2);
 >          if (!tlb_hit_page(tlb_addr2, page2)
->              && !victim_tlb_hit(env, mmu_idx, index2, tlb_off,
->                                 page2 & TARGET_PAGE_MASK)) {
-> -            tlb_fill(env_cpu(env), page2, size, MMU_DATA_STORE,
-> +            tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
+> -            && !victim_tlb_hit(env, mmu_idx, index2, tlb_off,
+> -                               page2 & TARGET_PAGE_MASK)) {
+> +            && !victim_tlb_hit(env, mmu_idx, index2, tlb_off, page2)) {
+>              tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
 >                       mmu_idx, retaddr);
 >          }
->  
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
