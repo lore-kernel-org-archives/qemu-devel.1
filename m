@@ -2,143 +2,91 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED821C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 19:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A68EC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 20:23:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE5EC2166E
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 19:37:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE5EC2166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40C802189D
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 20:23:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RKi5yQej"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40C802189D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3QEw-0000VM-VA
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 15:37:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56082)
+	id 1i3Qwx-0003VR-8W
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 16:23:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36156)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i3QE3-0008Qd-GZ
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 15:36:56 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i3Qw7-0002u0-5c
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i3QE2-00078a-BW
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 15:36:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56544)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i3QDy-000755-Sk; Thu, 29 Aug 2019 15:36:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 289132D6A0B;
- Thu, 29 Aug 2019 19:36:50 +0000 (UTC)
-Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1668260872;
- Thu, 29 Aug 2019 19:36:42 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190820235243.26092-1-jsnow@redhat.com>
- <20190820235243.26092-2-jsnow@redhat.com>
- <5c7555f2-fba0-29fc-8bcd-bc68e5b42c63@redhat.com>
- <41d1edcf-ed61-6287-1019-4f779ffa3c79@redhat.com>
- <98ac0bd1-6c36-b053-916d-17cd65a446d1@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <d0b0ab3b-b309-2351-a977-6ad813860b07@redhat.com>
-Date: Thu, 29 Aug 2019 15:36:38 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alex.bennee@linaro.org>) id 1i3Qw5-0004Pv-KD
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:22:26 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46879)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i3Qw5-0004Ok-Bu
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:22:25 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h7so3391145wrt.13
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 13:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=7E2qqxDS1Kj6oqoJx2iuHbvzzl6fdLD72WEam0+phcg=;
+ b=RKi5yQej6+Cqifbw1AxuO7cPFaWFvdAfC/sfTWHrO6NJnJUEN9OWmqCBxS3uKHVgVn
+ 6edKtkDx892ka0IdfHVi1wlHi3Qp1OaTo67GawHsjnAGW2KjMl/nu2zKeqR7KcmUqZRS
+ OntyCLbweEt2BMk8nduy38xny9+BHU1nKDdqWdmh2O18ZYao6tKUW0HpydjEjFJbHr97
+ KfwtXdQCfXIw741hBmqvN0S3+Htl3Cko4rDd9jxjH28q2rAy1qc1JbQrsJrRIclXAYHh
+ v7jQG9r5AhDQs1ZSMasA1vHF7OEPwjb/qvuwXLnHn9ZTIe4s2XENYNA1JLVW36KXY3vY
+ OB0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=7E2qqxDS1Kj6oqoJx2iuHbvzzl6fdLD72WEam0+phcg=;
+ b=dLZaHUvrwqbKq79AFdQqVd1IxMuR0AVAA8b4L06Jjo/oZfVnUp0oOpbhAI8AEtMaTZ
+ +hZR6tZC1rjvFpTs41Q1+8i9sYXApg8MWJXSIu+sW4JNz2H3/tAJtN16mle/s6qvpRnf
+ G6ft9ZNcuWEEEMSFJNU1EbJGVXpusVYPi6KE1JcDeTmzYyAAXdyNs7um1cXEDC9M6NbE
+ z6QtIT8fSHwpn2tqhANeCdi90z67oQtzwte6vAGZvNexBAzvXOVdD3SY8D4kdHdFiy8z
+ JcY90KDhmD+nsa7tYxJCVxkaVNGbBtG6NBZwFVVQClkJjufaHE6DA6nCtedkl6JWmKRn
+ 5nqg==
+X-Gm-Message-State: APjAAAVHr0qhie7HHqxKssFq6KMH4bEIDCPrMrl2cQZY+BMyWEVSPUsq
+ 08CPpM88wjdHGsNosHlVmhQ6dg==
+X-Google-Smtp-Source: APXvYqxhA/6JrexasZVeDRQp9vZIQlvsNL8wsc6JfB6EKITVvPkBihQ/gcfDa5zIyTSc3EvdPtt5MQ==
+X-Received: by 2002:a5d:434a:: with SMTP id u10mr14800126wrr.245.1567110143623; 
+ Thu, 29 Aug 2019 13:22:23 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u6sm4887491wrr.26.2019.08.29.13.22.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 29 Aug 2019 13:22:22 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3F56D1FF87;
+ Thu, 29 Aug 2019 21:22:22 +0100 (BST)
+References: <20190827121931.26836-1-peter.maydell@linaro.org>
+ <CAL1e-=j_uoOcyxqv7CZv3V6FWaarBnS1wEnU4k1cAoc1_b5mMg@mail.gmail.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <CAL1e-=j_uoOcyxqv7CZv3V6FWaarBnS1wEnU4k1cAoc1_b5mMg@mail.gmail.com>
+Date: Thu, 29 Aug 2019 21:22:22 +0100
+Message-ID: <87v9uf4t8h.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <98ac0bd1-6c36-b053-916d-17cd65a446d1@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 29 Aug 2019 19:36:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] iotests: add script_initialize
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Free TCG temps in
+ trans_VMOV_64_sp()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,64 +98,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
 
-On 8/29/19 2:58 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 8/29/19 8:43 PM, John Snow wrote:
->> On 8/29/19 2:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> This restrict test 208 to the Linux platform, is this OK?
->>>
->>> The rest looks good.
+> 27.08.2019. 14.20, "Peter Maydell" <peter.maydell@linaro.org> =D1=98=D0=
+=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >>
->> I forgot about that, so good catch.
+>> The function neon_store_reg32() doesn't free the TCG temp that it
+>> is passed, so the caller must do that. We got this right in most
+>> places but forgot to free the TCG temps in trans_VMOV_64_sp().
 >>
->> I don't know. We seem to already restrict a LOT of tests to the Linux
->> platform. Does this one actually work on other platforms?
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>
+> Hello, Peter,
+>
+> I am just curious if you found this by manual code inspection, or perhaps
+> using a tool?
+
+I'm guessing that if you run code that exercises this while built with
+--enable-tcg-debug then TCG's sanity checking complains about unfreed
+temps.
+
+>
+> Yours,
+> Aleksandar
+>
+>>  target/arm/translate-vfp.inc.c | 2 ++
+>>  1 file changed, 2 insertions(+)
 >>
->> Actually, I can't see any other supported oses/supported platforms cal=
-ls
->> anywhere in iotests that don't just specify Linux or leave it the
->> default (...which is also linux.)
+>> diff --git a/target/arm/translate-vfp.inc.c
+> b/target/arm/translate-vfp.inc.c
+>> index 3e8ea80493b..9ae980bef63 100644
+>> --- a/target/arm/translate-vfp.inc.c
+>> +++ b/target/arm/translate-vfp.inc.c
+>> @@ -880,8 +880,10 @@ static bool trans_VMOV_64_sp(DisasContext *s,
+> arg_VMOV_64_sp *a)
+>>          /* gpreg to fpreg */
+>>          tmp =3D load_reg(s, a->rt);
+>>          neon_store_reg32(tmp, a->vm);
+>> +        tcg_temp_free_i32(tmp);
+>>          tmp =3D load_reg(s, a->rt2);
+>>          neon_store_reg32(tmp, a->vm + 1);
+>> +        tcg_temp_free_i32(tmp);
+>>      }
 >>
->> There isn't a way to engage the old-style python unittest framework
->> without implying Linux; you have to manually override it if so.
->=20
-> Then let's use:
->=20
->     iotests.script_initialize(supported_oses=3D[])
->=20
-> and call it a day?
->=20
-
-*whines*
-
-The even lazier thing to do is to do more work to come up with some
-excuse to avoid re-spinning the series:
-
-commit bc521696607c5348fcd8a9e57b408d0ac0dbe2f8
-Author: Fam Zheng <famz@redhat.com>
-Date:   Sun Jan 4 09:53:52 2015 +0800
-
-    qemu-iotests: Add supported os parameter for python tests
-
-    If I understand correctly, qemu-iotests never meant to be portable. W=
-e
-    only support Linux for all the shell cases, but didn't specify it for
-    python tests. Now add this and default all the python tests as Linux
-    only. If we cares enough later, we can override the parameter in
-    individual cases.
+>>      return true;
+>> --
+>> 2.20.1
+>>
+>>
 
 
-
-I think it's only an oversight that this one test didn't specify a
-platform. It's certainly the only one. If someone feels strongly that
-other platforms are supported, let them send the patch.
-
---js
+--
+Alex Benn=C3=A9e
 
