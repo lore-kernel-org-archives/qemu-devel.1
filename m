@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D617C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECE5C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:39:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22CE6208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:39:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22CE6208C2
+	by mail.kernel.org (Postfix) with ESMTPS id 455B5208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:39:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 455B5208C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Hpw-0001yU-9L
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 06:39:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47330)
+	id 1i3HqB-0002GP-D2
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 06:39:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3Hcd-0005RI-NH
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:47 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3Hcf-0005S1-O6
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3Hcb-0005kf-NM
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45362 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3Hcd-0005op-Me
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:45 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45428 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i3Hca-0005Lb-JT
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:41 -0400
+ id 1i3Hcc-0005Pp-Gw
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:43 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 1505D1A21BE;
+ by mail.rt-rk.com (Postfix) with ESMTP id 512C51A225B;
  Thu, 29 Aug 2019 12:25:25 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id DC4B71A21E3;
- Thu, 29 Aug 2019 12:25:24 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 1F27A1A21DA;
+ Thu, 29 Aug 2019 12:25:25 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 29 Aug 2019 12:24:55 +0200
-Message-Id: <1567074313-22998-14-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 29 Aug 2019 12:25:01 +0200
+Message-Id: <1567074313-22998-20-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1567074313-22998-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1567074313-22998-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 13/31] target/mips: Clean up handling of CP0
- register 12
+Subject: [Qemu-devel] [PULL 19/31] target/mips: Clean up handling of CP0
+ register 18
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,154 +70,150 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up handling of CP0 register 12.
+Clean up handling of CP0 register 18.
 
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1567009614-12438-14-git-send-email-aleksandar.markovic@rt-rk.com>
+Message-Id: <1567009614-12438-20-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- target/mips/cpu.h       |  3 +++
- target/mips/translate.c | 32 ++++++++++++++++----------------
- 2 files changed, 19 insertions(+), 16 deletions(-)
+ target/mips/cpu.h       | 20 +++++++++-------
+ target/mips/translate.c | 64 ++++++++++++++++++++++++-------------------------
+ 2 files changed, 44 insertions(+), 40 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 3797bdc..061effb 100644
+index d6405ad..d6ea111 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -350,6 +350,9 @@ typedef struct mips_def_t mips_def_t;
- #define CP0_REG12__STATUS          0
- #define CP0_REG12__INTCTL          1
- #define CP0_REG12__SRSCTL          2
-+#define CP0_REG12__SRSMAP          3
-+#define CP0_REG12__VIEW_IPL        4
-+#define CP0_REG12__SRSMAP2         5
- #define CP0_REG12__GUESTCTL0       6
- #define CP0_REG12__GTOFFSET        7
- /* CP0 Register 13 */
+@@ -192,14 +192,14 @@ typedef struct mips_def_t mips_def_t;
+  *     Register 16       Register 17       Register 18       Register 19
+  *     -----------       -----------       -----------       -----------
+  *
+- * 0   Config            LLAddr            WatchLo           WatchHi
+- * 1   Config1           MAAR              WatchLo           WatchHi
+- * 2   Config2           MAARI             WatchLo           WatchHi
+- * 3   Config3                             WatchLo           WatchHi
+- * 4   Config4                             WatchLo           WatchHi
+- * 5   Config5                             WatchLo           WatchHi
+- * 6                                       WatchLo           WatchHi
+- * 7                                       WatchLo           WatchHi
++ * 0   Config            LLAddr            WatchLo0          WatchHi
++ * 1   Config1           MAAR              WatchLo1          WatchHi
++ * 2   Config2           MAARI             WatchLo2          WatchHi
++ * 3   Config3                             WatchLo3          WatchHi
++ * 4   Config4                             WatchLo4          WatchHi
++ * 5   Config5                             WatchLo5          WatchHi
++ * 6                                       WatchLo6          WatchHi
++ * 7                                       WatchLo7          WatchHi
+  *
+  *
+  *     Register 20       Register 21       Register 22       Register 23
+@@ -386,6 +386,10 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG18__WATCHLO1        1
+ #define CP0_REG18__WATCHLO2        2
+ #define CP0_REG18__WATCHLO3        3
++#define CP0_REG18__WATCHLO4        4
++#define CP0_REG18__WATCHLO5        5
++#define CP0_REG18__WATCHLO6        6
++#define CP0_REG18__WATCHLO7        7
+ /* CP0 Register 19 */
+ #define CP0_REG19__WATCHHI0        0
+ #define CP0_REG19__WATCHHI1        1
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index b5d5994..fb9c719 100644
+index edeaaad..6a11e8d 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -7177,21 +7177,21 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -7305,14 +7305,14 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_12:
+     case CP0_REGISTER_18:
          switch (sel) {
 -        case 0:
-+        case CP0_REG12__STATUS:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Status));
-             register_name = "Status";
-             break;
 -        case 1:
-+        case CP0_REG12__INTCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_IntCtl));
-             register_name = "IntCtl";
-             break;
 -        case 2:
-+        case CP0_REG12__SRSCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSCtl));
-             register_name = "SRSCtl";
-             break;
 -        case 3:
-+        case CP0_REG12__SRSMAP:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
-             register_name = "SRSMap";
-@@ -7893,7 +7893,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+-        case 4:
+-        case 5:
+-        case 6:
+-        case 7:
++        case CP0_REG18__WATCHLO0:
++        case CP0_REG18__WATCHLO1:
++        case CP0_REG18__WATCHLO2:
++        case CP0_REG18__WATCHLO3:
++        case CP0_REG18__WATCHLO4:
++        case CP0_REG18__WATCHLO5:
++        case CP0_REG18__WATCHLO6:
++        case CP0_REG18__WATCHLO7:
+             CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(mfc0_watchlo, arg, sel);
+             register_name = "WatchLo";
+@@ -8040,14 +8040,14 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_12:
+     case CP0_REGISTER_18:
          switch (sel) {
 -        case 0:
-+        case CP0_REG12__STATUS:
-             save_cpu_state(ctx, 1);
-             gen_helper_mtc0_status(cpu_env, arg);
-             /* DISAS_STOP isn't good enough here, hflags may have changed. */
-@@ -7901,21 +7901,21 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             ctx->base.is_jmp = DISAS_EXIT;
-             register_name = "Status";
-             break;
 -        case 1:
-+        case CP0_REG12__INTCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_helper_mtc0_intctl(cpu_env, arg);
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             register_name = "IntCtl";
-             break;
 -        case 2:
-+        case CP0_REG12__SRSCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_helper_mtc0_srsctl(cpu_env, arg);
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             register_name = "SRSCtl";
-             break;
 -        case 3:
-+        case CP0_REG12__SRSMAP:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
-             /* Stop translation as we may have switched the execution mode */
-@@ -8652,21 +8652,21 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+-        case 4:
+-        case 5:
+-        case 6:
+-        case 7:
++        case CP0_REG18__WATCHLO0:
++        case CP0_REG18__WATCHLO1:
++        case CP0_REG18__WATCHLO2:
++        case CP0_REG18__WATCHLO3:
++        case CP0_REG18__WATCHLO4:
++        case CP0_REG18__WATCHLO5:
++        case CP0_REG18__WATCHLO6:
++        case CP0_REG18__WATCHLO7:
+             CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             register_name = "WatchLo";
+@@ -8777,14 +8777,14 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_12:
+     case CP0_REGISTER_18:
          switch (sel) {
 -        case 0:
-+        case CP0_REG12__STATUS:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_Status));
-             register_name = "Status";
-             break;
 -        case 1:
-+        case CP0_REG12__INTCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_IntCtl));
-             register_name = "IntCtl";
-             break;
 -        case 2:
-+        case CP0_REG12__SRSCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSCtl));
-             register_name = "SRSCtl";
-             break;
 -        case 3:
-+        case CP0_REG12__SRSMAP:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
-             register_name = "SRSMap";
-@@ -9356,7 +9356,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+-        case 4:
+-        case 5:
+-        case 6:
+-        case 7:
++        case CP0_REG18__WATCHLO0:
++        case CP0_REG18__WATCHLO1:
++        case CP0_REG18__WATCHLO2:
++        case CP0_REG18__WATCHLO3:
++        case CP0_REG18__WATCHLO4:
++        case CP0_REG18__WATCHLO5:
++        case CP0_REG18__WATCHLO6:
++        case CP0_REG18__WATCHLO7:
+             CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_1e0i(dmfc0_watchlo, arg, sel);
+             register_name = "WatchLo";
+@@ -9494,14 +9494,14 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_12:
+     case CP0_REGISTER_18:
          switch (sel) {
 -        case 0:
-+        case CP0_REG12__STATUS:
-             save_cpu_state(ctx, 1);
-             gen_helper_mtc0_status(cpu_env, arg);
-             /* DISAS_STOP isn't good enough here, hflags may have changed. */
-@@ -9364,21 +9364,21 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             ctx->base.is_jmp = DISAS_EXIT;
-             register_name = "Status";
-             break;
 -        case 1:
-+        case CP0_REG12__INTCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_helper_mtc0_intctl(cpu_env, arg);
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             register_name = "IntCtl";
-             break;
 -        case 2:
-+        case CP0_REG12__SRSCTL:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_helper_mtc0_srsctl(cpu_env, arg);
-             /* Stop translation as we may have switched the execution mode */
-             ctx->base.is_jmp = DISAS_STOP;
-             register_name = "SRSCtl";
-             break;
 -        case 3:
-+        case CP0_REG12__SRSMAP:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_SRSMap));
-             /* Stop translation as we may have switched the execution mode */
+-        case 4:
+-        case 5:
+-        case 6:
+-        case 7:
++        case CP0_REG18__WATCHLO0:
++        case CP0_REG18__WATCHLO1:
++        case CP0_REG18__WATCHLO2:
++        case CP0_REG18__WATCHLO3:
++        case CP0_REG18__WATCHLO4:
++        case CP0_REG18__WATCHLO5:
++        case CP0_REG18__WATCHLO6:
++        case CP0_REG18__WATCHLO7:
+             CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
+             gen_helper_0e1i(mtc0_watchlo, arg, sel);
+             register_name = "WatchLo";
 -- 
 2.7.4
 
