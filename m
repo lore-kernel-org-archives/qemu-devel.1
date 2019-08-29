@@ -2,67 +2,98 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B245BC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C51C8C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:38:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8481D206BB
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:34:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8481D206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DA2D205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:38:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nhfPa6G7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DA2D205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Jcw-0008TJ-BN
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 08:34:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41568)
+	id 1i3Jgj-0001pi-Ju
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 08:38:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1i3JaR-0007RR-5M
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:31:36 -0400
+ (envelope-from <yuval.shaia@oracle.com>) id 1i3JfF-0001Ap-BY
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:36:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1i3JaO-00075s-NL
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:31:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2708)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1i3JaO-00074d-Di; Thu, 29 Aug 2019 08:31:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E300F3082145;
- Thu, 29 Aug 2019 12:31:30 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B513B60872;
- Thu, 29 Aug 2019 12:31:26 +0000 (UTC)
-Date: Thu, 29 Aug 2019 14:31:25 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <20190829143125.17a44fa5@redhat.com>
-In-Reply-To: <6afa8d99-c958-6f60-69f4-f84151358479@de.ibm.com>
-References: <20190806094834.7691-2-imammedo@redhat.com>
- <20190807153241.24050-1-imammedo@redhat.com>
- <20190820180727.32cf4891.cohuck@redhat.com>
- <20190827145629.62c5839e@redhat.com>
- <0abe612b-5a00-4ebc-9874-6b794d411f51@de.ibm.com>
- <20190829140402.3a547a76@redhat.com>
- <6afa8d99-c958-6f60-69f4-f84151358479@de.ibm.com>
+ (envelope-from <yuval.shaia@oracle.com>) id 1i3JfD-00053Z-Np
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:36:32 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:60914)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+ id 1i3JfD-0004xn-DH
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:36:31 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TCZ7Ju013573;
+ Thu, 29 Aug 2019 12:36:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=pxyVWTKsHlbhGpd/+lrnPoTi5QlKWpdoiaWfprlV2+g=;
+ b=nhfPa6G7/6yqrNUwt3z90OhSPwhxvieJXlciGtxl0UMlYGcfqzgVZ2Khz2Hti8aOxskd
+ kuDiJrAEjw+lhAO4uUu3CNR7NZCp7sMxQlIN7MaHY9lDylox/ZSKMDzrThffyUu6TJp3
+ VUv7OmnjJ4LxErIlreVtx2UNc7Gr3MuihPIzlIAIvQvoIsIV9c+vGn9Uj/EPduq/TSk5
+ hYaUHCjdsVB5HU/3OSXoS5g6/W05Hin9PohmcB9lYRZW1YYD1pcW6pstmLoIHvtifpa2
+ gNqcJXcMQiF+R3DQbWpYHMeNTwIz8N+y2hYItov0+RiLo8LMlSZHstRHwOUoMdX+pNuo cw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2upeu700e0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 29 Aug 2019 12:36:26 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TCYFd9046733;
+ Thu, 29 Aug 2019 12:36:26 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3020.oracle.com with ESMTP id 2unteuy6dv-75
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 29 Aug 2019 12:36:26 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7TC0Hp2013536;
+ Thu, 29 Aug 2019 12:00:17 GMT
+Received: from lap1 (/10.175.46.168) by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 29 Aug 2019 05:00:17 -0700
+Date: Thu, 29 Aug 2019 15:00:13 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+Message-ID: <20190829120013.GA9911@lap1>
+References: <20190828142328.24561-1-skrtbhtngr@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 29 Aug 2019 12:31:31 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.2 v5 1/2] kvm: s390:
- split too big memory section on several memslots
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190828142328.24561-1-skrtbhtngr@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9363
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908290138
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9363
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908290138
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Add live migration support in the
+ PVRDMA device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,72 +105,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 29 Aug 2019 14:07:44 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 29.08.19 14:04, Igor Mammedov wrote:
-> > On Thu, 29 Aug 2019 08:47:49 +0200
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> On 27.08.19 14:56, Igor Mammedov wrote:  
-> >>> On Tue, 20 Aug 2019 18:07:27 +0200
-> >>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>     
-> >>>> On Wed,  7 Aug 2019 11:32:41 -0400
-> >>>> Igor Mammedov <imammedo@redhat.com> wrote:
-> >>>>    
-> >>>>> Max memslot size supported by kvm on s390 is 8Tb,
-> >>>>> move logic of splitting RAM in chunks upto 8T to KVM code.
-> >>>>>
-> >>>>> This way it will hide KVM specific restrictions in KVM code
-> >>>>> and won't affect baord level design decisions. Which would allow
-> >>>>> us to avoid misusing memory_region_allocate_system_memory() API
-> >>>>> and eventually use a single hostmem backend for guest RAM.
-> >>>>>
-> >>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> >>>>> ---
-> >>>>> v5:
-> >>>>>   * move computation 'size -= slot_size' inside of loop body
-> >>>>>           (David Hildenbrand <david@redhat.com>)
-> >>>>> v4:
-> >>>>>   * fix compilation issue
-> >>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
-> >>>>>   * advance HVA along with GPA in kvm_set_phys_mem()
-> >>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
-> >>>>>
-> >>>>> patch prepares only KVM side for switching to single RAM memory region
-> >>>>> another patch will take care of  dropping manual RAM partitioning in
-> >>>>> s390 code.      
-> >>>>
-> >>>> I may have lost track a bit -- what is the status of this patch (and
-> >>>> the series)?    
-> >>>
-> >>> Christian,
-> >>>
-> >>> could you test it on a host that have sufficient amount of RAM?    
-> >>
-> >>
-> >> This version looks good. I was able to start a 9TB guest.
-> >> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=8796091973632, userspace_addr=0x3ffee700000}) = 0
-> >> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=1, flags=0, guest_phys_addr=0x7fffff00000, memory_size=1099512676352, userspace_addr=0xbffee600000}) = 0
->
-> >> The only question is if we want to fix the weird alignment (0x7fffff00000) when
-> >> we already add a migration barrier for uber-large guests.
-> >> Maybe we could split at 4TB to avoid future problem with larger page sizes?  
-> > That probably should be a separate patch on top.  
+On Wed, Aug 28, 2019 at 07:53:26PM +0530, Sukrit Bhatnagar wrote:
+> This series enables the migration of various GIDs used by the device.    
+> This is in addition to the successful migration of PCI and MSIX states
+> as well as various DMA addresses and ring page information.
+>     
+> We have a setup having two hosts and two VMs running atop them.    
+> Migrations are performed over the local network.    
 > 
-> Right. The split in KVM code is transparent to migration and other parts of QEMU, correct?
+> We also have performed various ping-pong tests (ibv_rc_pingpong) in the    
+> guest(s) after adding GID migration support and this is the current status:    
+> - ping-pong to localhost succeeds, when performed before starting the    
+>   migration and after the completion of migration.    
+> - ping-pong to a peer succeeds, both before and after migration as above,    
+>   provided that both VMs are running on/migrated to the same host.    
+>   So, if two VMs were started on two different hosts, and one of them    
+>   was migrated to the other host, the ping-pong was successful.    
 
-it should not affect other QEMU parts and migration (to my limited understanding of it),
-we are passing to KVM memory slots upto KVM_SLOT_MAX_BYTES as we were doing before by
-creating several memory regions instead of one as described in [2/2] commit message.
+This limitation looks to me like wrongly configured network. This patch-set
+should enable any migration.
 
-Also could you also test migration of +9Tb guest, to check that nothing where broken by
-accident in QEMU migration code?
+After our last meeting, please confirm.
+
+In addition, i don't see why non-VM peer (i.e. Bare-metal) is not
+supported. Can you run a test and update with the results?
+
+>   Similarly, if two VMs are migrated to the same host, then after migration,    
+>   the ping-pong was successful.    
+> - ping-pong to a peer on the remote host is not working as of now.    
+>     
+> Our next goal is to achieve successful migration with live traffic.    
+>     
+> This is the same as the RFC v3 series posted earlier:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg04752.html
+> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg04753.html
+> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg04754.html
+> 
+> 
+> Sukrit Bhatnagar (2):
+>   hw/pvrdma: make DSR mapping idempotent in load_dsr()
+>   hw/pvrdma: add live migration support
+> 
+>  hw/rdma/vmw/pvrdma_main.c | 94 +++++++++++++++++++++++++++++++++++----
+>  1 file changed, 86 insertions(+), 8 deletions(-)
+> 
+> -- 
+> 2.21.0
+> 
+> 
 
