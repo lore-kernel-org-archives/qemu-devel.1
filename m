@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 691EFC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2412FC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 389172077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:08:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 389172077B
+	by mail.kernel.org (Postfix) with ESMTPS id E7A782077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:10:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7A782077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i39rt-0007R8-B9
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 22:08:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56453)
+	id 1i39to-000095-Vq
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 22:10:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56926)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i39qo-0006zj-6g
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:07:51 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i39t5-00084i-MJ
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i39ql-0005hU-Mg
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:07:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34550)
+ (envelope-from <jsnow@redhat.com>) id 1i39t4-0006hU-Gp
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:10:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62774)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1i39ql-0005h7-FR
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:07:47 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1i39t4-0006h7-8P
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:10:10 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9529E18B3D83;
- Thu, 29 Aug 2019 02:07:46 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 89498308219E;
+ Thu, 29 Aug 2019 02:10:09 +0000 (UTC)
 Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B747719D7A;
- Thu, 29 Aug 2019 02:07:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B4CB5D713;
+ Thu, 29 Aug 2019 02:10:07 +0000 (UTC)
 To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
 References: <20190807142114.17569-1-danielhb413@gmail.com>
- <20190807142114.17569-3-danielhb413@gmail.com>
+ <20190807142114.17569-4-danielhb413@gmail.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,21 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <a3b0480c-da0e-d182-335d-77568efb8121@redhat.com>
-Date: Wed, 28 Aug 2019 22:07:45 -0400
+Message-ID: <30e39135-a023-2257-4718-747c94ae85ee@redhat.com>
+Date: Wed, 28 Aug 2019 22:10:06 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190807142114.17569-3-danielhb413@gmail.com>
+In-Reply-To: <20190807142114.17569-4-danielhb413@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Thu, 29 Aug 2019 02:07:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Thu, 29 Aug 2019 02:10:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] block.c: adding bdrv_delete_file
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] crypto.c: cleanup created file when
+ block_crypto_co_create_opts_luks fails
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,7 +147,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com
+Cc: kwolf@redhat.com, Srikanth Aithal <bssrikanth@in.ibm.com>,
+ berrange@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -154,151 +156,83 @@ Sender: "Qemu-devel"
 
 
 On 8/7/19 10:21 AM, Daniel Henrique Barboza wrote:
-> Using the new 'bdrv_co_delete_file' interface, bdrv_delete_file
-> can be used in a way similar of the existing bdrv_create_file to
-> to clean up a created file.
->=20
-> The logic is also similar to what is already done in bdrv_create_file:
-> a qemu_coroutine is created if needed, a specialized function
-> bdrv_delete_co_entry is used to call the bdrv_co_delete_file
-> co-routine of the driver, if the driver implements it.
->=20
-> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> When using a non-UTF8 secret to create a volume using qemu-img, the
+> following error happens:
+> 
+> $ qemu-img create -f luks --object secret,id=vol_1_encrypt0,file=vol_resize_pool.vol_1.secret.qzVQrI -o key-secret=vol_1_encrypt0 /var/tmp/pool_target/vol_1 10240K
+> 
+> Formatting '/var/tmp/pool_target/vol_1', fmt=luks size=10485760 key-secret=vol_1_encrypt0
+> qemu-img: /var/tmp/pool_target/vol_1: Data from secret vol_1_encrypt0 is not valid UTF-8
+> 
+> However, the created file '/var/tmp/pool_target/vol_1' is left behind in the
+> file system after the failure. This behavior can be observed when creating
+> the volume using Libvirt, via 'virsh vol-create', and then getting "volume
+> target path already exist" errors when trying to re-create the volume.
+> 
+> The volume file is created inside block_crypto_co_create_opts_luks(), in
+> block/crypto.c. If the bdrv_create_file() call is successful but any
+> succeeding step fails*, the existing 'fail' label does not take into
+> account the created file, leaving it behind.
+> 
+> This patch changes block_crypto_co_create_opts_luks() to delete
+> 'filename' in case of failure. A failure in this point means that
+> the volume is now truncated/corrupted, so even if 'filename' was an
+> existing volume before calling qemu-img, it is now unusable. Deleting
+> the file it is not much worse than leaving it in the filesystem in
+> this scenario, and we don't have to deal with checking the file
+> pre-existence in the code.
+> 
+> * in our case, block_crypto_co_create_generic calls qcrypto_block_create,
+> which calls qcrypto_block_luks_create, and this function fails when
+> calling qcrypto_secret_lookup_as_utf8.
+> 
+> Reported-by: Srikanth Aithal <bssrikanth@in.ibm.com>
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
 > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > ---
->  block.c               | 77 +++++++++++++++++++++++++++++++++++++++++++
->  include/block/block.h |  1 +
->  2 files changed, 78 insertions(+)
->=20
-> diff --git a/block.c b/block.c
-> index cbd8da5f3b..1e20250627 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -547,6 +547,83 @@ int bdrv_create_file(const char *filename, QemuOpt=
-s *opts, Error **errp)
+>  block/crypto.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+> 
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 8237424ae6..8ffca81df6 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -30,6 +30,7 @@
+>  #include "qapi/error.h"
+>  #include "qemu/module.h"
+>  #include "qemu/option.h"
+> +#include "qemu/cutils.h"
+>  #include "crypto.h"
+>  
+>  typedef struct BlockCrypto BlockCrypto;
+> @@ -575,6 +576,25 @@ fail:
+>      bdrv_unref(bs);
+>      qapi_free_QCryptoBlockCreateOptions(create_opts);
+>      qobject_unref(cryptoopts);
+> +
+> +    /*
+> +     * If an error occurred, delete the file. Even if the file existed
+> +     * beforehand, it has been truncated and corrupted in the process.
+> +     */
+> +    if (ret) {
+> +        Error *local_err;
+> +        int r_del = bdrv_delete_file(filename, &local_err);
+> +        /*
+> +         * ENOTSUP will happen if the block driver doesn't support
+> +         * 'bdrv_co_delete_file'. ENOENT will happen if the file
+> +         * doesn't exist. Both are predictable and shouldn't be
+> +         * reported back to the user.
+> +         */
+
+Hm, actually, didn't you use ENOENT to mean that we couldn't figure out
+which driver to use?
+
+> +        if ((r_del < 0) && (r_del != -ENOTSUP) && (r_del != -ENOENT)) {
+> +            error_reportf_err(local_err, "%s: ", bs->filename);
+> +        }> +    }
+> +
 >      return ret;
 >  }
-> =20
-> +typedef struct DeleteCo {
-> +    BlockDriver *drv;
-> +    BlockDriverState *bs;
-> +    int ret;
-> +    Error *err;
-> +} DeleteCo;
-> +
-> +static void coroutine_fn bdrv_delete_co_entry(void *opaque)
-> +{
-> +    Error *local_err =3D NULL;
-> +    DeleteCo *dco =3D opaque;
-> +
-> +    assert(dco->bs);
-> +
-> +    dco->ret =3D dco->drv->bdrv_co_delete_file(dco->bs, &local_err);
-> +    error_propagate(&dco->err, local_err);
-> +}
-> +
-> +int bdrv_delete_file(const char *filename, Error **errp)
-> +{
-> +    BlockDriver *drv =3D bdrv_find_protocol(filename, true, NULL);
-> +    BlockDriverState *bs =3D bdrv_open(filename, NULL, NULL,
-> +                                     BDRV_O_RDWR | BDRV_O_PROTOCOL, NU=
-LL);
-> +    DeleteCo dco =3D {
-> +        .drv =3D drv,
-> +        .bs =3D bs,
-> +        .ret =3D NOT_DONE,
-> +        .err =3D NULL,
-> +    };
-> +    Coroutine *co;
-> +    int ret;
-> +
-> +    if (!drv) {
-> +        error_setg(errp, "File '%s' has unknown format", filename);
-> +        ret =3D -ENOENT;
-> +        goto out;
-> +    }
-> +
-
-I was going to say that ENOENT is a weird error here, but I see it used
-for !drv a few other places in block.c too, alongside EINVAL and
-ENOMEDIUM. ENOMEDIUM loks like the most popular.
-
-> +    if (!drv->bdrv_co_delete_file) {
-> +        error_setg(errp, "Driver '%s' does not support image delete",
-> +                   drv->format_name);
-> +        ret =3D -ENOTSUP;
-> +        goto out;
-> +    }
-> +
-> +    if (!bs) {
-> +        error_setg(errp, "Could not open image '%s' for erasing",
-> +                   filename);
-> +        ret =3D 1;
-
-Please keep all errors negative (or at least consistent within a function=
-).
-
-
-I'm also wondering if we want a version of delete that doesn't try to
-open a file directly -- i.e. a version that exists like this:
-
-bdrv_co_delete_file(BlockDriverState *bs, Error **errp);
-
-That simply dispatches based on bs->drv to the correct routine.
-
-Then, you are free to have bdrv_delete_file handle the open (and let the
-opening figure out what driver it needs), and just hand off the bds to
-bdrv_co_delete_file.
-
-I'm not the authority for block.c, though, so maaaybe I'm giving you bad
-advice here. Kevin's away on PTO for a bit and gave you advice most
-recently, so I might try to gently ask him for more feedback next week.
-
-> +        goto out;
-> +    }
-> +
-> +    if (qemu_in_coroutine()) {
-> +        /* Fast-path if already in coroutine context */
-> +        bdrv_delete_co_entry(&dco);
-> +    } else {
-> +        co =3D qemu_coroutine_create(bdrv_delete_co_entry, &dco);
-> +        qemu_coroutine_enter(co);
-> +        while (dco.ret =3D=3D NOT_DONE) {
-> +            aio_poll(qemu_get_aio_context(), true);
-> +        }
-> +    }
-> +
-> +    ret =3D dco.ret;
-> +    if (ret < 0) {
-> +        if (dco.err) {
-> +            error_propagate(errp, dco.err);
-> +        } else {
-> +            error_setg_errno(errp, -ret, "Could not delete image");
-> +        }
-> +    }
-> +
-> +out:
-> +    bdrv_unref(bs);
-> +    return ret;
-> +}
-> +
->  /**
->   * Try to get @bs's logical and physical block size.
->   * On success, store them in @bsz struct and return 0.
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 50a07c1c33..5e83532364 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -369,6 +369,7 @@ bool bdrv_is_backing_chain_frozen(BlockDriverState =
-*bs, BlockDriverState *base,
->  int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *=
-base,
->                                Error **errp);
->  void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverStat=
-e *base);
-> +int bdrv_delete_file(const char *filename, Error **errp);
-> =20
-> =20
->  typedef struct BdrvCheckResult {
->=20
+>  
+> 
 
