@@ -2,140 +2,82 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2412FC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FCAC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7A782077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:10:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7A782077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A7F192077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 02:18:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="igOm3Dy2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7F192077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i39to-000095-Vq
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 22:10:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56926)
+	id 1i3A0h-0002Px-JY
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 22:18:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i39t5-00084i-MJ
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:10:12 -0400
+ (envelope-from <renyime@gmail.com>) id 1i39zR-0001aw-Ah
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:16:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i39t4-0006hU-Gp
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:10:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62774)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1i39t4-0006h7-8P
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:10:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 89498308219E;
- Thu, 29 Aug 2019 02:10:09 +0000 (UTC)
-Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B4CB5D713;
- Thu, 29 Aug 2019 02:10:07 +0000 (UTC)
-To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
-References: <20190807142114.17569-1-danielhb413@gmail.com>
- <20190807142114.17569-4-danielhb413@gmail.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <30e39135-a023-2257-4718-747c94ae85ee@redhat.com>
-Date: Wed, 28 Aug 2019 22:10:06 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190807142114.17569-4-danielhb413@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 29 Aug 2019 02:10:09 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] crypto.c: cleanup created file when
- block_crypto_co_create_opts_luks fails
+ (envelope-from <renyime@gmail.com>) id 1i39zQ-0001Or-7E
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:16:45 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37180)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <renyime@gmail.com>) id 1i39zQ-0001OW-1t
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:16:44 -0400
+Received: by mail-pf1-x441.google.com with SMTP id y9so995483pfl.4
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 19:16:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=rpJiFNtVBZf46LBvl66xUeKwwhdxxSngiM3KlKxLWPw=;
+ b=igOm3Dy2tGNCy6DN37YYvK6V8M6whUyftWArRuz8klGSD4drFGBm/2oBGxvK1UJbHX
+ yt/Gw1IKkr1xTFQp1UopRqEveUH8ud9b9RwG32gdJfmMVrZNGg1IfayabibkcoafTUoM
+ CtGfoWs+GWIF4qgaefnIKOfvDGniZiMZrDODCG3gGyba36xNgI7U7zPeWhoJDHBqYjHd
+ s+jy3QijpaleQBBBD5lltO9o1L+rR332RssvnqBbhRy6vWG1vLZNpOu+H3fUNA9UXgwL
+ 5aZ8IX3WVdqQmTV6pVTedcSz+Lo+QDzyIbO6cP7ROwT76D0b9SmVkCf4teG8Z6y4svS8
+ HveA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=rpJiFNtVBZf46LBvl66xUeKwwhdxxSngiM3KlKxLWPw=;
+ b=A7l7M6oMkvvTu6hvqFMVAlCL6xlUU62hGxoIJjOj/O9VVGqDHheHkmDMhZY+Ce1+wC
+ FG2c0xyaUl1xqFOixsuowz8r79i+7fa0z/68Ryy9vxeBCIZ78FFB2pYzW5/BSCwpSPRQ
+ n0DkumtAveyDIW4JW8AciOApcUdZvR53n3X//JFJKu5Y/r4c5IcBVNdgAVkIh/mp3hs+
+ lxXg2A/kdfTVWn/+Du8pGqPX/IgNxvp4RrROzxwzKPi4pkdOl/DcuUlTGwdpuGdpeVP/
+ xbvqPErRdQAKnqpQhQHWsidRhu6tgJIxIBk4SxjI2wUP/pzexgJsMnnQJfBDTALo+BxL
+ adAw==
+X-Gm-Message-State: APjAAAWB5OVVESfelRFMPiLYgp6NwIv8IBxmKqz9PwulFxLiL9NlIecO
+ n7gEjen3bY8IxrNAGRtcims=
+X-Google-Smtp-Source: APXvYqyJFliZDMsb1F6t0BUO+3QEJTdj+6ktrLQw2V4As7bFJ++E1Q5Ig+zjY0xaGjwMB23syS9pkg==
+X-Received: by 2002:a63:221f:: with SMTP id i31mr6251689pgi.251.1567045002187; 
+ Wed, 28 Aug 2019 19:16:42 -0700 (PDT)
+Received: from VM_85_204_centos.localdomain ([129.226.55.250])
+ by smtp.gmail.com with ESMTPSA id x128sm786038pfd.52.2019.08.28.19.16.41
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 28 Aug 2019 19:16:41 -0700 (PDT)
+From: Ivan Ren <renyime@gmail.com>
+X-Google-Original-From: Ivan Ren <ivanren@tencent.com>
+To: quintela@redhat.com,
+	dgilbert@redhat.com
+Date: Thu, 29 Aug 2019 10:16:36 +0800
+Message-Id: <1567044996-2362-1-git-send-email-ivanren@tencent.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: [Qemu-devel] [PATCH] migration: multifd_send_thread always post
+ p->sem_sync when error happen
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,92 +89,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Srikanth Aithal <bssrikanth@in.ibm.com>,
- berrange@redhat.com, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Ivan Ren <ivanren@tencent.com>
 
+When encounter error, multifd_send_thread should always notify who pay
+attention to it before exit. Otherwise it may block migration_thread
+at multifd_send_sync_main forever.
 
-On 8/7/19 10:21 AM, Daniel Henrique Barboza wrote:
-> When using a non-UTF8 secret to create a volume using qemu-img, the
-> following error happens:
-> 
-> $ qemu-img create -f luks --object secret,id=vol_1_encrypt0,file=vol_resize_pool.vol_1.secret.qzVQrI -o key-secret=vol_1_encrypt0 /var/tmp/pool_target/vol_1 10240K
-> 
-> Formatting '/var/tmp/pool_target/vol_1', fmt=luks size=10485760 key-secret=vol_1_encrypt0
-> qemu-img: /var/tmp/pool_target/vol_1: Data from secret vol_1_encrypt0 is not valid UTF-8
-> 
-> However, the created file '/var/tmp/pool_target/vol_1' is left behind in the
-> file system after the failure. This behavior can be observed when creating
-> the volume using Libvirt, via 'virsh vol-create', and then getting "volume
-> target path already exist" errors when trying to re-create the volume.
-> 
-> The volume file is created inside block_crypto_co_create_opts_luks(), in
-> block/crypto.c. If the bdrv_create_file() call is successful but any
-> succeeding step fails*, the existing 'fail' label does not take into
-> account the created file, leaving it behind.
-> 
-> This patch changes block_crypto_co_create_opts_luks() to delete
-> 'filename' in case of failure. A failure in this point means that
-> the volume is now truncated/corrupted, so even if 'filename' was an
-> existing volume before calling qemu-img, it is now unusable. Deleting
-> the file it is not much worse than leaving it in the filesystem in
-> this scenario, and we don't have to deal with checking the file
-> pre-existence in the code.
-> 
-> * in our case, block_crypto_co_create_generic calls qcrypto_block_create,
-> which calls qcrypto_block_luks_create, and this function fails when
-> calling qcrypto_secret_lookup_as_utf8.
-> 
-> Reported-by: Srikanth Aithal <bssrikanth@in.ibm.com>
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  block/crypto.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 8237424ae6..8ffca81df6 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -30,6 +30,7 @@
->  #include "qapi/error.h"
->  #include "qemu/module.h"
->  #include "qemu/option.h"
-> +#include "qemu/cutils.h"
->  #include "crypto.h"
->  
->  typedef struct BlockCrypto BlockCrypto;
-> @@ -575,6 +576,25 @@ fail:
->      bdrv_unref(bs);
->      qapi_free_QCryptoBlockCreateOptions(create_opts);
->      qobject_unref(cryptoopts);
-> +
-> +    /*
-> +     * If an error occurred, delete the file. Even if the file existed
-> +     * beforehand, it has been truncated and corrupted in the process.
-> +     */
-> +    if (ret) {
-> +        Error *local_err;
-> +        int r_del = bdrv_delete_file(filename, &local_err);
-> +        /*
-> +         * ENOTSUP will happen if the block driver doesn't support
-> +         * 'bdrv_co_delete_file'. ENOENT will happen if the file
-> +         * doesn't exist. Both are predictable and shouldn't be
-> +         * reported back to the user.
-> +         */
+Error as follow:
+-------------------------------------------------------------------------------
+ (gdb) bt
+ #0  0x00007f4d669dfa0b in do_futex_wait.constprop.1 () from /lib64/libpthread.so.0
+ #1  0x00007f4d669dfa9f in __new_sem_wait_slow.constprop.0 () from /lib64/libpthread.so.0
+ #2  0x00007f4d669dfb3b in sem_wait@@GLIBC_2.2.5 () from /lib64/libpthread.so.0
+ #3  0x0000562ccf0a5614 in qemu_sem_wait (sem=sem@entry=0x562cd1b698e8) at util/qemu-thread-posix.c:319
+ #4  0x0000562ccecb4752 in multifd_send_sync_main (rs=<optimized out>) at /qemu/migration/ram.c:1099
+ #5  0x0000562ccecb95f4 in ram_save_iterate (f=0x562cd0ecc000, opaque=<optimized out>) at /qemu/migration/ram.c:3550
+ #6  0x0000562ccef43c23 in qemu_savevm_state_iterate (f=0x562cd0ecc000, postcopy=false) at migration/savevm.c:1189
+ #7  0x0000562ccef3dcf3 in migration_iteration_run (s=0x562cd09fabf0) at migration/migration.c:3131
+ #8  migration_thread (opaque=opaque@entry=0x562cd09fabf0) at migration/migration.c:3258
+ #9  0x0000562ccf0a4c26 in qemu_thread_start (args=<optimized out>) at util/qemu-thread-posix.c:502
+ #10 0x00007f4d669d9e25 in start_thread () from /lib64/libpthread.so.0
+ #11 0x00007f4d6670635d in clone () from /lib64/libc.so.6
+ (gdb) f 4
+ #4  0x0000562ccecb4752 in multifd_send_sync_main (rs=<optimized out>) at /qemu/migration/ram.c:1099
+ 1099	        qemu_sem_wait(&p->sem_sync);
+ (gdb) list
+ 1094	    }
+ 1095	    for (i = 0; i < migrate_multifd_channels(); i++) {
+ 1096	        MultiFDSendParams *p = &multifd_send_state->params[i];
+ 1097
+ 1098	        trace_multifd_send_sync_main_wait(p->id);
+ 1099	        qemu_sem_wait(&p->sem_sync);
+ 1100	    }
+ 1101	    trace_multifd_send_sync_main(multifd_send_state->packet_num);
+ 1102	}
+ 1103
+ (gdb) p i
+ $1 = 0
+ (gdb)  p multifd_send_state->params[0].pending_job
+ $2 = 2    //It means the job before MULTIFD_FLAG_SYNC has already fail
+ (gdb)  p multifd_send_state->params[0].quit
+ $3 = true
 
-Hm, actually, didn't you use ENOENT to mean that we couldn't figure out
-which driver to use?
+Signed-off-by: Ivan Ren <ivanren@tencent.com>
+---
+ migration/ram.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> +        if ((r_del < 0) && (r_del != -ENOTSUP) && (r_del != -ENOENT)) {
-> +            error_reportf_err(local_err, "%s: ", bs->filename);
-> +        }> +    }
-> +
->      return ret;
->  }
->  
-> 
+diff --git a/migration/ram.c b/migration/ram.c
+index b01a37e7ca..0047286b7e 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1112,6 +1112,7 @@ static void *multifd_send_thread(void *opaque)
+     rcu_register_thread();
+ 
+     if (multifd_send_initial_packet(p, &local_err) < 0) {
++        ret = -1;
+         goto out;
+     }
+     /* initial packet */
+@@ -1179,9 +1180,7 @@ out:
+      * who pay attention to me.
+      */
+     if (ret != 0) {
+-        if (flags & MULTIFD_FLAG_SYNC) {
+-            qemu_sem_post(&p->sem_sync);
+-        }
++        qemu_sem_post(&p->sem_sync);
+         qemu_sem_post(&multifd_send_state->channels_ready);
+     }
+ 
+-- 
+2.17.2 (Apple Git-113)
+
 
