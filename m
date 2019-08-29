@@ -2,92 +2,87 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCBEC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E01CC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:28:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCE0F21726
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:24:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a4CQ3GrA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCE0F21726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 05F7F205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:28:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05F7F205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3P6A-0003PS-VJ
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 14:24:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43512)
+	id 1i3PAH-0005v6-3P
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 14:28:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44941)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i3P26-0008Mp-Ji
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:20:32 -0400
+ (envelope-from <philmd@redhat.com>) id 1i3P9T-0005MZ-Iu
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:28:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i3P22-0000qS-Hj
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:20:30 -0400
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:46633)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i3P1y-0000na-Ok
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:20:24 -0400
-Received: by mail-ot1-x332.google.com with SMTP id z17so4319353otk.13
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 11:20:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=j+d3yuyXe4/5R5NXiXJ69H+E32lgwoAq3r9uw55Ecos=;
- b=a4CQ3GrAhh2qBWeFKYSEHrXDrNrTJAnIWaDCODRAFi8tMnTHzP9UPlqWdzBNXN9XcU
- N+LR7x33qTJ/od25Lr2Br9hFOOeCQho4HgmjvCRBbe0DTGh6q7zazftw1FmUBUKL6py0
- 1Uf+z29DaYLN5QArkDvDxN4nOgIPeS5nPsPyRgbb4TEmPWVGALN5toV6txuatZ3YfSyZ
- aKwerAA8pmbkRAr6/vj+IgMxhKuyhfLKonyG2KMo/jyZWDmiUEPDU3mgdYuvmGtzXdkI
- 5V+CszYgI0r5GbpCr9q8qPCkv8drJRaFor4hqqPWbewoWhOoCKWYHchYDgKS1oBctlo5
- MO4Q==
+ (envelope-from <philmd@redhat.com>) id 1i3P9N-0006zC-Ca
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:28:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52546)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i3P9N-0006xI-4i
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:28:01 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E956C89AC4
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 18:27:58 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id w11so2518794wru.17
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 11:27:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=j+d3yuyXe4/5R5NXiXJ69H+E32lgwoAq3r9uw55Ecos=;
- b=oKPNzR5el25y3Xu3HoZSa7XgfpK3thyoGo4JWlVLfq0PDgHMbJdXZQmRhtQRoQDfOc
- guVTZgPBe6qhsNXddYoe17ekf59YQxSQ/AEyJmKDyxtmS1JQ/5jp8Md4WcmpwojDk5GV
- R/hfkqcToyWQXnH464INyr7PhCDHglG1PzwKKi2Z7Myoq4+OSdZOehH/nrIOmdXQag68
- 7zdUUk5mPD4hYRtQWjPKnkSuSe17TfUJl4k4k3KP1MF/CbgppEWBNxDFjar0XdTJmgQ4
- zIP9IW28Yte3G6TNZ0VY5ntQ6/1glWC16o3nG+7ok9VydqYMp2xhovYNhdJRkT+WyOBi
- oMEw==
-X-Gm-Message-State: APjAAAUKdhErssUCXyqzBmCwOhAwvEv2bI4590gj335T2hl/njGTFNgP
- fAFQhplKvbiBhMjNjCgzAD3T+EMVsFv5jzEl504=
-X-Google-Smtp-Source: APXvYqx+6ub5zb9nXW38jxVALg6XlpLCkUlX2V5OypIYNBBzcmTtAUUFVHyoeZrSUsCXWZnuYqEdA0mO4f68jE9bL/I=
-X-Received: by 2002:a05:6830:4d6:: with SMTP id
- s22mr9233821otd.295.1567102821511; 
- Thu, 29 Aug 2019 11:20:21 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dLbqMQT4VGtBHhcY6djUV9rrwjoSCLY8udMo4z905lc=;
+ b=Ps5oiZSNs59GAikAMemy3NPTKZ9PEWYHST33O7XWz1iBlE3S5y6hm0Sit5tNhIkN+J
+ vEt2B7+UiYzsy2/iLJBZ4SnGO379BUUmObis7xFwNxhUrqyDa9cO/o8x7E8Kfoq9Vz9m
+ 0Ye5Zhf/rUESILA7oWcpixIfWdOa3CFWbveX7jDtdBErqZgudNBewDzLpXFlKssvjif4
+ YTQE9bfNDJXKNwqc2B/abFCVd+q4x+u454ALD164StYPLLywTaje2QKmWdfBMW3uhc/4
+ 3F4xIiCVvHMTR6OjcTwVklUcyJ3aYdAt82boejFNe1sRsmY2j7Tl7c2J015Ml0p/RfLs
+ 6IFA==
+X-Gm-Message-State: APjAAAVZhW5rzD1EIkn7gpi2Oz40qeLj4l0nrrkfwpqZSdg+BsiC5qu4
+ Fr408y3YctsMEDGDRqLuvGakUiaL5pqPmSbAH4aqFdGlsI2m7vNwWuobfcq1d4yF0NpFV7OcEsQ
+ 5OkgbUj68F5nomUg=
+X-Received: by 2002:a7b:c935:: with SMTP id h21mr12777065wml.35.1567103277046; 
+ Thu, 29 Aug 2019 11:27:57 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx67Shxy6QXSku8wS3aZB65tM/xZ55JqmBGUyv9RxvNiQU0nUdxXJjhbWEncQItQn/L9lGk3Q==
+X-Received: by 2002:a7b:c935:: with SMTP id h21mr12777026wml.35.1567103276668; 
+ Thu, 29 Aug 2019 11:27:56 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id g65sm6030697wma.21.2019.08.29.11.27.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 29 Aug 2019 11:27:55 -0700 (PDT)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190820235243.26092-1-jsnow@redhat.com>
+ <20190820235243.26092-2-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <5c7555f2-fba0-29fc-8bcd-bc68e5b42c63@redhat.com>
+Date: Thu, 29 Aug 2019 20:27:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Thu, 29 Aug 2019 11:20:20
- -0700 (PDT)
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Thu, 29 Aug 2019 11:20:20
- -0700 (PDT)
-In-Reply-To: <20190828212425.GB11512@localhost.localdomain>
-References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <CAL1e-=hWc6G7Ob+LU7EWoY3LVBvABY2ky=RT28dSzqM=9O=OEA@mail.gmail.com>
- <20190821210030.GH7077@habkost.net>
- <CAL1e-=iZziwdyjJeaE-ZC2Rbjdmr_enYGBdK5zs4Lh0kN1DQOg@mail.gmail.com>
- <CAL1e-=gf-DOrdfN__Bxbx+B5NKu71ZTCypGEekoFc05WDaQjbw@mail.gmail.com>
- <20190828212425.GB11512@localhost.localdomain>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 29 Aug 2019 20:20:20 +0200
-Message-ID: <CAL1e-=h71qaPjD2teWBW4gwqX=1_tBqjwirWUEi-gcEK6=mS=w@mail.gmail.com>
-To: Cleber Rosa <crosa@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::332
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 0/2] tests/acceptance: Update MIPS Malta
- ssh test
+In-Reply-To: <20190820235243.26092-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] iotests: add script_initialize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,193 +94,572 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com,
- qemu-devel@nongnu.org, f4bug@amsat.org,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, amarkovic@wavecomp.com
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-28.08.2019. 23.24, "Cleber Rosa" <crosa@redhat.com> =D1=98=D0=B5 =D0=BD=D0=
-=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On Thu, Aug 22, 2019 at 07:59:07PM +0200, Aleksandar Markovic wrote:
-> > 22.08.2019. 05.15, "Aleksandar Markovic" <aleksandar.m.mail@gmail.com>
-=D1=98=D0=B5
-> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > >
-> > >
-> > > 21.08.2019. 23.00, "Eduardo Habkost" <ehabkost@redhat.com> =D1=98=D0=
-=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > > >
-> > > > On Wed, Aug 21, 2019 at 10:27:11PM +0200, Aleksandar Markovic wrote=
-:
-> > > > > 02.08.2019. 17.37, "Aleksandar Markovic" <
-> > aleksandar.markovic@rt-rk.com> =D1=98=D0=B5
-> > > > > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > > > > >
-> > > > > > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > > > > >
-> > > > > > This little series improves linux_ssh_mips_malta.py, both in th=
-e
-> > sense
-> > > > > > of code organization and in the sense of quantity of executed
-tests.
-> > > > > >
-> > > > >
-> > > > > Hello, all.
-> > > > >
-> > > > > I am going to send a new version in few days, and I have a
-question
-> > for
-> > > > > test team:
-> > > > >
-> > > > > Currently, the outcome of the script execition is either PASS:1
-> > FAIL:0 or
-> > > > > PASS:0 FAIL:1. But the test actually consists of several
-subtests. Is
-> > there
-> > > > > any way that this single Python script considers these subtests a=
-s
-> > separate
-> > > > > tests (test cases), reporting something like PASS:12 FAIL:7? If
-yes,
-> > what
-> > > > > would be the best way to achieve that?
-> > > >
-> > > > If you are talking about each test_*() method, they are already
-> > > > treated like separate tests.  If you mean treating each
-> > > > ssh_command_output_contains() call as a separate test, this might
-> > > > be difficult.
-> > > >
-> > >
-> > > Yes, I meant the latter one, individual code segments involving an
-> > invocation of ssh_command_output_contains() instance being treated as
-> > separate tests.
-> > >
-> >
-> > Hello, Cleber,
-> >
-> > I am willing to rewamp python file structure if needed.
-> >
-> > The only thing I feel a little unconfortable is if I need to reboot the
-> > virtual machine for each case of ssh_command_output_contains().
-> >
->
-> Hi Aleksandar,
->
-> The short answer is that Avocado provides no way to report "subtest"
-> statuses (as a formal concept), neither does the current
-> "avocado_qemu" infrastructure allow for management of VMs across
-> tests.  The later is an Avocado-VT feature, and it to be honest it
-> brings a good deal of problems in itself, which we decided to avoid
-> here.
->
-> About the lack of subtests, we (the autotest project, then the Avocado
-> project) found that this concept, to be well applied, need more than
-> we could deal with initially.  For instance, Avocado has the concept
-> of "pre_test" and "post_test" hooks, with that, should those be
-> applied to subtests as well?  Also, there's support for capturing
-> system information (a feature called sysinfo) before and after the
-> tests... again, should it be applied to subtests?  Avocado also stores
-> a well defined results directory, and we'd have to deal with something
-> like that for subtests.  With regards to the variants feature, should
-> they also be applied to subtests?  The list of questions goes on and
-> on.
->
-> The fact that one test should not be able (as much as possible) to
-> influence another test also comes into play in our initial decision
-> to avoid subtests.
->
-> IMO, the best way to handle this is to either keep a separate logger
-> with the test progress:
->
->
-https://avocado-framework.readthedocs.io/en/71.0/WritingTests.html#advanced=
--logging-capabilities
->
-> With a change similar to:
->
+On 8/21/19 1:52 AM, John Snow wrote:
+> Like script_main, but doesn't require a single point of entry.
+> Replace all existing initialization sections with this drop-in replacement.
+> 
+> This brings debug support to all existing script-style iotests.
+> 
+> Note: supported_oses=['linux'] was omitted, as it is a default argument.
 > ---
-> diff --git a/tests/acceptance/linux_ssh_mips_malta.py
-b/tests/acceptance/linux_ssh_mips_malta.py
-> index 509ff929cf..0683586c35 100644
-> --- a/tests/acceptance/linux_ssh_mips_malta.py
-> +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> @@ -17,6 +17,7 @@ from avocado_qemu import Test
->  from avocado.utils import process
->  from avocado.utils import archive
->
-> +progress_log =3D logging.getLogger("progress")
->
->  class LinuxSSH(Test):
->
-> @@ -149,6 +150,7 @@ class LinuxSSH(Test):
->          stdout, _ =3D self.ssh_command(cmd)
->          for line in stdout:
->              if exp in line:
-> +                progress_log.info('Check successful for "%s"', cmd)
->                  break
->          else:
->              self.fail('"%s" output does not contain "%s"' % (cmd, exp))
-> ---
->
-> You could run tests with:
->
->   $ ./tests/venv/bin/avocado --show=3Dconsole,progress run
---store-logging-stream progress -- tests/acceptance/linux_ssh_mips_malta.py
->
-> And at the same time:
->
->   $ tail -f ~/avocado/job-results/latest/progress.INFO
->   17:20:44 INFO | Check successful for "uname -a"
->   17:20:44 INFO | Check successful for "cat /proc/cpuinfo"
->   ...
->
-> I hope this helps somehow.
->
-> Best regards,
-> - Cleber.
->
+>  tests/qemu-iotests/149        |  3 +-
+>  tests/qemu-iotests/194        |  3 +-
+>  tests/qemu-iotests/202        |  3 +-
+>  tests/qemu-iotests/203        |  3 +-
+>  tests/qemu-iotests/206        |  2 +-
+>  tests/qemu-iotests/207        |  2 +-
+>  tests/qemu-iotests/208        |  2 +-
+>  tests/qemu-iotests/209        |  2 +-
+>  tests/qemu-iotests/210        |  2 +-
+>  tests/qemu-iotests/211        |  2 +-
+>  tests/qemu-iotests/212        |  2 +-
+>  tests/qemu-iotests/213        |  2 +-
+>  tests/qemu-iotests/216        |  3 +-
+>  tests/qemu-iotests/218        |  2 +-
+>  tests/qemu-iotests/219        |  2 +-
+>  tests/qemu-iotests/222        |  5 ++-
+>  tests/qemu-iotests/224        |  3 +-
+>  tests/qemu-iotests/228        |  3 +-
+>  tests/qemu-iotests/234        |  3 +-
+>  tests/qemu-iotests/235        |  4 +--
+>  tests/qemu-iotests/236        |  2 +-
+>  tests/qemu-iotests/237        |  2 +-
+>  tests/qemu-iotests/238        |  2 ++
+>  tests/qemu-iotests/242        |  2 +-
+>  tests/qemu-iotests/246        |  2 +-
+>  tests/qemu-iotests/248        |  2 +-
+>  tests/qemu-iotests/254        |  2 +-
+>  tests/qemu-iotests/255        |  2 +-
+>  tests/qemu-iotests/256        |  2 +-
+>  tests/qemu-iotests/262        |  3 +-
+>  tests/qemu-iotests/iotests.py | 58 +++++++++++++++++++++++------------
+>  31 files changed, 71 insertions(+), 61 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
+> index 4f363f295f..9fa97966c5 100755
+> --- a/tests/qemu-iotests/149
+> +++ b/tests/qemu-iotests/149
+> @@ -383,8 +383,7 @@ def test_once(config, qemu_img=False):
+>  
+>  
+>  # Obviously we only work with the luks image format
+> -iotests.verify_image_format(supported_fmts=['luks'])
+> -iotests.verify_platform()
+> +iotests.script_initialize(supported_fmts=['luks'])
+>  
+>  # We need sudo in order to run cryptsetup to create
+>  # dm-crypt devices. This is safe to use on any
+> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+> index d746ab1e21..c8aeb6d0e4 100755
+> --- a/tests/qemu-iotests/194
+> +++ b/tests/qemu-iotests/194
+> @@ -21,8 +21,7 @@
+>  
+>  import iotests
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2', 'qed', 'raw'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2', 'qed', 'raw'])
+>  
+>  with iotests.FilePath('source.img') as source_img_path, \
+>       iotests.FilePath('dest.img') as dest_img_path, \
+> diff --git a/tests/qemu-iotests/202 b/tests/qemu-iotests/202
+> index 581ca34d79..1271ac9459 100755
+> --- a/tests/qemu-iotests/202
+> +++ b/tests/qemu-iotests/202
+> @@ -24,8 +24,7 @@
+>  
+>  import iotests
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  with iotests.FilePath('disk0.img') as disk0_img_path, \
+>       iotests.FilePath('disk1.img') as disk1_img_path, \
+> diff --git a/tests/qemu-iotests/203 b/tests/qemu-iotests/203
+> index 4874a1a0d8..c40fe231ea 100755
+> --- a/tests/qemu-iotests/203
+> +++ b/tests/qemu-iotests/203
+> @@ -24,8 +24,7 @@
+>  
+>  import iotests
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  with iotests.FilePath('disk0.img') as disk0_img_path, \
+>       iotests.FilePath('disk1.img') as disk1_img_path, \
+> diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+> index 5bb738bf23..23ff2f624b 100755
+> --- a/tests/qemu-iotests/206
+> +++ b/tests/qemu-iotests/206
+> @@ -23,7 +23,7 @@
+>  import iotests
+>  from iotests import imgfmt
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  def blockdev_create(vm, options):
+>      result = vm.qmp_log('blockdev-create',
+> diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
+> index ec8c1d06f0..ab9e3b6747 100755
+> --- a/tests/qemu-iotests/207
+> +++ b/tests/qemu-iotests/207
+> @@ -24,7 +24,7 @@ import iotests
+>  import subprocess
+>  import re
+>  
+> -iotests.verify_image_format(supported_fmts=['raw'])
+> +iotests.script_initialize(supported_fmts=['raw'])
+>  iotests.verify_protocol(supported=['ssh'])
+>  
+>  def filter_hash(qmsg):
+> diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
+> index 1e202388dc..dfce6f9fe4 100755
+> --- a/tests/qemu-iotests/208
+> +++ b/tests/qemu-iotests/208
+> @@ -22,7 +22,7 @@
+>  
+>  import iotests
+>  
+> -iotests.verify_image_format(supported_fmts=['generic'])
+> +iotests.script_initialize(supported_fmts=['generic'])
+>  
+>  with iotests.FilePath('disk.img') as disk_img_path, \
+>       iotests.FilePath('disk-snapshot.img') as disk_snapshot_img_path, \
+> diff --git a/tests/qemu-iotests/209 b/tests/qemu-iotests/209
+> index 259e991ec6..a77f884166 100755
+> --- a/tests/qemu-iotests/209
+> +++ b/tests/qemu-iotests/209
+> @@ -22,7 +22,7 @@ import iotests
+>  from iotests import qemu_img_create, qemu_io, qemu_img_verbose, qemu_nbd, \
+>                      file_path
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  disk, nbd_sock = file_path('disk', 'nbd-sock')
+>  nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
+> diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
+> index 565e3b7b9b..5a7013cd34 100755
+> --- a/tests/qemu-iotests/210
+> +++ b/tests/qemu-iotests/210
+> @@ -23,7 +23,7 @@
+>  import iotests
+>  from iotests import imgfmt
+>  
+> -iotests.verify_image_format(supported_fmts=['luks'])
+> +iotests.script_initialize(supported_fmts=['luks'])
+>  iotests.verify_protocol(supported=['file'])
+>  
+>  def blockdev_create(vm, options):
+> diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
+> index 6afc894f76..4d6aac497f 100755
+> --- a/tests/qemu-iotests/211
+> +++ b/tests/qemu-iotests/211
+> @@ -23,7 +23,7 @@
+>  import iotests
+>  from iotests import imgfmt
+>  
+> -iotests.verify_image_format(supported_fmts=['vdi'])
+> +iotests.script_initialize(supported_fmts=['vdi'])
+>  iotests.verify_protocol(supported=['file'])
+>  
+>  def blockdev_create(vm, options):
+> diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
+> index 42b74f208b..ec35bceb11 100755
+> --- a/tests/qemu-iotests/212
+> +++ b/tests/qemu-iotests/212
+> @@ -23,7 +23,7 @@
+>  import iotests
+>  from iotests import imgfmt
+>  
+> -iotests.verify_image_format(supported_fmts=['parallels'])
+> +iotests.script_initialize(supported_fmts=['parallels'])
+>  iotests.verify_protocol(supported=['file'])
+>  
+>  def blockdev_create(vm, options):
+> diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
+> index 5604f3cebb..3d2c024375 100755
+> --- a/tests/qemu-iotests/213
+> +++ b/tests/qemu-iotests/213
+> @@ -23,7 +23,7 @@
+>  import iotests
+>  from iotests import imgfmt
+>  
+> -iotests.verify_image_format(supported_fmts=['vhdx'])
+> +iotests.script_initialize(supported_fmts=['vhdx'])
+>  iotests.verify_protocol(supported=['file'])
+>  
+>  def blockdev_create(vm, options):
+> diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
+> index 3c0ae54b44..7574bcc09f 100755
+> --- a/tests/qemu-iotests/216
+> +++ b/tests/qemu-iotests/216
+> @@ -23,8 +23,7 @@ import iotests
+>  from iotests import log, qemu_img, qemu_io_silent
+>  
+>  # Need backing file support
+> -iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk'])
+>  
+>  log('')
+>  log('=== Copy-on-read across nodes ===')
+> diff --git a/tests/qemu-iotests/218 b/tests/qemu-iotests/218
+> index 2554d84581..e18e31076b 100755
+> --- a/tests/qemu-iotests/218
+> +++ b/tests/qemu-iotests/218
+> @@ -29,7 +29,7 @@
+>  import iotests
+>  from iotests import log, qemu_img, qemu_io_silent
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2', 'raw'])
+> +iotests.script_initialize(supported_fmts=['qcow2', 'raw'])
+>  
+>  
+>  # Launches the VM, adds two null-co nodes (source and target), and
+> diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
+> index e0c51662c0..9ae27cb04e 100755
+> --- a/tests/qemu-iotests/219
+> +++ b/tests/qemu-iotests/219
+> @@ -21,7 +21,7 @@
+>  
+>  import iotests
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  img_size = 4 * 1024 * 1024
+>  
+> diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
+> index 0ead56d574..6788979ed3 100644
+> --- a/tests/qemu-iotests/222
+> +++ b/tests/qemu-iotests/222
+> @@ -24,9 +24,8 @@
+>  import iotests
+>  from iotests import log, qemu_img, qemu_io, qemu_io_silent
+>  
+> -iotests.verify_platform(['linux'])
+> -iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk',
+> -                                            'vhdx', 'raw'])
+> +iotests.script_initialize(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk',
+> +                                          'vhdx', 'raw'])
+>  
+>  patterns = [("0x5d", "0",         "64k"),
+>              ("0xd5", "1M",        "64k"),
+> diff --git a/tests/qemu-iotests/224 b/tests/qemu-iotests/224
+> index b4dfaa639f..d0d0c44104 100755
+> --- a/tests/qemu-iotests/224
+> +++ b/tests/qemu-iotests/224
+> @@ -26,8 +26,7 @@ from iotests import log, qemu_img, qemu_io_silent, filter_qmp_testfiles, \
+>  import json
+>  
+>  # Need backing file support (for arbitrary backing formats)
+> -iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2', 'qcow', 'qed'])
+>  
+>  
+>  # There are two variations of this test:
+> diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
+> index 9a50afd205..9785868ab3 100755
+> --- a/tests/qemu-iotests/228
+> +++ b/tests/qemu-iotests/228
+> @@ -25,8 +25,7 @@ from iotests import log, qemu_img, filter_testfiles, filter_imgfmt, \
+>          filter_qmp_testfiles, filter_qmp_imgfmt
+>  
+>  # Need backing file and change-backing-file support
+> -iotests.verify_image_format(supported_fmts=['qcow2', 'qed'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2', 'qed'])
+>  
+>  
+>  def log_node_info(node):
+> diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
+> index 34c818c485..3de6ab2341 100755
+> --- a/tests/qemu-iotests/234
+> +++ b/tests/qemu-iotests/234
+> @@ -23,8 +23,7 @@
+>  import iotests
+>  import os
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  with iotests.FilePath('img') as img_path, \
+>       iotests.FilePath('backing') as backing_path, \
+> diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+> index fedd111fd4..9e88c65b93 100755
+> --- a/tests/qemu-iotests/235
+> +++ b/tests/qemu-iotests/235
+> @@ -27,6 +27,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
+>  
+>  from qemu.machine import QEMUMachine
+>  
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+> +
+>  # Note:
+>  # This test was added to check that mirror dead-lock was fixed (see previous
+>  # commit before this test addition).
+> @@ -40,8 +42,6 @@ from qemu.machine import QEMUMachine
+>  
+>  size = 1 * 1024 * 1024 * 1024
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> -
+>  disk = file_path('disk')
+>  
+>  # prepare source image
+> diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
+> index 79a6381f8e..b88779eb0b 100755
+> --- a/tests/qemu-iotests/236
+> +++ b/tests/qemu-iotests/236
+> @@ -22,7 +22,7 @@
+>  import iotests
+>  from iotests import log
+>  
+> -iotests.verify_image_format(supported_fmts=['generic'])
+> +iotests.script_initialize(supported_fmts=['generic'])
+>  size = 64 * 1024 * 1024
+>  granularity = 64 * 1024
+>  
+> diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
+> index 06897f8c87..3758ace0bc 100755
+> --- a/tests/qemu-iotests/237
+> +++ b/tests/qemu-iotests/237
+> @@ -24,7 +24,7 @@ import math
+>  import iotests
+>  from iotests import imgfmt
+>  
+> -iotests.verify_image_format(supported_fmts=['vmdk'])
+> +iotests.script_initialize(supported_fmts=['vmdk'])
+>  
+>  def blockdev_create(vm, options):
+>      result = vm.qmp_log('blockdev-create', job_id='job0', options=options,
+> diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+> index e5ac2b2ff8..6e27fb40c2 100755
+> --- a/tests/qemu-iotests/238
+> +++ b/tests/qemu-iotests/238
+> @@ -23,6 +23,8 @@ import os
+>  import iotests
+>  from iotests import log
+>  
+> +iotests.script_initialize()
 
-Thanks, Cleber, for your detailed response. I'll use whatever is available,
-along the lines you highligted. I will most likely gradually modify this
-test until I find the sweet spot where I am satisfied with test behavior
-and reporting, but also everything fits well into Avocado framework.
 
-Thanks again, both to you and Eduardo,
-Aleksandar
+This restrict test 208 to the Linux platform, is this OK?
 
-> > Grateful in advance,
-> > Aleksandar
-> >
-> > > > Cleber, is there something already available in the Avocado API
-> > > > that would help us report more fine-grained results inside each
-> > > > test case?
-> > > >
-> > >
-> > > Thanks, that would be a better way of expressing my question.
-> > >
-> > > >
-> > > > >
-> > > > > Thanks in advance,
-> > > > > Aleksandar
-> > > > >
-> > > > > > Aleksandar Markovic (2):
-> > > > > >   tests/acceptance: Refactor and improve reporting in
-> > > > > >     linux_ssh_mips_malta.py
-> > > > > >   tests/acceptance: Add new test cases in
-linux_ssh_mips_malta.py
-> > > > > >
-> > > > > >  tests/acceptance/linux_ssh_mips_malta.py | 81
-> > > > > ++++++++++++++++++++++++++------
-> > > > > >  1 file changed, 66 insertions(+), 15 deletions(-)
-> > > > > >
-> > > > > > --
-> > > > > > 2.7.4
-> > > > > >
-> > > > > >
-> > > >
-> > > > --
-> > > > Eduardo
+The rest looks good.
+
+> +
+>  virtio_scsi_device = iotests.get_virtio_scsi_device()
+>  
+>  vm = iotests.VM()
+> diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+> index c176e92da6..7c2685b4cc 100755
+> --- a/tests/qemu-iotests/242
+> +++ b/tests/qemu-iotests/242
+> @@ -24,7 +24,7 @@ import struct
+>  from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
+>      file_path, img_info_log, log, filter_qemu_io
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  disk = file_path('disk')
+>  chunk = 256 * 1024
+> diff --git a/tests/qemu-iotests/246 b/tests/qemu-iotests/246
+> index b0997a392f..1d7747d62d 100755
+> --- a/tests/qemu-iotests/246
+> +++ b/tests/qemu-iotests/246
+> @@ -22,7 +22,7 @@
+>  import iotests
+>  from iotests import log
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  size = 64 * 1024 * 1024 * 1024
+>  gran_small = 32 * 1024
+>  gran_large = 128 * 1024
+> diff --git a/tests/qemu-iotests/248 b/tests/qemu-iotests/248
+> index f26b4bb2aa..781b21b227 100755
+> --- a/tests/qemu-iotests/248
+> +++ b/tests/qemu-iotests/248
+> @@ -21,7 +21,7 @@
+>  import iotests
+>  from iotests import qemu_img_create, qemu_io, file_path, filter_qmp_testfiles
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  source, target = file_path('source', 'target')
+>  size = 5 * 1024 * 1024
+> diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
+> index 09584f3f7d..43b40f4f71 100755
+> --- a/tests/qemu-iotests/254
+> +++ b/tests/qemu-iotests/254
+> @@ -21,7 +21,7 @@
+>  import iotests
+>  from iotests import qemu_img_create, file_path, log
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  disk, top = file_path('disk', 'top')
+>  size = 1024 * 1024
+> diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
+> index 3632d507d0..ff16402268 100755
+> --- a/tests/qemu-iotests/255
+> +++ b/tests/qemu-iotests/255
+> @@ -23,7 +23,7 @@
+>  import iotests
+>  from iotests import imgfmt
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  def blockdev_create(vm, options):
+>      result = vm.qmp_log('blockdev-create',
+> diff --git a/tests/qemu-iotests/256 b/tests/qemu-iotests/256
+> index c594a43205..d2f9212e5a 100755
+> --- a/tests/qemu-iotests/256
+> +++ b/tests/qemu-iotests/256
+> @@ -23,7 +23,7 @@ import os
+>  import iotests
+>  from iotests import log
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  size = 64 * 1024 * 1024
+>  
+>  with iotests.FilePath('img0') as img0_path, \
+> diff --git a/tests/qemu-iotests/262 b/tests/qemu-iotests/262
+> index 398f63587e..f0e9d0f8ac 100755
+> --- a/tests/qemu-iotests/262
+> +++ b/tests/qemu-iotests/262
+> @@ -23,8 +23,7 @@
+>  import iotests
+>  import os
+>  
+> -iotests.verify_image_format(supported_fmts=['qcow2'])
+> -iotests.verify_platform(['linux'])
+> +iotests.script_initialize(supported_fmts=['qcow2'])
+>  
+>  with iotests.FilePath('img') as img_path, \
+>       iotests.FilePath('mig_fifo') as fifo, \
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index 84438e837c..2970d7304a 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -895,7 +895,20 @@ def skip_if_unsupported(required_formats=[], read_only=False):
+>          return func_wrapper
+>      return skip_test_decorator
+>  
+> -def execute_unittest(output, verbosity, debug):
+> +def execute_unittest(debug=False):
+> +    """Executes unittests within the calling module."""
+> +
+> +    verbosity = 2 if debug else 1
+> +
+> +    if debug:
+> +        output = sys.stdout
+> +    elif sys.version_info.major >= 3:
+> +        output = io.StringIO()
+> +    else:
+> +        # io.StringIO is for unicode strings, which is not what
+> +        # 2.x's test runner emits.
+> +        output = io.BytesIO()
+> +
+>      runner = unittest.TextTestRunner(stream=output, descriptions=True,
+>                                       verbosity=verbosity)
+>      try:
+> @@ -903,14 +916,19 @@ def execute_unittest(output, verbosity, debug):
+>          # exception
+>          unittest.main(testRunner=runner)
+>      finally:
+> +        # We need to filter out the time taken from the output so that
+> +        # qemu-iotest can reliably diff the results against master output.
+>          if not debug:
+>              sys.stderr.write(re.sub(r'Ran (\d+) tests? in [\d.]+s',
+>                                      r'Ran \1 tests', output.getvalue()))
+>  
+> -def execute_test(test_function=None,
+> -                 supported_fmts=[], supported_oses=['linux'],
+> -                 supported_cache_modes=[], unsupported_fmts=[]):
+> -    """Run either unittest or script-style tests."""
+> +def execute_setup_common(supported_fmts=[],
+> +                         supported_oses=['linux'],
+> +                         supported_cache_modes=[],
+> +                         unsupported_fmts=[]):
+> +    """
+> +    Perform necessary setup for either script-style or unittest-style tests.
+> +    """
+>  
+>      # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
+>      # indicate that we're not being run via "check". There may be
+> @@ -920,37 +938,37 @@ def execute_test(test_function=None,
+>          sys.stderr.write('Please run this test via the "check" script\n')
+>          sys.exit(os.EX_USAGE)
+>  
+> -    debug = '-d' in sys.argv
+> -    verbosity = 1
+>      verify_image_format(supported_fmts, unsupported_fmts)
+>      verify_platform(supported_oses)
+>      verify_cache_mode(supported_cache_modes)
+>  
+> +    debug = '-d' in sys.argv
+>      if debug:
+> -        output = sys.stdout
+> -        verbosity = 2
+>          sys.argv.remove('-d')
+> -    else:
+> -        # We need to filter out the time taken from the output so that
+> -        # qemu-iotest can reliably diff the results against master output.
+> -        if sys.version_info.major >= 3:
+> -            output = io.StringIO()
+> -        else:
+> -            # io.StringIO is for unicode strings, which is not what
+> -            # 2.x's test runner emits.
+> -            output = io.BytesIO()
+> -
+>      logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
+>  
+> +    return debug
+> +
+> +def execute_test(test_function=None, *args, **kwargs):
+> +    """Run either unittest or script-style tests."""
+> +
+> +    debug = execute_setup_common(*args, **kwargs)
+>      if not test_function:
+> -        execute_unittest(output, verbosity, debug)
+> +        execute_unittest(debug)
+>      else:
+>          test_function()
+>  
+> +# This is called from script-style iotests without a single point of entry
+> +def script_initialize(*args, **kwargs):
+> +    """Initialize script-style tests without running any tests."""
+> +    execute_setup_common(*args, **kwargs)
+> +
+> +# This is called from script-style iotests with a single point of entry
+>  def script_main(test_function, *args, **kwargs):
+>      """Run script-style tests outside of the unittest framework"""
+>      execute_test(test_function, *args, **kwargs)
+>  
+> +# This is called from unittest style iotests
+>  def main(*args, **kwargs):
+>      """Run tests using the unittest framework"""
+>      execute_test(None, *args, **kwargs)
+> 
+
