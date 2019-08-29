@@ -2,69 +2,85 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A2DC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 353FBC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:20:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F01422CED
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:17:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Z6QfzmCL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F01422CED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 0D0602054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:20:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0602054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3946-0002AA-7n
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 21:17:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45409)
+	id 1i396e-0003WN-0u
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 21:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i391i-0000zy-Mz
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:15:04 -0400
+ (envelope-from <peterx@redhat.com>) id 1i395h-00035A-Us
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i391h-0000ux-3m
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:15:02 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:55759)
+ (envelope-from <peterx@redhat.com>) id 1i395f-00021Y-MQ
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:19:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58048)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i391f-0000u3-Ol; Wed, 28 Aug 2019 21:15:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46Jl5V597nz9sML; Thu, 29 Aug 2019 11:14:54 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1567041294;
- bh=NkcIJMIORNQSjsG7YZnmxFjgoeQpc21HXdXc0FAg2pw=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Z6QfzmCLEGIzEpIsOT7shIiPVZB6duFI68+a+vyTueCVuS3FIt9UDsZGn2+T7+fHk
- bhNtMAz8jpUw80TeokI7kbn9E0ge2yKAGUPWNMiGa6dhURpXwq9A/MNNDkIiswXRk1
- HhbLlcUf8IvQO9r3at9xkVhvsg72ctRQtmQ6XK9U=
-Date: Thu, 29 Aug 2019 10:00:22 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190829000022.GD16342@umbus.fritz.box>
-References: <20190827065650.107319-1-aik@ozlabs.ru>
- <20190828004634.GB16825@umbus.fritz.box>
- <20190828021237.GD16825@umbus.fritz.box>
- <2ee9df47-1536-f2e3-9892-b4868ec359c2@ozlabs.ru>
- <20190828055740.GG16825@umbus.fritz.box>
- <20190828115014.0364baa1@bahia.lab.toulouse-stg.fr.ibm.com>
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i395e-0001za-Sk
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:19:07 -0400
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AD35EC0568FD
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 01:19:03 +0000 (UTC)
+Received: by mail-pf1-f197.google.com with SMTP id q67so1134356pfc.10
+ for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 18:19:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=TFebKm8t2JEA1ZtygUlY9r6izUXMjEJUGbwi1oAD0Ig=;
+ b=l3av9e7fkNeimj6cLbSuGnooueqqltXaoKIM6q9qv7eTbxq/4/vP5DUGXujFYkDHgh
+ OEXhSqeBsI+VAsA+G0vni1+Uauoj2RLPqhFc42Uj2bMMkZ9zeqcJ8MsF+vgoDr6htaWU
+ 99DydyCsMjJcK1iPe0cn+4Wzqf+deLwyRvXB3ITwZwYj/PwExJdnI+W4kGxM+9oeqLcI
+ gTbt5OiZ/MzWqpZ3KwaFNYqYgs/uiQPnanR2eTVCUp2bgsBtZPBW7WMdp+loBcCoQKe1
+ JthETCeb3o8u4XRlAsBtcsrAOeU588NDHGtaRHAs4uSe73uOCN6AZqySSfY3+kRqHqte
+ 6PHA==
+X-Gm-Message-State: APjAAAXdOboV6+YSA3lBuG9XUhVHAlINr8pqk1U5Khc/nhcZw8NQaV2y
+ i8aKEDG0Ya1lHElA+jG9/gXCDUZV5SSRvSGD3twSwUkP3cC+cv/5q/ofLUOQhdzuYdaG9psVomC
+ lGP2URV3Iv7J7hMU=
+X-Received: by 2002:a17:902:be12:: with SMTP id
+ r18mr6928027pls.341.1567041542572; 
+ Wed, 28 Aug 2019 18:19:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzzS9RAFWmhbIda/zU6hxr3RX4qfcHz0f7tETXcWrAxGL6hOYJ4qEoXhU16PrpbhheMWENcxg==
+X-Received: by 2002:a17:902:be12:: with SMTP id
+ r18mr6928003pls.341.1567041542385; 
+ Wed, 28 Aug 2019 18:19:02 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id e6sm761725pfl.37.2019.08.28.18.18.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Aug 2019 18:19:01 -0700 (PDT)
+Date: Thu, 29 Aug 2019 09:18:51 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Message-ID: <20190829011850.GC8729@xz-x1>
+References: <20190812074531.28970-1-peterx@redhat.com>
+ <319f1d6a-ef55-cc1b-98d6-f99b365bd88a@redhat.com>
+ <e128decc-8b40-160e-fe8e-673682530750@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UfEAyuTBtIjiZzX6"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190828115014.0364baa1@bahia.lab.toulouse-stg.fr.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [Qemu-ppc] [GIT PULL for qemu-pseries] spapr:
- Render full FDT on ibm, client-architecture-support
+In-Reply-To: <e128decc-8b40-160e-fe8e-673682530750@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH RFC 0/4] intel_iommu: Do sanity check of
+ vfio-pci earlier
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,104 +92,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Bandan Das <bsd@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Aug 28, 2019 at 02:59:45PM +0200, Auger Eric wrote:
+> Hi Peter,
 
---UfEAyuTBtIjiZzX6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi, Eric,
 
-On Wed, Aug 28, 2019 at 11:50:14AM +0200, Greg Kurz wrote:
-> On Wed, 28 Aug 2019 15:57:40 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Aug 28, 2019 at 01:27:35PM +1000, Alexey Kardashevskiy wrote:
-> > >=20
-> > >=20
-> > > On 28/08/2019 12:12, David Gibson wrote:
-> > > > On Wed, Aug 28, 2019 at 10:46:34AM +1000, David Gibson wrote:
-> > > > > On Tue, Aug 27, 2019 at 04:56:50PM +1000, Alexey Kardashevskiy wr=
-ote:
-> > > > > > The following changes since commit d6bb8b27204eaa58f1da948b6545=
-4e3a598ab2a4:
-> > > > > >=20
-> > > > > >    pseries: Update SLOF firmware image (2019-08-27 16:47:04 +10=
-00)
-> > > > > >=20
-> > > > > > are available in the Git repository at:
-> > > > > >=20
-> > > > > >    git@github.com:aik/qemu.git tags/qemu-slof-20190827
-> > > > > >=20
-> > > > > > for you to fetch changes up to da9960a5aaa25d27c9798c3d94c7b4c2=
-d8af31ac:
-> > > > > >=20
-> > > > > >    spapr: Render full FDT on ibm,client-architecture-support (2=
-019-08-27 16:47:46 +1000)
-> > > > > >=20
-> > > > > > ----------------------------------------------------------------
-> > > > > > Alexey Kardashevskiy (1):
-> > > > > >        spapr: Render full FDT on ibm,client-architecture-support
-> > > > > >=20
-> > > > > >   hw/ppc/spapr.c | 90 +++++++----------------------------------=
------------------
-> > > > > >   1 file changed, 10 insertions(+), 80 deletions(-)
-> > > > > >=20
-> > > > > >=20
-> > > > > > *** Note: this is not for master, this is for pseries
-> > > > > >=20
-> > > > >=20
-> > > > > Merged, thanks.
-> > > >=20
-> > > > Urgh.  And the qemu change is now un-merged.  Alas, as soon as we h=
-ad
-> > > > a CAS reboot for XIVE the guest didn't boot on the second attempt.
-> > > > Haven't had a chance to investigate yet.
-> > >=20
-> > > QEMU command line, guest kernel version? I'd give it a try.
-> >=20
-> > RHEL8.1 in guest and host, booting via GRUB into a XIVE capable
-> > kernel.
-> >=20
-> > I've now been able to investigate, dumping the dtb at H_UPDATE_DT
-> > time.
->=20
-> FWIW I sent a patch to do just that some times ago:
->=20
-> https://patchwork.ozlabs.org/patch/1095705/
+[...]
 
-Yeah, I know.  I didn't like adding yet another option as a permanent
-fixture.
+> In
+> [PATCH v4 2/5] memory: Add IOMMU_ATTR_HW_NESTED_PAGING IOMMU memory
+> region attribute (https://patchwork.kernel.org/patch/11109701/)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+[1]
 
---UfEAyuTBtIjiZzX6
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> [PATCH v4 3/5] hw/vfio/common: Fail on VFIO/HW nested paging detection
+> (https://patchwork.kernel.org/patch/11109697/)
+> 
+> I proposed to introduce a new IOMMU MR attribute to retrieve whether the
+> vIOMMU uses HW nested paging to integrate with VFIO. I wonder whether
+> this kind of solution would fit your need too.
+> 
+> Assuming we would rename the attribute (whose name is challenged by
+> Peter anyway) into something like IOMMU_ATTR_PHYS_MAP_MODE
+> taking the possible values: NONE, CM, HW_NESTED_PAGING. SMMUv3 would
+> return HW_NESTED_PAGING, Intel IOMMU would return CM if CM is enabled or
+> NONE in the negative. Then we could implement the check directly in VFIO
+> common.c. That way I don't think you would need the new notifiers and
+> this would satisfy both requirements?
 
------BEGIN PGP SIGNATURE-----
+IMHO it'll suffer from the similar issue we have now with
+flag_changed, because at the very beginning of x86 system boots DMAR
+is not yet enabled, the intel-iommu device is using the same mode as
+its passthrough mode so there's no IOMMU memory region at all in the
+DMA address spaces of the devices.  Hence even with patch [1] above we
+still can't really reach the get_attr() check until DMAR enabled?
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1nFZYACgkQbDjKyiDZ
-s5I45RAAxJTlY2bAg/hTIZrFT59xP4DSHL0ixXIhQL/SQgOHQGJ/i5T7QlCoI1rn
-qdy88prnH9inoQd2AzJwqseuzsPTFjbFDpTcxPnSctvBMW/x/9+zDUnGRbndqwKG
-+4qx7s5tKHcogHlLn+2iv+8DQU2PRnZU5vvkaIskptoOJc6zqgGvopH7hx2QfOEr
-AZfPuP38Fuvy4Hb39fldzeeeEGwX0czbUI+xdfui9KSxFCALmU4qD9m6kSVG4kyP
-QkDzGR7ipkW4Vf4Ikcb4/QqkXy2AoTgIduOpFZhqgNhSjgY2yYnXh84QRwW7rEIZ
-/bOegGp1so/hAM/OVdw4moxFTdUx6mzDsQXX9EdrvPuRDgwtfQA2fd4pm5JcdR5V
-KBZTvS3TKCm0aBtj2DJW3cLn+dd+1YMY03yx/Qp8PiBH1P3XOpZO8enUGTm0qaxt
-Fsk2yszM1b85/cJV8JRIrUHPgBBnXMP6c+bZEWWxgQGJcCyvibzXjuhEa5yWb1yF
-fjfSK5igapA8Gpab1/2R9NknNIySx4zpLRLr8XIQOlqu5ahDtXozTJCUbylFT+QX
-GynvReyoLszmsUvIMWzYgL2evQMgcgNXPRHADZo8Ayd+XJ4UwsQ37lbxN/3dETfi
-If+oh1mkr54BGtulWvFGCIq29Pd7KG0bW0h3jdhVhOc2RF15tew=
-=CCmY
------END PGP SIGNATURE-----
+Maybe we can figure out a good way to expose IOMMU attributes rather
+than the IOMMU memory region attributes then we let vfio to pick that
+up, but I'm not very sure whether that's clean enough.
 
---UfEAyuTBtIjiZzX6--
+Thanks,
+
+-- 
+Peter Xu
 
