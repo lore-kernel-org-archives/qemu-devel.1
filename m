@@ -2,91 +2,89 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD25CC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D14D7C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:09:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94C8F2173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:06:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94C8F2173E
+	by mail.kernel.org (Postfix) with ESMTPS id A834A20828
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:09:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A834A20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Oo7-0000CI-Lm
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 14:06:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41225)
+	id 1i3Or7-0002Yf-Oq
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 14:09:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i3Omz-0007vT-A7
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:04:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1i3OqE-0001Ub-1s
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i3Omy-0006Vb-2R
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:04:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37280)
+ (envelope-from <philmd@redhat.com>) id 1i3OqB-0000mL-A8
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:08:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40330)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i3Omx-0006UW-R0
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:04:51 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i3OqB-0000lL-4H
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:08:11 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A2141C0546F2
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 18:04:50 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id n6so861530wrw.14
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 11:04:50 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4A856882EA
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 18:08:10 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id o5so2489574wrg.15
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 11:08:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=bP7ESnZ1RAt0LXK6eH9zKAf51XwW+XJZ3/F1B9BOJw0=;
- b=s5d60tqD440wysF5Ktk0TRzgFwNOFq5TJu/kHQCdUW0qBIBoNBz7gY//h+Ww1vLcin
- aWkSJs676+wTKMQadFd9QpOqczNIOtsZELQGymY6S8Jqw3nk+Kk7kLn4kkn+IRkr4rdg
- CgIxyMQ7ahMqKJVN9lbyHuCh1jiVSrblKJEPOPdV5/g9Lq5vVNgQbkH9YHcfixJdV+gK
- A0Vlmt9FatOtzKLQRkFDVpYuWoZkHbnN14bDIFiVHTAhQ31Z/wFmBosjdrz488A7dYin
- RZJ6BGBLpb32lsY3dqTMGFG4k58UoBTW7fnfNh1xuK91QYk4Y1rA6dDO/YbUAP8em8lN
- VOyg==
-X-Gm-Message-State: APjAAAXj4/A945vpSDNhVQ5AsbrOCoWA6ILwFFr5EO3IaNVoUsblmHsE
- jwtlt/io7bnQnDKr617Dmo+jCiIoBbRjYZSYAAXhV2ci6DBavjoVb87+xm/S8k7YrwULKtcJdYG
- JxMfmnyCsTuGeHPs=
-X-Received: by 2002:a05:6000:1186:: with SMTP id
- g6mr13880790wrx.17.1567101889464; 
- Thu, 29 Aug 2019 11:04:49 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxPwYJMAFR4A/N/cCiVDp1Nu2yqB5hfc4qi6/dY9+9Yx9MbJS8QHQbcFUi4NaZEVHWbCPKibA==
-X-Received: by 2002:a05:6000:1186:: with SMTP id
- g6mr13880761wrx.17.1567101889192; 
- Thu, 29 Aug 2019 11:04:49 -0700 (PDT)
+ bh=CQWLlOCEAXNM1XHQS+wuXw28cMfRqTy0sIlKvCp7+aE=;
+ b=cxOLjxXv6OUfx7LwZISbWfeJoNN8jddQaR2DOQhWh0z0D+nFaBS7oum5UVP2Y8vAaU
+ WfIfgc9uWQmssKIlWhmCv9+R2hreddR2dd7jQeNFGa8tZ62R7ZHxo1JFjCtKA/xMvuIb
+ aIk8gAPv1faQTYZkWwdyxPWsfw8v9iu3nDNt8iwUDN29YPe/E1j9nqsPxvBhdUnRg+tL
+ cveBQ3A++hVIKon9kQ8envigDOTi8r2ybeqnokyI37KTPadV1VtHAeuh1atKYwcXhwh+
+ gPZlGMuVk2tX9frbaei7wGkuTTmZTxKB+Y7zGCQe8ozm35DBz3J4UCnXWww8tYrN01VQ
+ C8mA==
+X-Gm-Message-State: APjAAAVMppaSWaQBJY39ed/UrfE+0vUND0I1NzDdfuA6Sm+nqF8jnFXz
+ PAjDwUzJsbFq+90bHFaASzl+6iwe6NhaiK7MANWLDH/PrN/ZL/VSv75H119mkLxUvarNtRHT6ib
+ bwo4vb4YNLS6/EiM=
+X-Received: by 2002:a7b:cb11:: with SMTP id u17mr13012168wmj.17.1567102088969; 
+ Thu, 29 Aug 2019 11:08:08 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwPoFTc6V/kkhWN1RnUYXwc8BEbyAO5I/RY2iCp7AW8xf/qK39vARP2+qykaugV8O1thUcK4Q==
+X-Received: by 2002:a7b:cb11:: with SMTP id u17mr13012138wmj.17.1567102088692; 
+ Thu, 29 Aug 2019 11:08:08 -0700 (PDT)
 Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id s1sm7208059wrg.80.2019.08.29.11.04.48
+ by smtp.gmail.com with ESMTPSA id j17sm2207525wru.24.2019.08.29.11.08.07
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 29 Aug 2019 11:04:48 -0700 (PDT)
+ Thu, 29 Aug 2019 11:08:07 -0700 (PDT)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190823135811.13883-1-philmd@redhat.com>
- <20190823135811.13883-2-philmd@redhat.com>
- <64061664-f79f-b074-8fec-fea24594d5df@linaro.org>
+ <20190823135811.13883-4-philmd@redhat.com>
+ <402a2532-a61a-18cc-2153-73a0447bad7d@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <427b3a07-b428-fca4-a6ed-ba0d663d6a83@redhat.com>
-Date: Thu, 29 Aug 2019 20:04:47 +0200
+Message-ID: <26cc14fa-977b-edea-8879-22c84dc01c96@redhat.com>
+Date: Thu, 29 Aug 2019 20:08:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <64061664-f79f-b074-8fec-fea24594d5df@linaro.org>
+In-Reply-To: <402a2532-a61a-18cc-2153-73a0447bad7d@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] target/arm: Restrict pre-ARMv7 cpus to
- TCG
+Subject: Re: [Qemu-devel] [PATCH 3/4] RFC target/arm: Do not build pre-ARMv7
+ cpus when using KVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,24 +102,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/23/19 7:04 PM, Richard Henderson wrote:
+On 8/23/19 7:12 PM, Richard Henderson wrote:
 > On 8/23/19 6:58 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> @@ -2535,6 +2544,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
->>      { .name =3D "arm1176",     .initfn =3D arm1176_initfn },
->>      { .name =3D "arm11mpcore", .initfn =3D arm11mpcore_initfn },
->>      { .name =3D "cortex-m0",   .initfn =3D cortex_m0_initfn,
->> +#endif
->>                               .class_init =3D arm_v7m_class_init },
->>      { .name =3D "cortex-m3",   .initfn =3D cortex_m3_initfn,
->>                               .class_init =3D arm_v7m_class_init },
+>> A KVM-only build won't be able to run pre-ARMv7 cpus, disable them.
+>>
+>> If KVM is not enabled, they are enabled by default.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>> Sadly this does not work with --enable-tcg --enable-kvm dual config.
+>> ---
 >=20
-> Ifdef is misplaced.  This shouldn't even compile without CONFIG_TCG.
+> Huh?  --enable-kvm does not imply --disable-tcg.
 
-What a shame... I hope I messed this due to a failed rebase...
+That would have made my life easier ;)
 
-> Also, m-profile shouldn't work with kvm either, so I think the endif sh=
-ould go
-> below cortex-m33.
+>> +config ARM_V4
+>> +    default y
+>> +    depends on !KVM
+>> +    bool
+>=20
+> This should surely be "depends on TCG".
 
-Obviously.
+I restricted this to KVM because this is the only one I know and got
+confirmation by Peter. I don't know about other accelerators but I'll
+happily take your suggestion!
+
+Thanks,
+
+Phil.
 
