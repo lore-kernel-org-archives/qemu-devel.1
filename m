@@ -2,141 +2,90 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6247BC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8324BC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:21:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38BF62173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:19:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38BF62173E
+	by mail.kernel.org (Postfix) with ESMTPS id 572DB2189D
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:21:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572DB2189D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3O5D-0004sc-Dx
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:19:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54948)
+	id 1i3O78-0005zD-D7
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:21:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56239)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i3O4P-0004Gm-Qv
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:18:50 -0400
+ (envelope-from <philmd@redhat.com>) id 1i3O6O-0005X5-Uk
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i3O4N-0005qw-TJ
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:18:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54660)
+ (envelope-from <philmd@redhat.com>) id 1i3O6N-00081Z-Da
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:20:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54942)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i3O4L-0005nn-9y; Thu, 29 Aug 2019 13:18:45 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i3O6N-0007zl-09
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:20:51 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8E674821CB;
- Thu, 29 Aug 2019 17:18:44 +0000 (UTC)
-Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AAF81001944;
- Thu, 29 Aug 2019 17:18:38 +0000 (UTC)
-To: Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
-References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
- <20190814100735.24234-3-vsementsov@virtuozzo.com>
- <3eded188-0161-d494-194c-9d67da644eb1@redhat.com> <m1mufsdktq.fsf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c9c2386e-e27e-ac63-235f-ee996dd60446@redhat.com>
-Date: Thu, 29 Aug 2019 13:18:37 -0400
+ by mx1.redhat.com (Postfix) with ESMTPS id C7C2E3B738
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 17:20:49 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id j10so2430137wrb.16
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 10:20:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bRBZ3j2RI5D5bXWoXNrHk/Z2JGviGl2zXOBeibQPK6k=;
+ b=ibt1qFrdoKl89ph7BqzMzVSWbtlbG4B9iUsRkqcSTVen1PQpR9JyKbfxRsce6f7tqc
+ DiApuGpO3Y7n1OLqHLwcdK1Jup5d7dILvQRQ2ooSLP5+AcejSZP8kRMFxnoA47UelYOE
+ NPBKby+1VYZEI0mFXQiCISszyOlokJj2R6bHKRNdHVXLelA7B2ddtu2hN53SycT6moA3
+ 9psF9mr2a7MWnrpH5w2/2tGFCpigHFcJBqHxaeWRR6upOZewDKTOShxbcQjNa6dACazM
+ vpjPzWZP+QippCrAJ8qJ5/fwz5zgA5dxAbJUnnmdri3jRVNChDHAF6WKSpeABi3kFZ/z
+ STRA==
+X-Gm-Message-State: APjAAAUr3Dr9+PnFfBbZtdoX6xwwkpuFq3pZcxnRjGKhwpt57CAPZPlZ
+ CRaxyLyFMypMz/G7Dsxk1ts+Dp6cZ7D1rdiGtpbYok4sQ7fAiUdhBcDnI4YCdyMLEQOILAaIEoS
+ bi5N3e7wkQJ0nyEU=
+X-Received: by 2002:a05:6000:1187:: with SMTP id
+ g7mr10761212wrx.192.1567099248577; 
+ Thu, 29 Aug 2019 10:20:48 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwFp7rHqe1shogijOMbrzzR/Jbc3p8of0piDh+S417nsuS/RlAwRFGByVnKcDIpAg9xsA9aTw==
+X-Received: by 2002:a05:6000:1187:: with SMTP id
+ g7mr10761187wrx.192.1567099248347; 
+ Thu, 29 Aug 2019 10:20:48 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id q13sm4203952wmq.30.2019.08.29.10.20.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 29 Aug 2019 10:20:47 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190828231651.17176-1-richard.henderson@linaro.org>
+ <20190828231651.17176-5-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <dc2d396f-d1ac-1c45-0bf8-16acc7421647@redhat.com>
+Date: Thu, 29 Aug 2019 19:20:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <m1mufsdktq.fsf@redhat.com>
+In-Reply-To: <20190828231651.17176-5-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 29 Aug 2019 17:18:44 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qapi: deprecate implicit
- filters
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] exec: Factor out
+ cpu_watchpoint_address_matches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,69 +97,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, libvir-list@redhat.com, armbru@redhat.com,
- mreitz@redhat.com, abologna@redhat.com, den@openvz.org
+Cc: david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 8/29/19 1:16 AM, Richard Henderson wrote:
+> We want to move the check for watchpoints from
+> memory_region_section_get_iotlb to tlb_set_page_with_attrs.
+> Isolate the loop over watchpoints to an exported function.
+>=20
+> Rename the existing cpu_watchpoint_address_matches to
+> watchpoint_address_matches, since it doesn't actually
+> have a cpu argument.
+>=20
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/hw/core/cpu.h |  7 +++++++
+>  exec.c                | 45 ++++++++++++++++++++++++++++---------------
+>  2 files changed, 36 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> index 7bd8bed5b2..c7cda65c66 100644
+> --- a/include/hw/core/cpu.h
+> +++ b/include/hw/core/cpu.h
+> @@ -1096,6 +1096,12 @@ static inline void cpu_check_watchpoint(CPUState=
+ *cpu, vaddr addr, vaddr len,
+>                                          MemTxAttrs atr, int fl, uintpt=
+r_t ra)
+>  {
+>  }
+> +
+> +static inline int cpu_watchpoint_address_matches(CPUState *cpu,
+> +                                                 vaddr addr, vaddr len=
+)
+> +{
+> +    return 0;
+> +}
+>  #else
+>  int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
+>                            int flags, CPUWatchpoint **watchpoint);
+> @@ -1105,6 +1111,7 @@ void cpu_watchpoint_remove_by_ref(CPUState *cpu, =
+CPUWatchpoint *watchpoint);
+>  void cpu_watchpoint_remove_all(CPUState *cpu, int mask);
+>  void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
+>                            MemTxAttrs attrs, int flags, uintptr_t ra);
+> +int cpu_watchpoint_address_matches(CPUState *cpu, vaddr addr, vaddr le=
+n);
+>  #endif
+> =20
+>  /**
+> diff --git a/exec.c b/exec.c
+> index cb6f5763dc..8575ce51ad 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1138,9 +1138,8 @@ void cpu_watchpoint_remove_all(CPUState *cpu, int=
+ mask)
+>   * partially or completely with the address range covered by the
+>   * access).
+>   */
+> -static inline bool cpu_watchpoint_address_matches(CPUWatchpoint *wp,
+> -                                                  vaddr addr,
+> -                                                  vaddr len)
+> +static inline bool watchpoint_address_matches(CPUWatchpoint *wp,
+> +                                              vaddr addr, vaddr len)
+>  {
+>      /* We know the lengths are non-zero, but a little caution is
+>       * required to avoid errors in the case where the range ends
+> @@ -1152,6 +1151,20 @@ static inline bool cpu_watchpoint_address_matche=
+s(CPUWatchpoint *wp,
+> =20
+>      return !(addr > wpend || wp->vaddr > addrend);
+>  }
+> +
+> +/* Return flags for watchpoints that match addr + prot.  */
+> +int cpu_watchpoint_address_matches(CPUState *cpu, vaddr addr, vaddr le=
+n)
+> +{
+> +    CPUWatchpoint *wp;
+> +    int ret =3D 0;
+> +
+> +    QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+> +        if (watchpoint_address_matches(wp, addr, TARGET_PAGE_SIZE)) {
+> +            ret |=3D wp->flags;
+> +        }
+> +    }
+> +    return ret;
+> +}
+>  #endif /* !CONFIG_USER_ONLY */
+> =20
+>  /* Add a breakpoint.  */
+> @@ -1459,7 +1472,7 @@ hwaddr memory_region_section_get_iotlb(CPUState *=
+cpu,
+>                                         target_ulong *address)
+>  {
+>      hwaddr iotlb;
+> -    CPUWatchpoint *wp;
+> +    int flags, match;
+> =20
+>      if (memory_region_is_ram(section->mr)) {
+>          /* Normal RAM.  */
+> @@ -1477,17 +1490,17 @@ hwaddr memory_region_section_get_iotlb(CPUState=
+ *cpu,
+>          iotlb +=3D xlat;
+>      }
+> =20
+> -    /* Make accesses to pages with watchpoints go via the
+> -       watchpoint trap routines.  */
+> -    QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+> -        if (cpu_watchpoint_address_matches(wp, vaddr, TARGET_PAGE_SIZE=
+)) {
+> -            /* Avoid trapping reads of pages with a write breakpoint. =
+*/
+> -            if ((prot & PAGE_WRITE) || (wp->flags & BP_MEM_READ)) {
+> -                iotlb =3D PHYS_SECTION_WATCH + paddr;
+> -                *address |=3D TLB_MMIO;
+> -                break;
+> -            }
+> -        }
+> +    /* Avoid trapping reads of pages with a write breakpoint. */
+> +    match =3D (prot & PAGE_READ ? BP_MEM_READ : 0)
+> +          | (prot & PAGE_WRITE ? BP_MEM_WRITE : 0);
 
+Isn't it cheaper to do here:
 
-On 8/29/19 11:59 AM, Christophe de Dinechin wrote:
-> 
-> John Snow writes:
-> [...]
->>
->> This might be OK to do right away, though.
->>
->> I asked Markus this not too long ago; do we want to amend the QAPI
->> schema specification to allow commands to return with "Warning" strings,
->> or "Deprecated" stings to allow in-band deprecation notices for cases
->> like these?
->>
->> example:
->>
->> { "return": {},
->>   "deprecated": True,
->>   "warning": "Omitting filter-node-name parameter is deprecated, it will
->> be required in the future"
->> }
->>
->> There's no "error" key, so this should be recognized as success by
->> compatible clients, but they'll definitely see the extra information.
->>
->> Part of my motivation is to facilitate a more aggressive deprecation of
->> legacy features by ensuring that we are able to rigorously notify users
->> through any means that they need to adjust their scripts.
-> 
-> I like this approach even if there is no consumer today. It does not
-> hurt, and it is indeed a motivation to develop consumers that care.
-> 
-> I personally find this much easier to swallow than any kind of crash on
-> deprecation, which already at the BoF seemed like a really big hammer to
-> kill a fly.
-> 
-> CC'ing Andrea as well, because we discussed recently about how to deal
-> with error checking in general, and if a new error checking framework is
-> being put in place, adding deprecation to the thinking could be a good
-> idea.
+       if (!match) {
+           return iotlb;
+       }
 
-The most convincing argument against deprecation notices like this is
-not that they won't be consumed, but that they are difficult to plumb
-through the C infrastructure.
+or
 
-Sadly, I think I have to agree there -- we can't even really model it
-like hints, because these are cases where there was no /error/ but
-instead a success -- but our error propagation doesn't work on those
-terms generally and we'd need a rather extensive audit to allow warnings.
+       if (match) {
 
-We could always fudge it with a kind of global warning log: clear the
-log at the beginning of a QMP interaction and if the log is non-empty
-when we return, amend the return with that information.
+> +    flags =3D cpu_watchpoint_address_matches(cpu, vaddr, TARGET_PAGE_S=
+IZE);
+> +    if (flags & match) {
+> +        /*
+> +         * Make accesses to pages with watchpoints go via the
+> +         * watchpoint trap routines.
+> +         */
+> +        iotlb =3D PHYS_SECTION_WATCH + paddr;
+> +        *address |=3D TLB_MMIO;
+>      }
 
-That's not really the nicest thing to do in a multi-process,
-multi-threaded, multi-stacked application, though, so...
+}
 
---js
+Regardless:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+>      return iotlb;
+> @@ -2806,7 +2819,7 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr ad=
+dr, vaddr len,
+> =20
+>      addr =3D cc->adjust_watchpoint_address(cpu, addr, len);
+>      QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+> -        if (cpu_watchpoint_address_matches(wp, addr, len)
+> +        if (watchpoint_address_matches(wp, addr, len)
+>              && (wp->flags & flags)) {
+>              if (flags =3D=3D BP_MEM_READ) {
+>                  wp->flags |=3D BP_WATCHPOINT_HIT_READ;
+>=20
 
