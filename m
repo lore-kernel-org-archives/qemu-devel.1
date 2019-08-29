@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5971EC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9C8C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:57:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2258D233FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:55:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0919D233FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:57:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TBbQj5tx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2258D233FF
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pMna4PZz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0919D233FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3JxF-0005BA-8D
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 08:55:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46598)
+	id 1i3Jzk-0006HV-7e
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 08:57:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47244)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia@oracle.com>) id 1i3Jw8-0004jg-OH
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:54:02 -0400
+ (envelope-from <yuval.shaia@oracle.com>) id 1i3Jyw-0005sj-PC
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia@oracle.com>) id 1i3Jw6-0007TW-U3
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:54:00 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:47872)
+ (envelope-from <yuval.shaia@oracle.com>) id 1i3Jyv-0001JK-FC
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:56:54 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:57838)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
- id 1i3Jw6-0007Rp-KC
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:53:58 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TCoRCB023037;
- Thu, 29 Aug 2019 12:53:55 GMT
+ id 1i3Jyv-0001I8-6U
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:56:53 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TCs9Nd039285;
+ Thu, 29 Aug 2019 12:56:51 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=date : from : to : cc
  : subject : message-id : references : mime-version : content-type :
  in-reply-to; s=corp-2019-08-05;
- bh=bwyCfowvtMT6RzDjvUbq633WnOqs7QHUt+qHPPTnCTc=;
- b=TBbQj5txF84PfTKFtq14r7/WGXI7BuCQaaLz4S144QSiI8qvV/pTiLzhzAF/ZUcd8IeG
- Cm2N51KKQb4BGkX0bZYDUMRGjbeZ6tAuAo9xtkZ/hnScw0sP3rtewVxgAIUZSsqeJgyT
- XRzj/gDK0wbsvnxvZkInzHJpUZG7wfPaYuF3/D907OWXrk5eSMpNRrcUzhUP7yE23GbG
- vXxpgEcPaeKzhvyui/qJuMeu8+K5TC/Q1JqRPDm2sVJwULqg+EW5t/KxgB0efnnkRmdo
- nepVmpcj8S4fH9tFF7S8Ne375p8gVatjYNyZiaLzAUfm2w9swDpjCYI5PeG6AwmZ75Zh FQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 2upf2eg0pt-1
+ bh=quSTKCSkODREe2s9wzr3owE5Gu9o2LdrmZywxbmWh3o=;
+ b=pMna4PZzYJSzExk/0h3F/Hf0bfH11uMSSRqxClqxlCWx5tomH/xt+5a/hZ+Nv6CvGXmH
+ lV1PyNCykR5ExVC2JfJjleWmaG+l8hlPijp9TntIzpCGbvyQJYahlTDeHXCop+SM/w5d
+ cfji7Y0voAYu6oYQN1Abi8pSS/xuWZEvlk28O+zV4che4qRIfUHkgg8q3JWdMJgYV3L+
+ NdoqbOvvS3jMLs4R6Wyxgz4bJe/ikpBS3tS/W2Xn9G8EIj5MMNAeajXgib71OGkHXFaL
+ fPzwS6LFCVaSDXHzGovOtXySTlNXyHqsR+s3T3KHdaCYZTSrzUJdtZ8yzsm+31XmzAwc pQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2upeyfg4u2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 29 Aug 2019 12:53:55 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TCrXtC008077;
- Thu, 29 Aug 2019 12:53:54 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2upc8unp2u-1
+ Thu, 29 Aug 2019 12:56:51 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TCrqIV096528;
+ Thu, 29 Aug 2019 12:56:51 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 2unvtywy46-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 29 Aug 2019 12:53:54 +0000
+ Thu, 29 Aug 2019 12:56:50 +0000
 Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7TCrIM3022396;
- Thu, 29 Aug 2019 12:53:19 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7TCuo3l021126;
+ Thu, 29 Aug 2019 12:56:50 GMT
 Received: from lap1 (/10.175.46.168) by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 29 Aug 2019 05:53:17 -0700
-Date: Thu, 29 Aug 2019 15:53:14 +0300
+ with ESMTP ; Thu, 29 Aug 2019 05:56:49 -0700
+Date: Thu, 29 Aug 2019 15:56:46 +0300
 From: Yuval Shaia <yuval.shaia@oracle.com>
 To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-Message-ID: <20190829125313.GB9911@lap1>
+Message-ID: <20190829125645.GC9911@lap1>
 References: <20190828142328.24561-1-skrtbhtngr@gmail.com>
  <20190828142328.24561-3-skrtbhtngr@gmail.com>
 MIME-Version: 1.0
@@ -90,9 +90,9 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908290141
+ definitions=main-1908290142
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
+X-Received-From: 156.151.31.85
 Subject: Re: [Qemu-devel] [PATCH v1 2/2] hw/pvrdma: add live migration
  support
 X-BeenThere: qemu-devel@nongnu.org
@@ -122,16 +122,6 @@ On Wed, Aug 28, 2019 at 07:53:28PM +0530, Sukrit Bhatnagar wrote:
 > pvrdma_post_load() maps to dsr using the loaded dma address, registers
 > each loaded gid into the backend device, and finally calls load_dsr()
 > to perform other mappings and ring init operations.
-
-I think it worth to mention that the dma address is kept in driver/device
-shared memory (dsr->dma) which is migrated as part of memory migration and
-it is out of the scope of this change and so we do not need to save/load
-the dma address during migration.
-
-Also you should specifically comment that this migration-support does not
-includes QP migration. This means that support for life migration *during*
-traffic is not yet supported.
-
 > 
 > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 > Cc: Yuval Shaia <yuval.shaia@oracle.com>
@@ -163,9 +153,6 @@ traffic is not yet supported.
 > +
 > +    for (i = 0; i < MAX_GIDS; i++) {
 > +
-
-Empty line is redundant here.
-
 > +        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
 > +            continue;
 > +        }
@@ -174,9 +161,6 @@ Empty line is redundant here.
 > +                                   &dev->rdma_dev_res.port.gid_tbl[i].gid);
 > +        if (rc) {
 > +            return -EINVAL;
-
-Some error report will help here i guess.
-
 > +        }
 > +    }
 > +
@@ -199,9 +183,6 @@ Some error report will help here i guess.
 > +
 > +    for (i = 0; i < MAX_GIDS; i++) {
 > +
-
-Empty line is redundant here.
-
 > +        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
 > +            continue;
 > +        }
@@ -215,6 +196,10 @@ Empty line is redundant here.
 > +    }
 > +
 > +    return load_dsr(dev);
+
+This check is better performed before any gid manipulation on the host
+because no one will undo it if load_dsr fails.
+
 > +}
 > +
 > +static const VMStateDescription vmstate_pvrdma_gids = {
