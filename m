@@ -5,85 +5,85 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA308C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC0FC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:52:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9BF121874
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:52:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9CEF2077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:52:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HNhm4SoV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BF121874
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JtxvI4Tc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9CEF2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Net-0002Xm-Iv
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 12:52:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46471)
+	id 1i3NfI-00036s-Il
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 12:52:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vandersonmr2@gmail.com>) id 1i3Naz-0006KX-Jq
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:27 -0400
+ (envelope-from <vandersonmr2@gmail.com>) id 1i3Nas-0006Dp-GT
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1i3Nay-0006Gq-0S
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:25 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:39018)
+ (envelope-from <vandersonmr2@gmail.com>) id 1i3Nar-0006AR-4B
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:18 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:46788)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1i3Nax-0006GI-SJ
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:23 -0400
-Received: by mail-qt1-x843.google.com with SMTP id n7so4411679qtb.6
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 09:48:23 -0700 (PDT)
+ id 1i3Naq-0006AJ-WE
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:17 -0400
+Received: by mail-qt1-x843.google.com with SMTP id j15so4354007qtl.13
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 09:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ype+RhMQ6yuP+PwkChrUABRIauIUwsULdkVXVz2HWbA=;
- b=HNhm4SoVmjnHxdjw6QxYKlFzH0pkT/tD0t6uHxmswbEZ1dApTArSaXc3bfdtYbXopw
- /QJsA+XzcoZmUCTgx5+9d3aQmYEVm4Npmzyelsuaugcs/Tqo0dDW+D+sBRRny3P4RgB9
- KvcInx7MH1j8KHk7gkQ6ivChn8wyPFmckMgsQ5WX1Xyk9P2t2Ti4RNM9CDKdsV7mlqV5
- 0I6oTcXpxxaYLV8k5ui20Xd98I6E2f6ysArsgr4BM0/3TbpiOQyAXhKTMfObBadyiN+i
- XlFxhSyJfoG4WFFddHuU13VtG19QVFQGCUDupI1c/RoHeWUuI2IFxYl0crR5zTDNGKOf
- 4I/w==
+ bh=fBs5joRr2GmQQ30d+sA4UaECTV9lNrfGzlG2K0u8w34=;
+ b=JtxvI4TcUuH0qZM9o1DL6MPTGd+q/u2d4GSDBInCYwgGLDUODIRzVL2fDwukX/jma7
+ r6SpkD3oyhxxv1pLIuGy8LhAuMJxh+er0Yp/iYYyuaWVvhCd9Hu1F0krn2fEGpUs9+71
+ MeMMFwLqUV4vC1IWkjmDbWpXcw1RVZCLBXJPMtja3mCVaq6E1sDYs32jXpQmGsdsVUZ9
+ 8SNUXPXZt0AJx3KRzlyCnUqtHck+KL4AELFvk6J6cQ0vXDoFnoEzZGAbItSURb4Zya+W
+ nOZJ9W2poeMSMw3PCr23EpGIMzpqw4KT8IaBFIh9ai6yJa5EwNzN0AWmgt+8Bo1K9JD1
+ iKKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Ype+RhMQ6yuP+PwkChrUABRIauIUwsULdkVXVz2HWbA=;
- b=cq1Ad8ljrdIvdmTBwwQCiq4OZnld/iOON50XdZiQabpQcA7qibHLWWdN3p44i7audD
- 0cawR8z4eQrYY6cR6Igt3sQyUJf2lMb5Rq81Rll156wA9LvJrHuiXeQ/iTb0AuTclpZN
- Gsl1ZWbbjKh98m0shGtPYCnKyvYLXrBPyAKRvxc6LEN/61T0veVaU4+O51vg2kxQvaW4
- Vp+QmcQPpcVN4fkd70GCpc/d71wfaMT9NLm3J4AVLZt0zRc48pBV6xhMqScPQsHbfT+f
- vBacxuu1R4MEJ3Haar18c1EdoUlUWQZoC4VLpVSDo+rpa9LCBP5hm7Tpcv3ZFBtfEfjf
- EvGg==
-X-Gm-Message-State: APjAAAV9RC6s/W7Y0X6GHY8wXrTub1c1TT1OhQVzdhaR13Sha60xteey
- h2w21cO67kfHpPAwgnGaNltmMwNnwFx9lg==
-X-Google-Smtp-Source: APXvYqyiZJ00XnTEfmc9gAEpMdyKFnsamy8uXAgAx1GIOgqpPHsVGB1IfcOvc9NWvAWUqhxSuVPFDA==
-X-Received: by 2002:ad4:496b:: with SMTP id p11mr3433868qvy.29.1567097302936; 
- Thu, 29 Aug 2019 09:48:22 -0700 (PDT)
+ bh=fBs5joRr2GmQQ30d+sA4UaECTV9lNrfGzlG2K0u8w34=;
+ b=MrrxQjtcMfX3IU9aRuW+ISejYsH5PNksHhbJ4FGC6wLCcXfwc3WfU/ECaDZrmagxP/
+ rubDObGsBTPuMk4Y/IFobDXYkPsobM1oJRoXIHoo/VZIOoIdvMcHcYGfOoCGIAfgDjJq
+ ++zqs4rUvjN96aKJNGGvscn6hVFbJl/uNEf6IBbtlvu3HSmfWZUs+VLuV8Tgn1RlBL7O
+ XdfKicD6Omx7MoE6HhLqNPKz1U8YwtY9TZHwei3qhfojENsl024u1BBqKEDkq7vHKw/k
+ u4dYJhsa2xTxALC2zwKh8q1AyQw5sDoKXfMN5i3xz3pwLXxDUZq6YeVz/Ukrcq1DZymY
+ 0+AA==
+X-Gm-Message-State: APjAAAVPbHDEBNuELYVuh5N9Nx8Lp6y6D5xgljjwlMoE+13DAVCgorxn
+ VxygKtpiHxKVBW9qwO5F/RerwXnlA0T05w==
+X-Google-Smtp-Source: APXvYqzJr5OrE3sTv/7s+iLrOGRXgc0Ko7/6KPtwTLi4xOHThdvAvhTjzOhOVbR7fElmzUY111/PMQ==
+X-Received: by 2002:ac8:1419:: with SMTP id k25mr10560141qtj.339.1567097296194; 
+ Thu, 29 Aug 2019 09:48:16 -0700 (PDT)
 Received: from vanderson-lmcad.gw.lmcad.ic.unicamp.br (gw.lmcad.ic.unicamp.br.
  [143.106.73.166])
- by smtp.googlemail.com with ESMTPSA id g25sm1441024qkk.87.2019.08.29.09.48.21
+ by smtp.googlemail.com with ESMTPSA id g25sm1441024qkk.87.2019.08.29.09.48.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Aug 2019 09:48:22 -0700 (PDT)
+ Thu, 29 Aug 2019 09:48:15 -0700 (PDT)
 From: vandersonmr <vandersonmr2@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 29 Aug 2019 13:47:49 -0300
-Message-Id: <20190829164754.3906-6-vandersonmr2@gmail.com>
+Date: Thu, 29 Aug 2019 13:47:46 -0300
+Message-Id: <20190829164754.3906-3-vandersonmr2@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190829164754.3906-1-vandersonmr2@gmail.com>
 References: <20190829164754.3906-1-vandersonmr2@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::843
-Subject: [Qemu-devel] [PATCH v7 05/10] Adding -d tb_stats to control
- TBStatistics collection:
+Subject: [Qemu-devel] [PATCH v7 02/10] accel: collecting JIT statistics
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,218 +95,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vandersonmr <vandersonmr2@gmail.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- -d tb_stats[[,level=(+all+jit+exec+time)][,dump_limit=<number>]]
+If a TB has a TBS (TBStatistics) with the TB_JIT_STATS
+enabled then we collect statistics of its translation
+processes and code translation.
 
-"dump_limit" is used to limit the number of dumped TBStats in
-linux-user mode.
+Collecting the number of host instructions seems to be
+not simple as it would imply in having to modify several
+target source files. So, for now, we are only collecting
+the size of the host gen code.
 
-[all+jit+exec+time] control the profilling level used
-by the TBStats. Can be used as follow:
-
--d tb_stats
--d tb_stats,level=jit+time
--d tb_stats,dump_limit=15
-...
-
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
 ---
- include/exec/gen-icount.h     |  1 +
- include/exec/tb-stats-flags.h | 42 +++++++++++++++++++++++++++++++++++
- include/exec/tb-stats.h       | 18 +++------------
- include/qemu/log.h            |  1 +
- util/log.c                    | 35 +++++++++++++++++++++++++++++
- 5 files changed, 82 insertions(+), 15 deletions(-)
- create mode 100644 include/exec/tb-stats-flags.h
+ accel/tcg/translate-all.c | 15 ++++++++++++++-
+ accel/tcg/translator.c    |  4 ++++
+ include/exec/tb-stats.h   | 15 +++++++++++++++
+ tcg/tcg.c                 | 23 +++++++++++++++++++++++
+ tcg/tcg.h                 |  2 ++
+ 5 files changed, 58 insertions(+), 1 deletion(-)
 
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index be006383b9..3987adfb0e 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -2,6 +2,7 @@
- #define GEN_ICOUNT_H
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index e72aeba682..fb2fe0fa1f 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1705,6 +1705,7 @@ static TBStatistics *tb_get_stats(tb_page_addr_t phys_pc, target_ulong pc,
+          * then just make the new TB point to the older TBStatistic
+          */
+         g_free(new_stats);
++        ((TBStatistics *) existing_stats)->tb = current_tb;
+         return existing_stats;
+     } else {
+         return new_stats;
+@@ -1785,13 +1786,18 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+      */
+     if (tb_stats_collection_enabled()) {
+         tb->tb_stats = tb_get_stats(phys_pc, pc, cs_base, flags, tb);
++        uint32_t flag = get_default_tbstats_flag();
  
- #include "qemu/timer.h"
-+#include "tb-stats-flags.h"
+         if (qemu_log_in_addr_range(tb->pc)) {
+-            uint32_t flag = get_default_tbstats_flag();
+             if (flag & TB_EXEC_STATS) {
+                 tb->tb_stats->stats_enabled |= TB_EXEC_STATS;
+             }
+         }
++
++        if (flag & TB_JIT_STATS) {
++            tb->tb_stats->stats_enabled |= TB_JIT_STATS;
++            atomic_inc(&tb->tb_stats->translations.total);
++        }
+     } else {
+         tb->tb_stats = NULL;
+     }
+@@ -1869,6 +1875,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     atomic_set(&prof->search_out_len, prof->search_out_len + search_size);
+ #endif
  
- /* Helpers for instruction counting code generation.  */
++    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
++        atomic_add(&tb->tb_stats->code.out_len, gen_code_size);
++    }
++
+ #ifdef DEBUG_DISAS
+     if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM) &&
+         qemu_log_in_addr_range(tb->pc)) {
+@@ -1926,6 +1936,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     phys_page2 = -1;
+     if ((pc & TARGET_PAGE_MASK) != virt_page2) {
+         phys_page2 = get_page_addr_code(env, virt_page2);
++        if (tb_stats_enabled(tb, TB_JIT_STATS)) {
++            atomic_inc(&tb->tb_stats->translations.spanning);
++        }
+     }
+     /*
+      * No explicit memory barrier is required -- tb_link_page() makes the
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index ec6bd829a0..9b2e248b09 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -116,6 +116,10 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+     db->tb->size = db->pc_next - db->pc_first;
+     db->tb->icount = db->num_insns;
  
-diff --git a/include/exec/tb-stats-flags.h b/include/exec/tb-stats-flags.h
-new file mode 100644
-index 0000000000..c936ac1084
---- /dev/null
-+++ b/include/exec/tb-stats-flags.h
-@@ -0,0 +1,42 @@
-+/*
-+ * QEMU System Emulator, Code Quality Monitor System
-+ *
-+ * Copyright (c) 2019 Vanderson M. do Rosario <vandersonmr2@gmail.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#ifndef TB_STATS_FLAGS
-+#define TB_STATS_FLAGS
++    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
++        atomic_add(&db->tb->tb_stats->code.num_guest_inst, db->num_insns);
++    }
 +
-+enum TBStatsStatus {
-+    TB_STATS_DISABLED = 0,
-+    TB_STATS_RUNNING,
-+    TB_STATS_PAUSED,
-+    TB_STATS_STOPPED
-+};
-+
-+#define TB_NOTHING    (1 << 0)
-+#define TB_EXEC_STATS (1 << 1)
-+#define TB_JIT_STATS  (1 << 2)
-+#define TB_JIT_TIME   (1 << 3)
-+
-+extern int tcg_collect_tb_stats;
-+extern uint32_t default_tbstats_flag;
-+
-+#endif
+ #ifdef DEBUG_DISAS
+     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+         && qemu_log_in_addr_range(db->pc_first)) {
 diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-index 0b9a6e2f72..6a53bef31b 100644
+index c4a8715400..b68edd5d24 100644
 --- a/include/exec/tb-stats.h
 +++ b/include/exec/tb-stats.h
-@@ -30,6 +30,8 @@
- #include "exec/tb-context.h"
- #include "tcg.h"
+@@ -58,6 +58,20 @@ struct TBStatistics {
+         unsigned long atomic;
+     } executions;
  
-+#include "exec/tb-stats-flags.h"
++    struct {
++        unsigned num_guest_inst;
++        unsigned num_tcg_ops;
++        unsigned num_tcg_ops_opt;
++        unsigned spills;
++        unsigned out_len;
++    } code;
 +
- #define tb_stats_enabled(tb, JIT_STATS) \
-     (tb && tb->tb_stats && (tb->tb_stats->stats_enabled & JIT_STATS))
++    struct {
++        unsigned long total;
++        unsigned long uncached;
++        unsigned long spanning;
++    } translations;
++
+     /* current TB linked to this TBStatistics */
+     TranslationBlock *tb;
+ };
+@@ -71,6 +85,7 @@ enum TBStatsStatus { TB_STATS_RUNNING, TB_STATS_PAUSED, TB_STATS_STOPPED };
  
-@@ -98,26 +100,12 @@ bool tb_stats_cmp(const void *ap, const void *bp);
+ #define TB_NOTHING    (1 << 0)
+ #define TB_EXEC_STATS (1 << 1)
++#define TB_JIT_STATS  (1 << 2)
  
- void dump_jit_exec_time_info(uint64_t dev_time);
+ extern int tcg_collect_tb_stats;
+ extern uint32_t default_tbstats_flag;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 0458eaec57..ae3e7a2217 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -3125,6 +3125,11 @@ static void temp_sync(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs,
+         case TEMP_VAL_REG:
+             tcg_out_st(s, ts->type, ts->reg,
+                        ts->mem_base->reg, ts->mem_offset);
++
++            /* Count number of spills */
++            if (tb_stats_enabled(s->current_tb, TB_JIT_STATS)) {
++                atomic_inc(&s->current_tb->tb_stats->code.spills);
++            }
+             break;
  
-+void set_tbstats_flags(uint32_t flags);
- void init_tb_stats_htable_if_not(void);
+         case TEMP_VAL_MEM:
+@@ -3996,6 +4001,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     int i, num_insns;
+     TCGOp *op;
  
- void dump_jit_profile_info(TCGProfile *s);
++    s->current_tb = tb;
++
+ #ifdef CONFIG_PROFILER
+     {
+         int n = 0;
+@@ -4027,6 +4034,14 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     }
+ #endif
  
- /* TBStatistic collection controls */
--enum TBStatsStatus {
--    TB_STATS_DISABLED = 0,
--    TB_STATS_RUNNING,
--    TB_STATS_PAUSED,
--    TB_STATS_STOPPED
--};
--
--#define TB_NOTHING    (1 << 0)
--#define TB_EXEC_STATS (1 << 1)
--#define TB_JIT_STATS  (1 << 2)
--#define TB_JIT_TIME   (1 << 3)
--
--extern int tcg_collect_tb_stats;
--extern uint32_t default_tbstats_flag;
--
- void enable_collect_tb_stats(void);
- void disable_collect_tb_stats(void);
- void pause_collect_tb_stats(void);
-diff --git a/include/qemu/log.h b/include/qemu/log.h
-index b097a6cae1..a8d1997cde 100644
---- a/include/qemu/log.h
-+++ b/include/qemu/log.h
-@@ -45,6 +45,7 @@ static inline bool qemu_log_separate(void)
- /* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
- #define CPU_LOG_TB_OP_IND  (1 << 16)
- #define CPU_LOG_TB_FPU     (1 << 17)
-+#define CPU_LOG_TB_STATS   (1 << 18)
++    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
++        int n = 0;
++        QTAILQ_FOREACH(op, &s->ops, link) {
++            n++;
++        }
++        atomic_add(&tb->tb_stats->code.num_tcg_ops, n);
++    }
++
+ #ifdef CONFIG_DEBUG_TCG
+     /* Ensure all labels referenced have been emitted.  */
+     {
+@@ -4093,6 +4108,14 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     }
+ #endif
  
- /* Lock output for a series of related logs.  Since this is not needed
-  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
-diff --git a/util/log.c b/util/log.c
-index 29021a4584..c3805b331b 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -19,17 +19,20 @@
++    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
++        int n = 0;
++        QTAILQ_FOREACH(op, &s->ops, link) {
++            n++;
++        }
++        atomic_add(&tb->tb_stats->code.num_tcg_ops_opt, n);
++    }
++
+     tcg_reg_alloc_start(s);
  
- #include "qemu/osdep.h"
- #include "qemu/log.h"
-+#include "qemu/qemu-print.h"
- #include "qemu/range.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "trace/control.h"
-+#include "exec/tb-stats-flags.h"
+     s->code_buf = tb->tc.ptr;
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 529acb2ed8..b4601162f8 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -740,6 +740,8 @@ struct TCGContext {
  
- static char *logfilename;
- FILE *qemu_logfile;
- int qemu_loglevel;
- static int log_append = 0;
- static GArray *debug_regions;
-+int32_t max_num_hot_tbs_to_dump;
- 
- int tcg_collect_tb_stats;
- uint32_t default_tbstats_flag;
-@@ -276,6 +279,9 @@ const QEMULogItem qemu_log_items[] = {
-     { CPU_LOG_TB_NOCHAIN, "nochain",
-       "do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"
-       "complete traces" },
-+    { CPU_LOG_TB_STATS, "tb_stats[[,level=(+all+jit+exec+time)][,dump_limit=<number>]]",
-+      "enable collection of TBs statistics"
-+      "(and dump until given a limit if in user mode).\n" },
-     { 0, NULL, NULL },
+     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
+     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
++
++    TranslationBlock *current_tb;
  };
  
-@@ -297,6 +303,35 @@ int qemu_str_to_log_mask(const char *str)
-             trace_enable_events((*tmp) + 6);
-             mask |= LOG_TRACE;
- #endif
-+        } else if (g_str_has_prefix(*tmp, "tb_stats")) {
-+            mask |= CPU_LOG_TB_STATS;
-+            default_tbstats_flag = TB_JIT_STATS | TB_EXEC_STATS | TB_JIT_TIME;
-+            tcg_collect_tb_stats = TB_STATS_RUNNING;
-+        } else if (tcg_collect_tb_stats == TB_STATS_RUNNING &&
-+                g_str_has_prefix(*tmp, "dump_limit=")) {
-+
-+            max_num_hot_tbs_to_dump = atoi((*tmp) + 11);
-+        } else if (tcg_collect_tb_stats == TB_STATS_RUNNING &&
-+                g_str_has_prefix(*tmp, "level=")) {
-+
-+            default_tbstats_flag = 0;
-+            char **level_parts = g_strsplit(*tmp + 6, "+", 0);
-+            char **level_tmp;
-+            for (level_tmp = level_parts; level_tmp && *level_tmp; level_tmp++) {
-+                if (g_str_equal(*level_tmp, "jit")) {
-+                    default_tbstats_flag |= TB_JIT_STATS;
-+                } else if (g_str_equal(*level_tmp, "exec")) {
-+                    default_tbstats_flag |= TB_EXEC_STATS;
-+                } else if (g_str_equal(*level_tmp, "time")) {
-+                    default_tbstats_flag |= TB_JIT_TIME;
-+                } else if (g_str_equal(*level_tmp, "all")) {
-+                    default_tbstats_flag |= TB_JIT_STATS | TB_EXEC_STATS | TB_JIT_TIME;
-+                } else {
-+                    fprintf(stderr, "no option level=%s, valid options are:"
-+                            "all, jit, exec or/and time\n", *level_tmp);
-+                    exit(1);
-+                }
-+            }
-         } else {
-             for (item = qemu_log_items; item->mask != 0; item++) {
-                 if (g_str_equal(*tmp, item->name)) {
+ extern TCGContext tcg_init_ctx;
 -- 
 2.22.0
 
