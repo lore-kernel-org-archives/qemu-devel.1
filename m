@@ -2,50 +2,50 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C4DC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4969FC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:52:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24C17215EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:45:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C17215EA
+	by mail.kernel.org (Postfix) with ESMTPS id 1DFDA2166E
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 18:52:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DFDA2166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3PQ0-0000sa-2U
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 14:45:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47875)
+	id 1i3PX3-0004bi-8D
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 14:52:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49533)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i3POV-000851-Pj
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:43:40 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i3PWM-00048N-8M
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i3POU-00067a-Jw
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:43:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45626)
+ (envelope-from <jsnow@redhat.com>) id 1i3PWL-0006cc-6h
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 14:51:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34254)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i3POP-0005vH-Ee; Thu, 29 Aug 2019 14:43:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1i3PWH-0006YA-5J; Thu, 29 Aug 2019 14:51:41 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1E13010F23FB;
- Thu, 29 Aug 2019 18:43:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 59909308123B;
+ Thu, 29 Aug 2019 18:51:40 +0000 (UTC)
 Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2AF1460872;
- Thu, 29 Aug 2019 18:43:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 51AD360C05;
+ Thu, 29 Aug 2019 18:51:34 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190820235243.26092-1-jsnow@redhat.com>
- <20190820235243.26092-2-jsnow@redhat.com>
- <5c7555f2-fba0-29fc-8bcd-bc68e5b42c63@redhat.com>
+ <20190820235243.26092-5-jsnow@redhat.com>
+ <0f7af7b1-cc53-a06b-5e53-bf091ec40683@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,21 +122,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <41d1edcf-ed61-6287-1019-4f779ffa3c79@redhat.com>
-Date: Thu, 29 Aug 2019 14:43:20 -0400
+Message-ID: <db682644-fcaf-a2df-5e86-83aea9cbe19f@redhat.com>
+Date: Thu, 29 Aug 2019 14:51:33 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <5c7555f2-fba0-29fc-8bcd-bc68e5b42c63@redhat.com>
+In-Reply-To: <0f7af7b1-cc53-a06b-5e53-bf091ec40683@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Thu, 29 Aug 2019 18:43:27 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 29 Aug 2019 18:51:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] iotests: add script_initialize
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] iotests: use python logging for
+ iotests.log()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,40 +149,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ ehabkost@redhat.com, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/29/19 2:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> This restrict test 208 to the Linux platform, is this OK?
+On 8/29/19 2:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 8/21/19 1:52 AM, John Snow wrote:
+>> We can turn logging on/off globally instead of per-function.
+>>
+>> Remove use_log from run_job, and use python logging to turn on
+>> diffable output when we run through a script entry point.
+>>
+>> iotest 245 changes output order due to buffering reasons.
+>> ---
+>>  tests/qemu-iotests/030        |  4 +--
+>>  tests/qemu-iotests/245        |  1 +
+>>  tests/qemu-iotests/245.out    | 24 +++++++++---------
+>>  tests/qemu-iotests/iotests.py | 47 +++++++++++++++++++++-------------=
+-
+>>  4 files changed, 43 insertions(+), 33 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+>> index 1b69f318c6..a382cb430b 100755
+>> --- a/tests/qemu-iotests/030
+>> +++ b/tests/qemu-iotests/030
+>> @@ -411,8 +411,8 @@ class TestParallelOps(iotests.QMPTestCase):
+>>          result =3D self.vm.qmp('block-job-set-speed', device=3D'drive=
+0', speed=3D0)
+>>          self.assert_qmp(result, 'return', {})
+>> =20
+>> -        self.vm.run_job(job=3D'drive0', auto_dismiss=3DTrue, use_log=3D=
+False)
+>> -        self.vm.run_job(job=3D'node4', auto_dismiss=3DTrue, use_log=3D=
+False)
+>> +        self.vm.run_job(job=3D'drive0', auto_dismiss=3DTrue)
+>> +        self.vm.run_job(job=3D'node4', auto_dismiss=3DTrue)
+>>          self.assert_no_active_block_jobs()
+>> =20
+>>      # Test a block-stream and a block-commit job in parallel
+>> diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+>> index bc1ceb9792..3bc29acb33 100644
+>> --- a/tests/qemu-iotests/245
+>> +++ b/tests/qemu-iotests/245
+>> @@ -1000,4 +1000,5 @@ class TestBlockdevReopen(iotests.QMPTestCase):
+>>          self.reopen(opts, {'backing': 'hd2'})
+>> =20
+>>  if __name__ =3D=3D '__main__':
+>> +    iotests.activate_logging()
+>>      iotests.main(supported_fmts=3D["qcow2"])
 >=20
-> The rest looks good.
+> Why not use:
+>=20
+>        iotests.script_main(iotests.main, supported_fmts=3D['qcow2')
+>=20
 
-I forgot about that, so good catch.
+Well, that'd call iotests.execute_test twice and it'd perform setup
+twice, too.
 
-I don't know. We seem to already restrict a LOT of tests to the Linux
-platform. Does this one actually work on other platforms?
+Usually, we want logging on for "script-style" tests, but we want
+logging off for unittest-style ones. This test has opted to use both.
 
-Actually, I can't see any other supported oses/supported platforms calls
-anywhere in iotests that don't just specify Linux or leave it the
-default (...which is also linux.)
+(Or more likely: just wanted to use run_job and just dealt with the
+extramodal output.)
 
-There isn't a way to engage the old-style python unittest framework
-without implying Linux; you have to manually override it if so.
-
-For new tests, MOST of them specified Linux in some way or another, as
-you saw.
-
-So either:
-- 208 was an oversight, or
-- Many tests are accidentally limiting to Linux and could be loosened.
-
-Which is it? Dunno. Guess I'll look at the VM tests to see if I can
-co-opt some of that... stay tuned?
+OK; we can turn on logging as we see fit.
 
 --js
+
 
