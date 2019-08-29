@@ -2,50 +2,53 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4778DC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2A9C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:33:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A66021874
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:30:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A66021874
+	by mail.kernel.org (Postfix) with ESMTPS id E62BB22CF5
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:33:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E62BB22CF5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3OFn-0002Tr-6U
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:30:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59110)
+	id 1i3OJ2-00049a-2N
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:33:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i3OF0-0001ni-RL
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:29:47 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i3OIF-0003cR-BI
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i3OEy-0005j1-J3
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:29:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41234)
+ (envelope-from <jsnow@redhat.com>) id 1i3OIE-0007ZO-2d
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:33:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33930)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i3OEv-0005h2-Mq; Thu, 29 Aug 2019 13:29:41 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1i3OIB-0007XN-2N; Thu, 29 Aug 2019 13:33:03 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EE224308A9E2;
- Thu, 29 Aug 2019 17:29:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3474D883CA;
+ Thu, 29 Aug 2019 17:33:02 +0000 (UTC)
 Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E06DB1001925;
- Thu, 29 Aug 2019 17:29:39 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20190828093447.12441-1-thuth@redhat.com>
- <cad0e700-be32-3fc2-210a-b395c0f00a12@redhat.com>
- <fd479765-0d05-2868-05d4-4cd46c7c971b@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18C0219D7A;
+ Thu, 29 Aug 2019 17:33:01 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <1566834628-485525-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1566834628-485525-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <d04202ac-87ab-f226-0fc9-490d20f571fd@redhat.com>
+ <dd9f0ef8-d24c-29c3-6c48-809c9a4ac5d8@redhat.com>
+ <be87cbd6-4b12-0222-3825-90ef8538d7ac@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,22 +125,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <52263434-e565-bdf9-a0c2-976633091122@redhat.com>
-Date: Thu, 29 Aug 2019 13:29:39 -0400
+Message-ID: <115c74bc-5e73-b825-ac2f-7b8dff06d064@redhat.com>
+Date: Thu, 29 Aug 2019 13:33:00 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <fd479765-0d05-2868-05d4-4cd46c7c971b@redhat.com>
+In-Reply-To: <be87cbd6-4b12-0222-3825-90ef8538d7ac@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 29 Aug 2019 17:29:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Thu, 29 Aug 2019 17:33:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-doc: Do not hard-code
- the name of the QEMU binary
+Subject: Re: [Qemu-devel] [PATCH v6 1/6] iotests: allow Valgrind checking
+ all QEMU processes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,61 +152,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, mrezanin@redhat.com,
- Richard Henderson <rth@twiddle.net>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/29/19 1:41 AM, Thomas Huth wrote:
-> On 28/08/2019 21.18, John Snow wrote:
+On 8/29/19 6:50 AM, Andrey Shinkevich wrote:
+> 
+> 
+> On 29/08/2019 03:30, Eric Blake wrote:
+>> On 8/28/19 5:58 PM, John Snow wrote:
 >>
+>>>> +++ b/tests/qemu-iotests/common.rc
+>>>> @@ -60,61 +60,132 @@ if ! . ./common.config
+>>>>       exit 1
+>>>>   fi
+>>>>   
+>>>> +# Unset the variables to turn Valgrind off for specific processes, e.g.
 >>
->> On 8/28/19 5:34 AM, Thomas Huth wrote:
->>> In our documentation, we use a mix of "$QEMU", "qemu-system-i386" and
->>> "qemu-system-x86_64" when we give examples to the users how to run
->>> QEMU. Some more consistency would be good here. Also some distributions
->>> use different names for the QEMU binary (e.g. "qemu-kvm" in RHEL), so
->>> providing more flexibility here would also be good. Thus let's define
->>> some variables for the names of the QEMU command and use those in the
->>> documentation instead: @value{qemu_system} for generic examples, and
->>> @value{qemu_system_x86} for examples that only work with the x86
->>> binaries.
+>> That's not unsetting, that's setting to the empty string.
+>>
+> 
+> Thanks Eric, I will make the correction of the comment. Any string other 
+> than "y", including the empty one, fits.
+> 
+>>>> +# $ VALGRIND_QEMU_IO= ./check -qcow2 -valgrind 015
+>>>> +
+>>>> +: ${VALGRIND_QEMU_VM='y'}
+>>>> +: ${VALGRIND_QEMU_IMG='y'}
+>>>> +: ${VALGRIND_QEMU_IO='y'}
+>>>> +: ${VALGRIND_QEMU_NBD='y'}
+>>>> +: ${VALGRIND_QEMU_VXHS='y'}
+>>>> +
 >>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> 
+> I am going to make the change:
+> 
+> : ${VALGRIND_QEMU_VM=$VALGRIND_QEMU}
+> : ${VALGRIND_QEMU_IMG=$VALGRIND_QEMU}
+> : ${VALGRIND_QEMU_IO=$VALGRIND_QEMU}
+> : ${VALGRIND_QEMU_NBD=$VALGRIND_QEMU}
+> : ${VALGRIND_QEMU_VXHS=$VALGRIND_QEMU}
+> 
+> and get rid of the local VALGRIND_ON="${VALGRIND_QEMU}"
+> 
+> so that the code will be optimized.
+> 
+
+Seems good!
+
+>>> I have to admit to you that I'm not familiar with this trick. I'm
+>>> looking it up and I see := documented, but not = alone.
 >>
->> Makes sense to me, but do we want a definitions.texi or similar that can
->> be used globally (and is easy to find and edit by e.g. distro
->> packagers), or is it better to re-define them per-each file as you've done?
+>> It's been a repeated complaint to the bash developer that the manual is
+>> doing a disservice to its users by not documenting ${var=val} in an
+>> easily searchable form.  It IS documented, but only by virtue of
+>> ${var:=val} occurring under a section header that states:
+>>
+>>         When not performing substring expansion,  using  the  forms
+>> documented
+>>         below  (e.g.,  :-),  bash  tests for a parameter that is unset or
+>> null.
+>>         Omitting the colon results in a test  only  for  a  parameter
+>> that  is
+>>         unset.
+>>
+>> So the choice is whether you want to special case a variable set to an
+>> empty string the same as an unset variable, or the same as a variable
+>> with a non-empty value.
+>>
 > 
-> Hmm, as long as it's just one or two variables, it seems a little bit
-> excessive to me, but if we'd have more config knobs, that would
-> certainly be the right way to go ... but currently we do not have any
-> more variables, do we?
+> Thank you all for your reviews and comments. The purpose why I omitted 
+> the colon is to allow a user writing the shorter command syntax like
+> $ VALGRIND_QEMU_IO= ./check -valgrind <test#>
+> rather than
+> $ VALGRIND_QEMU_IO=" 'no' or 'off' or else anything other than 'y' " 
+> ./check -valgrind <test#>
+> so, no need to strike the Shift key twice and guess at what else is 
+> acceptable to type )))
+> 
+> The variable default value 'y' looks good to me to implement the new 
+> functionality that is compatible with the existing one when we just set 
+> the '-valgrind' switch. The general idea behind using the Valgrind is to 
+> make a careful search for memory issues. Once found, a user can tune the 
+> particular test with extra variables to save their development/testing 
+> time as John suggested. Also, no need to specify all the five long name 
+> variables each time a user writes the command if default values aren't set.
+> 
+> I am flexible to make a change that is good for all. So, what solution 
+> will we come to?
 > 
 
-Not that I'm aware of. We might find more as we embark on the
-ReSTification of our docs.
-
-I only bring it up because it might not be clear in which documents and
-in how many places this definition needs to be changed by a package
-maintainer; if our end goal is one big unified manual then I think we
-need a central configuration for it, too. Maybe that only shows up for
-the Sphinx manual.
-
-(Maybe a yaml file that conf.py can consume and uses to generate ReST
-definitions that can be used throughout the rest of the docs would be an
-appropriate thing to do.)
-
-I won't insist, because creating new infrastructure for texi docs seems
-lateral. Your patch doesn't make anything I'm pointing out worse than it
-already was, though, so:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+I don't actually really have a preference here; it's development and
+testing infrastructure. As long as it is POSIX portable, I'm happy. If
+we goof it up, we'll find out eventually. If we don't, well. Just more
+evidence we need more non-Linux contributors.
 
 --js
 
