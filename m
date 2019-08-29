@@ -7,57 +7,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BCDC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A5BC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:24:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2B76215EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21C7B2189D
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 06:24:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Bexbe0nm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B76215EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="b+V6XeND"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C7B2189D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Doj-0007gO-Ly
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 02:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35390)
+	id 1i3Dql-0001bU-0Z
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 02:24:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35255)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i3Dc5-0004Jm-KS
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:08:55 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i3Dc0-0004Ct-EN
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:08:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i3Dc1-0003kW-Ij
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:08:53 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:50317)
+ (envelope-from <dgibson@ozlabs.org>) id 1i3Dby-0003fu-1R
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 02:08:48 -0400
+Received: from ozlabs.org ([203.11.71.1]:57597)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i3Dc0-0003hF-HQ; Thu, 29 Aug 2019 02:08:49 -0400
+ id 1i3Dbx-0003au-3F; Thu, 29 Aug 2019 02:08:45 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46JscN4fPsz9sPV; Thu, 29 Aug 2019 16:08:36 +1000 (AEST)
+ id 46JscM6tJbz9sNF; Thu, 29 Aug 2019 16:08:35 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1567058916;
- bh=ymMSTYLQLz6KT9co8vwGr8fLoufPtaRsO9JJjm+zhtc=;
+ d=gibson.dropbear.id.au; s=201602; t=1567058915;
+ bh=5jlmo8H1Y1OoP/KbH6aydk6ryEb1iD5XUmG98WQI86w=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Bexbe0nmi4YO1oQdWI/HEYJeOt2/g9RBlfxZ0FB8UUwsjpFb544rxVhlYJiLcCCco
- rxruV28+UxXirAfR1RtZ2ex5F/zZZ04181k6W7tlzu/GG1QnEXtfdQdF0GchQzgNwd
- DbAQxiLtUbE2PfB1gqX8a0qcmUsLnAF7fL5c3mdA=
+ b=b+V6XeNDj4kneHGxKJTWSZUegsjiRzPbvjGSo0e1XZa9uraYXzgmB5ag6AGNYoYFv
+ 5hL/K3PhjDOiT5lHuZWYSk2OoR3saQnRoLxuQgRgvAUMEY/qCdvCbF2takCFBpXVUp
+ Ro3hEE+5motuMNMe/0Yh4P6+KiPx2oQcm5XvtCpU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Thu, 29 Aug 2019 16:08:21 +1000
-Message-Id: <20190829060827.25731-14-david@gibson.dropbear.id.au>
+Date: Thu, 29 Aug 2019 16:08:16 +1000
+Message-Id: <20190829060827.25731-9-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190829060827.25731-1-david@gibson.dropbear.id.au>
 References: <20190829060827.25731-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 13/19] target/ppc: Refactor emulation of vmrgew
- and vmrgow instructions
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 08/19] ppc: Fix xscvdpspn for SNAN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,145 +69,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru,
  Richard Henderson <richard.henderson@linaro.org>, groug@kaod.org,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Stefan Brankovic <stefan.brankovic@rt-rk.com>,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Paul A. Clarke" <pc@us.ibm.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+From: "Paul A. Clarke" <pc@us.ibm.com>
 
-Since I found this two instructions implemented with tcg, I refactored
-them so they are consistent with other similar implementations that
-I introduced in this patch.
+The xscvdpspn instruction implements a non-arithmetic conversion.
+In particular, NaNs are not silenced and rounding is not performed.
 
-Also, a new dual macro GEN_VXFORM_TRANS_DUAL is added. This macro is
-used if one instruction is realized with direct translation, and second
-one with a helper.
+Rewrite to match the pseudocode for ConvertDPtoSP_NS() in the
+Power 3.0B manual.
 
-Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-Message-Id: <1566898663-25858-4-git-send-email-stefan.brankovic@rt-rk.com=
->
+Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+Message-Id: <1566321964-1447-1-git-send-email-pc@us.ibm.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+[dwg: Replaced description with clearer version from rth]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate/vmx-impl.inc.c | 66 ++++++++++++++++-------------
- 1 file changed, 37 insertions(+), 29 deletions(-)
+ target/ppc/fpu_helper.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
-mx-impl.inc.c
-index 0d71c10428..2472a5217a 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -350,6 +350,28 @@ static void glue(gen_, name0##_##name1)(DisasContext=
- *ctx)             \
-     }                                                                  \
- }
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 07bc9051b0..c8e719272d 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2887,12 +2887,40 @@ void helper_xscvqpdp(CPUPPCState *env, uint32_t o=
+pcode,
 =20
-+/*
-+ * We use this macro if one instruction is realized with direct
-+ * translation, and second one with helper.
-+ */
-+#define GEN_VXFORM_TRANS_DUAL(name0, flg0, flg2_0, name1, flg1, flg2_1)\
-+static void glue(gen_, name0##_##name1)(DisasContext *ctx)             \
-+{                                                                      \
-+    if ((Rc(ctx->opcode) =3D=3D 0) &&                                   =
-   \
-+        ((ctx->insns_flags & flg0) || (ctx->insns_flags2 & flg2_0))) { \
-+        if (unlikely(!ctx->altivec_enabled)) {                         \
-+            gen_exception(ctx, POWERPC_EXCP_VPU);                      \
-+            return;                                                    \
-+        }                                                              \
-+        trans_##name0(ctx);                                            \
-+    } else if ((Rc(ctx->opcode) =3D=3D 1) &&                            =
-   \
-+        ((ctx->insns_flags & flg1) || (ctx->insns_flags2 & flg2_1))) { \
-+        gen_##name1(ctx);                                              \
-+    } else {                                                           \
-+        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);            \
-+    }                                                                  \
-+}
+ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
+ {
+-    uint64_t result;
++    uint64_t result, sign, exp, frac;
+=20
+     float_status tstat =3D env->fp_status;
+     set_float_exception_flags(0, &tstat);
+=20
+-    result =3D (uint64_t)float64_to_float32(xb, &tstat);
++    sign =3D extract64(xb, 63,  1);
++    exp  =3D extract64(xb, 52, 11);
++    frac =3D extract64(xb,  0, 52) | 0x10000000000000ULL;
 +
- /* Adds support to provide invalid mask */
- #define GEN_VXFORM_DUAL_EXT(name0, flg0, flg2_0, inval0,                =
-\
-                             name1, flg1, flg2_1, inval1)                =
-\
-@@ -431,20 +453,13 @@ GEN_VXFORM(vmrglb, 6, 4);
- GEN_VXFORM(vmrglh, 6, 5);
- GEN_VXFORM(vmrglw, 6, 6);
-=20
--static void gen_vmrgew(DisasContext *ctx)
-+static void trans_vmrgew(DisasContext *ctx)
- {
--    TCGv_i64 tmp;
--    TCGv_i64 avr;
--    int VT, VA, VB;
--    if (unlikely(!ctx->altivec_enabled)) {
--        gen_exception(ctx, POWERPC_EXCP_VPU);
--        return;
--    }
--    VT =3D rD(ctx->opcode);
--    VA =3D rA(ctx->opcode);
--    VB =3D rB(ctx->opcode);
--    tmp =3D tcg_temp_new_i64();
--    avr =3D tcg_temp_new_i64();
-+    int VT =3D rD(ctx->opcode);
-+    int VA =3D rA(ctx->opcode);
-+    int VB =3D rB(ctx->opcode);
-+    TCGv_i64 tmp =3D tcg_temp_new_i64();
-+    TCGv_i64 avr =3D tcg_temp_new_i64();
-=20
-     get_avr64(avr, VB, true);
-     tcg_gen_shri_i64(tmp, avr, 32);
-@@ -462,21 +477,14 @@ static void gen_vmrgew(DisasContext *ctx)
-     tcg_temp_free_i64(avr);
++    if (unlikely(exp =3D=3D 0 && extract64(frac, 0, 52) !=3D 0)) {
++        /* DP denormal operand.  */
++        /* Exponent override to DP min exp.  */
++        exp =3D 1;
++        /* Implicit bit override to 0.  */
++        frac =3D deposit64(frac, 53, 1, 0);
++    }
++
++    if (unlikely(exp < 897 && frac !=3D 0)) {
++        /* SP tiny operand.  */
++        if (897 - exp > 63) {
++            frac =3D 0;
++        } else {
++            /* Denormalize until exp =3D SP min exp.  */
++            frac >>=3D (897 - exp);
++        }
++        /* Exponent override to SP min exp - 1.  */
++        exp =3D 896;
++    }
++
++    result =3D sign << 31;
++    result |=3D extract64(exp, 10, 1) << 30;
++    result |=3D extract64(exp, 0, 7) << 23;
++    result |=3D extract64(frac, 29, 23);
++
+     /* hardware replicates result to both words of the doubleword result=
+.  */
+     return (result << 32) | result;
  }
-=20
--static void gen_vmrgow(DisasContext *ctx)
-+static void trans_vmrgow(DisasContext *ctx)
- {
--    TCGv_i64 t0, t1;
--    TCGv_i64 avr;
--    int VT, VA, VB;
--    if (unlikely(!ctx->altivec_enabled)) {
--        gen_exception(ctx, POWERPC_EXCP_VPU);
--        return;
--    }
--    VT =3D rD(ctx->opcode);
--    VA =3D rA(ctx->opcode);
--    VB =3D rB(ctx->opcode);
--    t0 =3D tcg_temp_new_i64();
--    t1 =3D tcg_temp_new_i64();
--    avr =3D tcg_temp_new_i64();
-+    int VT =3D rD(ctx->opcode);
-+    int VA =3D rA(ctx->opcode);
-+    int VB =3D rB(ctx->opcode);
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 avr =3D tcg_temp_new_i64();
-=20
-     get_avr64(t0, VB, true);
-     get_avr64(t1, VA, true);
-@@ -936,14 +944,14 @@ GEN_VXFORM_ENV(vminfp, 5, 17);
- GEN_VXFORM_HETRO(vextublx, 6, 24)
- GEN_VXFORM_HETRO(vextuhlx, 6, 25)
- GEN_VXFORM_HETRO(vextuwlx, 6, 26)
--GEN_VXFORM_DUAL(vmrgow, PPC_NONE, PPC2_ALTIVEC_207,
-+GEN_VXFORM_TRANS_DUAL(vmrgow, PPC_NONE, PPC2_ALTIVEC_207,
-                 vextuwlx, PPC_NONE, PPC2_ISA300)
- GEN_VXFORM_HETRO(vextubrx, 6, 28)
- GEN_VXFORM_HETRO(vextuhrx, 6, 29)
- GEN_VXFORM_HETRO(vextuwrx, 6, 30)
- GEN_VXFORM_TRANS(lvsl, 6, 31)
- GEN_VXFORM_TRANS(lvsr, 6, 32)
--GEN_VXFORM_DUAL(vmrgew, PPC_NONE, PPC2_ALTIVEC_207, \
-+GEN_VXFORM_TRANS_DUAL(vmrgew, PPC_NONE, PPC2_ALTIVEC_207,
-                 vextuwrx, PPC_NONE, PPC2_ISA300)
-=20
- #define GEN_VXRFORM1(opname, name, str, opc2, opc3)                     =
-\
 --=20
 2.21.0
 
