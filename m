@@ -2,89 +2,55 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E62CBC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 08:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE4EC3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 08:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB9C9215EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 08:55:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9C9215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9109C215EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 08:59:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9109C215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3GDQ-0008Jz-UO
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 04:55:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60407)
+	id 1i3GH6-00012E-Nv
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 04:59:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60781)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1i3GCm-0007qY-PO
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 04:54:57 -0400
+ (envelope-from <chao.gao@intel.com>) id 1i3GGH-0000aL-8d
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 04:58:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1i3GCl-0004sM-UJ
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 04:54:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59880)
+ (envelope-from <chao.gao@intel.com>) id 1i3GGE-0006ld-SW
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 04:58:32 -0400
+Received: from mga09.intel.com ([134.134.136.24]:11741)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i3GCl-0004rq-OS
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 04:54:55 -0400
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B868A87633
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 08:54:54 +0000 (UTC)
-Received: by mail-pg1-f200.google.com with SMTP id q1so1612594pgt.2
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 01:54:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=MV05PmXuqI6VTJEXNNiLb665+UFsPMcbnVHkKxcHxvw=;
- b=PEKYC68H8etI3aKUh9Qx1gT26AR6nUZA8umLan5PddUCfkfzBkPBppQK8BLKrZfJIe
- bbMMd5q6eEy44vDoMDI6eptdQWEEE6uYTGqjMa1tGl66WFkFkFLbh6hlzC2vzmgOo/VC
- Pjq3+OOjSpH/VQUuBZtwgXt78HS6vOUP8AgKgm2bGimy6KJGJgK0Py8t9XsPa3hhga3r
- qGSLu33FSedyAL2h0rrSbC4K4SdeML3JttDBD/Frgi3LCZwA5E1QRttlw3akpFdH5O99
- OnZBYvP+2nz28dV5o7wZ9hJY/X0aZofJxVSj+uh49/CTgWTDLZL7tOyUbF+HBXo0jvvv
- pPSw==
-X-Gm-Message-State: APjAAAW7sj0I6IoHtwn7EgolHOrhdG4YjiRczuz4K1RHlD7wCv+6qbM7
- 7NP/O2ehcj9gigLB0dvyZT/EStGRf6FyGoftD72V4XyCqGFTREAeb4+z9JNeFYzxu0ov7zrp5tJ
- L1lwHcKzZ2coKSgs=
-X-Received: by 2002:a17:902:848c:: with SMTP id
- c12mr8671349plo.47.1567068894328; 
- Thu, 29 Aug 2019 01:54:54 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzmCR4breGRC20DfQyDvMzvPIUiR9Ay+vzD/WzFdFlxIJfpHL9WX9BxQuvKq3d2GyGe3moEnQ==
-X-Received: by 2002:a17:902:848c:: with SMTP id
- c12mr8671340plo.47.1567068894133; 
- Thu, 29 Aug 2019 01:54:54 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id u18sm2208177pfl.29.2019.08.29.01.54.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Aug 2019 01:54:53 -0700 (PDT)
-Date: Thu, 29 Aug 2019 16:54:42 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20190829085442.GI8729@xz-x1>
-References: <20190812074531.28970-1-peterx@redhat.com>
- <319f1d6a-ef55-cc1b-98d6-f99b365bd88a@redhat.com>
- <e128decc-8b40-160e-fe8e-673682530750@redhat.com>
- <20190829011850.GC8729@xz-x1>
- <ba2df187-81cd-6dbb-992b-6ae9a7b35e37@redhat.com>
- <20190829082153.GH8729@xz-x1>
- <85b87150-9414-00e6-86a3-cf92f1ca6f7c@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <85b87150-9414-00e6-86a3-cf92f1ca6f7c@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC 0/4] intel_iommu: Do sanity check of
- vfio-pci earlier
+ (Exim 4.71) (envelope-from <chao.gao@intel.com>) id 1i3GGE-0006k0-JD
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 04:58:30 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 29 Aug 2019 01:58:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,442,1559545200"; d="scan'208";a="381572329"
+Received: from gao-cwp.sh.intel.com ([10.239.159.26])
+ by fmsmga006.fm.intel.com with ESMTP; 29 Aug 2019 01:58:24 -0700
+From: Chao Gao <chao.gao@intel.com>
+To: xen-devel@lists.xenproject.org,
+	qemu-devel@nongnu.org
+Date: Thu, 29 Aug 2019 17:02:27 +0800
+Message-Id: <1567069347-22841-1-git-send-email-chao.gao@intel.com>
+X-Mailer: git-send-email 1.9.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
+Subject: [Qemu-devel] [RFC Patch] xen/pt: Emulate FLR capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,33 +62,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Bandan Das <bsd@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Paul Durrant <paul.durrant@citrix.com>, Jan Beulich <jbeulich@suse.com>,
+ Anthony Perard <anthony.perard@citrix.com>, Chao Gao <chao.gao@intel.com>,
+ =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 29, 2019 at 10:46:42AM +0200, Auger Eric wrote:
-> If I understand correctly PT mode is a bypass mode. With the ARM SMMUv3
-> the IOMMU MR translate() function gets called but implements a direct
-> mapping. I understand that on your side, you destroy the IOMMU MR, right?
-> 
-> At the moment since SMMUv3/VFIO integration is not ready I plan to
-> forbid any usage of VFIO along with SMMUv3, whatever the enable state.
-> 
-> When HW nested paging gets ready, the stage1 bypass state will be
-> propagated to the HW config structure.
-> 
-> Hope I answer your question.
+Currently, for a HVM on Xen, no reset method is virtualized. So in a VM's
+perspective, assigned devices cannot be reset. But some devices rely on PCI
+reset to recover from hardware hangs. When being assigned to a VM, those
+devices cannot be reset and won't work any longer if a hardware hang occurs.
+We have to reboot VM to trigger PCI reset on host to recover the device.
 
-Yes, nested page tables will be fine. :)
+This patch exposes FLR capability to VMs if the assigned device can be reset on
+host. When VM initiates an FLR to a device, qemu cleans up the device state,
+(including disabling of intx and/or MSI and unmapping BARs from guest, deleting
+emulated registers), then initiate PCI reset through 'reset' knob under the
+device's sysfs, finally initialize the device again.
 
-Thanks,
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+---
+Do we need to introduce an attribute, like "permissive" to explicitly
+enable FLR capability emulation? During PCI reset, interrupts and BARs are
+unmapped from the guest. It seems that guest cannot interact with the device
+directly except access to device's configuration space which is emulated by
+qemu. If proper method can be used to prevent qemu accessing the physical
+device there is no new security hole caused by the FLR emulation.
 
+VM's FLR may be backed by any reset function on host to the physical device,
+for example: FLR, D3softreset, secondary bus reset. Not sure it is fine to mix
+them. Given Linux kernel just uses an unified API to reset device and caller
+cannot choose a specific one, it might be OK.
+---
+ hw/xen/xen-host-pci-device.c | 30 ++++++++++++++++++++++++++++++
+ hw/xen/xen-host-pci-device.h |  3 +++
+ hw/xen/xen_pt.c              |  9 +++++++++
+ hw/xen/xen_pt.h              |  1 +
+ hw/xen/xen_pt_config_init.c  | 30 +++++++++++++++++++++++++++---
+ 5 files changed, 70 insertions(+), 3 deletions(-)
+
+diff --git a/hw/xen/xen-host-pci-device.c b/hw/xen/xen-host-pci-device.c
+index 1b44dcafaf..d549656f42 100644
+--- a/hw/xen/xen-host-pci-device.c
++++ b/hw/xen/xen-host-pci-device.c
+@@ -198,6 +198,35 @@ static bool xen_host_pci_dev_is_virtfn(XenHostPCIDevice *d)
+     return !stat(path, &buf);
+ }
+ 
++static bool xen_host_pci_resetable(XenHostPCIDevice *d)
++{
++    char path[PATH_MAX];
++
++    xen_host_pci_sysfs_path(d, "reset", path, sizeof(path));
++
++    return !access(path, W_OK);
++}
++
++void xen_host_pci_reset(XenHostPCIDevice *d)
++{
++    char path[PATH_MAX];
++    int fd;
++
++    xen_host_pci_sysfs_path(d, "reset", path, sizeof(path));
++
++    fd = open(path, O_WRONLY);
++    if (fd == -1) {
++        XEN_HOST_PCI_LOG("Xen host pci reset: open error\n");
++        return;
++    }
++
++    if (write(fd, "1", 1) != 1) {
++        XEN_HOST_PCI_LOG("Xen host pci reset: write error\n");
++    }
++
++    return;
++}
++
+ static void xen_host_pci_config_open(XenHostPCIDevice *d, Error **errp)
+ {
+     char path[PATH_MAX];
+@@ -377,6 +406,7 @@ void xen_host_pci_device_get(XenHostPCIDevice *d, uint16_t domain,
+     d->class_code = v;
+ 
+     d->is_virtfn = xen_host_pci_dev_is_virtfn(d);
++    d->is_resetable = xen_host_pci_resetable(d);
+ 
+     return;
+ 
+diff --git a/hw/xen/xen-host-pci-device.h b/hw/xen/xen-host-pci-device.h
+index 4d8d34ecb0..cacf9b3df8 100644
+--- a/hw/xen/xen-host-pci-device.h
++++ b/hw/xen/xen-host-pci-device.h
+@@ -32,6 +32,7 @@ typedef struct XenHostPCIDevice {
+     XenHostPCIIORegion rom;
+ 
+     bool is_virtfn;
++    bool is_resetable;
+ 
+     int config_fd;
+ } XenHostPCIDevice;
+@@ -55,4 +56,6 @@ int xen_host_pci_set_block(XenHostPCIDevice *d, int pos, uint8_t *buf,
+ 
+ int xen_host_pci_find_ext_cap_offset(XenHostPCIDevice *s, uint32_t cap);
+ 
++void xen_host_pci_reset(XenHostPCIDevice *d);
++
+ #endif /* XEN_HOST_PCI_DEVICE_H */
+diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+index 8fbaf2eae9..d750367c0a 100644
+--- a/hw/xen/xen_pt.c
++++ b/hw/xen/xen_pt.c
+@@ -938,6 +938,15 @@ static void xen_pt_unregister_device(PCIDevice *d)
+     xen_pt_destroy(d);
+ }
+ 
++void xen_pt_reset(XenPCIPassthroughState *s)
++{
++    PCIDevice *d = PCI_DEVICE(s);
++
++    xen_pt_unregister_device(d);
++    xen_host_pci_reset(&s->real_device);
++    xen_pt_realize(d, NULL);
++}
++
+ static Property xen_pci_passthrough_properties[] = {
+     DEFINE_PROP_PCI_HOST_DEVADDR("hostaddr", XenPCIPassthroughState, hostaddr),
+     DEFINE_PROP_BOOL("permissive", XenPCIPassthroughState, permissive, false),
+diff --git a/hw/xen/xen_pt.h b/hw/xen/xen_pt.h
+index 9167bbaf6d..ed05bc0d39 100644
+--- a/hw/xen/xen_pt.h
++++ b/hw/xen/xen_pt.h
+@@ -332,4 +332,5 @@ int xen_pt_register_vga_regions(XenHostPCIDevice *dev);
+ int xen_pt_unregister_vga_regions(XenHostPCIDevice *dev);
+ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHostPCIDevice *dev,
+                      Error **errp);
++void xen_pt_reset(XenPCIPassthroughState *s);
+ #endif /* XEN_PT_H */
+diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
+index 31ec5add1d..435abd7286 100644
+--- a/hw/xen/xen_pt_config_init.c
++++ b/hw/xen/xen_pt_config_init.c
+@@ -852,6 +852,30 @@ static inline uint8_t get_device_type(XenPCIPassthroughState *s,
+     return (flag & PCI_EXP_FLAGS_TYPE) >> 4;
+ }
+ 
++/* Initialize Device Capability register */
++static int xen_pt_devcap_reg_init(XenPCIPassthroughState *s,
++                                  XenPTRegInfo *reg, uint32_t real_offset,
++                                  uint32_t *data)
++{
++    *data = reg->init_val;
++
++    if (s->real_device.is_resetable) {
++        *data |= PCI_EXP_DEVCAP_FLR;
++    }
++
++    return 0;
++}
++
++static int xen_pt_devctl_reg_write(XenPCIPassthroughState *s,
++                                   XenPTReg *cfg_entry, uint16_t *val,
++                                   uint16_t dev_value, uint16_t valid_mask)
++{
++    if (s->real_device.is_resetable && (*val & PCI_EXP_DEVCTL_BCR_FLR)) {
++        xen_pt_reset(s);
++    }
++    return xen_pt_word_reg_write(s, cfg_entry, val, dev_value, valid_mask);
++}
++
+ /* initialize Link Control register */
+ static int xen_pt_linkctrl_reg_init(XenPCIPassthroughState *s,
+                                     XenPTRegInfo *reg, uint32_t real_offset,
+@@ -933,7 +957,7 @@ static XenPTRegInfo xen_pt_emu_reg_pcie[] = {
+         .init_val   = 0x00000000,
+         .ro_mask    = 0xFFFFFFFF,
+         .emu_mask   = 0x10000000,
+-        .init       = xen_pt_common_reg_init,
++        .init       = xen_pt_devcap_reg_init,
+         .u.dw.read  = xen_pt_long_reg_read,
+         .u.dw.write = xen_pt_long_reg_write,
+     },
+@@ -946,7 +970,7 @@ static XenPTRegInfo xen_pt_emu_reg_pcie[] = {
+         .emu_mask   = 0xFFFF,
+         .init       = xen_pt_common_reg_init,
+         .u.w.read   = xen_pt_word_reg_read,
+-        .u.w.write  = xen_pt_word_reg_write,
++        .u.w.write  = xen_pt_devctl_reg_write,
+     },
+     /* Device Status reg */
+     {
+@@ -1969,7 +1993,7 @@ static void xen_pt_config_reg_init(XenPCIPassthroughState *s,
+             /* Mask out host (including past size). */
+             new_val = val & host_mask;
+             /* Merge emulated ones (excluding the non-emulated ones). */
+-            new_val |= data & host_mask;
++            new_val |= data & ~host_mask;
+             /* Leave intact host and emulated values past the size - even though
+              * we do not care as we write per reg->size granularity, but for the
+              * logging below lets have the proper value. */
 -- 
-Peter Xu
+2.17.1
+
 
