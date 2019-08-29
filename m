@@ -2,70 +2,64 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.3 required=3.0 tests=DATE_IN_PAST_03_06,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBC6C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 20:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 296F1C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 20:57:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 515D8233FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 20:36:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515D8233FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id F19DC23403
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 20:57:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F19DC23403
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3R9h-00065q-Ej
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 16:36:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38044)
+	id 1i3RUS-0002Zk-WC
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 16:57:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41412)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i3R8n-0005eo-AV
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:35:34 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1i3RTn-00028H-7B
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i3R8k-0001mc-Sw
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:35:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56046)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i3R8k-0001kI-MV
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:35:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i3R8j-0004Kq-7t
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 20:35:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 364F52E8033
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 20:35:29 +0000 (UTC)
+ (envelope-from <ehabkost@redhat.com>) id 1i3RTk-0006sq-1Z
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:57:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46412)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1i3RTj-0006py-QW
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 16:57:11 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CB2D5368CF;
+ Thu, 29 Aug 2019 20:57:10 +0000 (UTC)
+Received: from localhost (ovpn-116-109.gru2.redhat.com [10.97.116.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FBE6100194E;
+ Thu, 29 Aug 2019 20:57:10 +0000 (UTC)
+Date: Thu, 29 Aug 2019 14:55:37 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Message-ID: <20190829175537.GB3694@habkost.net>
+References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 29 Aug 2019 20:29:30 -0000
-From: Paul Clarke <pc@us.ibm.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
-Message-Id: <156711057074.6835.13599471410604217618.malonedeb@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19044";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 22c00a3cb87a3aff0fc299cc05a103a0486d7663
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Thu, 29 Aug 2019 20:57:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1841990] [NEW] instruction 'denbcdq' misbehaving
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] tests/acceptance: Update MIPS Malta
+ ssh test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,118 +68,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841990 <1841990@bugs.launchpad.net>
+Cc: crosa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
+ amarkovic@wavecomp.com, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Fri, Aug 02, 2019 at 05:35:56PM +0200, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> This little series improves linux_ssh_mips_malta.py, both in the sense
+> of code organization and in the sense of quantity of executed tests.
 
-Instruction 'denbcdq' appears to have no effect.  Test case attached.
+Thanks!  I'm queueing it on python-next.  The changes suggested
+by others can be implemented as follow up patches.
 
-On ppc64le native:
---
-gcc -g -O -mcpu=3Dpower9 bcdcfsq.c test-denbcdq.c -o test-denbcdq
-$ ./test-denbcdq
-0x00000000000000000000000000000000
-0x0000000000000000000000000000000c
-0x22080000000000000000000000000000
-$ ./test-denbcdq 1
-0x00000000000000000000000000000001
-0x0000000000000000000000000000001c
-0x22080000000000000000000000000001
-$ ./test-denbcdq $(seq 0 99)
-0x00000000000000000000000000000064
-0x0000000000000000000000000000100c
-0x22080000000000000000000000000080
---
 
-With "qemu-ppc64le -cpu power9"
---
-$ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq
-0x00000000000000000000000000000000
-0x0000000000000000000000000000000c
-0x0000000000000000000000000000000c
-$ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq 1
-0x00000000000000000000000000000001
-0x0000000000000000000000000000001c
-0x0000000000000000000000000000001c
-$ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq $(seq 100)
-0x00000000000000000000000000000064
-0x0000000000000000000000000000100c
-0x0000000000000000000000000000100c
---
+> 
+> Aleksandar Markovic (2):
+>   tests/acceptance: Refactor and improve reporting in
+>     linux_ssh_mips_malta.py
+>   tests/acceptance: Add new test cases in linux_ssh_mips_malta.py
+> 
+>  tests/acceptance/linux_ssh_mips_malta.py | 81 ++++++++++++++++++++++++++------
+>  1 file changed, 66 insertions(+), 15 deletions(-)
+> 
+> -- 
+> 2.7.4
+> 
+> 
 
-I started looking at the code, but I got confused rather quickly.  Could
-be related to endianness? I think denbcdq arrived on the scene before
-little-endian was a big deal.  Maybe something to do with utilizing
-implicit floating-point register pairs...  I don't think the right data
-is getting to helper_denbcdq, which would point back to the gen_fprp_ptr
-uses in dfp-impl.inc.c (GEN_DFP_T_FPR_I32_Rc).  (Maybe?)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "test case for using denbcdq"
-   https://bugs.launchpad.net/bugs/1841990/+attachment/5285701/+files/test-=
-denbcdq.c
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841990
-
-Title:
-  instruction 'denbcdq' misbehaving
-
-Status in QEMU:
-  New
-
-Bug description:
-  Instruction 'denbcdq' appears to have no effect.  Test case attached.
-
-  On ppc64le native:
-  --
-  gcc -g -O -mcpu=3Dpower9 bcdcfsq.c test-denbcdq.c -o test-denbcdq
-  $ ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x22080000000000000000000000000000
-  $ ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x22080000000000000000000000000001
-  $ ./test-denbcdq $(seq 0 99)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x22080000000000000000000000000080
-  --
-
-  With "qemu-ppc64le -cpu power9"
-  --
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x0000000000000000000000000000000c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x0000000000000000000000000000001c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq $(seq 100)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x0000000000000000000000000000100c
-  --
-
-  I started looking at the code, but I got confused rather quickly.
-  Could be related to endianness? I think denbcdq arrived on the scene
-  before little-endian was a big deal.  Maybe something to do with
-  utilizing implicit floating-point register pairs...  I don't think the
-  right data is getting to helper_denbcdq, which would point back to the
-  gen_fprp_ptr uses in dfp-impl.inc.c (GEN_DFP_T_FPR_I32_Rc).  (Maybe?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841990/+subscriptions
+-- 
+Eduardo
 
