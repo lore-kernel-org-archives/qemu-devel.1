@@ -2,140 +2,88 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 337B8C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CB1C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:43:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C69721726
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:43:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C69721726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C10362189D
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 17:43:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tkq37QTp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C10362189D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3OSZ-0005Fp-4w
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:43:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60511)
+	id 1i3OSg-0005Rx-OW
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 13:43:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i3OKU-00055p-Lu
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:35:27 -0400
+ (envelope-from <vandersonmr2@gmail.com>) id 1i3OKN-0004vo-Ds
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i3OKT-0000Pb-En
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:35:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39422)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i3OKP-0000Mz-R5; Thu, 29 Aug 2019 13:35:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CCEBD18C426B;
- Thu, 29 Aug 2019 17:35:20 +0000 (UTC)
-Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 016C35C21E;
- Thu, 29 Aug 2019 17:35:17 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190829100521.12143-1-philmd@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e5d6219f-e170-5e73-fbba-cbc21fd41a42@redhat.com>
-Date: Thu, 29 Aug 2019 13:35:17 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <vandersonmr2@gmail.com>) id 1i3OKJ-0000J9-0i
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:35:18 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:32815)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
+ id 1i3OKI-0000Ij-PQ
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 13:35:14 -0400
+Received: by mail-qk1-x742.google.com with SMTP id w18so3735345qki.0
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 10:35:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=vD3H1azDT1nF0aF1U/15SXskrW4/Xq3TLViAuCH6Ixk=;
+ b=tkq37QTpco6RTHhxC+HNhvtkuuiY5pRIvPXfOTBbzYsgRg1m+DNX4cm+2Dw1JhEhV5
+ 09VfnXplWnXrHsQo86OByeA7l8rIOHVpxOCN7C6NiD9bm7QWbrqBJyhwGdTpeYA95XFf
+ R3BbrHYTgsMCakfH93m7rdOymM/C7kxqoM4HU3m7lrMbRDWkgOUtIY7MPNNuyxHVkDYU
+ z0Uco34059i1Lz+mCzYuTk7Z2TkuL3eN73r7vupdRIg5szheRKi+9lz/YlYYiHJKSEYr
+ 84w4H7KD8DJosFP/pO/7Ahfx5anSfsvsPnrEnD5A7I5lVC0MyWGE8xsQAnxDEhX63mdB
+ 8xGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=vD3H1azDT1nF0aF1U/15SXskrW4/Xq3TLViAuCH6Ixk=;
+ b=N21naW+jQ6Cw7MXJiH0FdXKMpcRjM7Gufx9GzuRaJJB6b0goDPQCMBHY6eb8e1MmI0
+ W+00vPtImueIgw78egrg44R4J4B+k9T4dR5s8dE1PYKDNaGmtF7SGia/yWftQ3ukIe5q
+ lWecC9n+gzTkocfOtY3Z+gvuThkqOaHmyRbMppLHweKXcxipC2o4MiXMxEnUolsJE+Us
+ Cn4ef/RBcMDIkUkJxNExONHHYX0eIsQe0P9Hf0I/9JzXJZlKXXEcwN7hCKVwZmaCM4pB
+ 0EVo6831uZaTU6QFhBaFNRxEZK3cz9gIVR95kfHTwBN9EVHUCyd+sTAHtB+6e1dk5lxJ
+ Z24w==
+X-Gm-Message-State: APjAAAWNXblShUGmkZn+etVPLmA9VkA1u74dMC1y/XA6n5QkA0VAR2W7
+ R+1+GfEqoYxUN80/jdX104XF/8abrPg47Q==
+X-Google-Smtp-Source: APXvYqzmyvugOLTzbDyLwI/qfdKmWzlXXWK6M2MMurP9vQn335FmV9gtkra3UE0sIc2RdJi7ipvslw==
+X-Received: by 2002:a05:620a:1518:: with SMTP id
+ i24mr10922575qkk.276.1567100114010; 
+ Thu, 29 Aug 2019 10:35:14 -0700 (PDT)
+Received: from vanderson-lmcad.gw.lmcad.ic.unicamp.br (gw.lmcad.ic.unicamp.br.
+ [143.106.73.166])
+ by smtp.googlemail.com with ESMTPSA id j50sm1721700qtj.30.2019.08.29.10.35.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 29 Aug 2019 10:35:13 -0700 (PDT)
+From: vandersonmr <vandersonmr2@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 29 Aug 2019 14:34:33 -0300
+Message-Id: <20190829173437.5926-8-vandersonmr2@gmail.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190829173437.5926-1-vandersonmr2@gmail.com>
+References: <20190829173437.5926-1-vandersonmr2@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190829100521.12143-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Thu, 29 Aug 2019 17:35:20 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/2] git.orderfile: Order Python/shell
- scripts before unordered files
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::742
+Subject: [Qemu-devel] [PATCH v8 07/11] monitor: adding tb_stats hmp command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,31 +95,337 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Adding tb_stats [start|pause|stop|filter] command to hmp.
+This allows controlling the collection of statistics.
+It is also possible to set the level of collection:
+all, jit, or exec.
 
+tb_stats filter allow to only collect statistics for the TB
+in the last_search list.
 
-On 8/29/19 6:05 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> This series update the git.orderfile to order Python and shell
-> scripts before unordered files.
-> This is particularly useful for changes in tests/qemu-iotests.
->=20
-> Regards,
->=20
-> Phil.
->=20
-> Philippe Mathieu-Daud=C3=A9 (2):
->   scripts/git.orderfile: Order Python files before unordered ones
->   scripts/git.orderfile: Order shell scripts before unordered files
->=20
->  scripts/git.orderfile | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
+The goal of this command is to allow the dynamic exploration
+of the TCG behavior and quality. Therefore, for now, a
+corresponding QMP command is not worthwhile.
 
-ACK, not that you need more reviews for a trivial patch:
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+---
+ accel/tcg/tb-stats.c          | 110 ++++++++++++++++++++++++++++++++++
+ hmp-commands.hx               |  17 ++++++
+ include/exec/tb-stats-flags.h |   1 +
+ include/exec/tb-stats.h       |  11 ++++
+ monitor/misc.c                |  47 +++++++++++++++
+ vl.c                          |   6 ++
+ 6 files changed, 192 insertions(+)
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
+index 66abc97ad4..9959477fbb 100644
+--- a/accel/tcg/tb-stats.c
++++ b/accel/tcg/tb-stats.c
+@@ -32,6 +32,9 @@
+ 
+ #include "exec/tb-stats.h"
+ 
++/* only accessed in safe work */
++static GList *last_search;
++
+ uint64_t dev_time;
+ 
+ struct jit_profile_info {
+@@ -160,6 +163,95 @@ void dump_jit_profile_info(TCGProfile *s)
+     g_free(jpi);
+ }
+ 
++static void free_tbstats(void *p, uint32_t hash, void *userp)
++{
++    g_free(p);
++}
++
++static void clean_tbstats(void)
++{
++    /* remove all tb_stats */
++    qht_iter(&tb_ctx.tb_stats, free_tbstats, NULL);
++    qht_destroy(&tb_ctx.tb_stats);
++}
++
++void do_hmp_tbstats_safe(CPUState *cpu, run_on_cpu_data icmd)
++{
++    struct TbstatsCommand *cmdinfo = icmd.host_ptr;
++    int cmd = cmdinfo->cmd;
++    uint32_t level = cmdinfo->level;
++
++    switch (cmd) {
++    case START:
++        if (tb_stats_collection_paused()) {
++            set_tbstats_flags(level);
++        } else {
++            if (tb_stats_collection_enabled()) {
++                qemu_printf("TB information already being recorded");
++                return;
++            }
++            qht_init(&tb_ctx.tb_stats, tb_stats_cmp, CODE_GEN_HTABLE_SIZE,
++                        QHT_MODE_AUTO_RESIZE);
++        }
++
++        set_default_tbstats_flag(level);
++        enable_collect_tb_stats();
++        tb_flush(cpu);
++        break;
++    case PAUSE:
++        if (!tb_stats_collection_enabled()) {
++            qemu_printf("TB information not being recorded");
++            return;
++        }
++
++        /* Continue to create TBStatistic structures but stop collecting statistics */
++        pause_collect_tb_stats();
++        set_default_tbstats_flag(TB_NOTHING);
++        set_tbstats_flags(TB_PAUSED);
++        tb_flush(cpu);
++        break;
++    case STOP:
++        if (!tb_stats_collection_enabled()) {
++            qemu_printf("TB information not being recorded");
++            return;
++        }
++
++        /* Dissalloc all TBStatistics structures and stop creating new ones */
++        disable_collect_tb_stats();
++        clean_tbstats();
++        tb_flush(cpu);
++        break;
++    case FILTER:
++        if (!tb_stats_collection_enabled()) {
++            qemu_printf("TB information not being recorded");
++            return;
++        }
++        if (!last_search) {
++            qemu_printf("no search on record! execute info tbs before filtering!");
++            return;
++        }
++
++        set_default_tbstats_flag(TB_NOTHING);
++
++        /* Set all tbstats as paused, then return only the ones from last_search */
++        pause_collect_tb_stats();
++        set_tbstats_flags(TB_PAUSED);
++
++        for (GList *iter = last_search; iter; iter = g_list_next(iter)) {
++            TBStatistics *tbs = iter->data;
++            tbs->stats_enabled = level;
++        }
++
++        tb_flush(cpu);
++
++        break;
++    default: /* INVALID */
++        g_assert_not_reached();
++        break;
++    }
++
++    g_free(cmdinfo);
++}
+ 
+ void init_tb_stats_htable_if_not(void)
+ {
+@@ -195,6 +287,24 @@ bool tb_stats_collection_paused(void)
+     return tcg_collect_tb_stats == TB_STATS_PAUSED;
+ }
+ 
++static void reset_tbstats_flag(void *p, uint32_t hash, void *userp)
++{
++    uint32_t flag = *((int *)userp);
++    TBStatistics *tbs = p;
++    tbs->stats_enabled = flag;
++}
++
++void set_default_tbstats_flag(uint32_t flag)
++{
++    default_tbstats_flag = flag;
++}
++
++void set_tbstats_flags(uint32_t flag)
++{
++    /* iterate over tbstats setting their flag as TB_NOTHING */
++    qht_iter(&tb_ctx.tb_stats, reset_tbstats_flag, &flag);
++}
++
+ uint32_t get_default_tbstats_flag(void)
+ {
+     return default_tbstats_flag;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index cfcc044ce4..6cd2800378 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1886,6 +1886,23 @@ STEXI
+ @findex qemu-io
+ Executes a qemu-io command on the given block device.
+ 
++ETEXI
++#if defined(CONFIG_TCG)
++    {
++        .name       = "tb_stats",
++        .args_type  = "command:s,level:s?",
++        .params     = "command [stats_level]",
++        .help       = "Control tb statistics collection:"
++                        "tb_stats (start|pause|stop|filter) [all|jit_stats|exec_stats]",
++        .cmd        = hmp_tbstats,
++    },
++#endif
++
++STEXI
++@item tb_stats
++@findex
++Control recording tb statistics
++
+ ETEXI
+ 
+     {
+diff --git a/include/exec/tb-stats-flags.h b/include/exec/tb-stats-flags.h
+index c936ac1084..16b563f858 100644
+--- a/include/exec/tb-stats-flags.h
++++ b/include/exec/tb-stats-flags.h
+@@ -35,6 +35,7 @@ enum TBStatsStatus {
+ #define TB_EXEC_STATS (1 << 1)
+ #define TB_JIT_STATS  (1 << 2)
+ #define TB_JIT_TIME   (1 << 3)
++#define TB_PAUSED     (1 << 4)
+ 
+ extern int tcg_collect_tb_stats;
+ extern uint32_t default_tbstats_flag;
+diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
+index 6a53bef31b..65063c52d7 100644
+--- a/include/exec/tb-stats.h
++++ b/include/exec/tb-stats.h
+@@ -32,6 +32,9 @@
+ 
+ #include "exec/tb-stats-flags.h"
+ 
++enum SortBy { SORT_BY_HOTNESS, SORT_BY_HG /* Host/Guest */, SORT_BY_SPILLS };
++enum TbstatsCmd { START, PAUSE, STOP, FILTER };
++
+ #define tb_stats_enabled(tb, JIT_STATS) \
+     (tb && tb->tb_stats && (tb->tb_stats->stats_enabled & JIT_STATS))
+ 
+@@ -105,6 +108,13 @@ void init_tb_stats_htable_if_not(void);
+ 
+ void dump_jit_profile_info(TCGProfile *s);
+ 
++struct TbstatsCommand {
++    enum TbstatsCmd cmd;
++    uint32_t level;
++};
++
++void do_hmp_tbstats_safe(CPUState *cpu, run_on_cpu_data icmd);
++
+ /* TBStatistic collection controls */
+ void enable_collect_tb_stats(void);
+ void disable_collect_tb_stats(void);
+@@ -112,6 +122,7 @@ void pause_collect_tb_stats(void);
+ bool tb_stats_collection_enabled(void);
+ bool tb_stats_collection_paused(void);
+ 
++void set_default_tbstats_flag(uint32_t flag);
+ uint32_t get_default_tbstats_flag(void);
+ 
+ #endif
+diff --git a/monitor/misc.c b/monitor/misc.c
+index ac4ff58d96..b389ca09a1 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -459,6 +459,49 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+ }
+ 
+ #ifdef CONFIG_TCG
++static void hmp_tbstats(Monitor *mon, const QDict *qdict)
++{
++    if (!tcg_enabled()) {
++        error_report("TB information is only available with accel=tcg");
++        return;
++    }
++
++    char *cmd = (char *) qdict_get_try_str(qdict, "command");
++    enum TbstatsCmd icmd = -1;
++
++    if (strcmp(cmd, "start") == 0) {
++        icmd = START;
++    } else if (strcmp(cmd, "pause") == 0) {
++        icmd = PAUSE;
++    } else if (strcmp(cmd, "stop") == 0) {
++        icmd = STOP;
++    } else if (strcmp(cmd, "filter") == 0) {
++        icmd = FILTER;
++    } else {
++        error_report("invalid command!");
++        return;
++    }
++
++    char *slevel = (char *) qdict_get_try_str(qdict, "level");
++    uint32_t level = TB_EXEC_STATS | TB_JIT_STATS | TB_JIT_TIME;
++    if (slevel) {
++        if (strcmp(slevel, "jit") == 0) {
++            level = TB_JIT_STATS;
++        } else if (strcmp(slevel, "exec") == 0) {
++            level = TB_EXEC_STATS;
++        } else if (strcmp(slevel, "time") == 0) {
++            level = TB_JIT_TIME;
++        }
++    }
++
++    struct TbstatsCommand *tbscommand = g_new0(struct TbstatsCommand, 1);
++    tbscommand->cmd = icmd;
++    tbscommand->level = level;
++    async_safe_run_on_cpu(first_cpu, do_hmp_tbstats_safe,
++                          RUN_ON_CPU_HOST_PTR(tbscommand));
++
++}
++
+ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+ {
+     if (!tcg_enabled()) {
+@@ -1089,8 +1132,12 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
+ 
+ static void hmp_info_profile(Monitor *mon, const QDict *qdict)
+ {
++#ifdef CONFIG_TCG
+     dump_jit_exec_time_info(dev_time);
+     dev_time = 0;
++#else
++    error_report("TCG should be enabled!");
++#endif
+ }
+ 
+ /* Capture support */
+diff --git a/vl.c b/vl.c
+index 4203cc728c..dcb30eea8a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1796,11 +1796,17 @@ static bool main_loop_should_exit(void)
+ 
+ static void main_loop(void)
+ {
++#ifdef CONFIG_TCG
+     uint64_t ti;
++#endif
+     while (!main_loop_should_exit()) {
++#ifdef CONFIG_TCG
+         ti = profile_getclock();
++#endif
+         main_loop_wait(false);
++#ifdef CONFIG_TCG
+         dev_time += profile_getclock() - ti;
++#endif
+     }
+ }
+ 
+-- 
+2.22.0
+
 
