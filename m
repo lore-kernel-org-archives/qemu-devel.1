@@ -2,65 +2,67 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E21C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 11:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D29C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 11:14:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28E2120674
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 11:11:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E2120674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=windriver.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4AA9F20674
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 11:14:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AA9F20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3IL8-0001ut-Cn
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 07:11:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54559)
+	id 1i3IO2-0003I0-EU
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 07:14:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Zhe.He@windriver.com>) id 1i3IHO-0007hS-IX
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 07:07:53 -0400
+ (envelope-from <ppandit@redhat.com>) id 1i3INL-0002j1-6l
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 07:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Zhe.He@windriver.com>) id 1i3IHL-0001lj-VJ
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 07:07:49 -0400
-Received: from mail.windriver.com ([147.11.1.11]:46834)
+ (envelope-from <ppandit@redhat.com>) id 1i3INJ-0008K3-0s
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 07:13:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36464)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Zhe.He@windriver.com>)
- id 1i3IHL-0001ij-Jk
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 07:07:47 -0400
-Received: from ALA-HCA.corp.ad.wrs.com ([147.11.189.40])
- by mail.windriver.com (8.15.2/8.15.1) with ESMTPS id x7T9QsDO028955
- (version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL);
- Thu, 29 Aug 2019 02:26:54 -0700 (PDT)
-Received: from [128.224.162.221] (128.224.162.221) by ALA-HCA.corp.ad.wrs.com
- (147.11.189.50) with Microsoft SMTP Server (TLS) id 14.3.468.0;
- Thu, 29 Aug 2019 02:26:53 -0700
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <1567068782-371028-1-git-send-email-zhe.he@windriver.com>
- <20190829091505.GB17141@redhat.com>
-From: He Zhe <zhe.he@windriver.com>
-Message-ID: <7d3d9777-725c-7e27-515d-fc003351704f@windriver.com>
-Date: Thu, 29 Aug 2019 17:26:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <ppandit@redhat.com>)
+ id 1i3INI-0008If-RW; Thu, 29 Aug 2019 07:13:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7F5EF881341;
+ Thu, 29 Aug 2019 11:13:55 +0000 (UTC)
+Received: from kaapi (ovpn-116-71.ams2.redhat.com [10.36.116.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C40D5D712;
+ Thu, 29 Aug 2019 11:13:44 +0000 (UTC)
+Date: Thu, 29 Aug 2019 16:43:40 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Samuel Thibault <samuel.thibault@gnu.org>
+In-Reply-To: <20190825225403.vwg2fhfff6i7gnwd@function>
+Message-ID: <nycvar.YSQ.7.76.1908291635010.28885@xnncv>
+References: <20190822144134.23521-1-philmd@redhat.com>
+ <20190822144134.23521-2-philmd@redhat.com>
+ <20190822183313.pptfwjsnrpdi6tfp@function>
+ <14216968-a066-6abf-1952-3cff3aa3eee3@redhat.com>
+ <20190825225403.vwg2fhfff6i7gnwd@function>
 MIME-Version: 1.0
-In-Reply-To: <20190829091505.GB17141@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-X-Originating-IP: [128.224.162.221]
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Thu, 29 Aug 2019 11:13:55 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by mail.windriver.com id
- x7T9QsDO028955
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 147.11.1.11
-Subject: Re: [Qemu-devel] [PATCH] configure: Add pkg-config handling for
- libgcrypt
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Slirp] [PATCH 1/2] Do not reassemble fragments
+ pointing outside of the original payload
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,136 +74,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, thuth@redhat.com, philmd@redhat.com, laurent@vivier.eu,
- qemu-devel@nongnu.org
+Cc: slirp@lists.freedesktop.org, Petr Matousek <pmatouse@redhat.com>,
+ Vishnu Dev TJ <vishnudevtj@gmail.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
++-- On Mon, 26 Aug 2019, Samuel Thibault wrote --+
+| Philippe Mathieu-Daud=C3=A9, le ven. 23 ao=C3=BBt 2019 17:15:32 +0200, =
+a ecrit:
+| > > Did you make your test with commit 126c04acbabd ("Fix heap overflow=
+ in
+| > > ip_reass on big packet input") applied?
+| >=20
+| > Yes, unfortunately it doesn't fix the issue.
+|=20
+| Ok.
+|=20
+| Could you try the attached patch?  There was a use-after-free.  Without
+| it, I can indeed crash qemu with the given exploit.  With it I don't
+| seem to be able to crash it (trying in a loop for several minutes).
 
+Considering that earlier fix was released/pulled into upstream QEMU v4.1.=
+0, we=20
+need to treat this one as a separate issue.
 
-On 8/29/19 5:15 PM, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Aug 29, 2019 at 04:53:02PM +0800, zhe.he@windriver.com wrote:
->> From: He Zhe <zhe.he@windriver.com>
->>
->> libgcrypt may also be controlled by pkg-config, this patch adds pkg-co=
-nfig
->> handling for libgcrypt.
-> Where are you seeing pkg-config files for libgcrypt ?
->
-> The upstream project has (frustratingly) been hostile to any proposal t=
-o
-> add pkg-config support saying people should stick with their custom=20
-> libgcrypt-config tool
->
->    https://dev.gnupg.org/T2037
->
-> Even if this is something added by some distro downstream, what is the
-> benefit in using it, compared with libgcrypt-confg which should already
-> work & is portable.
+   commit c59279437eda91841b9d26079c70b8a540d41204
+   Author: Samuel Thibault <samuel.thibault@ens-lyon.org>
+   Date:   Mon Aug 26 00:55:03 2019 +0200
 
-IMHO, it could be easy for people to use pkg-config as a center to contro=
-l
-configurations for many different packages.
+   ip_reass: Fix use after free
+  =20
+   Using ip_deq after m_free might read pointers from an allocation reuse=
+.
 
-This is just an addition for qemu to be able to work in both cases. It do=
-es not
-remove libgcrypt-confg and can fall back to libgcrypt-confg when pkg-conf=
-ig does
-not work.
+I'll follow-up on that.
 
-Zhe
-
->
->> Signed-off-by: He Zhe <zhe.he@windriver.com>
->> ---
->>  configure | 48 ++++++++++++++++++++++++++++++++++++++++--------
->>  1 file changed, 40 insertions(+), 8 deletions(-)
->>
->> diff --git a/configure b/configure
->> index e44e454..0f362a7 100755
->> --- a/configure
->> +++ b/configure
->> @@ -2875,6 +2875,30 @@ has_libgcrypt() {
->>      return 0
->>  }
->> =20
->> +has_libgcrypt_pkgconfig() {
->> +    if ! has $pkg_config ; then
->> +        return 1
->> +    fi
->> +
->> +    if ! $pkg_config --list-all | grep libgcrypt > /dev/null 2>&1 ; t=
-hen
->> +        return 1
->> +    fi
->> +
->> +    if test -n "$cross_prefix" ; then
->> +        host=3D$($pkg_config --variable=3Dhost libgcrypt)
->> +        if test "${host%-gnu}-" !=3D "${cross_prefix%-gnu}" ; then
->> +            print_error "host($host) does not match cross_prefix($cro=
-ss_prefix)"
->> +            return 1
->> +        fi
->> +    fi
->> +
->> +    if ! $pkg_config --atleast-version=3D1.5.0 libgcrypt ; then
->> +        print_error "libgcrypt version is $($pkg_config --modversion =
-libgcrypt)"
->> +        return 1
->> +    fi
->> +
->> +    return 0
->> +}
->> =20
->>  if test "$nettle" !=3D "no"; then
->>      pass=3D"no"
->> @@ -2902,7 +2926,14 @@ fi
->> =20
->>  if test "$gcrypt" !=3D "no"; then
->>      pass=3D"no"
->> -    if has_libgcrypt; then
->> +    if has_libgcrypt_pkgconfig; then
->> +        gcrypt_cflags=3D$($pkg_config --cflags libgcrypt)
->> +        if test "$static" =3D "yes" ; then
->> +            gcrypt_libs=3D$($pkg_config --libs --static libgcrypt)
->> +        else
->> +            gcrypt_libs=3D$($pkg_config --libs libgcrypt)
->> +        fi
->> +    elif has_libgcrypt; then
->>          gcrypt_cflags=3D$(libgcrypt-config --cflags)
->>          gcrypt_libs=3D$(libgcrypt-config --libs)
->>          # Debian has removed -lgpg-error from libgcrypt-config
->> @@ -2912,15 +2943,16 @@ if test "$gcrypt" !=3D "no"; then
->>          then
->>              gcrypt_libs=3D"$gcrypt_libs -lgpg-error"
->>          fi
->> +    fi
->> =20
->> -        # Link test to make sure the given libraries work (e.g for st=
-atic).
->> -        write_c_skeleton
->> -        if compile_prog "" "$gcrypt_libs" ; then
->> -            LIBS=3D"$gcrypt_libs $LIBS"
->> -            QEMU_CFLAGS=3D"$QEMU_CFLAGS $gcrypt_cflags"
->> -            pass=3D"yes"
->> -        fi
->> +    # Link test to make sure the given libraries work (e.g for static=
-).
->> +    write_c_skeleton
->> +    if compile_prog "" "$gcrypt_libs" ; then
->> +	    LIBS=3D"$gcrypt_libs $LIBS"
->> +	    QEMU_CFLAGS=3D"$QEMU_CFLAGS $gcrypt_cflags"
->> +	    pass=3D"yes"
->>      fi
->> +
->>      if test "$pass" =3D "yes"; then
->>          gcrypt=3D"yes"
->>          cat > $TMPC << EOF
->> --=20
->> 2.7.4
->>
-> Regards,
-> Daniel
-
-
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
