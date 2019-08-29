@@ -2,64 +2,61 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD191C3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 03:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01585C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 04:57:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91ED722CED
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 03:29:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91ED722CED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB9C12173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 04:57:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9C12173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3B7g-0005vJ-M5
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 23:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44501)
+	id 1i3CV7-0001Kx-V8
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 00:57:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57196)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i3B6J-0004zo-Hz
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 23:27:58 -0400
+ (envelope-from <yuzenghui@huawei.com>) id 1i39u8-0000ZL-I0
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i3B6F-0002Ta-Jq
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 23:27:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36486)
+ (envelope-from <yuzenghui@huawei.com>) id 1i39u7-000796-Ca
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 22:11:16 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2257 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i3B6F-0002T6-C4
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 23:27:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2A1B25AFD9;
- Thu, 29 Aug 2019 03:27:50 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-242.rdu2.redhat.com
- [10.10.123.242])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5351F600C1;
- Thu, 29 Aug 2019 03:27:48 +0000 (UTC)
-Date: Wed, 28 Aug 2019 23:27:46 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190829032746.GA488@localhost.localdomain>
-References: <20190829013125.GG16342@umbus.fritz.box>
- <20190829015117.GH16342@umbus.fritz.box>
+ (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
+ id 1i39u4-00074q-R6; Wed, 28 Aug 2019 22:11:13 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 9E8565E696147CB115BC;
+ Thu, 29 Aug 2019 10:11:05 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Thu, 29 Aug 2019
+ 10:10:59 +0800
+To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+ <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <peter.maydell@linaro.org>
+References: <20190827160554.30995-1-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <2b9f6028-117b-f3da-e40b-3e5e217ad826@huawei.com>
+Date: Thu, 29 Aug 2019 10:06:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190829015117.GH16342@umbus.fritz.box>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 29 Aug 2019 03:27:50 +0000 (UTC)
+In-Reply-To: <20190827160554.30995-1-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Cryptic errors from PIP install if missing
- openssl-devel
+X-Received-From: 45.249.212.191
+X-Mailman-Approved-At: Thu, 29 Aug 2019 00:56:37 -0400
+Subject: Re: [Qemu-devel] [RFC 0/3] KVM/ARM: Fix >256 vcpus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,90 +68,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ldoktor@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: maz@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 29, 2019 at 11:51:17AM +1000, David Gibson wrote:
-> On Thu, Aug 29, 2019 at 11:31:25AM +1000, David Gibson wrote:
-> > If I attempt to run "make check-acceptance" on my POWER9, RHEL8.1
-> > machine when the openssl-devel package isn't installed, I get the
-> > following very cryptic error:
-> > 
-> >   VENV    /home/dwg/qemu/build/rhel8/tests/venv
-> >   PIP     /home/dwg/qemu/tests/requirements.txt
-> > Command "/home/dwg/qemu/build/rhel8/tests/venv/bin/python -u -c "import setuptools, tokenize;__file__='/tmp/pip-build-la4el5r5/cryptography/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))" install --record /tmp/pip-1efs22iz-record/install-record.txt --single-version-externally-managed --compile --install-headers /home/dwg/qemu/build/rhel8/tests/venv/include/site/python3.6/cryptography" failed with error code 1 in /tmp/pip-build-la4el5r5/cryptography/
-> > 
-> > Using V=1 doesn't give any more useful information, and it's not
-> > (easily) possible to manually re-run the given command since it relies
-> > on things in /tmp that are removed once the attempt finishes.
-> > 
-> > I only figured out it was openssl-devel being missing that was the
-> > problem by (mostly) guesswork.  It would be really great if we could
-> > generate a more helpful error here.
-> > 
-> > In addition, if I rerun "make check-acceptance" it no longer even
-> > attempts the PIP install, since tests/venv already exists in my build
-> > environment.  It then sort of works, but I think it might be hitting
-> > other errors because of the missing python packages.  Sorry that's a
-> > bit vague - I also seem to be getting unrelated errors that I'm still
-> > trying to figure out.
+Hi Eric,
+
+On 2019/8/28 0:05, Eric Auger wrote:
+> Since 4.18, KVM/ARM exposes a KVM_MAX_VCPUS equal to 512. However it was
+> reported [1] that a VM with more than 256 vcpus cannot be launched. 5.4
+> is about to fix the situation with 2 patches:
+> - one upgrade of the KVM_IRQ_LINE API [2] supporting a vcpu id encoded
+>    on 12 bits,
+> - the reduction of KVM IO devices consumed by each GICv3 redistributor [3]
 > 
-> Fwiw, I also get an equally cryptic error that I haven't figured out
-> the cause for on my 32-bit Fedora container environment:
+> This series uses the new KVM_IRQ_LINE API and also checks the associated
+> capability (KVM_CAP_ARM_IRQ_LINE_LAYOUT_2) in machvirt.
 > 
->   VENV    /home/dwg/src/qemu/build/i386/tests/venv
->   PIP     /home/dwg/src/qemu/tests/requirements.txt
->   Failed building wheel for bcrypt
-> Could not build wheels for bcrypt which use PEP 517 and cannot be installed directly
-> You are using pip version 19.0.3, however version 19.2.3 is available.
-> You should consider upgrading via the 'pip install --upgrade pip' command.
->
+> Without the series, as soon as the -smp arguments exceeds 256, QEMU exits
+> with "kvm_set_irq: Invalid argument".
 
-This is certainly caused by pip not being able to install paramiko on
-those systems.  I have dealt with paramiko (and its many dependencies)
-before on the avocado remote runner plugin (which is not being used
-here) and it was not fun.
+For the series:
 
-My personal goal was to rely on the ssh binary as an ssh client, which
-should be more ubiquitous, and with that I added a simple wrapper to
-Avocado:
+Tested-by: Zenghui Yu <yuzenghui@huawei.com>
 
-  https://avocado-framework.readthedocs.io/en/71.0/api/utils/avocado.utils.html#module-avocado.utils.ssh
+together with [2], [3].
 
-I guess we should consider changing the (few) tests that require
-paramiko to use that module instead.
-
-> In this case the check definitely doesn't work - it doesn't appear to
-> have installed avocado in the venv.
 > 
->   AVOCADO tests/acceptance
-> /home/dwg/src/qemu/build/i386/tests/venv/bin/python: No module named avocado
->
+> Best Regards
+> 
+> Eric
+> 
+> References:
+> [1] Can we boot a 512U kvm guest?
+>      https://patchwork.kernel.org/patch/11091501/
+> [2] [PATCH] KVM: arm/arm64: vgic: Allow more than 256 vcpus for KVM_IRQ_LINE
+>      https://patchwork.kernel.org/patch/11099609/
+> [3] [PATCH] KVM: arm/arm64: vgic: Use a single IO device per redistributor
+>      https://patchwork.kernel.org/patch/11112141/
+> 
+> This series can be found at:
+> https://github.com/eauger/qemu/tree/v4.1.0-256fix-rfc-v1
+> 
+> Eric Auger (3):
+>    linux headers: update for KVM_CAP_ARM_IRQ_LINE_LAYOUT_2
+>    intc/arm_gic: Support PPI injection for more than 256 vpus
+>    virt: Check KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for smp_cpus > 256
 
-My hope is that with pure Python modules in requirements.txt, failures
-will be much harder to come by.  Either way, it'd be nice to improve
-the venv creation, at the very least add a cleanup if it fails to
-complete successfully.
-
-As a workaround I'd suggest two things:
-
- 1) remove paramiko from requirements.txt
- 2) set the env var CONTINUOUS_INTEGRATION=1 before running `make
-    check-acceptace` (the tests in linux_ssh_mips_malta.py check for
-    that and don't run if it's set).
-
-But, we'll need to address those failures definitely ASAP.  Anyway,
-thanks for reporting it.
-
-- Cleber.
-
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-
+Thanks,
+zenghui
 
 
