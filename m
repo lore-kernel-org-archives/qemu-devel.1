@@ -2,65 +2,60 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1CDC3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F978C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E33CC2166E
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:05:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E33CC2166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 149922166E
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 12:07:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 149922166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3JAk-0006Gw-5o
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 08:05:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35969)
+	id 1i3JCq-0007y7-6I
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 08:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36427)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1i3J9t-0005of-GD
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:04:10 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i3JBf-00073y-2G
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1i3J9q-0006nl-Sy
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:04:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46450)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i3JBc-0000vQ-IN
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 08:05:58 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:36290)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1i3J9q-0006jL-Eb; Thu, 29 Aug 2019 08:04:06 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9AB1210F23F1;
- Thu, 29 Aug 2019 12:04:05 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A4F6600C1;
- Thu, 29 Aug 2019 12:04:04 +0000 (UTC)
-Date: Thu, 29 Aug 2019 14:04:02 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <20190829140402.3a547a76@redhat.com>
-In-Reply-To: <0abe612b-5a00-4ebc-9874-6b794d411f51@de.ibm.com>
-References: <20190806094834.7691-2-imammedo@redhat.com>
- <20190807153241.24050-1-imammedo@redhat.com>
- <20190820180727.32cf4891.cohuck@redhat.com>
- <20190827145629.62c5839e@redhat.com>
- <0abe612b-5a00-4ebc-9874-6b794d411f51@de.ibm.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1i3JBa-0000rj-JF; Thu, 29 Aug 2019 08:05:55 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07271378|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.130802-0.0139632-0.855235; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e01a16370; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=12; RT=12; SR=0;
+ TI=SMTPD_---.FL--YOH_1567080343; 
+Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.FL--YOH_1567080343)
+ by smtp.aliyun-inc.com(10.147.43.230);
+ Thu, 29 Aug 2019 20:05:46 +0800
+To: Alistair Francis <alistair23@gmail.com>
+References: <1566959818-38369-1-git-send-email-zhiwei_liu@c-sky.com>
+ <CAKmqyKMDmaABGWyLZD2R-4J8=jM6hry6Bfmu498+UZzQtxsTMA@mail.gmail.com>
+From: liuzhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <af15b620-1350-aa1a-0f02-2a46518f0ef2@c-sky.com>
+Date: Thu, 29 Aug 2019 20:00:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Thu, 29 Aug 2019 12:04:05 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v5 1/2] kvm: s390: split too big
- memory section on several memslots
+In-Reply-To: <CAKmqyKMDmaABGWyLZD2R-4J8=jM6hry6Bfmu498+UZzQtxsTMA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 121.197.200.217
+Subject: Re: [Qemu-devel] [PATCH] RISCV: support riscv vector extension 0.7.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,60 +67,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 29 Aug 2019 08:47:49 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 27.08.19 14:56, Igor Mammedov wrote:
-> > On Tue, 20 Aug 2019 18:07:27 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> On Wed,  7 Aug 2019 11:32:41 -0400
-> >> Igor Mammedov <imammedo@redhat.com> wrote:
-> >>  
-> >>> Max memslot size supported by kvm on s390 is 8Tb,
-> >>> move logic of splitting RAM in chunks upto 8T to KVM code.
-> >>>
-> >>> This way it will hide KVM specific restrictions in KVM code
-> >>> and won't affect baord level design decisions. Which would allow
-> >>> us to avoid misusing memory_region_allocate_system_memory() API
-> >>> and eventually use a single hostmem backend for guest RAM.
-> >>>
-> >>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> >>> ---
-> >>> v5:
-> >>>   * move computation 'size -= slot_size' inside of loop body
-> >>>           (David Hildenbrand <david@redhat.com>)
-> >>> v4:
-> >>>   * fix compilation issue
-> >>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
-> >>>   * advance HVA along with GPA in kvm_set_phys_mem()
-> >>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
-> >>>
-> >>> patch prepares only KVM side for switching to single RAM memory region
-> >>> another patch will take care of  dropping manual RAM partitioning in
-> >>> s390 code.    
-> >>
-> >> I may have lost track a bit -- what is the status of this patch (and
-> >> the series)?  
-> > 
-> > Christian,
-> > 
-> > could you test it on a host that have sufficient amount of RAM?  
-> 
-> 
-> This version looks good. I was able to start a 9TB guest.
-> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=8796091973632, userspace_addr=0x3ffee700000}) = 0
-> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=1, flags=0, guest_phys_addr=0x7fffff00000, memory_size=1099512676352, userspace_addr=0xbffee600000}) = 0
+On 2019/8/29 上午5:34, Alistair Francis wrote:
+> On Wed, Aug 28, 2019 at 12:04 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
+>> Change-Id: I3cf891bc400713b95f47ecca82b1bf773f3dcb25
+>> Signed-off-by: liuzhiwei <zhiwei_liu@c-sky.com>
+>> ---
+>>   fpu/softfloat.c                         |   119 +
+>>   include/fpu/softfloat.h                 |     4 +
+>>   linux-user/riscv/cpu_loop.c             |     8 +-
+>>   target/riscv/Makefile.objs              |     2 +-
+>>   target/riscv/cpu.h                      |    30 +
+>>   target/riscv/cpu_bits.h                 |    15 +
+>>   target/riscv/cpu_helper.c               |     7 +
+>>   target/riscv/csr.c                      |    65 +-
+>>   target/riscv/helper.h                   |   354 +
+>>   target/riscv/insn32.decode              |   374 +-
+>>   target/riscv/insn_trans/trans_rvv.inc.c |   484 +
+>>   target/riscv/translate.c                |     1 +
+>>   target/riscv/vector_helper.c            | 26563 ++++++++++++++++++++++++++++++
+>>   13 files changed, 28017 insertions(+), 9 deletions(-)
+>>   create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+>>   create mode 100644 target/riscv/vector_helper.c
+>>
+> Hello,
 >
-> The only question is if we want to fix the weird alignment (0x7fffff00000) when
-> we already add a migration barrier for uber-large guests.
-> Maybe we could split at 4TB to avoid future problem with larger page sizes?
-That probably should be a separate patch on top.
+> Thanks for the patch!
+>
+> As others have pointed out you will need to split the patch up into
+> multiple smaller patches, otherwise it is too hard to review almost
+> 30,000 lines of code.
 
+Hi, Alistair
+
+I'm so sorry for the inconvenience. It will be a patch set with a cover 
+letter in V2.
+
+> Can you also include a cover letter with your patch series describing
+> how you are testing this? AFAIK vector extension support isn't in any
+> compiler so I'm assuming you are handwriting the assembly or have
+> toolchain patches. Either way it will help if you can share that so
+> others can test your implementation.
+
+Yes, it's handwriting assembly. The assembler in Binutils has support 
+Vector extension.  First define an function test_vadd_vv_8 in assembly 
+and then it can be called from a C program.
+
+The function is something like
+
+/* vadd.vv */
+TEST_FUNC(test_vadd_vv_8)
+         vsetvli        t1, x0, e8, m2
+         vlb.v           v6, (a4)
+         vsb.v           v6, (a3)
+         vsetvli        t1, a0, e8, m2
+         vlb.v           v0, (a1)
+         vlb.v           v2, (a2)
+         vadd.vv     v4, v0, v2
+         vsb.v          v4, (a3)
+ret
+         .size   test_vadd_vv_8, .-test_vadd_vv_8
+
+It takes more time to test than to implement the instructions. Maybe 
+there is some better test method or some forced test cases in QEMU. 
+Could you give me some advice for testing?
+
+Best Regards,
+
+Zhiwei
+
+> Alex and Richard have kindly started the review. Once you have
+> addressed their comments and split this patch up into smaller patches
+> you can send a v2 and we can go from there.
+>
+> Once again thanks for doing this implementation for QEMU!
+>
+> Alistair
+>
 
