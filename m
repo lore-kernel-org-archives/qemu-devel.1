@@ -3,84 +3,137 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 353FBC3A5A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D6AC3A5A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:32:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D0602054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:20:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0602054F
+	by mail.kernel.org (Postfix) with ESMTPS id CA47D215EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 01:32:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA47D215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i396e-0003WN-0u
-	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 21:20:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46019)
+	id 1i39IR-0006Ba-0K
+	for qemu-devel@archiver.kernel.org; Wed, 28 Aug 2019 21:32:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48071)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1i395h-00035A-Us
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:19:10 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i39HF-0005gC-1i
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:31:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1i395f-00021Y-MQ
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:19:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58048)
+ (envelope-from <jsnow@redhat.com>) id 1i39HC-0005ZY-Sg
+ for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:31:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52496)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i395e-0001za-Sk
- for qemu-devel@nongnu.org; Wed, 28 Aug 2019 21:19:07 -0400
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i39HA-0005Yn-72; Wed, 28 Aug 2019 21:31:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AD35EC0568FD
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 01:19:03 +0000 (UTC)
-Received: by mail-pf1-f197.google.com with SMTP id q67so1134356pfc.10
- for <qemu-devel@nongnu.org>; Wed, 28 Aug 2019 18:19:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=TFebKm8t2JEA1ZtygUlY9r6izUXMjEJUGbwi1oAD0Ig=;
- b=l3av9e7fkNeimj6cLbSuGnooueqqltXaoKIM6q9qv7eTbxq/4/vP5DUGXujFYkDHgh
- OEXhSqeBsI+VAsA+G0vni1+Uauoj2RLPqhFc42Uj2bMMkZ9zeqcJ8MsF+vgoDr6htaWU
- 99DydyCsMjJcK1iPe0cn+4Wzqf+deLwyRvXB3ITwZwYj/PwExJdnI+W4kGxM+9oeqLcI
- gTbt5OiZ/MzWqpZ3KwaFNYqYgs/uiQPnanR2eTVCUp2bgsBtZPBW7WMdp+loBcCoQKe1
- JthETCeb3o8u4XRlAsBtcsrAOeU588NDHGtaRHAs4uSe73uOCN6AZqySSfY3+kRqHqte
- 6PHA==
-X-Gm-Message-State: APjAAAXdOboV6+YSA3lBuG9XUhVHAlINr8pqk1U5Khc/nhcZw8NQaV2y
- i8aKEDG0Ya1lHElA+jG9/gXCDUZV5SSRvSGD3twSwUkP3cC+cv/5q/ofLUOQhdzuYdaG9psVomC
- lGP2URV3Iv7J7hMU=
-X-Received: by 2002:a17:902:be12:: with SMTP id
- r18mr6928027pls.341.1567041542572; 
- Wed, 28 Aug 2019 18:19:02 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzzS9RAFWmhbIda/zU6hxr3RX4qfcHz0f7tETXcWrAxGL6hOYJ4qEoXhU16PrpbhheMWENcxg==
-X-Received: by 2002:a17:902:be12:: with SMTP id
- r18mr6928003pls.341.1567041542385; 
- Wed, 28 Aug 2019 18:19:02 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id e6sm761725pfl.37.2019.08.28.18.18.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Aug 2019 18:19:01 -0700 (PDT)
-Date: Thu, 29 Aug 2019 09:18:51 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20190829011850.GC8729@xz-x1>
-References: <20190812074531.28970-1-peterx@redhat.com>
- <319f1d6a-ef55-cc1b-98d6-f99b365bd88a@redhat.com>
- <e128decc-8b40-160e-fe8e-673682530750@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7D94A3082131;
+ Thu, 29 Aug 2019 01:30:59 +0000 (UTC)
+Received: from [10.18.17.85] (dhcp-17-85.bos.redhat.com [10.18.17.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AF4A05DA21;
+ Thu, 29 Aug 2019 01:30:58 +0000 (UTC)
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190820235243.26092-1-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <81a8dd02-2420-f612-fbf5-26960f23efc2@redhat.com>
+Date: Wed, 28 Aug 2019 21:30:58 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190820235243.26092-1-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e128decc-8b40-160e-fe8e-673682530750@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Thu, 29 Aug 2019 01:30:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC 0/4] intel_iommu: Do sanity check of
- vfio-pci earlier
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] iotests: use python logging
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,58 +145,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Bandan Das <bsd@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 28, 2019 at 02:59:45PM +0200, Auger Eric wrote:
-> Hi Peter,
+Gentle ping. This should be fairly easy to review, I hope; the worst of
+it is making sure that no tests remain that don't engage an entry point
+in iotests.py anymore.
 
-Hi, Eric,
-
-[...]
-
-> In
-> [PATCH v4 2/5] memory: Add IOMMU_ATTR_HW_NESTED_PAGING IOMMU memory
-> region attribute (https://patchwork.kernel.org/patch/11109701/)
-
-[1]
-
+On 8/20/19 7:52 PM, John Snow wrote:
+> This series uses python logging to enable output conditionally on
+> iotests.log(). We unify an initialization call (which also enables
+> debugging output for those tests with -d) and then make the switch
+> inside of iotests.
 > 
-> [PATCH v4 3/5] hw/vfio/common: Fail on VFIO/HW nested paging detection
-> (https://patchwork.kernel.org/patch/11109697/)
+> It will help alleviate the need to create logged/unlogged versions
+> of all the various helpers we have made.
 > 
-> I proposed to introduce a new IOMMU MR attribute to retrieve whether the
-> vIOMMU uses HW nested paging to integrate with VFIO. I wonder whether
-> this kind of solution would fit your need too.
+> V3:
+>  - Rebased for 4.1+; now based on main branch.
 > 
-> Assuming we would rename the attribute (whose name is challenged by
-> Peter anyway) into something like IOMMU_ATTR_PHYS_MAP_MODE
-> taking the possible values: NONE, CM, HW_NESTED_PAGING. SMMUv3 would
-> return HW_NESTED_PAGING, Intel IOMMU would return CM if CM is enabled or
-> NONE in the negative. Then we could implement the check directly in VFIO
-> common.c. That way I don't think you would need the new notifiers and
-> this would satisfy both requirements?
-
-IMHO it'll suffer from the similar issue we have now with
-flag_changed, because at the very beginning of x86 system boots DMAR
-is not yet enabled, the intel-iommu device is using the same mode as
-its passthrough mode so there's no IOMMU memory region at all in the
-DMA address spaces of the devices.  Hence even with patch [1] above we
-still can't really reach the get_attr() check until DMAR enabled?
-
-Maybe we can figure out a good way to expose IOMMU attributes rather
-than the IOMMU memory region attributes then we let vfio to pick that
-up, but I'm not very sure whether that's clean enough.
-
-Thanks,
-
--- 
-Peter Xu
+> V2:
+>  - Added all of the other python tests I missed to use script_initialize
+>  - Refactored the common setup as per Ehabkost's suggestion
+>  - Added protocol arguments to common initialization,
+>    but this isn't strictly required.
+> 
+> John Snow (4):
+>   iotests: add script_initialize
+>   iotest 258: use script_main
+>   iotests: add protocol support to initialization info
+>   iotests: use python logging for iotests.log()
+> 
+>  tests/qemu-iotests/030        |   4 +-
+>  tests/qemu-iotests/149        |   3 +-
+>  tests/qemu-iotests/194        |   3 +-
+>  tests/qemu-iotests/202        |   3 +-
+>  tests/qemu-iotests/203        |   3 +-
+>  tests/qemu-iotests/206        |   2 +-
+>  tests/qemu-iotests/207        |   4 +-
+>  tests/qemu-iotests/208        |   2 +-
+>  tests/qemu-iotests/209        |   2 +-
+>  tests/qemu-iotests/210        |   4 +-
+>  tests/qemu-iotests/211        |   4 +-
+>  tests/qemu-iotests/212        |   4 +-
+>  tests/qemu-iotests/213        |   4 +-
+>  tests/qemu-iotests/216        |   3 +-
+>  tests/qemu-iotests/218        |   2 +-
+>  tests/qemu-iotests/219        |   2 +-
+>  tests/qemu-iotests/222        |   5 +-
+>  tests/qemu-iotests/224        |   3 +-
+>  tests/qemu-iotests/228        |   3 +-
+>  tests/qemu-iotests/234        |   3 +-
+>  tests/qemu-iotests/235        |   4 +-
+>  tests/qemu-iotests/236        |   2 +-
+>  tests/qemu-iotests/237        |   2 +-
+>  tests/qemu-iotests/238        |   2 +
+>  tests/qemu-iotests/242        |   2 +-
+>  tests/qemu-iotests/245        |   1 +
+>  tests/qemu-iotests/245.out    |  24 ++++----
+>  tests/qemu-iotests/246        |   2 +-
+>  tests/qemu-iotests/248        |   2 +-
+>  tests/qemu-iotests/254        |   2 +-
+>  tests/qemu-iotests/255        |   2 +-
+>  tests/qemu-iotests/256        |   2 +-
+>  tests/qemu-iotests/258        |   8 +--
+>  tests/qemu-iotests/262        |   3 +-
+>  tests/qemu-iotests/iotests.py | 108 ++++++++++++++++++++++------------
+>  35 files changed, 124 insertions(+), 105 deletions(-)
+> 
 
