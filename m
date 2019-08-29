@@ -2,87 +2,62 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81327C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0324C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:56:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A5E020828
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:56:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qoQEZucS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A5E020828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4844208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 16:56:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4844208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3NiO-0006u0-6X
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 12:56:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46639)
+	id 1i3Nir-0007DB-9W
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 12:56:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vandersonmr2@gmail.com>) id 1i3Nb9-0006XM-Na
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:37 -0400
+ (envelope-from <berrange@redhat.com>) id 1i3NdJ-00013X-UN
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1i3Nb6-0006Qm-Ro
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:35 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:43373)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1i3Nb6-0006QY-Mu
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:48:32 -0400
-Received: by mail-qk1-x742.google.com with SMTP id m2so3512592qkd.10
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 09:48:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=uA3SYtnZA83HptN0mbb2qEQqLyGVSp6IpiQrNn1J314=;
- b=qoQEZucSxutuLNJ7BHXHaKQ4o05+KDGgfGGBuY1AYNntXDudAXEdX36Q8fHEUEy3Mm
- c7BQruBPeAQ2hL/SkNNjjXnHmOhTdCTCx0nzdna9hJJFd+0DfSlq/PypUVi2Oc+NgXE1
- Jl2V5fPs+Oltxp9IRMacsFfT7LEcwA7y1PY3w5UGmkL5wXHCATCdmzz7V+lwVSoV2jQM
- zzr1qCAxHae9hU5u+NJrliMWdkt8762BvqnxBdiSeL+QM61BsMRIWz9CmY6hYnl2au/D
- G9iXwh6biBHtUzEpBmQJDuTZPBSFPjh85iTd0NGhwrWbA1KABnmJn5506OVJBgmLJ7XR
- 01BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uA3SYtnZA83HptN0mbb2qEQqLyGVSp6IpiQrNn1J314=;
- b=moiLYnt03ivjNLaV4j8PIZu4F/xO7OsB6qRtSFV+Hta9s1RC/6hVv/MqyHRmgiqD2G
- dkLi1S2FaxQ0w3OvM4eE4A+SpJ1dRVJs2rpYykdPNiBr4JnQ4VeRmdLh7ST3iOVpTWLY
- Zn5jtkp3A7C2DCk0O9oST1nNDcbjTFczNpcgdafmrglHn5CBACj7Z9rHuwdEseW3ukNI
- GnmdPwM0GFlcVgBTZzK1q29oTnv5+bKGKnvryAK2510Ebyzo0Rz9LXL3RoHXe8zTB/Fz
- rKsa0nQEzaXjmCzQoKfQ76xnswcfrpiPiajyC7rgxv0YYpJYTLyV+5igJIprJVgoL5Fm
- cLdQ==
-X-Gm-Message-State: APjAAAW1FrXZ98RzE9KfmXtikYPor7WXS8Hbt9v3cmZ/cLmRMDLuVTl9
- LwUJXahThgtht57OTjyBcQplORoIw8Uzhg==
-X-Google-Smtp-Source: APXvYqy+21fV7Ks2ENGvGDwSCxK72XE/nEnBv0bSKSsH8PCpgcPbdkF91L6SQjIqe4YB2DCHEG+FmQ==
-X-Received: by 2002:ae9:e313:: with SMTP id v19mr10560378qkf.22.1567097311852; 
- Thu, 29 Aug 2019 09:48:31 -0700 (PDT)
-Received: from vanderson-lmcad.gw.lmcad.ic.unicamp.br (gw.lmcad.ic.unicamp.br.
- [143.106.73.166])
- by smtp.googlemail.com with ESMTPSA id g25sm1441024qkk.87.2019.08.29.09.48.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Aug 2019 09:48:31 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
+ (envelope-from <berrange@redhat.com>) id 1i3NdI-0007vJ-Hg
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:50:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56594)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i3NdI-0007uw-A0
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 12:50:48 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8CCB630842B0;
+ Thu, 29 Aug 2019 16:50:47 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-112-60.ams2.redhat.com
+ [10.36.112.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2E30100197A;
+ Thu, 29 Aug 2019 16:50:45 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 29 Aug 2019 13:47:53 -0300
-Message-Id: <20190829164754.3906-10-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190829164754.3906-1-vandersonmr2@gmail.com>
-References: <20190829164754.3906-1-vandersonmr2@gmail.com>
+Date: Thu, 29 Aug 2019 17:50:35 +0100
+Message-Id: <20190829165036.9773-4-berrange@redhat.com>
+In-Reply-To: <20190829165036.9773-1-berrange@redhat.com>
+References: <20190829165036.9773-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
-Subject: [Qemu-devel] [PATCH v7 09/10] monitor: adding new info cfg command
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 29 Aug 2019 16:50:47 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 3/4] docs: document use of automatic cleanup
+ functions in glib
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,270 +69,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding "info cfg id depth" commands to HMP.
-This command allow the exploration a TB
-neighbors by dumping [and opening] a .dot
-file with the TB CFG neighbors colorized
-by their hotness.
+Document the use of g_autofree and g_autoptr in glib for automatic
+freeing of memory.
 
-The goal of this command is to allow the dynamic exploration
-of TCG behavior and code quality. Therefore, for now, a
-corresponding QMP command is not worthwhile.
-
-Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- accel/tcg/tb-stats.c    | 164 ++++++++++++++++++++++++++++++++++++++++
- hmp-commands-info.hx    |   7 ++
- include/exec/tb-stats.h |   1 +
- monitor/misc.c          |  22 ++++++
- 4 files changed, 194 insertions(+)
+ CODING_STYLE.rst | 85 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
-index d588c551c9..fd2344c5d1 100644
---- a/accel/tcg/tb-stats.c
-+++ b/accel/tcg/tb-stats.c
-@@ -679,6 +679,170 @@ void dump_tb_info(int id, int log_mask, bool use_monitor)
-     /* tbdi free'd by do_dump_tb_info_safe */
- }
- 
-+/* TB CFG xdot/dot dump implementation */
-+#define MAX_CFG_NUM_NODES 1000
-+static int cfg_tb_id;
-+static GHashTable *cfg_nodes;
-+static uint64_t root_count;
+diff --git a/CODING_STYLE.rst b/CODING_STYLE.rst
+index 4501d87352..39397f0f6f 100644
+--- a/CODING_STYLE.rst
++++ b/CODING_STYLE.rst
+@@ -441,6 +441,91 @@ In addition, QEMU assumes that the compiler does not=
+ use the latitude
+ given in C99 and C11 to treat aspects of signed '<<' as undefined, as
+ documented in the GNU Compiler Collection manual starting at version 4.0=
+.
+=20
++Automatic memory deallocation
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
 +
-+static void fputs_jump(TBStatistics *from, TBStatistics *to, FILE *dot)
-+{
-+    if (!from || !to) {
-+        return;
-+    }
++QEMU has a mandatory dependency either the GCC or CLang compiler. As
++such it has the freedom to make use of a C language extension for
++automatically running a cleanup function when a stack variable goes
++out of scope. This can be used to simplify function cleanup paths,
++often allowing many goto jumps to be eliminated, through automatic
++free'ing of memory.
 +
-+    int *from_id = (int *) g_hash_table_lookup(cfg_nodes, from);
-+    int *to_id   = (int *) g_hash_table_lookup(cfg_nodes, to);
++The GLib2 library provides a number of functions/macros for enabling
++automatic cleanup:
 +
-+    if (!from_id || !to_id) {
-+        return;
-+    }
++  `<https://developer.gnome.org/glib/stable/glib-Miscellaneous-Macros.ht=
+ml>`_
 +
-+    fprintf(dot, "   node_%d -> node_%d;\n", *from_id, *to_id);
-+}
++Most notably:
 +
-+/* Hotness colors used in the CFG */
-+#define HOT_RED1  0xFF000 /* RGB(255,0,0)     */
-+#define HOT_RED2  0xFF333 /* RGB(255,51,48)   */
-+#define MILD_RED  0xFF666 /* RGB(255,102,96)  */
-+#define WEAK_RED1 0xFF999 /* RGB(255,153,144) */
-+#define WEAK_RED2 0xFFCCC /* RGB(255,204,192) */
++* g_autofree - will invoke g_free() on the variable going out of scope
 +
-+static void fputs_tbstats(TBStatistics *tbs, FILE *dot, int log_flags)
-+{
-+    if (!tbs) {
-+        return;
-+    }
++* g_autoptr - for structs / objects, will invoke the cleanup func create=
+d
++  by a previous use of G_DEFINE_AUTOPTR_CLEANUP_FUNC. This is
++  supported for most GLib data types and GObjects
 +
-+    uint32_t color = MILD_RED;
-+    uint64_t count = tbs->executions.normal;
-+    if (count > 1.6 * root_count) {
-+        color = HOT_RED1;
-+    } else if (count > 1.2 * root_count) {
-+        color = HOT_RED2;
-+    } else if (count < 0.4 * root_count) {
-+        color = WEAK_RED2;
-+    } else if (count < 0.8 * root_count) {
-+        color = WEAK_RED1;
-+    }
++For example, instead of
 +
-+    GString *code_s = get_code_string(tbs, log_flags);
++.. code-block:: c
 +
-+    for (int i = 0; i < code_s->len; i++) {
-+        if (code_s->str[i] == '\n') {
-+            code_s->str[i] = ' ';
-+            code_s = g_string_insert(code_s, i, "\\l");
-+            i += 2;
++    int somefunc(void) {
++        int ret =3D -1;
++        char *foo =3D g_strdup_printf("foo%", "wibble");
++        GList *bar =3D .....
++
++        if (eek) {
++           goto cleanup;
 +        }
++
++        ret =3D 0;
++
++      cleanup:
++        g_free(foo);
++        g_list_free(bar);
++        return ret;
 +    }
 +
-+    fprintf(dot,
-+            "   node_%d [fillcolor=\"#%xFF0000\" shape=\"record\" "
-+            "label=\"TB %d\\l"
-+            "-------------\\l"
-+            "PC:\t0x"TARGET_FMT_lx"\\l"
-+            "exec count:\t%lu\\l"
-+            "\\l %s\"];\n",
-+            cfg_tb_id, color, cfg_tb_id, tbs->pc,
-+            tbs->executions.normal, code_s->str);
++Using g_autofree/g_autoptr enables the code to be written as:
 +
-+    int *id = g_new(int, 1);
-+    *id = cfg_tb_id;
-+    g_hash_table_insert(cfg_nodes, tbs, id);
++.. code-block:: c
 +
-+    cfg_tb_id++;
++    int somefunc(void) {
++        g_autofree char *foo =3D g_strdup_printf("foo%", "wibble");
++        g_autoptr (GList) bar =3D .....
 +
-+    g_string_free(code_s, true);
-+}
-+
-+static void fputs_preorder_walk(TBStatistics *tbs, int depth, FILE *dot, int log_flags)
-+{
-+    if (tbs && depth > 0
-+            && cfg_tb_id < MAX_CFG_NUM_NODES
-+            && !g_hash_table_contains(cfg_nodes, tbs)) {
-+
-+        fputs_tbstats(tbs, dot, log_flags);
-+
-+        if (tbs->tb) {
-+            TranslationBlock *left_tb  = NULL;
-+            TranslationBlock *right_tb = NULL;
-+            if (tbs->tb->jmp_dest[0]) {
-+                left_tb = (TranslationBlock *) atomic_read(tbs->tb->jmp_dest);
-+            }
-+            if (tbs->tb->jmp_dest[1]) {
-+                right_tb = (TranslationBlock *) atomic_read(tbs->tb->jmp_dest + 1);
-+            }
-+
-+            if (left_tb) {
-+                fputs_preorder_walk(left_tb->tb_stats, depth - 1, dot, log_flags);
-+                fputs_jump(tbs, left_tb->tb_stats, dot);
-+            }
-+            if (right_tb) {
-+                fputs_preorder_walk(right_tb->tb_stats, depth - 1, dot, log_flags);
-+                fputs_jump(tbs, right_tb->tb_stats, dot);
-+            }
++        if (eek) {
++           return -1;
 +        }
-+    }
-+}
 +
-+struct PreorderInfo {
-+    TBStatistics *tbs;
-+    int depth;
-+    int log_flags;
-+};
-+
-+static void fputs_preorder_walk_safe(CPUState *cpu, run_on_cpu_data icmd)
-+{
-+    struct PreorderInfo *info = icmd.host_ptr;
-+
-+    GString *file_name = g_string_new(NULL);;
-+    g_string_printf(file_name, "/tmp/qemu-cfg-tb-%d-%d.dot", id, info->depth);
-+    FILE *dot = fopen(file_name->str, "w+");
-+
-+    fputs(
-+            "digraph G {\n"
-+            "   mclimit=1.5;\n"
-+            "   rankdir=TD; ordering=out;\n"
-+            "   graph[fontsize=10 fontname=\"Verdana\"];\n"
-+            "   color=\"#efefef\";\n"
-+            "   node[shape=box style=filled fontsize=8 fontname=\"Verdana\" fillcolor=\"#efefef\"];\n"
-+            "   edge[fontsize=8 fontname=\"Verdana\"];\n"
-+         , dot);
-+
-+    cfg_nodes = g_hash_table_new(NULL, NULL);
-+    fputs_preorder_walk(info->tbs, info->depth, dot, info->log_flags);
-+    g_hash_table_destroy(cfg_nodes);
-+
-+    fputs("}\n\0", dot);
-+    fclose(dot);
-+
-+    qemu_log("CFG dumped: %s\n", file_name->str);
-+
-+    g_string_free(file_name, true);
-+    g_free(info);
-+}
-+
-+void dump_tb_cfg(int id, int depth, int log_flags)
-+{
-+    cfg_tb_id = 1;
-+    root_count = 0;
-+
-+    /* do a pre-order walk in the CFG with a limited depth */
-+    TBStatistics *root = get_tbstats_by_id(id);
-+    if (root) {
-+        root_count = root->executions.normal;
++        return 0;
 +    }
 +
-+    struct PreorderInfo *info = g_new(struct PreorderInfo, 1);
-+    info->tbs = root;
-+    info->depth = depth + 1;
-+    info->log_flags = log_flags;
-+    async_safe_run_on_cpu(first_cpu, fputs_preorder_walk_safe,
-+            RUN_ON_CPU_HOST_PTR(info));
-+}
++While this generally results in simpler, less leak-prone code, there
++are still some caveats to beware of
 +
-+/* TBStatistic collection controls */
++* Variables declared with g_auto* MUST always be initialized,
++  otherwise the cleanup function will use uninitialized stack memory
 +
- 
- void enable_collect_tb_stats(void)
- {
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index f415479011..8c96924c0b 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -305,6 +305,13 @@ ETEXI
-                       "dump flags can be used to set dump code level: out_asm in_asm op",
-         .cmd        = hmp_info_tb,
-     },
-+    {
-+        .name       = "cfg",
-+        .args_type  = "id:i,depth:i?,flags:s?",
-+        .params     = "id [depth flags]",
-+        .help       = "plot CFG around TB with the given id",
-+        .cmd        = hmp_info_cfg,
-+    },
-     {
-         .name       = "coverset",
-         .args_type  = "coverage:i?",
-diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-index 51d73e1c5f..4515db106a 100644
---- a/include/exec/tb-stats.h
-+++ b/include/exec/tb-stats.h
-@@ -155,6 +155,7 @@ void dump_tbs_info(int count, int sort_by, bool use_monitor);
-  */
- void dump_tb_info(int id, int log_mask, bool use_monitor);
- 
-+void dump_tb_cfg(int id, int depth, int log_flags);
- 
- /* TBStatistic collection controls */
- void enable_collect_tb_stats(void);
-diff --git a/monitor/misc.c b/monitor/misc.c
-index b99c018124..b3b31d7035 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -556,6 +556,28 @@ static void hmp_info_tb(Monitor *mon, const QDict *qdict)
-     dump_tb_info(id, mask, true);
- }
- 
-+static void hmp_info_cfg(Monitor *mon, const QDict *qdict)
-+{
-+    const int id = qdict_get_int(qdict, "id");
-+    const int depth = qdict_get_try_int(qdict, "depth", 3);
-+    const char *flags = qdict_get_try_str(qdict, "flags");
-+    int mask;
++* If a variable declared with g_auto* holds a value which must
++  live beyond the life of the function, that value must be saved
++  and the original variable NULL'd out. This can be simpler using
++  g_steal_pointer
 +
-+    if (!tcg_enabled()) {
-+        error_report("TB information is only available with accel=tcg");
-+        return;
++
++.. code-block:: c
++
++    char *somefunc(void) {
++        g_autofree char *foo =3D g_strdup_printf("foo%", "wibble");
++        g_autoptr (GList) bar =3D .....
++
++        if (eek) {
++           return NULL;
++        }
++
++        return g_steal_pointer(&foo);
 +    }
 +
-+    mask = flags ? qemu_str_to_log_mask(flags) : CPU_LOG_TB_IN_ASM;
 +
-+    if (!mask) {
-+        error_report("Unable to parse log flags, see 'help log'");
-+        return;
-+    }
-+
-+    dump_tb_cfg(id, depth, mask);
-+}
-+
- static void hmp_info_coverset(Monitor *mon, const QDict *qdict)
- {
-     int coverage;
--- 
-2.22.0
+ Error handling and reporting
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+=20
+--=20
+2.21.0
 
 
