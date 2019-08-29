@@ -2,69 +2,85 @@ Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F701C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 13:49:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01788C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 14:23:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 461E52189D
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 13:49:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 461E52189D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD5F1208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 14:23:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdfbRmGb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD5F1208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Kna-0002m3-BM
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 09:49:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58410)
+	id 1i3LKi-00010P-Oz
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 10:23:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1i3KlX-0001WJ-9n
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 09:47:08 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i3LJp-0000ap-WD
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 10:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1i3KlU-00011X-V4
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 09:47:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55790)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>)
- id 1i3KlU-00010Z-O7; Thu, 29 Aug 2019 09:47:04 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 802893084031;
- Thu, 29 Aug 2019 13:47:03 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.43.2.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B3AE26107E;
- Thu, 29 Aug 2019 13:46:42 +0000 (UTC)
-Date: Thu, 29 Aug 2019 15:46:40 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190829134640.GK13714@angien.pipo.sk>
-References: <20190816170750.23910-1-ehabkost@redhat.com>
- <871rx5eq8j.fsf@dusky.pond.sub.org>
- <20190828143524.GA7642@habkost.net>
- <20190828185718.0e4eced8@redhat.com>
- <20190829131225.GJ13714@angien.pipo.sk>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i3LJo-0007kN-2C
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 10:22:33 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:34914)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i3LJn-0007ja-SO
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 10:22:32 -0400
+Received: by mail-oi1-x234.google.com with SMTP id a127so2686483oii.2
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 07:22:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oGhlzJloVlK6+u0vtE+IMMlwRc0YoqOxyFplJxyIQ8w=;
+ b=KdfbRmGbiGgAztQ4pcdiii0axRC4FDlFnGooHvfJl01DNtlwCFejMMWBjXryEIw5FX
+ +P7dpwCERVwosJ6tt1HTIzLCcU0eAIvKPddz4xj6xfqOBTpAcXqncoTDwV7snpn8XWIR
+ zYosp58LxxOm3mjJfOlC+DM+bHBmAx/aNIklTyfHAqLKX5CtiweABCJx1AFRqAy8iCsy
+ xuqsYABgmffEQlgBbQQ8MLj6jTpQstv0KWxhhMQNL8WZu5YeLOtciKJw3Y97yjGTKbJX
+ NdSRz9U5mq/hhKjiHvGRMmrk5pVaAOBTtBbWlRaB03Pa/KdlsvBmr07anuKLml0AOOPA
+ ym5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oGhlzJloVlK6+u0vtE+IMMlwRc0YoqOxyFplJxyIQ8w=;
+ b=MjWSg/LX9bUYjpVVbsIrWv05BCUywzTMbzG2KesfRJiKKx5wmC8PhFAJdgjdr5LnzJ
+ x9pqbayFZ+zWPhl3e2l2cXQaoL96L17b+0OXZRFuad0vZ6LTKr31p4potc7ptXDt4nDo
+ pdpwpgAMwdJB2djzV9Olkfxog8n2YoRmiwJh0JlcGNjufRpW3oAlU3Cgvm7OaBF/6lIA
+ qr+CBeVdsOAljCLJNNdPbIU8dB7NJSv+PSg19qX/f7A30zaMttBR9BGPMSrEy6th+qv7
+ 9kXFguJ+0z8iwIoXeKjE6CT9RoilQXcViCnmXCCZxqi7kdxvv9S71/ZSNNU19cPwAsAK
+ 4ThQ==
+X-Gm-Message-State: APjAAAUecSbItU4lCiImWw7/dm+b6HgcO9+tdmRKUI5Q79hFnfLHBXcO
+ QyfdZzKRb++NxbjKCkKkpuuxWHsvnqwBtn9caEQ=
+X-Google-Smtp-Source: APXvYqxpm/3Ek3U2p6GqBYPjDohFZXItZpk98Hc0oDlCqvHD5J+upWVJaP98INjRzo7sUGJjd9zbx+Bl/fh4i6JsVWg=
+X-Received: by 2002:aca:ad57:: with SMTP id w84mr6341830oie.106.1567088550885; 
+ Thu, 29 Aug 2019 07:22:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="+278g007AL/ykmV8"
-Content-Disposition: inline
-In-Reply-To: <20190829131225.GJ13714@angien.pipo.sk>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 29 Aug 2019 13:47:03 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] pc: Don't make die-id mandatory unless
- necessary
+References: <tencent_A4D270EBF3CC4134E8EB55BB9B541724780A@qq.com>
+ <CAL1e-=jUNzu19BBhFq0M_hjxi6BSgfmZUgQMygszTTonORVNmg@mail.gmail.com>
+ <tencent_6386EC2F24D7A13D2B753FCF@qq.com>
+ <CAL1e-=gtL6AxsRYPTO5bztH_F-gJDXixEEif3QRKQYo7d4XcUA@mail.gmail.com>
+ <tencent_1D2ACC9711B86DEA5633A4F0@qq.com>
+In-Reply-To: <tencent_1D2ACC9711B86DEA5633A4F0@qq.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 29 Aug 2019 16:22:19 +0200
+Message-ID: <CAL1e-=jrZPuAhDP2TUxrmHzf8ts81i3SPAq89cmMfREx4ATN-A@mail.gmail.com>
+To: Libo Zhou <zhlb29@foxmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::234
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,68 +92,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>,
- Vanderson Martins do Rosario <vandersonmr2@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Like Xu <like.xu@linux.intel.com>,
- Erik Skultety <eskultet@redhat.com>, qemu-stable@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Aug 28, 2019 at 5:54 AM Libo Zhou <zhlb29@foxmail.com> wrote:
 
---+278g007AL/ykmV8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Hi Aleksandar,
+>
+> Thank you for the link to Loongson2F documentation. It has been very
+> useful:)
+>
+> I have spent several days immersing myself in the source code, now I thin=
+k
+> I have a more solid understanding about it. Just like Loongson Multimedia
+> Instructions, I need to implement some sort of complex vector instruction=
+s,
+> and I need to write some helper functions (e.g. my_helper.c).
+>
+> The QEMU wiki website has very thorough explanation on TCG, but I haven't
+> found any explanation on the port-specific helpers. Is there any
+> documentation on how the helper functions are generated? I think now I
+> *might* know how to write a working helper function, but I just don't kno=
+w
+> how it works.
+>
+>
+Hello, Libo,
 
-On Thu, Aug 29, 2019 at 15:12:33 +0200, Peter Krempa wrote:
-> On Wed, Aug 28, 2019 at 18:57:18 +0200, Igor Mammedov wrote:
-> > On Wed, 28 Aug 2019 11:35:24 -0300
+Prerequisite for writing a helper is that you have a clear definition of
+new instruction functionality, in the sense, what operation is done on what
+resources. "Resources" are registers - they could be general-purpose MIPS
+registers, or some special additional registers. Did you use existing
+registers, or did you define a new set or registers for your new
+instructions? Registers are modeled as fields in a structure, and both
+helpers and TCG implementations modify those fields while performing
+instruction emulation.
 
-[...]
+In any case, you pass to the helper all information needed for the
+instruction in question to perform. These are usually ordinal numbers of
+involved register, derived from decoding the opcode. Alternatively, you can
+pass pointers to the registers, rather than ordinal numbers. In turn, the
+main part of functionality is implemented. At the end of helper, you may
+want to update, let's say, a status register, if any (depending on your
+design).
 
-> > Also if we would need to change implicit values logic down the road
-> > it would be a pain like with any default parameters in QEMU, which is
-> > a good reason against relaxing rule.
->=20
-> Hi,
->=20
-> after a discussion with Igor I'm preparing patches which take the
-> 'props' verbatim and use it for hotplug. It's a fairly simple change in
-> libvirt. Originally I've opted to reconstruct the props from internal
-> data since it was simpler as the values were already parsed into
-> internal structures anyways.
->=20
-> With some persuation we could even get it into libvirt during the freeze
-> so that with new libvirt the released stuff will not break any more.
+The declaration of helpers is a little contrived, and may still confuse
+you. But this is not crucial to you. I advise you just to copy a solution
+for a similar existing instruction.
 
-https://www.redhat.com/archives/libvir-list/2019-August/msg01322.html
+Yours,
+Aleksandar
 
 
---+278g007AL/ykmV8
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAl1n1z0ACgkQHGwCByjY
-1GoZ7g/8DhHcLxun10rHBzM0xesojn3bgKmsP4A+h8CeEvZxHNAZ3qXc/6hZRRD3
-izfSLmhEtT0OoRwZh/10V5OAtVSXPC1sqDd/JmjxWpkymhXddujKrWMcjPf0wZlA
-xFJBCgse9g7ErYmy2UgZr6twVRrCC7uqi5gSKlyl3QoBJiB1EXibrKX6kn1jFzZx
-mgntbS36wul9Y2kXUBmUm2UC0GXjhZfYyOeBupItlqmlU6FinrdIqAGQykbhsmge
-HhU962eemL57njM6bfLl0FZ2IiWl424a16U24PGr/YeHrG31yH76dAD2fI958kXl
-qFXQYar7zDsEOiw6EFwEP2PYDV/UIXYJhOweByMAdxoW/bU4rTvzzJyK995t0/NP
-QeOqJrDkMecDdbdrQK2K4uKI7Wh7CMNWM3cFbBmjOSxBz53fHOjsunHO8sm2EAJR
-Pf5WSI37t5T+GgcRR/hq/qUDhDmkmW639aWHFrlvIhj4JTQjjLKMDZllYk5fXayo
-p9Nt9bzzj31clb539uan7fO4jOotblbaShAyFGpUN+ZChAY+WMaPEA8jCQUN9lTn
-h1TR1u8TAT7R/5I/3JAGV0qJfMErnyWscMMGneKIPKVSp/9kQAJ1fquMAqXm/bWo
-wHVd5OsmZqv2oYBL1lvVS/hK/3wLZP7fGT3deAEnSax54MkpI8A=
-=gNUl
------END PGP SIGNATURE-----
-
---+278g007AL/ykmV8--
-
+> Cheers,
+> Libo
+>
+>
+>
+>
+> ------------------ Original message ------------------
+> *From:* "Aleksandar Markovic";
+> *Sendtime:* Thursday, Aug 22, 2019 6:53 PM
+> *To:* "Libo Zhou";
+> *Cc:* "qemu-devel";
+> *Subject:* Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+>
+> On Thu, Aug 22, 2019 at 12:24 PM =E7=AB=8B <zhlb29@foxmail.com> wrote:
+>
+> > Hi Aleksandar,
+> >
+> > Thank you very much for your patient explanation in the previous post.
+> And
+> > thank you for checking.
+> > Your and Peter's replies in the previous post certainly helped a lot. I
+> am
+> > now looking at a git commit 7 years ago (
+> > bd277fa1966bc400f1b411f868f39125cda0c403), it was a Loongson Multimedia
+> > Instruction implementation done my Richard Henderson.
+> >
+>
+> Cool, that commit is a very good staring point - it is definitely not too
+> simple, and it is not too complex either. And you can discover several
+> different concepts in the process of exploring the change.
+>
+> Documentation on instruction set extension related to the commit (found b=
+y
+> Google):
+> https://files.somniafabularum.com/loongson/docs/Loongson2FUserGuide.pdf
+>
+> Be persistent, take your time, study the details and handling of individu=
+al
+> instructions, and, of course, let us know if you encounter some major
+> obstacles or thorny dilemmas.
+>
+> Yours,
+> Aleksandar
+>
+>
+> > I think what he did is exactly what I want to do now. I got a vague vie=
+w
+> > of the big picture, but I need more time to figure out the details. I
+> will
+> > certainly ask more questions about this later, but before that I need t=
+o
+> > look at some other parts of the source code:) Again thank you for
+> checking!
+> >
+> > Cheers,
+> > Libo
+> >
+> >
+> > ------------------ Original message ------------------
+> > *From:* "Aleksandar Markovic";
+> > *Sendtime:* Thursday, Aug 22, 2019 4:23 PM
+> > *To:* "=E7=AB=8B";
+> > *Cc:* "qemu-devel";
+> > *Subject:* Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+> >
+> > On Tue, Aug 20, 2019 at 12:12 PM =E7=AB=8B <zhlb29@foxmail.com> wrote:
+> >
+> > > I am working on a project that requires me to modify the ISA of the
+> MIPS
+> > > target.
+> >
+> >
+> > L.,
+> >
+> > How is it going?
+> >
+> > Aleksandar
+> >
+> >
+> >
+> > > I have been staring at the source code for about a week, but found it
+> > > really difficult due to me being a young rookie and the sparse
+> comments.
+> > > Specifically, I need to extend MIPS, by adding some new instructions
+> and
+> > > new CPU registers to the current architecture, and that sounds really
+> > easy.
+> > > I think the place for me to look at should be at the directory
+> > > ${qemu_root}/target/mips/. With a MIPS Instruction Set Manual Release=
+ 6
+> > > handy, I have difficulty finding the source code where the ISA reside=
+s.
+> > Is
+> > > it in op_helper.c? Or translate.c? Any guidance would be really
+> > > appreciated. Thank you very much in advance.
+> > >
+> > >
+> > > Cheers,
+> > > L.
+> >
+>
