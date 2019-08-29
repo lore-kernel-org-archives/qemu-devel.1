@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 070D4C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89096C3A59F
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D287C2073F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:32:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D287C2073F
+	by mail.kernel.org (Postfix) with ESMTPS id 6236423404
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 10:36:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6236423404
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3HjB-0002dG-D9
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 06:32:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47146)
+	id 1i3Hn3-0006Ef-6R
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 06:36:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47301)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3HcR-0005HG-TM
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:34 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3Hcc-0005R5-FD
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3HcP-0005Ku-9N
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:31 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45218 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i3Hca-0005ix-Rj
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45361 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i3HcO-0005Fb-LG
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:29 -0400
+ id 1i3Hca-0005LZ-IO
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 06:25:40 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 7FA331A20FA;
+ by mail.rt-rk.com (Postfix) with ESMTP id EE3E61A21E9;
  Thu, 29 Aug 2019 12:25:24 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 5F4911A2177;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id BE06E1A21BE;
  Thu, 29 Aug 2019 12:25:24 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 29 Aug 2019 12:24:44 +0200
-Message-Id: <1567074313-22998-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 29 Aug 2019 12:24:53 +0200
+Message-Id: <1567074313-22998-12-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1567074313-22998-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1567074313-22998-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 02/31] target/mips: Clean up handling of CP0
- register 1
+Subject: [Qemu-devel] [PULL 11/31] target/mips: Clean up handling of CP0
+ register 10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,243 +70,68 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up handling of CP0 register 1.
+Clean up handling of CP0 register 10.
 
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1567009614-12438-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Message-Id: <1567009614-12438-12-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- target/mips/cpu.h       |  8 +++++++
- target/mips/translate.c | 64 ++++++++++++++++++++++++-------------------------
- 2 files changed, 40 insertions(+), 32 deletions(-)
+ target/mips/cpu.h       | 1 +
+ target/mips/translate.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 42d0e44..36e983a 100644
+index 50a7205..3797bdc 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -282,6 +282,14 @@ typedef struct mips_def_t mips_def_t;
- #define CP0_REG00__MVPCONF1        3
- #define CP0_REG00__VPCONTROL       4
- /* CP0 Register 01 */
-+#define CP0_REG01__RANDOM          0
-+#define CP0_REG01__VPECONTROL      1
-+#define CP0_REG01__VPECONF0        2
-+#define CP0_REG01__VPECONF1        3
-+#define CP0_REG01__YQMASK          4
-+#define CP0_REG01__VPESCHEDULE     5
-+#define CP0_REG01__VPESCHEFBACK    6
-+#define CP0_REG01__VPEOPT          7
- /* CP0 Register 02 */
- #define CP0_REG02__ENTRYLO0        0
- /* CP0 Register 03 */
+@@ -342,6 +342,7 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG10__ENTRYHI         0
+ #define CP0_REG10__GUESTCTL1       4
+ #define CP0_REG10__GUESTCTL2       5
++#define CP0_REG10__GUESTCTL3       6
+ /* CP0 Register 11 */
+ #define CP0_REG11__COMPARE         0
+ #define CP0_REG11__GUESTCTL0EXT    4
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index c3fcfb4..97e0aec 100644
+index b79c58c..50863cf 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -6843,42 +6843,42 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -7155,7 +7155,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_01:
+     case CP0_REGISTER_10:
          switch (sel) {
 -        case 0:
-+        case CP0_REG01__RANDOM:
-             CP0_CHECK(!(ctx->insn_flags & ISA_MIPS32R6));
-             gen_helper_mfc0_random(arg, cpu_env);
-             register_name = "Random";
-             break;
--        case 1:
-+        case CP0_REG01__VPECONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEControl));
-             register_name = "VPEControl";
-             break;
--        case 2:
-+        case CP0_REG01__VPECONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEConf0));
-             register_name = "VPEConf0";
-             break;
--        case 3:
-+        case CP0_REG01__VPECONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEConf1));
-             register_name = "VPEConf1";
-             break;
--        case 4:
-+        case CP0_REG01__YQMASK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load64(arg, offsetof(CPUMIPSState, CP0_YQMask));
-             register_name = "YQMask";
-             break;
--        case 5:
-+        case CP0_REG01__VPESCHEDULE:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load64(arg, offsetof(CPUMIPSState, CP0_VPESchedule));
-             register_name = "VPESchedule";
-             break;
--        case 6:
-+        case CP0_REG01__VPESCHEFBACK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load64(arg, offsetof(CPUMIPSState, CP0_VPEScheFBack));
-             register_name = "VPEScheFBack";
-             break;
--        case 7:
-+        case CP0_REG01__VPEOPT:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEOpt));
-             register_name = "VPEOpt";
-@@ -7603,43 +7603,43 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
++        case CP0_REG10__ENTRYHI:
+             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_EntryHi));
+             tcg_gen_ext32s_tl(arg, arg);
+             register_name = "EntryHi";
+@@ -7872,7 +7872,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_01:
+     case CP0_REGISTER_10:
          switch (sel) {
 -        case 0:
-+        case CP0_REG01__RANDOM:
-             /* ignored */
-             register_name = "Random";
++        case CP0_REG10__ENTRYHI:
+             gen_helper_mtc0_entryhi(cpu_env, arg);
+             register_name = "EntryHi";
              break;
--        case 1:
-+        case CP0_REG01__VPECONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpecontrol(cpu_env, arg);
-             register_name = "VPEControl";
-             break;
--        case 2:
-+        case CP0_REG01__VPECONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpeconf0(cpu_env, arg);
-             register_name = "VPEConf0";
-             break;
--        case 3:
-+        case CP0_REG01__VPECONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpeconf1(cpu_env, arg);
-             register_name = "VPEConf1";
-             break;
--        case 4:
-+        case CP0_REG01__YQMASK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_yqmask(cpu_env, arg);
-             register_name = "YQMask";
-             break;
--        case 5:
-+        case CP0_REG01__VPESCHEDULE:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             tcg_gen_st_tl(arg, cpu_env,
-                           offsetof(CPUMIPSState, CP0_VPESchedule));
-             register_name = "VPESchedule";
-             break;
--        case 6:
-+        case CP0_REG01__VPESCHEFBACK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             tcg_gen_st_tl(arg, cpu_env,
-                           offsetof(CPUMIPSState, CP0_VPEScheFBack));
-             register_name = "VPEScheFBack";
-             break;
--        case 7:
-+        case CP0_REG01__VPEOPT:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpeopt(cpu_env, arg);
-             register_name = "VPEOpt";
-@@ -8349,42 +8349,42 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -8631,7 +8631,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_01:
+     case CP0_REGISTER_10:
          switch (sel) {
 -        case 0:
-+        case CP0_REG01__RANDOM:
-             CP0_CHECK(!(ctx->insn_flags & ISA_MIPS32R6));
-             gen_helper_mfc0_random(arg, cpu_env);
-             register_name = "Random";
++        case CP0_REG10__ENTRYHI:
+             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_EntryHi));
+             register_name = "EntryHi";
              break;
--        case 1:
-+        case CP0_REG01__VPECONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEControl));
-             register_name = "VPEControl";
-             break;
--        case 2:
-+        case CP0_REG01__VPECONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEConf0));
-             register_name = "VPEConf0";
-             break;
--        case 3:
-+        case CP0_REG01__VPECONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEConf1));
-             register_name = "VPEConf1";
-             break;
--        case 4:
-+        case CP0_REG01__YQMASK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_YQMask));
-             register_name = "YQMask";
-             break;
--        case 5:
-+        case CP0_REG01__VPESCHEDULE:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_VPESchedule));
-             register_name = "VPESchedule";
-             break;
--        case 6:
-+        case CP0_REG01__VPESCHEFBACK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_VPEScheFBack));
-             register_name = "VPEScheFBack";
-             break;
--        case 7:
-+        case CP0_REG01__VPEOPT:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPEOpt));
-             register_name = "VPEOpt";
-@@ -9063,41 +9063,41 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+@@ -9333,7 +9333,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
          break;
-     case CP0_REGISTER_01:
+     case CP0_REGISTER_10:
          switch (sel) {
 -        case 0:
-+        case CP0_REG01__RANDOM:
-             /* ignored */
-             register_name = "Random";
++        case CP0_REG10__ENTRYHI:
+             gen_helper_mtc0_entryhi(cpu_env, arg);
+             register_name = "EntryHi";
              break;
--        case 1:
-+        case CP0_REG01__VPECONTROL:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpecontrol(cpu_env, arg);
-             register_name = "VPEControl";
-             break;
--        case 2:
-+        case CP0_REG01__VPECONF0:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpeconf0(cpu_env, arg);
-             register_name = "VPEConf0";
-             break;
--        case 3:
-+        case CP0_REG01__VPECONF1:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpeconf1(cpu_env, arg);
-             register_name = "VPEConf1";
-             break;
--        case 4:
-+        case CP0_REG01__YQMASK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_yqmask(cpu_env, arg);
-             register_name = "YQMask";
-             break;
--        case 5:
-+        case CP0_REG01__VPESCHEDULE:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             tcg_gen_st_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_VPESchedule));
-             register_name = "VPESchedule";
-             break;
--        case 6:
-+        case CP0_REG01__VPESCHEFBACK:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             tcg_gen_st_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_VPEScheFBack));
-             register_name = "VPEScheFBack";
-             break;
--        case 7:
-+        case CP0_REG01__VPEOPT:
-             CP0_CHECK(ctx->insn_flags & ASE_MT);
-             gen_helper_mtc0_vpeopt(cpu_env, arg);
-             register_name = "VPEOpt";
 -- 
 2.7.4
 
