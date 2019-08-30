@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA33C3A59B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1740C3A59B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:17:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E18142342C
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:16:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E18142342C
+	by mail.kernel.org (Postfix) with ESMTPS id 833282342C
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:17:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 833282342C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3jZ9-00020C-Dr
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 12:15:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48484)
+	id 1i3jab-0002u9-62
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 12:17:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i3jW5-0008VH-5i
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:12:51 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i3jWA-00006O-5H
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i3jW1-0004RE-Ai
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:12:47 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60606)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i3jW4-0004TG-Fk
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:12:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60586)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i3jVs-0004Fg-Pk; Fri, 30 Aug 2019 12:12:38 -0400
+ id 1i3jVs-0004Fc-Pu; Fri, 30 Aug 2019 12:12:38 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1i3jVm-0001X0-BM; Fri, 30 Aug 2019 19:12:30 +0300
+ id 1i3jVl-0001X0-W3; Fri, 30 Aug 2019 19:12:30 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Fri, 30 Aug 2019 19:12:21 +0300
-Message-Id: <20190830161228.54238-8-vsementsov@virtuozzo.com>
+Date: Fri, 30 Aug 2019 19:12:17 +0300
+Message-Id: <20190830161228.54238-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190830161228.54238-1-vsementsov@virtuozzo.com>
 References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v10 07/14] block: teach bdrv_debug_breakpoint
- skip filters with backing
+Subject: [Qemu-devel] [PATCH v10 03/14] block/backup: improve comment about
+ image fleecing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,75 +66,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Teach bdrv_debug_breakpoint and bdrv_debug_remove_breakpoint skip
-filters with backing. This is needed to implement and use in backup job
-it's own backup_top filter driver (like mirror already has one), and
-without this improvement, breakpoint removal will fail at least in 55
-iotest.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
+ block/backup.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/block.c b/block.c
-index 5944124845..1c7c199849 100644
---- a/block.c
-+++ b/block.c
-@@ -5164,14 +5164,35 @@ void bdrv_debug_event(BlockDriverState *bs, BlkdebugEvent event)
-     bs->drv->bdrv_debug_event(bs, event);
- }
+diff --git a/block/backup.c b/block/backup.c
+index 8c19a265b2..abb5099fa3 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -764,9 +764,18 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+     job->bitmap_mode = bitmap_mode;
  
--int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
--                          const char *tag)
-+static BlockDriverState *bdrv_find_debug_node(BlockDriverState *bs)
- {
-     while (bs && bs->drv && !bs->drv->bdrv_debug_breakpoint) {
--        bs = bs->file ? bs->file->bs : NULL;
-+        if (bs->file) {
-+            bs = bs->file->bs;
-+            continue;
-+        }
-+
-+        if (bs->drv->is_filter && bs->backing) {
-+            bs = bs->backing->bs;
-+            continue;
-+        }
-+
-+        break;
-     }
- 
-     if (bs && bs->drv && bs->drv->bdrv_debug_breakpoint) {
-+        assert(bs->drv->bdrv_debug_remove_breakpoint);
-+        return bs;
-+    }
-+
-+    return NULL;
-+}
-+
-+int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
-+                          const char *tag)
-+{
-+    bs = bdrv_find_debug_node(bs);
-+    if (bs) {
-         return bs->drv->bdrv_debug_breakpoint(bs, event, tag);
-     }
- 
-@@ -5180,11 +5201,8 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
- 
- int bdrv_debug_remove_breakpoint(BlockDriverState *bs, const char *tag)
- {
--    while (bs && bs->drv && !bs->drv->bdrv_debug_remove_breakpoint) {
--        bs = bs->file ? bs->file->bs : NULL;
--    }
--
--    if (bs && bs->drv && bs->drv->bdrv_debug_remove_breakpoint) {
-+    bs = bdrv_find_debug_node(bs);
-+    if (bs) {
-         return bs->drv->bdrv_debug_remove_breakpoint(bs, tag);
-     }
- 
+     /*
+-     * Set write flags:
+-     * 1. Detect image-fleecing (and similar) schemes
+-     * 2. Handle compression
++     * If source is in backing chain of target assume that target is going to be
++     * used for "image fleecing", i.e. it should represent a kind of snapshot of
++     * source at backup-start point in time. And target is going to be read by
++     * somebody (for example, used as NBD export) during backup job.
++     *
++     * In this case, we need to add BDRV_REQ_SERIALISING write flag to avoid
++     * intersection of backup writes and third party reads from target,
++     * otherwise reading from target we may occasionally read already updated by
++     * guest data.
++     *
++     * For more information see commit f8d59dfb40bb and test
++     * tests/qemu-iotests/222
+      */
+     job->write_flags =
+         (bdrv_chain_contains(target, bs) ? BDRV_REQ_SERIALISING : 0) |
 -- 
 2.18.0
 
