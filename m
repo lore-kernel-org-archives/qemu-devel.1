@@ -1,74 +1,91 @@
 Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.9 required=3.0 tests=CHARSET_FARAWAY_HEADER,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C663C3A5A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 09:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D444CC3A5A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 09:21:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68D5B23426
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 09:18:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="w+jZz7fU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68D5B23426
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A7A0923426
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 09:21:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A0923426
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3d3G-0006TL-FC
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 05:18:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35058)
+	id 1i3d6O-0000ok-Rl
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 05:21:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59107)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhlb29@foxmail.com>) id 1i3czS-0003zK-Ra
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:14:46 -0400
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i3cyv-0003X6-Dn
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:14:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhlb29@foxmail.com>) id 1i3czM-00010O-Qq
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:14:39 -0400
-Received: from smtpbg511.qq.com ([203.205.250.109]:47895 helo=smtpbg.qq.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1i3czK-0000h7-B9
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:14:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
- s=s201512; t=1567156461;
- bh=S9xw0wZWsXwArUqxeaxP27F1gD+FLqmkJSzG/OX3vmI=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=w+jZz7fUlcl8YQJKX7L4dq9IOVIwhjqB/3/nteWNXfYE0KqAVohlT5FjkGvTq6S5O
- Au57JA2ZrxCrvEG5kAtceWjd+hAEAzUy7xs9A+c6wgfPGmw0dM6SO7c59a2jaxl4Dq
- jSEnEZ/tVjCDdbvFyS3LjmGzQm96z2GJ0nhe5TPA=
-X-QQ-SSF: 000100000000006000000000000000G
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 124.200.70.7
-X-QQ-STYLE: 
-X-QQ-mid: webenglish1t1567156460t233245
-From: "=?gb18030?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
-To: "=?gb18030?B?QWxla3NhbmRhciBNYXJrb3ZpYw==?=" <aleksandar.m.mail@gmail.com>
-Mime-Version: 1.0
-Date: Fri, 30 Aug 2019 17:14:20 +0800
-X-Priority: 3
-Message-ID: <tencent_4D0D8A6738AA24B65B532FA1@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Fri, 30 Aug 2019 17:14:20 +0800 (CST)
-Feedback-ID: webenglish:foxmail.com:bgweb:bgweb4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 203.205.250.109
-Content-Type: text/plain;
-	charset="gb18030"
-Content-Transfer-Encoding: base64
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i3cyt-0008BS-FK
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:14:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22274)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+ id 1i3cyn-0007u3-Ei; Fri, 30 Aug 2019 05:14:01 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7U97NL7016101; Fri, 30 Aug 2019 05:13:56 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2uq0em9e6t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 30 Aug 2019 05:13:56 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7U99PHR024190;
+ Fri, 30 Aug 2019 09:13:54 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com
+ (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+ by ppma02wdc.us.ibm.com with ESMTP id 2ujvv71tvc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 30 Aug 2019 09:13:54 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x7U9DrNE23331312
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 30 Aug 2019 09:13:53 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8AAC0C605A;
+ Fri, 30 Aug 2019 09:13:53 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 64AA9C6059;
+ Fri, 30 Aug 2019 09:13:51 +0000 (GMT)
+Received: from [127.0.1.1] (unknown [9.85.75.15])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 30 Aug 2019 09:13:51 +0000 (GMT)
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
+Date: Fri, 30 Aug 2019 14:43:50 +0530
+Message-ID: <156715643020.27761.6478380064885992450.stgit@aravinda>
+In-Reply-To: <156715632966.27761.8190459106519248668.stgit@aravinda>
+References: <156715632966.27761.8190459106519248668.stgit@aravinda>
+User-Agent: StGit/0.17.1-dirty
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-30_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908300099
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v12 3/6] target/ppc: Handle NMI guest exit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,143 +97,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?gb18030?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
+Cc: paulus@ozlabs.org, aravinda@linux.vnet.ibm.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgQWxla3NhbmRhciwNCg0KDQpUaGFua3MgZm9yIGV4cGxhaW5pbmcgIGhlbHBlciBmdW5j
-dGlvbnMgZm9yIG1lLiBCZWZvcmUgZ2V0dGluZyBteSBoYW5kcyBkaXJ0eSwgSSBoYXZlIHNv
-bWUgbW9yZSAgcXVlc3Rpb25zLiBBZnRlciBmaWd1cmluZyB0aGVtIG91dCwgSSBjYW4gZ2V0
-IHN0YXJ0ZWQuDQoNCg0KDQpJICBuZWVkIHRvIGFkZCBzb21lIG5ldyByZWdpc3RlcnMgdG8g
-dGhlIENQVS4gSW4gInRyYW5zbGF0ZS5jIiwgSSBmb3VuZCAgdGhhdCB0aGUgcmVnaXN0ZXJz
-IGFyZSBkZWNsYXJlZCBhcyBzdGF0aWMgVENHdiBhcnJheSAoZS5nLiBjcHVfZ3ByWzMyXSku
-ICBUaGVuLCBpbiBmdW5jdGlvbiBtaXBzX3RjZ19pbml0KCksIGNwdV9ncHJbaV0gaXMgY3Jl
-YXRlZCBvbmUgYnkgb25lICB3aXRoIHRjZ19nbG9iYWxfbWVtX25ldyguLi4pIGluIGEgZm9y
-IGxvb3AuIElzIHRoYXQgYWxsIEkgbmVlZCB0byBkbyB0byAgYWRkIG5ldyByZWdpc3RlcnMg
-dG8gdGhlIENQVT8gSSBub3RpY2VkIGFub3RoZXIgZmlsZSAiY3B1LmgiLCBkbyBJIGFsc28g
-IG5lZWQgdG8gYWRkIG15IG5ldyByZWdpc3RlcnMsIHNheSwgIm15X2dwclszMl0iIGluICJj
-cHUuaCI/DQoNCg0KTXkgIG5ldyBpbnN0cnVjdGlvbnMgYWxzbyBpbmNsdWRlIHNvbWUgbG9h
-ZCAmIHN0b3Jlcy4gSSBzZWUgSSBjYW4gIGltcGxlbWVudCB0aGVtIHdpdGggdGNnX2dlbl9x
-ZW11X2xkL3N0X3RsKC4uLikgaW4gdGhlIGRlY29kZSBmdW5jdGlvbidzICBzd2l0Y2gtY2Fz
-ZSBzdGF0ZW1lbnRzLCBidXQgSSBkb24ndCBzZWUgaG93IHRoZSAqdGFyZ2V0KiBtZW1vcnkg
-aXMgIGNyZWF0ZWQuIFNob3VsZG4ndCB0aGV5IGJlIGNyZWF0ZWQgd2l0aCB0Y2dfZ2xvYmFs
-X21lbV9uZXcoLi4uKSwganVzdCAgbGlrZSBob3cgdGhlIHJlZ2lzdGVycyBhcmUgY3JlYXRl
-ZD8gSSBjYW4gaGFjayB0aGUgbWVtb3J5IGJ5IGNyZWF0aW5nIGEgICpzdXBlciogbGFyZ2Vy
-IHJlZ2lzdGVyIGZpbGUsIGFuZCBoYWNrIHRoZSBsb2FkcyAmIHN0b3JlcyB3aXRoICByZWdp
-c3RlciBtb3ZlcywgYnV0IHRoYXQganVzdCBzb3VuZHMgdG9vIHNrZXRjaHkuDQoNCg0KT24g
-IHRoZSBvdGhlciBoYW5kLCBJIHdvdWxkIGxpa2UgdG8gZ2V0IGl0IHJ1bm5pbmcgZmlyc3Qs
-IHdpdGhvdXQgZG9pbmcgYW55ICBtb2RpZmljYXRpb24gdG8gdGhlIHNvdXJjZSBjb2RlLiBJ
-IGNhbiBidWlsZCB0aGUgdXNlciBzcGFjZSBlbXVsYXRpb24gIG9uIExpbnV4Lg0KDQouL2Nv
-bmZpZ3VyZSAtLXRhcmdldC1saXN0PW1pcHMtbGludXgtdXNlcg0KDQpUaGVuICBJIHdpbGwg
-d3JpdGUgYSB0ZXN0cHJvZ3JhbS5jLCBjcm9zcyBjb21waWxlIGl0IG9uIHg4NiBpbnRvIE1J
-UFMgdXNpbmcgIGdjYyhJIGFtIG5vdCBjbGVhciBvbiBob3cgdG8gZG8gaXQsIGJ1dCBteSB0
-ZWFtIGhhcyB0aGUgY29tcGlsZXIgZm9yIG91ciAgbmV3IElTQSwgSSBqdXN0IHdhbnQgdG8g
-dHJ5IHRoZSBNSVBTIHZlcnNpb24gZmlyc3QpLCBhbmQgcnVuIHRoZSB0ZXN0ICBwcm9ncmFt
-Lg0KDQoNCg0KLi9xZW11IHRlc3Rwcm9ncmFtDQoNCg0KSG93ICBkbyBJIGxvb2sgYXQgdGhl
-IGNvbnRlbnRzIGluIHRoZSB0YXJnZXQgcmVnaXN0ZXJzIGFuZCBtZW1vcnk/IEkgc2F3ICB0
-aGF0IGZ1bmN0aW9uICJtaXBzX2NwdV9kdW1wX3N0YXRlIiBpbiAidHJhbnNsYXRlLmMiIGRv
-ZXMgd2hhdCBJIG5lZWQsICBidXQgSSBkb24ndCBrbm93IGhvdyB0byBjYWxsIGl0IGluIHRo
-aXMgcHJvY2Vzcy4gU2hvdWxkIEkgdXNlIGdkYj8NCg0KDQpJICBhbSByZWFsbHkgc29ycnkg
-Zm9yIGFza2luZyB5b3Ugc28gbWFueSBxdWVzdGlvbnMsIGJ1dCBJIHRoaW5rIGFmdGVyICBn
-ZXR0aW5nIHRoZW0gZmlndXJlZCBvdXQsIEkgY2FuIHN0YXJ0IG15IHByb2plY3QuIFRoYW5r
-IHlvdSB2ZXJ5IG11Y2ggaW4gIGFkdmFuY2UsIGFuZCBoYXZlIGEgZ29vZCB3ZWVrZW5kIQ0K
-DQoNCkNoZWVycywNCg0KTGlibw0KDQoNCg0KLS0tLS0tLS0tLS0tLS0tLS0tIE9yaWdpbmFs
-IC0tLS0tLS0tLS0tLS0tLS0tLQ0KRnJvbTogICJBbGVrc2FuZGFyIE1hcmtvdmljIjs8YWxl
-a3NhbmRhci5tLm1haWxAZ21haWwuY29tPjsNClNlbmQgdGltZTogVGh1cnNkYXksIEF1ZyAy
-OSwgMjAxOSAxMDoyMiBQTQ0KVG86ICJMaWJvIFpob3UiPHpobGIyOUBmb3htYWlsLmNvbT47
-IA0KQ2M6ICJxZW11LWRldmVsIjxxZW11LWRldmVsQG5vbmdudS5vcmc+OyANClN1YmplY3Q6
-ICBSZTogW1FlbXUtZGV2ZWxdIFFFTVUgYXMgSVNTIChJbnN0cnVjdGlvbiBTZXQgU2ltdWxh
-dG9yKQ0KDQoNCg0KT24gV2VkLCBBdWcgMjgsIDIwMTkgYXQgNTo1NCBBTSBMaWJvIFpob3Ug
-PHpobGIyOUBmb3htYWlsLmNvbT4gd3JvdGU6DQoNCj4gSGkgQWxla3NhbmRhciwNCj4NCj4g
-VGhhbmsgeW91IGZvciB0aGUgbGluayB0byBMb29uZ3NvbjJGIGRvY3VtZW50YXRpb24uIEl0
-IGhhcyBiZWVuIHZlcnkNCj4gdXNlZnVsOikNCj4NCj4gSSBoYXZlIHNwZW50IHNldmVyYWwg
-ZGF5cyBpbW1lcnNpbmcgbXlzZWxmIGluIHRoZSBzb3VyY2UgY29kZSwgbm93IEkgdGhpbmsN
-Cj4gSSBoYXZlIGEgbW9yZSBzb2xpZCB1bmRlcnN0YW5kaW5nIGFib3V0IGl0LiBKdXN0IGxp
-a2UgTG9vbmdzb24gTXVsdGltZWRpYQ0KPiBJbnN0cnVjdGlvbnMsIEkgbmVlZCB0byBpbXBs
-ZW1lbnQgc29tZSBzb3J0IG9mIGNvbXBsZXggdmVjdG9yIGluc3RydWN0aW9ucywNCj4gYW5k
-IEkgbmVlZCB0byB3cml0ZSBzb21lIGhlbHBlciBmdW5jdGlvbnMgKGUuZy4gbXlfaGVscGVy
-LmMpLg0KPg0KPiBUaGUgUUVNVSB3aWtpIHdlYnNpdGUgaGFzIHZlcnkgdGhvcm91Z2ggZXhw
-bGFuYXRpb24gb24gVENHLCBidXQgSSBoYXZlbid0DQo+IGZvdW5kIGFueSBleHBsYW5hdGlv
-biBvbiB0aGUgcG9ydC1zcGVjaWZpYyBoZWxwZXJzLiBJcyB0aGVyZSBhbnkNCj4gZG9jdW1l
-bnRhdGlvbiBvbiBob3cgdGhlIGhlbHBlciBmdW5jdGlvbnMgYXJlIGdlbmVyYXRlZD8gSSB0
-aGluayBub3cgSQ0KPiAqbWlnaHQqIGtub3cgaG93IHRvIHdyaXRlIGEgd29ya2luZyBoZWxw
-ZXIgZnVuY3Rpb24sIGJ1dCBJIGp1c3QgZG9uJ3Qga25vdw0KPiBob3cgaXQgd29ya3MuDQo+
-DQo+DQpIZWxsbywgTGlibywNCg0KUHJlcmVxdWlzaXRlIGZvciB3cml0aW5nIGEgaGVscGVy
-IGlzIHRoYXQgeW91IGhhdmUgYSBjbGVhciBkZWZpbml0aW9uIG9mDQpuZXcgaW5zdHJ1Y3Rp
-b24gZnVuY3Rpb25hbGl0eSwgaW4gdGhlIHNlbnNlLCB3aGF0IG9wZXJhdGlvbiBpcyBkb25l
-IG9uIHdoYXQNCnJlc291cmNlcy4gIlJlc291cmNlcyIgYXJlIHJlZ2lzdGVycyAtIHRoZXkg
-Y291bGQgYmUgZ2VuZXJhbC1wdXJwb3NlIE1JUFMNCnJlZ2lzdGVycywgb3Igc29tZSBzcGVj
-aWFsIGFkZGl0aW9uYWwgcmVnaXN0ZXJzLiBEaWQgeW91IHVzZSBleGlzdGluZw0KcmVnaXN0
-ZXJzLCBvciBkaWQgeW91IGRlZmluZSBhIG5ldyBzZXQgb3IgcmVnaXN0ZXJzIGZvciB5b3Vy
-IG5ldw0KaW5zdHJ1Y3Rpb25zPyBSZWdpc3RlcnMgYXJlIG1vZGVsZWQgYXMgZmllbGRzIGlu
-IGEgc3RydWN0dXJlLCBhbmQgYm90aA0KaGVscGVycyBhbmQgVENHIGltcGxlbWVudGF0aW9u
-cyBtb2RpZnkgdGhvc2UgZmllbGRzIHdoaWxlIHBlcmZvcm1pbmcNCmluc3RydWN0aW9uIGVt
-dWxhdGlvbi4NCg0KSW4gYW55IGNhc2UsIHlvdSBwYXNzIHRvIHRoZSBoZWxwZXIgYWxsIGlu
-Zm9ybWF0aW9uIG5lZWRlZCBmb3IgdGhlDQppbnN0cnVjdGlvbiBpbiBxdWVzdGlvbiB0byBw
-ZXJmb3JtLiBUaGVzZSBhcmUgdXN1YWxseSBvcmRpbmFsIG51bWJlcnMgb2YNCmludm9sdmVk
-IHJlZ2lzdGVyLCBkZXJpdmVkIGZyb20gZGVjb2RpbmcgdGhlIG9wY29kZS4gQWx0ZXJuYXRp
-dmVseSwgeW91IGNhbg0KcGFzcyBwb2ludGVycyB0byB0aGUgcmVnaXN0ZXJzLCByYXRoZXIg
-dGhhbiBvcmRpbmFsIG51bWJlcnMuIEluIHR1cm4sIHRoZQ0KbWFpbiBwYXJ0IG9mIGZ1bmN0
-aW9uYWxpdHkgaXMgaW1wbGVtZW50ZWQuIEF0IHRoZSBlbmQgb2YgaGVscGVyLCB5b3UgbWF5
-DQp3YW50IHRvIHVwZGF0ZSwgbGV0J3Mgc2F5LCBhIHN0YXR1cyByZWdpc3RlciwgaWYgYW55
-IChkZXBlbmRpbmcgb24geW91cg0KZGVzaWduKS4NCg0KVGhlIGRlY2xhcmF0aW9uIG9mIGhl
-bHBlcnMgaXMgYSBsaXR0bGUgY29udHJpdmVkLCBhbmQgbWF5IHN0aWxsIGNvbmZ1c2UNCnlv
-dS4gQnV0IHRoaXMgaXMgbm90IGNydWNpYWwgdG8geW91LiBJIGFkdmlzZSB5b3UganVzdCB0
-byBjb3B5IGEgc29sdXRpb24NCmZvciBhIHNpbWlsYXIgZXhpc3RpbmcgaW5zdHJ1Y3Rpb24u
-DQoNCllvdXJzLA0KQWxla3NhbmRhcg0KDQoNCg0KPiBDaGVlcnMsDQo+IExpYm8NCj4NCj4N
-Cj4NCj4NCj4gLS0tLS0tLS0tLS0tLS0tLS0tIE9yaWdpbmFsIG1lc3NhZ2UgLS0tLS0tLS0t
-LS0tLS0tLS0tDQo+ICpGcm9tOiogIkFsZWtzYW5kYXIgTWFya292aWMiOw0KPiAqU2VuZHRp
-bWU6KiBUaHVyc2RheSwgQXVnIDIyLCAyMDE5IDY6NTMgUE0NCj4gKlRvOiogIkxpYm8gWmhv
-dSI7DQo+ICpDYzoqICJxZW11LWRldmVsIjsNCj4gKlN1YmplY3Q6KiBSZTogW1FlbXUtZGV2
-ZWxdIFFFTVUgYXMgSVNTIChJbnN0cnVjdGlvbiBTZXQgU2ltdWxhdG9yKQ0KPg0KPiBPbiBU
-aHUsIEF1ZyAyMiwgMjAxOSBhdCAxMjoyNCBQTSDBoiA8emhsYjI5QGZveG1haWwuY29tPiB3
-cm90ZToNCj4NCj4gPiBIaSBBbGVrc2FuZGFyLA0KPiA+DQo+ID4gVGhhbmsgeW91IHZlcnkg
-bXVjaCBmb3IgeW91ciBwYXRpZW50IGV4cGxhbmF0aW9uIGluIHRoZSBwcmV2aW91cyBwb3N0
-Lg0KPiBBbmQNCj4gPiB0aGFuayB5b3UgZm9yIGNoZWNraW5nLg0KPiA+IFlvdXIgYW5kIFBl
-dGVyJ3MgcmVwbGllcyBpbiB0aGUgcHJldmlvdXMgcG9zdCBjZXJ0YWlubHkgaGVscGVkIGEg
-bG90LiBJDQo+IGFtDQo+ID4gbm93IGxvb2tpbmcgYXQgYSBnaXQgY29tbWl0IDcgeWVhcnMg
-YWdvICgNCj4gPiBiZDI3N2ZhMTk2NmJjNDAwZjFiNDExZjg2OGYzOTEyNWNkYTBjNDAzKSwg
-aXQgd2FzIGEgTG9vbmdzb24gTXVsdGltZWRpYQ0KPiA+IEluc3RydWN0aW9uIGltcGxlbWVu
-dGF0aW9uIGRvbmUgbXkgUmljaGFyZCBIZW5kZXJzb24uDQo+ID4NCj4NCj4gQ29vbCwgdGhh
-dCBjb21taXQgaXMgYSB2ZXJ5IGdvb2Qgc3RhcmluZyBwb2ludCAtIGl0IGlzIGRlZmluaXRl
-bHkgbm90IHRvbw0KPiBzaW1wbGUsIGFuZCBpdCBpcyBub3QgdG9vIGNvbXBsZXggZWl0aGVy
-LiBBbmQgeW91IGNhbiBkaXNjb3ZlciBzZXZlcmFsDQo+IGRpZmZlcmVudCBjb25jZXB0cyBp
-biB0aGUgcHJvY2VzcyBvZiBleHBsb3JpbmcgdGhlIGNoYW5nZS4NCj4NCj4gRG9jdW1lbnRh
-dGlvbiBvbiBpbnN0cnVjdGlvbiBzZXQgZXh0ZW5zaW9uIHJlbGF0ZWQgdG8gdGhlIGNvbW1p
-dCAoZm91bmQgYnkNCj4gR29vZ2xlKToNCj4gaHR0cHM6Ly9maWxlcy5zb21uaWFmYWJ1bGFy
-dW0uY29tL2xvb25nc29uL2RvY3MvTG9vbmdzb24yRlVzZXJHdWlkZS5wZGYNCj4NCj4gQmUg
-cGVyc2lzdGVudCwgdGFrZSB5b3VyIHRpbWUsIHN0dWR5IHRoZSBkZXRhaWxzIGFuZCBoYW5k
-bGluZyBvZiBpbmRpdmlkdWFsDQo+IGluc3RydWN0aW9ucywgYW5kLCBvZiBjb3Vyc2UsIGxl
-dCB1cyBrbm93IGlmIHlvdSBlbmNvdW50ZXIgc29tZSBtYWpvcg0KPiBvYnN0YWNsZXMgb3Ig
-dGhvcm55IGRpbGVtbWFzLg0KPg0KPiBZb3VycywNCj4gQWxla3NhbmRhcg0KPg0KPg0KPiA+
-IEkgdGhpbmsgd2hhdCBoZSBkaWQgaXMgZXhhY3RseSB3aGF0IEkgd2FudCB0byBkbyBub3cu
-IEkgZ290IGEgdmFndWUgdmlldw0KPiA+IG9mIHRoZSBiaWcgcGljdHVyZSwgYnV0IEkgbmVl
-ZCBtb3JlIHRpbWUgdG8gZmlndXJlIG91dCB0aGUgZGV0YWlscy4gSQ0KPiB3aWxsDQo+ID4g
-Y2VydGFpbmx5IGFzayBtb3JlIHF1ZXN0aW9ucyBhYm91dCB0aGlzIGxhdGVyLCBidXQgYmVm
-b3JlIHRoYXQgSSBuZWVkIHRvDQo+ID4gbG9vayBhdCBzb21lIG90aGVyIHBhcnRzIG9mIHRo
-ZSBzb3VyY2UgY29kZTopIEFnYWluIHRoYW5rIHlvdSBmb3INCj4gY2hlY2tpbmchDQo+ID4N
-Cj4gPiBDaGVlcnMsDQo+ID4gTGlibw0KPiA+DQo+ID4NCj4gPiAtLS0tLS0tLS0tLS0tLS0t
-LS0gT3JpZ2luYWwgbWVzc2FnZSAtLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiAqRnJvbToqICJB
-bGVrc2FuZGFyIE1hcmtvdmljIjsNCj4gPiAqU2VuZHRpbWU6KiBUaHVyc2RheSwgQXVnIDIy
-LCAyMDE5IDQ6MjMgUE0NCj4gPiAqVG86KiAiwaIiOw0KPiA+ICpDYzoqICJxZW11LWRldmVs
-IjsNCj4gPiAqU3ViamVjdDoqIFJlOiBbUWVtdS1kZXZlbF0gUUVNVSBhcyBJU1MgKEluc3Ry
-dWN0aW9uIFNldCBTaW11bGF0b3IpDQo+ID4NCj4gPiBPbiBUdWUsIEF1ZyAyMCwgMjAxOSBh
-dCAxMjoxMiBQTSDBoiA8emhsYjI5QGZveG1haWwuY29tPiB3cm90ZToNCj4gPg0KPiA+ID4g
-SSBhbSB3b3JraW5nIG9uIGEgcHJvamVjdCB0aGF0IHJlcXVpcmVzIG1lIHRvIG1vZGlmeSB0
-aGUgSVNBIG9mIHRoZQ0KPiBNSVBTDQo+ID4gPiB0YXJnZXQuDQo+ID4NCj4gPg0KPiA+IEwu
-LA0KPiA+DQo+ID4gSG93IGlzIGl0IGdvaW5nPw0KPiA+DQo+ID4gQWxla3NhbmRhcg0KPiA+
-DQo+ID4NCj4gPg0KPiA+ID4gSSBoYXZlIGJlZW4gc3RhcmluZyBhdCB0aGUgc291cmNlIGNv
-ZGUgZm9yIGFib3V0IGEgd2VlaywgYnV0IGZvdW5kIGl0DQo+ID4gPiByZWFsbHkgZGlmZmlj
-dWx0IGR1ZSB0byBtZSBiZWluZyBhIHlvdW5nIHJvb2tpZSBhbmQgdGhlIHNwYXJzZQ0KPiBj
-b21tZW50cy4NCj4gPiA+IFNwZWNpZmljYWxseSwgSSBuZWVkIHRvIGV4dGVuZCBNSVBTLCBi
-eSBhZGRpbmcgc29tZSBuZXcgaW5zdHJ1Y3Rpb25zDQo+IGFuZA0KPiA+ID4gbmV3IENQVSBy
-ZWdpc3RlcnMgdG8gdGhlIGN1cnJlbnQgYXJjaGl0ZWN0dXJlLCBhbmQgdGhhdCBzb3VuZHMg
-cmVhbGx5DQo+ID4gZWFzeS4NCj4gPiA+IEkgdGhpbmsgdGhlIHBsYWNlIGZvciBtZSB0byBs
-b29rIGF0IHNob3VsZCBiZSBhdCB0aGUgZGlyZWN0b3J5DQo+ID4gPiAke3FlbXVfcm9vdH0v
-dGFyZ2V0L21pcHMvLiBXaXRoIGEgTUlQUyBJbnN0cnVjdGlvbiBTZXQgTWFudWFsIFJlbGVh
-c2UgNg0KPiA+ID4gaGFuZHksIEkgaGF2ZSBkaWZmaWN1bHR5IGZpbmRpbmcgdGhlIHNvdXJj
-ZSBjb2RlIHdoZXJlIHRoZSBJU0EgcmVzaWRlcy4NCj4gPiBJcw0KPiA+ID4gaXQgaW4gb3Bf
-aGVscGVyLmM/IE9yIHRyYW5zbGF0ZS5jPyBBbnkgZ3VpZGFuY2Ugd291bGQgYmUgcmVhbGx5
-DQo+ID4gPiBhcHByZWNpYXRlZC4gVGhhbmsgeW91IHZlcnkgbXVjaCBpbiBhZHZhbmNlLg0K
-PiA+ID4NCj4gPiA+DQo+ID4gPiBDaGVlcnMsDQo+ID4gPiBMLg0KPiA+DQo+
+Memory error such as bit flips that cannot be corrected
+by hardware are passed on to the kernel for handling.
+If the memory address in error belongs to guest then
+the guest kernel is responsible for taking suitable action.
+Patch [1] enhances KVM to exit guest with exit reason
+set to KVM_EXIT_NMI in such cases. This patch handles
+KVM_EXIT_NMI exit.
+
+[1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
+    (e20bbd3d and related commits)
+
+Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c          |    8 ++++++++
+ hw/ppc/spapr_events.c   |   24 ++++++++++++++++++++++++
+ include/hw/ppc/spapr.h  |   10 ++++++++++
+ target/ppc/kvm.c        |   14 ++++++++++++++
+ target/ppc/kvm_ppc.h    |    2 ++
+ target/ppc/trace-events |    1 +
+ 6 files changed, 59 insertions(+)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 8288e8b..76ed988 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1823,6 +1823,12 @@ static void spapr_machine_reset(MachineState *machine)
+     first_ppc_cpu->env.gpr[5] = 0;
+ 
+     spapr->cas_reboot = false;
++
++    spapr->mc_status = -1;
++    spapr->guest_machine_check_addr = -1;
++
++    /* Signal all vCPUs waiting on this condition */
++    qemu_cond_broadcast(&spapr->mc_delivery_cond);
+ }
+ 
+ static void spapr_create_nvram(SpaprMachineState *spapr)
+@@ -3099,6 +3105,8 @@ static void spapr_machine_init(MachineState *machine)
+ 
+         kvmppc_spapr_enable_inkernel_multitce();
+     }
++
++    qemu_cond_init(&spapr->mc_delivery_cond);
+ }
+ 
+ static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 0e4c195..e76c1a7 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -40,6 +40,7 @@
+ #include "hw/ppc/spapr_drc.h"
+ #include "qemu/help_option.h"
+ #include "qemu/bcd.h"
++#include "qemu/main-loop.h"
+ #include "hw/ppc/spapr_ovec.h"
+ #include <libfdt.h>
+ 
+@@ -621,6 +622,29 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
+                             RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
+ }
+ 
++void spapr_mce_req_event(PowerPCCPU *cpu)
++{
++    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++
++    while (spapr->mc_status != -1) {
++        /*
++         * Check whether the same CPU got machine check error
++         * while still handling the mc error (i.e., before
++         * that CPU called "ibm,nmi-interlock")
++         */
++        if (spapr->mc_status == cpu->vcpu_id) {
++            qemu_system_guest_panicked(NULL);
++            return;
++        }
++        qemu_cond_wait_iothread(&spapr->mc_delivery_cond);
++        /* Meanwhile if the system is reset, then just return */
++        if (spapr->guest_machine_check_addr == -1) {
++            return;
++        }
++    }
++    spapr->mc_status = cpu->vcpu_id;
++}
++
+ static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                             uint32_t token, uint32_t nargs,
+                             target_ulong args,
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 66049ac..99a2966 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -192,6 +192,15 @@ struct SpaprMachineState {
+      * occurs during the unplug process. */
+     QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
+ 
++    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
++    target_ulong guest_machine_check_addr;
++    /*
++     * mc_status is set to -1 if mc is not in progress, else is set to the CPU
++     * handling the mc.
++     */
++    int mc_status;
++    QemuCond mc_delivery_cond;
++
+     /*< public >*/
+     char *kvm_type;
+     char *host_model;
+@@ -805,6 +814,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
+ int spapr_max_server_number(SpaprMachineState *spapr);
+ void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+                       uint64_t pte0, uint64_t pte1);
++void spapr_mce_req_event(PowerPCCPU *cpu);
+ 
+ /* DRC callbacks. */
+ void spapr_core_release(DeviceState *dev);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index c055fc1..4e282f6 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -1704,6 +1704,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+         ret = 0;
+         break;
+ 
++    case KVM_EXIT_NMI:
++        trace_kvm_handle_nmi_exception();
++        ret = kvm_handle_nmi(cpu, run);
++        break;
++
+     default:
+         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
+         ret = -1;
+@@ -2807,6 +2812,15 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+     return data & 0xffff;
+ }
+ 
++int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
++{
++    cpu_synchronize_state(CPU(cpu));
++
++    spapr_mce_req_event(cpu);
++
++    return 0;
++}
++
+ int kvmppc_enable_hwrng(void)
+ {
+     if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_PPC_HWRNG)) {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 2990898..173c000 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -84,6 +84,8 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
+ void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
+ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset);
+ 
++int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
++
+ #else
+ 
+ static inline uint32_t kvmppc_get_tbfreq(void)
+diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+index 3dc6740..6d15aa9 100644
+--- a/target/ppc/trace-events
++++ b/target/ppc/trace-events
+@@ -28,3 +28,4 @@ kvm_handle_papr_hcall(void) "handle PAPR hypercall"
+ kvm_handle_epr(void) "handle epr"
+ kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
+ kvm_handle_debug_exception(void) "handle debug exception"
++kvm_handle_nmi_exception(void) "handle NMI exception"
+
+
