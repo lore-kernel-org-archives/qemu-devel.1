@@ -2,85 +2,66 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D52C3A59B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:21:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F07DC3A59B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:22:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E607523407
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:21:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItOKUmoi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E607523407
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6280821726
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:22:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6280821726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3hmR-0005qV-4Y
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 10:21:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53177)
+	id 1i3hni-0007c5-Gz
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 10:22:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vandersonmr2@gmail.com>) id 1i3hXH-0005i3-OT
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:05:57 -0400
+ (envelope-from <armbru@redhat.com>) id 1i3hTl-0003tk-15
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1i3hXG-0002HK-Cp
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:05:55 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:43966)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1i3hXG-00025Q-2j
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:05:54 -0400
-Received: by mail-qk1-x743.google.com with SMTP id m2so6181839qkd.10
- for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 07:05:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=n5K+/jgCN5Vl1Y5P2Wq4YmrdggUNqrnMnKcI9mMTaeY=;
- b=ItOKUmoiWbO4UHbsSe53u+ojH3OQfZ/XVbmKASjPTGpyao9wFSkDVGdW2Rp/t3NTrr
- /8CqITuwIG7fpJ/ItpwpeOSbFfZS6vUVeSbav+CAUPwW3pk0UEdb1+1JORBo86uBuD0i
- jcMh48YdMoDmEF+VFJbfZWb+LR0f+P5dLvcM1awLi5aqi4W0QHKFU08sSlpkNpp/CfgV
- GzXh1dviLTv3awcCeYcwAZvZBmtDiZ97LIgpN1MTSLIAcY4byXjXK1wfW3yZQ8k0f2C/
- NYxzHg//ju7um2vLkZ6Yp2Ct0OVvE+6IuqwNrcvlwPaYAFnj85O2FRjzmOFtxMicB5g5
- Gmkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=n5K+/jgCN5Vl1Y5P2Wq4YmrdggUNqrnMnKcI9mMTaeY=;
- b=EAsEmqnlP8gPkzZiMgR9gWI4JUmvRNujxWLl4xRvRei6HNb34G9+3qVI7UjyttOkP1
- 6BgTVsiXj3qEl2QpIflaKRyOiMrJvEUK115lHBh6lJ7RNaYP7NT+Lob5f9aVaNIRf1Mv
- iLUEPiBWxHIHTtFxTS7zRz4TImV9BdSoOcLR5aeC1irjhqxdu6QxhBBSBXMty8t3OWj/
- jTrIhEu7n1em+os6RvqZ0khEkNfKSIiZX/08YlaI28otmqUNUFRubwBq3lNnWY7YyzQT
- lmtES1U/CgIkqLkbtAL3Qf6W3IVtjxyeoihfehpL141WTaQOGMjWnVOEz8F1bIQUK2dg
- XB0A==
-X-Gm-Message-State: APjAAAVrshF4QunnMszq3CFH3i3OVLUNSywZQzZNLhJO8dBbaCNHz1Mx
- xf3PLOFoUR+4/Ay2jWAGyrGezqHAtBt0Kw==
-X-Google-Smtp-Source: APXvYqznWkG/Jjkq3oxJrlj9tfzP9mgk/N2vDo2OF72PpeOAWCUVUN2svd7q9Qlp/tkG8id5gSnRrA==
-X-Received: by 2002:a05:620a:142e:: with SMTP id
- k14mr14669937qkj.336.1567167553472; 
- Fri, 30 Aug 2019 05:19:13 -0700 (PDT)
-Received: from vanderson-lmcad.gw.lmcad.ic.unicamp.br (gw.lmcad.ic.unicamp.br.
- [143.106.73.166]) by smtp.googlemail.com with ESMTPSA id
- o127sm3001299qkd.104.2019.08.30.05.19.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Aug 2019 05:19:12 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
+ (envelope-from <armbru@redhat.com>) id 1i3hTb-00077s-T0
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:02:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35916)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i3hTZ-00071r-Oj
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:02:07 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A8F583082B02;
+ Fri, 30 Aug 2019 12:44:02 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5311319C58;
+ Fri, 30 Aug 2019 12:44:02 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D79771165361; Fri, 30 Aug 2019 14:44:00 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 30 Aug 2019 09:19:01 -0300
-Message-Id: <20190830121903.17585-1-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
+References: <20190828202641.24752-1-armbru@redhat.com>
+ <20190828202641.24752-3-armbru@redhat.com>
+Date: Fri, 30 Aug 2019 14:44:00 +0200
+In-Reply-To: <20190828202641.24752-3-armbru@redhat.com> (Markus Armbruster's
+ message of "Wed, 28 Aug 2019 22:26:34 +0200")
+Message-ID: <87v9ueomb3.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::743
-Subject: [Qemu-devel] [PATCH v2 0/2] Integrating qemu to Linux Perf
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 30 Aug 2019 12:44:02 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/9] qapi: Drop support for boxed alternate
+ for commands, events
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,43 +73,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vandersonmr <vandersonmr2@gmail.com>
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch is part of Google Summer of Code (GSoC) 2019.
-More about the project can be found in:
-https://wiki.qemu.org/Internships/ProjectIdeas/TCGCodeQuality
+Markus Armbruster <armbru@redhat.com> writes:
 
-This adds --perf command-line option to dump Linux Perf
-jitdump files. These files are used to enhant Perf report
-and to be able to analyze and dump JITed code with perf.
+> Commands and events can define their argument type inline (default) or
+> by referring to another type ('boxed': true, since commit c818408e44
+> "qapi: Implement boxed types for commands/events", v2.7.0).  The
+> unboxed inline definition is an (anonymous) struct type.  The boxed
+> type may be a struct, union, or alternate type.
+>
+> The latter is problematic: docs/interop/qemu-spec.txt requires the
+> value of the 'data' key to be a json-object, but any non-degenerate
+> alternate type has at least one branch that isn't.
+>
+> Fortunately, we haven't made use of alternates in this context outside
+> tests/.  Drop support for them.
+>
+> QAPISchemaAlternateType.is_empty() is now unused.  Drop it, too.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Example of use:
- perf record -k 1 qemu-x86_64 -perf ./a.out
- perf inject -j -i perf.data -o perf.data.jitted
- perf report -i perf.data.jitted
+Need to squash in
 
-vandersonmr (2):
-  accel/tcg: adding integration with linux perf
-  tb-stats: adding TBStatistics info into perf dump
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index c54c148263..54d02458b5 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1711,15 +1711,13 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         QAPISchemaEntity.check(self, schema)
+         if self._arg_type_name:
+             self.arg_type = schema.lookup_type(self._arg_type_name)
+-            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+-                    isinstance(self.arg_type, QAPISchemaAlternateType))
++            assert isinstance(self.arg_type, QAPISchemaObjectType)
+             self.arg_type.check(schema)
+             if self.boxed:
+                 if self.arg_type.is_empty():
+                     raise QAPISemError(self.info,
+                                        "Cannot use 'boxed' with empty type")
+             else:
+-                assert not isinstance(self.arg_type, QAPISchemaAlternateType)
+                 assert not self.arg_type.variants
+         elif self.boxed:
+             raise QAPISemError(self.info, "Use of 'boxed' requires 'data'")
+@@ -1747,15 +1745,13 @@ class QAPISchemaEvent(QAPISchemaEntity):
+         QAPISchemaEntity.check(self, schema)
+         if self._arg_type_name:
+             self.arg_type = schema.lookup_type(self._arg_type_name)
+-            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+-                    isinstance(self.arg_type, QAPISchemaAlternateType))
++            assert isinstance(self.arg_type, QAPISchemaObjectType)
+             self.arg_type.check(schema)
+             if self.boxed:
+                 if self.arg_type.is_empty():
+                     raise QAPISemError(self.info,
+                                        "Cannot use 'boxed' with empty type")
+             else:
+-                assert not isinstance(self.arg_type, QAPISchemaAlternateType)
+                 assert not self.arg_type.variants
+         elif self.boxed:
+             raise QAPISemError(self.info, "Use of 'boxed' requires 'data'")
 
- accel/tcg/Makefile.objs      |   1 +
- accel/tcg/perf/Makefile.objs |   1 +
- accel/tcg/perf/jitdump.c     | 206 +++++++++++++++++++++++++++++++++++
- accel/tcg/perf/jitdump.h     |  36 ++++++
- accel/tcg/translate-all.c    |  14 +++
- include/qemu-common.h        |   3 +
- linux-user/main.c            |   7 ++
- os-posix.c                   |   3 +
- qemu-options.hx              |  11 ++
- 9 files changed, 282 insertions(+)
- create mode 100644 accel/tcg/perf/Makefile.objs
- create mode 100644 accel/tcg/perf/jitdump.c
- create mode 100644 accel/tcg/perf/jitdump.h
 
--- 
-2.22.0
-
+> ---
+>  docs/devel/qapi-code-gen.txt            | 12 ++++++------
+>  tests/qapi-schema/qapi-schema-test.json |  2 +-
+>  scripts/qapi/common.py                  |  7 ++-----
+>  tests/qapi-schema/qapi-schema-test.out  |  2 +-
+>  4 files changed, 10 insertions(+), 13 deletions(-)
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index e8ec8ac1de..3d3931fb7a 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -612,9 +612,9 @@ the command.  Normally, 'data' is a dictionary for an anonymous type,
+>  or names a struct type (possibly empty, but not a union), and its
+>  members are passed as separate arguments to this function.  If the
+>  command definition includes a key 'boxed' with the boolean value true,
+> -then 'data' is instead the name of any non-empty complex type
+> -(struct, union, or alternate), and a pointer to that QAPI type is
+> -passed as a single argument.
+> +then 'data' is instead the name of any non-empty complex type (struct
+> +or union), and a pointer to that QAPI type is passed as a single
+> +argument.
+>  
+>  The generator also emits a marshalling function that extracts
+>  arguments for the user's function out of an input QDict, calls the
+> @@ -714,9 +714,9 @@ The generator emits a function to send the event.  Normally, 'data' is
+>  a dictionary for an anonymous type, or names a struct type (possibly
+>  empty, but not a union), and its members are passed as separate
+>  arguments to this function.  If the event definition includes a key
+> -'boxed' with the boolean value true, then 'data' is instead the name of
+> -any non-empty complex type (struct, union, or alternate), and a
+> -pointer to that QAPI type is passed as a single argument.
+> +'boxed' with the boolean value true, then 'data' is instead the name
+> +of any non-empty complex type (struct or union), and a pointer to that
+> +QAPI type is passed as a single argument.
+>  
+>  
+>  === Features ===
+> diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
+> index c6d59acc3e..0fadb4ddd7 100644
+> --- a/tests/qapi-schema/qapi-schema-test.json
+> +++ b/tests/qapi-schema/qapi-schema-test.json
+> @@ -180,7 +180,7 @@
+>  { 'event': 'EVENT_D',
+>    'data': { 'a' : 'EventStructOne', 'b' : 'str', '*c': 'str', '*enum3': 'EnumOne' } }
+>  { 'event': 'EVENT_E', 'boxed': true, 'data': 'UserDefZero' }
+> -{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefAlternate' }
+> +{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefFlatUnion' }
+>  
+>  # test that we correctly compile downstream extensions, as well as munge
+>  # ticklish names
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 9aefcfe015..c54c148263 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -840,7 +840,7 @@ def check_command(expr, info):
+>  
+>      args_meta = ['struct']
+>      if boxed:
+> -        args_meta += ['union', 'alternate']
+> +        args_meta += ['union']
+>      check_type(info, "'data' for command '%s'" % name,
+>                 expr.get('data'), allow_dict=not boxed,
+>                 allow_metas=args_meta)
+> @@ -858,7 +858,7 @@ def check_event(expr, info):
+>  
+>      meta = ['struct']
+>      if boxed:
+> -        meta += ['union', 'alternate']
+> +        meta += ['union']
+>      check_type(info, "'data' for event '%s'" % name,
+>                 expr.get('data'), allow_dict=not boxed,
+>                 allow_metas=meta)
+> @@ -1690,9 +1690,6 @@ class QAPISchemaAlternateType(QAPISchemaType):
+>          visitor.visit_alternate_type(self.name, self.info, self.ifcond,
+>                                       self.variants)
+>  
+> -    def is_empty(self):
+> -        return False
+> -
+>  
+>  class QAPISchemaCommand(QAPISchemaEntity):
+>      def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
+> diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
+> index 85d510bc00..5470a525f5 100644
+> --- a/tests/qapi-schema/qapi-schema-test.out
+> +++ b/tests/qapi-schema/qapi-schema-test.out
+> @@ -252,7 +252,7 @@ event EVENT_D q_obj_EVENT_D-arg
+>     boxed=False
+>  event EVENT_E UserDefZero
+>     boxed=True
+> -event EVENT_F UserDefAlternate
+> +event EVENT_F UserDefFlatUnion
+>     boxed=True
+>  enum __org.qemu_x-Enum
+>      member __org.qemu_x-value
 
