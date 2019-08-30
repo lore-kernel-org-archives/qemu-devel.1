@@ -7,87 +7,88 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D9EC3A59B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 15:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EBBC3A59B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 15:23:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E2EC23407
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 15:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3374C22CE9
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 15:23:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cbj0Fbbs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E2EC23407
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LfNnKVNu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3374C22CE9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3igN-0001d0-9A
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 11:19:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34306)
+	id 1i3ikf-0002nk-CI
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 11:23:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i3idL-0000vn-Kb
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 11:16:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i3ihb-0002Cr-G4
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 11:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i3idH-0001wk-FU
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 11:16:13 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39128)
+ (envelope-from <richard.henderson@linaro.org>) id 1i3ihY-0005FK-7p
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 11:20:38 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:35100)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i3idH-0001md-4p
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 11:16:11 -0400
-Received: by mail-pf1-x443.google.com with SMTP id a67so1566350pfa.6
- for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 08:16:09 -0700 (PDT)
+ id 1i3ihW-0005An-BR
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 11:20:36 -0400
+Received: by mail-pl1-x642.google.com with SMTP id gn20so3519601plb.2
+ for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 08:20:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=W/5KIcDspcCw4aMY+Mi0R66tPJCSR/ireqasuabxNoI=;
- b=cbj0FbbsM32b5T6tIUvTc0FS5j8I3k507dV1dzfoEER3fJuiIX75EtPcqoyOnGoMTe
- A3dEV+juzYy3hkiDOqAma/Mh8RRldXz6yQSRr2JUTg5oUIhyAYs2oaTnzKoFP1y12OEc
- o+qR7bWNnrqbGgUsVde/YE7ilHftc0p26lBmDHsw6YkifJuaAduuaRYc/+KJKoKx71oU
- a3BITDNScELBKSYQmd6si9ms4uEN62RGgQi4J94unHmFVSjyQ4oqHfREaBUuDtgRnWbV
- aozbubc7bkhGyHeImMKXgW4tMh9y3FuMF6HuzGMG5psQHCDoaWty+hm0MllJ4ZrOydCt
- k46w==
+ bh=w29b21BZvW6QHFcyFYkoQK/4zWzZUtFJ4JQFViTO00g=;
+ b=LfNnKVNuXabTG1/r919wi0SOEYQlKTVTLHsT6CiO7jGsvXRgUJTO+IzYFCQ1K36ne+
+ RTAB3jUky2NpMRxK8xLUSOdyMMcczVoXr17/89AoQNglUwXrw+5RDVZAQVv9/uct52NN
+ Yv53UaPFk+dnUoFz9iRD1wXjaF/rp3YYOnp91JeFfto5D8jBGXVWPtKhm4i/mBtzj2mp
+ iT+gDzJCDL3Omj2ojmL7QCR6QPnF8g7jUfBW9qBOegbB1cEbjKctoPBd6KpZjkDPfEzr
+ kbzB18HZnomDNL1eXKRgnjD3zOqr45ZMs4187BDTUGR4O0U0kAwAfr2faXPWc9fm9Qxi
+ jOOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=W/5KIcDspcCw4aMY+Mi0R66tPJCSR/ireqasuabxNoI=;
- b=dMvX2evJTkCgTIMD4Sa3RlYdjh4PP9PeXWpiOfBnFrA8hHHUVSd8wINsxrSM3D/RiN
- zF3AWkeJ9zHPYDXzuXhhQx3W8bf42GuJtrcn7j3nsPMPYMqu4MZjyMkW69uLqNGW11oN
- pwukR5VfhNZaFs0uJn+Y1Aj2YZ+fyXgOBLHksk2V5QvZX+suM/17AIpMABTJAY92Di92
- Oiw4B0bVUV3jSM5A9W/G50bk+HWIFK8iam6SqFeGMTUp1h35RvgZl1Z82f65uCvVRpry
- uyZbGhvnwWzI2rReQ3qlJ5kVQOmt2UBMv71UEiatH2U5f7pm/EGLuRCABKFRy+Q5mxYB
- TdBA==
-X-Gm-Message-State: APjAAAUgEHYcIE5h+nZTBAhnu2TbR4C+vH17MR5s9mZBEhx7kCkHfQK/
- sBY1mn2VrPwyzmbb0oPHMKTing==
-X-Google-Smtp-Source: APXvYqwrXm79mehfopV5eJ7n+n5IubZJTM+VtAbDL1JQKstPlUH+f1nJUJ8i5oDiNbC1ZGUUTm0i4Q==
-X-Received: by 2002:a65:620a:: with SMTP id d10mr13262621pgv.8.1567178168289; 
- Fri, 30 Aug 2019 08:16:08 -0700 (PDT)
+ bh=w29b21BZvW6QHFcyFYkoQK/4zWzZUtFJ4JQFViTO00g=;
+ b=cVfQVEbFQYkfa1EwXNr77KTIFN/+4O9mv6Uh3JWAFqOSWtQ/yYUDuLU5q1OET2jKgo
+ s8zxMSVoNsVwHDqlb8WpB38yHwNnklkagadKJG23lQhEMs5jzI1ugI6N75r9mn3my1Yt
+ sze2nMtB3tvLXPjnNP6te2OxY7fAUtSVfNQnxJj3IYHDqaa6T0FhRnyHK3beBySt88IJ
+ LG4nhPoCgEkF/Z0yfFnYgu1Kar49FIro+eXLeFYNUSmQNi0ab+fyCZXA5tKn162jxDv4
+ yyJdJbBglxCzSr8r6BUS5jHP5jzlRkGeL25N+69AbO76syMO8vD4ka/8+uXatuU40s+I
+ FHKA==
+X-Gm-Message-State: APjAAAXU27OmGfrttra+9gL4RC/9Qr3W4tYbWP9uZC/6u4sBgKAk4CGW
+ e5NuMysNuf9mw5GTneZNgv2sUQ==
+X-Google-Smtp-Source: APXvYqxnpTiZU8lmSrn4wZtUo11S2deNq5n/3iGT/7PTz5U/DF9+UVi159rCTVZk7gal3SWhwMkajg==
+X-Received: by 2002:a17:902:b58d:: with SMTP id
+ a13mr2102404pls.116.1567178430494; 
+ Fri, 30 Aug 2019 08:20:30 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id b126sm17137025pfa.177.2019.08.30.08.16.06
+ by smtp.gmail.com with ESMTPSA id 97sm4903999pjz.12.2019.08.30.08.20.28
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 30 Aug 2019 08:16:07 -0700 (PDT)
+ Fri, 30 Aug 2019 08:20:29 -0700 (PDT)
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190830100959.26615-1-david@redhat.com>
- <20190830100959.26615-2-david@redhat.com>
+ <20190830100959.26615-3-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <bf422242-735c-afec-0bd7-97d088468a70@linaro.org>
-Date: Fri, 30 Aug 2019 08:16:04 -0700
+Message-ID: <d77f487e-b913-3a53-1602-6011466bd2fe@linaro.org>
+Date: Fri, 30 Aug 2019 08:20:27 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190830100959.26615-2-david@redhat.com>
+In-Reply-To: <20190830100959.26615-3-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] tcg: Make probe_write() return a
- pointer to the host page
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] tcg: Factor out probe_write() logic
+ into probe_access()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,18 +108,18 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/30/19 3:09 AM, David Hildenbrand wrote:
-> ... similar to tlb_vaddr_to_host(); however, allow access to the host
-> page except when TLB_NOTDIRTY or TLB_MMIO is set.
+> Let's also allow to probe other access types.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  accel/tcg/cputlb.c      | 21 ++++++++++++++++-----
->  accel/tcg/user-exec.c   |  6 ++++--
->  include/exec/exec-all.h |  4 ++--
->  3 files changed, 22 insertions(+), 9 deletions(-)
+>  accel/tcg/cputlb.c      | 43 ++++++++++++++++++++++++++++++-----------
+>  accel/tcg/user-exec.c   | 26 +++++++++++++++++++------
+>  include/exec/exec-all.h |  9 +++++++--
+>  3 files changed, 59 insertions(+), 19 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
+
 
