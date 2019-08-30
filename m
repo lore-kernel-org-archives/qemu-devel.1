@@ -2,76 +2,116 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF11EC3A59B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E00F4C3A59B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:57:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1C992341B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:56:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C992341B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B6D8D2341B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:57:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6D8D2341B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3iJs-0002MN-DJ
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 10:56:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47387)
+	id 1i3iLI-0002tK-U6
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 10:57:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1i3iCP-0006nt-Eq
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:48:27 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i3i2Y-00009p-3A
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:38:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1i3iCL-0000Mc-PF
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:48:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40278)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1i3iCC-0000A1-Jk
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:48:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C66243D96B;
- Fri, 30 Aug 2019 14:48:06 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E32A960623;
- Fri, 30 Aug 2019 14:48:03 +0000 (UTC)
-Date: Fri, 30 Aug 2019 16:48:02 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <20190830164802.1b17ff26@redhat.com>
-In-Reply-To: <033ced1a-1399-968e-cce6-6b15a20b0baf@redhat.com>
-References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
- <D2A45071-A097-4642-A34C-6B7C5D7D2466@intel.com>
- <E92EE9817A31E24EB0585FDF735412F5B9D9C671@ORSMSX113.amr.corp.intel.com>
- <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
- <b3907432-b149-3f96-6d93-f443f215e0f8@redhat.com>
- <2b4ba607-f0e3-efee-6712-6dcef129b310@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA209B@ORSMSX113.amr.corp.intel.com>
- <7f2d2f1e-2dd8-6914-c55e-61067e06b142@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA218F@ORSMSX113.amr.corp.intel.com>
- <3661c0c5-3da4-1453-a66a-3e4d4022e876@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA2346@ORSMSX113.amr.corp.intel.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F76FDAF@shsmsx102.ccr.corp.intel.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA25CC@ORSMSX113.amr.corp.intel.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F7728AB@shsmsx102.ccr.corp.intel.com>
- <20190827203102.56d0d048@redhat.com>
- <033ced1a-1399-968e-cce6-6b15a20b0baf@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1i3i2T-0004YK-04
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:38:11 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:51823)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i3i2Q-0004NZ-Vc
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:38:08 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M8hR1-1i7olT04On-004hLN; Fri, 30 Aug 2019 16:37:50 +0200
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190830143648.2967-1-alex.bennee@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c8340803-34a7-ab53-7791-efdcb734db41@vivier.eu>
+Date: Fri, 30 Aug 2019 16:37:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 30 Aug 2019 14:48:06 +0000 (UTC)
+In-Reply-To: <20190830143648.2967-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:g/1VrzOuT8L8AcbUnPQTymNkBpyQbF2wLDT8ax6Zru0AqF8zRb8
+ B7KHDSPQwXXNYI9V5OK4qUnbtYlXJEPDMTUFRcq0a6PPbKiejIdaFYfLZyJt4zc+RpVuPBh
+ SPq/riu/kkjzyFjr/2nNSHxg08Rr4MHiAVLjpbJwIYFOku/o1sEfNxoTv2uc28r3/nUEZQn
+ QgGTB7lfATU7lHO+DTH5A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Uavp6udqEtk=:gBL77zjb9oHgiXPnm/7gky
+ KZTFI/D1OHlKZjFDNRjBxX+0lU0cGMZIF5knR6/iBTOTrARAT/5Y/hKVvAyl+LA5nr35nZmfD
+ vuJ4CbB7zyHNfx3SO1+hU7rUqCK0tPkdOaDCqLID/ng8OaZOMjzn+SkybiKF5jA5jV0NGM7TR
+ SLMW+3USbvINijI9OrMkXAwVugHPLxj2EYslh14WkLjZr5VZa66MOrAyp6cDpoW6z60h5ea25
+ NJoCxPvHDYu54n9yfhIPtCFEDDnLXn5UJyvnEIXserySnhNNz/tNKSdsNETAoTafFC6o/Yhyt
+ bYdst02vJs8B+5rvIVTCrW7dEMn5XCbjB3NmfVWlOOGaKL6h1E1VxDxp/SD8ZOG1wwZ6hG2zm
+ /zn4/5RG1Rk4PLCvjq8DlUGlDfcod7ek96vVtCY8mDIAgdnB7CDf664RVIudR99Yy3cMaYtq5
+ FFEQ14L2Zem/N20cxF+7Y8cQ3DPv5DdNmxH301Ph3IINV7h90sMZ5xlvkFEwMtLsIxJbHdUlZ
+ HoQreFr0yo7MCkPrda1t4uaJL2rF3hYlCm+Vz9I+wjk/Ac+cjv2sV8WV9cNikPFbvPHa27I2d
+ qpIh0b6rlY1atpsw2RdTbTiYZ5H16jr53LohNCqrWiemLBsk0OEHIagUGZXKFjrxbQUOuBc1C
+ 6ruI6s1hEh63VSNcKB2EBSRs9OaVT/BH3twjzW3blYpPowsnb+oHdCWlSL47hpHgVWApqM0Nd
+ IdeQodYuwSpnnib0A9KxlGsD4UL/Arss7p7ms9+ZzQ90sRQo3TjOtUjWkq+0CiQokpk3iwKdE
+ B1gm1MFP35s6fbmvqzBJ9zBmA+tLw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
- QEMU+OVMF
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fail and report on bad dfilter
+ specs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,148 +123,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
- "devel@edk2.groups.io" <devel@edk2.groups.io>,
- Phillip Goerl <phillip.goerl@oracle.com>,
- qemu devel list <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>, "Yao,
- Jiewen" <jiewen.yao@intel.com>, "Nakajima, Jun" <jun.nakajima@intel.com>,
- "Kinney, Michael D" <michael.d.kinney@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- "rfc@edk2.groups.io" <rfc@edk2.groups.io>,
- Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 29 Aug 2019 19:01:35 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+Le 30/08/2019 à 16:36, Alex Bennée a écrit :
+> Just passing NULL means we end up ignoring the bad dfilter spec
+> instead of reporting it and exiting as we should.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  linux-user/main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 47917bbb20f..50a031520ca 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -236,7 +236,7 @@ static void handle_arg_log(const char *arg)
+>  
+>  static void handle_arg_dfilter(const char *arg)
+>  {
+> -    qemu_set_dfilter_ranges(arg, NULL);
+> +    qemu_set_dfilter_ranges(arg, &error_fatal);
+>  }
+>  
+>  static void handle_arg_log_filename(const char *arg)
+> 
 
-> On 08/27/19 20:31, Igor Mammedov wrote:
-> > On Sat, 24 Aug 2019 01:48:09 +0000
-> > "Yao, Jiewen" <jiewen.yao@intel.com> wrote:  
-> 
-> >> (05) Host CPU: (OS) Port 0xB2 write, all CPUs enter SMM (NOTE: New CPU
-> >>      will not enter CPU because SMI is disabled)  
-> > I think only CPU that does the write will enter SMM  
-> 
-> That used to be the case (and it is still the default QEMU behavior, if
-> broadcast SMI is not negotiated). However, OVMF does negotiate broadcast
-> SMI whenever QEMU offers the feature. Broadcast SMI is important for the
-> stability of the edk2 SMM infrastructure on QEMU/KVM, we've found.
-> 
-> https://bugzilla.redhat.com/show_bug.cgi?id=1412313
-> https://bugzilla.redhat.com/show_bug.cgi?id=1412327
-> 
-> > and we might not need to pull in all already initialized CPUs into SMM.  
-> 
-> That, on the other hand, could be a valid idea. But then the CPU should
-> use a different method for raising a synchronous SMI for itself (not a
-> write to IO port 0xB2). Is a "directed SMI for self" possible?
-
-theoretically depending on argument in 0xb3, it should be possible to
-rise directed SMI even if broadcast ones are negotiated.
-
-> > [...]  
-> 
-> I've tried to read through the procedure with your suggested changes,
-> but I'm failing at composing a coherent mental image, in this email
-> response format.
-> 
-> If you have the time, can you write up the suggested list of steps in a
-> "flat" format? (I believe you are suggesting to eliminate some steps
-> completely.)
-if I'd sum it up:
-
-(01) On boot firmware maps and initializes SMI handler at default SMBASE (30000)
-     (using dedicated SMRAM at 30000 would allow us to avoid save/restore
-      steps and make SMM handler pointer not vulnerable to DMA attacks)
-
-(02) QEMU hotplugs a new CPU in reset-ed state and sends SCI
-
-(03) on receiving SCI, host CPU calls GPE cpu hotplug handler
-      which writes to IO port 0xB2 (broadcast SMI)
-
-(04) firmware waits for all existing CPUs rendezvous in SMM mode,
-     new CPU(s) have SMI pending but does nothing yet
-
-(05) host CPU wakes up one new CPU (INIT-INIT-SIPI)
-     SIPI vector points to RO flash HLT loop.
-     (how host CPU will know which new CPUs to relocate?
-      possibly reuse QEMU CPU hotplug MMIO interface???)
-
-(06) new CPU does relocation.
-     (in case of attacker sends SIPI to several new CPUs,
-      open question how to detect collision of several CPUs at the same default SMBASE)
-
-(07) once new CPU relocated host CPU completes initialization, returns
-     from IO port write and executes the rest of GPE handler, telling OS
-     to online new CPU.
-
-
-> ... jumping to another point:
-> 
-> >> 2) Let trusted software (SMM and init code) guarantee SMREBASE one by one (include any code runs before SMREBASE)  
-> > that would mean pulling all present CPUs into SMM mode so no attack
-> > code could be executing before doing hotplug. With a lot of present CPUs
-> > it could be quite expensive and unlike physical hardware, guest's CPUs
-> > could be preempted arbitrarily long causing long delays.  
-> 
-> I agree with your analysis, but I slightly disagree about the impact:
-> 
-> - CPU hotplug is not a frequent administrative action, so the CPU load
-> should be temporary (it should be a spike). I don't worry that it would
-> trip up OS kernel code. (SMI handling is known to take long on physical
-> platforms oo.) In practice, all "normal" SMIs are broadcast already (for
-> example when calling the runtime UEFI variable services from the OS kernel).
-> 
-> - The fact that QEMU/KVM introduces some jitter into the execution of
-> multi-core code (including SMM code) has proved useful in the past, for
-> catching edk2 regressions.
-> 
-> Again, this is not a strong disagreement from my side. I'm open to
-> better ways for synching CPUs during muti-CPU-hotplug.
-> 
-> (Digression:
-> 
-> I expect someone could be curious why (a) I find it acceptable (even
-> beneficial) that "some jitter" injected by the QEMU/KVM scheduling
-> exposes multi-core regressions in edk2, but at the same time (b) I found
-> it really important to add broadcast SMI to QEMU and OVMF. After all,
-> both "jitter" and "unicast SMIs" are QEMU/KVM platform specifics, so why
-> the different treatment?
-> 
-> The reason is that the "jitter" does not interfere with normal
-> operation, and it has been good for catching *regressions*. IOW, there
-> is a working edk2 state, someone posts a patch, works on physical
-> hardware, but breaks on QEMU/KVM --> then we can still reject or rework
-> or revert the patch. And we're back to a working state again (in the
-> best case, with a fixed feature patch).
-> 
-> With the unicast SMIs however, it was impossible to enable the SMM stack
-> reliably in the first place. There was no functional state to return to.
-I don't really get the last statement, but the I know nothing about OVMF.
-I don't insist on unicast SMI being used, it's just some ideas about what
-we could do. It could be done later, broadcast SMI (might be not the best)
-is sufficient to implement CPU hotplug.
-
-> Digression ends.)
-> 
-> > lets first see if if we can ignore race  
-> 
-> Makes me uncomfortable, but if this is the consensus, I'll go along.
-same here, as mentioned in another reply as it's only possible in
-attack case (multiple SMIs + multiple SIPI) so it could be fine to just
-explode in case it happens (point is fw in not leaking anything from SMRAM
-and OS did something illegeal). 
-
-> > and if it's not then
-> > we probably end up with implementing some form of #1  
-> 
-> OK.
-> 
-> Thanks!
-> Laszlo
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
