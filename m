@@ -2,90 +2,63 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ABF4C3A59B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 13:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94515C3A59B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 13:48:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5B3920820
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 13:47:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nh6D9XG1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5B3920820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 54F4E23405
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 13:48:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F4E23405
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3hFt-00036y-5a
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 09:47:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34842)
+	id 1i3hGq-0003zn-Es
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 09:48:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i3h2b-0001oS-Sp
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 09:34:19 -0400
+ (envelope-from <groug@kaod.org>) id 1i3h74-000615-B2
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 09:38:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i3h2T-0001P5-7c
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 09:34:12 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44271)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i3h2N-0001IU-MW
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 09:34:01 -0400
-Received: by mail-wr1-x443.google.com with SMTP id b6so4197794wrv.11
- for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 06:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=T1+mi4QBJL+nXG55WIQJQBjvbbmEG0WV2wziZrIsJM4=;
- b=nh6D9XG1YhmejB8ZwM1DiHkFPyYoeXoD3BhO7Xc8p0PHyv4pGoppPD4d7oeQocOBl/
- 3b2yKChVmbYh/LNQiYfdPYaaMHpnfjUCTfqml1nfH6AVMgxBLYEbpjIeHSLCtFuvoB5a
- 9o0juR1FKkUwCw1TySsyX/E7jcSTvGhdLVPyFflRxhKQ+/HxzjV+wQtL3HQf5m7jprD7
- 22aY/uVjCVBySYgedBF5V2TWXRwZX/9DPh06kP+hEMfVdSie+EHeSeIjGDoJi3oEnb6p
- q08kXi9JNE9fpanHy6KLF72PKP9haevbylbKU0ax7BvOQYoAQQiKYSD0++RkcFUQqtF1
- 0oLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=T1+mi4QBJL+nXG55WIQJQBjvbbmEG0WV2wziZrIsJM4=;
- b=AA1jXKsY2lPv/BYI3v4QViqTXlHMBa7OgG466i2HzDbbcmwPrADCgZ48Kb230h2dLT
- AOyrP7A9fouHejLbzMRzUwIiy0OAAUAOKz8tMUUrqwBhbFDEg+mD7yNZYS099alEMbwk
- HLb9rgihiNpl4zrIqdTq3MgD2OZ4qBHWyL6iH3mzuIZFXBqUtWgUltJ0uJQMSI8CfA+Y
- jacx7cDhYQuoBodkOFbswyUtsb/w4Xog6vo4YlhCEJRm3rhs6U98mXLGNZ0mM4BJE/mk
- xoohms/tR//ZLmS8+Ex/Z5zo54KydXfz3QBGb9J3D6zbAgAiCLSS77ooTqqnv8o7occ8
- 2A7g==
-X-Gm-Message-State: APjAAAX3YyKFnJZkPdt5Jsf+VcXhN3vzo7ZBRGKaQmJnZYORiqbj1SE2
- AdsvmXydQLHz6/tbv1iQohI2c7tgSkU=
-X-Google-Smtp-Source: APXvYqyYpGmjchR64pRS0544BH4DrXGiB04iZ1xLAx9oHX2d7SFEcB3Y/nqWY3NUKNGN6YNdkhafmg==
-X-Received: by 2002:adf:fa42:: with SMTP id y2mr9328290wrr.170.1567170758880; 
- Fri, 30 Aug 2019 06:12:38 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l62sm9785765wml.13.2019.08.30.06.12.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Aug 2019 06:12:38 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 914B41FF87;
- Fri, 30 Aug 2019 14:12:37 +0100 (BST)
-References: <20190829173437.5926-1-vandersonmr2@gmail.com>
- <20190829173437.5926-6-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190829173437.5926-6-vandersonmr2@gmail.com>
-Date: Fri, 30 Aug 2019 14:12:37 +0100
-Message-ID: <87zhjq7q62.fsf@linaro.org>
+ (envelope-from <groug@kaod.org>) id 1i3h70-00061h-Uv
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 09:38:49 -0400
+Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:42150)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i3h70-0005hq-IG
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 09:38:46 -0400
+Received: from player158.ha.ovh.net (unknown [10.109.159.123])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id B32AB77262
+ for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 14:22:45 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player158.ha.ovh.net (Postfix) with ESMTPSA id 6491292BFBE4;
+ Fri, 30 Aug 2019 12:22:39 +0000 (UTC)
+Date: Fri, 30 Aug 2019 14:22:38 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-ID: <20190830142238.4dbf65c8@bahia.lan>
+In-Reply-To: <50fc6fbbfd80c25d2ad1752fb945cdfc7d847f20.1566503584.git.qemu_oss@crudebyte.com>
+References: <cover.1566503584.git.qemu_oss@crudebyte.com>
+ <50fc6fbbfd80c25d2ad1752fb945cdfc7d847f20.1566503584.git.qemu_oss@crudebyte.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v8 05/11] accel: adding TB_JIT_TIME and
- full replacing CONFIG_PROFILER
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 1519120451097893184
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudeigedghedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.49.171
+Subject: Re: [Qemu-devel] [PATCH v6 2/4] 9p: Added virtfs option
+ 'multidevs=remap|forbid|warn'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,767 +70,508 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- vandersonmr <vandersonmr2@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>, "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 22 Aug 2019 21:33:37 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-vandersonmr <vandersonmr2@gmail.com> writes:
-
-> Replace all others CONFIG_PROFILER statistics and migrate it to
-> TBStatistics system. However, TCGProfiler still exists and can
-> be use to store global statistics and times. All TB related
-> statistics goes to TBStatistics.
->
-> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+> 'warn' (default): Only log an error message (once) on host if more than one
+> device is shared by same export, except of that just ignore this config
+> error though. This is the default behaviour for not breaking existing
+> installations implying that they really know what they are doing.
+> 
+> 'forbid': Like 'warn', but except of just logging an error this
+> also denies access of guest to additional devices.
+> 
+> 'remap': Allows to share more than one device per export by remapping
+> inodes from host to guest appropriately. To support multiple devices on the
+> 9p share, and avoid qid path collisions we take the device id as input to
+> generate a unique QID path. The lowest 48 bits of the path will be set
+> equal to the file inode, and the top bits will be uniquely assigned based
+> on the top 16 bits of the inode and the device id.
+> 
+> Signed-off-by: Antonios Motakis <antonios.motakis@huawei.com>
+> [CS: - Rebased to https://github.com/gkurz/qemu/commits/9p-next
+>        (SHA1 177fd3b6a8).
+>      - Updated hash calls to new xxhash API.
+>      - Added virtfs option 'multidevs', original patch simply did the inode
+>        remapping without being asked.
+>      - Updated docs for new option 'multidevs'.
+>      - Capture root_ino in v9fs_device_realize_common() as well, not just
+>        the device id.
+>      - Fixed v9fs_do_readdir() not having remapped inodes.
+>      - Log error message when running out of prefixes in
+>        qid_path_prefixmap().
+>      - Fixed definition of QPATH_INO_MASK.
+>      - Dropped unnecessary parantheses in qpp_lookup_func().
+>      - Dropped unnecessary g_malloc0() result checks. ]
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 > ---
->  accel/tcg/tb-stats.c      |  91 +++++++++++++++++++---------
->  accel/tcg/translate-all.c |  47 ++++++++-------
->  configure                 |   3 -
->  cpus.c                    |  14 ++---
->  include/exec/tb-stats.h   |  19 +++++-
->  include/qemu/timer.h      |   5 +-
->  monitor/misc.c            |  28 ++-------
->  tcg/tcg.c                 | 124 +++++++++++---------------------------
->  tcg/tcg.h                 |  10 +--
->  vl.c                      |   8 +--
->  10 files changed, 156 insertions(+), 193 deletions(-)
->
-> diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
-> index 176da60e13..66abc97ad4 100644
-> --- a/accel/tcg/tb-stats.c
-> +++ b/accel/tcg/tb-stats.c
-> @@ -32,6 +32,8 @@
->
->  #include "exec/tb-stats.h"
->
-> +uint64_t dev_time;
+
+Some more comments below.
+
+>  fsdev/file-op-9p.h      |   5 ++
+>  fsdev/qemu-fsdev-opts.c |   7 +-
+>  fsdev/qemu-fsdev.c      |  11 +++
+>  hw/9pfs/9p.c            | 182 ++++++++++++++++++++++++++++++++++++++++++------
+>  hw/9pfs/9p.h            |  13 ++++
+>  qemu-options.hx         |  33 +++++++--
+>  vl.c                    |   6 +-
+>  7 files changed, 229 insertions(+), 28 deletions(-)
+> 
+> diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
+> index c757c8099f..f2f7772c86 100644
+> --- a/fsdev/file-op-9p.h
+> +++ b/fsdev/file-op-9p.h
+> @@ -59,6 +59,11 @@ typedef struct ExtendedOps {
+>  #define V9FS_RDONLY                 0x00000040
+>  #define V9FS_PROXY_SOCK_FD          0x00000080
+>  #define V9FS_PROXY_SOCK_NAME        0x00000100
+> +/*
+> + * multidevs option (either one of the two applies exclusively)
+> + */
+> +#define V9FS_REMAP_INODES           0x00000200
+> +#define V9FS_FORBID_MULTIDEVS       0x00000400
+>  
+>  #define V9FS_SEC_MASK               0x0000003C
+>  
+> diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
+> index 7c31ffffaf..07a18c6e48 100644
+> --- a/fsdev/qemu-fsdev-opts.c
+> +++ b/fsdev/qemu-fsdev-opts.c
+> @@ -31,7 +31,9 @@ static QemuOptsList qemu_fsdev_opts = {
+>          }, {
+>              .name = "readonly",
+>              .type = QEMU_OPT_BOOL,
+> -
+> +        }, {
+> +            .name = "multidevs",
+> +            .type = QEMU_OPT_STRING,
+>          }, {
+>              .name = "socket",
+>              .type = QEMU_OPT_STRING,
+> @@ -76,6 +78,9 @@ static QemuOptsList qemu_virtfs_opts = {
+>              .name = "readonly",
+>              .type = QEMU_OPT_BOOL,
+>          }, {
+> +            .name = "multidevs",
+> +            .type = QEMU_OPT_STRING,
+> +        }, {
+>              .name = "socket",
+>              .type = QEMU_OPT_STRING,
+>          }, {
+> diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
+> index 077a8c4e2b..ed03d559a9 100644
+> --- a/fsdev/qemu-fsdev.c
+> +++ b/fsdev/qemu-fsdev.c
+> @@ -58,6 +58,7 @@ static FsDriverTable FsDrivers[] = {
+>              "writeout",
+>              "fmode",
+>              "dmode",
+> +            "multidevs",
+>              "throttling.bps-total",
+>              "throttling.bps-read",
+>              "throttling.bps-write",
+> @@ -121,6 +122,7 @@ int qemu_fsdev_add(QemuOpts *opts, Error **errp)
+>      const char *fsdev_id = qemu_opts_id(opts);
+>      const char *fsdriver = qemu_opt_get(opts, "fsdriver");
+>      const char *writeout = qemu_opt_get(opts, "writeout");
+> +    const char *multidevs = qemu_opt_get(opts, "multidevs");
+>      bool ro = qemu_opt_get_bool(opts, "readonly", 0);
+>  
+>      if (!fsdev_id) {
+> @@ -161,6 +163,15 @@ int qemu_fsdev_add(QemuOpts *opts, Error **errp)
+>      } else {
+>          fsle->fse.export_flags &= ~V9FS_RDONLY;
+>      }
+> +    if (multidevs) {
+> +        if (!strcmp(multidevs, "remap")) {
+> +            fsle->fse.export_flags &= ~V9FS_FORBID_MULTIDEVS;
+> +            fsle->fse.export_flags |= V9FS_REMAP_INODES;
+> +        } else if (!strcmp(multidevs, "forbid")) {
+> +            fsle->fse.export_flags &= ~V9FS_REMAP_INODES;
+> +            fsle->fse.export_flags |= V9FS_FORBID_MULTIDEVS;
+> +        }
+> +    }
+>  
+>      if (fsle->fse.ops->parse_opts) {
+>          if (fsle->fse.ops->parse_opts(opts, &fsle->fse, errp)) {
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 8cc65c2c67..c96ea51116 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -25,6 +25,7 @@
+>  #include "trace.h"
+>  #include "migration/blocker.h"
+>  #include "sysemu/qtest.h"
+> +#include "qemu/xxhash.h"
+>  
+>  int open_fd_hw;
+>  int total_open_fd;
+> @@ -571,22 +572,109 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
+>                                  P9_STAT_MODE_NAMED_PIPE |   \
+>                                  P9_STAT_MODE_SOCKET)
+>  
+> -/* This is the algorithm from ufs in spfs */
 > +
->  struct jit_profile_info {
->      uint64_t translations;
->      uint64_t aborted;
-> @@ -43,6 +45,13 @@ struct jit_profile_info {
->      uint64_t host;
->      uint64_t guest;
->      uint64_t search_data;
-> +
-> +    uint64_t interm_time;
-> +    uint64_t code_time;
-> +    uint64_t restore_count;
-> +    uint64_t restore_time;
-> +    uint64_t opt_time;
-> +    uint64_t la_time;
->  };
->
->  /* accumulate the statistics from all TBs */
-> @@ -64,6 +73,29 @@ static void collect_jit_profile_info(void *p, uint32_t=
- hash, void *userp)
->      jpi->host +=3D tbs->code.out_len;
->      jpi->guest +=3D tbs->code.in_len;
->      jpi->search_data +=3D tbs->code.search_out_len;
-> +
-> +    jpi->interm_time +=3D stat_per_translation(tbs, time.interm);
-> +    jpi->code_time +=3D stat_per_translation(tbs, time.code);
-> +    jpi->opt_time +=3D stat_per_translation(tbs, time.opt);
-> +    jpi->la_time +=3D stat_per_translation(tbs, time.la);
-> +    jpi->restore_time +=3D tbs->time.restore;
-> +    jpi->restore_count +=3D tbs->time.restore_count;
+> +/* creative abuse of tb_hash_func7, which is based on xxhash */
+> +static uint32_t qpp_hash(QppEntry e)
+> +{
+> +    return qemu_xxhash7(e.ino_prefix, e.dev, 0, 0, 0);
 > +}
 > +
-> +void dump_jit_exec_time_info(uint64_t dev_time)
+> +static bool qpp_lookup_func(const void *obj, const void *userp)
 > +{
-> +    static uint64_t last_cpu_exec_time;
-> +    uint64_t cpu_exec_time;
-> +    uint64_t delta;
+> +    const QppEntry *e1 = obj, *e2 = userp;
+> +    return e1->dev == e2->dev && e1->ino_prefix == e2->ino_prefix;
+> +}
 > +
-> +    cpu_exec_time =3D tcg_cpu_exec_time();
-> +    delta =3D cpu_exec_time - last_cpu_exec_time;
+> +static void qpp_table_remove(void *p, uint32_t h, void *up)
+> +{
+> +    g_free(p);
+> +}
 > +
-> +    qemu_printf("async time  %" PRId64 " (%0.3f)\n",
-> +                   dev_time, dev_time / (double) NANOSECONDS_PER_SECOND);
-> +    qemu_printf("qemu time   %" PRId64 " (%0.3f)\n",
-> +                   delta, delta / (double) NANOSECONDS_PER_SECOND);
-> +    last_cpu_exec_time =3D cpu_exec_time;
->  }
->
->  /* dump JIT statisticis using TCGProfile and TBStats */
-> @@ -90,34 +122,39 @@ void dump_jit_profile_info(TCGProfile *s)
->          qemu_printf("avg search data/TB  %0.1f\n",
->                  jpi->search_data / (double) jpi->translations);
->
-> +        uint64_t tot =3D jpi->interm_time + jpi->code_time;
+> +static void qpp_table_destroy(struct qht *ht)
+> +{
+> +    qht_iter(ht, qpp_table_remove, NULL);
+> +    qht_destroy(ht);
+> +}
 > +
-> +        qemu_printf("JIT cycles          %" PRId64 " (%0.3fs at 2.4 GHz)=
-\n",
-> +                tot, tot / 2.4e9);
-> +        qemu_printf("  cycles/op           %0.1f\n",
-> +                jpi->ops ? (double)tot / jpi->ops : 0);
-> +        qemu_printf("  cycles/in byte      %0.1f\n",
-> +                jpi->guest ? (double)tot / jpi->guest : 0);
-> +        qemu_printf("  cycles/out byte     %0.1f\n",
-> +                jpi->host ? (double)tot / jpi->host : 0);
-> +        qemu_printf("  cycles/search byte  %0.1f\n",
-> +                jpi->search_data ? (double)tot / jpi->search_data : 0);
-> +        if (tot =3D=3D 0) {
-> +            tot =3D 1;
+> +/* stat_to_qid needs to map inode number (64 bits) and device id (32 bits)
+> + * to a unique QID path (64 bits). To avoid having to map and keep track
+> + * of up to 2^64 objects, we map only the 16 highest bits of the inode plus
+> + * the device id to the 16 highest bits of the QID path. The 48 lowest bits
+> + * of the QID path equal to the lowest bits of the inode number.
+> + *
+> + * This takes advantage of the fact that inode number are usually not
+> + * random but allocated sequentially, so we have fewer items to keep
+> + * track of.
+> + */
+> +static int qid_path_prefixmap(V9fsPDU *pdu, const struct stat *stbuf,
+> +                                uint64_t *path)
+> +{
+> +    QppEntry lookup = {
+> +        .dev = stbuf->st_dev,
+> +        .ino_prefix = (uint16_t) (stbuf->st_ino >> 48)
+> +    }, *val;
+> +    uint32_t hash = qpp_hash(lookup);
+> +
+> +    val = qht_lookup(&pdu->s->qpp_table, &lookup, hash);
+> +
+> +    if (!val) {
+> +        if (pdu->s->qp_prefix_next == 0) {
+> +            /* we ran out of prefixes */
+> +            error_report_once(
+> +                "9p: No more prefixes available for remapping inodes from "
+> +                "host to guest."
+> +            );
+> +            return -ENFILE;
 > +        }
 > +
-> +        qemu_printf("  gen_interm time     %0.1f%%\n",
-> +                (double)jpi->interm_time / tot * 100.0);
-> +        qemu_printf("  gen_code time       %0.1f%%\n",
-> +                (double)jpi->code_time / tot * 100.0);
+> +        val = g_malloc0(sizeof(QppEntry));
+> +        *val = lookup;
 > +
-> +        qemu_printf("    optim./code time    %0.1f%%\n",
-> +                (double)jpi->opt_time / (jpi->code_time ? jpi->code_time=
- : 1) * 100.0);
-> +        qemu_printf("    liveness/code time  %0.1f%%\n",
-> +                (double)jpi->la_time / (jpi->code_time ? jpi->code_time =
-: 1) * 100.0);
-> +
-> +        qemu_printf("cpu_restore count   %" PRId64 "\n", jpi->restore_co=
-unt);
-> +        qemu_printf("  avg cycles        %0.1f\n",
-> +                jpi->restore_count ? (double)jpi->restore_time / jpi->re=
-store_count : 0);
-> +
->          if (s) {
-> -            int64_t tot =3D s->interm_time + s->code_time;
-> -            qemu_printf("JIT cycles          %" PRId64 " (%0.3f s at 2.4=
- GHz)\n",
-> -                            tot, tot / 2.4e9);
-> -            qemu_printf("cycles/op           %0.1f\n",
-> -                        jpi->ops ? (double)tot / jpi->ops : 0);
-> -            qemu_printf("cycles/in byte      %0.1f\n",
-> -                        jpi->guest ? (double)tot / jpi->guest : 0);
-> -            qemu_printf("cycles/out byte     %0.1f\n",
-> -                        jpi->host ? (double)tot / jpi->host : 0);
-> -            qemu_printf("cycles/search byte     %0.1f\n",
-> -                        jpi->search_data ? (double)tot / jpi->search_dat=
-a : 0);
-> -            if (tot =3D=3D 0) {
-> -                tot =3D 1;
-> -            }
-> -            qemu_printf("  gen_interm time   %0.1f%%\n",
-> -                        (double)s->interm_time / tot * 100.0);
-> -            qemu_printf("  gen_code time     %0.1f%%\n",
-> -                        (double)s->code_time / tot * 100.0);
-> -            qemu_printf("optim./code time    %0.1f%%\n",
-> -                        (double)s->opt_time / (s->code_time ? s->code_ti=
-me : 1)
-> -                        * 100.0);
-> -            qemu_printf("liveness/code time  %0.1f%%\n",
-> -                    (double)s->la_time / (s->code_time ? s->code_time : =
-1) * 100.0);
-> -            qemu_printf("cpu_restore count   %" PRId64 "\n",
-> -                    s->restore_count);
-> -            qemu_printf("  avg cycles        %0.1f\n",
-> -                    s->restore_count ? (double)s->restore_time / s->rest=
-ore_count : 0);
-> +            qemu_printf("cpu exec time  %" PRId64 " (%0.3fs)\n",
-> +                s->cpu_exec_time, s->cpu_exec_time / (double) NANOSECOND=
-S_PER_SECOND);
->          }
->      }
->      g_free(jpi);
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index fe890f0782..a2e65bb85c 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -337,10 +337,11 @@ static int cpu_restore_state_from_tb(CPUState *cpu,=
- TranslationBlock *tb,
->      CPUArchState *env =3D cpu->env_ptr;
->      uint8_t *p =3D tb->tc.ptr + tb->tc.size;
->      int i, j, num_insns =3D tb->icount;
-> -#ifdef CONFIG_PROFILER
-> -    TCGProfile *prof =3D &tcg_ctx->prof;
-> -    int64_t ti =3D profile_getclock();
-> -#endif
-> +    uint64_t ti =3D 0;
-> +
-> +    if (tb_stats_enabled(tb, TB_JIT_TIME)) {
-> +        ti =3D profile_getclock();
-> +    }
->
->      searched_pc -=3D GETPC_ADJ;
->
-> @@ -370,11 +371,11 @@ static int cpu_restore_state_from_tb(CPUState *cpu,=
- TranslationBlock *tb,
->      }
->      restore_state_to_opc(env, tb, data);
->
-> -#ifdef CONFIG_PROFILER
-> -    atomic_set(&prof->restore_time,
-> -                prof->restore_time + profile_getclock() - ti);
-> -    atomic_set(&prof->restore_count, prof->restore_count + 1);
-> -#endif
-> +    if (tb_stats_enabled(tb, TB_JIT_TIME)) {
-> +        atomic_add(&tb->tb_stats->time.restore, profile_getclock() - ti);
-> +        atomic_inc(&tb->tb_stats->time.restore_count);
+> +        /* new unique inode prefix and device combo */
+> +        val->qp_prefix = pdu->s->qp_prefix_next++;
+> +        qht_insert(&pdu->s->qpp_table, val, hash, NULL);
 > +    }
 > +
+> +    *path = ((uint64_t)val->qp_prefix << 48) | (stbuf->st_ino & QPATH_INO_MASK);
+> +    return 0;
+> +}
+> +
+>  static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID *qidp)
+>  {
+> +    int err;
+>      size_t size;
+>  
+> -    if (pdu->s->dev_id != stbuf->st_dev) {
+> -        error_report_once(
+> -            "9p: Multiple devices detected in same VirtFS export. "
+> -            "You must use a separate export for each device."
+> -        );
+> -        return -ENODEV;
+> +    if (pdu->s->ctx.export_flags & V9FS_REMAP_INODES) {
+> +        /* map inode+device to qid path (fast path) */
+> +        err = qid_path_prefixmap(pdu, stbuf, &qidp->path);
+> +        if (err) {
+> +            return err;
+> +        }
+> +    } else {
+> +        if (pdu->s->dev_id != stbuf->st_dev) {
+> +            if (pdu->s->ctx.export_flags & V9FS_FORBID_MULTIDEVS) {
+> +                error_report_once(
+> +                    "9p: Multiple devices detected in same VirtFS export. "
+> +                    "Access of guest to additional devices is (partly) "
+> +                    "denied due to virtfs option 'multidevs=forbid' being "
+> +                    "effective."
+> +                );
+> +                return -ENODEV;
+> +            } else {
+> +                error_report_once(
+> +                    "9p: Multiple devices detected in same VirtFS export, "
+> +                    "which might lead to file ID collisions and severe "
+> +                    "misbehaviours on guest! You should either use a "
+> +                    "separate export for each device shared from host or "
+> +                    "use virtfs option 'multidevs=remap'!"
+> +                );
+> +            }
+> +        }
+> +        memset(&qidp->path, 0, sizeof(qidp->path));
+> +        size = MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
+> +        memcpy(&qidp->path, &stbuf->st_ino, size);
+>      }
+>  
+> -    memset(&qidp->path, 0, sizeof(qidp->path));
+> -    size = MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
+> -    memcpy(&qidp->path, &stbuf->st_ino, size);
+>      qidp->version = stbuf->st_mtime ^ (stbuf->st_size << 8);
+>      qidp->type = 0;
+>      if (S_ISDIR(stbuf->st_mode)) {
+> @@ -616,6 +704,30 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
 >      return 0;
 >  }
->
-> @@ -1724,10 +1725,8 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->      target_ulong virt_page2;
->      tcg_insn_unit *gen_code_buf;
->      int gen_code_size, search_size, max_insns;
-> -#ifdef CONFIG_PROFILER
-> -    TCGProfile *prof =3D &tcg_ctx->prof;
-> -    int64_t ti;
-> -#endif
-> +    uint64_t ti =3D 0;
-> +
->      assert_memory_lock();
->
->      phys_pc =3D get_page_addr_code(env, pc);
-> @@ -1773,9 +1772,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->      tcg_ctx->tb_cflags =3D cflags;
->   tb_overflow:
->
-> -#ifdef CONFIG_PROFILER
-> -    ti =3D profile_getclock();
-> -#endif
->
->      /*
->       * We want to fetch the stats structure before we start code
-> @@ -1796,6 +1792,11 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->              tb->tb_stats->stats_enabled |=3D TB_JIT_STATS;
->              atomic_inc(&tb->tb_stats->translations.total);
->          }
-> +
-> +        if (flag & TB_JIT_TIME) {
-> +            tb->tb_stats->stats_enabled |=3D TB_JIT_TIME;
-> +            ti =3D profile_getclock();
-> +        }
->      } else {
->          tb->tb_stats =3D NULL;
->      }
-> @@ -1820,10 +1821,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->          tcg_ctx->tb_jmp_target_addr =3D tb->jmp_target_arg;
->      }
->
-> -#ifdef CONFIG_PROFILER
-> -    atomic_set(&prof->interm_time, prof->interm_time + profile_getclock(=
-) - ti);
-> -    ti =3D profile_getclock();
-> -#endif
-> +    if (tb_stats_enabled(tb, TB_JIT_TIME)) {
-> +        atomic_add(&tb->tb_stats->time.interm, profile_getclock() - ti);
-> +        ti =3D profile_getclock();
-> +    }
->
->      gen_code_size =3D tcg_gen_code(tcg_ctx, tb);
->      if (unlikely(gen_code_size < 0)) {
-> @@ -1865,9 +1866,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->      }
->      tb->tc.size =3D gen_code_size;
->
-> -#ifdef CONFIG_PROFILER
-> -    atomic_set(&prof->code_time, prof->code_time + profile_getclock() - =
-ti);
-> -#endif
-> +    if (tb_stats_enabled(tb, TB_JIT_TIME)) {
-> +        atomic_add(&tb->tb_stats->time.code, profile_getclock() - ti);
-> +    }
->
->      if (tb_stats_enabled(tb, TB_JIT_STATS)) {
->          atomic_add(&tb->tb_stats->code.in_len, tb->size);
-> diff --git a/configure b/configure
-> index e44e454c43..af8ff2e6dc 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6611,9 +6611,6 @@ fi
->  if test "$static" =3D "yes" ; then
->    echo "CONFIG_STATIC=3Dy" >> $config_host_mak
->  fi
-> -if test "$profiler" =3D "yes" ; then
-> -  echo "CONFIG_PROFILER=3Dy" >> $config_host_mak
-> -fi
->  if test "$want_tools" =3D "yes" ; then
->    echo "CONFIG_TOOLS=3Dy" >> $config_host_mak
->  fi
-> diff --git a/cpus.c b/cpus.c
-> index 85cd451a86..c1844a412b 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1433,21 +1433,17 @@ static void process_icount_data(CPUState *cpu)
->  static int tcg_cpu_exec(CPUState *cpu)
->  {
->      int ret;
-> -#ifdef CONFIG_PROFILER
-> -    int64_t ti;
-> -#endif
-> +    uint64_t ti;
->
->      assert(tcg_enabled());
-> -#ifdef CONFIG_PROFILER
->      ti =3D profile_getclock();
-> -#endif
-> +
->      cpu_exec_start(cpu);
->      ret =3D cpu_exec(cpu);
->      cpu_exec_end(cpu);
-> -#ifdef CONFIG_PROFILER
-> -    atomic_set(&tcg_ctx->prof.cpu_exec_time,
-> -               tcg_ctx->prof.cpu_exec_time + profile_getclock() - ti);
-> -#endif
-> +
-> +    atomic_add(&tcg_ctx->prof.cpu_exec_time, profile_getclock() - ti);
-> +
->      return ret;
->  }
->
-> diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-> index b9d5a343be..0b9a6e2f72 100644
-> --- a/include/exec/tb-stats.h
-> +++ b/include/exec/tb-stats.h
-> @@ -81,22 +81,39 @@ struct TBStatistics {
->          unsigned long spanning;
->      } translations;
->
-> +    struct {
-> +        int64_t restore;
-> +        uint64_t restore_count;
-> +        int64_t interm;
-> +        int64_t code;
-> +        int64_t opt;
-> +        int64_t la;
-> +    } time;
-> +
->      /* current TB linked to this TBStatistics */
->      TranslationBlock *tb;
->  };
->
->  bool tb_stats_cmp(const void *ap, const void *bp);
->
-> +void dump_jit_exec_time_info(uint64_t dev_time);
-> +
->  void init_tb_stats_htable_if_not(void);
->
->  void dump_jit_profile_info(TCGProfile *s);
->
->  /* TBStatistic collection controls */
-> -enum TBStatsStatus { TB_STATS_RUNNING, TB_STATS_PAUSED, TB_STATS_STOPPED=
- };
-> +enum TBStatsStatus {
-> +    TB_STATS_DISABLED =3D 0,
-> +    TB_STATS_RUNNING,
-> +    TB_STATS_PAUSED,
-> +    TB_STATS_STOPPED
-> +};
->
->  #define TB_NOTHING    (1 << 0)
->  #define TB_EXEC_STATS (1 << 1)
->  #define TB_JIT_STATS  (1 << 2)
-> +#define TB_JIT_TIME   (1 << 3)
->
->  extern int tcg_collect_tb_stats;
->  extern uint32_t default_tbstats_flag;
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index 85bc6eb00b..641ca3ddd0 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -1006,13 +1006,10 @@ static inline int64_t cpu_get_host_ticks(void)
->  }
->  #endif
->
-> -#ifdef CONFIG_PROFILER
->  static inline int64_t profile_getclock(void)
->  {
->      return get_clock();
->  }
->
-> -extern int64_t dev_time;
-> -#endif
-> -
-> +extern uint64_t dev_time;
->  #endif
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index aef16f6cfb..ac4ff58d96 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -472,6 +472,11 @@ static void hmp_info_jit(Monitor *mon, const QDict *=
-qdict)
->
->  static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
->  {
-> +    if (!tb_stats_collection_enabled()) {
-> +        error_report("TB information not being recorded.");
-> +        return;
-> +    }
-> +
->      dump_opcount_info();
->  }
->  #endif
-> @@ -1082,32 +1087,11 @@ static void hmp_info_mtree(Monitor *mon, const QD=
-ict *qdict)
->      mtree_info(flatview, dispatch_tree, owner);
->  }
->
-> -#ifdef CONFIG_PROFILER
-> -
-> -int64_t dev_time;
-> -
->  static void hmp_info_profile(Monitor *mon, const QDict *qdict)
->  {
-> -    static int64_t last_cpu_exec_time;
-> -    int64_t cpu_exec_time;
-> -    int64_t delta;
-> -
-> -    cpu_exec_time =3D tcg_cpu_exec_time();
-> -    delta =3D cpu_exec_time - last_cpu_exec_time;
-> -
-> -    monitor_printf(mon, "async time  %" PRId64 " (%0.3f)\n",
-> -                   dev_time, dev_time / (double)NANOSECONDS_PER_SECOND);
-> -    monitor_printf(mon, "qemu time   %" PRId64 " (%0.3f)\n",
-> -                   delta, delta / (double)NANOSECONDS_PER_SECOND);
-> -    last_cpu_exec_time =3D cpu_exec_time;
-> +    dump_jit_exec_time_info(dev_time);
->      dev_time =3D 0;
->  }
-> -#else
-> -static void hmp_info_profile(Monitor *mon, const QDict *qdict)
-> -{
-> -    monitor_printf(mon, "Internal profiler not compiled\n");
-> -}
-> -#endif
->
->  /* Capture support */
->  static QLIST_HEAD (capture_list_head, CaptureState) capture_head;
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 03b11495aa..4986ff3984 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -3884,82 +3884,34 @@ static void tcg_reg_alloc_call(TCGContext *s, TCG=
-Op *op)
->      }
->  }
->
-> -#ifdef CONFIG_PROFILER
-> -
->  /* avoid copy/paste errors */
->  #define PROF_ADD(to, from, field)                       \
->      do {                                                \
->          (to)->field +=3D atomic_read(&((from)->field));   \
->      } while (0)
->
-> -#define PROF_MAX(to, from, field)                                       \
-> -    do {                                                                \
-> -        typeof((from)->field) val__ =3D atomic_read(&((from)->field));  =
-  \
-> -        if (val__ > (to)->field) {                                      \
-> -            (to)->field =3D val__;                                      =
-  \
-> -        }                                                               \
-> -    } while (0)
-> -
-> -/* Pass in a zero'ed @prof */
-> -static inline
-> -void tcg_profile_snapshot(TCGProfile *prof, bool counters, bool table)
-> +static void collect_tcg_profiler(TCGProfile *prof)
->  {
-> +    int i;
->      unsigned int n_ctxs =3D atomic_read(&n_tcg_ctxs);
-> -    unsigned int i;
->
->      for (i =3D 0; i < n_ctxs; i++) {
->          TCGContext *s =3D atomic_read(&tcg_ctxs[i]);
->          const TCGProfile *orig =3D &s->prof;
->
-> -        if (counters) {
-> -            PROF_ADD(prof, orig, cpu_exec_time);
-> -            PROF_ADD(prof, orig, interm_time);
-> -            PROF_ADD(prof, orig, code_time);
-> -            PROF_ADD(prof, orig, la_time);
-> -            PROF_ADD(prof, orig, opt_time);
-> -            PROF_ADD(prof, orig, restore_count);
-> -            PROF_ADD(prof, orig, restore_time);
-> -        }
-> -        if (table) {
-> -            int i;
-> +        PROF_ADD(prof, orig, cpu_exec_time);
->
-> -            for (i =3D 0; i < NB_OPS; i++) {
-> -                PROF_ADD(prof, orig, table_op_count[i]);
-> -            }
-> +        for (i =3D 0; i < NB_OPS; i++) {
-> +            PROF_ADD(prof, orig, table_op_count[i]);
-
-
-I've just noticed we've run into the same problem we had with the
-original exec count patch of breaking on the 32 bit builds, e.g:
-
-  make docker-test-build@debian-mipsel-cross V=3D1 J=3D9 TARGET_LIST=3Dmips=
-el-linux-user,mips-softmmu
-
-Gives:
-
-  In file included from /tmp/qemu-test/src/include/qemu/osdep.h:51:0,
-                   from /tmp/qemu-test/src/tcg/tcg.c:28:
-  /tmp/qemu-test/src/tcg/tcg.c: In function 'collect_tcg_profiler':
-  /tmp/qemu-test/src/include/qemu/compiler.h:86:36: error: static assertion=
- failed: "not expecting: sizeof(*&((orig)->cpu_exec_time)) > ATOMIC_REG_SIZ=
-E"
-   #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
-                                      ^
-  /tmp/qemu-test/src/include/qemu/compiler.h:94:30: note: in expansion of m=
-acro 'QEMU_BUILD_BUG_MSG'
-   #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
-                                ^~~~~~~~~~~~~~~~~~
-  /tmp/qemu-test/src/include/qemu/atomic.h:133:5: note: in expansion of mac=
-ro 'QEMU_BUILD_BUG_ON'
-       QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
-       ^~~~~~~~~~~~~~~~~
-  /tmp/qemu-test/src/tcg/tcg.c:3890:24: note: in expansion of macro 'atomic=
-_read'
-           (to)->field +=3D atomic_read(&((from)->field));   \
-                          ^~~~~~~~~~~
-  /tmp/qemu-test/src/tcg/tcg.c:3902:9: note: in expansion of macro 'PROF_AD=
-D'
-           PROF_ADD(prof, orig, cpu_exec_time);
-           ^~~~~~~~
-
-Of course this would have happened if you had enabled CONFIG_PROFILER on
-a 32 bit build anyway. So what options do we have:
-
-1. Gate the code on something based of ATOMIC_REG_SIZE
-
-not desirable - the newer code is a lot nicer than having lots of ugly
-#ifdefs
-
-2. Defer the summing of the work with async work
-
-Much like we do at the moment with TB stats info
-
-3. Maybe consider an RCU approach?
-
-This would mean the numbers weren't exact at time of calculation but if
-you want precise numbers you would have halted the machine somehow
-anyway right?
-
->          }
->      }
->  }
->=20=20
-> -#undef PROF_ADD
-> -#undef PROF_MAX
-> -
-> -static void tcg_profile_snapshot_counters(TCGProfile *prof)
-> -{
-> -    tcg_profile_snapshot(prof, true, false);
-> -}
-> -
-> -static void tcg_profile_snapshot_table(TCGProfile *prof)
-> -{
-> -    tcg_profile_snapshot(prof, false, true);
-> -}
-> -
-> -void tcg_dump_op_count(void)
-> -{
-> -    TCGProfile prof =3D {};
-> -    int i;
-> -
-> -    tcg_profile_snapshot_table(&prof);
-> -    for (i =3D 0; i < NB_OPS; i++) {
-> -        qemu_printf("%s %" PRId64 "\n", tcg_op_defs[i].name,
-> -                    prof.table_op_count[i]);
-> -    }
-> -}
-> -
-> -int64_t tcg_cpu_exec_time(void)
-> +uint64_t tcg_cpu_exec_time(void)
->  {
->      unsigned int n_ctxs =3D atomic_read(&n_tcg_ctxs);
->      unsigned int i;
-> -    int64_t ret =3D 0;
-> +    uint64_t ret =3D 0;
->
->      for (i =3D 0; i < n_ctxs; i++) {
->          const TCGContext *s =3D atomic_read(&tcg_ctxs[i]);
-> @@ -3969,25 +3921,9 @@ int64_t tcg_cpu_exec_time(void)
->      }
->      return ret;
->  }
-> -#else
-> -void tcg_dump_op_count(void)
-> -{
-> -    qemu_printf("[TCG profiler not compiled]\n");
-> -}
-> -
-> -int64_t tcg_cpu_exec_time(void)
-> -{
-> -    error_report("%s: TCG profiler not compiled", __func__);
-> -    exit(EXIT_FAILURE);
-> -}
-> -#endif
-> -
->
->  int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
->  {
-> -#ifdef CONFIG_PROFILER
-> -    TCGProfile *prof =3D &s->prof;
-> -#endif
->      int i, num_insns;
->      TCGOp *op;
->
-> @@ -4040,18 +3976,18 @@ int tcg_gen_code(TCGContext *s, TranslationBlock =
-*tb)
->      }
->  #endif
->
-> -#ifdef CONFIG_PROFILER
-> -    atomic_set(&prof->opt_time, prof->opt_time - profile_getclock());
-> -#endif
-> +    if (tb_stats_enabled(tb, TB_JIT_TIME)) {
-> +        atomic_add(&tb->tb_stats->time.opt, -profile_getclock());
-> +    }
->
->  #ifdef USE_TCG_OPTIMIZATIONS
->      tcg_optimize(s);
->  #endif
->
-> -#ifdef CONFIG_PROFILER
-> -    atomic_set(&prof->opt_time, prof->opt_time + profile_getclock());
-> -    atomic_set(&prof->la_time, prof->la_time - profile_getclock());
-> -#endif
-> +    if (tb_stats_enabled(tb, TB_JIT_TIME)) {
-> +        atomic_add(&tb->tb_stats->time.opt, profile_getclock());
-> +        atomic_add(&tb->tb_stats->time.la,  -profile_getclock());
-> +    }
->
->      reachable_code_pass(s);
->      liveness_pass_1(s);
-> @@ -4074,9 +4010,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *t=
-b)
->          }
->      }
->
-> -#ifdef CONFIG_PROFILER
-> -    atomic_set(&prof->la_time, prof->la_time + profile_getclock());
-> -#endif
-> +    if (tb_stats_enabled(tb, TB_JIT_TIME)) {
-> +        atomic_add(&tb->tb_stats->time.la, profile_getclock());
-> +    }
->
->  #ifdef DEBUG_DISAS
->      if (unlikely(qemu_loglevel_mask(CPU_LOG_TB_OP_OPT)
-> @@ -4109,14 +4045,17 @@ int tcg_gen_code(TCGContext *s, TranslationBlock =
-*tb)
->      s->pool_labels =3D NULL;
->  #endif
->
-> +    if (!tb_stats_collection_enabled()) {
-> +        QTAILQ_FOREACH(op, &s->ops, link) {
-> +            TCGOpcode opc =3D op->opc;
-> +            atomic_add(&s->prof.table_op_count[opc], 1);
-> +        }
-> +    }
-> +
->      num_insns =3D -1;
->      QTAILQ_FOREACH(op, &s->ops, link) {
->          TCGOpcode opc =3D op->opc;
->
-> -#ifdef CONFIG_PROFILER
-> -        atomic_set(&prof->table_op_count[opc], prof->table_op_count[opc]=
- + 1);
-> -#endif
-> -
->          switch (opc) {
->          case INDEX_op_mov_i32:
->          case INDEX_op_mov_i64:
-> @@ -4209,14 +4148,23 @@ int tcg_gen_code(TCGContext *s, TranslationBlock =
-*tb)
->      return tcg_current_code_size(s);
->  }
->
-> +void tcg_dump_op_count(void)
+>  
+> +static int coroutine_fn dirent_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
+> +                                      struct dirent *dent, V9fsQID *qidp)
 > +{
-> +    TCGProfile prof =3D {};
-> +    int i;
+> +    struct stat stbuf;
+> +    V9fsPath path;
+> +    int err;
 > +
-> +    collect_tcg_profiler(&prof);
-> +    for (i =3D 0; i < NB_OPS; i++) {
-> +        qemu_printf("%s %" PRId64 "\n", tcg_op_defs[i].name, prof.table_=
-op_count[i]);
+> +    v9fs_path_init(&path);
+> +
+> +    err = v9fs_co_name_to_path(pdu, &fidp->path, dent->d_name, &path);
+> +    if (err < 0) {
+> +        goto out;
 > +    }
+> +    err = v9fs_co_lstat(pdu, &path, &stbuf);
+> +    if (err < 0) {
+> +        goto out;
+> +    }
+> +    err = stat_to_qid(pdu, &stbuf, qidp);
+> +
+> +out:
+> +    v9fs_path_free(&path);
+> +    return err;
 > +}
 > +
->  void tcg_dump_info(void)
+>  V9fsPDU *pdu_alloc(V9fsState *s)
 >  {
->      TCGProfile *s =3D NULL;
-> -#ifdef CONFIG_PROFILER
->      TCGProfile prof =3D {};
-> -    tcg_profile_snapshot_counters(&prof);
->      s =3D &prof;
-> -#endif
-> +    collect_tcg_profiler(s);
->      dump_jit_profile_info(s);
+>      V9fsPDU *pdu = NULL;
+> @@ -1964,16 +2076,39 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
+>              v9fs_string_free(&name);
+>              return count;
+>          }
+> -        /*
+> -         * Fill up just the path field of qid because the client uses
+> -         * only that. To fill the entire qid structure we will have
+> -         * to stat each dirent found, which is expensive
+> -         */
+> -        size = MIN(sizeof(dent->d_ino), sizeof(qid.path));
+> -        memcpy(&qid.path, &dent->d_ino, size);
+> -        /* Fill the other fields with dummy values */
+> -        qid.type = 0;
+> -        qid.version = 0;
+> +
+> +        if (pdu->s->ctx.export_flags & V9FS_REMAP_INODES) {
+> +            /*
+> +             * dirent_to_qid() implies expensive stat call for each entry,
+> +             * we must do that here though since inode remapping requires
+> +             * the device id, which in turn might be different for
+> +             * different entries; we cannot make any assumption to avoid
+> +             * that here.
+> +             */
+> +            err = dirent_to_qid(pdu, fidp, dent, &qid);
+> +            if (err < 0) {
+> +                v9fs_readdir_unlock(&fidp->fs.dir);
+> +                v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
+> +                v9fs_string_free(&name);
+> +                return err;
+> +            }
+> +        } else {
+> +            /*
+> +             * Fill up just the path field of qid because the client uses
+> +             * only that. To fill the entire qid structure we will have
+> +             * to stat each dirent found, which is expensive. For the
+> +             * latter reason we don't call dirent_to_qid() here. Only drawback
+> +             * is that no multi-device export detection of stat_to_qid()
+> +             * would be done and provided as error to the user here. But
+> +             * user would get that error anyway when accessing those
+> +             * files/dirs through other ways.
+> +             */
+> +            size = MIN(sizeof(dent->d_ino), sizeof(qid.path));
+> +            memcpy(&qid.path, &dent->d_ino, size);
+> +            /* Fill the other fields with dummy values */
+> +            qid.type = 0;
+> +            qid.version = 0;
+> +        }
+>  
+>          /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
+>          len = pdu_marshal(pdu, 11 + count, "Qqbs",
+> @@ -3672,8 +3807,13 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
+>          goto out;
+>      }
+>  
+> +    s->root_ino = stat.st_ino;
+
+This isn't used anywhere. It looks like a leftover of the readdir fix
+in v5.
+
+>      s->dev_id = stat.st_dev;
+>  
+> +    /* QID path hash table. 1 entry ought to be enough for anybody ;) */
+> +    qht_init(&s->qpp_table, qpp_lookup_func, 1, QHT_MODE_AUTO_RESIZE);
+> +    s->qp_prefix_next = 1; /* reserve 0 to detect overflow */
+> +
+>      s->ctx.fst = &fse->fst;
+>      fsdev_throttle_init(s->ctx.fst);
+>  
+> @@ -3687,6 +3827,7 @@ out:
+>          }
+>          g_free(s->tag);
+>          g_free(s->ctx.fs_root);
+> +        qpp_table_destroy(&s->qpp_table);
+>          v9fs_path_free(&path);
+>      }
+>      return rc;
+> @@ -3699,6 +3840,7 @@ void v9fs_device_unrealize_common(V9fsState *s, Error **errp)
+>      }
+>      fsdev_throttle_cleanup(s->ctx.fst);
+>      g_free(s->tag);
+> +    qpp_table_destroy(&s->qpp_table);
+>      g_free(s->ctx.fs_root);
 >  }
->
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index a8d779f7e6..3550d22873 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -646,12 +646,6 @@ QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
->
->  typedef struct TCGProfile {
->      int64_t cpu_exec_time;
-> -    int64_t interm_time;
-> -    int64_t code_time;
-> -    int64_t la_time;
-> -    int64_t opt_time;
-> -    int64_t restore_count;
-> -    int64_t restore_time;
->      int64_t table_op_count[NB_OPS];
->  } TCGProfile;
->
-> @@ -679,9 +673,7 @@ struct TCGContext {
->
->      tcg_insn_unit *code_ptr;
->
-> -#ifdef CONFIG_PROFILER
->      TCGProfile prof;
-> -#endif
->
->  #ifdef CONFIG_DEBUG_TCG
->      int temps_in_use;
-> @@ -1013,7 +1005,7 @@ int tcg_check_temp_count(void);
->  #define tcg_check_temp_count() 0
->  #endif
->
-> -int64_t tcg_cpu_exec_time(void);
-> +uint64_t tcg_cpu_exec_time(void);
->  void tcg_dump_info(void);
->  void tcg_dump_op_count(void);
->
+>  
+> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> index 5e316178d5..a283b0193e 100644
+> --- a/hw/9pfs/9p.h
+> +++ b/hw/9pfs/9p.h
+> @@ -8,6 +8,7 @@
+>  #include "fsdev/9p-iov-marshal.h"
+>  #include "qemu/thread.h"
+>  #include "qemu/coroutine.h"
+> +#include "qemu/qht.h"
+>  
+>  enum {
+>      P9_TLERROR = 6,
+> @@ -235,6 +236,15 @@ struct V9fsFidState
+>      V9fsFidState *rclm_lst;
+>  };
+>  
+> +#define QPATH_INO_MASK        ((1ULL << 48) - 1)
+> +
+> +/* QID path prefix entry, see stat_to_qid */
+> +typedef struct {
+> +    dev_t dev;
+> +    uint16_t ino_prefix;
+> +    uint16_t qp_prefix;
+> +} QppEntry;
+> +
+>  struct V9fsState
+>  {
+>      QLIST_HEAD(, V9fsPDU) free_list;
+> @@ -256,7 +266,10 @@ struct V9fsState
+>      Error *migration_blocker;
+>      V9fsConf fsconf;
+>      V9fsQID root_qid;
+> +    ino_t root_ino;
+
+Thinking again, I'm wondering if root_ino and dev_id could be used
+instead of root_qid in v9fs_walk()... Would you have a look at that
+if you decide to fix the readdir issue ?
+
+>      dev_t dev_id;
+> +    struct qht qpp_table;
+> +    uint16_t qp_prefix_next;
+>  };
+>  
+>  /* 9p2000.L open flags */
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9621e934c0..603e5e8e15 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1335,17 +1335,17 @@ ETEXI
+>  
+>  DEF("virtfs", HAS_ARG, QEMU_OPTION_virtfs,
+>      "-virtfs local,path=path,mount_tag=tag,security_model=mapped-xattr|mapped-file|passthrough|none\n"
+> -    "        [,id=id][,writeout=immediate][,readonly][,fmode=fmode][,dmode=dmode]\n"
+> -    "-virtfs proxy,mount_tag=tag,socket=socket[,id=id][,writeout=immediate][,readonly]\n"
+> -    "-virtfs proxy,mount_tag=tag,sock_fd=sock_fd[,id=id][,writeout=immediate][,readonly]\n"
+> +    "        [,id=id][,writeout=immediate][,readonly][,fmode=fmode][,dmode=dmode][,multidevs=remap|forbid|warn]\n"
+> +    "-virtfs proxy,mount_tag=tag,socket=socket[,id=id][,writeout=immediate][,readonly][,multidevs=remap|forbid|warn]\n"
+> +    "-virtfs proxy,mount_tag=tag,sock_fd=sock_fd[,id=id][,writeout=immediate][,readonly][,multidevs=remap|forbid|warn]\n"
+>      "-virtfs synth,mount_tag=tag[,id=id][,readonly]\n",
+>      QEMU_ARCH_ALL)
+>  
+>  STEXI
+>  
+> -@item -virtfs local,path=@var{path},mount_tag=@var{mount_tag} ,security_model=@var{security_model}[,writeout=@var{writeout}][,readonly] [,fmode=@var{fmode}][,dmode=@var{dmode}]
+> -@itemx -virtfs proxy,socket=@var{socket},mount_tag=@var{mount_tag} [,writeout=@var{writeout}][,readonly]
+> -@itemx -virtfs proxy,sock_fd=@var{sock_fd},mount_tag=@var{mount_tag} [,writeout=@var{writeout}][,readonly]
+> +@item -virtfs local,path=@var{path},mount_tag=@var{mount_tag} ,security_model=@var{security_model}[,writeout=@var{writeout}][,readonly] [,fmode=@var{fmode}][,dmode=@var{dmode}][,multidevs=@var{multidevs}]
+> +@itemx -virtfs proxy,socket=@var{socket},mount_tag=@var{mount_tag} [,writeout=@var{writeout}][,readonly][,multidevs=@var{multidevs}]
+> +@itemx -virtfs proxy,sock_fd=@var{sock_fd},mount_tag=@var{mount_tag} [,writeout=@var{writeout}][,readonly][,multidevs=@var{multidevs}]
+>  @itemx -virtfs synth,mount_tag=@var{mount_tag}
+>  @findex -virtfs
+>  
+> @@ -1399,6 +1399,27 @@ Specifies the default mode for newly created directories on the host. Works
+>  only with security models "mapped-xattr" and "mapped-file".
+>  @item mount_tag=@var{mount_tag}
+>  Specifies the tag name to be used by the guest to mount this export point.
+> +@item multidevs=@var{multidevs}
+> +Specifies how to deal with multiple devices being shared with a 9p export.
+> +Supported behaviours are either "remap", "forbid" or "warn". The latter is
+> +the default behaviour on which virtfs 9p expects only one device to be
+> +shared with the same export, and if more than one device is shared and
+> +accessed via the same 9p export then only a warning message is logged
+> +(once) by qemu on host side. In order to avoid file ID collisions on guest
+> +you should either create a separate virtfs export for each device to be
+> +shared with guests (recommended way) or you might use "remap" instead which
+> +allows you to share multiple devices with only one export instead, which is
+> +achieved by remapping the original inode numbers from host to guest in a
+> +way that would prevent such collisions. Remapping inodes in such use cases
+> +is required because the original device IDs from host are never passed and
+> +exposed on guest. Instead all files of an export shared with virtfs always
+> +share the same device id on guest. So two files with identical inode
+> +numbers but from actually different devices on host would otherwise cause a
+> +file ID collision and hence potential misbehaviours on guest. "forbid" on
+> +the other hand assumes like "warn" that only one device is shared by the
+> +same export, however it will not only log a warning message but also
+> +deny access to additional devices on guest. Note though that "forbid" does
+> +currently not block all possible file access operations.
+>  @end table
+>  ETEXI
+>  
 > diff --git a/vl.c b/vl.c
-> index 630f5c5e9c..4203cc728c 100644
+> index b426b32134..9cb29b483d 100644
 > --- a/vl.c
 > +++ b/vl.c
-> @@ -1796,17 +1796,11 @@ static bool main_loop_should_exit(void)
->
->  static void main_loop(void)
->  {
-> -#ifdef CONFIG_PROFILER
-> -    int64_t ti;
-> -#endif
-> +    uint64_t ti;
->      while (!main_loop_should_exit()) {
-> -#ifdef CONFIG_PROFILER
->          ti =3D profile_getclock();
-> -#endif
->          main_loop_wait(false);
-> -#ifdef CONFIG_PROFILER
->          dev_time +=3D profile_getclock() - ti;
-> -#endif
->      }
->  }
+> @@ -3320,7 +3320,7 @@ int main(int argc, char **argv, char **envp)
+>              case QEMU_OPTION_virtfs: {
+>                  QemuOpts *fsdev;
+>                  QemuOpts *device;
+> -                const char *writeout, *sock_fd, *socket, *path, *security_model;
+> +                const char *writeout, *sock_fd, *socket, *path, *security_model, *multidevs;
+>  
+>                  olist = qemu_find_opts("virtfs");
+>                  if (!olist) {
+> @@ -3380,6 +3380,10 @@ int main(int argc, char **argv, char **envp)
+>                  qemu_opt_set_bool(fsdev, "readonly",
+>                                    qemu_opt_get_bool(opts, "readonly", 0),
+>                                    &error_abort);
+> +                multidevs = qemu_opt_get(opts, "multidevs");
+> +                if (multidevs) {
+> +                    qemu_opt_set(fsdev, "multidevs", multidevs, &error_abort);
+> +                }
+>                  device = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
+>                                            &error_abort);
+>                  qemu_opt_set(device, "driver", "virtio-9p-pci", &error_abort);
 
-
---
-Alex Benn=C3=A9e
 
