@@ -2,65 +2,112 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A838CC3A5A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 04:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F5EC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 05:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71C9F2186A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 04:54:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71C9F2186A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 47F352087F
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 05:37:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47F352087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Yvo-0004N9-Ir
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 00:54:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43055)
+	id 1i3Zal-0002qU-CV
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 01:36:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jing2.liu@linux.intel.com>) id 1i3Yuq-0003yR-AF
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 00:53:41 -0400
+ (envelope-from <thuth@redhat.com>) id 1i3ZZs-0002JZ-Gc
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 01:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jing2.liu@linux.intel.com>) id 1i3Yuo-0003EH-PY
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 00:53:40 -0400
-Received: from mga03.intel.com ([134.134.136.65]:54557)
+ (envelope-from <thuth@redhat.com>) id 1i3ZZr-00065V-DO
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 01:36:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59086)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
- id 1i3Yuo-00038f-FZ
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 00:53:38 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Aug 2019 21:53:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,445,1559545200"; d="scan'208";a="381890493"
-Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.128.246])
- ([10.238.128.246])
- by fmsmga006.fm.intel.com with ESMTP; 29 Aug 2019 21:53:30 -0700
-To: Sergio Lopez <slp@redhat.com>
-References: <20190702121106.28374-1-slp@redhat.com>
- <879c7f68-95a3-3bf6-cba8-d3465770d399@linux.intel.com>
- <87lfvc3rgj.fsf@redhat.com>
-From: Jing Liu <jing2.liu@linux.intel.com>
-Message-ID: <18777980-a2ca-fe27-419b-6e2bd213dd17@linux.intel.com>
-Date: Fri, 30 Aug 2019 12:53:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1i3ZZn-0005vq-Jc; Fri, 30 Aug 2019 01:35:59 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BEE133023087;
+ Fri, 30 Aug 2019 05:35:57 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-123.ams2.redhat.com [10.36.116.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 134FB60F82;
+ Fri, 30 Aug 2019 05:35:53 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190823135811.13883-1-philmd@redhat.com>
+ <20190823135811.13883-4-philmd@redhat.com>
+ <98da7855-40eb-2d58-8f0a-b75a041aba4c@redhat.com>
+ <91b9cdcd-fe85-5283-8d03-c0e948f72f45@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <134d430b-5f9f-591b-8bd5-f746c5a68f2f@redhat.com>
+Date: Fri, 30 Aug 2019 07:35:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87lfvc3rgj.fsf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <91b9cdcd-fe85-5283-8d03-c0e948f72f45@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 30 Aug 2019 05:35:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] RFC target/arm: Do not build pre-ARMv7
+ cpus when using KVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,135 +119,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
- sgarzare@redhat.com, rth@twiddle.net
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Sergio,
-
-On 8/29/2019 11:46 PM, Sergio Lopez wrote:
-> 
-> Jing Liu <jing2.liu@linux.intel.com> writes:
-> 
->> Hi Sergio,
->>
->> The idea is interesting and I tried to launch a guest by your
->> guide but seems failed to me. I tried both legacy and normal modes,
->> but the vncviewer connected and told me that:
->> The vm has no graphic display device.
->> All the screen in vnc is just black.
-> 
-> The microvm machine type doesn't support any graphics device, so you
-> need to rely on the serial console.
-Got it.
-
-> 
->> kernel config:
->> CONFIG_KVM_MMIO=y
->> CONFIG_VIRTIO_MMIO=y
->>
->> I don't know if any specified kernel version/patch/config
->> is needed or anything I missed.
->> Could you kindly give some tips?
-> 
-> I'm testing it with upstream vanilla Linux. In addition to MMIO, you
-> need to add support for PVH (the next version of this patchset, v4, will
-> support booting from FW, so it'll be possible to use non-PVH ELF kernels
-> and bzImages too).
-> 
-> I've just uploaded a working kernel config here:
-> 
-> https://gist.github.com/slp/1060ba3aaf708584572ad4109f28c8f9
-> 
-Thanks very much and this config is helpful to me.
-
-> As for the QEMU command line, something like this should do the trick:
-> 
-> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm,legacy -kernel vmlinux -append "earlyprintk=ttyS0 console=ttyS0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial stdio
-> 
-> If this works, you can move to non-legacy mode with a virtio-console:
-> 
-> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0
-> 
-I tried the above two ways and it works now. Thanks!
-
-> If is still working, you can try adding some devices too:
-> 
-> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1 root=/dev/vda" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0 -netdev user,id=testnet -device virtio-net-device,netdev=testnet -drive id=test,file=alpine-rootfs-x86_64.raw,format=raw,if=none -device virtio-blk-device,drive=test
-> 
-But I'm wondering why the image I used can not be found.
-root=/dev/vda3 and the same image worked well on normal qemu/guest-
-config bootup, but didn't work here. The details are,
-
--append "console=hvc0 reboot=k panic=1 root=/dev/vda3 rw rootfstype=ext4" \
-
-[    0.022784] Key type encrypted registered
-[    0.022988] VFS: Cannot open root device "vda3" or 
-unknown-block(254,3): error -6
-[    0.023041] Please append a correct "root=" boot option; here are the 
-available partitions:
-[    0.023089] fe00         8946688 vda
-[    0.023090]  driver: virtio_blk
-[    0.023143] Kernel panic - not syncing: VFS: Unable to mount root fs 
-on unknown-block(254,3)
-[    0.023201] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-rc3 #23
-
-
-BTW, root=/dev/vda is also tried and didn't work. The dmesg is a little 
-different:
-
-[    0.028050] Key type encrypted registered
-[    0.028484] List of all partitions:
-[    0.028529] fe00         8946688 vda
-[    0.028529]  driver: virtio_blk
-[    0.028615] No filesystem could mount root, tried:
-[    0.028616]  ext4
-[    0.028670]
-[    0.028712] Kernel panic - not syncing: VFS: Unable to mount root fs 
-on unknown-block(254,0)
-
-I tried another ext4 img but still doesn't work.
-Is there any limitation of blk image? Could I copy your image for simple
-test?
-
-Thanks in advance,
-Jing
-
-> Sergio.
-> 
->> Thanks very much.
->> Jing
->>
->>
->>
->>> A QEMU instance with the microvm machine type can be invoked this way:
+On 29/08/2019 20.19, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 8/23/19 4:28 PM, Thomas Huth wrote:
+>> On 8/23/19 3:58 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> A KVM-only build won't be able to run pre-ARMv7 cpus, disable them.
 >>>
->>>    - Normal mode:
->>>
->>> qemu-system-x86_64 -M microvm -m 512m -smp 2 \
->>>    -kernel vmlinux -append "console=hvc0 root=/dev/vda" \
->>>    -nodefaults -no-user-config \
->>>    -chardev pty,id=virtiocon0,server \
->>>    -device virtio-serial-device \
->>>    -device virtconsole,chardev=virtiocon0 \
->>>    -drive id=test,file=test.img,format=raw,if=none \
->>>    -device virtio-blk-device,drive=test \
->>>    -netdev tap,id=tap0,script=no,downscript=no \
->>>    -device virtio-net-device,netdev=tap0
->>>
->>>    - Legacy mode:
->>>
->>> qemu-system-x86_64 -M microvm,legacy -m 512m -smp 2 \
->>>    -kernel vmlinux -append "console=ttyS0 root=/dev/vda" \
->>>    -nodefaults -no-user-config \
->>>    -drive id=test,file=test.img,format=raw,if=none \
->>>    -device virtio-blk-device,drive=test \
->>>    -netdev tap,id=tap0,script=no,downscript=no \
->>>    -device virtio-net-device,netdev=tap0 \
->>>    -serial stdio
->>>
-> 
+>>> If KVM is not enabled, they are enabled by default.
+>> [...]
+>>>  config CHEETAH
+>>>      bool
+>>> +    select ARM_V4
+>>>      select OMAP
+>>>      select TSC210X
+>>
+>> Are you sure about the "enabled by default" ? There is not "default y"
+>> here, is it?
+>=20
+> What I mean is if you build with --disable-kvm, this selects
+> --enable-tcg which provides the pre-ARMv7 cpus. So to make no changes, =
+I
+> also added:
+>=20
+>   config ARM_V4
+>       default y
+>=20
+> Which include the "default y".
+
+Well, so the ARM_V4 config switch is enabled by default. But where is
+the CHEETAH config switch enabled now?
+
+>> I think we should maybe rather rework the default-configs directory:
+>> Rename the default to "config/default/" instead and then we can add
+>> other subfolders with such special configurations, e.g. config/nemu/ o=
+r
+>> config/lean-kvm/ or however you want to call it. Then add a new switch
+>> to the configure script to be able to use the configs from such a
+>> different folder.
+>=20
+> OK so if someone wants a special config, he'd know the config values to
+> select, so it is pointless/confusing to keep them commented.
+> Are you suggesting to simply remove the default entries?
+Certainly not! I meant to keep the current file (with everything
+enabled) in config/default/, and to add another config file to
+config/lean-kvm/ where the TCG-only boards are disabled. Then the user
+can easily run "./configure --build-config-dir=3Dconfig/lean-kvm/" to
+enable these settings.
+
+ Thomas
 
