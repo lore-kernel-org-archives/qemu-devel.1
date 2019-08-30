@@ -2,66 +2,60 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B06DCC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 10:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE11C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 10:12:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81A4B21721
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 10:10:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81A4B21721
+	by mail.kernel.org (Postfix) with ESMTPS id 01CB7206BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 10:12:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01CB7206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3drg-0006dc-L2
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 06:10:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45094)
+	id 1i3dto-0007wW-46
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 06:12:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dinechin@redhat.com>) id 1i3dpd-0005yt-7C
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 06:08:39 -0400
+ (envelope-from <david@redhat.com>) id 1i3drG-0006h9-Mj
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 06:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dinechin@redhat.com>) id 1i3dpI-0008IC-B3
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 06:08:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46964)
+ (envelope-from <david@redhat.com>) id 1i3drC-0005o9-SQ
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 06:10:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39960)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dinechin@redhat.com>)
- id 1i3dpB-0007fB-3E; Fri, 30 Aug 2019 06:08:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1i3drC-0005k7-Ga; Fri, 30 Aug 2019 06:10:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E0EDDC010923;
- Fri, 30 Aug 2019 10:08:04 +0000 (UTC)
-Received: from ptitpuce (ovpn-116-165.ams2.redhat.com [10.36.116.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 32A255D9CA;
- Fri, 30 Aug 2019 10:07:51 +0000 (UTC)
-References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
- <20190814100735.24234-3-vsementsov@virtuozzo.com>
- <3eded188-0161-d494-194c-9d67da644eb1@redhat.com>
- <20190815104928.GC7415@linux.fritz.box>
- <20190815114553.GQ300@andariel.pipo.sk> <87d0h6zfrt.fsf@dusky.pond.sub.org>
- <m1lfvbex92.fsf@redhat.com> <eba518d8-0104-fb41-8ed5-d59ebdb211c9@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.2
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: John Snow <jsnow@redhat.com>
-In-reply-to: <eba518d8-0104-fb41-8ed5-d59ebdb211c9@redhat.com>
-Date: Fri, 30 Aug 2019 12:07:49 +0200
-Message-ID: <m1k1avdkzu.fsf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6D276693E7;
+ Fri, 30 Aug 2019 10:10:13 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-117-243.ams2.redhat.com [10.36.117.243])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A2DF4600F8;
+ Fri, 30 Aug 2019 10:10:11 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 30 Aug 2019 12:09:59 +0200
+Message-Id: <20190830100959.26615-3-david@redhat.com>
+In-Reply-To: <20190830100959.26615-1-david@redhat.com>
+References: <20190830100959.26615-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 30 Aug 2019 10:08:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Fri, 30 Aug 2019 10:10:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 2/2] qapi: deprecate implicit
- filters
+Subject: [Qemu-devel] [PATCH v2 2/2] tcg: Factor out probe_write() logic
+ into probe_access()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,142 +67,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- Christophe de Dinechin <dinechin@redhat.com>, den@openvz.org
+Cc: Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Let's also allow to probe other access types.
 
-John Snow writes:
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ accel/tcg/cputlb.c      | 43 ++++++++++++++++++++++++++++++-----------
+ accel/tcg/user-exec.c   | 26 +++++++++++++++++++------
+ include/exec/exec-all.h |  9 +++++++--
+ 3 files changed, 59 insertions(+), 19 deletions(-)
 
-> On 8/29/19 12:45 PM, Christophe de Dinechin wrote:
->>
-[...]
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index cb969d8372..abae79650c 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -1075,30 +1075,51 @@ tb_page_addr_t get_page_addr_code(CPUArchState *e=
+nv, target_ulong addr)
+     return qemu_ram_addr_from_host_nofail(p);
+ }
+=20
+-/* Probe for whether the specified guest write access is permitted.
+- * If it is not permitted then an exception will be taken in the same
+- * way as if this were a real write access (and we will not return).
++/*
++ * Probe for whether the specified guest access is permitted. If it is n=
+ot
++ * permitted then an exception will be taken in the same way as if this
++ * were a real access (and we will not return).
+  * If the size is 0 or the page requires I/O access, returns NULL; other=
+wise,
+  * returns the address of the host page similar to tlb_vaddr_to_host().
+  */
+-void *probe_write(CPUArchState *env, target_ulong addr, int size, int mm=
+u_idx,
+-                  uintptr_t retaddr)
++void *probe_access(CPUArchState *env, target_ulong addr, int size,
++                   MMUAccessType access_type, int mmu_idx, uintptr_t ret=
+addr)
+ {
+     uintptr_t index =3D tlb_index(env, mmu_idx, addr);
+     CPUTLBEntry *entry =3D tlb_entry(env, mmu_idx, addr);
+-    target_ulong tlb_addr =3D tlb_addr_write(entry);
++    target_ulong tlb_addr;
++    size_t elt_ofs;
++    int wp_access;
+=20
+     g_assert(-(addr | TARGET_PAGE_MASK) >=3D size);
+=20
++    switch (access_type) {
++    case MMU_DATA_LOAD:
++        elt_ofs =3D offsetof(CPUTLBEntry, addr_read);
++        wp_access =3D BP_MEM_READ;
++        break;
++    case MMU_DATA_STORE:
++        elt_ofs =3D offsetof(CPUTLBEntry, addr_write);
++        wp_access =3D BP_MEM_WRITE;
++        break;
++    case MMU_INST_FETCH:
++        elt_ofs =3D offsetof(CPUTLBEntry, addr_code);
++        wp_access =3D BP_MEM_READ;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    tlb_addr =3D tlb_read_ofs(entry, elt_ofs);
++
+     if (unlikely(!tlb_hit(tlb_addr, addr))) {
+-        if (!VICTIM_TLB_HIT(addr_write, addr)) {
+-            tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
+-                     mmu_idx, retaddr);
++        if (!victim_tlb_hit(env, mmu_idx, index, elt_ofs,
++                            addr & TARGET_PAGE_MASK)) {
++            tlb_fill(env_cpu(env), addr, size, access_type, mmu_idx, ret=
+addr);
+             /* TLB resize via tlb_fill may have moved the entry. */
+             index =3D tlb_index(env, mmu_idx, addr);
+             entry =3D tlb_entry(env, mmu_idx, addr);
+         }
+-        tlb_addr =3D tlb_addr_write(entry);
++        tlb_addr =3D tlb_read_ofs(entry, elt_ofs);
+     }
+=20
+     if (!size) {
+@@ -1109,7 +1130,7 @@ void *probe_write(CPUArchState *env, target_ulong a=
+ddr, int size, int mmu_idx,
+     if (tlb_addr & TLB_WATCHPOINT) {
+         cpu_check_watchpoint(env_cpu(env), addr, size,
+                              env_tlb(env)->d[mmu_idx].iotlb[index].attrs=
+,
+-                             BP_MEM_WRITE, retaddr);
++                             wp_access, retaddr);
+     }
+=20
+     if (tlb_addr & (TLB_NOTDIRTY | TLB_MMIO)) {
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 5720bf8056..71c4bf6477 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -188,17 +188,31 @@ static inline int handle_cpu_signal(uintptr_t pc, s=
+iginfo_t *info,
+     g_assert_not_reached();
+ }
+=20
+-void *probe_write(CPUArchState *env, target_ulong addr, int size, int mm=
+u_idx,
+-                  uintptr_t retaddr)
++void *probe_access(CPUArchState *env, target_ulong addr, int size,
++                   MMUAccessType access_type, int mmu_idx, uintptr_t ret=
+addr)
+ {
++    int flags;
++
+     g_assert(-(addr | TARGET_PAGE_MASK) >=3D size);
+=20
+-    if (!guest_addr_valid(addr) ||
+-        page_check_range(addr, size, PAGE_WRITE) < 0) {
++    switch (access_type) {
++    case MMU_DATA_STORE:
++        flags =3D PAGE_WRITE;
++        break;
++    case MMU_DATA_LOAD:
++        flags =3D PAGE_READ;
++        break;
++    case MMU_INST_FETCH:
++        flags =3D PAGE_EXEC;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    if (!guest_addr_valid(addr) || page_check_range(addr, size, flags) <=
+ 0) {
+         CPUState *cpu =3D env_cpu(env);
+         CPUClass *cc =3D CPU_GET_CLASS(cpu);
+-
+-        cc->tlb_fill(cpu, addr, size, MMU_DATA_STORE, MMU_USER_IDX, fals=
+e,
++        cc->tlb_fill(cpu, addr, size, access_type, MMU_USER_IDX, false,
+                      retaddr);
+         g_assert_not_reached();
+     }
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index a7893ed16b..3eaf39cd0d 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -310,8 +310,13 @@ static inline void tlb_flush_by_mmuidx_all_cpus_sync=
+ed(CPUState *cpu,
+ {
+ }
+ #endif
+-void *probe_write(CPUArchState *env, target_ulong addr, int size, int mm=
+u_idx,
+-                  uintptr_t retaddr);
++void *probe_access(CPUArchState *env, target_ulong addr, int size,
++                   MMUAccessType access_type, int mmu_idx, uintptr_t ret=
+addr);
++static inline void *probe_write(CPUArchState *env, target_ulong addr, in=
+t size,
++                                int mmu_idx, uintptr_t retaddr)
++{
++    return probe_access(env, addr, size, MMU_DATA_STORE, mmu_idx, retadd=
+r);
++}
+=20
+ #define CODE_GEN_ALIGN           16 /* must be >=3D of the size of a ica=
+che line */
+=20
+--=20
+2.21.0
 
->> Sorry for catching up late, this mail thread happened during my PTO.
->>
->> I remember bringing up at the time [1] that the correct solution needs
->> to take into account usage models that vary from
->>
->> - a workstation case, where displaying an error box is easy and
->>   convenient,
->>
->> - to local headless VMs where system-level notification would do the job
->>   better, allowing us to leverage things like system-wide email notifications
->>
->> - to large-scale collections of VMs managed by some layered product,
->>   where the correct reporting would be through something like Insights,
->>   i.e. you don't scan individual logs, you want something like "913 VMs
->>   are using deprecated X"
->>
->> To me, that implies that we need to have a clear division of roles, with
->> a standard way to
->>
->> a) produce the errors,
->> b) propagate them,
->
-> I started replying to this thread to the other mail you sent; I think
-> this is going to be fairly involved. I wouldn't mind being proven wrong
-> though.
-
-Yes, I think it does look involved, but mostly for historical reasons.
-In other words, what is complicated is preserving the historical
-behaviors so as to not break existing consumers.
-
->
->> c) consume them (at least up to libvirt)
->>
->> Notice that this work has already been done for "real" errors,
->> i.e. there is a real QAPI notion of "errors". AFAICT, warn_report does
->> not connect to it, though, it goes through error_vprintf which is really
->> just basic logging.
->>
->> So would it make sense to:
->>
->> 1. Add a deprecation_report() alongside warn_report()?
->>
->
-> Where's that get routed to? just an error_vprintf style situation?
-
-Yes, but see below.
-
->
->> 2. Connect warn_report() and all the error_vprintf output to QAPI,
->>    e.g. using John's suggestion of adding the messages using some
->>    "warning" or "deprecated" tag?
->>
->
-> How do you correlate them?
-
-Without having looked at the code much, I think I would
-
-1. extend the existing QAPI error to support warnings, deprecations and
-   info messages. The first problem I see is that there is no error, so
-   we may sometimes need to create one when there was none before. And
-   of course make sure that this does not ultimately show as an error,
-   but as a success with additional annotations.
-
-2. replace the current "link + if" switching for error_vprintf with some
-   actual notification mechanism, with one option routine to
-   monitor_vprintf, one to stderr, one to log file, and then an
-   additional path that would post a newly minted qapi warning.
-
->
->> 3. Teach libvirt how to consume that new tag and pass it along?
->>
->
-> I think it's not libvirt's job to pass it along, exactly -- libvirt made
-> the decision for which features to engage in QEMU, not the end user.
-
-First, by "pass along", I meant to possible layered products or
-management software. We don't necessarily need a new virErrorLevel,
-deprecation could be a warning with some special domain,
-e.g. VIR_FROM_DEPRECATION.
-
-There may be a need to add some API here. Looking at the code, it's not
-obvious to me that libvirt has any notion of error priority. In other
-words, if you raise an error then a warning, you get the warning as the
-last error, right?
-
-
-Second, why not report the use of deprecated features? I don't fully buy
-the rationale that libvirt engages the features, because it does not do
-it on its own, it does it because the user made some specific request.
-This point of view also seems to require that libvirt or the user should
-know ahead of time it's about to engage a deprecated feature. To me, the
-problem is precisely that neither libvirt nor the user knows, which is
-why we are discussing how to best make it known.
-
->
-> If the user upgrades QEMU but not libvirt, it's not really anything they
-> have control over and they shouldn't be pestered with such things.
->
-> However, if libvirt accidentally released a version that engages
-> deprecated behavior (and were unaware of it), it'd be nice to get user
-> reports, surely?
->
-> Logging messages for libvirt might be the best that can be done there in
-> that case.
-
-I personally would treat that like any warning.
-
->
->
-> In contrast, power user tools like QMP libraries, qmp-shell and others
-> allow more direct and meaningful access to QMP, so those should report
-> deprecation messages to the user.
-
-Agreed.
-
->
->>
->> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg06131.html
->>
-
---
-Thanks,
-Christophe de Dinechin (IRC c3d)
 
