@@ -2,93 +2,65 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CB6C3A59F
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 01:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A838CC3A5A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 04:54:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BA5721726
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 01:35:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cf31/lZs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA5721726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 71C9F2186A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 04:54:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71C9F2186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3Vol-0003Jc-OA
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 21:35:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58283)
+	id 1i3Yvo-0004N9-Ir
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 00:54:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43055)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i3Vmc-0002iM-UV
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 21:32:59 -0400
+ (envelope-from <jing2.liu@linux.intel.com>) id 1i3Yuq-0003yR-AF
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 00:53:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i3VmZ-0005vp-HR
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 21:32:57 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45396)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i3VmZ-0005gS-9I
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 21:32:55 -0400
-Received: by mail-pf1-x444.google.com with SMTP id w26so3400628pfq.12
- for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 18:32:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Ebag+3kMLc5NJjseN3RIqWI9hFm0qcW7CgCN9vMt8e4=;
- b=Cf31/lZsjX/P7ta1iF+DtmoHndu5O4+bSxzmIYOmjoXnq9xFA30Fy78SlUbb4MYZOA
- LKukENDRjy08EfAUaGGz8wbYYpNBio4EqE/Aeymhn7xGlOIUxWs2yRThh3fZ8fuQ7vBx
- 2031sASAMgtafiTVg7Z9zxWs26XXAktrBGn4oTWY03WsWsg7ZDE3657fIoLxXkccK6al
- OM55zAfT1TLlwSqH5zzClR6tOltrF2HohUKTlyPWP6EvJn6eOvtKmXM0zKn5xP5KQ2mL
- +g3d9Old4hX9y2b2+NZGWx603RsGcWyHTT/o8EOgsjft12jO/ryqTlLQKYVg9Ch+GpE8
- nurA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Ebag+3kMLc5NJjseN3RIqWI9hFm0qcW7CgCN9vMt8e4=;
- b=RzUUqUdX2SQ5iQ+CbUd93KoPK/VfY5V3fX4YoND7hwtVW7PEDqpXqeAVjP1ub8rwXP
- f2KZO84bcHBrpp+V44dhToIufqMwXp72At61CcH+OmGf8yRy8V421ZlnXelIM67kS4zc
- qo8UOfCF0PdzJHjCLqkjV9QMTEPIHbB6e3Pd8kD5Eo2jKAc0W+NsuglQujSTDb0QrLTT
- NY2MbcoTxNIqa7ieevgVF5FnFqLcwx/k2U8PTudKCmAObxkQwpH2rjIU0o6j9YHn+aw+
- RZYtld7e4LqLzhT6cQ8yt+PmHqa2bJypQI7agq+s/KLqcYk990xOOrVSjoMpto9EyadX
- +5fg==
-X-Gm-Message-State: APjAAAVcxcaC08H2Osb3Nrd99+gcVV4f00x5A9kVY5KWWNe1bchPWghU
- U3jKIjLPCXO+MDY2Jz2+VJONtw==
-X-Google-Smtp-Source: APXvYqx21NPDa3BVUWHeO5FV41/Ub/ZQqVffuiEDS2fqE9I+ygV7a6zVfpqWujmWy+QFTZTgcO7q1w==
-X-Received: by 2002:a62:31c3:: with SMTP id x186mr14717923pfx.97.1567128770921; 
- Thu, 29 Aug 2019 18:32:50 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id u24sm3017464pgk.31.2019.08.29.18.32.50
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 29 Aug 2019 18:32:50 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190828231651.17176-1-richard.henderson@linaro.org>
- <20190828231651.17176-5-richard.henderson@linaro.org>
- <dc2d396f-d1ac-1c45-0bf8-16acc7421647@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <8b5b1247-cd77-d890-b15c-3e0a6db00afd@linaro.org>
-Date: Thu, 29 Aug 2019 18:32:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ (envelope-from <jing2.liu@linux.intel.com>) id 1i3Yuo-0003EH-PY
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 00:53:40 -0400
+Received: from mga03.intel.com ([134.134.136.65]:54557)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+ id 1i3Yuo-00038f-FZ
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 00:53:38 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 29 Aug 2019 21:53:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,445,1559545200"; d="scan'208";a="381890493"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.128.246])
+ ([10.238.128.246])
+ by fmsmga006.fm.intel.com with ESMTP; 29 Aug 2019 21:53:30 -0700
+To: Sergio Lopez <slp@redhat.com>
+References: <20190702121106.28374-1-slp@redhat.com>
+ <879c7f68-95a3-3bf6-cba8-d3465770d399@linux.intel.com>
+ <87lfvc3rgj.fsf@redhat.com>
+From: Jing Liu <jing2.liu@linux.intel.com>
+Message-ID: <18777980-a2ca-fe27-419b-6e2bd213dd17@linux.intel.com>
+Date: Fri, 30 Aug 2019 12:53:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <dc2d396f-d1ac-1c45-0bf8-16acc7421647@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87lfvc3rgj.fsf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v2 4/8] exec: Factor out
- cpu_watchpoint_address_matches
+X-Received-From: 134.134.136.65
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,38 +72,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com
+Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ sgarzare@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/29/19 10:20 AM, Philippe Mathieu-Daudé wrote:
->> +    /* Avoid trapping reads of pages with a write breakpoint. */
->> +    match = (prot & PAGE_READ ? BP_MEM_READ : 0)
->> +          | (prot & PAGE_WRITE ? BP_MEM_WRITE : 0);
+Hi Sergio,
+
+On 8/29/2019 11:46 PM, Sergio Lopez wrote:
 > 
-> Isn't it cheaper to do here:
+> Jing Liu <jing2.liu@linux.intel.com> writes:
 > 
->        if (!match) {
->            return iotlb;
->        }
+>> Hi Sergio,
+>>
+>> The idea is interesting and I tried to launch a guest by your
+>> guide but seems failed to me. I tried both legacy and normal modes,
+>> but the vncviewer connected and told me that:
+>> The vm has no graphic display device.
+>> All the screen in vnc is just black.
 > 
-> or
+> The microvm machine type doesn't support any graphics device, so you
+> need to rely on the serial console.
+Got it.
+
 > 
->        if (match) {
+>> kernel config:
+>> CONFIG_KVM_MMIO=y
+>> CONFIG_VIRTIO_MMIO=y
+>>
+>> I don't know if any specified kernel version/patch/config
+>> is needed or anything I missed.
+>> Could you kindly give some tips?
+> 
+> I'm testing it with upstream vanilla Linux. In addition to MMIO, you
+> need to add support for PVH (the next version of this patchset, v4, will
+> support booting from FW, so it'll be possible to use non-PVH ELF kernels
+> and bzImages too).
+> 
+> I've just uploaded a working kernel config here:
+> 
+> https://gist.github.com/slp/1060ba3aaf708584572ad4109f28c8f9
+> 
+Thanks very much and this config is helpful to me.
 
-Note that PROT_NONE pages never reach here; they always trap in tlb_fill.
+> As for the QEMU command line, something like this should do the trick:
+> 
+> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm,legacy -kernel vmlinux -append "earlyprintk=ttyS0 console=ttyS0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial stdio
+> 
+> If this works, you can move to non-legacy mode with a virtio-console:
+> 
+> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0
+> 
+I tried the above two ways and it works now. Thanks!
 
-The only way we can get match == 0 here is for the case of an execute-only
-page.  Which is possible, but extremely unlikely.  Almost all targets merge the
-text and rodata sections, which means that virtually all executable pages are
-also readable.
+> If is still working, you can try adding some devices too:
+> 
+> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1 root=/dev/vda" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0 -netdev user,id=testnet -device virtio-net-device,netdev=testnet -drive id=test,file=alpine-rootfs-x86_64.raw,format=raw,if=none -device virtio-blk-device,drive=test
+> 
+But I'm wondering why the image I used can not be found.
+root=/dev/vda3 and the same image worked well on normal qemu/guest-
+config bootup, but didn't work here. The details are,
 
-(Although I must say that in this age of ROP-gadgets, leaving the rodata
-section executable is probably a mistake, and tools should be updated to *not*
-merge them.  That's still not necessarily execute-only for the text section,
-but I don't see anything in principal that would prevent it.)
+-append "console=hvc0 reboot=k panic=1 root=/dev/vda3 rw rootfstype=ext4" \
+
+[    0.022784] Key type encrypted registered
+[    0.022988] VFS: Cannot open root device "vda3" or 
+unknown-block(254,3): error -6
+[    0.023041] Please append a correct "root=" boot option; here are the 
+available partitions:
+[    0.023089] fe00         8946688 vda
+[    0.023090]  driver: virtio_blk
+[    0.023143] Kernel panic - not syncing: VFS: Unable to mount root fs 
+on unknown-block(254,3)
+[    0.023201] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-rc3 #23
 
 
-r~
+BTW, root=/dev/vda is also tried and didn't work. The dmesg is a little 
+different:
+
+[    0.028050] Key type encrypted registered
+[    0.028484] List of all partitions:
+[    0.028529] fe00         8946688 vda
+[    0.028529]  driver: virtio_blk
+[    0.028615] No filesystem could mount root, tried:
+[    0.028616]  ext4
+[    0.028670]
+[    0.028712] Kernel panic - not syncing: VFS: Unable to mount root fs 
+on unknown-block(254,0)
+
+I tried another ext4 img but still doesn't work.
+Is there any limitation of blk image? Could I copy your image for simple
+test?
+
+Thanks in advance,
+Jing
+
+> Sergio.
+> 
+>> Thanks very much.
+>> Jing
+>>
+>>
+>>
+>>> A QEMU instance with the microvm machine type can be invoked this way:
+>>>
+>>>    - Normal mode:
+>>>
+>>> qemu-system-x86_64 -M microvm -m 512m -smp 2 \
+>>>    -kernel vmlinux -append "console=hvc0 root=/dev/vda" \
+>>>    -nodefaults -no-user-config \
+>>>    -chardev pty,id=virtiocon0,server \
+>>>    -device virtio-serial-device \
+>>>    -device virtconsole,chardev=virtiocon0 \
+>>>    -drive id=test,file=test.img,format=raw,if=none \
+>>>    -device virtio-blk-device,drive=test \
+>>>    -netdev tap,id=tap0,script=no,downscript=no \
+>>>    -device virtio-net-device,netdev=tap0
+>>>
+>>>    - Legacy mode:
+>>>
+>>> qemu-system-x86_64 -M microvm,legacy -m 512m -smp 2 \
+>>>    -kernel vmlinux -append "console=ttyS0 root=/dev/vda" \
+>>>    -nodefaults -no-user-config \
+>>>    -drive id=test,file=test.img,format=raw,if=none \
+>>>    -device virtio-blk-device,drive=test \
+>>>    -netdev tap,id=tap0,script=no,downscript=no \
+>>>    -device virtio-net-device,netdev=tap0 \
+>>>    -serial stdio
+>>>
+> 
 
