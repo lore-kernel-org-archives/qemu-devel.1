@@ -2,66 +2,86 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F07DC3A59B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E601C3A59B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:32:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6280821726
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:22:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6280821726
+	by mail.kernel.org (Postfix) with ESMTPS id 40F4223407
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 14:32:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40F4223407
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3hni-0007c5-Gz
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 10:22:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42265)
+	id 1i3hwl-0005hF-EG
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 10:32:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i3hTl-0003tk-15
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:02:20 -0400
+ (envelope-from <slp@redhat.com>) id 1i3hsH-0002mi-O9
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i3hTb-00077s-T0
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:02:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35916)
+ (envelope-from <slp@redhat.com>) id 1i3hs3-0003U2-9a
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:27:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56110)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i3hTZ-00071r-Oj
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:02:07 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i3hs2-0003Hk-Nd
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 10:27:23 -0400
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A8F583082B02;
- Fri, 30 Aug 2019 12:44:02 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5311319C58;
- Fri, 30 Aug 2019 12:44:02 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D79771165361; Fri, 30 Aug 2019 14:44:00 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-References: <20190828202641.24752-1-armbru@redhat.com>
- <20190828202641.24752-3-armbru@redhat.com>
-Date: Fri, 30 Aug 2019 14:44:00 +0200
-In-Reply-To: <20190828202641.24752-3-armbru@redhat.com> (Markus Armbruster's
- message of "Wed, 28 Aug 2019 22:26:34 +0200")
-Message-ID: <87v9ueomb3.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7C10089AC4
+ for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 14:27:19 +0000 (UTC)
+Received: by mail-ed1-f69.google.com with SMTP id b5so4301707eds.22
+ for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 07:27:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=8Rzf2qw3kfGMPBrdQnkWwTg/svk9CTfljtdshOW51yo=;
+ b=fNFj+FucXfN6TwUtonQScuIKTWkNxvJS2Ktld916sapAUUfE2SXc7cvixVNxrkjJse
+ lQKS8PVvpxtd8RdWRPq5zyxfLeqyki6/ceq9/dB3bZtEd3pEA5wlGtcZ5ztxV0+LhiN2
+ B/8LmzoKb83WR8WBgYG67kJzcsqbz7132wlc7Af2EiueW+TxlIyGZ1386lm25+e/m2Oh
+ be8KsMvTgTpu/+yQbzZil7kSnTyvDGkPXIqv4Mf4mbowF/2384P1P4GeeTjtJ+xoSspd
+ xP4qc0F1WpMmQlWmVpNUhdjXL2kjiWki0E+t8cLi5AsBA13/lQlNO99HyOFdnHDxPATD
+ IU7g==
+X-Gm-Message-State: APjAAAVmcK3a11NPjga5cU2f7bEc5waBjnToiPhw+sv1wiJK1r34Kle8
+ NpsBNuKwrtfmhdyziWxiuJb30/AdBrg/aGIboxOQaoWyieg7V7EfudGuhv6jKBbSJnTT4ur+3Tf
+ WmAL+yJ/P5vZhlHs=
+X-Received: by 2002:a17:906:938a:: with SMTP id
+ l10mr13443768ejx.232.1567175237663; 
+ Fri, 30 Aug 2019 07:27:17 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzJ2djwQJxOx0Apt1vtbPkj99tH3DqA4TIDAwbQxDeik1hHPBBv4oO+6Pb8DddFqKX2aOaMqw==
+X-Received: by 2002:a17:906:938a:: with SMTP id
+ l10mr13443739ejx.232.1567175237407; 
+ Fri, 30 Aug 2019 07:27:17 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id i24sm322517eds.27.2019.08.30.07.27.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 30 Aug 2019 07:27:16 -0700 (PDT)
+References: <20190702121106.28374-1-slp@redhat.com>
+ <879c7f68-95a3-3bf6-cba8-d3465770d399@linux.intel.com>
+ <87lfvc3rgj.fsf@redhat.com>
+ <18777980-a2ca-fe27-419b-6e2bd213dd17@linux.intel.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Jing Liu <jing2.liu@linux.intel.com>
+In-reply-to: <18777980-a2ca-fe27-419b-6e2bd213dd17@linux.intel.com>
+Date: Fri, 30 Aug 2019 16:27:11 +0200
+Message-ID: <87ftlibuf4.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 30 Aug 2019 12:44:02 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/9] qapi: Drop support for boxed alternate
- for commands, events
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,165 +93,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com
+Cc: ehabkost@redhat.com, maran.wilson@oracle.com, mst@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ sgarzare@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Commands and events can define their argument type inline (default) or
-> by referring to another type ('boxed': true, since commit c818408e44
-> "qapi: Implement boxed types for commands/events", v2.7.0).  The
-> unboxed inline definition is an (anonymous) struct type.  The boxed
-> type may be a struct, union, or alternate type.
->
-> The latter is problematic: docs/interop/qemu-spec.txt requires the
-> value of the 'data' key to be a json-object, but any non-degenerate
-> alternate type has at least one branch that isn't.
->
-> Fortunately, we haven't made use of alternates in this context outside
-> tests/.  Drop support for them.
->
-> QAPISchemaAlternateType.is_empty() is now unused.  Drop it, too.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Need to squash in
-
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index c54c148263..54d02458b5 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1711,15 +1711,13 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type = schema.lookup_type(self._arg_type_name)
--            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
--                    isinstance(self.arg_type, QAPISchemaAlternateType))
-+            assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
-             if self.boxed:
-                 if self.arg_type.is_empty():
-                     raise QAPISemError(self.info,
-                                        "Cannot use 'boxed' with empty type")
-             else:
--                assert not isinstance(self.arg_type, QAPISchemaAlternateType)
-                 assert not self.arg_type.variants
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data'")
-@@ -1747,15 +1745,13 @@ class QAPISchemaEvent(QAPISchemaEntity):
-         QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type = schema.lookup_type(self._arg_type_name)
--            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
--                    isinstance(self.arg_type, QAPISchemaAlternateType))
-+            assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
-             if self.boxed:
-                 if self.arg_type.is_empty():
-                     raise QAPISemError(self.info,
-                                        "Cannot use 'boxed' with empty type")
-             else:
--                assert not isinstance(self.arg_type, QAPISchemaAlternateType)
-                 assert not self.arg_type.variants
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data'")
+--=-=-=
+Content-Type: text/plain
 
 
-> ---
->  docs/devel/qapi-code-gen.txt            | 12 ++++++------
->  tests/qapi-schema/qapi-schema-test.json |  2 +-
->  scripts/qapi/common.py                  |  7 ++-----
->  tests/qapi-schema/qapi-schema-test.out  |  2 +-
->  4 files changed, 10 insertions(+), 13 deletions(-)
+Jing Liu <jing2.liu@linux.intel.com> writes:
+
+> Hi Sergio,
 >
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index e8ec8ac1de..3d3931fb7a 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -612,9 +612,9 @@ the command.  Normally, 'data' is a dictionary for an anonymous type,
->  or names a struct type (possibly empty, but not a union), and its
->  members are passed as separate arguments to this function.  If the
->  command definition includes a key 'boxed' with the boolean value true,
-> -then 'data' is instead the name of any non-empty complex type
-> -(struct, union, or alternate), and a pointer to that QAPI type is
-> -passed as a single argument.
-> +then 'data' is instead the name of any non-empty complex type (struct
-> +or union), and a pointer to that QAPI type is passed as a single
-> +argument.
->  
->  The generator also emits a marshalling function that extracts
->  arguments for the user's function out of an input QDict, calls the
-> @@ -714,9 +714,9 @@ The generator emits a function to send the event.  Normally, 'data' is
->  a dictionary for an anonymous type, or names a struct type (possibly
->  empty, but not a union), and its members are passed as separate
->  arguments to this function.  If the event definition includes a key
-> -'boxed' with the boolean value true, then 'data' is instead the name of
-> -any non-empty complex type (struct, union, or alternate), and a
-> -pointer to that QAPI type is passed as a single argument.
-> +'boxed' with the boolean value true, then 'data' is instead the name
-> +of any non-empty complex type (struct or union), and a pointer to that
-> +QAPI type is passed as a single argument.
->  
->  
->  === Features ===
-> diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-> index c6d59acc3e..0fadb4ddd7 100644
-> --- a/tests/qapi-schema/qapi-schema-test.json
-> +++ b/tests/qapi-schema/qapi-schema-test.json
-> @@ -180,7 +180,7 @@
->  { 'event': 'EVENT_D',
->    'data': { 'a' : 'EventStructOne', 'b' : 'str', '*c': 'str', '*enum3': 'EnumOne' } }
->  { 'event': 'EVENT_E', 'boxed': true, 'data': 'UserDefZero' }
-> -{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefAlternate' }
-> +{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefFlatUnion' }
->  
->  # test that we correctly compile downstream extensions, as well as munge
->  # ticklish names
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 9aefcfe015..c54c148263 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -840,7 +840,7 @@ def check_command(expr, info):
->  
->      args_meta = ['struct']
->      if boxed:
-> -        args_meta += ['union', 'alternate']
-> +        args_meta += ['union']
->      check_type(info, "'data' for command '%s'" % name,
->                 expr.get('data'), allow_dict=not boxed,
->                 allow_metas=args_meta)
-> @@ -858,7 +858,7 @@ def check_event(expr, info):
->  
->      meta = ['struct']
->      if boxed:
-> -        meta += ['union', 'alternate']
-> +        meta += ['union']
->      check_type(info, "'data' for event '%s'" % name,
->                 expr.get('data'), allow_dict=not boxed,
->                 allow_metas=meta)
-> @@ -1690,9 +1690,6 @@ class QAPISchemaAlternateType(QAPISchemaType):
->          visitor.visit_alternate_type(self.name, self.info, self.ifcond,
->                                       self.variants)
->  
-> -    def is_empty(self):
-> -        return False
-> -
->  
->  class QAPISchemaCommand(QAPISchemaEntity):
->      def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
-> diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-> index 85d510bc00..5470a525f5 100644
-> --- a/tests/qapi-schema/qapi-schema-test.out
-> +++ b/tests/qapi-schema/qapi-schema-test.out
-> @@ -252,7 +252,7 @@ event EVENT_D q_obj_EVENT_D-arg
->     boxed=False
->  event EVENT_E UserDefZero
->     boxed=True
-> -event EVENT_F UserDefAlternate
-> +event EVENT_F UserDefFlatUnion
->     boxed=True
->  enum __org.qemu_x-Enum
->      member __org.qemu_x-value
+> On 8/29/2019 11:46 PM, Sergio Lopez wrote:
+>>
+>> Jing Liu <jing2.liu@linux.intel.com> writes:
+>>
+>>> Hi Sergio,
+>>>
+>>> The idea is interesting and I tried to launch a guest by your
+>>> guide but seems failed to me. I tried both legacy and normal modes,
+>>> but the vncviewer connected and told me that:
+>>> The vm has no graphic display device.
+>>> All the screen in vnc is just black.
+>>
+>> The microvm machine type doesn't support any graphics device, so you
+>> need to rely on the serial console.
+> Got it.
+>
+>>
+>>> kernel config:
+>>> CONFIG_KVM_MMIO=y
+>>> CONFIG_VIRTIO_MMIO=y
+>>>
+>>> I don't know if any specified kernel version/patch/config
+>>> is needed or anything I missed.
+>>> Could you kindly give some tips?
+>>
+>> I'm testing it with upstream vanilla Linux. In addition to MMIO, you
+>> need to add support for PVH (the next version of this patchset, v4, will
+>> support booting from FW, so it'll be possible to use non-PVH ELF kernels
+>> and bzImages too).
+>>
+>> I've just uploaded a working kernel config here:
+>>
+>> https://gist.github.com/slp/1060ba3aaf708584572ad4109f28c8f9
+>>
+> Thanks very much and this config is helpful to me.
+>
+>> As for the QEMU command line, something like this should do the trick:
+>>
+>> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm,legacy -kernel vmlinux -append "earlyprintk=ttyS0 console=ttyS0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial stdio
+>>
+>> If this works, you can move to non-legacy mode with a virtio-console:
+>>
+>> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0
+>>
+> I tried the above two ways and it works now. Thanks!
+>
+>> If is still working, you can try adding some devices too:
+>>
+>> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1 root=/dev/vda" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0 -netdev user,id=testnet -device virtio-net-device,netdev=testnet -drive id=test,file=alpine-rootfs-x86_64.raw,format=raw,if=none -device virtio-blk-device,drive=test
+>>
+> But I'm wondering why the image I used can not be found.
+> root=/dev/vda3 and the same image worked well on normal qemu/guest-
+> config bootup, but didn't work here. The details are,
+>
+> -append "console=hvc0 reboot=k panic=1 root=/dev/vda3 rw rootfstype=ext4" \
+>
+> [    0.022784] Key type encrypted registered
+> [    0.022988] VFS: Cannot open root device "vda3" or
+> unknown-block(254,3): error -6
+> [    0.023041] Please append a correct "root=" boot option; here are
+> the available partitions:
+> [    0.023089] fe00         8946688 vda
+> [    0.023090]  driver: virtio_blk
+> [    0.023143] Kernel panic - not syncing: VFS: Unable to mount root
+> fs on unknown-block(254,3)
+> [    0.023201] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-rc3 #23
+>
+>
+> BTW, root=/dev/vda is also tried and didn't work. The dmesg is a
+> little different:
+>
+> [    0.028050] Key type encrypted registered
+> [    0.028484] List of all partitions:
+> [    0.028529] fe00         8946688 vda
+> [    0.028529]  driver: virtio_blk
+> [    0.028615] No filesystem could mount root, tried:
+> [    0.028616]  ext4
+> [    0.028670]
+> [    0.028712] Kernel panic - not syncing: VFS: Unable to mount root
+> fs on unknown-block(254,0)
+>
+> I tried another ext4 img but still doesn't work.
+> Is there any limitation of blk image? Could I copy your image for simple
+> test?
+
+The kernel config I posted lacks support for DOS partitions. Adding
+CONFIG_MSDOS_PARTITION=y should allow you to boot from /dev/vda3.
+
+Anyway, in case you also want to try booting from /dev/vda (without
+partitions), this is the recipe I use to quickly create a minimal rootfs
+image:
+
+# wget http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/x86_64/alpine-minirootfs-3.10.2-x86_64.tar.gz
+# qemu-img create -f raw alpine-rootfs-x86_64.raw 1G
+# sudo losetup /dev/loop0 alpine-rootfs-x86_64.raw
+# sudo mkfs.ext4 /dev/loop0
+# sudo mount /dev/loop0 /mnt
+# sudo tar xpf alpine-minirootfs-3.10.2-x86_64.tar.gz -C /mnt
+# sudo umount /mnt
+# sudo losetup -d /dev/loop0
+
+The rootfs will be missing openrc, so you'll need to add "init=/bin/sh"
+to the command line.
+
+Sergio.
+
+> Thanks in advance,
+> Jing
+>
+>> Sergio.
+>>
+>>> Thanks very much.
+>>> Jing
+>>>
+>>>
+>>>
+>>>> A QEMU instance with the microvm machine type can be invoked this way:
+>>>>
+>>>>    - Normal mode:
+>>>>
+>>>> qemu-system-x86_64 -M microvm -m 512m -smp 2 \
+>>>>    -kernel vmlinux -append "console=hvc0 root=/dev/vda" \
+>>>>    -nodefaults -no-user-config \
+>>>>    -chardev pty,id=virtiocon0,server \
+>>>>    -device virtio-serial-device \
+>>>>    -device virtconsole,chardev=virtiocon0 \
+>>>>    -drive id=test,file=test.img,format=raw,if=none \
+>>>>    -device virtio-blk-device,drive=test \
+>>>>    -netdev tap,id=tap0,script=no,downscript=no \
+>>>>    -device virtio-net-device,netdev=tap0
+>>>>
+>>>>    - Legacy mode:
+>>>>
+>>>> qemu-system-x86_64 -M microvm,legacy -m 512m -smp 2 \
+>>>>    -kernel vmlinux -append "console=ttyS0 root=/dev/vda" \
+>>>>    -nodefaults -no-user-config \
+>>>>    -drive id=test,file=test.img,format=raw,if=none \
+>>>>    -device virtio-blk-device,drive=test \
+>>>>    -netdev tap,id=tap0,script=no,downscript=no \
+>>>>    -device virtio-net-device,netdev=tap0 \
+>>>>    -serial stdio
+>>>>
+>>
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl1pMj8ACgkQ9GknjS8M
+AjXwQg//Ruo/05XPqLUerodkCfnBEOdhh81RRs8Rlmje2WYAsYolNwyTE3BAmkc4
+1YkOL4qBziSsyhqm35QQqBfAJHPInF4/wtr42y8K9HRyZg5028jglA13zadNEh/p
+ooatJX940e9mfd0e5DKlj1zp30bmHRv9cNV2s9Q98CvMfCtnuXPbC91dSAB3LUYP
+RwAQek0HjtVMOzHuaEvcsDhlQVIvf4QBE7CDh9oS/Z+X7ckdEvqSEF4QDSNoqF3/
+arE21CA8LZ92ibll5rD+jp80LtDPevk42EGfoZWCuO56dtHsGareJwbUqzdXaggw
+s9xgFHnfrbaQUrZaQIIArlPvKzdU4BoI540EQ+XEnl+uuTgrWXjDKmKb0rqCFMa7
+Zic594mpL6oLIlaIDDtiBHpiJvU00OFICFNjlrzrbXEYo9gtyLri5RdKyGWFB/XZ
+bz+q3uxX57roB212Ef4n2od4+HhGXY5OByyiV2dGxCZ/wYWSaESp95ltwuZ0inBm
+E6BcIwWvA79AkKpiVrgmJDicjhaFYzCtlsXgKIs9zubRMN+TWtl4B+j2uoLrjtnN
+JRoRlA08uHP23islrfsGEjZeefPGvZmeRH2Fb44u58hhhvVC5MjoCoXcVRhfukK/
+HXU4a9FmZ0WzdcEL8LTgurL2SbfOrqp9ncDJDttuYJM4ViewcUs=
+=UetG
+-----END PGP SIGNATURE-----
+--=-=-=--
 
