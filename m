@@ -1,84 +1,95 @@
-Return-Path: <SRS0=0mkr=WZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB13C3A59F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 21:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 543A5C3A59F
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 01:23:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADB80208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Aug 2019 21:57:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AC7020828
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 01:23:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8c5ZGCT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADB80208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XTvBHoyg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AC7020828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3SPe-00087j-TC
-	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 17:57:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48408)
+	id 1i3Vdd-0008UY-6S
+	for qemu-devel@archiver.kernel.org; Thu, 29 Aug 2019 21:23:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i3SNh-000796-PB
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 17:55:03 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i3VbR-0007w4-Np
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 21:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i3SNf-00085S-W6
- for qemu-devel@nongnu.org; Thu, 29 Aug 2019 17:55:01 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33422)
+ (envelope-from <richard.henderson@linaro.org>) id 1i3VbN-0007Q8-4G
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 21:21:22 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:40413)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i3SNf-00080N-1i; Thu, 29 Aug 2019 17:54:59 -0400
-Received: by mail-lj1-x242.google.com with SMTP id z17so4566211ljz.0;
- Thu, 29 Aug 2019 14:54:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xUhUxvH8j7S1GaBgnx3mWeabAqeuaOCZf4HQzE88eIs=;
- b=Q8c5ZGCTb7aw527ePupYWKtOpvgmK3Dhkyeeamp9ol8PxvAyF0Q3jGFjy8TQtzKEhj
- 7fil65sa2+2q8MAp4Qdo629GZQiLcwJX5lBC/btVIw1Qa3SzuwftOS8j1aen/NnV+0/E
- oq6+7b6extqITTPEwRDIzOcnAI6mQk3Yjj8HPBvMudn+Waan9yKCj7vpAWeHLvUNLgm3
- VIjwymt1wmU69WXlKPmyeerJPeNBe7GtFb5iEfMCgNBUBGIYxK4F1UK6f9AbTZNIuwyz
- TN73Cnuexk9CNTYQOfqhzVWSPugXi0EuFNe/Xd8qjdVIl948wU+VCenqfK8afvhmzWsF
- y/Vw==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i3VbM-0007Kv-R6
+ for qemu-devel@nongnu.org; Thu, 29 Aug 2019 21:21:21 -0400
+Received: by mail-pf1-x442.google.com with SMTP id w16so3390692pfn.7
+ for <qemu-devel@nongnu.org>; Thu, 29 Aug 2019 18:21:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FVWuW2MnNVHQR5OGIIC5mr8clQWfjfFdWjqJZ4zDacY=;
+ b=XTvBHoygdgU+EwTIWk8p4ZvZogsVlKnkP4M7g2Lq7Je1cNpRXvss0ugyeNMqbXaWYM
+ WEFdAlElI8eBO6yTqMhR9XnLBWKrbH7moOV2E1kzMWbGlPdXEAyb22DH9WdcuNa454Zp
+ 1H1/6YvHO3Vq803cIOrDsuWTiNJRBW5Fe9zwINTyfY+OYsDJWrZx6aurD5sbAfytt09W
+ tMmwwQxNSzcpf496YdaKGJdxBDbcSihGsHHAtAxERM7CkWagkNHY1ctvP4EvW1tkhcFJ
+ uAUtFB/DlYe2rsIqKna3qry0FIBI8byroWVWp1qDXq3OfyCvjNd2F2jVxkTTmxtuu8J+
+ KXKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xUhUxvH8j7S1GaBgnx3mWeabAqeuaOCZf4HQzE88eIs=;
- b=IBoxB/DMsjUNmmmw2Hwv71/v4F6vS5bZlpDMcc05nHOLPgzBhcQGhJFK30znRHB6pM
- M/K74GDixquD4jJXPmlTx4AtXHi+kh391xPvuQ5MAnk9GP4dGdrUfMcbBBrGproZqLkp
- mFc/wBc7vPF9YLUkyUMoBn8ca7a0e7W7MaZv8JORT+Io+7sM8ecgHE/+2jrKu3TpYurR
- 9BlsEA8oC48jWUMCrll1A1bB6GDffmc9ZkSbcgXvY9/sqYxG84cjmaaEb6xSbT5oqM8U
- A5C6Lqz07bGu8OY0AqKwLmyny+Ph+QRpKO6Msbv4GwkUkkczjS4Jb0F8CDid7Dk+LHEN
- nJ2g==
-X-Gm-Message-State: APjAAAUm87lDLpwD6vG01saIj4NjnMOLBXEcIW3Az70wmKJttrjuAX1X
- jfWvrH7e8Bb3TOG7sKK9W00Nsh6SFfDJf2tB7M8=
-X-Google-Smtp-Source: APXvYqyOfdx2nZIfkGq3JfCIcyKj4fPiGv7TytN5DBavZHp2LAeISmGlABUfy9Ph0CGrTaHce70Mj6V0Khe54lxqnmc=
-X-Received: by 2002:a05:651c:109:: with SMTP id
- a9mr6672979ljb.33.1567115695612; 
- Thu, 29 Aug 2019 14:54:55 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FVWuW2MnNVHQR5OGIIC5mr8clQWfjfFdWjqJZ4zDacY=;
+ b=i6ais4DNBehVi9gKk/omndujciih4a5tJ8OZmcU8mvW9Cjb87a03v0x+j95kfDrM9G
+ g5xS1cJH+BPfKyWaB9TDoZ+oDerH/cP6pEcVdGWGFQLxFPMRpSItWzNx3DxjCyZSe89c
+ PyzzxLGlPVs27XbXllAFmivtlFaoh/J0zwHVVHkZki7fY354rwvIV1+y4Bu0Xx9jOqlH
+ xqHz0ycR9CzJFjGNU4RuN1h8dtXtttnofzn8LUhMY4ijvuk2dQSMXpvx6iItkDGti/9B
+ DCwXCkimktHDbeVHt645Lb38uojOXO3MXdMmIBa5CAfqeNDS6IhXwRTGFox9NDWvexDZ
+ A+6w==
+X-Gm-Message-State: APjAAAVR6JPVqywk151s8nUpjBY0zT5nTaLW818zTkakMqObv1YjGrXC
+ GwIus5L/FLbhVNAs8x+X6v3PfDsoRWs=
+X-Google-Smtp-Source: APXvYqwzWWMscInqEjQIPK1XuTvM+XHFNKmE41GQSUOpEtuFqMa30FnhL+odJaiUA33whDGHeiv+9w==
+X-Received: by 2002:a17:90a:8083:: with SMTP id
+ c3mr12891294pjn.50.1567128079063; 
+ Thu, 29 Aug 2019 18:21:19 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id c5sm4440778pfo.175.2019.08.29.18.21.17
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 29 Aug 2019 18:21:17 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190828231651.17176-1-richard.henderson@linaro.org>
+ <20190828231651.17176-3-richard.henderson@linaro.org>
+ <a7cf962f-eeb3-3628-4f33-c02292d4f07a@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <50debd18-518a-ab16-2084-8848bd5f39e7@linaro.org>
+Date: Thu, 29 Aug 2019 18:21:15 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1566959818-38369-1-git-send-email-zhiwei_liu@c-sky.com>
- <CAKmqyKMDmaABGWyLZD2R-4J8=jM6hry6Bfmu498+UZzQtxsTMA@mail.gmail.com>
- <af15b620-1350-aa1a-0f02-2a46518f0ef2@c-sky.com>
-In-Reply-To: <af15b620-1350-aa1a-0f02-2a46518f0ef2@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 29 Aug 2019 14:50:43 -0700
-Message-ID: <CAKmqyKPUxyMZnnOd896aK4ZRoG+6iiBQ0E3MJbEqRv9KudbN7Q@mail.gmail.com>
-To: liuzhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <a7cf962f-eeb3-3628-4f33-c02292d4f07a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH] RISCV: support riscv vector extension 0.7.1
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] exec: Factor out core logic of
+ check_watchpoint()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,115 +101,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 29, 2019 at 5:05 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> On 2019/8/29 =E4=B8=8A=E5=8D=885:34, Alistair Francis wrote:
-> > On Wed, Aug 28, 2019 at 12:04 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote=
-:
-> >> Change-Id: I3cf891bc400713b95f47ecca82b1bf773f3dcb25
-> >> Signed-off-by: liuzhiwei <zhiwei_liu@c-sky.com>
-> >> ---
-> >>   fpu/softfloat.c                         |   119 +
-> >>   include/fpu/softfloat.h                 |     4 +
-> >>   linux-user/riscv/cpu_loop.c             |     8 +-
-> >>   target/riscv/Makefile.objs              |     2 +-
-> >>   target/riscv/cpu.h                      |    30 +
-> >>   target/riscv/cpu_bits.h                 |    15 +
-> >>   target/riscv/cpu_helper.c               |     7 +
-> >>   target/riscv/csr.c                      |    65 +-
-> >>   target/riscv/helper.h                   |   354 +
-> >>   target/riscv/insn32.decode              |   374 +-
-> >>   target/riscv/insn_trans/trans_rvv.inc.c |   484 +
-> >>   target/riscv/translate.c                |     1 +
-> >>   target/riscv/vector_helper.c            | 26563 ++++++++++++++++++++=
-++++++++++
-> >>   13 files changed, 28017 insertions(+), 9 deletions(-)
-> >>   create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
-> >>   create mode 100644 target/riscv/vector_helper.c
-> >>
-> > Hello,
-> >
-> > Thanks for the patch!
-> >
-> > As others have pointed out you will need to split the patch up into
-> > multiple smaller patches, otherwise it is too hard to review almost
-> > 30,000 lines of code.
->
-> Hi, Alistair
->
-> I'm so sorry for the inconvenience. It will be a patch set with a cover
-> letter in V2.
+On 8/29/19 10:26 AM, Philippe Mathieu-Daudé wrote:
+>> -            wp->hitaddr = vaddr;
+>> +            wp->hitaddr = MAX(addr, wp->vaddr);
+> 
+> When is addr > wp->vaddr?
 
-No worries.
+Both the watchpoint and the access are arbitrary ranges.
 
->
-> > Can you also include a cover letter with your patch series describing
-> > how you are testing this? AFAIK vector extension support isn't in any
-> > compiler so I'm assuming you are handwriting the assembly or have
-> > toolchain patches. Either way it will help if you can share that so
-> > others can test your implementation.
->
-> Yes, it's handwriting assembly. The assembler in Binutils has support
-> Vector extension.  First define an function test_vadd_vv_8 in assembly
-> and then it can be called from a C program.
->
-> The function is something like
->
-> /* vadd.vv */
-> TEST_FUNC(test_vadd_vv_8)
->          vsetvli        t1, x0, e8, m2
->          vlb.v           v6, (a4)
->          vsb.v           v6, (a3)
->          vsetvli        t1, a0, e8, m2
->          vlb.v           v0, (a1)
->          vlb.v           v2, (a2)
->          vadd.vv     v4, v0, v2
->          vsb.v          v4, (a3)
-> ret
->          .size   test_vadd_vv_8, .-test_vadd_vv_8
+  wp:    [ 1000               - 1008 ]
+  store:     [ 1002 - 1004 ]
 
-If possible it might be worth releasing the code that you are using for tes=
-ting.
+  wp:               [ 1004    - 1008 ]
+  store: [ 1000               - 1008 ]
 
->
-> It takes more time to test than to implement the instructions. Maybe
-> there is some better test method or some forced test cases in QEMU.
-> Could you give me some advice for testing?
+The old code would, for the first case, return 1002 and not the 1000 of the
+watch point, which seems reasonable.  For the second case, we would set 1000,
+an address outside of the watchpoint.
 
-Richard's idea of risu seems like a good option.
+David's change makes sure that the address signaled is inside the watchpoint.
+I.e. leaving the first case unchanged and making the second  set 1004.
 
-Thinking about it a bit more we are going to have other extensions in
-the future that will need assembly testing so setting up a test
-framework seems like a good idea. I am happy to help try and get this
-going as well.
+It seems very reasonable to me.
 
-Alistair
 
->
-> Best Regards,
->
-> Zhiwei
->
-> > Alex and Richard have kindly started the review. Once you have
-> > addressed their comments and split this patch up into smaller patches
-> > you can send a v2 and we can go from there.
-> >
-> > Once again thanks for doing this implementation for QEMU!
-> >
-> > Alistair
-> >
+r~
 
