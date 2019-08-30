@@ -2,71 +2,96 @@ Return-Path: <SRS0=DGTm=W2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF6DC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 08:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62BC0C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 09:10:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3EE621726
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 08:54:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3EE621726
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2C6952341C
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 09:10:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MSmeTcYJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C6952341C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3cfq-0006q4-2z
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 04:54:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54237)
+	id 1i3cvY-00021Z-E8
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 05:10:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43225)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i3ce8-0006Id-9Q
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 04:52:44 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i3crQ-0001JR-LI
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i3ce5-00014T-CT
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 04:52:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50152)
+ (envelope-from <alex.bennee@linaro.org>) id 1i3crM-0008Q2-E2
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:06:22 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36815)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i3cc8-00045K-V8
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 04:52:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i3cc7-0005cF-NK
- for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 08:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AD4FE2E80C7
- for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 08:50:35 +0000 (UTC)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i3crM-00084Z-4s
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 05:06:20 -0400
+Received: by mail-wm1-x341.google.com with SMTP id p13so6662740wmh.1
+ for <qemu-devel@nongnu.org>; Fri, 30 Aug 2019 02:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=AcGGbQCProEi2yhXItlgqt/SFnRLFVnIij98L2feLsU=;
+ b=MSmeTcYJFhz1ISHugDPfFoCyPQsiTRcijS3hCNv19Pa2xqHtuNpzU9jDFqLvlWs55v
+ g+Wqlmx1b4ac9lirKyYIitQF+ZgUoLt/xfcUPQ5+1Ivn2uC2uxJT/JIjIfW17eLlZ5kP
+ Hhlr8HGU9gI9L10wJBjqHxhFkwiIyRnbzGWNRUBv+AQL5FWM5r6AZbuEysjndPrIh7Ki
+ cUNd01/lxDO7FKci0W+o/XdcjEC40UKc+cqv767TEAKCWY55iiiZsZppYtl3AJOvsT9f
+ HQGltCbEV+1p7hRXfTwfQWxcqoRiEf970Oax4b0dX9UJbCIniLJopskDctfhUtf/7RI/
+ uAjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=AcGGbQCProEi2yhXItlgqt/SFnRLFVnIij98L2feLsU=;
+ b=DTozi+PKH3jbIa67tDAEIaGJuSGA6XYkILpVaLunFbRhGR1xjFiqxlwcNyxmAoyf/e
+ RNyd4jhCDg4zQcEBsXd+dlQv2dkN3IYM0RLfk4L7DT/8oPEFbNULH7XXTU5FNnT4etsz
+ NkRW7gwlBhz0YiYBlX/sc4K9+beuhiYK3nNc/DD/iL/ZIXezKEOMmDkEC3n8w/Udvugs
+ 4ZPn3/to65Pw6/mluArJP+L1GHdrQtw756B4cdIG3wZpZt+bkKivnRDlaHI8ysAb/TWz
+ XhT1rMoDFSMSw69686cTbVzskNPK8yamqr5QAn8NmJXddHZ09K7Xe6oTNxObmEofjbor
+ osiQ==
+X-Gm-Message-State: APjAAAWpz09+og9BtGTbT5PVi0DptiuiNvuDK4wFcD1i4XD6ggqRY6pb
+ RTCscB8L+8U5yqMcFQu60R9JSQ==
+X-Google-Smtp-Source: APXvYqw5ORjP8yOBzwlXQgYxCEnDbU0L6unbhB3pU5tOIc5cWf/P9GAOmS54KpWIIbgm09+EGGbhVw==
+X-Received: by 2002:a05:600c:2056:: with SMTP id
+ p22mr15726600wmg.159.1567155973579; 
+ Fri, 30 Aug 2019 02:06:13 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u129sm6103161wmb.12.2019.08.30.02.06.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 30 Aug 2019 02:06:12 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C278A1FF87;
+ Fri, 30 Aug 2019 10:06:11 +0100 (BST)
+References: <1566959818-38369-1-git-send-email-zhiwei_liu@c-sky.com>
+ <CAKmqyKMDmaABGWyLZD2R-4J8=jM6hry6Bfmu498+UZzQtxsTMA@mail.gmail.com>
+ <af15b620-1350-aa1a-0f02-2a46518f0ef2@c-sky.com>
+ <CAKmqyKPUxyMZnnOd896aK4ZRoG+6iiBQ0E3MJbEqRv9KudbN7Q@mail.gmail.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alistair Francis <alistair23@gmail.com>
+In-reply-to: <CAKmqyKPUxyMZnnOd896aK4ZRoG+6iiBQ0E3MJbEqRv9KudbN7Q@mail.gmail.com>
+Date: Fri, 30 Aug 2019 10:06:11 +0100
+Message-ID: <87tv9z3tvg.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Aug 2019 08:44:35 -0000
-From: Dmitriy <1842038@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dimsmain
-X-Launchpad-Bug-Reporter: Dmitriy (dimsmain)
-X-Launchpad-Bug-Modifier: Dmitriy (dimsmain)
-Message-Id: <156715467564.28583.4532580571142689623.malonedeb@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19044";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 188a46a12baa13b3daba92ffa166283e448d34b1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1842038] [NEW] qemu 4.0/4.1 segfault on live
- migrate with virtio-scsi iothread
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH] RISCV: support riscv vector extension 0.7.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,543 +100,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1842038 <1842038@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Alistair Francis <Alistair.Francis@wdc.com>, liuzhiwei <zhiwei_liu@c-sky.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
 
-[root@kvm-nvme5 qemu]# uname -a
-Linux kvm-nvme5 4.14.35-1902.4.8.el7uek.x86_64 #2 SMP Sun Aug 4 22:25:18 GM=
-T 2019 x86_64 x86_64 x86_64 GNU/Linux
+Alistair Francis <alistair23@gmail.com> writes:
 
-[root@kvm-nvme5 qemu]# qemu-system-x86_64 --version
-QEMU emulator version 4.1.0 (qemu-4.1.0-1.el7)
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+> On Thu, Aug 29, 2019 at 5:05 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
+>>
+>> On 2019/8/29 =E4=B8=8A=E5=8D=885:34, Alistair Francis wrote:
+>> > On Wed, Aug 28, 2019 at 12:04 AM liuzhiwei <zhiwei_liu@c-sky.com> wrot=
+e:
+>> >> Change-Id: I3cf891bc400713b95f47ecca82b1bf773f3dcb25
+>> >> Signed-off-by: liuzhiwei <zhiwei_liu@c-sky.com>
+>> >> ---
+>> >>   fpu/softfloat.c                         |   119 +
+>> >>   include/fpu/softfloat.h                 |     4 +
+>> >>   linux-user/riscv/cpu_loop.c             |     8 +-
+>> >>   target/riscv/Makefile.objs              |     2 +-
+>> >>   target/riscv/cpu.h                      |    30 +
+>> >>   target/riscv/cpu_bits.h                 |    15 +
+>> >>   target/riscv/cpu_helper.c               |     7 +
+>> >>   target/riscv/csr.c                      |    65 +-
+>> >>   target/riscv/helper.h                   |   354 +
+>> >>   target/riscv/insn32.decode              |   374 +-
+>> >>   target/riscv/insn_trans/trans_rvv.inc.c |   484 +
+>> >>   target/riscv/translate.c                |     1 +
+>> >>   target/riscv/vector_helper.c            | 26563 +++++++++++++++++++=
++++++++++++
+>> >>   13 files changed, 28017 insertions(+), 9 deletions(-)
+>> >>   create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+>> >>   create mode 100644 target/riscv/vector_helper.c
+>> >>
+>> > Hello,
+>> >
+>> > Thanks for the patch!
+>> >
+>> > As others have pointed out you will need to split the patch up into
+>> > multiple smaller patches, otherwise it is too hard to review almost
+>> > 30,000 lines of code.
+>>
+>> Hi, Alistair
+>>
+>> I'm so sorry for the inconvenience. It will be a patch set with a cover
+>> letter in V2.
+>
+> No worries.
+>
+>>
+>> > Can you also include a cover letter with your patch series describing
+>> > how you are testing this? AFAIK vector extension support isn't in any
+>> > compiler so I'm assuming you are handwriting the assembly or have
+>> > toolchain patches. Either way it will help if you can share that so
+>> > others can test your implementation.
+>>
+>> Yes, it's handwriting assembly. The assembler in Binutils has support
+>> Vector extension.  First define an function test_vadd_vv_8 in assembly
+>> and then it can be called from a C program.
+>>
+>> The function is something like
+>>
+>> /* vadd.vv */
+>> TEST_FUNC(test_vadd_vv_8)
+>>          vsetvli        t1, x0, e8, m2
+>>          vlb.v           v6, (a4)
+>>          vsb.v           v6, (a3)
+>>          vsetvli        t1, a0, e8, m2
+>>          vlb.v           v0, (a1)
+>>          vlb.v           v2, (a2)
+>>          vadd.vv     v4, v0, v2
+>>          vsb.v          v4, (a3)
+>> ret
+>>          .size   test_vadd_vv_8, .-test_vadd_vv_8
+>
+> If possible it might be worth releasing the code that you are using for t=
+esting.
+>
+>>
+>> It takes more time to test than to implement the instructions. Maybe
+>> there is some better test method or some forced test cases in QEMU.
+>> Could you give me some advice for testing?
+>
+> Richard's idea of risu seems like a good option.
+>
+> Thinking about it a bit more we are going to have other extensions in
+> the future that will need assembly testing so setting up a test
+> framework seems like a good idea. I am happy to help try and get this
+> going as well.
 
-[root@kvm-nvme5 qemu]# libvirtd --version
-libvirtd (libvirt) 5.6.0
+tests/tcg already has the bits you need for both linux-user and system
+based testing. The main problem is getting a version of gcc that is new
+enough to emit the newer instructions. I recently updated the images to
+buster so gcc is pretty recent now (8.3).
 
-when migrate =
+I did start down the road of a general "op" test frame work which tried
+to come up with a common framework/boilerplate so all you needed to do
+was supply a new function (possible with a hex encoded instruction) and
+a list of expected inputs and outputs:
 
-MIGR_OPTS=3D"--live --copy-storage-all --verbose --persistent --undefinesou=
-rce"
-virsh migrate $MIGR_OPTS p12345 qemu+ssh://$SERV/system
+  https://github.com/stsquad/qemu/commits/testing/generic-op-tester
 
-we got segfault if we have option <driver iothread=3D'1'/> in config for
-virtio-scsi controller
+I suspect it was over engineered but perhaps it would be worth reviving
+it (or something like it) to make adding a simple single instruction
+test case with minimal additional verbiage?
 
-[1205674.818067] qemu-system-x86[39744]: segfault at 38 ip
-00005575890ad411 sp 00007ffd3c10a0e0 error 6 in qemu-system-
-x86_64[5575889ad000+951000]
-
-On 4.0 we have error with this context(dont save all output)
-"qemu_coroutine_get_aio_context(co)' failed"
-
-If we remove option =
-
-<driver iothread=3D'1'/>
-migrate work fine without segfaults
-
-2019-08-30 08:25:35.402+0000: starting up libvirt version: 5.6.0, package: =
-1.el7 (Unknown, 2019-08-06-09:57:56, mock), qemu version: 4.1.0qemu-4.1.0-1=
-.el7, kernel: 4.14.35-1902.4.8.el7uek.x86_64, hostname: kvm-nvme5
-LC_ALL=3DC \
-PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin \
-HOME=3D/var/lib/libvirt/qemu/domain-75-p541999 \
-XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-75-p541999/.local/share \
-XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-75-p541999/.cache \
-XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-75-p541999/.config \
-QEMU_AUDIO_DRV=3Dnone \
-/usr/bin/qemu-system-x86_64 \
--name guest=3Dp541999,debug-threads=3Don \
--S \
--object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/do=
-main-75-p541999/master-key.aes \
--machine pc-q35-4.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
--cpu Cascadelake-Server,ss=3Don,hypervisor=3Don,tsc-adjust=3Don,umip=3Don,p=
-ku=3Don,md-clear=3Don,stibp=3Don,arch-capabilities=3Don,xsaves=3Don,rdctl-n=
-o=3Don,ibrs-all=3Don,skip-l1dfl-vmentry=3Don,mds-no=3Don,hv-time,hv-relaxed=
-,hv-vapic,hv-spinlocks=3D0x1000,hv-vpindex,hv-runtime,hv-synic,hv-stimer,hv=
--fre
-quencies,hv-reenlightenment,hv-tlbflush \
--m 2148 \
--overcommit mem-lock=3Doff \
--smp 1,sockets=3D1,cores=3D1,threads=3D1 \
--object iothread,id=3Diothread1 \
--uuid ff20ae7f-8cfe-4ec5-bd50-e78f8a167414 \
--no-user-config \
--nodefaults \
--chardev socket,id=3Dcharmonitor,fd=3D44,server,nowait \
--mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
--rtc base=3Dutc,driftfix=3Dslew \
--global kvm-pit.lost_tick_policy=3Ddelay \
--no-shutdown \
--boot menu=3Don,strict=3Don \
--device ich9-usb-ehci1,id=3Dusb,bus=3Dpcie.0,addr=3D0x5.0x7 \
--device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpcie.0,multifu=
-nction=3Don,addr=3D0x5 \
--device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpcie.0,addr=3D=
-0x5.0x1 \
--device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpcie.0,addr=3D=
-0x5.0x2 \
--device virtio-scsi-pci,iothread=3Diothread1,id=3Dscsi0,bus=3Dpcie.0,addr=
-=3D0x9 \
--device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpcie.0,addr=3D0x6 \
--drive file=3D/dev/vm/p541999,format=3Draw,if=3Dnone,id=3Ddrive-scsi0-0-0-0=
-,cache=3Dnone,discard=3Dunmap,aio=3Dthreads,throttling.bps-write=3D52428800=
-,throttling.bps-write-max=3D314572800,throttling.bps-write-max-length=3D120=
- \
--device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Dd=
-rive-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2,w=
-rite-cache=3Don \
--drive if=3Dnone,id=3Ddrive-sata0-0-0,readonly=3Don \
--device ide-cd,bus=3Dide.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0,bootindex=
-=3D1 \
--netdev tap,fd=3D47,id=3Dhostnet0,vhost=3Don,vhostfd=3D48 \
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D00:00:00:54:19:99,=
-bus=3Dpcie.0,addr=3D0x3 \
--chardev pty,id=3Dcharserial0 \
--device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
--chardev socket,id=3Dcharchannel0,fd=3D49,server,nowait \
--device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0=
-,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
--vnc 0.0.0.0:6128,password \
--device cirrus-vga,id=3Dvideo0,bus=3Dpcie.0,addr=3D0x1 \
--device virtio-balloon-pci,id=3Dballoon0,bus=3Dpcie.0,addr=3D0x8 \
--sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcec=
-ontrol=3Ddeny \
--msg timestamp=3Don
-char device redirected to /dev/pts/5 (label charserial0)
-2019-08-30 08:27:00.539+0000: shutting down, reason=3Dcrashed
+>
+> Alistair
+>
+>>
+>> Best Regards,
+>>
+>> Zhiwei
+>>
+>> > Alex and Richard have kindly started the review. Once you have
+>> > addressed their comments and split this patch up into smaller patches
+>> > you can send a v2 and we can go from there.
+>> >
+>> > Once again thanks for doing this implementation for QEMU!
+>> >
+>> > Alistair
+>> >
 
 
-config:
-<domain type=3D'kvm'>
-  <name>p541999</name>
-  <uuid>ff20ae7f-8cfe-4ec5-bd50-e78f8a167414</uuid>
-  <memory unit=3D'KiB'>2199552</memory>
-  <currentMemory unit=3D'KiB'>2199552</currentMemory>
-  <vcpu placement=3D'static'>1</vcpu>
-  <iothreads>1</iothreads>
-  <resource>
-    <partition>/machine</partition>
-  </resource>
-  <os>
-    <type arch=3D'x86_64' machine=3D'pc-q35-4.0'>hvm</type>
-    <boot dev=3D'cdrom'/>
-    <boot dev=3D'hd'/>
-    <bootmenu enable=3D'yes'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-    <hyperv>
-      <relaxed state=3D'on'/>
-      <vapic state=3D'on'/>
-      <spinlocks state=3D'on' retries=3D'4096'/>
-      <vpindex state=3D'on'/>
-      <runtime state=3D'on'/>
-      <synic state=3D'on'/>
-      <stimer state=3D'on'/>
-      <frequencies state=3D'on'/>
-      <reenlightenment state=3D'on'/>
-      <tlbflush state=3D'on'/>
-    </hyperv>
-    <msrs unknown=3D'ignore'/>
-  </features>
-  <cpu mode=3D'host-model' check=3D'full'>
-    <model fallback=3D'forbid'/>
-  </cpu>
-  <clock offset=3D'utc'>
-    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
-    <timer name=3D'pit' tickpolicy=3D'delay'/>
-    <timer name=3D'hpet' present=3D'yes'/>
-    <timer name=3D'hypervclock' present=3D'yes'/>
-  </clock>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>restart</on_crash>
-  <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
-    <disk type=3D'block' device=3D'disk'>
-      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'threads' disc=
-ard=3D'unmap'/>
-      <source dev=3D'/dev/vm/p541999'/>
-      <backingStore/>
-      <target dev=3D'sda' bus=3D'scsi'/>
-      <iotune>
-        <write_bytes_sec>52428800</write_bytes_sec>
-        <write_bytes_sec_max>314572800</write_bytes_sec_max>
-        <write_bytes_sec_max_length>120</write_bytes_sec_max_length>
-      </iotune>
-      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
-=3D'0'/>
-    </disk>
-    <disk type=3D'file' device=3D'cdrom'>
-      <driver name=3D'qemu' type=3D'raw'/>
-      <target dev=3D'sdb' bus=3D'sata'/>
-      <readonly/>
-      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
-=3D'0'/>
-    </disk>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x7'/>
-    </controller>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
-      <master startport=3D'0'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x0' multifunction=3D'on'/>
-    </controller>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
-      <master startport=3D'2'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x1'/>
-    </controller>
-    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
-      <master startport=3D'4'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x2'/>
-    </controller>
-    <controller type=3D'virtio-serial' index=3D'0'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' fu=
-nction=3D'0x0'/>
-    </controller>
-    <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
-      <driver iothread=3D'1'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' fu=
-nction=3D'0x0'/>
-    </controller>
-    <controller type=3D'pci' index=3D'0' model=3D'pcie-root'/>
-    <controller type=3D'sata' index=3D'0'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1f' fu=
-nction=3D'0x2'/>
-    </controller>
-    <interface type=3D'bridge'>
-      <mac address=3D'00:00:00:54:19:99'/>
-      <source bridge=3D'br0'/>
-      <bandwidth>
-        <inbound average=3D'12500' peak=3D'12500' burst=3D'1024'/>
-        <outbound average=3D'12500' peak=3D'12500' burst=3D'1024'/>
-      </bandwidth>
-      <model type=3D'virtio'/>
-      <filterref filter=3D'clean-traffic'>
-        <parameter name=3D'CTRL_IP_LEARNING' value=3D'none'/>
-        <parameter name=3D'IP' value=3D'1.2.3.4'/>
-      </filterref>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' fu=
-nction=3D'0x0'/>
-    </interface>
-    <serial type=3D'pty'>
-      <target type=3D'isa-serial' port=3D'0'>
-        <model name=3D'isa-serial'/>
-      </target>
-    </serial>
-    <console type=3D'pty'>
-      <target type=3D'serial' port=3D'0'/>
-    </console>
-    <channel type=3D'unix'>
-      <source mode=3D'bind' path=3D'/var/lib/libvirt/qemu/p541999.agent'/>
-      <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
-      <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'1'=
-/>
-    </channel>
-    <input type=3D'mouse' bus=3D'ps2'/>
-    <input type=3D'keyboard' bus=3D'ps2'/>
-    <graphics type=3D'vnc' port=3D'12028' autoport=3D'no' listen=3D'0.0.0.0=
-' passwd=3D'SUPERPASSWORD'>
-      <listen type=3D'address' address=3D'0.0.0.0'/>
-    </graphics>
-    <video>
-      <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' fu=
-nction=3D'0x0'/>
-    </video>
-    <memballoon model=3D'virtio'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' fu=
-nction=3D'0x0'/>
-    </memballoon>
-  </devices>
-  <seclabel type=3D'none' model=3D'none'/>
-</domain>
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1842038
-
-Title:
-  qemu 4.0/4.1 segfault on live migrate with virtio-scsi iothread
-
-Status in QEMU:
-  New
-
-Bug description:
-  [root@kvm-nvme5 qemu]# uname -a
-  Linux kvm-nvme5 4.14.35-1902.4.8.el7uek.x86_64 #2 SMP Sun Aug 4 22:25:18 =
-GMT 2019 x86_64 x86_64 x86_64 GNU/Linux
-
-  [root@kvm-nvme5 qemu]# qemu-system-x86_64 --version
-  QEMU emulator version 4.1.0 (qemu-4.1.0-1.el7)
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-  [root@kvm-nvme5 qemu]# libvirtd --version
-  libvirtd (libvirt) 5.6.0
-
-  when migrate =
-
-  MIGR_OPTS=3D"--live --copy-storage-all --verbose --persistent --undefines=
-ource"
-  virsh migrate $MIGR_OPTS p12345 qemu+ssh://$SERV/system
-
-  we got segfault if we have option <driver iothread=3D'1'/> in config for
-  virtio-scsi controller
-
-  [1205674.818067] qemu-system-x86[39744]: segfault at 38 ip
-  00005575890ad411 sp 00007ffd3c10a0e0 error 6 in qemu-system-
-  x86_64[5575889ad000+951000]
-
-  On 4.0 we have error with this context(dont save all output)
-  "qemu_coroutine_get_aio_context(co)' failed"
-
-  If we remove option =
-
-  <driver iothread=3D'1'/>
-  migrate work fine without segfaults
-
-  2019-08-30 08:25:35.402+0000: starting up libvirt version: 5.6.0, package=
-: 1.el7 (Unknown, 2019-08-06-09:57:56, mock), qemu version: 4.1.0qemu-4.1.0=
--1.el7, kernel: 4.14.35-1902.4.8.el7uek.x86_64, hostname: kvm-nvme5
-  LC_ALL=3DC \
-  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin \
-  HOME=3D/var/lib/libvirt/qemu/domain-75-p541999 \
-  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-75-p541999/.local/share \
-  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-75-p541999/.cache \
-  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-75-p541999/.config \
-  QEMU_AUDIO_DRV=3Dnone \
-  /usr/bin/qemu-system-x86_64 \
-  -name guest=3Dp541999,debug-threads=3Don \
-  -S \
-  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
-domain-75-p541999/master-key.aes \
-  -machine pc-q35-4.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
-  -cpu Cascadelake-Server,ss=3Don,hypervisor=3Don,tsc-adjust=3Don,umip=3Don=
-,pku=3Don,md-clear=3Don,stibp=3Don,arch-capabilities=3Don,xsaves=3Don,rdctl=
--no=3Don,ibrs-all=3Don,skip-l1dfl-vmentry=3Don,mds-no=3Don,hv-time,hv-relax=
-ed,hv-vapic,hv-spinlocks=3D0x1000,hv-vpindex,hv-runtime,hv-synic,hv-stimer,=
-hv-fre
-  quencies,hv-reenlightenment,hv-tlbflush \
-  -m 2148 \
-  -overcommit mem-lock=3Doff \
-  -smp 1,sockets=3D1,cores=3D1,threads=3D1 \
-  -object iothread,id=3Diothread1 \
-  -uuid ff20ae7f-8cfe-4ec5-bd50-e78f8a167414 \
-  -no-user-config \
-  -nodefaults \
-  -chardev socket,id=3Dcharmonitor,fd=3D44,server,nowait \
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
-  -rtc base=3Dutc,driftfix=3Dslew \
-  -global kvm-pit.lost_tick_policy=3Ddelay \
-  -no-shutdown \
-  -boot menu=3Don,strict=3Don \
-  -device ich9-usb-ehci1,id=3Dusb,bus=3Dpcie.0,addr=3D0x5.0x7 \
-  -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpcie.0,multi=
-function=3Don,addr=3D0x5 \
-  -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpcie.0,addr=
-=3D0x5.0x1 \
-  -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpcie.0,addr=
-=3D0x5.0x2 \
-  -device virtio-scsi-pci,iothread=3Diothread1,id=3Dscsi0,bus=3Dpcie.0,addr=
-=3D0x9 \
-  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpcie.0,addr=3D0x6 \
-  -drive file=3D/dev/vm/p541999,format=3Draw,if=3Dnone,id=3Ddrive-scsi0-0-0=
--0,cache=3Dnone,discard=3Dunmap,aio=3Dthreads,throttling.bps-write=3D524288=
-00,throttling.bps-write-max=3D314572800,throttling.bps-write-max-length=3D1=
-20 \
-  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=
-=3Ddrive-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=
-=3D2,write-cache=3Don \
-  -drive if=3Dnone,id=3Ddrive-sata0-0-0,readonly=3Don \
-  -device ide-cd,bus=3Dide.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0,bootind=
-ex=3D1 \
-  -netdev tap,fd=3D47,id=3Dhostnet0,vhost=3Don,vhostfd=3D48 \
-  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D00:00:00:54:19:9=
-9,bus=3Dpcie.0,addr=3D0x3 \
-  -chardev pty,id=3Dcharserial0 \
-  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
-  -chardev socket,id=3Dcharchannel0,fd=3D49,server,nowait \
-  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
-l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
-  -vnc 0.0.0.0:6128,password \
-  -device cirrus-vga,id=3Dvideo0,bus=3Dpcie.0,addr=3D0x1 \
-  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpcie.0,addr=3D0x8 \
-  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
-econtrol=3Ddeny \
-  -msg timestamp=3Don
-  char device redirected to /dev/pts/5 (label charserial0)
-  2019-08-30 08:27:00.539+0000: shutting down, reason=3Dcrashed
-
-  =
-
-  config:
-  <domain type=3D'kvm'>
-    <name>p541999</name>
-    <uuid>ff20ae7f-8cfe-4ec5-bd50-e78f8a167414</uuid>
-    <memory unit=3D'KiB'>2199552</memory>
-    <currentMemory unit=3D'KiB'>2199552</currentMemory>
-    <vcpu placement=3D'static'>1</vcpu>
-    <iothreads>1</iothreads>
-    <resource>
-      <partition>/machine</partition>
-    </resource>
-    <os>
-      <type arch=3D'x86_64' machine=3D'pc-q35-4.0'>hvm</type>
-      <boot dev=3D'cdrom'/>
-      <boot dev=3D'hd'/>
-      <bootmenu enable=3D'yes'/>
-    </os>
-    <features>
-      <acpi/>
-      <apic/>
-      <pae/>
-      <hyperv>
-        <relaxed state=3D'on'/>
-        <vapic state=3D'on'/>
-        <spinlocks state=3D'on' retries=3D'4096'/>
-        <vpindex state=3D'on'/>
-        <runtime state=3D'on'/>
-        <synic state=3D'on'/>
-        <stimer state=3D'on'/>
-        <frequencies state=3D'on'/>
-        <reenlightenment state=3D'on'/>
-        <tlbflush state=3D'on'/>
-      </hyperv>
-      <msrs unknown=3D'ignore'/>
-    </features>
-    <cpu mode=3D'host-model' check=3D'full'>
-      <model fallback=3D'forbid'/>
-    </cpu>
-    <clock offset=3D'utc'>
-      <timer name=3D'rtc' tickpolicy=3D'catchup'/>
-      <timer name=3D'pit' tickpolicy=3D'delay'/>
-      <timer name=3D'hpet' present=3D'yes'/>
-      <timer name=3D'hypervclock' present=3D'yes'/>
-    </clock>
-    <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-    <on_crash>restart</on_crash>
-    <devices>
-      <emulator>/usr/bin/qemu-system-x86_64</emulator>
-      <disk type=3D'block' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'threads' di=
-scard=3D'unmap'/>
-        <source dev=3D'/dev/vm/p541999'/>
-        <backingStore/>
-        <target dev=3D'sda' bus=3D'scsi'/>
-        <iotune>
-          <write_bytes_sec>52428800</write_bytes_sec>
-          <write_bytes_sec_max>314572800</write_bytes_sec_max>
-          <write_bytes_sec_max_length>120</write_bytes_sec_max_length>
-        </iotune>
-        <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' uni=
-t=3D'0'/>
-      </disk>
-      <disk type=3D'file' device=3D'cdrom'>
-        <driver name=3D'qemu' type=3D'raw'/>
-        <target dev=3D'sdb' bus=3D'sata'/>
-        <readonly/>
-        <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' uni=
-t=3D'0'/>
-      </disk>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x7'/>
-      </controller>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
-        <master startport=3D'0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x0' multifunction=3D'on'/>
-      </controller>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
-        <master startport=3D'2'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x1'/>
-      </controller>
-      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
-        <master startport=3D'4'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x2'/>
-      </controller>
-      <controller type=3D'virtio-serial' index=3D'0'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
-function=3D'0x0'/>
-      </controller>
-      <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
-        <driver iothread=3D'1'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
-function=3D'0x0'/>
-      </controller>
-      <controller type=3D'pci' index=3D'0' model=3D'pcie-root'/>
-      <controller type=3D'sata' index=3D'0'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1f' =
-function=3D'0x2'/>
-      </controller>
-      <interface type=3D'bridge'>
-        <mac address=3D'00:00:00:54:19:99'/>
-        <source bridge=3D'br0'/>
-        <bandwidth>
-          <inbound average=3D'12500' peak=3D'12500' burst=3D'1024'/>
-          <outbound average=3D'12500' peak=3D'12500' burst=3D'1024'/>
-        </bandwidth>
-        <model type=3D'virtio'/>
-        <filterref filter=3D'clean-traffic'>
-          <parameter name=3D'CTRL_IP_LEARNING' value=3D'none'/>
-          <parameter name=3D'IP' value=3D'1.2.3.4'/>
-        </filterref>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
-function=3D'0x0'/>
-      </interface>
-      <serial type=3D'pty'>
-        <target type=3D'isa-serial' port=3D'0'>
-          <model name=3D'isa-serial'/>
-        </target>
-      </serial>
-      <console type=3D'pty'>
-        <target type=3D'serial' port=3D'0'/>
-      </console>
-      <channel type=3D'unix'>
-        <source mode=3D'bind' path=3D'/var/lib/libvirt/qemu/p541999.agent'/>
-        <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
-        <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'=
-1'/>
-      </channel>
-      <input type=3D'mouse' bus=3D'ps2'/>
-      <input type=3D'keyboard' bus=3D'ps2'/>
-      <graphics type=3D'vnc' port=3D'12028' autoport=3D'no' listen=3D'0.0.0=
-.0' passwd=3D'SUPERPASSWORD'>
-        <listen type=3D'address' address=3D'0.0.0.0'/>
-      </graphics>
-      <video>
-        <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
-function=3D'0x0'/>
-      </video>
-      <memballoon model=3D'virtio'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' =
-function=3D'0x0'/>
-      </memballoon>
-    </devices>
-    <seclabel type=3D'none' model=3D'none'/>
-  </domain>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1842038/+subscriptions
+--
+Alex Benn=C3=A9e
 
