@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97096C3A59B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE73C3A59B
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:25:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C44B2342B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:25:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C44B2342B
+	by mail.kernel.org (Postfix) with ESMTPS id 332852186A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Aug 2019 16:25:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 332852186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3ji5-0001Ov-D0
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 12:25:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48603)
+	id 1i3jiI-0001YB-CV
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 12:25:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49091)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i3jWB-00006e-6g
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:13:03 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i3jWY-0000Mq-Aw
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:13:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i3jW5-0004U8-45
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:12:53 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60580)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i3jWV-0004xj-VV
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 12:13:17 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60630)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i3jVs-0004Fa-Q5; Fri, 30 Aug 2019 12:12:38 -0400
+ id 1i3jWF-0004Fk-8z; Fri, 30 Aug 2019 12:13:02 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1i3jVm-0001X0-H2; Fri, 30 Aug 2019 19:12:30 +0300
+ id 1i3jVm-0001X0-Pi; Fri, 30 Aug 2019 19:12:30 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Fri, 30 Aug 2019 19:12:23 +0300
-Message-Id: <20190830161228.54238-10-vsementsov@virtuozzo.com>
+Date: Fri, 30 Aug 2019 19:12:25 +0300
+Message-Id: <20190830161228.54238-12-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190830161228.54238-1-vsementsov@virtuozzo.com>
 References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v10 09/14] iotests: 257: drop unused
- Drive.device field
+Subject: [Qemu-devel] [PATCH v10 11/14] block/io: refactor
+ wait_serialising_requests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,137 +66,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After previous commit Drive.device is actually unused. Drop it together
-with .name property.  While being here reuse .node in qmp commands
-instead of writing 'drive0' twice.
+Split out do_wait_serialising_requests with additional possibility to
+not actually wait but just check, that there is something to wait for.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/257 | 37 +++++++++++++++----------------------
- 1 file changed, 15 insertions(+), 22 deletions(-)
+ block/io.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index 6218ff20cf..8185871285 100755
---- a/tests/qemu-iotests/257
-+++ b/tests/qemu-iotests/257
-@@ -148,11 +148,6 @@ class Drive:
-         self.fmt = None
-         self.size = None
-         self.node = None
--        self.device = None
--
--    @property
--    def name(self):
--        return self.node or self.device
+diff --git a/block/io.c b/block/io.c
+index 56bbf195bb..378180b274 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -785,12 +785,13 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
+     bdrv_wakeup(bs);
+ }
  
-     def img_create(self, fmt, size):
-         self.fmt = fmt
-@@ -201,7 +196,7 @@ def blockdev_backup(vm, device, target, sync, **kwargs):
- def blockdev_backup_mktarget(drive, target_id, filepath, sync, **kwargs):
-     target_drive = Drive(filepath, vm=drive.vm)
-     target_drive.create_target(target_id, drive.fmt, drive.size)
--    blockdev_backup(drive.vm, drive.name, target_id, sync, **kwargs)
-+    blockdev_backup(drive.vm, drive.node, target_id, sync, **kwargs)
+-static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
++static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
++                                                      bool wait)
+ {
+     BlockDriverState *bs = self->bs;
+     BdrvTrackedRequest *req;
+     bool retry;
+-    bool waited = false;
++    bool found = false;
  
- def reference_backup(drive, n, filepath):
-     log("--- Reference Backup #{:d} ---\n".format(n))
-@@ -229,7 +224,7 @@ def perform_writes(drive, n):
-             pattern.offset,
-             pattern.size)
-         log(cmd)
--        log(drive.vm.hmp_qemu_io(drive.name, cmd))
-+        log(drive.vm.hmp_qemu_io(drive.node, cmd))
-     bitmaps = drive.vm.query_bitmaps()
-     log({'bitmaps': bitmaps}, indent=2)
-     log('')
-@@ -324,18 +319,17 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
-                 }]
+     if (!atomic_read(&bs->serialising_in_flight)) {
+         return false;
+@@ -816,11 +817,13 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+                  * will wait for us as soon as it wakes up, then just go on
+                  * (instead of producing a deadlock in the former case). */
+                 if (!req->waiting_for) {
+-                    self->waiting_for = req;
+-                    qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
+-                    self->waiting_for = NULL;
+-                    retry = true;
+-                    waited = true;
++                    found = true;
++                    if (wait) {
++                        self->waiting_for = req;
++                        qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
++                        self->waiting_for = NULL;
++                        retry = true;
++                    }
+                     break;
+                 }
              }
+@@ -828,7 +831,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+         qemu_co_mutex_unlock(&bs->reqs_lock);
+     } while (retry);
  
-+        drive0.node = 'drive0'
-         vm.qmp_log('blockdev-add',
-                    filters=[iotests.filter_qmp_testfiles],
--                   node_name="drive0",
-+                   node_name=drive0.node,
-                    driver=drive0.fmt,
-                    file=file_config)
--        drive0.node = 'drive0'
--        drive0.device = 'device0'
-         # Use share-rw to allow writes directly to the node;
-         # The anonymous block-backend for this configuration prevents us
-         # from using HMP's qemu-io commands to address the device.
--        vm.qmp_log("device_add", id=drive0.device,
--                   drive=drive0.name, driver="scsi-hd",
-+        vm.qmp_log("device_add", id='device0',
-+                   drive=drive0.node, driver="scsi-hd",
-                    share_rw=True)
-         log('')
+-    return waited;
++    return found;
++}
++
++static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
++{
++    return do_wait_serialising_requests(self, true);
+ }
  
-@@ -343,7 +337,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
-         perform_writes(drive0, 0)
-         reference_backup(drive0, 0, fbackup0)
-         log('--- Add Bitmap ---\n')
--        vm.qmp_log("block-dirty-bitmap-add", node=drive0.name,
-+        vm.qmp_log("block-dirty-bitmap-add", node=drive0.node,
-                    name="bitmap0", granularity=GRANULARITY)
-         log('')
-         ebitmap = EmulatedBitmap()
-@@ -358,7 +352,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
-         # 1 - Test Backup (w/ Optional induced failure)
-         if failure == 'intermediate':
-             # Activate blkdebug induced failure for second-to-next read
--            log(vm.hmp_qemu_io(drive0.name, 'flush'))
-+            log(vm.hmp_qemu_io(drive0.node, 'flush'))
-             log('')
-         job = backup(drive0, 1, bsync1, msync_mode,
-                      bitmap="bitmap0", bitmap_mode=bsync_mode)
-@@ -426,7 +420,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
- 
-         log('--- Cleanup ---\n')
-         vm.qmp_log("block-dirty-bitmap-remove",
--                   node=drive0.name, name="bitmap0")
-+                   node=drive0.node, name="bitmap0")
-         bitmaps = vm.query_bitmaps()
-         log({'bitmaps': bitmaps}, indent=2)
-         vm.shutdown()
-@@ -467,22 +461,21 @@ def test_backup_api():
-             'filename': drive0.path
-         }
- 
-+        drive0.node = 'drive0'
-         vm.qmp_log('blockdev-add',
-                    filters=[iotests.filter_qmp_testfiles],
--                   node_name="drive0",
-+                   node_name=drive0.node,
-                    driver=drive0.fmt,
-                    file=file_config)
--        drive0.node = 'drive0'
--        drive0.device = 'device0'
--        vm.qmp_log("device_add", id=drive0.device,
--                   drive=drive0.name, driver="scsi-hd")
-+        vm.qmp_log("device_add", id='device0',
-+                   drive=drive0.node, driver="scsi-hd")
-         log('')
- 
-         target0 = Drive(backup_path, vm=vm)
-         target0.create_target("backup_target", drive0.fmt, drive0.size)
-         log('')
- 
--        vm.qmp_log("block-dirty-bitmap-add", node=drive0.name,
-+        vm.qmp_log("block-dirty-bitmap-add", node=drive0.node,
-                    name="bitmap0", granularity=GRANULARITY)
-         log('')
- 
-@@ -521,7 +514,7 @@ def test_backup_api():
-             log("-- Sync mode {:s} tests --\n".format(sync_mode))
-             for bitmap in (None, 'bitmap404', 'bitmap0'):
-                 for policy in error_cases[sync_mode][bitmap]:
--                    blockdev_backup(drive0.vm, drive0.name, "backup_target",
-+                    blockdev_backup(drive0.vm, drive0.node, "backup_target",
-                                     sync_mode, job_id='api_job',
-                                     bitmap=bitmap, bitmap_mode=policy)
-                     log('')
+ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
 -- 
 2.18.0
 
