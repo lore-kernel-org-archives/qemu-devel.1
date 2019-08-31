@@ -7,76 +7,78 @@ X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC42AC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 15:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEEFAC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 15:54:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A19F22D37
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 15:50:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7546621874
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 15:54:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZKoKO/hx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A19F22D37
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZBpb0uB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7546621874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i45eE-0005l3-Jt
-	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 11:50:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51545)
+	id 1i45hg-00075D-Jl
+	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 11:54:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@gmail.com>) id 1i45bj-0004hy-Fy
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 11:48:08 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1i45gs-0006dX-Vo
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 11:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1i45bh-0002QI-Vf
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 11:48:07 -0400
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:45370)
+ (envelope-from <liq3ea@gmail.com>) id 1i45gr-0000O5-IF
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 11:53:26 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40975)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1i45be-0002Fw-2F
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 11:48:05 -0400
-Received: by mail-oi1-x230.google.com with SMTP id v12so7592092oic.12
- for <qemu-devel@nongnu.org>; Sat, 31 Aug 2019 08:47:57 -0700 (PDT)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1i45gr-0000Ne-CE
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 11:53:25 -0400
+Received: by mail-ot1-x343.google.com with SMTP id o101so9777171ota.8
+ for <qemu-devel@nongnu.org>; Sat, 31 Aug 2019 08:53:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ARv2VHQW/0W/uyIr+dLtYr09Qtbh1dea6S+ebOE/fJ0=;
- b=ZKoKO/hxaZy58OPbO98/iBR2A9DMk6Z5xXldlV98aZr2rDy2gvj0KT3aWPmlMDc7mJ
- tcKJHLcmivX2FOeGH8MUWS2jDLanMCuHWn7p3jchqkFNuCr0NGaEYBJMtAS2frV6bQLV
- z84PeRxEgM+VUHUPqA+hhhocVB4zox+OLDUG+cj6AMtQHImmii3RytMBJ+S7Pew+3b1z
- IeqwvSAlMMgegKqw1fghxfmvUwOjGMSelVcnXM46GKR/5Oic8k0DQwCJ/db7vBsH2MUp
- F+SGXTx5e76wo+CGLoOCVWGEEjrZqZ9Obli0C4x/587BHlsVA596OZ5it6cStNi4+GjS
- IBqw==
+ :cc; bh=Opso9VDvjtSmuXcBakFZZrI2Cpx2O8yEEuOrz93gILM=;
+ b=XZBpb0uBc58JdcLD/2cuAM8SG+QzdzD4o4V9WL6UnvlfBaFiphsgpXSdp5wMcDcxAl
+ aLQuQkwmvTOTzfVYVVilUwTWgwQ5SP2pW/I98S5gYxdHSrJZZWRepc/bwSn4GQY0xbv+
+ 5z2LDiSSXnQsIVk1JPQSJcpQ+VUmx6WyruzUp7z/Am50Wo/KGJVGYxkjJZiHRpALNtSn
+ UDFJ8Z+UJMWRlM+FNIt3PKx2+WBZUgabbLN567pyE0EPLnJF962YWLtzZLby2sTjxhBE
+ swMrHi0QiBJrbES8p9P4vqcpAgN8/lS8K7PUe/kzFDd0CqNk+1Jd9GaoE7KRCFOhf0BN
+ CyYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=ARv2VHQW/0W/uyIr+dLtYr09Qtbh1dea6S+ebOE/fJ0=;
- b=jQDSxYe4QvIj4WT1izVJpSMChDutmrjX3bxvO81Mm99E8er71EYL5hdrDF6WyDmDP+
- 3jNhX7VJAp26Mi2h8KVSwV6EvOXY2rXvrvkdnP99SzAdn1s95CCjDWbuGLj9SrwygyJ9
- yKLYH17TheFrRsUwIYfkLhfBWWCL6ggt8X6/FApSI++XD76SXPkQH3dZYCJswyxgVERd
- NSO2bs+wpMaaksB07F5GF3EvpcgO6zs+JHjzFfVzokzUqI9qsaETfRjHatX2dsLCaGSF
- wRQ2QwIj+wm1H9qyW8puuVUgaaQNYvcuqWEvu/nOLoJeYlPwo0GwW4ArfvBLH8KJXyEf
- P82w==
-X-Gm-Message-State: APjAAAXxbiM6xAe+jFo6b3GCTCqZkpfZNC3Gm3ADjE59xvHrsOcR0D5p
- 2AFq5hVP1ZtduvwY1xG73l8byY2l8gVP3lq8wUU=
-X-Google-Smtp-Source: APXvYqxrxXRApoIfxbbpINlBDqPAygWXE91l6+ufAqrmeP+/wjIzVrygLa9IchgcDL5hPt6Tr5CpcKvUmvhkJSN9BP8=
-X-Received: by 2002:aca:4b88:: with SMTP id
- y130mr14502929oia.157.1567266476448; 
- Sat, 31 Aug 2019 08:47:56 -0700 (PDT)
+ bh=Opso9VDvjtSmuXcBakFZZrI2Cpx2O8yEEuOrz93gILM=;
+ b=MXzbh55KwbsZOIQEl3JFbHopmq6BOrw0KLIxpUtKI19MQuKja11qMKjD8OiEVJzBJ1
+ 7rcIprDHI8JnWkx3atwZMMkARW+J51GeXAGvhCyXDosUTPLhY64a31QbbhcPnA5HiPrF
+ 6bZVsAsCnQA/X5QN528Y/gmcGxaMfYca5jTmDMd6SfoLpXlmE09lvT06S4S0gw3KfZj+
+ MBTF45NdnZvwDF1XEffAMJMrpE/ShV161CMCa9LcIG3W3a5OVVjZEhUzdG9zwXoJ/+7J
+ k4Nx3bO0pZGlxRaOFd9/D5Kx1c+tWU5zNSBA4UZbAxTJ3HjYFQUe8yYQUPgU6NPZ+rEz
+ Nlqg==
+X-Gm-Message-State: APjAAAXLvehiVLKLpaie8JGqnhzoHf3cWSZqe9aNYwy9r0FnSW4BR4G1
+ VV9DHehwLeiCVlLigrCRlYlbRr8OmNaudCPVqf81sVEq8jjLtg==
+X-Google-Smtp-Source: APXvYqx1GVCupi9Ex5DE4+dlH6wIR2VtmJHz2I8XDhTkm9WigMGBIOXk3st4RQgz/l78P0Mt+6e5gGg15gtfye7WAF4=
+X-Received: by 2002:a05:6830:1184:: with SMTP id
+ u4mr16386583otq.181.1567266803939; 
+ Sat, 31 Aug 2019 08:53:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <7d22c299-29fe-8479-ee14-17d521bb9d6b@huawei.com>
-In-Reply-To: <7d22c299-29fe-8479-ee14-17d521bb9d6b@huawei.com>
+References: <20190831153922.121308-1-liq3ea@163.com>
+ <156726640099.4971.12196429235488580695@5dec9699b7de>
+In-Reply-To: <156726640099.4971.12196429235488580695@5dec9699b7de>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Sat, 31 Aug 2019 23:47:20 +0800
-Message-ID: <CAKXe6SL+LC4RVRy+4oAKnuS=qMFDG4A0iyoL0hqg_f76gSrmBA@mail.gmail.com>
-To: fangying <fangying1@huawei.com>
+Date: Sat, 31 Aug 2019 23:52:47 +0800
+Message-ID: <CAKXe6SKO60x5MGW22iDQuKh=JLByQVULJpwD+0DffpzeG231xw@mail.gmail.com>
+To: Qemu Developers <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::230
+X-Received-From: 2607:f8b0:4864:20::343
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] Discussion: vnc: memory leak in zrle_compress_data
+Subject: Re: [Qemu-devel] [PATCH] vnc: fix memory leak when vnc disconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,85 +90,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, zhouyibo <zhouyibo3@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Ying Fang <fangying1@huawei.com>, =?UTF-8?B?5p2O5by6?= <liq3ea@163.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fangying <fangying1@huawei.com> =E4=BA=8E2019=E5=B9=B48=E6=9C=8831=E6=97=A5=
-=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=888:45=E5=86=99=E9=81=93=EF=BC=9A
+<no-reply@patchew.org> =E4=BA=8E2019=E5=B9=B48=E6=9C=8831=E6=97=A5=E5=91=A8=
+=E5=85=AD =E4=B8=8B=E5=8D=8811:46=E5=86=99=E9=81=93=EF=BC=9A
 
-> Hi Gerd,
->
-> Memory leak is observed in zrle_compress_data when we are doing some
-> AddressSanitizer tests. The leak stack is as bellow:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D47887=3D=3DERROR: LeakSanitizer: detected memory leaks
->
-> Direct leak of 29760 byte(s) in 5 object(s) allocated from:
->      #0 0xffffa67ef3c3 in __interceptor_calloc
-> (/lib64/libasan.so.4+0xd33c3)
->      #1 0xffffa65071cb in g_malloc0 (/lib64/libglib-2.0.so.0+0x571cb)
->      #2 0xffffa5e968f7 in deflateInit2_ (/lib64/libz.so.1+0x78f7)
->      #3 0xaaaacec58613 in zrle_compress_data ui/vnc-enc-zrle.c:87
->      #4 0xaaaacec58613 in zrle_send_framebuffer_update
-> ui/vnc-enc-zrle.c:344
->      #5 0xaaaacec34e77 in vnc_send_framebuffer_update ui/vnc.c:919
->      #6 0xaaaacec5e023 in vnc_worker_thread_loop ui/vnc-jobs.c:271
->      #7 0xaaaacec5e5e7 in vnc_worker_thread ui/vnc-jobs.c:340
->      #8 0xaaaacee4d3c3 in qemu_thread_start util/qemu-thread-posix.c:502
->      #9 0xffffa544e8bb in start_thread (/lib64/libpthread.so.0+0x78bb)
->      #10 0xffffa53965cb in thread_start (/lib64/libc.so.6+0xd55cb)
->
-> This leak stack can be easily reproduced in the case that a client
-> repeatedly
-> does vnc connect/disconnect .
->
-> To get the leak stack, we can compile qemu with
-> --extra-ldflags=3D-Wl,--build-id -Wl,-z,relro -Wl,-z,now -lasan'
-> '--extra-cflags=3D-O0 -g -fno-omit-frame-pointer -fno-stack-protector
-> -fsanitize=3Daddress -fsanitize=3Dleak' using gcc that supports asan.
->
-> It is obvious that there may be memory leak in the zlib/zrle compress
-> stuff.
-> IIUC, *deflateInit2* is called with the local VncState vs->zrle.stream
-> when a
-> client is connected the vnc server. And then *deflate* is called to do th=
-e
-> encoding. Finally *deflateEnd* is called in vnc_zrle_clear when a
-> connection is
-> closed.
->
-> I had not think it out why this memory leak could happen here.
-> It is noticed that deflateInit2 is called with the local vs,
-> however deflateEnd is called with the origin vs.
-> The local vs is copied to the origin vs in vnc_async_encoding_start and
-> vnc_async_encoding_end on the contrary.
->
-> Have you got any idea on this issue ?
+> Patchew URL:
+> https://patchew.org/QEMU/20190831153922.121308-1-liq3ea@163.com/
 >
 >
-Hello Ying,
+>
+> Hi,
+>
+> This series seems to have some coding style problems. See output below fo=
+r
+> more information:
+>
+> Type: series
+> Message-id: 20190831153922.121308-1-liq3ea@163.com
+> Subject: [Qemu-devel] [PATCH] vnc: fix memory leak when vnc disconnect
+>
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> fb52b49 vnc: fix memory leak when vnc disconnect
+>
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> ERROR: spaces required around that '*' (ctx:WxB)
+> #118: FILE: ui/vnc-enc-tight.c:355:
+> +        data =3D (uint##bpp##_t *)vs->tight->tight.buffer;              =
+  \
+>                                ^
+>
+>
 
-I have posted a patch for this issue:
---> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg06675.html
+Hello Paolo and the Checkpatch maintainers,
 
-Please check whether the patch can address this issue.
+I also see this error in scripts/checkpatch.pl.
+However when I add sapces around '*". I got following error:
+
+ERROR: space prohibited before that close parenthesis ')'
+
+#124: FILE: ui/vnc-enc-tight.c:355:
+
++        data =3D (uint##bpp##_t * )vs->tight->tight.buffer;               =
+\
+
+
+
+So I'm confused how to make checkpatch.pl happy.
+
+
+Any one has suggests? Or we need a patch for checkpatch.pl?
+
+
 
 Thanks,
+
 Li Qiang
 
 
 
 
 
-> Thanks.
-> Ying Fang
+
+> total: 1 errors, 0 warnings, 869 lines checked
+>
+> Commit fb52b492757a (vnc: fix memory leak when vnc disconnect) has style
+> problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>
+> Test command exited with code: 1
 >
 >
+> The full log is available at
 >
+> http://patchew.org/logs/20190831153922.121308-1-liq3ea@163.com/testing.ch=
+eckpatch/?type=3Dmessage
+> .
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
