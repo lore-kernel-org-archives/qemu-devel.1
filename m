@@ -2,65 +2,62 @@ Return-Path: <SRS0=aRDT=W3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50811C3A59B
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 02:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C30C3A59B
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 02:24:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1054B23697
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 02:07:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="ea+lR4OU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1054B23697
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	by mail.kernel.org (Postfix) with ESMTPS id C7AC423697
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 02:24:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7AC423697
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3snV-0000zr-5a
-	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 22:07:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40842)
+	id 1i3t4P-00037n-Gs
+	for qemu-devel@archiver.kernel.org; Fri, 30 Aug 2019 22:24:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33946)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@163.com>) id 1i3sl5-0000MA-5h
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 22:04:56 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1i3t3J-0002jE-Tx
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 22:23:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@163.com>) id 1i3sl2-0005YP-Uj
- for qemu-devel@nongnu.org; Fri, 30 Aug 2019 22:04:53 -0400
-Received: from m12-13.163.com ([220.181.12.13]:60919)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <liq3ea@163.com>)
- id 1i3skt-0004uh-Ly; Fri, 30 Aug 2019 22:04:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=NfqNl877nCR/D/aM0d
- taU66xKq6QVIG5592QvPQsrK4=; b=ea+lR4OUcrhfKYylc5ADLUburyopuHbHkm
- 3WVRATM4DXi81+pYWA60pR3pWa5XhvivwddbF1fMR/V20f21wACVZ8cjQ+0TGez4
- nLEgOPw4qhAFFhY2qj/rHcOKsxcui1U5bYP2NBh3TSFS16IGqLvpNDUxBr4FrSm0
- 6y6hBwJyQ=
-Received: from localhost.localdomain (unknown [183.158.152.47])
- by smtp9 (Coremail) with SMTP id DcCowAAXheex1WldVYrCAQ--.6740S2;
- Sat, 31 Aug 2019 10:04:34 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: kwolf@redhat.com,
-	mreitz@redhat.com
-Date: Fri, 30 Aug 2019 19:04:32 -0700
-Message-Id: <20190831020432.61473-1-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: DcCowAAXheex1WldVYrCAQ--.6740S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZFWxtr1kAF1xJry3ury8Xwb_yoW8KFy5pr
- 9FgryfGr1FgryrJr4DG3srZr4fW3yDCryUGFyxGw1Yqa4akr17Xr4kKryDuFWUKws3Zrs8
- Zr4UGr1xuryxtFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRMxRDUUUUU=
-X-Originating-IP: [183.158.152.47]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBZhIibVaD3Oh7ngAAs-
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.181.12.13
-Subject: [Qemu-devel] [PATCH] block: qcow2: free 'refcount_table' in error
- path
+ (envelope-from <alex.williamson@redhat.com>) id 1i3t3G-0002Kz-Jb
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 22:23:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32940)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1i3t3G-0002HQ-EL
+ for qemu-devel@nongnu.org; Fri, 30 Aug 2019 22:23:42 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C5B4E83F42;
+ Sat, 31 Aug 2019 02:23:40 +0000 (UTC)
+Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 75C9660BE1;
+ Sat, 31 Aug 2019 02:23:40 +0000 (UTC)
+Date: Fri, 30 Aug 2019 20:23:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Li Qiang <liq3ea@163.com>
+Message-ID: <20190830202340.3815dde8@x1.home>
+In-Reply-To: <5D69CE0F.011DCE.26140@m12-11.163.com>
+References: <5D69CE0F.011DCE.26140@m12-11.163.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Sat, 31 Aug 2019 02:23:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Questions about 'emulated_config_bits' in vfio pci
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,79 +69,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Alex Williamson <alex.l.williamson@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, when doing './check -qcow2 098'. We can get following
-asan output:
+On Sat, 31 Aug 2019 09:31:59 +0800
+Li Qiang <liq3ea@163.com> wrote:
 
-qemu-img: Could not empty blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
-+
-+=================================================================
-+==60365==ERROR: LeakSanitizer: detected memory leaks
-+
-+Direct leak of 65536 byte(s) in 1 object(s) allocated from:
-+    #0 0x7f3ed729fd38 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xded38)
-+    #1 0x56274517fe66 in make_completely_empty block/IMGFMT.c:4219
-+    #2 0x562745180e51 in IMGFMT_make_empty block/IMGFMT.c:4313
-+    #3 0x56274509b14e in img_commit /home/test/qemu5/qemu/qemu-img.c:1053
-+    #4 0x5627450b4b74 in main /home/test/qemu5/qemu/qemu-img.c:5097
-+    #5 0x7f3ed4f2fb96 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x21b96)
+> Hi Alex and all,
+>=20
+> My understanding for =E2=80=98emulated_config_bits=E2=80=99 in =E2=80=98V=
+FIOPCIDevice=E2=80=99 is
+> that this is the mask for PCI config space. If the bits is set in =E2=80=
+=98
+> emulated_config_bits=E2=80=99 then we can just use the qemu=E2=80=99s
+> =E2=80=98vdev->pdev.config=E2=80=99, it the bits is not set, we need to a=
+sk the
+> physical device.=20
 
-This is because the logic of clean resource in 'make_completely_empty' is
-wrong. The patch frees the 's->refcount_table' in error path.
+Yes.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- block/qcow2.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+> But there are two places I got confused in =E2=80=98vfio_realize=E2=80=99.
+>=20
+> Here in =E2=80=98vfio_realize=E2=80=99
+>     /* QEMU can change multi-function devices to single function, or
+> reverse */ vdev->emulated_config_bits[PCI_HEADER_TYPE] =3D
+>                                               PCI_HEADER_TYPE_MULTI_FUNCT=
+ION;
+>=20
+> In =E2=80=98vfio_add_std_cap=E2=80=99
+>=20
+>         /* Begin the rebuild, use QEMU emulated list bits */
+>         pdev->config[PCI_CAPABILITY_LIST] =3D 0;
+>         vdev->emulated_config_bits[PCI_CAPABILITY_LIST] =3D 0xff;
+>         vdev->emulated_config_bits[PCI_STATUS] |=3D PCI_STATUS_CAP_LIST;
+>=20
+>=20
+> Per my understanding, I think =E2=80=98emulated_config_bits=E2=80=99 shou=
+ld be set to
+> 0xff just as other places. But here use
+> =E2=80=98PCI_HEADER_TYPE_MULTI_FUNCTION=E2=80=99 and =E2=80=98PCI_STATUS_=
+CAP_LIST=E2=80=99. In fact,
+> this doesn=E2=80=99t affect the results, but it=E2=80=99s confusion. Just=
+ a typo? Or
+> other reasons.
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7c5a4859f7..23fe713d4c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4243,7 +4243,7 @@ static int make_completely_empty(BlockDriverState *bs)
-     ret = bdrv_pwrite_sync(bs->file, s->cluster_size,
-                            &rt_entry, sizeof(rt_entry));
-     if (ret < 0) {
--        goto fail_broken_refcounts;
-+        goto fail;
-     }
-     s->refcount_table[0] = 2 * s->cluster_size;
- 
-@@ -4252,7 +4252,7 @@ static int make_completely_empty(BlockDriverState *bs)
-     offset = qcow2_alloc_clusters(bs, 3 * s->cluster_size + l1_size2);
-     if (offset < 0) {
-         ret = offset;
--        goto fail_broken_refcounts;
-+        goto fail;
-     } else if (offset > 0) {
-         error_report("First cluster in emptied image is in use");
-         abort();
-@@ -4274,6 +4274,9 @@ static int make_completely_empty(BlockDriverState *bs)
- 
-     return 0;
- 
-+fail:
-+    g_free(s->refcount_table);
-+
- fail_broken_refcounts:
-     /* The BDS is unusable at this point. If we wanted to make it usable, we
-      * would have to call qcow2_refcount_close(), qcow2_refcount_init(),
-@@ -4283,8 +4286,6 @@ fail_broken_refcounts:
-      * that that sequence will fail as well. Therefore, just eject the BDS. */
-     bs->drv = NULL;
- 
--fail:
--    g_free(new_reftable);
-     return ret;
- }
- 
--- 
-2.17.1
+I'm not sure I understand the question.  We're only trying to emulate
+the multi-function bit of the header-type register and the capability
+list bit of the status register, therefore we set only these bits in
+the emulated bits mask.  The header type is static, so it doesn't make
+much difference if we emulate the entire 8-bit register or only this
+bit (I don't think it's worth the optimization and doing so potentially
+masks what we're trying to accomplish).  The status register though is
+partially static and partially dynamic, some bits are reporting the
+current device status.  So I don't see that we'd ever want to emulate
+all of the bits in that register.  emulate_config_bits has bit level
+granularity to which bits of config space are emulated in QEMU, so
+we're not always going to set a full byte for emulation.  Thanks,
 
-
+Alex
 
