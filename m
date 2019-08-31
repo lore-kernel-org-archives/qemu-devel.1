@@ -2,75 +2,121 @@ Return-Path: <SRS0=aRDT=W3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC83C3A59F
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 07:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CABB1C3A59F
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 08:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C74123774
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 07:52:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C74123774
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C8A123697
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 08:12:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="EV1iItXm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8A123697
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3yBg-0006vj-Sf
-	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 03:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37328)
+	id 1i3yVA-0004Eu-KJ
+	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 04:12:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <th.huth@gmail.com>) id 1i3y4v-0000yz-M5
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:47 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i3yUC-0003jO-62
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 04:11:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <th.huth@gmail.com>) id 1i3y4r-0005ld-PA
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:43 -0400
-Received: from mail-wm1-f47.google.com ([209.85.128.47]:54082)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1i3y4j-0005Sd-CJ
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:35 -0400
-Received: by mail-wm1-f47.google.com with SMTP id q19so741025wmc.3
- for <qemu-devel@nongnu.org>; Sat, 31 Aug 2019 00:45:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=gGiAO5p7k3xFjuRUbGuIdQXsbmq6Zo+CXx6qkmiP6DU=;
- b=CULgBa/tg3gdokOvLiGyZYzIJuqWvEjKT22Sf3KeVw7GypeNh1I//DYI4L5Z9c4L2m
- r+PBquyC3s4ArRBusv01suZA+XOaSpCOUOtq5UDrsJK0s7nfBQt8proBC6T+tQK1OU20
- 5gQ3DEyLciWzuEkUQInDiDod0kDIGoen3OOnH4pqwb0n8HjXPk4fsrWqfWZsmZcNQrlg
- QPpvdTBVTHiBET5Km7ySYpESsbXKu5soVQt0IjR0yyJ0sDo6r0brBtcRmZyqYwnRjr3n
- NJztxB+TdVk5N0ROCOIpA+pUtcQHQFQkG5/I/8mWltCKediF5m80/FqKzJNlcCX69mee
- aQ9A==
-X-Gm-Message-State: APjAAAUc9sw1I4uhc79mDZTO5H/BN9YEyjOy0A09FjsJU4Ew2oG8hyOR
- PZUCmFFoHt4CGnAoHaS0Mx6xBOcDVe4=
-X-Google-Smtp-Source: APXvYqzQukkDj7Nrz/M2jarN2oXK33ThdlhdiLcl4rIzoz/ipXLIWB/iu+J4xofFHCU0IvTtDiyTXg==
-X-Received: by 2002:a1c:810a:: with SMTP id c10mr22308110wmd.72.1567237529539; 
- Sat, 31 Aug 2019 00:45:29 -0700 (PDT)
-Received: from thl530.multi.box (pD9E83624.dip0.t-ipconnect.de.
- [217.232.54.36])
- by smtp.gmail.com with ESMTPSA id w1sm7546650wrm.38.2019.08.31.00.45.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 31 Aug 2019 00:45:29 -0700 (PDT)
-From: Thomas Huth <huth@tuxfamily.org>
-To: qemu-devel@nongnu.org
-Date: Sat, 31 Aug 2019 09:45:14 +0200
-Message-Id: <20190831074519.32613-2-huth@tuxfamily.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190831074519.32613-1-huth@tuxfamily.org>
-References: <20190831074519.32613-1-huth@tuxfamily.org>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i3yUB-00017c-6I
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 04:11:52 -0400
+Received: from mail-eopbgr30134.outbound.protection.outlook.com
+ ([40.107.3.134]:9381 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i3yU7-00010R-Iy; Sat, 31 Aug 2019 04:11:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ONwygeJpcYQUcehwUmU9rPTK6GFkDrClpkJxlMaB4iDUSWyUtIkJbSwt/cmI27+jcy4yXKjznVRt8VWW4Kv+0leYZZrl2FrCj7g1oGv5OG5WTPwWvK9iyTxwLRcXBdI6Fzin7YH5wbAnKWxdn4qPg9ZMLEvngeZM4m3qNb4o+L2b/ahTYiMJKmcxyRnSC2lD5hS3GJVf7O7W0fDQaRKHaaOsJbz56AdoMNAmLmgTj/QVyOFFzQysImuJ4dguJQArLPIZpriIcTD/D+yOYhwgMdlG+DrM8f+nyAnyovocZsxAvm2eSPOqwC7rRtR9uNEsvdSdku554c2lZtpoTxL3sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aQTLidQXu6QZyAlTqjAUaThMA5ymiFH2Df+1Ynb5CCI=;
+ b=mzEvnRD9xxTG6XhcBkEaq5KL1DvybKzMhx6QWBL7nCZNJCkmAOvqdshGuy7qHMyNbkQZHQeuPMjKogE5Au0ew+50bgxnpz0ovM62QzSzsQtqgdvRei46xhKnNCs94Ae3l+ZSK1pMnCHzB0A4wVOmPQHx+CNfsISC8aSE0VEgc9mgGoo+tCzToFXih2CHvT9kXHvRKtkEtcf71AzAN4+6PLwh+l9x+Vaf7M5yyt/y+YJFZQMR6GcjUnYas5D+HVPsGYaH1WuuT81krgqoy6pOoChUYcD+KhfkESNbAPOLqpG9nCvrG+j0U2FAGnURNm6IqEfkzCGZ6T/yZyCFs/2zjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aQTLidQXu6QZyAlTqjAUaThMA5ymiFH2Df+1Ynb5CCI=;
+ b=EV1iItXm+sYzS+iKYOWrLxK02Dn8WjpTyV/ZQ9Jpei/hiVZVlSoFgHEj2Ssz6aH7WvpoWLoyIKEEgpG0CpQLYt8eVWc69r1SXgoq0ECbujLBrNeD+6NIlkdOhH1xwMwSZBinbCj3kPmGd7CsL1Nw24ar785caz4hNqoonaTEji4=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4154.eurprd08.prod.outlook.com (20.179.12.92) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2220.19; Sat, 31 Aug 2019 08:11:45 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2220.020; Sat, 31 Aug 2019
+ 08:11:45 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH 2/5] nbd: Prepare for NBD_CMD_FLAG_FAST_ZERO
+Thread-Index: AQHVWcJnZgUz/ZiSEEiPmfDFNqlCh6cUCAIAgABcQACAAI+qAA==
+Date: Sat, 31 Aug 2019 08:11:45 +0000
+Message-ID: <c56103bc-cf94-1585-8ffa-aa2efbc5bba8@virtuozzo.com>
+References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
+ <20190823143726.27062-1-eblake@redhat.com>
+ <20190823143726.27062-3-eblake@redhat.com>
+ <9476b1d1-47e4-ecfd-eb23-5b2fbc1410e3@virtuozzo.com>
+ <911ecfee-675a-da91-19ec-dd11d6d21e78@redhat.com>
+In-Reply-To: <911ecfee-675a-da91-19ec-dd11d6d21e78@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR07CA0011.eurprd07.prod.outlook.com
+ (2603:10a6:7:67::21) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190831111142413
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fe6a4520-6279-4457-9567-08d72deadce4
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4154; 
+x-ms-traffictypediagnostic: DB8PR08MB4154:
+x-microsoft-antispam-prvs: <DB8PR08MB41543D948A05F174BE91A464C1BC0@DB8PR08MB4154.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 014617085B
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39840400004)(396003)(136003)(346002)(376002)(366004)(52314003)(199004)(189003)(2501003)(478600001)(66446008)(52116002)(66066001)(186003)(71200400001)(71190400001)(102836004)(3846002)(2616005)(14454004)(26005)(76176011)(446003)(6486002)(11346002)(486006)(2906002)(476003)(229853002)(110136005)(4326008)(6246003)(7736002)(316002)(54906003)(8936002)(64756008)(6116002)(305945005)(66556008)(25786009)(36756003)(31686004)(81156014)(6506007)(53546011)(86362001)(5660300002)(14444005)(6512007)(386003)(256004)(31696002)(99286004)(8676002)(6436002)(81166006)(66946007)(66476007)(53936002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4154;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: qGTkgcKSEKXkjoObLwmFsFKlDvgYrvyfSr+osfYsTM+NbbTjOWd2PbRfsB5ZyKzxQaI0jnFT7sUe7mR9RR+RCCjS6mf5CpUERdJUphi/zrWnP3yUyVHwFxrIr8axJoxzWqZOrq60a0LsLplZl3g76zX5QbusMSP0tIsmegMMRELn4ypELfKQ/B74tSHDeaT7oQr0AkIhkKS7Z20T8kCzhU3XIIkMZ6qALbBbXCxxkCSdFnzOLC/OXGF4zykVv3tKpbQKvGP2zYZ5uEfd68VfiUbCcq5cxEJiuy/CaS35r1AMoa7fFUCsfraRHv069P3XtHjTxZS4myDVBdOeNFhTE7g6XdwPqsq/sUr5MYk4scSvzW/D3ZllNraxmoHq/F8N1pD97aRAdNyIGQBhNprKavO6c9UT3esc2Xh8rY+R7co=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F419A915487F1E4091182EF1A137FE43@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.47
-Subject: [Qemu-devel] [PATCH v5 1/6] m68k: Add NeXTcube framebuffer device
- emulation
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe6a4520-6279-4457-9567-08d72deadce4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Aug 2019 08:11:45.1302 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fjDLHC8DfDjJ1UshNPRtIrrIDR/PNcNNUDYT/NwP5BUhzfmPub5mNoF/BINAHw2IFlWSVQRRiR/PYuptPwxRc7k3dkh0W+2LwAVEkK+mtkU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4154
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.134
+Subject: Re: [Qemu-devel] [PATCH 2/5] nbd: Prepare for NBD_CMD_FLAG_FAST_ZERO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,236 +128,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "nbd@other.debian.org" <nbd@other.debian.org>,
+ "libguestfs@redhat.com" <libguestfs@redhat.com>, "open
+ list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The NeXTcube uses a linear framebuffer with 4 greyscale colors and
-a fixed resolution of 1120 * 832.
-This code has been taken from Bryce Lanham's GSoC 2011 NeXT branch at
-
- https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-fb.c
-
-and altered to fit the latest interface of the current QEMU (e.g.
-the device has been "qdev"-ified etc.).
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Thomas Huth <huth@tuxfamily.org>
----
- default-configs/m68k-softmmu.mak |   1 +
- hw/display/Makefile.objs         |   1 +
- hw/display/next-fb.c             | 146 +++++++++++++++++++++++++++++++
- hw/m68k/Kconfig                  |   4 +
- include/hw/m68k/next-cube.h      |   7 ++
- 5 files changed, 159 insertions(+)
- create mode 100644 hw/display/next-fb.c
- create mode 100644 include/hw/m68k/next-cube.h
-
-diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
-index 4049a8f2ba..d67ab8b96d 100644
---- a/default-configs/m68k-softmmu.mak
-+++ b/default-configs/m68k-softmmu.mak
-@@ -6,3 +6,4 @@ CONFIG_SEMIHOSTING=y
- #
- CONFIG_AN5206=y
- CONFIG_MCF5208=y
-+CONFIG_NEXTCUBE=y
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 0f11d55b14..5a4066383b 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -38,6 +38,7 @@ common-obj-$(CONFIG_RASPI) += bcm2835_fb.o
- common-obj-$(CONFIG_SM501) += sm501.o
- common-obj-$(CONFIG_TCX) += tcx.o
- common-obj-$(CONFIG_CG3) += cg3.o
-+common-obj-$(CONFIG_NEXTCUBE) += next-fb.o
- 
- obj-$(CONFIG_VGA) += vga.o
- 
-diff --git a/hw/display/next-fb.c b/hw/display/next-fb.c
-new file mode 100644
-index 0000000000..2b726a10f8
---- /dev/null
-+++ b/hw/display/next-fb.c
-@@ -0,0 +1,146 @@
-+/*
-+ * NeXT Cube/Station Framebuffer Emulation
-+ *
-+ * Copyright (c) 2011 Bryce Lanham
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "ui/console.h"
-+#include "hw/hw.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
-+#include "hw/display/framebuffer.h"
-+#include "ui/pixel_ops.h"
-+#include "hw/m68k/next-cube.h"
-+
-+#define NEXTFB(obj) OBJECT_CHECK(NeXTFbState, (obj), TYPE_NEXTFB)
-+
-+struct NeXTFbState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion fb_mr;
-+    MemoryRegionSection fbsection;
-+    QemuConsole *con;
-+
-+    uint32_t cols;
-+    uint32_t rows;
-+    int invalidate;
-+};
-+typedef struct NeXTFbState NeXTFbState;
-+
-+static void nextfb_draw_line(void *opaque, uint8_t *d, const uint8_t *s,
-+                             int width, int pitch)
-+{
-+    NeXTFbState *nfbstate = NEXTFB(opaque);
-+    static const uint32_t pal[4] = {
-+        0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000
-+    };
-+    uint32_t *buf = (uint32_t *)d;
-+    int i = 0;
-+
-+    for (i = 0; i < nfbstate->cols / 4; i++) {
-+        int j = i * 4;
-+        uint8_t src = s[i];
-+        buf[j + 3] = pal[src & 0x3];
-+        src >>= 2;
-+        buf[j + 2] = pal[src & 0x3];
-+        src >>= 2;
-+        buf[j + 1] = pal[src & 0x3];
-+        src >>= 2;
-+        buf[j + 0] = pal[src & 0x3];
-+    }
-+}
-+
-+static void nextfb_update(void *opaque)
-+{
-+    NeXTFbState *s = NEXTFB(opaque);
-+    int dest_width = 4;
-+    int src_width;
-+    int first = 0;
-+    int last  = 0;
-+    DisplaySurface *surface = qemu_console_surface(s->con);
-+
-+    src_width = s->cols / 4 + 8;
-+    dest_width = s->cols * 4;
-+
-+    if (s->invalidate) {
-+        framebuffer_update_memory_section(&s->fbsection, &s->fb_mr, 0,
-+                                          s->cols, src_width);
-+        s->invalidate = 0;
-+    }
-+
-+    framebuffer_update_display(surface, &s->fbsection, s->cols, s->rows,
-+                               src_width, dest_width, 0, 1, nextfb_draw_line,
-+                               s, &first, &last);
-+
-+    dpy_gfx_update(s->con, 0, 0, s->cols, s->rows);
-+}
-+
-+static void nextfb_invalidate(void *opaque)
-+{
-+    NeXTFbState *s = NEXTFB(opaque);
-+    s->invalidate = 1;
-+}
-+
-+static const GraphicHwOps nextfb_ops = {
-+    .invalidate  = nextfb_invalidate,
-+    .gfx_update  = nextfb_update,
-+};
-+
-+static void nextfb_realize(DeviceState *dev, Error **errp)
-+{
-+    NeXTFbState *s = NEXTFB(dev);
-+
-+    memory_region_init_ram(&s->fb_mr, OBJECT(dev), "next-video", 0x1CB100,
-+                           &error_fatal);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->fb_mr);
-+
-+    s->invalidate = 1;
-+    s->cols = 1120;
-+    s->rows = 832;
-+
-+    s->con = graphic_console_init(dev, 0, &nextfb_ops, s);
-+    qemu_console_resize(s->con, s->cols, s->rows);
-+}
-+
-+static void nextfb_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+    dc->realize = nextfb_realize;
-+
-+    /* Note: This device does not any state that we have to reset or migrate */
-+}
-+
-+static const TypeInfo nextfb_info = {
-+    .name          = TYPE_NEXTFB,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(NeXTFbState),
-+    .class_init    = nextfb_class_init,
-+};
-+
-+static void nextfb_register_types(void)
-+{
-+    type_register_static(&nextfb_info);
-+}
-+
-+type_init(nextfb_register_types)
-diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index 49ef0b3f6d..ec58a2eb06 100644
---- a/hw/m68k/Kconfig
-+++ b/hw/m68k/Kconfig
-@@ -7,3 +7,7 @@ config MCF5208
-     bool
-     select COLDFIRE
-     select PTIMER
-+
-+config NEXTCUBE
-+    bool
-+    select FRAMEBUFFER
-diff --git a/include/hw/m68k/next-cube.h b/include/hw/m68k/next-cube.h
-new file mode 100644
-index 0000000000..090c7c51aa
---- /dev/null
-+++ b/include/hw/m68k/next-cube.h
-@@ -0,0 +1,7 @@
-+
-+#ifndef NEXT_CUBE_H
-+#define NEXT_CUBE_H
-+
-+#define TYPE_NEXTFB "next-fb"
-+
-+#endif /* NEXT_CUBE_H */
--- 
-2.21.0
-
+MzEuMDguMjAxOSAyOjM3LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiA4LzMwLzE5IDE6MDcgUE0s
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiAyMy4wOC4yMDE5IDE3OjM3
+LCBFcmljIEJsYWtlIHdyb3RlOg0KPj4+IENvbW1pdCBmZTA0ODBkNiBhbmQgZnJpZW5kcyBhZGRl
+ZCBCRFJWX1JFUV9OT19GQUxMQkFDSyBhcyBhIHdheSB0bw0KPj4+IGF2b2lkIHdhc3RpbmcgdGlt
+ZSBvbiBhIHByZWxpbWluYXJ5IHdyaXRlLXplcm8gcmVxdWVzdCB0aGF0IHdpbGwgbGF0ZXINCj4+
+PiBiZSByZXdyaXR0ZW4gYnkgYWN0dWFsIGRhdGEsIGlmIGl0IGlzIGtub3duIHRoYXQgdGhlIHdy
+aXRlLXplcm8NCj4+PiByZXF1ZXN0IHdpbGwgdXNlIGEgc2xvdyBmYWxsYmFjazsgYnV0IGluIGRv
+aW5nIHNvLCBjb3VsZCBub3Qgb3B0aW1pemUNCj4+PiBmb3IgTkJELiAgVGhlIE5CRCBzcGVjaWZp
+Y2F0aW9uIGlzIG5vdyBjb25zaWRlcmluZyBhbiBleHRlbnNpb24gdGhhdA0KPj4+IHdpbGwgYWxs
+b3cgcGFzc2luZyBvbiB0aG9zZSBzZW1hbnRpY3M7IHRoaXMgcGF0Y2ggdXBkYXRlcyB0aGUgbmV3
+DQo+Pj4gcHJvdG9jb2wgYml0cyBhbmQgJ3FlbXUtbmJkIC0tbGlzdCcgb3V0cHV0IHRvIHJlY29n
+bml6ZSB0aGUgYml0LCBhcw0KPj4+IHdlbGwgYXMgdGhlIG5ldyBlcnJubyB2YWx1ZSBwb3NzaWJs
+ZSB3aGVuIHVzaW5nIHRoZSBuZXcgZmxhZzsgd2hpbGUNCj4+PiB1cGNvbWluZyBwYXRjaGVzIHdp
+bGwgaW1wcm92ZSB0aGUgY2xpZW50IHRvIHVzZSB0aGUgZmVhdHVyZSB3aGVuDQo+Pj4gcHJlc2Vu
+dCwgYW5kIHRoZSBzZXJ2ZXIgdG8gYWR2ZXJ0aXNlIHN1cHBvcnQgZm9yIGl0Lg0KPj4+DQo+Pj4g
+U2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IA0KPj4+ICsr
+KyBiL25iZC9zZXJ2ZXIuYw0KPj4+IEBAIC01NSw2ICs1NSw4IEBAIHN0YXRpYyBpbnQgc3lzdGVt
+X2Vycm5vX3RvX25iZF9lcnJubyhpbnQgZXJyKQ0KPj4+ICAgICAgICAgICAgcmV0dXJuIE5CRF9F
+Tk9TUEM7DQo+Pj4gICAgICAgIGNhc2UgRU9WRVJGTE9XOg0KPj4+ICAgICAgICAgICAgcmV0dXJu
+IE5CRF9FT1ZFUkZMT1c7DQo+Pj4gKyAgICBjYXNlIEVOT1RTVVA6DQo+Pj4gKyAgICAgICAgcmV0
+dXJuIE5CRF9FTk9UU1VQOw0KPj4NCj4+IFRoaXMgbWF5IHByb3Zva2UgcmV0dXJuaW5nIE5CRF9F
+Tk9UU1VQIGluIG90aGVyIGNhc2VzLCBub3Qgb25seSBuZXcgb25lIHdlIGFyZSBnb2luZyB0byBh
+ZGQuDQo+IA0KPiBDb3JyZWN0LiBCdXQgdGhlIHNwZWMgb25seSBzYWlkIFNIT1VMRCBhdm9pZCBF
+Tk9UU1VQIGluIHRob3NlIG90aGVyDQo+IGNhc2VzLCBub3QgTVVTVCBhdm9pZCBFTk9UU1VQOyBh
+bmQgaW4gcHJhY3RpY2UsIGVpdGhlciB0aGUgY2xpZW50IHRoYXQNCj4gaXMgbm90IHN1c3BlY3Rp
+bmcgaXQgd2lsbCB0cmVhdCBpdCB0aGUgc2FtZSBhcyBOQkRfRUlOVkFMLCBvciB3ZSd2ZQ0KPiBt
+YW5hZ2VkIHRvIGdldCBhIHNsaWdodGx5IGJldHRlciBlcnJvciBtZXNzYWdlIGFjcm9zcyB0aGFu
+IG5vcm1hbC4gIEkNCj4gZG9uJ3Qgc2VlIHRoYXQgYXMgYSByZWFsIHNob3ctc3RvcHBlci4NCj4g
+DQo+IEJ1dCBpZiBpdCBib3RoZXJzIHlvdSwNCg0KTm8sIEkgdGhpbmsgaXQgZG9lc24ndC4gT0ss
+IEVOT1RTVVAgaXMgRU5PVFNVUCBhbnl3YXksIGl0IHNob3VsZG4ndCBiZSB0cmVhdGVkIGluY29y
+cmVjdGx5Lg0KDQo+IG5vdGUgdGhhdCBpbiBuYmRraXQsIEkgYWN0dWFsbHkgY29kZWQgdGhpbmdz
+IHVwDQo+IHRvIHJlZnVzZSB0byBzZW5kIE5CRF9FT1ZFUkZMT1cgdW5sZXNzIE5CRF9DTURfRkxB
+R19ERiB3YXMgc2V0LCBhbmQgdG8NCj4gcmVmdXNlIHRvIHNlbmQgTkJEX0VOT1RTVVAgdW5sZXNz
+IE5CRF9DTURfRkxBR19GQVNUX1pFUk8gd2FzIHNldC4gSQ0KPiBjb3VsZCBjb3B5IHRoYXQgYmVo
+YXZpb3IgaGVyZSwgaWYgd2Ugd2FudCBxZW11IHRvIGJlIHRoYXQgbXVjaCBzdHJpY3Rlcg0KPiBh
+cyBhIHNlcnZlci4NCj4gDQo+IChOb3RlIHRvIHNlbGY6IGFsc28gY2hlY2sgaWYsIHdoZW4gdXNp
+bmcgc3RydWN0dXJlZCByZXBsaWVzIHRvIHNlbmQNCj4gZXJyb3IgbWVzc2FnZXMsIGluIGFkZGl0
+aW9uIHRvIHRoZSBjb2RlLCBpZiB0aGUgc3RyaW5nIGNvbnRhaW5zDQo+IHN0cmVycm9yKGVycm5v
+KSBmcm9tIEJFRk9SRSB0aGUgbWFwcGluZywgcmF0aGVyIHRoYW4gYWZ0ZXIgd2UndmUgbG9zdA0K
+PiBpbmZvcm1hdGlvbiB0byB0aGUgbW9yZS1saW1pdGVkIE5CRF9FKiB2YWx1ZXMpDQo+IA0KDQoN
+Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
