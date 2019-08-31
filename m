@@ -2,92 +2,91 @@ Return-Path: <SRS0=aRDT=W3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6999CC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 19:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED40C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 19:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C63121874
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 19:46:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9118D22DA9
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 19:55:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gn54YAiy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C63121874
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFU2FO6N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9118D22DA9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i49KZ-0005Ya-Bp
-	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 15:46:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58592)
+	id 1i49TL-00079l-Oq
+	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 15:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1i49JZ-00059b-NS
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 15:45:39 -0400
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1i49SZ-0006Ys-7N
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 15:54:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1i49JY-0003Mk-DI
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 15:45:37 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41643)
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1i49SX-00069V-Q3
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 15:54:55 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34355)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1i49JY-0003Im-3w
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 15:45:36 -0400
-Received: by mail-wr1-x443.google.com with SMTP id j16so10110371wrr.8
- for <qemu-devel@nongnu.org>; Sat, 31 Aug 2019 12:45:36 -0700 (PDT)
+ id 1i49SX-00061Y-Iz
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 15:54:53 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y135so6798170wmc.1
+ for <qemu-devel@nongnu.org>; Sat, 31 Aug 2019 12:54:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=fUdgzUdd2IK9hi1Xee/i/1Y1RSl4j7hUT0ioyE6etUY=;
- b=Gn54YAiyRpkyn7c0Nju26TMDRn+nZm1kL1kDZTfhTCF+KPg8P7xbud8HDoFDk8MUvs
- OTjIX96a63zAIxRnw5NBuQf6XkihnmOj7VXAGhOPrkTc2jLTUUJ+yztl/pK115jNB1vq
- /ClOw+9RZk8Jm3wnutjkm+xYMjfV+kGDJ04WpXYpMmMM9pdbkMz//RJikdhrarfYzZBC
- sK9TPslUaGZJHixIBNnVWKcqBCKJnzjXwKJrw6b9JqkECjdF3P4teUmWK6T0NLerMO7C
- MFYNtuVRtBBj6hsf9k3Bx+GFVgXlUQqqbJddjgYO90hLvTrtCtjSTHOS3/0+YELkFaqS
- QHEw==
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-transfer-encoding:content-language;
+ bh=2dUjAJIwZ7SXDFaqxbR7zHhlf2QGgXoJDWE5WBsCSHA=;
+ b=PFU2FO6N5TGFFtggZdYJvUKrcxjxtQNAi4qWWycxxfTlVrXzEo5PdPDJwU5mXCopRt
+ ij+8tZ/tUrWe88/REU2vJ/uUDvm/f6B73p3Qi161ssjtTDBpst2cQ63D70RUPetkIVmo
+ /wN83XbjRFB0iLkzlAPsAbPftok0bJ2eZryDf4YKcoSRoj6QTOdsG2LRHxsDaNlWPjHx
+ Hfxe5S0yiEMOaGQtfkrSC8DsbdW1XOP6zsG4Vkf84C2dvT6JW0hgS49JCOKNAP0n2QjI
+ dlCD9li/0CJS0UpZwlyt4m5EZ8U+iJg02Ldi8oP/Q9f3Nbxq70D7wroEOULKBQLMYOr5
+ goqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-transfer-encoding
  :content-language;
- bh=fUdgzUdd2IK9hi1Xee/i/1Y1RSl4j7hUT0ioyE6etUY=;
- b=sCa1iPovpdBedNtrWMMumbe1tNz2N36K+62EBRvrveMH2x0fApPnyQw3K8/PxIq5g/
- ZCepJyUVowT4M3KwQfET/stb5Lm7EjmqIY5LotDjxtWevZ705tLkA7epo7BqWx7d+l27
- MfLwoXyYvE0gySaj7hWN7J6N4/0tsktoZI59h1GfNURv3lZpWz2IXL8UtApbIsMAXa0h
- 8oAY8l25t93lB11AKB7+Ko8pcW1roH5N0649pHfEocMGMoFxgAMlTx7MYjtORiKy1nTe
- R6ud9X6Fif/CCu6+NxqXJvH2FVCzaF0+cQpRzlP1giYMiKnSe4Hkpi3knctp4nu6+lm6
- kkDw==
-X-Gm-Message-State: APjAAAXRiXzN093B8GcPR8/kYYIF52zfvLSsnTEJ/z3EedV+CmZxO0Aj
- xfl/73GB4ymniSBa73/6JqE=
-X-Google-Smtp-Source: APXvYqwaRm3ELpF5gl2wmozh+9ZjNogRqfRfLA/ClxIxOL2R3zvqBRx0XWbci3WEJIiU7YF5x++Tgw==
-X-Received: by 2002:adf:fad0:: with SMTP id a16mr26007009wrs.195.1567280734551; 
- Sat, 31 Aug 2019 12:45:34 -0700 (PDT)
+ bh=2dUjAJIwZ7SXDFaqxbR7zHhlf2QGgXoJDWE5WBsCSHA=;
+ b=bfztdNJ0N8ikDju1/n/zoB6hjYQlXa5KBJZlPllytQq/WbcQ0Vmr28APODfu4EiTmQ
+ bom6/tBfLYVfNZ33khGWO3fj4TMkrRP60ldUXnTt8dBJOxhERr2GhplF1oG2w2uWIqKL
+ 1pvm1L5xiUmciCFCraJk1VAE5vH7y9T09UGMeQhsj+Q0L3pbaEd98hTj4r2xyMLGCEiJ
+ n0ryH5e2X4XW5QjFQonBsdx8FDe47W88j9RuOEM9lN85Xlg4SiDNlb5VM4bbYCKv5Syh
+ WaNlbH+rErjHXqISRJ73uNWvpBgCGBhUDfOqSy8ARHY7785Fjz0lEdLPvTnwteFP21yl
+ 76Ug==
+X-Gm-Message-State: APjAAAW1FIVhkD/2zJWVZPzoonC57NEW5mxjqqDe+yTFVNWA+f6XaqL7
+ nCi5E+wyQzpd+qrDCT8B7toxj8QgmO8=
+X-Google-Smtp-Source: APXvYqwtt6cXxLiOhhSLR2Q+zP3/PMEftVpUQO9XN4p/xYLRqAGfgtw8odrSMmW9Jox1UnKzhlDDwA==
+X-Received: by 2002:a7b:c094:: with SMTP id r20mr5639793wmh.134.1567281290302; 
+ Sat, 31 Aug 2019 12:54:50 -0700 (PDT)
 Received: from [192.168.86.99] ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id b194sm14481545wmg.46.2019.08.31.12.45.33
+ by smtp.gmail.com with ESMTPSA id k9sm7680327wrd.7.2019.08.31.12.54.49
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 31 Aug 2019 12:45:33 -0700 (PDT)
-To: Sukrit Bhatnagar <skrtbhtngr@gmail.com>, qemu-devel@nongnu.org
-References: <20190828142328.24561-1-skrtbhtngr@gmail.com>
- <20190828142328.24561-3-skrtbhtngr@gmail.com>
+ Sat, 31 Aug 2019 12:54:49 -0700 (PDT)
+To: Julia Suvorova <jusual@redhat.com>,
+ Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
+References: <0dc1a87882d78b071134dba7787d4459b48ed096.camel@gmail.com>
+ <c87583f3e8487100fdb8196ad45e6375cc877e3b.camel@redhat.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <710966e9-d1ac-3c55-0a12-02ff19005531@gmail.com>
-Date: Sat, 31 Aug 2019 22:45:44 +0300
+Message-ID: <b7441a1c-9552-76cc-d879-ae3e7f8af8fb@gmail.com>
+Date: Sat, 31 Aug 2019 22:55:00 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190828142328.24561-3-skrtbhtngr@gmail.com>
+In-Reply-To: <c87583f3e8487100fdb8196ad45e6375cc877e3b.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] hw/pvrdma: add live migration
- support
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [RFC v5 0/6] pci_expander_brdige: support separate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,151 +98,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Julia,
 
+On 8/27/19 5:58 PM, Julia Suvorova wrote:
+> On Mon, 2018-09-17 at 22:57 +0800, Zihan Yang wrote:
+>> Hi all
+>>
+>> Here is a minimal working version of supporting multiple pci domains.
+> Hi Zihan,
+> Do you plan to continue working on this project?
 
-On 8/28/19 5:23 PM, Sukrit Bhatnagar wrote:
-> vmstate_pvrdma describes the PCI and MSIX states as well as the dma
-> address for dsr and the gid table of device.
-> vmstate_pvrdma_gids describes each gid in the gid table.
+Since the last submission was long ago we can safely assume
+Zihan moved to other projects.
+Thanks Zihan for the great work!
+
 >
-> pvrdma_post_save() does the job of unregistering gid entries from the
-> backend device in the source host.
->
-> pvrdma_post_load() maps to dsr using the loaded dma address, registers
-> each loaded gid into the backend device, and finally calls load_dsr()
-> to perform other mappings and ring init operations.
->
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Cc: Yuval Shaia <yuval.shaia@oracle.com>
-> Signed-off-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
-> ---
->   hw/rdma/vmw/pvrdma_main.c | 77 +++++++++++++++++++++++++++++++++++++++
->   1 file changed, 77 insertions(+)
->
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 6c90db96f9..6f8b56dea3 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -28,6 +28,7 @@
->   #include "sysemu/sysemu.h"
->   #include "monitor/monitor.h"
->   #include "hw/rdma/rdma.h"
-> +#include "migration/register.h"
->   
->   #include "../rdma_rm.h"
->   #include "../rdma_backend.h"
-> @@ -593,6 +594,81 @@ static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
->       pvrdma_fini(pci_dev);
->   }
->   
-> +static int pvrdma_post_save(void *opaque)
-> +{
-> +    int i, rc;
-> +    PVRDMADev *dev = opaque;
-> +
-> +    for (i = 0; i < MAX_GIDS; i++) {
-> +
+> I am interested in it, and if you do not mind I would like to finish
+> the project, retaining your authorship. I am going to take care
+> of this patch set, and the one in SeaBios too.
+> How does it sound to you?
 
-No need for the extra line
-> +        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
-> +            continue;
-> +        }
-> +        rc = rdma_backend_del_gid(&dev->backend_dev,
-> +                                   dev->backend_eth_device_name,
-> +                                   &dev->rdma_dev_res.port.gid_tbl[i].gid);
-> +        if (rc) {
-> +            return -EINVAL;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int pvrdma_post_load(void *opaque, int version_id)
-> +{
-> +    int i, rc;
-> +    PVRDMADev *dev = opaque;
-> +    PCIDevice *pci_dev = PCI_DEVICE(dev);
-> +    DSRInfo *dsr_info = &dev->dsr_info;
-> +
-> +    dsr_info->dsr = rdma_pci_dma_map(pci_dev, dsr_info->dma,
-> +                                sizeof(struct pvrdma_device_shared_region));
-> +    if (!dsr_info->dsr) {
-> +        rdma_error_report("Failed to map to DSR");
-> +        return -ENOMEM;
-> +    }
-> +
-> +    for (i = 0; i < MAX_GIDS; i++) {
-> +
+I don't Zihan would mind, anyway I fully agree on keeping his authorship.
+His work is part of GSOC, so there is no problem with the licensing either.
 
-The same here
+> Any tips and clues are welcomed.
 
-> +        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
-> +            continue;
-> +        }
-> +
-> +        rc = rdma_backend_add_gid(&dev->backend_dev,
-> +                                  dev->backend_eth_device_name,
-> +                                  &dev->rdma_dev_res.port.gid_tbl[i].gid);
-> +        if (rc) {
-> +            return -EINVAL;
-> +        }
-> +    }
-> +
-> +    return load_dsr(dev);
-> +}
-> +
-> +static const VMStateDescription vmstate_pvrdma_gids = {
-> +    .name = "pvrdma-gids",
-> +    .fields = (VMStateField[]) {
-> +            VMSTATE_UINT8_ARRAY_V(gid.raw, RdmaRmGid, 16, 0),
+I would start with merging his work with latest QEMU and giving it a try.
+MSI/MSIx PCI devices should simply work.
 
-Is 16 the array length? If yes, do we have same macro definition?
+If I remember correctly 2 issues remain:
+1. Devices with legacy interrupts do not work (some INTx wiring issue)
+2. Running lspci -vt does not show the correct tree (every pxb should 
+start a separate PCI hierarchy)
 
-> +            VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_pvrdma = {
-> +    .name = PVRDMA_HW_NAME,
-> +    .post_save = pvrdma_post_save,
-> +    .post_load = pvrdma_post_load,
-> +    .fields = (VMStateField[]) {
-> +            VMSTATE_PCI_DEVICE(parent_obj, PVRDMADev),
-> +            VMSTATE_MSIX(parent_obj, PVRDMADev),
-> +            VMSTATE_UINT64(dsr_info.dma, PVRDMADev),
-> +            VMSTATE_STRUCT_ARRAY(rdma_dev_res.port.gid_tbl, PVRDMADev,
-> +                                 MAX_PORT_GIDS, 0, vmstate_pvrdma_gids,
-> +                                 RdmaRmGid),
-> +            VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->   static void pvrdma_realize(PCIDevice *pdev, Error **errp)
->   {
->       int rc = 0;
-> @@ -688,6 +764,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
->   
->       dc->desc = "RDMA Device";
->       dc->props = pvrdma_dev_properties;
-> +    dc->vmsd = &vmstate_pvrdma;
->       set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
->   
->       ir->print_statistics = pvrdma_print_statistics;
-
-Very simple an elegant.
-If I understand correctly the live migration of a pvrdma device with no
-active workloads works with this patch, right?
-If yes, I think we should consider merging this code already.
-Yuval, do you agree?
-
-Thanks,
+Good luck!
 Marcel
 
+
+>
+> Best regards, Julia Suvorova.
+>
+>> The next a few paragraphs will illustrate the purpose and use
+>> example.
+>> Current issue and limitations will be in last 2 paragraphs, followed
+>> by the changelog of each verison.
+>>
+>> Currently only q35 host bridge is allocated an item in MCFG table,
+>> all
+>> pxb-pcie host bridges stay within pci domain 0. This series of
+>> patches
+>> allow each pxb-pcie to be put in separate pci domain, allocating a
+>> new
+>> MCFG table item for it.
+>>
+>> Users can configure whether to put pxb host bridge into separate
+>> domain
+>> by specifying property 'domain_nr' of pxb-pcie device. 'bus_nr'
+>> property
+>> indicates the Base Bus Number(BBN) of the pxb-pcie host bridge.
+>> Another
+>> property max_bus specifies the maximum desired bus numbers to reduce
+>> MCFG space cost. Example command is
+>>
+>>      -device pxb-pcie,id=bridge3,bus="pcie.0",domain_nr=1,max_bus=15
+>>
+>> Then this pxb-pcie host bridge is placed at pci domain 1, and only
+>> reserve
+>> (15+1)=16 buses, which is much smaller than the default 256 buses.
+>>
+>> Compared with previous version, this version is much simpler because
+>> mcfg of extra domain now has a relatively fixed address, as suggested
+>> by Marcel and Gerd. Putting extra mmconfig above 4G and let seabios
+>> leave them for guest os will be expected in next version. The range
+>> is
+>> [0x80000000, 0xb0000000), which allows us to hold 4x busses compared
+>> with before.
+>>
+>> A complete command line for test is follows, you need to replace
+>> GUEST_IMAGE,
+>> DATA_IMAGE and SEABIOS_BIN with proper environment variable
+>>
+>> ./x86_64-softmmu/qemu-system-x86_64 \
+>>      -machine q35,accel=kvm -smp 2 -m 2048 \
+>>      -drive file=${GUEST_IMAGE}  -netdev user,id=realnet0 \
+>>      -device e1000e,netdev=realnet0,mac=52:54:00:12:34:56 \
+>>      -device pxb-pcie,id=bridge3,bus="pcie.0",domain_nr=1 \
+>>      -device pcie-root-
+>> port,id=rp1,bus=bridge3,addr=1c.0,port=8,chassis=8
+>> \
+>>      -drive if=none,id=drive0,file=${DATA_IMAGE} \
+>>      -device virtio-scsi-pci,id=scsi,bus=rp1,addr=00.0 \
+>>      -bios ${SEABIOS_BIN}
+>>
+>> There are a few limitations, though
+>> 1. Legacy interrupt routing is not dealt with yet. There is only
+>> support
+>> for
+>>     devices using MSI/MSIX
+>> 2. Only 4x devices is supported, you need to be careful not to
+>> overuse
+>> 3. I have not fully tested the functionality of devices under
+>> separate
+>> domain
+>>     yet, but Linux can recognize then when typing `lspci`
+>>
+>> Current issue:
+>> * SCSI storage device will be recognized twice, one in domain 0 as
+>> 0000:01.0,
+>>    the other in domain 1 as 0001:01.0. I will try to fix it in next
+>> version
+>>
+>> v5 <- v4:
+>> - Refactor the design and place pxb-pcie's mcfg in [0x80000000,
+>> 0xb0000000)
+>> - QEMU only decides the desired mcfg_size and leaves mcfg_base for
+>> seabios
+>> - Does not connect PXBDev and PXBPCIEHost with link property
+>> anymore,
+>> but
+>>    with the pcibus under them, which makes code simpler.
+>>
+>> v4 <- v3:
+>> - Fix bug in setting mcfg table
+>> - bus_nr is not used when pxb-pcie is in a new pci domain
+>>
+>> v3 <- v2:
+>> - Replace duplicate properties in pxb pcie host with link property
+>> to
+>> PXBDev
+>> - Allow seabios to access config space and data space of expander
+>> bridge
+>>    through a different ioport, because 0xcf8 is attached only to
+>> sysbus.
+>> - Add a new property start_bus to indicate the BBN of pxb host
+>> bridge.
+>> The
+>>    bus_nr property is used as the bus number of pxb-pcie device on
+>> pcie.0
+>> bus
+>>
+>> v2 <- v1:
+>> - Allow user to configure whether to put pxb-pcie into seperate
+>> domain
+>> - Add AML description part of each host bridge
+>> - Modify the location of MCFG space to between RAM hotplug and pci
+>> hole64
+>>
+>> Many thanks to
+>> Please let me know if you have any suggestions.
+>>
+>> Zihan Yang (6):
+>>    pci_expander_bridge: add type TYPE_PXB_PCIE_HOST
+>>    pci_expander_bridge: add domain_nr and max_bus property for pxb-
+>> pcie
+>>    acpi-build: allocate mcfg for pxb-pcie host bridges
+>>    i386/acpi-build: describe new pci domain in AML
+>>    pci_expander_bridge: add config_write callback for pxb-pcie
+>>    pci_expander_bridge: inform seabios of desired mcfg size via hidden
+>>      bar
+>>
+>>   hw/i386/acpi-build.c                        | 162
+>> ++++++++++++++++++--------
+>>   hw/pci-bridge/pci_expander_bridge.c         | 172
+>> +++++++++++++++++++++++++++-
+>>   hw/pci/pci.c                                |  30 ++++-
+>>   include/hw/pci-bridge/pci_expander_bridge.h |  25 ++++
+>>   include/hw/pci/pci.h                        |   2 +
+>>   include/hw/pci/pci_bus.h                    |   2 +
+>>   include/hw/pci/pci_host.h                   |   2 +-
+>>   7 files changed, 336 insertions(+), 59 deletions(-)
+>>   create mode 100644 include/hw/pci-bridge/pci_expander_bridge.h
+>>
 
 
