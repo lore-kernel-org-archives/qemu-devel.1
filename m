@@ -2,75 +2,72 @@ Return-Path: <SRS0=aRDT=W3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA53C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 07:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E30C3A59F
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 07:48:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2B232343A
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 07:48:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B232343A
+	by mail.kernel.org (Postfix) with ESMTPS id 649232343A
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Aug 2019 07:48:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 649232343A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i3y7t-0002fA-C8
-	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 03:48:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37361)
+	id 1i3y7x-0002iM-If
+	for qemu-devel@archiver.kernel.org; Sat, 31 Aug 2019 03:48:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <th.huth@gmail.com>) id 1i3y4x-0000zO-P7
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:49 -0400
+ (envelope-from <th.huth@gmail.com>) id 1i3y4r-0000yo-SN
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <th.huth@gmail.com>) id 1i3y4t-0005r4-QF
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:47 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:32797)
+ (envelope-from <th.huth@gmail.com>) id 1i3y4m-0005Xv-6C
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:40 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37770)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1i3y4r-0005XF-Ri
- for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:42 -0400
-Received: by mail-wm1-f67.google.com with SMTP id r17so7967930wme.0
- for <qemu-devel@nongnu.org>; Sat, 31 Aug 2019 00:45:35 -0700 (PDT)
+ (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1i3y4f-0005NX-SC
+ for qemu-devel@nongnu.org; Sat, 31 Aug 2019 03:45:31 -0400
+Received: by mail-wr1-f67.google.com with SMTP id z11so9054846wrt.4
+ for <qemu-devel@nongnu.org>; Sat, 31 Aug 2019 00:45:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=H0UFyDpbbv8A9RAHWSXrFtp5QPIF2nD2VJ3/zYyAEC0=;
- b=fCp0v8DL45CXaOey6z1WLWDjaYuUwNNuI5JrpYFe8sJvCdIwhKqDf4p41YoTuQF3nk
- TGTeqHRxlmOBut51AIu+2iKg7iMs8V7hG5b5AizHuZFmvg8RTbH0ARnEjsr7dU/Vugjj
- 6ED6FoAwg/KBUMt3/dt+21+xMlV4tAf8KBZC8oDr4vwvVuR01xzSFjPr8EG2lLdO4EMB
- 7ER9/MYncWXcRjQj6riSWl2ix5M62gv5ZbZ1Rm7wawLrpWYVMAdqTzFTe3kRD5Ur6DPD
- BwM0zcoo+AtrZhWc0QAcxPpmLBgWpoJ29YwX6Y1qZRDQOZhSIu9cWJKhZnmCo1lbT1kO
- SCxw==
-X-Gm-Message-State: APjAAAUp4EdsYFaXxHpoZzA33/18HwONP28TvOhOfR/CJghbY2X3pgu1
- 54Lq+40Dt+w3iyGgIj96Xj94yp41/E4=
-X-Google-Smtp-Source: APXvYqxOCUMolDxlEmVFhGPDNzLaxC8XqBrzAeiWg1UjUqyGPGOuJ6aok6QPy04ncPUQcpHBSTl+ng==
-X-Received: by 2002:a05:600c:20c2:: with SMTP id
- y2mr3382368wmm.68.1567237533630; 
- Sat, 31 Aug 2019 00:45:33 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=XMYAb+ZZ+ZAPuvq982+60p+qjmFpGmPb+BpB3dw68dU=;
+ b=b40wgO3vwvU2O3g7x+ibqNmdSu4Ncs+/HXk6L6IvvobVo+DJAouggQRI5vwnATxX4X
+ TMJgFttA0/ZJD5aUf2CjwHVc/oSDgyRnrCPqHFCpp2qOTuXK6CF95vMtUL4Da0KNjXa4
+ GtfOGRyhVPHHNTKcsTvnxeqj+6plYMX3pFlFSuFxfmVelOZL9AMAT2ivqQQ2+xTEsIwT
+ 3py6TKdOuWUq7o5UCps8qJSqecy5w1T3IgkSrFLFvc2XuEYsQYkqx7HTQiieS7YQShas
+ U4tkKf7G4S6YK/ChPYI51KapBrdy+qCC66xvakOgkY6OwUvirdzP0ZhLYe6axJtaydUT
+ Eeow==
+X-Gm-Message-State: APjAAAUQfP6hsKksvu6OgOt3XgfsV23cSAERhbxpyCOS6Lt9hsPc0GWP
+ i0zehjhQN8JtIUzlsxu43tvDaQ39gqk=
+X-Google-Smtp-Source: APXvYqxL6nHcTuSIuhZDEs+bUgkr8MoWfcwwSbbeIGwbgeK1tGVCoMIWlSQ5Xft+BF+t6Dxc0RPWpg==
+X-Received: by 2002:a5d:68cd:: with SMTP id p13mr15791767wrw.18.1567237528376; 
+ Sat, 31 Aug 2019 00:45:28 -0700 (PDT)
 Received: from thl530.multi.box (pD9E83624.dip0.t-ipconnect.de.
  [217.232.54.36])
- by smtp.gmail.com with ESMTPSA id w1sm7546650wrm.38.2019.08.31.00.45.32
+ by smtp.gmail.com with ESMTPSA id w1sm7546650wrm.38.2019.08.31.00.45.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 31 Aug 2019 00:45:33 -0700 (PDT)
+ Sat, 31 Aug 2019 00:45:27 -0700 (PDT)
 From: Thomas Huth <huth@tuxfamily.org>
 To: qemu-devel@nongnu.org
-Date: Sat, 31 Aug 2019 09:45:17 +0200
-Message-Id: <20190831074519.32613-5-huth@tuxfamily.org>
+Date: Sat, 31 Aug 2019 09:45:13 +0200
+Message-Id: <20190831074519.32613-1-huth@tuxfamily.org>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190831074519.32613-1-huth@tuxfamily.org>
-References: <20190831074519.32613-1-huth@tuxfamily.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: [Qemu-devel] [PATCH v5 4/6] escc: introduce a selector for the
- register bit
+X-Received-From: 209.85.221.67
+Subject: [Qemu-devel] [PATCH v5 0/6] m68k: Add basic support for the
+ NeXTcube machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,118 +88,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laurent Vivier <laurent@vivier.eu>
+During Google Summer of Code 2011, Bryce Lanham added the possibility to
+emulate the NeXTcube machine in QEMU, e.g. see these URLs for some details:
 
-On Sparc and PowerMac, the bit 0 of the address selects the register
-type (control or data) and bit 1 selects the channel (B or A).
+https://wiki.qemu.org/Google_Summer_of_Code_2011#NeXT_machines_system_emulation
+https://lists.gnu.org/archive/html/qemu-devel/2011-08/msg02158.html
 
-On m68k Macintosh and NeXTcube, the bit 0 selects the channel and
-bit 1 the register type.
+But since the machine requires a 68040 CPU and this was not included in
+upstream QEMU in 2011 yet, the patches have never been merged to upstream.
 
-This patch introduces a new parameter (bit_swap) to the device interface
-to indicate bits usage must be swapped between registers and channels.
+Then, during the last years, Laurent completed the full 680x0 support in
+upstream QEMU, so we could finally merge the NeXTcube support, too.
 
-For the moment all the machines use the bit 0, but this change will be
-needed to emulate the Quadra 800 or NeXTcube machine.
+The QEMU interfaces changed a lot since 2011, so I had to modify the
+sources quite a bit, but with the attached patches, it is now possible
+to boot up to the firmware monitor again.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-[thh: added NeXTcube to the patch description]
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Thomas Huth <huth@tuxfamily.org>
----
- hw/char/escc.c         | 30 ++++++++++++++++++++++++------
- include/hw/char/escc.h |  1 +
- 2 files changed, 25 insertions(+), 6 deletions(-)
+Note that boot device emulation is still missing (network and SCSI),
+so you can not boot any operating systems with this machine yet. I have
+the patches for these devices in my brach here:
 
-diff --git a/hw/char/escc.c b/hw/char/escc.c
-index e185522e27..8f7bf322cb 100644
---- a/hw/char/escc.c
-+++ b/hw/char/escc.c
-@@ -45,14 +45,21 @@
-  * mouse and keyboard ports don't implement all functions and they are
-  * only asynchronous. There is no DMA.
-  *
-- * Z85C30 is also used on PowerMacs. There are some small differences
-- * between Sparc version (sunzilog) and PowerMac (pmac):
-+ * Z85C30 is also used on PowerMacs and m68k Macs.
-+ *
-+ * There are some small differences between Sparc version (sunzilog)
-+ * and PowerMac (pmac):
-  *  Offset between control and data registers
-  *  There is some kind of lockup bug, but we can ignore it
-  *  CTS is inverted
-  *  DMA on pmac using DBDMA chip
-  *  pmac can do IRDA and faster rates, sunzilog can only do 38400
-  *  pmac baud rate generator clock is 3.6864 MHz, sunzilog 4.9152 MHz
-+ *
-+ * Linux driver for m68k Macs is the same as for PowerMac (pmac_zilog),
-+ * but registers are grouped by type and not by channel:
-+ * channel is selected by bit 0 of the address (instead of bit 1)
-+ * and register is selected by bit 1 of the address (instead of bit 0).
-  */
- 
- /*
-@@ -172,6 +179,16 @@ static void handle_kbd_command(ESCCChannelState *s, int val);
- static int serial_can_receive(void *opaque);
- static void serial_receive_byte(ESCCChannelState *s, int ch);
- 
-+static int reg_shift(ESCCState *s)
-+{
-+    return s->bit_swap ? s->it_shift + 1 : s->it_shift;
-+}
-+
-+static int chn_shift(ESCCState *s)
-+{
-+    return s->bit_swap ? s->it_shift : s->it_shift + 1;
-+}
-+
- static void clear_queue(void *opaque)
- {
-     ESCCChannelState *s = opaque;
-@@ -436,8 +453,8 @@ static void escc_mem_write(void *opaque, hwaddr addr,
-     int newreg, channel;
- 
-     val &= 0xff;
--    saddr = (addr >> serial->it_shift) & 1;
--    channel = (addr >> (serial->it_shift + 1)) & 1;
-+    saddr = (addr >> reg_shift(serial)) & 1;
-+    channel = (addr >> chn_shift(serial)) & 1;
-     s = &serial->chn[channel];
-     switch (saddr) {
-     case SERIAL_CTRL:
-@@ -547,8 +564,8 @@ static uint64_t escc_mem_read(void *opaque, hwaddr addr,
-     uint32_t ret;
-     int channel;
- 
--    saddr = (addr >> serial->it_shift) & 1;
--    channel = (addr >> (serial->it_shift + 1)) & 1;
-+    saddr = (addr >> reg_shift(serial)) & 1;
-+    channel = (addr >> chn_shift(serial)) & 1;
-     s = &serial->chn[channel];
-     switch (saddr) {
-     case SERIAL_CTRL:
-@@ -832,6 +849,7 @@ static void escc_realize(DeviceState *dev, Error **errp)
- static Property escc_properties[] = {
-     DEFINE_PROP_UINT32("frequency", ESCCState, frequency,   0),
-     DEFINE_PROP_UINT32("it_shift",  ESCCState, it_shift,    0),
-+    DEFINE_PROP_BOOL("bit_swap",    ESCCState, bit_swap,    false),
-     DEFINE_PROP_UINT32("disabled",  ESCCState, disabled,    0),
-     DEFINE_PROP_UINT32("chnBtype",  ESCCState, chn[0].type, 0),
-     DEFINE_PROP_UINT32("chnAtype",  ESCCState, chn[1].type, 0),
-diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
-index d5196c53e6..794b653484 100644
---- a/include/hw/char/escc.h
-+++ b/include/hw/char/escc.h
-@@ -51,6 +51,7 @@ typedef struct ESCCState {
- 
-     struct ESCCChannelState chn[2];
-     uint32_t it_shift;
-+    bool bit_swap;
-     MemoryRegion mmio;
-     uint32_t disabled;
-     uint32_t frequency;
+ https://gitlab.com/huth/qemu/commits/next-cube
+
+... but they are not quite working yet, so I'll submit them later once
+they have been fixed and the basic support patches of this series have
+been merged.
+
+v5:
+ - Rebased to master (fix the #include statements after Markus' rework)
+ - Removed some more disabled/commented code fragments
+ - Added Reviewed-bys and Tested-bys from Philippe
+ - Mark the KBD device as unmigratable (m68k CPUs can not be migrated, too)
+
+v4:
+ - Fixed the "bmap" memory region with its alias - the error messages
+   about wrong DIMMs should now be gone.
+ - Managed to wired up the ESCC serial device (after including Laurent's
+   "bit_swap" patch)
+
+v3:
+ - Don't connect the devices to the sysbus from the device files themselves,
+   do it from next-cube.c instead.
+ - Adjusted some values according to Philippe's review comments
+ - The MMIO region at 0x820c0020 is now correctly initialized as alias
+ - Some more clean-ups here and there
+
+v2:
+ - Don't use memory_region_allocate_system_memory() for the framebuffer
+   device anymore
+ - Turn the keyboard device into a proper QOM device
+ - Put the global variables in the third patch into the machine state
+   structure
+ - Got rid of the "//" C++ comments
+
+Laurent Vivier (1):
+  escc: introduce a selector for the register bit
+
+Thomas Huth (5):
+  m68k: Add NeXTcube framebuffer device emulation
+  m68k: Add NeXTcube keyboard device
+  m68k: Add NeXTcube machine
+  m68k: Add serial controller to the NeXTcube machine
+  m68k: Add an entry for the NeXTcube machine to the MAINTAINERS file
+
+ MAINTAINERS                      |   7 +
+ default-configs/m68k-softmmu.mak |   1 +
+ hw/char/escc.c                   |  30 +-
+ hw/display/Makefile.objs         |   1 +
+ hw/display/next-fb.c             | 146 +++++
+ hw/m68k/Kconfig                  |   5 +
+ hw/m68k/Makefile.objs            |   1 +
+ hw/m68k/next-cube.c              | 978 +++++++++++++++++++++++++++++++
+ hw/m68k/next-kbd.c               | 291 +++++++++
+ include/hw/char/escc.h           |   1 +
+ include/hw/m68k/next-cube.h      |  47 ++
+ tests/boot-serial-test.c         |  12 +
+ 12 files changed, 1514 insertions(+), 6 deletions(-)
+ create mode 100644 hw/display/next-fb.c
+ create mode 100644 hw/m68k/next-cube.c
+ create mode 100644 hw/m68k/next-kbd.c
+ create mode 100644 include/hw/m68k/next-cube.h
+
 -- 
 2.21.0
 
