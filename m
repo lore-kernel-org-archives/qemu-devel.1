@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E9EC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 17:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BEBC3A5A4
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 18:41:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7C802173E
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 17:39:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DCDE2190F
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 18:41:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="WNeIYbyH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7C802173E
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="a+X0eLDl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DCDE2190F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4TpH-000160-4G
-	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 13:39:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36436)
+	id 1i4UnD-0000Xu-DD
+	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 14:41:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43940)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1i4ToA-0000af-GF
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 13:38:35 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1i4UmH-0008LI-Se
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 14:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1i4To9-0006Yb-EY
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 13:38:34 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:40457)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1i4UmF-0001DJ-Jl
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 14:40:41 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:58471)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1i4To8-0006T8-VW
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 13:38:33 -0400
+ id 1i4UmF-0001CV-1A
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 14:40:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
  MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
  :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
  Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
  List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=f+p0E6yYT+91k9zU0ES4ZVHcoeiinKaivMaOvsI63LU=; b=WNeIYbyHPhr7tqBuIxCtvP5Arb
- 7Zex1GW8coVnLSTIa4L8WFH9iu7Hhk9kfCub3gNyoTQgFdkZTRQTJZ2FxJ384chuSX1v/pbPFnV4f
- gYe6VWK3hjfly993sD4izjh8Bvd8F3FWi/eQL7dm+ndtWQUEdSLGlLUC7fUOzlQyqUDoMG0F6xkgq
- gfGTmRSdlbSjuUFJ4/+2KNbcbTPcIKdNmaGtgzgC9F1MzS7SN9WSCsyxnH0Wu2+pNeGFvfRX+MLgL
- VuTm5k/3tpP2go+V2Rw4c3c4C/3E1uWe+pYEqMkg8GC8RLjU7s1chAM14VxGBJ4ugHn4OcQQ/ADkK
- sMdltpYbGrI2PmQZENbl32/HPVn9T0dsORMMVadJwhP66dsjyyjHJlQFRu5ZqMvbjdP6VD/P0H8VT
- 8JjCY4roxyX8kIrTgXMqnU4toSPuiZu66JbzD4FISy9WsFRLwKDaIdPlhRT12hg0XpcPAf3S2jPeH
- oz8WTBgaVOq+0WbqckDfs8ucR7x0+sbDXP0xLM/KXOxyqcmGy21wEwZ5smWAeZgAloH0SEza9rS9S
- 283Q9WOx7a6PYKavwam3jPeBp0BtdZtYiGAb++oBg8aD9f7ycPHSljFOVcAGwbsdzGLxjGJNPvcjo
- y49dUKzE2ts8sC47E8e3tiAebZuSHWQ1krO7M8yiA=;
+ bh=MFVO1g2zl/2X8RHBCkyneaYCo1HojVcpqvQeE02e9OY=; b=a+X0eLDlP+s9UVGlczwL/ZBbdx
+ 1oLYqoY4SJeC3UBMqHowehyldS0TJ6G+Zv+4FGSWCT5/uGlw2oRwrfW5JbL5Zx98XSPr6COhRk4P0
+ jHgdey1Mb7w5sHkwaH4NFcCNOfaQ7oOAebFNYkmd29ZBqFfRJ7utsUGp24Gj0OHktpCKAqYOk2Wyg
+ Sgk1AC/pzfNmxDNKIdEvYbTF13kLL0ML4QOgIAyIoK0jQnuPpeCWIEzRGZJdDFBpNaibGFfKxzQGX
+ GWdONUWtec/xUsuQumOAYw/1vRpNAy8qIdIlKEHuBn6Q7nqrX7gslr9MIL02YeEEgJ0s4TKJ4aq3f
+ 2Ut9knEne1wFCa6LGKKxELQWAqbGuBuKRLOKo2hjY4h/f9MwS7HXL33wKY8Z2ZSKa8XWnxN+ihSIO
+ SW0SD86WLpx54DMJZMhbWeUyom4NWPWIvzFrzpGL88o/UgYfuBgT4KghjJlDeE8jo+XoOoLfprz8t
+ V0qVmN6n3Nm3RwNB3+juBOvFfiTUroWpk3Z04qtw7L5DhVkEA7q9NjeozN9lFJxWImHT5h19w/Pfi
+ JFAa+TDCrJhIUScR6ocPx35VtRx2TZCJa+ZR8t56Qwi+ux6EurNN/tX1lQGegQC/yIzJd4tqf5pqg
+ 6TYPE/rNbmZYJhrC6PMAQ0eVLoZ5BFNKreJb4/o1I=;
 To: qemu-devel@nongnu.org
-Date: Sun, 01 Sep 2019 19:38:28 +0200
-Message-ID: <4884116.45koar3ZxJ@silver>
-In-Reply-To: <20190829182730.1e1d69b2@bahia.lan>
+Date: Sun, 01 Sep 2019 20:40:34 +0200
+Message-ID: <2018575.EFrLczUYWK@silver>
+In-Reply-To: <20190829185528.1db6607e@bahia.lan>
 References: <cover.1566503584.git.qemu_oss@crudebyte.com>
- <5415baa3955c354d9f1e6aab39270ab2abca662a.1566503584.git.qemu_oss@crudebyte.com>
- <20190829182730.1e1d69b2@bahia.lan>
+ <50fc6fbbfd80c25d2ad1752fb945cdfc7d847f20.1566503584.git.qemu_oss@crudebyte.com>
+ <20190829185528.1db6607e@bahia.lan>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.189.157.229
-Subject: Re: [Qemu-devel] [PATCH v6 1/4] 9p: Treat multiple devices on one
- export as an error
+Subject: Re: [Qemu-devel] [PATCH v6 2/4] 9p: Added virtfs option
+ 'multidevs=remap|forbid|warn'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,52 +87,510 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 29. August 2019 18:27:30 CEST Greg Kurz wrote:
+On Donnerstag, 29. August 2019 18:55:28 CEST Greg Kurz wrote:
+> > diff --git a/fsdev/qemu-fsdev-opts.c b/fsdev/qemu-fsdev-opts.c
+> > index 7c31ffffaf..07a18c6e48 100644
+> > --- a/fsdev/qemu-fsdev-opts.c
+> > +++ b/fsdev/qemu-fsdev-opts.c
+> > @@ -31,7 +31,9 @@ static QemuOptsList qemu_fsdev_opts =3D {
+> >=20
+> >          }, {
+> >         =20
+> >              .name =3D "readonly",
+> >              .type =3D QEMU_OPT_BOOL,
+> >=20
+> > -
+> > +        }, {
+> > +            .name =3D "multidevs",
+> > +            .type =3D QEMU_OPT_STRING,
+> >=20
+> >          }, {
+> >         =20
+> >              .name =3D "socket",
+> >              .type =3D QEMU_OPT_STRING,
+> >=20
+> > @@ -76,6 +78,9 @@ static QemuOptsList qemu_virtfs_opts =3D {
+> >=20
+> >              .name =3D "readonly",
+> >              .type =3D QEMU_OPT_BOOL,
+> >         =20
+> >          }, {
+> >=20
+> > +            .name =3D "multidevs",
+> > +            .type =3D QEMU_OPT_STRING,
+> > +        }, {
+> >=20
+> >              .name =3D "socket",
+> >              .type =3D QEMU_OPT_STRING,
+> >         =20
+> >          }, {
+> >=20
+> > diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
+> > index 077a8c4e2b..ed03d559a9 100644
+> > --- a/fsdev/qemu-fsdev.c
+> > +++ b/fsdev/qemu-fsdev.c
+> > @@ -58,6 +58,7 @@ static FsDriverTable FsDrivers[] =3D {
+> >=20
+> >              "writeout",
+> >              "fmode",
+> >              "dmode",
+> >=20
+> > +            "multidevs",
+>=20
+> So we only allow this for the "local" backend. Any reason not to
+> add this to "proxy" as well ?
+>=20
+> I didn't do it for the "throttling" options because it is a
+> feature I didn't care to support much, but "multidevs" is more
+> a fix than a fancy feature.
+
+Well, to be honest I haven't cared about the proxy backend at all. Like I=20
+mentioned before, I am a bit sceptical that the proxy feature is actually u=
+sed=20
+by people in real life at all (at least in its current implementation). So=
+=20
+personally I don't see much sense in investing time for adding & testing ne=
+w=20
+things on this backend ATM.
+
+> > +    if (multidevs) {
+> > +        if (!strcmp(multidevs, "remap")) {
+> > +            fsle->fse.export_flags &=3D ~V9FS_FORBID_MULTIDEVS;
+> > +            fsle->fse.export_flags |=3D V9FS_REMAP_INODES;
+> > +        } else if (!strcmp(multidevs, "forbid")) {
+> > +            fsle->fse.export_flags &=3D ~V9FS_REMAP_INODES;
+> > +            fsle->fse.export_flags |=3D V9FS_FORBID_MULTIDEVS;
+> > +        }
+>=20
+> And...
+>=20
+>         } else if (!strcmp(multidevs, "warn")) {
+>             fsle->fse.export_flags &=3D ~V9FS_FORBID_MULTIDEVS;
+>             fsle->fse.export_flags &=3D ~V9FS_REMAP_INODES;
+>         } else {
+>             error_setg(errp, "invalid multidevs property '%s'", multidevs=
+);
+>             return -1;
+>         }
+>=20
+> ... because we're a bit pedantic for command line options :)
+
+And I thought I adapted to relaxed handling of CLI arguments. See existing=
+=20
+option "writeout".  :)
+
+>=20
+> > +    }
+> >=20
+> >      if (fsle->fse.ops->parse_opts) {
+> >     =20
+> >          if (fsle->fse.ops->parse_opts(opts, &fsle->fse, errp)) {
+> >=20
 > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > index 586a6dccba..8cc65c2c67 100644
+> > index 8cc65c2c67..c96ea51116 100644
 > > --- a/hw/9pfs/9p.c
 > > +++ b/hw/9pfs/9p.c
-> > @@ -572,10 +572,18 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
-> > 
+> > @@ -25,6 +25,7 @@
+> >=20
+> >  #include "trace.h"
+> >  #include "migration/blocker.h"
+> >  #include "sysemu/qtest.h"
+> >=20
+> > +#include "qemu/xxhash.h"
+> >=20
+> >  int open_fd_hw;
+> >  int total_open_fd;
+> >=20
+> > @@ -571,22 +572,109 @@ static void coroutine_fn virtfs_reset(V9fsPDU *p=
+du)
+> >=20
+> >                                  P9_STAT_MODE_NAMED_PIPE |   \
 > >                                  P9_STAT_MODE_SOCKET)
-> >  
-> >  /* This is the algorithm from ufs in spfs */
-> > 
-> > -static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
-> > +static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID
-> > *qidp)> 
-> >  {
-> >  
+> >=20
+> > -/* This is the algorithm from ufs in spfs */
+> > +
+> > +/* creative abuse of tb_hash_func7, which is based on xxhash */
+> > +static uint32_t qpp_hash(QppEntry e)
+> > +{
+> > +    return qemu_xxhash7(e.ino_prefix, e.dev, 0, 0, 0);
+> > +}
+> > +
+> > +static bool qpp_lookup_func(const void *obj, const void *userp)
+> > +{
+> > +    const QppEntry *e1 =3D obj, *e2 =3D userp;
+> > +    return e1->dev =3D=3D e2->dev && e1->ino_prefix =3D=3D e2->ino_pre=
+fix;
+> > +}
+> > +
+> > +static void qpp_table_remove(void *p, uint32_t h, void *up)
+> > +{
+> > +    g_free(p);
+> > +}
+> > +
+> > +static void qpp_table_destroy(struct qht *ht)
+> > +{
+> > +    qht_iter(ht, qpp_table_remove, NULL);
+> > +    qht_destroy(ht);
+> > +}
+>=20
+> Ok to have a function for this instead of open-coding but I'd
+> like to see qpp_table_init() for consistency.
+
+Well, these are just qht_init() one-liners, but if you really want to have=
+=20
+dedicated, local init functions for them, okay.
+
+> >  static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID
+> >  *qidp) {
+> >=20
+> > +    int err;
+> >=20
 > >      size_t size;
-> > 
-> > +    if (pdu->s->dev_id != stbuf->st_dev) {
-> > +        error_report_once(
-> > +            "9p: Multiple devices detected in same VirtFS export. "
-> > +            "You must use a separate export for each device."
-> > +        );
-> > +        return -ENODEV;
-> 
-> As explained in the v5 review, we don't necessarily want to break existing
-> cross-device setups that just happen to work. Moreover, the next patch
-> re-allows them since remap_inodes=ignore is the default. I would thus
-> only do:
-> 
->         warn_report_once(
->                     "9p: Multiple devices detected in same VirtFS export, "
->                     "which might lead to file ID collisions and severe "
->                     "misbehaviours on guest! You should use a separate "
->                     "export for each device shared from host."
->         );
-> 
-> So I've just changed that and applied to 9p-next since it is
-> a valuable improvement. Note that I've kept the signature change
-> of stat_to_qid() for simplicity even if it isn't needed before
-> the next patch.
+> >=20
+> > -    if (pdu->s->dev_id !=3D stbuf->st_dev) {
+> > -        error_report_once(
+> > -            "9p: Multiple devices detected in same VirtFS export. "
+> > -            "You must use a separate export for each device."
+> > -        );
+> > -        return -ENODEV;
+> > +    if (pdu->s->ctx.export_flags & V9FS_REMAP_INODES) {
+> > +        /* map inode+device to qid path (fast path) */
+> > +        err =3D qid_path_prefixmap(pdu, stbuf, &qidp->path);
+> > +        if (err) {
+> > +            return err;
+> > +        }
+> > +    } else {
+> > +        if (pdu->s->dev_id !=3D stbuf->st_dev) {
+> > +            if (pdu->s->ctx.export_flags & V9FS_FORBID_MULTIDEVS) {
+> > +                error_report_once(
+> > +                    "9p: Multiple devices detected in same VirtFS expo=
+rt.
+> > " +                    "Access of guest to additional devices is (partl=
+y)
+> > " +                    "denied due to virtfs option 'multidevs=3Dforbid'
+> > being " +                    "effective."
+> > +                );
+> > +                return -ENODEV;
+> > +            } else {
+> > +                error_report_once(
+>=20
+> Please use warn_report_once().
 
-I'm fine with your changes.
+Sure!
 
-Dropping "return -ENODEV" in this patch was beyond my default level for 
-details since this is really just a very detailed sort of git history 
-tweaking. :) Like you already pointed out, not aborting (as default behaviour) 
-would have been addressed with the subsequent patch anyway.
+> > +                    "9p: Multiple devices detected in same VirtFS expo=
+rt,
+> > " +                    "which might lead to file ID collisions and seve=
+re
+> > " +                    "misbehaviours on guest! You should either use a=
+ "
+> > +                    "separate export for each device shared from host =
+or
+> > " +                    "use virtfs option 'multidevs=3Dremap'!"
+> > +                );
+> > +            }
+> > +        }
+> > +        memset(&qidp->path, 0, sizeof(qidp->path));
+> > +        size =3D MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
+> > +        memcpy(&qidp->path, &stbuf->st_ino, size);
+> >=20
+> >      }
+> >=20
+> > -    memset(&qidp->path, 0, sizeof(qidp->path));
+> > -    size =3D MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
+> > -    memcpy(&qidp->path, &stbuf->st_ino, size);
+> >=20
+> >      qidp->version =3D stbuf->st_mtime ^ (stbuf->st_size << 8);
+> >      qidp->type =3D 0;
+> >      if (S_ISDIR(stbuf->st_mode)) {
+> >=20
+> > @@ -616,6 +704,30 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu,
+> > V9fsFidState *fidp,>=20
+> >      return 0;
+> > =20
+> >  }
+> >=20
+> > +static int coroutine_fn dirent_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
+> > +                                      struct dirent *dent, V9fsQID *qi=
+dp)
+> > +{
+> > +    struct stat stbuf;
+> > +    V9fsPath path;
+> > +    int err;
+> > +
+> > +    v9fs_path_init(&path);
+> > +
+> > +    err =3D v9fs_co_name_to_path(pdu, &fidp->path, dent->d_name, &path=
+);
+> > +    if (err < 0) {
+> > +        goto out;
+> > +    }
+> > +    err =3D v9fs_co_lstat(pdu, &path, &stbuf);
+> > +    if (err < 0) {
+> > +        goto out;
+> > +    }
+> > +    err =3D stat_to_qid(pdu, &stbuf, qidp);
+> > +
+> > +out:
+> > +    v9fs_path_free(&path);
+> > +    return err;
+> > +}
+> > +
+> >=20
+> >  V9fsPDU *pdu_alloc(V9fsState *s)
+> >  {
+> > =20
+> >      V9fsPDU *pdu =3D NULL;
+> >=20
+> > @@ -1964,16 +2076,39 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU
+> > *pdu, V9fsFidState *fidp,>=20
+> >              v9fs_string_free(&name);
+> >              return count;
+> >         =20
+> >          }
+> >=20
+> > -        /*
+> > -         * Fill up just the path field of qid because the client uses
+> > -         * only that. To fill the entire qid structure we will have
+> > -         * to stat each dirent found, which is expensive
+> > -         */
+> > -        size =3D MIN(sizeof(dent->d_ino), sizeof(qid.path));
+> > -        memcpy(&qid.path, &dent->d_ino, size);
+> > -        /* Fill the other fields with dummy values */
+> > -        qid.type =3D 0;
+> > -        qid.version =3D 0;
+> > +
+> > +        if (pdu->s->ctx.export_flags & V9FS_REMAP_INODES) {
+> > +            /*
+> > +             * dirent_to_qid() implies expensive stat call for each
+> > entry,
+> > +             * we must do that here though since inode remapping requi=
+res
+> > +             * the device id, which in turn might be different for
+> > +             * different entries; we cannot make any assumption to avo=
+id
+> > +             * that here.
+> > +             */
+> > +            err =3D dirent_to_qid(pdu, fidp, dent, &qid);
+> > +            if (err < 0) {
+> > +                v9fs_readdir_unlock(&fidp->fs.dir);
+> > +                v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
+> > +                v9fs_string_free(&name);
+> > +                return err;
+> > +            }
+> > +        } else {
+> > +            /*
+> > +             * Fill up just the path field of qid because the client u=
+ses
+> > +             * only that. To fill the entire qid structure we will have
+> > +             * to stat each dirent found, which is expensive. For the
+> > +             * latter reason we don't call dirent_to_qid() here. Only
+> > drawback +             * is that no multi-device export detection of
+> > stat_to_qid() +             * would be done and provided as error to the
+> > user here. But +             * user would get that error anyway when
+> > accessing those +             * files/dirs through other ways.
+> > +             */
+> > +            size =3D MIN(sizeof(dent->d_ino), sizeof(qid.path));
+> > +            memcpy(&qid.path, &dent->d_ino, size);
+> > +            /* Fill the other fields with dummy values */
+> > +            qid.type =3D 0;
+> > +            qid.version =3D 0;
+> > +        }
+> >=20
+> >          /* 11 =3D 7 + 4 (7 =3D start offset, 4 =3D space for storing c=
+ount) */
+> >          len =3D pdu_marshal(pdu, 11 + count, "Qqbs",
+> >=20
+> > @@ -3672,8 +3807,13 @@ int v9fs_device_realize_common(V9fsState *s, con=
+st
+> > V9fsTransport *t,>=20
+> >          goto out;
+> >     =20
+> >      }
+> >=20
+> > +    s->root_ino =3D stat.st_ino;
+> >=20
+> >      s->dev_id =3D stat.st_dev;
+> >=20
+> > +    /* QID path hash table. 1 entry ought to be enough for anybody ;) =
+*/
+> > +    qht_init(&s->qpp_table, qpp_lookup_func, 1, QHT_MODE_AUTO_RESIZE);
+> > +    s->qp_prefix_next =3D 1; /* reserve 0 to detect overflow */
+> > +
+> >=20
+> >      s->ctx.fst =3D &fse->fst;
+> >      fsdev_throttle_init(s->ctx.fst);
+> >=20
+> > @@ -3687,6 +3827,7 @@ out:
+> >          }
+> >          g_free(s->tag);
+> >          g_free(s->ctx.fs_root);
+> >=20
+> > +        qpp_table_destroy(&s->qpp_table);
+>=20
+> This causes QEMU to crash if we get there before qht_init() was called.
+> This should be guarded by a s->qpp_table.map !=3D NULL check.
+
+Touch=E9.
+
+I'll add that to qp_table_destroy() for simplicity.
+
+> I've just posted a patch that simplifies error handling in this
+> function, you in Cc. The patch is also in 9p-next. Please rebase
+> on top of it.
+
+Ok.
+=20
+> > diff --git a/qemu-options.hx b/qemu-options.hx
+> > index 9621e934c0..603e5e8e15 100644
+> > --- a/qemu-options.hx
+> > +++ b/qemu-options.hx
+> > @@ -1335,17 +1335,17 @@ ETEXI
+> >=20
+> >  DEF("virtfs", HAS_ARG, QEMU_OPTION_virtfs,
+> > =20
+> >      "-virtfs
+> >      local,path=3Dpath,mount_tag=3Dtag,security_model=3Dmapped-xattr|ma=
+pped-fil
+> >      e|passthrough|none\n">=20
+> > -    "      =20
+> > [,id=3Did][,writeout=3Dimmediate][,readonly][,fmode=3Dfmode][,dmode=3Dd=
+mode]\n" -
+> >    "-virtfs
+> > proxy,mount_tag=3Dtag,socket=3Dsocket[,id=3Did][,writeout=3Dimmediate][=
+,readonly]
+> > \n" -    "-virtfs
+> > proxy,mount_tag=3Dtag,sock_fd=3Dsock_fd[,id=3Did][,writeout=3Dimmediate=
+][,readonl
+> > y]\n" +    "      =20
+> > [,id=3Did][,writeout=3Dimmediate][,readonly][,fmode=3Dfmode][,dmode=3Dd=
+mode][,mul
+> > tidevs=3Dremap|forbid|warn]\n" +    "-virtfs
+> > proxy,mount_tag=3Dtag,socket=3Dsocket[,id=3Did][,writeout=3Dimmediate][=
+,readonly]
+> > [,multidevs=3Dremap|forbid|warn]\n" +    "-virtfs
+> > proxy,mount_tag=3Dtag,sock_fd=3Dsock_fd[,id=3Did][,writeout=3Dimmediate=
+][,readonl
+> > y][,multidevs=3Dremap|forbid|warn]\n"
+> Either enable support in "proxy" or don't update the "proxy" documentation
+> :)
+
+Then, if you don't mind, I'll just drop it from the proxy documentation, fo=
+r=20
+the reasons I described above.
+
+> >      "-virtfs synth,mount_tag=3Dtag[,id=3Did][,readonly]\n",
+> >      QEMU_ARCH_ALL)
+> > =20
+> >  STEXI
+> >=20
+> > -@item -virtfs local,path=3D@var{path},mount_tag=3D@var{mount_tag}
+> > ,security_model=3D@var{security_model}[,writeout=3D@var{writeout}][,rea=
+donly]
+> > [,fmode=3D@var{fmode}][,dmode=3D@var{dmode}] -@itemx -virtfs
+> > proxy,socket=3D@var{socket},mount_tag=3D@var{mount_tag}
+> > [,writeout=3D@var{writeout}][,readonly] -@itemx -virtfs
+> > proxy,sock_fd=3D@var{sock_fd},mount_tag=3D@var{mount_tag}
+> > [,writeout=3D@var{writeout}][,readonly] +@item -virtfs
+> > local,path=3D@var{path},mount_tag=3D@var{mount_tag}
+> > ,security_model=3D@var{security_model}[,writeout=3D@var{writeout}][,rea=
+donly]
+> > [,fmode=3D@var{fmode}][,dmode=3D@var{dmode}][,multidevs=3D@var{multidev=
+s}]
+> > +@itemx -virtfs proxy,socket=3D@var{socket},mount_tag=3D@var{mount_tag}
+> > [,writeout=3D@var{writeout}][,readonly][,multidevs=3D@var{multidevs}] +=
+@itemx
+> > -virtfs proxy,sock_fd=3D@var{sock_fd},mount_tag=3D@var{mount_tag}
+> > [,writeout=3D@var{writeout}][,readonly][,multidevs=3D@var{multidevs}]
+> Ditto.
+
+Ack.
+
+> >  @itemx -virtfs synth,mount_tag=3D@var{mount_tag}
+> >  @findex -virtfs
+> >=20
+> > @@ -1399,6 +1399,27 @@ Specifies the default mode for newly created
+> > directories on the host. Works>=20
+> >  only with security models "mapped-xattr" and "mapped-file".
+> >  @item mount_tag=3D@var{mount_tag}
+> >  Specifies the tag name to be used by the guest to mount this export
+> >  point.
+> >=20
+> > +@item multidevs=3D@var{multidevs}
+> > +Specifies how to deal with multiple devices being shared with a 9p
+> > export.
+> > +Supported behaviours are either "remap", "forbid" or "warn". The latter
+> > is
+> > +the default behaviour on which virtfs 9p expects only one device to be
+> > +shared with the same export, and if more than one device is shared and
+> > +accessed via the same 9p export then only a warning message is logged
+> > +(once) by qemu on host side. In order to avoid file ID collisions on
+> > guest
+> > +you should either create a separate virtfs export for each device to be
+> > +shared with guests (recommended way) or you might use "remap" instead
+> > which +allows you to share multiple devices with only one export instea=
+d,
+> > which is +achieved by remapping the original inode numbers from host to
+> > guest in a +way that would prevent such collisions. Remapping inodes in
+> > such use cases +is required because the original device IDs from host a=
+re
+> > never passed and +exposed on guest. Instead all files of an export shar=
+ed
+> > with virtfs always +share the same device id on guest. So two files with
+> > identical inode +numbers but from actually different devices on host
+> > would otherwise cause a +file ID collision and hence potential
+> > misbehaviours on guest. "forbid" on +the other hand assumes like "warn"
+> > that only one device is shared by the +same export, however it will not
+> > only log a warning message but also +deny access to additional devices =
+on
+> > guest. Note though that "forbid" does +currently not block all possible
+> > file access operations.
+>=20
+> Maybe provide a list of such operations that won't be blocked ?
+
+I feel punished for being so verbose. Okaaay. :)
+
+>=20
+> >  @end table
+> >  ETEXI
+> >=20
+> > diff --git a/vl.c b/vl.c
+> > index b426b32134..9cb29b483d 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -3320,7 +3320,7 @@ int main(int argc, char **argv, char **envp)
+> >=20
+> >              case QEMU_OPTION_virtfs: {
+> >             =20
+> >                  QemuOpts *fsdev;
+> >                  QemuOpts *device;
+> >=20
+> > -                const char *writeout, *sock_fd, *socket, *path,
+> > *security_model; +                const char *writeout, *sock_fd,
+> > *socket, *path, *security_model, *multidevs;>=20
+> >                  olist =3D qemu_find_opts("virtfs");
+> >                  if (!olist) {
+> >=20
+> > @@ -3380,6 +3380,10 @@ int main(int argc, char **argv, char **envp)
+> >=20
+> >                  qemu_opt_set_bool(fsdev, "readonly",
+> >                 =20
+> >                                    qemu_opt_get_bool(opts, "readonly", =
+0),
+> >                                    &error_abort);
+> >=20
+> > +                multidevs =3D qemu_opt_get(opts, "multidevs");
+> > +                if (multidevs) {
+> > +                    qemu_opt_set(fsdev, "multidevs", multidevs,
+> > &error_abort); +                }
+> >=20
+> >                  device =3D qemu_opts_create(qemu_find_opts("device"), =
+NULL,
+> >                  0,
+> >                 =20
+> >                                            &error_abort);
+> >                 =20
+> >                  qemu_opt_set(device, "driver", "virtio-9p-pci",
+> >                  &error_abort);
+
 
