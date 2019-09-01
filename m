@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A74C3A5A4
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 14:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 065A3C3A5A4
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 14:24:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 260EE22CE9
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 14:24:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 260EE22CE9
+	by mail.kernel.org (Postfix) with ESMTPS id CE54B22CE9
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 14:24:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE54B22CE9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4QmL-00065e-TX
-	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 10:24:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39443)
+	id 1i4QmR-0006CO-3y
+	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 10:24:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39448)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1i4QjS-0004SO-AO
+ (envelope-from <tao3.xu@intel.com>) id 1i4QjS-0004SP-AP
  for qemu-devel@nongnu.org; Sun, 01 Sep 2019 10:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1i4QjQ-0004Z5-AW
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 10:21:29 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1i4QjQ-0004Ze-Qt
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 10:21:30 -0400
 Received: from mga12.intel.com ([192.55.52.136]:16710)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1i4QjQ-0004WR-3E
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1i4QjQ-0004WR-Hk
  for qemu-devel@nongnu.org; Sun, 01 Sep 2019 10:21:28 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 01 Sep 2019 07:21:25 -0700
+ 01 Sep 2019 07:21:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,455,1559545200"; d="scan'208";a="211453071"
+X-IronPort-AV: E=Sophos;i="5.64,455,1559545200"; d="scan'208";a="211453077"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga002.fm.intel.com with ESMTP; 01 Sep 2019 07:21:24 -0700
+ by fmsmga002.fm.intel.com with ESMTP; 01 Sep 2019 07:21:26 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Sun,  1 Sep 2019 22:21:09 +0800
-Message-Id: <20190901142119.20482-2-tao3.xu@intel.com>
+Date: Sun,  1 Sep 2019 22:21:10 +0800
+Message-Id: <20190901142119.20482-3-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190901142119.20482-1-tao3.xu@intel.com>
 References: <20190901142119.20482-1-tao3.xu@intel.com>
@@ -55,7 +55,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.136
-Subject: [Qemu-devel] [PATCH v10 01/11] util/cutils: Add qemu_strtotime_ps()
+Subject: [Qemu-devel] [PATCH v10 02/11] tests/cutils: Add test for
+ qemu_strtotime_ps()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,120 +75,233 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To convert strings with time suffixes to numbers, support time unit are
-"ps" for picosecond, "ns" for nanosecond, "us" for microsecond, "ms"
-for millisecond or "s" for second.
+Test the input of basic, time suffixes, float, invaild, trailing and
+overflow.
 
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 New patch in v10.
 ---
- include/qemu/cutils.h |  1 +
- util/cutils.c         | 82 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 83 insertions(+)
+ tests/test-cutils.c | 199 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 199 insertions(+)
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 12301340a4..0e70a807e1 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -180,5 +180,6 @@ int uleb128_decode_small(const uint8_t *in, uint32_t *n);
-  * *str1 is <, == or > than *str2.
-  */
- int qemu_pstrcmp0(const char **str1, const char **str2);
-+int qemu_strtotime_ps(const char *nptr, const char **end, uint64_t *result);
- 
- #endif
-diff --git a/util/cutils.c b/util/cutils.c
-index fd591cadf0..a50c15f46a 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -847,3 +847,85 @@ int qemu_pstrcmp0(const char **str1, const char **str2)
- {
-     return g_strcmp0(*str1, *str2);
+diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+index 1aa8351520..19c967d3d5 100644
+--- a/tests/test-cutils.c
++++ b/tests/test-cutils.c
+@@ -2179,6 +2179,193 @@ static void test_qemu_strtosz_metric(void)
+     g_assert(endptr == str + 6);
  }
-+
-+static int64_t timeunit_mul(const char *unitstr)
+ 
++static void test_qemu_strtotime_ps_simple(void)
 +{
-+    if (g_strcmp0(unitstr, "ps") == 0) {
-+        return 1;
-+    } else if (g_strcmp0(unitstr, "ns") == 0) {
-+        return 1000;
-+    } else if (g_strcmp0(unitstr, "us") == 0) {
-+        return 1000000;
-+    } else if (g_strcmp0(unitstr, "ms") == 0) {
-+        return 1000000000LL;
-+    } else if (g_strcmp0(unitstr, "s") == 0) {
-+        return 1000000000000LL;
-+    } else {
-+        return -1;
-+    }
-+}
-+
-+
-+/*
-+ * Convert string to time, support time unit are ps for picosecond,
-+ * ns for nanosecond, us for microsecond, ms for millisecond or s for second.
-+ * End pointer will be returned in *end, if not NULL. Return -ERANGE on
-+ * overflow, and -EINVAL on other error.
-+ */
-+static int do_strtotime(const char *nptr, const char **end,
-+                      const char *default_unit, uint64_t *result)
-+{
-+    int retval;
++    const char *str;
 +    const char *endptr;
-+    int mul_required = 0;
-+    int64_t mul;
-+    double val, integral, fraction;
++    int err;
++    uint64_t res = 0xbaadf00d;
 +
-+    retval = qemu_strtod_finite(nptr, &endptr, &val);
-+    if (retval) {
-+        goto out;
-+    }
-+    fraction = modf(val, &integral);
-+    if (fraction != 0) {
-+        mul_required = 1;
-+    }
++    str = "0";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0);
++    g_assert(endptr == str + 1);
 +
-+    mul = timeunit_mul(endptr);
++    str = "56789";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 56789);
++    g_assert(endptr == str + 5);
 +
-+    if (mul == 1000000000000LL) {
-+        endptr++;
-+    } else if (mul != -1) {
-+        endptr += 2;
-+    } else {
-+        mul = timeunit_mul(default_unit);
-+        assert(mul >= 0);
-+    }
-+    if (mul == 1 && mul_required) {
-+        retval = -EINVAL;
-+        goto out;
-+    }
-+    /*
-+     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
-+     * through double (53 bits of precision).
-+     */
-+    if ((val * (double)mul >= 0xfffffffffffffc00) || val < 0) {
-+        retval = -ERANGE;
-+        goto out;
-+    }
-+    *result = val * (double)mul;
-+    retval = 0;
++    err = qemu_strtotime_ps(str, NULL, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 56789);
 +
-+out:
-+    if (end) {
-+        *end = endptr;
-+    } else if (*endptr) {
-+        retval = -EINVAL;
-+    }
++    /* Note: precision is 53 bits since we're parsing with strtod() */
 +
-+    return retval;
++    str = "9007199254740991"; /* 2^53-1 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0x1fffffffffffff);
++    g_assert(endptr == str + 16);
++
++    str = "9007199254740992"; /* 2^53 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0x20000000000000);
++    g_assert(endptr == str + 16);
++
++    str = "9007199254740993"; /* 2^53+1 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0x20000000000000); /* rounded to 53 bits */
++    g_assert(endptr == str + 16);
++
++    str = "18446744073709549568"; /* 0xfffffffffffff800 (53 msbs set) */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0xfffffffffffff800);
++    g_assert(endptr == str + 20);
++
++    str = "18446744073709550591"; /* 0xfffffffffffffbff */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0xfffffffffffff800); /* rounded to 53 bits */
++    g_assert(endptr == str + 20);
++
++    /* 0x7ffffffffffffe00..0x7fffffffffffffff get rounded to
++     * 0x8000000000000000, thus -ERANGE; see test_qemu_strtosz_erange() */
 +}
 +
-+int qemu_strtotime_ps(const char *nptr, const char **end, uint64_t *result)
++static void test_qemu_strtotime_ps_units(void)
 +{
-+    return do_strtotime(nptr, end, "ps", result);
++    const char *ps = "1ps";
++    const char *ns = "1ns";
++    const char *us = "1us";
++    const char *ms = "1ms";
++    const char *s = "1s";
++    int err;
++    const char *endptr;
++    uint64_t res = 0xbaadf00d;
++
++    err = qemu_strtotime_ps(ps, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1);
++    g_assert(endptr == ps + 3);
++
++    err = qemu_strtotime_ps(ns, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000);
++    g_assert(endptr == ns + 3);
++
++    err = qemu_strtotime_ps(us, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000000);
++    g_assert(endptr == us + 3);
++
++    err = qemu_strtotime_ps(ms, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000000000LL);
++    g_assert(endptr == ms + 3);
++
++    err = qemu_strtotime_ps(s, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000000000000ULL);
++    g_assert(endptr == s + 2);
 +}
++
++static void test_qemu_strtotime_ps_float(void)
++{
++    const char *str = "56.789ns";
++    int err;
++    const char *endptr;
++    uint64_t res = 0xbaadf00d;
++
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 56.789 * 1000);
++    g_assert(endptr == str + 8);
++}
++
++static void test_qemu_strtotime_ps_invalid(void)
++{
++    const char *str;
++    const char *endptr;
++    int err;
++    uint64_t res = 0xbaadf00d;
++
++    str = "";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = " \t ";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = "crap";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = "inf";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = "NaN";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++}
++
++static void test_qemu_strtotime_ps_trailing(void)
++{
++    const char *str;
++    int err;
++    uint64_t res = 0xbaadf00d;
++
++    str = "123xxx";
++
++    err = qemu_strtotime_ps(str, NULL, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++}
++
++static void test_qemu_strtotime_ps_erange(void)
++{
++    const char *str;
++    const char *endptr;
++    int err;
++    uint64_t res = 0xbaadf00d;
++
++    str = "-1";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 2);
++
++    str = "18446744073709550592"; /* 0xfffffffffffffc00 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 20);
++
++    str = "18446744073709551615"; /* 2^64-1 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 20);
++
++    str = "18446744073709551616"; /* 2^64 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 20);
++
++    str = "200000000000000s";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 16);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -2456,5 +2643,17 @@ int main(int argc, char **argv)
+     g_test_add_func("/cutils/strtosz/metric",
+                     test_qemu_strtosz_metric);
+ 
++    g_test_add_func("/cutils/strtotime/simple",
++                    test_qemu_strtotime_ps_simple);
++    g_test_add_func("/cutils/strtotime/units",
++                    test_qemu_strtotime_ps_units);
++    g_test_add_func("/cutils/strtotime/float",
++                    test_qemu_strtotime_ps_float);
++    g_test_add_func("/cutils/strtotime/invalid",
++                    test_qemu_strtotime_ps_invalid);
++    g_test_add_func("/cutils/strtotime/trailing",
++                    test_qemu_strtotime_ps_trailing);
++    g_test_add_func("/cutils/strtotime/erange",
++                    test_qemu_strtotime_ps_erange);
+     return g_test_run();
+ }
 -- 
 2.20.1
 
