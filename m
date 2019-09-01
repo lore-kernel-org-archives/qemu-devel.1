@@ -2,82 +2,69 @@ Return-Path: <SRS0=Jh9c=W4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 336CDC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 14:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E9EC3A5A4
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 17:39:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECDB521872
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 14:45:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7C802173E
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Sep 2019 17:39:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m/bUQEjM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECDB521872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="WNeIYbyH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7C802173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4R6e-0003CG-1P
-	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 10:45:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42184)
+	id 1i4TpH-000160-4G
+	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 13:39:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@gmail.com>) id 1i4R5Z-0002dJ-Mr
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 10:44:23 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1i4ToA-0000af-GF
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 13:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1i4R5Y-0005e4-0X
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 10:44:21 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:43960)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1i4R5X-0005c7-Od
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 10:44:19 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id y8so8746112oih.10
- for <qemu-devel@nongnu.org>; Sun, 01 Sep 2019 07:44:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cKMltYeBi6dzYKA5CbWu6tyUS+T0ysZLFaTPqlj9B7k=;
- b=m/bUQEjM0WoSarXjH8xKx8iYGeLB9Psq7SBfKtRnXXQ9+Yo4g2tc5yvv1rAem1CP/I
- UuOoXdSzLQayVRGuHtOYc3SDiqxIzPu1/u0+d9BCe4pm51u44u1soJe+W0hFVAw1IxQw
- JeUDhmnxbgu2wF0MtZT2A5XDoYwwmqIafbP2mDHRBTJyQh0ZPcRWS1gKEWJGgygCwmB2
- mJCXY+nbSxSX/58FVodBuB14BxUP669a3q49I4jtFK57m/+YhqzCy9h1pnuhjNarKMzt
- ZDTRHBy6+ScPEYdxRqQdZgSm/YrPcfDkESj4Nn/SFyFwsABfSOz1hsLJIoqqYoCJCvKh
- 9IKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=cKMltYeBi6dzYKA5CbWu6tyUS+T0ysZLFaTPqlj9B7k=;
- b=t1x6YQE7U5FUkvo+a8DJHUoswrR1+W6JMqj/GE52qq0C/QqTETlF3vpEcoKFG8Rb1I
- syabbDZXyuJonvOPFpnnLldoI0VkgK+VDpkLCUZB+xl1UOruHgMDXxvr7CQj6dx6EaO7
- kRZeloyXPWNq4DuRpYK617+xQBaaqlWoRbG0dtIIH1HcllSF1hI0nHWbC/pqrgnvm3AQ
- HOHBFr6v8p2zKZE8zOcb9gq78pZQE7t7+ysWNgzNLrhNQ7a4YHWAePHSPV7Z1IuHM63K
- hlN3dBIo/5XWaileUz+sTc8PwuVSy+BgFSTC1KKgErchmlXY7BwgiNNWCz7b1SNzPup9
- JSMg==
-X-Gm-Message-State: APjAAAUQnztgdF9rLEaR8hVf0KFQtcgNIRJ014CCCR4H7KZB8nCLsmoF
- Ob3KUN4k8DV8SvmMisOzNLntL1GUjwaBFczRg6o=
-X-Google-Smtp-Source: APXvYqwHVJmqan3EWU/xxER7Lg1PbPJ2zQcWSQ/tCvRK3vt/4p9eNqVIk0wx7zwO0xX0FP4T8WIOt/kL4vzdVGMhfcI=
-X-Received: by 2002:aca:1a08:: with SMTP id a8mr15957107oia.150.1567349058698; 
- Sun, 01 Sep 2019 07:44:18 -0700 (PDT)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1i4To9-0006Yb-EY
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 13:38:34 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:40457)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1i4To8-0006T8-VW
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 13:38:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+ :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=f+p0E6yYT+91k9zU0ES4ZVHcoeiinKaivMaOvsI63LU=; b=WNeIYbyHPhr7tqBuIxCtvP5Arb
+ 7Zex1GW8coVnLSTIa4L8WFH9iu7Hhk9kfCub3gNyoTQgFdkZTRQTJZ2FxJ384chuSX1v/pbPFnV4f
+ gYe6VWK3hjfly993sD4izjh8Bvd8F3FWi/eQL7dm+ndtWQUEdSLGlLUC7fUOzlQyqUDoMG0F6xkgq
+ gfGTmRSdlbSjuUFJ4/+2KNbcbTPcIKdNmaGtgzgC9F1MzS7SN9WSCsyxnH0Wu2+pNeGFvfRX+MLgL
+ VuTm5k/3tpP2go+V2Rw4c3c4C/3E1uWe+pYEqMkg8GC8RLjU7s1chAM14VxGBJ4ugHn4OcQQ/ADkK
+ sMdltpYbGrI2PmQZENbl32/HPVn9T0dsORMMVadJwhP66dsjyyjHJlQFRu5ZqMvbjdP6VD/P0H8VT
+ 8JjCY4roxyX8kIrTgXMqnU4toSPuiZu66JbzD4FISy9WsFRLwKDaIdPlhRT12hg0XpcPAf3S2jPeH
+ oz8WTBgaVOq+0WbqckDfs8ucR7x0+sbDXP0xLM/KXOxyqcmGy21wEwZ5smWAeZgAloH0SEza9rS9S
+ 283Q9WOx7a6PYKavwam3jPeBp0BtdZtYiGAb++oBg8aD9f7ycPHSljFOVcAGwbsdzGLxjGJNPvcjo
+ y49dUKzE2ts8sC47E8e3tiAebZuSHWQ1krO7M8yiA=;
+To: qemu-devel@nongnu.org
+Date: Sun, 01 Sep 2019 19:38:28 +0200
+Message-ID: <4884116.45koar3ZxJ@silver>
+In-Reply-To: <20190829182730.1e1d69b2@bahia.lan>
+References: <cover.1566503584.git.qemu_oss@crudebyte.com>
+ <5415baa3955c354d9f1e6aab39270ab2abca662a.1566503584.git.qemu_oss@crudebyte.com>
+ <20190829182730.1e1d69b2@bahia.lan>
 MIME-Version: 1.0
-References: <7d22c299-29fe-8479-ee14-17d521bb9d6b@huawei.com>
- <CAKXe6SL+LC4RVRy+4oAKnuS=qMFDG4A0iyoL0hqg_f76gSrmBA@mail.gmail.com>
- <43E932EA88344C498D975E4FF00CF41E2EAB29A5@dggeml529-mbx.china.huawei.com>
-In-Reply-To: <43E932EA88344C498D975E4FF00CF41E2EAB29A5@dggeml529-mbx.china.huawei.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Sun, 1 Sep 2019 22:43:42 +0800
-Message-ID: <CAKXe6SJB4fc_2a0gz8JJ_LD6Qh65DDXaFVhJSspTHQxxn4=UQg@mail.gmail.com>
-To: fangying <fangying1@huawei.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] Discussion: vnc: memory leak in zrle_compress_data
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.189.157.229
+Subject: Re: [Qemu-devel] [PATCH v6 1/4] 9p: Treat multiple devices on one
+ export as an error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,123 +76,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, zhouyibo <zhouyibo3@huawei.com>,
- qemu-devel <qemu-devel@nongnu.org>
+From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fangying <fangying1@huawei.com> =E4=BA=8E2019=E5=B9=B49=E6=9C=881=E6=97=A5=
-=E5=91=A8=E6=97=A5 =E4=B8=8B=E5=8D=888:29=E5=86=99=E9=81=93=EF=BC=9A
+On Donnerstag, 29. August 2019 18:27:30 CEST Greg Kurz wrote:
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index 586a6dccba..8cc65c2c67 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -572,10 +572,18 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
+> > 
+> >                                  P9_STAT_MODE_SOCKET)
+> >  
+> >  /* This is the algorithm from ufs in spfs */
+> > 
+> > -static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
+> > +static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID
+> > *qidp)> 
+> >  {
+> >  
+> >      size_t size;
+> > 
+> > +    if (pdu->s->dev_id != stbuf->st_dev) {
+> > +        error_report_once(
+> > +            "9p: Multiple devices detected in same VirtFS export. "
+> > +            "You must use a separate export for each device."
+> > +        );
+> > +        return -ENODEV;
+> 
+> As explained in the v5 review, we don't necessarily want to break existing
+> cross-device setups that just happen to work. Moreover, the next patch
+> re-allows them since remap_inodes=ignore is the default. I would thus
+> only do:
+> 
+>         warn_report_once(
+>                     "9p: Multiple devices detected in same VirtFS export, "
+>                     "which might lead to file ID collisions and severe "
+>                     "misbehaviours on guest! You should use a separate "
+>                     "export for each device shared from host."
+>         );
+> 
+> So I've just changed that and applied to 9p-next since it is
+> a valuable improvement. Note that I've kept the signature change
+> of stat_to_qid() for simplicity even if it isn't needed before
+> the next patch.
 
-> Nice work, your patch does fix this issue in my test.
->
-> I think we should make VncState.zlib to be a pointer type as well.
->
-> Since we are going to use pointers instead of copy, we must make sure tha=
-t
-> there=E2=80=99s no race condition of pointer members between the local vs=
- (vnc
-> worker thread) and origin vs (main thread).
->
->
+I'm fine with your changes.
 
-Yes, there is a race between the main thread and vnc thread. Maybe we
-should add a lock just like the 'vs->output_mutex'.
-Let's wait for Gerd's (or others) comments whether there is a better way
-than using pointer before sending the revision.
+Dropping "return -ENODEV" in this patch was beyond my default level for 
+details since this is really just a very detailed sort of git history 
+tweaking. :) Like you already pointed out, not aborting (as default behaviour) 
+would have been addressed with the subsequent patch anyway.
 
-Thanks,
-Li Qiang
-
-
->
-> Thanks.
-> Ying Fang
-> *=E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A *Li Qiang<liq3ea@gmail.com>
-> *=E6=94=B6=E4=BB=B6=E4=BA=BA=EF=BC=9A *fangying<fangying1@huawei.com>
-> *=E6=8A=84=E9=80=81=EF=BC=9A *Gerd Hoffmann<kraxel@redhat.com>;qemu-devel=
-<qemu-devel@nongnu.org>;Daniel
-> P. Berrange<berrange@redhat.com>;zhouyibo<zhouyibo3@huawei.com>
-> *=E4=B8=BB=E9=A2=98=EF=BC=9A *Re: [Qemu-devel] Discussion: vnc: memory le=
-ak in zrle_compress_data
-> *=E6=97=B6=E9=97=B4=EF=BC=9A *2019-08-31 23:48:10
->
->
->
-> fangying <fangying1@huawei.com> =E4=BA=8E2019=E5=B9=B48=E6=9C=8831=E6=97=
-=A5=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=888:45=E5=86=99=E9=81=93=EF=BC=9A
->
->> Hi Gerd,
->>
->> Memory leak is observed in zrle_compress_data when we are doing some
->> AddressSanitizer tests. The leak stack is as bellow:
->>
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> =3D=3D47887=3D=3DERROR: LeakSanitizer: detected memory leaks
->>
->> Direct leak of 29760 byte(s) in 5 object(s) allocated from:
->>      #0 0xffffa67ef3c3 in __interceptor_calloc
->> (/lib64/libasan.so.4+0xd33c3)
->>      #1 0xffffa65071cb in g_malloc0 (/lib64/libglib-2.0.so.0+0x571cb)
->>      #2 0xffffa5e968f7 in deflateInit2_ (/lib64/libz.so.1+0x78f7)
->>      #3 0xaaaacec58613 in zrle_compress_data ui/vnc-enc-zrle.c:87
->>      #4 0xaaaacec58613 in zrle_send_framebuffer_update
->> ui/vnc-enc-zrle.c:344
->>      #5 0xaaaacec34e77 in vnc_send_framebuffer_update ui/vnc.c:919
->>      #6 0xaaaacec5e023 in vnc_worker_thread_loop ui/vnc-jobs.c:271
->>      #7 0xaaaacec5e5e7 in vnc_worker_thread ui/vnc-jobs.c:340
->>      #8 0xaaaacee4d3c3 in qemu_thread_start util/qemu-thread-posix.c:502
->>      #9 0xffffa544e8bb in start_thread (/lib64/libpthread.so.0+0x78bb)
->>      #10 0xffffa53965cb in thread_start (/lib64/libc.so.6+0xd55cb)
->>
->> This leak stack can be easily reproduced in the case that a client
->> repeatedly
->> does vnc connect/disconnect .
->>
->> To get the leak stack, we can compile qemu with
->> --extra-ldflags=3D-Wl,--build-id -Wl,-z,relro -Wl,-z,now -lasan'
->> '--extra-cflags=3D-O0 -g -fno-omit-frame-pointer -fno-stack-protector
->> -fsanitize=3Daddress -fsanitize=3Dleak' using gcc that supports asan.
->>
->> It is obvious that there may be memory leak in the zlib/zrle compress
->> stuff.
->> IIUC, *deflateInit2* is called with the local VncState vs->zrle.stream
->> when a
->> client is connected the vnc server. And then *deflate* is called to do
->> the
->> encoding. Finally *deflateEnd* is called in vnc_zrle_clear when a
->> connection is
->> closed.
->>
->> I had not think it out why this memory leak could happen here.
->> It is noticed that deflateInit2 is called with the local vs,
->> however deflateEnd is called with the origin vs.
->> The local vs is copied to the origin vs in vnc_async_encoding_start and
->> vnc_async_encoding_end on the contrary.
->>
->> Have you got any idea on this issue ?
->>
->>
-> Hello Ying,
->
-> I have posted a patch for this issue:
-> --> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg06675.html
->
-> Please check whether the patch can address this issue.
->
-> Thanks,
-> Li Qiang
->
->
->
->
->
->> Thanks.
->> Ying Fang
->>
->>
->>
