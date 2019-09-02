@@ -2,63 +2,57 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD20CC3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AA5C41514
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 12:03:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0B032168B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:50:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B032168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5C6FD217D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 12:03:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C6FD217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4kr4-0001Dy-R8
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 07:50:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37836)
+	id 1i4l3Q-0004E7-C4
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 08:03:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1i4kqA-0000co-ST
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:49:47 -0400
+ (envelope-from <imammedo@redhat.com>) id 1i4l2b-0003hZ-EE
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 08:02:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1i4kq9-0007dS-8E
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:49:46 -0400
-Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:33576)
+ (envelope-from <imammedo@redhat.com>) id 1i4l2a-0008Tr-7i
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 08:02:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34586)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i4kq9-0007d0-2g
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:49:45 -0400
-Received: from player787.ha.ovh.net (unknown [10.108.35.185])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 02B95141371
- for <qemu-devel@nongnu.org>; Mon,  2 Sep 2019 13:49:42 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id F2F67970D587;
- Mon,  2 Sep 2019 11:49:36 +0000 (UTC)
-Date: Mon, 2 Sep 2019 13:49:34 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-ID: <20190902134934.6b013f1a@bahia.lan>
-In-Reply-To: <1985382.8LBUmpxoXr@silver>
-References: <cover.1566503584.git.qemu_oss@crudebyte.com>
- <50fc6fbbfd80c25d2ad1752fb945cdfc7d847f20.1566503584.git.qemu_oss@crudebyte.com>
- <20190830142238.4dbf65c8@bahia.lan> <1985382.8LBUmpxoXr@silver>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 132293241500113216
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejtddggeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1i4l2a-0008Sn-22; Mon, 02 Sep 2019 08:02:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3A5568763B;
+ Mon,  2 Sep 2019 12:02:35 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3000560600;
+ Mon,  2 Sep 2019 12:02:27 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon,  2 Sep 2019 08:02:22 -0400
+Message-Id: <20190902120222.6179-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 02 Sep 2019 12:02:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.58.60
-Subject: Re: [Qemu-devel] [PATCH v6 2/4] 9p: Added virtfs option
- 'multidevs=remap|forbid|warn'
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] x86: do not advertise die-id in
+ query-hotpluggbale-cpus if '-smp dies' is not set
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,145 +64,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Antonios Motakis <antonios.motakis@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: pkrempa@redhat.com, ehabkost@redhat.com, like.xu@linux.intel.com,
+ mst@redhat.com, armbru@redhat.com, qemu-stable@nongnu.org, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 01 Sep 2019 20:56:16 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+Commit 176d2cda0 (i386/cpu: Consolidate die-id validity in smp context) added
+new 'die-id' topology property to CPUs and exposed it via QMP command
+query-hotpluggable-cpus, which broke -device/device_add cpu-foo for existing
+users that do not support die-id/dies yet. That's would be fine if it happened
+to new machine type only but it also happened to old machine types,
+which breaks migration from old QEMU to the new one, for example following CLI:
 
-> On Freitag, 30. August 2019 14:22:38 CEST Greg Kurz wrote:
-> > Some more comments below.
-> [snip]
-> > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > > index 8cc65c2c67..c96ea51116 100644
-> > > --- a/hw/9pfs/9p.c
-> > > +++ b/hw/9pfs/9p.c
-> > > @@ -25,6 +25,7 @@
-> > > 
-> > >  #include "trace.h"
-> > >  #include "migration/blocker.h"
-> > >  #include "sysemu/qtest.h"
-> [snip]
-> > > @@ -3672,8 +3807,13 @@ int v9fs_device_realize_common(V9fsState *s, const
-> > > V9fsTransport *t,> 
-> > >          goto out;
-> > >      
-> > >      }
-> > > 
-> > > +    s->root_ino = stat.st_ino;
-> > 
-> > This isn't used anywhere. It looks like a leftover of the readdir fix
-> > in v5.
-> 
-> Yes, both correct. I intentionally left it though, since I found it a natural 
-> complement always capturing the root inode along to the root device.
-> 
+  OLD-QEMU -M pc-i440fx-4.0 -smp 1,max_cpus=2 \
+           -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id
+is not able to start with new QEMU, complaining about invalid die-id.
 
-Fair enough. The local backend opens an fd to the root directory, to be used by
-any access to the 9p share. I think root_dev/root_ino should be obtained with fstat()
-on this fd, to be sure they are consistent. Maybe add an extra struct stat * argument
-to the init function ? I'd rather see this done as a preparatory "backend to cache
-9p root device/inode during init" patch.
+After discovering regression, the patch
+   "pc: Don't make die-id mandatory unless necessary"
+makes die-id optional so old CLI would work.
 
-> > >      s->dev_id = stat.st_dev;
-> > > 
-> > > +    /* QID path hash table. 1 entry ought to be enough for anybody ;) */
-> > > +    qht_init(&s->qpp_table, qpp_lookup_func, 1, QHT_MODE_AUTO_RESIZE);
-> > > +    s->qp_prefix_next = 1; /* reserve 0 to detect overflow */
-> > > +
-> > > 
-> > >      s->ctx.fst = &fse->fst;
-> > >      fsdev_throttle_init(s->ctx.fst);
-> > > 
-> > > @@ -3687,6 +3827,7 @@ out:
-> > >          }
-> > >          g_free(s->tag);
-> > >          g_free(s->ctx.fs_root);
-> > > 
-> > > +        qpp_table_destroy(&s->qpp_table);
-> > > 
-> > >          v9fs_path_free(&path);
-> > >      
-> > >      }
-> > >      return rc;
-> > > 
-> > > @@ -3699,6 +3840,7 @@ void v9fs_device_unrealize_common(V9fsState *s,
-> > > Error **errp)> 
-> > >      }
-> > >      fsdev_throttle_cleanup(s->ctx.fst);
-> > >      g_free(s->tag);
-> > > 
-> > > +    qpp_table_destroy(&s->qpp_table);
-> > > 
-> > >      g_free(s->ctx.fs_root);
-> > >  
-> > >  }
-> > > 
-> > > diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> > > index 5e316178d5..a283b0193e 100644
-> > > --- a/hw/9pfs/9p.h
-> > > +++ b/hw/9pfs/9p.h
-> > > @@ -8,6 +8,7 @@
-> > > 
-> > >  #include "fsdev/9p-iov-marshal.h"
-> > >  #include "qemu/thread.h"
-> > >  #include "qemu/coroutine.h"
-> > > 
-> > > +#include "qemu/qht.h"
-> > > 
-> > >  enum {
-> > >  
-> > >      P9_TLERROR = 6,
-> > > 
-> > > @@ -235,6 +236,15 @@ struct V9fsFidState
-> > > 
-> > >      V9fsFidState *rclm_lst;
-> > >  
-> > >  };
-> > > 
-> > > +#define QPATH_INO_MASK        ((1ULL << 48) - 1)
-> > > +
-> > > +/* QID path prefix entry, see stat_to_qid */
-> > > +typedef struct {
-> > > +    dev_t dev;
-> > > +    uint16_t ino_prefix;
-> > > +    uint16_t qp_prefix;
-> > > +} QppEntry;
-> > > +
-> > > 
-> > >  struct V9fsState
-> > >  {
-> > >  
-> > >      QLIST_HEAD(, V9fsPDU) free_list;
-> > > 
-> > > @@ -256,7 +266,10 @@ struct V9fsState
-> > > 
-> > >      Error *migration_blocker;
-> > >      V9fsConf fsconf;
-> > >      V9fsQID root_qid;
-> > > 
-> > > +    ino_t root_ino;
-> > 
-> > Thinking again, I'm wondering if root_ino and dev_id could be used
-> > instead of root_qid in v9fs_walk()... Would you have a look at that
-> > if you decide to fix the readdir issue ?
-> 
-> I keep it in mind when looking at the postponed readdir() issue again.
-> 
-> > >      dev_t dev_id;
-> > > 
-> > > +    struct qht qpp_table;
-> > > +    uint16_t qp_prefix_next;
-> > > 
-> > >  };
-> > >  
-> > >  /* 9p2000.L open flags */
-> > > 
-> 
+However it's not enough as new QEMU still exposes die-id via query-hotpluggbale-cpus
+QMP command, so the users that started old machine type on new QEMU, using all
+properties (including die-id) received from QMP command (as required), won't be
+able to start old QEMU using the same properties since it doesn't support die-id.
+
+Fix it by hiding die-id in query-hotpluggbale-cpus for all machine types in case
+'-smp dies' is not provided on CLI or -smp dies = 1', in which case smp_dies == 1
+and APIC ID is calculated in default way (as it was before DIE support) so we won't
+need compat code as in both cases the topology provided to guest via CPUID is the same.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/i386/pc.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index cf06d8a83f..f802741061 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2913,8 +2913,10 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
+                                  ms->smp.threads, &topo);
+         ms->possible_cpus->cpus[i].props.has_socket_id = true;
+         ms->possible_cpus->cpus[i].props.socket_id = topo.pkg_id;
+-        ms->possible_cpus->cpus[i].props.has_die_id = true;
+-        ms->possible_cpus->cpus[i].props.die_id = topo.die_id;
++        if (pcms->smp_dies > 1) {
++            ms->possible_cpus->cpus[i].props.has_die_id = true;
++            ms->possible_cpus->cpus[i].props.die_id = topo.die_id;
++        }
+         ms->possible_cpus->cpus[i].props.has_core_id = true;
+         ms->possible_cpus->cpus[i].props.core_id = topo.core_id;
+         ms->possible_cpus->cpus[i].props.has_thread_id = true;
+-- 
+2.18.1
 
 
