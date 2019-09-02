@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C16DDC3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1A4C3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:37:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D80D20820
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:36:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45360217D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:37:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hNhkz+Ur"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D80D20820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c5yaFzXn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45360217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4jhY-0000it-Sy
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 06:36:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55838)
+	id 1i4jiW-0001xf-5d
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 06:37:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i4ja6-0002jc-SA
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:29:12 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i4jSp-0004n3-Pj
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i4ja5-0000Lb-C2
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:29:06 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45507)
+ (envelope-from <alex.bennee@linaro.org>) id 1i4jSn-0004JH-Po
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:21:35 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:33442)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i4ja5-0000L9-5b
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:29:05 -0400
-Received: by mail-wr1-x444.google.com with SMTP id q12so13413205wrj.12
- for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 03:29:04 -0700 (PDT)
+ id 1i4jSn-0004Ig-K5
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:21:33 -0400
+Received: by mail-wr1-x429.google.com with SMTP id u16so13459788wrr.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 03:21:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BwBZji+5Tt15dNYdrMynPgEvZVN3UGmmOt0ukLNN0s4=;
- b=hNhkz+UrkyVCEgoaNtzioElv610aS3SDbzuMRXLHncK9BDg8nxYWupssBI7cm7oaMS
- zc3Mj9rCWDK02wm72MbmmExpW5SeCR64vAVHaE7521xin1g7vvZ5pMAxSkFHUzrZmwaI
- D7FCrZ36Wvv7iABsD0hm1QOB/0pRKGu0KkArkArD6ipuld75z8lK0FJaDG/506oRwY/U
- +Cn1gKwpWLEYggRpoLLfacuGm/Tn4+S23ooTYN79ktflXm4NmuXiEKMxGKY87Q5w4n9X
- 7SSEJQss32wBY9c+tqOiybltnxLnrsCO3ZhnPmPRnFrLy7hTjzEI9rxPp/XvCGGZTBP8
- ubiQ==
+ bh=oPHGA4epXrz3sRBaImYzLMH9SUMVM871U98ActdGL7I=;
+ b=c5yaFzXnNK+06rXJ44PKu9mbQ2TS4OONs6hkX2z7ANU6cVuzgyq1J/gKl59NJb2wKd
+ 7VjEcGFVjKYWqzTaw8HsY7fPT1FuXo5muL3l4lnIr9Wt8Hw7o/AkrTqmbfiQZo4pRSbK
+ XfP+b/Rtib4Xev2ThdvNOU8KCA513S7TxknGwimJxLefB30C7PhGJq6j8do6/v/4B73h
+ UstXAHC5au/wvxdOrokoi9UTacq5TeCH6Q8RSoGODu3UucetVLMVnoujC1JX1gXLm4H6
+ laduExguTVg/G4uCfYfYhxgGPsNpAE+3bLGRt1G/oX7ZKOG86wYO+NwtSQXT19Jjeqm3
+ +7kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BwBZji+5Tt15dNYdrMynPgEvZVN3UGmmOt0ukLNN0s4=;
- b=uJ6mDoNaaZ/gS35Wj89H996YnWCkb5IEyO4bXY3DzTI/6mlD9q0uDq8NZEpWikucJy
- DDQlCJRlfAuMfLCZFeUIn2FfIM8G0hIJl8WhD0Gqkf3G4TAMrSVp7Iuo46WXewBlMPYD
- JozQwoQsvtm3fQ/7tVsINh9ZJK6Mw0vecCeX2j+kDU9VeEaUqkju2I2g2FDSuZ3ImP6V
- BiJPm59GxS/m8GgvS4mLd76gwEv+m35gs1Ub2pQ9Os36bHEBBTpLsUDkZwIQgZmymHu7
- do73ORmAY1mvXxw/JfOfCh7gnmCeiSjk2nh1z3lllkPjIHCkLVZbptmfhU9yMlpLNq8t
- o0QQ==
-X-Gm-Message-State: APjAAAW61eFMXHRYxUEA5yYCnXFH+807KnU+/H9i9oAuzHqnR4W+JCJm
- gjzXW2AmLH0+NPCnsKl9mvpKAA==
-X-Google-Smtp-Source: APXvYqzSPbterrNbPATqhvjwlBUH7ngIVpAJ3pFEPbHvcQ6/FXXrGQnJVWvmeUFrX9yhVhoTmVx6JQ==
-X-Received: by 2002:adf:f482:: with SMTP id l2mr15786055wro.103.1567420143530; 
- Mon, 02 Sep 2019 03:29:03 -0700 (PDT)
+ bh=oPHGA4epXrz3sRBaImYzLMH9SUMVM871U98ActdGL7I=;
+ b=uK6Lu1++MoGC+EIH5OrBAiZJ8AR+3a2QuB4qqYmyKpS6+bia3ze3PbD7Y+LW3mBrPN
+ ukvhYGUqphjwDYKvj5eoYtlLZfHHdalxF7fOuIHNoPx3RpWTkgjaV1H3AoBeWIlYx3cs
+ WoGLfOl6AuAa0gQT+IvjtLAGOuo2sUETLPpmHVjelhHQAjlZJr6w0W9F6vyA+PvLlEAU
+ +BLWi2VMdBKB7SAsttWnXArF0RBPIwmFgGzsq5x0RGQwSV18jOsoJJYVeu0JW+Urbi/i
+ +nGcwhIHm1y69F9VX9yIkbx0rUpZlsRtWBosSsV9BtfyFpM3m6w3g7pE/rjk9Lfs02A9
+ w2ag==
+X-Gm-Message-State: APjAAAXelnKdItW0Xgr2UP6oPgrKkiZwfJwnKrnB+Y5x2Ow3ROo77NN/
+ iA3Es3WE/JhfLlm5QZopTJL5o9TKTQA=
+X-Google-Smtp-Source: APXvYqyJQNqghJ9WGWvxukvgBBuCFfbAoYgHttJVjtAawlKuOY+Zzb2js5S3LBQuTKg0woLnpOicTg==
+X-Received: by 2002:a5d:460e:: with SMTP id t14mr37069670wrq.171.1567419691561; 
+ Mon, 02 Sep 2019 03:21:31 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d18sm16556973wra.91.2019.09.02.03.29.02
+ by smtp.gmail.com with ESMTPSA id b26sm15848046wmj.14.2019.09.02.03.21.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Sep 2019 03:29:02 -0700 (PDT)
+ Mon, 02 Sep 2019 03:21:29 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 481001FF9C;
+ by zen.linaroharston (Postfix) with ESMTP id 319451FF9B;
  Mon,  2 Sep 2019 11:21:23 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Mon,  2 Sep 2019 11:21:22 +0100
-Message-Id: <20190902102122.1128-13-alex.bennee@linaro.org>
+Date: Mon,  2 Sep 2019 11:21:21 +0100
+Message-Id: <20190902102122.1128-12-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190902102122.1128-1-alex.bennee@linaro.org>
 References: <20190902102122.1128-1-alex.bennee@linaro.org>
@@ -83,8 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PULL 12/12] tests/docker: upgrade docker.py to python3
+X-Received-From: 2a00:1450:4864:20::429
+Subject: [Qemu-devel] [PULL 11/12] tests: fix modules-test with no default
+ machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,134 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org,
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The recent podman changes (9459f754134bb) imported enum which is part
-of the python3 standard library but only available as an external
-library for python2. This causes problems on the fairly restricted
-environment such as shippable. Lets bite the bullet and make the
-script a fully python3 one. To that end:
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-  - drop the from __future__ import (we are there now ;-)
-  - avoid the StringIO import hack
-  - be consistent with the mode we read/write dockerfiles
-  - s/iteritems/items/
-  - ensure check_output returns strings for processing
-
+Fixes: eb062cfa733 ("tests: add module loading test")
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190827140241.20818-2-marcandre.lureau@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index ac5baab4cad..4bba29e104e 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python2
-+#!/usr/bin/env python3
- #
- # Docker controlling module
- #
-@@ -11,7 +11,6 @@
- # or (at your option) any later version. See the COPYING file in
- # the top-level directory.
+diff --git a/tests/modules-test.c b/tests/modules-test.c
+index a8118e90427..d1a6ace218c 100644
+--- a/tests/modules-test.c
++++ b/tests/modules-test.c
+@@ -1,12 +1,14 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
  
--from __future__ import print_function
- import os
- import sys
- import subprocess
-@@ -25,10 +24,7 @@ import tempfile
- import re
- import signal
- from tarfile import TarFile, TarInfo
--try:
--    from StringIO import StringIO
--except ImportError:
--    from io import StringIO
-+from io import StringIO
- from shutil import copy, rmtree
- from pwd import getpwuid
- from datetime import datetime, timedelta
-@@ -62,11 +58,13 @@ USE_ENGINE = EngineEnum.AUTO
++const char common_args[] = "-nodefaults -machine none";
++
+ static void test_modules_load(const void *data)
+ {
+     QTestState *qts;
+     const char **args = (const char **)data;
  
- def _text_checksum(text):
-     """Calculate a digest string unique to the text content"""
--    return hashlib.sha1(text).hexdigest()
-+    return hashlib.sha1(text.encode('utf-8')).hexdigest()
- 
-+def _read_dockerfile(path):
-+    return open(path, 'rt', encoding='utf-8').read()
- 
- def _file_checksum(filename):
--    return _text_checksum(open(filename, 'rb').read())
-+    return _text_checksum(_read_dockerfile(filename))
- 
- 
- def _guess_engine_command():
-@@ -192,7 +190,7 @@ def _read_qemu_dockerfile(img_name):
- 
-     df = os.path.join(os.path.dirname(__file__), "dockerfiles",
-                       img_name + ".docker")
--    return open(df, "r").read()
-+    return _read_dockerfile(df)
- 
- 
- def _dockerfile_preprocess(df):
-@@ -262,6 +260,7 @@ class Docker(object):
-     def _output(self, cmd, **kwargs):
-         return subprocess.check_output(self._command + cmd,
-                                        stderr=subprocess.STDOUT,
-+                                       encoding='utf-8',
-                                        **kwargs)
- 
-     def inspect_tag(self, tag):
-@@ -283,7 +282,9 @@ class Docker(object):
-         if argv is None:
-             argv = []
- 
--        tmp_df = tempfile.NamedTemporaryFile(dir=docker_dir, suffix=".docker")
-+        tmp_df = tempfile.NamedTemporaryFile(mode="w+t",
-+                                             encoding='utf-8',
-+                                             dir=docker_dir, suffix=".docker")
-         tmp_df.write(dockerfile)
- 
-         if user:
-@@ -396,7 +397,7 @@ class BuildCommand(SubCommand):
-                             help="Dockerfile name")
- 
-     def run(self, args, argv):
--        dockerfile = open(args.dockerfile, "rb").read()
-+        dockerfile = _read_dockerfile(args.dockerfile)
-         tag = args.tag
- 
-         dkr = Docker()
-@@ -442,7 +443,7 @@ class BuildCommand(SubCommand):
-                 cksum += [(filename, _file_checksum(filename))]
- 
-             argv += ["--build-arg=" + k.lower() + "=" + v
--                     for k, v in os.environ.iteritems()
-+                     for k, v in os.environ.items()
-                      if k.lower() in FILTERED_ENV_NAMES]
-             dkr.build_image(tag, docker_dir, dockerfile,
-                             quiet=args.quiet, user=args.user, argv=argv,
-@@ -611,7 +612,7 @@ class CheckCommand(SubCommand):
-                 print("Need a dockerfile for tag:%s" % (tag))
-                 return 1
- 
--            dockerfile = open(args.dockerfile, "rb").read()
-+            dockerfile = _read_dockerfile(args.dockerfile)
- 
-             if dkr.image_matches_dockerfile(tag, dockerfile):
-                 if not args.quiet:
+-    qts = qtest_init(NULL);
++    qts = qtest_init(common_args);
+     qtest_module_load(qts, args[0], args[1]);
+     qtest_quit(qts);
+ }
 -- 
 2.20.1
 
