@@ -2,55 +2,53 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D87F8C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 12:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD42C3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 12:14:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B28FB206B8
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 12:14:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B28FB206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 12722206B8
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 12:14:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12722206B8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4lDp-0007nS-SW
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 08:14:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41189)
+	id 1i4lDs-0007rq-6B
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 08:14:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41191)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1i4lCS-0006yE-Dx
+ (envelope-from <johannes@sipsolutions.net>) id 1i4lCS-0006yF-EC
  for qemu-devel@nongnu.org; Mon, 02 Sep 2019 08:12:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1i4lCR-00025v-3p
+ (envelope-from <johannes@sipsolutions.net>) id 1i4lCR-000260-4A
  for qemu-devel@nongnu.org; Mon, 02 Sep 2019 08:12:48 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:60446
+Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:60442
  helo=sipsolutions.net)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1i4lCQ-00023p-TS
+ id 1i4lCQ-00023g-U1
  for qemu-devel@nongnu.org; Mon, 02 Sep 2019 08:12:47 -0400
 Received: by sipsolutions.net with esmtpsa
  (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
  (Exim 4.92.1) (envelope-from <johannes@sipsolutions.net>)
- id 1i4lCM-0003Ne-A7; Mon, 02 Sep 2019 14:12:42 +0200
+ id 1i4lCL-0003Ne-V9; Mon, 02 Sep 2019 14:12:42 +0200
 From: Johannes Berg <johannes@sipsolutions.net>
 To: qemu-devel@nongnu.org
-Date: Mon,  2 Sep 2019 14:12:32 +0200
-Message-Id: <20190902121233.13382-2-johannes@sipsolutions.net>
+Date: Mon,  2 Sep 2019 14:12:31 +0200
+Message-Id: <20190902121233.13382-1-johannes@sipsolutions.net>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190902121233.13382-1-johannes@sipsolutions.net>
-References: <20190902121233.13382-1-johannes@sipsolutions.net>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a01:4f8:191:4433::2
-Subject: [Qemu-devel] [RFC] docs: vhost-user: add in-band kick/call messages
+Subject: [Qemu-devel] [RFC] vhost-user simulation extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,125 +61,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Johannes Berg <johannes.berg@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Johannes Berg <johannes.berg@intel.com>
+Hi all,
 
-For good reason, vhost-user is currently built asynchronously, that
-way better performance can be obtained. However, for certain use
-cases such as simulation, this is problematic.
+First of all, I'm not sure if QEMU actually maintains the master copy of
+this document and it isn't like virtio? It *looks* like it does, given
+that the updates are "do something" rather than "sync to some version",
+but please let me know if I need to send this elsewhere.
 
-Consider an event-based simulation in which both the device and CPU
-have are scheduled according to a simulation "calendar". Now, for
-example, consider the CPU sending a command to the device, over a
-vring in the vhost-user protocol. In this case, the CPU must wait
-for the vring update to have been processed, so that the device has
-time to put an entry onto the simulation calendar to obtain time to
-handle the interrupt, before the CPU goes back to scheduling and
-thus updates the simulation calendar or even has the simulation
-move time forward.
+Secondly, I'm not sure how amenable you are to changes that are likely
+to not be of "production" use. There are many people using Linux for
+simulation, but you don't necessarily have to make it easy for them :-)
 
-This cannot easily achieved with the eventfd based vring kick/call
-design.
+Third, if this is accepted I'm not sure we'd currently implement it in
+QEMU itself. We're currently working on user-mode-Linux because I haven't
+found a really good way to control time in QEMU simulation (though other
+people have, e.g. VMSimInt[1] has implemented this, AFAICT though only
+in full simulation, not with KVM.) So again, this may or may not be a
+show-stopper, let me know. The UML patch[2] to implement vhost-user has
+been posted to the list but we expect to be making revisions to it before
+it can be integrated.
 
-Extend the protocol slightly, so that a message can be used for kick
-and call instead, if the new VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS is
-negotiated. This in itself doesn't guarantee synchronisation, but both
-sides can also negotiate VHOST_USER_PROTOCOL_F_REPLY_ACK and thus get
-a reply to this message by setting the need_reply flag, and ensure
-synchronisation this way.
+With all that said, let me explain a bit more what this is about. In a
+simulation system like VMSimInt or what we're working on, you have what
+the VMSimInt paper[3] calls the "simulation calendar", where each of the
+simulated components adds an entry and then gets told when (and for how
+much simulated time) to run. This is necessary to ensure the simulation
+will run the different components in the proper timeline, and if none of
+the components has anything to do, time can just skip forward, similar to
+the time-travel mode I implemented in UML[4].
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- docs/interop/vhost-user.rst | 36 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 34 insertions(+), 2 deletions(-)
+Now, of course it's not very useful if you have multiple VMs that can be
+on the same simulation time, if they cannot exchange data. VMSimInt has
+its own network hooks in the code changes[5], but I'm also interested in
+simulating devices (using the same simulation calendar), not just networks.
 
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index 7827b710aa0a..1270885fecf2 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -2,6 +2,7 @@
- Vhost-user Protocol
- ===================
- :Copyright: 2014 Virtual Open Systems Sarl.
-+:Copyright: 2019 Intel Corporation
- :Licence: This work is licensed under the terms of the GNU GPL,
-           version 2 or later. See the COPYING file in the top-level
-           directory.
-@@ -785,6 +786,7 @@ Protocol features
-   #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
-   #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
-   #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
-+  #define VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS 13
- 
- Master message types
- --------------------
-@@ -946,7 +948,9 @@ Master message types
-   Bits (0-7) of the payload contain the vring index. Bit 8 is the
-   invalid FD flag. This flag is set when there is no file descriptor
-   in the ancillary data. This signals that polling should be used
--  instead of waiting for a kick.
-+  instead of waiting for the call. however, if the protocol feature
-+  ``VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS`` has been negotiated it instead
-+  means the updates should be done using the messages.
- 
- ``VHOST_USER_SET_VRING_CALL``
-   :id: 13
-@@ -959,7 +963,9 @@ Master message types
-   Bits (0-7) of the payload contain the vring index. Bit 8 is the
-   invalid FD flag. This flag is set when there is no file descriptor
-   in the ancillary data. This signals that polling will be used
--  instead of waiting for the call.
-+  instead of waiting for the call; however, if the protocol feature
-+  ``VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS`` has been negotiated it instead
-+  means the updates should be done using the messages.
- 
- ``VHOST_USER_SET_VRING_ERR``
-   :id: 14
-@@ -1190,6 +1196,19 @@ Master message types
-   ancillary data. The GPU protocol is used to inform the master of
-   rendering state and updates. See vhost-user-gpu.rst for details.
- 
-+``VHOST_USER_VQ_CALL``
-+  :id: 34
-+  :equivalent ioctl: N/A
-+  :slave payload: vring state description
-+  :master payload: N/A
-+
-+  When the ``VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS`` protocol feature has
-+  been successfully negotiated, this message may be submitted by the master
-+  to indicate that a buffer was added to the vring instead of signalling it
-+  using the vring's event FD or having the slave rely on polling.
-+
-+  The state.num field is currently reserved and must be set to 0.
-+
- Slave message types
- -------------------
- 
-@@ -1246,6 +1265,19 @@ Slave message types
-   ``VHOST_USER_PROTOCOL_F_HOST_NOTIFIER`` protocol feature has been
-   successfully negotiated.
- 
-+``VHOST_USER_VQ_KICK``
-+  :id: 4
-+  :equivalent ioctl: N/A
-+  :slave payload: vring state description
-+  :master payload: N/A
-+
-+  When the ``VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS`` protocol feature has
-+  been successfully negotiated, this message may be submitted by the slave
-+  to indicate that a buffer was used from the vring instead of signalling it
-+  using the vring's kick FD or having the master relying on polling.
-+
-+  The state.num field is currently reserved and must be set to 0.
-+
- .. _reply_ack:
- 
- VHOST_USER_PROTOCOL_F_REPLY_ACK
--- 
-2.20.1
+The obvious way of integrating devices seemed to be virtio/vhost-user, and
+that's why we already implemented vhost-user in UML. Now, a bit later, I
+realized that due to the asynchronous nature of kick/call on vrings, the
+simulation calendar update cannot be guaranteed properly without some extra
+synchronisation.
+
+I haven't implemented it yet, but I'm convinced that the proposed addition
+to the vhost-user spec would let us implement this properly, as we could
+have the vring update message (VHOST_USER_VQ_KICK) put an entry on the
+simulation calendar for actually processing the message before sending an
+ACK reply back, and the same for VHOST_USER_VQ_CALL in the other direction.
+The actual processing of the message on the vring would then happen when
+the simulation calendar told that component to run, i.e. when the event
+on the calendar actually gets scheduled.
+
+There are obviously other ways of implementing this, for instance I could
+use vhost-user polling mode, and then not really implement polling but
+have an out-of-band message (e.g. through the communcation channel that's
+also used for the simulation time/calendar [6]) to indiciate kick/call.
+However, this is uglier in the code, extending the protocol in this way
+would just require me to configure the drivers/devices to negotiate these
+extensions and hook the interrupt handling on both sides to the simulation
+calendar, the latter of which is necessary anyway.
+
+Hopefully I've managed to explain what I'm trying to do here, questions or
+suggestions are always welcome :-)
+
+johannes
+
+[1] http://www.ikr.uni-stuttgart.de/INDSimLib/
+[2] https://patchwork.ozlabs.org/patch/1140033/
+[3] http://www.ikr.uni-stuttgart.de/Content/Publications/Archive/We_SIMUTools_2014_40209.pdf
+[4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=065038706f77a56754e8f0c2556dab7e22dfe577
+[5] I've extracted them from their sources as a diff against QEMU v1.6.0:
+    https://p.sipsolutions.net/af9a68ded948c07e.txt
+[6] which I'm currently planning to implement using a separate virtio device
+    with an appropriate driver that hooks into low-level UML things
 
 
