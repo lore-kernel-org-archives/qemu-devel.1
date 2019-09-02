@@ -2,62 +2,66 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94ECFC41514
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 13:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D82EC3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 13:47:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DE16216C8
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 13:42:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE16216C8
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA66216C8
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 13:47:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA66216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4mbb-0004kH-Jk
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 09:42:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53282)
+	id 1i4mgR-0006fw-DN
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 09:47:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1i4maa-000423-9I
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 09:41:49 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i4mf9-00060i-TX
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 09:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1i4maX-0000KR-28
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 09:41:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46624)
+ (envelope-from <kwolf@redhat.com>) id 1i4mf8-0007ar-Ph
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 09:46:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41672)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1i4maW-0000IF-RD
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 09:41:45 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i4mf4-0007Uz-U1; Mon, 02 Sep 2019 09:46:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3404580F6D;
- Mon,  2 Sep 2019 13:41:43 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D72D360C18;
- Mon,  2 Sep 2019 13:41:37 +0000 (UTC)
-Date: Mon, 2 Sep 2019 15:41:35 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190902154135.39043595.cohuck@redhat.com>
-In-Reply-To: <20190829165026.225173-1-slp@redhat.com>
-References: <20190829165026.225173-1-slp@redhat.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id 40DE73082E10;
+ Mon,  2 Sep 2019 13:46:25 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-189.ams2.redhat.com
+ [10.36.116.189])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D738460920;
+ Mon,  2 Sep 2019 13:46:23 +0000 (UTC)
+Date: Mon, 2 Sep 2019 15:46:22 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Message-ID: <20190902134622.GH13140@localhost.localdomain>
+References: <20190829133615.29873-1-pl@kamp.de>
+ <20190902130701.GE13140@localhost.localdomain>
+ <7992af97-086e-b1c1-2b1a-fa72727e04c1@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <7992af97-086e-b1c1-2b1a-fa72727e04c1@kamp.de>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 02 Sep 2019 13:41:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 02 Sep 2019 13:46:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] virtio-mmio: implement modern (v2)
- personality (virtio-1)
+Subject: Re: [Qemu-devel] [PATCH] block/vhdx: add check for truncated image
+ files
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,97 +73,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@gmail.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
- abologna@redhat.com, mst@redhat.com
+Cc: codyprime@gmail.com, Jan-Hendrik Frintrop <jhf@kamp.de>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 29 Aug 2019 18:50:27 +0200
-Sergio Lopez <slp@redhat.com> wrote:
+Am 02.09.2019 um 15:15 hat Peter Lieven geschrieben:
+> Am 02.09.19 um 15:07 schrieb Kevin Wolf:
+> > Am 29.08.2019 um 15:36 hat Peter Lieven geschrieben:
+> > > qemu is currently not able to detect truncated vhdx image files.
+> > > Add a basic check if all allocated blocks are reachable to vhdx_co_=
+check.
+> > >=20
+> > > Signed-off-by: Jan-Hendrik Frintrop <jhf@kamp.de>
+> > > Signed-off-by: Peter Lieven <pl@kamp.de>
+> > > ---
+> > >   block/vhdx.c | 19 +++++++++++++++++++
+> > >   1 file changed, 19 insertions(+)
+> > >=20
+> > > diff --git a/block/vhdx.c b/block/vhdx.c
+> > > index 6a09d0a55c..4382b1375d 100644
+> > > --- a/block/vhdx.c
+> > > +++ b/block/vhdx.c
+> > > @@ -2068,10 +2068,29 @@ static int coroutine_fn vhdx_co_check(Block=
+DriverState *bs,
+> > >                                         BdrvCheckMode fix)
+> > >   {
+> > >       BDRVVHDXState *s =3D bs->opaque;
+> > > +    VHDXSectorInfo sinfo;
+> > > +    int64_t file_size =3D bdrv_get_allocated_file_size(bs);
+> > Don't you mean bdrv_getlength()?
+> >=20
+> > bdrv_get_allocated_file_size() is only the allocated size, i.e. witho=
+ut
+> > holes. So a higher offset may actually be present.
+>=20
+>=20
+> Isn't bdrv_getlength the virtual disk size? I need to check if a block
+> points to a location after EOF of the underlying physical file.
 
-> Implement the modern (v2) personality, according to the VirtIO 1.0
-> specification.
-> 
-> Support for v2 among guests is not as widespread as it'd be
-> desirable. While the Linux driver has had it for a while, support is
-> missing, at least, from Tianocore EDK II, NetBSD and FreeBSD.
-> 
-> For this reason, the v2 personality is disabled, keeping the legacy
-> behavior as default. Machine types willing to use v2, can enable it
-> using MachineClass's compat_props.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
-> Changelog:
-> 
-> v2:
->  - Switch from RFC to PATCH.
->  - Avoid the modern vs. legacy dichotomy. Use legacy or non-legacy
->    instead. (Andrea Bolognani, Cornelia Huck)
->  - Include the register offset in the warning messages. (Stefan
->    Hajnoczi)
->  - Fix device endianness for the non-legacy mode. (Michael S. Tsirkin)
->  - Honor the specs in VIRTIO_MMIO_QUEUE_READY. (Michael S. Tsirkin)
-> ---
->  hw/virtio/virtio-mmio.c | 296 +++++++++++++++++++++++++++++++++++++---
->  1 file changed, 279 insertions(+), 17 deletions(-)
-> 
+Yes, it would have to be bdrv_getlength(bs->file->bs), i.e. call it on
+the protocol layer, not on the format layer.
 
-> @@ -146,28 +163,51 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->      case VIRTIO_MMIO_MAGIC_VALUE:
->          return VIRT_MAGIC;
->      case VIRTIO_MMIO_VERSION:
-> -        return VIRT_VERSION;
-> +        if (proxy->legacy) {
-> +            return VIRT_VERSION_LEGACY;
-> +        } else {
-> +            return VIRT_VERSION;
-> +        }
->      case VIRTIO_MMIO_DEVICE_ID:
->          return vdev->device_id;
->      case VIRTIO_MMIO_VENDOR_ID:
->          return VIRT_VENDOR;
->      case VIRTIO_MMIO_DEVICE_FEATURES:
-> -        if (proxy->host_features_sel) {
-> -            return 0;
-> -        }
-> -        return vdev->host_features;
-> +        return vdev->host_features >> (32 * proxy->host_features_sel);
+> > > +    int64_t sector_num;
+> > >       if (s->log_replayed_on_open) {
+> > >           result->corruptions_fixed++;
+> > >       }
+> > > +
+> > > +    for (sector_num =3D 0; sector_num < bs->total_sectors;
+> > > +         sector_num +=3D s->block_size / BDRV_SECTOR_SIZE) {
+> > > +        int nb_sectors =3D MIN(bs->total_sectors - sector_num,
+> > > +                             s->block_size / BDRV_SECTOR_SIZE);
+> > > +        vhdx_block_translate(s, sector_num, nb_sectors, &sinfo);
+> > > +        if ((s->bat[sinfo.bat_idx] & VHDX_BAT_STATE_BIT_MASK) =3D=3D
+> > > +            PAYLOAD_BLOCK_FULLY_PRESENT) {
+> > > +            if (sinfo.file_offset +
+> > > +                sinfo.sectors_avail * BDRV_SECTOR_SIZE > file_size=
+) {
+> > Do we need to protect against integer overflows here? I think
+> > sinfo.file_offset comes directly from the image file and might be
+> > corrupted.
+> >=20
+> > Or has it already been check somewhere?
+>=20
+>=20
+> The headers are being checked in vhdx_open.=A0 sinfo.file_offset +
+> sinfo.sectors_avail * BDRV_SECTOR_SIZE is exactly what is being passed
+> to bdrv_pread when reading from the image file.
 
-Hm... I think you want to return 0 for host_features_sel > 0 on legacy
-devices.
+Fair enough, though if I'm not missing anything, we only check that BAT
+entries don't overlap with other regions, not that they aren't too high.
+And vhdx_block_translate() doesn't seem to check for overflows either
+before it sets sinfo->sectors_avail.
 
-Also, there's VirtIODeviceClass->legacy_features, which probably should
-be masked out for non-legacy devices?
+So maybe this is actually a bug that should be fixed in
+vhdx_block_translate() so that normal accesses get the fix, too.
 
-(...)
+> > > +                /* block is past the end of file, image has been t=
+runcated. */
+> > > +                result->corruptions++;
+> > I think we should print an error message like other formats do, so th=
+at
+> > the user knows which kind of corruption 'qemu-img check' found (inclu=
+de
+> > the guest and host offset of the invalid block).
+>=20
+> What would be the appropriate way to do this? There is no errp in the
+> check funtion. Inclunde headers so that error_report() is available?
 
-> @@ -229,17 +275,33 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->      }
->      switch (offset) {
->      case VIRTIO_MMIO_DEVICE_FEATURES_SEL:
-> -        proxy->host_features_sel = value;
-> +        if (value) {
-> +            proxy->host_features_sel = 1;
-> +        } else {
-> +            proxy->host_features_sel = 0;
-> +        }
->          break;
->      case VIRTIO_MMIO_DRIVER_FEATURES:
-> -        if (!proxy->guest_features_sel) {
-> +        if (!proxy->legacy) {
-> +            proxy->guest_features[proxy->guest_features_sel] = value;
-> +        } else if (!proxy->guest_features_sel) {
->              virtio_set_features(vdev, value);
+Yes, I think error_report() would be fine.
 
-If the guest tries to set something !0 for guest_features_sel > 0 on a
-legacy device, should that be logged as a guest bug?
+qcow2 even just uses fprintf(stderr, ...), but maybe that's something we
+shouldn't imitate.
 
->          }
->          break;
-
-(...)
-
-Otherwise, looks good to me.
+Kevin
 
