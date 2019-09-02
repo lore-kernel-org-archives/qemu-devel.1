@@ -2,62 +2,73 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF2AC3A5A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 01:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A889CC3A5A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 01:46:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F23221874
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 01:36:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F23221874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id 81789217F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 01:46:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81789217F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4bGL-0000E4-HL
-	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 21:36:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36359)
+	id 1i4bQf-0002cf-SA
+	for qemu-devel@archiver.kernel.org; Sun, 01 Sep 2019 21:46:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38365)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1i4bEy-00086s-GM
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 21:34:45 -0400
+ (envelope-from <bounces@canonical.com>) id 1i4bPa-0002B5-Fb
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 21:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1i4bEx-0000Nn-HY
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 21:34:44 -0400
-Received: from nsstlmta05p.bpe.bigpond.com ([203.38.21.5]:55498)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1i4bEw-0000KS-UW
- for qemu-devel@nongnu.org; Sun, 01 Sep 2019 21:34:43 -0400
-Received: from smtp.telstra.com ([10.10.24.4])
- by nsstlfep21p-svc.bpe.nexus.telstra.com.au with ESMTP id
- <20190902012254.LWWZ15045.nsstlfep21p-svc.bpe.nexus.telstra.com.au@smtp.telstra.com>;
- Mon, 2 Sep 2019 11:22:54 +1000
-X-RG-Spam: Unknown
-X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgeduvddrudeiledggeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuuffpveftpgfvgffnuffvtfetpdfqfgfvnecuuegrihhlohhuthemucegtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepvfhonhihucfpghhuhigvnhcuoehtohhnhidrnhhguhihvghnsegsthdrtghomheqnecukfhppeehkedrudejfedrleekrdeikeenucfrrghrrghmpehhvghlohepuggsiidrthgvlhhsthhrrgdrtghomhdrrghupdhinhgvthepheekrddujeefrdelkedrieekpdhmrghilhhfrhhomhepoehtohhnhidrnhhguhihvghnsegsthdrtghomheqpdhrtghpthhtohepoehpsghonhiiihhnihesrhgvughhrghtrdgtohhmqedprhgtphhtthhopeeoqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgheqpdhrtghpthhtohepoehrthhhsehtfihiuggulhgvrdhnvghtqedprhgtphhtthhopeeothhonhihrdhnghhuhigvnhessghtrdgtohhmqeenucevlhhushhtvghrufhiiigvpedt
-X-RazorGate-Vade-Verdict: clean 0
-X-RazorGate-Vade-Classification: clean
-X-RG-VS-CLASS: clean
-X-Authentication-Info: Submitted using ID tony.nguyen.git@bigpond.com
-Received: from dbz.telstra.com.au (58.173.98.68) by smtp.telstra.com (5.8.335)
- (authenticated as tony.nguyen.git@bigpond.com)
- id 5D358144105D0F56; Mon, 2 Sep 2019 11:22:54 +1000
-From: Tony Nguyen <tony.nguyen@bt.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  2 Sep 2019 11:26:47 +1000
-Message-Id: <20190902012647.1761-1-tony.nguyen@bt.com>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <bounces@canonical.com>) id 1i4bPZ-0006fu-Cr
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 21:45:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47244)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i4bPZ-0006fh-82
+ for qemu-devel@nongnu.org; Sun, 01 Sep 2019 21:45:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i4bPW-0004yP-U0
+ for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 01:45:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C5AAA2E80C9
+ for <qemu-devel@nongnu.org>; Mon,  2 Sep 2019 01:45:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 203.38.21.5
-Subject: [Qemu-devel]  [PATCH] memory: Set notdirty_mem_ops validator
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Sep 2019 01:36:07 -0000
+From: Geoffrey McRae <1839060@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gnif idarlund spheenik
+X-Launchpad-Bug-Reporter: Martin Schrodt (spheenik)
+X-Launchpad-Bug-Modifier: Geoffrey McRae (gnif)
+References: <156507518934.25260.15982229597694445610.malonedeb@soybean.canonical.com>
+Message-Id: <156738816745.6300.11491240971474223228.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0111253024cca66cc46dd4ba13d5a2a95148e439
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1839060] Re: HDA device non functional in Windows
+ 10 1903
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,41 +77,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Nguyen <tony.nguyen@bt.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1839060 <1839060@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Existing read rejecting validator was mistakenly cleared.
+Hi,
 
-Reads dispatched to io_mem_notdirty then segfaults as there is no read
-handler.
+I am trying to dig into this issue, can you please provide the verb
+debug trace from the working version of windows.
 
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
----
- exec.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+-- =
 
-diff --git a/exec.c b/exec.c
-index 1df966d17a..05d664541f 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2796,12 +2796,12 @@ static bool notdirty_mem_accepts(void *opaque, hwaddr addr,
- 
- static const MemoryRegionOps notdirty_mem_ops = {
-     .write = notdirty_mem_write,
--    .valid.accepts = notdirty_mem_accepts,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-     .valid = {
-         .min_access_size = 1,
-         .max_access_size = 8,
-         .unaligned = false,
-+        .accepts = notdirty_mem_accepts,
-     },
-     .impl = {
-         .min_access_size = 1,
--- 
-2.23.0
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1839060
 
+Title:
+  HDA device non functional in Windows 10 1903
+
+Status in QEMU:
+  New
+
+Bug description:
+  I made the update to 1903, and the HDA device stopped working.
+
+  The driver says the device is working correctly, but it does not.
+  When I try to open the Windows sound configuration, the dialog hangs and =
+never shows it's content.
+
+  Several people reported this back in May:
+
+  https://windowsreport.com/windows-10-v1903-ich6-ich9-virtio/
+
+  I can confirm I have exactly the same problem.
+
+  Host is Arch Linux, current (5.2.5) kernel, QEMU 4.0.
+
+  I enabled HDA debug output and compared an older, working Windows
+  version to 1903, but could not see the difference. The driver seems to
+  issue the same verbs.
+
+  I am happy to provide additional information if needed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1839060/+subscriptions
 
