@@ -1,63 +1,78 @@
 Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=CHARSET_FARAWAY_HEADER,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4C4C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75975C3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:26:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68BEF216C8
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:13:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4140F216C8
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:26:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="N4ZMP07+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68BEF216C8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="M6hdzNTQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4140F216C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4kGi-0001cZ-EC
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 07:13:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33495)
+	id 1i4kTl-00056t-Cz
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 07:26:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i4kFr-00018z-BY
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:12:16 -0400
+ (envelope-from <zhlb29@foxmail.com>) id 1i4kT1-0004fj-4o
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i4kFp-0000aE-OC
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:12:15 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:48507 helo=ozlabs.org)
+ (envelope-from <zhlb29@foxmail.com>) id 1i4kSr-0006Pt-Da
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:25:42 -0400
+Received: from smtpbguseast2.qq.com ([54.204.34.130]:53349)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i4kFn-0000PS-9q; Mon, 02 Sep 2019 07:12:13 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46MS8l26vRz9sDQ; Mon,  2 Sep 2019 21:12:07 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1567422727;
- bh=K1bYLC+UyHqiOVfioDCOAx7SO3Do6c00TTgBnw+4rAs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=N4ZMP07+/NxcXhLqsubn/ARiAwJKOf5T8A6aecq27mQj5jhFGAW1DVYkav/3CWo3k
- WF+W+buSorBEiLeCcw9ZUxA+WUbMrkqvFf+dYaob/mA/IfDjg5Ft54O/Fj/F2JPu3c
- 1rKiMjgjvgfNyHj6qD3D7KpUziRWpfh/ltLIzX50=
-Date: Mon, 2 Sep 2019 20:28:44 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190902102844.GD30674@umbus.fritz.box>
-References: <20190902092932.20200-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="AkbCVLjbJ9qUtAXD"
-Content-Disposition: inline
-In-Reply-To: <20190902092932.20200-1-clg@kaod.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix "bmc" node name in DT
+ (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1i4kSq-00068v-JB
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:25:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+ s=s201512; t=1567423528;
+ bh=fAk4LexEbpBEggO4XJTqTiAl2svYv5APasXIKhiJaos=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=M6hdzNTQHaFLSrYNJN0GYcdrevL3M6MX1WYc1x2uGbMLhlitW+GiiVanPuLwo2tug
+ KxXrFzSW4lIrXQmGyAqptk0L80ycEAXqzfdzluXO0agADyjey4HYlkoGWP3bJJG3PM
+ MZzw9EeJRj87mApr/P6+oDv1RJUqy/IpFJdzdbSU=
+X-QQ-SSF: 000100000000008000000000000000G
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 124.200.70.7
+In-Reply-To: <tencent_61024D4F136E131E2B085A7DACEA1593D007@qq.com>
+References: <tencent_61024D4F136E131E2B085A7DACEA1593D007@qq.com>
+X-QQ-STYLE: 
+X-QQ-mid: webenglish1t1567423528t126817
+From: "=?gb18030?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
+To: "=?gb18030?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
+Mime-Version: 1.0
+Date: Mon, 2 Sep 2019 19:25:28 +0800
+X-Priority: 3
+Message-ID: <tencent_60FF9338731C8E0D678B2C3B@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-ReplyHash: 4226378228
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Mon, 02 Sep 2019 19:25:28 +0800 (CST)
+Feedback-ID: webenglish:foxmail.com:bgforeign:bgforeign2
+X-QQ-Bgrelay: 1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 54.204.34.130
+Content-Type: text/plain;
+	charset="gb18030"
+Content-Transfer-Encoding: base64
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] Uncaught target signal 11 (Segmentation Faullt)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,77 +84,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---AkbCVLjbJ9qUtAXD
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Sep 02, 2019 at 11:29:32AM +0200, C=E9dric Le Goater wrote:
-> Fixes the dtc output :
->=20
-> ERROR (node_name_chars): //bmc: Bad character '/' in node name
-> Warning (avoid_unnecessary_addr_size): /bmc: unnecessary #address-cells/#=
-size-cells without "ranges" or child "reg" property
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Applied to ppc-for-4.2, thanks.
-
-> ---
->  hw/ppc/pnv_bmc.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-> index e5eb6e5a70da..dc5e918cb79e 100644
-> --- a/hw/ppc/pnv_bmc.c
-> +++ b/hw/ppc/pnv_bmc.c
-> @@ -77,13 +77,10 @@ void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt)
->      const struct ipmi_sdr_compact *sdr;
->      uint16_t nextrec;
-> =20
-> -    offset =3D fdt_add_subnode(fdt, 0, "/bmc");
-> +    offset =3D fdt_add_subnode(fdt, 0, "bmc");
->      _FDT(offset);
-> =20
->      _FDT((fdt_setprop_string(fdt, offset, "name", "bmc")));
-> -    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
-> -    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-> -
->      offset =3D fdt_add_subnode(fdt, offset, "sensors");
->      _FDT(offset);
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---AkbCVLjbJ9qUtAXD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1s7toACgkQbDjKyiDZ
-s5L06RAAvrjCD0rxbVRRoTisGN/HonURG8yqSwOgAjHvmAopZFoFJz6K3fL3XXSu
-GQ2nn/9wgj5JAE2Z/fwpjC/yeawWX0rMPvpF4xfm2sl1GK87AvezARMdZXoE6tIe
-kG8N+Tp06XA6UVVd8E/0mOry10n3D6JqO5mLtcUFR/+lqi2QhLbmusiI0UBT0wiZ
-xRtMCtrbfLvnYZJe2eNkoPPSur/AnbEPQBQPt6UwsFcucr5dhA+DM2E797xT3bxM
-NDeXo8ao9gQeUzLRBNg7B+9K0OyCKw+rbf1seAEI3CaAE9rdWvLW7tsjEMzn/p4I
-LpeesYUGvSSFJm2/RnqkvNNUZXZIXTJjPw1qmGIh7YQZsNHDXX40VkbWpK0fT+YI
-wb0vdZBvNHbBdV8xA4EwpPCSJIpXAzf45OFWZzLE4w4MagzZtojXNaTkj4vun5AC
-gVMfGzZNzkiUZOtLj3GR0vBtXohM6iH/dRGiDXXxIMfmuQM4iyEKksnTcpeodpb+
-5Rnyj75lXaNPq9f9xFdFBL9NEUTENQZthAjXvLllI4gLlSchUPO/cIcbX/+3BrOT
-rLXP2z22iqUbOF5HQ6lXEqgt8qPmyq5IQrTfwH+mRHGm4Nsgt5MxQWw2PZgk2eEJ
-8X+kyiNTsHdS7o+fkb8IN1l1tK7N0fdVv4c1kWEfz30itTQNAk8=
-=9ybz
------END PGP SIGNATURE-----
-
---AkbCVLjbJ9qUtAXD--
-
+QWRkaW5nIHNvbWUgdXNlZnVsIGluZm9ybWF0aW9uLCBlbmFibGluZyBzdHJhY2UgZ2l2ZXMg
+bWUgdGhlIGZvbGxvd2luZyBtZXNzYWdlcy4gSXQgbG9va3MgbGlrZSB0aGUgc2VnbWVudGF0
+aW9uIGZhdWx0IGlzIHVsdGltYXRlbHkgY2F1c2VkIGJ5IG1pc3NpbmcgbGQuc28ubm9od2Nh
+cCBhbmQgbGQuc28ucHJlbG9hZD8NCg0KDQoNCiQgLi9xZW11LW1pcHMgLUwgL3Vzci9taXBz
+LWxpbnV4LWdudSAtc3RyYWNlIHRlc3QNCjEwMjU1IGJyayhOVUxMKSA9IDB4MDA0MTIwMDAN
+CjEwMjU1IG1tYXAyKE5VTEwsODE5MixQUk9UX1JFQUR8UFJPVF9XUklURSxNQVBfUFJJVkFU
+RXxNQVBfQU5PTllNT1VTLC0xLDApID0gMHg3ZjdjODAwMA0KMTAyNTUgdW5hbWUoMHg3ZmZm
+ZThjOCkgPSAwDQoxMDI1NSBhY2Nlc3MoIi9ldGMvbGQuc28ubm9od2NhcCIsRl9PSykgPSAt
+MSBlcnJubz0yIChObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5KQ0KMTAyNTUgYWNjZXNzKCIv
+ZXRjL2xkLnNvLnByZWxvYWQiLFJfT0spID0gLTEgZXJybm89MiAoTm8gc3VjaCBmaWxlIG9y
+IGRpcmVjdG9yeSkNCjEwMjU1IG9wZW5hdChBVF9GRENXRCwiL2V0Yy9sZC5zby5jYWNoZSIs
+T19SRE9OTFl8T19DTE9FWEVDKSA9IDMNCjEwMjU1IGZzdGF0NjQoMywweDdmZmZlNTE4KSA9
+IDANCjEwMjU1IG1tYXAyKE5VTEwsMTA2ODAyLFBST1RfUkVBRCxNQVBfUFJJVkFURSwzLDAp
+ID0gMHg3ZjdhZDAwMA0KMTAyNTUgY2xvc2UoMykgPSAwDQotLS0gU0lHU0VHViB7c2lfc2ln
+bm89U0lHU0VHViwgc2lfY29kZT0xLCBzaV9hZGRyPTB4MjM5MmQwMDh9IC0tLQ0KcWVtdTog
+dW5jYXVnaHQgdGFyZ2V0IHNpZ25hbCAxMSAoU2VnbWVudGF0aW9uIGZhdWx0KSAtIGNvcmUg
+ZHVtcGVkDQpbMV0gICAgMTAyNTUgc2VnbWVudGF0aW9uIGZhdWx0IChjb3JlIGR1bXBlZCkg
+IC4vcWVtdS1taXBzIC1zdHJhY2UgdGVzdA0KDQoNCg0KDQoNCg0KLS0tLS0tLS0tLS0tLS0t
+LS0tIE9yaWdpbmFsIC0tLS0tLS0tLS0tLS0tLS0tLQ0KRnJvbTogICJMaWJvIFpob3UiOzx6
+aGxiMjlAZm94bWFpbC5jb20+Ow0KU2VuZCB0aW1lOiBNb25kYXksIFNlcCAyLCAyMDE5IDEy
+OjE2IFBNDQpUbzogInFlbXUtZGV2ZWwiPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz47IA0KDQpT
+dWJqZWN0OiAgVW5jYXVnaHQgdGFyZ2V0IHNpZ25hbCAxMSAoU2VnbWVudGF0aW9uIEZhdWxs
+dCkNCg0KDQoNCkkgYW0gdHJ5aW5nIHRvIHJ1biBhIHNpbXBsZSBNSVBTIHByb2dyYW0gd2l0
+aCBRRU1VIHVzZXIgbW9kZS4NCg0KDQoNCkhvc3Q6IFVidW50dSAxOC4wNCBMVFMgb24geDg2
+XzY0DQpRRU1VIGNvbmZpZzogLi4vY29uZmlndXJlIC0tdGFyZ2V0LWxpc3Q9bWlwcy1saW51
+eC11c2VyDQoNCkNyb3NzIENvbXBpbGVyOiBzdWRvIGFwdCBpbnN0YWxsIGdjYy1taXBzLWxp
+bnV4LWdudQ0KDQoNCk15IHRlc3QuYyBpcyBzaW1wbGU6IGludCBtYWluKHZvaWQpIHtpbnQg
+YSA9IDE7IGludCBiID0yOyBpbnQgYzsgYyA9IGEgKyBiOyByZXR1cm4gMDt9DQpBZnRlciBj
+b21waWxpbmcgaXQgd2l0aCAibWlwcy1saW51eC1nbnUtZ2NjIHRlc3QuYyAtbyB0ZXN0Iiwg
+SSByYW4gaXQgd2l0aCAiLi9xZW11LW1pcHMgLUwgL3Vzci9taXBzLWxpbnV4LWdudSB0ZXN0
+IiwgdGhlbiBJIGdvdCB0aGUgZm9sbG93aW5nIGVycm9yIG1lc3NhZ2U6DQpxZW11OiB1bmNh
+dWdodCB0YXJnZXQgc2lnbmFsIDExIChTZWdtZW50YXRpb24gZmF1bHQpIC0gY29yZSBkdW1w
+ZWQNCg0KDQpEb2VzIGFueW9uZSBoYXZlIGEgc29sdXRpb24gdG8gdGhpcz8gVGhhbmsgeW91
+IGluIGFkdmFuY2UuDQoNCg0KQ2hlZXJzLA0KTGlibw==
