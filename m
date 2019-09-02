@@ -2,94 +2,89 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06149C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 18:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF2BDC3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 18:56:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C99A4208E4
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 18:27:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85EDE21883
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 18:56:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ocsZnJ0l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C99A4208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="KEZjNGNZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85EDE21883
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4r2x-0006aA-Mt
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 14:27:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41632)
+	id 1i4rUx-0003ZP-MK
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 14:56:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1i4r1x-0005vQ-Co
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 14:26:22 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1i4rQP-0002Rh-OF
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 14:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1i4r1w-00087C-7V
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 14:26:21 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:41568)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1i4r1w-00086x-3S
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 14:26:20 -0400
-Received: by mail-qt1-x842.google.com with SMTP id i4so16467920qtj.8
- for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 11:26:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=zikoXGI6oAPEStxiF6T2yMpknJYFavgILZtIJRjQr9k=;
- b=ocsZnJ0lSiD9bAo8iT8kgnuWUaP+V3H5lFn0ex3+LUOrYB1ze2nQ1xkH0haseQBU70
- jYKF6OUlWA4LQEjq8xZENkzQETIT8GHjD8w2Fvtu/JQRlXL0CFQDBPjbTvTV57n2docF
- 3wYhmYcz8uF5zhNMvpFq6JWQKJKUPZf4lPwObs3YdjBTFTM3jK246B+cvluWeCQwPkf+
- 2N2dLRznrfc9matKlEp+57ToQ3kVZVtpByXqzJ2k1noelb96AVi/JJzrga1rJZyn2CQb
- VdfruIdXzgsvpoqbnzJgr+fzegR4a2Xwb4c/63TnqNFIIPa6UywsJw47L/bGjQUqnBW7
- kjqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=zikoXGI6oAPEStxiF6T2yMpknJYFavgILZtIJRjQr9k=;
- b=PrykA3vDuLVIibSD29EzY/3PP4I7yT8Oe+x/+FiTFN4bHbI4fYyWC7TAXhELDm4Acd
- mKDWZfU4vZ+MvHbwzi8Mb+C249lQ5/kytlc8GUnbRam6gv2+QN2PNsL9W/Qil22kWbM9
- YGhTFzNmbmCw3KrHfN2BhBRUNwVtN/DEB48CuZ3a8DusSvXbp2qgJojxI53pjP0CNCEL
- YYQrP3tGuX+eBDwPjybWU2AjLj+gNojEAB8a+tmHxKQhOJx5GTkCDzMjYwHfleTRJ5G5
- Eh3HlL67nxUjewop4TXRdLJVt9+dx6hTV1tYCm1WuSbx7zun3/RWClnhvSH0ZA4zkt5Z
- nxOg==
-X-Gm-Message-State: APjAAAVMzWqonfbKuaal9N5t3hT4ij+ThqpgtlWk5/mxs0kEiT0g1JoW
- J0M2QoL/WAuTCZXCOs+V07s=
-X-Google-Smtp-Source: APXvYqzvsD0PkMGpMCuOei7GM9KxhAsS4O4JWxhbHFrkL9w8lHs3n2BLrnK7t1Qifo62RzxJi4a4Ow==
-X-Received: by 2002:a05:6214:80d:: with SMTP id
- df13mr7302039qvb.161.1567448779424; 
- Mon, 02 Sep 2019 11:26:19 -0700 (PDT)
-Received: from ?IPv6:2804:431:c7c6:9589:1351:c7eb:87b:c9d5?
- ([2804:431:c7c6:9589:1351:c7eb:87b:c9d5])
- by smtp.gmail.com with ESMTPSA id b5sm6772180qkk.78.2019.09.02.11.26.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Sep 2019 11:26:18 -0700 (PDT)
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20190807142114.17569-1-danielhb413@gmail.com>
- <20190807142114.17569-4-danielhb413@gmail.com>
- <30e39135-a023-2257-4718-747c94ae85ee@redhat.com>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <f4f8449a-48ec-2312-33ef-7b556f127b66@gmail.com>
-Date: Mon, 2 Sep 2019 15:26:15 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <lukasstraub2@web.de>) id 1i4rQO-0007Mx-FH
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 14:51:37 -0400
+Received: from mout.web.de ([212.227.15.4]:59127)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1i4rQO-0007JQ-1u
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 14:51:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1567450275;
+ bh=k5gVFPMbDR8yNC8B0/6ktnPk5lBiko7KOvJzqFH9BFs=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=KEZjNGNZDPJSpZLaH6YzblitaYOA6GUM/HuDBp4ArBxrw2xpfkon/4UM+Gzw2fz57
+ KtWZg6XpB0RSvSbiFxXcZ4a5NXyDp4rc1r+v2mfJLdzMlSTlbgY8KaxcrzyLiDzYJM
+ iMjjpYMwrD7mWcLDWWt4qbgYYQIa+tBXxAL5DrRk=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([87.123.206.43]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MK2JZ-1i3TyY0WAP-001NJJ; Mon, 02
+ Sep 2019 20:51:15 +0200
+Date: Mon, 2 Sep 2019 20:51:11 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: "Zhang, Chen" <chen.zhang@intel.com>
+Message-ID: <20190902205111.7917db23@luklap>
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78062507FD@shsmsx102.ccr.corp.intel.com>
+References: <cover.1565894837.git.lukasstraub2@web.de>
+ <6643a807a5f4c5ceb2f09e0718e97e5f968577f7.1565894837.git.lukasstraub2@web.de>
+ <9CFF81C0F6B98A43A459C9EDAD400D780622D3DC@shsmsx102.ccr.corp.intel.com>
+ <20190823082125.499095d7@luklap>
+ <9CFF81C0F6B98A43A459C9EDAD400D78062507FD@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <30e39135-a023-2257-4718-747c94ae85ee@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::842
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] crypto.c: cleanup created file when
- block_crypto_co_create_opts_luks fails
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:wP4q/HjCk38VyHmGnhNDLR8AIXEvYBU27J87hBwsIsMEGcf4+Eh
+ m92Dx7pyXPcJzBkI27h0vck3g+hMyCyrpvVDoeyPUxdWxxCyJGsGr45M3Tt9/w5ubZcMEpI
+ phWHWOIFWJ0iOMMYttl5zCFGHv3au7WwZLItDi6Rl0yx6E8hDvlMlTKNpfCUsCRAybylxVg
+ 3DM3efj5boIuI+2w8EDIA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CwUcLTApZG0=:6dAxHy2JFoh3KJ1y/IzG56
+ d3WC5qlPpO72bg9hsLGGsjNYeuRFvqKDgYF2jgHPx5YrNxRE4gdLF13ymmenTcVct6DqYcHpk
+ 1KC539mQcbSKkqnceir+BPNObumlxasFKKEmmLwR+ehNcr4CPVdSaDcO6aYHmTLRgC7wNnMVj
+ 8OVkdfzdf+4eB10CT84muBj1iq+e7jDA+MG7A8BV8mNn8cA4rftBfKZuuuuiw8LT2En7VKSrM
+ WWZlgK1k/Rfe9pPymU+W55fq31OdXTYenAd8VBIILxGTYUw4yZbpicMg8Cv22dY7dsjQ7HWye
+ 85DJ+ydNZS/TnM1HV+MtKnMQyIjaFjp4qM8eSxeiFsWc0ljBhXP4v3uE8/2o8IGbGHSzzPt60
+ 7aDGHM+7+W1fXv7/a9lovMmXvXlNBxMKYVotSljzCXi+YNdC+yoK/dqPPTHIVcPbM7eLZiipX
+ 3sGbGJCoJIxEUlgb5xr19G9GRO2vGy6Uv9maNT3ZwBDbwGNP2fuZKgSuanviaD3xOViF2tVE7
+ gYdTzImfTrOBMZpu2ExH0Rbib7MlS8+pvR2hjklzENu6h95aBOsEd9SOruOqyd7oyJtGNPmtn
+ NZKHeuqRrExxUy0vxfNgCgHIzCi4UcEsSUdkE6fwRCyyHqiycBPs1D/DYSZs1H98DFg+5egPM
+ gOtcH1Uhf3Uzm8ougzbRYv1xh7yOv32iCwxOHGiHeqa5XjysdbCSY4GhkatNK56zfBsgYHlMr
+ jh90PUyZcXcCKqanmgOm/4M+/aMwvBsM+aB4VIYXIrN4iER1Do2U1sjRklaCc4zXjuYdMEAWJ
+ iJDzT1cqm1iPTjLDxuCaElpdmA0esIMlRcnrmbWwnysMtAYVNpLxn5xsYs7GkY4GG08qNd6zV
+ +ZD8x/l5DwIbytFRdy8P0OZnhZxeaOb/Ykdg4RQLLIlTybTW+EG/xjGY4hXXcoQSAh0YyB9OD
+ ZPKZeBK9oD6C5XDwpRNAStfsbbjH94DOOz+6gOrU8y2Fm4e8NSzFKAAksN116LePmLNdRExKe
+ I5veri3sDu80aHWlcn3jV5o3D1uop/lXzPZk49SRdTX/1gW8yAhjroLKbUtaWzJC5cDJdidpr
+ iTLfBb7Xj+EZx09i7i/WMN6ZC+K4AQKoKf7DR4Zo4MSoPSxJx58z1KfY1w/vTGMKAiKrrr6Dg
+ R8ywL+N3vxVH1MvbIcLimhtto0yyerFop9ShiJKHNoLIi7pg==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.15.4
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] net/filter.c: Add Options to insert
+ filters anywhere in the filter list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,128 +96,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Srikanth Aithal <bssrikanth@in.ibm.com>,
- berrange@redhat.com, mreitz@redhat.com
+Cc: Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 2 Sep 2019 11:43:57 +0000
+"Zhang, Chen" <chen.zhang@intel.com> wrote:
 
-
-On 8/28/19 11:10 PM, John Snow wrote:
+> > -----Original Message-----
+> > From: Lukas Straub <lukasstraub2@web.de>
+> > Sent: Friday, August 23, 2019 2:21 PM
+> > To: Zhang, Chen <chen.zhang@intel.com>
+> > Cc: qemu-devel <qemu-devel@nongnu.org>; Jason Wang
+> > <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
+> > Xie Changlong <xiechanglong.d@gmail.com>
+> > Subject: Re: [PATCH v2 2/3] net/filter.c: Add Options to insert filter=
+s
+> > anywhere in the filter list
+> >
+> > On Fri, 23 Aug 2019 03:24:02 +0000
+> > "Zhang, Chen" <chen.zhang@intel.com> wrote:
+> >
+> > > > -----Original Message-----
+> > > > From: Lukas Straub [mailto:lukasstraub2@web.de]
+> > > > Sent: Friday, August 16, 2019 2:49 AM
+> > > > To: qemu-devel <qemu-devel@nongnu.org>
+> > > > Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
+> > > > <jasowang@redhat.com>; Wen Congyang
+> > <wencongyang2@huawei.com>; Xie
+> > > > Changlong <xiechanglong.d@gmail.com>
+> > > > Subject: [PATCH v2 2/3] net/filter.c: Add Options to insert filter=
+s
+> > > > anywhere in the filter list
+> > > >
+> > > > To switch the Secondary to Primary, we need to insert new filters
+> > > > before the filter-rewriter.
+> > > >
+> > > > Add the options insert=3D and position=3D to be able to insert fil=
+ters
+> > > > anywhere in the filter list.
+> > > >
+> > > > position should be either "head", "tail" or the id of another filt=
+er.
+> > > > insert should be either "before" or "after" to specify where to
+> > > > insert the new filter relative to the one specified with position.
+> > > >
+> > >
+> > > Hi Lukas,
+> > >
+> > > It looks no need to add the "insert =3D xxx" for this operation.
+> > > For example:
+> > >
+> > > We have 3 net-filters, the running order like that:
+> > >
+> > > Fiter1   ---------->   Filter2 ------------> Filter3
+> > >
+> > > If we want to add another filter between filter1 and filter2.
+> > > The "Position =3D head, insert =3D after" always seam with "position=
+ =3D filter2 id,
+> > insert =3D before".
+> >
+> > Hi Zhang,
+> > The insert=3D parameter is ignored if position=3Dhead or tail. It alwa=
+ys Inserts at
+> > the head (before Filter1) or the tail (after Filter3) of the List in t=
+hese cases.
+> >
+> > > It seems the "insert" is a redundant args.
+> > > So I think it is enough with the "position", we can make the "insert=
+" always
+> > equal "after" except the "head".
+> >
+> > Yes, we still could do it without it, but its more convenient with the=
+ insert=3D
+> > parameter. For example our Case with inserting before the rewriter:
+> >
+> > 'filter-mirror', 'id': 'm0', 'props': { 'insert': 'before', 'position'=
+: 'rew0', 'netdev':
+> > 'hn0', 'queue': 'tx', 'outdev': 'mirror0' } 'filter-redirector', 'id':=
+ 'redire0', 'props':
+> > { 'insert': 'before', 'position': 'rew0', 'netdev': 'hn0', 'queue': 'r=
+x', 'indev':
+> > 'compare_out' } 'filter-redirector', 'id': 'redire1', 'props': { 'inse=
+rt': 'before',
+> > 'position': 'rew0', 'netdev': 'hn0', 'queue': 'rx', 'outdev': 'compare=
+0' }
+> >
+> > You see directly that here 3 Filters are inserted before the rewriter.
+> >
+> > would have to become:
+> >
+> > 'filter-mirror', 'id': 'm0', 'props': { 'position': 'head', 'netdev': =
+'hn0', 'queue': 'tx',
+> > 'outdev': 'mirror0' } 'filter-redirector', 'id': 'redire0', 'props': {=
+ 'position': 'm0',
+> > 'netdev': 'hn0', 'queue': 'rx', 'indev': 'compare_out' } 'filter-redir=
+ector', 'id':
+> > 'redire1', 'props': { 'position': 'redire0', 'netdev': 'hn0', 'queue':=
+ 'rx', 'outdev':
+> > 'compare0' }
+> >
+> > Which is less obvious.
 >
-> On 8/7/19 10:21 AM, Daniel Henrique Barboza wrote:
->> When using a non-UTF8 secret to create a volume using qemu-img, the
->> following error happens:
->>
->> $ qemu-img create -f luks --object secret,id=vol_1_encrypt0,file=vol_resize_pool.vol_1.secret.qzVQrI -o key-secret=vol_1_encrypt0 /var/tmp/pool_target/vol_1 10240K
->>
->> Formatting '/var/tmp/pool_target/vol_1', fmt=luks size=10485760 key-secret=vol_1_encrypt0
->> qemu-img: /var/tmp/pool_target/vol_1: Data from secret vol_1_encrypt0 is not valid UTF-8
->>
->> However, the created file '/var/tmp/pool_target/vol_1' is left behind in the
->> file system after the failure. This behavior can be observed when creating
->> the volume using Libvirt, via 'virsh vol-create', and then getting "volume
->> target path already exist" errors when trying to re-create the volume.
->>
->> The volume file is created inside block_crypto_co_create_opts_luks(), in
->> block/crypto.c. If the bdrv_create_file() call is successful but any
->> succeeding step fails*, the existing 'fail' label does not take into
->> account the created file, leaving it behind.
->>
->> This patch changes block_crypto_co_create_opts_luks() to delete
->> 'filename' in case of failure. A failure in this point means that
->> the volume is now truncated/corrupted, so even if 'filename' was an
->> existing volume before calling qemu-img, it is now unusable. Deleting
->> the file it is not much worse than leaving it in the filesystem in
->> this scenario, and we don't have to deal with checking the file
->> pre-existence in the code.
->>
->> * in our case, block_crypto_co_create_generic calls qcrypto_block_create,
->> which calls qcrypto_block_luks_create, and this function fails when
->> calling qcrypto_secret_lookup_as_utf8.
->>
->> Reported-by: Srikanth Aithal <bssrikanth@in.ibm.com>
->> Suggested-by: Kevin Wolf <kwolf@redhat.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->> ---
->>   block/crypto.c | 20 ++++++++++++++++++++
->>   1 file changed, 20 insertions(+)
->>
->> diff --git a/block/crypto.c b/block/crypto.c
->> index 8237424ae6..8ffca81df6 100644
->> --- a/block/crypto.c
->> +++ b/block/crypto.c
->> @@ -30,6 +30,7 @@
->>   #include "qapi/error.h"
->>   #include "qemu/module.h"
->>   #include "qemu/option.h"
->> +#include "qemu/cutils.h"
->>   #include "crypto.h"
->>   
->>   typedef struct BlockCrypto BlockCrypto;
->> @@ -575,6 +576,25 @@ fail:
->>       bdrv_unref(bs);
->>       qapi_free_QCryptoBlockCreateOptions(create_opts);
->>       qobject_unref(cryptoopts);
->> +
->> +    /*
->> +     * If an error occurred, delete the file. Even if the file existed
->> +     * beforehand, it has been truncated and corrupted in the process.
->> +     */
->> +    if (ret) {
->> +        Error *local_err;
->> +        int r_del = bdrv_delete_file(filename, &local_err);
->> +        /*
->> +         * ENOTSUP will happen if the block driver doesn't support
->> +         * 'bdrv_co_delete_file'. ENOENT will happen if the file
->> +         * doesn't exist. Both are predictable and shouldn't be
->> +         * reported back to the user.
->> +         */
-> Hm, actually, didn't you use ENOENT to mean that we couldn't figure out
-> which driver to use?
+> OK, It is fine for me.
+> But in the code have some other issues like that:
+>
+> +
+> +static void netfilter_set_insert(Object *obj, const char *str, Error **=
+errp)
+> +{
+> +    NetFilterState *nf =3D NETFILTER(obj);
+> +
+> +    if (strcmp(str, "before") && strcmp(str, "after")) {
+> +        error_setg(errp, "Invalid value for netfilter insert, "
+> +                         "should be 'head' or 'tail'");                =
+                  -------------------------------->>> I think you should c=
+hange the "head/tail"  to "before/after".
 
+Oops, that was a typo.
 
-True. In this context though I am referring to the co_routine function
-that deletes the file:
+> +        return;
+> +    }
+> +
+> +    nf->insert_before =3D !strcmp(str, "before");
+> +}
+>
+>
+> And I think the "front/behind" is better than "before/after" in this sta=
+tus.
+> At the same time the name of the "insert_before" change to "front_flag" =
+is better.
 
--------
-(file-posix.c)
-static int coroutine_fn raw_co_delete_file(BlockDriverState *bs,
-                                            Error **errp)
-{
-     struct stat st;
-     int ret;
+What I like about the "before" is that it sounds more like an English sent=
+ence.
+insert: before, position: rew0
+vs.
+insert: front, position: rew0
 
-     if (!(stat(bs->filename, &st) == 0) || !S_ISREG(st.st_mode)) {
-         ret = -ENOENT;
-         error_setg_errno(errp, -ret, "%s is not a regular file",
-                          bs->filename);
-         goto done;
-     }
-(...)
------
+But I agree, "behind" is more clear than "after".
 
+What do you think about "first/last" instead of "head/tail"?
 
-I'll make it clearer in the comment where ENOENT is coming from.
-
-(In fact, this is a good reason to change the !drv error in patch 2 from
-ENOENT to ENOMEDIUM ....)
-
-
-
-
-
-
+Regards,
+Lukas Straub
 
 >
->> +        if ((r_del < 0) && (r_del != -ENOTSUP) && (r_del != -ENOENT)) {
->> +            error_reportf_err(local_err, "%s: ", bs->filename);
->> +        }> +    }
->> +
->>       return ret;
->>   }
->>   
->>
+> Thanks
+> Zhang Chen
+>
+> >
+> > Regards,
+> > Lukas Straub
+> >
+> > >
+> > > Thanks
+> > > Zhang Chen
+> > >
+> > > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> > > > ---
+> > > >  include/net/filter.h |  2 ++
+> > > >  net/filter.c         | 71
+> > +++++++++++++++++++++++++++++++++++++++++++-
+> > > >  qemu-options.hx      | 10 +++----
+> > > >  3 files changed, 77 insertions(+), 6 deletions(-)
+>
 
 
