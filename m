@@ -2,62 +2,76 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE27C3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 08:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E15C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 08:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F385021744
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 08:24:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F385021744
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D2D92173E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 08:47:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D2D92173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4hdZ-0005Ls-Vm
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 04:24:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38953)
+	id 1i4hzT-0002fE-8C
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 04:47:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i4hcd-0004pA-PV
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 04:23:36 -0400
+ (envelope-from <imammedo@redhat.com>) id 1i4hy5-0002CL-HX
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 04:45:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i4hcc-00036E-DN
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 04:23:35 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43997)
+ (envelope-from <imammedo@redhat.com>) id 1i4hy3-0001ef-Ie
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 04:45:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37636)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1i4hcb-0002vL-R1; Mon, 02 Sep 2019 04:23:34 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.04862976|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.222551-0.0564094-0.721039; FP=0|0|0|0|0|-1|-1|-1;
- HT=e02c03305; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=12; RT=12; SR=0;
- TI=SMTPD_---.FNOJ5Rr_1567412601; 
-Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.FNOJ5Rr_1567412601)
- by smtp.aliyun-inc.com(10.147.42.241);
- Mon, 02 Sep 2019 16:23:25 +0800
-To: Chih-Min Chao <chihmin.chao@sifive.com>
-References: <1566959818-38369-1-git-send-email-zhiwei_liu@c-sky.com>
- <CAEiOBXXofjrY2=sjuMDb9dTV2fk9yUVKnr+qmf+7mg9vki6OCw@mail.gmail.com>
-From: liuzhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <50e65c74-1bf2-0732-e40e-63b6b30ca18c@c-sky.com>
-Date: Mon, 2 Sep 2019 16:17:31 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1i4hy3-0001bz-AG
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 04:45:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 404DC10C6975;
+ Mon,  2 Sep 2019 08:45:41 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85E165D6A7;
+ Mon,  2 Sep 2019 08:45:36 +0000 (UTC)
+Date: Mon, 2 Sep 2019 10:45:34 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <20190902104534.46e58c95@redhat.com>
+In-Reply-To: <a43d47e0-6e99-ad42-77d4-638421e8768c@redhat.com>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
+ <b3907432-b149-3f96-6d93-f443f215e0f8@redhat.com>
+ <2b4ba607-f0e3-efee-6712-6dcef129b310@redhat.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA209B@ORSMSX113.amr.corp.intel.com>
+ <7f2d2f1e-2dd8-6914-c55e-61067e06b142@redhat.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA218F@ORSMSX113.amr.corp.intel.com>
+ <3661c0c5-3da4-1453-a66a-3e4d4022e876@redhat.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA2346@ORSMSX113.amr.corp.intel.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F76FDAF@shsmsx102.ccr.corp.intel.com>
+ <E92EE9817A31E24EB0585FDF735412F5B9DA25CC@ORSMSX113.amr.corp.intel.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F7728AB@shsmsx102.ccr.corp.intel.com>
+ <20190827203102.56d0d048@redhat.com>
+ <033ced1a-1399-968e-cce6-6b15a20b0baf@redhat.com>
+ <20190830164802.1b17ff26@redhat.com>
+ <a43d47e0-6e99-ad42-77d4-638421e8768c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEiOBXXofjrY2=sjuMDb9dTV2fk9yUVKnr+qmf+7mg9vki6OCw@mail.gmail.com>
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 121.197.200.217
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH] RISCV: support riscv vector
- extension 0.7.1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Mon, 02 Sep 2019 08:45:41 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
+ QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,61 +83,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, riku.voipio@iki.fi,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, laurent@vivier.eu,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, aurelien@aurel32.net
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ "devel@edk2.groups.io" <devel@edk2.groups.io>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>,
+ Alex Williamson <alex.williamson@redhat.com>, "Yao,
+ Jiewen" <jiewen.yao@intel.com>, "Nakajima, Jun" <jun.nakajima@intel.com>,
+ "Kinney, Michael D" <michael.d.kinney@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ "rfc@edk2.groups.io" <rfc@edk2.groups.io>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 30 Aug 2019 20:46:14 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-On 2019/8/29 下午10:06, Chih-Min Chao wrote:
-> Hi Liuzhiwei,
->
-> Some comments:
->      1. vector extension allows flexible implementation. It is better 
-> to describe the limitation of current implementation (such as 
-> vlen/elen/slen) , supported sections and unsupported features.
-Thanks!  All mentioned will be in patch V2.
->      2. there should be cfg.ext_v  to turn on  vector extension from 
-> command line
-I will add the vector extension to cpu "any".  Is it all right?
->      3. from license
->            It should be   "Copyright  (c) 2019 C-SKY Limited, All 
-> rights reserved."  but not  "2011 ~ 2019"
->
-> It is huge work wait and thanks for your contribution.
->
-> chihmin
->
-> On Wed, Aug 28, 2019 at 3:06 PM liuzhiwei <zhiwei_liu@c-sky.com 
-> <mailto:zhiwei_liu@c-sky.com>> wrote:
->
->     Change-Id: I3cf891bc400713b95f47ecca82b1bf773f3dcb25
->     Signed-off-by: liuzhiwei <zhiwei_liu@c-sky.com
->     <mailto:zhiwei_liu@c-sky.com>>
->     ---
->      fpu/softfloat.c                         |   119 +
->      include/fpu/softfloat.h                 |     4 +
->      linux-user/riscv/cpu_loop.c             |     8 +-
->      target/riscv/Makefile.objs              |     2 +-
->      target/riscv/cpu.h                      |    30 +
->      target/riscv/cpu_bits.h                 |    15 +
->      target/riscv/cpu_helper.c               |     7 +
->      target/riscv/csr.c                      |    65 +-
->      target/riscv/helper.h                   |   354 +
->      target/riscv/insn32.decode              |   374 +-
->      target/riscv/insn_trans/trans_rvv.inc.c |   484 +
->      target/riscv/translate.c                |     1 +
->      target/riscv/vector_helper.c            | 26563
->     ++++++++++++++++++++++++++++++
->      13 files changed, 28017 insertions(+), 9 deletions(-)
->      create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
->      create mode 100644 target/riscv/vector_helper.c
->
->
+> On 08/30/19 16:48, Igor Mammedov wrote:
+> 
+> > (01) On boot firmware maps and initializes SMI handler at default SMBASE (30000)
+> >      (using dedicated SMRAM at 30000 would allow us to avoid save/restore
+> >       steps and make SMM handler pointer not vulnerable to DMA attacks)
+> > 
+> > (02) QEMU hotplugs a new CPU in reset-ed state and sends SCI
+> > 
+> > (03) on receiving SCI, host CPU calls GPE cpu hotplug handler
+> >       which writes to IO port 0xB2 (broadcast SMI)
+> > 
+> > (04) firmware waits for all existing CPUs rendezvous in SMM mode,
+> >      new CPU(s) have SMI pending but does nothing yet
+> > 
+> > (05) host CPU wakes up one new CPU (INIT-INIT-SIPI)
+> >      SIPI vector points to RO flash HLT loop.
+> >      (how host CPU will know which new CPUs to relocate?
+> >       possibly reuse QEMU CPU hotplug MMIO interface???)
+> > 
+> > (06) new CPU does relocation.
+> >      (in case of attacker sends SIPI to several new CPUs,
+> >       open question how to detect collision of several CPUs at the same default SMBASE)
+> > 
+> > (07) once new CPU relocated host CPU completes initialization, returns
+> >      from IO port write and executes the rest of GPE handler, telling OS
+> >      to online new CPU.  
+> 
+> In step (03), it is the OS that handles the SCI; it transfers control to
+> ACPI. The AML can write to IO port 0xB2 only because the OS allows it.
+> 
+> If the OS decides to omit that step, and sends an INIT-SIPI-SIPI
+> directly to the new CPU, can it steal the CPU?
+It sure can but this way it won't get access to privileged SMRAM
+so OS can't subvert firmware.
+The next time SMI broadcast is sent the CPU will use SMI handler at
+default 30000 SMBASE. It's up to us to define behavior here (for example
+relocation handler can put such CPU in shutdown state).
+
+It's in the best interest of OS to cooperate and execute AML
+provided by firmware, if it does not follow proper cpu hotplug flow
+we can't guarantee that stolen CPU will work.
+
+> Thanks!
+> Laszlo
+
+
