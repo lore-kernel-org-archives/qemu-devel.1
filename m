@@ -2,94 +2,57 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9380C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 16:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 924CEC3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 16:27:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F0E72173E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 16:11:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F0E72173E
+	by mail.kernel.org (Postfix) with ESMTPS id 6565521744
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 16:27:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6565521744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4ovm-0001Qt-JN
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 12:11:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48236)
+	id 1i4pB8-00061z-Il
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 12:27:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i4ouk-0000my-0K
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 12:10:46 -0400
+ (envelope-from <thuth@redhat.com>) id 1i4pAO-0005QO-9l
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 12:26:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i4ouj-0006ix-3A
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 12:10:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38834)
+ (envelope-from <thuth@redhat.com>) id 1i4pAN-0001mr-4J
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 12:26:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44980)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i4oug-0006gb-Vn; Mon, 02 Sep 2019 12:10:43 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1i4pAJ-0001kK-Ey; Mon, 02 Sep 2019 12:26:51 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1F1453003715;
- Mon,  2 Sep 2019 16:10:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-221.brq.redhat.com
- [10.40.204.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C3EA95C21A;
- Mon,  2 Sep 2019 16:10:30 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
- <20190826161312.489398-8-vsementsov@virtuozzo.com>
- <8700abe3-01a0-9395-59fb-ca78d9f05a30@redhat.com>
- <77ac0ee1-166d-fc50-f7b8-24485460b24c@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7abe0e0d-320a-c0b3-475c-893cebc8b8f0@redhat.com>
-Date: Mon, 2 Sep 2019 18:10:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <77ac0ee1-166d-fc50-f7b8-24485460b24c@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="XMDaCbyd8ctPT15BEXNtCSSlnuEhx204e"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ by mx1.redhat.com (Postfix) with ESMTPS id 1AD0A3C91A;
+ Mon,  2 Sep 2019 16:26:49 +0000 (UTC)
+Received: from thuth.com (ovpn-116-48.ams2.redhat.com [10.36.116.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F3B313DBB;
+ Mon,  2 Sep 2019 16:26:41 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Mon,  2 Sep 2019 18:26:38 +0200
+Message-Id: <20190902162638.28142-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 02 Sep 2019 16:10:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Mon, 02 Sep 2019 16:26:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 07/13] iotests: prepare 124 and 257
- bitmap querying for backup-top filter
+Subject: [Qemu-devel] [PATCH] hw/misc: Mark most objects as "common" code to
+ speed up compilation a litte bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,103 +64,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-trivial@nongnu.org,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-arm@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XMDaCbyd8ctPT15BEXNtCSSlnuEhx204e
-Content-Type: multipart/mixed; boundary="C0Zjqx0YMkw1bDpdtqSRszdLzqf0n0iXf";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eblake@redhat.com" <eblake@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com"
- <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <7abe0e0d-320a-c0b3-475c-893cebc8b8f0@redhat.com>
-Subject: Re: [PATCH v9 07/13] iotests: prepare 124 and 257 bitmap querying for
- backup-top filter
-References: <20190826161312.489398-1-vsementsov@virtuozzo.com>
- <20190826161312.489398-8-vsementsov@virtuozzo.com>
- <8700abe3-01a0-9395-59fb-ca78d9f05a30@redhat.com>
- <77ac0ee1-166d-fc50-f7b8-24485460b24c@virtuozzo.com>
-In-Reply-To: <77ac0ee1-166d-fc50-f7b8-24485460b24c@virtuozzo.com>
+Most of the code in hw/misc/ does not directly depend on CPU-specific
+code. Mark it as "common" so that the code can be shared between e.g.
+qemu-system-arm and qemu-system-aarch64, or between the various mips
+flavours, instead of recompiling it for each and every target again
+and again.
 
---C0Zjqx0YMkw1bDpdtqSRszdLzqf0n0iXf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/misc/Makefile.objs | 90 +++++++++++++++++++++----------------------
+ 1 file changed, 45 insertions(+), 45 deletions(-)
 
-On 29.08.19 15:22, Vladimir Sementsov-Ogievskiy wrote:
-> 28.08.2019 19:40, Max Reitz wrote:
->> On 26.08.19 18:13, Vladimir Sementsov-Ogievskiy wrote:
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index e4aad707fb..a150680966 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -26,57 +26,57 @@ common-obj-$(CONFIG_PUV3) += puv3_pm.o
+ 
+ common-obj-$(CONFIG_MACIO) += macio/
+ 
+-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
++common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
+ 
+-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
+-obj-$(CONFIG_NSERIES) += cbus.o
+-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
+-obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o exynos4210_rng.o
+-obj-$(CONFIG_IMX) += imx_ccm.o
+-obj-$(CONFIG_IMX) += imx31_ccm.o
+-obj-$(CONFIG_IMX) += imx25_ccm.o
+-obj-$(CONFIG_IMX) += imx6_ccm.o
+-obj-$(CONFIG_IMX) += imx6ul_ccm.o
++common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
++common-obj-$(CONFIG_NSERIES) += cbus.o
++common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
++common-obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o exynos4210_rng.o
++common-obj-$(CONFIG_IMX) += imx_ccm.o
++common-obj-$(CONFIG_IMX) += imx31_ccm.o
++common-obj-$(CONFIG_IMX) += imx25_ccm.o
++common-obj-$(CONFIG_IMX) += imx6_ccm.o
++common-obj-$(CONFIG_IMX) += imx6ul_ccm.o
+ obj-$(CONFIG_IMX) += imx6_src.o
+-obj-$(CONFIG_IMX) += imx7_ccm.o
+-obj-$(CONFIG_IMX) += imx2_wdt.o
+-obj-$(CONFIG_IMX) += imx7_snvs.o
+-obj-$(CONFIG_IMX) += imx7_gpr.o
+-obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+-obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+-obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+-obj-$(CONFIG_OMAP) += omap_clk.o
+-obj-$(CONFIG_OMAP) += omap_gpmc.o
+-obj-$(CONFIG_OMAP) += omap_l4.o
+-obj-$(CONFIG_OMAP) += omap_sdrc.o
+-obj-$(CONFIG_OMAP) += omap_tap.o
+-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
+-obj-$(CONFIG_RASPI) += bcm2835_property.o
+-obj-$(CONFIG_RASPI) += bcm2835_rng.o
+-obj-$(CONFIG_SLAVIO) += slavio_misc.o
+-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
+-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
+-obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
++common-obj-$(CONFIG_IMX) += imx7_ccm.o
++common-obj-$(CONFIG_IMX) += imx2_wdt.o
++common-obj-$(CONFIG_IMX) += imx7_snvs.o
++common-obj-$(CONFIG_IMX) += imx7_gpr.o
++common-obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
++common-obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
++common-obj-$(CONFIG_MAINSTONE) += mst_fpga.o
++common-obj-$(CONFIG_OMAP) += omap_clk.o
++common-obj-$(CONFIG_OMAP) += omap_gpmc.o
++common-obj-$(CONFIG_OMAP) += omap_l4.o
++common-obj-$(CONFIG_OMAP) += omap_sdrc.o
++common-obj-$(CONFIG_OMAP) += omap_tap.o
++common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
++common-obj-$(CONFIG_RASPI) += bcm2835_property.o
++common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
++common-obj-$(CONFIG_SLAVIO) += slavio_misc.o
++common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
++common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
++common-obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
+ obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
+ obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
+ obj-$(CONFIG_MIPS_ITU) += mips_itu.o
+-obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
+-obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
++common-obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
++common-obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
+ 
+-obj-$(CONFIG_TZ_MPC) += tz-mpc.o
+-obj-$(CONFIG_TZ_MSC) += tz-msc.o
+-obj-$(CONFIG_TZ_PPC) += tz-ppc.o
+-obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
++common-obj-$(CONFIG_TZ_MPC) += tz-mpc.o
++common-obj-$(CONFIG_TZ_MSC) += tz-msc.o
++common-obj-$(CONFIG_TZ_PPC) += tz-ppc.o
++common-obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
+ obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
+-obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
+-obj-$(CONFIG_ARMSSE_CPUID) += armsse-cpuid.o
+-obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
++common-obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
++common-obj-$(CONFIG_ARMSSE_CPUID) += armsse-cpuid.o
++common-obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
+ 
+-obj-$(CONFIG_PVPANIC) += pvpanic.o
+-obj-$(CONFIG_AUX) += auxbus.o
+-obj-$(CONFIG_ASPEED_SOC) += aspeed_xdma.o
+-obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+-obj-$(CONFIG_MSF2) += msf2-sysreg.o
+-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
++common-obj-$(CONFIG_PVPANIC) += pvpanic.o
++common-obj-$(CONFIG_AUX) += auxbus.o
++common-obj-$(CONFIG_ASPEED_SOC) += aspeed_xdma.o
++common-obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
++common-obj-$(CONFIG_MSF2) += msf2-sysreg.o
++common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+ 
+-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
++common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
+-- 
+2.18.1
 
-[...]
-
->>> +
->>> +    def get_bitmap(self, bitmaps, node_name, name, recording=3DNone)=
-:
->>> +        """
->>> +        get a specific bitmap from the object returned by query_bitm=
-aps.
->>> +        :param recording: If specified, filter results by the specif=
-ied value.
->>> +        """
->>> +        if bitmaps is None:
->>> +            bitmaps =3D self.query_bitmaps()
->>> +
->>> +        for bitmap in bitmaps['bitmaps'][node_name]:
->>> +            if bitmap.get('name', '') =3D=3D name:
->>> +                if recording is None:
->>> +                    return bitmap
->>> +                elif bitmap.get('recording') =3D=3D recording:
->>> +                    return bitmap
->>
->> Maybe add a =E2=80=9Cbreak=E2=80=9D or =E2=80=9Creturn None=E2=80=9D h=
-ere?
->>
->> (Yes, yes, you just moved existing code.  Still.)
->>
->=20
-> No, as we may have several unnamed bitmaps, which should be selected by=
- "recording"..
-
-Ah.  OK.  Now it all makes sense...
-
-Max
-
-
---C0Zjqx0YMkw1bDpdtqSRszdLzqf0n0iXf--
-
---XMDaCbyd8ctPT15BEXNtCSSlnuEhx204e
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1tPvUACgkQ9AfbAGHV
-z0BhSQf9HWaIskAa5SitVLvLubieLjbUpjbPVfwpBBJX6765t9YL1RFGlaU0Mluz
-OFUXxdJjUFhtq3Jnne56k1zXqbip7c7OVOG8ndEcJvs4FSzfGN7J087gyAkv7dl9
-RAJ7WH8HhiEpqjniMlKsRJzJxQn/omKD+Jdz6ZKib9UzzPZ8dIvVF/6CQ14WU3fB
-9EBV3zeEiGUL8MdLF+ueFVGMqyvvBL3pb1x2YGikLcc6cFc+W8gR6dAIz2ci+cXU
-vf6mhA8WniCmrVvQuPdKj+ipHs7aAqjXsX3LrOT/3jHNeMsXSw6SZ2F/cYd1wBFL
-smbL/e1jN365brjv1TzQeUwvR+XD0w==
-=jnvz
------END PGP SIGNATURE-----
-
---XMDaCbyd8ctPT15BEXNtCSSlnuEhx204e--
 
