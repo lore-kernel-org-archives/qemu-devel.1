@@ -2,93 +2,89 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC509C3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 09:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB24C3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:08:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B887D217F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 09:52:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187B6215EA
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:08:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vP3oyCLW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B887D217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQcuZTz5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187B6215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4j0O-0002wr-TV
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 05:52:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51775)
+	id 1i4jGY-0007Io-9j
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 06:08:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53230)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i4izJ-000202-ED
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 05:51:07 -0400
+ (envelope-from <stefanha@gmail.com>) id 1i4jFg-0006qF-2G
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i4izI-0003rb-1X
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 05:51:05 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:47055)
+ (envelope-from <stefanha@gmail.com>) id 1i4jFe-0005rI-Uu
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:08:00 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35557)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i4izH-0003qO-Qy
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 05:51:03 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h7so11984891wrt.13
- for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 02:51:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=boxTdfILFpg2zK/e1WRqUW6AdH2c3p1NAxzrh6tLK50=;
- b=vP3oyCLWEhGq0amlsl8/edIGvpgcLg4YlAgTms8R/2idV3vlenyEP5mtWaOSjqkVBE
- l4B3Gd3eS2T4N0rbuvVah4r2XY9sj24Eg4QonLR2M6SYvjLDERtbQqzlz/zMhaaomhgH
- w4sV2mEZa3fO5bE7LXH89iJWFjX/V83II9yWBGrNZP6HoU1zRp8b+qUPQZBVbSnQcy6z
- T7zrbceCxyHfd+Ln8xf65uN7FJvnBaXWlhL2OV7WpIBAnXJciVic775t7RRsnvqA7Odk
- w97K6ZrF4L4VAmOQJlnMkxqzrKj8Tfh0OO6PTsg2tMYM+NeX/JdFXv6ply2XIdibNg4n
- d03g==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i4jFe-0005qs-OK
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:07:58 -0400
+Received: by mail-wm1-x343.google.com with SMTP id n10so3271255wmj.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 03:07:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=HMm1cMzg6Z1mRIXLcB654xqbgrTIZUnqJnXVbmW4JgA=;
+ b=OQcuZTz5dFn9/6/XyjFUSNs/iTz0rL/x5YUziDz6OVzbwjTEc5TP81q8VO1Cyol3DO
+ ZmOLQZNHoE6P76q6wtfgjcjJ3/dlp5w86k6FSkVXSggppEgfPa/TsoE2F6cMgQeg5ZX1
+ u2xhPqIbzh9gn1ZgRNwyJKrpbrTbTkW83NvkhzbKbTwWjnPvm57gbpEgluXR8bY/6+bW
+ BAHmkIPJbBkwXTd5dcKLbOUbuS2mUn0ovXLsbjYbchWscBqnESLsOifrETcAb9nmhSrx
+ OJuJKQVP6q+XKSpLWh0KXhPzlYXIoy3sa8Y/1lc1Lah4bTSdScUtdfNurqmxWWZSHHb6
+ /mVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=boxTdfILFpg2zK/e1WRqUW6AdH2c3p1NAxzrh6tLK50=;
- b=CZkG36OeQ3/NkjQvinq/2deWNUlNXcMp3GIIM+nxKxzLdmJwyr392aOGIiO+bfaNqQ
- viVsSF9kKmb8Ihp5bO9dNaQH73H2BBa4qKwRdqfdlNxHU2z0u66z52oB0S6xASCbtB9K
- Xf5vMW2fL21AsXbkQL4j3uVPtVg4EiZ8kTgQAPgAHQNmis8GMeJpOnZjcT5Dwr+ZHorM
- W601pk9QDdl8hYjFZfPGwy5EoO4j0Da2RMQ04RWLrGAgRjCCVtghXxP0uPlQVhHUaznV
- KyqKY3D0DttwIk8UrotlOCqokKf2St/qhkYvptG/sVtlaPOsBiyG8pQuhdN7jUvwv+dv
- QoAw==
-X-Gm-Message-State: APjAAAUtixEVcKNjIVMI/fsvyqjSH/lDVUGNAHvcB8fTvyBlbs2fuz04
- gyCSR0pFPgkm5ORDDwXjpcREtSQFyCQ=
-X-Google-Smtp-Source: APXvYqwzDzT/Pq6pb/oawYsVblLjXYm96RrD7y7p8+AZPPHwdbDqwCn09kJNYpjulSy8TUwYcTznfA==
-X-Received: by 2002:a5d:480d:: with SMTP id l13mr34367184wrq.321.1567417860907; 
- Mon, 02 Sep 2019 02:51:00 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f186sm18645998wmg.21.2019.09.02.02.51.00
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=HMm1cMzg6Z1mRIXLcB654xqbgrTIZUnqJnXVbmW4JgA=;
+ b=oDdvxakWGikOoduqJzEIFSW9Mp5nriP8YIkGVUXfa8ly2L5lWaNBvo5cCHZ7QvRpXI
+ +lcfhEUegnt+u7L03zdEU5AIb2z2Y9r1CkREPeTslKIqLQ84V9jd8V5D5uEr30hdqrQX
+ lGgtl4bTcPpqPnv6uTSTfoHlRGqEgLmn0myGYLzo/ZB4ReQagoB5f7Win3LHyaoS8GLA
+ 2jRjWksUbv4ziDpr3l5PHUhZaUsiG1+RyW+hQRx1+VTCAZzoK2O7dTg1Q6+Idws5Baay
+ acX1QKnowF1HWcv+pBrT/tjL9Fw2W33p3GtkxJpoUJHDHltNecfrqv2xD3Vl1YdL44hN
+ 8Seg==
+X-Gm-Message-State: APjAAAU1olGlBL4I7YdWEIMdxV48lRkeWNhw2jTFb//DFxBbl3U4YiBu
+ +//N2TLSvygdBqzpqugGlv4=
+X-Google-Smtp-Source: APXvYqwwUEXAh5fRjNJJRM13SmQkyFd6Bk8H7M1V5HI+fWeTWZSz/9L7G6xC3HyUPm9n41XiOjV1Nw==
+X-Received: by 2002:a1c:7c17:: with SMTP id x23mr14386726wmc.26.1567418877522; 
+ Mon, 02 Sep 2019 03:07:57 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id b15sm30606475wmb.28.2019.09.02.03.07.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Sep 2019 02:51:00 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 548F61FF87;
- Mon,  2 Sep 2019 10:50:59 +0100 (BST)
-References: <20190827140241.20818-1-marcandre.lureau@redhat.com>
- <20190827140241.20818-2-marcandre.lureau@redhat.com>
- <e3b0333b-848f-62b6-f12a-23b6a83afb0e@redhat.com>
- <CAFEAcA_a8xShCR_owqC_QhZU=iGaG_E0fLH8GciTpdk66HRVHw@mail.gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <CAFEAcA_a8xShCR_owqC_QhZU=iGaG_E0fLH8GciTpdk66HRVHw@mail.gmail.com>
-Date: Mon, 02 Sep 2019 10:50:59 +0100
-Message-ID: <87o9036n7g.fsf@linaro.org>
+ Mon, 02 Sep 2019 03:07:56 -0700 (PDT)
+Date: Mon, 2 Sep 2019 11:07:55 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: vandersonmr <vandersonmr2@gmail.com>
+Message-ID: <20190902100755.GG9069@stefanha-x1.localdomain>
+References: <20190830121903.17585-1-vandersonmr2@gmail.com>
+ <20190830121903.17585-2-vandersonmr2@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="/Zw+/jwnNHcBRYYu"
+Content-Disposition: inline
+In-Reply-To: <20190830121903.17585-2-vandersonmr2@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fix modules-test with no
- default machine
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] accel/tcg: adding integration with
+ linux perf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,67 +96,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--/Zw+/jwnNHcBRYYu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, 27 Aug 2019 at 15:46, Thomas Huth <thuth@redhat.com> wrote:
->>
->> On 27/08/2019 16.02, Marc-Andr=C3=A9 Lureau wrote:
->> > Fixes: eb062cfa733 ("tests: add module loading test")
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> > ---
->> >  tests/modules-test.c | 4 +++-
->> >  1 file changed, 3 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/tests/modules-test.c b/tests/modules-test.c
->> > index a8118e9042..d1a6ace218 100644
->> > --- a/tests/modules-test.c
->> > +++ b/tests/modules-test.c
->> > @@ -1,12 +1,14 @@
->> >  #include "qemu/osdep.h"
->> >  #include "libqtest.h"
->> >
->> > +const char common_args[] =3D "-nodefaults -machine none";
->>
->> "-nodefaults" likely does not do much with the "none" machine ... OTOH,
->> it also does not hurt here.
->>
->> >  static void test_modules_load(const void *data)
->> >  {
->> >      QTestState *qts;
->> >      const char **args =3D (const char **)data;
->> >
->> > -    qts =3D qtest_init(NULL);
->> > +    qts =3D qtest_init(common_args);
->> >      qtest_module_load(qts, args[0], args[1]);
->> >      qtest_quit(qts);
->> >  }
->> >
->>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>
->> Peter, will you apply this directly as a fix for the travis builds, or
->> shall I take it through the qtest tree?
->
-> I'm happy to take it directly (assuming patch 1/2 doesn't
-> have anything too big in it -- it hasn't arrived here yet.)
+On Fri, Aug 30, 2019 at 09:19:02AM -0300, vandersonmr wrote:
+> This commit adds support to Linux Perf in order
+> to be able to analyze qemu jitted code and
+> also to able to see the TBs PC in it.
+>=20
+> When using "-perf" qemu creates a jitdump file in
+> the current working directory. The file format
+> specification can be found in:
+> https://github.com/torvalds/linux/blob/master/tools/perf/Documentation/ji=
+tdump-specification.tx
 
-I've been testing this in my testing/next tree and as you're not back
-until tomorrow I can have these sitting in the PR I'm pulling together
-now if that's ok.
+Oops, the link is broken: .txt
 
->
-> thanks
-> -- PMM
+> +struct jr_code_close {
+> +    struct jr_prefix p;
+> +};
 
+Unused?
 
---
-Alex Benn=C3=A9e
+> +
+> +struct jr_code_move {
+
+Unused?
+
+> +static uint32_t get_e_machine(void)
+> +{
+> +    uint32_t e_machine =3D EM_NONE;
+> +    Elf64_Ehdr elf_header;
+> +    FILE *exe =3D fopen("/proc/self/exe", "r");
+> +
+> +    if (exe =3D=3D NULL) {
+> +        return e_machine;
+> +    }
+> +
+> +    if (fread(&elf_header, sizeof(Elf64_Ehdr), 1, exe) !=3D 1) {
+
+What if this is a 32-bit binary because QEMU was built for a 32-bit
+host?
+
+> +        goto end;
+> +    }
+> +
+> +    e_machine =3D elf_header.e_machine;
+> +
+> +end:
+> +    fclose(exe);
+> +    return e_machine;
+> +}
+> +
+> +void start_jitdump_file(void)
+> +{
+> +    gchar *dumpfile_name =3D g_strdup_printf("./jit-%d.dump", getpid());
+
+You can now use g_autofree:
+
+  g_autofree gchar *dumpfile_name =3D g_strdup_printf(...);
+
+and then the explicit g_free() isn't necessary anymore (and the memory
+leak in the mmap error case is also solved).
+
+> +void append_load_in_jitdump_file(TranslationBlock *tb)
+> +{
+> +    gchar *func_name =3D g_strdup_printf("TB virt:0x"TARGET_FMT_lx, tb->=
+pc);
+> +
+> +    struct jr_code_load load_event;
+> +    load_event.p.id =3D JIT_CODE_LOAD;
+> +    load_event.p.total_size =3D
+> +        sizeof(struct jr_code_load) + strlen(func_name) + 1 + tb->tc.siz=
+e;
+> +    load_event.p.timestamp =3D get_timestamp();
+> +    load_event.pid =3D getpid();
+> +    load_event.tid =3D syscall(SYS_gettid);
+> +    load_event.vma =3D tb->pc;
+> +    load_event.code_addr =3D (uint64_t) tb->tc.ptr;
+> +    load_event.code_size =3D tb->tc.size;
+> +    load_event.code_index =3D tb->pc;
+> +
+> +    fwrite(&load_event, sizeof(struct jr_code_load), 1, dumpfile);
+> +    fwrite(func_name, strlen(func_name) + 1, 1, dumpfile);
+> +    fwrite(tb->tc.ptr, tb->tc.size, 1, dumpfile);
+> +
+> +    g_free(func_name);
+> +    fflush(dumpfile);
+> +}
+
+I didn't see a reply to my question on the previous patch series:
+
+  "append_load_in_jitdump_file() calls fwrite() multiple times.  What
+  guarantees they will not be interleaved when multiple threads call
+  this function?"
+
+Does TCG ever throw away TBs and is it necessary to record this in the
+file so perf knows about it?
+
+--/Zw+/jwnNHcBRYYu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1s6foACgkQnKSrs4Gr
+c8hx5wf+L+8PpbLSNyXfgABNaDpFia/WQqsY+jNHcBVtIgqDqbLnTrf8KLiPFTSB
+c1wq+v4+J9wmkrrfio2aIJp1K9JyeNAZ73QQtIrzOoR9tYI6ViC9P/ZaDgtQ1R43
+qN7cORL+BNJn2tk4vqq/eMlbRyKx5530m653cSJIeKC8rxbhHPiTBEbqy0Vx97Oi
+A2C4ofMTJG8ma1/J6yU6l1JIIkB0MWpW8Nw491SO0/CKd5SzvmfVLxGoitrNC5ZH
+07pXWfHoB/LHGNxuxdgbs8Dh6zs7uOTjU1W8qt7y3EJA0LTy9iY5jC8CtT8EnKyY
+ecH2oHOhuAi+O4Z6A6DluFLB2+sPag==
+=m+Dc
+-----END PGP SIGNATURE-----
+
+--/Zw+/jwnNHcBRYYu--
 
