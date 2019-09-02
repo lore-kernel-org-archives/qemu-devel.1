@@ -2,63 +2,62 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134DFC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 07:52:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE27C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 08:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0159214AE
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 07:52:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0159214AE
+	by mail.kernel.org (Postfix) with ESMTPS id F385021744
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 08:24:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F385021744
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4h8g-00088v-Rs
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 03:52:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33257)
+	id 1i4hdZ-0005Ls-Vm
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 04:24:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38953)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i4h7q-0007jy-Hq
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 03:51:47 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i4hcd-0004pA-PV
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 04:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i4h7n-00025Q-Os
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 03:51:46 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:59775)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i4hcc-00036E-DN
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 04:23:35 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43997)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1i4h7n-0001sk-Ca; Mon, 02 Sep 2019 03:51:43 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08585322|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.108841-0.0017065-0.889452; FP=0|0|0|0|0|-1|-1|-1;
- HT=e02c03307; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=12; RT=12; SR=0;
- TI=SMTPD_---.FNN9pas_1567410693; 
+ id 1i4hcb-0002vL-R1; Mon, 02 Sep 2019 04:23:34 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.04862976|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.222551-0.0564094-0.721039; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e02c03305; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=12; RT=12; SR=0;
+ TI=SMTPD_---.FNOJ5Rr_1567412601; 
 Received: from 172.16.28.187(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.FNN9pas_1567410693)
- by smtp.aliyun-inc.com(10.147.43.95); Mon, 02 Sep 2019 15:51:36 +0800
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
+ fp:SMTPD_---.FNOJ5Rr_1567412601)
+ by smtp.aliyun-inc.com(10.147.42.241);
+ Mon, 02 Sep 2019 16:23:25 +0800
+To: Chih-Min Chao <chihmin.chao@sifive.com>
 References: <1566959818-38369-1-git-send-email-zhiwei_liu@c-sky.com>
- <ba8c7451-b0a7-0405-f881-0c6d0d8574fb@linaro.org>
- <3b85e9b6-8799-9682-9aaf-b688924cb52e@linaro.org>
- <841ebe5f-dd5e-c59d-d7e9-c246ad7741c0@c-sky.com>
- <f81553cc-0f95-003e-f608-f83f9a7e8dd2@linaro.org>
+ <CAEiOBXXofjrY2=sjuMDb9dTV2fk9yUVKnr+qmf+7mg9vki6OCw@mail.gmail.com>
 From: liuzhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <b439e5a8-8ade-2f90-d298-9cedd1b2333b@c-sky.com>
-Date: Mon, 2 Sep 2019 15:45:43 +0800
+Message-ID: <50e65c74-1bf2-0732-e40e-63b6b30ca18c@c-sky.com>
+Date: Mon, 2 Sep 2019 16:17:31 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <f81553cc-0f95-003e-f608-f83f9a7e8dd2@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEiOBXXofjrY2=sjuMDb9dTV2fk9yUVKnr+qmf+7mg9vki6OCw@mail.gmail.com>
 Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 121.197.200.217
-Subject: Re: [Qemu-devel] [PATCH] RISCV: support riscv vector extension 0.7.1
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH] RISCV: support riscv vector
+ extension 0.7.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,79 +69,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, palmer@sifive.com, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, riku.voipio@iki.fi, laurent@vivier.eu,
- Alistair.Francis@wdc.com, alex.bennee@linaro.org, aurelien@aurel32.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, riku.voipio@iki.fi,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, laurent@vivier.eu,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2019/8/29 下午11:09, Richard Henderson wrote:
-> On 8/29/19 5:45 AM, liuzhiwei wrote:
->> Even in qemu,  it may be some situations that VSTART != 0. For example, a load
->> instruction leads to a page fault exception in a middle position. If VSTART ==
->> 0,  some elements that had been loaded before the exception will be loaded once
->> again.
-> Alternately, you can validate all of the pages before performing any memory
-> operations.  At which point there will never be an exception in the middle.
-
-As a vector instruction may access memory  across many pages,  is there 
-any way to validate the pages? Page table walk ?Or some TLB APIs?
-
-> As it turns out, you *must* do this in order to allow watchpoints to work
-> correctly.  David Hildebrand and I are at this moment fixing this aspect of
-> watchpoints for s390x.
+On 2019/8/29 下午10:06, Chih-Min Chao wrote:
+> Hi Liuzhiwei,
 >
-> See https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05979.html
-
-I am interested in wathpoint implementation and  once implemented the 
-user mode watchpoints in the wild.
-
-A backtrace of watchpoint is like
-
-#0  cpu_watchpoint_address_matches (wp=0x555556228110, addr=536871072, 
-len=1) at qemu/exec.c:1094
-#1  0x000055555567204f in check_watchpoint (offset=160, len=1, 
-attrs=..., flags=2) at qemu/exec.c:2803
-#2  0x0000555555672379 in watch_mem_write (opaque=0x0, addr=536871072, 
-val=165, size=1, attrs=...) at qemu/exec.c:2878
-#3  0x00005555556d44bb in memory_region_write_with_attrs_accessor 
-(mr=0x5555561292e0 <io_mem_watch>, addr=536871072, value=0x7fffedffe2c8, 
-size=1, shift=0, mask=255, attrs=...)
-     at qemu/memory.c:553
-#4  0x00005555556d45de in access_with_adjusted_size (addr=536871072, 
-value=0x7fffedffe2c8, size=1, access_size_min=1, access_size_max=8, 
-access_fn=0x5555556d43cd <memory_region_write_with_attrs_accessor>,
-     mr=0x5555561292e0 <io_mem_watch>, attrs=...) at qemu/memory.c:594
-#5  0x00005555556d7247 in memory_region_dispatch_write 
-(mr=0x5555561292e0 <io_mem_watch>, addr=536871072, data=165, size=1, 
-attrs=...) at qemu/memory.c:1480
-#6  0x00005555556f0d13 in io_writex (env=0x5555561efb58, 
-iotlbentry=0x5555561f5398, mmu_idx=1, val=165, addr=536871072, 
-retaddr=0, recheck=false, size=1) at qemu/accel/tcg/cputlb.c:909
-#7  0x00005555556f19a6 in io_writeb (env=0x5555561efb58, mmu_idx=1, 
-index=0, val=165 '\245', addr=536871072, retaddr=0, recheck=false) at 
-qemu/accel/tcg/softmmu_template.h:268
-#8  0x00005555556f1b54 in helper_ret_stb_mmu (env=0x5555561efb58, 
-addr=536871072, val=165 '\245', oi=1, retaddr=0) at 
-qemu/accel/tcg/softmmu_template.h:304
-#9  0x0000555555769f06 in cpu_stb_data_ra (env=0x5555561efb58, 
-ptr=536871072, v=165, retaddr=0) at 
-qemu/include/exec/cpu_ldst_template.h:182
-#10 0x0000555555769f80 in cpu_stb_data (env=0x5555561efb58, 
-ptr=536871072, v=165) at /qemu/include/exec/cpu_ldst_template.h:194
-#11 0x000055555576a913 in csky_cpu_stb_data (env=0x5555561efb58, 
-vaddr=536871072, data=165 '\245') at qemu/target/csky/csky_ldst.c:48
-#12 0x000055555580ba7d in helper_vdsp2_vstru_n (env=0x5555561efb58, 
-insn=4167183360) at qemu/target/csky/op_vdsp2.c:1317
-
-The path is not related to probe_write in the patch().
-
-Could you give more details or a test case where watchpoint doesn't work 
-correctly?
-
+> Some comments:
+>      1. vector extension allows flexible implementation. It is better 
+> to describe the limitation of current implementation (such as 
+> vlen/elen/slen) , supported sections and unsupported features.
+Thanks!  All mentioned will be in patch V2.
+>      2. there should be cfg.ext_v  to turn on  vector extension from 
+> command line
+I will add the vector extension to cpu "any".  Is it all right?
+>      3. from license
+>            It should be   "Copyright  (c) 2019 C-SKY Limited, All 
+> rights reserved."  but not  "2011 ~ 2019"
 >
-> r~
+> It is huge work wait and thanks for your contribution.
 >
-
+> chihmin
+>
+> On Wed, Aug 28, 2019 at 3:06 PM liuzhiwei <zhiwei_liu@c-sky.com 
+> <mailto:zhiwei_liu@c-sky.com>> wrote:
+>
+>     Change-Id: I3cf891bc400713b95f47ecca82b1bf773f3dcb25
+>     Signed-off-by: liuzhiwei <zhiwei_liu@c-sky.com
+>     <mailto:zhiwei_liu@c-sky.com>>
+>     ---
+>      fpu/softfloat.c                         |   119 +
+>      include/fpu/softfloat.h                 |     4 +
+>      linux-user/riscv/cpu_loop.c             |     8 +-
+>      target/riscv/Makefile.objs              |     2 +-
+>      target/riscv/cpu.h                      |    30 +
+>      target/riscv/cpu_bits.h                 |    15 +
+>      target/riscv/cpu_helper.c               |     7 +
+>      target/riscv/csr.c                      |    65 +-
+>      target/riscv/helper.h                   |   354 +
+>      target/riscv/insn32.decode              |   374 +-
+>      target/riscv/insn_trans/trans_rvv.inc.c |   484 +
+>      target/riscv/translate.c                |     1 +
+>      target/riscv/vector_helper.c            | 26563
+>     ++++++++++++++++++++++++++++++
+>      13 files changed, 28017 insertions(+), 9 deletions(-)
+>      create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+>      create mode 100644 target/riscv/vector_helper.c
+>
+>
