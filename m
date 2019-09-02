@@ -2,89 +2,93 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61154C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 15:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DBCC3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 15:07:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35091217D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 15:03:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35091217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 67C2420449
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 15:07:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67C2420449
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4nrs-00048l-DY
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 11:03:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35832)
+	id 1i4nvt-0005xA-ID
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 11:07:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i4nr3-0003UE-6U
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 11:02:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i4nv6-0005Mx-Sy
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 11:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i4nr0-0006Bt-T6
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 11:02:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54104)
+ (envelope-from <mreitz@redhat.com>) id 1i4nv5-00053D-Pg
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 11:07:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39404)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i4nr0-00068s-O5
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 11:02:50 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i4nv2-0004vU-Sl; Mon, 02 Sep 2019 11:07:01 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BC86485550
- for <qemu-devel@nongnu.org>; Mon,  2 Sep 2019 15:02:47 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id x12so8944859wrw.0
- for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 08:02:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0WdYqeCpZ4B8u6AgJMETINz7jsQtzjua14G9j7ZELkI=;
- b=Nn5ohnaITtsxnhi/TlKcsEwZyg6STtw7s04vMO1p87O+EXvoH/SWEaPuo+xUUUfRI5
- XjX6clwbJgmVtHoRG2z9Zyz9d5BzUq48TvaiWf8Eef0M6nitHUQXPf8zqFy/o9UWi5bj
- 55tgMlehvWmJpOIw4a92z32bmumbX+JC1MzxnZ+ML76nibOl3mtbpwyfsCYEZuXNLlG7
- 9Cfz5BL4a5OKnh6Sq4I+fRrtKsGqwtKaUXdEaauYoB0gjDGlm1110yyIoM+d7D5uCUJh
- F1bWfuekjAxMGAr8c69v5Qjni27C7OtY5jWOPiVYCAk/YFkkpu7XmFJmm2XXR9B9Sgde
- y0wA==
-X-Gm-Message-State: APjAAAWnQZ7EeQi8WohZ3hqBSVzTid+2NMd6zk/sJzkdZK7ELBWN9ltX
- Ehdee9wxoFxxNo/nwXGUgiqB7XQabCkPOIrqvhmwTVcX7c57MG6vW2WtNVUx3Yd9x6TJSoXSedH
- /7SWLtvNuUBO853E=
-X-Received: by 2002:a7b:c7cb:: with SMTP id z11mr33620285wmk.24.1567436566473; 
- Mon, 02 Sep 2019 08:02:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy5WRWQypHriXVUual1u5PuHfgkfAS7MP0smYwttjpyonkTw8Zm7KU5CvhQ1bIWC4vQXD91Tw==
-X-Received: by 2002:a7b:c7cb:: with SMTP id z11mr33620232wmk.24.1567436566163; 
- Mon, 02 Sep 2019 08:02:46 -0700 (PDT)
-Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id a18sm19581262wrt.18.2019.09.02.08.02.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Sep 2019 08:02:45 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, richard.henderson@linaro.org,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20190817073628.94473-1-ysato@users.sourceforge.jp>
- <be47ad7c-54ce-3d55-2ae0-2f72c5730f7a@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <dd18cf9c-27c0-5c52-4b17-800c46c0aa58@redhat.com>
-Date: Mon, 2 Sep 2019 17:02:44 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 09CB93082126;
+ Mon,  2 Sep 2019 15:07:00 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-221.brq.redhat.com
+ [10.40.204.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CEE3660C05;
+ Mon,  2 Sep 2019 15:06:58 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-40-mreitz@redhat.com>
+ <098d2ce3-5ff1-8b27-cada-1f738011424d@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <50e2621b-d6f2-186a-4b40-6cf563d62d8b@redhat.com>
+Date: Mon, 2 Sep 2019 17:06:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <be47ad7c-54ce-3d55-2ae0-2f72c5730f7a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <098d2ce3-5ff1-8b27-cada-1f738011424d@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="jEZ1K2hKTka4pXXOsEKAPaa7bzChiwSyr"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 02 Sep 2019 15:07:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v23 00/22] Add RX archtecture support
+Subject: Re: [Qemu-devel] [PATCH v6 39/42] iotests: Add filter commit test
+ cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,42 +100,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor, kindly ping :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jEZ1K2hKTka4pXXOsEKAPaa7bzChiwSyr
+Content-Type: multipart/mixed; boundary="3w1nw2GeFcMoD1zg0lOtTwbL67JCBK1rh";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <50e2621b-d6f2-186a-4b40-6cf563d62d8b@redhat.com>
+Subject: Re: [PATCH v6 39/42] iotests: Add filter commit test cases
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-40-mreitz@redhat.com>
+ <098d2ce3-5ff1-8b27-cada-1f738011424d@virtuozzo.com>
+In-Reply-To: <098d2ce3-5ff1-8b27-cada-1f738011424d@virtuozzo.com>
 
-On 8/21/19 12:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Igor,
->=20
-> On 8/17/19 9:36 AM, Yoshinori Sato wrote:
->> Hello.
->> This patch series is added Renesas RX target emulation.
+--3w1nw2GeFcMoD1zg0lOtTwbL67JCBK1rh
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 31.08.19 13:41, Vladimir Sementsov-Ogievskiy wrote:
+> 09.08.2019 19:14, Max Reitz wrote:
+>> This patch adds some tests on how commit copes with filter nodes.
 >>
->> Changes for v22.
->> Added some include.
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   tests/qemu-iotests/040     | 177 +++++++++++++++++++++++++++++++++++=
+++
+>>   tests/qemu-iotests/040.out |   4 +-
+>>   2 files changed, 179 insertions(+), 2 deletions(-)
 >>
->> Changes for v21.
->> rebase latest master.
->> Remove unneeded hmp_info_tlb.
->>
->> Chanegs for v20.
->> Reorderd patches.
->> Squashed v19 changes.
->>
->> Changes for v19.
->> Follow tcg changes.
->> Cleanup cpu.c.
->> simplify rx_cpu_class_by_name and rx_load_image move to rx-virt.
+>> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+>> index 6db9abf8e6..a0a0db8889 100755
+>> --- a/tests/qemu-iotests/040
+>> +++ b/tests/qemu-iotests/040
+
+[...]
+
+>> +    def tearDown(self):
+>> +        self.vm.shutdown(has_quit=3Dself.has_quit)
+>> +
+>> +        for index in range(len(self.pattern_files)):
 >=20
-> Since do asked changes in the CPU QOM design in previous versions of
-> Yoshinori work, can you Ack this version (or provide guidance in how to
-> properly implement your suggestions, this is Yoshinori's first
-> contribution to the project)?
+> you may use enumerate for such cases:
+> for ind, file in enumerate(self.pattern_files):
+>     ...
+
+Ah, nice.
+
+>> +            result =3D qemu_io('-f', iotests.imgfmt,
+>> +                             '-c', 'read -P %i %iM 1M' % (index + 1, =
+index),
+>> +                             self.pattern_files[index])
+>> +            self.assertFalse('Pattern verification failed' in result)=
+
 >=20
-> Thanks,
+> A bit better would be to keep this loop in a function and do "writes" t=
+hrough it too,
+> to make it more obvious that they are the same.. But I'm OK with it as =
+is.
+
+Hm, yes.  I=E2=80=99ll have a look.
+
+>> +
+>> +        os.remove(self.img3)
+>> +        os.remove(self.img2)
+>> +        os.remove(self.img1)
+>> +        os.remove(self.img0)
+>> +
+>> +    # Filters make for funny filenames, so we cannot just use
+>> +    # self.imgX to get them
+>> +    def get_filename(self, node):
+>> +        return self.vm.node_info(node)['image']['filename']
+>> +
 >=20
-> Phil.
+> maybe:
+> def assertHasNode(self, node_name):
+>    self.assertIsNotNone(self.vm.node_info(node_name))
+>=20
+> and similar for assertNoNode...
+
+Hm, I don=E2=80=99t know.  It fits on one line either way.
+
+>> +    def test_filterless_commit(self):
+>> +        self.assert_no_active_block_jobs()
+>=20
+> why not just to include this call into setUp() ? Or even, just drop it?=
+
+> We create and start new vm in setUp, it don't have any block jobs for s=
+ure.
+
+Other tests do it the same way, e.g. 030, 040, and 041.
+
+[...]
+
+>> +        self.assertIsNone(self.vm.node_info('top-filter'))
+>> +        self.assertIsNone(self.vm.node_info('cow-3'))
+>> +        self.assertIsNotNone(self.vm.node_info('cow-2'))
+>=20
+> It would be good to assert here the cow-2 became drv0 child. However, o=
+therwise
+> it should be automatically dropped, so it's not necessary.
+
+Yep, like cow-3.  I=E2=80=99ll look into it anyway.
+
+>> +
+>> +        # 3 has been comitted into 2
+>> +        self.pattern_files[3] =3D self.img2
+>> +
+>> +    def test_filtered_active_commit_without_filter(self):
+>> +        self.assert_no_active_block_jobs()
+>> +        result =3D self.vm.qmp('block-commit',
+>> +                             job_id=3D'commit',
+>> +                             device=3D'top-filter',
+>> +                             top_node=3D'cow-3',
+>> +                             base_node=3D'cow-2')
+>> +        self.assert_qmp(result, 'return', {})
+>=20
+> can we check that really "active" commit is started, i.e. mirror block =
+job?
+
+We do:
+
+>> +        self.complete_and_wait(drive=3D'commit')
+
+wait_ready is True by default, so this will first wait for a READY
+event.  That only happens for active commit.
+
+Max
+
+
+--3w1nw2GeFcMoD1zg0lOtTwbL67JCBK1rh--
+
+--jEZ1K2hKTka4pXXOsEKAPaa7bzChiwSyr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1tMBEACgkQ9AfbAGHV
+z0CHOQf/egz0+55KtggHmWp/nyWBL4TjM05DyZ5L/lsdz8PLOBJJo6r+eCQpQiVu
+aPJByH6gNW08oOFb0ldg97WDmyRuSR/XJCsJRMp39kF2D9adcADtNVjSXoqCT7Rw
+0Sa0QX9N+brqtlMWSPpfm7NManZEBb0tFy1Gl8+JQAhds9QYKkov9QM3G56xVKyH
+FJNu5jdqAZhdJntlNI1KP1e8yxp0ICZdJcXq+3Q/TflE6iTYW1fP4Md0HBr4Uuiy
+uYEDe2RmXGlrcPBsyIVIBcrHv3ujq4gxBLj0Ry0VOE0j3djOzImBUjsai/q0/VKn
+MzDr2YMf6QJeoNtb6DN0VISXmeS4Sg==
+=I3e0
+-----END PGP SIGNATURE-----
+
+--jEZ1K2hKTka4pXXOsEKAPaa7bzChiwSyr--
 
