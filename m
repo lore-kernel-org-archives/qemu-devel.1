@@ -2,90 +2,62 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1A4C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4C4C3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:13:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45360217D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 10:37:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68BEF216C8
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 11:13:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c5yaFzXn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45360217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="N4ZMP07+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68BEF216C8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4jiW-0001xf-5d
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 06:37:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54920)
+	id 1i4kGi-0001cZ-EC
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 07:13:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i4jSp-0004n3-Pj
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:21:36 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i4kFr-00018z-BY
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:12:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i4jSn-0004JH-Po
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:21:35 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:33442)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i4jSn-0004Ig-K5
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 06:21:33 -0400
-Received: by mail-wr1-x429.google.com with SMTP id u16so13459788wrr.0
- for <qemu-devel@nongnu.org>; Mon, 02 Sep 2019 03:21:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=oPHGA4epXrz3sRBaImYzLMH9SUMVM871U98ActdGL7I=;
- b=c5yaFzXnNK+06rXJ44PKu9mbQ2TS4OONs6hkX2z7ANU6cVuzgyq1J/gKl59NJb2wKd
- 7VjEcGFVjKYWqzTaw8HsY7fPT1FuXo5muL3l4lnIr9Wt8Hw7o/AkrTqmbfiQZo4pRSbK
- XfP+b/Rtib4Xev2ThdvNOU8KCA513S7TxknGwimJxLefB30C7PhGJq6j8do6/v/4B73h
- UstXAHC5au/wvxdOrokoi9UTacq5TeCH6Q8RSoGODu3UucetVLMVnoujC1JX1gXLm4H6
- laduExguTVg/G4uCfYfYhxgGPsNpAE+3bLGRt1G/oX7ZKOG86wYO+NwtSQXT19Jjeqm3
- +7kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=oPHGA4epXrz3sRBaImYzLMH9SUMVM871U98ActdGL7I=;
- b=uK6Lu1++MoGC+EIH5OrBAiZJ8AR+3a2QuB4qqYmyKpS6+bia3ze3PbD7Y+LW3mBrPN
- ukvhYGUqphjwDYKvj5eoYtlLZfHHdalxF7fOuIHNoPx3RpWTkgjaV1H3AoBeWIlYx3cs
- WoGLfOl6AuAa0gQT+IvjtLAGOuo2sUETLPpmHVjelhHQAjlZJr6w0W9F6vyA+PvLlEAU
- +BLWi2VMdBKB7SAsttWnXArF0RBPIwmFgGzsq5x0RGQwSV18jOsoJJYVeu0JW+Urbi/i
- +nGcwhIHm1y69F9VX9yIkbx0rUpZlsRtWBosSsV9BtfyFpM3m6w3g7pE/rjk9Lfs02A9
- w2ag==
-X-Gm-Message-State: APjAAAXelnKdItW0Xgr2UP6oPgrKkiZwfJwnKrnB+Y5x2Ow3ROo77NN/
- iA3Es3WE/JhfLlm5QZopTJL5o9TKTQA=
-X-Google-Smtp-Source: APXvYqyJQNqghJ9WGWvxukvgBBuCFfbAoYgHttJVjtAawlKuOY+Zzb2js5S3LBQuTKg0woLnpOicTg==
-X-Received: by 2002:a5d:460e:: with SMTP id t14mr37069670wrq.171.1567419691561; 
- Mon, 02 Sep 2019 03:21:31 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b26sm15848046wmj.14.2019.09.02.03.21.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Sep 2019 03:21:29 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 319451FF9B;
- Mon,  2 Sep 2019 11:21:23 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Mon,  2 Sep 2019 11:21:21 +0100
-Message-Id: <20190902102122.1128-12-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190902102122.1128-1-alex.bennee@linaro.org>
-References: <20190902102122.1128-1-alex.bennee@linaro.org>
+ (envelope-from <dgibson@ozlabs.org>) id 1i4kFp-0000aE-OC
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 07:12:15 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:48507 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1i4kFn-0000PS-9q; Mon, 02 Sep 2019 07:12:13 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46MS8l26vRz9sDQ; Mon,  2 Sep 2019 21:12:07 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1567422727;
+ bh=K1bYLC+UyHqiOVfioDCOAx7SO3Do6c00TTgBnw+4rAs=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=N4ZMP07+/NxcXhLqsubn/ARiAwJKOf5T8A6aecq27mQj5jhFGAW1DVYkav/3CWo3k
+ WF+W+buSorBEiLeCcw9ZUxA+WUbMrkqvFf+dYaob/mA/IfDjg5Ft54O/Fj/F2JPu3c
+ 1rKiMjgjvgfNyHj6qD3D7KpUziRWpfh/ltLIzX50=
+Date: Mon, 2 Sep 2019 20:28:44 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190902102844.GD30674@umbus.fritz.box>
+References: <20190902092932.20200-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::429
-Subject: [Qemu-devel] [PULL 11/12] tests: fix modules-test with no default
- machine
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="AkbCVLjbJ9qUtAXD"
+Content-Disposition: inline
+In-Reply-To: <20190902092932.20200-1-clg@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix "bmc" node name in DT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,43 +69,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Fixes: eb062cfa733 ("tests: add module loading test")
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190827140241.20818-2-marcandre.lureau@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+--AkbCVLjbJ9qUtAXD
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/modules-test.c b/tests/modules-test.c
-index a8118e90427..d1a6ace218c 100644
---- a/tests/modules-test.c
-+++ b/tests/modules-test.c
-@@ -1,12 +1,14 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- 
-+const char common_args[] = "-nodefaults -machine none";
-+
- static void test_modules_load(const void *data)
- {
-     QTestState *qts;
-     const char **args = (const char **)data;
- 
--    qts = qtest_init(NULL);
-+    qts = qtest_init(common_args);
-     qtest_module_load(qts, args[0], args[1]);
-     qtest_quit(qts);
- }
--- 
-2.20.1
+On Mon, Sep 02, 2019 at 11:29:32AM +0200, C=E9dric Le Goater wrote:
+> Fixes the dtc output :
+>=20
+> ERROR (node_name_chars): //bmc: Bad character '/' in node name
+> Warning (avoid_unnecessary_addr_size): /bmc: unnecessary #address-cells/#=
+size-cells without "ranges" or child "reg" property
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
+Applied to ppc-for-4.2, thanks.
+
+> ---
+>  hw/ppc/pnv_bmc.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+> index e5eb6e5a70da..dc5e918cb79e 100644
+> --- a/hw/ppc/pnv_bmc.c
+> +++ b/hw/ppc/pnv_bmc.c
+> @@ -77,13 +77,10 @@ void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt)
+>      const struct ipmi_sdr_compact *sdr;
+>      uint16_t nextrec;
+> =20
+> -    offset =3D fdt_add_subnode(fdt, 0, "/bmc");
+> +    offset =3D fdt_add_subnode(fdt, 0, "bmc");
+>      _FDT(offset);
+> =20
+>      _FDT((fdt_setprop_string(fdt, offset, "name", "bmc")));
+> -    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
+> -    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
+> -
+>      offset =3D fdt_add_subnode(fdt, offset, "sensors");
+>      _FDT(offset);
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--AkbCVLjbJ9qUtAXD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1s7toACgkQbDjKyiDZ
+s5L06RAAvrjCD0rxbVRRoTisGN/HonURG8yqSwOgAjHvmAopZFoFJz6K3fL3XXSu
+GQ2nn/9wgj5JAE2Z/fwpjC/yeawWX0rMPvpF4xfm2sl1GK87AvezARMdZXoE6tIe
+kG8N+Tp06XA6UVVd8E/0mOry10n3D6JqO5mLtcUFR/+lqi2QhLbmusiI0UBT0wiZ
+xRtMCtrbfLvnYZJe2eNkoPPSur/AnbEPQBQPt6UwsFcucr5dhA+DM2E797xT3bxM
+NDeXo8ao9gQeUzLRBNg7B+9K0OyCKw+rbf1seAEI3CaAE9rdWvLW7tsjEMzn/p4I
+LpeesYUGvSSFJm2/RnqkvNNUZXZIXTJjPw1qmGIh7YQZsNHDXX40VkbWpK0fT+YI
+wb0vdZBvNHbBdV8xA4EwpPCSJIpXAzf45OFWZzLE4w4MagzZtojXNaTkj4vun5AC
+gVMfGzZNzkiUZOtLj3GR0vBtXohM6iH/dRGiDXXxIMfmuQM4iyEKksnTcpeodpb+
+5Rnyj75lXaNPq9f9xFdFBL9NEUTENQZthAjXvLllI4gLlSchUPO/cIcbX/+3BrOT
+rLXP2z22iqUbOF5HQ6lXEqgt8qPmyq5IQrTfwH+mRHGm4Nsgt5MxQWw2PZgk2eEJ
+8X+kyiNTsHdS7o+fkb8IN1l1tK7N0fdVv4c1kWEfz30itTQNAk8=
+=9ybz
+-----END PGP SIGNATURE-----
+
+--AkbCVLjbJ9qUtAXD--
 
