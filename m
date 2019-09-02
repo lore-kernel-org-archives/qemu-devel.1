@@ -1,80 +1,68 @@
 Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.9 required=3.0 tests=CHARSET_FARAWAY_HEADER,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E1AC3A59B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 04:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E53C3A59B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 05:44:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A5B721897
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 04:17:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="pO9HvkFh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A5B721897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8DDE21897
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 05:44:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8DDE21897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4dmp-0005XR-Eq
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 00:17:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57908)
+	id 1i4f8j-00026A-SG
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 01:44:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhlb29@foxmail.com>) id 1i4dll-0004wC-UA
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 00:16:47 -0400
+ (envelope-from <jing2.liu@linux.intel.com>) id 1i4f83-0001hN-QE
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 01:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhlb29@foxmail.com>) id 1i4dlk-0008LE-J2
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 00:16:45 -0400
-Received: from smtpproxy19.qq.com ([184.105.206.84]:42612)
+ (envelope-from <jing2.liu@linux.intel.com>) id 1i4f81-0003Gx-D2
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 01:43:51 -0400
+Received: from mga17.intel.com ([192.55.52.151]:8899)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1i4dlj-0008G4-Q5
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 00:16:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
- s=s201512; t=1567397792;
- bh=42BupgJXk9ZNUFDJ7lt14+x4fwJ5tKpPhQsLysjygjQ=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=pO9HvkFhVF09G+eORZyjMPVqyqz3nyvWdigx2+ah2i0AB7vDIUcw9CCpJH8Ev3VRL
- ZXHbQF77uYQ0JbUpzIgTZ4o8Jc6A84KiQUcURYwK0+VuY3i7fFVLo5GI50TspVqTId
- lr6WgTm8Y9gRuz1XBjJVct1LpNq6XTmHbRqK0qms=
-X-QQ-FEAT: 7560NedJMvuyQlXpbqJHN1ZU+RF5o6misGmPNoLBBu+YTLW5/RxBsvZ3P1SRv
- OqQrTpr9eO6iUJexFNyiwiMsvkHpQzTfpzPAqIoUQISpNufrV4/o0TT17gt06EZcjc5wExx
- Z2TltzuLVAgAyvmQ+Cys/ArqLJeyyXvQsE68nIfVBFKdrDEI1cSn4WO0g9EU9+fOKc+NEOv
- 1A2hs8xCQ97590EHrWohs8ucf4JOLlhYQH/uAsIZy/hVXtqh6cEJ4dCNRTU/4SqVTvjfZF4
- ipYqhDRHtu8z3OrXNOFCDTWEvnLwmfe/KST+lb/7qapKU7
-X-QQ-SSF: 000100000000008000000000000000G
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 124.200.70.7
-X-QQ-STYLE: 
-X-QQ-mid: webmail190t1567397791t3633208
-From: "=?gb18030?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
-To: "=?gb18030?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
-Mime-Version: 1.0
-Date: Mon, 2 Sep 2019 12:16:31 +0800
-X-Priority: 3
-Message-ID: <tencent_61024D4F136E131E2B085A7DACEA1593D007@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Mon, 02 Sep 2019 12:16:31 +0800 (CST)
-Feedback-ID: webmail:foxmail.com:bgforeign:bgforeign4
-X-QQ-Bgrelay: 1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.4.x
-X-Received-From: 184.105.206.84
-Content-Type: text/plain;
-	charset="gb18030"
-Content-Transfer-Encoding: base64
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] Uncaught target signal 11 (Segmentation Faullt)
+ (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+ id 1i4f80-0002yH-Et
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 01:43:49 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 01 Sep 2019 22:43:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,457,1559545200"; d="scan'208";a="184407680"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.129.55])
+ ([10.238.129.55])
+ by orsmga003.jf.intel.com with ESMTP; 01 Sep 2019 22:43:39 -0700
+To: Sergio Lopez <slp@redhat.com>
+References: <20190702121106.28374-1-slp@redhat.com>
+ <879c7f68-95a3-3bf6-cba8-d3465770d399@linux.intel.com>
+ <87lfvc3rgj.fsf@redhat.com>
+ <18777980-a2ca-fe27-419b-6e2bd213dd17@linux.intel.com>
+ <87ftlibuf4.fsf@redhat.com>
+From: Jing Liu <jing2.liu@linux.intel.com>
+Message-ID: <ff09a652-8dfa-d7d7-ba1b-dd798531224f@linux.intel.com>
+Date: Mon, 2 Sep 2019 13:43:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <87ftlibuf4.fsf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,19 +74,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, mst@redhat.com, maran.wilson@oracle.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
+ sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SSBhbSB0cnlpbmcgdG8gcnVuIGEgc2ltcGxlIE1JUFMgcHJvZ3JhbSB3aXRoIFFFTVUgdXNl
-ciBtb2RlLg0KDQoNCg0KSG9zdDogVWJ1bnR1IDE4LjA0IExUUyBvbiB4ODZfNjQNClFFTVUg
-Y29uZmlnOiAuLi9jb25maWd1cmUgLS10YXJnZXQtbGlzdD1taXBzLWxpbnV4LXVzZXINCg0K
-Q3Jvc3MgQ29tcGlsZXI6IHN1ZG8gYXB0IGluc3RhbGwgZ2NjLW1pcHMtbGludXgtZ251DQoN
-Cg0KTXkgdGVzdC5jIGlzIHNpbXBsZTogaW50IG1haW4odm9pZCkge2ludCBhID0gMTsgaW50
-IGIgPTI7IGludCBjOyBjID0gYSArIGI7IHJldHVybiAwO30NCkFmdGVyIGNvbXBpbGluZyBp
-dCB3aXRoICJtaXBzLWxpbnV4LWdudS1nY2MgdGVzdC5jIC1vIHRlc3QiLCBJIHJhbiBpdCB3
-aXRoICIuL3FlbXUtbWlwcyAtTCAvdXNyL21pcHMtbGludXgtZ251IHRlc3QiLCB0aGVuIEkg
-Z290IHRoZSBmb2xsb3dpbmcgZXJyb3IgbWVzc2FnZToNCnFlbXU6IHVuY2F1Z2h0IHRhcmdl
-dCBzaWduYWwgMTEgKFNlZ21lbnRhdGlvbiBmYXVsdCkgLSBjb3JlIGR1bXBlZA0KDQoNCkRv
-ZXMgYW55b25lIGhhdmUgYSBzb2x1dGlvbiB0byB0aGlzPyBUaGFuayB5b3UgaW4gYWR2YW5j
-ZS4NCg0KDQpDaGVlcnMsDQpMaWJv
+
+
+On 8/30/2019 10:27 PM, Sergio Lopez wrote:
+> 
+> Jing Liu <jing2.liu@linux.intel.com> writes:
+> 
+>> Hi Sergio,
+>>
+>> On 8/29/2019 11:46 PM, Sergio Lopez wrote:
+>>>
+>>> Jing Liu <jing2.liu@linux.intel.com> writes:
+>>>
+>>>> Hi Sergio,
+>>>>
+>>>> The idea is interesting and I tried to launch a guest by your
+>>>> guide but seems failed to me. I tried both legacy and normal modes,
+>>>> but the vncviewer connected and told me that:
+>>>> The vm has no graphic display device.
+>>>> All the screen in vnc is just black.
+>>>
+>>> The microvm machine type doesn't support any graphics device, so you
+>>> need to rely on the serial console.
+>> Got it.
+>>
+>>>
+>>>> kernel config:
+>>>> CONFIG_KVM_MMIO=y
+>>>> CONFIG_VIRTIO_MMIO=y
+>>>>
+>>>> I don't know if any specified kernel version/patch/config
+>>>> is needed or anything I missed.
+>>>> Could you kindly give some tips?
+>>>
+>>> I'm testing it with upstream vanilla Linux. In addition to MMIO, you
+>>> need to add support for PVH (the next version of this patchset, v4, will
+>>> support booting from FW, so it'll be possible to use non-PVH ELF kernels
+>>> and bzImages too).
+>>>
+>>> I've just uploaded a working kernel config here:
+>>>
+>>> https://gist.github.com/slp/1060ba3aaf708584572ad4109f28c8f9
+>>>
+>> Thanks very much and this config is helpful to me.
+>>
+>>> As for the QEMU command line, something like this should do the trick:
+>>>
+>>> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm,legacy -kernel vmlinux -append "earlyprintk=ttyS0 console=ttyS0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial stdio
+>>>
+>>> If this works, you can move to non-legacy mode with a virtio-console:
+>>>
+>>> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0
+>>>
+>> I tried the above two ways and it works now. Thanks!
+>>
+>>> If is still working, you can try adding some devices too:
+>>>
+>>> ./x86_64-softmmu/qemu-system-x86_64 -smp 1 -m 1g -enable-kvm -M microvm -kernel vmlinux -append "console=hvc0 reboot=k panic=1 root=/dev/vda" -nodefaults -no-user-config -nographic -serial pty -chardev stdio,id=virtiocon0,server -device virtio-serial-device -device virtconsole,chardev=virtiocon0 -netdev user,id=testnet -device virtio-net-device,netdev=testnet -drive id=test,file=alpine-rootfs-x86_64.raw,format=raw,if=none -device virtio-blk-device,drive=test
+>>>
+>> But I'm wondering why the image I used can not be found.
+>> root=/dev/vda3 and the same image worked well on normal qemu/guest-
+>> config bootup, but didn't work here. The details are,
+>>
+>> -append "console=hvc0 reboot=k panic=1 root=/dev/vda3 rw rootfstype=ext4" \
+>>
+>> [    0.022784] Key type encrypted registered
+>> [    0.022988] VFS: Cannot open root device "vda3" or
+>> unknown-block(254,3): error -6
+>> [    0.023041] Please append a correct "root=" boot option; here are
+>> the available partitions:
+>> [    0.023089] fe00         8946688 vda
+>> [    0.023090]  driver: virtio_blk
+>> [    0.023143] Kernel panic - not syncing: VFS: Unable to mount root
+>> fs on unknown-block(254,3)
+>> [    0.023201] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-rc3 #23
+>>
+>>
+>> BTW, root=/dev/vda is also tried and didn't work. The dmesg is a
+>> little different:
+>>
+>> [    0.028050] Key type encrypted registered
+>> [    0.028484] List of all partitions:
+>> [    0.028529] fe00         8946688 vda
+>> [    0.028529]  driver: virtio_blk
+>> [    0.028615] No filesystem could mount root, tried:
+>> [    0.028616]  ext4
+>> [    0.028670]
+>> [    0.028712] Kernel panic - not syncing: VFS: Unable to mount root
+>> fs on unknown-block(254,0)
+>>
+>> I tried another ext4 img but still doesn't work.
+>> Is there any limitation of blk image? Could I copy your image for simple
+>> test?
+> 
+> The kernel config I posted lacks support for DOS partitions. Adding
+> CONFIG_MSDOS_PARTITION=y should allow you to boot from /dev/vda3.
+> 
+> Anyway, in case you also want to try booting from /dev/vda (without
+> partitions), this is the recipe I use to quickly create a minimal rootfs
+> image:
+> 
+> # wget http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/x86_64/alpine-minirootfs-3.10.2-x86_64.tar.gz
+> # qemu-img create -f raw alpine-rootfs-x86_64.raw 1G
+> # sudo losetup /dev/loop0 alpine-rootfs-x86_64.raw
+> # sudo mkfs.ext4 /dev/loop0
+> # sudo mount /dev/loop0 /mnt
+> # sudo tar xpf alpine-minirootfs-3.10.2-x86_64.tar.gz -C /mnt
+> # sudo umount /mnt
+> # sudo losetup -d /dev/loop0
+> 
+> The rootfs will be missing openrc, so you'll need to add "init=/bin/sh"
+> to the command line.
+> 
+
+Thank you Sergio. I'll try that.
+
+Jing
+> Sergio.
+> 
+>> Thanks in advance,
+>> Jing
+>>
+>>> Sergio.
+
