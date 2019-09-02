@@ -2,81 +2,59 @@ Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DEB0C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 19:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4785EC3A59E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 19:36:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51C5721881
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 19:11:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C5721881
+	by mail.kernel.org (Postfix) with ESMTPS id 1A2B620674
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 19:36:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A2B620674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4rjA-0007gb-An
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 15:11:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48112)
+	id 1i4s7M-0005uu-0G
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 15:36:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1i4riQ-0007Aq-AO
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 15:10:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i4s4x-000445-9N
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 15:33:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1i4riN-0002Dd-8y
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 15:10:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39882)
+ (envelope-from <mreitz@redhat.com>) id 1i4s4w-0006uv-2y
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 15:33:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37550)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1i4riN-000258-0Z
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 15:10:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i4s4s-0006rJ-7Q; Mon, 02 Sep 2019 15:33:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4340A3082D9E;
- Mon,  2 Sep 2019 19:10:07 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-152.ams2.redhat.com
- [10.36.117.152])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDC2B19C78;
- Mon,  2 Sep 2019 19:09:59 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
- <a76014e2-2f0a-afce-6d15-1c45c5c1e467@redhat.com>
- <b3907432-b149-3f96-6d93-f443f215e0f8@redhat.com>
- <2b4ba607-f0e3-efee-6712-6dcef129b310@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA209B@ORSMSX113.amr.corp.intel.com>
- <7f2d2f1e-2dd8-6914-c55e-61067e06b142@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA218F@ORSMSX113.amr.corp.intel.com>
- <3661c0c5-3da4-1453-a66a-3e4d4022e876@redhat.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA2346@ORSMSX113.amr.corp.intel.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F76FDAF@shsmsx102.ccr.corp.intel.com>
- <E92EE9817A31E24EB0585FDF735412F5B9DA25CC@ORSMSX113.amr.corp.intel.com>
- <74D8A39837DF1E4DA445A8C0B3885C503F7728AB@shsmsx102.ccr.corp.intel.com>
- <20190827203102.56d0d048@redhat.com>
- <033ced1a-1399-968e-cce6-6b15a20b0baf@redhat.com>
- <20190830164802.1b17ff26@redhat.com>
- <a43d47e0-6e99-ad42-77d4-638421e8768c@redhat.com>
- <20190902104534.46e58c95@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2ef1910e-8879-028a-4db6-97a0ecc64083@redhat.com>
-Date: Mon, 2 Sep 2019 21:09:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mx1.redhat.com (Postfix) with ESMTPS id E3EA8C057F31;
+ Mon,  2 Sep 2019 19:33:24 +0000 (UTC)
+Received: from localhost (ovpn-204-221.brq.redhat.com [10.40.204.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CD0235D9CC;
+ Mon,  2 Sep 2019 19:33:21 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon,  2 Sep 2019 21:33:15 +0200
+Message-Id: <20190902193320.32233-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190902104534.46e58c95@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 02 Sep 2019 19:10:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Mon, 02 Sep 2019 19:33:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [edk2-rfc] [edk2-devel] CPU hotplug using SMM with
- QEMU+OVMF
+Subject: [Qemu-devel] [PATCH v2 0/5] vpc: Return 0 from vpc_co_create() on
+ success
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,110 +66,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
- "devel@edk2.groups.io" <devel@edk2.groups.io>,
- Phillip Goerl <phillip.goerl@oracle.com>,
- qemu devel list <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>, "Yao,
- Jiewen" <jiewen.yao@intel.com>, "Nakajima, Jun" <jun.nakajima@intel.com>,
- "Kinney, Michael D" <michael.d.kinney@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- "rfc@edk2.groups.io" <rfc@edk2.groups.io>,
- Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/02/19 10:45, Igor Mammedov wrote:
-> On Fri, 30 Aug 2019 20:46:14 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
->> On 08/30/19 16:48, Igor Mammedov wrote:
->>
->>> (01) On boot firmware maps and initializes SMI handler at default SMBASE (30000)
->>>      (using dedicated SMRAM at 30000 would allow us to avoid save/restore
->>>       steps and make SMM handler pointer not vulnerable to DMA attacks)
->>>
->>> (02) QEMU hotplugs a new CPU in reset-ed state and sends SCI
->>>
->>> (03) on receiving SCI, host CPU calls GPE cpu hotplug handler
->>>       which writes to IO port 0xB2 (broadcast SMI)
->>>
->>> (04) firmware waits for all existing CPUs rendezvous in SMM mode,
->>>      new CPU(s) have SMI pending but does nothing yet
->>>
->>> (05) host CPU wakes up one new CPU (INIT-INIT-SIPI)
->>>      SIPI vector points to RO flash HLT loop.
->>>      (how host CPU will know which new CPUs to relocate?
->>>       possibly reuse QEMU CPU hotplug MMIO interface???)
->>>
->>> (06) new CPU does relocation.
->>>      (in case of attacker sends SIPI to several new CPUs,
->>>       open question how to detect collision of several CPUs at the same default SMBASE)
->>>
->>> (07) once new CPU relocated host CPU completes initialization, returns
->>>      from IO port write and executes the rest of GPE handler, telling OS
->>>      to online new CPU.  
->>
->> In step (03), it is the OS that handles the SCI; it transfers control to
->> ACPI. The AML can write to IO port 0xB2 only because the OS allows it.
->>
->> If the OS decides to omit that step, and sends an INIT-SIPI-SIPI
->> directly to the new CPU, can it steal the CPU?
-> It sure can but this way it won't get access to privileged SMRAM
-> so OS can't subvert firmware.
-> The next time SMI broadcast is sent the CPU will use SMI handler at
-> default 30000 SMBASE. It's up to us to define behavior here (for example
-> relocation handler can put such CPU in shutdown state).
-> 
-> It's in the best interest of OS to cooperate and execute AML
-> provided by firmware, if it does not follow proper cpu hotplug flow
-> we can't guarantee that stolen CPU will work.
+(v2 for =E2=80=9Cblock: Let blockdev-create return 0 on success=E2=80=9D)
 
-This sounds convincing enough, for the hotplugged CPU; thanks.
+Jobs are expected to return 0 on success, so this extends to
+.bdrv_co_create().  After some inspection, it turns out that vpc is the
+only block driver that may return a positive value instead (to indicate
+success).  Fix that.
 
-So now my concern is with step (01). While preparing for the initial
-relocation (of cold-plugged CPUs), the code assumes the memory at the
-default SMBASE (0x30000) is normal RAM.
+Without this patch, blockdev-create is likely to fail for VPC images.
+Hence patch 5.
 
-Is it not a problem that the area is written initially while running in
-normal 32-bit or 64-bit mode, but then executed (in response to the
-first, synchronous, SMI) as SMRAM?
+John indicated his preference for me to use iotests.script_main().  I
+did that; but I still wanted to retain some form of verify_protocol().
+Patch 2 adds @supported_protocols to execute_test() (and thus to
+iotests.script_main() and iotests.main()).  Then I noticed we should
+probably make all Python tests (that use either script_main() or main())
+pass something for that parameter, because it=E2=80=99s a bit silly to ru=
+n all
+Python tests for raw when you just want to run the nbd tests (which are
+five or so).  Enter patches 3 and 4.
 
-Basically I'm confused by the alias.
+(There are two Python tests (093 and 136) which I didn=E2=80=99t change t=
+o pass
+supported_protocols, because they use null-{co,aio} as their protocol.
+As these are not actually testee protocols for the iotests, I decided to
+just keep running these tests for any protocol.)
 
-TSEG (and presumably, A/B seg) work like this:
-- when open, looks like RAM to normal mode and SMM
-- when closed, looks like black-hole to normal mode, and like RAM to SMM
 
-The generic edk2 code knows this, and manages the SMRAM areas accordingly.
+For completeness=E2=80=99 sake[1]:
 
-The area at 0x30000 is different:
-- looks like RAM to both normal mode and SMM
+git-backport-diff against v1:
 
-If we set up the alias at 0x30000 into A/B seg,
-- will that *permanently* hide the normal RAM at 0x30000?
-- will 0x30000 start behaving like A/B seg?
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
 
-Basically my concern is that the universal code in edk2 might or might
-not keep A/B seg open while initially populating the area at the default
-SMBASE. Specifically, I can imagine two issues:
+001/5:[down] 'vpc: Return 0 from vpc_co_create() on success'
+002/5:[down] 'iotests: Add supported protocols to execute_test()'
+003/5:[down] 'iotests: Restrict file Python tests to file'
+004/5:[down] 'iotests: Restrict nbd Python tests to nbd'
+005/5:[0204] [FC] 'iotests: Test blockdev-create for vpc'
 
-- if the alias into A/B seg is inactive during the initial population,
-then the initial writes go to RAM, but the execution (the first SMBASE
-relocation) will occur from A/B seg through the alias
 
-- alternatively, if the alias is always active, but A/B seg is closed
-during initial population (which happens in normal mode), then the
-initial writes go to the black hole, and execution will occur from a
-"blank" A/B seg.
+[1]
+Please vote on the correct spelling:
+(A) =E2=80=9CFor completeness sake=E2=80=9D
+(B) =E2=80=9CFor completeness=E2=80=99 sake=E2=80=9D
+(C) =E2=80=9CFor completeness=E2=80=99s sake=E2=80=9D
 
-Am I seeing things? (Sorry, I keep feeling dumber and dumber in this
-thread.)
+By participating, you become eligible to receive mention in the git log.
 
-Anyway, I guess we could try and see if OVMF still boots with the alias...
+To give you mention, we need your full name and email address.
+Therefore, please cast your vote by replying to this mail as follows:
+> I vote for ${letter}${reason:=3D.}
+>
+> Reviewed-by: $name <$email_address>
 
-Thanks
-Laszlo
+(Set the =E2=80=9Cletter=E2=80=9D variable to be any of A, B, or C; =E2=80=
+=9Creason=E2=80=9D to be a
+justification (optional; should be prefixed by =E2=80=9C, because =E2=80=9D=
+ and end with
+a full stop); =E2=80=9Cname=E2=80=9D to be your name; and =E2=80=9Cemail_=
+address=E2=80=9D to be your
+email address.)
+
+Thank you for doing your part in saving democracy!
+
+
+Max Reitz (5):
+  vpc: Return 0 from vpc_co_create() on success
+  iotests: Add supported protocols to execute_test()
+  iotests: Restrict file Python tests to file
+  iotests: Restrict nbd Python tests to nbd
+  iotests: Test blockdev-create for vpc
+
+ block/vpc.c                   |   3 +-
+ tests/qemu-iotests/030        |   3 +-
+ tests/qemu-iotests/040        |   3 +-
+ tests/qemu-iotests/041        |   3 +-
+ tests/qemu-iotests/044        |   3 +-
+ tests/qemu-iotests/045        |   3 +-
+ tests/qemu-iotests/055        |   3 +-
+ tests/qemu-iotests/056        |   3 +-
+ tests/qemu-iotests/057        |   3 +-
+ tests/qemu-iotests/065        |   3 +-
+ tests/qemu-iotests/096        |   3 +-
+ tests/qemu-iotests/118        |   3 +-
+ tests/qemu-iotests/124        |   3 +-
+ tests/qemu-iotests/129        |   3 +-
+ tests/qemu-iotests/132        |   3 +-
+ tests/qemu-iotests/139        |   3 +-
+ tests/qemu-iotests/147        |   5 +-
+ tests/qemu-iotests/148        |   3 +-
+ tests/qemu-iotests/151        |   3 +-
+ tests/qemu-iotests/152        |   3 +-
+ tests/qemu-iotests/155        |   3 +-
+ tests/qemu-iotests/163        |   3 +-
+ tests/qemu-iotests/165        |   3 +-
+ tests/qemu-iotests/169        |   3 +-
+ tests/qemu-iotests/196        |   3 +-
+ tests/qemu-iotests/199        |   3 +-
+ tests/qemu-iotests/205        |   3 +-
+ tests/qemu-iotests/245        |   3 +-
+ tests/qemu-iotests/257        |   3 +-
+ tests/qemu-iotests/266        | 153 ++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/266.out    | 137 ++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group      |   1 +
+ tests/qemu-iotests/iotests.py |   4 +-
+ 33 files changed, 352 insertions(+), 32 deletions(-)
+ create mode 100755 tests/qemu-iotests/266
+ create mode 100644 tests/qemu-iotests/266.out
+
+--=20
+2.21.0
+
 
