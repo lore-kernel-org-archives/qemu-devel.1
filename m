@@ -2,67 +2,82 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA41C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 10:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0B97C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 11:06:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43A5F217D7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 10:59:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A5F217D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 98AAD217D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 11:06:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kg/M5xZG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AAD217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i56Wm-0007Zq-DU
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 06:59:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48250)
+	id 1i56eH-0001T4-O0
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 07:06:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i56Vq-000775-Fz
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 06:58:16 -0400
+ (envelope-from <skrtbhtngr@gmail.com>) id 1i56dZ-00011l-DR
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i56Vl-0003zA-SH
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 06:58:14 -0400
-Resent-Date: Tue, 03 Sep 2019 06:58:11 -0400
-Resent-Message-Id: <E1i56Vl-0003zA-SH@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21458)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i56Vj-0003tE-Vg
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 06:58:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1567508059; cv=none; d=zoho.com; s=zohoarc; 
- b=iKgKWeYxnJny65O653p5Up2+dIs1haeNC/R5y01OvMWmTcp3UDQElOpE5q1CieAJHUq6XR7aHq/8jabNY1Pa0c6NQdn2uEbWB5oRnOylJYxktDFhOG/S6aVr8rhHw5DSYFCx904O5+ECa/XDCArEWdXnwjQuyHh0xy+5lvA08DI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1567508059;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=d5IhP7zezyFuTIk47aaaUxzKth7CF6DXlg6DaFbRG14=; 
- b=L7dwccGgmeLNlONa6yHTcsohY9XMaMYRL9/USpc/kxOq49uc2s1EUppLn2qNz+qJQEzowx1melyLEr41Y44XkhHSjrdbw4TYTk9kHjw0JoGanRoPfVZOt4tjDHSWRhJz7O/b+6UHG4YfJQ9zkwKRDk6zttV+U/1PwsdhB1OF2U0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1567508057035631.2385260108742;
- Tue, 3 Sep 2019 03:54:17 -0700 (PDT)
-In-Reply-To: <cover.1567500411.git.lukasstraub2@web.de>
-Message-ID: <156750805552.17101.2070848121573617872@5dec9699b7de>
+ (envelope-from <skrtbhtngr@gmail.com>) id 1i56dY-0000yv-6j
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:06:13 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36914)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <skrtbhtngr@gmail.com>)
+ id 1i56dY-0000xl-0M
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:06:12 -0400
+Received: by mail-wm1-x344.google.com with SMTP id r195so1451893wme.2
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 04:06:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZQpan4Ceh87r7qtgmPZ7unAJ7HVgPrOUBdfCKgEtu8U=;
+ b=Kg/M5xZG0rvyRhPZfcCDTtBQYvcFnmoGNGdQz7wnHqNjmY2RUuV84h1zSmBlK8+RWL
+ IU43ukMAmJhh38C+eUB+a8MTWCYDpzzuw02C1lYtbxJfERmym0HsimTWJrGf2LN+7EPI
+ LnkTPgAg4CSJAw1JijGkxDf0EnuILg69wyWy3YpDdRpXghzJsXQdxpTPd2gCMrJV/Yv7
+ lqErQQRAijfXZXZ2HdSIYpurfTP8NGPXUWBOsi86FWDe1Ubh2eRwO3YI6p9R0Xf6/jEX
+ ByLurm09YpQOfiIsEX4gITvvvIUrmuAeEytVBGPja/030e1yVh2zvcaEIWDMMBVk4hiq
+ F+NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZQpan4Ceh87r7qtgmPZ7unAJ7HVgPrOUBdfCKgEtu8U=;
+ b=l9eQ0S/xojGeviHYCaQM8Mqn/350uQ+GcnQ9T3cSikmj1FHvrppi3JGPejBM0kI33g
+ FPSKo4JJxtsvD6mNk99ohLFBKaHm3i+uNmKAUDfllFxW6ppSyzJlT+T9FPJhTkgO8Wlb
+ bpYH9sPYWXpH+3SCVyQwzkD0DsQTdxlCpN7s0aZBm4BRGPWUCclvDuAljF5Ep9n+PDO2
+ Xq9TJlBgynHnwwckT3LeBimyAUSZRN7ehMenbZFvHPm8x5YcJ7iJ7MLzR2sLWRLe2n9k
+ pZKriRufWdBggxjsT6NPjwTK9pN2bnosDai9cx4zSHd7TCKpGC+ULvBBiRuzwFzCo3au
+ XtUg==
+X-Gm-Message-State: APjAAAV6rn3HgCtdCom3R4qxGsNo4G2nJniaynAEmcnZrTO+bxqXTwu+
+ 0zk6hDVulW6fsH6qRXVdXuTe0FTE/ejkWsYKl9I=
+X-Google-Smtp-Source: APXvYqzV5oURO9dUxdFz0ljKXSFi6rhHv4xLrPCoUIA7HORTobivrTRBnPahpnO+lKFpXxWqmRBdq/eJQpX1DvQWI2I=
+X-Received: by 2002:a1c:a713:: with SMTP id q19mr5998487wme.127.1567508770024; 
+ Tue, 03 Sep 2019 04:06:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: lukasstraub2@web.de
-Date: Tue, 3 Sep 2019 03:54:17 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] colo: Add support for continious
- replication
+References: <20190828142328.24561-1-skrtbhtngr@gmail.com>
+ <20190828142328.24561-3-skrtbhtngr@gmail.com>
+ <710966e9-d1ac-3c55-0a12-02ff19005531@gmail.com>
+In-Reply-To: <710966e9-d1ac-3c55-0a12-02ff19005531@gmail.com>
+From: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+Date: Tue, 3 Sep 2019 16:35:58 +0530
+Message-ID: <CAMzgYoN0i4cUTDuRztpRvdvGp68TKJ074v=jkzy22ZSsFCtBmg@mail.gmail.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] hw/pvrdma: add live migration
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,51 +89,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, wencongyang2@huawei.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, chen.zhang@intel.com,
- xiechanglong.d@gmail.com
+Cc: qemu-devel@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTY3NTAwNDExLmdp
-dC5sdWthc3N0cmF1YjJAd2ViLmRlLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAvNF0gY29sbzogQWRk
-IHN1cHBvcnQgZm9yIGNvbnRpbmlvdXMgcmVwbGljYXRpb24KVHlwZTogc2VyaWVzCk1lc3NhZ2Ut
-aWQ6IGNvdmVyLjE1Njc1MDA0MTEuZ2l0Lmx1a2Fzc3RyYXViMkB3ZWIuZGUKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGExY2Yy
-NyBjb2xvOiBVcGRhdGUgRG9jdW1lbnRhdGlvbiBmb3IgY29udGluaW91cyByZXBsaWNhdGlvbgpj
-Nzg5Mjg3IG5ldC9maWx0ZXIuYzogQWRkIE9wdGlvbnMgdG8gaW5zZXJ0IGZpbHRlcnMgYW55d2hl
-cmUgaW4gdGhlIGZpbHRlciBsaXN0CjgxZDA2MDcgdGVzdHMvdGVzdC1yZXBsaWNhdGlvbi5jOiBB
-ZGQgdGVzdCBmb3IgaWdub3JpbmcgcmVxdWVzdHMgYWZ0ZXIgZmFpbG92ZXIKYTE3N2Y4NiBibG9j
-ay9yZXBsaWNhdGlvbi5jOiBJZ25vcmUgcmVxdWVzdHMgYWZ0ZXIgZmFpbG92ZXIKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CjEvNCBDaGVja2luZyBjb21taXQgYTE3N2Y4NjIxMWE3IChibG9jay9yZXBs
-aWNhdGlvbi5jOiBJZ25vcmUgcmVxdWVzdHMgYWZ0ZXIgZmFpbG92ZXIpCjIvNCBDaGVja2luZyBj
-b21taXQgODFkMDYwNzMyNzgxICh0ZXN0cy90ZXN0LXJlcGxpY2F0aW9uLmM6IEFkZCB0ZXN0IGZv
-ciBpZ25vcmluZyByZXF1ZXN0cyBhZnRlciBmYWlsb3ZlcikKRVJST1I6IHNwYWNlIHByb2hpYml0
-ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojNDE6IEZJTEU6IHRlc3RzL3Rlc3Qt
-cmVwbGljYXRpb24uYzo1MTQ6CisgICAgcmVwbGljYXRpb25fc3RvcF9hbGwoIHRydWUsICZsb2Nh
-bF9lcnIpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhl
-c2lzICcoJwojNTU6IEZJTEU6IHRlc3RzL3Rlc3QtcmVwbGljYXRpb24uYzo1Mjg6CisgICAgcmVw
-bGljYXRpb25fc3RvcF9hbGwoIHRydWUsICZsb2NhbF9lcnIpOwoKdG90YWw6IDIgZXJyb3JzLCAw
-IHdhcm5pbmdzLCA2NCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzQgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCjMvNCBDaGVja2luZyBjb21taXQgYzc4OTI4Nzg1YTlmIChuZXQvZmlsdGVyLmM6
-IEFkZCBPcHRpb25zIHRvIGluc2VydCBmaWx0ZXJzIGFueXdoZXJlIGluIHRoZSBmaWx0ZXIgbGlz
-dCkKNC80IENoZWNraW5nIGNvbW1pdCAwYTFjZjI3MDcwZGUgKGNvbG86IFVwZGF0ZSBEb2N1bWVu
-dGF0aW9uIGZvciBjb250aW5pb3VzIHJlcGxpY2F0aW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9jb3Zlci4xNTY3NTAwNDExLmdpdC5sdWthc3N0
-cmF1YjJAd2ViLmRlL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Sun, 1 Sep 2019 at 01:15, Marcel Apfelbaum
+<marcel.apfelbaum@gmail.com> wrote:
+>
+>
+>
+> On 8/28/19 5:23 PM, Sukrit Bhatnagar wrote:
+> > vmstate_pvrdma describes the PCI and MSIX states as well as the dma
+> > address for dsr and the gid table of device.
+> > vmstate_pvrdma_gids describes each gid in the gid table.
+> >
+> > pvrdma_post_save() does the job of unregistering gid entries from the
+> > backend device in the source host.
+> >
+> > pvrdma_post_load() maps to dsr using the loaded dma address, registers
+> > each loaded gid into the backend device, and finally calls load_dsr()
+> > to perform other mappings and ring init operations.
+> >
+> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > Cc: Yuval Shaia <yuval.shaia@oracle.com>
+> > Signed-off-by: Sukrit Bhatnagar <skrtbhtngr@gmail.com>
+> > ---
+> >   hw/rdma/vmw/pvrdma_main.c | 77 +++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 77 insertions(+)
+> >
+> > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> > index 6c90db96f9..6f8b56dea3 100644
+> > --- a/hw/rdma/vmw/pvrdma_main.c
+> > +++ b/hw/rdma/vmw/pvrdma_main.c
+> > @@ -28,6 +28,7 @@
+> >   #include "sysemu/sysemu.h"
+> >   #include "monitor/monitor.h"
+> >   #include "hw/rdma/rdma.h"
+> > +#include "migration/register.h"
+> >
+> >   #include "../rdma_rm.h"
+> >   #include "../rdma_backend.h"
+> > @@ -593,6 +594,81 @@ static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
+> >       pvrdma_fini(pci_dev);
+> >   }
+> >
+> > +static int pvrdma_post_save(void *opaque)
+> > +{
+> > +    int i, rc;
+> > +    PVRDMADev *dev = opaque;
+> > +
+> > +    for (i = 0; i < MAX_GIDS; i++) {
+> > +
+>
+> No need for the extra line
+> > +        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
+> > +            continue;
+> > +        }
+> > +        rc = rdma_backend_del_gid(&dev->backend_dev,
+> > +                                   dev->backend_eth_device_name,
+> > +                                   &dev->rdma_dev_res.port.gid_tbl[i].gid);
+> > +        if (rc) {
+> > +            return -EINVAL;
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static int pvrdma_post_load(void *opaque, int version_id)
+> > +{
+> > +    int i, rc;
+> > +    PVRDMADev *dev = opaque;
+> > +    PCIDevice *pci_dev = PCI_DEVICE(dev);
+> > +    DSRInfo *dsr_info = &dev->dsr_info;
+> > +
+> > +    dsr_info->dsr = rdma_pci_dma_map(pci_dev, dsr_info->dma,
+> > +                                sizeof(struct pvrdma_device_shared_region));
+> > +    if (!dsr_info->dsr) {
+> > +        rdma_error_report("Failed to map to DSR");
+> > +        return -ENOMEM;
+> > +    }
+> > +
+> > +    for (i = 0; i < MAX_GIDS; i++) {
+> > +
+>
+> The same here
+>
+> > +        if (!dev->rdma_dev_res.port.gid_tbl[i].gid.global.interface_id) {
+> > +            continue;
+> > +        }
+> > +
+> > +        rc = rdma_backend_add_gid(&dev->backend_dev,
+> > +                                  dev->backend_eth_device_name,
+> > +                                  &dev->rdma_dev_res.port.gid_tbl[i].gid);
+> > +        if (rc) {
+> > +            return -EINVAL;
+> > +        }
+> > +    }
+> > +
+> > +    return load_dsr(dev);
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_pvrdma_gids = {
+> > +    .name = "pvrdma-gids",
+> > +    .fields = (VMStateField[]) {
+> > +            VMSTATE_UINT8_ARRAY_V(gid.raw, RdmaRmGid, 16, 0),
+>
+> Is 16 the array length? If yes, do we have same macro definition?
 
+16 here represents the number of bytes in a GID.
+This comes from the verbs definition of ibv_gid
+
+union ibv_gid {
+    uint8_t         raw[16];
+    struct {
+        __be64  subnet_prefix;
+        __be64  interface_id;
+    } global;
+};
+
+I suppose there is no macro for this but we can declare
+our own (something like IBV_GID_SIZE).
+
+> > +            VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> > +static const VMStateDescription vmstate_pvrdma = {
+> > +    .name = PVRDMA_HW_NAME,
+> > +    .post_save = pvrdma_post_save,
+> > +    .post_load = pvrdma_post_load,
+> > +    .fields = (VMStateField[]) {
+> > +            VMSTATE_PCI_DEVICE(parent_obj, PVRDMADev),
+> > +            VMSTATE_MSIX(parent_obj, PVRDMADev),
+> > +            VMSTATE_UINT64(dsr_info.dma, PVRDMADev),
+> > +            VMSTATE_STRUCT_ARRAY(rdma_dev_res.port.gid_tbl, PVRDMADev,
+> > +                                 MAX_PORT_GIDS, 0, vmstate_pvrdma_gids,
+> > +                                 RdmaRmGid),
+> > +            VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >   static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+> >   {
+> >       int rc = 0;
+> > @@ -688,6 +764,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
+> >
+> >       dc->desc = "RDMA Device";
+> >       dc->props = pvrdma_dev_properties;
+> > +    dc->vmsd = &vmstate_pvrdma;
+> >       set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+> >
+> >       ir->print_statistics = pvrdma_print_statistics;
+>
+> Very simple an elegant.
+> If I understand correctly the live migration of a pvrdma device with no
+> active workloads works with this patch, right?
+
+Yes.
+
+> If yes, I think we should consider merging this code already.
+> Yuval, do you agree?
+>
+> Thanks,
+> Marcel
+>
+>
 
