@@ -2,84 +2,80 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFCF3C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95C17C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:54:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDE3C22CF8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:53:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E02422CF8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:54:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C2QMifnv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE3C22CF8
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wV9SaMOY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E02422CF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5C3d-0001jU-Rt
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:53:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37528)
+	id 1i5C4a-0002ba-DE
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:54:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43900)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BNK-0001pf-TC
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:48 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5C1O-0007e4-A5
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BNJ-00049T-Fd
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:46 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40541)
+ (envelope-from <peter.maydell@linaro.org>) id 1i5C1N-00029K-4e
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:51:09 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46624)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5BNJ-000490-8p
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:45 -0400
-Received: by mail-pf1-x441.google.com with SMTP id w16so11073524pfn.7
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:09:45 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i5C1N-00028d-0B
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:51:09 -0400
+Received: by mail-oi1-x241.google.com with SMTP id t24so13274321oij.13
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:51:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=N5NztJfh5BzMOtf9h7VP/IFXxLeIqYtsDkIeRVHhk+A=;
- b=C2QMifnvGVofYTbNdgkO7I1yucfD5L8BtHvzazYLRiKoaR+qZ9ux8gBcOf4IL3KydI
- QNd2jWTAWl/+oSXdjLh2uhChmDLIBZuXgdITOzIvM3rj0DTVwKNCuZi6FG9dPM20Z8ua
- w5Lm4FdxESz2OnFM70R8mu8P+DUjpX6XsU3eXRGxknXD4KrBnfZ7K34eUHDWXZ5+SZIK
- x4Tc2UWjvSSyGyp0CUtiDLEoOVZUa60S76MrV1JotogPiyrJHjzwd53KxpEcuPnlD6v9
- tNbknqYCV641yOBeFAcAyZKQFZeI4PtpwLFC0hnG2OM3sQ1meJu7QK58y+xbm8JhRLpR
- souw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YZqwi0aq+endEwrYnx1rYuf1Fjf4SeGrg361AKCqgXo=;
+ b=wV9SaMOY6QXjf1U1U7+5YURAL+kLo5JXLd1hHTF0tpxX8OLTw2rU0FDSdIJc72EhjJ
+ T437tQiP6EnlTOZQ3WG1J7EtwFDkjW6s9NMArz2kTNUAfLC/Tno+3xak/oeIWren9B46
+ OsgT3pwJC4jFru0+HrPxpJ8T3JhWewqyL9Fv9+9lQY99w/ZtfeqYZ8YzgVb7ipl8ejQO
+ IntBm0DP06TTOv4Q0FOV23jaUSqQ0vfDyqEN0SzYrXcA6cSR2YhhRRaang2GB9jBQK52
+ GOQ+cwjBIqKS8ETX1gyxrmvYFf7M+CS/MFGq4HTKe6oP9FhFuft9a5KLwQELcmv2TzT1
+ LlDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=N5NztJfh5BzMOtf9h7VP/IFXxLeIqYtsDkIeRVHhk+A=;
- b=Y6g7WyIqNEEuujN/r7NepwTd+B9PDPS0YNqYZaIWszdkcJ7ejleBDkwjcCxIE91fFd
- qRgsKMfSBjDhCOxnpe2xq4P1EYH2ii2CLKscAnkfN8GwBuOE+cCDy5GMILSRsAgI07sv
- YotQ9yZvAbdyyOWfY7US9X/grCsBzs1soL8b2CxlFRC/hGcOADpv5h2ffWPkFJ8TIfOC
- MEYbt1RjYyU8OhM6hTTnjgVZdoGBrtCwNUx9l9jPHRZdwRxwkhv+ktiVZthAtzLTt87C
- 8INOBWEaoAEVGppJB05icVExm3MHX5wqGX7BM7zdYVTWE73dLw1VZ0cZ0yP2UXoe/sFe
- 5ogQ==
-X-Gm-Message-State: APjAAAUr/rUgAHLyMBXaA9WiT0ngauAOogxXf7+5IcO1nZNrM4gTaj+L
- HSXWZ+CmN4u4fMyn5hK3o9ll5RXZgF4=
-X-Google-Smtp-Source: APXvYqxRcnbh20fX6NrtvimoWg5A5oABqsa5FuK7QL/Fxt2TI0r4mK0/MU1L+fKB9JgnpVXUE1aBPQ==
-X-Received: by 2002:a62:7911:: with SMTP id u17mr25834847pfc.162.1567526984070; 
- Tue, 03 Sep 2019 09:09:44 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id 127sm28089711pfy.56.2019.09.03.09.09.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 09:09:43 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 09:08:58 -0700
-Message-Id: <20190903160858.5296-37-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190903160858.5296-1-richard.henderson@linaro.org>
-References: <20190903160858.5296-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YZqwi0aq+endEwrYnx1rYuf1Fjf4SeGrg361AKCqgXo=;
+ b=IC5BMdqzkHxr1og0wEVINvsk58VmGQRLygQWp602H3hrFtWbr1eVLYcz4FUXFYzqso
+ 7rQJJxu3kRS+c9qn4zGeXv3Vi64PC7nFRjR/KDeNpB4TL26WmSbH6GMRXuXwOs48V/8H
+ NVNm8F9tqO+JGybdtqyAluP1iw1Ump8F3/FXUiEpV7ClrLDVDvIjNRgCChatgJjAJSW3
+ FSwv5mJsfRd7jIp85OhRd9kXTHEo6ij06OKA6UesIFv0fU6NZes/Pdtz9z1+5IGbkf8x
+ 7esL6VcMMajK8ZU/NjzHP5fkXQdZAAYtvJE+v4ouYv4zCNSfwuQttRHZ90YTEurhiyQK
+ 8Guw==
+X-Gm-Message-State: APjAAAVNPMK95A11Aviy2XmCBQ1qIWPHUGjSjZBG8CPYahXmEgZbe0dE
+ fjHI1N5EduGkmjh4KKJsIyOTRQ+HKfvlyQBoMAEV0Q==
+X-Google-Smtp-Source: APXvYqx30iv1NUjlPQ3nd+KV6kXa3QDXchfULRkvrzxlZaRNrbfPNQQxpaDv7ckies1qTzKKPUpdDfIx7DnFCYFcZMU=
+X-Received: by 2002:aca:50d8:: with SMTP id e207mr197089oib.48.1567529467757; 
+ Tue, 03 Sep 2019 09:51:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190902012647.1761-1-tony.nguyen@bt.com>
+ <CAFEAcA-4Tpa4qTCBXMTX+1n3fDK48d3ZFYn5CckOD7weqAWrcA@mail.gmail.com>
+ <20190903164712.GA85777@imac.local>
+In-Reply-To: <20190903164712.GA85777@imac.local>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Sep 2019 17:50:56 +0100
+Message-ID: <CAFEAcA-FAJV1XEAZ7bcrstOWPv6wpAuZ4WjVo8bf+ewiWQYopA@mail.gmail.com>
+To: Tony Nguyen <tony.nguyen@bt.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH 36/36] tcg: Factor out probe_write() logic into
- probe_access()
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH] memory: Set notdirty_mem_ops validator
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,164 +87,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+On Tue, 3 Sep 2019 at 17:47, Tony Nguyen <tony.nguyen@bt.com> wrote:
+>
+> On Tue, Sep 03, 2019 at 11:25:28AM +0100, Peter Maydell wrote:
+> > On Mon, 2 Sep 2019 at 02:36, Tony Nguyen <tony.nguyen@bt.com> wrote:
+> > >
+> > > Existing read rejecting validator was mistakenly cleared.
+> > >
+> > > Reads dispatched to io_mem_notdirty then segfaults as there is no read
+> > > handler.
+> >
+> > Do you have the commit hash for where we introduced the
+> > bug that this is fixing?
+> >
+> > thanks
+> > -- PMM
+> >
+>
+> ad52878f97610757390148fe5d5b4cc5ad15c585.
+>
+> Please feel free to amend my commit message.
 
-Let's also allow to probe other access types.
+Thanks.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190830100959.26615-3-david@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/exec/exec-all.h | 10 ++++++++--
- accel/tcg/cputlb.c      | 43 ++++++++++++++++++++++++++++++-----------
- accel/tcg/user-exec.c   | 26 +++++++++++++++++++------
- 3 files changed, 60 insertions(+), 19 deletions(-)
+> I do not understand why sun4u booting Solaris 10 triggers the bug.
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index a7893ed16b..81b02eb2fe 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -310,8 +310,14 @@ static inline void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu,
- {
- }
- #endif
--void *probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
--                  uintptr_t retaddr);
-+void *probe_access(CPUArchState *env, target_ulong addr, int size,
-+                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr);
-+
-+static inline void *probe_write(CPUArchState *env, target_ulong addr, int size,
-+                                int mmu_idx, uintptr_t retaddr)
-+{
-+    return probe_access(env, addr, size, MMU_DATA_STORE, mmu_idx, retaddr);
-+}
- 
- #define CODE_GEN_ALIGN           16 /* must be >= of the size of a icache line */
- 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index cb969d8372..abae79650c 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1075,30 +1075,51 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
-     return qemu_ram_addr_from_host_nofail(p);
- }
- 
--/* Probe for whether the specified guest write access is permitted.
-- * If it is not permitted then an exception will be taken in the same
-- * way as if this were a real write access (and we will not return).
-+/*
-+ * Probe for whether the specified guest access is permitted. If it is not
-+ * permitted then an exception will be taken in the same way as if this
-+ * were a real access (and we will not return).
-  * If the size is 0 or the page requires I/O access, returns NULL; otherwise,
-  * returns the address of the host page similar to tlb_vaddr_to_host().
-  */
--void *probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
--                  uintptr_t retaddr)
-+void *probe_access(CPUArchState *env, target_ulong addr, int size,
-+                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
- {
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr = tlb_addr_write(entry);
-+    target_ulong tlb_addr;
-+    size_t elt_ofs;
-+    int wp_access;
- 
-     g_assert(-(addr | TARGET_PAGE_MASK) >= size);
- 
-+    switch (access_type) {
-+    case MMU_DATA_LOAD:
-+        elt_ofs = offsetof(CPUTLBEntry, addr_read);
-+        wp_access = BP_MEM_READ;
-+        break;
-+    case MMU_DATA_STORE:
-+        elt_ofs = offsetof(CPUTLBEntry, addr_write);
-+        wp_access = BP_MEM_WRITE;
-+        break;
-+    case MMU_INST_FETCH:
-+        elt_ofs = offsetof(CPUTLBEntry, addr_code);
-+        wp_access = BP_MEM_READ;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    tlb_addr = tlb_read_ofs(entry, elt_ofs);
-+
-     if (unlikely(!tlb_hit(tlb_addr, addr))) {
--        if (!VICTIM_TLB_HIT(addr_write, addr)) {
--            tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
--                     mmu_idx, retaddr);
-+        if (!victim_tlb_hit(env, mmu_idx, index, elt_ofs,
-+                            addr & TARGET_PAGE_MASK)) {
-+            tlb_fill(env_cpu(env), addr, size, access_type, mmu_idx, retaddr);
-             /* TLB resize via tlb_fill may have moved the entry. */
-             index = tlb_index(env, mmu_idx, addr);
-             entry = tlb_entry(env, mmu_idx, addr);
-         }
--        tlb_addr = tlb_addr_write(entry);
-+        tlb_addr = tlb_read_ofs(entry, elt_ofs);
-     }
- 
-     if (!size) {
-@@ -1109,7 +1130,7 @@ void *probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
-     if (tlb_addr & TLB_WATCHPOINT) {
-         cpu_check_watchpoint(env_cpu(env), addr, size,
-                              env_tlb(env)->d[mmu_idx].iotlb[index].attrs,
--                             BP_MEM_WRITE, retaddr);
-+                             wp_access, retaddr);
-     }
- 
-     if (tlb_addr & (TLB_NOTDIRTY | TLB_MMIO)) {
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 5720bf8056..71c4bf6477 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -188,17 +188,31 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-     g_assert_not_reached();
- }
- 
--void *probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
--                  uintptr_t retaddr)
-+void *probe_access(CPUArchState *env, target_ulong addr, int size,
-+                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
- {
-+    int flags;
-+
-     g_assert(-(addr | TARGET_PAGE_MASK) >= size);
- 
--    if (!guest_addr_valid(addr) ||
--        page_check_range(addr, size, PAGE_WRITE) < 0) {
-+    switch (access_type) {
-+    case MMU_DATA_STORE:
-+        flags = PAGE_WRITE;
-+        break;
-+    case MMU_DATA_LOAD:
-+        flags = PAGE_READ;
-+        break;
-+    case MMU_INST_FETCH:
-+        flags = PAGE_EXEC;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    if (!guest_addr_valid(addr) || page_check_range(addr, size, flags) < 0) {
-         CPUState *cpu = env_cpu(env);
-         CPUClass *cc = CPU_GET_CLASS(cpu);
--
--        cc->tlb_fill(cpu, addr, size, MMU_DATA_STORE, MMU_USER_IDX, false,
-+        cc->tlb_fill(cpu, addr, size, access_type, MMU_USER_IDX, false,
-                      retaddr);
-         g_assert_not_reached();
-     }
--- 
-2.17.1
+Do you have a backtrace of QEMU from the segfault? I'm having trouble
+thinking of what the situation is when we'd try to invoke the
+read handler on io_mem_notdirty...
 
+thanks
+-- PMM
 
