@@ -2,85 +2,86 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A3FC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F20C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:38:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55874215EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D6FC2339D
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:38:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ttvwd2oW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55874215EA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a7u21qfK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D6FC2339D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Bop-0007GM-EZ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:38:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37357)
+	id 1i5BpG-0007sN-Be
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:38:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BN5-0001Re-JO
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:32 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5BMd-0000vI-Qr
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BN4-0003uL-Bp
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:31 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44486)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5BMc-0003ae-A3
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:03 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39204)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5BN4-0003te-5d
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:30 -0400
-Received: by mail-pl1-x642.google.com with SMTP id k1so730247pls.11
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:09:30 -0700 (PDT)
+ id 1i5BMc-0003Zo-2O
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:02 -0400
+Received: by mail-pg1-x541.google.com with SMTP id u17so9393876pgi.6
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=goOolIueQxF4ldrHBZeQkgOys0U39zehwPxKYyDrcRk=;
- b=ttvwd2oWzrFgh/mKGaAnap2RblGYKFgoxuByAZxl7oP+OF8/LGpJJNCtq729Gu5Zn+
- LR3+Fq/qJ/0wG9hMEQGYXZAZYG2SUEI4Dn4ENh8fxUS0cXcZmuMQzPupt5VvqHWmDRU/
- OpIZdHPrAXS7xW7o61wZFN9Ic7uJp8N42xQLddgSuxtro0ab6QhlwJ6KQX9Q5MT00hFx
- +95i7tOVEQq3MvWNYOQ8eSiraXAeqi1j6Roqee1kbnVsq/nmz+WirXA38yxMhIZCl9jj
- gmdVuaebv9r7LvdoNfkXRXuls2eC/JsXx6rjnfZQLTplYvRNwdeIlqrS6xOAyyoSmjOh
- Uc2g==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=HFt+SNoHxnXsKubH38yPgmAkrGKo2nrflpCUOr6pM2U=;
+ b=a7u21qfKLWizLCq3qD8HlqRhSDNytMzhWCE9NsNeup9DXGQaRyDPudu82tBfqx/M7n
+ frWGulfU/tDDg7ruBuIyeLNYg2/f+yclzFl2YhdsUAkvc57eJ5uAYYboVqDw4nMeVSPV
+ XfdLYE1z1EMbyWrGzmlOP78cjTOeyBBVWt0fJ0OEGaPyypMCThmAQs8YKOJdo7UoSM7z
+ OC0iwBkVHYLYoje/z4MZygAIovsJ2byolM6GD0O+r1c3PmZQKySyq6JeqpPi6iW/8Aot
+ gy1PpoDfwN6FRLA+OlegFJmRrAgr0YwJ6CZK7xf0m4hfj51wFL/bCKieOY8KMotw8X+u
+ 9Pbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=goOolIueQxF4ldrHBZeQkgOys0U39zehwPxKYyDrcRk=;
- b=lNDRDBf14GR+6NvhFVDbbAXBFcV3pdXIN5ebJ4vLDsF/rRZ+4XHAhpYX4ZVxDgUIl1
- kVK5UC3lusfReykrb5TgVFlQk6wN4/FSeqdwLxBBljKqe2sdp7wdflmvw7O5bG0jaNbK
- cnM8mwD2mUN0ab/8I+FcJ0P0QjIP9y3l9A5++/e2mpe6vYEbIofRSBWo34g9uFiPw6wH
- HebVw8iS5wHUk+cqbwcEbJ+ykLLY5SF+1OcBTTRANWmqcBFxaVgf7L8/p3WLhRtnEFju
- q6oNa2A/H4KirOg9rmW5+OVbZn3XYuf4lioYKXt3hP5utktWYRwHxa7y64aphMu05ax3
- Imhg==
-X-Gm-Message-State: APjAAAVgAWuNHIE9u/poDPivuNZ+8gmkXjTcaY0hESGnFuMFeZgJxdQl
- LFKgyuYMKrYLohWctKnQoAIjVIrv8Q0=
-X-Google-Smtp-Source: APXvYqzju40s75jbz2ukUSKdYyw+7glzT7UKOEkUOQ1+Cg1HmWGNo0+gwMqfRDzo9tlXtgWAyPpSuw==
-X-Received: by 2002:a17:902:4201:: with SMTP id
- g1mr36235927pld.300.1567526968954; 
- Tue, 03 Sep 2019 09:09:28 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=HFt+SNoHxnXsKubH38yPgmAkrGKo2nrflpCUOr6pM2U=;
+ b=MM/FS0HiYkZDppSYnyBEKCKYAYN8t2nkLkP6QzLwrakGKy7RCrBEE2J4KB+bBMEfpI
+ 8mEKo+AiL84IffHjh/qqn0eGOjSYUVxZeik1xXalWb+lhN90bpq6QwKoPOQLbBW6XaJA
+ 6cta9o8/t2xfZ55d0h2L2mAG1o/CIn6IDwtmA4u1VIgHt6LnWJM0q/otaYzR7+mj8oVh
+ sz7q1kFmAHMcTrxVsWSdUFLSdhHX/Fcd0X/6hou+CY0uX8etyAlWnyvjam16rXKlp2V+
+ +72koHUT/B1RvRqPWIcjZpHKfokDTTBtdWtmhQtotA4VdwVGQrd9sHlZEe1a2v84YU0K
+ tZ5Q==
+X-Gm-Message-State: APjAAAXW6kvkju1doqdFEaizZoIqc/wIpphF6dZSevVw4mw05TDwhqd6
+ m3ZLO+oC39KcVG3K2245oENVx1OfDj8=
+X-Google-Smtp-Source: APXvYqwYOli+FIM5fjmh9RzbkcSMBJsGbro1SHnFxZc8M0K0d5jNxcXtBbrX9zJ26X7DpNG6dck0jw==
+X-Received: by 2002:a17:90a:ba96:: with SMTP id
+ t22mr53409pjr.104.1567526940324; 
+ Tue, 03 Sep 2019 09:09:00 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id 127sm28089711pfy.56.2019.09.03.09.09.27
+ by smtp.gmail.com with ESMTPSA id 127sm28089711pfy.56.2019.09.03.09.08.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 09:09:28 -0700 (PDT)
+ Tue, 03 Sep 2019 09:08:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 09:08:45 -0700
-Message-Id: <20190903160858.5296-24-richard.henderson@linaro.org>
+Date: Tue,  3 Sep 2019 09:08:22 -0700
+Message-Id: <20190903160858.5296-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190903160858.5296-1-richard.henderson@linaro.org>
-References: <20190903160858.5296-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [PATCH 23/36] exec: Factor out
- cpu_watchpoint_address_matches
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH 00/36] tcg patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,131 +98,123 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want to move the check for watchpoints from
-memory_region_section_get_iotlb to tlb_set_page_with_attrs.
-Isolate the loop over watchpoints to an exported function.
+The following changes since commit fec105c2abda8567ec15230429c41429b5ee307c:
 
-Rename the existing cpu_watchpoint_address_matches to
-watchpoint_address_matches, since it doesn't actually
-have a cpu argument.
+  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20190828-pull-request' into staging (2019-09-03 14:03:15 +0100)
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/hw/core/cpu.h |  7 +++++++
- exec.c                | 45 ++++++++++++++++++++++++++++---------------
- 2 files changed, 36 insertions(+), 16 deletions(-)
+are available in the Git repository at:
 
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 7bd8bed5b2..c7cda65c66 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -1096,6 +1096,12 @@ static inline void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
-                                         MemTxAttrs atr, int fl, uintptr_t ra)
- {
- }
-+
-+static inline int cpu_watchpoint_address_matches(CPUState *cpu,
-+                                                 vaddr addr, vaddr len)
-+{
-+    return 0;
-+}
- #else
- int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
-                           int flags, CPUWatchpoint **watchpoint);
-@@ -1105,6 +1111,7 @@ void cpu_watchpoint_remove_by_ref(CPUState *cpu, CPUWatchpoint *watchpoint);
- void cpu_watchpoint_remove_all(CPUState *cpu, int mask);
- void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
-                           MemTxAttrs attrs, int flags, uintptr_t ra);
-+int cpu_watchpoint_address_matches(CPUState *cpu, vaddr addr, vaddr len);
- #endif
- 
- /**
-diff --git a/exec.c b/exec.c
-index cb6f5763dc..8575ce51ad 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1138,9 +1138,8 @@ void cpu_watchpoint_remove_all(CPUState *cpu, int mask)
-  * partially or completely with the address range covered by the
-  * access).
-  */
--static inline bool cpu_watchpoint_address_matches(CPUWatchpoint *wp,
--                                                  vaddr addr,
--                                                  vaddr len)
-+static inline bool watchpoint_address_matches(CPUWatchpoint *wp,
-+                                              vaddr addr, vaddr len)
- {
-     /* We know the lengths are non-zero, but a little caution is
-      * required to avoid errors in the case where the range ends
-@@ -1152,6 +1151,20 @@ static inline bool cpu_watchpoint_address_matches(CPUWatchpoint *wp,
- 
-     return !(addr > wpend || wp->vaddr > addrend);
- }
-+
-+/* Return flags for watchpoints that match addr + prot.  */
-+int cpu_watchpoint_address_matches(CPUState *cpu, vaddr addr, vaddr len)
-+{
-+    CPUWatchpoint *wp;
-+    int ret = 0;
-+
-+    QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
-+        if (watchpoint_address_matches(wp, addr, TARGET_PAGE_SIZE)) {
-+            ret |= wp->flags;
-+        }
-+    }
-+    return ret;
-+}
- #endif /* !CONFIG_USER_ONLY */
- 
- /* Add a breakpoint.  */
-@@ -1459,7 +1472,7 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
-                                        target_ulong *address)
- {
-     hwaddr iotlb;
--    CPUWatchpoint *wp;
-+    int flags, match;
- 
-     if (memory_region_is_ram(section->mr)) {
-         /* Normal RAM.  */
-@@ -1477,17 +1490,17 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
-         iotlb += xlat;
-     }
- 
--    /* Make accesses to pages with watchpoints go via the
--       watchpoint trap routines.  */
--    QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
--        if (cpu_watchpoint_address_matches(wp, vaddr, TARGET_PAGE_SIZE)) {
--            /* Avoid trapping reads of pages with a write breakpoint. */
--            if ((prot & PAGE_WRITE) || (wp->flags & BP_MEM_READ)) {
--                iotlb = PHYS_SECTION_WATCH + paddr;
--                *address |= TLB_MMIO;
--                break;
--            }
--        }
-+    /* Avoid trapping reads of pages with a write breakpoint. */
-+    match = (prot & PAGE_READ ? BP_MEM_READ : 0)
-+          | (prot & PAGE_WRITE ? BP_MEM_WRITE : 0);
-+    flags = cpu_watchpoint_address_matches(cpu, vaddr, TARGET_PAGE_SIZE);
-+    if (flags & match) {
-+        /*
-+         * Make accesses to pages with watchpoints go via the
-+         * watchpoint trap routines.
-+         */
-+        iotlb = PHYS_SECTION_WATCH + paddr;
-+        *address |= TLB_MMIO;
-     }
- 
-     return iotlb;
-@@ -2806,7 +2819,7 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
- 
-     addr = cc->adjust_watchpoint_address(cpu, addr, len);
-     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
--        if (cpu_watchpoint_address_matches(wp, addr, len)
-+        if (watchpoint_address_matches(wp, addr, len)
-             && (wp->flags & flags)) {
-             if (flags == BP_MEM_READ) {
-                 wp->flags |= BP_WATCHPOINT_HIT_READ;
--- 
-2.17.1
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190903
 
+for you to fetch changes up to c25c283df0f08582df29f1d5d7be1516b851532d:
+
+  tcg: Factor out probe_write() logic into probe_access() (2019-09-03 08:34:18 -0700)
+
+----------------------------------------------------------------
+Allow page table bit to swap endianness.
+Reorganize watchpoints out of i/o path.
+Return host address from probe_write / probe_access.
+
+----------------------------------------------------------------
+David Hildenbrand (11):
+      exec: Factor out core logic of check_watchpoint()
+      tcg: Check for watchpoints in probe_write()
+      s390x/tcg: Use guest_addr_valid() instead of h2g_valid() in probe_write_access()
+      s390x/tcg: Fix length calculation in probe_write_access()
+      tcg: Factor out CONFIG_USER_ONLY probe_write() from s390x code
+      tcg: Enforce single page access in probe_write()
+      mips/tcg: Call probe_write() for CONFIG_USER_ONLY as well
+      hppa/tcg: Call probe_write() also for CONFIG_USER_ONLY
+      s390x/tcg: Pass a size to probe_write() in do_csst()
+      tcg: Make probe_write() return a pointer to the host page
+      tcg: Factor out probe_write() logic into probe_access()
+
+Richard Henderson (6):
+      exec: Move user-only watchpoint stubs inline
+      cputlb: Fold TLB_RECHECK into TLB_INVALID_MASK
+      exec: Factor out cpu_watchpoint_address_matches
+      cputlb: Fix size operand for tlb_fill on unaligned store
+      cputlb: Remove double-alignment in store_helper
+      cputlb: Handle watchpoints via TLB_WATCHPOINT
+
+Tony Nguyen (19):
+      tcg: TCGMemOp is now accelerator independent MemOp
+      memory: Introduce size_memop
+      target/mips: Access MemoryRegion with MemOp
+      hw/s390x: Access MemoryRegion with MemOp
+      hw/intc/armv7m_nic: Access MemoryRegion with MemOp
+      hw/virtio: Access MemoryRegion with MemOp
+      hw/vfio: Access MemoryRegion with MemOp
+      exec: Access MemoryRegion with MemOp
+      cputlb: Access MemoryRegion with MemOp
+      memory: Access MemoryRegion with MemOp
+      hw/s390x: Hard code size with MO_{8|16|32|64}
+      target/mips: Hard code size with MO_{8|16|32|64}
+      exec: Hard code size with MO_{8|16|32|64}
+      memory: Access MemoryRegion with endianness
+      cputlb: Replace size and endian operands for MemOp
+      memory: Single byte swap along the I/O path
+      cputlb: Byte swap memory transaction attribute
+      target/sparc: Add TLB entry with attributes
+      target/sparc: sun4u Invert Endian TTE bit
+
+ include/exec/cpu-all.h                  |   8 +-
+ include/exec/exec-all.h                 |  10 +-
+ include/exec/memattrs.h                 |   2 +
+ include/exec/memop.h                    | 134 +++++++++++
+ include/exec/memory.h                   |  12 +-
+ include/hw/core/cpu.h                   |  37 +++
+ target/arm/translate-a64.h              |   2 +-
+ target/arm/translate.h                  |   2 +-
+ target/sparc/cpu.h                      |   2 +
+ tcg/tcg-op.h                            |  80 +++---
+ tcg/tcg.h                               | 101 +-------
+ trace/mem-internal.h                    |   4 +-
+ trace/mem.h                             |   4 +-
+ accel/tcg/cputlb.c                      | 414 ++++++++++++++++++--------------
+ accel/tcg/user-exec.c                   |  32 +++
+ exec.c                                  | 177 +++-----------
+ hw/intc/armv7m_nvic.c                   |  13 +-
+ hw/s390x/s390-pci-inst.c                |  11 +-
+ hw/vfio/pci-quirks.c                    |   7 +-
+ hw/virtio/virtio-pci.c                  |  15 +-
+ memory.c                                |  58 +++--
+ memory_ldst.inc.c                       |  81 ++-----
+ target/alpha/translate.c                |   2 +-
+ target/arm/translate-a64.c              |  48 ++--
+ target/arm/translate-sve.c              |   2 +-
+ target/arm/translate.c                  |  32 +--
+ target/hppa/op_helper.c                 |   2 -
+ target/hppa/translate.c                 |  14 +-
+ target/i386/translate.c                 | 132 +++++-----
+ target/m68k/translate.c                 |   2 +-
+ target/microblaze/translate.c           |   4 +-
+ target/mips/op_helper.c                 |  13 +-
+ target/mips/translate.c                 |   8 +-
+ target/openrisc/translate.c             |   4 +-
+ target/ppc/translate.c                  |  12 +-
+ target/riscv/insn_trans/trans_rva.inc.c |   8 +-
+ target/riscv/insn_trans/trans_rvi.inc.c |   4 +-
+ target/s390x/mem_helper.c               |  13 +-
+ target/s390x/translate.c                |   6 +-
+ target/s390x/translate_vx.inc.c         |  10 +-
+ target/sparc/mmu_helper.c               |  40 +--
+ target/sparc/translate.c                |  14 +-
+ target/tilegx/translate.c               |  10 +-
+ target/tricore/translate.c              |   8 +-
+ tcg/aarch64/tcg-target.inc.c            |  26 +-
+ tcg/arm/tcg-target.inc.c                |  26 +-
+ tcg/i386/tcg-target.inc.c               |  24 +-
+ tcg/mips/tcg-target.inc.c               |  16 +-
+ tcg/optimize.c                          |   2 +-
+ tcg/ppc/tcg-target.inc.c                |  12 +-
+ tcg/riscv/tcg-target.inc.c              |  20 +-
+ tcg/s390/tcg-target.inc.c               |  14 +-
+ tcg/sparc/tcg-target.inc.c              |   6 +-
+ tcg/tcg-op.c                            |  38 +--
+ tcg/tcg.c                               |   2 +-
+ MAINTAINERS                             |   1 +
+ tcg/README                              |   2 +-
+ 57 files changed, 918 insertions(+), 865 deletions(-)
+ create mode 100644 include/exec/memop.h
 
