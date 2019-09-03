@@ -2,88 +2,59 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F13C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF6FC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5084D22CF8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:54:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hqVt7v0A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5084D22CF8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A451222CF8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:55:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A451222CF8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5B8q-0003pP-Uk
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:54:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59374)
+	id 1i5B91-0003xD-Js
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:54:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33013)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5Arc-00038d-J2
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:37:01 -0400
+ (envelope-from <thuth@redhat.com>) id 1i5B2h-0004sj-9z
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:48:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5Arb-00065G-Kz
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:37:00 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40774)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5Arb-00064Z-EF
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:59 -0400
-Received: by mail-wr1-x444.google.com with SMTP id c3so17988349wrd.7
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=PQwumxLD0naoGLveJArJ+0uz+trgPMLG7ByeUUTiw3c=;
- b=hqVt7v0A+RHc8yPlc+/akWP8XDgvXvaCpwmsl8C06sRocrkdWgnZ4fsB2UBzgf5FeW
- baJvJHoeqRruO5xRJvCqaz+xq+JxV8G2WMV9sumfMKCmU3HQ4m7eLPgFn66J2AWNH3qk
- L/i4g+q3XJgETBgyjmZ/2vV4GchANz4g6gBUUJzIGKACnJWUpmLdF0KwmyH3lPMknZMO
- R1ztMvOYpqxx6GyhY3pBySM6mKd3JvVut5axbzgkHbhaGdOQWHzCTvyqpQKtgs5dENXo
- KaKQq/jk9fZgfyi0VPw+nb7OCqJZxwDDOlDkePssbaonwHo2wv2gNRVpVnlsVGdhw/gD
- ftGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PQwumxLD0naoGLveJArJ+0uz+trgPMLG7ByeUUTiw3c=;
- b=eZStrrTHJ6wH9HtqS0wZ4dbiBYsEznAgqPYyAMNy8ikcZKUuBqrFQymJv771c+RLw7
- DsPZQHk7AeTyrl1IMdqKT15EZbtuVVFPpe/aqeXUivVLGMbB48ksgUPIH5DPm7EGRGBe
- +CswelAycBjR5PASXSsGYRXNnzgFghjHWZJx0hUXvcIJ/qE2IfyrcdJgBYDXbKfo+eua
- EdzQ3ho3hlmd0UO/+j5I4OJbslX+9fBqzHab1bKF0S4Wcjqu1UWbzcMF0/Q+HH6q8ayP
- OI4wx2VpGZyrdQOMlfAm6+/PLiZgD1cOb8xu31SiJP/0Aox5hv7D3CKliUfijyqJiY1n
- cC/w==
-X-Gm-Message-State: APjAAAVtGyHaLZnhvkiq+gkrHAJl1+waBCU0GEVKcqI90CvGgq4Momtf
- tN6lVngm+nWH3sQbxwuPsCltILcGNL+Jmg==
-X-Google-Smtp-Source: APXvYqxb6VFRSxmBw5yM1EvaeAJ4KQfy4lw+UlWyHv58aLXC6tn5xi88QV1KsbWpYZu8SFGnbvRkkw==
-X-Received: by 2002:a5d:6ac8:: with SMTP id u8mr7733455wrw.104.1567525018262; 
- Tue, 03 Sep 2019 08:36:58 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.57
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 08:36:57 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:36:32 +0100
-Message-Id: <20190903153633.6651-21-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190903153633.6651-1-peter.maydell@linaro.org>
-References: <20190903153633.6651-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PULL 20/21] target/arm: Free TCG temps in
- trans_VMOV_64_sp()
+ (envelope-from <thuth@redhat.com>) id 1i5B2f-0005Wa-UV
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:48:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59116)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1i5B2a-0005Pl-Aa; Tue, 03 Sep 2019 11:48:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5B3E23082B6D;
+ Tue,  3 Sep 2019 15:48:18 +0000 (UTC)
+Received: from thuth.com (ovpn-117-51.ams2.redhat.com [10.36.117.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D06D19D7A;
+ Tue,  3 Sep 2019 15:48:17 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue,  3 Sep 2019 17:48:08 +0200
+Message-Id: <20190903154810.27365-2-thuth@redhat.com>
+In-Reply-To: <20190903154810.27365-1-thuth@redhat.com>
+References: <20190903154810.27365-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 03 Sep 2019 15:48:18 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [RFC PATCH 1/3] target/arm: Make cpu_register() and
+ set_feature() available for other files
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,39 +66,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The function neon_store_reg32() doesn't free the TCG temp that it
-is passed, so the caller must do that. We got this right in most
-places but forgot to free the TCG temps in trans_VMOV_64_sp().
+Move the common set_feature() and unset_feature() functions from cpu.c and
+cpu64.c to cpu.h, and make cpu_register() (renamed to arm_cpu_register())
+available from there, too, so we can register CPUs also from other files
+in the future.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190827121931.26836-1-peter.maydell@linaro.org
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/arm/translate-vfp.inc.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/arm/cpu.c   | 20 ++------------------
+ target/arm/cpu.h   | 18 ++++++++++++++++++
+ target/arm/cpu64.c | 16 ----------------
+ 3 files changed, 20 insertions(+), 34 deletions(-)
 
-diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 3e8ea80493b..9ae980bef63 100644
---- a/target/arm/translate-vfp.inc.c
-+++ b/target/arm/translate-vfp.inc.c
-@@ -880,8 +880,10 @@ static bool trans_VMOV_64_sp(DisasContext *s, arg_VMOV_64_sp *a)
-         /* gpreg to fpreg */
-         tmp = load_reg(s, a->rt);
-         neon_store_reg32(tmp, a->vm);
-+        tcg_temp_free_i32(tmp);
-         tmp = load_reg(s, a->rt2);
-         neon_store_reg32(tmp, a->vm + 1);
-+        tcg_temp_free_i32(tmp);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 2399c14471..f1f9eecdc8 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -614,16 +614,6 @@ static bool arm_cpu_virtio_is_big_endian(CPUState *cs)
+ 
+ #endif
+ 
+-static inline void set_feature(CPUARMState *env, int feature)
+-{
+-    env->features |= 1ULL << feature;
+-}
+-
+-static inline void unset_feature(CPUARMState *env, int feature)
+-{
+-    env->features &= ~(1ULL << feature);
+-}
+-
+ static int
+ print_insn_thumb1(bfd_vma pc, disassemble_info *info)
+ {
+@@ -2515,12 +2505,6 @@ static void arm_max_initfn(Object *obj)
+ 
+ #endif /* !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64) */
+ 
+-struct ARMCPUInfo {
+-    const char *name;
+-    void (*initfn)(Object *obj);
+-    void (*class_init)(ObjectClass *oc, void *data);
+-};
+-
+ static const ARMCPUInfo arm_cpus[] = {
+ #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+     { .name = "arm926",      .initfn = arm926_initfn },
+@@ -2681,7 +2665,7 @@ static void cpu_register_class_init(ObjectClass *oc, void *data)
+     acc->info = data;
+ }
+ 
+-static void cpu_register(const ARMCPUInfo *info)
++void arm_cpu_register(const ARMCPUInfo *info)
+ {
+     TypeInfo type_info = {
+         .parent = TYPE_ARM_CPU,
+@@ -2722,7 +2706,7 @@ static void arm_cpu_register_types(void)
+     type_register_static(&idau_interface_type_info);
+ 
+     while (info->name) {
+-        cpu_register(info);
++        arm_cpu_register(info);
+         info++;
      }
  
-     return true;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 0981303170..c5007edf1f 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3600,4 +3600,22 @@ static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
+ #define cpu_isar_feature(name, cpu) \
+     ({ ARMCPU *cpu_ = (cpu); isar_feature_##name(&cpu_->isar); })
+ 
++static inline void set_feature(CPUARMState *env, int feature)
++{
++    env->features |= 1ULL << feature;
++}
++
++static inline void unset_feature(CPUARMState *env, int feature)
++{
++    env->features &= ~(1ULL << feature);
++}
++
++struct ARMCPUInfo {
++    const char *name;
++    void (*initfn)(Object *obj);
++    void (*class_init)(ObjectClass *oc, void *data);
++};
++
++void arm_cpu_register(const ARMCPUInfo *info);
++
+ #endif
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index d7f5bf610a..869cec13ca 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -29,16 +29,6 @@
+ #include "kvm_arm.h"
+ #include "qapi/visitor.h"
+ 
+-static inline void set_feature(CPUARMState *env, int feature)
+-{
+-    env->features |= 1ULL << feature;
+-}
+-
+-static inline void unset_feature(CPUARMState *env, int feature)
+-{
+-    env->features &= ~(1ULL << feature);
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+@@ -396,12 +386,6 @@ static void aarch64_max_initfn(Object *obj)
+     }
+ }
+ 
+-struct ARMCPUInfo {
+-    const char *name;
+-    void (*initfn)(Object *obj);
+-    void (*class_init)(ObjectClass *oc, void *data);
+-};
+-
+ static const ARMCPUInfo aarch64_cpus[] = {
+     { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
+     { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
 -- 
-2.20.1
+2.18.1
 
 
