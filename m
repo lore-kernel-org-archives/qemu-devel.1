@@ -2,92 +2,139 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C514CC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5F6C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:51:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9922A2168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:50:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9922A2168B
+	by mail.kernel.org (Postfix) with ESMTPS id 1C1D62168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:51:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C1D62168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Dsr-0001v8-NI
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:50:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34570)
+	id 1i5DtZ-0002vI-Ax
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:51:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5Ds9-0001Kc-7g
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:49:46 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i5Dsj-00022g-Ri
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5Ds8-0008Fk-74
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:49:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43532)
+ (envelope-from <jsnow@redhat.com>) id 1i5Dsi-0000F0-PO
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:50:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60190)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i5Ds5-0008Bw-GP; Tue, 03 Sep 2019 14:49:41 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i5Dsg-0000Ds-6w; Tue, 03 Sep 2019 14:50:18 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 46C052A09CD;
- Tue,  3 Sep 2019 18:49:40 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5393260127;
- Tue,  3 Sep 2019 18:49:39 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823143726.27062-1-eblake@redhat.com>
- <20190823143726.27062-3-eblake@redhat.com>
- <9476b1d1-47e4-ecfd-eb23-5b2fbc1410e3@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C0ECF8980EA;
+ Tue,  3 Sep 2019 18:50:16 +0000 (UTC)
+Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 35E605D6B2;
+ Tue,  3 Sep 2019 18:50:16 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20190903145634.20237-1-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <bae3c83f-644f-4379-5426-bdfba467fb0b@redhat.com>
-Date: Tue, 3 Sep 2019 13:49:38 -0500
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <9bde61cf-b4a7-fb11-7b8d-12cf8a2dc558@redhat.com>
+Date: Tue, 3 Sep 2019 14:50:15 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <9476b1d1-47e4-ecfd-eb23-5b2fbc1410e3@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="AQETwcaKFmjCOxQ8YEFM4wHWVWxCptIco"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 03 Sep 2019 18:49:40 +0000 (UTC)
+In-Reply-To: <20190903145634.20237-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Tue, 03 Sep 2019 18:50:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/5] nbd: Prepare for NBD_CMD_FLAG_FAST_ZERO
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] docs: Update preferred NBD
+ device syntax
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,105 +146,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AQETwcaKFmjCOxQ8YEFM4wHWVWxCptIco
-Content-Type: multipart/mixed; boundary="s6ryFedDeGdvO7tkQgzabCIIl6LQEZWG2";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
-Message-ID: <bae3c83f-644f-4379-5426-bdfba467fb0b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] nbd: Prepare for NBD_CMD_FLAG_FAST_ZERO
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823143726.27062-1-eblake@redhat.com>
- <20190823143726.27062-3-eblake@redhat.com>
- <9476b1d1-47e4-ecfd-eb23-5b2fbc1410e3@virtuozzo.com>
-In-Reply-To: <9476b1d1-47e4-ecfd-eb23-5b2fbc1410e3@virtuozzo.com>
-
---s6ryFedDeGdvO7tkQgzabCIIl6LQEZWG2
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/30/19 1:07 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 23.08.2019 17:37, Eric Blake wrote:
->> Commit fe0480d6 and friends added BDRV_REQ_NO_FALLBACK as a way to
->> avoid wasting time on a preliminary write-zero request that will later=
-
->> be rewritten by actual data, if it is known that the write-zero
->> request will use a slow fallback; but in doing so, could not optimize
->> for NBD.  The NBD specification is now considering an extension that
->> will allow passing on those semantics; this patch updates the new
->> protocol bits and 'qemu-nbd --list' output to recognize the bit, as
->> well as the new errno value possible when using the new flag; while
->> upcoming patches will improve the client to use the feature when
->> present, and the server to advertise support for it.
->>
-
->> +++ b/nbd/server.c
->> @@ -55,6 +55,8 @@ static int system_errno_to_nbd_errno(int err)
->>           return NBD_ENOSPC;
->>       case EOVERFLOW:
->>           return NBD_EOVERFLOW;
->> +    case ENOTSUP:
->> +        return NBD_ENOTSUP;
->=20
-
-I'm squashing this in:
-
-diff --git i/nbd/server.c w/nbd/server.c
-index b3bd08ef2953..4992148de1c4 100644
---- i/nbd/server.c
-+++ w/nbd/server.c
-@@ -56,6 +56,9 @@ static int system_errno_to_nbd_errno(int err)
-     case EOVERFLOW:
-         return NBD_EOVERFLOW;
-     case ENOTSUP:
-+#if ENOTSUP !=3D EOPNOTSUPP
-+    case EOPNOTSUPP:
-+#endif
-         return NBD_ENOTSUP;
-     case ESHUTDOWN:
-         return NBD_ESHUTDOWN;
-
-It makes no difference on Linux, but may matter on other platforms
-(since POSIX says the two may be equivalent, but may also be distinct).
-
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
 
---s6ryFedDeGdvO7tkQgzabCIIl6LQEZWG2--
+On 9/3/19 10:56 AM, Eric Blake wrote:
+> Mention the preferred URI form, especially since NBD is trying to
+> standardize that form: https://lists.debian.org/nbd/2019/06/msg00012.html
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  qemu-doc.texi | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
+> 
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 577d1e837640..c83fb347d77e 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -297,7 +297,14 @@ qemu-system-i386 -drive file=iscsi://192.0.2.1/iqn.2001-04.com.example/1
+> 
+>  @item NBD
+>  QEMU supports NBD (Network Block Devices) both using TCP protocol as well
+> -as Unix Domain Sockets.
+> +as Unix Domain Sockets.  With TCP, the default port is 10809.
+> 
+> -Syntax for specifying a NBD device using TCP
+> +Syntax for specifying a NBD device using TCP, in preferred URI form:
+> +``nbd://<server-ip>[:<port>]/[<export>]''
+> +
+> +Syntax for specifying a NBD device using Unix Domain Sockets; remember
+> +that '?' is a shell glob character and may need quoting:
+> +``nbd+unix:///[<export>]?socket=<domain-socket>''
+> +
+> +Older syntax that is also recognized:
 
---AQETwcaKFmjCOxQ8YEFM4wHWVWxCptIco
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Deprecated officially, or no?
 
------BEGIN PGP SIGNATURE-----
+>  ``nbd:<server-ip>:<port>[:exportname=<export>]''
+> 
+> -Syntax for specifying a NBD device using Unix Domain Sockets
+>  ``nbd:unix:<domain-socket>[:exportname=<export>]''
+> 
+>  Example for TCP
+>  @example
+> -qemu-system-i386 --drive file=nbd:192.0.2.1:30000
+> +qemu-system-i386 --drive file=nbd://192.0.2.1:30000
+>  @end example
+> 
+>  Example for Unix Domain Sockets
+>  @example
+> -qemu-system-i386 --drive file=nbd:unix:/tmp/nbd-socket
+> +qemu-system-i386 --drive "file=nbd+unix:///?socket=/tmp/nbd-socket"
+>  @end example
+> 
+>  @item SSH
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1utcIACgkQp6FrSiUn
-Q2rhdwf+N6fWoBbdS4ZTsW8eiVIyb4H+LO3zQKkEMP+FtUHQM2VtZYOitBGNNCN/
-CU+ZjfoPZT3rLQsdulRjSUoIruDNwkXgrXOBSGV94pu1+TyNt8NQXvfzkaKV1yf7
-sIlit9bZoqUGcvkFplRuoO1s5Gw1TaVOA/4NC7jN48bwzKlTdpMkHTvJZwAj5TWz
-RDAqV/nBznWsxRfY75/oKd64VlV5G+LFlsXFtQzenICuczGDi67SjHPhkWcuBgUs
-znPy7X6kc4iarpIHB4EjJZ1lMPbJNmevJ4+TSL60M9pssm/PRTvbe0LSQVUwIjc8
-ArQ8VZccq+rKpXUUpC/hNuwd2G1uSg==
-=lAIX
------END PGP SIGNATURE-----
-
---AQETwcaKFmjCOxQ8YEFM4wHWVWxCptIco--
+Reviewed-by: John Snow <jsnow@redhat.com>
 
