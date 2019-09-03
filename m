@@ -2,59 +2,90 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8354C3A5A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 06:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E9AC3A5A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 06:58:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DBC320882
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 06:24:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DBC320882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D09A1206B8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 06:58:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09A1206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i52F2-0004d4-LX
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 02:24:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57063)
+	id 1i52lu-0002G9-0S
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 02:58:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i529m-0007Jj-RO
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:19:13 -0400
+ (envelope-from <kevin.tian@intel.com>) id 1i52l0-0001qB-6U
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i529k-0003cP-IN
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:19:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48006)
+ (envelope-from <kevin.tian@intel.com>) id 1i52kx-00071Q-W0
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:37 -0400
+Received: from mga03.intel.com ([134.134.136.65]:60247)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i529k-0003bq-Ac
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:19:08 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A8158307CDFC
- for <qemu-devel@nongnu.org>; Tue,  3 Sep 2019 06:19:07 +0000 (UTC)
-Received: from thuth.com (ovpn-116-80.ams2.redhat.com [10.36.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A9A4600C6;
- Tue,  3 Sep 2019 06:19:05 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>,
-	qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 08:18:48 +0200
-Message-Id: <20190903061849.21493-6-thuth@redhat.com>
-In-Reply-To: <20190903061849.21493-1-thuth@redhat.com>
-References: <20190903061849.21493-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 03 Sep 2019 06:19:07 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 5/6] tests/libqtest: Move global_test wrapper
- function into a separate header
+ (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+ id 1i52kx-00070H-OA
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:35 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Sep 2019 23:57:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,462,1559545200"; d="scan'208";a="194253034"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+ by orsmga002.jf.intel.com with ESMTP; 02 Sep 2019 23:57:30 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 2 Sep 2019 23:57:30 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 2 Sep 2019 23:57:30 -0700
+Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 2 Sep 2019 23:57:29 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
+ SHSMSX107.ccr.corp.intel.com ([169.254.9.89]) with mapi id 14.03.0439.000;
+ Tue, 3 Sep 2019 14:57:28 +0800
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Thread-Topic: [PATCH v8 01/13] vfio: KABI for migration interface
+Thread-Index: AQHVXEPM6Ds11z4g1kGhkyVJXk+n4qcQheKAgAKxOUCAABvDkIAAD6EAgAYgQnA=
+Date: Tue, 3 Sep 2019 06:57:27 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D560D74@SHSMSX104.ccr.corp.intel.com>
+References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
+ <1566845753-18993-2-git-send-email-kwankhede@nvidia.com>
+ <20190828145045.20f2a7b3@x1.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D553133@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D553184@SHSMSX104.ccr.corp.intel.com>
+ <20190830103252.2b427144@x1.home>
+In-Reply-To: <20190830103252.2b427144@x1.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiM2QzYWRhZDYtYTdmZi00Y2U0LWExZGItNmI2NmZhZWIyODFkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWUpCVmQxSEdKa2ozMjVSbVlEVHVZVXlLbStQOU40QWJJSUtLRDdqVUV6NHREUFY1MGNDbXhZczRFSldHR0xDWiJ9
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
+Subject: Re: [Qemu-devel] [PATCH v8 01/13] vfio: KABI for migration interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,682 +97,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
+ Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
+ Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want libqtest.h to become completely independen from global_qtest
-(so that the wrapper functions are not used by accident anymore). As
-a first step, move the wrapper functions into a separate header file.
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Saturday, August 31, 2019 12:33 AM
+>=20
+> On Fri, 30 Aug 2019 08:06:32 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+>=20
+> > > From: Tian, Kevin
+> > > Sent: Friday, August 30, 2019 3:26 PM
+> > >
+> > [...]
+> > > > How does QEMU handle the fact that IOVAs are potentially dynamic
+> while
+> > > > performing the live portion of a migration?  For example, each time=
+ a
+> > > > guest driver calls dma_map_page() or dma_unmap_page(), a
+> > > > MemoryRegionSection pops in or out of the AddressSpace for the devi=
+ce
+> > > > (I'm assuming a vIOMMU where the device AddressSpace is not
+> > > > system_memory).  I don't see any QEMU code that intercepts that
+> change
+> > > > in the AddressSpace such that the IOVA dirty pfns could be recorded=
+ and
+> > > > translated to GFNs.  The vendor driver can't track these beyond get=
+ting
+> > > > an unmap notification since it only knows the IOVA pfns, which can =
+be
+> > > > re-used with different GFN backing.  Once the DMA mapping is torn
+> down,
+> > > > it seems those dirty pfns are lost in the ether.  If this works in =
+QEMU,
+> > > > please help me find the code that handles it.
+> > >
+> > > I'm curious about this part too. Interestingly, I didn't find any log=
+_sync
+> > > callback registered by emulated devices in Qemu. Looks dirty pages
+> > > by emulated DMAs are recorded in some implicit way. But KVM always
+> > > reports dirty page in GFN instead of IOVA, regardless of the presence=
+ of
+> > > vIOMMU. If Qemu also tracks dirty pages in GFN for emulated DMAs
+> > >  (translation can be done when DMA happens), then we don't need
+> > > worry about transient mapping from IOVA to GFN. Along this way we
+> > > also want GFN-based dirty bitmap being reported through VFIO,
+> > > similar to what KVM does. For vendor drivers, it needs to translate
+> > > from IOVA to HVA to GFN when tracking DMA activities on VFIO
+> > > devices. IOVA->HVA is provided by VFIO. for HVA->GFN, it can be
+> > > provided by KVM but I'm not sure whether it's exposed now.
+> > >
+> >
+> > HVA->GFN can be done through hva_to_gfn_memslot in kvm_host.h.
+>=20
+> I thought it was bad enough that we have vendor drivers that depend on
+> KVM, but designing a vfio interface that only supports a KVM interface
+> is more undesirable.  I also note without comment that gfn_to_memslot()
+> is a GPL symbol.  Thanks,
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- MAINTAINERS             |   2 +-
- tests/libqtest-single.h | 311 ++++++++++++++++++++++++++++++++++++++++
- tests/libqtest.c        |  11 --
- tests/libqtest.h        | 287 +-----------------------------------
- 4 files changed, 313 insertions(+), 298 deletions(-)
- create mode 100644 tests/libqtest-single.h
+yes it is bad, but sometimes inevitable. If you recall our discussions
+back to 3yrs (when discussing the 1st mdev framework), there were similar
+hypervisor dependencies in GVT-g, e.g. querying gpa->hpa when
+creating some shadow structures. gpa->hpa is definitely hypervisor
+specific knowledge, which is easy in KVM (gpa->hva->hpa), but needs
+hypercall in Xen. but VFIO already makes assumption based on KVM-
+only flavor when implementing vfio_{un}pin_page_external. So GVT-g
+has to maintain an internal abstraction layer to support both Xen and
+KVM. Maybe someday we will re-consider introducing some hypervisor
+abstraction layer in VFIO, if this issue starts to hurt other devices and
+Xen guys are willing to support VFIO.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ef6c01084b..b01bf0902a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2078,7 +2078,7 @@ R: Paolo Bonzini <pbonzini@redhat.com>
- S: Maintained
- F: qtest.c
- F: accel/qtest.c
--F: tests/libqtest.*
-+F: tests/libqtest*
- F: tests/libqos/
- F: tests/*-test.c
- 
-diff --git a/tests/libqtest-single.h b/tests/libqtest-single.h
-new file mode 100644
-index 0000000000..49259558a5
---- /dev/null
-+++ b/tests/libqtest-single.h
-@@ -0,0 +1,311 @@
-+/*
-+ * QTest - wrappers for test with single QEMU instances
-+ *
-+ * Copyright IBM, Corp. 2012
-+ * Copyright Red Hat, Inc. 2012
-+ * Copyright SUSE LINUX Products GmbH 2013
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#ifndef LIBQTEST_SINGLE_H
-+#define LIBQTEST_SINGLE_H
-+
-+/**
-+ * qtest_start:
-+ * @args: other arguments to pass to QEMU
-+ *
-+ * Start QEMU and assign the resulting #QTestState to a global variable.
-+ * The global variable is used by "shortcut" functions documented below.
-+ *
-+ * Returns: #QTestState instance.
-+ */
-+static inline QTestState *qtest_start(const char *args)
-+{
-+    global_qtest = qtest_init(args);
-+    return global_qtest;
-+}
-+
-+/**
-+ * qtest_end:
-+ *
-+ * Shut down the QEMU process started by qtest_start().
-+ */
-+static inline void qtest_end(void)
-+{
-+    if (!global_qtest) {
-+        return;
-+    }
-+    qtest_quit(global_qtest);
-+    global_qtest = NULL;
-+}
-+
-+/**
-+ * qmp:
-+ * @fmt...: QMP message to send to qemu, formatted like
-+ * qobject_from_jsonf_nofail().  See parse_escape() for what's
-+ * supported after '%'.
-+ *
-+ * Sends a QMP message to QEMU and returns the response.
-+ */
-+GCC_FMT_ATTR(1, 2)
-+static inline QDict *qmp(const char *fmt, ...)
-+{
-+    va_list ap;
-+    QDict *response;
-+
-+    va_start(ap, fmt);
-+    response = qtest_vqmp(global_qtest, fmt, ap);
-+    va_end(ap);
-+    return response;
-+}
-+
-+/**
-+ * qmp_eventwait:
-+ * @s: #event event to wait for.
-+ *
-+ * Continuously polls for QMP responses until it receives the desired event.
-+ */
-+static inline void qmp_eventwait(const char *event)
-+{
-+    return qtest_qmp_eventwait(global_qtest, event);
-+}
-+
-+/**
-+ * get_irq:
-+ * @num: Interrupt to observe.
-+ *
-+ * Returns: The level of the @num interrupt.
-+ */
-+static inline bool get_irq(int num)
-+{
-+    return qtest_get_irq(global_qtest, num);
-+}
-+
-+/**
-+ * outb:
-+ * @addr: I/O port to write to.
-+ * @value: Value being written.
-+ *
-+ * Write an 8-bit value to an I/O port.
-+ */
-+static inline void outb(uint16_t addr, uint8_t value)
-+{
-+    qtest_outb(global_qtest, addr, value);
-+}
-+
-+/**
-+ * outw:
-+ * @addr: I/O port to write to.
-+ * @value: Value being written.
-+ *
-+ * Write a 16-bit value to an I/O port.
-+ */
-+static inline void outw(uint16_t addr, uint16_t value)
-+{
-+    qtest_outw(global_qtest, addr, value);
-+}
-+
-+/**
-+ * outl:
-+ * @addr: I/O port to write to.
-+ * @value: Value being written.
-+ *
-+ * Write a 32-bit value to an I/O port.
-+ */
-+static inline void outl(uint16_t addr, uint32_t value)
-+{
-+    qtest_outl(global_qtest, addr, value);
-+}
-+
-+/**
-+ * inb:
-+ * @addr: I/O port to read from.
-+ *
-+ * Reads an 8-bit value from an I/O port.
-+ *
-+ * Returns: Value read.
-+ */
-+static inline uint8_t inb(uint16_t addr)
-+{
-+    return qtest_inb(global_qtest, addr);
-+}
-+
-+/**
-+ * inw:
-+ * @addr: I/O port to read from.
-+ *
-+ * Reads a 16-bit value from an I/O port.
-+ *
-+ * Returns: Value read.
-+ */
-+static inline uint16_t inw(uint16_t addr)
-+{
-+    return qtest_inw(global_qtest, addr);
-+}
-+
-+/**
-+ * inl:
-+ * @addr: I/O port to read from.
-+ *
-+ * Reads a 32-bit value from an I/O port.
-+ *
-+ * Returns: Value read.
-+ */
-+static inline uint32_t inl(uint16_t addr)
-+{
-+    return qtest_inl(global_qtest, addr);
-+}
-+
-+/**
-+ * writeb:
-+ * @addr: Guest address to write to.
-+ * @value: Value being written.
-+ *
-+ * Writes an 8-bit value to guest memory.
-+ */
-+static inline void writeb(uint64_t addr, uint8_t value)
-+{
-+    qtest_writeb(global_qtest, addr, value);
-+}
-+
-+/**
-+ * writew:
-+ * @addr: Guest address to write to.
-+ * @value: Value being written.
-+ *
-+ * Writes a 16-bit value to guest memory.
-+ */
-+static inline void writew(uint64_t addr, uint16_t value)
-+{
-+    qtest_writew(global_qtest, addr, value);
-+}
-+
-+/**
-+ * writel:
-+ * @addr: Guest address to write to.
-+ * @value: Value being written.
-+ *
-+ * Writes a 32-bit value to guest memory.
-+ */
-+static inline void writel(uint64_t addr, uint32_t value)
-+{
-+    qtest_writel(global_qtest, addr, value);
-+}
-+
-+/**
-+ * writeq:
-+ * @addr: Guest address to write to.
-+ * @value: Value being written.
-+ *
-+ * Writes a 64-bit value to guest memory.
-+ */
-+static inline void writeq(uint64_t addr, uint64_t value)
-+{
-+    qtest_writeq(global_qtest, addr, value);
-+}
-+
-+/**
-+ * readb:
-+ * @addr: Guest address to read from.
-+ *
-+ * Reads an 8-bit value from guest memory.
-+ *
-+ * Returns: Value read.
-+ */
-+static inline uint8_t readb(uint64_t addr)
-+{
-+    return qtest_readb(global_qtest, addr);
-+}
-+
-+/**
-+ * readw:
-+ * @addr: Guest address to read from.
-+ *
-+ * Reads a 16-bit value from guest memory.
-+ *
-+ * Returns: Value read.
-+ */
-+static inline uint16_t readw(uint64_t addr)
-+{
-+    return qtest_readw(global_qtest, addr);
-+}
-+
-+/**
-+ * readl:
-+ * @addr: Guest address to read from.
-+ *
-+ * Reads a 32-bit value from guest memory.
-+ *
-+ * Returns: Value read.
-+ */
-+static inline uint32_t readl(uint64_t addr)
-+{
-+    return qtest_readl(global_qtest, addr);
-+}
-+
-+/**
-+ * readq:
-+ * @addr: Guest address to read from.
-+ *
-+ * Reads a 64-bit value from guest memory.
-+ *
-+ * Returns: Value read.
-+ */
-+static inline uint64_t readq(uint64_t addr)
-+{
-+    return qtest_readq(global_qtest, addr);
-+}
-+
-+/**
-+ * memread:
-+ * @addr: Guest address to read from.
-+ * @data: Pointer to where memory contents will be stored.
-+ * @size: Number of bytes to read.
-+ *
-+ * Read guest memory into a buffer.
-+ */
-+static inline void memread(uint64_t addr, void *data, size_t size)
-+{
-+    qtest_memread(global_qtest, addr, data, size);
-+}
-+
-+/**
-+ * memwrite:
-+ * @addr: Guest address to write to.
-+ * @data: Pointer to the bytes that will be written to guest memory.
-+ * @size: Number of bytes to write.
-+ *
-+ * Write a buffer to guest memory.
-+ */
-+static inline void memwrite(uint64_t addr, const void *data, size_t size)
-+{
-+    qtest_memwrite(global_qtest, addr, data, size);
-+}
-+
-+/**
-+ * clock_step_next:
-+ *
-+ * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
-+ *
-+ * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
-+ */
-+static inline int64_t clock_step_next(void)
-+{
-+    return qtest_clock_step_next(global_qtest);
-+}
-+
-+/**
-+ * clock_step:
-+ * @step: Number of nanoseconds to advance the clock by.
-+ *
-+ * Advance the QEMU_CLOCK_VIRTUAL by @step nanoseconds.
-+ *
-+ * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
-+ */
-+static inline int64_t clock_step(int64_t step)
-+{
-+    return qtest_clock_step(global_qtest, step);
-+}
-+
-+#endif
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 2713b86cf7..e5101d9d3a 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -1106,17 +1106,6 @@ void qtest_memset(QTestState *s, uint64_t addr, uint8_t pattern, size_t size)
-     qtest_rsp(s, 0);
- }
- 
--QDict *qmp(const char *fmt, ...)
--{
--    va_list ap;
--    QDict *response;
--
--    va_start(ap, fmt);
--    response = qtest_vqmp(global_qtest, fmt, ap);
--    va_end(ap);
--    return response;
--}
--
- void qtest_qmp_assert_success(QTestState *qts, const char *fmt, ...)
- {
-     va_list ap;
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 07ea35867c..6a7d7e41ad 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -628,45 +628,6 @@ void qtest_add_data_func_full(const char *str, void *data,
- 
- void qtest_add_abrt_handler(GHookFunc fn, const void *data);
- 
--/**
-- * qtest_start:
-- * @args: other arguments to pass to QEMU
-- *
-- * Start QEMU and assign the resulting #QTestState to a global variable.
-- * The global variable is used by "shortcut" functions documented below.
-- *
-- * Returns: #QTestState instance.
-- */
--static inline QTestState *qtest_start(const char *args)
--{
--    global_qtest = qtest_init(args);
--    return global_qtest;
--}
--
--/**
-- * qtest_end:
-- *
-- * Shut down the QEMU process started by qtest_start().
-- */
--static inline void qtest_end(void)
--{
--    if (!global_qtest) {
--        return;
--    }
--    qtest_quit(global_qtest);
--    global_qtest = NULL;
--}
--
--/**
-- * qmp:
-- * @fmt...: QMP message to send to qemu, formatted like
-- * qobject_from_jsonf_nofail().  See parse_escape() for what's
-- * supported after '%'.
-- *
-- * Sends a QMP message to QEMU and returns the response.
-- */
--QDict *qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
--
- /**
-  * qtest_qmp_assert_success:
-  * @qts: QTestState instance to operate on
-@@ -680,253 +641,7 @@ QDict *qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
- void qtest_qmp_assert_success(QTestState *qts, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
- 
--/*
-- * qmp_eventwait:
-- * @s: #event event to wait for.
-- *
-- * Continuously polls for QMP responses until it receives the desired event.
-- */
--static inline void qmp_eventwait(const char *event)
--{
--    return qtest_qmp_eventwait(global_qtest, event);
--}
--
--/**
-- * get_irq:
-- * @num: Interrupt to observe.
-- *
-- * Returns: The level of the @num interrupt.
-- */
--static inline bool get_irq(int num)
--{
--    return qtest_get_irq(global_qtest, num);
--}
--
--/**
-- * outb:
-- * @addr: I/O port to write to.
-- * @value: Value being written.
-- *
-- * Write an 8-bit value to an I/O port.
-- */
--static inline void outb(uint16_t addr, uint8_t value)
--{
--    qtest_outb(global_qtest, addr, value);
--}
--
--/**
-- * outw:
-- * @addr: I/O port to write to.
-- * @value: Value being written.
-- *
-- * Write a 16-bit value to an I/O port.
-- */
--static inline void outw(uint16_t addr, uint16_t value)
--{
--    qtest_outw(global_qtest, addr, value);
--}
--
--/**
-- * outl:
-- * @addr: I/O port to write to.
-- * @value: Value being written.
-- *
-- * Write a 32-bit value to an I/O port.
-- */
--static inline void outl(uint16_t addr, uint32_t value)
--{
--    qtest_outl(global_qtest, addr, value);
--}
--
--/**
-- * inb:
-- * @addr: I/O port to read from.
-- *
-- * Reads an 8-bit value from an I/O port.
-- *
-- * Returns: Value read.
-- */
--static inline uint8_t inb(uint16_t addr)
--{
--    return qtest_inb(global_qtest, addr);
--}
--
--/**
-- * inw:
-- * @addr: I/O port to read from.
-- *
-- * Reads a 16-bit value from an I/O port.
-- *
-- * Returns: Value read.
-- */
--static inline uint16_t inw(uint16_t addr)
--{
--    return qtest_inw(global_qtest, addr);
--}
--
--/**
-- * inl:
-- * @addr: I/O port to read from.
-- *
-- * Reads a 32-bit value from an I/O port.
-- *
-- * Returns: Value read.
-- */
--static inline uint32_t inl(uint16_t addr)
--{
--    return qtest_inl(global_qtest, addr);
--}
--
--/**
-- * writeb:
-- * @addr: Guest address to write to.
-- * @value: Value being written.
-- *
-- * Writes an 8-bit value to guest memory.
-- */
--static inline void writeb(uint64_t addr, uint8_t value)
--{
--    qtest_writeb(global_qtest, addr, value);
--}
--
--/**
-- * writew:
-- * @addr: Guest address to write to.
-- * @value: Value being written.
-- *
-- * Writes a 16-bit value to guest memory.
-- */
--static inline void writew(uint64_t addr, uint16_t value)
--{
--    qtest_writew(global_qtest, addr, value);
--}
--
--/**
-- * writel:
-- * @addr: Guest address to write to.
-- * @value: Value being written.
-- *
-- * Writes a 32-bit value to guest memory.
-- */
--static inline void writel(uint64_t addr, uint32_t value)
--{
--    qtest_writel(global_qtest, addr, value);
--}
--
--/**
-- * writeq:
-- * @addr: Guest address to write to.
-- * @value: Value being written.
-- *
-- * Writes a 64-bit value to guest memory.
-- */
--static inline void writeq(uint64_t addr, uint64_t value)
--{
--    qtest_writeq(global_qtest, addr, value);
--}
--
--/**
-- * readb:
-- * @addr: Guest address to read from.
-- *
-- * Reads an 8-bit value from guest memory.
-- *
-- * Returns: Value read.
-- */
--static inline uint8_t readb(uint64_t addr)
--{
--    return qtest_readb(global_qtest, addr);
--}
--
--/**
-- * readw:
-- * @addr: Guest address to read from.
-- *
-- * Reads a 16-bit value from guest memory.
-- *
-- * Returns: Value read.
-- */
--static inline uint16_t readw(uint64_t addr)
--{
--    return qtest_readw(global_qtest, addr);
--}
--
--/**
-- * readl:
-- * @addr: Guest address to read from.
-- *
-- * Reads a 32-bit value from guest memory.
-- *
-- * Returns: Value read.
-- */
--static inline uint32_t readl(uint64_t addr)
--{
--    return qtest_readl(global_qtest, addr);
--}
--
--/**
-- * readq:
-- * @addr: Guest address to read from.
-- *
-- * Reads a 64-bit value from guest memory.
-- *
-- * Returns: Value read.
-- */
--static inline uint64_t readq(uint64_t addr)
--{
--    return qtest_readq(global_qtest, addr);
--}
--
--/**
-- * memread:
-- * @addr: Guest address to read from.
-- * @data: Pointer to where memory contents will be stored.
-- * @size: Number of bytes to read.
-- *
-- * Read guest memory into a buffer.
-- */
--static inline void memread(uint64_t addr, void *data, size_t size)
--{
--    qtest_memread(global_qtest, addr, data, size);
--}
--
--/**
-- * memwrite:
-- * @addr: Guest address to write to.
-- * @data: Pointer to the bytes that will be written to guest memory.
-- * @size: Number of bytes to write.
-- *
-- * Write a buffer to guest memory.
-- */
--static inline void memwrite(uint64_t addr, const void *data, size_t size)
--{
--    qtest_memwrite(global_qtest, addr, data, size);
--}
--
--/**
-- * clock_step_next:
-- *
-- * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
-- *
-- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
-- */
--static inline int64_t clock_step_next(void)
--{
--    return qtest_clock_step_next(global_qtest);
--}
--
--/**
-- * clock_step:
-- * @step: Number of nanoseconds to advance the clock by.
-- *
-- * Advance the QEMU_CLOCK_VIRTUAL by @step nanoseconds.
-- *
-- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
-- */
--static inline int64_t clock_step(int64_t step)
--{
--    return qtest_clock_step(global_qtest, step);
--}
-+#include "libqtest-single.h"
- 
- QDict *qmp_fd_receive(int fd);
- void qmp_fd_vsend_fds(int fd, int *fds, size_t fds_num,
--- 
-2.18.1
+Back to this IOVA issue, I discussed with Yan and we found another=20
+hypervisor-agnostic alternative, by learning from vhost. vhost is very
+similar to VFIO - DMA also happens in the kernel, while it already=20
+supports vIOMMU.
+
+Generally speaking, there are three paths of dirty page collection
+in Qemu so far (as previously noted, Qemu always tracks the dirty
+bitmap in GFN):
+
+1) Qemu-tracked memory writes (e.g. emulated DMAs). Dirty bitmaps=20
+are updated directly when the guest memory is being updated. For=20
+example, PCI writes are completed through pci_dma_write, which=20
+goes through vIOMMU to translate IOVA into GPA and then update=20
+the bitmap through cpu_physical_memory_set_dirty_range.
+
+2) Memory writes that are not tracked by Qemu are collected by
+registering .log_sync() callback, which is invoked in the dirty logging
+process. Now there are two users: kvm and vhost.
+
+  2.1) KVM tracks CPU-side memory writes, through write-protection
+or EPT A/D bits (+PML). This part is always based on GFN and returned
+to Qemu when kvm_log_sync is invoked;
+
+  2.2) vhost tracks kernel-side DMA writes, by interpreting vring
+data structure. It maintains an internal iotlb which is synced with
+Qemu vIOMMU through a specific interface:
+	- new vhost message type (VHOST_IOTLB_UPDATE/INVALIDATE)
+for Qemu to keep vhost iotlb in sync
+	- new VHOST_IOTLB_MISS message to notify Qemu in case of
+a miss in vhost iotlb.
+	- Qemu registers a log buffer to kernel vhost driver. The latter
+update the buffer (using internal iotlb to get GFN) when serving vring
+descriptor.
+
+VFIO could also implement an internal iotlb, so vendor drivers can
+utilize the iotlb to update the GFN-based dirty bitmap. Ideally we
+don't need re-invent another iotlb protocol as vhost does. vIOMMU
+already sends map/unmap ioctl cmds upon any change of IOVA
+mapping. We may introduce a v2 map/unmap interface, allowing
+Qemu to pass both {iova, gpa, hva} together to keep internal iotlb
+in-sync. But we may also need a iotlb_miss_upcall interface, if VFIO
+doesn't want to cache full-size vIOMMU mappings.=20
+
+Definitely this alternative needs more work and possibly less=20
+performant (if maintaining a small size iotlb) than straightforward
+calling into KVM interface. But the gain is also obvious, since it
+is fully constrained with VFIO.
+
+Thoughts? :-)
+
+Thanks
+Kevin
+
+>=20
+> Alex
+>=20
+> > Above flow works for software-tracked dirty mechanism, e.g. in
+> > KVMGT, where GFN-based 'dirty' is marked when a guest page is
+> > mapped into device mmu. IOVA->HPA->GFN translation is done
+> > at that time, thus immune from further IOVA->GFN changes.
+> >
+> > When hardware IOMMU supports D-bit in 2nd level translation (e.g.
+> > VT-d rev3.0), there are two scenarios:
+> >
+> > 1) nested translation: guest manages 1st-level translation (IOVA->GPA)
+> > and host manages 2nd-level translation (GPA->HPA). The 2nd-level
+> > is not affected by guest mapping operations. So it's OK for IOMMU
+> > driver to retrieve GFN-based dirty pages by directly scanning the 2nd-
+> > level structure, upon request from user space.
+> >
+> > 2) shadowed translation (IOVA->HPA) in 2nd level: in such case the dirt=
+y
+> > information is tied to IOVA. the IOMMU driver is expected to maintain
+> > an internal dirty bitmap. Upon any change of IOVA->GPA notification
+> > from VFIO, the IOMMU driver should flush dirty status of affected 2nd-l=
+evel
+> > entries to the internal GFN-based bitmap. At this time, again IOVA->HVA
+> > ->GPA translation required for GFN-based recording. When userspace
+> > queries dirty bitmap, the IOMMU driver needs to flush latest 2nd-level
+> > dirty status to internal bitmap, which is then copied to user space.
+> >
+> > Given the trickiness of 2), we aim to enable 1) on intel-iommu driver.
+> >
+> > Thanks
+> > Kevin
 
 
