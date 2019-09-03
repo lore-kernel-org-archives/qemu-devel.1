@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FBE1C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 21:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 871C8C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 21:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BFDC21883
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 21:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50E022087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 21:06:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iVuTcef2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BFDC21883
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fLokqer8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E022087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Fzl-0006GB-Fo
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 17:05:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53607)
+	id 1i5G0I-0006V5-11
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 17:06:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53696)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1i5FaB-0007pA-QJ
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:39:20 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1i5FaL-0007xW-MD
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:39:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1i5FaA-0000cn-T2
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:39:19 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:57204)
+ (envelope-from <jag.raman@oracle.com>) id 1i5FaK-0000mq-L0
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:39:29 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:57550)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1i5FaA-0000cN-N7
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:39:18 -0400
+ id 1i5FaJ-0000lK-Aw
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:39:28 -0400
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83KXebb053258;
- Tue, 3 Sep 2019 20:39:12 GMT
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83KXev8053247;
+ Tue, 3 Sep 2019 20:39:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2019-08-05;
- bh=yBQRFrRvpsAiZU9EBQzZNbES+5o+LwhcwXRGcje/IzY=;
- b=iVuTcef2/ZxoGdDvVBH3ECz6QPGAT0O1cLdrx+WElLyR/e21x+CZ4/d3rL2QnhBO4c6Y
- 9ZZ1Ms5o/ClhfUy2Cju4NBU4lxGUpSMGdSxsQBVDmYU3P5H9KxPHGJ1XT6Cggpy0R8gP
- Gnleij1KvYssnJ3F4c0SY/Zm/y6w/09S+ZQIBW+59DVlGszZgtxCTfkDbwVbyFL5k1ag
- fdDT7LFU/K//Uyra7JBkauPA8ZkT5izQ0AqSsWANyEQElHzmvHQyRTPFb2wJMTfWyhtt
- iro0inBQgM4dSuHkCro3hOs+Bg8xLWEevgUottwuzfklJhq/L0W3/fpOlhWWb8HkDw8R Uw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2usy6n021d-1
+ bh=MutKmP+OHj02p9DHj3xH7q24SrwjpKc0Y4265jCiEAM=;
+ b=fLokqer8pP9v1rESLwsR0hQouEgaY9GAxfvTJddV1ZR8cqtD9frA/8LCYo+6dsAjajPD
+ 89zahY7vCdg0paWn530PvzTyKAtYF19/xFPjBvFjystxwKwCABO9KgGw0SyZSb6xZNOL
+ FrdovZxgRjHO5HTxb4AE4VP9e25lr0kRcCjPyxxHE9t+s+O9kd2X7HLynqZGwCd1ZtEC
+ XB4YsGfZmnm16DXoI2NxXHTMYqu6cTYJoaR6xErN6GALo0yCxoDcwNveNSzdF1HtTg7v
+ JLLbDxxb/z2F4+a2wkBQgwfKj7Cdg60JbeX+yD0Gs2XPdU6FnikENbv5KxU/v0dAH9eX vw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 2usy6n0221-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 03 Sep 2019 20:39:11 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83Kc9Mt025303;
- Tue, 3 Sep 2019 20:39:11 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 2us5pha0kp-1
+ Tue, 03 Sep 2019 20:39:21 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83KcKYb188137;
+ Tue, 3 Sep 2019 20:39:21 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 2usu5118h6-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 03 Sep 2019 20:39:11 +0000
+ Tue, 03 Sep 2019 20:39:21 +0000
 Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x83KdA7g023899;
- Tue, 3 Sep 2019 20:39:11 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x83KdJLw017788;
+ Tue, 3 Sep 2019 20:39:19 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 03 Sep 2019 13:39:10 -0700
+ with ESMTP ; Tue, 03 Sep 2019 13:39:18 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:37:56 -0400
-Message-Id: <dc1ccef91c50d96accc56553ca767bb1073cdc38.1567534653.git.jag.raman@oracle.com>
+Date: Tue,  3 Sep 2019 16:38:01 -0400
+Message-Id: <9342dcc0fccdbb5e23024e55c7127ab6ecc4e269.1567534653.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1567534653.git.jag.raman@oracle.com>
 References: <cover.1567534653.git.jag.raman@oracle.com>
@@ -92,7 +92,8 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  definitions=main-1909030206
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 141.146.126.78
-Subject: [Qemu-devel] [RFC v3 PATCH 30/45] multi-process: add remote option
+Subject: [Qemu-devel] [RFC v3 PATCH 35/45] multi-process: handle heartbeat
+ messages in remote process
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,47 +118,39 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+and reply back to proxy object.
+
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- New patch in v3
+ remote/remote-main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
- qemu-options.hx | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9621e93..e2dca3d 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -27,6 +27,27 @@ STEXI
- Display version information and exit
- ETEXI
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 5552712..f0a4de9 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -420,6 +420,7 @@ static void process_msg(GIOCondition cond, ProcChannel *chan)
+     ProcMsg *msg = NULL;
+     Error *err = NULL;
+     remote_pci_devs *r = NULL;
++    int wait;
  
-+DEF("remote", HAS_ARG, QEMU_OPTION_remote,
-+    "-remote socket[,prop[=value][,...]]\n"
-+    "                add remote process\n"
-+    "                prop=value,... sets driver properties\n"
-+    "                use '-remote help' to print all possible properties\n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+@table @option
-+@item rid
-+@findex -rid
-+remote id
-+@item socket
-+@findex -socket
-+Remote process socket
-+@item command
-+@findex -command
-+Remote process command.
-+
-+@end table
-+ETEXI
-+
- DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "-machine [type=]name[,prop[=value][,...]]\n"
-     "                selects emulated machine ('-machine help' for list)\n"
+     if ((cond & G_IO_HUP) || (cond & G_IO_ERR)) {
+         error_setg(&err, "socket closed, cond is %d", cond);
+@@ -513,6 +514,11 @@ static void process_msg(GIOCondition cond, ProcChannel *chan)
+     case DEVICE_DEL:
+         process_device_del_msg(msg);
+         break;
++    case PROXY_PING:
++        wait = msg->fds[0];
++        notify_proxy(wait, (uint32_t)getpid());
++        PUT_REMOTE_WAIT(wait);
++        break;
+     default:
+         error_setg(&err, "Unknown command");
+         goto finalize_loop;
 -- 
 1.8.3.1
 
