@@ -2,88 +2,72 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
+X-Spam-Status: No, score=-10.8 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E990EC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DE0C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:07:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C15BD22CF8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:06:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15BD22CF8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 6284F22CED
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:07:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6284F22CED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5CGP-0008Bl-ON
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:06:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45729)
+	id 1i5CHP-0000sp-BV
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:07:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5CAl-0001na-FM
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:00:52 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1i5CGT-00009j-J5
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5CAj-0007gh-Kp
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:00:51 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:40802
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1i5CAj-0007fv-EK
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:00:49 -0400
-Received: from host86-168-80-252.range86-168.btcentralplus.com
- ([86.168.80.252] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1i5C8h-0000Cj-1H; Tue, 03 Sep 2019 17:58:45 +0100
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190903160858.5296-1-richard.henderson@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <6b27210e-a4b3-a8be-77a1-717e26de1747@ilande.co.uk>
-Date: Tue, 3 Sep 2019 17:58:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1i5CGR-0002fB-G7
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:06:45 -0400
+Received: from mail-yw1-f66.google.com ([209.85.161.66]:40721)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1i5CGR-0002et-AX
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:06:43 -0400
+Received: by mail-yw1-f66.google.com with SMTP id k200so1829292ywa.7
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 10:06:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=X4KRvxQ/zWMLbFnPV8JYXiE1ckTI08fRyRRG0+y7IEA=;
+ b=jRs93c/rWCuO7lFYdAgfEi5+iguk7WKd8Uc4lisn17gRgUo07O/5TDMmGcUbhnAonY
+ Mg0VNnaoTAAJzAFpt4/uJMVyuM0Y/FAbcVItykBe52+zsEXi2Oa+g1mcFakf1DmIK7a8
+ ux0ztmxPoSVrytusUs93mKwJsH5eygGDXzHH5SPywOQZ021tViIagV0vkONCCR1b3EQS
+ GS5fWnRlmU+a9XPyadhEsnTjn42Q95v9wUG0zN9CxYKKYDEUjRKzHB92kO8OZww7Hfjn
+ +6t47kuvXWo1LKNzau8lfx3P1S5svZItvogIpJRdsol6KXtEuC0hagkmVqHeUhZ7v8t4
+ 8IrQ==
+X-Gm-Message-State: APjAAAXRvP/1ajnGlXyovkBJI5ypPbaEVJ2DPoOa7WiWNCInWok7Yxpk
+ PdSN++niG62zygfs8h+XhW7vRgy+FVLK+BbMiu8=
+X-Google-Smtp-Source: APXvYqw5A8TVtZDbg5nJXPsfhqKRrq8xqU7BLc0C0ndLiKW9rbz0Ot1RS7axVPT9iEeshMfbTYD3JS/uhUp5zHjNr6s=
+X-Received: by 2002:a0d:c401:: with SMTP id g1mr24896498ywd.37.1567530402537; 
+ Tue, 03 Sep 2019 10:06:42 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190903160858.5296-1-richard.henderson@linaro.org>
 In-Reply-To: <20190903160858.5296-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.168.80.252
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: No (on mail.default.ilande.uk0.bigv.io); Unknown failure
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 3 Sep 2019 19:06:29 +0200
+Message-ID: <CAAdtpL53wBZ14Af8CROW4eabsxDwJjRAiiSijFnKROC+9aHR4Q@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
+ [fuzzy]
+X-Received-From: 209.85.161.66
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
 Subject: Re: [Qemu-devel] [PATCH 00/36] tcg patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,35 +80,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/09/2019 17:08, Richard Henderson wrote:
+"PATCH" -> "PULL" in subject :)
+I wonder if Peter's script works too, I guess it does.
 
-> The following changes since commit fec105c2abda8567ec15230429c41429b5ee307c:
-> 
->   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20190828-pull-request' into staging (2019-09-03 14:03:15 +0100)
-> 
+Le mar. 3 sept. 2019 18:37, Richard Henderson <richard.henderson@linaro.org=
+>
+a =C3=A9crit :
+
+> The following changes since commit
+> fec105c2abda8567ec15230429c41429b5ee307c:
+>
+>   Merge remote-tracking branch
+> 'remotes/kraxel/tags/audio-20190828-pull-request' into staging (2019-09-0=
+3
+> 14:03:15 +0100)
+>
 > are available in the Git repository at:
-> 
+>
 >   https://github.com/rth7680/qemu.git tags/pull-tcg-20190903
-> 
+>
 > for you to fetch changes up to c25c283df0f08582df29f1d5d7be1516b851532d:
-> 
->   tcg: Factor out probe_write() logic into probe_access() (2019-09-03 08:34:18 -0700)
-> 
+>
+>   tcg: Factor out probe_write() logic into probe_access() (2019-09-03
+> 08:34:18 -0700)
+>
 > ----------------------------------------------------------------
 > Allow page table bit to swap endianness.
 > Reorganize watchpoints out of i/o path.
 > Return host address from probe_write / probe_access.
-> 
+>
 > ----------------------------------------------------------------
 > David Hildenbrand (11):
 >       exec: Factor out core logic of check_watchpoint()
 >       tcg: Check for watchpoints in probe_write()
->       s390x/tcg: Use guest_addr_valid() instead of h2g_valid() in probe_write_access()
+>       s390x/tcg: Use guest_addr_valid() instead of h2g_valid() in
+> probe_write_access()
 >       s390x/tcg: Fix length calculation in probe_write_access()
 >       tcg: Factor out CONFIG_USER_ONLY probe_write() from s390x code
 >       tcg: Enforce single page access in probe_write()
@@ -133,7 +128,7 @@ On 03/09/2019 17:08, Richard Henderson wrote:
 >       s390x/tcg: Pass a size to probe_write() in do_csst()
 >       tcg: Make probe_write() return a pointer to the host page
 >       tcg: Factor out probe_write() logic into probe_access()
-> 
+>
 > Richard Henderson (6):
 >       exec: Move user-only watchpoint stubs inline
 >       cputlb: Fold TLB_RECHECK into TLB_INVALID_MASK
@@ -141,7 +136,7 @@ On 03/09/2019 17:08, Richard Henderson wrote:
 >       cputlb: Fix size operand for tlb_fill on unaligned store
 >       cputlb: Remove double-alignment in store_helper
 >       cputlb: Handle watchpoints via TLB_WATCHPOINT
-> 
+>
 > Tony Nguyen (19):
 >       tcg: TCGMemOp is now accelerator independent MemOp
 >       memory: Introduce size_memop
@@ -162,7 +157,7 @@ On 03/09/2019 17:08, Richard Henderson wrote:
 >       cputlb: Byte swap memory transaction attribute
 >       target/sparc: Add TLB entry with attributes
 >       target/sparc: sun4u Invert Endian TTE bit
-> 
+>
 >  include/exec/cpu-all.h                  |   8 +-
 >  include/exec/exec-all.h                 |  10 +-
 >  include/exec/memattrs.h                 |   2 +
@@ -176,7 +171,8 @@ On 03/09/2019 17:08, Richard Henderson wrote:
 >  tcg/tcg.h                               | 101 +-------
 >  trace/mem-internal.h                    |   4 +-
 >  trace/mem.h                             |   4 +-
->  accel/tcg/cputlb.c                      | 414 ++++++++++++++++++--------------
+>  accel/tcg/cputlb.c                      | 414
+> ++++++++++++++++++--------------
 >  accel/tcg/user-exec.c                   |  32 +++
 >  exec.c                                  | 177 +++-----------
 >  hw/intc/armv7m_nvic.c                   |  13 +-
@@ -222,13 +218,5 @@ On 03/09/2019 17:08, Richard Henderson wrote:
 >  tcg/README                              |   2 +-
 >  57 files changed, 918 insertions(+), 865 deletions(-)
 >  create mode 100644 include/exec/memop.h
-
-Is this a pull request rather than just a queue update? I'm just wondering if I
-should wait for this to get merged first before I start testing the
-do_transaction_failed hook patches?
-
-
-ATB,
-
-Mark.
-
+>
+>
