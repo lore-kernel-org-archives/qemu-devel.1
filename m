@@ -8,78 +8,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF837C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 22:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F3B2C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 23:10:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 725B121883
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 22:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03D2022CED
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 23:10:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ownyjE0r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 725B121883
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bp7/Gh76"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03D2022CED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Hie-00007Z-Iq
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 18:56:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44898)
+	id 1i5HwM-0002pz-3L
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 19:10:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i5Hhs-0007tT-5J
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 18:55:25 -0400
+ (envelope-from <alistair23@gmail.com>) id 1i5Hvg-0002Ob-6C
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 19:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i5Hhr-0008Cb-3t
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 18:55:24 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46962)
+ (envelope-from <alistair23@gmail.com>) id 1i5Hvf-0007w6-41
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 19:09:40 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:47028)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i5Hhq-0008Bh-Rz; Tue, 03 Sep 2019 18:55:23 -0400
-Received: by mail-lj1-x244.google.com with SMTP id e17so6695156ljf.13;
- Tue, 03 Sep 2019 15:55:22 -0700 (PDT)
+ id 1i5Hve-0007uu-Sl; Tue, 03 Sep 2019 19:09:39 -0400
+Received: by mail-lj1-x241.google.com with SMTP id e17so6721815ljf.13;
+ Tue, 03 Sep 2019 16:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=+8Z7lgG57vQ2/yBLQqx76xo0fBYpHJQthGArthUlr+w=;
- b=ownyjE0r+JBG92A1Qf1f0GxvHa9KhgFOhwhe3OAm9OqCOVowc/T2iTHorzJB47pXNt
- AjuTpd+ShfRN2dB0QNwWLIIwe7DMzLvmvvZiP108Jg6xfhm95DsG/YVtMbbuIqcEIIOP
- vAlFPzA3vuu0C/I4y+i7mSGKnaa8dYZQbj20IpWFiDOL0x4uHwqgpWBGmHyc28Xe3aqm
- 0h6DENZfw4CMc85icZeR+dz8hDaT0Dr9wdr5UrExlWNdSin+Fx5ePCnUNBzOPM2CAi8h
- 47i12YGvGaC14hjjox4ZhRxjhaQYHZfgytoVew8nSUdVy3k9LD0YKVoJqHEmiGzFRAqe
- WUXg==
+ :cc; bh=PPwljZA2rPpRbvS0e37mfASF5sIMRnIrD2rdGIOq6EE=;
+ b=Bp7/Gh76IvXkUb2TIwPCQH7SkPJRZb4pKec+pQ34MTd+g2k9gZSwuKT7i3fhZFlT4y
+ MYT+91RolBwwgBOwg0SWOT9MkTkdq+gYaZZ3a13wbYlFgkDjJpdxaPkCHQOt6xeE+FBg
+ Abwv7ZjXhrCVmqfRkMcF0KSX9G9MukfhfLMn95WSaQVy71OvNZpPOj0S7oqflonqpvZz
+ +UjTpi/4EQ/vtoIc1zunJcpky9EYB8NsamzGnAPgBxdaJjTOikqhfzYkM9CIyWnoJiic
+ K2I0eYakAKR4fncR4pT390H4GUKn1JfwiTmii8BboZJ+5EgEpRj72jkm2cBPXNxHX+J0
+ 6PLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=+8Z7lgG57vQ2/yBLQqx76xo0fBYpHJQthGArthUlr+w=;
- b=NFwWU8zqwc3W3r1iIZ6T3q9KUSU48pnXZ2GJ9GgKoTdqAWA5XCeCW2On6AkzGgfSbn
- 3a9Kw/mekEt8wJryHQ8xV0ymIYWSoEPtc+FCbfEYy+JP4jF6+lImkAC9DxQJBKbbF6na
- sWA4DNQoLm17h77tmcqwPwjDVCsLp5m8xz4FQxCIGGfY38uoL5VzZctDIxgeC/fhHxQG
- cLooo++h/1cKr6IxN2HsImy9BN2semxYuctNAO8wYhibaM0uKLebbUNgciEr2M3MY2wS
- F9G0NMLuNBz9TEj3xp2n/Y0kLELfKkd3SM94WFUDUx7ttiLzzNZxCd/ld59xFFe5WXQP
- ekWw==
-X-Gm-Message-State: APjAAAWT/nTX45lILJU8DcDGNJi69Pdr0n3xUyDi1kKOD7WH0uvZ7EC7
- qAMHoALC2Z0TUIEaifI413bnn2Z869gHW+xCYStT1dX5Ya8=
-X-Google-Smtp-Source: APXvYqxSm02sTj7GpMdy155PpInqJLx8uugRrA+mQ0nu4WlD7VoKjPer7qCg+Phc/xtSxipw2BL9JXPzlWSuqyDzfZQ=
+ :message-id:subject:to:cc;
+ bh=PPwljZA2rPpRbvS0e37mfASF5sIMRnIrD2rdGIOq6EE=;
+ b=ISnH5bwHSBgon9hhjIjM7mICdEe0cpXU15aECjxG/LH/Mun/t5rJqjH4XvXz1atYfC
+ yobkpLALvk+PtqdfRavEAvsp1p4v2XM0cU/WM3FzHUUDbLxgYYs0F5Po63lmMcccIaLt
+ zoPBICpoTUcBha25bZ4gN7ieSeN/Z6pX3Y6szWVFeWjeNypkCU2NP96DAtZingZBZTXp
+ 1VxXHfUa2G3fDpHc2xReGRoCJr/+RkjEzdOv2KQAprWPHTnl0HOtBXDWnEzhOip5cWiR
+ kkW4BefKmO/KEyOqZ+vfxfrAVuqMT6D9yYg23hAKAik5FBODM73fO5ojqk59fSvYQyNE
+ l57w==
+X-Gm-Message-State: APjAAAWygJuss8H0JaFD/l3gJw4MYrZbeY+qn3Ez4klEz6HTMhiMPiq2
+ AFA49tWJinvTTWYw9rcqZdn9VleooywORasul2s=
+X-Google-Smtp-Source: APXvYqyRcEcIj7iHac1aJtg6fUExpgZ4lqDRh6vfSsv1K0FkpfV7qQGOpK2NoE/yeOUQLWSIr6BUOYzovawXZspAvVM=
 X-Received: by 2002:a05:651c:109:: with SMTP id
- a9mr21100413ljb.33.1567551320702; 
- Tue, 03 Sep 2019 15:55:20 -0700 (PDT)
+ a9mr21125800ljb.33.1567552177827; 
+ Tue, 03 Sep 2019 16:09:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190903114729.3400-1-philmd@redhat.com>
- <20190903114729.3400-4-philmd@redhat.com>
-In-Reply-To: <20190903114729.3400-4-philmd@redhat.com>
+References: <1567306391-2682-1-git-send-email-bmeng.cn@gmail.com>
+ <1567306391-2682-16-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1567306391-2682-16-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 3 Sep 2019 15:54:54 -0700
-Message-ID: <CAKmqyKNdbbhc+knpetPvsHxHV=tNvNsvvzBCkijgSsGju1QSgw@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 3 Sep 2019 16:09:11 -0700
+Message-ID: <CAKmqyKOmP6KjJBrY8Taw1DKqcmkeY22gNgJZ9r8=ccRwbzxtXw@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] hw/arm: Restrict pre-ARMv7 cpus to
- TCG
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v7 15/30] riscv: hart: Add a "hartid-base"
+ property to RISC-V hart array
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,139 +89,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 3, 2019 at 4:48 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
+On Sat, Aug 31, 2019 at 7:58 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> A KVM-only build won't be able to run pre-ARMv7 cpus, disable them.
+> At present each hart's hartid in a RISC-V hart array is assigned
+> the same value of its index in the hart array. But for a system
+> that has multiple hart arrays, this is not the case any more.
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Add a new "hartid-base" property so that hartid number can be
+> assigned based on the property value.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+>
 > ---
-> v2: - "depends on !KVM" -> "depends on TCG" (rth)
->     - do not modify default-configs/arm-softmmu.mak (thuth)
-> ---
->  hw/arm/Kconfig | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
 >
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 76a2a6bcbf..1c359a6f47 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -1,3 +1,15 @@
-> +config ARM_V4
-> +    depends on TCG
-> +    bool
-> +
-> +config ARM_V5
-> +    depends on TCG
-> +    bool
-> +
-> +config ARM_V6
-> +    depends on TCG
-> +    bool
-> +
->  config ARM_VIRT
->      bool
->      imply PCI_DEVICES
-> @@ -23,6 +35,7 @@ config ARM_VIRT
+> Changes in v7:
+> - use `s->hartid_base + idx` directly
 >
->  config CHEETAH
->      bool
-> +    select ARM_V4
->      select OMAP
->      select TSC210X
+> Changes in v6:
+> - use s->hartid_base directly, instead of an extra variable
 >
-> @@ -32,6 +45,7 @@ config CUBIEBOARD
+> Changes in v5: None
+> Changes in v4:
+> - new patch to add a "hartid-base" property to RISC-V hart array
 >
->  config DIGIC
->      bool
-> +    select ARM_V5
->      select PTIMER
->      select PFLASH_CFI02
+> Changes in v3: None
+> Changes in v2: None
 >
-> @@ -61,6 +75,7 @@ config HIGHBANK
+>  hw/riscv/riscv_hart.c         | 3 ++-
+>  include/hw/riscv/riscv_hart.h | 1 +
+>  2 files changed, 3 insertions(+), 1 deletion(-)
 >
->  config INTEGRATOR
->      bool
-> +    select ARM_V5
->      select ARM_TIMER
->      select INTEGRATOR_DEBUG
->      select PL011 # UART
-> @@ -86,6 +101,7 @@ config MUSCA
+> diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+> index 9deef869..e28db80 100644
+> --- a/hw/riscv/riscv_hart.c
+> +++ b/hw/riscv/riscv_hart.c
+> @@ -27,6 +27,7 @@
 >
->  config MUSICPAL
->      bool
-> +    select ARM_V5
->      select BITBANG_I2C
->      select MARVELL_88W8618
->      select PTIMER
-> @@ -99,6 +115,7 @@ config NETDUINO2
+>  static Property riscv_harts_props[] = {
+>      DEFINE_PROP_UINT32("num-harts", RISCVHartArrayState, num_harts, 1),
+> +    DEFINE_PROP_UINT32("hartid-base", RISCVHartArrayState, hartid_base, 0),
+>      DEFINE_PROP_STRING("cpu-type", RISCVHartArrayState, cpu_type),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> @@ -45,7 +46,7 @@ static void riscv_hart_realize(RISCVHartArrayState *s, int idx,
+>      object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx],
+>                              sizeof(RISCVCPU), cpu_type,
+>                              &error_abort, NULL);
+> -    s->harts[idx].env.mhartid = idx;
+> +    s->harts[idx].env.mhartid = s->hartid_base + idx;
+>      qemu_register_reset(riscv_harts_cpu_reset, &s->harts[idx]);
+>      object_property_set_bool(OBJECT(&s->harts[idx]), true,
+>                               "realized", &err);
+> diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.h
+> index 0671d88..1984e30 100644
+> --- a/include/hw/riscv/riscv_hart.h
+> +++ b/include/hw/riscv/riscv_hart.h
+> @@ -32,6 +32,7 @@ typedef struct RISCVHartArrayState {
 >
->  config NSERIES
->      bool
-> +    select ARM_V6
->      select OMAP
->      select TMP105   # tempature sensor
->      select BLIZZARD # LCD/TV controller
-> @@ -121,6 +138,7 @@ config OMAP
->
->  config PXA2XX
->      bool
-> +    select ARM_V5
->      select FRAMEBUFFER
->      select I2C
->      select SERIAL
-> @@ -232,10 +250,12 @@ config COLLIE
->
->  config SX1
->      bool
-> +    select ARM_V4
->      select OMAP
->
->  config VERSATILE
->      bool
-> +    select ARM_V5
->      select ARM_TIMER # sp804
->      select PFLASH_CFI01
->      select LSI_SCSI_PCI
-> @@ -327,6 +347,7 @@ config XLNX_VERSAL
->
->  config FSL_IMX25
->      bool
-> +    select ARM_V5
->      select IMX
->      select IMX_FEC
->      select IMX_I2C
-> @@ -334,6 +355,7 @@ config FSL_IMX25
->
->  config FSL_IMX31
->      bool
-> +    select ARM_V6
->      select SERIAL
->      select IMX
->      select IMX_I2C
-> @@ -349,6 +371,7 @@ config FSL_IMX6
->
->  config ASPEED_SOC
->      bool
-> +    select ARM_V5
->      select DS1338
->      select FTGMAC100
->      select I2C
+>      /*< public >*/
+>      uint32_t num_harts;
+> +    uint32_t hartid_base;
+>      char *cpu_type;
+>      RISCVCPU *harts;
+>  } RISCVHartArrayState;
 > --
-> 2.20.1
+> 2.7.4
 >
 >
 
