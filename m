@@ -2,153 +2,86 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2E2C3A5A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA00CC3A5A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:08:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEF4D206B8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:00:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEF4D206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4E8B206B8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:08:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1VfeHA8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E8B206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i52nN-0003Id-Qh
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 03:00:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35542)
+	id 1i52ve-0005EL-Na
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 03:08:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37064)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1i52lD-0001sl-Mx
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:53 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i52uk-0004pl-VV
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1i52lB-00077L-Tr
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31764)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1i52lB-00074l-KB
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:49 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x836rGiq055714
- for <qemu-devel@nongnu.org>; Tue, 3 Sep 2019 02:57:46 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2usgmfmjvk-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 02:57:45 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Tue, 3 Sep 2019 07:57:43 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 3 Sep 2019 07:57:39 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x836vcHP38535264
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 3 Sep 2019 06:57:38 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 98E69A4040;
- Tue,  3 Sep 2019 06:57:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 501C9A404D;
- Tue,  3 Sep 2019 06:57:38 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.122])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue,  3 Sep 2019 06:57:38 +0000 (GMT)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190806094834.7691-2-imammedo@redhat.com>
- <20190807153241.24050-1-imammedo@redhat.com>
- <20190820180727.32cf4891.cohuck@redhat.com>
- <20190827145629.62c5839e@redhat.com>
- <0abe612b-5a00-4ebc-9874-6b794d411f51@de.ibm.com>
- <20190829140402.3a547a76@redhat.com>
- <6afa8d99-c958-6f60-69f4-f84151358479@de.ibm.com>
- <20190829143125.17a44fa5@redhat.com>
- <ff7b7534-e954-84f2-34a9-bfa0ac37c8fe@de.ibm.com>
- <20190830114105.312cf69f@redhat.com>
- <4f816851-9435-51e0-81e9-0dc2ac47ff78@de.ibm.com>
- <20190902154929.16f32591@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Tue, 3 Sep 2019 08:57:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i52ui-00035q-BI
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:07:42 -0400
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:37245)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i52ui-00035Y-2C
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:07:40 -0400
+Received: by mail-oi1-x22e.google.com with SMTP id b25so11991337oib.4
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 00:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=QQJ5aYHHHASGNdZ81y6xT7exo0NH5izgyd29CZT6GsY=;
+ b=d1VfeHA8nBjTS+QYSi4PibGYuE1pMR0CKOWCPG/9XmYwz4NSXIHGjriyjFFLGdvh8Y
+ eKDXNvKCkkxQhWfLUc+nyfC7kHa4UqdizT53rzynvnUzQApmI9bZ+nBTU2M/W80l+/hT
+ Qsm/e7dEqO8vvodtSogzWT684JuMo1JMBrLZwqgxLvvaiNZnHB2lblBNlZjYFsdtv+Me
+ +3cIPM4vtVO/sv0JMr2gEeOh2I84c52VKUP1jWHQIiwn+ECwgnUUOtowQ8UEFlEKJIwJ
+ OLi7dsK2ZJxLaIWqcrS40ffMgyVq8Te2bq2cz50s1zKTsy/GByPQqCtPE15SzJgs3nOg
+ +oEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=QQJ5aYHHHASGNdZ81y6xT7exo0NH5izgyd29CZT6GsY=;
+ b=F+15HWK2os8WZSvrK6nINaFA1C9bRhfwgUPb0F4htPcHVoyLr3GVLGrkwSh1Ce0Hp5
+ YL8S9p6sFthr0XHKGayAJT/sp3na2SCztMEEENlko9qvwQ4zXjXNKVjQKRyim+c9SI66
+ 8CPScEJhy8Y5dXKRyr2ZYCFQe7Ai7kWKtRRBYHZpT5qzjLESgB0oAhU0C8Ht7dE5xA4m
+ zwFsb7RHbMh5IkemVYWYqHOBCKJClfCVoXBUftc2lJTp5OwS4TwzbbizkADFIkBQWFxa
+ Wz4bx2v3XddcWAr9EcnjT+voa+dirs/KJvWueQ5FN7zvHRsvBy6TR64sEGQzFrj3WGtt
+ JRrQ==
+X-Gm-Message-State: APjAAAVZ0b9e7XlJ1d/65RLUN424zl+gBJUQZik7fPIJBPAhRKpwSykV
+ 8d5JiWtVxMG45onz1YCTATw3QrKLdgV1kIr1FPE=
+X-Google-Smtp-Source: APXvYqx1vpN8yge2cMhcQCyRPDkI1R+mSNClxvwffyOd1oUFpwlKhXJe+4PQJfQ3Mc47l1PPFUaIcjfFbn4vNfBdcYc=
+X-Received: by 2002:a05:6808:a1c:: with SMTP id
+ n28mr3340529oij.136.1567494459023; 
+ Tue, 03 Sep 2019 00:07:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190902154929.16f32591@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19090306-0016-0000-0000-000002A5F9EE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19090306-0017-0000-0000-000033065F29
-Message-Id: <09480baa-c736-6726-4852-777f99fd54c6@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-03_01:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909030076
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.2 v5 1/2] kvm: s390:
- split too big memory section on several memslots
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
+ Tue, 3 Sep 2019 00:07:37 -0700 (PDT)
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
+ Tue, 3 Sep 2019 00:07:37 -0700 (PDT)
+In-Reply-To: <tencent_4D0D8A6738AA24B65B532FA1@qq.com>
+References: <tencent_4D0D8A6738AA24B65B532FA1@qq.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 3 Sep 2019 09:07:37 +0200
+Message-ID: <CAL1e-=hc7Xi8EVXThQ0-kJQfvqs2m6wLAuEyTZaK7SUe1gbqBg@mail.gmail.com>
+To: Libo Zhou <zhlb29@foxmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -160,106 +93,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pbonzini@redhat.com
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+30.08.2019. 11.14, "Libo Zhou" <zhlb29@foxmail.com> =D1=98=D0=B5 =D0=BD=D0=
+=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Hi Aleksandar,
+>
+> Thanks for explaining helper functions for me. Before getting my hands
+dirty, I have some more questions. After figuring them out, I can get
+started.
+>
+> I need to add some new registers to the CPU. In "translate.c", I found
+that the registers are declared as static TCGv array (e.g. cpu_gpr[32]).
+Then, in function mips_tcg_init(), cpu_gpr[i] is created one by one with
+tcg_global_mem_new(...) in a for loop. Is that all I need to do to add new
+registers to the CPU? I noticed another file "cpu.h", do I also need to add
+my new registers, say, "my_gpr[32]" in "cpu.h"?
+>
+> My new instructions also include some load & stores. I see I can
+implement them with tcg_gen_qemu_ld/st_tl(...) in the decode function's
+switch-case statements, but I don't see how the *target* memory is created.
+Shouldn't they be created with tcg_global_mem_new(...), just like how the
+registers are created? I can hack the memory by creating a *super* larger
+register file, and hack the loads & stores with register moves, but that
+just sounds too sketchy.
+>
 
+For register definition, load/store instruction, take a look at details of
+this series:
 
-On 02.09.19 15:49, Igor Mammedov wrote:
-> On Fri, 30 Aug 2019 18:19:29 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 30.08.19 11:41, Igor Mammedov wrote:
->>> On Thu, 29 Aug 2019 14:41:13 +0200
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>   
->>>> On 29.08.19 14:31, Igor Mammedov wrote:  
->>>>> On Thu, 29 Aug 2019 14:07:44 +0200
->>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>>>     
->>>>>> On 29.08.19 14:04, Igor Mammedov wrote:    
->>>>>>> On Thu, 29 Aug 2019 08:47:49 +0200
->>>>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>>>>>       
->>>>>>>> On 27.08.19 14:56, Igor Mammedov wrote:      
->>>>>>>>> On Tue, 20 Aug 2019 18:07:27 +0200
->>>>>>>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>>>>>>         
->>>>>>>>>> On Wed,  7 Aug 2019 11:32:41 -0400
->>>>>>>>>> Igor Mammedov <imammedo@redhat.com> wrote:
->>>>>>>>>>        
->>>>>>>>>>> Max memslot size supported by kvm on s390 is 8Tb,
->>>>>>>>>>> move logic of splitting RAM in chunks upto 8T to KVM code.
->>>>>>>>>>>
->>>>>>>>>>> This way it will hide KVM specific restrictions in KVM code
->>>>>>>>>>> and won't affect baord level design decisions. Which would allow
->>>>>>>>>>> us to avoid misusing memory_region_allocate_system_memory() API
->>>>>>>>>>> and eventually use a single hostmem backend for guest RAM.
->>>>>>>>>>>
->>>>>>>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>>>>>>>>>> ---
->>>>>>>>>>> v5:
->>>>>>>>>>>   * move computation 'size -= slot_size' inside of loop body
->>>>>>>>>>>           (David Hildenbrand <david@redhat.com>)
->>>>>>>>>>> v4:
->>>>>>>>>>>   * fix compilation issue
->>>>>>>>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
->>>>>>>>>>>   * advance HVA along with GPA in kvm_set_phys_mem()
->>>>>>>>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
->>>>>>>>>>>
->>>>>>>>>>> patch prepares only KVM side for switching to single RAM memory region
->>>>>>>>>>> another patch will take care of  dropping manual RAM partitioning in
->>>>>>>>>>> s390 code.          
->>>>>>>>>>
->>>>>>>>>> I may have lost track a bit -- what is the status of this patch (and
->>>>>>>>>> the series)?        
->>>>>>>>>
->>>>>>>>> Christian,
->>>>>>>>>
->>>>>>>>> could you test it on a host that have sufficient amount of RAM?        
->>>>>>>>
->>>>>>>>
->>>>>>>> This version looks good. I was able to start a 9TB guest.
->>>>>>>> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=8796091973632, userspace_addr=0x3ffee700000}) = 0
->>>>>>>> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=1, flags=0, guest_phys_addr=0x7fffff00000, memory_size=1099512676352, userspace_addr=0xbffee600000}) = 0    
->>>>>>    
->>>>>>>> The only question is if we want to fix the weird alignment (0x7fffff00000) when
->>>>>>>> we already add a migration barrier for uber-large guests.
->>>>>>>> Maybe we could split at 4TB to avoid future problem with larger page sizes?      
->>>>>>> That probably should be a separate patch on top.      
->>>>>>
->>>>>> Right. The split in KVM code is transparent to migration and other parts of QEMU, correct?    
->>>>>
->>>>> it should not affect other QEMU parts and migration (to my limited understanding of it),
->>>>> we are passing to KVM memory slots upto KVM_SLOT_MAX_BYTES as we were doing before by
->>>>> creating several memory regions instead of one as described in [2/2] commit message.
->>>>>
->>>>> Also could you also test migration of +9Tb guest, to check that nothing where broken by
->>>>> accident in QEMU migration code?    
->>>>
->>>> I only have one server that is large enough :-/  
->>> Could you test offline migration on it (to a file and restore from it)?  
->>
->> I tested migration with a hacked QEMU (basically split in KVM code at 1GB instead of 8TB) and
->> the restore from file failed with data corruption in the guest. The current code
->> does work when I use small memslots. No idea yet what is wrong.
-> 
-> I've tested 2Gb (max, I can test) guest (also hacked up version)
-> and it worked for me.
-> How do you test it and detect corruption so I could try to reproduce it locally?
-> (given it worked before, there is no much hope but I could try)
+https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06028.html
 
-I basically started a guest with just kernel and ramdisk on the command line and
-then in the monitor I did 
-migrate "exec: cat > savefile"
-and then I restarted the guest with
--incoming "exec: cat savefile"
+Don't mix register and memory initialization. For memory, the existing code
+should bu sufficient.
 
-the guest then very quickly crashed with random kernel oopses. 
+What you need to additionally do (and you didn't mention it) is to define a
+CPU that will have some base instruction set (it coukd be, for example,
+mips32r2) + your additional instructions. This is done in file by adding a
+corresponding item in translate_init.inc.c (if you choise mips32r2 as base
+ISA, you could base your new CPU on existing CPU 24Kf). And then you start
+QEMU with switch "-cpu <your newly defined CPU>".
 
-Using libvirts managedsave should work as well. 
+I may add more explanation later on.
 
+> On the other hand, I would like to get it running first, without doing
+any modification to the source code. I can build the user space emulation
+on Linux.
+>
+> ./configure --target-list=3Dmips-linux-user
+>
+> Then I will write a testprogram.c, cross compile it on x86 into MIPS
+using gcc(I am not clear on how to do it, but my team has the compiler for
+our new ISA, I just want to try the MIPS version first), and run the test
+program.
+>
+> ./qemu testprogram
+>
+> How do I look at the contents in the target registers and memory? I saw
+that function "mips_cpu_dump_state" in "translate.c" does what I need, but
+I don't know how to call it in this process. Should I use gdb?
+>
+> I am really sorry for asking you so many questions, but I think after
+getting them figured out, I can start my project. Thank you very much in
+advance, and have a good weekend!
+>
 
+The questions are always fine and welcome, just we are typically very busy,
+snd can't always promptly replay.
+
+Aleksandae
+
+> Cheers,
+> Libo
+>
+>
+> ------------------ Original ------------------
+> From:  "Aleksandar Markovic";<aleksandar.m.mail@gmail.com>;
+> Send time: Thursday, Aug 29, 2019 10:22 PM
+> To: "Libo Zhou"<zhlb29@foxmail.com>;
+> Cc: "qemu-devel"<qemu-devel@nongnu.org>;
+> Subject:  Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+>
+> On Wed, Aug 28, 2019 at 5:54 AM Libo Zhou <zhlb29@foxmail.com> wrote:
+>
+> > Hi Aleksandar,
+> >
+> > Thank you for the link to Loongson2F documentation. It has been very
+> > useful:)
+> >
+> > I have spent several days immersing myself in the source code, now I
+think
+> > I have a more solid understanding about it. Just like Loongson
+Multimedia
+> > Instructions, I need to implement some sort of complex vector
+instructions,
+> > and I need to write some helper functions (e.g. my_helper.c).
+> >
+> > The QEMU wiki website has very thorough explanation on TCG, but I
+haven't
+> > found any explanation on the port-specific helpers. Is there any
+> > documentation on how the helper functions are generated? I think now I
+> > *might* know how to write a working helper function, but I just don't
+know
+> > how it works.
+> >
+> >
+> Hello, Libo,
+>
+> Prerequisite for writing a helper is that you have a clear definition of
+> new instruction functionality, in the sense, what operation is done on
+what
+> resources. "Resources" are registers - they could be general-purpose MIPS
+> registers, or some special additional registers. Did you use existing
+> registers, or did you define a new set or registers for your new
+> instructions? Registers are modeled as fields in a structure, and both
+> helpers and TCG implementations modify those fields while performing
+> instruction emulation.
+>
+> In any case, you pass to the helper all information needed for the
+> instruction in question to perform. These are usually ordinal numbers of
+> involved register, derived from decoding the opcode. Alternatively, you
+can
+> pass pointers to the registers, rather than ordinal numbers. In turn, the
+> main part of functionality is implemented. At the end of helper, you may
+> want to update, let's say, a status register, if any (depending on your
+> design).
+>
+> The declaration of helpers is a little contrived, and may still confuse
+> you. But this is not crucial to you. I advise you just to copy a solution
+> for a similar existing instruction.
+>
+> Yours,
+> Aleksandar
+>
+>
+>
+> > Cheers,
+> > Libo
+> >
+> >
+> >
+> >
+> > ------------------ Original message ------------------
+> > *From:* "Aleksandar Markovic";
+> > *Sendtime:* Thursday, Aug 22, 2019 6:53 PM
+> > *To:* "Libo Zhou";
+> > *Cc:* "qemu-devel";
+> > *Subject:* Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+> >
+> > On Thu, Aug 22, 2019 at 12:24 PM =E7=AB=8B <zhlb29@foxmail.com> wrote:
+> >
+> > > Hi Aleksandar,
+> > >
+> > > Thank you very much for your patient explanation in the previous post=
+.
+> > And
+> > > thank you for checking.
+> > > Your and Peter's replies in the previous post certainly helped a lot.
+I
+> > am
+> > > now looking at a git commit 7 years ago (
+> > > bd277fa1966bc400f1b411f868f39125cda0c403), it was a Loongson
+Multimedia
+> > > Instruction implementation done my Richard Henderson.
+> > >
+> >
+> > Cool, that commit is a very good staring point - it is definitely not
+too
+> > simple, and it is not too complex either. And you can discover several
+> > different concepts in the process of exploring the change.
+> >
+> > Documentation on instruction set extension related to the commit (found
+by
+> > Google):
+> > https://files.somniafabularum.com/loongson/docs/Loongson2FUserGuide.pdf
+> >
+> > Be persistent, take your time, study the details and handling of
+individual
+> > instructions, and, of course, let us know if you encounter some major
+> > obstacles or thorny dilemmas.
+> >
+> > Yours,
+> > Aleksandar
+> >
+> >
+> > > I think what he did is exactly what I want to do now. I got a vague
+view
+> > > of the big picture, but I need more time to figure out the details. I
+> > will
+> > > certainly ask more questions about this later, but before that I need
+to
+> > > look at some other parts of the source code:) Again thank you for
+> > checking!
+> > >
+> > > Cheers,
+> > > Libo
+> > >
+> > >
+> > > ------------------ Original message ------------------
+> > > *From:* "Aleksandar Markovic";
+> > > *Sendtime:* Thursday, Aug 22, 2019 4:23 PM
+> > > *To:* "=E7=AB=8B";
+> > > *Cc:* "qemu-devel";
+> > > *Subject:* Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+> > >
+> > > On Tue, Aug 20, 2019 at 12:12 PM =E7=AB=8B <zhlb29@foxmail.com> wrote=
+:
+> > >
+> > > > I am working on a project that requires me to modify the ISA of the
+> > MIPS
+> > > > target.
+> > >
+> > >
+> > > L.,
+> > >
+> > > How is it going?
+> > >
+> > > Aleksandar
+> > >
+> > >
+> > >
+> > > > I have been staring at the source code for about a week, but found
+it
+> > > > really difficult due to me being a young rookie and the sparse
+> > comments.
+> > > > Specifically, I need to extend MIPS, by adding some new instruction=
+s
+> > and
+> > > > new CPU registers to the current architecture, and that sounds
+really
+> > > easy.
+> > > > I think the place for me to look at should be at the directory
+> > > > ${qemu_root}/target/mips/. With a MIPS Instruction Set Manual
+Release 6
+> > > > handy, I have difficulty finding the source code where the ISA
+resides.
+> > > Is
+> > > > it in op_helper.c? Or translate.c? Any guidance would be really
+> > > > appreciated. Thank you very much in advance.
+> > > >
+> > > >
+> > > > Cheers,
+> > > > L.
+> > >
+> >
