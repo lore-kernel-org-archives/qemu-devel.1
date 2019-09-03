@@ -6,57 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA50C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0561C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 862A52339D
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:41:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 862A52339D
+	by mail.kernel.org (Postfix) with ESMTPS id 8288C2339D
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:41:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8288C2339D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5940-0008SD-Tf
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 09:41:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51527)
+	id 1i594D-0000Ks-50
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 09:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i58qI-0002Pe-QA
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:27:31 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i58yi-0002Gx-Nj
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i58qH-0000on-HS
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:27:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50879)
+ (envelope-from <mreitz@redhat.com>) id 1i58yh-0006Ix-FR
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:36:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53632)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i58qH-0000oi-8F
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:27:29 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i58ye-0006EK-6d; Tue, 03 Sep 2019 09:36:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 92A99308FE8D;
- Tue,  3 Sep 2019 13:27:28 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-102.brq.redhat.com [10.40.204.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 607995C25B;
- Tue,  3 Sep 2019 13:27:26 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 15:26:48 +0200
-Message-Id: <20190903132649.20226-10-philmd@redhat.com>
-In-Reply-To: <20190903132649.20226-1-philmd@redhat.com>
-References: <20190903132649.20226-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 80BDA308402D;
+ Tue,  3 Sep 2019 13:36:07 +0000 (UTC)
+Received: from localhost (ovpn-204-98.brq.redhat.com [10.40.204.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1ACD160C4E;
+ Tue,  3 Sep 2019 13:36:06 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue,  3 Sep 2019 15:35:42 +0200
+Message-Id: <20190903133553.6500-6-mreitz@redhat.com>
+In-Reply-To: <20190903133553.6500-1-mreitz@redhat.com>
+References: <20190903133553.6500-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 03 Sep 2019 13:27:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 03 Sep 2019 13:36:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 09/10] .travis.yml: Cache Linux/GCC 'non-debug
- profile' jobs together
+Subject: [Qemu-devel] [PULL v2 05/16] iotests: Fix _filter_img_create()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,113 +66,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These jobs build different components but use the same
-host features. Put them in the same cache bucket.
+fe646693acc changed qemu-img create's output so that it no longer prints
+single quotes around parameter values.  The subformat and adapter_type
+filters in _filter_img_create() have never been adapted to that change.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Fixes: fe646693acc13ac48b98435d14149ab04dc597bc
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20190815153638.4600-2-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- .travis.yml | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tests/qemu-iotests/059.out       | 16 ++++++++--------
+ tests/qemu-iotests/common.filter |  4 ++--
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index e362c3fe02..7132cf8fba 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -101,15 +101,18 @@ matrix:
-   include:
-     - env:
-         - CONFIG=3D"--disable-system --static"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+diff --git a/tests/qemu-iotests/059.out b/tests/qemu-iotests/059.out
+index fe3f861f3c..b2e718d29f 100644
+--- a/tests/qemu-iotests/059.out
++++ b/tests/qemu-iotests/059.out
+@@ -13,17 +13,17 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D6=
+7108864
+ qemu-io: can't open device TEST_DIR/t.vmdk: L1 size too big
 =20
+ =3D=3D=3D Testing monolithicFlat creation and opening =3D=3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648 subformat=
+=3DmonolithicFlat
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 2 GiB (2147483648 bytes)
 =20
-     # we split the system builds as it takes a while to build them all
-     - env:
-         - CONFIG=3D"--disable-user --target-list=3D${MAIN_SOFTMMU_TARGET=
-S}"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+ =3D=3D=3D Testing monolithicFlat with zeroed_grain =3D=3D=3D
+ qemu-img: TEST_DIR/t.IMGFMT: Flat image can't enable zeroed grain
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648 subformat=
+=3DmonolithicFlat
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648
 =20
+ =3D=3D=3D Testing big twoGbMaxExtentFlat =3D=3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824000 subfor=
+mat=3DtwoGbMaxExtentFlat
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824000
+ image: TEST_DIR/t.vmdk
+ file format: vmdk
+ virtual size: 0.977 TiB (1073741824000 bytes)
+@@ -2038,7 +2038,7 @@ Format specific information:
+ qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Invalid extent line: RW 12=
+582912 VMFS "dummy.IMGFMT" 1
 =20
-     - env:
-         - CONFIG=3D"--disable-user --target-list-exclude=3D${MAIN_SOFTMM=
-U_TARGETS}"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+ =3D=3D=3D Testing truncated sparse =3D=3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D107374182400 subform=
+at=3DmonolithicSparse
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D107374182400
+ qemu-img: Could not open 'TEST_DIR/t.IMGFMT': File truncated, expecting =
+at least 13172736 bytes
 =20
+ =3D=3D=3D Converting to streamOptimized from image with small cluster si=
+ze=3D=3D=3D
+@@ -2049,7 +2049,7 @@ wrote 512/512 bytes at offset 10240
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 =20
-     # Just build tools and run minimal unit and softfloat checks
-@@ -117,6 +120,8 @@ matrix:
-         - BASE_CONFIG=3D"--enable-tools"
-         - CONFIG=3D"--disable-user --disable-system"
-         - TEST_CMD=3D"make check-unit check-softfloat -j3"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
-+
+ =3D=3D=3D Testing monolithicFlat with internally generated JSON file nam=
+e =3D=3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 subformat=3D=
+monolithicFlat
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+ qemu-io: can't open: Cannot use relative extent paths with VMDK descript=
+or file 'json:{"image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT=
+"}, "driver": "blkdebug", "inject-error.0.event": "read_aio"}'
 =20
-     - env:
-         - CONFIG=3D"--enable-debug --enable-debug-tcg --disable-user"
-@@ -136,6 +141,7 @@ matrix:
-     # Module builds are mostly of interest to major distros
-     - env:
-         - CONFIG=3D"--enable-modules --target-list=3D${MAIN_SOFTMMU_TARG=
-ETS}"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+ =3D=3D=3D Testing version 3 =3D=3D=3D
+@@ -2259,7 +2259,7 @@ read 512/512 bytes at offset 64931328
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 =20
+ =3D=3D=3D Testing 4TB monolithicFlat creation and IO =3D=3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4398046511104 subfor=
+mat=3DmonolithicFlat
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4398046511104
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 4 TiB (4398046511104 bytes)
+@@ -2333,7 +2333,7 @@ read 1024/1024 bytes at offset 966367641600
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 =20
-     # Alternate coroutines implementations are only really of interest t=
-o KVM users
-@@ -155,6 +161,7 @@ matrix:
-         - BUILD_DIR=3D"out-of-tree/build/dir" SRC_DIR=3D"../../.."
-         - BASE_CONFIG=3D"--enable-tools --enable-docs"
-         - CONFIG=3D"--target-list=3Dx86_64-softmmu,aarch64-linux-user"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
-       addons:
-         apt:
-           packages:
-@@ -196,6 +203,7 @@ matrix:
-     # We manually include builds which we disable "make check" for
-     - env:
-         - CONFIG=3D"--without-default-devices --disable-user"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
-         - TEST_CMD=3D""
-=20
-=20
-@@ -239,6 +247,7 @@ matrix:
-     # Python builds
-     - env:
-         - CONFIG=3D"--target-list=3Dx86_64-softmmu"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
-       language: python
-       python:
-         - "3.4"
-@@ -246,6 +255,7 @@ matrix:
-=20
-     - env:
-         - CONFIG=3D"--target-list=3Dx86_64-softmmu"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
-       language: python
-       python:
-         - "3.6"
-@@ -312,8 +322,11 @@ matrix:
-     - env:
-         - CONFIG=3D"--disable-system"
-         - TEST_CMD=3D"make -j3 check-tcg V=3D1"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
-+
-=20
-     # Run check-tcg against softmmu targets
-     - env:
-         - CONFIG=3D"--target-list=3Dxtensa-softmmu,arm-softmmu,aarch64-s=
-oftmmu,alpha-softmmu"
-         - TEST_CMD=3D"make -j3 check-tcg V=3D1"
-+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+ =3D=3D=3D Testing qemu-img map on extents =3D=3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544 subforma=
+t=3DmonolithicSparse
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544
+ wrote 1024/1024 bytes at offset 65024
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 1024/1024 bytes at offset 2147483136
+@@ -2344,7 +2344,7 @@ Offset          Length          Mapped to       Fil=
+e
+ 0               0x20000         0x3f0000        TEST_DIR/t.vmdk
+ 0x7fff0000      0x20000         0x410000        TEST_DIR/t.vmdk
+ 0x140000000     0x10000         0x430000        TEST_DIR/t.vmdk
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544 subforma=
+t=3DtwoGbMaxExtentSparse
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33285996544
+ wrote 1024/1024 bytes at offset 65024
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 1024/1024 bytes at offset 2147483136
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
+.filter
+index 8e9235d6fe..445a1c23e0 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -130,8 +130,8 @@ _filter_img_create()
+         -e "s# compat6=3D\\(on\\|off\\)##g" \
+         -e "s# static=3D\\(on\\|off\\)##g" \
+         -e "s# zeroed_grain=3D\\(on\\|off\\)##g" \
+-        -e "s# subformat=3D'[^']*'##g" \
+-        -e "s# adapter_type=3D'[^']*'##g" \
++        -e "s# subformat=3D[^ ]*##g" \
++        -e "s# adapter_type=3D[^ ]*##g" \
+         -e "s# hwversion=3D[^ ]*##g" \
+         -e "s# lazy_refcounts=3D\\(on\\|off\\)##g" \
+         -e "s# block_size=3D[0-9]\\+##g" \
 --=20
-2.20.1
+2.21.0
 
 
