@@ -6,59 +6,58 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 188EAC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C162C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:20:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1808215EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:09:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1808215EA
+	by mail.kernel.org (Postfix) with ESMTPS id 214E422CF8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:19:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214E422CF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5ARO-0000ep-0y
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:09:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50153)
+	id 1i5Ab9-0002qH-3F
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:19:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i5AQD-0000CU-Po
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:08:42 -0400
+ (envelope-from <crosa@redhat.com>) id 1i5AaP-0002Ne-U4
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i5AQC-0004kY-L7
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:08:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54776)
+ (envelope-from <crosa@redhat.com>) id 1i5AaM-0001Wt-7T
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:19:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58224)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i5AQC-0004jq-Fj
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:08:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i5AaI-0001TK-2y
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:19:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9C4FB86E86F;
- Tue,  3 Sep 2019 15:08:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 99CD5308427D;
+ Tue,  3 Sep 2019 15:19:04 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-123-245.rdu2.redhat.com
  [10.10.123.245])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A6B35DC1B;
- Tue,  3 Sep 2019 15:08:26 +0000 (UTC)
-Date: Tue, 3 Sep 2019 11:08:24 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C6A4A60C5D;
+ Tue,  3 Sep 2019 15:19:00 +0000 (UTC)
+Date: Tue, 3 Sep 2019 11:18:59 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190903150824.GA14836@localhost.localdomain>
+Message-ID: <20190903151859.GB14836@localhost.localdomain>
 References: <20190829013125.GG16342@umbus.fritz.box>
  <20190829015117.GH16342@umbus.fritz.box>
  <20190829032746.GA488@localhost.localdomain>
  <24d0d5be-d206-33a0-cd8c-29825e2f8516@redhat.com>
- <ecfc63f3-d208-4a79-c26c-3d8fa031b3d3@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ecfc63f3-d208-4a79-c26c-3d8fa031b3d3@redhat.com>
+In-Reply-To: <24d0d5be-d206-33a0-cd8c-29825e2f8516@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 03 Sep 2019 15:08:39 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 03 Sep 2019 15:19:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -81,43 +80,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 29, 2019 at 11:46:15AM +0200, Philippe Mathieu-Daud=E9 wrote:
+On Thu, Aug 29, 2019 at 11:24:30AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Is there a way to check for this before submitting/merging patches?
 >=20
-> class avocado.utils.ssh.Session(address, credentials)
+> Some checkpatch.py lines that report:
 >=20
->   Parameters:=09
->=20
->     credentials (tuple)
->          username and path to a key for authentication purposes
->=20
-> The current test uses username + password.
-> Can we use this credentials with the Avocado module?
-> (The image used is prebuilt).
->=20
+>   The 'paramiko' module is not pure Python and can
+>   not be added in requirements.txt.
+>
 
-I'm working on adding password based authentication.  To keep the API
-the same, I'm thinking of checking if the second credential item is an
-existing file, if it is, assume one containing a key.  If not, assume
-it's a password.
+I dont think there is... at least, I can't think of one.  None of the
+PyPI classifiers[1] seems to cover the "pure Python .vs. compiled
+code" installation requirements.  AFAIK, this is usually buried in the
+setup.py code of each package, so it's not easy to inspect it.
 
-This should make the use simple in the case of keys:
+But, we can define "only Pure Python modules" as a policy, document it
+and hopefully flag it on code review.
 
-  with Session(('hostname', port),
-               ('username', '/path/to/key')) as session:
-      session.cmd('cmd')
+[1] https://pypi.org/classifiers/
 
-And passwords:
-
-  with Session(('hostname', port),
-               ('username', 'p@ssw0rD')) as session:
-      session.cmd('cmd')
-
-It's being tracked here:
-  https://trello.com/c/uetpIgML/1517-avocadoutilssh-implement-password-ba=
-sed-auth
-
-I'll try to have it in Avocado's 72.0 release due next week.
-
-Let me know how that sounds, and thanks for the feedback.
 - Cleber.
 
