@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF4EC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80226C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:23:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FBC923431
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A002207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:23:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MkB/qnYw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FBC923431
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ke3SGaZp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A002207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5BZb-0005w9-7r
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37201)
+	id 1i5Ba7-0006mB-Si
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:22:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37139)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BMt-00019W-UU
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:21 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5BMp-00012v-P4
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BMs-0003kO-Jv
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:19 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41993)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5BMo-0003hK-JA
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:15 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35890)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5BMs-0003jx-Ds
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:18 -0400
-Received: by mail-pf1-x442.google.com with SMTP id w22so2621911pfi.9
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:09:18 -0700 (PDT)
+ id 1i5BMm-0003fQ-Ir
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:12 -0400
+Received: by mail-pf1-x444.google.com with SMTP id y22so5434946pfr.3
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:09:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=QUELZke21EDjOzUmfr5OazuxTZ4XzsbULsMXR7XqLTU=;
- b=MkB/qnYwcNb1A3DbtngTrGDuMb1dg3P3HdBv5CiD9Y7Tm/AlDGmznXhyuhmEazheAo
- QDqg7UyjyLsCYMYHTH9iLl0RULQuFJrwbq1Vpgn1U6x7fRiAjC2IcEsGiwdxr5XWf33r
- P1OcQ7qwTMxSoRkigFmcxLfZ6aCiQ1/KenzYMjL0uZqa7onQWsdG25CzBKIfV6PaVJ4Q
- iO3W3MNaWyOr/Y1nGMHawxsU7fAmu+sWVX7PK7Moq9xq8L1zcjHsGen8xC805yCJbmI4
- 4KoJn2h6KrYMUxSmEmYpga5VboznpkB9piJHapJQqzm1HyPC7z+sinSlhGikABWWp+0/
- bbdA==
+ bh=yA2tCG225nmRvmvSYliNTgGqIpVngsbzb4LG/KhgDa8=;
+ b=ke3SGaZpp583Zt3nK84PL3TxAgya2rEu4q+EQN3uHtNLp3nRHwYz0e5gBtN8JkrY5Y
+ dMZrYv5i+NPUw/p9WEUT7OwPkdBqizYxvhR0nCFOKkLquI8AXUOGTLyOTbtouszyNJXz
+ wybF1c9vqP12tHK2EbnMzNVezx3l8kUQH1bhRuhxVJ5NBuWU8CLxJAv9kePoFdwcIP9L
+ 2Dth9InO/hDKuB7Wr6ayF3wmiCLqVGWaBD98d8azSODwtjxbNE7mLcWcBzTW/p7veSTT
+ Ue6YUeay/2IAgCWz3BNILjPlD2UtrRzL4mKCnMl3Z68Zo7U/sqJ8nr83gRX8lKMOAZaQ
+ XFcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=QUELZke21EDjOzUmfr5OazuxTZ4XzsbULsMXR7XqLTU=;
- b=aVc0zMZwIClVUhv1m78/Jf8/rNcJsm/Anr4jjXnUlF9yGaGzjq1aqgb6jFgGlTu34j
- grtPaYbyz+1d70Y7TAaJjEsNw0lZpdATD1VVtU3LOOhvjO1vOs36xSYhXHpGeUDj9zYE
- Z77U4YPlktC45xeWV1loLrpND+l2GTVrTa4iun4k+ElhmFIfsPylf+XHp67rtjTIcpY5
- zpUpbdSY3Eo0659NycTSoqCBJcdYMeXCa++UD6Mis9jc4Lf3GaTVqv+CWJSMmHhitBNQ
- K2wjjgziCUx5CSNDhESQwux9CVK1sTASnUAAAStsEUdM9Le4ei4EwLFKQSdN1PH4p/DQ
- u4iA==
-X-Gm-Message-State: APjAAAWxFyQ93KAPznTR31tRrt/SjOg48ecC6/yPkRl4MC0GMfqnZjyL
- ICwoI0jW/rzC4htca+Unp246tl604jw=
-X-Google-Smtp-Source: APXvYqwJFtriY3r6gB7GPZLtYnTLxLopIs1r/EgOY/Fpi5qbhek366rcT/+0YYlyAjeME0ttEDua0A==
-X-Received: by 2002:a17:90a:f98e:: with SMTP id
- cq14mr66101pjb.52.1567526957129; 
- Tue, 03 Sep 2019 09:09:17 -0700 (PDT)
+ bh=yA2tCG225nmRvmvSYliNTgGqIpVngsbzb4LG/KhgDa8=;
+ b=bdHBqEAJhMytkApa+MaK5CWfHODmn8mVYxwLkohpsSTBYZRdaLe8GmpauIC1j0tLic
+ 2Dmflq5lut8ZrKV0x+/t9NhVTnta5v0HKHYCvgctRsXAs72vL2MiJb+p8HmgvNnHEYDf
+ z8iqziSnIIF4xQyoGQfigV1sCxu0JxQrf+tykEVuQQqNm40b6a3Vo86rmWyMWejygbwJ
+ Z6aCfh0rH1j3BFocTxeFpEMitGMQIYKB/FyMOiq/ajAtMEgajKRcuRcVUBRRVXHmahC9
+ qpPYdozO7FKso9Qy+kBE2okj5ya8LvX1ExEX4M115fh/w/9AiazIuqJ8KdsE7VtIxmH4
+ a9eQ==
+X-Gm-Message-State: APjAAAVc7cXrMY2d9zvtFvq5noK352F75xg0qKcroE2ZBtI95ESIH/Zd
+ JYE6cukhTB4UjW7Zl4jJT98NhevWUw4=
+X-Google-Smtp-Source: APXvYqyzQ+/lOFYIz3GXRHTp/l6hQhEK4aFLpYbgwZghtaA6Wcro/fEAqbpYFd47ircC+8RQ1uNE/g==
+X-Received: by 2002:a63:f118:: with SMTP id f24mr31782828pgi.322.1567526949600; 
+ Tue, 03 Sep 2019 09:09:09 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id 127sm28089711pfy.56.2019.09.03.09.09.16
+ by smtp.gmail.com with ESMTPSA id 127sm28089711pfy.56.2019.09.03.09.09.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 09:09:16 -0700 (PDT)
+ Tue, 03 Sep 2019 09:09:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 09:08:35 -0700
-Message-Id: <20190903160858.5296-14-richard.henderson@linaro.org>
+Date: Tue,  3 Sep 2019 09:08:29 -0700
+Message-Id: <20190903160858.5296-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190903160858.5296-1-richard.henderson@linaro.org>
 References: <20190903160858.5296-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH 13/36] exec: Hard code size with MO_{8|16|32|64}
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH 07/36] hw/vfio: Access MemoryRegion with MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,106 +97,57 @@ Sender: "Qemu-devel"
 
 From: Tony Nguyen <tony.nguyen@bt.com>
 
-Temporarily no-op size_memop was introduced to aid the conversion of
-memory_region_dispatch_{read|write} operand "unsigned size" into
-"MemOp op".
+The memory_region_dispatch_{read|write} operand "unsigned size" is
+being converted into a "MemOp op".
 
-Now size_memop is implemented, again hard coded size but with
-MO_{8|16|32|64}. This is more expressive and avoids size_memop calls.
+Convert interfaces by using no-op size_memop.
+
+After all interfaces are converted, size_memop will be implemented
+and the memory_region_dispatch_{read|write} operand "unsigned size"
+will be converted into a "MemOp op".
+
+As size_memop is a no-op, this patch does not change any behaviour.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <99f69701cad294db638f84abebc58115e1b9de9a.1566466906.git.tony.nguyen@bt.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <e70ff5814ac3656974180db6375397c43b0bc8b8.1566466906.git.tony.nguyen@bt.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- memory_ldst.inc.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ hw/vfio/pci-quirks.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-index 1e8a2fc3ba..de658c40c4 100644
---- a/memory_ldst.inc.c
-+++ b/memory_ldst.inc.c
-@@ -38,7 +38,7 @@ static inline uint32_t glue(address_space_ldl_internal, SUFFIX)(ARG1_DECL,
-         release_lock |= prepare_mmio_access(mr);
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index f71aace156..a4e1d2abb5 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -11,6 +11,7 @@
+  */
  
-         /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, size_memop(4), attrs);
-+        r = memory_region_dispatch_read(mr, addr1, &val, MO_32, attrs);
- #if defined(TARGET_WORDS_BIGENDIAN)
-         if (endian == DEVICE_LITTLE_ENDIAN) {
-             val = bswap32(val);
-@@ -114,7 +114,7 @@ static inline uint64_t glue(address_space_ldq_internal, SUFFIX)(ARG1_DECL,
-         release_lock |= prepare_mmio_access(mr);
+ #include "qemu/osdep.h"
++#include "exec/memop.h"
+ #include "qemu/units.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+@@ -1073,7 +1074,7 @@ static void vfio_rtl8168_quirk_address_write(void *opaque, hwaddr addr,
  
-         /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, size_memop(8), attrs);
-+        r = memory_region_dispatch_read(mr, addr1, &val, MO_64, attrs);
- #if defined(TARGET_WORDS_BIGENDIAN)
-         if (endian == DEVICE_LITTLE_ENDIAN) {
-             val = bswap64(val);
-@@ -188,7 +188,7 @@ uint32_t glue(address_space_ldub, SUFFIX)(ARG1_DECL,
-         release_lock |= prepare_mmio_access(mr);
+                 /* Write to the proper guest MSI-X table instead */
+                 memory_region_dispatch_write(&vdev->pdev.msix_table_mmio,
+-                                             offset, val, size,
++                                             offset, val, size_memop(size),
+                                              MEMTXATTRS_UNSPECIFIED);
+             }
+             return; /* Do not write guest MSI-X data to hardware */
+@@ -1104,7 +1105,8 @@ static uint64_t vfio_rtl8168_quirk_data_read(void *opaque,
+     if (rtl->enabled && (vdev->pdev.cap_present & QEMU_PCI_CAP_MSIX)) {
+         hwaddr offset = rtl->addr & 0xfff;
+         memory_region_dispatch_read(&vdev->pdev.msix_table_mmio, offset,
+-                                    &data, size, MEMTXATTRS_UNSPECIFIED);
++                                    &data, size_memop(size),
++                                    MEMTXATTRS_UNSPECIFIED);
+         trace_vfio_quirk_rtl8168_msix_read(vdev->vbasedev.name, offset, data);
+     }
  
-         /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, size_memop(1), attrs);
-+        r = memory_region_dispatch_read(mr, addr1, &val, MO_8, attrs);
-     } else {
-         /* RAM case */
-         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -224,7 +224,7 @@ static inline uint32_t glue(address_space_lduw_internal, SUFFIX)(ARG1_DECL,
-         release_lock |= prepare_mmio_access(mr);
- 
-         /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, size_memop(2), attrs);
-+        r = memory_region_dispatch_read(mr, addr1, &val, MO_16, attrs);
- #if defined(TARGET_WORDS_BIGENDIAN)
-         if (endian == DEVICE_LITTLE_ENDIAN) {
-             val = bswap16(val);
-@@ -300,7 +300,7 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
-     if (l < 4 || !memory_access_is_direct(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
--        r = memory_region_dispatch_write(mr, addr1, val, size_memop(4), attrs);
-+        r = memory_region_dispatch_write(mr, addr1, val, MO_32, attrs);
-     } else {
-         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-         stl_p(ptr, val);
-@@ -346,7 +346,7 @@ static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
-             val = bswap32(val);
-         }
- #endif
--        r = memory_region_dispatch_write(mr, addr1, val, size_memop(4), attrs);
-+        r = memory_region_dispatch_write(mr, addr1, val, MO_32, attrs);
-     } else {
-         /* RAM case */
-         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -408,7 +408,7 @@ void glue(address_space_stb, SUFFIX)(ARG1_DECL,
-     mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (!memory_access_is_direct(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
--        r = memory_region_dispatch_write(mr, addr1, val, size_memop(1), attrs);
-+        r = memory_region_dispatch_write(mr, addr1, val, MO_8, attrs);
-     } else {
-         /* RAM case */
-         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -451,7 +451,7 @@ static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
-             val = bswap16(val);
-         }
- #endif
--        r = memory_region_dispatch_write(mr, addr1, val, size_memop(2), attrs);
-+        r = memory_region_dispatch_write(mr, addr1, val, MO_16, attrs);
-     } else {
-         /* RAM case */
-         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -524,7 +524,7 @@ static void glue(address_space_stq_internal, SUFFIX)(ARG1_DECL,
-             val = bswap64(val);
-         }
- #endif
--        r = memory_region_dispatch_write(mr, addr1, val, size_memop(8), attrs);
-+        r = memory_region_dispatch_write(mr, addr1, val, MO_64, attrs);
-     } else {
-         /* RAM case */
-         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
 -- 
 2.17.1
 
