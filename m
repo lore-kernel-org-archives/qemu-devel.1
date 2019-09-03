@@ -2,59 +2,89 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C263C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DBF6C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:58:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3C2B233A1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:57:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3C2B233A1
+	by mail.kernel.org (Postfix) with ESMTPS id 144B02341F
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 13:58:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 144B02341F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i59JD-0002jf-LZ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 09:57:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55896)
+	id 1i59KN-0004HL-Ey
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 09:58:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i58yp-0002QW-5V
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:36:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1i5906-0003lx-KH
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:37:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i58yn-0006QE-Lu
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:36:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47068)
+ (envelope-from <philmd@redhat.com>) id 1i5905-0007MP-Aw
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:37:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42730)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i58yl-0006Mg-7s; Tue, 03 Sep 2019 09:36:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i5905-0007M6-3U
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:37:37 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8EE597F76C;
- Tue,  3 Sep 2019 13:36:14 +0000 (UTC)
-Received: from localhost (ovpn-204-98.brq.redhat.com [10.40.204.98])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 286B019D7A;
- Tue,  3 Sep 2019 13:36:13 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue,  3 Sep 2019 15:35:45 +0200
-Message-Id: <20190903133553.6500-9-mreitz@redhat.com>
-In-Reply-To: <20190903133553.6500-1-mreitz@redhat.com>
-References: <20190903133553.6500-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 2FA672CE905
+ for <qemu-devel@nongnu.org>; Tue,  3 Sep 2019 13:37:36 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id r187so14291wme.0
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 06:37:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=DfP94qPAkTZ+gSxr/ofdQYrTK1iKl3TWo1iVnl2DcE8=;
+ b=ZCtPgPNkVJAFfibdygSmFD1pDI0RXoc5AxwRvF4JsByP8E8mTiw9wEYMbtkXmuqIAN
+ XSk52PYSBaiBN/890dj7EZUih8eBLmYOIBYFx42sDxvOGjcJWisp7AEESlQ7bfRX+YIl
+ hmRpr1ZhbdsQCOgJ6Gl2EIM6+VMg1pzkBpxAOvc+o59x2N3yopdj9EsWlTClSgAH5YhQ
+ YpvEXf0G87SXOwauYbBPI/ihyLMEjPNRVBz9rqjcX8OeR4sWnWqth2sI18w5Ozzdf/6n
+ Sz+f4vefx8UkoinVsng7SHT1oFRGZvUeeFJEL45v68AHP1SWr4P8M+li1gUx/UQRkAn3
+ Fh6Q==
+X-Gm-Message-State: APjAAAWnsAOmyLvhGgxqzuqj+/aoqq7oJzo4kDrrR2tYERxYWrsQX1Gg
+ wdiGUhdFiR4kHqEaEpfoPlIja66XZAm1BsOEHPBPY3p+zPKazlKa9T506TEOyHPxP6vXGTR0OWL
+ JPnJI2VAKz+6CTVE=
+X-Received: by 2002:a05:600c:2047:: with SMTP id p7mr58674wmg.13.1567517854725; 
+ Tue, 03 Sep 2019 06:37:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzBlASrUlwHxRdbphyyZAi8TlTDmrgr5y0HBIgXtq/deVYjRh4SGFbBENATlwT0OCEbgLHaLw==
+X-Received: by 2002:a05:600c:2047:: with SMTP id p7mr58653wmg.13.1567517854471; 
+ Tue, 03 Sep 2019 06:37:34 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id w13sm40406932wre.44.2019.09.03.06.37.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Sep 2019 06:37:33 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190903114729.3400-1-philmd@redhat.com>
+ <20190903114729.3400-3-philmd@redhat.com>
+ <a035e876-6f38-b80f-9a8f-1f88472fc7d7@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <3684dbbe-3aaf-6206-3943-fd883f8f7c2a@redhat.com>
+Date: Tue, 3 Sep 2019 15:37:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Tue, 03 Sep 2019 13:36:14 +0000 (UTC)
+In-Reply-To: <a035e876-6f38-b80f-9a8f-1f88472fc7d7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 08/16] vmdk: Reject invalid compressed writes
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] target/arm: Restrict pre-ARMv7 cpus
+ to TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,77 +96,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Compressed writes generally have to write full clusters, not just in
-theory but also in practice when it comes to vmdk's streamOptimized
-subformat.  It currently is just silently broken for writes with
-non-zero in-cluster offsets:
+On 9/3/19 2:10 PM, Thomas Huth wrote:
+> On 03/09/2019 13.47, Philippe Mathieu-Daud=C3=A9 wrote:
+>> KVM requires a cpu based on (at least) the ARMv7 architecture.
+>>
+>> The following CPUs are disabled:
+>>
+>> * ARMv4
+>>
+>>   - StrongARM (SA1100/1110)
+>>   - OMAP1510 (TI925T)
+>>
+>> * ARMv5
+>>
+>>   - ARM926
+>>   - ARM946
+>>   - ARM1026
+>>   - XScale (PXA250/255/260/261/262/270)
+>>
+>> * ARMv6
+>>
+>>   - ARM1136
+>>   - ARM1176
+>>   - ARM11MPCore
+>>   - Cortex-M0
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>> v2: fixed misplaced #endif (rth), list cpus
+>> ---
+>>  target/arm/cpu.c | 12 ++++++++++++
+>>  1 file changed, 12 insertions(+)
+>>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index 2399c14471..f69780147c 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -1678,6 +1678,8 @@ static ObjectClass *arm_cpu_class_by_name(const =
+char *cpu_model)
+>>  /* CPU models. These are not needed for the AArch64 linux-user build.=
+ */
+>>  #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+>> =20
+>> +#ifdef CONFIG_TCG
+>> +
+>>  static void arm926_initfn(Object *obj)
+>>  {
+>>      ARMCPU *cpu =3D ARM_CPU(obj);
+>> @@ -1900,6 +1902,8 @@ static void cortex_m0_initfn(Object *obj)
+>>      cpu->midr =3D 0x410cc200;
+>>  }
+>> =20
+>> +#endif
+>> +
+>>  static void cortex_m3_initfn(Object *obj)
+>>  {
+>>      ARMCPU *cpu =3D ARM_CPU(obj);
+>> @@ -2283,6 +2287,8 @@ static void cortex_a15_initfn(Object *obj)
+>>      define_arm_cp_regs(cpu, cortexa15_cp_reginfo);
+>>  }
+>> =20
+>> +#ifdef CONFIG_TCG
+>> +
+>>  static void ti925t_initfn(Object *obj)
+>>  {
+>>      ARMCPU *cpu =3D ARM_CPU(obj);
+>> @@ -2451,6 +2457,8 @@ static void pxa270c5_initfn(Object *obj)
+>>      cpu->reset_sctlr =3D 0x00000078;
+>>  }
+>> =20
+>> +#endif
+>> +
+>>  #ifndef TARGET_AARCH64
+>>  /* -cpu max: if KVM is enabled, like -cpu host (best possible with th=
+is host);
+>>   * otherwise, a CPU with as many features enabled as our emulation su=
+pports.
+>> @@ -2523,6 +2531,7 @@ struct ARMCPUInfo {
+>> =20
+>>  static const ARMCPUInfo arm_cpus[] =3D {
+>>  #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+>> +#ifdef CONFIG_TCG
+>>      { .name =3D "arm926",      .initfn =3D arm926_initfn },
+>>      { .name =3D "arm946",      .initfn =3D arm946_initfn },
+>>      { .name =3D "arm1026",     .initfn =3D arm1026_initfn },
+>> @@ -2536,6 +2545,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
+>>      { .name =3D "arm11mpcore", .initfn =3D arm11mpcore_initfn },
+>>      { .name =3D "cortex-m0",   .initfn =3D cortex_m0_initfn,
+>>                               .class_init =3D arm_v7m_class_init },
+>> +#endif
+>>      { .name =3D "cortex-m3",   .initfn =3D cortex_m3_initfn,
+>>                               .class_init =3D arm_v7m_class_init },
+>>      { .name =3D "cortex-m4",   .initfn =3D cortex_m4_initfn,
+>> @@ -2548,6 +2558,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
+>>      { .name =3D "cortex-a8",   .initfn =3D cortex_a8_initfn },
+>>      { .name =3D "cortex-a9",   .initfn =3D cortex_a9_initfn },
+>>      { .name =3D "cortex-a15",  .initfn =3D cortex_a15_initfn },
+>> +#ifdef CONFIG_TCG
+>>      { .name =3D "ti925t",      .initfn =3D ti925t_initfn },
+>>      { .name =3D "sa1100",      .initfn =3D sa1100_initfn },
+>>      { .name =3D "sa1110",      .initfn =3D sa1110_initfn },
+>> @@ -2564,6 +2575,7 @@ static const ARMCPUInfo arm_cpus[] =3D {
+>>      { .name =3D "pxa270-b1",   .initfn =3D pxa270b1_initfn },
+>>      { .name =3D "pxa270-c0",   .initfn =3D pxa270c0_initfn },
+>>      { .name =3D "pxa270-c5",   .initfn =3D pxa270c5_initfn },
+>> +#endif
+>>  #ifndef TARGET_AARCH64
+>>      { .name =3D "max",         .initfn =3D arm_max_initfn },
+>>  #endif
+>>
+>=20
+> All that #ifdeffery is a little bit ugly. I wonder whether we could
+> solve this by moving the CPU registrations to separate files which then
+> only get compiled if the corresponding CONFIG_ARM_Vx switch is set.
 
-$ qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 1M
-$ qemu-io -c 'write 4k 4k' -c 'read 4k 4k' foo.vmdk
-wrote 4096/4096 bytes at offset 4096
-4 KiB, 1 ops; 00.01 sec (443.724 KiB/sec and 110.9309 ops/sec)
-read failed: Invalid argument
+I tried splitting arm_cpus[] and move the ifdef in
+arm_cpu_register_types(), but the resulting diff is much bigger and it
+only reduces from 4 '#ifdef CONFIG_TCG' to 2...
 
-(The technical reason is that vmdk_write_extent() just writes the
-incomplete compressed data actually to offset 4k.  When reading the
-data, vmdk_read_extent() looks at offset 0 and finds the compressed data
-size to be 0, because that is what it reads from there.  This yields an
-error.)
+I'll see what thinks Peter first.
 
-For incomplete writes with zero in-cluster offsets, the error path when
-reading the rest of the cluster is a bit different, but the result is
-the same:
+> That reminds me of a patch series of mine where I tried to make the cod=
+e
+> compilable without CONFIG_ARM_V7M ... unfortunately, I never found
+> enough spare time to finish and publish it... I'll have a try to see
+> whether I can rebase it and send it as an RFC or so.
 
-$ qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 1M
-$ qemu-io -c 'write 0k 4k' -c 'read 4k 4k' foo.vmdk
-wrote 4096/4096 bytes at offset 0
-4 KiB, 1 ops; 00.01 sec (362.641 KiB/sec and 90.6603 ops/sec)
-read failed: Invalid argument
+Well, this is the same goal of this series... So regarding on Peter's
+comments I might wait on your work.
 
-(Here, vmdk_read_extent() finds the data and then sees that the
-uncompressed data is short.)
+Regards,
 
-It is better to reject invalid writes than to make the user believe they
-might have succeeded and then fail when trying to read it back.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190815153638.4600-5-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/vmdk.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/block/vmdk.c b/block/vmdk.c
-index a7f82e665e..fed3b50c8a 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1734,6 +1734,16 @@ static int vmdk_write_extent(VmdkExtent *extent, i=
-nt64_t cluster_offset,
-     if (extent->compressed) {
-         void *compressed_data;
-=20
-+        /* Only whole clusters */
-+        if (offset_in_cluster ||
-+            n_bytes > (extent->cluster_sectors * SECTOR_SIZE) ||
-+            (n_bytes < (extent->cluster_sectors * SECTOR_SIZE) &&
-+             offset + n_bytes !=3D extent->end_sector * SECTOR_SIZE))
-+        {
-+            ret =3D -EINVAL;
-+            goto out;
-+        }
-+
-         if (!extent->has_marker) {
-             ret =3D -EINVAL;
-             goto out;
---=20
-2.21.0
-
+Phil.
 
