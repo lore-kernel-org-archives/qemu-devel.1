@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFCBC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C163C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:49:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B08A2077B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 377A023431
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:49:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vg+NK7CX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B08A2077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AAuRoDL5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 377A023431
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5B1k-0003ia-Ha
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:47:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59269)
+	id 1i5B3b-00058D-Tp
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:49:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59311)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArU-0002v5-K7
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArY-00031y-Im
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArT-0005zT-Jc
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:52 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:33325)
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArW-00061W-El
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:56 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:53094)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5ArT-0005yw-DG
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:51 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id r17so322370wme.0
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:51 -0700 (PDT)
+ id 1i5ArW-000610-8C
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:54 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id t17so18753733wmi.2
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=SKHA4RaCRlFvjpRvwJ6bGEV5aXzSjabMiK2LHrB3a8I=;
- b=Vg+NK7CXE0Najuibkw2vGpMbnV2Q2IOSwJUKikPvjaoTi4beCxO7gD6/2Tb/aI/Ty6
- OI9W0TJzhsNMF0GDURLkCY4S+XhEBXYbJGoxd7tyghc5LxTiAoJoJwZrGZX7yjtI5WTN
- H9vcAdUwsNe6uMWASS8D0giOtWW9YDT40GaDAe4j1lA1CjaNnxzs2yMO10RS5MCS/4DY
- /beuNj/b3Xnh386DnXJWQhMeGN6i3eMqE3LAPY6tqPjOBALSA9EKkIHU0BdQAyoKbNi1
- bLbtgOAbNfDfhYrIoPxKHq/mz7FAcq52dxNuqiiwDOJCTyFPIow0u6eacFSYYk/PCdIK
- cfOg==
+ bh=8/T9mmX0W7AG1ACKL4IcYUCZwX8sRH9ZWIp1nKl2B4A=;
+ b=AAuRoDL5j9IeKmGoUhmWSkrEBwvKGYGZmNtP9QXU8QRBQUgG6gJbMWvUNyTs2H7k2w
+ xEV3vizI4J5IvwXnHZ2sStnmedl1bfca6A+bRqefbt3hG1BLw/S5nWyZ7wO0RGJno5d7
+ 5ZiKFECXa3cBp+reT0uNLDDdKAFhCAVbznL/jWhaXQBuz+gRnpP3APpQ2fZIhycx5CIS
+ bH8hgXx/vJJi49f1ShLcE5FBxdvKvDQsHOL0W7Hlbs1ofU6hMJnrlUxAJ2u8jfg0GIp1
+ Q3ZDQAEq1/LttU3zXDPNzxqCJwIp63OxUTnEAMeYRwlAPyc1sRQz++YoT1cFs0GmoWM0
+ gPBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=SKHA4RaCRlFvjpRvwJ6bGEV5aXzSjabMiK2LHrB3a8I=;
- b=A2vXdJqW9vsvoKEpHDhf9o7ri/DMELe9eRo1fDHF2Q/aAAo482twLDmshw57QymtH/
- khxP7PQmbaHP3pr+WqpXZlHzPIml/LGHwGAqYLRxhs8xULBY9cZ2gauku6RvpThkKivS
- HTHAHQgCJHc3mFfSxHMZNOCy8gYETPco8QSxr4O0dbh5SqfgWokyw87O52GHA8NxWso7
- a6QnZ67r7vvrZwV+ld/ifF+hUCVMlAykDy92J4c6wEsFFSb/rJLN48chxapyljrcZcg8
- SRCAKNuUBJfoYBsJocWUHNNyvjJpQSOijkDi+lMZsIWD2LXH4JyH2UUfdpXLB9UF4gha
- EFug==
-X-Gm-Message-State: APjAAAXnbSB05sHPvmuZzXP+E8xRqa7WaigsRzMDtojSgyp/OBgx9ehS
- OZmCcrqA+JwBAUa33vYh/TuOU72PqxCV3Q==
-X-Google-Smtp-Source: APXvYqxvDAHrZPZqzgcSX8p2xtoAlbUdIWLpqc7FqD2vFnfASy9MmsD+gGD878bOau5Frg2xAXF+4w==
-X-Received: by 2002:a1c:7a14:: with SMTP id v20mr840856wmc.75.1567525010167;
- Tue, 03 Sep 2019 08:36:50 -0700 (PDT)
+ bh=8/T9mmX0W7AG1ACKL4IcYUCZwX8sRH9ZWIp1nKl2B4A=;
+ b=ixboqM44FQsMjTIhrhpHOnSfL/cAXmbbePiPRFcUNNaA2c0O2EJHbQufEkLL9PQdBA
+ L+jYcWheA9KLBlnDDgBudR8SVTOGWzrdWN9xC9aDPpNyBfyeu8cbx5fEIOBZUydILBrv
+ u43+hpRcSQO8S4t3CKjyiuaIh5/aBssht/Go70DPCtChIwe0TDmL3ghOv2Nrnm1L+el0
+ fiKI6PILCCXAKCp4P0al/ZY/7iUy16eTnioEi6vCHmC9KAgUWIgc9BCmARYKcS1HSE/A
+ TZE9viSNd0K1WsCtYoTfdscoCR5XB5mkWFR99e6Sg8453NHf3BrNhhD0XQSKuSeKwOrP
+ +MQg==
+X-Gm-Message-State: APjAAAUprlKRcfcEf4VYAPrFGqtAieJ8NrWtEhy2litQza35X1JlDrIz
+ g07WM89/a+XxG8WZqM43a8dH4QOX3zP7TA==
+X-Google-Smtp-Source: APXvYqzudDbzpjH8QAPCM+sKkDIKxsvcQU5S602XH/po1ze53H7lxE2O0jukDpSEqU4iS0YIvXrB9A==
+X-Received: by 2002:a1c:f009:: with SMTP id a9mr760170wmb.151.1567525012984;
+ Tue, 03 Sep 2019 08:36:52 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.49
+ by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.51
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 08:36:49 -0700 (PDT)
+ Tue, 03 Sep 2019 08:36:52 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:36:24 +0100
-Message-Id: <20190903153633.6651-13-peter.maydell@linaro.org>
+Date: Tue,  3 Sep 2019 16:36:27 +0100
+Message-Id: <20190903153633.6651-16-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903153633.6651-1-peter.maydell@linaro.org>
 References: <20190903153633.6651-1-peter.maydell@linaro.org>
@@ -81,9 +81,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32f
-Subject: [Qemu-devel] [PULL 12/21] hw/arm: Use sysbus_init_child_obj for
- correct reference counting
+X-Received-From: 2a00:1450:4864:20::32e
+Subject: [Qemu-devel] [PULL 15/21] hw/net/xilinx_axi: Use
+ object_initialize_child for correct ref. counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,39 +101,54 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Both object_initialize() and qdev_set_parent_bus() increase the
-reference counter of the new object, so one of the references has
-to be dropped afterwards to get the reference counting right.
-In machine model code this refcount leak is not particularly
-problematic because (unlike devices) machines will never be
-created on demand via QMP, and they are never destroyed.
-But in any case let's use the new sysbus_init_child_obj() instead
-to get the reference counting here right.
+As explained in commit aff39be0ed97:
 
+  Both functions, object_initialize() and object_property_add_child()
+  increase the reference counter of the new object, so one of the
+  references has to be dropped afterwards to get the reference
+  counting right. Otherwise the child object will not be properly
+  cleaned up when the parent gets destroyed.
+  Thus let's use now object_initialize_child() instead to get the
+  reference counting here right.
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190823143249.8096-4-philmd@redhat.com
-[PMM: rewrote commit message]
+Message-id: 20190823143249.8096-7-philmd@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/exynos4_boards.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/net/xilinx_axienet.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index f69358a5ba8..2781d8bd419 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -131,8 +131,8 @@ exynos4_boards_init_common(MachineState *machine,
-     exynos4_boards_init_ram(s, get_system_memory(),
-                             exynos4_board_ram_size[board_type]);
+diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+index d8716a1f737..2c8c065401a 100644
+--- a/hw/net/xilinx_axienet.c
++++ b/hw/net/xilinx_axienet.c
+@@ -994,15 +994,14 @@ static void xilinx_enet_init(Object *obj)
+     XilinxAXIEnet *s = XILINX_AXI_ENET(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
  
--    object_initialize(&s->soc, sizeof(s->soc), TYPE_EXYNOS4210_SOC);
--    qdev_set_parent_bus(DEVICE(&s->soc), sysbus_get_default());
-+    sysbus_init_child_obj(OBJECT(machine), "soc",
-+                          &s->soc, sizeof(s->soc), TYPE_EXYNOS4210_SOC);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                              &error_fatal);
+-    object_initialize(&s->rx_data_dev, sizeof(s->rx_data_dev),
+-                      TYPE_XILINX_AXI_ENET_DATA_STREAM);
+-    object_initialize(&s->rx_control_dev, sizeof(s->rx_control_dev),
+-                      TYPE_XILINX_AXI_ENET_CONTROL_STREAM);
+-    object_property_add_child(OBJECT(s), "axistream-connected-target",
+-                              (Object *)&s->rx_data_dev, &error_abort);
+-    object_property_add_child(OBJECT(s), "axistream-control-connected-target",
+-                              (Object *)&s->rx_control_dev, &error_abort);
+-
++    object_initialize_child(OBJECT(s), "axistream-connected-target",
++                            &s->rx_data_dev, sizeof(s->rx_data_dev),
++                            TYPE_XILINX_AXI_ENET_DATA_STREAM, &error_abort,
++                            NULL);
++    object_initialize_child(OBJECT(s), "axistream-control-connected-target",
++                            &s->rx_control_dev, sizeof(s->rx_control_dev),
++                            TYPE_XILINX_AXI_ENET_CONTROL_STREAM, &error_abort,
++                            NULL);
+     sysbus_init_irq(sbd, &s->irq);
  
+     memory_region_init_io(&s->iomem, OBJECT(s), &enet_ops, s, "enet", 0x40000);
 -- 
 2.20.1
 
