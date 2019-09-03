@@ -2,112 +2,85 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B544C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DEFC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:28:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0002B22CF8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:27:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0002B22CF8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F6AD22CF8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:28:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="YGP6XdIy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F6AD22CF8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i555Y-0004pB-6U
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 05:27:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33786)
+	id 1i557Q-0005st-BV
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 05:28:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33559)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i550a-0000jE-D2
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:21:53 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1i54zc-00088z-2i
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i550X-0003CS-ON
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:21:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53534)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i550X-0003Bj-H2
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:21:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5561B877A66;
- Tue,  3 Sep 2019 09:21:48 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-51.ams2.redhat.com [10.36.117.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 57F7C5F7E4;
- Tue,  3 Sep 2019 09:21:46 +0000 (UTC)
-To: qemu-devel@nongnu.org
-References: <20190709073222.26370-1-huth@tuxfamily.org>
- <20190709073222.26370-3-huth@tuxfamily.org>
- <CAFEAcA9uech2_Uc1XnxSm8Dk2rEAuyvxtnH74e_oCgw7ovVCaw@mail.gmail.com>
- <20190831071857.5e3f53dc@thl530.multi.box>
- <CAFEAcA-EAZUL48-WVfrHLb6ONgW+VbV8RtppM_nAAHua+rH36g@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <6c78f2dd-69f3-1f6e-bb88-6e83d78f2c36@redhat.com>
-Date: Tue, 3 Sep 2019 11:21:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <lukasstraub2@web.de>) id 1i54zX-0002S5-Je
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:20:51 -0400
+Received: from mout.web.de ([212.227.15.14]:35421)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1i54zX-0002Qe-7o
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:20:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1567502430;
+ bh=fyxFW0jLN+bdzNxHGPogdBIgIPlW9CiQAqsYYHE4l04=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=YGP6XdIyXYRMvlYOqKlSQc0BNCkYQM8oKX3GrnurXm8xsRpDC3F/Ha9+iAv0f4qL3
+ FeLSwUoSsgcJYYPZ6OUhYkHzlsjhVxe4wYvjNp7jl3399wKqVclgXUT5ZwOavsTDz9
+ dDufNJdwX4zn2TUROVWjrv+aldGNLaEMxFPe2U8Y=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.78]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MfYTr-1hpT6b04ol-00P9Gd; Tue, 03
+ Sep 2019 11:20:30 +0200
+Date: Tue, 3 Sep 2019 11:20:29 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <b9383e7b7697ec1f1eb963449d14f2e44724b907.1567500411.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1567500411.git.lukasstraub2@web.de>
+References: <cover.1567500411.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-EAZUL48-WVfrHLb6ONgW+VbV8RtppM_nAAHua+rH36g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Tue, 03 Sep 2019 09:21:48 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:HQvkqKwr0+u8BVTtVfw182Wcoesbz4BDN99+KV9I8lVtiWk7G5e
+ qErAIk4TL+Oj4gCwT3U0b5XGA7d0hUGLgURQueQN5o5iEEDQNJ3mfSUi+VfQrpyZduO/DYx
+ anD1ZEEWGE/HmioJqR3sM5qB2HGZPWRlGA9bQWL5RyFwrhu3SQDWwg7gFCwf3F40h1nA9nT
+ YllVMRT0pw6EjhDthB66Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:W9NIws5o3KI=:S9EnPoIpybIiD5SllAhvy6
+ BeiBn2eULnHlFSH/vEfdSmWd4dJF0vL0cGb5eGdHI1e/z4YG0sTaQzrcZrxLL3VtmUtyJTtij
+ WJ96nLxvV2HVDIaF/T+xgbvsRuoruvhoWqiex1xiua7llnNTYn2TYXm5JCbxIMMTkYLzwuv4b
+ HfLPvmeG0Or1g3GY9nPGpODfPlNtPN5o9pOp1l/Vmm97IbMSOjRA2G6/THly1Wrl6bpVduPTO
+ FI6umKACgid9TGH4cjpmflugTnrurS8XdZd5ajOgWptHKSO0tJZIxK4rD6P9bqEDJKyp63I/J
+ P9kKVn1kGZXfuC07ntTcj+QUmUCqQpQlzEGrPGkk2nNJKMUY3GCj+Ip5fM6vCxvBbZSjL/cag
+ CSS3AVDzNhiFxT1Z0nWwDDlcqgg8JThDSAN34AWR0JfCETgacnzmrEroNi4ee6BfNKfoPHr8P
+ pdZAQ26bRjR1J4FEx1JfumUpsmp6OIohpZuLvH77TyfA8YdiM+EnjEfhJ1ycjExzj+SAiO9rB
+ BtI5gtm6MilTmbou3l25UBRqTBU0b0Q9fWY3xiKaEwpEtPeHKoCg8534JqVW6MzNBXFsW5Pkr
+ NlzMrxa6/sSg1ElvJB/EXABYSkhi4DGm17ZSMtQPWWhaK6T5adK1OeDs3Awx0D6d1HDDxHPqL
+ iaL2IayBCvC1GJougZhJyKsN1QOG0FI+ZfmzMYV3mcpPcHMT6URSGKnuzY6Wdxwp7aTGKzxVq
+ j6/qAdjSamyTLOdzIEmdVUujWy9KYlA96akoJ0pob6kSg9aTU2aD60gHPMqyp64olXqDnXfrf
+ /+vVHG69IL4OBjvS7aTin6TsqpHPhacnwUyPxnozOlnOX/pIB34i5algcOItaG1O31+wdp/qt
+ 6tw/GPXiD0QY8AycJWvAERckyaY8eMxbnysDKGVWawT/CyqenjnbPAmtejPrNyCOn0Q4NSifJ
+ KSNuDJWrRtiEsSs6a014dIw+cxcZJiWT7RbQO5tC3U3hX+uOPM45zX1d0VhUVDKQ6G/MN/sMO
+ WoKgG1rTVKl4EiE1u55yR2enFFe5W10YfoF8vwdAhWPhhvKmQirXauSxnqYyAVpzOP2+YNxtg
+ I8orKupUbq+gNtIQrovP0G5OLCKuxJ7/b09xGy67Zc5ebmwgzOLK5yRyzwWVOPCYcY9mJxT+g
+ 65ehy42odFUAbp5BE+NL48m41ozkyuoDi3R4F7gygdR1XoYQ==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 2/6] m68k: Add NeXTcube keyboard device
+X-Received-From: 212.227.15.14
+Subject: [Qemu-devel] [PATCH v3 2/4] tests/test-replication.c: Add test for
+ ignoring requests after failover
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,55 +92,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: kwolf@redhat.com, Wen Congyang <wencongyang2@huawei.com>,
+ Jason Wang <jasowang@redhat.com>, mreitz@redhat.com,
+ Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/09/2019 11.12, Peter Maydell wrote:
-> On Sat, 31 Aug 2019 at 06:19, Thomas Huth <huth@tuxfamily.org> wrote:
->>
->> Am Tue, 13 Aug 2019 11:16:44 +0100
->> schrieb Peter Maydell <peter.maydell@linaro.org>:
->>
->>> On Tue, 9 Jul 2019 at 08:35, Thomas Huth <huth@tuxfamily.org> wrote:
->>>>
->>>> It is likely still quite incomplete (e.g. mouse and interrupts are
->>>> not implemented yet), but it is good enough for keyboard input at
->>>> the firmware monitor.
->>>> This code has been taken from Bryce Lanham's GSoC 2011 NeXT branch
->>>> at
->>>>
->>>>  https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-kbd.c
->>>>
->>>> and altered to fit the latest interface of the current QEMU (e.g.
->>>> to use memory_region_init_io() instead of
->>>> cpu_register_physical_memory()).
->>>>
->>>> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
->>>> +static void nextkbd_class_init(ObjectClass *oc, void *data)
->>>> +{
->>>> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
->>>> +
->>>> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->>>> +    dc->realize =3D nextkbd_realize;
->>>> +    dc->reset =3D nextkbd_reset;
->>>> +}
->>>
->>> This one definitely needs migration state...
->>
->> m68k machines are currently unmigratable - see vmstate_m68k_cpu in
->> target/m68k/cpu.c. So I assume it's currently enough if I add a
->> ".unmigratable =3D 1" here, too?
->=20
-> Well, if you insist I guess. But personally I find it's just
-> as easy to simply implement migration state.
+This simulates the case that happens when we resume COLO after failover.
 
-My main concern is testing - if there is no way to test it, I can only
-implement this in a hit-or-miss style, which I really don't like (though
-it might be easy for such a simple device). So for the time being,
-marking it with ".unmigratable =3D 1" and a proper TODO comments sounds
-like the best solution to me.
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+=2D--
+ tests/test-replication.c | 52 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
- Thomas
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index f085d1993a..4502a6f816 100644
+=2D-- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -489,6 +489,56 @@ static void test_secondary_stop(void)
+     teardown_secondary();
+ }
+
++static void test_secondary_failover_then_ignore_requests(void)
++{
++    BlockBackend *top_blk, *local_blk;
++    Error *local_err =3D NULL;
++
++    top_blk =3D start_secondary();
++    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
++    g_assert(!local_err);
++
++    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
++    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
++    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
++
++    /* replication will backup s_local_disk to s_hidden_disk */
++    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);
++
++    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
++    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
++
++    /* do failover (active commit) */
++    replication_stop_all( true, &local_err);
++    g_assert(!local_err);
++
++    /* it should ignore all requests from now on */
++
++    /* start after failover */
++    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
++    g_assert(!local_err);
++
++    /* checkpoint */
++    replication_do_checkpoint_all(&local_err);
++    g_assert(!local_err);
++
++    /* stop */
++    replication_stop_all( true, &local_err);
++    g_assert(!local_err);
++
++    /* read from s_local_disk (0, IMG_SIZE / 2) */
++    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
++                  0, IMG_SIZE / 2, false);
++
++
++    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
++    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);
++
++    teardown_secondary();
++}
++
+ static void test_secondary_do_checkpoint(void)
+ {
+     BlockBackend *top_blk, *local_blk;
+@@ -584,6 +634,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/replication/secondary/write", test_secondary_write)=
+;
+     g_test_add_func("/replication/secondary/start", test_secondary_start)=
+;
+     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
++    g_test_add_func("/replication/secondary/failover_then_ignore_requests=
+",
++                    test_secondary_failover_then_ignore_requests);
+     g_test_add_func("/replication/secondary/do_checkpoint",
+                     test_secondary_do_checkpoint);
+     g_test_add_func("/replication/secondary/get_error_all",
+=2D-
+2.20.1
+
 
