@@ -8,81 +8,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1799C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 270EBC41514
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD11C233A1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:01:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3E132341F
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KTH5il9s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD11C233A1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6e6daJV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E132341F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i59NM-0008M9-2j
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 10:01:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33758)
+	id 1i59O1-0000hV-ML
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 10:02:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33803)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1i59JF-0003LT-AX
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:27 -0400
+ (envelope-from <danielhb413@gmail.com>) id 1i59JK-0003Nm-GV
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1i59JC-0005ii-7I
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:25 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:43717)
+ (envelope-from <danielhb413@gmail.com>) id 1i59JJ-0005mA-1C
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:30 -0400
+Received: from mail-qt1-x836.google.com ([2607:f8b0:4864:20::836]:43315)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1i59JB-0005i9-F5
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:22 -0400
-Received: by mail-qk1-x743.google.com with SMTP id m2so15971093qkd.10
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 06:57:21 -0700 (PDT)
+ id 1i59JF-0005kg-88
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:27 -0400
+Received: by mail-qt1-x836.google.com with SMTP id l22so7767263qtp.10
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 06:57:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WpmpFg50u8+Zk9hRBw0p/auazvjnZ6BkfdcA2q6nNXs=;
- b=KTH5il9sfnCYCI/v6QvRyUGTSPP39h2MqaArraeRgdX8GsLGYaceGzZv4iTdJbglFa
- Hm6V3Yvl5buwprF76WMcrWHxRXuvmTvgfSVwhOsy20+q/1DsCX3GnwWyrs+Wdi0ozUj+
- EUjDtPZPPNbU6cEM8kgj6k3VAc67Wg3IuUQd2BsajASHioOl17hJ6yPrpKB0DE9sBpdR
- 1JZOhqGYcJ0PKFUeMDOPJIXE6DJY16DuL856Q9DT3VoRJ82O3Cm6RJJA13wX2BXbNgwK
- HKbyMm1hYit9IeFRJ0ThvzJCvCgLNYXfu5SdkOdV2MXnyrcIE+SyY55ULZ3mbYe5zli4
- pgZw==
+ bh=3vBr1n1UsZgU8PgLgokhaXnjo/VGwWwRQ5hmljwJgVU=;
+ b=Y6e6daJV9/1SfIAKAh6wC8Ew44SuR4x4sVPSyc1oyjfnPOXEbPpQYh6zhck3LCzwpr
+ p/cTN2RXOe2Yr0mus4bA3xXKH+6eXU9l8uNJpw37V3aiyuh9uQ/979fy30spg1mGTAyK
+ U3Ub3ZHx/2f95RLOP/1l4KA+hD9sRn4hEutd246RYOI7KCp92X0y6qkxDtFcGo6nPr/g
+ 6bskxi5ZAhB5eF188URXfRQAJyhbQMKbY2MVHxtNmPdDQwaG3wmUgX0Kn7OyWV6daYc7
+ QiQSgpifsR9ofRrIXgZgN3jaZILdJ7Rzy+shim3fafqVTzTGgKifdQLeeQNyqq+4m0x8
+ iarA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WpmpFg50u8+Zk9hRBw0p/auazvjnZ6BkfdcA2q6nNXs=;
- b=Phgdw0pJbe8LNyXeoZsLelPFyXV+s18s3T5RqJoIm4WcGhZsPp3lGrEUsH74ETnqln
- Z6oRVqtOdBsB2RMaciKXooAsgsduLf5jFXmMxqCdS2RAeuWnD6Akt6LC+XCNpPBsZHQj
- haqRPhhUERWfXWWLrGNrBhvcsH39sO8ofbRVtutKarh9zuGVV35JFUj8uP0VAbuWOy97
- 9wMihvEj6NsYtN6I8jEgY7S6RvaqP/G8PmmCY5elO3bMmx/WW0m8gH1coinfqvPOxI5p
- fraVS82r0px4/Rjv/oa980cgu7QZ/GqSXwdD1aWQ3BeCg1V57hEv7yqKSsEkOGvCZQ+v
- 1dkw==
-X-Gm-Message-State: APjAAAVCn3JibCeWfroalPRZvAAmpD7GY7wm0ohIgsh2RgFBy+LPaqWV
- 17q3RkXMY67402lQxyt0Vj+r98uE9kc=
-X-Google-Smtp-Source: APXvYqwF4o5v7gBhCtkLCSn944+5ze06oG4fhar0GoUi/8wqReYT1dEobO26gDsZ8tg+Z+RBZeTMmA==
-X-Received: by 2002:a37:9c81:: with SMTP id f123mr17201440qke.66.1567519040813; 
- Tue, 03 Sep 2019 06:57:20 -0700 (PDT)
+ bh=3vBr1n1UsZgU8PgLgokhaXnjo/VGwWwRQ5hmljwJgVU=;
+ b=e8K4Hu0gkA6Y9j3/KMVMvqtDJMEyIRGkGf7cKQJQbuv5h3r7Z37hzgdRlFSgHL5p78
+ A2JYdfvdfpLpl8/4Eiw2YI7t1oJ2J53cis5z0jveUSIViI8wsWClevyVnzdFTywBBew6
+ lNBTIar30J9j55EvpCNrIDgBD3CGpvFmXMHJkf+i+x8QExZLEQV4BHIi/qnIJsLBIwRh
+ i2htPpvTGv9+t3XRzAbRTfMZQGXNUjqPGK7G+z6OO3CXOg6tO2baUZGJeUerkq0bvTMT
+ dgrYxWNfVDD6uz2epzi31/esLllkz6azR15rKlO+W4hljrEVD+ymChT7R9DsX/buJgl8
+ +yrA==
+X-Gm-Message-State: APjAAAUVjIKXkOLA9V+Ll9f/jsJTm+cYsiOYKBHrbmWEHRLfxTleM49w
+ L7e3uBI5tNeQ5TR8zdApOtSjmXvE69E=
+X-Google-Smtp-Source: APXvYqwXqOzBobl+pwRFr7qAODjHZA419uA0lOXicNZIejbA58jkHlKMMTwpaNSzT2Ce59gT/8MKbw==
+X-Received: by 2002:ac8:6ce:: with SMTP id j14mr33704693qth.373.1567519044204; 
+ Tue, 03 Sep 2019 06:57:24 -0700 (PDT)
 Received: from rekt.ibmuc.com ([2804:431:c7c7:5c9f:9471:e230:52b:8c93])
- by smtp.gmail.com with ESMTPSA id k49sm9211158qtc.9.2019.09.03.06.57.18
+ by smtp.gmail.com with ESMTPSA id k49sm9211158qtc.9.2019.09.03.06.57.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 06:57:20 -0700 (PDT)
+ Tue, 03 Sep 2019 06:57:23 -0700 (PDT)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 10:57:06 -0300
-Message-Id: <20190903135708.21624-3-danielhb413@gmail.com>
+Date: Tue,  3 Sep 2019 10:57:08 -0300
+Message-Id: <20190903135708.21624-5-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190903135708.21624-1-danielhb413@gmail.com>
 References: <20190903135708.21624-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::743
-Subject: [Qemu-devel] [PATCH v7 2/4] block.c: adding bdrv_delete_file
+X-Received-From: 2607:f8b0:4864:20::836
+Subject: [Qemu-devel] [PATCH v7 4/4] qemu-iotests: adding LUKS cleanup for
+ non-UTF8 secret error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,125 +94,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>, jsnow@redhat.com
+Cc: kwolf@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using the new 'bdrv_co_delete_file' interface, bdrv_delete_file
-can be used in a way similar of the existing bdrv_create_file to
-to clean up a created file.
+This patch adds a new test file, 257, to exercise the case where
+qemu-img fails to complete for the LUKS format when a non-UTF8
+secret is used.
 
-The logic is also similar to what is already done in bdrv_create_file:
-a qemu_coroutine is created if needed, a specialized function
-bdrv_delete_co_entry is used to call the bdrv_co_delete_file
-co-routine of the driver, if the driver implements it.
-
-Suggested-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- block.c               | 73 +++++++++++++++++++++++++++++++++++++++++++
- include/block/block.h |  1 +
- 2 files changed, 74 insertions(+)
+ tests/qemu-iotests/259     | 67 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/259.out | 11 +++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 79 insertions(+)
+ create mode 100755 tests/qemu-iotests/259
+ create mode 100644 tests/qemu-iotests/259.out
 
-diff --git a/block.c b/block.c
-index 874a29a983..250c69ca7a 100644
---- a/block.c
-+++ b/block.c
-@@ -548,6 +548,79 @@ int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp)
-     return ret;
- }
- 
-+typedef struct DeleteCo {
-+    BlockDriver *drv;
-+    BlockDriverState *bs;
-+    int ret;
-+    Error *err;
-+} DeleteCo;
+diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
+new file mode 100755
+index 0000000000..cb362598b4
+--- /dev/null
++++ b/tests/qemu-iotests/259
+@@ -0,0 +1,67 @@
++#!/usr/bin/env bash
++#
++# Test qemu-img file cleanup for LUKS when using a non-UTF8 secret
++#
++# Copyright (C) 2019, IBM Corporation.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+static void coroutine_fn bdrv_delete_co_entry(void *opaque)
++seq=`basename $0`
++echo "QA output created by $seq"
++
++status=1	# failure is the default!
++TEST_IMAGE_FILE='vol.img'
++
++_cleanup()
 +{
-+    Error *local_err = NULL;
-+    DeleteCo *dco = opaque;
-+    BlockDriver *drv = dco->bs->drv;
-+
-+    assert(dco->bs);
-+
-+    dco->ret = drv->bdrv_co_delete_file(dco->bs, &local_err);
-+    error_propagate(&dco->err, local_err);
++  _cleanup_test_img
++  rm non_utf8_secret
++  rm -f $TEST_IMAGE_FILE
 +}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+int bdrv_delete_file(BlockDriverState *bs, Error **errp)
-+{
-+    DeleteCo dco = {
-+        .bs = bs,
-+        .ret = NOT_DONE,
-+        .err = NULL,
-+    };
-+    Coroutine *co;
-+    int ret;
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
 +
-+    if (!bs) {
-+        error_setg(errp, "Could not open image '%s' for erasing",
-+                   bs->filename);
-+        ret = -1;
-+        goto out;
-+    }
++_supported_fmt luks
++_supported_proto generic
++_unsupported_proto vxhs
 +
-+    if (!bs->drv) {
-+        error_setg(errp, "File '%s' has unknown format", bs->filename);
-+        ret = -ENOMEDIUM;
-+        goto out;
-+    }
++echo "== Create non-UTF8 secret =="
++echo -n -e '\x3a\x3c\x3b\xff' > non_utf8_secret
++SECRET="secret,id=sec0,file=non_utf8_secret"
 +
-+    if (!bs->drv->bdrv_co_delete_file) {
-+        error_setg(errp, "Driver '%s' does not support image delete",
-+                   bs->drv->format_name);
-+        ret = -ENOTSUP;
-+        goto out;
-+    }
++echo "== Throws an error because of invalid UTF-8 secret =="
++$QEMU_IMG create -f $IMGFMT --object $SECRET -o "key-secret=sec0" $TEST_IMAGE_FILE 4M
 +
-+    if (qemu_in_coroutine()) {
-+        /* Fast-path if already in coroutine context */
-+        bdrv_delete_co_entry(&dco);
-+    } else {
-+        co = qemu_coroutine_create(bdrv_delete_co_entry, &dco);
-+        qemu_coroutine_enter(co);
-+        while (dco.ret == NOT_DONE) {
-+            aio_poll(qemu_get_aio_context(), true);
-+        }
-+    }
++echo "== Image file should not exist after the error =="
++if test -f "$TEST_IMAGE_FILE"; then
++    exit 1
++fi
 +
-+    ret = dco.ret;
-+    if (ret < 0) {
-+        if (dco.err) {
-+            error_propagate(errp, dco.err);
-+        } else {
-+            error_setg_errno(errp, -ret, "Could not delete image");
-+        }
-+    }
++echo "== Create a stub image file and run qemu-img again =="
++touch $TEST_IMAGE_FILE
++$QEMU_IMG create -f $IMGFMT --object $SECRET -o "key-secret=sec0" $TEST_IMAGE_FILE 4M
 +
-+out:
-+    return ret;
-+}
++echo "== Pre-existing image file should also be deleted after the error =="
++if test -f "$TEST_IMAGE_FILE"; then
++    exit 1
++fi
 +
- /**
-  * Try to get @bs's logical and physical block size.
-  * On success, store them in @bsz struct and return 0.
-diff --git a/include/block/block.h b/include/block/block.h
-index 124ad40809..00fe8d6534 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -374,6 +374,7 @@ bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
- int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
-                               Error **errp);
- void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base);
-+int bdrv_delete_file(BlockDriverState *bs, Error **errp);
- 
- 
- typedef struct BdrvCheckResult {
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
+new file mode 100644
+index 0000000000..6b0188111c
+--- /dev/null
++++ b/tests/qemu-iotests/259.out
+@@ -0,0 +1,11 @@
++QA output created by 259
++== Create non-UTF8 secret ==
++== Throws an error because of invalid UTF-8 secret ==
++qemu-img: vol.img: Data from secret sec0 is not valid UTF-8
++Formatting 'vol.img', fmt=luks size=4194304 key-secret=sec0
++== Image file should not exist after the error ==
++== Create a stub image file and run qemu-img again ==
++qemu-img: vol.img: Data from secret sec0 is not valid UTF-8
++Formatting 'vol.img', fmt=luks size=4194304 key-secret=sec0
++== Pre-existing image file should also be deleted after the error ==
++ *** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index d95d556414..8f50bd91e5 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -273,4 +273,5 @@
+ 256 rw quick
+ 257 rw
+ 258 rw quick
++259 rw img quick
+ 262 rw quick migration
 -- 
 2.21.0
 
