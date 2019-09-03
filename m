@@ -2,93 +2,93 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42214C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BABC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:35:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CE2E20828
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:24:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="prC22F6I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE2E20828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id F2606217D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:35:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2606217D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5DTT-0002ZV-2M
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:24:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58306)
+	id 1i5De9-0004vE-Tk
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:35:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5DSU-00022H-1i
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:23:14 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5DdC-0004U0-Pd
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5DSS-0008PO-Sp
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:23:13 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40410)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5DSS-0008Ol-KR
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:23:12 -0400
-Received: by mail-pg1-x541.google.com with SMTP id w10so9591637pgj.7
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 11:23:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+VUwAlVM2cI1IKg+ezBoLvZ9Bv6e+ecmrYteWE86y0E=;
- b=prC22F6I/2VPj7J9DvqwUqgaJcT2Ax9D8TPD24Vn+3STBCVF9EGZYx1gqGDHCI9Vla
- 5Zu17+DSTxjPRLUROez1BaLWd22cICcqTr/b2yrCsfxLByaVGQUFlTFbw+sVHlQAr8uG
- BV+8b/5pufA7gTVP/NhUB64Y/CKpuB22q1DAV4SVWcoLIpqwtafLEs7oZLsVj9j79s53
- VKdDtmKT7GfLz4dh014CCvafX7h1/TlJfoLqP4eKw6fzwqPj05W89eW3kMDm1jmqgAzH
- xB5fMMnkZCG9zZke622zbT1M1F8hE1geCpVbBG1gq+t+T15/7Fc8hhz88IAlcw9CoWFh
- VZzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+VUwAlVM2cI1IKg+ezBoLvZ9Bv6e+ecmrYteWE86y0E=;
- b=cDZ2I8TuJf2nPVzrkBbbCVEwCWbVdNKWe0yXkH4z0ok2+4FEELFHWwX/N5RNeHFewR
- aGU30WweeDGOYX1Ka0pdjxHAev1/JjUDxKHfELNqhCPgO83QRpKrYZgzzi4cf9ORmJ5A
- TY3cZwU3qbjIxcRiU9KvKdxn+uVA9mYJobKCvjOM1c6E76ydUCM4m0AzpB22l46tfto8
- EkscbC4W4Is1aomoE4+Ny6bXd0HgPoxdmPac9AvY2nZtOXGEhli4mC+/8i0iIR5vB2pe
- nK1nLTzz56xy8CdUsufyU2C5eAogdDQ6qH2r2BtMcrTgt46HeOOaAAzaUtSl3kHoF6me
- HIww==
-X-Gm-Message-State: APjAAAXfVsjbD5eXFdJjT+IHnyg39P1v7dC55kBwXHwvF1O/262Ybw5V
- tQFutqIXcggJHb+J9oT4zfcNAg==
-X-Google-Smtp-Source: APXvYqxkfZ7jbMPRemj2jqcowRS3G2WI1uqazHScX7VWtaBYxoVHHK1qje/0uJKgZxj6XBoW1O+d2w==
-X-Received: by 2002:a17:90a:bf01:: with SMTP id c1mr709756pjs.30.1567534991103; 
- Tue, 03 Sep 2019 11:23:11 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id z29sm26893145pff.23.2019.09.03.11.23.09
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 03 Sep 2019 11:23:10 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190903154810.27365-1-thuth@redhat.com>
- <20190903154810.27365-4-thuth@redhat.com>
- <bb6eb994-532e-7afc-bb27-aa5d56080b50@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5DdB-0006IJ-GJ
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:34:18 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:41456
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1i5DdB-0006Hh-9W
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:34:17 -0400
+Received: from host86-168-80-252.range86-168.btcentralplus.com
+ ([86.168.80.252] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1i5Db8-0000SO-DK; Tue, 03 Sep 2019 19:32:12 +0100
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190629130017.2973-1-richard.henderson@linaro.org>
+ <5746cc58-c132-ef29-6ff4-da07c6086dac@ilande.co.uk>
+ <3fe632b7-e83c-9b26-9338-1d7a9c881e0d@linaro.org>
+ <CABLmASFUnBnn2DZidKFAiaMb7gExYttgvEv12uce9EPi6NL9Qw@mail.gmail.com>
+ <f1eeb1de-a6e7-bb83-3501-705382da4b14@ilande.co.uk>
+ <CAL1e-=gtgzRHzZyX9r69_zB5-v-ThYeuxBameoF12TBs59M95w@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
-Message-ID: <42d43c33-e316-81de-4ec6-13c8a6d04660@linaro.org>
-Date: Tue, 3 Sep 2019 11:23:08 -0700
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <db28c297-290b-3641-d87a-67fde65312a8@ilande.co.uk>
+Date: Tue, 3 Sep 2019 19:32:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <bb6eb994-532e-7afc-bb27-aa5d56080b50@redhat.com>
+In-Reply-To: <CAL1e-=gtgzRHzZyX9r69_zB5-v-ThYeuxBameoF12TBs59M95w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [RFC PATCH 3/3] target/arm: Make m_helper.c
- optional via CONFIG_ARM_V7M
+X-SA-Exim-Connect-IP: 86.168.80.252
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: No (on mail.default.ilande.uk0.bigv.io); Unknown failure
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v6 00/16] tcg/ppc: Add vector opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,29 +100,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/3/19 9:19 AM, Philippe Mathieu-Daudé wrote:
-> On 9/3/19 5:48 PM, Thomas Huth wrote:
->> We've already got the CONFIG_ARM_V7M switch, but it currently can
->> not be disabled yet. The m_helper.c code should not be compiled
->> into the binary if the switch is not enabled. We also have to
->> provide some stubs in a separate file to make sure that we still
->> can link the other code without CONFIG_ARM_V7M.
+On 03/09/2019 18:37, Aleksandar Markovic wrote:
+
+> On Tue, Sep 3, 2019 at 7:05 PM Mark Cave-Ayland <
+> mark.cave-ayland@ilande.co.uk> wrote:
 > 
-> If there is no M support, the translate code shouldn't even generate M
-> calls, so the stub shouldn't be necessary.
+>> On 01/07/2019 19:34, Howard Spoelstra wrote:
+>>
+>>> On Mon, Jul 1, 2019 at 12:30 PM Richard Henderson <
+>>> richard.henderson@linaro.org> wrote:
+>>>
+>>>> On 6/30/19 7:58 PM, Mark Cave-Ayland wrote:
+>>>>> I don't have space for a full set of images on the G4, however I've
+>>>> tried boot tests
+>>>>> on installer CDs for MacOS 9, OS X 10.2, Linux and HelenOS and it looks
+>>>> good here.
+>>>>>
+>>>>> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> [PPC32]
+>>>>
+>>>> Thanks!
+>>>>
+>>>> Hi
+>>>
+>>> I just compiled the v6 set applied to current master on my G5, Ubuntu 16.
+>>> command line:
+>>> ./qemu-system-ppc -L pc-bios -boot c m 512 -M mac99,via=pmu \
+>>> -netdev user,id=net1 -device sungem,netdev=net1 \
+>>> -drive file=10.3.img,format=raw,media=disk \
+>>>
+>>> With no specific cpu set, Mac OS 9.2 hard disk image and 9.2 iso do not
+>> get
+>>> to the desktop, they just hang while still in the openbios window. They
+>>> need -cpu G4 on the command line to get to the desktop.
+>>>
+>>> OSX 10.3 installed image boots to desktop.
+>>> OSX 10.3 iso boots to installer
+>>> OSX 10.4 installed image boots to desktop.
+>>> OSX 10.4 iso boot to installer
+>>> OSX 10.5 installed image boots to desktop.
+>>> OSX 10.5 iso boots to installer
+>>>
+>>> So there seems to be a difference between hosts: If ran on a G4 host
+>> there
+>>> is no need to add -cpu G4 to run Mac OS 9.x, while there is when ran on a
+>>> G5 host.
+>>
+>> Are there any outstanding issues with this patchset now, or is it ready to
+>> be merged?
+>> I'm really looking forward to seeing the improved performance when testing
+>> QEMU on my
+>> Mac Mini :)
+>>
+>>
+> Howard pointed to some illogical quirks of command line:
+> 
+>> If ran on a G4 host there is no need to add -cpu G4 to run Mac OS 9.x,
+>> while there is when ran on a G5 host.
+> 
+> I am not sure if Howard says that this is a consequence of this series
+> though.
 
-No, the symbols are still required for link.
+No, that has been an existing issue for a long time :)
 
-> Anyhow I guess this code will be simplified by the ongoing decodetree
-> conversion from Richard.
+> Overall, I think this is a very good series - however, I had a number of
+> minor
+> objections to multiple patches, that don't affect (or affect in a minimal
+> way)
+> provided functionality - those objections are not addressed, nor properly
+> discussed - but I do think they should be addressed in order to get the
+> series
+> in a better shape before upstreaming.
 
-No, the decodetree conversion will not affect this at all.
+I've had a quick look at some of your review comments, and certainly I can see how
+the earlier revisions have benefited from your feedback. There has been a lot of
+positive discussion, and Richard has taken the time to respond and update the
+patchset over several weeks to its latest revision.
+
+AFAICT the only remaining issue is that related to the ISA flags, but to me this
+isn't something that should prevent the patchset being merged. I can certainly see
+how the current flags implementation may not be considered technically correct, but
+then from your comments I don't see that it would be something that would be
+particularly difficult to change at a later date either.
+
+The things that are important to me are i) is the patchset functionally correct and
+ii) is it understandable and maintainable. I would say that the first point is
+clearly true (both myself and Howard have spent a lot of time testing it), and given
+that I had to delve into these patches to fix the R2 register issue on 32-bit PPC
+then I can confirm that the contents of the patches were a reasonably accurate
+representation of the changes described within. And that's from someone like me who
+is mostly still a TCG beginner :)
+
+From a slightly more selfish position as the PPC Mac machine maintainer, these
+patches make a significant difference to me in that they reduce the MacOS boot times
+during everyday testing. Now for someone like myself who works on QEMU as a hobby
+outside of family life and a full time job, those few minutes are really important to
+me and soon add up really quickly during testing.
+
+I would really like these patches to be merged soon, since the worst thing that can
+happen is that the patchset ends up bit-rotting and then all the time and effort put
+into writing, testing and reviewing the patches by Richard, Howard, David, myself and
+indeed your review time will all end up going to waste.
 
 
-r~
+ATB,
+
+Mark.
 
