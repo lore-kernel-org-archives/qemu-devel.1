@@ -2,85 +2,87 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BE9C3A5A2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F27CC3A5A7
 	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 153AA2077B
+	by mail.kernel.org (Postfix) with ESMTPS id 5E6082077B
 	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:39:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mhT7QJyF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 153AA2077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MhaqZomN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6082077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5AtX-0004XF-HZ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:38:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59111)
+	id 1i5AtX-0004Xq-V5
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:39:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59109)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArI-0002er-K5
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArI-0002ek-KQ
  for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArH-0005qh-5k
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArH-0005qm-5v
  for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:40 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44740)
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:38082)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5ArG-0005p2-Rv
+ id 1i5ArG-0005pp-SW
  for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:39 -0400
-Received: by mail-wr1-x443.google.com with SMTP id 30so7041109wrk.11
+Received: by mail-wr1-x42c.google.com with SMTP id l11so9173911wrx.5
  for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=siE66EHNoZSdb5Y8Dt5mz5vybn6gWgzukEagHaOkoTc=;
- b=mhT7QJyFSC+qiyh8SKhWYmGK8C2tV9dlSvaw8y6jyU7j6iBgOEOl+dpKMTTag6+sgS
- faMczmlOVPzwHQDqoNCkBA23sC4i+PYgLjRyJOa/z+N8CUVQUxQF6vGhy8WDL2bFgHjm
- P8RqN724XfHJdv40n/8586lnP7mRzo1HWmux4QBvhZ6YIW2op77m/Mp/LCNGu5SPodgo
- CBJtntiTrGt9jwii2ztv0D21iPnofNmFG6cbgAguXk1/GVcg4YV0HyWFgHRZVK7KI1eM
- huhmZ7ns68Es0HRsPboSf/gs5X+pLXUee7wFlN95yiEgU/p7+1OIEct18vI83clrwwii
- bLTA==
+ bh=+yNac1qJC9Kh92Gr5cseXT2mTxIseX7RPiOfC11845I=;
+ b=MhaqZomN+PtvJ+EGr4UackucruyA34Du8esAUre2WihdDrm1BeIoCKyA8gkDLUwb2L
+ 9s+c+p8Zmju8dYBtKXf6QZk5Jg4Xtav5CBZvZIow1f4V7MnM9dp1jwphU3FvA/n8UMbh
+ 9PQxiWU1EvvzvZoQg/4K3WwJBqSZoJ7hhOjkMG5IYsj7dzjUWNy8YcRJiX4Ybc71buwo
+ HjiQT6mlw13zOSPbENQft8uc9vcfnUThdNevJHQ0jtyxYSx+Jiv411soECHrouI9vnvP
+ uKudhXcARFSRceK4BBErffTRsKZO1DyWePL32Gi7fyg9yxpxsywPu5199FBbnfp3/BgB
+ PEKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=siE66EHNoZSdb5Y8Dt5mz5vybn6gWgzukEagHaOkoTc=;
- b=s3q2c04fpqiFo+iklB+HJF49QzMaP0qJjCoEbSAFYaHSsCCYMzMBXOn28G+UB/Foo5
- Q3vi7JWKSvF2e7hW34/0SwQCE1+kLBYE0zHKhimTDMbTMykMY4pfSIryn+zrExwcN/EK
- YNr4DAMcCIQ/Fk0oYgty1GJzE+Ben0XKc5yaYRmHSnnS70t2ZhVSxvv1DXBukCCSCfZ0
- /mvFaJLl4SPzAcleFni+4XxSaDtyMqfeOwwNxpPlI6eIE+BfTnCMuf/9DVky2FU1E5Xq
- //ps7UTyonkV4h1+0CzfZDuA7EM780P/zTD6WJ4gkAZTXSJHBmZYZFbO39YeDi57HQHG
- ndtg==
-X-Gm-Message-State: APjAAAW4K4VE6q5dOj143XDnQVq0l1PICvD/YpkJPL6t3hwhQkdaFf51
- n6wO82YOI6RjnX2/1kE5lutzA27COCYCPQ==
-X-Google-Smtp-Source: APXvYqw4+OuqbfklHrZhKEi5cyYJhSfCfdNzv8sg3Dqg2f0N4+DntskQEjobzbFTWlAx3lP+IdZIsw==
-X-Received: by 2002:a5d:458b:: with SMTP id p11mr13960854wrq.160.1567524995725; 
- Tue, 03 Sep 2019 08:36:35 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=+yNac1qJC9Kh92Gr5cseXT2mTxIseX7RPiOfC11845I=;
+ b=UahgrE53oMKK/RR3TgO8neCA2EbGrzwWnexFXNs0HZR5TMRaW2p0t0V45R2S1aB7xy
+ c5bZRWhDMDskDn1yVWrZEqi3oCLf3kyYHpr1XzSjWe50t1/HvVev1iAzPNYVC5de27Dl
+ kP1/VOYTyynmZg4MA3BUkT7Hoh9YlyzZWDeRV+NOjqanU/nh94XXjPj9iJzxx1NBPyAQ
+ jodSN+BPZRYS4FTdw60+uk6TH+53meJHKaY27SfjRxnK+Xr4kwKClZiekBgDXiH0sgO7
+ WLao5rcN5+RIzwjqq5vbsekNPcc6K4knRE2ZbyfvbZTvfb/viaL0SadMjxNNlHepfc/P
+ UTaA==
+X-Gm-Message-State: APjAAAVqBgWBQpMC3A6mF+CjFfR2/a2IPjX3HxxB3tXdgprLltwTNBke
+ Q6NjDFQWbzDwIU9BBfkFqsFE09LfFe9urg==
+X-Google-Smtp-Source: APXvYqxzfpSKnYM2mAa7xU3o2e6dXQxJx0izSe2ksg8gzfsOSF4+WuGhD/4yK+Mw0Yw/57P0KWKjVg==
+X-Received: by 2002:a5d:614b:: with SMTP id y11mr4321024wrt.154.1567524997305; 
+ Tue, 03 Sep 2019 08:36:37 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.34
+ by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.35
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 08:36:35 -0700 (PDT)
+ Tue, 03 Sep 2019 08:36:36 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:36:12 +0100
-Message-Id: <20190903153633.6651-1-peter.maydell@linaro.org>
+Date: Tue,  3 Sep 2019 16:36:13 +0100
+Message-Id: <20190903153633.6651-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190903153633.6651-1-peter.maydell@linaro.org>
+References: <20190903153633.6651-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PULL 00/21] target-arm queue
+X-Received-From: 2a00:1450:4864:20::42c
+Subject: [Qemu-devel] [PULL 01/21] Revert "target/arm: Use
+ unallocated_encoding for aarch32"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,107 +98,156 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-target-arm queue: this time around is all small fixes
-and changes.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-thanks
--- PMM
+This reverts commit 3cb36637157088892e9e33ddb1034bffd1251d3b.
 
-The following changes since commit fec105c2abda8567ec15230429c41429b5ee307c:
+Despite the fact that the text for the call to gen_exception_insn
+is identical for aarch64 and aarch32, the implementation inside
+gen_exception_insn is totally different.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20190828-pull-request' into staging (2019-09-03 14:03:15 +0100)
+This fixes exceptions raised from aarch64.
 
-are available in the Git repository at:
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20190826151536.6771-2-richard.henderson@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate-a64.h     |  2 ++
+ target/arm/translate.h         |  2 --
+ target/arm/translate-a64.c     |  7 +++++++
+ target/arm/translate-vfp.inc.c |  3 ++-
+ target/arm/translate.c         | 22 ++++++++++------------
+ 5 files changed, 21 insertions(+), 15 deletions(-)
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190903
+diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
+index 12ad8ac6ed1..9cd2b3d2389 100644
+--- a/target/arm/translate-a64.h
++++ b/target/arm/translate-a64.h
+@@ -18,6 +18,8 @@
+ #ifndef TARGET_ARM_TRANSLATE_A64_H
+ #define TARGET_ARM_TRANSLATE_A64_H
+ 
++void unallocated_encoding(DisasContext *s);
++
+ #define unsupported_encoding(s, insn)                                    \
+     do {                                                                 \
+         qemu_log_mask(LOG_UNIMP,                                         \
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 92ef790be9e..64304c957ee 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -99,8 +99,6 @@ typedef struct DisasCompare {
+     bool value_global;
+ } DisasCompare;
+ 
+-void unallocated_encoding(DisasContext *s);
+-
+ /* Share the TCG temporaries common between 32 and 64 bit modes.  */
+ extern TCGv_i32 cpu_NF, cpu_ZF, cpu_CF, cpu_VF;
+ extern TCGv_i64 cpu_exclusive_addr;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 6fd0b779d37..9183f89ba39 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -338,6 +338,13 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
+     }
+ }
+ 
++void unallocated_encoding(DisasContext *s)
++{
++    /* Unallocated and reserved encodings are uncategorized */
++    gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
++                       default_exception_el(s));
++}
++
+ static void init_tmp_a64_array(DisasContext *s)
+ {
+ #ifdef CONFIG_DEBUG_TCG
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index 3e8ea80493b..5065d4524cd 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -108,7 +108,8 @@ static bool full_vfp_access_check(DisasContext *s, bool ignore_vfp_enabled)
+ 
+     if (!s->vfp_enabled && !ignore_vfp_enabled) {
+         assert(!arm_dc_feature(s, ARM_FEATURE_M));
+-        unallocated_encoding(s);
++        gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
++                           default_exception_el(s));
+         return false;
+     }
+ 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index cbe19b7a625..2aac9aae681 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1231,13 +1231,6 @@ static void gen_exception_bkpt_insn(DisasContext *s, uint32_t syn)
+     s->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+-void unallocated_encoding(DisasContext *s)
+-{
+-    /* Unallocated and reserved encodings are uncategorized */
+-    gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
+-                       default_exception_el(s));
+-}
+-
+ /* Force a TB lookup after an instruction that changes the CPU state.  */
+ static inline void gen_lookup_tb(DisasContext *s)
+ {
+@@ -1268,7 +1261,8 @@ static inline void gen_hlt(DisasContext *s, int imm)
+         return;
+     }
+ 
+-    unallocated_encoding(s);
++    gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
++                       default_exception_el(s));
+ }
+ 
+ static inline void gen_add_data_offset(DisasContext *s, unsigned int insn,
+@@ -7580,7 +7574,8 @@ static void gen_srs(DisasContext *s,
+     }
+ 
+     if (undef) {
+-        unallocated_encoding(s);
++        gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
++                           default_exception_el(s));
+         return;
+     }
+ 
+@@ -9201,7 +9196,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             break;
+         default:
+         illegal_op:
+-            unallocated_encoding(s);
++            gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
++                               default_exception_el(s));
+             break;
+         }
+     }
+@@ -10886,7 +10882,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+     }
+     return;
+ illegal_op:
+-    unallocated_encoding(s);
++    gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
++                       default_exception_el(s));
+ }
+ 
+ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+@@ -11709,7 +11706,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     return;
+ illegal_op:
+ undef:
+-    unallocated_encoding(s);
++    gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_uncategorized(),
++                       default_exception_el(s));
+ }
+ 
+ static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
+-- 
+2.20.1
 
-for you to fetch changes up to 5e5584c89f36b302c666bc6db535fd3f7ff35ad2:
-
-  target/arm: Don't abort on M-profile exception return in linux-user mode (2019-09-03 16:20:35 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * Revert and correctly fix refactoring of unallocated_encoding()
- * Take exceptions on ATS instructions when needed
- * aspeed/timer: Provide back-pressure information for short periods
- * memory: Remove unused memory_region_iommu_replay_all()
- * hw/arm/smmuv3: Log a guest error when decoding an invalid STE
- * hw/arm/smmuv3: Remove spurious error messages on IOVA invalidations
- * target/arm: Fix SMMLS argument order
- * hw/arm: Use ARM_CPU_TYPE_NAME() macro when appropriate
- * hw/arm: Correct reference counting for creation of various objects
- * includes: remove stale [smp|max]_cpus externs
- * tcg/README: fix typo
- * atomic_template: fix indentation in GEN_ATOMIC_HELPER
- * include/exec/cpu-defs.h: fix typo
- * target/arm: Free TCG temps in trans_VMOV_64_sp()
- * target/arm: Don't abort on M-profile exception return in linux-user mode
-
-----------------------------------------------------------------
-Alex Bennée (2):
-      includes: remove stale [smp|max]_cpus externs
-      include/exec/cpu-defs.h: fix typo
-
-Andrew Jeffery (1):
-      aspeed/timer: Provide back-pressure information for short periods
-
-Emilio G. Cota (2):
-      tcg/README: fix typo s/afterwise/afterwards/
-      atomic_template: fix indentation in GEN_ATOMIC_HELPER
-
-Eric Auger (3):
-      memory: Remove unused memory_region_iommu_replay_all()
-      hw/arm/smmuv3: Log a guest error when decoding an invalid STE
-      hw/arm/smmuv3: Remove spurious error messages on IOVA invalidations
-
-Peter Maydell (4):
-      target/arm: Allow ARMCPRegInfo read/write functions to throw exceptions
-      target/arm: Take exceptions on ATS instructions when needed
-      target/arm: Free TCG temps in trans_VMOV_64_sp()
-      target/arm: Don't abort on M-profile exception return in linux-user mode
-
-Philippe Mathieu-Daudé (6):
-      hw/arm: Use ARM_CPU_TYPE_NAME() macro when appropriate
-      hw/arm: Use object_initialize_child for correct reference counting
-      hw/arm: Use sysbus_init_child_obj for correct reference counting
-      hw/arm/fsl-imx: Add the cpu as child of the SoC object
-      hw/dma/xilinx_axi: Use object_initialize_child for correct ref. counting
-      hw/net/xilinx_axi: Use object_initialize_child for correct ref. counting
-
-Richard Henderson (3):
-      Revert "target/arm: Use unallocated_encoding for aarch32"
-      target/arm: Factor out unallocated_encoding for aarch32
-      target/arm: Fix SMMLS argument order
-
- accel/tcg/atomic_template.h    |   2 +-
- hw/arm/smmuv3-internal.h       |   1 +
- include/exec/cpu-defs.h        |   2 +-
- include/exec/memory.h          |  10 ----
- include/sysemu/sysemu.h        |   2 -
- target/arm/cpu.h               |   6 ++-
- target/arm/translate-a64.h     |   2 +
- target/arm/translate.h         |   2 -
- hw/arm/allwinner-a10.c         |   3 +-
- hw/arm/cubieboard.c            |   3 +-
- hw/arm/digic.c                 |   3 +-
- hw/arm/exynos4_boards.c        |   4 +-
- hw/arm/fsl-imx25.c             |   4 +-
- hw/arm/fsl-imx31.c             |   4 +-
- hw/arm/fsl-imx6.c              |   3 +-
- hw/arm/fsl-imx6ul.c            |   2 +-
- hw/arm/mcimx7d-sabre.c         |   9 ++--
- hw/arm/mps2-tz.c               |  15 +++---
- hw/arm/musca.c                 |   9 ++--
- hw/arm/smmuv3.c                |  18 ++++---
- hw/arm/xlnx-zynqmp.c           |   8 +--
- hw/dma/xilinx_axidma.c         |  16 +++---
- hw/net/xilinx_axienet.c        |  17 +++----
- hw/timer/aspeed_timer.c        |  17 ++++++-
- memory.c                       |   9 ----
- target/arm/helper.c            | 107 +++++++++++++++++++++++++++++++++++------
- target/arm/translate-a64.c     |  13 +++++
- target/arm/translate-vfp.inc.c |   2 +
- target/arm/translate.c         |  50 +++++++++++++++++--
- tcg/README                     |   2 +-
- 30 files changed, 244 insertions(+), 101 deletions(-)
 
