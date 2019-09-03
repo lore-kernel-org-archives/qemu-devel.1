@@ -6,60 +6,61 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB71C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D91C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DDA12168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:39:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DDA12168B
+	by mail.kernel.org (Postfix) with ESMTPS id 66A242168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:44:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66A242168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5DiY-0006En-Q3
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:39:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32921)
+	id 1i5Dms-0007fv-L9
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:44:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i5Dhs-0005nj-I8
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:39:09 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i5Dm7-00079S-MX
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:43:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i5Dhp-0008LM-E2
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:39:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56602)
+ (envelope-from <dgilbert@redhat.com>) id 1i5Dm6-00033A-Gt
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:43:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56978)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5Dhp-0008L9-5L
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:39:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5Dm6-00032o-95
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:43:30 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0FCA94904;
- Tue,  3 Sep 2019 18:39:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 833D6308429D;
+ Tue,  3 Sep 2019 18:43:29 +0000 (UTC)
 Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B34A611DB;
- Tue,  3 Sep 2019 18:39:02 +0000 (UTC)
-Date: Tue, 3 Sep 2019 19:39:00 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 96C185D6B2;
+ Tue,  3 Sep 2019 18:43:26 +0000 (UTC)
+Date: Tue, 3 Sep 2019 19:43:24 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190903183900.GZ2744@work-vm>
-References: <20190802060359.16556-1-richardw.yang@linux.intel.com>
- <20190823155919.GO2784@work-vm>
- <20190826130544.bsypypma2mcqocyy@master>
+Message-ID: <20190903184324.GA2744@work-vm>
+References: <20190731144225.3784-1-richardw.yang@linux.intel.com>
+ <20190731144225.3784-3-richardw.yang@linux.intel.com>
+ <20190823110609.GF2784@work-vm>
+ <20190824161509.xtm65qu6k6amrjk6@master>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190826130544.bsypypma2mcqocyy@master>
+In-Reply-To: <20190824161509.xtm65qu6k6amrjk6@master>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Tue, 03 Sep 2019 18:39:04 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 03 Sep 2019 18:43:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH] migration/postcopy: enable compress
- with postcopy
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration/qemu-file: fix potential buf
+ waste for extra buf_index adjustment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,147 +72,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
- qemu-devel@nongnu.org
+Cc: quintela@redhat.com, berrange@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Wei Yang (richard.weiyang@gmail.com) wrote:
-> On Fri, Aug 23, 2019 at 04:59:19PM +0100, Dr. David Alan Gilbert wrote:
+> On Fri, Aug 23, 2019 at 12:06:09PM +0100, Dr. David Alan Gilbert wrote:
+> >(Copying Dan in)
+> >
 > >* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> >> This patch enable compress with postcopy.
+> >> In add_to_iovec(), qemu_fflush() will be called if iovec is full. If
+> >> this happens, buf_index is reset. Currently, this is not checked and
+> >> buf_index would always been adjust with buf size.
 > >> 
-> >> This is a RFC and based on some unmerged patch
-> >> 
-> >>   "migration: extract ram_load_precopy"
-> >>   "migration/postcopy: skip compression when postcopy is active"
+> >> This is not harmful, but will waste some space in file buffer.
+> >
+> >That's a nice find.
+> >
+> >> This patch make add_to_iovec() return 1 when it has flushed the file.
+> >> Then the caller could check the return value to see whether it is
+> >> necessary to adjust the buf_index any more.
 > >> 
 > >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >
+> >Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >
+> >(I wonder if there's a way to wrap that little add_to_iovec, check, add
+> >to index, flush in a little wrapper).
+> >
+> >Dave
+> >
 > >> ---
-> >>  migration/postcopy-ram.c |  3 +--
-> >>  migration/ram.c          | 35 +++++++++++++++++++++--------------
-> >>  2 files changed, 22 insertions(+), 16 deletions(-)
+> >>  migration/qemu-file.c | 42 ++++++++++++++++++++++++++++--------------
+> >>  1 file changed, 28 insertions(+), 14 deletions(-)
 > >> 
-> >> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> >> index a7e7ec9c22..70b6beb5a9 100644
-> >> --- a/migration/postcopy-ram.c
-> >> +++ b/migration/postcopy-ram.c
-> >> @@ -1252,8 +1252,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-> >>              }
-> >>              memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
-> >>          }
-> >> -        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
-> >> -                                   rb);
-> >> +        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page, rb);
-> >
-> >Please keep these type of cleanups separate.
-> >
-> >>      }
+> >> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> >> index 35c22605dd..05d9f42ddb 100644
+> >> --- a/migration/qemu-file.c
+> >> +++ b/migration/qemu-file.c
+> >> @@ -343,8 +343,16 @@ int qemu_fclose(QEMUFile *f)
+> >>      return ret;
 > >>  }
 > >>  
-> >> diff --git a/migration/ram.c b/migration/ram.c
-> >> index a0d3bc60b2..c1d6eadf38 100644
-> >> --- a/migration/ram.c
-> >> +++ b/migration/ram.c
-> >> @@ -2384,16 +2384,6 @@ static bool save_page_use_compression(RAMState *rs)
-> >>          return false;
-> >>      }
+> >> -static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
+> >> -                         bool may_free)
+> >> +/*
+> >> + * Add buf to iovec. Do flush if iovec is full.
+> >> + *
+> >> + * Return values:
+> >> + * 1 iovec is full and flushed
+> >> + * 0 iovec is not flushed
+> >> + *
+> >> + */
+> >> +static int add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
+> >> +                        bool may_free)
+> >>  {
+> >>      /* check for adjacent buffer and coalesce them */
+> >>      if (f->iovcnt > 0 && buf == f->iov[f->iovcnt - 1].iov_base +
+> >> @@ -362,7 +370,10 @@ static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
 > >>  
-> >> -    /*
-> >> -     * The decompression threads asynchronously write into RAM
-> >> -     * rather than use the atomic copies needed to avoid
-> >> -     * userfaulting.  It should be possible to fix the decompression
-> >> -     * threads for compatibility in future.
-> >> -     */
-> >> -    if (migration_in_postcopy()) {
-> >> -        return false;
-> >> -    }
-> >> -
-> >>      /*
-> >>       * If xbzrle is on, stop using the data compression after first
-> >>       * round of migration even if compression is enabled. In theory,
-> >> @@ -3433,6 +3423,11 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+> >>      if (f->iovcnt >= MAX_IOV_SIZE) {
+> >>          qemu_fflush(f);
+> >> +        return 1;
+> >>      }
+> >> +
+> >> +    return 0;
+> >>  }
+> >>  
+> >>  void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size,
+> >> @@ -391,10 +402,11 @@ void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size)
 > >>          }
-> >>          i++;
-> >>      }
-> >> +
-> >> +    if (migrate_postcopy_ram()) {
-> >> +        flush_compressed_data(rs);
-> >> +    }
-> >> +
-> >>      rcu_read_unlock();
-> >>  
-> >>      /*
-> >> @@ -4019,6 +4014,7 @@ static int ram_load_postcopy(QEMUFile *f)
-> >>          void *place_source = NULL;
-> >>          RAMBlock *block = NULL;
-> >>          uint8_t ch;
-> >> +        int len;
-> >>  
-> >>          addr = qemu_get_be64(f);
-> >>  
-> >> @@ -4036,7 +4032,8 @@ static int ram_load_postcopy(QEMUFile *f)
-> >>  
-> >>          trace_ram_load_postcopy_loop((uint64_t)addr, flags);
-> >>          place_needed = false;
-> >> -        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
-> >> +        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-> >> +                     RAM_SAVE_FLAG_COMPRESS_PAGE)) {
-> >>              block = ram_block_from_stream(f, flags);
-> >>  
-> >>              host = host_from_ram_block_offset(block, addr);
-> >> @@ -4109,6 +4106,17 @@ static int ram_load_postcopy(QEMUFile *f)
-> >>                                           TARGET_PAGE_SIZE);
-> >>              }
-> >>              break;
-> >> +        case RAM_SAVE_FLAG_COMPRESS_PAGE:
-> >> +            all_zero = false;
-> >> +            len = qemu_get_be32(f);
-> >> +            if (len < 0 || len > compressBound(TARGET_PAGE_SIZE)) {
-> >> +                error_report("Invalid compressed data length: %d", len);
-> >> +                ret = -EINVAL;
-> >> +                break;
+> >>          memcpy(f->buf + f->buf_index, buf, l);
+> >>          f->bytes_xfer += l;
+> >> -        add_to_iovec(f, f->buf + f->buf_index, l, false);
+> >> -        f->buf_index += l;
+> >> -        if (f->buf_index == IO_BUF_SIZE) {
+> >> -            qemu_fflush(f);
+> >> +        if (!add_to_iovec(f, f->buf + f->buf_index, l, false)) {
+> >> +            f->buf_index += l;
+> >> +            if (f->buf_index == IO_BUF_SIZE) {
+> >> +                qemu_fflush(f);
 > >> +            }
-> >> +            decompress_data_with_multi_threads(f, page_buffer, len);
-> >> +            ret |= wait_for_decompress_done();
-> >
-> >I think this might work for a 4k page host; but I'm not sure it's
-> >safe on hugepages or ARM/Power where they have bigger pages.
-> >ram_load_postcopy relies on all of the pages within a single hostpage
-> >arriving before the last subpage and that's what then triggers the call
-> >to postcopy_place_page;  that relies on some ordering - but I don't
-> >think that the multiple compress threads on the source have any ordering
-> >between the threads - or am I missing something about how the multiple
-> >threads are organised?
-> >
 > 
-> Thanks for your comment. I think you are right. It's me who miss this
-> situation.
+> You mean put these four lines into a wrapper?
 > 
-> One quick fix for this problem is to leverage save_compress_page to do the
-> flush before it compress another page. But this would lose the multi-thread
-> capability.
-> 
-> The other way is to have a similar "buf" like the receiving side to hold the
-> compressed page and send it after all threads finish compressing.
+> Name it as add_buf_to_iovec?
 
-The problem becomes you then need a buf as big as a host page for each
-thread; that gets a bit big for huge pages (although it's not too bad
-for 2MB hugepages, and the really big 1GB hugepages are a bad idea for
-postcopy anyway).  I'm guessing it's more efficient if the compression
-code worked in host pages and you were using host pages anyway -
-compressing one 2MB chunk sounds easier than compressing 512x4KB chunks.
-
-> BTW, is multifd have this in order? Looks we can have multifd with postcopy?
-
-I think multifd has the same problem; it's code can set the granularity
-of each thread, so I think you could set it to 2MB chunks for example
-that would help; but the receive code in multifd_recv_unfill_packet
-just sets up an iov, I don't think it uses place_page.
+Yes.
 
 Dave
 
+> >>          }
+> >>          if (qemu_file_get_error(f)) {
+> >>              break;
+> >> @@ -412,10 +424,11 @@ void qemu_put_byte(QEMUFile *f, int v)
+> >>  
+> >>      f->buf[f->buf_index] = v;
+> >>      f->bytes_xfer++;
+> >> -    add_to_iovec(f, f->buf + f->buf_index, 1, false);
+> >> -    f->buf_index++;
+> >> -    if (f->buf_index == IO_BUF_SIZE) {
+> >> -        qemu_fflush(f);
+> >> +    if (!add_to_iovec(f, f->buf + f->buf_index, 1, false)) {
+> >> +        f->buf_index++;
+> >> +        if (f->buf_index == IO_BUF_SIZE) {
+> >> +            qemu_fflush(f);
+> >> +        }
+> >>      }
+> >>  }
+> >>  
+> >> @@ -717,10 +730,11 @@ ssize_t qemu_put_compression_data(QEMUFile *f, z_stream *stream,
+> >>      }
+> >>  
+> >>      qemu_put_be32(f, blen);
+> >> -    add_to_iovec(f, f->buf + f->buf_index, blen, false);
+> >> -    f->buf_index += blen;
+> >> -    if (f->buf_index == IO_BUF_SIZE) {
+> >> -        qemu_fflush(f);
+> >> +    if (!add_to_iovec(f, f->buf + f->buf_index, blen, false)) {
+> >> +        f->buf_index += blen;
+> >> +        if (f->buf_index == IO_BUF_SIZE) {
+> >> +            qemu_fflush(f);
+> >> +        }
+> >>      }
+> >>      return blen + sizeof(int32_t);
+> >>  }
+> >> -- 
+> >> 2.17.1
+> >> 
+> >--
+> >Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 > -- 
 > Wei Yang
 > Help you, Help me
