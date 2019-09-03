@@ -6,43 +6,44 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5F6C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5B0C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:58:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C1D62168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:51:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C1D62168B
+	by mail.kernel.org (Postfix) with ESMTPS id 07D1921897
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:58:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07D1921897
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5DtZ-0002vI-Ax
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:51:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34688)
+	id 1i5E0g-000565-4s
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:58:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i5Dsj-00022g-Ri
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:50:22 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i5Dzo-0004Wi-O8
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i5Dsi-0000F0-PO
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:50:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60190)
+ (envelope-from <jsnow@redhat.com>) id 1i5Dzn-0004E0-MY
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:57:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33854)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i5Dsg-0000Ds-6w; Tue, 03 Sep 2019 14:50:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1i5Dzl-0004Ck-4n; Tue, 03 Sep 2019 14:57:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C0ECF8980EA;
- Tue,  3 Sep 2019 18:50:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F1C831056FB1;
+ Tue,  3 Sep 2019 18:57:35 +0000 (UTC)
 Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 35E605D6B2;
- Tue,  3 Sep 2019 18:50:16 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190903145634.20237-1-eblake@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 47A0619C78;
+ Tue,  3 Sep 2019 18:57:32 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190903120555.7551-1-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -119,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <9bde61cf-b4a7-fb11-7b8d-12cf8a2dc558@redhat.com>
-Date: Tue, 3 Sep 2019 14:50:15 -0400
+Message-ID: <6aca73a4-1567-4952-14eb-ecd3c115acad@redhat.com>
+Date: Tue, 3 Sep 2019 14:57:31 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190903145634.20237-1-eblake@redhat.com>
+In-Reply-To: <20190903120555.7551-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 03 Sep 2019 18:50:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Tue, 03 Sep 2019 18:57:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] docs: Update preferred NBD
- device syntax
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] cutils: Move size_to_str()
+ from "qemu-common.h" to "qemu/cutils.h"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,64 +147,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/3/19 10:56 AM, Eric Blake wrote:
-> Mention the preferred URI form, especially since NBD is trying to
-> standardize that form: https://lists.debian.org/nbd/2019/06/msg00012.html
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 9/3/19 8:05 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> "qemu/cutils.h" contains various qemu_strtosz_*() functions
+> useful to convert strings to size. It seems natural to have
+> the opposite usage (from size to string) there too.
+>=20
+> The function definition is already in util/cutils.c.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  qemu-doc.texi | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 577d1e837640..c83fb347d77e 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -297,7 +297,14 @@ qemu-system-i386 -drive file=iscsi://192.0.2.1/iqn.2001-04.com.example/1
-> 
->  @item NBD
->  QEMU supports NBD (Network Block Devices) both using TCP protocol as well
-> -as Unix Domain Sockets.
-> +as Unix Domain Sockets.  With TCP, the default port is 10809.
-> 
-> -Syntax for specifying a NBD device using TCP
-> +Syntax for specifying a NBD device using TCP, in preferred URI form:
-> +``nbd://<server-ip>[:<port>]/[<export>]''
-> +
-> +Syntax for specifying a NBD device using Unix Domain Sockets; remember
-> +that '?' is a shell glob character and may need quoting:
-> +``nbd+unix:///[<export>]?socket=<domain-socket>''
-> +
-> +Older syntax that is also recognized:
+> There are only 5 users, is it worthwhile renaming it qemu_sztostrt()?
 
-Deprecated officially, or no?
+(On the other hand, "size_to_str" is easy to read and "sztostrt" looks
+like someone sneezed with their hand on the keyboard.)
 
->  ``nbd:<server-ip>:<port>[:exportname=<export>]''
-> 
-> -Syntax for specifying a NBD device using Unix Domain Sockets
->  ``nbd:unix:<domain-socket>[:exportname=<export>]''
-> 
->  Example for TCP
->  @example
-> -qemu-system-i386 --drive file=nbd:192.0.2.1:30000
-> +qemu-system-i386 --drive file=nbd://192.0.2.1:30000
->  @end example
-> 
->  Example for Unix Domain Sockets
->  @example
-> -qemu-system-i386 --drive file=nbd:unix:/tmp/nbd-socket
-> +qemu-system-i386 --drive "file=nbd+unix:///?socket=/tmp/nbd-socket"
->  @end example
-> 
->  @item SSH
-> 
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  block/qapi.c                 | 2 +-
+>  include/qemu-common.h        | 1 -
+>  include/qemu/cutils.h        | 2 ++
+>  qapi/string-output-visitor.c | 2 +-
+>  4 files changed, 4 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/block/qapi.c b/block/qapi.c
+> index 15f1030264..7ee2ee065d 100644
+> --- a/block/qapi.c
+> +++ b/block/qapi.c
+> @@ -23,7 +23,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> -#include "qemu-common.h"
+> +#include "qemu/cutils.h"
+
+I guess that's a more targeted inclusion. (That was the last thing we
+needed in there?)
+
+Seems proper. It must be an oversight to begin with that we declared it
+in qemu-common but defined it in cutils.
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
