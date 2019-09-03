@@ -2,66 +2,62 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E58C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 11:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D322CC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 11:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A78A72087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 11:47:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A78A72087E
+	by mail.kernel.org (Postfix) with ESMTPS id AAB162087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 11:47:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAB162087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i57HA-00043U-ET
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 07:47:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54733)
+	id 1i57HD-00046k-Og
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 07:47:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54750)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1i57Fj-00037O-2t
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:45:40 -0400
+ (envelope-from <berrange@redhat.com>) id 1i57Fm-0003Ac-1q
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1i57Fh-0004c4-JD
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:45:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53730)
+ (envelope-from <berrange@redhat.com>) id 1i57Fk-0004eJ-PM
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:45:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59078)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1i57Fe-0004ZX-KC; Tue, 03 Sep 2019 07:45:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i57Fk-0004dF-HU
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 07:45:40 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 710561E2E6;
- Tue,  3 Sep 2019 11:45:33 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0497E60A35;
- Tue,  3 Sep 2019 11:45:23 +0000 (UTC)
-To: Peter Xu <peterx@redhat.com>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-10-eric.auger@redhat.com>
- <20190819082424.GB13560@xz-x1>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <d3759ba2-6ae6-2ae4-a71e-69965285f3f4@redhat.com>
-Date: Tue, 3 Sep 2019 13:45:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 2748E8980E5;
+ Tue,  3 Sep 2019 11:45:39 +0000 (UTC)
+Received: from redhat.com (ovpn-112-33.ams2.redhat.com [10.36.112.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F366A60C05;
+ Tue,  3 Sep 2019 11:45:35 +0000 (UTC)
+Date: Tue, 3 Sep 2019 12:45:32 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190903114532.GC15960@redhat.com>
+References: <20190827120221.15725-1-yury-kotov@yandex-team.ru>
+ <20190903112140.GE2744@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20190819082424.GB13560@xz-x1>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 03 Sep 2019 11:45:33 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <20190903112140.GE2744@work-vm>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Tue, 03 Sep 2019 11:45:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 09/15] virtio-iommu: Implement
- translate
+Subject: Re: [Qemu-devel] [PATCH 0/3] UUID validation during migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,116 +69,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, mst@redhat.com,
- tn@semihalf.com, qemu-devel@nongnu.org, alex.williamson@redhat.com,
- qemu-arm@nongnu.org, jean-philippe@linaro.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>,
+ yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
-
-On 8/19/19 10:24 AM, Peter Xu wrote:
-> On Tue, Jul 30, 2019 at 07:21:31PM +0200, Eric Auger wrote:
->> @@ -464,19 +464,75 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
->>                                              int iommu_idx)
->>  {
->>      IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
->> +    VirtIOIOMMU *s = sdev->viommu;
->>      uint32_t sid;
->> +    viommu_endpoint *ep;
->> +    viommu_mapping *mapping;
->> +    viommu_interval interval;
->> +    bool bypass_allowed;
->> +
->> +    interval.low = addr;
->> +    interval.high = addr + 1;
->>  
->>      IOMMUTLBEntry entry = {
->>          .target_as = &address_space_memory,
->>          .iova = addr,
->>          .translated_addr = addr,
->> -        .addr_mask = ~(hwaddr)0,
->> +        .addr_mask = (1 << ctz32(s->config.page_size_mask)) - 1,
->>          .perm = IOMMU_NONE,
->>      };
->>  
->> +    bypass_allowed = virtio_has_feature(s->acked_features,
->> +                                        VIRTIO_IOMMU_F_BYPASS);
->> +
->>      sid = virtio_iommu_get_sid(sdev);
->>  
->>      trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
->> +    qemu_mutex_lock(&s->mutex);
->> +
->> +    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(sid));
->> +    if (!ep) {
->> +        if (!bypass_allowed) {
->> +            error_report("%s sid=%d is not known!!", __func__, sid);
+On Tue, Sep 03, 2019 at 12:21:40PM +0100, Dr. David Alan Gilbert wrote:
+> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> > Hi,
+> > 
+> > This series adds an UUID validation at the start of the migration
+> > on the target side. The idea is to identify the source of migration.
+> > 
+> > Possible case of problem:
+> > 1. There are 3 servers: A, B and C
+> > 2. Server A has a VM 1, server B has a VM 2
+> > 3. VM 1 and VM 2 want to migrate to the server C
+> > 4. Target of VM 1 starts on the server C and dies too quickly for some reason
+> > 5. Target of VM 2 starts just after that and listen the same tcp port X, which
+> >    the target of VM 1 wanted to use
+> > 6. Source of VM 1 connects to the tcp port X, and migrates to VM 2 source
 > 
-> Maybe use error_report_once() to avoid DOS attack?  Also would it be
-> good to unify the debug prints?  I see both error_report() and
-> qemu_log_mask() are used in the whole patchset.  Or is that attempted?
+> That shouldn't be possible in practice; you specify the destination tcp
+> port when you start the destination qemu; so unless the management code
+> that starts the migration is very broken it should know which port it's
+> migrating to.
+> However, if it is very broken then this is a good check.
 
-I switched to error_report_once()
+In some, but not all, cases allowing the wrong source QEMU to connect to
+a target QEMU could be considered a serious security flaw.
 
-I understand that qemu_log_mask() should be used whenever the root cause
-is a bad action of the guest OS (in below case, the EP was not attached
-to any domain). Above, there is an EP that attempts to talk through the
-IOMMU and this was not expected (rather a platform description issue or
-a qemu bug).
+Historically live migration security was pretty minimal, to non-existant,
+but we do now have the ability todo much better with TLS.
 
-Thanks
+With the way libvirt currently uses TLS for migration, we're just protecting
+against a rogue host connecting, as any host with a valid cert gets allowed.
 
-Eric
-> 
->> +        } else {
->> +            entry.perm = flag;
->> +        }
->> +        goto unlock;
->> +    }
->> +
->> +    if (!ep->domain) {
->> +        if (!bypass_allowed) {
->> +            qemu_log_mask(LOG_GUEST_ERROR,
->> +                          "%s %02x:%02x.%01x not attached to any domain\n",
->> +                          __func__, PCI_BUS_NUM(sid),
->> +                          PCI_SLOT(sid), PCI_FUNC(sid));
->> +        } else {
->> +            entry.perm = flag;
->> +        }
->> +        goto unlock;
->> +    }
->> +
->> +    mapping = g_tree_lookup(ep->domain->mappings, (gpointer)(&interval));
->> +    if (!mapping) {
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "%s no mapping for 0x%"PRIx64" for sid=%d\n",
->> +                      __func__, addr, sid);
->> +        goto unlock;
->> +    }
->> +
->> +    if (((flag & IOMMU_RO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
->> +        ((flag & IOMMU_WO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "Permission error on 0x%"PRIx64"(%d): allowed=%d\n",
->> +                      addr, flag, mapping->flags);
->> +        goto unlock;
->> +    }
->> +    entry.translated_addr = addr - mapping->virt_addr + mapping->phys_addr;
->> +    entry.perm = flag;
->> +    trace_virtio_iommu_translate_out(addr, entry.translated_addr, sid);
->> +
->> +unlock:
->> +    qemu_mutex_unlock(&s->mutex);
->>      return entry;
->>  }
->>  
->> -- 
->> 2.20.1
->>
-> 
-> Regards,
-> 
+We could do better by using the new ACLs feature to whitelist just the
+particular virt host that we know the source VM is on.
+
+This still allows for an accident if libvirt is migrating 2 VMs on the
+same source host at the same time.
+
+What's needed is a unique identity for each individual migration operation.
+
+The use of the UUID here is aiming to serve that role.
+
+Assuming libvirt has protected its TLS certificates on the source host,
+then this solution is secure. An attacker would need to become root on
+the source host to access libvirt's TLS certs, at which point no other
+strategy libvirt used instead of UUID would be secure either.
+
+
+So I think from a security POV, the use of UUID is acceptable.
+
+
+An alternative would be to not use TLS certificates, and instead use the
+TLS pre-shared  keys credential type, generating a new set of PSK creds
+for each migration operation.  In this case, UUID would not be required
+at all. I don't see this as a reason to reject the UUID check though.
+It is reasonable for mgmt apps to have a choice in which approach they
+pick.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
