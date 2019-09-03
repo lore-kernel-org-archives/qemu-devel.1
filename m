@@ -2,50 +2,47 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-12.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B651C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E990EC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:06:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FCAB20870
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:06:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCAB20870
+	by mail.kernel.org (Postfix) with ESMTPS id C15BD22CF8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:06:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15BD22CF8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5CG1-0007gW-1G
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:06:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45999)
+	id 1i5CGP-0008Bl-ON
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:06:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45729)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5CCQ-0003s1-CS
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:02:35 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5CAl-0001na-FM
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5CCP-00007Z-CJ
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:02:34 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:40842
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5CAj-0007gh-Kp
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:00:51 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:40802
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1i5CCP-00007G-2c
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:02:33 -0400
+ id 1i5CAj-0007fv-EK
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 13:00:49 -0400
 Received: from host86-168-80-252.range86-168.btcentralplus.com
  ([86.168.80.252] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1i5CCU-0000DZ-Bc; Tue, 03 Sep 2019 18:02:40 +0100
-To: Howard Spoelstra <hsp.cat7@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20190629130017.2973-1-richard.henderson@linaro.org>
- <5746cc58-c132-ef29-6ff4-da07c6086dac@ilande.co.uk>
- <3fe632b7-e83c-9b26-9338-1d7a9c881e0d@linaro.org>
- <CABLmASFUnBnn2DZidKFAiaMb7gExYttgvEv12uce9EPi6NL9Qw@mail.gmail.com>
+ id 1i5C8h-0000Cj-1H; Tue, 03 Sep 2019 17:58:45 +0100
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190903160858.5296-1-richard.henderson@linaro.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -72,12 +69,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <f1eeb1de-a6e7-bb83-3501-705382da4b14@ilande.co.uk>
-Date: Tue, 3 Sep 2019 18:02:29 +0100
+Message-ID: <6b27210e-a4b3-a8be-77a1-717e26de1747@ilande.co.uk>
+Date: Tue, 3 Sep 2019 17:58:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CABLmASFUnBnn2DZidKFAiaMb7gExYttgvEv12uce9EPi6NL9Qw@mail.gmail.com>
+In-Reply-To: <20190903160858.5296-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -87,7 +84,7 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: No (on mail.default.ilande.uk0.bigv.io); Unknown failure
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v6 00/16] tcg/ppc: Add vector opcodes
+Subject: Re: [Qemu-devel] [PATCH 00/36] tcg patch queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,52 +96,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, amarkovic@wavecomp.com
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/07/2019 19:34, Howard Spoelstra wrote:
+On 03/09/2019 17:08, Richard Henderson wrote:
 
-> On Mon, Jul 1, 2019 at 12:30 PM Richard Henderson <
-> richard.henderson@linaro.org> wrote:
+> The following changes since commit fec105c2abda8567ec15230429c41429b5ee307c:
 > 
->> On 6/30/19 7:58 PM, Mark Cave-Ayland wrote:
->>> I don't have space for a full set of images on the G4, however I've
->> tried boot tests
->>> on installer CDs for MacOS 9, OS X 10.2, Linux and HelenOS and it looks
->> good here.
->>>
->>> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> [PPC32]
->>
->> Thanks!
->>
->> Hi
+>   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20190828-pull-request' into staging (2019-09-03 14:03:15 +0100)
 > 
-> I just compiled the v6 set applied to current master on my G5, Ubuntu 16.
-> command line:
-> ./qemu-system-ppc -L pc-bios -boot c m 512 -M mac99,via=pmu \
-> -netdev user,id=net1 -device sungem,netdev=net1 \
-> -drive file=10.3.img,format=raw,media=disk \
+> are available in the Git repository at:
 > 
-> With no specific cpu set, Mac OS 9.2 hard disk image and 9.2 iso do not get
-> to the desktop, they just hang while still in the openbios window. They
-> need -cpu G4 on the command line to get to the desktop.
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20190903
 > 
-> OSX 10.3 installed image boots to desktop.
-> OSX 10.3 iso boots to installer
-> OSX 10.4 installed image boots to desktop.
-> OSX 10.4 iso boot to installer
-> OSX 10.5 installed image boots to desktop.
-> OSX 10.5 iso boots to installer
+> for you to fetch changes up to c25c283df0f08582df29f1d5d7be1516b851532d:
 > 
-> So there seems to be a difference between hosts: If ran on a G4 host there
-> is no need to add -cpu G4 to run Mac OS 9.x, while there is when ran on a
-> G5 host.
+>   tcg: Factor out probe_write() logic into probe_access() (2019-09-03 08:34:18 -0700)
+> 
+> ----------------------------------------------------------------
+> Allow page table bit to swap endianness.
+> Reorganize watchpoints out of i/o path.
+> Return host address from probe_write / probe_access.
+> 
+> ----------------------------------------------------------------
+> David Hildenbrand (11):
+>       exec: Factor out core logic of check_watchpoint()
+>       tcg: Check for watchpoints in probe_write()
+>       s390x/tcg: Use guest_addr_valid() instead of h2g_valid() in probe_write_access()
+>       s390x/tcg: Fix length calculation in probe_write_access()
+>       tcg: Factor out CONFIG_USER_ONLY probe_write() from s390x code
+>       tcg: Enforce single page access in probe_write()
+>       mips/tcg: Call probe_write() for CONFIG_USER_ONLY as well
+>       hppa/tcg: Call probe_write() also for CONFIG_USER_ONLY
+>       s390x/tcg: Pass a size to probe_write() in do_csst()
+>       tcg: Make probe_write() return a pointer to the host page
+>       tcg: Factor out probe_write() logic into probe_access()
+> 
+> Richard Henderson (6):
+>       exec: Move user-only watchpoint stubs inline
+>       cputlb: Fold TLB_RECHECK into TLB_INVALID_MASK
+>       exec: Factor out cpu_watchpoint_address_matches
+>       cputlb: Fix size operand for tlb_fill on unaligned store
+>       cputlb: Remove double-alignment in store_helper
+>       cputlb: Handle watchpoints via TLB_WATCHPOINT
+> 
+> Tony Nguyen (19):
+>       tcg: TCGMemOp is now accelerator independent MemOp
+>       memory: Introduce size_memop
+>       target/mips: Access MemoryRegion with MemOp
+>       hw/s390x: Access MemoryRegion with MemOp
+>       hw/intc/armv7m_nic: Access MemoryRegion with MemOp
+>       hw/virtio: Access MemoryRegion with MemOp
+>       hw/vfio: Access MemoryRegion with MemOp
+>       exec: Access MemoryRegion with MemOp
+>       cputlb: Access MemoryRegion with MemOp
+>       memory: Access MemoryRegion with MemOp
+>       hw/s390x: Hard code size with MO_{8|16|32|64}
+>       target/mips: Hard code size with MO_{8|16|32|64}
+>       exec: Hard code size with MO_{8|16|32|64}
+>       memory: Access MemoryRegion with endianness
+>       cputlb: Replace size and endian operands for MemOp
+>       memory: Single byte swap along the I/O path
+>       cputlb: Byte swap memory transaction attribute
+>       target/sparc: Add TLB entry with attributes
+>       target/sparc: sun4u Invert Endian TTE bit
+> 
+>  include/exec/cpu-all.h                  |   8 +-
+>  include/exec/exec-all.h                 |  10 +-
+>  include/exec/memattrs.h                 |   2 +
+>  include/exec/memop.h                    | 134 +++++++++++
+>  include/exec/memory.h                   |  12 +-
+>  include/hw/core/cpu.h                   |  37 +++
+>  target/arm/translate-a64.h              |   2 +-
+>  target/arm/translate.h                  |   2 +-
+>  target/sparc/cpu.h                      |   2 +
+>  tcg/tcg-op.h                            |  80 +++---
+>  tcg/tcg.h                               | 101 +-------
+>  trace/mem-internal.h                    |   4 +-
+>  trace/mem.h                             |   4 +-
+>  accel/tcg/cputlb.c                      | 414 ++++++++++++++++++--------------
+>  accel/tcg/user-exec.c                   |  32 +++
+>  exec.c                                  | 177 +++-----------
+>  hw/intc/armv7m_nvic.c                   |  13 +-
+>  hw/s390x/s390-pci-inst.c                |  11 +-
+>  hw/vfio/pci-quirks.c                    |   7 +-
+>  hw/virtio/virtio-pci.c                  |  15 +-
+>  memory.c                                |  58 +++--
+>  memory_ldst.inc.c                       |  81 ++-----
+>  target/alpha/translate.c                |   2 +-
+>  target/arm/translate-a64.c              |  48 ++--
+>  target/arm/translate-sve.c              |   2 +-
+>  target/arm/translate.c                  |  32 +--
+>  target/hppa/op_helper.c                 |   2 -
+>  target/hppa/translate.c                 |  14 +-
+>  target/i386/translate.c                 | 132 +++++-----
+>  target/m68k/translate.c                 |   2 +-
+>  target/microblaze/translate.c           |   4 +-
+>  target/mips/op_helper.c                 |  13 +-
+>  target/mips/translate.c                 |   8 +-
+>  target/openrisc/translate.c             |   4 +-
+>  target/ppc/translate.c                  |  12 +-
+>  target/riscv/insn_trans/trans_rva.inc.c |   8 +-
+>  target/riscv/insn_trans/trans_rvi.inc.c |   4 +-
+>  target/s390x/mem_helper.c               |  13 +-
+>  target/s390x/translate.c                |   6 +-
+>  target/s390x/translate_vx.inc.c         |  10 +-
+>  target/sparc/mmu_helper.c               |  40 +--
+>  target/sparc/translate.c                |  14 +-
+>  target/tilegx/translate.c               |  10 +-
+>  target/tricore/translate.c              |   8 +-
+>  tcg/aarch64/tcg-target.inc.c            |  26 +-
+>  tcg/arm/tcg-target.inc.c                |  26 +-
+>  tcg/i386/tcg-target.inc.c               |  24 +-
+>  tcg/mips/tcg-target.inc.c               |  16 +-
+>  tcg/optimize.c                          |   2 +-
+>  tcg/ppc/tcg-target.inc.c                |  12 +-
+>  tcg/riscv/tcg-target.inc.c              |  20 +-
+>  tcg/s390/tcg-target.inc.c               |  14 +-
+>  tcg/sparc/tcg-target.inc.c              |   6 +-
+>  tcg/tcg-op.c                            |  38 +--
+>  tcg/tcg.c                               |   2 +-
+>  MAINTAINERS                             |   1 +
+>  tcg/README                              |   2 +-
+>  57 files changed, 918 insertions(+), 865 deletions(-)
+>  create mode 100644 include/exec/memop.h
 
-Are there any outstanding issues with this patchset now, or is it ready to be merged?
-I'm really looking forward to seeing the improved performance when testing QEMU on my
-Mac Mini :)
+Is this a pull request rather than just a queue update? I'm just wondering if I
+should wait for this to get merged first before I start testing the
+do_transaction_failed hook patches?
 
 
 ATB,
