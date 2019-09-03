@@ -2,81 +2,89 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE352C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B72D3C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:06:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78AF522D6D
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:04:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KfFJQrWW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78AF522D6D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C9FF22D6D
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:06:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C9FF22D6D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5AMZ-0006KH-LK
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:04:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49377)
+	id 1i5ANz-0007jf-Oy
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:06:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ALo-0005rn-91
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:04:09 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5ANH-000766-DD
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ALn-0002LN-15
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:04:07 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:44814)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5ALm-0002Ku-Nf
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:04:06 -0400
-Received: by mail-oi1-x232.google.com with SMTP id w6so463738oie.11
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:04:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=QXdCOxdRr4JhFXbNuaXCvbN5G0um9X9Bke2llrs7tBQ=;
- b=KfFJQrWWzXzQvSYr5WqEKFhCgEaC5ry8Cu26wzRZDSpfZKT9Z8zngv/hXh5E3nqkRB
- icQNc2v4c4C7OZ/f0nzZDVDKhxEbAX9MkN0+7kwFpdW4AEIkADnHlFF0aS1zH0yNrhZQ
- EOUkSkoGZY3DbmQ/wU7C6F7AsdEG8srscyvSA2JEtbnT4SHP4qF4EEB2qonZultWnSAG
- 1Ci3YaNAIfhw4TVu7Pg7+yzeROItxf1a9hH0UIKAm0vdlVEIsyun3qu8ASsB+IYhgFS/
- fqia1vRulW/1HYv9JKEbPgW7HJ9kigtlIt83IyKN15OQD+vdhfx5Qyfx1thTvEz2QZJS
- WKvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=QXdCOxdRr4JhFXbNuaXCvbN5G0um9X9Bke2llrs7tBQ=;
- b=s9QsRXT1LCzIfus3FJ5Y5qWr3pym7olgjXq8Ijg+Wf4hSBjBg+DXGIViQNCYaUIJB5
- 2Mu2vlz8A32eZT7doJRsu6Sqa8dm/7A/K/+p8shXn2R0kad7iZA1TWJ2auhSMqg9aTV2
- /QRi3rWqXBPpS56z3jLYgpAH11dH+MY4WEHHQ9snkzOpMTv25Ww55yC2l+kfEdXULgEI
- 4j1r1maA1zmQYUUdccmANLjE9lUy9W7Q8pDBE7cl0PkY6wwvU2nHhXVofXcNKazZGu7r
- t0Jhxxqo174pWwj+dArNEKrss79++U8s6Bh+TBxUSCyfv01zubM90RSAwk6wXy23uizN
- zMQw==
-X-Gm-Message-State: APjAAAUeRKCtIQJ2vsFLxhCgkjkIsUHuZWSgL+qTSjhlHETV78UwqYZ0
- /JMIkcvE2hWQAXnh9cRiqJq1NmlROs21YMDlZ+6i0A==
-X-Google-Smtp-Source: APXvYqyIdP0pYa+gsxSP1A6o/PwfAq4PrR6rvjKlw58zfRcw54tb68yq4Yxz8mVmmkQTw0mQvr8C8bQP65qlEzcXHDk=
-X-Received: by 2002:aca:50d8:: with SMTP id e207mr353847oib.48.1567523045261; 
- Tue, 03 Sep 2019 08:04:05 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1i5ANC-0003AG-JL
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:05:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51669)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i5AN6-000352-2i; Tue, 03 Sep 2019 11:05:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1B8EB3174645;
+ Tue,  3 Sep 2019 15:05:27 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F60E612B1;
+ Tue,  3 Sep 2019 15:05:26 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190903135024.498239-1-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <0863ee98-eb0f-8e59-12b4-42557767ab38@redhat.com>
+Date: Tue, 3 Sep 2019 10:05:25 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190828184026.5840-1-ehabkost@redhat.com>
-In-Reply-To: <20190828184026.5840-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Sep 2019 16:03:54 +0100
-Message-ID: <CAFEAcA-AvFS2cbDH-t5SxgY9hA=LGL81_8dn-vh193vtV9W1Lg@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::232
-Subject: Re: [Qemu-devel] [PULL v6 00/12] Machine + x86 queue, 2019-08-28
+In-Reply-To: <20190903135024.498239-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="GMGNzxw0K61aWJhv7UnxjHT2i11JkKrVs"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Tue, 03 Sep 2019 15:05:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: skip 232 when run tests as root
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,59 +96,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 28 Aug 2019 at 19:40, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> Sorry for taking so long after 4.1.0 to send this.  I had to sort
-> out some conflicts with recent header cleanups.
->
-> The following changes since commit 23919ddfd56135cad3cb468a8f54d5a595f024=
-f4:
->
->   Merge remote-tracking branch 'remotes/aperard/tags/pull-xen-20190827' i=
-nto staging (2019-08-27 15:52:36 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
->
-> for you to fetch changes up to f4abcc0a75f1310dbe66b852ed97ec7caf2708d5:
->
->   i386/vmmouse: Properly reset state (2019-08-27 16:50:14 -0300)
->
-> ----------------------------------------------------------------
-> Machine + x86 queue, 2019-08-28
->
-> Bug fixes:
-> * Fix die-id validation regression (Eduardo Habkost)
-> * vmmouse: Properly reset state (Jan Kiszka)
-> * hostmem-file: fix pmem file size check (Stefan Hajnoczi)
->
-> Cleanups:
-> * NUMA code cleanups (Tao Xu)
-> * Remove stale externs from includes (Alex Benn=C3=A9e)
->
-> Features:
-> * qapi: report the default CPU type for each machine (Daniel P. Berrang=
-=C3=A9)
->
-> ----------------------------------------------------------------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GMGNzxw0K61aWJhv7UnxjHT2i11JkKrVs
+Content-Type: multipart/mixed; boundary="thKFMSBsfnn22ksEGUmwhfEkeTb62S6Du";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <0863ee98-eb0f-8e59-12b4-42557767ab38@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: skip 232 when run tests as root
+References: <20190903135024.498239-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190903135024.498239-1-vsementsov@virtuozzo.com>
 
-Hi. This generates extra warnings during 'make check'
-that all look like:
+--thKFMSBsfnn22ksEGUmwhfEkeTb62S6Du
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-qemu-system-ppc64: warning: Default splitting of RAM between nodes is
-deprecated, Use '-numa node,memdev' to explictly define RAM allocation
-per node
+On 9/3/19 8:50 AM, Vladimir Sementsov-Ogievskiy wrote:
+> chmod a-w don't help under root, so skip the test in such case.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>=20
+> v2: move new check under TEST_IMG=3DTEST_IMG_FILE workaround [Kevin]
+>=20
+>  tests/qemu-iotests/232 | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/tests/qemu-iotests/232 b/tests/qemu-iotests/232
+> index 2063f78876..65b0e42063 100755
+> --- a/tests/qemu-iotests/232
+> +++ b/tests/qemu-iotests/232
+> @@ -74,6 +74,12 @@ if [ -n "$TEST_IMG_FILE" ]; then
+>      TEST_IMG=3D$TEST_IMG_FILE
+>  fi
+> =20
+> +chmod a-w $TEST_IMG
+> +(echo test > $TEST_IMG) 2>/dev/null && \
+> +    _notrun "Readonly attribute is ignored, probably you run this test=
+ as" \
 
-Can you suppress them, please (or fix them if they are
-legitimate)?
+s/run/ran/
 
-thanks
--- PMM
+> +            "root, which is unsupported."
+> +chmod a+w $TEST_IMG
+> +
+>  echo
+>  echo "=3D=3D=3D -drive with read-write image: read-only/auto-read-only=
+ combinations =3D=3D=3D"
+>  echo
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--thKFMSBsfnn22ksEGUmwhfEkeTb62S6Du--
+
+--GMGNzxw0K61aWJhv7UnxjHT2i11JkKrVs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1ugTUACgkQp6FrSiUn
+Q2pWRQf8CINNJ1VrCDGRN0egPnobZwxVHz9lAFxoN0cCPETcyEA7SRfT3vZ3aCUg
+ypsPYteobQAt8FsR+WFr8F+V8Y4CbYVnNiTy2jc8NDKHN6OG5WL7Vi5vCnHXmdy7
+rijarh5EBXy5lbVt6vakpc6ybV5Wk7Tlpjf0XCyoqQJi11ibJabjkQOyVB8jiab6
+VfFKi8vDF0a6kFcYkNR0zhxHAwqR33YFN+ZBTuMG+WjWk8D35QOilSPESw6E2Vqr
+TQW4Y4eRnsSsP61u4/ajzaCdQlGE4Nm7HwtLmut3eh/O/YAFVECNUYxG0GsdrPkz
+g2aPLv+qgTBZhAbGtLUj0CLe8x2EJw==
+=rEnt
+-----END PGP SIGNATURE-----
+
+--GMGNzxw0K61aWJhv7UnxjHT2i11JkKrVs--
 
