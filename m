@@ -2,86 +2,93 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA00CC3A5A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:08:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21492C3A5A7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4E8B206B8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:08:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1VfeHA8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E8B206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EDF402054F
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:23:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDF402054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i52ve-0005EL-Na
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 03:08:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37064)
+	id 1i53AP-0007mV-2F
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 03:23:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i52uk-0004pl-VV
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:07:45 -0400
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i539d-0007B8-9i
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i52ui-00035q-BI
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:07:42 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:37245)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i52ui-00035Y-2C
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:07:40 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id b25so11991337oib.4
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 00:07:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=QQJ5aYHHHASGNdZ81y6xT7exo0NH5izgyd29CZT6GsY=;
- b=d1VfeHA8nBjTS+QYSi4PibGYuE1pMR0CKOWCPG/9XmYwz4NSXIHGjriyjFFLGdvh8Y
- eKDXNvKCkkxQhWfLUc+nyfC7kHa4UqdizT53rzynvnUzQApmI9bZ+nBTU2M/W80l+/hT
- Qsm/e7dEqO8vvodtSogzWT684JuMo1JMBrLZwqgxLvvaiNZnHB2lblBNlZjYFsdtv+Me
- +3cIPM4vtVO/sv0JMr2gEeOh2I84c52VKUP1jWHQIiwn+ECwgnUUOtowQ8UEFlEKJIwJ
- OLi7dsK2ZJxLaIWqcrS40ffMgyVq8Te2bq2cz50s1zKTsy/GByPQqCtPE15SzJgs3nOg
- +oEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=QQJ5aYHHHASGNdZ81y6xT7exo0NH5izgyd29CZT6GsY=;
- b=F+15HWK2os8WZSvrK6nINaFA1C9bRhfwgUPb0F4htPcHVoyLr3GVLGrkwSh1Ce0Hp5
- YL8S9p6sFthr0XHKGayAJT/sp3na2SCztMEEENlko9qvwQ4zXjXNKVjQKRyim+c9SI66
- 8CPScEJhy8Y5dXKRyr2ZYCFQe7Ai7kWKtRRBYHZpT5qzjLESgB0oAhU0C8Ht7dE5xA4m
- zwFsb7RHbMh5IkemVYWYqHOBCKJClfCVoXBUftc2lJTp5OwS4TwzbbizkADFIkBQWFxa
- Wz4bx2v3XddcWAr9EcnjT+voa+dirs/KJvWueQ5FN7zvHRsvBy6TR64sEGQzFrj3WGtt
- JRrQ==
-X-Gm-Message-State: APjAAAVZ0b9e7XlJ1d/65RLUN424zl+gBJUQZik7fPIJBPAhRKpwSykV
- 8d5JiWtVxMG45onz1YCTATw3QrKLdgV1kIr1FPE=
-X-Google-Smtp-Source: APXvYqx1vpN8yge2cMhcQCyRPDkI1R+mSNClxvwffyOd1oUFpwlKhXJe+4PQJfQ3Mc47l1PPFUaIcjfFbn4vNfBdcYc=
-X-Received: by 2002:a05:6808:a1c:: with SMTP id
- n28mr3340529oij.136.1567494459023; 
- Tue, 03 Sep 2019 00:07:39 -0700 (PDT)
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i539b-00035k-Ro
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 03:23:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59666)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+ id 1i539Y-00031e-Ch; Tue, 03 Sep 2019 03:23:00 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x837LxTN110407; Tue, 3 Sep 2019 03:22:44 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2usjbttq0s-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 03 Sep 2019 03:22:44 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x837JgON006599;
+ Tue, 3 Sep 2019 07:22:43 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma04wdc.us.ibm.com with ESMTP id 2us9fmtudn-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 03 Sep 2019 07:22:43 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
+ [9.57.199.107])
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x837MgXC52101494
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 3 Sep 2019 07:22:42 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C6088124055;
+ Tue,  3 Sep 2019 07:22:42 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0B526124052;
+ Tue,  3 Sep 2019 07:22:40 +0000 (GMT)
+Received: from [9.85.70.152] (unknown [9.85.70.152])
+ by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue,  3 Sep 2019 07:22:40 +0000 (GMT)
+To: Greg Kurz <groug@kaod.org>
+References: <156715632966.27761.8190459106519248668.stgit@aravinda>
+ <156715642090.27761.17328167484986424722.stgit@aravinda>
+ <20190830155856.6b4ede14@bahia.lan>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <f4e53c2c-12ac-5422-a7dc-26cb28b087af@linux.vnet.ibm.com>
+Date: Tue, 3 Sep 2019 12:52:39 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.6.0
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
- Tue, 3 Sep 2019 00:07:37 -0700 (PDT)
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
- Tue, 3 Sep 2019 00:07:37 -0700 (PDT)
-In-Reply-To: <tencent_4D0D8A6738AA24B65B532FA1@qq.com>
-References: <tencent_4D0D8A6738AA24B65B532FA1@qq.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 3 Sep 2019 09:07:37 +0200
-Message-ID: <CAL1e-=hc7Xi8EVXThQ0-kJQfvqs2m6wLAuEyTZaK7SUe1gbqBg@mail.gmail.com>
-To: Libo Zhou <zhlb29@foxmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+In-Reply-To: <20190830155856.6b4ede14@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-03_01:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=924 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909030080
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH v12 2/6] ppc: spapr: Introduce FWNMI
+ capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,251 +100,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, paulus@ozlabs.org,
+ qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-30.08.2019. 11.14, "Libo Zhou" <zhlb29@foxmail.com> =D1=98=D0=B5 =D0=BD=D0=
-=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Hi Aleksandar,
->
-> Thanks for explaining helper functions for me. Before getting my hands
-dirty, I have some more questions. After figuring them out, I can get
-started.
->
-> I need to add some new registers to the CPU. In "translate.c", I found
-that the registers are declared as static TCGv array (e.g. cpu_gpr[32]).
-Then, in function mips_tcg_init(), cpu_gpr[i] is created one by one with
-tcg_global_mem_new(...) in a for loop. Is that all I need to do to add new
-registers to the CPU? I noticed another file "cpu.h", do I also need to add
-my new registers, say, "my_gpr[32]" in "cpu.h"?
->
-> My new instructions also include some load & stores. I see I can
-implement them with tcg_gen_qemu_ld/st_tl(...) in the decode function's
-switch-case statements, but I don't see how the *target* memory is created.
-Shouldn't they be created with tcg_global_mem_new(...), just like how the
-registers are created? I can hack the memory by creating a *super* larger
-register file, and hack the loads & stores with register moves, but that
-just sounds too sketchy.
->
 
-For register definition, load/store instruction, take a look at details of
-this series:
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg06028.html
+On Friday 30 August 2019 07:28 PM, Greg Kurz wrote:
+> On Fri, 30 Aug 2019 14:43:40 +0530
+> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+> 
+>> Introduce the KVM capability KVM_CAP_PPC_FWNMI so that
+>> the KVM causes guest exit with NMI as exit reason
+>> when it encounters a machine check exception on the
+>> address belonging to a guest. Without this capability
+>> enabled, KVM redirects machine check exceptions to
+>> guest's 0x200 vector.
+>>
+>> This patch also introduces fwnmi-mce capability to
+>> deal with the case when a guest with the
+>> KVM_CAP_PPC_FWNMI capability enabled is attempted
+>> to migrate to a host that does not support this
+>> capability.
+>>
+>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>> ---
+>>  hw/ppc/spapr.c         |    1 +
+>>  hw/ppc/spapr_caps.c    |   29 +++++++++++++++++++++++++++++
+>>  include/hw/ppc/spapr.h |    4 +++-
+>>  target/ppc/kvm.c       |   22 ++++++++++++++++++++++
+>>  target/ppc/kvm_ppc.h   |   11 +++++++++++
+>>  5 files changed, 66 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index ea56499..8288e8b 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -4487,6 +4487,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
+>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+>>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
+>> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
+>>      spapr_caps_add_properties(smc, &error_abort);
+>>      smc->irq = &spapr_irq_dual;
+>>      smc->dr_phb_enabled = true;
+>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+>> index 481dfd2..c11ff87 100644
+>> --- a/hw/ppc/spapr_caps.c
+>> +++ b/hw/ppc/spapr_caps.c
+>> @@ -496,6 +496,25 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+>>      }
+>>  }
+>>  
+>> +static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
+>> +                                Error **errp)
+>> +{
+>> +    if (!val) {
+>> +        return; /* Disabled by default */
+>> +    }
+>> +
+>> +    if (tcg_enabled()) {
+>> +        /*
+>> +         * TCG support may not be correct in some conditions (e.g., in case
+>> +         * of software injected faults like duplicate SLBs).
+>> +         */
+>> +        warn_report("Firmware Assisted Non-Maskable Interrupts not supported in TCG");
+>> +    } else if (kvm_enabled() && !kvmppc_has_cap_ppc_fwnmi()) {
+>> +        error_setg(errp,
+>> +"Firmware Assisted Non-Maskable Interrupts not supported by KVM, try cap-fwnmi-mce=off");
+>> +    }
+>> +}
+>> +
+>>  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>>      [SPAPR_CAP_HTM] = {
+>>          .name = "htm",
+>> @@ -595,6 +614,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>>          .type = "bool",
+>>          .apply = cap_ccf_assist_apply,
+>>      },
+>> +    [SPAPR_CAP_FWNMI_MCE] = {
+>> +        .name = "fwnmi-mce",
+>> +        .description = "Handle fwnmi machine check exceptions",
+>> +        .index = SPAPR_CAP_FWNMI_MCE,
+>> +        .get = spapr_cap_get_bool,
+>> +        .set = spapr_cap_set_bool,
+>> +        .type = "bool",
+>> +        .apply = cap_fwnmi_mce_apply,
+>> +    },
+>>  };
+>>  
+>>  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+>> @@ -734,6 +762,7 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
+>>  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+>>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+>>  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+>> +SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
+>>  
+>>  void spapr_caps_init(SpaprMachineState *spapr)
+>>  {
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 03111fd..66049ac 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -79,8 +79,10 @@ typedef enum {
+>>  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
+>>  /* Count Cache Flush Assist HW Instruction */
+>>  #define SPAPR_CAP_CCF_ASSIST            0x09
+>> +/* FWNMI machine check handling */
+>> +#define SPAPR_CAP_FWNMI_MCE             0x0A
+>>  /* Num Caps */
+>> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
+>> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
+>>  
+>>  /*
+>>   * Capability Values
+>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+>> index 8c5b1f2..c055fc1 100644
+>> --- a/target/ppc/kvm.c
+>> +++ b/target/ppc/kvm.c
+>> @@ -85,6 +85,7 @@ static int cap_ppc_safe_indirect_branch;
+>>  static int cap_ppc_count_cache_flush_assist;
+>>  static int cap_ppc_nested_kvm_hv;
+>>  static int cap_large_decr;
+>> +static int cap_ppc_fwnmi;
+>>  
+>>  static uint32_t debug_inst_opcode;
+>>  
+>> @@ -2055,6 +2056,22 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
+>>      }
+>>  }
+>>  
+>> +int kvmppc_set_fwnmi(void)
+>> +{
+>> +    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
+>> +    CPUState *cs = CPU(cpu);
+>> +    int ret;
+>> +
+>> +    ret = kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
+>> +    if (ret) {
+>> +        error_report("This KVM version does not support FWNMI");
+>> +        return ret;
+>> +    }
+>> +
+>> +    cap_ppc_fwnmi = 1;
+> 
+> Hmm... AFAICT the meaning of cap_ppc_fwnmi should just be "KVM knows about
+> FWNMI", not "FWNMI was successfully enabled in KVM". Your v10 used to set
+> cap_ppc_fwnmi in kvm_arch_init() just like the other guys... why this change ?
 
-Don't mix register and memory initialization. For memory, the existing code
-should bu sufficient.
+Even I thought that cap_* is for that, but cap_papr uses it the other
+way. So I decided to use a similar convention for cap_ppc_fwnmi.
 
-What you need to additionally do (and you didn't mention it) is to define a
-CPU that will have some base instruction set (it coukd be, for example,
-mips32r2) + your additional instructions. This is done in file by adding a
-corresponding item in translate_init.inc.c (if you choise mips32r2 as base
-ISA, you could base your new CPU on existing CPU 24Kf). And then you start
-QEMU with switch "-cpu <your newly defined CPU>".
+In v10, cap_ppc_fwnmi is set in kvm_arch_init() if FWNMI is available in
+KVM and we try to enable FWNMI later in the boot phase when
+rtas_ibm_nmi_register() is called. It's possible that
+SPAPR_CAP_FWNMI_MCE is set and we may fail to enable FWNMI due to errors
+in KVM or QEMU.
 
-I may add more explanation later on.
+To avoid this, in v12, FWNMI is enabled if SPAPR_CAP_FWNMI_MCE is set
+irrespective of rtas_ibm_nmi_register() is called or not. This way we
+fail early if we are not able to enable FWNMI.
 
-> On the other hand, I would like to get it running first, without doing
-any modification to the source code. I can build the user space emulation
-on Linux.
->
-> ./configure --target-list=3Dmips-linux-user
->
-> Then I will write a testprogram.c, cross compile it on x86 into MIPS
-using gcc(I am not clear on how to do it, but my team has the compiler for
-our new ISA, I just want to try the MIPS version first), and run the test
-program.
->
-> ./qemu testprogram
->
-> How do I look at the contents in the target registers and memory? I saw
-that function "mips_cpu_dump_state" in "translate.c" does what I need, but
-I don't know how to call it in this process. Should I use gdb?
->
-> I am really sorry for asking you so many questions, but I think after
-getting them figured out, I can start my project. Thank you very much in
-advance, and have a good weekend!
->
+So, when SPAPR_CAP_FWNMI_MCE is set with FWNMI enabled in KVM, a machine
+check error will always cause a guest exit. If the guest has registered
+a handler by calling rtas_ibm_nmi_register(), then we will invoke the
+guest registered handler else we will jump to 0x200 interrupt vector in
+the guest.
 
-The questions are always fine and welcome, just we are typically very busy,
-snd can't always promptly replay.
+With this change we don't need "KVM knows about FWNMI" information. So I
+removed that part and used cap_ppc_fwnmi to track if FWNMI is enabled or
+disabled in KVM. This also simplifies spapr_fwnmi_post_load() to avoid
+enabling FWNMI multiple times (see patch 6).
 
-Aleksandae
+> 
+>> +    return ret;
+>> +}
+>> +
+>>  int kvmppc_smt_threads(void)
+>>  {
+>>      return cap_ppc_smt ? cap_ppc_smt : 1;
+>> @@ -2355,6 +2372,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
+>>      return cap_mmu_hash_v3;
+>>  }
+>>  
+>> +bool kvmppc_has_cap_ppc_fwnmi(void)
+>> +{
+>> +    return cap_ppc_fwnmi;
+>> +}
+>> +
+>>  static bool kvmppc_power8_host(void)
+>>  {
+>>      bool ret = false;
+>> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+>> index 98bd7d5..2990898 100644
+>> --- a/target/ppc/kvm_ppc.h
+>> +++ b/target/ppc/kvm_ppc.h
+>> @@ -27,6 +27,8 @@ void kvmppc_enable_h_page_init(void);
+>>  void kvmppc_set_papr(PowerPCCPU *cpu);
+>>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+>> +int kvmppc_set_fwnmi(void);
+>> +bool kvmppc_has_cap_ppc_fwnmi(void);
+>>  int kvmppc_smt_threads(void);
+>>  void kvmppc_hint_smt_possible(Error **errp);
+>>  int kvmppc_set_smt_threads(int smt);
+>> @@ -159,6 +161,15 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
+>>  {
+>>  }
+>>  
+>> +static inline int kvmppc_set_fwnmi(void)
+>> +{
+> 
+> Missing return -1;
 
-> Cheers,
-> Libo
->
->
-> ------------------ Original ------------------
-> From:  "Aleksandar Markovic";<aleksandar.m.mail@gmail.com>;
-> Send time: Thursday, Aug 29, 2019 10:22 PM
-> To: "Libo Zhou"<zhlb29@foxmail.com>;
-> Cc: "qemu-devel"<qemu-devel@nongnu.org>;
-> Subject:  Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
->
-> On Wed, Aug 28, 2019 at 5:54 AM Libo Zhou <zhlb29@foxmail.com> wrote:
->
-> > Hi Aleksandar,
-> >
-> > Thank you for the link to Loongson2F documentation. It has been very
-> > useful:)
-> >
-> > I have spent several days immersing myself in the source code, now I
-think
-> > I have a more solid understanding about it. Just like Loongson
-Multimedia
-> > Instructions, I need to implement some sort of complex vector
-instructions,
-> > and I need to write some helper functions (e.g. my_helper.c).
-> >
-> > The QEMU wiki website has very thorough explanation on TCG, but I
-haven't
-> > found any explanation on the port-specific helpers. Is there any
-> > documentation on how the helper functions are generated? I think now I
-> > *might* know how to write a working helper function, but I just don't
-know
-> > how it works.
-> >
-> >
-> Hello, Libo,
->
-> Prerequisite for writing a helper is that you have a clear definition of
-> new instruction functionality, in the sense, what operation is done on
-what
-> resources. "Resources" are registers - they could be general-purpose MIPS
-> registers, or some special additional registers. Did you use existing
-> registers, or did you define a new set or registers for your new
-> instructions? Registers are modeled as fields in a structure, and both
-> helpers and TCG implementations modify those fields while performing
-> instruction emulation.
->
-> In any case, you pass to the helper all information needed for the
-> instruction in question to perform. These are usually ordinal numbers of
-> involved register, derived from decoding the opcode. Alternatively, you
-can
-> pass pointers to the registers, rather than ordinal numbers. In turn, the
-> main part of functionality is implemented. At the end of helper, you may
-> want to update, let's say, a status register, if any (depending on your
-> design).
->
-> The declaration of helpers is a little contrived, and may still confuse
-> you. But this is not crucial to you. I advise you just to copy a solution
-> for a similar existing instruction.
->
-> Yours,
-> Aleksandar
->
->
->
-> > Cheers,
-> > Libo
-> >
-> >
-> >
-> >
-> > ------------------ Original message ------------------
-> > *From:* "Aleksandar Markovic";
-> > *Sendtime:* Thursday, Aug 22, 2019 6:53 PM
-> > *To:* "Libo Zhou";
-> > *Cc:* "qemu-devel";
-> > *Subject:* Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
-> >
-> > On Thu, Aug 22, 2019 at 12:24 PM =E7=AB=8B <zhlb29@foxmail.com> wrote:
-> >
-> > > Hi Aleksandar,
-> > >
-> > > Thank you very much for your patient explanation in the previous post=
-.
-> > And
-> > > thank you for checking.
-> > > Your and Peter's replies in the previous post certainly helped a lot.
-I
-> > am
-> > > now looking at a git commit 7 years ago (
-> > > bd277fa1966bc400f1b411f868f39125cda0c403), it was a Loongson
-Multimedia
-> > > Instruction implementation done my Richard Henderson.
-> > >
-> >
-> > Cool, that commit is a very good staring point - it is definitely not
-too
-> > simple, and it is not too complex either. And you can discover several
-> > different concepts in the process of exploring the change.
-> >
-> > Documentation on instruction set extension related to the commit (found
-by
-> > Google):
-> > https://files.somniafabularum.com/loongson/docs/Loongson2FUserGuide.pdf
-> >
-> > Be persistent, take your time, study the details and handling of
-individual
-> > instructions, and, of course, let us know if you encounter some major
-> > obstacles or thorny dilemmas.
-> >
-> > Yours,
-> > Aleksandar
-> >
-> >
-> > > I think what he did is exactly what I want to do now. I got a vague
-view
-> > > of the big picture, but I need more time to figure out the details. I
-> > will
-> > > certainly ask more questions about this later, but before that I need
-to
-> > > look at some other parts of the source code:) Again thank you for
-> > checking!
-> > >
-> > > Cheers,
-> > > Libo
-> > >
-> > >
-> > > ------------------ Original message ------------------
-> > > *From:* "Aleksandar Markovic";
-> > > *Sendtime:* Thursday, Aug 22, 2019 4:23 PM
-> > > *To:* "=E7=AB=8B";
-> > > *Cc:* "qemu-devel";
-> > > *Subject:* Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
-> > >
-> > > On Tue, Aug 20, 2019 at 12:12 PM =E7=AB=8B <zhlb29@foxmail.com> wrote=
-:
-> > >
-> > > > I am working on a project that requires me to modify the ISA of the
-> > MIPS
-> > > > target.
-> > >
-> > >
-> > > L.,
-> > >
-> > > How is it going?
-> > >
-> > > Aleksandar
-> > >
-> > >
-> > >
-> > > > I have been staring at the source code for about a week, but found
-it
-> > > > really difficult due to me being a young rookie and the sparse
-> > comments.
-> > > > Specifically, I need to extend MIPS, by adding some new instruction=
-s
-> > and
-> > > > new CPU registers to the current architecture, and that sounds
-really
-> > > easy.
-> > > > I think the place for me to look at should be at the directory
-> > > > ${qemu_root}/target/mips/. With a MIPS Instruction Set Manual
-Release 6
-> > > > handy, I have difficulty finding the source code where the ISA
-resides.
-> > > Is
-> > > > it in op_helper.c? Or translate.c? Any guidance would be really
-> > > > appreciated. Thank you very much in advance.
-> > > >
-> > > >
-> > > > Cheers,
-> > > > L.
-> > >
-> >
+Hmm.. missed it.
+
+Regards,
+Aravinda
+
+> 
+>> +}
+>> +
+>> +static inline bool kvmppc_has_cap_ppc_fwnmi(void)
+>> +{
+>> +    return false;
+>> +}
+>> +
+>>  static inline int kvmppc_smt_threads(void)
+>>  {
+>>      return 1;
+>>
+> 
+
+-- 
+Regards,
+Aravinda
+
