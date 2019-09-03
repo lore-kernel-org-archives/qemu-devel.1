@@ -2,90 +2,153 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E9AC3A5A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 06:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2E2C3A5A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:00:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D09A1206B8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 06:58:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09A1206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AEF4D206B8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 07:00:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEF4D206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i52lu-0002G9-0S
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 02:58:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35510)
+	id 1i52nN-0003Id-Qh
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 03:00:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35542)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin.tian@intel.com>) id 1i52l0-0001qB-6U
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:39 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1i52lD-0001sl-Mx
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1i52kx-00071Q-W0
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:37 -0400
-Received: from mga03.intel.com ([134.134.136.65]:60247)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1i52kx-00070H-OA
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:35 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 02 Sep 2019 23:57:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,462,1559545200"; d="scan'208";a="194253034"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga002.jf.intel.com with ESMTP; 02 Sep 2019 23:57:30 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 2 Sep 2019 23:57:30 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 2 Sep 2019 23:57:30 -0700
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Mon, 2 Sep 2019 23:57:29 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.89]) with mapi id 14.03.0439.000;
- Tue, 3 Sep 2019 14:57:28 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Thread-Topic: [PATCH v8 01/13] vfio: KABI for migration interface
-Thread-Index: AQHVXEPM6Ds11z4g1kGhkyVJXk+n4qcQheKAgAKxOUCAABvDkIAAD6EAgAYgQnA=
-Date: Tue, 3 Sep 2019 06:57:27 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D560D74@SHSMSX104.ccr.corp.intel.com>
-References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
- <1566845753-18993-2-git-send-email-kwankhede@nvidia.com>
- <20190828145045.20f2a7b3@x1.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D553133@SHSMSX104.ccr.corp.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D553184@SHSMSX104.ccr.corp.intel.com>
- <20190830103252.2b427144@x1.home>
-In-Reply-To: <20190830103252.2b427144@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiM2QzYWRhZDYtYTdmZi00Y2U0LWExZGItNmI2NmZhZWIyODFkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWUpCVmQxSEdKa2ozMjVSbVlEVHVZVXlLbStQOU40QWJJSUtLRDdqVUV6NHREUFY1MGNDbXhZczRFSldHR0xDWiJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <borntraeger@de.ibm.com>) id 1i52lB-00077L-Tr
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31764)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1i52lB-00074l-KB
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 02:57:49 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x836rGiq055714
+ for <qemu-devel@nongnu.org>; Tue, 3 Sep 2019 02:57:46 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2usgmfmjvk-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 02:57:45 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 3 Sep 2019 07:57:43 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 3 Sep 2019 07:57:39 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x836vcHP38535264
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 3 Sep 2019 06:57:38 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 98E69A4040;
+ Tue,  3 Sep 2019 06:57:38 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 501C9A404D;
+ Tue,  3 Sep 2019 06:57:38 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.122])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue,  3 Sep 2019 06:57:38 +0000 (GMT)
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190806094834.7691-2-imammedo@redhat.com>
+ <20190807153241.24050-1-imammedo@redhat.com>
+ <20190820180727.32cf4891.cohuck@redhat.com>
+ <20190827145629.62c5839e@redhat.com>
+ <0abe612b-5a00-4ebc-9874-6b794d411f51@de.ibm.com>
+ <20190829140402.3a547a76@redhat.com>
+ <6afa8d99-c958-6f60-69f4-f84151358479@de.ibm.com>
+ <20190829143125.17a44fa5@redhat.com>
+ <ff7b7534-e954-84f2-34a9-bfa0ac37c8fe@de.ibm.com>
+ <20190830114105.312cf69f@redhat.com>
+ <4f816851-9435-51e0-81e9-0dc2ac47ff78@de.ibm.com>
+ <20190902154929.16f32591@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Tue, 3 Sep 2019 08:57:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH v8 01/13] vfio: KABI for migration interface
+In-Reply-To: <20190902154929.16f32591@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19090306-0016-0000-0000-000002A5F9EE
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19090306-0017-0000-0000-000033065F29
+Message-Id: <09480baa-c736-6726-4852-777f99fd54c6@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-03_01:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909030076
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.2 v5 1/2] kvm: s390:
+ split too big memory section on several memslots
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,175 +160,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
- Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Saturday, August 31, 2019 12:33 AM
->=20
-> On Fri, 30 Aug 2019 08:06:32 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
->=20
-> > > From: Tian, Kevin
-> > > Sent: Friday, August 30, 2019 3:26 PM
-> > >
-> > [...]
-> > > > How does QEMU handle the fact that IOVAs are potentially dynamic
-> while
-> > > > performing the live portion of a migration?  For example, each time=
- a
-> > > > guest driver calls dma_map_page() or dma_unmap_page(), a
-> > > > MemoryRegionSection pops in or out of the AddressSpace for the devi=
-ce
-> > > > (I'm assuming a vIOMMU where the device AddressSpace is not
-> > > > system_memory).  I don't see any QEMU code that intercepts that
-> change
-> > > > in the AddressSpace such that the IOVA dirty pfns could be recorded=
- and
-> > > > translated to GFNs.  The vendor driver can't track these beyond get=
-ting
-> > > > an unmap notification since it only knows the IOVA pfns, which can =
-be
-> > > > re-used with different GFN backing.  Once the DMA mapping is torn
-> down,
-> > > > it seems those dirty pfns are lost in the ether.  If this works in =
-QEMU,
-> > > > please help me find the code that handles it.
-> > >
-> > > I'm curious about this part too. Interestingly, I didn't find any log=
-_sync
-> > > callback registered by emulated devices in Qemu. Looks dirty pages
-> > > by emulated DMAs are recorded in some implicit way. But KVM always
-> > > reports dirty page in GFN instead of IOVA, regardless of the presence=
- of
-> > > vIOMMU. If Qemu also tracks dirty pages in GFN for emulated DMAs
-> > >  (translation can be done when DMA happens), then we don't need
-> > > worry about transient mapping from IOVA to GFN. Along this way we
-> > > also want GFN-based dirty bitmap being reported through VFIO,
-> > > similar to what KVM does. For vendor drivers, it needs to translate
-> > > from IOVA to HVA to GFN when tracking DMA activities on VFIO
-> > > devices. IOVA->HVA is provided by VFIO. for HVA->GFN, it can be
-> > > provided by KVM but I'm not sure whether it's exposed now.
-> > >
-> >
-> > HVA->GFN can be done through hva_to_gfn_memslot in kvm_host.h.
->=20
-> I thought it was bad enough that we have vendor drivers that depend on
-> KVM, but designing a vfio interface that only supports a KVM interface
-> is more undesirable.  I also note without comment that gfn_to_memslot()
-> is a GPL symbol.  Thanks,
 
-yes it is bad, but sometimes inevitable. If you recall our discussions
-back to 3yrs (when discussing the 1st mdev framework), there were similar
-hypervisor dependencies in GVT-g, e.g. querying gpa->hpa when
-creating some shadow structures. gpa->hpa is definitely hypervisor
-specific knowledge, which is easy in KVM (gpa->hva->hpa), but needs
-hypercall in Xen. but VFIO already makes assumption based on KVM-
-only flavor when implementing vfio_{un}pin_page_external. So GVT-g
-has to maintain an internal abstraction layer to support both Xen and
-KVM. Maybe someday we will re-consider introducing some hypervisor
-abstraction layer in VFIO, if this issue starts to hurt other devices and
-Xen guys are willing to support VFIO.
 
-Back to this IOVA issue, I discussed with Yan and we found another=20
-hypervisor-agnostic alternative, by learning from vhost. vhost is very
-similar to VFIO - DMA also happens in the kernel, while it already=20
-supports vIOMMU.
+On 02.09.19 15:49, Igor Mammedov wrote:
+> On Fri, 30 Aug 2019 18:19:29 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> On 30.08.19 11:41, Igor Mammedov wrote:
+>>> On Thu, 29 Aug 2019 14:41:13 +0200
+>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>   
+>>>> On 29.08.19 14:31, Igor Mammedov wrote:  
+>>>>> On Thu, 29 Aug 2019 14:07:44 +0200
+>>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>>>     
+>>>>>> On 29.08.19 14:04, Igor Mammedov wrote:    
+>>>>>>> On Thu, 29 Aug 2019 08:47:49 +0200
+>>>>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>>>>>       
+>>>>>>>> On 27.08.19 14:56, Igor Mammedov wrote:      
+>>>>>>>>> On Tue, 20 Aug 2019 18:07:27 +0200
+>>>>>>>>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>>>>>>>>         
+>>>>>>>>>> On Wed,  7 Aug 2019 11:32:41 -0400
+>>>>>>>>>> Igor Mammedov <imammedo@redhat.com> wrote:
+>>>>>>>>>>        
+>>>>>>>>>>> Max memslot size supported by kvm on s390 is 8Tb,
+>>>>>>>>>>> move logic of splitting RAM in chunks upto 8T to KVM code.
+>>>>>>>>>>>
+>>>>>>>>>>> This way it will hide KVM specific restrictions in KVM code
+>>>>>>>>>>> and won't affect baord level design decisions. Which would allow
+>>>>>>>>>>> us to avoid misusing memory_region_allocate_system_memory() API
+>>>>>>>>>>> and eventually use a single hostmem backend for guest RAM.
+>>>>>>>>>>>
+>>>>>>>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>>>>>>>>>> ---
+>>>>>>>>>>> v5:
+>>>>>>>>>>>   * move computation 'size -= slot_size' inside of loop body
+>>>>>>>>>>>           (David Hildenbrand <david@redhat.com>)
+>>>>>>>>>>> v4:
+>>>>>>>>>>>   * fix compilation issue
+>>>>>>>>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
+>>>>>>>>>>>   * advance HVA along with GPA in kvm_set_phys_mem()
+>>>>>>>>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
+>>>>>>>>>>>
+>>>>>>>>>>> patch prepares only KVM side for switching to single RAM memory region
+>>>>>>>>>>> another patch will take care of  dropping manual RAM partitioning in
+>>>>>>>>>>> s390 code.          
+>>>>>>>>>>
+>>>>>>>>>> I may have lost track a bit -- what is the status of this patch (and
+>>>>>>>>>> the series)?        
+>>>>>>>>>
+>>>>>>>>> Christian,
+>>>>>>>>>
+>>>>>>>>> could you test it on a host that have sufficient amount of RAM?        
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> This version looks good. I was able to start a 9TB guest.
+>>>>>>>> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=8796091973632, userspace_addr=0x3ffee700000}) = 0
+>>>>>>>> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=1, flags=0, guest_phys_addr=0x7fffff00000, memory_size=1099512676352, userspace_addr=0xbffee600000}) = 0    
+>>>>>>    
+>>>>>>>> The only question is if we want to fix the weird alignment (0x7fffff00000) when
+>>>>>>>> we already add a migration barrier for uber-large guests.
+>>>>>>>> Maybe we could split at 4TB to avoid future problem with larger page sizes?      
+>>>>>>> That probably should be a separate patch on top.      
+>>>>>>
+>>>>>> Right. The split in KVM code is transparent to migration and other parts of QEMU, correct?    
+>>>>>
+>>>>> it should not affect other QEMU parts and migration (to my limited understanding of it),
+>>>>> we are passing to KVM memory slots upto KVM_SLOT_MAX_BYTES as we were doing before by
+>>>>> creating several memory regions instead of one as described in [2/2] commit message.
+>>>>>
+>>>>> Also could you also test migration of +9Tb guest, to check that nothing where broken by
+>>>>> accident in QEMU migration code?    
+>>>>
+>>>> I only have one server that is large enough :-/  
+>>> Could you test offline migration on it (to a file and restore from it)?  
+>>
+>> I tested migration with a hacked QEMU (basically split in KVM code at 1GB instead of 8TB) and
+>> the restore from file failed with data corruption in the guest. The current code
+>> does work when I use small memslots. No idea yet what is wrong.
+> 
+> I've tested 2Gb (max, I can test) guest (also hacked up version)
+> and it worked for me.
+> How do you test it and detect corruption so I could try to reproduce it locally?
+> (given it worked before, there is no much hope but I could try)
 
-Generally speaking, there are three paths of dirty page collection
-in Qemu so far (as previously noted, Qemu always tracks the dirty
-bitmap in GFN):
+I basically started a guest with just kernel and ramdisk on the command line and
+then in the monitor I did 
+migrate "exec: cat > savefile"
+and then I restarted the guest with
+-incoming "exec: cat savefile"
 
-1) Qemu-tracked memory writes (e.g. emulated DMAs). Dirty bitmaps=20
-are updated directly when the guest memory is being updated. For=20
-example, PCI writes are completed through pci_dma_write, which=20
-goes through vIOMMU to translate IOVA into GPA and then update=20
-the bitmap through cpu_physical_memory_set_dirty_range.
+the guest then very quickly crashed with random kernel oopses. 
 
-2) Memory writes that are not tracked by Qemu are collected by
-registering .log_sync() callback, which is invoked in the dirty logging
-process. Now there are two users: kvm and vhost.
-
-  2.1) KVM tracks CPU-side memory writes, through write-protection
-or EPT A/D bits (+PML). This part is always based on GFN and returned
-to Qemu when kvm_log_sync is invoked;
-
-  2.2) vhost tracks kernel-side DMA writes, by interpreting vring
-data structure. It maintains an internal iotlb which is synced with
-Qemu vIOMMU through a specific interface:
-	- new vhost message type (VHOST_IOTLB_UPDATE/INVALIDATE)
-for Qemu to keep vhost iotlb in sync
-	- new VHOST_IOTLB_MISS message to notify Qemu in case of
-a miss in vhost iotlb.
-	- Qemu registers a log buffer to kernel vhost driver. The latter
-update the buffer (using internal iotlb to get GFN) when serving vring
-descriptor.
-
-VFIO could also implement an internal iotlb, so vendor drivers can
-utilize the iotlb to update the GFN-based dirty bitmap. Ideally we
-don't need re-invent another iotlb protocol as vhost does. vIOMMU
-already sends map/unmap ioctl cmds upon any change of IOVA
-mapping. We may introduce a v2 map/unmap interface, allowing
-Qemu to pass both {iova, gpa, hva} together to keep internal iotlb
-in-sync. But we may also need a iotlb_miss_upcall interface, if VFIO
-doesn't want to cache full-size vIOMMU mappings.=20
-
-Definitely this alternative needs more work and possibly less=20
-performant (if maintaining a small size iotlb) than straightforward
-calling into KVM interface. But the gain is also obvious, since it
-is fully constrained with VFIO.
-
-Thoughts? :-)
-
-Thanks
-Kevin
-
->=20
-> Alex
->=20
-> > Above flow works for software-tracked dirty mechanism, e.g. in
-> > KVMGT, where GFN-based 'dirty' is marked when a guest page is
-> > mapped into device mmu. IOVA->HPA->GFN translation is done
-> > at that time, thus immune from further IOVA->GFN changes.
-> >
-> > When hardware IOMMU supports D-bit in 2nd level translation (e.g.
-> > VT-d rev3.0), there are two scenarios:
-> >
-> > 1) nested translation: guest manages 1st-level translation (IOVA->GPA)
-> > and host manages 2nd-level translation (GPA->HPA). The 2nd-level
-> > is not affected by guest mapping operations. So it's OK for IOMMU
-> > driver to retrieve GFN-based dirty pages by directly scanning the 2nd-
-> > level structure, upon request from user space.
-> >
-> > 2) shadowed translation (IOVA->HPA) in 2nd level: in such case the dirt=
-y
-> > information is tied to IOVA. the IOMMU driver is expected to maintain
-> > an internal dirty bitmap. Upon any change of IOVA->GPA notification
-> > from VFIO, the IOMMU driver should flush dirty status of affected 2nd-l=
-evel
-> > entries to the internal GFN-based bitmap. At this time, again IOVA->HVA
-> > ->GPA translation required for GFN-based recording. When userspace
-> > queries dirty bitmap, the IOMMU driver needs to flush latest 2nd-level
-> > dirty status to internal bitmap, which is then copied to user space.
-> >
-> > Given the trickiness of 2), we aim to enable 1) on intel-iommu driver.
-> >
-> > Thanks
-> > Kevin
+Using libvirts managedsave should work as well. 
 
 
