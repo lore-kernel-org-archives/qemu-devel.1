@@ -2,65 +2,72 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D91C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:44:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF15EC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:47:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66A242168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:44:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66A242168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB4AF2168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 18:47:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4AF2168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Dms-0007fv-L9
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:44:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33512)
+	id 1i5Dq2-0000TA-Th
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 14:47:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33972)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i5Dm7-00079S-MX
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:43:32 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i5Dp5-0008Tl-I8
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i5Dm6-00033A-Gt
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:43:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56978)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5Dm6-00032o-95
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:43:30 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 833D6308429D;
- Tue,  3 Sep 2019 18:43:29 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 96C185D6B2;
- Tue,  3 Sep 2019 18:43:26 +0000 (UTC)
-Date: Tue, 3 Sep 2019 19:43:24 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190903184324.GA2744@work-vm>
-References: <20190731144225.3784-1-richardw.yang@linux.intel.com>
- <20190731144225.3784-3-richardw.yang@linux.intel.com>
- <20190823110609.GF2784@work-vm>
- <20190824161509.xtm65qu6k6amrjk6@master>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190824161509.xtm65qu6k6amrjk6@master>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 03 Sep 2019 18:43:29 +0000 (UTC)
+ (envelope-from <palmer@dabbelt.com>) id 1i5Dp4-0004Et-Ac
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:46:35 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:36070)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i5Dp4-0004ED-5O
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 14:46:34 -0400
+Received: by mail-pf1-f195.google.com with SMTP id y22so5688592pfr.3
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 11:46:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=lTBnmSOBqUKx2hxZLXlAr5Jk335lHE92K6mAhufuKb0=;
+ b=T1DHM68qSFblDaPXngsCMFYIo1cJgyTsUg6zS3rZXo3kxGUuIdrgcgpaDXbrdS5XMz
+ NZuSCZMdwEGNcMcURHdHbBko+bBIMtNeeK6AoIwdyb6cNBvKa9E/k/NG8YNfEYn7pMED
+ TLAWwLzYro9iS+u57+LzI/54Sb+EVL3xc2G53BH20/mIztDYdcyZVgNwXNfnrtGDc0uz
+ 3w+NdYFh03gH4z+ESkqSIUBeu57CElT3LXchlayUmDMhPirRziQXpb2jEBQnNtDCkVXr
+ 1cZZnISVStuG1pwdf4l1AD4wMPUzeADiVX0Z8d6RSK005luUVWDISmivktqcbf3LNjao
+ +xtg==
+X-Gm-Message-State: APjAAAVGiwe3/6BWANSheeCs1dSeAlwoydy+hQQy93lGBPgznmlwuug8
+ PZjTsc+siMXZSPM9djk0L+U40Q==
+X-Google-Smtp-Source: APXvYqyCURPjGi+zSKb5TovgXT/uNBgY2uC1FxCLDolVYEDgiIujwtZjOMK3nvrGiePEoCtISw4miw==
+X-Received: by 2002:a63:4a51:: with SMTP id j17mr31507143pgl.284.1567536392250; 
+ Tue, 03 Sep 2019 11:46:32 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id r23sm272493pjo.22.2019.09.03.11.46.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Sep 2019 11:46:31 -0700 (PDT)
+Date: Tue, 03 Sep 2019 11:46:31 -0700 (PDT)
+X-Google-Original-Date: Tue, 03 Sep 2019 10:35:56 PDT (-0700)
+In-Reply-To: <CAEUhbmV5fWqzPcdWW52n7DTczTtoLfbmE0HhLCz1jsgcNbLwRA@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-255d26e8-02dd-4acb-8b8f-a5e35aabd6c4@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration/qemu-file: fix potential buf
- waste for extra buf_index adjustment
+ [fuzzy]
+X-Received-From: 209.85.210.195
+Subject: Re: [Qemu-devel] [PATCH v4] riscv: hmp: Add a command to show
+ virtual memory mappings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,142 +79,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, berrange@redhat.com,
- Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, dgilbert@redhat.com,
+ qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Wei Yang (richard.weiyang@gmail.com) wrote:
-> On Fri, Aug 23, 2019 at 12:06:09PM +0100, Dr. David Alan Gilbert wrote:
-> >(Copying Dan in)
-> >
-> >* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> >> In add_to_iovec(), qemu_fflush() will be called if iovec is full. If
-> >> this happens, buf_index is reset. Currently, this is not checked and
-> >> buf_index would always been adjust with buf size.
-> >> 
-> >> This is not harmful, but will waste some space in file buffer.
-> >
-> >That's a nice find.
-> >
-> >> This patch make add_to_iovec() return 1 when it has flushed the file.
-> >> Then the caller could check the return value to see whether it is
-> >> necessary to adjust the buf_index any more.
-> >> 
-> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> >
-> >Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >
-> >(I wonder if there's a way to wrap that little add_to_iovec, check, add
-> >to index, flush in a little wrapper).
-> >
-> >Dave
-> >
-> >> ---
-> >>  migration/qemu-file.c | 42 ++++++++++++++++++++++++++++--------------
-> >>  1 file changed, 28 insertions(+), 14 deletions(-)
-> >> 
-> >> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> >> index 35c22605dd..05d9f42ddb 100644
-> >> --- a/migration/qemu-file.c
-> >> +++ b/migration/qemu-file.c
-> >> @@ -343,8 +343,16 @@ int qemu_fclose(QEMUFile *f)
-> >>      return ret;
-> >>  }
-> >>  
-> >> -static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
-> >> -                         bool may_free)
-> >> +/*
-> >> + * Add buf to iovec. Do flush if iovec is full.
-> >> + *
-> >> + * Return values:
-> >> + * 1 iovec is full and flushed
-> >> + * 0 iovec is not flushed
-> >> + *
-> >> + */
-> >> +static int add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
-> >> +                        bool may_free)
-> >>  {
-> >>      /* check for adjacent buffer and coalesce them */
-> >>      if (f->iovcnt > 0 && buf == f->iov[f->iovcnt - 1].iov_base +
-> >> @@ -362,7 +370,10 @@ static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
-> >>  
-> >>      if (f->iovcnt >= MAX_IOV_SIZE) {
-> >>          qemu_fflush(f);
-> >> +        return 1;
-> >>      }
-> >> +
-> >> +    return 0;
-> >>  }
-> >>  
-> >>  void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size,
-> >> @@ -391,10 +402,11 @@ void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size)
-> >>          }
-> >>          memcpy(f->buf + f->buf_index, buf, l);
-> >>          f->bytes_xfer += l;
-> >> -        add_to_iovec(f, f->buf + f->buf_index, l, false);
-> >> -        f->buf_index += l;
-> >> -        if (f->buf_index == IO_BUF_SIZE) {
-> >> -            qemu_fflush(f);
-> >> +        if (!add_to_iovec(f, f->buf + f->buf_index, l, false)) {
-> >> +            f->buf_index += l;
-> >> +            if (f->buf_index == IO_BUF_SIZE) {
-> >> +                qemu_fflush(f);
-> >> +            }
-> 
-> You mean put these four lines into a wrapper?
-> 
-> Name it as add_buf_to_iovec?
+On Tue, 27 Aug 2019 18:31:18 PDT (-0700), bmeng.cn@gmail.com wrote:
+> Hi Palmer,
+>
+> On Wed, Aug 28, 2019 at 7:18 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> On Sun, 18 Aug 2019 22:59:54 PDT (-0700), bmeng.cn@gmail.com wrote:
+>> > On Wed, Aug 14, 2019 at 11:33 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>> >>
+>> >> This adds 'info mem' command for RISC-V, to show virtual memory
+>> >> mappings that aids debugging.
+>> >>
+>> >> Rather than showing every valid PTE, the command compacts the
+>> >> output by merging all contiguous physical address mappings into
+>> >> one block and only shows the merged block mapping details.
+>> >>
+>> >> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>> >> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> >> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+>> >>
+>> >> ---
+>> >>
+>> >> Changes in v4:
+>> >> - restore to v2, that does not print all harts's PTE, since we
+>> >>   should switch to a cpu context via the 'cpu' command
+>> >>
+>> >> Changes in v3:
+>> >> - print PTEs for all harts instead of just current hart
+>> >>
+>> >> Changes in v2:
+>> >> - promote ppn to hwaddr when doing page table address calculation
+>> >>
+>> >>  hmp-commands-info.hx       |   2 +-
+>> >>  target/riscv/Makefile.objs |   4 +
+>> >>  target/riscv/monitor.c     | 229 +++++++++++++++++++++++++++++++++++++++++++++
+>> >>  3 files changed, 234 insertions(+), 1 deletion(-)
+>> >>  create mode 100644 target/riscv/monitor.c
+>> >>
+>> >
+>> > Ping?
+>> >
+>> > What's the status of this patch?
+>>
+>> This is in my patch queue (for-master on github).  I'm still a bit backed up on
+>> email, but when I get caught back up I'll send a PR.
+>
+> I double checked your git repo, and found you applied an older version
+> of this patch.
+>
+> Please drop that, and apply this v4 one.
+> http://patchwork.ozlabs.org/patch/1147104/
 
-Yes.
-
-Dave
-
-> >>          }
-> >>          if (qemu_file_get_error(f)) {
-> >>              break;
-> >> @@ -412,10 +424,11 @@ void qemu_put_byte(QEMUFile *f, int v)
-> >>  
-> >>      f->buf[f->buf_index] = v;
-> >>      f->bytes_xfer++;
-> >> -    add_to_iovec(f, f->buf + f->buf_index, 1, false);
-> >> -    f->buf_index++;
-> >> -    if (f->buf_index == IO_BUF_SIZE) {
-> >> -        qemu_fflush(f);
-> >> +    if (!add_to_iovec(f, f->buf + f->buf_index, 1, false)) {
-> >> +        f->buf_index++;
-> >> +        if (f->buf_index == IO_BUF_SIZE) {
-> >> +            qemu_fflush(f);
-> >> +        }
-> >>      }
-> >>  }
-> >>  
-> >> @@ -717,10 +730,11 @@ ssize_t qemu_put_compression_data(QEMUFile *f, z_stream *stream,
-> >>      }
-> >>  
-> >>      qemu_put_be32(f, blen);
-> >> -    add_to_iovec(f, f->buf + f->buf_index, blen, false);
-> >> -    f->buf_index += blen;
-> >> -    if (f->buf_index == IO_BUF_SIZE) {
-> >> -        qemu_fflush(f);
-> >> +    if (!add_to_iovec(f, f->buf + f->buf_index, blen, false)) {
-> >> +        f->buf_index += blen;
-> >> +        if (f->buf_index == IO_BUF_SIZE) {
-> >> +            qemu_fflush(f);
-> >> +        }
-> >>      }
-> >>      return blen + sizeof(int32_t);
-> >>  }
-> >> -- 
-> >> 2.17.1
-> >> 
-> >--
-> >Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
-> -- 
-> Wei Yang
-> Help you, Help me
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Sorry about that, it should be fixed now.
 
