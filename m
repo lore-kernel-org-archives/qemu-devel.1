@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C163C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C42BC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:51:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 377A023431
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:49:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59B6B23774
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:51:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AAuRoDL5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 377A023431
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o91Y+kEZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59B6B23774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5B3b-00058D-Tp
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:49:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59311)
+	id 1i5B5Q-0007SG-Me
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:51:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArY-00031y-Im
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArQ-0002ov-7f
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArW-00061W-El
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:56 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:53094)
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArO-0005wO-Uf
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:48 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37757)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5ArW-000610-8C
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:54 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id t17so18753733wmi.2
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:54 -0700 (PDT)
+ id 1i5ArO-0005w0-ON
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:46 -0400
+Received: by mail-wr1-x434.google.com with SMTP id z11so17998295wrt.4
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=8/T9mmX0W7AG1ACKL4IcYUCZwX8sRH9ZWIp1nKl2B4A=;
- b=AAuRoDL5j9IeKmGoUhmWSkrEBwvKGYGZmNtP9QXU8QRBQUgG6gJbMWvUNyTs2H7k2w
- xEV3vizI4J5IvwXnHZ2sStnmedl1bfca6A+bRqefbt3hG1BLw/S5nWyZ7wO0RGJno5d7
- 5ZiKFECXa3cBp+reT0uNLDDdKAFhCAVbznL/jWhaXQBuz+gRnpP3APpQ2fZIhycx5CIS
- bH8hgXx/vJJi49f1ShLcE5FBxdvKvDQsHOL0W7Hlbs1ofU6hMJnrlUxAJ2u8jfg0GIp1
- Q3ZDQAEq1/LttU3zXDPNzxqCJwIp63OxUTnEAMeYRwlAPyc1sRQz++YoT1cFs0GmoWM0
- gPBQ==
+ bh=zwgsbRC7S/9tqfeU7JxypMKTOKpf8DEKt23oGutI3as=;
+ b=o91Y+kEZ9ekJhZ76S0+e42h5hPE+3kvnLpVzMB6dhI+DFwhhNUYHILeaREJX1UJzKl
+ oVdSpgzLxEAdhulwoDfUTWicwSlMXkWsMT2J3OZ1oKmi2FAQsaeluiatxD5Y4+Lvyqi1
+ o+7XHPB8iWqEEeefzKQpvmudreDJ0UYXfrviw+EAFct0zrOG/YgMUE39nhZ59LuxPzdu
+ TSC+g8j1KOtChSr1V97Im4Q6/VH0bsaeyKkHc+Og7rYiXBy8KGEndtSfJFPZ3hZNZQWO
+ Cac6bQVFLX9jwi9BkBMufl5/48Nm9zMN3P5PLzMbqSgrSfsfzUYU9Lr0GmZHEzA7Ll27
+ mhaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8/T9mmX0W7AG1ACKL4IcYUCZwX8sRH9ZWIp1nKl2B4A=;
- b=ixboqM44FQsMjTIhrhpHOnSfL/cAXmbbePiPRFcUNNaA2c0O2EJHbQufEkLL9PQdBA
- L+jYcWheA9KLBlnDDgBudR8SVTOGWzrdWN9xC9aDPpNyBfyeu8cbx5fEIOBZUydILBrv
- u43+hpRcSQO8S4t3CKjyiuaIh5/aBssht/Go70DPCtChIwe0TDmL3ghOv2Nrnm1L+el0
- fiKI6PILCCXAKCp4P0al/ZY/7iUy16eTnioEi6vCHmC9KAgUWIgc9BCmARYKcS1HSE/A
- TZE9viSNd0K1WsCtYoTfdscoCR5XB5mkWFR99e6Sg8453NHf3BrNhhD0XQSKuSeKwOrP
- +MQg==
-X-Gm-Message-State: APjAAAUprlKRcfcEf4VYAPrFGqtAieJ8NrWtEhy2litQza35X1JlDrIz
- g07WM89/a+XxG8WZqM43a8dH4QOX3zP7TA==
-X-Google-Smtp-Source: APXvYqzudDbzpjH8QAPCM+sKkDIKxsvcQU5S602XH/po1ze53H7lxE2O0jukDpSEqU4iS0YIvXrB9A==
-X-Received: by 2002:a1c:f009:: with SMTP id a9mr760170wmb.151.1567525012984;
- Tue, 03 Sep 2019 08:36:52 -0700 (PDT)
+ bh=zwgsbRC7S/9tqfeU7JxypMKTOKpf8DEKt23oGutI3as=;
+ b=pr77NqenQARtAYF08SKV+iOuYlFHnHYmfSwD8OpdULhQIQPBk3dARc59ZF1oyagKzl
+ IoUxhIGD3E4xMC8c8e/IfOqPaZ9I9aSE+uv7FrMzCpE8PUrKKlHHtuC+H3Q9Nbxvwy8m
+ Yxa0XOBXKHS0buCydCAo28ulLFjORpz+pcL79ptcBx2nj+QLpNj7AhMaDctD58FG4fxy
+ w/Zh7WckMQg+1EvlRU4kTvD5uf5mnosiZfOuWFiHzFCJYaH8z1bmN+8/wBtEhC9MMSjy
+ 8iVpnqz7weKI5ka694nkEXgH4EugBh7PGIvrIOYL0fUVuZuq16Ft65YqNxSK86UNN8p3
+ VaCQ==
+X-Gm-Message-State: APjAAAV3XaOlFuu1trcJckr0Lb+CPcVmyRWJM3Lap5nv6q3PeofBlL/G
+ OBHyFeu/lagQDQMIAdUeXciyWUHHF5E2AA==
+X-Google-Smtp-Source: APXvYqyxfhmZVOQC6h9j4JCQgWAc0MfurL2rR1HUFR01uHr0B+cMRjQK22n2NqCkoEvzI/hStjA4tg==
+X-Received: by 2002:adf:fb11:: with SMTP id c17mr1500573wrr.0.1567525005632;
+ Tue, 03 Sep 2019 08:36:45 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.51
+ by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.44
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 08:36:52 -0700 (PDT)
+ Tue, 03 Sep 2019 08:36:45 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:36:27 +0100
-Message-Id: <20190903153633.6651-16-peter.maydell@linaro.org>
+Date: Tue,  3 Sep 2019 16:36:20 +0100
+Message-Id: <20190903153633.6651-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903153633.6651-1-peter.maydell@linaro.org>
 References: <20190903153633.6651-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
-Subject: [Qemu-devel] [PULL 15/21] hw/net/xilinx_axi: Use
- object_initialize_child for correct ref. counting
+X-Received-From: 2a00:1450:4864:20::434
+Subject: [Qemu-devel] [PULL 08/21] hw/arm/smmuv3: Remove spurious error
+ messages on IOVA invalidations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,56 +98,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-As explained in commit aff39be0ed97:
+An IOVA/ASID invalidation is notified to all IOMMU Memory Regions
+through smmuv3_inv_notifiers_iova/smmuv3_notify_iova.
 
-  Both functions, object_initialize() and object_property_add_child()
-  increase the reference counter of the new object, so one of the
-  references has to be dropped afterwards to get the reference
-  counting right. Otherwise the child object will not be properly
-  cleaned up when the parent gets destroyed.
-  Thus let's use now object_initialize_child() instead to get the
-  reference counting here right.
+When the notification occurs it is possible that some of the
+PCIe devices associated to the notified regions do not have a
+valid stream table entry. In that case we output a LOG_GUEST_ERROR
+message, for example:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190823143249.8096-7-philmd@redhat.com
+invalid sid=<SID> (L1STD span=0)
+"smmuv3_notify_iova error decoding the configuration for iommu mr=<MR>
+
+This is unfortunate as the user gets the impression that there
+are some translation decoding errors whereas there are not.
+
+This patch adds a new field in SMMUEventInfo that tells whether
+the detection of an invalid STE must lead to an error report.
+invalid_ste_allowed is set before doing the invalidations and
+kept unset on actual translation.
+
+The other configuration decoding error messages are kept since if the
+STE is valid then the rest of the config must be correct.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 20190822172350.12008-6-eric.auger@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/net/xilinx_axienet.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ hw/arm/smmuv3-internal.h |  1 +
+ hw/arm/smmuv3.c          | 19 +++++++++++--------
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-index d8716a1f737..2c8c065401a 100644
---- a/hw/net/xilinx_axienet.c
-+++ b/hw/net/xilinx_axienet.c
-@@ -994,15 +994,14 @@ static void xilinx_enet_init(Object *obj)
-     XilinxAXIEnet *s = XILINX_AXI_ENET(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+index b160289cd12..d190181ef1b 100644
+--- a/hw/arm/smmuv3-internal.h
++++ b/hw/arm/smmuv3-internal.h
+@@ -381,6 +381,7 @@ typedef struct SMMUEventInfo {
+     uint32_t sid;
+     bool recorded;
+     bool record_trans_faults;
++    bool inval_ste_allowed;
+     union {
+         struct {
+             uint32_t ssid;
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 31ac4b15c30..db051dcac87 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -320,7 +320,9 @@ static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
+     uint32_t config;
  
--    object_initialize(&s->rx_data_dev, sizeof(s->rx_data_dev),
--                      TYPE_XILINX_AXI_ENET_DATA_STREAM);
--    object_initialize(&s->rx_control_dev, sizeof(s->rx_control_dev),
--                      TYPE_XILINX_AXI_ENET_CONTROL_STREAM);
--    object_property_add_child(OBJECT(s), "axistream-connected-target",
--                              (Object *)&s->rx_data_dev, &error_abort);
--    object_property_add_child(OBJECT(s), "axistream-control-connected-target",
--                              (Object *)&s->rx_control_dev, &error_abort);
--
-+    object_initialize_child(OBJECT(s), "axistream-connected-target",
-+                            &s->rx_data_dev, sizeof(s->rx_data_dev),
-+                            TYPE_XILINX_AXI_ENET_DATA_STREAM, &error_abort,
-+                            NULL);
-+    object_initialize_child(OBJECT(s), "axistream-control-connected-target",
-+                            &s->rx_control_dev, sizeof(s->rx_control_dev),
-+                            TYPE_XILINX_AXI_ENET_CONTROL_STREAM, &error_abort,
-+                            NULL);
-     sysbus_init_irq(sbd, &s->irq);
+     if (!STE_VALID(ste)) {
+-        qemu_log_mask(LOG_GUEST_ERROR, "invalid STE\n");
++        if (!event->inval_ste_allowed) {
++            qemu_log_mask(LOG_GUEST_ERROR, "invalid STE\n");
++        }
+         goto bad_ste;
+     }
  
-     memory_region_init_io(&s->iomem, OBJECT(s), &enet_ops, s, "enet", 0x40000);
+@@ -407,8 +409,10 @@ static int smmu_find_ste(SMMUv3State *s, uint32_t sid, STE *ste,
+ 
+         if (!span) {
+             /* l2ptr is not valid */
+-            qemu_log_mask(LOG_GUEST_ERROR,
+-                          "invalid sid=%d (L1STD span=0)\n", sid);
++            if (!event->inval_ste_allowed) {
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "invalid sid=%d (L1STD span=0)\n", sid);
++            }
+             event->type = SMMU_EVT_C_BAD_STREAMID;
+             return -EINVAL;
+         }
+@@ -603,7 +607,9 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+     SMMUv3State *s = sdev->smmu;
+     uint32_t sid = smmu_get_sid(sdev);
+-    SMMUEventInfo event = {.type = SMMU_EVT_NONE, .sid = sid};
++    SMMUEventInfo event = {.type = SMMU_EVT_NONE,
++                           .sid = sid,
++                           .inval_ste_allowed = false};
+     SMMUPTWEventInfo ptw_info = {};
+     SMMUTranslationStatus status;
+     SMMUState *bs = ARM_SMMU(s);
+@@ -796,16 +802,13 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
+                                dma_addr_t iova)
+ {
+     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+-    SMMUEventInfo event = {};
++    SMMUEventInfo event = {.inval_ste_allowed = true};
+     SMMUTransTableInfo *tt;
+     SMMUTransCfg *cfg;
+     IOMMUTLBEntry entry;
+ 
+     cfg = smmuv3_get_config(sdev, &event);
+     if (!cfg) {
+-        qemu_log_mask(LOG_GUEST_ERROR,
+-                      "%s error decoding the configuration for iommu mr=%s\n",
+-                      __func__, mr->parent_obj.name);
+         return;
+     }
+ 
 -- 
 2.20.1
 
