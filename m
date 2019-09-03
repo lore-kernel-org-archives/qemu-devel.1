@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFBBC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB4BC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:52:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BC332343A
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBE9722CF8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:52:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ujKY9P2v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC332343A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qun0RvSY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE9722CF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5B6F-00009g-VU
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:52:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59286)
+	id 1i5B6N-0000Lo-IU
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:52:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59318)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArW-0002wh-2s
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:54 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArZ-00032v-4n
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArU-000604-FW
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:53 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:55772)
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArY-00062S-59
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:56 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:33966)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5ArU-0005zX-7t
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:52 -0400
-Received: by mail-wm1-x330.google.com with SMTP id g207so14752246wmg.5
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:52 -0700 (PDT)
+ id 1i5ArX-000626-VY
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:56 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id y135so317617wmc.1
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=xlVfa4X6hgu0Qn72UxF4DtuCgLqcTN2WoNHXseq96d4=;
- b=ujKY9P2v5YCHnJzMvyPvXblDgaUyDasFclg/wwG2Er/Hsty0EXCSswXrE0eAfiKfTX
- mZS/JFWypyn/50URYp/xiRLqlt2pHfApU04QCLWoHnpjvImyXJkyZAAaz5PcHyKAJayU
- 3zQes/E2pAUOS/CpzRPvEbP+DhCqhaukDCexSTTvgrw3ZYGKXMPM7Ia5PVKdqAerwOL0
- ZWYcpcib2wTp8lRQ9ulhTcNATbiTd5tzNGYND5ByhUdhsIDQ4XUkh/Vlal/IfXGa7u2u
- F+5lYhgIGUuw6Bw4MXPksxscoxNhQaN4mlEpPUt/yANRh+BBO9WJpchMu5CaxvnqB6+3
- 0KPQ==
+ bh=zfQZN+w0EL38uUZUufAKEIUIh1fjw2w5B/j+/inz4Vo=;
+ b=Qun0RvSYQ9BP0q+i6s1Hywx4IUDRnV7hAiEksFstrvODhvU0xlRJRPKtADPk82TGA/
+ uuFexQ3vM1eleDcXX+NCcH2A00lYaK1VxznwPwlMKEMcozlalFOSJPexv2cnvd9f3oaL
+ N6NUXaSz/yBkJPkUZbhXzH1xJqI9SPYjmmUgaXztoYjZWeB8elg3tOJKbQoS0fhOXAqU
+ buQIhB48OGG7zt4+gps8U33JMK+dRnTzGBU2I+1dhoWSE9+Ic44W/PqQzK/LnwPwKr7Z
+ 4C3h3W8xdY2cilioYAn4TDBQW/1/T5IcT7Iz/7QLJdpo65nHURV3af/k7O70EG/uYHwl
+ Pvcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xlVfa4X6hgu0Qn72UxF4DtuCgLqcTN2WoNHXseq96d4=;
- b=TMqswbo+aw52/yfOVXOrMQsTdVdCb8NDJUmEnYCSqhO1sO46I5rULCXetcf0fZIS93
- /pCvKQ7bNHs8Wn9mx3mq9BhyFK3vvVXQKeY1jsrUUloBukztJekkyhvYUg58h2egFXmw
- ZeCvAgZ3SCeTZzvodO0EGCvjXAvrlJjK5vVcsAL0XVegEXADA38MdfhvXyLIQ3nvoZph
- lD6xOu8gsRjrEauh+y6m1eX30sp/AJSWxIHe1qn/BCy4/P+veayrHe3jGVFOdsWSVMeH
- Jk7HHv8WCuAG4wscvW3IU+Lu6ANWXhbXVCgiRxZT8oSlgjkWs0Ymq7OHk4CC83X39LHT
- Jdog==
-X-Gm-Message-State: APjAAAUzTGsgUl61eMPGddaJiuO3dE11xx2VBhfOqkJCWlk1PQKMx9dd
- lgSWBkudqnDEmfV2zE/CRIVqfGhorC/8lg==
-X-Google-Smtp-Source: APXvYqx8PpmJRf//JZ9GrCdTFZMzXhhVRG8+yR6+xTff1ifLIkttG0Cv2OJlz32rNAY/xZfqhwNVmQ==
-X-Received: by 2002:a1c:740b:: with SMTP id p11mr869715wmc.6.1567525011013;
- Tue, 03 Sep 2019 08:36:51 -0700 (PDT)
+ bh=zfQZN+w0EL38uUZUufAKEIUIh1fjw2w5B/j+/inz4Vo=;
+ b=p8pFGVSD87FQ7i4O9H8ZBkMiVnKMd9Mz3b0MtuwafA1Dlh+baCRlz1Gmub6P9cazsn
+ fKftaWuNves3FkNR6RM47NsI/FjzOL9W3vuvZg4o7dwGkncuLa8AsOJY+daowetpAIym
+ MO53XFWg8Dbyb73pLsiiwZlRw6Ylf8bLzj8efR5vLODRWXcmacIZBcyXlA6+OezeOEQy
+ 7s48nG0OK9WZwo6PtmML1fWzDX2SxXdr43JHRG8mEMyC2PIeB/XUhxPWoN50tp26SWa8
+ igkn+CxuNJmF2FwmpVCbToTSaqTrWyXs4YG2r8Ax2tJCv0mNPoFe+h4HLIuVCh1RjwYe
+ PdDw==
+X-Gm-Message-State: APjAAAUBC+B5K3Fs0z4SUTOm/5f+rM0DNZ49o0v3E1WVY9GuGb2GOxRN
+ 14aRzcwowi/stq2oXoQXq1u7BvienCT/Ag==
+X-Google-Smtp-Source: APXvYqy8DpRW8R0o1yBZVXE/LwvsRPHufSh6V++aObJsmXg/Nf7IYBWWPmfgBSFNP78sZp5kJpvuug==
+X-Received: by 2002:a7b:c922:: with SMTP id h2mr833701wml.63.1567525014850;
+ Tue, 03 Sep 2019 08:36:54 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.50
+ by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.53
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 08:36:50 -0700 (PDT)
+ Tue, 03 Sep 2019 08:36:54 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:36:25 +0100
-Message-Id: <20190903153633.6651-14-peter.maydell@linaro.org>
+Date: Tue,  3 Sep 2019 16:36:28 +0100
+Message-Id: <20190903153633.6651-17-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903153633.6651-1-peter.maydell@linaro.org>
 References: <20190903153633.6651-1-peter.maydell@linaro.org>
@@ -81,9 +81,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
-Subject: [Qemu-devel] [PULL 13/21] hw/arm/fsl-imx: Add the cpu as child of
- the SoC object
+X-Received-From: 2a00:1450:4864:20::32d
+Subject: [Qemu-devel] [PULL 16/21] includes: remove stale [smp|max]_cpus
+ externs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,52 +99,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Alex Bennée <alex.bennee@linaro.org>
 
-Child properties form the composition tree. All objects need to be
-a child of another object. Objects can only be a child of one object.
+Commit a5e0b3311 removed these in favour of querying machine
+properties. Remove the extern declarations as well.
 
-Respect this with the i.MX SoC, to get a cleaner composition tree.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190823143249.8096-5-philmd@redhat.com
+Message-id: 20190828165307.18321-6-alex.bennee@linaro.org
+Cc: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190711130546.18578-1-alex.bennee@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/fsl-imx25.c | 4 +++-
- hw/arm/fsl-imx31.c | 4 +++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ include/sysemu/sysemu.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 2b2fdb203a2..3cb5a8fdfd7 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -36,7 +36,9 @@ static void fsl_imx25_init(Object *obj)
-     FslIMX25State *s = FSL_IMX25(obj);
-     int i;
- 
--    object_initialize(&s->cpu, sizeof(s->cpu), ARM_CPU_TYPE_NAME("arm926"));
-+    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
-+                            ARM_CPU_TYPE_NAME("arm926"),
-+                            &error_abort, NULL);
- 
-     sysbus_init_child_obj(obj, "avic", &s->avic, sizeof(s->avic),
-                           TYPE_IMX_AVIC);
-diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index 6760de3c8c1..55e90d104bc 100644
---- a/hw/arm/fsl-imx31.c
-+++ b/hw/arm/fsl-imx31.c
-@@ -33,7 +33,9 @@ static void fsl_imx31_init(Object *obj)
-     FslIMX31State *s = FSL_IMX31(obj);
-     int i;
- 
--    object_initialize(&s->cpu, sizeof(s->cpu), ARM_CPU_TYPE_NAME("arm1136"));
-+    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
-+                            ARM_CPU_TYPE_NAME("arm1136"),
-+                            &error_abort, NULL);
- 
-     sysbus_init_child_obj(obj, "avic", &s->avic, sizeof(s->avic),
-                           TYPE_IMX_AVIC);
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index d2c38f611a3..44f18eb7394 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -42,8 +42,6 @@ extern const char *keyboard_layout;
+ extern int win2k_install_hack;
+ extern int alt_grab;
+ extern int ctrl_grab;
+-extern int smp_cpus;
+-extern unsigned int max_cpus;
+ extern int cursor_hide;
+ extern int graphic_rotate;
+ extern int no_quit;
 -- 
 2.20.1
 
