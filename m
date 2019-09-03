@@ -2,85 +2,112 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D9AC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B544C3A5A7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:27:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 341D622CF8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:25:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Mz5u+SGs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341D622CF8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	by mail.kernel.org (Postfix) with ESMTPS id 0002B22CF8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:27:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0002B22CF8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i553n-0002eM-82
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 05:25:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33543)
+	id 1i555Y-0004pB-6U
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 05:27:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1i54zW-00083o-Fs
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:20:51 -0400
+ (envelope-from <thuth@redhat.com>) id 1i550a-0000jE-D2
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1i54zV-0002Q6-8n
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:20:46 -0400
-Received: from mout.web.de ([212.227.15.3]:35737)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1i54zU-0002PF-Vf
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:20:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1567502426;
- bh=1aMK3WcfXGtXkTJdGeILldP4LKkJ6RJ1Yf8zxuMXcY0=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=Mz5u+SGsiV9KfRIGchX1DGjWSZiHo9wlfX4KBXGTPRqTVv7w3hJ9WT1pPatZv7UDb
- M0OKL5ylfTEghIfTPxDu3aFZsBKr2E5BBnGkf4GNHDsgLOZY+fR+YelEumRvpK+K/T
- mssEtkUMfmEM/3ypA1f92gy7QiZru6Kahgv3UDX4=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.78]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0M3k9J-1iNA2F2unJ-00rLNi; Tue, 03
- Sep 2019 11:20:26 +0200
-Date: Tue, 3 Sep 2019 11:20:21 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <5305f30b0f798adfc3883bbcebbfc5030661dbe9.1567500411.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1567500411.git.lukasstraub2@web.de>
-References: <cover.1567500411.git.lukasstraub2@web.de>
+ (envelope-from <thuth@redhat.com>) id 1i550X-0003CS-ON
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:21:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53534)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i550X-0003Bj-H2
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:21:49 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5561B877A66;
+ Tue,  3 Sep 2019 09:21:48 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-51.ams2.redhat.com [10.36.117.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 57F7C5F7E4;
+ Tue,  3 Sep 2019 09:21:46 +0000 (UTC)
+To: qemu-devel@nongnu.org
+References: <20190709073222.26370-1-huth@tuxfamily.org>
+ <20190709073222.26370-3-huth@tuxfamily.org>
+ <CAFEAcA9uech2_Uc1XnxSm8Dk2rEAuyvxtnH74e_oCgw7ovVCaw@mail.gmail.com>
+ <20190831071857.5e3f53dc@thl530.multi.box>
+ <CAFEAcA-EAZUL48-WVfrHLb6ONgW+VbV8RtppM_nAAHua+rH36g@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
+ aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
+ QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
+ EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
+ 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
+ eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
+ ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
+ zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
+ tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
+ WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
+ UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
+ BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
+ 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
+ +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
+ 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
+ gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
+ WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
+ VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
+ knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
+ cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
+ X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
+ AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
+ ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
+ fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
+ 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
+ cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
+ ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
+ Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
+ oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
+ IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
+ yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
+Organization: Red Hat
+Message-ID: <6c78f2dd-69f3-1f6e-bb88-6e83d78f2c36@redhat.com>
+Date: Tue, 3 Sep 2019 11:21:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA-EAZUL48-WVfrHLb6ONgW+VbV8RtppM_nAAHua+rH36g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Tue, 03 Sep 2019 09:21:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:6n7NUftyhGnsv3QHpJPJcpP7cONMly5SDtg4EveHA7CKukumlVU
- kkaEnL/EzNYE/fecpU94pqUmzucidGS3VXpCBlaloKmvHMVAjHy3DAFBjARlOVnx88Q0yjr
- Wz+IFJ1WC5QvrpADRwgNoF83JAgtKSFBD0oXyUDEWnk7rqj4OA+90C0yyQzqkooPfehMVM2
- 8W8yMneAidMWlMDqnGKlw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Qf8/f9fOP8k=:fiQ0/c/PWc8JeIvNEadnsz
- aYlpVdKv51IbRNBwBNdNJPaTRF4LSj5FhihVn/e4lsaDgqCZSfujVoyB8g/Iaw5TuX2m/YZxo
- tpYwUcCTIotbYdCuJrOh9yGbB9Irrb2JS18jDgw9PmTsR0wU9CaphBbPxQV0WfPJQDyRTLr8R
- +8iauT+F5P5TDgQt1xTt5PhKwPeeC/FYJxqL4Mz/9w8Fv5XCxOOlaTKdpQIkFeMaE0ud/bNnW
- DcMpMO3tOL9JIZbjYHZULIYbFf/ah05AYeSN9Si+9vGTln52H1jE3fTVqEKSxzbolWjje/FG7
- fpQ5wRQd+JQkC3uEI+QX3Z9tu/dYEfek6w5/G2RgKqbmedlIAa9G4ns8mJlbH0WnZRTDrFF6H
- EQ3kJuX2K+kl0xskiksJ7fNzJFEF2PUn/HkMga6tXm4mcfBPu9IHGgW9sqFr1hwFZTyiuKtus
- 2AngeNaLJbhSAjRB6jhNwfgarjKiVPjs/uwzzTdPLIOwPeHx6pvBeUzj8M3YO+hw3R/rPP/E1
- 9V8ZbQzNEHHYtxBsoHD+NfOUcwnEmhDdATQTLqVzjhkWDoPGahLFExRMFzGzkX34Ns5jzNblW
- GKMjToXAtLO6GinX2cGhZBRaDfcEVxsrCX27PoP/7ISwATT7rkJyhK1kANpMGdDmd6Gm5uxPW
- JfNn/3eYFKVCu1sz+QuyBv49JV/JKYWn5VmmQ0RT+T8RZram7dFRTvjgHklAzO5oXbl4wRoT1
- sWriopiKWUIaRJHbv1NFgQMKJsMt6HkkNuDebIYKj6v9Ec4uio17fT5wOmHA6T+an2Q855iJl
- vE6v7Y4W9L3SJ587Jf6leNMFSkweXhej4CnFQCLRdmfIFI5IzCrYPCMdmCv1LZd/4v0es2362
- G6tBxX57SQ5WxONMElFgsVwqdoSKMmcRiAFbzA/ii04Ix0eyq8FmvN5NrzEaUtRV712DcC4ZP
- Ck3wTu0FywaoXJehWXOXvW4arv814LRU7SLrgMcRxkpnhIJ6lhlIC04MeZ4BbNtAYYeQ0Nr/L
- c8EFsYUn5VqrGct5JG6SGs6I4NBJ1G7szHW9uHePw88SHd3FytBwi1fEYI+No5Y4GeBxuz1hK
- wbUgOLXz4Z95RWK9vkOJcNk5gi1bgO0vvafWYNXX5Qu771q0UcBkrmd8cUKO/ZXveYndTM2zw
- KT2g0s+uYa54NYb/2VRgwKj9npE6KnGwDwTre6f9NLk2fLIg==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.3
-Subject: [Qemu-devel] [PATCH v3 1/4] block/replication.c: Ignore requests
- after failover
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 2/6] m68k: Add NeXTcube keyboard device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,112 +119,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Wen Congyang <wencongyang2@huawei.com>,
- Jason Wang <jasowang@redhat.com>, mreitz@redhat.com,
- Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After failover the Secondary side of replication shouldn't change state, b=
-ecause
-it now functions as our primary disk.
+On 03/09/2019 11.12, Peter Maydell wrote:
+> On Sat, 31 Aug 2019 at 06:19, Thomas Huth <huth@tuxfamily.org> wrote:
+>>
+>> Am Tue, 13 Aug 2019 11:16:44 +0100
+>> schrieb Peter Maydell <peter.maydell@linaro.org>:
+>>
+>>> On Tue, 9 Jul 2019 at 08:35, Thomas Huth <huth@tuxfamily.org> wrote:
+>>>>
+>>>> It is likely still quite incomplete (e.g. mouse and interrupts are
+>>>> not implemented yet), but it is good enough for keyboard input at
+>>>> the firmware monitor.
+>>>> This code has been taken from Bryce Lanham's GSoC 2011 NeXT branch
+>>>> at
+>>>>
+>>>>  https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-kbd.c
+>>>>
+>>>> and altered to fit the latest interface of the current QEMU (e.g.
+>>>> to use memory_region_init_io() instead of
+>>>> cpu_register_physical_memory()).
+>>>>
+>>>> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+>>>> +static void nextkbd_class_init(ObjectClass *oc, void *data)
+>>>> +{
+>>>> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+>>>> +
+>>>> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>>>> +    dc->realize =3D nextkbd_realize;
+>>>> +    dc->reset =3D nextkbd_reset;
+>>>> +}
+>>>
+>>> This one definitely needs migration state...
+>>
+>> m68k machines are currently unmigratable - see vmstate_m68k_cpu in
+>> target/m68k/cpu.c. So I assume it's currently enough if I add a
+>> ".unmigratable =3D 1" here, too?
+>=20
+> Well, if you insist I guess. But personally I find it's just
+> as easy to simply implement migration state.
 
-In replication_start, replication_do_checkpoint, replication_stop, ignore
-the request if current state is BLOCK_REPLICATION_DONE (sucessful failover=
-) or
-BLOCK_REPLICATION_FAILOVER (failover in progres i.e. currently merging act=
-ive
-and hidden images into the base image).
+My main concern is testing - if there is no way to test it, I can only
+implement this in a hit-or-miss style, which I really don't like (though
+it might be easy for such a simple device). So for the time being,
+marking it with ".unmigratable =3D 1" and a proper TODO comments sounds
+like the best solution to me.
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-=2D--
- block/replication.c | 38 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 35 insertions(+), 3 deletions(-)
-
-diff --git a/block/replication.c b/block/replication.c
-index 3d4dedddfc..97cc65c0cf 100644
-=2D-- a/block/replication.c
-+++ b/block/replication.c
-@@ -454,6 +454,17 @@ static void replication_start(ReplicationState *rs, R=
-eplicationMode mode,
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
-
-+    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
-+        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
-+        /*
-+         * This case happens when a secondary is promoted to primary.
-+         * Ignore the request because the secondary side of replication
-+         * doesn't have to do anything anymore.
-+         */
-+        aio_context_release(aio_context);
-+        return;
-+    }
-+
-     if (s->stage !=3D BLOCK_REPLICATION_NONE) {
-         error_setg(errp, "Block replication is running or done");
-         aio_context_release(aio_context);
-@@ -529,8 +540,7 @@ static void replication_start(ReplicationState *rs, Re=
-plicationMode mode,
-                    "Block device is in use by internal backup job");
-
-         top_bs =3D bdrv_lookup_bs(s->top_id, s->top_id, NULL);
--        if (!top_bs || !bdrv_is_root_node(top_bs) ||
--            !check_top_bs(top_bs, bs)) {
-+        if (!top_bs || !check_top_bs(top_bs, bs)) {
-             error_setg(errp, "No top_bs or it is invalid");
-             reopen_backing_file(bs, false, NULL);
-             aio_context_release(aio_context);
-@@ -577,6 +587,17 @@ static void replication_do_checkpoint(ReplicationStat=
-e *rs, Error **errp)
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
-
-+    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
-+        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
-+        /*
-+         * This case happens when a secondary was promoted to primary.
-+         * Ignore the request because the secondary side of replication
-+         * doesn't have to do anything anymore.
-+         */
-+        aio_context_release(aio_context);
-+        return;
-+    }
-+
-     if (s->mode =3D=3D REPLICATION_MODE_SECONDARY) {
-         secondary_do_checkpoint(s, errp);
-     }
-@@ -593,7 +614,7 @@ static void replication_get_error(ReplicationState *rs=
-, Error **errp)
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
-
--    if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
-+    if (s->stage =3D=3D BLOCK_REPLICATION_NONE) {
-         error_setg(errp, "Block replication is not running");
-         aio_context_release(aio_context);
-         return;
-@@ -635,6 +656,17 @@ static void replication_stop(ReplicationState *rs, bo=
-ol failover, Error **errp)
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
-
-+    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
-+        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
-+        /*
-+         * This case happens when a secondary was promoted to primary.
-+         * Ignore the request because the secondary side of replication
-+         * doesn't have to do anything anymore.
-+         */
-+        aio_context_release(aio_context);
-+        return;
-+    }
-+
-     if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
-         error_setg(errp, "Block replication is not running");
-         aio_context_release(aio_context);
-=2D-
-2.20.1
-
+ Thomas
 
