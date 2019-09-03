@@ -2,141 +2,54 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFCFBC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 19:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 497C6C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 19:11:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C77C0217D7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 19:08:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C77C0217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1EE1D22D6D
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 19:11:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EE1D22D6D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=fsf.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5EAG-0001lD-2n
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 15:08:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37354)
+	id 1i5EDc-0002xe-CE
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 15:11:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i5E8R-0008TR-15
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 15:06:36 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i5E8P-0000NN-In
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 15:06:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43450)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i5E8M-0000Kn-6G; Tue, 03 Sep 2019 15:06:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 891B0800DD4;
- Tue,  3 Sep 2019 19:06:28 +0000 (UTC)
-Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E8F1A1001956;
- Tue,  3 Sep 2019 19:06:25 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190903145634.20237-1-eblake@redhat.com>
- <9bde61cf-b4a7-fb11-7b8d-12cf8a2dc558@redhat.com>
- <a49c5a8d-b77a-a2fe-fb02-673971ccd70b@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e7d1f571-9e0b-9fd0-5921-e182a2bc92ca@redhat.com>
-Date: Tue, 3 Sep 2019 15:06:24 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <iank@fsf.org>) id 1i5ECs-0002Uk-G8
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 15:11:12 -0400
+Received: from mail.fsf.org ([209.51.188.13]:40668)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <iank@fsf.org>) id 1i5ECs-0002ks-7f
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 15:11:10 -0400
+Received: from mail.iankelling.org ([72.14.176.105]:39556)
+ by mail.fsf.org with esmtps (TLS-1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.69) (envelope-from <iank@fsf.org>)
+ id 1i5ECr-0003Sq-Ho; Tue, 03 Sep 2019 15:11:09 -0400
+Received: from iank by mail.iankelling.org with local (Exim 4.90_1)
+ (envelope-from <iank@fsf.org>)
+ id 1i5ECq-00015k-AR; Tue, 03 Sep 2019 15:11:08 -0400
+References: <cover.1566503584.git.qemu_oss@crudebyte.com>
+ <21182000.2zn5IIMESL@silver> <20190902173432.20f2637b@bahia.lan>
+ <2734436.Mu773bgsdE@silver>
+User-agent: mu4e 1.1.0; emacs 27.0.50
+From: Ian Kelling <iank@fsf.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+In-reply-to: <2734436.Mu773bgsdE@silver>
+Date: Tue, 03 Sep 2019 15:11:08 -0400
+Message-ID: <87r24xqjoz.fsf@fsf.org>
 MIME-Version: 1.0
-In-Reply-To: <a49c5a8d-b77a-a2fe-fb02-673971ccd70b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Tue, 03 Sep 2019 19:06:28 +0000 (UTC)
+Content-Type: text/plain
+X-detected-operating-system: by mail.fsf.org: GNU/Linux 2.2.x-3.x [generic]
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] docs: Update preferred NBD
- device syntax
+Subject: [Qemu-devel] DMARC/DKIM and qemu-devel list settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,96 +61,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, libvirt-list@redhat.com, qemu-block@nongnu.org
+Cc: berrange@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, Greg Kurz <groug@kaod.org>, antonios.motakis@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+At FSF, we've been working on this issue recently. I was planning to
+send a general message to qemu-devel, but someone brought it up in a
+thread below, so I'm doing it now.
+
+Currently, a message sent to qemu-devel from a domain that publishes a
+strict DMARC policy gets what mailman calls "Munge From". For example,
+for a message sent to the list:
+
+From: Anne Example Person <exampleperson@examplepersonsdomain>
+
+Is modified my Mailman and sent to subscribers as:
+
+From: Anne Example Person via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Anne Example Person <exampleperson@examplepersonsdomain>
+
+We've recently made possible an alternative solution that does not need
+munging and I call the unmodified message fix. Currently, mailman adds
+"[Qemu-devel] " to the subject of messages. Modifying the message breaks
+DKIM message signature and thus DMARC. In short: turn that off, and we
+can stop from munging. Many lists are already this way, including most
+popular @gnu and @nongnu lists, and this week we are doing a mass
+conversion of lists which never touched DMARC related list settings (not
+qemu-devel). Instead of using the subject prefix to identify a list,
+subscribers can use the List-Id, To, and Cc headers.  List information
+can also be be put in the welcome email to subscribers and the list
+information page by list administrators.
+
+Without going into all of the details, here's a few points about why we
+concluded the unmodified message fix is better for discussion
+lists. Email clients don't all treat munged messages the same way as
+unmunged, and humans read these headers so it can confuse people,
+causing messages not to be sent to the expected recipients. GNU Mailman
+has an option to do "Munge From" always, but does not recommend using
+it[1]. While we're not bound by what others do, it's worth noting that
+other very large free software communities like Debian GNU/Linux have
+adopted the unmodified message fix[2]. The unmodified messages fix
+avoids breaking DKIM cryptographic signatures, which show the message
+was authorized by the signing domain, which seems generally better for
+security. Additionally, patchew has problems, as seen in the below
+thread, subject was "[PATCH v6 0/4] 9p: Fix file ID collisions".
+
+There is a small additional wrinkle. Very rarely, someone will send a
+message to the list with a bad DKIM signature and publish a strict DMARC
+policy, and in that case, we are forced to munge. I've searched all
+messages posted to nongnu and gnu lists and, its always by someone
+sending via their own mail server, or small enough to consider it that,
+so its reasonable to ask them fix their DKIM signatures or turn off
+their strict DMARC. I plan to setup an autoresponder to do that
+automatically. Another case is if someone sends an html only email,
+qemu-devel is configured to convert it to plaintext. That modifies the
+message, and if its from a strict DMARC domain, the from munging is
+done. Again, you can tell them to stop sending html only email.
+
+I don't know who has the Qemu-devel list admin password, but whoever has
+it can adopt the unmodified message fix by changing
+dmarc_moderation_action to Accept here:
+https://lists.nongnu.org/mailman/admin/qemu-devel/privacy/sender and
+remove subject_prefix here
+https://lists.nongnu.org/mailman/admin/qemu-devel/general
+
+If the list admins went missing, email mailman@gnu.org and we can sort
+out new ones eventually.
+
+A few additional notes for completeness. We announced some of this at
+https://lists.gnu.org/archive/html/savannah-hackers-public/2019-06/msg00018.html,
+which includes information about other kinds of lists. For the unusual
+cases of munging I described, we do from munging through exim because
+mailman is not smart enough to only munge in these edge cases, and I'll
+document that soon here[1].
+
+[1]: https://wiki.list.org/DEV/DMARC
+[2]: https://lists.debian.org/debian-devel-announce/2015/08/msg00003.html
 
 
-On 9/3/19 3:02 PM, Eric Blake wrote:
-> [adding libvirt list]
-> 
-> On 9/3/19 1:50 PM, John Snow wrote:
->>
->>
->> On 9/3/19 10:56 AM, Eric Blake wrote:
->>> Mention the preferred URI form, especially since NBD is trying to
->>> standardize that form: https://lists.debian.org/nbd/2019/06/msg00012.html
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>  qemu-doc.texi | 16 +++++++++++-----
->>>  1 file changed, 11 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/qemu-doc.texi b/qemu-doc.texi
->>> index 577d1e837640..c83fb347d77e 100644
->>> --- a/qemu-doc.texi
->>> +++ b/qemu-doc.texi
->>> @@ -297,7 +297,14 @@ qemu-system-i386 -drive file=iscsi://192.0.2.1/iqn.2001-04.com.example/1
->>>
->>>  @item NBD
->>>  QEMU supports NBD (Network Block Devices) both using TCP protocol as well
->>> -as Unix Domain Sockets.
->>> +as Unix Domain Sockets.  With TCP, the default port is 10809.
->>>
->>> -Syntax for specifying a NBD device using TCP
->>> +Syntax for specifying a NBD device using TCP, in preferred URI form:
->>> +``nbd://<server-ip>[:<port>]/[<export>]''
->>> +
->>> +Syntax for specifying a NBD device using Unix Domain Sockets; remember
->>> +that '?' is a shell glob character and may need quoting:
->>> +``nbd+unix:///[<export>]?socket=<domain-socket>''
->>> +
->>> +Older syntax that is also recognized:
->>
->> Deprecated officially, or no?
->>
->>>  ``nbd:<server-ip>:<port>[:exportname=<export>]''
->>>
->>> -Syntax for specifying a NBD device using Unix Domain Sockets
->>>  ``nbd:unix:<domain-socket>[:exportname=<export>]''
-> 
-> I didn't feel like starting a deprecation clock, in part because libvirt
-> is still using nbd:host:port:exportname during migration, similarly code
-> in virstoragefile.c is using only the old form.  Do we want to start a
-> deprecation (as a separate patch), to prod faster changes in libvirt in
-> switching to the newer form where sensible?
-> 
+Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org> writes:
 
-Yeah, understood -- I was merely curious for wording purposes. Some
-people might wonder what "Older syntax" means and perhaps why they
-shouldn't use it. It sounds like we do want to wander away from it
-eventually but aren't prepared to do that yet.
-
-I think largely such a deprecation clock is up to the workload of
-whoever would have to update the libvirt workflow (You, Peter?) and how
-much benefit we'd gain by dropping it in QEMU (little?)
-
-If you don't have motivation for doing it unprompted I have little
-reason to coerce you into it.
-
->>>
->>>  Example for TCP
->>>  @example
->>> -qemu-system-i386 --drive file=nbd:192.0.2.1:30000
->>> +qemu-system-i386 --drive file=nbd://192.0.2.1:30000
->>>  @end example
->>>
->>>  Example for Unix Domain Sockets
->>>  @example
->>> -qemu-system-i386 --drive file=nbd:unix:/tmp/nbd-socket
->>> +qemu-system-i386 --drive "file=nbd+unix:///?socket=/tmp/nbd-socket"
->>>  @end example
->>>
->>>  @item SSH
->>>
->>
->> Reviewed-by: John Snow <jsnow@redhat.com>
-> 
-> Thanks; will queue through my NBD tree (regardless of whether we decide
-> I should add more patches to start a deprecation cycle).
-> 
-
-
+> On Montag, 2. September 2019 17:34:32 CEST Greg Kurz wrote:
+>> On Sun, 01 Sep 2019 21:28:45 +0200
+>> 
+>> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+>> > On Donnerstag, 29. August 2019 19:02:34 CEST Greg Kurz wrote:
+>> > > On Thu, 22 Aug 2019 15:18:54 -0700 (PDT)
+>> > > 
+>> > > no-reply@patchew.org wrote:
+>> > > > Patchew URL:
+>> > > > https://patchew.org/QEMU/cover.1566503584.git.qemu_oss@crudebyte.com/
+>> > > > 
+>> > > > 
+>> > > > 
+>> > > > Hi,
+>> > > > 
+>> > > > This series seems to have some coding style problems. See output below
+>> > > > for
+>> > 
+>> > > > more information:
+>> > [snip]
+>> > 
+>> > > > === OUTPUT BEGIN ===
+>> > > > 1/4 Checking commit bb69de63f788 (9p: Treat multiple devices on one
+>> > > > export
+>> > > > as an error) ERROR: Author email address is mangled by the mailing
+>> > > > list
+>> > > > #2:
+>> > > > Author: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+>> > > 
+>> > > This is problematic since it ends up in the Author: field in git. Please
+>> > > find a way to fix that.
+>> > 
+>> > Like in which way do you imagine that? And where is the actual practical
+>> > problem? I mean every patch still has my signed-off-by tag with the
+>> > correct
+>> > email address ending up in git history.
+>> 
+>> Yes, this only breaks Author: if the patch is applied from the list.
+>> 
+>> > The cause for this issue is that the domain is configured to require DKIM
+>> > signatures for all outgoing emails. That's why mailman replaces my address
+>> > by "Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>"
+>> > placeholder since it could not provide a valid signature.
+>> > 
+>> > There were good reasons for enabling DKIM and it is a good thing for all
+>> > domains in general, since that ensures that (i.e. foreign) email addresses
+>> > cannot be used as sender address if the actual sender is not authorized
+>> > for
+>> > sending emails with that address.
+>> 
+>> Don't know much about DKIM but google seems to confirm what you say.
+>
+> When you view the source of my emails you'll always see a "DKIM-Signature:" 
+> field in the email header, which is a signature of the email's body and the 
+> specific email header fields listed in the "DKIM-Signature:" block, so the 
+> original server can choose by itself which header fields to include ("h=...") 
+> for signing, but the standard requires the From: field must always be 
+> included.
+>
+> A receiving server then obtains the public key from the domain's DNS records 
+> and checks if the DKIM signature of the email was correct:
+> https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail
+>
+> Additionally the receiving server obtains the so called "DMARC" entry from the 
+> domain's DNS records. The "DMARC" DNS entry contains the domain's general 
+> policies how receiving email servers shall handle verification of emails of 
+> this domain. For instance the DMARC entry may list SMTP servers (e.g. IPs, DNS 
+> names) eligble to send emails on behalf of the domain at all, and it defines 
+> what receiving email servers shall do with emails which were identified of not 
+> being from an eligible source (e.g. sender IP not listed in DMARC entry or 
+> missing or wrong DKIM signature in email header). For instance if the policy 
+> is "quarantine" in the DMARC entry then receiving servers are advised to 
+> simply drop invalid emails:  https://en.wikipedia.org/wiki/DMARC
+>
+>> So, this means that patchew will complain each time you post if we can't
+>> find a proper way to address that... :-\
+>
+> Well, mailman is handling this correctly. It replaces the "From:" field with a 
+> placeholder and instead adds my actual email address as "Reply-To:" field. 
+> That's the common way to handle this on mailing lists, as also mentioned here:
+> https://en.wikipedia.org/wiki/DMARC#From:_rewriting
+>
+> So IMO patchew should automatically use the value of "Reply-To:" in that case 
+> as author of patches instead.
+>
+> Reducing security cannot be the solution.
+>
+>> > What I changed in the meantime though is that you should get all my
+>> > patches
+>> > directly to your personal address, not only from the list. Or did you
+>> > receive v6 again just from the list?
+>> 
+>> I've received the patches in my mailbox but I prefer to use the patchwork's
+>> pwclient CLI to apply patches... and patchwork captures the patches from
+>> the list, so I end up having to patch the authorship manually anyway.
+>> 
+>> How are you sending patches ? With git send-email ? If so, maybe you can
+>> pass something like --from='"Christian Schoenebeck"
+>> <qemu_oss@crudebyte.com>'. Since this is a different string, git will
+>> assume you're sending someone else's patch : it will automatically add an
+>> extra From: made out of the commit Author as recorded in the git tree.
+>
+> I use "git format-patch ..." to dump the invidiual emails as raw email sources 
+> and then I'll send those raw emails from the command line. So I have even more 
+> control of what is exactly sent out and could of course also add custom email 
+> header fields if required, if that would solve the situation somehow, i.e. 
+> manually as first test and later in automated way. That's not the issue here.
+>
+> The problem however is that there is probably not any header field I could add 
+> that would solve the problem. Because I guess patchew is really just taking 
+> the first "From:" field as author, period.
+>
+> I think the source files are available, so I could check that.
+>
 
