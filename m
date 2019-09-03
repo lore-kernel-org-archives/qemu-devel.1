@@ -1,68 +1,88 @@
-Return-Path: <SRS0=OFvx=W5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C569C3A59E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 22:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5EEC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 03:33:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4295D20828
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Sep 2019 22:31:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="AHTDyJUd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4295D20828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 01199214AE
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 03:33:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01199214AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i4uql-000838-CY
-	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 18:31:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46232)
+	id 1i4zZZ-0005Ee-6u
+	for qemu-devel@archiver.kernel.org; Mon, 02 Sep 2019 23:33:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59516)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1i4upa-0007Z1-Br
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 18:29:52 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1i4zYd-0004oU-0Z
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 23:32:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1i4upY-0001cN-NY
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 18:29:50 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:40191)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1i4upX-0001bS-Vt
- for qemu-devel@nongnu.org; Mon, 02 Sep 2019 18:29:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
- :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=5RQJgQwWFYKFJmJoB5t/p/OgzOgHujRzOXrkYHfYs10=; b=AHTDyJUdg9Eqn2/+XmwtUquHkW
- oJ2eAl6AFroWu6eTaRCz3xYhtAc9ltXrNwD7n3vPVZKu3DgTXt/XboAmbCE4drNqvHmpRQjbBIQ3d
- +/XkckZ45kT3vOGXVkxdEtaVjiwKiJHGFOH2xFxtl6+h2l6+H0+atxeYpt4d0Kc2JCDjVW9eOEce1
- WizPdNAKszvx4MsuI2wKhrtErOZWV2SQBND9Q2uxoldcQ02NHUMxNyaG7jH3YenvAifNJLVtoQCCY
- aQcS8UV30h5N1nVER5oMcTMiMXRpZzqMoISAobv/zGh7GsZAFFzeldntJ8bQX1Hw2onHR5lmEuvlv
- ZabTeSvsqim5ON6H/MoWeZhPCtSRGuXBwMjSt1BB0RN7/+6r1fwsad1skuWyWFKBiWC+W7vtI6q+Q
- kD0jO5zrgNSDLP4GFK3lYtvyhx04ysR7AXZyxggEhjPbkNrwpnDWaBQbawMvd7DN5cQ5JyIGl8wFs
- cULnW2ekxfY11GSZ5LDt6oasG2eoN2ifY9EiVj2hWaRMSjjCNOhXKecKInMJsGYPjCURTtGAuzAVA
- RztHUvHWpLnvCrUVwNsf2GMI/f0oEYo7Psc33zsD/fCj6b28GAV6pwwll2HgLclsmwj/LLstOuNyZ
- 5T1pstac8iSbRHH2VRS/x9bDe06EIWf0ETCpWN67Q=;
-To: qemu-devel@nongnu.org
-Date: Tue, 03 Sep 2019 00:29:43 +0200
-Message-ID: <2734436.Mu773bgsdE@silver>
-In-Reply-To: <20190902173432.20f2637b@bahia.lan>
-References: <cover.1566503584.git.qemu_oss@crudebyte.com>
- <21182000.2zn5IIMESL@silver> <20190902173432.20f2637b@bahia.lan>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
+ (envelope-from <chen.zhang@intel.com>) id 1i4zYa-0007Ji-PD
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 23:32:38 -0400
+Received: from mga14.intel.com ([192.55.52.115]:41539)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1i4zYa-0007Hn-Fo
+ for qemu-devel@nongnu.org; Mon, 02 Sep 2019 23:32:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Sep 2019 20:32:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,461,1559545200"; d="scan'208";a="211847776"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+ by fmsmga002.fm.intel.com with ESMTP; 02 Sep 2019 20:32:32 -0700
+Received: from fmsmsx122.amr.corp.intel.com (10.18.125.37) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 2 Sep 2019 20:32:32 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ fmsmsx122.amr.corp.intel.com (10.18.125.37) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 2 Sep 2019 20:32:32 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.113]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.132]) with mapi id 14.03.0439.000;
+ Tue, 3 Sep 2019 11:32:30 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Thread-Topic: [PATCH v2 2/3] net/filter.c: Add Options to insert filters
+ anywhere in the filter list
+Thread-Index: AQHVU5oiMguPMz5nEE2bcmsx0goHsqcIGSaw//+vhICAEJH/MP//9s2AgAEWQ1A=
+Date: Tue, 3 Sep 2019 03:32:29 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78062526EA@shsmsx102.ccr.corp.intel.com>
+References: <cover.1565894837.git.lukasstraub2@web.de>
+ <6643a807a5f4c5ceb2f09e0718e97e5f968577f7.1565894837.git.lukasstraub2@web.de>
+ <9CFF81C0F6B98A43A459C9EDAD400D780622D3DC@shsmsx102.ccr.corp.intel.com>
+ <20190823082125.499095d7@luklap>
+ <9CFF81C0F6B98A43A459C9EDAD400D78062507FD@shsmsx102.ccr.corp.intel.com>
+ <20190902205111.7917db23@luklap>
+In-Reply-To: <20190902205111.7917db23@luklap>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzVjNDUyODktYWUxNi00ZmUwLWEyNDQtMmVmMDJkMTM2NTM0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWVVvS2dsN0JtdzVKXC9RRDhVVTJyZVFKSERWWkZ3V2ZqUWNrVHJEYW9veTZWMlZXMHRXXC9DYW04Nk80VXhRd1F1In0=
+x-originating-ip: [10.239.127.40]
 Content-Type: text/plain; charset="us-ascii"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] 9p: Fix file ID collisions
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] net/filter.c: Add Options to insert
+ filters anywhere in the filter list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,168 +94,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: berrange@redhat.com, stefanha@gmail.com,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- dgilbert@redhat.com, antonios.motakis@huawei.com
+Cc: Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Montag, 2. September 2019 17:34:32 CEST Greg Kurz wrote:
-> On Sun, 01 Sep 2019 21:28:45 +0200
-> 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > On Donnerstag, 29. August 2019 19:02:34 CEST Greg Kurz wrote:
-> > > On Thu, 22 Aug 2019 15:18:54 -0700 (PDT)
-> > > 
-> > > no-reply@patchew.org wrote:
-> > > > Patchew URL:
-> > > > https://patchew.org/QEMU/cover.1566503584.git.qemu_oss@crudebyte.com/
-> > > > 
-> > > > 
-> > > > 
-> > > > Hi,
-> > > > 
-> > > > This series seems to have some coding style problems. See output below
-> > > > for
-> > 
-> > > > more information:
-> > [snip]
-> > 
-> > > > === OUTPUT BEGIN ===
-> > > > 1/4 Checking commit bb69de63f788 (9p: Treat multiple devices on one
-> > > > export
-> > > > as an error) ERROR: Author email address is mangled by the mailing
-> > > > list
-> > > > #2:
-> > > > Author: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-> > > 
-> > > This is problematic since it ends up in the Author: field in git. Please
-> > > find a way to fix that.
-> > 
-> > Like in which way do you imagine that? And where is the actual practical
-> > problem? I mean every patch still has my signed-off-by tag with the
-> > correct
-> > email address ending up in git history.
-> 
-> Yes, this only breaks Author: if the patch is applied from the list.
-> 
-> > The cause for this issue is that the domain is configured to require DKIM
-> > signatures for all outgoing emails. That's why mailman replaces my address
-> > by "Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>"
-> > placeholder since it could not provide a valid signature.
-> > 
-> > There were good reasons for enabling DKIM and it is a good thing for all
-> > domains in general, since that ensures that (i.e. foreign) email addresses
-> > cannot be used as sender address if the actual sender is not authorized
-> > for
-> > sending emails with that address.
-> 
-> Don't know much about DKIM but google seems to confirm what you say.
 
-When you view the source of my emails you'll always see a "DKIM-Signature:" 
-field in the email header, which is a signature of the email's body and the 
-specific email header fields listed in the "DKIM-Signature:" block, so the 
-original server can choose by itself which header fields to include ("h=...") 
-for signing, but the standard requires the From: field must always be 
-included.
+> -----Original Message-----
+> From: Lukas Straub <lukasstraub2@web.de>
+> Sent: Tuesday, September 3, 2019 2:51 AM
+> To: Zhang, Chen <chen.zhang@intel.com>
+> Cc: qemu-devel <qemu-devel@nongnu.org>; Jason Wang
+> <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
+> Xie Changlong <xiechanglong.d@gmail.com>
+> Subject: Re: [PATCH v2 2/3] net/filter.c: Add Options to insert filters
+> anywhere in the filter list
+>=20
+> On Mon, 2 Sep 2019 11:43:57 +0000
+> "Zhang, Chen" <chen.zhang@intel.com> wrote:
+>=20
+> > > -----Original Message-----
+> > > From: Lukas Straub <lukasstraub2@web.de>
+> > > Sent: Friday, August 23, 2019 2:21 PM
+> > > To: Zhang, Chen <chen.zhang@intel.com>
+> > > Cc: qemu-devel <qemu-devel@nongnu.org>; Jason Wang
+> > > <jasowang@redhat.com>; Wen Congyang
+> <wencongyang2@huawei.com>; Xie
+> > > Changlong <xiechanglong.d@gmail.com>
+> > > Subject: Re: [PATCH v2 2/3] net/filter.c: Add Options to insert
+> > > filters anywhere in the filter list
+> > >
+> > > On Fri, 23 Aug 2019 03:24:02 +0000
+> > > "Zhang, Chen" <chen.zhang@intel.com> wrote:
+> > >
+> > > > > -----Original Message-----
+> > > > > From: Lukas Straub [mailto:lukasstraub2@web.de]
+> > > > > Sent: Friday, August 16, 2019 2:49 AM
+> > > > > To: qemu-devel <qemu-devel@nongnu.org>
+> > > > > Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
+> > > > > <jasowang@redhat.com>; Wen Congyang
+> > > <wencongyang2@huawei.com>; Xie
+> > > > > Changlong <xiechanglong.d@gmail.com>
+> > > > > Subject: [PATCH v2 2/3] net/filter.c: Add Options to insert
+> > > > > filters anywhere in the filter list
+> > > > >
+> > > > > To switch the Secondary to Primary, we need to insert new
+> > > > > filters before the filter-rewriter.
+> > > > >
+> > > > > Add the options insert=3D and position=3D to be able to insert
+> > > > > filters anywhere in the filter list.
+> > > > >
+> > > > > position should be either "head", "tail" or the id of another fil=
+ter.
+> > > > > insert should be either "before" or "after" to specify where to
+> > > > > insert the new filter relative to the one specified with position=
+.
+> > > > >
+> > > >
+> > > > Hi Lukas,
+> > > >
+> > > > It looks no need to add the "insert =3D xxx" for this operation.
+> > > > For example:
+> > > >
+> > > > We have 3 net-filters, the running order like that:
+> > > >
+> > > > Fiter1   ---------->   Filter2 ------------> Filter3
+> > > >
+> > > > If we want to add another filter between filter1 and filter2.
+> > > > The "Position =3D head, insert =3D after" always seam with "positio=
+n =3D
+> > > > filter2 id,
+> > > insert =3D before".
+> > >
+> > > Hi Zhang,
+> > > The insert=3D parameter is ignored if position=3Dhead or tail. It alw=
+ays
+> > > Inserts at the head (before Filter1) or the tail (after Filter3) of t=
+he List in
+> these cases.
+> > >
+> > > > It seems the "insert" is a redundant args.
+> > > > So I think it is enough with the "position", we can make the
+> > > > "insert" always
+> > > equal "after" except the "head".
+> > >
+> > > Yes, we still could do it without it, but its more convenient with
+> > > the insert=3D parameter. For example our Case with inserting before t=
+he
+> rewriter:
+> > >
+> > > 'filter-mirror', 'id': 'm0', 'props': { 'insert': 'before', 'position=
+': 'rew0',
+> 'netdev':
+> > > 'hn0', 'queue': 'tx', 'outdev': 'mirror0' } 'filter-redirector', 'id'=
+: 'redire0',
+> 'props':
+> > > { 'insert': 'before', 'position': 'rew0', 'netdev': 'hn0', 'queue': '=
+rx', 'indev':
+> > > 'compare_out' } 'filter-redirector', 'id': 'redire1', 'props': {
+> > > 'insert': 'before',
+> > > 'position': 'rew0', 'netdev': 'hn0', 'queue': 'rx', 'outdev':
+> > > 'compare0' }
+> > >
+> > > You see directly that here 3 Filters are inserted before the rewriter=
+.
+> > >
+> > > would have to become:
+> > >
+> > > 'filter-mirror', 'id': 'm0', 'props': { 'position': 'head',
+> > > 'netdev': 'hn0', 'queue': 'tx',
+> > > 'outdev': 'mirror0' } 'filter-redirector', 'id': 'redire0', 'props':
+> > > { 'position': 'm0',
+> > > 'netdev': 'hn0', 'queue': 'rx', 'indev': 'compare_out' } 'filter-redi=
+rector', 'id':
+> > > 'redire1', 'props': { 'position': 'redire0', 'netdev': 'hn0', 'queue'=
+: 'rx',
+> 'outdev':
+> > > 'compare0' }
+> > >
+> > > Which is less obvious.
+> >
+> > OK, It is fine for me.
+> > But in the code have some other issues like that:
+> >
+> > +
+> > +static void netfilter_set_insert(Object *obj, const char *str, Error
+> > +**errp) {
+> > +    NetFilterState *nf =3D NETFILTER(obj);
+> > +
+> > +    if (strcmp(str, "before") && strcmp(str, "after")) {
+> > +        error_setg(errp, "Invalid value for netfilter insert, "
+> > +                         "should be 'head' or 'tail'");               =
+                   ----------------------
+> ---------->>> I think you should change the "head/tail"  to "before/after=
+".
+>=20
+> Oops, that was a typo.
+>=20
+> > +        return;
+> > +    }
+> > +
+> > +    nf->insert_before =3D !strcmp(str, "before"); }
+> >
+> >
+> > And I think the "front/behind" is better than "before/after" in this st=
+atus.
+> > At the same time the name of the "insert_before" change to "front_flag"=
+ is
+> better.
+>=20
+> What I like about the "before" is that it sounds more like an English sen=
+tence.
+> insert: before, position: rew0
+> vs.
+> insert: front, position: rew0
+>=20
+> But I agree, "behind" is more clear than "after".
+>=20
+> What do you think about "first/last" instead of "head/tail"?
 
-A receiving server then obtains the public key from the domain's DNS records 
-and checks if the DKIM signature of the email was correct:
-https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail
+I'm not a English native speaker, but I think head/tail is enough same as t=
+he QTAILQ.
 
-Additionally the receiving server obtains the so called "DMARC" entry from the 
-domain's DNS records. The "DMARC" DNS entry contains the domain's general 
-policies how receiving email servers shall handle verification of emails of 
-this domain. For instance the DMARC entry may list SMTP servers (e.g. IPs, DNS 
-names) eligble to send emails on behalf of the domain at all, and it defines 
-what receiving email servers shall do with emails which were identified of not 
-being from an eligible source (e.g. sender IP not listed in DMARC entry or 
-missing or wrong DKIM signature in email header). For instance if the policy 
-is "quarantine" in the DMARC entry then receiving servers are advised to 
-simply drop invalid emails:  https://en.wikipedia.org/wiki/DMARC
+Thanks
+Zhang Chen
 
-> So, this means that patchew will complain each time you post if we can't
-> find a proper way to address that... :-\
-
-Well, mailman is handling this correctly. It replaces the "From:" field with a 
-placeholder and instead adds my actual email address as "Reply-To:" field. 
-That's the common way to handle this on mailing lists, as also mentioned here:
-https://en.wikipedia.org/wiki/DMARC#From:_rewriting
-
-So IMO patchew should automatically use the value of "Reply-To:" in that case 
-as author of patches instead.
-
-Reducing security cannot be the solution.
-
-> > What I changed in the meantime though is that you should get all my
-> > patches
-> > directly to your personal address, not only from the list. Or did you
-> > receive v6 again just from the list?
-> 
-> I've received the patches in my mailbox but I prefer to use the patchwork's
-> pwclient CLI to apply patches... and patchwork captures the patches from
-> the list, so I end up having to patch the authorship manually anyway.
-> 
-> How are you sending patches ? With git send-email ? If so, maybe you can
-> pass something like --from='"Christian Schoenebeck"
-> <qemu_oss@crudebyte.com>'. Since this is a different string, git will
-> assume you're sending someone else's patch : it will automatically add an
-> extra From: made out of the commit Author as recorded in the git tree.
-
-I use "git format-patch ..." to dump the invidiual emails as raw email sources 
-and then I'll send those raw emails from the command line. So I have even more 
-control of what is exactly sent out and could of course also add custom email 
-header fields if required, if that would solve the situation somehow, i.e. 
-manually as first test and later in automated way. That's not the issue here.
-
-The problem however is that there is probably not any header field I could add 
-that would solve the problem. Because I guess patchew is really just taking 
-the first "From:" field as author, period.
-
-I think the source files are available, so I could check that.
-
-> > > Other warnings/errors should also be fixed but they look trivial.
-> > 
-> > Yeah, they are trivial. *But* there is one thing ...
-> > 
-> > > > Author: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-> > > > 
-> > > > ERROR: space prohibited after that open parenthesis '('
-> > > > #92: FILE: hw/9pfs/9p.c:586:
-> > > > +    return ((uint64_t)mirror8bit( value        & 0xff) << 56) |
-> > > > 
-> > > > ERROR: space prohibited before that close parenthesis ')'
-> > > > #98: FILE: hw/9pfs/9p.c:592:
-> > > > +           ((uint64_t)mirror8bit((value >> 48) & 0xff) << 8 ) |
-> > > > 
-> > > > ERROR: space prohibited before that close parenthesis ')'
-> > > > #99: FILE: hw/9pfs/9p.c:593:
-> > > > +           ((uint64_t)mirror8bit((value >> 56) & 0xff)      ) ;
-> > 
-> > ... I would like to ignore this specific bot whining, because that
-> > particular function looks much more readable the way it is (in that
-> > patch) right now.
-> Prettier certainly but...
-> 
-> /* Same as mirror8bit() just for a 64 bit data type instead for a byte. */
-> static inline uint64_t mirror64bit(uint64_t value)
-> {
->     return ((uint64_t)mirror8bit(value         & 0xff) << 56) |
->            ((uint64_t)mirror8bit((value >> 8)  & 0xff) << 48) |
->            ((uint64_t)mirror8bit((value >> 16) & 0xff) << 40) |
->            ((uint64_t)mirror8bit((value >> 24) & 0xff) << 32) |
->            ((uint64_t)mirror8bit((value >> 32) & 0xff) << 24) |
->            ((uint64_t)mirror8bit((value >> 40) & 0xff) << 16) |
->            ((uint64_t)mirror8bit((value >> 48) & 0xff) <<  8) |
->            ((uint64_t)mirror8bit((value >> 56) & 0xff));
-> }
-> 
-> ... is readable enough IMHO and makes checkpatch happy :)
-
-Well, okay :)
-
+>=20
+> Regards,
+> Lukas Straub
+>=20
+> >
+> > Thanks
+> > Zhang Chen
+> >
+> > >
+> > > Regards,
+> > > Lukas Straub
+> > >
+> > > >
+> > > > Thanks
+> > > > Zhang Chen
+> > > >
+> > > > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> > > > > ---
+> > > > >  include/net/filter.h |  2 ++
+> > > > >  net/filter.c         | 71
+> > > +++++++++++++++++++++++++++++++++++++++++++-
+> > > > >  qemu-options.hx      | 10 +++----
+> > > > >  3 files changed, 77 insertions(+), 6 deletions(-)
+> >
 
 
