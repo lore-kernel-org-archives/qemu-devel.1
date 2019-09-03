@@ -2,87 +2,60 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 270EBC41514
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C0DC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3E132341F
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:02:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6e6daJV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E132341F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 37227233A1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:02:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37227233A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i59O1-0000hV-ML
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 10:02:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33803)
+	id 1i59OI-0000sk-W9
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 10:02:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1i59JK-0003Nm-GV
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i58yu-0002YE-B0
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:36:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1i59JJ-0005mA-1C
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:30 -0400
-Received: from mail-qt1-x836.google.com ([2607:f8b0:4864:20::836]:43315)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1i59JF-0005kg-88
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:27 -0400
-Received: by mail-qt1-x836.google.com with SMTP id l22so7767263qtp.10
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 06:57:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=3vBr1n1UsZgU8PgLgokhaXnjo/VGwWwRQ5hmljwJgVU=;
- b=Y6e6daJV9/1SfIAKAh6wC8Ew44SuR4x4sVPSyc1oyjfnPOXEbPpQYh6zhck3LCzwpr
- p/cTN2RXOe2Yr0mus4bA3xXKH+6eXU9l8uNJpw37V3aiyuh9uQ/979fy30spg1mGTAyK
- U3Ub3ZHx/2f95RLOP/1l4KA+hD9sRn4hEutd246RYOI7KCp92X0y6qkxDtFcGo6nPr/g
- 6bskxi5ZAhB5eF188URXfRQAJyhbQMKbY2MVHxtNmPdDQwaG3wmUgX0Kn7OyWV6daYc7
- QiQSgpifsR9ofRrIXgZgN3jaZILdJ7Rzy+shim3fafqVTzTGgKifdQLeeQNyqq+4m0x8
- iarA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=3vBr1n1UsZgU8PgLgokhaXnjo/VGwWwRQ5hmljwJgVU=;
- b=e8K4Hu0gkA6Y9j3/KMVMvqtDJMEyIRGkGf7cKQJQbuv5h3r7Z37hzgdRlFSgHL5p78
- A2JYdfvdfpLpl8/4Eiw2YI7t1oJ2J53cis5z0jveUSIViI8wsWClevyVnzdFTywBBew6
- lNBTIar30J9j55EvpCNrIDgBD3CGpvFmXMHJkf+i+x8QExZLEQV4BHIi/qnIJsLBIwRh
- i2htPpvTGv9+t3XRzAbRTfMZQGXNUjqPGK7G+z6OO3CXOg6tO2baUZGJeUerkq0bvTMT
- dgrYxWNfVDD6uz2epzi31/esLllkz6azR15rKlO+W4hljrEVD+ymChT7R9DsX/buJgl8
- +yrA==
-X-Gm-Message-State: APjAAAUVjIKXkOLA9V+Ll9f/jsJTm+cYsiOYKBHrbmWEHRLfxTleM49w
- L7e3uBI5tNeQ5TR8zdApOtSjmXvE69E=
-X-Google-Smtp-Source: APXvYqwXqOzBobl+pwRFr7qAODjHZA419uA0lOXicNZIejbA58jkHlKMMTwpaNSzT2Ce59gT/8MKbw==
-X-Received: by 2002:ac8:6ce:: with SMTP id j14mr33704693qth.373.1567519044204; 
- Tue, 03 Sep 2019 06:57:24 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c7:5c9f:9471:e230:52b:8c93])
- by smtp.gmail.com with ESMTPSA id k49sm9211158qtc.9.2019.09.03.06.57.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 06:57:23 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 10:57:08 -0300
-Message-Id: <20190903135708.21624-5-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190903135708.21624-1-danielhb413@gmail.com>
-References: <20190903135708.21624-1-danielhb413@gmail.com>
+ (envelope-from <mreitz@redhat.com>) id 1i58ys-0006WJ-Er
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:36:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59876)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i58yn-0006OT-Mn; Tue, 03 Sep 2019 09:36:17 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 042F23001ACB;
+ Tue,  3 Sep 2019 13:36:17 +0000 (UTC)
+Received: from localhost (ovpn-204-98.brq.redhat.com [10.40.204.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66C7560C18;
+ Tue,  3 Sep 2019 13:36:16 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue,  3 Sep 2019 15:35:46 +0200
+Message-Id: <20190903133553.6500-10-mreitz@redhat.com>
+In-Reply-To: <20190903133553.6500-1-mreitz@redhat.com>
+References: <20190903133553.6500-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::836
-Subject: [Qemu-devel] [PATCH v7 4/4] qemu-iotests: adding LUKS cleanup for
- non-UTF8 secret error
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Tue, 03 Sep 2019 13:36:17 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v2 09/16] iotests: Disable broken
+ streamOptimized tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,126 +67,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
- jsnow@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a new test file, 257, to exercise the case where
-qemu-img fails to complete for the LUKS format when a non-UTF8
-secret is used.
+streamOptimized does not support writes that do not span exactly one
+cluster.  Furthermore, it cannot rewrite already allocated clusters.
+As such, many iotests do not work with it.  Disable them.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190815153638.4600-6-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/259     | 67 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/259.out | 11 +++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 79 insertions(+)
- create mode 100755 tests/qemu-iotests/259
- create mode 100644 tests/qemu-iotests/259.out
+ tests/qemu-iotests/002 | 1 +
+ tests/qemu-iotests/003 | 1 +
+ tests/qemu-iotests/005 | 3 ++-
+ tests/qemu-iotests/009 | 1 +
+ tests/qemu-iotests/010 | 1 +
+ tests/qemu-iotests/011 | 1 +
+ tests/qemu-iotests/017 | 3 ++-
+ tests/qemu-iotests/018 | 3 ++-
+ tests/qemu-iotests/019 | 3 ++-
+ tests/qemu-iotests/020 | 3 ++-
+ tests/qemu-iotests/027 | 1 +
+ tests/qemu-iotests/032 | 1 +
+ tests/qemu-iotests/033 | 1 +
+ tests/qemu-iotests/034 | 3 ++-
+ tests/qemu-iotests/037 | 3 ++-
+ tests/qemu-iotests/063 | 3 ++-
+ tests/qemu-iotests/072 | 1 +
+ tests/qemu-iotests/105 | 3 ++-
+ tests/qemu-iotests/197 | 1 +
+ tests/qemu-iotests/215 | 1 +
+ tests/qemu-iotests/251 | 1 +
+ 21 files changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
-new file mode 100755
-index 0000000000..cb362598b4
---- /dev/null
-+++ b/tests/qemu-iotests/259
-@@ -0,0 +1,67 @@
-+#!/usr/bin/env bash
-+#
-+# Test qemu-img file cleanup for LUKS when using a non-UTF8 secret
-+#
-+# Copyright (C) 2019, IBM Corporation.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+TEST_IMAGE_FILE='vol.img'
-+
-+_cleanup()
-+{
-+  _cleanup_test_img
-+  rm non_utf8_secret
-+  rm -f $TEST_IMAGE_FILE
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt luks
-+_supported_proto generic
-+_unsupported_proto vxhs
-+
-+echo "== Create non-UTF8 secret =="
-+echo -n -e '\x3a\x3c\x3b\xff' > non_utf8_secret
-+SECRET="secret,id=sec0,file=non_utf8_secret"
-+
-+echo "== Throws an error because of invalid UTF-8 secret =="
-+$QEMU_IMG create -f $IMGFMT --object $SECRET -o "key-secret=sec0" $TEST_IMAGE_FILE 4M
-+
-+echo "== Image file should not exist after the error =="
-+if test -f "$TEST_IMAGE_FILE"; then
-+    exit 1
-+fi
-+
-+echo "== Create a stub image file and run qemu-img again =="
-+touch $TEST_IMAGE_FILE
-+$QEMU_IMG create -f $IMGFMT --object $SECRET -o "key-secret=sec0" $TEST_IMAGE_FILE 4M
-+
-+echo "== Pre-existing image file should also be deleted after the error =="
-+if test -f "$TEST_IMAGE_FILE"; then
-+    exit 1
-+fi
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
-new file mode 100644
-index 0000000000..6b0188111c
---- /dev/null
-+++ b/tests/qemu-iotests/259.out
-@@ -0,0 +1,11 @@
-+QA output created by 259
-+== Create non-UTF8 secret ==
-+== Throws an error because of invalid UTF-8 secret ==
-+qemu-img: vol.img: Data from secret sec0 is not valid UTF-8
-+Formatting 'vol.img', fmt=luks size=4194304 key-secret=sec0
-+== Image file should not exist after the error ==
-+== Create a stub image file and run qemu-img again ==
-+qemu-img: vol.img: Data from secret sec0 is not valid UTF-8
-+Formatting 'vol.img', fmt=luks size=4194304 key-secret=sec0
-+== Pre-existing image file should also be deleted after the error ==
-+ *** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index d95d556414..8f50bd91e5 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -273,4 +273,5 @@
- 256 rw quick
- 257 rw
- 258 rw quick
-+259 rw img quick
- 262 rw quick migration
--- 
+diff --git a/tests/qemu-iotests/002 b/tests/qemu-iotests/002
+index fd413bce48..1a0d411df5 100755
+--- a/tests/qemu-iotests/002
++++ b/tests/qemu-iotests/002
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt generic
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+=20
+ size=3D128M
+diff --git a/tests/qemu-iotests/003 b/tests/qemu-iotests/003
+index ccd3a39dfb..33eeade0de 100755
+--- a/tests/qemu-iotests/003
++++ b/tests/qemu-iotests/003
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt generic
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+ size=3D128M
+ offset=3D67M
+diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+index 9c7681c19b..58442762fe 100755
+--- a/tests/qemu-iotests/005
++++ b/tests/qemu-iotests/005
+@@ -43,7 +43,8 @@ _supported_fmt generic
+ _supported_proto generic
+ _supported_os Linux
+ _unsupported_imgopts "subformat=3DtwoGbMaxExtentFlat" \
+-                     "subformat=3DtwoGbMaxExtentSparse"
++                     "subformat=3DtwoGbMaxExtentSparse" \
++                     "subformat=3DstreamOptimized"
+=20
+ # vpc is limited to 127GB, so we can't test it here
+ if [ "$IMGFMT" =3D "vpc" ]; then
+diff --git a/tests/qemu-iotests/009 b/tests/qemu-iotests/009
+index 51b200db1d..4dc7d210f9 100755
+--- a/tests/qemu-iotests/009
++++ b/tests/qemu-iotests/009
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt generic
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+=20
+ size=3D6G
+diff --git a/tests/qemu-iotests/010 b/tests/qemu-iotests/010
+index 48c533f632..df809b3088 100755
+--- a/tests/qemu-iotests/010
++++ b/tests/qemu-iotests/010
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt generic
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+=20
+ size=3D6G
+diff --git a/tests/qemu-iotests/011 b/tests/qemu-iotests/011
+index 56f704b5b9..57b99ae4a9 100755
+--- a/tests/qemu-iotests/011
++++ b/tests/qemu-iotests/011
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt generic
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+=20
+ size=3D6G
+diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
+index 79875de454..0a4b854e65 100755
+--- a/tests/qemu-iotests/017
++++ b/tests/qemu-iotests/017
+@@ -41,7 +41,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto generic
+ _unsupported_proto vxhs
+-_unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
+xtentFlat"
++_unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
+xtentFlat" \
++                     "subformat=3DstreamOptimized"
+=20
+ TEST_OFFSETS=3D"0 4294967296"
+=20
+diff --git a/tests/qemu-iotests/018 b/tests/qemu-iotests/018
+index 78169838ba..c69ce09209 100755
+--- a/tests/qemu-iotests/018
++++ b/tests/qemu-iotests/018
+@@ -41,7 +41,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto file
+ _supported_os Linux
+-_unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
+xtentFlat"
++_unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
+xtentFlat" \
++                     "streamOptimized"
+=20
+ TEST_OFFSETS=3D"0 4294967296"
+=20
+diff --git a/tests/qemu-iotests/019 b/tests/qemu-iotests/019
+index a56dd30bed..b4f5234609 100755
+--- a/tests/qemu-iotests/019
++++ b/tests/qemu-iotests/019
+@@ -47,7 +47,8 @@ _supported_proto file
+ _supported_os Linux
+ _unsupported_imgopts "subformat=3DmonolithicFlat" \
+                      "subformat=3DtwoGbMaxExtentFlat" \
+-                     "subformat=3DtwoGbMaxExtentSparse"
++                     "subformat=3DtwoGbMaxExtentSparse" \
++                     "subformat=3DstreamOptimized"
+=20
+ TEST_OFFSETS=3D"0 4294967296"
+ CLUSTER_SIZE=3D65536
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index 6b0ebb37d2..f41b92f35f 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -44,7 +44,8 @@ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto file
+ _unsupported_imgopts "subformat=3DmonolithicFlat" \
+                      "subformat=3DtwoGbMaxExtentFlat" \
+-                     "subformat=3DtwoGbMaxExtentSparse"
++                     "subformat=3DtwoGbMaxExtentSparse" \
++                     "subformat=3DstreamOptimized"
+=20
+ TEST_OFFSETS=3D"0 4294967296"
+=20
+diff --git a/tests/qemu-iotests/027 b/tests/qemu-iotests/027
+index 4cb638022a..494be0921f 100755
+--- a/tests/qemu-iotests/027
++++ b/tests/qemu-iotests/027
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt vmdk qcow qcow2 qed
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+=20
+ size=3D128M
+diff --git a/tests/qemu-iotests/032 b/tests/qemu-iotests/032
+index 988a8c5d8f..8337a4d825 100755
+--- a/tests/qemu-iotests/032
++++ b/tests/qemu-iotests/032
+@@ -42,6 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ # This works for any image format (though unlikely to segfault for raw)
+ _supported_fmt generic
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+ echo
+ echo =3D=3D=3D Prepare image =3D=3D=3D
+diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
+index 362a48c0a0..8b40991d55 100755
+--- a/tests/qemu-iotests/033
++++ b/tests/qemu-iotests/033
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt generic
+ _supported_proto generic
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+=20
+ size=3D128M
+diff --git a/tests/qemu-iotests/034 b/tests/qemu-iotests/034
+index 324bed28c6..da4cea1571 100755
+--- a/tests/qemu-iotests/034
++++ b/tests/qemu-iotests/034
+@@ -41,7 +41,8 @@ _supported_proto file
+ _supported_os Linux
+ _unsupported_imgopts "subformat=3DmonolithicFlat" \
+                      "subformat=3DtwoGbMaxExtentFlat" \
+-                     "subformat=3DtwoGbMaxExtentSparse"
++                     "subformat=3DtwoGbMaxExtentSparse" \
++                     "subformat=3DstreamOptimized"
+=20
+ CLUSTER_SIZE=3D4k
+ size=3D128M
+diff --git a/tests/qemu-iotests/037 b/tests/qemu-iotests/037
+index 4946b9be92..e6517acbd4 100755
+--- a/tests/qemu-iotests/037
++++ b/tests/qemu-iotests/037
+@@ -40,7 +40,8 @@ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto file
+ _unsupported_imgopts "subformat=3DmonolithicFlat" \
+                      "subformat=3DtwoGbMaxExtentFlat" \
+-                     "subformat=3DtwoGbMaxExtentSparse"
++                     "subformat=3DtwoGbMaxExtentSparse" \
++                     "subformat=3DstreamOptimized"
+=20
+ CLUSTER_SIZE=3D4k
+ size=3D128M
+diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
+index fe4892e467..7cf0427af4 100755
+--- a/tests/qemu-iotests/063
++++ b/tests/qemu-iotests/063
+@@ -43,7 +43,8 @@ _supported_fmt qcow qcow2 vmdk qed raw
+ _supported_proto file
+ _unsupported_imgopts "subformat=3DmonolithicFlat" \
+                      "subformat=3DtwoGbMaxExtentFlat" \
+-                     "subformat=3DtwoGbMaxExtentSparse"
++                     "subformat=3DtwoGbMaxExtentSparse" \
++                     "subformat=3DstreamOptimized"
+=20
+ _make_test_img 4M
+=20
+diff --git a/tests/qemu-iotests/072 b/tests/qemu-iotests/072
+index 661b36da2d..f0b73e7e65 100755
+--- a/tests/qemu-iotests/072
++++ b/tests/qemu-iotests/072
+@@ -38,6 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+=20
+ _supported_fmt vpc vmdk vhdx vdi qed qcow2 qcow
+ _supported_proto file
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+ IMG_SIZE=3D64M
+=20
+diff --git a/tests/qemu-iotests/105 b/tests/qemu-iotests/105
+index 3346e8cb25..4d55a2d3ef 100755
+--- a/tests/qemu-iotests/105
++++ b/tests/qemu-iotests/105
+@@ -39,7 +39,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt qcow2 vmdk vhdx qed
+ _supported_proto generic
+ _unsupported_imgopts "subformat=3DtwoGbMaxExtentFlat" \
+-                     "subformat=3DtwoGbMaxExtentSparse"
++                     "subformat=3DtwoGbMaxExtentSparse" \
++                     "subformat=3DstreamOptimized"
+=20
+ echo
+ echo "creating large image"
+diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
+index 383d7d7f61..1d4f6786db 100755
+--- a/tests/qemu-iotests/197
++++ b/tests/qemu-iotests/197
+@@ -53,6 +53,7 @@ _supported_fmt generic
+ _supported_proto generic
+ # LUKS support may be possible, but it complicates things.
+ _unsupported_fmt luks
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+ echo
+ echo '=3D=3D=3D Copy-on-read =3D=3D=3D'
+diff --git a/tests/qemu-iotests/215 b/tests/qemu-iotests/215
+index 958c14f5a0..2eb377d682 100755
+--- a/tests/qemu-iotests/215
++++ b/tests/qemu-iotests/215
+@@ -50,6 +50,7 @@ _supported_fmt generic
+ _supported_proto generic
+ # LUKS support may be possible, but it complicates things.
+ _unsupported_fmt luks
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+ echo
+ echo '=3D=3D=3D Copy-on-read =3D=3D=3D'
+diff --git a/tests/qemu-iotests/251 b/tests/qemu-iotests/251
+index 13f85de9cd..7918ba3559 100755
+--- a/tests/qemu-iotests/251
++++ b/tests/qemu-iotests/251
+@@ -40,6 +40,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt generic
+ _supported_proto file
+ _supported_os Linux
++_unsupported_imgopts "subformat=3DstreamOptimized"
+=20
+ if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
+     # We use json:{} filenames here, so we cannot work with additional o=
+ptions.
+--=20
 2.21.0
 
 
