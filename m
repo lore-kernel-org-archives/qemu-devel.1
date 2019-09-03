@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 325E3C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 20:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9224EC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 20:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F25A121897
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 20:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49A3D207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 20:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SsM86V5O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25A121897
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aqWIu36V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A3D207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Fbm-0000Wj-Uz
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 16:40:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53087)
+	id 1i5Fbr-0000f6-Sl
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 16:41:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53110)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1i5FZa-00072c-Ds
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:38:43 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1i5FZb-00072e-4W
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1i5FZZ-0008Qx-4r
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:38:42 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:59526)
+ (envelope-from <jag.raman@oracle.com>) id 1i5FZZ-0008R7-6y
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:38:43 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36320)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1i5FZY-0008Pj-SH
+ id 1i5FZY-0008Ps-SP
  for qemu-devel@nongnu.org; Tue, 03 Sep 2019 16:38:41 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83KXqUN062430;
- Tue, 3 Sep 2019 20:38:34 GMT
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83KXfrK066117;
+ Tue, 3 Sep 2019 20:38:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2019-08-05;
- bh=PzYg9OHooYsPSBqvu/Hk8iWabk8SxhmCqBxT68BFX94=;
- b=SsM86V5OPBGEpaDpPK5QNWFTWutnGxUKZb/ULP5Q9cclxzns0crDNsBSk/DM7HDWQWuF
- C+G8gi1EIMX3JDA4LV8QiZmYqwBBOg2SX17NDsj7C5GZVdCfcw0YZ5i6YbPCIafxi0wE
- Oselg3TDjMAsY73m1fxbLUOynak7cyy6l/eKnzWhxhcPN2lpiXeyCfz4JY7ijdn4YYRu
- sASE+RbChLOnKnRf7+G3G7cIvYU0m1UtGBc+HrMBxLLKOoC0c2z9f9WQv479+0ur+AKn
- Z6pUdyoWAh0CWnzSrcH+z/uvOq/GbMXJl/gF27Iykc/djohjE4shBKu2M+h3sBzz5gvI og== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2usy66r2c8-1
+ bh=XmCHv23AczqDtwapCDtN5qAjoOFV03ExMoAKO7FdPuM=;
+ b=aqWIu36VKSaBz0QRLMewu+6EewRNXjZKWs8/vlxlLsDAtYqMMHrlrclGC0/3BABYtEJq
+ B5wmTojYJGkxd6kqcbOG/tUU+FYWk3U6WizxAOg2KFh2u79rSK6QVujZGOt6O0WXW167
+ bok2+BNDtBN6csvyGnxOlj5ff7Ufd4tH2r6lRMN8rS/3JvCfzlYj/GE3jsVt60NmiYg7
+ TR7wOOmyfAB2hfXrzeuehDzvAgxcE09S2z+ns23TgKZRafWJtp9Z/qHdKZgCeFSM7l3c
+ SzaKLXlZalnaF8Rk40H2Zt4kqU6m+P0nVJMdL/NRZApJ5WM+7Y0RvOa8aVG0KagVkie3 0w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2usy4u82xq-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 03 Sep 2019 20:38:34 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83Kc9sL025345;
- Tue, 3 Sep 2019 20:38:33 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3020.oracle.com with ESMTP id 2us5ph9ynn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 03 Sep 2019 20:38:33 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x83KcVao017295;
+ Tue, 03 Sep 2019 20:38:32 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83KcJwJ188092;
  Tue, 3 Sep 2019 20:38:31 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 2usu5117hk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 03 Sep 2019 20:38:31 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x83KcTB4017264;
+ Tue, 3 Sep 2019 20:38:30 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 03 Sep 2019 13:38:30 -0700
+ with ESMTP ; Tue, 03 Sep 2019 13:38:29 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:37:31 -0400
-Message-Id: <aef3fada5cd53cd16dfb485c33407d8b2b5e41b6.1567534653.git.jag.raman@oracle.com>
+Date: Tue,  3 Sep 2019 16:37:30 -0400
+Message-Id: <29bbfa028904a603b708801897872fa250a6bbaa.1567534653.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1567534653.git.jag.raman@oracle.com>
 References: <cover.1567534653.git.jag.raman@oracle.com>
@@ -91,9 +91,9 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
  definitions=main-1909030206
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: [Qemu-devel] [RFC v3 PATCH 05/45] multi-process: Add config option
- for multi-process QEMU
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [RFC v3 PATCH 04/45] multi-process: Add stub functions
+ to facilate build of multi-process
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,65 +116,418 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a configuration option to separate multi-process code
+Add stub functions that are needed during compile time but not in
+runtime.
 
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- configure | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ accel/stubs/kvm-stub.c    |  5 +++
+ accel/stubs/tcg-stub.c    | 85 +++++++++++++++++++++++++++++++++++++++++++++++
+ stubs/machine-init-done.c |  4 +++
+ stubs/monitor.c           | 33 ++++++++++++++++++
+ stubs/net-stub.c          | 31 +++++++++++++++++
+ stubs/replay.c            | 14 ++++++++
+ stubs/vl-stub.c           | 77 ++++++++++++++++++++++++++++++++++++++++++
+ stubs/vmstate.c           | 20 +++++++++++
+ stubs/xen-mapcache.c      | 22 ++++++++++++
+ 9 files changed, 291 insertions(+)
+ create mode 100644 stubs/net-stub.c
+ create mode 100644 stubs/vl-stub.c
+ create mode 100644 stubs/xen-mapcache.c
 
-diff --git a/configure b/configure
-index 714e7fb..b467441 100755
---- a/configure
-+++ b/configure
-@@ -499,6 +499,7 @@ docker="no"
- debug_mutex="no"
- libpmem=""
- default_devices="yes"
-+mpqemu="no"
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 6feb66e..f129dfb 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -31,6 +31,7 @@ bool kvm_allowed;
+ bool kvm_readonly_mem_allowed;
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
++bool kvm_halt_in_kernel_allowed;
  
- # cross compilers defaults, can be overridden with --cross-cc-ARCH
- cross_cc_aarch64="aarch64-linux-gnu-gcc"
-@@ -1543,6 +1544,10 @@ for opt do
-   ;;
-   --disable-libpmem) libpmem=no
-   ;;
-+  --enable-mpqemu) mpqemu=yes
-+  ;;
-+  --disable-mpqemu) mpqemu=no
-+  ;;
-   *)
-       echo "ERROR: unknown option $opt"
-       echo "Try '$0 --help' for more information"
-@@ -1842,6 +1847,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   capstone        capstone disassembler support
-   debug-mutex     mutex debugging support
-   libpmem         libpmem support
-+  mpqemu          multi-process QEMU support
+ int kvm_destroy_vcpu(CPUState *cpu)
+ {
+@@ -58,6 +59,10 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
+ {
+ }
  
- NOTE: The object files are built at the place where configure is launched
- EOF
-@@ -6481,6 +6487,7 @@ echo "docker            $docker"
- echo "libpmem support   $libpmem"
- echo "libudev           $libudev"
- echo "default devices   $default_devices"
-+echo "multiprocess QEMU $mpqemu"
- 
- if test "$supported_cpu" = "no"; then
-     echo
-@@ -7279,6 +7286,10 @@ if test "$libpmem" = "yes" ; then
-   echo "CONFIG_LIBPMEM=y" >> $config_host_mak
- fi
- 
-+if test "$mpqemu" = "yes" ; then
-+  echo "CONFIG_MPQEMU=y" >> $config_host_mak
-+fi
++void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
++{
++}
 +
- if test "$bochs" = "yes" ; then
-   echo "CONFIG_BOCHS=y" >> $config_host_mak
- fi
+ int kvm_cpu_exec(CPUState *cpu)
+ {
+     abort();
+diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
+index 76ae461..52722c7 100644
+--- a/accel/stubs/tcg-stub.c
++++ b/accel/stubs/tcg-stub.c
+@@ -16,11 +16,96 @@
+ #include "tcg/tcg.h"
+ #include "exec/cpu-common.h"
+ #include "exec/exec-all.h"
++#include "translate-all.h"
++#include "exec/ram_addr.h"
++
++bool parallel_cpus;
+ 
+ void tb_flush(CPUState *cpu)
+ {
+ }
+ 
++void tb_check_watchpoint(CPUState *cpu)
++{
++}
++
++void tb_invalidate_phys_range(ram_addr_t start, ram_addr_t end)
++{
++}
++
++void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
++                                   int is_cpu_write_access)
++{
++}
++
++void tb_invalidate_phys_page_fast(struct page_collection *pages,
++                                  tb_page_addr_t start, int len)
++{
++}
++
++void tlb_init(CPUState *cpu)
++{
++}
++
+ void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
+ {
+ }
++
++void tlb_flush(CPUState *cpu)
++{
++}
++
++void tlb_flush_page(CPUState *cpu, target_ulong addr)
++{
++}
++
++void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
++{
++}
++
++void tcg_region_init(void)
++{
++}
++
++void tcg_register_thread(void)
++{
++}
++
++void tcg_flush_softmmu_tlb(CPUState *cs)
++{
++}
++
++void cpu_loop_exit_noexc(CPUState *cpu)
++{
++    cpu->exception_index = -1;
++    cpu_loop_exit(cpu);
++}
++
++void cpu_loop_exit(CPUState *cpu)
++{
++    cpu->can_do_io = 1;
++    siglongjmp(cpu->jmp_env, 1);
++}
++
++void cpu_reloading_memory_map(void)
++{
++}
++
++int cpu_exec(CPUState *cpu)
++{
++    return 0;
++}
++
++void cpu_exec_step_atomic(CPUState *cpu)
++{
++}
++
++struct page_collection *
++page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
++{
++    return NULL;
++}
++
++void page_collection_unlock(struct page_collection *set)
++{
++}
+diff --git a/stubs/machine-init-done.c b/stubs/machine-init-done.c
+index cd8e813..3deabc9 100644
+--- a/stubs/machine-init-done.c
++++ b/stubs/machine-init-done.c
+@@ -6,3 +6,7 @@ bool machine_init_done = true;
+ void qemu_add_machine_init_done_notifier(Notifier *notify)
+ {
+ }
++
++void qemu_remove_machine_init_done_notifier(Notifier *notify)
++{
++}
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index c3e9a2e..75dafce 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -2,6 +2,12 @@
+ #include "qapi/error.h"
+ #include "qapi/qapi-emit-events.h"
+ #include "monitor/monitor.h"
++#include "qapi/qapi-types-misc.h"
++#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-types-qom.h"
++#include "qapi/qapi-commands-qdev.h"
++#include "hw/qdev-core.h"
++#include "sysemu/sysemu.h"
+ 
+ __thread Monitor *cur_mon;
+ 
+@@ -27,3 +33,30 @@ void monitor_init_hmp(Chardev *chr, bool use_readline)
+ void qapi_event_emit(QAPIEvent event, QDict *qdict)
+ {
+ }
++
++int monitor_get_cpu_index(void)
++{
++    return -ENOSYS;
++}
++int monitor_printf(Monitor *mon, const char *fmt, ...)
++{
++    return -ENOSYS;
++}
++
++bool monitor_cur_is_qmp(void)
++{
++    return false;
++}
++
++ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
++                                                   Error **errp)
++{
++    return NULL;
++}
++
++VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
++                                                     VMChangeStateHandler *cb,
++                                                     void *opaque)
++{
++    return NULL;
++}
+diff --git a/stubs/net-stub.c b/stubs/net-stub.c
+new file mode 100644
+index 0000000..cb2274b
+--- /dev/null
++++ b/stubs/net-stub.c
+@@ -0,0 +1,31 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "net/net.h"
++
++int qemu_find_net_clients_except(const char *id, NetClientState **ncs,
++                                 NetClientDriver type, int max)
++{
++    return -ENOSYS;
++}
++
++NetClientState *net_hub_port_find(int hub_id)
++{
++    return NULL;
++}
++
++int net_hub_id_for_client(NetClientState *nc, int *id)
++{
++    return -ENOSYS;
++}
++
++int qemu_show_nic_models(const char *arg, const char *const *models)
++{
++    return -ENOSYS;
++}
++
++int qemu_find_nic_model(NICInfo *nd, const char * const *models,
++                        const char *default_model)
++{
++    return -ENOSYS;
++}
++
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 4ac6078..38fd1d3 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -80,3 +80,17 @@ void replay_mutex_lock(void)
+ void replay_mutex_unlock(void)
+ {
+ }
++
++bool replay_has_checkpoint(void)
++{
++    return false;
++}
++
++int replay_get_instructions(void)
++{
++    return 0;
++}
++
++void replay_account_executed_instructions(void)
++{
++}
+diff --git a/stubs/vl-stub.c b/stubs/vl-stub.c
+new file mode 100644
+index 0000000..89db36c
+--- /dev/null
++++ b/stubs/vl-stub.c
+@@ -0,0 +1,77 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/uuid.h"
++#include "sysemu/sysemu.h"
++#include "exec/cpu-common.h"
++#include "exec/gdbstub.h"
++#include "sysemu/replay.h"
++#include "disas/disas.h"
++
++bool tcg_allowed;
++bool xen_allowed;
++bool boot_strict;
++
++int mem_prealloc;
++int smp_cpus;
++int vga_interface_type = VGA_NONE;
++int smp_cores = 1;
++int smp_threads = 1;
++int icount_align_option;
++int boot_menu;
++
++unsigned int max_cpus;
++const uint32_t arch_type;
++const char *mem_path;
++uint8_t qemu_extra_params_fw[2];
++uint8_t *boot_splash_filedata;
++size_t boot_splash_filedata_size;
++struct syminfo *syminfos;
++
++ram_addr_t ram_size;
++MachineState *current_machine;
++QemuUUID qemu_uuid;
++
++int runstate_is_running(void)
++{
++    return 0;
++}
++
++void runstate_set(RunState new_state)
++{
++}
++
++void vm_state_notify(int running, RunState state)
++{
++}
++
++bool qemu_vmstop_requested(RunState *r)
++{
++    return false;
++}
++
++void qemu_system_debug_request(void)
++{
++}
++
++char *qemu_find_file(int type, const char *name)
++{
++    return NULL;
++}
++
++void gdb_set_stop_cpu(CPUState *cpu)
++{
++}
++
++void replay_enable_events(void)
++{
++}
++
++void replay_disable_events(void)
++{
++}
++
++#ifdef TARGET_I386
++void x86_cpu_list(void)
++{
++}
++#endif
+diff --git a/stubs/vmstate.c b/stubs/vmstate.c
+index e1e89b8..a9824bc 100644
+--- a/stubs/vmstate.c
++++ b/stubs/vmstate.c
+@@ -1,8 +1,11 @@
+ #include "qemu/osdep.h"
+ #include "migration/vmstate.h"
++#include "migration/misc.h"
+ 
+ const VMStateDescription vmstate_dummy = {};
+ 
++const VMStateInfo vmstate_info_timer;
++
+ int vmstate_register_with_alias_id(DeviceState *dev,
+                                    int instance_id,
+                                    const VMStateDescription *vmsd,
+@@ -23,3 +26,20 @@ bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
+ {
+     return true;
+ }
++
++void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
++{
++}
++
++void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
++{
++}
++
++void vmstate_register_ram_global(MemoryRegion *mr)
++{
++}
++
++bool migration_is_idle(void)
++{
++    return true;
++}
+diff --git a/stubs/xen-mapcache.c b/stubs/xen-mapcache.c
+new file mode 100644
+index 0000000..af5c031
+--- /dev/null
++++ b/stubs/xen-mapcache.c
+@@ -0,0 +1,22 @@
++#include "qemu/osdep.h"
++#include "exec/hwaddr.h"
++#include "exec/cpu-common.h"
++#include "sysemu/xen-mapcache.h"
++
++#ifdef CONFIG_XEN
++
++void xen_invalidate_map_cache_entry(uint8_t *buffer)
++{
++}
++
++uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size, uint8_t lock, bool dma)
++{
++    return NULL;
++}
++
++ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
++{
++    return 0;
++}
++
++#endif
 -- 
 1.8.3.1
 
