@@ -2,62 +2,88 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B5BC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F381C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:06:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5D8020870
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:05:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D8020870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F2C520870
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 14:06:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iz53mL1n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F2C520870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i59Qo-0003ht-Vb
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 10:05:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57099)
+	id 1i59Rs-0004sJ-HC
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 10:06:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33756)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i590i-0004gr-HG
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:38:17 -0400
+ (envelope-from <danielhb413@gmail.com>) id 1i59JF-0003LP-9p
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i590h-0007e3-HT
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:38:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50358)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i590f-0007cp-7e; Tue, 03 Sep 2019 09:38:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8F7E330860CF;
- Tue,  3 Sep 2019 13:38:12 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-195.ams2.redhat.com
- [10.36.116.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 86B9E6107E;
- Tue,  3 Sep 2019 13:38:11 +0000 (UTC)
-Date: Tue, 3 Sep 2019 15:38:10 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20190903133810.GI4582@localhost.localdomain>
-References: <20190903132110.380933-1-vsementsov@virtuozzo.com>
+ (envelope-from <danielhb413@gmail.com>) id 1i59JC-0005iW-4B
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:23 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:42396)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1i59JB-0005hd-E4
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 09:57:21 -0400
+Received: by mail-qt1-x843.google.com with SMTP id t12so19982133qtp.9
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 06:57:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ISRFJIcsQHvny5ehyZ7g2NR+kYMFconvzKsY4Lpa5sc=;
+ b=Iz53mL1nw0oDH9yJIX2czma0m3exIDaGGevWWE60ww58fd2dSF/ksVCYqMF0fx+SZZ
+ sHJJPLBA/l4VU55Y9bJlIxtXxf9AZOp0ucwl3b64UvlsR58cJFhVik2qm5iahigvBGbk
+ DTPtsPLF+uJHpJu8mtly99ezJ8NwSbAoXueaJRy49Z9XoIsOEfej7JAQXPP0H+rsIgOv
+ rciKmnRjOrFuX7n/pO01349rqkXOBjR6+5vSa4uqlwcQQEBFP05cHd9bV3mSzBvK03+u
+ LRZrNvo6Z3javk0XiHRmnkULoMcMMp1dGlg3IYcRSRUsTAbUpe61ZP3lUeLsmtQlTtTe
+ G1vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ISRFJIcsQHvny5ehyZ7g2NR+kYMFconvzKsY4Lpa5sc=;
+ b=S9CfzeLOVkspEvU1bXO++UPBB/4p+R8Ap6Xlg5M1eSqIV8RVJ9IzJDWdjKUYFOsEW/
+ ZnTjovCTXIDjod91qJT7x0zEx34xYdYV+n+glqsUcecMgTvKf4owkdYzm28lUrsi38DB
+ gONpK0hyz43AggYZ4OHDqtuOClr7p52sttp3d732e7out9n+A4imsVBy3y4TiLRvJHRM
+ fNFFEUj6kZmzBVd7KT/w+XP06RDauJR+CFut38rPJoTawc8sP671l7HFzkmGLd4GT0OX
+ nvSy4X5DjoF9YBmfgp5rI8Q0pc0S8i90kuZCG3SKVso2X1xjIsHYPKTUQSSwxbBEenL4
+ 5RmA==
+X-Gm-Message-State: APjAAAWpTHqteHiMF8sLlVbh85vlcEkp7eLkuKUsl82UsArdfxhhaCOq
+ ukWbj8BtjUUVYIwzxVqmqnvH8UuKfLg=
+X-Google-Smtp-Source: APXvYqz5Wqcfsq/racGGRHgWqMXUKS6/s6I9j4X7CICowQrOafsruN1JTs7jec3UbUnODbG7nMt49Q==
+X-Received: by 2002:ac8:6745:: with SMTP id n5mr30498619qtp.68.1567519038775; 
+ Tue, 03 Sep 2019 06:57:18 -0700 (PDT)
+Received: from rekt.ibmuc.com ([2804:431:c7c7:5c9f:9471:e230:52b:8c93])
+ by smtp.gmail.com with ESMTPSA id k49sm9211158qtc.9.2019.09.03.06.57.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Sep 2019 06:57:18 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  3 Sep 2019 10:57:05 -0300
+Message-Id: <20190903135708.21624-2-danielhb413@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190903135708.21624-1-danielhb413@gmail.com>
+References: <20190903135708.21624-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190903132110.380933-1-vsementsov@virtuozzo.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 03 Sep 2019 13:38:12 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] iotests: skip 232 when run tests as root
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::843
+Subject: [Qemu-devel] [PATCH v7 1/4] block: introducing
+ 'bdrv_co_delete_file' interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,43 +95,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: kwolf@redhat.com,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 03.09.2019 um 15:21 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> chmod a-w don't help under root, so skip the test in such case.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-> 
->  tests/qemu-iotests/232 | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/232 b/tests/qemu-iotests/232
-> index 2063f78876..da35a63d85 100755
-> --- a/tests/qemu-iotests/232
-> +++ b/tests/qemu-iotests/232
-> @@ -70,6 +70,12 @@ size=128M
->  
->  _make_test_img $size
->  
-> +chmod a-w $TEST_IMG
-> +(echo test > $TEST_IMG) 2>/dev/null && \
-> +    _notrun "Readonly attribute is ignored, probably you run this test as" \
-> +            "root, which is unsupported."
-> +chmod a+w $TEST_IMG
-> +
->  if [ -n "$TEST_IMG_FILE" ]; then
->      TEST_IMG=$TEST_IMG_FILE
->  fi
+Adding to Block Drivers the capability of being able to clean up
+its created files can be useful in certain situations. For the
+LUKS driver, for instance, a failure in one of its authentication
+steps can leave files in the host that weren't there before.
 
-I think you need to move the new check below this so that $TEST_IMG_FILE
-is considered because otherwise the test will fail for luks:
+This patch adds the 'bdrv_co_delete_file' interface to block
+drivers and add it to the 'file' driver in file-posix.c.The
+implementation is given by 'raw_co_delete_file'.
 
-+chmod: cannot access 'driver=luks,key-secret=keysec0,file.filename=/home/kwolf/source/qemu/tests/qemu-iotests/scratch/t.luks': No such file or directory
-+chmod: cannot access 'driver=luks,key-secret=keysec0,file.filename=/home/kwolf/source/qemu/tests/qemu-iotests/scratch/t.luks': No such file or directory
+Suggested-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+---
+ block/file-posix.c        | 28 ++++++++++++++++++++++++++++
+ include/block/block_int.h |  6 ++++++
+ 2 files changed, 34 insertions(+)
 
-Kevin
+diff --git a/block/file-posix.c b/block/file-posix.c
+index fbeb0068db..52756de522 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2390,6 +2390,33 @@ static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
+     return raw_co_create(&options, errp);
+ }
+ 
++/**
++ * Co-routine function that erases a regular file.
++ */
++static int coroutine_fn raw_co_delete_file(BlockDriverState *bs,
++                                           Error **errp)
++{
++    struct stat st;
++    int ret;
++
++    if (!(stat(bs->filename, &st) == 0) || !S_ISREG(st.st_mode)) {
++        ret = -ENOENT;
++        error_setg_errno(errp, -ret, "%s is not a regular file",
++                         bs->filename);
++        goto done;
++    }
++
++    ret = unlink(bs->filename);
++    if (ret < 0) {
++        ret = -errno;
++        error_setg_errno(errp, -ret, "Error when deleting file %s",
++                         bs->filename);
++    }
++
++done:
++    return ret;
++}
++
+ /*
+  * Find allocation range in @bs around offset @start.
+  * May change underlying file descriptor's file offset.
+@@ -2942,6 +2969,7 @@ BlockDriver bdrv_file = {
+     .bdrv_co_block_status = raw_co_block_status,
+     .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+     .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
++    .bdrv_co_delete_file = raw_co_delete_file,
+ 
+     .bdrv_co_preadv         = raw_co_preadv,
+     .bdrv_co_pwritev        = raw_co_pwritev,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 0422acdf1c..a959ec2d1e 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -314,6 +314,12 @@ struct BlockDriver {
+      */
+     int coroutine_fn (*bdrv_co_flush)(BlockDriverState *bs);
+ 
++    /*
++     * Delete a local created file.
++     */
++    int coroutine_fn (*bdrv_co_delete_file)(BlockDriverState *bs,
++                                            Error **errp);
++
+     /*
+      * Flushes all data that was already written to the OS all the way down to
+      * the disk (for example file-posix.c calls fsync()).
+-- 
+2.21.0
+
 
