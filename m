@@ -2,61 +2,85 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 196D6C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BE9C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDCBA2341F
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:36:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDCBA2341F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 153AA2077B
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:39:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mhT7QJyF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 153AA2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5ArU-0002bC-0r
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:36:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58972)
+	id 1i5AtX-0004XF-HZ
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:38:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59111)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i5AqU-00027c-19
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:35:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArI-0002er-K5
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i5AqS-0005PK-7T
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:35:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41194)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5AqR-0005OJ-VA
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:35:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1907F3C93E
- for <qemu-devel@nongnu.org>; Tue,  3 Sep 2019 15:35:47 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E5BDC60127;
- Tue,  3 Sep 2019 15:35:41 +0000 (UTC)
-Date: Tue, 3 Sep 2019 16:35:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190903153539.GM2744@work-vm>
-References: <20190829104133.17418-1-stefanha@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArH-0005qh-5k
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:40 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44740)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i5ArG-0005p2-Rv
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:39 -0400
+Received: by mail-wr1-x443.google.com with SMTP id 30so7041109wrk.11
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=siE66EHNoZSdb5Y8Dt5mz5vybn6gWgzukEagHaOkoTc=;
+ b=mhT7QJyFSC+qiyh8SKhWYmGK8C2tV9dlSvaw8y6jyU7j6iBgOEOl+dpKMTTag6+sgS
+ faMczmlOVPzwHQDqoNCkBA23sC4i+PYgLjRyJOa/z+N8CUVQUxQF6vGhy8WDL2bFgHjm
+ P8RqN724XfHJdv40n/8586lnP7mRzo1HWmux4QBvhZ6YIW2op77m/Mp/LCNGu5SPodgo
+ CBJtntiTrGt9jwii2ztv0D21iPnofNmFG6cbgAguXk1/GVcg4YV0HyWFgHRZVK7KI1eM
+ huhmZ7ns68Es0HRsPboSf/gs5X+pLXUee7wFlN95yiEgU/p7+1OIEct18vI83clrwwii
+ bLTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=siE66EHNoZSdb5Y8Dt5mz5vybn6gWgzukEagHaOkoTc=;
+ b=s3q2c04fpqiFo+iklB+HJF49QzMaP0qJjCoEbSAFYaHSsCCYMzMBXOn28G+UB/Foo5
+ Q3vi7JWKSvF2e7hW34/0SwQCE1+kLBYE0zHKhimTDMbTMykMY4pfSIryn+zrExwcN/EK
+ YNr4DAMcCIQ/Fk0oYgty1GJzE+Ben0XKc5yaYRmHSnnS70t2ZhVSxvv1DXBukCCSCfZ0
+ /mvFaJLl4SPzAcleFni+4XxSaDtyMqfeOwwNxpPlI6eIE+BfTnCMuf/9DVky2FU1E5Xq
+ //ps7UTyonkV4h1+0CzfZDuA7EM780P/zTD6WJ4gkAZTXSJHBmZYZFbO39YeDi57HQHG
+ ndtg==
+X-Gm-Message-State: APjAAAW4K4VE6q5dOj143XDnQVq0l1PICvD/YpkJPL6t3hwhQkdaFf51
+ n6wO82YOI6RjnX2/1kE5lutzA27COCYCPQ==
+X-Google-Smtp-Source: APXvYqw4+OuqbfklHrZhKEi5cyYJhSfCfdNzv8sg3Dqg2f0N4+DntskQEjobzbFTWlAx3lP+IdZIsw==
+X-Received: by 2002:a5d:458b:: with SMTP id p11mr13960854wrq.160.1567524995725; 
+ Tue, 03 Sep 2019 08:36:35 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.34
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Sep 2019 08:36:35 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue,  3 Sep 2019 16:36:12 +0100
+Message-Id: <20190903153633.6651-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190829104133.17418-1-stefanha@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 03 Sep 2019 15:35:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] virtiofsd: add man page
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PULL 00/21] target-arm queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,160 +92,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  Makefile                         |  7 +++
->  contrib/virtiofsd/virtiofsd.texi | 85 ++++++++++++++++++++++++++++++++
->  2 files changed, 92 insertions(+)
->  create mode 100644 contrib/virtiofsd/virtiofsd.texi
-> 
-> diff --git a/Makefile b/Makefile
-> index a3dfdd6fa8..cc18025753 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -334,6 +334,9 @@ DOCS+=docs/qemu-cpu-models.7
->  ifdef CONFIG_VIRTFS
->  DOCS+=fsdev/virtfs-proxy-helper.1
->  endif
-> +ifdef CONFIG_LINUX
+target-arm queue: this time around is all small fixes
+and changes.
 
-Is there a reason that's CONFIG_LINUX not CONFIG_VHOST_USER_FS ?
-(Although I guess it's guest vs daemon so the two are independent?)
+thanks
+-- PMM
 
-> +DOCS+=contrib/virtiofsd/virtiofsd.1
-> +endif
->  ifdef CONFIG_TRACE_SYSTEMTAP
->  DOCS+=scripts/qemu-trace-stap.1
->  endif
-> @@ -834,6 +837,9 @@ ifdef CONFIG_VIRTFS
->  	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
->  	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
->  endif
-> +ifdef CONFIG_LINUX
-> +	$(INSTALL_DATA) contrib/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
+The following changes since commit fec105c2abda8567ec15230429c41429b5ee307c:
 
-I had to fix that to contrib/virtiofsd/virtiofsd.1 to get make install
-happy.
+  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20190828-pull-request' into staging (2019-09-03 14:03:15 +0100)
 
-> +endif
->  
->  install-datadir:
->  	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
-> @@ -1018,6 +1024,7 @@ qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
->  qemu.1: qemu-option-trace.texi
->  qemu-img.1: qemu-img.texi qemu-option-trace.texi qemu-img-cmds.texi
->  fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
-> +contrib/virtiofsd/virtiofsd.1: contrib/virtiofsd/virtiofsd.texi
->  qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
->  qemu-ga.8: qemu-ga.texi
->  docs/qemu-block-drivers.7: docs/qemu-block-drivers.texi
-> diff --git a/contrib/virtiofsd/virtiofsd.texi b/contrib/virtiofsd/virtiofsd.texi
-> new file mode 100644
-> index 0000000000..eec7fbf4e6
-> --- /dev/null
-> +++ b/contrib/virtiofsd/virtiofsd.texi
-> @@ -0,0 +1,85 @@
-> +@example
-> +@c man begin SYNOPSIS
-> +@command{virtiofsd} [OPTION] @option{--socket-path=}@var{path}|@option{--fd=}@var{fdnum} @option{-o source=}@var{path}
-> +@c man end
-> +@end example
-> +
-> +@c man begin DESCRIPTION
-> +
-> +Share a host directory tree with a guest through a virtio-fs device.  This
-> +program is a vhost-user backend that implements the virtio-fs device.  Each
-> +virtio-fs device instance requires its own virtiofsd process.
-> +
-> +This program is designed to work with QEMU's @code{--device vhost-user-fs-pci}
+are available in the Git repository at:
 
-Should we include the -pci there?
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190903
 
-(Merged with the path fix above)
+for you to fetch changes up to 5e5584c89f36b302c666bc6db535fd3f7ff35ad2:
 
-Dave
+  target/arm: Don't abort on M-profile exception return in linux-user mode (2019-09-03 16:20:35 +0100)
 
-> +but should work with any virtual machine monitor (VMM) that supports
-> +vhost-user.  See the EXAMPLES section below.
-> +
-> +This program must be run as the root user.  Upon startup the program will
-> +switch into a new file system namespace with the shared directory tree as its
-> +root.  This prevents "file system escapes" due to symlinks and other file
-> +system objects that might lead to files outside the shared directory.  The
-> +program also sandboxes itself using seccomp(2) to prevent ptrace(2) and other
-> +vectors that could allow an attacker to compromise the system after gaining
-> +control of the virtiofsd process.
-> +
-> +@c man end
-> +
-> +@c man begin OPTIONS
-> +@table @option
-> +@item -h, --help
-> +Print help.
-> +@item -V, --version
-> +Print version.
-> +@item -d, -o debug
-> +Enable debug output.
-> +@item --syslog
-> +Print log messages to syslog instead of stderr.
-> +@item -o log_level=@var{level}
-> +Print only log messages matching @var{level} or more severe.  @var{level} is
-> +one of @code{err}, @code{warn}, @code{info}, or @code{debug}.  The default is
-> +@var{info}.
-> +@item -o source=@var{path}
-> +Share host directory tree located at @var{path}.  This option is required.
-> +@item --socket-path=@var{path}, -o vhost_user_socket=@var{path}
-> +Listen on vhost-user UNIX domain socket at @var{path}.
-> +@item --fd=@var{fdnum}
-> +Accept connections from vhost-user UNIX domain socket file descriptor @var{fdnum}.  The file descriptor must already be listening for connections.
-> +@item --thread-pool-size=@var{num}
-> +Restrict the number of worker threads per request queue to @var{num}.  The default is 64.
-> +@item --cache=@code{none}|@code{auto}|@code{always}
-> +Select the desired trade-off between coherency and performance.  @code{none}
-> +forbids the FUSE client from caching to achieve best coherency at the cost of
-> +performance.  @code{auto} acts similar to NFS with a 1 second metadata cache
-> +timeout.  @code{always} sets a long cache lifetime at the expense of coherency.
-> +@item --writeback
-> +Enable writeback cache, allowing the FUSE client to buffer and merge write requests.
-> +@end table
-> +@c man end
-> +
-> +@c man begin EXAMPLES
-> +Export @code{/var/lib/fs/vm001/} on vhost-user UNIX domain socket @code{/var/run/vm001-vhost-fs.sock}:
-> +
-> +@example
-> +host# virtiofsd --socket-path=/var/run/vm001-vhost-fs.sock -o source=/var/lib/fs/vm001
-> +host# qemu-system-x86_64 \
-> +    -chardev socket,id=char0,path=/var/run/vm001-vhost-fs.sock \
-> +    -device vhost-user-fs-pci,chardev=char0,tag=myfs \
-> +    -object memory-backend-file,id=mem,size=4G,mem-path=/dev/shm,share=on \
-> +    -numa node,memdev=mem \
-> +    ...
-> +guest# mount -t virtio_fs \
-> +    -o default_permissions,allow_other,user_id=0,group_id=0,rootmode=040000,dax \
-> +    myfs /mnt
-> +@end example
-> +@c man end
-> +
-> +@ignore
-> +@setfilename virtiofsd
-> +@settitle QEMU virtio-fs shared file system daemon
-> +
-> +@c man begin AUTHOR
-> +Copyright (C) 2019 Red Hat, Inc.
-> +This is free software; see the source for copying conditions.  There is NO
-> +warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-> +@c man end
-> +@end ignore
-> -- 
-> 2.21.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+----------------------------------------------------------------
+target-arm queue:
+ * Revert and correctly fix refactoring of unallocated_encoding()
+ * Take exceptions on ATS instructions when needed
+ * aspeed/timer: Provide back-pressure information for short periods
+ * memory: Remove unused memory_region_iommu_replay_all()
+ * hw/arm/smmuv3: Log a guest error when decoding an invalid STE
+ * hw/arm/smmuv3: Remove spurious error messages on IOVA invalidations
+ * target/arm: Fix SMMLS argument order
+ * hw/arm: Use ARM_CPU_TYPE_NAME() macro when appropriate
+ * hw/arm: Correct reference counting for creation of various objects
+ * includes: remove stale [smp|max]_cpus externs
+ * tcg/README: fix typo
+ * atomic_template: fix indentation in GEN_ATOMIC_HELPER
+ * include/exec/cpu-defs.h: fix typo
+ * target/arm: Free TCG temps in trans_VMOV_64_sp()
+ * target/arm: Don't abort on M-profile exception return in linux-user mode
+
+----------------------------------------------------------------
+Alex Bennée (2):
+      includes: remove stale [smp|max]_cpus externs
+      include/exec/cpu-defs.h: fix typo
+
+Andrew Jeffery (1):
+      aspeed/timer: Provide back-pressure information for short periods
+
+Emilio G. Cota (2):
+      tcg/README: fix typo s/afterwise/afterwards/
+      atomic_template: fix indentation in GEN_ATOMIC_HELPER
+
+Eric Auger (3):
+      memory: Remove unused memory_region_iommu_replay_all()
+      hw/arm/smmuv3: Log a guest error when decoding an invalid STE
+      hw/arm/smmuv3: Remove spurious error messages on IOVA invalidations
+
+Peter Maydell (4):
+      target/arm: Allow ARMCPRegInfo read/write functions to throw exceptions
+      target/arm: Take exceptions on ATS instructions when needed
+      target/arm: Free TCG temps in trans_VMOV_64_sp()
+      target/arm: Don't abort on M-profile exception return in linux-user mode
+
+Philippe Mathieu-Daudé (6):
+      hw/arm: Use ARM_CPU_TYPE_NAME() macro when appropriate
+      hw/arm: Use object_initialize_child for correct reference counting
+      hw/arm: Use sysbus_init_child_obj for correct reference counting
+      hw/arm/fsl-imx: Add the cpu as child of the SoC object
+      hw/dma/xilinx_axi: Use object_initialize_child for correct ref. counting
+      hw/net/xilinx_axi: Use object_initialize_child for correct ref. counting
+
+Richard Henderson (3):
+      Revert "target/arm: Use unallocated_encoding for aarch32"
+      target/arm: Factor out unallocated_encoding for aarch32
+      target/arm: Fix SMMLS argument order
+
+ accel/tcg/atomic_template.h    |   2 +-
+ hw/arm/smmuv3-internal.h       |   1 +
+ include/exec/cpu-defs.h        |   2 +-
+ include/exec/memory.h          |  10 ----
+ include/sysemu/sysemu.h        |   2 -
+ target/arm/cpu.h               |   6 ++-
+ target/arm/translate-a64.h     |   2 +
+ target/arm/translate.h         |   2 -
+ hw/arm/allwinner-a10.c         |   3 +-
+ hw/arm/cubieboard.c            |   3 +-
+ hw/arm/digic.c                 |   3 +-
+ hw/arm/exynos4_boards.c        |   4 +-
+ hw/arm/fsl-imx25.c             |   4 +-
+ hw/arm/fsl-imx31.c             |   4 +-
+ hw/arm/fsl-imx6.c              |   3 +-
+ hw/arm/fsl-imx6ul.c            |   2 +-
+ hw/arm/mcimx7d-sabre.c         |   9 ++--
+ hw/arm/mps2-tz.c               |  15 +++---
+ hw/arm/musca.c                 |   9 ++--
+ hw/arm/smmuv3.c                |  18 ++++---
+ hw/arm/xlnx-zynqmp.c           |   8 +--
+ hw/dma/xilinx_axidma.c         |  16 +++---
+ hw/net/xilinx_axienet.c        |  17 +++----
+ hw/timer/aspeed_timer.c        |  17 ++++++-
+ memory.c                       |   9 ----
+ target/arm/helper.c            | 107 +++++++++++++++++++++++++++++++++++------
+ target/arm/translate-a64.c     |  13 +++++
+ target/arm/translate-vfp.inc.c |   2 +
+ target/arm/translate.c         |  50 +++++++++++++++++--
+ tcg/README                     |   2 +-
+ 30 files changed, 244 insertions(+), 101 deletions(-)
 
