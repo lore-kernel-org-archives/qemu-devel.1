@@ -2,95 +2,62 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B609C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB67AC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:03:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F75920870
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:01:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F75920870
+	by mail.kernel.org (Postfix) with ESMTPS id 8744C20870
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:03:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8744C20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5CBp-0002e3-DS
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:01:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42020)
+	id 1i5CDH-0004Zq-BB
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:03:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5BqU-0001XX-00
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:39:55 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i5BxP-0002QF-J5
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:47:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5BqS-0003iU-PU
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:39:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54566)
+ (envelope-from <dgilbert@redhat.com>) id 1i5BxN-00087F-UZ
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:47:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6020)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i5BqP-0003gA-0f; Tue, 03 Sep 2019 12:39:49 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5BxN-00086n-Ll
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:47:01 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E6DFD307CDFC;
- Tue,  3 Sep 2019 16:39:47 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 711766092F;
- Tue,  3 Sep 2019 16:39:47 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823143726.27062-1-eblake@redhat.com>
- <20190823143726.27062-2-eblake@redhat.com>
- <92e9cfa2-fbaa-259d-7a04-91187cc809b6@virtuozzo.com>
- <b1483a24-d524-169a-3440-5a9bf4440265@redhat.com>
- <55ebe9db-5a28-d844-89f7-2dc9a7d977d7@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <143fea30-cc9a-246a-4aff-5bb27a082a0e@redhat.com>
-Date: Tue, 3 Sep 2019 11:39:46 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id D255718C4269;
+ Tue,  3 Sep 2019 16:47:00 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C568B6061E;
+ Tue,  3 Sep 2019 16:46:57 +0000 (UTC)
+Date: Tue, 3 Sep 2019 17:46:55 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Ying Fang <fangying1@huawei.com>
+Message-ID: <20190903164655.GP2744@work-vm>
+References: <20190827080512.2417-1-fangying1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <55ebe9db-5a28-d844-89f7-2dc9a7d977d7@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="cwWtl5XyynlRGeU5dTKv5JjCrwSMpGLJJ"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190827080512.2417-1-fangying1@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 03 Sep 2019 16:39:47 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 03 Sep 2019 16:47:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/5] nbd: Improve per-export flag handling
- in server
+Subject: Re: [Qemu-devel] [PATCH] qmp: Fix memory leak in
+ migrate_params_test_apply
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,150 +69,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: lcf.lichaofeng@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ qemu-devel@nongnu.org, zhouyibo3@huawei.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cwWtl5XyynlRGeU5dTKv5JjCrwSMpGLJJ
-Content-Type: multipart/mixed; boundary="nPMQuMe4vrTP96AX8JZoiZ0UHmczXx6Dy";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <143fea30-cc9a-246a-4aff-5bb27a082a0e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] nbd: Improve per-export flag handling in
- server
-References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
- <20190823143726.27062-1-eblake@redhat.com>
- <20190823143726.27062-2-eblake@redhat.com>
- <92e9cfa2-fbaa-259d-7a04-91187cc809b6@virtuozzo.com>
- <b1483a24-d524-169a-3440-5a9bf4440265@redhat.com>
- <55ebe9db-5a28-d844-89f7-2dc9a7d977d7@redhat.com>
-In-Reply-To: <55ebe9db-5a28-d844-89f7-2dc9a7d977d7@redhat.com>
-
---nPMQuMe4vrTP96AX8JZoiZ0UHmczXx6Dy
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/30/19 6:32 PM, Eric Blake wrote:
-
->>>> @@ -458,10 +458,13 @@ static int nbd_negotiate_handle_export_name(NB=
-DClient *client,
->>>>           return -EINVAL;
->>>>       }
->>>>
->>>> -    trace_nbd_negotiate_new_style_size_flags(client->exp->size,
->>>> -                                             client->exp->nbdflags =
-| myflags);
->>>> +    myflags =3D client->exp->nbdflags;
->>>> +    if (client->structured_reply) {
->>>> +        myflags |=3D NBD_FLAG_SEND_DF;
->>>> +    }
->>>
->>>
->>> why we cant do just
->>> client->exp->nbdflags |=3D NBD_FLAG_SEND_DF ?
->>
->> Because myflags is the runtime flags for _this_ client, while
->> client->exp->nbdflags are the base flags shared by _all_ clients.  If
->> client A requests structured reply, but client B does not, then we don=
-'t
->> want to advertise DF to client B; but amending client->exp->nbdflags
->> would have that effect.
->=20
-> I stand corrected - it looks like a fresh client->exp is created per
-> client, as evidenced by:
-
-I need to quit replying to myself, but my test was flawed.  Modern
-clients don't go through NBD_OPT_EXPORT_NAME, so my added line...
-
-
-> +++ w/nbd/server.c
-> @@ -457,6 +457,7 @@ static int
-> nbd_negotiate_handle_export_name(NBDClient *client, bool no_zeroes,
->      myflags =3D client->exp->nbdflags;
->      if (client->structured_reply) {
->          myflags |=3D NBD_FLAG_SEND_DF;
-> +        client->exp->nbdflags |=3D NBD_FLAG_SEND_DF;
+* Ying Fang (fangying1@huawei.com) wrote:
+> Address Sanitizer shows memory leak in migrate_params_test_apply
+> migration/migration.c:1253 and the stack is as bellow:
+> 
+> Direct leak of 45 byte(s) in 9 object(s) allocated from:
+>     #0 0xffffbd7fc1db in __interceptor_malloc (/lib64/libasan.so.4+0xd31db)
+>     #1 0xffffbd514163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+>     #2 0xffffbd52f43b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
+>     #3 0xaaaadfa4d623 in migrate_params_test_apply migration/migration.c:1253
+>     #4 0xaaaadfa4d623 in qmp_migrate_set_parameters migration/migration.c:1422
+>     #5 0xaaaadfa963f3 in hmp_migrate_set_parameter monitor/hmp-cmds.c:1867
+>     #6 0xaaaadfa8afe3 in handle_hmp_command monitor/hmp.c:1082
+>     #7 0xaaaadf479c57 in qmp_human_monitor_command monitor/misc.c:140
+>     #8 0xaaaadfadf87b in qmp_marshal_human_monitor_command qapi/qapi-commands-misc.c:1024
+>     #9 0xaaaadfc7797b in do_qmp_dispatch qapi/qmp-dispatch.c:131
+>     #10 0xaaaadfc7797b in qmp_dispatch qapi/qmp-dispatch.c:174
+>     #11 0xaaaadfa84fff in monitor_qmp_dispatch monitor/qmp.c:120
+>     #12 0xaaaadfa85bbf in monitor_qmp_bh_dispatcher monitor/qmp.c:209
+>     #13 0xaaaadfd2228f in aio_bh_call util/async.c:89
+>     #14 0xaaaadfd2228f in aio_bh_poll util/async.c:117
+>     #15 0xaaaadfd29bc3 in aio_dispatch util/aio-posix.c:459
+>     #16 0xaaaadfd21ff7 in aio_ctx_dispatch util/async.c:260
+>     #17 0xffffbd50e2f7 in g_main_context_dispatch (/lib64/libglib-2.0.so.0+0x512f7)
+>     #18 0xaaaadfd278d7 in glib_pollfds_poll util/main-loop.c:218
+>     #19 0xaaaadfd278d7 in os_host_main_loop_wait util/main-loop.c:241
+>     #20 0xaaaadfd278d7 in main_loop_wait util/main-loop.c:517
+>     #21 0xaaaadf67b5e7 in main_loop vl.c:1806
+>     #22 0xaaaadf15d453 in main vl.c:4488
+> 
+> Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Ying Fang <fangying1@huawei.com>
+> ---
+>  migration/migration.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 8b9f2fe30a..05e44ff7cc 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1250,11 +1250,17 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>  
+>      if (params->has_tls_creds) {
+>          assert(params->tls_creds->type == QTYPE_QSTRING);
+> +        if (dest->tls_creds) {
+> +            g_free(dest->tls_creds);
+> +        }
+>          dest->tls_creds = g_strdup(params->tls_creds->u.s);
+>      }
+>  
+>      if (params->has_tls_hostname) {
+>          assert(params->tls_hostname->type == QTYPE_QSTRING);
+> +        if (dest->tls_hostname) {
+> +            g_free(dest->tls_hostname);
+> +        }
+>          dest->tls_hostname = g_strdup(params->tls_hostname->u.s);
 >      }
 
-=2E..was not getting reached.  If I instead tweak NBD_OPT_GO:
+Thanks for reporting the leak, but I don't think this is the right fix:
 
-diff --git i/nbd/server.c w/nbd/server.c
-index 6f3a83704fb3..da1ef793f6df 100644
---- i/nbd/server.c
-+++ w/nbd/server.c
-@@ -640,6 +640,7 @@ static int nbd_negotiate_handle_info(NBDClient
-*client, Error **errp)
-     myflags =3D exp->nbdflags;
-     if (client->structured_reply) {
-         myflags |=3D NBD_FLAG_SEND_DF;
-+        exp->nbdflags |=3D NBD_FLAG_SEND_DF;
-     }
-     trace_nbd_negotiate_new_style_size_flags(exp->size, myflags);
-     stq_be_p(buf, exp->size);
+In the call chain we have, qmp_migrate_set_parameters calls:
 
+    migrate_params_test_apply(params, &tmp);
 
-> $ ./qemu-nbd -r -f raw file -t &
->=20
-> $  ~/qemu/qemu-io -r -f raw --trace=3Dnbd_\*size_flags
-> nbd://localhost:10809 -c quit
-> 32145@1567207628.519883:nbd_receive_negotiate_size_flags Size is
-> 1049088, export flags 0x48f
->=20
-> $ MY_HACK=3D1 ~/qemu/qemu-io -r -f raw --trace=3Dnbd_\*size_flags
-> nbd://localhost:10809 -c quit
-> 32156@1567207630.417815:nbd_receive_negotiate_size_flags Size is
-> 1049088, export flags 0x40f
->=20
+tmp is a stack allocated variable  that becomes the 'dest'
+we see here.  Then at the top of migrate_params_test_apply
+we have:
 
-Then this reports 0x48f, proving that my initial reaction was correct:
-client->exp is a shared resource across multiple connections, but
-advertising DF must be a per-connection decision.
+    *dest = migrate_get_current()->parameters;
 
-> $  ~/qemu/qemu-io -r -f raw --trace=3Dnbd_\*size_flags
-> nbd://localhost:10809 -c quit
-> 32167@1567207635.202940:nbd_receive_negotiate_size_flags Size is
-> 1049088, export flags 0x48f
->=20
-> The export flags change per client, so I _can_ store into
-> client->exp->nbdflags.  Will do that for v2.
+so that's probably bad; that's a shallow copy, so dest->tls_authz
+points to the same storage as the real current migration parameters.
 
-I see nothing to change for v2, so I'm inclined to take this patch as is.=
+whne the code does:
+    if (params->has_tls_creds) {
+        assert(params->tls_creds->type == QTYPE_QSTRING);
+        dest->tls_creds = g_strdup(params->tls_creds->u.s);
+    }
+
+it's only changing the pointer in the 'tmp' not the main copy
+because of migrate_params_check fails then the parameters get entirely
+unchanged.  So if you do a free on dest->tls_hostname you end up
+freeing the real parameter that's still getting used, not the tmp.
+
+So I think we need to:
+  a) change migrate_params_test_apply so that it returns a
+MigrationParameters *  rather than taking &tmp
+  b) Make migrate_params_test use QAPI_CLONE to clone instead of doing:
+         *dest = migrate_get_current()->parameters;
+  c) Then do a qapi_free_MigrateParameters in qmp_migrate_set_parameters
+    on both the true and false paths.
+
+Does that make sense?
+
+Dave
 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---nPMQuMe4vrTP96AX8JZoiZ0UHmczXx6Dy--
-
---cwWtl5XyynlRGeU5dTKv5JjCrwSMpGLJJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1ul1IACgkQp6FrSiUn
-Q2r01wgAj24Kxs6CCDTCooFe1Z+PzpdsdTqjYx1geZIoP1zllrq0MWlCrv79aS7P
-0lrsoFqfzsdjnU0vPZHbsbJEgNl8oIozAdEN2qxPkxY9b9n86G5mz9e2RwryqN6l
-/6LgA50wvgkEc/siF6HG4yJ0PNcltOR+iP73itzvdvFh2sYA+JWAa1k1a1brgmvd
-1Rm60odqj2Wqkd7HeX1JeUoM6eZ4UK6CQu88klILfBY1cuioS6821v7TulzLg574
-tSfBeJzm+YBxYgPEBfagnajmFcGaLlw/wJA/e/1suW4pIdjX11O85EeM3kuFkeXf
-vpz6qvT2st8ScosRsG9ZJbmwo/Nb4A==
-=Z1tl
------END PGP SIGNATURE-----
-
---cwWtl5XyynlRGeU5dTKv5JjCrwSMpGLJJ--
+>  
+> -- 
+> 2.19.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
