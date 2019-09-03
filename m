@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C42BC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AABBCC3A5A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59B6B23774
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:51:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A18A23774
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 15:51:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o91Y+kEZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59B6B23774
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E2rkC9QP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A18A23774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5B5Q-0007SG-Me
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:51:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
+	id 1i5B5S-0007Ua-41
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 11:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59259)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArQ-0002ov-7f
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:49 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArU-0002uJ-59
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5ArO-0005wO-Uf
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:48 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37757)
+ (envelope-from <peter.maydell@linaro.org>) id 1i5ArS-0005ys-PC
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:51 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:39524)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5ArO-0005w0-ON
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:46 -0400
-Received: by mail-wr1-x434.google.com with SMTP id z11so17998295wrt.4
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:46 -0700 (PDT)
+ id 1i5ArS-0005yE-E9
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 11:36:50 -0400
+Received: by mail-wm1-x336.google.com with SMTP id n2so17415040wmk.4
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 08:36:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=zwgsbRC7S/9tqfeU7JxypMKTOKpf8DEKt23oGutI3as=;
- b=o91Y+kEZ9ekJhZ76S0+e42h5hPE+3kvnLpVzMB6dhI+DFwhhNUYHILeaREJX1UJzKl
- oVdSpgzLxEAdhulwoDfUTWicwSlMXkWsMT2J3OZ1oKmi2FAQsaeluiatxD5Y4+Lvyqi1
- o+7XHPB8iWqEEeefzKQpvmudreDJ0UYXfrviw+EAFct0zrOG/YgMUE39nhZ59LuxPzdu
- TSC+g8j1KOtChSr1V97Im4Q6/VH0bsaeyKkHc+Og7rYiXBy8KGEndtSfJFPZ3hZNZQWO
- Cac6bQVFLX9jwi9BkBMufl5/48Nm9zMN3P5PLzMbqSgrSfsfzUYU9Lr0GmZHEzA7Ll27
- mhaA==
+ bh=m5LyuFloMeiWOvUC1xvIB8Pb8XrZPnk3a+E9CwjfkEU=;
+ b=E2rkC9QPMaVzfMW0907SSVlyojlomoUD2lNk4ZHI8KZcxDm5EIlfeb5QIRrP3WwqK8
+ HzZGPFsSJSCKCO8RNJ3n+SobNBf6/FmnsBEsMPRfx6d3aeHI1BbFIUkukukDsuCy+4nV
+ ngT96LyTU8dWvDIRb96B+UJ0zUK55TrJ5J4f5OvdhOL2Jxeqxu4N7M6Uty/rfGlo/sFO
+ /awkkUoECTfFy1WHLfpKRiCLX/PS26yD491FP3reuG8LW2TbfjFrHCf4vyY0cHswng7z
+ qKuuxAYi+Ajc3dzsd4pqopctWEambRj+1OHIs0SVG+KFgIMGVmmUSb3svqg1nCqgPNRC
+ VNSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zwgsbRC7S/9tqfeU7JxypMKTOKpf8DEKt23oGutI3as=;
- b=pr77NqenQARtAYF08SKV+iOuYlFHnHYmfSwD8OpdULhQIQPBk3dARc59ZF1oyagKzl
- IoUxhIGD3E4xMC8c8e/IfOqPaZ9I9aSE+uv7FrMzCpE8PUrKKlHHtuC+H3Q9Nbxvwy8m
- Yxa0XOBXKHS0buCydCAo28ulLFjORpz+pcL79ptcBx2nj+QLpNj7AhMaDctD58FG4fxy
- w/Zh7WckMQg+1EvlRU4kTvD5uf5mnosiZfOuWFiHzFCJYaH8z1bmN+8/wBtEhC9MMSjy
- 8iVpnqz7weKI5ka694nkEXgH4EugBh7PGIvrIOYL0fUVuZuq16Ft65YqNxSK86UNN8p3
- VaCQ==
-X-Gm-Message-State: APjAAAV3XaOlFuu1trcJckr0Lb+CPcVmyRWJM3Lap5nv6q3PeofBlL/G
- OBHyFeu/lagQDQMIAdUeXciyWUHHF5E2AA==
-X-Google-Smtp-Source: APXvYqyxfhmZVOQC6h9j4JCQgWAc0MfurL2rR1HUFR01uHr0B+cMRjQK22n2NqCkoEvzI/hStjA4tg==
-X-Received: by 2002:adf:fb11:: with SMTP id c17mr1500573wrr.0.1567525005632;
- Tue, 03 Sep 2019 08:36:45 -0700 (PDT)
+ bh=m5LyuFloMeiWOvUC1xvIB8Pb8XrZPnk3a+E9CwjfkEU=;
+ b=mJ/CbQ0MBWNv3wG7eB16hK+p9uvQgl6NYkV8ED3gBESxW0CKfXAW9NTkWkhYGXjNrm
+ E7ZIZ7bo9TlqGCwT7Sgi+017k2A57nOw/78/w1R+2rAxl24oSS+3HS4vzDVMnXAUN3me
+ lhQdlaKKzTlvmSG56EePlanWQP5l9rAFn6niAnDuXFQ0ixiirIQ9mlCjN83PTz8I1or1
+ hSiD7C4VCi7uaFo9ZAN5YgL/A2k5PmsBFlsxfeHUUacFR0lhpcw5LiV6ez5QkZJI4gZz
+ QvPyAY/2Zk651RNpqSEsN8hLd3KZfJU8jAsm4/TTTKcDreaa+1pucAtVcfdUqG/tTbZN
+ ihTw==
+X-Gm-Message-State: APjAAAXYSDuTNS7+d6MBpTAL2NapP3R5zzfRmP03bNMRPp5+6zrXx+Pf
+ IIady5PCFBZ0aMMsRfbIKLxQdVCNelwsSA==
+X-Google-Smtp-Source: APXvYqyLJR8ZOKq9fSqNdX9x+3JFwbKl/VBrmMpFAJlZtFq9+rMbKjUOqWWPjOtNMc7nUvudIEuwtA==
+X-Received: by 2002:a1c:ef18:: with SMTP id n24mr813146wmh.29.1567525009103;
+ Tue, 03 Sep 2019 08:36:49 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.44
+ by smtp.gmail.com with ESMTPSA id a18sm24435188wrt.18.2019.09.03.08.36.47
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 08:36:45 -0700 (PDT)
+ Tue, 03 Sep 2019 08:36:48 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 16:36:20 +0100
-Message-Id: <20190903153633.6651-9-peter.maydell@linaro.org>
+Date: Tue,  3 Sep 2019 16:36:23 +0100
+Message-Id: <20190903153633.6651-12-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903153633.6651-1-peter.maydell@linaro.org>
 References: <20190903153633.6651-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
-Subject: [Qemu-devel] [PULL 08/21] hw/arm/smmuv3: Remove spurious error
- messages on IOVA invalidations
+X-Received-From: 2a00:1450:4864:20::336
+Subject: [Qemu-devel] [PULL 11/21] hw/arm: Use object_initialize_child for
+ correct reference counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,108 +99,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-An IOVA/ASID invalidation is notified to all IOMMU Memory Regions
-through smmuv3_inv_notifiers_iova/smmuv3_notify_iova.
+As explained in commit aff39be0ed97:
 
-When the notification occurs it is possible that some of the
-PCIe devices associated to the notified regions do not have a
-valid stream table entry. In that case we output a LOG_GUEST_ERROR
-message, for example:
+  Both functions, object_initialize() and object_property_add_child()
+  increase the reference counter of the new object, so one of the
+  references has to be dropped afterwards to get the reference
+  counting right. Otherwise the child object will not be properly
+  cleaned up when the parent gets destroyed.
+  Thus let's use now object_initialize_child() instead to get the
+  reference counting here right.
 
-invalid sid=<SID> (L1STD span=0)
-"smmuv3_notify_iova error decoding the configuration for iommu mr=<MR>
-
-This is unfortunate as the user gets the impression that there
-are some translation decoding errors whereas there are not.
-
-This patch adds a new field in SMMUEventInfo that tells whether
-the detection of an invalid STE must lead to an error report.
-invalid_ste_allowed is set before doing the invalidations and
-kept unset on actual translation.
-
-The other configuration decoding error messages are kept since if the
-STE is valid then the rest of the config must be correct.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Message-id: 20190822172350.12008-6-eric.auger@redhat.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190823143249.8096-3-philmd@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/smmuv3-internal.h |  1 +
- hw/arm/smmuv3.c          | 19 +++++++++++--------
- 2 files changed, 12 insertions(+), 8 deletions(-)
+ hw/arm/mcimx7d-sabre.c |  9 ++++-----
+ hw/arm/mps2-tz.c       | 15 +++++++--------
+ hw/arm/musca.c         |  9 +++++----
+ 3 files changed, 16 insertions(+), 17 deletions(-)
 
-diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index b160289cd12..d190181ef1b 100644
---- a/hw/arm/smmuv3-internal.h
-+++ b/hw/arm/smmuv3-internal.h
-@@ -381,6 +381,7 @@ typedef struct SMMUEventInfo {
-     uint32_t sid;
-     bool recorded;
-     bool record_trans_faults;
-+    bool inval_ste_allowed;
-     union {
-         struct {
-             uint32_t ssid;
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 31ac4b15c30..db051dcac87 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -320,7 +320,9 @@ static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
-     uint32_t config;
- 
-     if (!STE_VALID(ste)) {
--        qemu_log_mask(LOG_GUEST_ERROR, "invalid STE\n");
-+        if (!event->inval_ste_allowed) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "invalid STE\n");
-+        }
-         goto bad_ste;
-     }
- 
-@@ -407,8 +409,10 @@ static int smmu_find_ste(SMMUv3State *s, uint32_t sid, STE *ste,
- 
-         if (!span) {
-             /* l2ptr is not valid */
--            qemu_log_mask(LOG_GUEST_ERROR,
--                          "invalid sid=%d (L1STD span=0)\n", sid);
-+            if (!event->inval_ste_allowed) {
-+                qemu_log_mask(LOG_GUEST_ERROR,
-+                              "invalid sid=%d (L1STD span=0)\n", sid);
-+            }
-             event->type = SMMU_EVT_C_BAD_STREAMID;
-             return -EINVAL;
-         }
-@@ -603,7 +607,9 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-     SMMUv3State *s = sdev->smmu;
-     uint32_t sid = smmu_get_sid(sdev);
--    SMMUEventInfo event = {.type = SMMU_EVT_NONE, .sid = sid};
-+    SMMUEventInfo event = {.type = SMMU_EVT_NONE,
-+                           .sid = sid,
-+                           .inval_ste_allowed = false};
-     SMMUPTWEventInfo ptw_info = {};
-     SMMUTranslationStatus status;
-     SMMUState *bs = ARM_SMMU(s);
-@@ -796,16 +802,13 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
-                                dma_addr_t iova)
+diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
+index 97b8bb788a1..78b87c502fc 100644
+--- a/hw/arm/mcimx7d-sabre.c
++++ b/hw/arm/mcimx7d-sabre.c
+@@ -30,7 +30,6 @@ static void mcimx7d_sabre_init(MachineState *machine)
  {
-     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
--    SMMUEventInfo event = {};
-+    SMMUEventInfo event = {.inval_ste_allowed = true};
-     SMMUTransTableInfo *tt;
-     SMMUTransCfg *cfg;
-     IOMMUTLBEntry entry;
+     static struct arm_boot_info boot_info;
+     MCIMX7Sabre *s = g_new0(MCIMX7Sabre, 1);
+-    Object *soc;
+     int i;
  
-     cfg = smmuv3_get_config(sdev, &event);
-     if (!cfg) {
--        qemu_log_mask(LOG_GUEST_ERROR,
--                      "%s error decoding the configuration for iommu mr=%s\n",
--                      __func__, mr->parent_obj.name);
-         return;
-     }
+     if (machine->ram_size > FSL_IMX7_MMDC_SIZE) {
+@@ -49,10 +48,10 @@ static void mcimx7d_sabre_init(MachineState *machine)
+         .nb_cpus = machine->smp.cpus,
+     };
  
+-    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX7);
+-    soc = OBJECT(&s->soc);
+-    object_property_add_child(OBJECT(machine), "soc", soc, &error_fatal);
+-    object_property_set_bool(soc, true, "realized", &error_fatal);
++    object_initialize_child(OBJECT(machine), "soc",
++                            &s->soc, sizeof(s->soc),
++                            TYPE_FSL_IMX7, &error_fatal, NULL);
++    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
+ 
+     memory_region_allocate_system_memory(&s->ram, NULL, "mcimx7d-sabre.ram",
+                                          machine->ram_size);
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index d85dc2c4bd8..6b24aaacded 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -427,10 +427,10 @@ static void mps2tz_common_init(MachineState *machine)
+     /* The sec_resp_cfg output from the IoTKit must be split into multiple
+      * lines, one for each of the PPCs we create here, plus one per MSC.
+      */
+-    object_initialize(&mms->sec_resp_splitter, sizeof(mms->sec_resp_splitter),
+-                      TYPE_SPLIT_IRQ);
+-    object_property_add_child(OBJECT(machine), "sec-resp-splitter",
+-                              OBJECT(&mms->sec_resp_splitter), &error_abort);
++    object_initialize_child(OBJECT(machine), "sec-resp-splitter",
++                            &mms->sec_resp_splitter,
++                            sizeof(mms->sec_resp_splitter),
++                            TYPE_SPLIT_IRQ, &error_abort, NULL);
+     object_property_set_int(OBJECT(&mms->sec_resp_splitter),
+                             ARRAY_SIZE(mms->ppc) + ARRAY_SIZE(mms->msc),
+                             "num-lines", &error_fatal);
+@@ -465,10 +465,9 @@ static void mps2tz_common_init(MachineState *machine)
+      * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
+      * Create the OR gate for this.
+      */
+-    object_initialize(&mms->uart_irq_orgate, sizeof(mms->uart_irq_orgate),
+-                      TYPE_OR_IRQ);
+-    object_property_add_child(OBJECT(mms), "uart-irq-orgate",
+-                              OBJECT(&mms->uart_irq_orgate), &error_abort);
++    object_initialize_child(OBJECT(mms), "uart-irq-orgate",
++                            &mms->uart_irq_orgate, sizeof(mms->uart_irq_orgate),
++                            TYPE_OR_IRQ, &error_abort, NULL);
+     object_property_set_int(OBJECT(&mms->uart_irq_orgate), 10, "num-lines",
+                             &error_fatal);
+     object_property_set_bool(OBJECT(&mms->uart_irq_orgate), true,
+diff --git a/hw/arm/musca.c b/hw/arm/musca.c
+index ddd8842732c..68db4b5b387 100644
+--- a/hw/arm/musca.c
++++ b/hw/arm/musca.c
+@@ -424,10 +424,11 @@ static void musca_init(MachineState *machine)
+      * The sec_resp_cfg output from the SSE-200 must be split into multiple
+      * lines, one for each of the PPCs we create here.
+      */
+-    object_initialize(&mms->sec_resp_splitter, sizeof(mms->sec_resp_splitter),
+-                      TYPE_SPLIT_IRQ);
+-    object_property_add_child(OBJECT(machine), "sec-resp-splitter",
+-                              OBJECT(&mms->sec_resp_splitter), &error_fatal);
++    object_initialize_child(OBJECT(machine), "sec-resp-splitter",
++                            &mms->sec_resp_splitter,
++                            sizeof(mms->sec_resp_splitter),
++                            TYPE_SPLIT_IRQ, &error_fatal, NULL);
++
+     object_property_set_int(OBJECT(&mms->sec_resp_splitter),
+                             ARRAY_SIZE(mms->ppc), "num-lines", &error_fatal);
+     object_property_set_bool(OBJECT(&mms->sec_resp_splitter), true,
 -- 
 2.20.1
 
