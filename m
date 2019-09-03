@@ -2,68 +2,81 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A23B3C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95754C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:43:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75D3B21881
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:42:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75D3B21881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 604BE22CF7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:43:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="ve8TV1t9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 604BE22CF7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i54O0-0007Ez-Me
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 04:42:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53209)
+	id 1i54Ps-0008VA-E2
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 04:43:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1i54MR-0005q2-QV
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:40:25 -0400
+ (envelope-from <bishara@daynix.com>) id 1i54OR-0007hh-Nr
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1i54MQ-00064a-Cg
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:40:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34058)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1i54MN-0005wF-TE; Tue, 03 Sep 2019 04:40:20 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 587ADA36F04;
- Tue,  3 Sep 2019 08:40:17 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D5FBA19C78;
- Tue,  3 Sep 2019 08:40:15 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190827160554.30995-1-eric.auger@redhat.com>
- <20190827160554.30995-3-eric.auger@redhat.com>
- <29520007-f3fd-ed8d-f52b-2839f991556a@huawei.com>
- <0dd3bc89-8f91-0f8e-8908-18712240a115@redhat.com>
- <CAFEAcA8u3Qe9zx=4QxW_Bb8a=JQ7kUmiAO5H-cwAU4i3R+Nf8w@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <9bd0a5b8-ad15-d19f-2bcc-8b605afb5b78@redhat.com>
-Date: Tue, 3 Sep 2019 10:40:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <bishara@daynix.com>) id 1i54OQ-0007hu-LC
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:42:27 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:41061)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bishara@daynix.com>) id 1i54OQ-0007hD-8K
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:42:26 -0400
+Received: by mail-io1-xd42.google.com with SMTP id j5so34051648ioj.8
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 01:42:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=XbkdfiK9mc4CfF+qgibQ1f0i1zBsATB537JIUIRS5Vk=;
+ b=ve8TV1t9q4uXs+cAFOtg2WM5PA9ndwuKWIP8Z8ij8+8nAOsmY6SuvuArLqaFJn8WZd
+ OYyQsMY7UHoml0gcJ4fOExOVDAsTFHRrd48iDC8oDiFGGiPwFnTJjyKsCgtL+tFdmPkR
+ /Mwz0mCF6rLz4pIYPUHDouQW0Cr6QCpvsLWJsDHmfZfGJjkYvDTO2QGlIrE0eguc/eAo
+ 8+JstNaSldQOGf+x60Br6rc5v9tDvNHIxQdOWqxBp6uIE4/mTKpK42tg6DqOoykLk4oL
+ b4vA2jpEvFpIhH/9EKK6UeX2eMihK7/3NmTO15CKf4IAIZ7aWP5RNcLIjt9nWn9L2NXO
+ MeSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=XbkdfiK9mc4CfF+qgibQ1f0i1zBsATB537JIUIRS5Vk=;
+ b=LaTcFhjyUnJRBmYDVg92UwkTgwK0klhcU4ZS/DzSLMwhnIFWYjrsQZjb/8/IdW6jcw
+ J+DrOEW8Vq6+KyZ0hCsUvnYLWnud/y0NoY7OaecSidnHhwKoARJq+FpMO7NcVmpij+IE
+ 6/PabDWCe7d3oDRMi9QmWiT65mf64NFbVxTktkIgXHMq78SSM5QsYlee9gTGTD7ZrQSO
+ VYGI5Jfk0sZhWzhLSTIyT5WKYm7pdSfq3kOmaEG1Lsi/8xZ+h1YYTu5+RaMGj0cFVCJb
+ 0kVfOKWzgp7TyZP7FNg44D5gcdrIMkAgqizmqPqDJ0+w1F9/ykwp4EpQa8+lHJACc5oN
+ W6sg==
+X-Gm-Message-State: APjAAAVLV3n8g1Oti0j3boencrwBnSL6EJoCRQE72TXwfD96rBVfpXqm
+ W5nR1w78LdhsVx5oE7xN1cxHwcoWHEflLCkiy0N1HfjU
+X-Google-Smtp-Source: APXvYqx79CYeTCuFSdhSzvdpft+JXB/6VbsvwoiQ9VGQ9qaseIfpM6G9vOdKAwDqxkWTfCQJo9NNQ6KujnKNq+fwWv8=
+X-Received: by 2002:a6b:ef09:: with SMTP id k9mr8259957ioh.61.1567500145186;
+ Tue, 03 Sep 2019 01:42:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8u3Qe9zx=4QxW_Bb8a=JQ7kUmiAO5H-cwAU4i3R+Nf8w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 03 Sep 2019 08:40:17 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 2/3] intc/arm_gic: Support PPI injection for
- more than 256 vpus
+References: <20190819131620.1302-1-bishara@daynix.com>
+In-Reply-To: <20190819131620.1302-1-bishara@daynix.com>
+From: Bishara AbuHattoum <bishara@daynix.com>
+Date: Tue, 3 Sep 2019 11:42:14 +0300
+Message-ID: <CADyT_0W8AXCaEnGBjnf04NfzJZHe+SHM2jNV9=5hCuhkvQjCkw@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 0/1] BZ#1733165: network-get-interfaces
+ Chinese NIC name
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,53 +88,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zenghui Yu <yuzenghui@huawei.com>, maz@kernel.org,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Eric Auger <eric.auger.pro@gmail.com>
+Cc: Yan Vugenfirer <yan@daynix.com>, Basil Salman <basil@daynix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+PING
 
-On 9/3/19 10:29 AM, Peter Maydell wrote:
-> On Thu, 29 Aug 2019 at 08:58, Auger Eric <eric.auger@redhat.com> wrote:
->>
->> Hi Zenghui,
->>
->> On 8/29/19 4:53 AM, Zenghui Yu wrote:
->>> For confirmation, should we also adjust the vcpu_index in
->>> arm_cpu_kvm_set_irq(), just like above?
->>
->> I am not familiar with this path. in arm_cpu_initfn(), there is a
->> comment saying "VIRQ and VFIQ are unused with KVM but we add them to
->> maintain the same interface as non-KVM CPUs." So I don't know when that
->> code gets executed.
-> 
-> That comment is saying that all KVM guest CPUs are
-> EL1-only (since we don't handle nested virt), and therefore
-> they logically don't have an inbound VIRQ or VFIQ line.
-> But we provide the qemu_irqs for them anyway, so that
-> board code doesn't have to have tedious conditionals
-> saying "if this CPU has EL2 then wire up VIRQ and VFIQ
-> to the GIC". If you ever try to actually assert the VIRQ
-> or VFIQ lines you will hit the g_assert_not_reached() in
-> arm_cpu_kvm_set_irq().
+On Mon, Aug 19, 2019 at 4:22 PM Bishara AbuHattoum <bishara@daynix.com>
+wrote:
 
-OK thanks for the clarification. I mixed things up.
-
-I guess arm_cpu_kvm_set_irq attempting to inject IRQ/FIQ into KVM is
-used with userspace GIC emulation, which is not supported along with
-GICv3. But anyway, I guess it does not hurt to set vcpu_index2 in
-arm_cpu_kvm_set_irq?
-
-Thanks
-
-Eric
-
-
-> 
-> thanks
-> -- PMM
-> 
-
+> https://bugzilla.redhat.com/show_bug.cgi?id=1733165
+>
+> Uppon renaming a NIC to a Chinese name and invoking the network get
+> interfaces command, guest-network-get-interfaces, the returned name
+> field has the (\ufffd) value for each Chinese character the NIC name
+> had, this value is the indication that the code page does not have the
+> decoding information for the given character.
+>
+> The suggested fix is to use the CP_UTF8 code page for decoding the NIC's
+> name instead of the CP_ACP code page.
+>
+> Bishara AbuHattoum (1):
+>   qga-win: network-get-interfaces command name field bug fix
+>
+>  qga/commands-win32.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> --
+> 2.17.2
+>
+>
+>
