@@ -2,72 +2,91 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44902C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 12:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBF0C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 12:51:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19F2020674
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 12:43:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F2020674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2315120870
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 12:51:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2315120870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i58A9-0007Cj-1S
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 08:43:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38142)
+	id 1i58Hi-0001Tt-7P
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 08:51:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i589A-0006gL-3f
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 08:42:57 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i58Gi-0000tf-NA
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 08:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5897-0003Xu-Vf
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 08:42:55 -0400
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:43193)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5897-0003XJ-S3; Tue, 03 Sep 2019 08:42:53 -0400
-Received: by mail-yw1-f66.google.com with SMTP id n205so5716088ywb.10;
- Tue, 03 Sep 2019 05:42:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=8/io0aF14kRtFPrIzN+Bf+i4azHZocjXaM3gxSbPLo0=;
- b=b/SCxntfnLfibm/13ZWsLfkS+E1dS/pnOUqAdhharr09fE2/JGik7Ylkz80JHb1ptK
- T0AT34T00tvnSbg/COBbhdVpIltR2RmTcdQOuVq6gdOCr4Pemfc7Octt4p1N7mpE6GNH
- G+zj3yaEuQDOrdNGuAnT5odNp34pJJd5Ya153HqCOEpXbNED52MOL9DOumpkXEpbRbS2
- 650D22EKKTlEOnajlMUi+Yby5agX6UPLLryGif8Oc4/W5RQ7NO9B/qGGZ3GM6juVBOM+
- yvfPL7+qsE4EMPpVbrZTUWWYhqT3XZEt9hVWRyaX1gBiCPisDsoozD/HPKQeKE/K5fe7
- W4Lw==
-X-Gm-Message-State: APjAAAVSf3h5aGbcUbBpY97+uk/TnVq0Eg2O3ORN7QiStp6XUKQvG4gd
- Sxo8rNWKxOBzs62vVwYumfOdjQotv8XqkbBmryQ=
-X-Google-Smtp-Source: APXvYqxPXpa19qDhBNUESpFYgzXOwKrH2Vbg3nFh0HjJBvKwSqE1305v4qia4JPa1AIYt7+GrD62giQFTEmio9dY1OM=
-X-Received: by 2002:a81:b40a:: with SMTP id h10mr10925279ywi.368.1567514572963; 
- Tue, 03 Sep 2019 05:42:52 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1i58Gh-0003DK-95
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 08:50:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42660)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i58GX-0002qv-2Z; Tue, 03 Sep 2019 08:50:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A6B17C04B940;
+ Tue,  3 Sep 2019 12:50:29 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-98.brq.redhat.com
+ [10.40.204.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 925621F5;
+ Tue,  3 Sep 2019 12:50:28 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190827182313.25983-1-mreitz@redhat.com>
+ <CAFEAcA-bt1GYfjUh0aRE6gwni1bzu8WJzNhbpQxrdc47ZYQkCg@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5bd7f7fc-ef4a-6fef-cc8d-0863b89cecec@redhat.com>
+Date: Tue, 3 Sep 2019 14:50:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20180216070201.4271-1-penberg@iki.fi>
- <20180216070201.4271-3-penberg@iki.fi>
-In-Reply-To: <20180216070201.4271-3-penberg@iki.fi>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 3 Sep 2019 14:42:41 +0200
-Message-ID: <CAAdtpL7ZRxLS=wbKKQrxQ_Ob8sLJFGvsqPWXmgtCGWKdJ-Ga9g@mail.gmail.com>
-To: Pekka Enberg <penberg@iki.fi>,
- =?UTF-8?Q?Zolt=C3=A1n_Baldaszti?= <bztemail@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA-bt1GYfjUh0aRE6gwni1bzu8WJzNhbpQxrdc47ZYQkCg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="OaXIT5BzABAKPZszKWeJ35bHWDLZBPfM0"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Tue, 03 Sep 2019 12:50:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.161.66
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] raspi: Raspberry Pi 3 support
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 00/15] Block patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,86 +98,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Pekka and Zolt=C3=A1n,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OaXIT5BzABAKPZszKWeJ35bHWDLZBPfM0
+Content-Type: multipart/mixed; boundary="9jtGy7GWmeZs0bEqZyuFPJdLhj6X8S6ca";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <5bd7f7fc-ef4a-6fef-cc8d-0863b89cecec@redhat.com>
+Subject: Re: [PULL 00/15] Block patches
+References: <20190827182313.25983-1-mreitz@redhat.com>
+ <CAFEAcA-bt1GYfjUh0aRE6gwni1bzu8WJzNhbpQxrdc47ZYQkCg@mail.gmail.com>
+In-Reply-To: <CAFEAcA-bt1GYfjUh0aRE6gwni1bzu8WJzNhbpQxrdc47ZYQkCg@mail.gmail.com>
 
-On Fri, Feb 16, 2018 at 8:04 AM Pekka Enberg <penberg@iki.fi> wrote:
->
-> This patch adds Raspberry Pi 3 support to hw/arm/raspi.c. The
-> differences to Pi 2 are:
->
->  - Firmware address
->  - Board ID
->  - Board revision
->
-> The CPU is different too, but that's going to be configured as part of
-> the machine default CPU when we introduce a new machine type.
->
-> The patch was written from scratch by me but the logic is similar to
-> Zolt=C3=A1n Baldaszti's previous work, which I used as a reference (with
-> permission from the author):
->
->   https://github.com/bztsrc/qemu-raspi3
->
-> Signed-off-by: Pekka Enberg <penberg@iki.fi>
-> ---
->  hw/arm/raspi.c | 31 +++++++++++++++++++++----------
->  1 file changed, 21 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index c24a4a1b14..66fe10e376 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -5,6 +5,9 @@
->   * Rasperry Pi 2 emulation Copyright (c) 2015, Microsoft
->   * Written by Andrew Baumann
->   *
-> + * Raspberry Pi 3 emulation Copyright (c) 2018 Zolt=C3=A1n Baldaszti
-> + * Upstream code cleanup (c) 2018 Pekka Enberg
-> + *
->   * This code is licensed under the GNU GPLv2 and later.
->   */
->
-> @@ -22,10 +25,11 @@
->  #define SMPBOOT_ADDR    0x300 /* this should leave enough space for ATAG=
-S */
->  #define MVBAR_ADDR      0x400 /* secure vectors */
->  #define BOARDSETUP_ADDR (MVBAR_ADDR + 0x20) /* board setup code */
-> -#define FIRMWARE_ADDR   0x8000 /* Pi loads kernel.img here by default */
-> +#define FIRMWARE_ADDR_2 0x8000 /* Pi 2 loads kernel.img here by default =
-*/
-> +#define FIRMWARE_ADDR_3 0x80000 /* Pi 3 loads kernel.img here by default=
- */
->
->  /* Table of Linux board IDs for different Pi versions */
-> -static const int raspi_boardid[] =3D {[1] =3D 0xc42, [2] =3D 0xc43};
-> +static const int raspi_boardid[] =3D {[1] =3D 0xc42, [2] =3D 0xc43, [3] =
-=3D 0xc44};
+--9jtGy7GWmeZs0bEqZyuFPJdLhj6X8S6ca
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Where does the value 0xc44 comes from?
+On 03.09.19 10:39, Peter Maydell wrote:
+> On Tue, 27 Aug 2019 at 19:23, Max Reitz <mreitz@redhat.com> wrote:
+>>
+>> The following changes since commit 23919ddfd56135cad3cb468a8f54d5a595f=
+024f4:
+>>
+>>   Merge remote-tracking branch 'remotes/aperard/tags/pull-xen-20190827=
+' into staging (2019-08-27 15:52:36 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/XanClic/qemu.git tags/pull-block-2019-08-27
+>>
+>> for you to fetch changes up to bb043c056cffcc2f3ce88bfdaf2e76e455c09e2=
+c:
+>>
+>>   iotests: Unify cache mode quoting (2019-08-27 19:48:44 +0200)
+>>
+>> ----------------------------------------------------------------
+>> Block patches:
+>> - qemu-io now accepts a file to read a write pattern from
+>> - Ensure that raw files have their first block allocated so we can pro=
+be
+>>   the O_DIRECT alignment if necessary
+>> - Various fixes
+>=20
+> Fails make check running the iotests (on some platforms,
+> including x86-64 Linux):
+>=20
+> Not run: 220
+> Failures: 071 099 120 184 186
+> Failed 5 of 105 tests
+> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:1100:
+> recipe for target 'check-tests/check-block.sh' failed
+>=20
+> The printed diff output for the failures generally looks like:
+> --- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/071.out
+>  2018-12-19 15:31:00.523062228 +0000
+> +++ /home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/=
+071.out.bad
+>      2019-09-03 09:01:43.665180692 +0100
+> @@ -1,4 +1,5 @@
+>  QA output created by 071
+> +Unable to init server: Could not connect: Connection refused
 
-I can only find 0xc42/0xc43 defined:
-https://github.com/raspberrypi/linux/blob/rpi-3.18.y/arch/arm/tools/mach-ty=
-pes#L525
+OK, I think I know which patch is to blame.  (The problem is probably
+that you don=E2=80=99t have a $DISPLAY on your test machine.  Neither had=
+ I
+until a couple of weeks ago.,,)
 
-0xc43 seems controversial, see
-http://lists.infradead.org/pipermail/linux-rpi-kernel/2015-February/001268.=
-html
-addition: https://github.com/raspberrypi/linux/commit/d9fac63adac#diff-6722=
-037d79570df5b392a49e0e006573R526
+(Well, I personally blame adding the iotests to make check, but, well.)
 
-Looking at the firmware source, the r1 register is always set to the
-BCM2708 machine id before calling the kernel:
-https://github.com/raspberrypi/tools/blob/920c7ed2ee/armstubs/armstub7.S#L1=
-33
+Max
 
-Thanks,
 
-Phil.
+--9jtGy7GWmeZs0bEqZyuFPJdLhj6X8S6ca--
+
+--OaXIT5BzABAKPZszKWeJ35bHWDLZBPfM0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1uYZIACgkQ9AfbAGHV
+z0CwrQf+KaHMEBi73cVA8KD5cmbk7vFxGqxgyKIec7hSleT0HfSXoVtLcEmjLniN
+Im4Y05nIq7SaQFeMdpUqtSVINPdf7hytCC4YqXt3Cc2bGNGKQL30YkEpXWZRuhQZ
+u10sfKXTR1cCjdfGt82+v0z4hMLioCSEXqbEEfRrz48t+EzHtQ49iDxhiWZOTbaR
+uN/7/ngr8MbRcbBDpL6tOK9BAUmlg6SmGtnKXr6B+S9RqOsdFNX7rZ6raiXbmV6I
+0AeWidxTBUuo/R6Nn2xHZCvTMUGMQF1KbFhGmgiJz72IRa4JTArfPQ+sk08UKqcd
+iRRY43OvJ6eTObQ76iJ/UNctHtad4g==
+=t+Yd
+-----END PGP SIGNATURE-----
+
+--OaXIT5BzABAKPZszKWeJ35bHWDLZBPfM0--
 
