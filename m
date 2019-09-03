@@ -2,108 +2,79 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BB5C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C03C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:40:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0D9A217D7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:35:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0D9A217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA69121881
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 08:40:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jn9Mk32t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA69121881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i54Hr-0004MP-7D
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 04:35:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51742)
+	id 1i54MX-0005hK-Jt
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 04:40:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1i54H4-0003m6-LU
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:34:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i54Lf-0005Dg-RO
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1i54H2-0000JX-PF
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:34:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36948)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1i54H2-0000Ie-G7
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:34:48 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 75D27190C004
- for <qemu-devel@nongnu.org>; Tue,  3 Sep 2019 08:34:47 +0000 (UTC)
-Received: from [10.36.116.225] (ovpn-116-225.ams2.redhat.com [10.36.116.225])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 199255D9DC;
- Tue,  3 Sep 2019 08:34:43 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190903061849.21493-1-thuth@redhat.com>
- <20190903061849.21493-3-thuth@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <1ebf3c37-551e-60b4-f8d1-581d2c7c47e3@redhat.com>
-Date: Tue, 3 Sep 2019 10:34:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1i54Le-0004zH-Ih
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:39:35 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:38922)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i54Le-0004y4-Do
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 04:39:34 -0400
+Received: by mail-oi1-x234.google.com with SMTP id w144so5167380oia.6
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 01:39:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=E/7T7rtCU+2sx7uKDZjDoAcD95MZLYf9/DK4RRW0rPU=;
+ b=jn9Mk32toN8zLJlkd/VfgbhjhGDv7MaQvQ5N2zrZZYLpzZciQPZsPNhVpqnBauhAlC
+ /VMZ2O3ZrVm0S9iuJ8EZd/7U86qE+URm+pK4njP6UUEf9WkA8lZ6YbPtK0rE+k7FSFsA
+ UjCor3xuoEl60AvDzvCBci15AJkUnGxM+PAzu3Ia7qSeAt68tw3/UHAjp3Ye5IFnad/2
+ NYtXlqFxpWbzZEFtobZc2P8m/oJ7OAr1cNcaZ0AhEOxxc4jrvQepPGSnF5Hypw2Hv75v
+ VXVoDSbd66Pvq12rzw0xRIQXb0IRPb1pCNmpDckTbNU3WmmuWrANwU45ZDP2lJjZeZRZ
+ D5Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=E/7T7rtCU+2sx7uKDZjDoAcD95MZLYf9/DK4RRW0rPU=;
+ b=tRvM3LLAQ0F7/FeBOcLdFhw4WGTqRPgTv87nTfpJPpPxaCNyCSb4/TYhWRUXhjSzYe
+ C7gKgbZx5x8xJhOsjnugqXJ+V0XmUL2UU0E+BbsE++vExXfdZnxfqy1hymtpDjUTSE+P
+ oKyNWHXDEboNNHXDbClSyUXWPxUuunDJ8XHEAtWtJGNfjt3sZoaTbiUEJEbb7masFtDV
+ xWgs4kcXw1zfhQdQeIP0wgS8juGVIPHBetAxSkKZ5yv/+q15lY2yix0nJnYjkK/Lj+lQ
+ yZwIo/ShKOtXqEi1IkukkwWU66RVLobwmyLJmzX60GIKkaJ73HaHywD7TRNhlo6291zA
+ mutg==
+X-Gm-Message-State: APjAAAWCo0YteZCd1H+QqP7hUquaKpL9BCgw76xUDVUwyM8K8EyEcL2g
+ CnAKYxL0aYGFIrsMonk2nk+XLUTjxy+QkAZ+2/jUYA==
+X-Google-Smtp-Source: APXvYqy8ccE9GGB94QgMc4FF68CYPjuvYIFU8qhmhiwchp5e4av0P394PFNmXTJX886KXZrYGAlc0P+G4MRpye2S7z8=
+X-Received: by 2002:aca:f54d:: with SMTP id t74mr13536096oih.170.1567499973438; 
+ Tue, 03 Sep 2019 01:39:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190903061849.21493-3-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Tue, 03 Sep 2019 08:34:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/6] tests/libqos/e1000e: Make e1000e
- libqos functions independent from global_qtest
+References: <20190827182313.25983-1-mreitz@redhat.com>
+In-Reply-To: <20190827182313.25983-1-mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Sep 2019 09:39:22 +0100
+Message-ID: <CAFEAcA-bt1GYfjUh0aRE6gwni1bzu8WJzNhbpQxrdc47ZYQkCg@mail.gmail.com>
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::234
+Subject: Re: [Qemu-devel] [PULL 00/15] Block patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,23 +86,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/09/2019 08:18, Thomas Huth wrote:
-> libqos library functions should never depend on functions (like memread(),
-> memwrite() or clock_step()) that require global_qtest to be set, since
-> library functions might get used in qtests that track multiple states, too.
-> Thus let's replace the global_qtest-related functions with their independent
-> counterparts.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/libqos/e1000e.c | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
+On Tue, 27 Aug 2019 at 19:23, Max Reitz <mreitz@redhat.com> wrote:
+>
+> The following changes since commit 23919ddfd56135cad3cb468a8f54d5a595f024f4:
+>
+>   Merge remote-tracking branch 'remotes/aperard/tags/pull-xen-20190827' into staging (2019-08-27 15:52:36 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/XanClic/qemu.git tags/pull-block-2019-08-27
+>
+> for you to fetch changes up to bb043c056cffcc2f3ce88bfdaf2e76e455c09e2c:
+>
+>   iotests: Unify cache mode quoting (2019-08-27 19:48:44 +0200)
+>
+> ----------------------------------------------------------------
+> Block patches:
+> - qemu-io now accepts a file to read a write pattern from
+> - Ensure that raw files have their first block allocated so we can probe
+>   the O_DIRECT alignment if necessary
+> - Various fixes
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Fails make check running the iotests (on some platforms,
+including x86-64 Linux):
 
+Not run: 220
+Failures: 071 099 120 184 186
+Failed 5 of 105 tests
+/home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:1100:
+recipe for target 'check-tests/check-block.sh' failed
+
+The printed diff output for the failures generally looks like:
+--- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/071.out
+ 2018-12-19 15:31:00.523062228 +0000
++++ /home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/071.out.bad
+     2019-09-03 09:01:43.665180692 +0100
+@@ -1,4 +1,5 @@
+ QA output created by 071
++Unable to init server: Could not connect: Connection refused
+
+thanks
+-- PMM
 
