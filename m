@@ -2,83 +2,57 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0A2C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E91DC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB871217D7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:10:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WXErh4N/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB871217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 61C59217D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 09:11:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61C59217D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i54pl-0003BH-HJ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 05:10:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59122)
+	id 1i54qo-0004GS-Cf
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 05:11:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i54oN-00024f-Hg
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:09:16 -0400
+ (envelope-from <pl@kamp.de>) id 1i54pD-0002t7-38
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:10:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i54oM-0005Lo-7Y
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:09:15 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45963)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i54oM-0005Kw-1U
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:09:14 -0400
-Received: by mail-ot1-x344.google.com with SMTP id g16so4120718otp.12
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 02:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GinhXmUU9TXQVsUcajUaYcNNt5ZI5PaZZ1md5npj4Lo=;
- b=WXErh4N/+ZYdTvOH7CZqIWqs0zY2LJ9clq6wDVx2vSmG/T65S6CVS0WG5EHgiPogay
- daZd79cATRgRA0QPq86NH5Q3X5W5fWhpHaTMjkdW+7lZwxmCJBZ4WZN/IUiMcDy5XHMf
- q58ui27Zc/sJitVyREYEBqg/HYJxvPREwjfYh0oMaDeAdee7uTH2NYezVpmJLTADl2U4
- X0Y1dHJVV6ebVNCm8CF8kUGthnnkwiiLvTTETXfKU2X+u14CqekhfnK4lmgV7Odv04NQ
- 9tQ4FTmhg8jXpqp4KEsT4XqWuw8mY6kU5kTIAuYifNoUoIcuPU4BR+6zptAuWu+1xtfb
- xT1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GinhXmUU9TXQVsUcajUaYcNNt5ZI5PaZZ1md5npj4Lo=;
- b=EM+Sj1/VeO6yvFxsiQV1nZVGOKPCIiuJ8kqiMrZMtFBZylN5/be1Mh7XQceb5dqso0
- EwVnLZnUvXU7i4XGFLRGWJgbCDBnW+kl+3fJt/ry6tJWOjY0xSisr6vzE16zW6tlQUFa
- NAR8ILuTJ1Cl2u9oOfB84em2tJEIQoL/jDmAH+unMX/jhLQi8itLmCF7CsE4iYipwC9l
- qrv9TeeQNmDxueQSbOaSA9X2fM5VDS4k7rtCD9mXbn5OjOl1qTefK5Bs2RlUjchTERyR
- 7mbH0JVrCbhkjeNMsqUccLVx/OnrKgMt63eHSqfFbtRA84dHcmAJhK1wYZt14byS6hqs
- eJ4Q==
-X-Gm-Message-State: APjAAAVj//XfuOBvhb/mZKEoF0qGidqo+f69ZrntzzRFKesW1neNZJ6k
- 0KVkbZLhu7mUgyte9Ljsg7YWxPtIW/jisZS7WcUCvg==
-X-Google-Smtp-Source: APXvYqzdocJltUTj5JjjQWlAuNx538lbQS1NdQ43OuXYgDyTCOLWY6TABjrd71dX2NfoHGFekJOKnB+Twla1KRn8dqo=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr28087598oti.135.1567501753071; 
- Tue, 03 Sep 2019 02:09:13 -0700 (PDT)
+ (envelope-from <pl@kamp.de>) id 1i54pB-0005iy-41
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 05:10:06 -0400
+Received: from kerio.kamp.de ([195.62.97.192]:45323)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pl@kamp.de>)
+ id 1i54p9-0005hr-Ev; Tue, 03 Sep 2019 05:10:05 -0400
+X-Footer: a2FtcC5kZQ==
+Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
+ by kerio.kamp.de with ESMTPSA
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
+ Tue, 3 Sep 2019 11:09:58 +0200
+To: qemu-block@nongnu.org
+References: <20190902152413.14070-1-pl@kamp.de>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <7d08ff22-ebe9-92f3-82a0-3168f30f2612@kamp.de>
+Date: Tue, 3 Sep 2019 11:09:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190827121931.26836-1-peter.maydell@linaro.org>
- <CAL1e-=j_uoOcyxqv7CZv3V6FWaarBnS1wEnU4k1cAoc1_b5mMg@mail.gmail.com>
- <87v9uf4t8h.fsf@linaro.org>
-In-Reply-To: <87v9uf4t8h.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Sep 2019 10:09:02 +0100
-Message-ID: <CAFEAcA-4KqGy-gg4dQu12XziuakO1Gs8SUC=z0Af22fUHn8kTg@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Free TCG temps in
- trans_VMOV_64_sp()
+In-Reply-To: <20190902152413.14070-1-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 195.62.97.192
+Subject: Re: [Qemu-devel] [PATCH V2] block/vhdx: add check for truncated
+ image files
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,30 +64,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>
+Cc: codyprime@gmail.com, kwolf@redhat.com, mreitz@redhat.com, jhf@kamp.de,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 29 Aug 2019 at 21:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
+Am 02.09.19 um 17:24 schrieb Peter Lieven:
+> qemu is currently not able to detect truncated vhdx image files.
+> Add a basic check if all allocated blocks are reachable at open and
+> report all errors during bdrv_co_check.
 >
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+> V2: - add error reporting [Kevin]
+>      - use bdrv_getlength instead of bdrv_get_allocated_file_size [Kevin]
+>      - factor out BAT entry check and add error reporting for region
+>        overlaps
+>      - already check on vhdx_open
 >
-> Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
-> > I am just curious if you found this by manual code inspection, or perha=
-ps
-> > using a tool?
+>   block/vhdx.c | 85 +++++++++++++++++++++++++++++++++++++++++-----------
+>   1 file changed, 68 insertions(+), 17 deletions(-)
 >
-> I'm guessing that if you run code that exercises this while built with
-> --enable-tcg-debug then TCG's sanity checking complains about unfreed
-> temps.
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 6a09d0a55c..6afba5e8c2 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -24,6 +24,7 @@
+>   #include "qemu/option.h"
+>   #include "qemu/crc32c.h"
+>   #include "qemu/bswap.h"
+> +#include "qemu/error-report.h"
+>   #include "vhdx.h"
+>   #include "migration/blocker.h"
+>   #include "qemu/uuid.h"
+> @@ -235,6 +236,9 @@ static int vhdx_region_check(BDRVVHDXState *s, uint64_t start, uint64_t length)
+>       end = start + length;
+>       QLIST_FOREACH(r, &s->regions, entries) {
+>           if (!((start >= r->end) || (end <= r->start))) {
+> +            error_report("VHDX region %" PRIu64 "-%" PRIu64 " overlaps with "
+> +                         "region %" PRIu64 "-%." PRIu64, start, end, r->start,
+> +                         r->end);
+>               ret = -EINVAL;
+>               goto exit;
+>           }
+> @@ -877,6 +881,60 @@ static void vhdx_calc_bat_entries(BDRVVHDXState *s)
+>   
+>   }
+>   
+> +static int vhdx_check_bat_entries(BlockDriverState *bs, int *errcnt)
+> +{
+> +    BDRVVHDXState *s = bs->opaque;
+> +    int64_t image_file_size = bdrv_getlength(bs->file->bs);
+> +    uint64_t payblocks = s->chunk_ratio;
+> +    int i, ret = 0;
+> +
+> +    for (i = 0; i < s->bat_entries; i++) {
+> +        if ((s->bat[i] & VHDX_BAT_STATE_BIT_MASK) ==
+> +            PAYLOAD_BLOCK_FULLY_PRESENT) {
+> +            /*
+> +             * Check if fully allocated BAT entries do not reside after
+> +             * end of the image file.
+> +             */
+> +            if ((s->bat[i] & VHDX_BAT_FILE_OFF_MASK) + s->block_size >
+> +                image_file_size) {
+> +                error_report("VHDX BAT entry %d offset points after end of "
+> +                             "file. Image has probably been truncated.", i);
+> +                ret = -EINVAL;
+> +                if (!errcnt) {
+> +                    break;
+> +                }
+> +                (*errcnt)++;
+> +            }
+> +
+> +            /*
+> +             * verify populated BAT field file offsets against
+> +             * region table and log entries
+> +             */
+> +            if (payblocks--) {
+> +                /* payload bat entries */
+> +                int ret2;
+> +                ret2 = vhdx_region_check(s, s->bat[i] & VHDX_BAT_FILE_OFF_MASK,
+> +                                         s->block_size);
+> +                if (ret2 < 0) {
+> +                    ret = -EINVAL;
+> +                    if (errcnt) {
+> +                        break;
+> +                    }
 
-Yes, exactly -- this was producing warnings for a random bit
-of guest code I happened to be running. (I run most of
-my testing with an --enable-debug build, which includes the
-TCG debug).
 
-thanks
--- PMM
+This should be if (!errcnt) ...
+
+
+I will respin, but wait for feedback regarding the remainder of the patch.
+
+
+Peter
+
+
+
 
