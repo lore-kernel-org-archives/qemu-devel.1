@@ -4,82 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F75C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E76C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:50:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50E9E22CED
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:49:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FFAA22CED
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 16:50:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qZ0vUAel"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E9E22CED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="izdtibyB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FFAA22CED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5C07-0005CK-SO
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:49:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37504)
+	id 1i5C0O-0005e9-Th
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 12:50:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BNI-0001m2-Bd
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:45 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5BNC-0001dk-B0
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5BNH-000479-83
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:44 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:35448)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5BNB-0003zi-9J
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:38 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:46267)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5BNH-00046F-2T
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:43 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id 205so8619790pfw.2
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:09:43 -0700 (PDT)
+ id 1i5BNB-0003z4-3v
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:09:37 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id m3so9372502pgv.13
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 09:09:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=rllUpWe62ZsfU+30fAApU6qKY3XDd69Sp3kh5Sw9sOs=;
- b=qZ0vUAelF0LSqC6ZaXDi4av155T2gRPVH15s3jA40kwgJLa6rzAl3dv4rT+BbU+/O4
- Un+h8pynsM41v6I4TFGwTU8vU+zfSOEHw107k0jorvZh5GjQfcsNCXF7wFFz/84aqNXS
- yW76dsqeP/XIihETGnaQRex5aZzTKCt0Hy/k58YizaxaeTHn95vo/jzRamTXXALG5VHo
- tGE2eYy3ABKIEPCCcm3ArMmQx01rXbT78n/uf8wNBfjzUKhlWn89+5bCs+wVNbeHZqOf
- nPTmtOGN5Pi00PT8u6Slj47VVAdTspeInA6i+exD+JGEgLaS9tGypj8q92oXPgGyMJeZ
- XKow==
+ bh=qb+ujYL2F+DwauWM58yFrqxB8nQIAn+bvj1URM0E/1A=;
+ b=izdtibyB5ELd5XFmw6SM8+8NHJ9yQFyZQYQiOZuXek3o0WFC2VT07MLoBK+MrJD/Yo
+ IsRwHWkRBj/qpnpuCh4HD5yXJIwHKlplGFWdIri8MsEXpYoJXkwXw5Szv0WUop5qzSTk
+ TCTrZ2Zk9Rat7GU7slX0zSVm2jmBuUWNNv/VntvnHF7yEqx7zjdvLtUQ2UeJGRICwsUG
+ K90LjedCbYBskr1fSW7vBMUkhUtCs0R1JFH4aG4X89KBh3axYRWR4D3vcJFKr01CWc5Y
+ oc/ns6fRz7KY1/DZJJOQUm9NZAZeP/btqCkfEx4stW2UIEuGs9RYUpA54FvJ3/xGNXLG
+ kqyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=rllUpWe62ZsfU+30fAApU6qKY3XDd69Sp3kh5Sw9sOs=;
- b=AyMk2wTJaC85mQVPZZw1ti0Tag1YL9pXZNIILnkDfJE/x9EZ7oFQThtoY2Cw7dZoiL
- VdnSkq3Wbat5fjumD64xYkj0IAtGmDpra8dL6KFJUkuUky5/vKSzJGJnyPx2W+iJwHUY
- moU3K6rqQOyfxz5OXwNIB11coB0/MEsQMUj0ZPMJv/VlG9HlmFJgnPptoXGcalHcMqFe
- VBVAQNVfITiwmW3za193VBTRDdZ+nLYE+7NTGeuAWXIX1PNP6206nZ2NeEMFHPeOmezi
- iARFKJRvPn4QiUXm9izjHrbnwpKuzqzgZH3hY/bUpz40O+D2KLuWWR+PiJi1yB/7aaNi
- JM/g==
-X-Gm-Message-State: APjAAAW+KVhF5PKtfgQJy+vmQ2FMJoq8Qfnz+VvTr/7NmVOhnXKjw9GF
- K7wpDuPk75e4R6oMu7D2Irl0zfKg5O8=
-X-Google-Smtp-Source: APXvYqyCvWzXnNgPS5bTAtulEqc0A+SdUsuo4b3IydeF9baCoFmjiEI6S0G3ekPUSpsgmM45btIxRQ==
-X-Received: by 2002:a63:4846:: with SMTP id x6mr19144731pgk.332.1567526981618; 
- Tue, 03 Sep 2019 09:09:41 -0700 (PDT)
+ bh=qb+ujYL2F+DwauWM58yFrqxB8nQIAn+bvj1URM0E/1A=;
+ b=ljGl3OkPlHMC61wfPXKiDRWULcoIxwf9M32gUz8SJvE01UW7pQvpVAJ2s6oQD4UEP9
+ 6vvUYEVlo6JkI9cieX3ivQYgwnoB+d52EPgJNpUSjOnaJt2QavBQHTreug73qqHqcEwn
+ YiH3qGh/4GWz4Jr7fekMvyxSJfP/Pned/YDaPMAELRsklLC8INOPAjXrurIcXtEU7KzP
+ 43Z8UygZahWBX8/YH+RxUscd11u0yssUpb8/pmtW0R4O0AJ463PZ1MGTAtyNIhUReWu4
+ IMk/yMKLRqFYatFWDVdEIVNFB9bdqB08jmhnOQIPG81tW6ozrM6740sJZ+Y98yE2ulWG
+ XkSA==
+X-Gm-Message-State: APjAAAUmTffbjAgsUsQFEkiWsoOfPvm6Omn7xyb//Jshrm5ccd6vy2ku
+ 329E/j4vJ+wi9wbHHR2aObC3ecQTWpk=
+X-Google-Smtp-Source: APXvYqzpPp1qH+2CIXsNm7nDfyHHt5+4j9fu1ZjcBmzOEBtuy7Crldz/KjnOnK/2VdLwg5ODQgL4Aw==
+X-Received: by 2002:a62:f80a:: with SMTP id d10mr2891158pfh.98.1567526975855; 
+ Tue, 03 Sep 2019 09:09:35 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id 127sm28089711pfy.56.2019.09.03.09.09.40
+ by smtp.gmail.com with ESMTPSA id 127sm28089711pfy.56.2019.09.03.09.09.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 09:09:41 -0700 (PDT)
+ Tue, 03 Sep 2019 09:09:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 09:08:56 -0700
-Message-Id: <20190903160858.5296-35-richard.henderson@linaro.org>
+Date: Tue,  3 Sep 2019 09:08:51 -0700
+Message-Id: <20190903160858.5296-30-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190903160858.5296-1-richard.henderson@linaro.org>
 References: <20190903160858.5296-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::42b
-Subject: [Qemu-devel] [PATCH 34/36] s390x/tcg: Pass a size to probe_write()
- in do_csst()
+X-Received-From: 2607:f8b0:4864:20::52f
+Subject: [Qemu-devel] [PATCH 29/36] s390x/tcg: Fix length calculation in
+ probe_write_access()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,36 +98,33 @@ Sender: "Qemu-devel"
 
 From: David Hildenbrand <david@redhat.com>
 
-... and also call it for CONFIG_USER_ONLY. This function probably will
-also need some refactoring in regards to probing, however, we'll have to
-come back to that later, once cleaning up the other mem helpers.
+Hm... how did that "-" slip in (-TAGRET_PAGE_SIZE would be correct). This
+currently makes us exceed one page in a single probe_write() call,
+essentially leaving some memory unchecked.
 
-The alignment check always makes sure that the write access falls into a
-single page.
-
+Fixes: c5a7392cfb96 ("s390x/tcg: Provide probe_write_access helper")
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190826075112.25637-8-david@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20190826075112.25637-3-david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/mem_helper.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ target/s390x/mem_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index fdff60ce5d..29fcce426e 100644
+index 7819aca15d..4b43440e89 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1443,9 +1443,7 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
-     }
+@@ -2623,7 +2623,7 @@ void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
+ #else
+     /* test the actual access, not just any access to the page due to LAP */
+     while (len) {
+-        const uint64_t pagelen = -(addr | -TARGET_PAGE_MASK);
++        const uint64_t pagelen = -(addr | TARGET_PAGE_MASK);
+         const uint64_t curlen = MIN(pagelen, len);
  
-     /* Sanity check writability of the store address.  */
--#ifndef CONFIG_USER_ONLY
--    probe_write(env, a2, 0, mem_idx, ra);
--#endif
-+    probe_write(env, a2, 1 << sc, mem_idx, ra);
- 
-     /*
-      * Note that the compare-and-swap is atomic, and the store is atomic,
+         probe_write(env, addr, curlen, cpu_mmu_index(env, false), ra);
 -- 
 2.17.1
 
