@@ -2,62 +2,91 @@ Return-Path: <SRS0=U1cK=W6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB67AC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E89AC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:05:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8744C20870
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:03:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8744C20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5501F20870
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Sep 2019 17:05:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5501F20870
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5CDH-0004Zq-BB
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:03:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43162)
+	id 1i5CEz-0006N1-H8
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 13:05:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i5BxP-0002QF-J5
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:47:05 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5C95-0008U7-C7
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:59:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i5BxN-00087F-UZ
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:47:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6020)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5BxN-00086n-Ll
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:47:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D255718C4269;
- Tue,  3 Sep 2019 16:47:00 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C568B6061E;
- Tue,  3 Sep 2019 16:46:57 +0000 (UTC)
-Date: Tue, 3 Sep 2019 17:46:55 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Ying Fang <fangying1@huawei.com>
-Message-ID: <20190903164655.GP2744@work-vm>
-References: <20190827080512.2417-1-fangying1@huawei.com>
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1i5C93-0006bU-6Q
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:59:07 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:40742
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1i5C92-0005yW-HR
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 12:59:04 -0400
+Received: from host86-168-80-252.range86-168.btcentralplus.com
+ ([86.168.80.252] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1i5C61-0000C5-VM; Tue, 03 Sep 2019 17:56:00 +0100
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <20190801183012.17564-1-peter.maydell@linaro.org>
+ <CAFEAcA-hBDgVKkzsWu=L63z85y23u3hQqzMLQgmtvMvTYNKhOQ@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <5c070cad-70d4-0b80-24f0-539599709cc7@ilande.co.uk>
+Date: Tue, 3 Sep 2019 17:55:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190827080512.2417-1-fangying1@huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Tue, 03 Sep 2019 16:47:00 +0000 (UTC)
+In-Reply-To: <CAFEAcA-hBDgVKkzsWu=L63z85y23u3hQqzMLQgmtvMvTYNKhOQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.168.80.252
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: No (on mail.default.ilande.uk0.bigv.io); Unknown failure
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] qmp: Fix memory leak in
- migrate_params_test_apply
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH 0/7] target/sparc: Convert to
+ do_transaction_failed hook
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,113 +98,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lcf.lichaofeng@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>,
- qemu-devel@nongnu.org, zhouyibo3@huawei.com, quintela@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Ying Fang (fangying1@huawei.com) wrote:
-> Address Sanitizer shows memory leak in migrate_params_test_apply
-> migration/migration.c:1253 and the stack is as bellow:
-> 
-> Direct leak of 45 byte(s) in 9 object(s) allocated from:
->     #0 0xffffbd7fc1db in __interceptor_malloc (/lib64/libasan.so.4+0xd31db)
->     #1 0xffffbd514163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
->     #2 0xffffbd52f43b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
->     #3 0xaaaadfa4d623 in migrate_params_test_apply migration/migration.c:1253
->     #4 0xaaaadfa4d623 in qmp_migrate_set_parameters migration/migration.c:1422
->     #5 0xaaaadfa963f3 in hmp_migrate_set_parameter monitor/hmp-cmds.c:1867
->     #6 0xaaaadfa8afe3 in handle_hmp_command monitor/hmp.c:1082
->     #7 0xaaaadf479c57 in qmp_human_monitor_command monitor/misc.c:140
->     #8 0xaaaadfadf87b in qmp_marshal_human_monitor_command qapi/qapi-commands-misc.c:1024
->     #9 0xaaaadfc7797b in do_qmp_dispatch qapi/qmp-dispatch.c:131
->     #10 0xaaaadfc7797b in qmp_dispatch qapi/qmp-dispatch.c:174
->     #11 0xaaaadfa84fff in monitor_qmp_dispatch monitor/qmp.c:120
->     #12 0xaaaadfa85bbf in monitor_qmp_bh_dispatcher monitor/qmp.c:209
->     #13 0xaaaadfd2228f in aio_bh_call util/async.c:89
->     #14 0xaaaadfd2228f in aio_bh_poll util/async.c:117
->     #15 0xaaaadfd29bc3 in aio_dispatch util/aio-posix.c:459
->     #16 0xaaaadfd21ff7 in aio_ctx_dispatch util/async.c:260
->     #17 0xffffbd50e2f7 in g_main_context_dispatch (/lib64/libglib-2.0.so.0+0x512f7)
->     #18 0xaaaadfd278d7 in glib_pollfds_poll util/main-loop.c:218
->     #19 0xaaaadfd278d7 in os_host_main_loop_wait util/main-loop.c:241
->     #20 0xaaaadfd278d7 in main_loop_wait util/main-loop.c:517
->     #21 0xaaaadf67b5e7 in main_loop vl.c:1806
->     #22 0xaaaadf15d453 in main vl.c:4488
-> 
-> Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Ying Fang <fangying1@huawei.com>
-> ---
->  migration/migration.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 8b9f2fe30a..05e44ff7cc 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1250,11 +1250,17 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
->  
->      if (params->has_tls_creds) {
->          assert(params->tls_creds->type == QTYPE_QSTRING);
-> +        if (dest->tls_creds) {
-> +            g_free(dest->tls_creds);
-> +        }
->          dest->tls_creds = g_strdup(params->tls_creds->u.s);
->      }
->  
->      if (params->has_tls_hostname) {
->          assert(params->tls_hostname->type == QTYPE_QSTRING);
-> +        if (dest->tls_hostname) {
-> +            g_free(dest->tls_hostname);
-> +        }
->          dest->tls_hostname = g_strdup(params->tls_hostname->u.s);
->      }
+On 03/09/2019 14:15, Peter Maydell wrote:
 
-Thanks for reporting the leak, but I don't think this is the right fix:
+> Mark -- ping? Richard has reviewed this series; do you want
+> more time to test it, or should I just apply it to master
+> if you don't have any other pending sparc patches?
 
-In the call chain we have, qmp_migrate_set_parameters calls:
-
-    migrate_params_test_apply(params, &tmp);
-
-tmp is a stack allocated variable  that becomes the 'dest'
-we see here.  Then at the top of migrate_params_test_apply
-we have:
-
-    *dest = migrate_get_current()->parameters;
-
-so that's probably bad; that's a shallow copy, so dest->tls_authz
-points to the same storage as the real current migration parameters.
-
-whne the code does:
-    if (params->has_tls_creds) {
-        assert(params->tls_creds->type == QTYPE_QSTRING);
-        dest->tls_creds = g_strdup(params->tls_creds->u.s);
-    }
-
-it's only changing the pointer in the 'tmp' not the main copy
-because of migrate_params_check fails then the parameters get entirely
-unchanged.  So if you do a free on dest->tls_hostname you end up
-freeing the real parameter that's still getting used, not the tmp.
-
-So I think we need to:
-  a) change migrate_params_test_apply so that it returns a
-MigrationParameters *  rather than taking &tmp
-  b) Make migrate_params_test use QAPI_CLONE to clone instead of doing:
-         *dest = migrate_get_current()->parameters;
-  c) Then do a qapi_free_MigrateParameters in qmp_migrate_set_parameters
-    on both the true and false paths.
-
-Does that make sense?
-
-Dave
+Yes, sorry - it has been on my TODO list for a while to look at this, but I've been
+quite short of time these past few weeks. I should be able to run it through my SPARC
+test images before the end of the week if that helps?
 
 
->  
-> -- 
-> 2.19.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ATB,
+
+Mark.
 
