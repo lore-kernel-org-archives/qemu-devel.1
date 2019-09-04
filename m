@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 384B3C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41180C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E232C21883
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:57:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0868021883
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LnxX8rTq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E232C21883
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lCJWSj6F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0868021883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5bOs-0007Ei-LS
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 15:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40448)
+	id 1i5bOu-0007Iu-I7
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 15:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b0K-0004tz-2v
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:49 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b04-0004WB-1y
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b0F-0002Yj-Id
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:43 -0400
-Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:39241)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b02-0002Mz-Ff
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:27 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38886)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5b0F-0002Xs-7J
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:39 -0400
-Received: by mail-pf1-x432.google.com with SMTP id s12so6915963pfe.6
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:31:38 -0700 (PDT)
+ id 1i5b02-0002MC-3b
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:26 -0400
+Received: by mail-pf1-x442.google.com with SMTP id h195so7359848pfe.5
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:31:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=BBXbQPZIVt2C5TSZNQAU4v9y0CqssCskt3ZWxo2XK/s=;
- b=LnxX8rTqpYomTYr8Kh2GsIdLly36XqMqA6cKO62A4a37ulZ4V0TYEz/hTWCteflc5S
- hCiSGw7biQWZGXujrQArKQjAmxDQr1Ff4GAu4MlSpGLAqmZ2bvpcZZEMjwGSFKqrdOlp
- k7mhb92xoDFkk5ywa16sLDbEAkghX3Y6ni1GiU34jXmLdl2AQwM1F60WHodXqjcHLGMk
- NBhac7KIQYejpSKfRl7U1pC56pE84iejJCoiXkTC8DqbItOBZDhwm1zipdLh4QYZuvKw
- P42bPDB533Nl1lkrUoiurRCQK7No85z1NWAr6ft3qx2WFLBeSPyqe4mvsGA8/Ky7vFeW
- nQ3w==
+ bh=VBWptZwV41wrybglM+V4M0H5NWdfiBjh3fvGH/I8Il8=;
+ b=lCJWSj6FvV6YXOL/SGlJ2Z+qLbaColkyYDbblmOn7Fb/57++oNnVzepyyFsNqSxdSf
+ oMA5o4sY+VEyAR+sSxVIL2aXv2Bjma6i4nYuNxpUv+OsGDHBqEbALnEXsJ8N72QhxrE9
+ jSYlDxmiy/puELGP98tNqGQ3/nPvRkW0sBktEtc+/Vf026xAa2Uaz7PJ/MGF+iHdg93C
+ 9IAxrdgtjV43/o7A/3S9M5kkHNGgj9g4oxdis0v5gEqkIL/puURJIikRXqV3YCvLo/AK
+ pnP6SqpC2p22ztLjR+sjxxt5GPLw3KBVnEdOeu9ulPxStKq/eMlK8qt9o1kc8leHznRW
+ C2+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=BBXbQPZIVt2C5TSZNQAU4v9y0CqssCskt3ZWxo2XK/s=;
- b=hRV04ry3BR1zvCe18AOd7ai8VNfH2BShNL3Ux0fjHT307kvSJ1tiPgQEEnem5fXWkO
- ctgRBGlgCqF1bkAggml7H59DkGzo9dtHyxzvhZ68AXsO2oCBydRoy+5eyzM/S9XTaLHL
- tbn/NZ12tHXgMr5c9d2OweyTHdfXW+xFDuWfMwL2JcJ4jPIy1S2bGmLkrtdH3O7edNI/
- OAfNDBGd/NORBwXVvx/3xWaSmVo1S+n+7kqU0cQuooO005NpVFiQIel8oaN431MbUJDx
- YqqAgzCZWMhwpFi0yJ6IGLlySMIcYklWxiNY8NoFGv99GeN9VGOUWYV7WCBKD0TBgkC8
- xWqA==
-X-Gm-Message-State: APjAAAVCbuq1PZhunwCpHmD/hm59EVSsor2J5xH0nA8xt3OXOFeFYfHi
- 6x9HEYesdcN/YJjfZlsuv18neJIvVcI=
-X-Google-Smtp-Source: APXvYqyzdMr7Y9jvuMc0SSMs6FFeO7T0WtFFgshZ6JbDVWDHRiPG1EoTl6xwc/bLzRMxZ+uajGUQgg==
-X-Received: by 2002:a63:f857:: with SMTP id v23mr36328845pgj.228.1567625497446; 
- Wed, 04 Sep 2019 12:31:37 -0700 (PDT)
+ bh=VBWptZwV41wrybglM+V4M0H5NWdfiBjh3fvGH/I8Il8=;
+ b=WYr70ecBRXOCu87QGcAA0l/ihppGfcylA6Aa2zhSKhkhT7i8MUIU9rHZlaLEhYSzFC
+ fxEh+ci4Fkp9ORE8sz/ZX2eZG8eNXnlekNuk9uwdUMK86vA1ssj3WUSDfEwD7DX1ObYm
+ Qh022flXeA0S/9yUVoMGwkBNfKQsjyjTutTGoqJKU/IjDukOKfDI97r9MJdjau5c8KmV
+ FZbx0KRBf5UxL93S5cAZiBJfTIEhrPOrKz/3hi45yjmq9wkqPZaxDiPNm1Nq24fsSwNK
+ 02Sc/tn9EBU2emy9yQvHvCWEs/aiXeZUcCD/sSynw3FCWIO7gcaAGgMDeeTM9U7jibmE
+ qCgw==
+X-Gm-Message-State: APjAAAWIa/0NipcDpy8B0Rfom5fKlo0xHU3dq1yvLcE1ehbOWEvktfRQ
+ UERA6fbB/zhrIlTvF4kC3nK2WbhGUfo=
+X-Google-Smtp-Source: APXvYqyttA+PAxzJyj67o13yz4DnKwhCU8O/yz5f99KDwMBEJwrqj8e8XHbVlZ1NS0t8O+jiSHho5Q==
+X-Received: by 2002:a63:d04e:: with SMTP id s14mr34727644pgi.189.1567625484790; 
+ Wed, 04 Sep 2019 12:31:24 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.31.36
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.31.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:31:36 -0700 (PDT)
+ Wed, 04 Sep 2019 12:31:24 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:30:18 -0700
-Message-Id: <20190904193059.26202-29-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 12:30:09 -0700
+Message-Id: <20190904193059.26202-20-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
 References: <20190904193059.26202-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::432
-Subject: [Qemu-devel] [PATCH v4 28/69] target/arm: Convert LDM, STM
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PATCH v4 19/69] target/arm: Convert T32 ADDW/SUBW
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,518 +95,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes a minor bug fix to LDM (user), which requires
-bit 21 to be 0, which means no writeback.
-
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 428 ++++++++++++++++++++++-------------------
- target/arm/a32.decode  |   6 +
- target/arm/t32.decode  |  10 +
- 3 files changed, 246 insertions(+), 198 deletions(-)
+ target/arm/translate.c | 24 +++++++++++++-----------
+ target/arm/a32.decode  |  1 +
+ target/arm/t32.decode  | 19 +++++++++++++++++++
+ 3 files changed, 33 insertions(+), 11 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index b7d26f7cc8..1f3c7bbd54 100644
+index 750331071b..7d12be4025 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -9784,6 +9784,232 @@ static bool trans_UDIV(DisasContext *s, arg_rrr *a)
-     return op_div(s, a, true);
- }
+@@ -7648,6 +7648,11 @@ static void arm_skip_unless(DisasContext *s, uint32_t cond)
+  * Constant expanders for the decoders.
+  */
  
-+/*
-+ * Block data transfer
-+ */
-+
-+static TCGv_i32 op_addr_block_pre(DisasContext *s, arg_ldst_block *a, int n)
++static int negate(DisasContext *s, int x)
 +{
-+    TCGv_i32 addr = load_reg(s, a->rn);
-+
-+    if (a->b) {
-+        if (a->i) {
-+            /* pre increment */
-+            tcg_gen_addi_i32(addr, addr, 4);
-+        } else {
-+            /* pre decrement */
-+            tcg_gen_addi_i32(addr, addr, -(n * 4));
-+        }
-+    } else if (!a->i && n != 1) {
-+        /* post decrement */
-+        tcg_gen_addi_i32(addr, addr, -((n - 1) * 4));
-+    }
-+
-+    if (s->v8m_stackcheck && a->rn == 13 && a->w) {
-+        /*
-+         * If the writeback is incrementing SP rather than
-+         * decrementing it, and the initial SP is below the
-+         * stack limit but the final written-back SP would
-+         * be above, then then we must not perform any memory
-+         * accesses, but it is IMPDEF whether we generate
-+         * an exception. We choose to do so in this case.
-+         * At this point 'addr' is the lowest address, so
-+         * either the original SP (if incrementing) or our
-+         * final SP (if decrementing), so that's what we check.
-+         */
-+        gen_helper_v8m_stackcheck(cpu_env, addr);
-+    }
-+
-+    return addr;
++    return -x;
 +}
 +
-+static void op_addr_block_post(DisasContext *s, arg_ldst_block *a,
-+                               TCGv_i32 addr, int n)
+ static int times_2(DisasContext *s, int x)
+ {
+     return x * 2;
+@@ -8004,6 +8009,12 @@ static bool trans_ORN_rri(DisasContext *s, arg_s_rri_rot *a)
+ #undef DO_ANY2
+ #undef DO_CMP2
+ 
++static bool trans_ADR(DisasContext *s, arg_ri *a)
 +{
-+    if (a->w) {
-+        /* write back */
-+        if (!a->b) {
-+            if (a->i) {
-+                /* post increment */
-+                tcg_gen_addi_i32(addr, addr, 4);
-+            } else {
-+                /* post decrement */
-+                tcg_gen_addi_i32(addr, addr, -(n * 4));
-+            }
-+        } else if (!a->i && n != 1) {
-+            /* pre decrement */
-+            tcg_gen_addi_i32(addr, addr, -((n - 1) * 4));
-+        }
-+        store_reg(s, a->rn, addr);
-+    } else {
-+        tcg_temp_free_i32(addr);
-+    }
-+}
-+
-+static bool op_stm(DisasContext *s, arg_ldst_block *a)
-+{
-+    int i, j, n, list, mem_idx;
-+    bool user = a->u;
-+    TCGv_i32 addr, tmp, tmp2;
-+
-+    if (user) {
-+        /* STM (user) */
-+        if (IS_USER(s)) {
-+            /* Only usable in supervisor mode.  */
-+            unallocated_encoding(s);
-+            return true;
-+        }
-+    }
-+
-+    list = a->list;
-+    n = ctpop16(list);
-+    /* TODO: test invalid n == 0 case */
-+
-+    addr = op_addr_block_pre(s, a, n);
-+    mem_idx = get_mem_index(s);
-+
-+    for (i = j = 0; i < 16; i++) {
-+        if (!(list & (1 << i))) {
-+            continue;
-+        }
-+
-+        if (user && i != 15) {
-+            tmp = tcg_temp_new_i32();
-+            tmp2 = tcg_const_i32(i);
-+            gen_helper_get_user_reg(tmp, cpu_env, tmp2);
-+            tcg_temp_free_i32(tmp2);
-+        } else {
-+            tmp = load_reg(s, i);
-+        }
-+        gen_aa32_st32(s, tmp, addr, mem_idx);
-+        tcg_temp_free_i32(tmp);
-+
-+        /* No need to add after the last transfer.  */
-+        if (++j != n) {
-+            tcg_gen_addi_i32(addr, addr, 4);
-+        }
-+    }
-+
-+    op_addr_block_post(s, a, addr, n);
++    store_reg_bx(s, a->rd, add_reg_for_lit(s, 15, a->imm));
 +    return true;
-+}
-+
-+static bool trans_STM(DisasContext *s, arg_ldst_block *a)
-+{
-+    return op_stm(s, a);
-+}
-+
-+static bool trans_STM_t32(DisasContext *s, arg_ldst_block *a)
-+{
-+    /* Writeback register in register list is UNPREDICTABLE for T32.  */
-+    if (a->w && (a->list & (1 << a->rn))) {
-+        unallocated_encoding(s);
-+        return true;
-+    }
-+    return op_stm(s, a);
-+}
-+
-+static bool do_ldm(DisasContext *s, arg_ldst_block *a)
-+{
-+    int i, j, n, list, mem_idx;
-+    bool loaded_base;
-+    bool user = a->u;
-+    bool exc_return = false;
-+    TCGv_i32 addr, tmp, tmp2, loaded_var;
-+
-+    if (user) {
-+        /* LDM (user), LDM (exception return) */
-+        if (IS_USER(s)) {
-+            /* Only usable in supervisor mode.  */
-+            unallocated_encoding(s);
-+            return true;
-+        }
-+        if (extract32(a->list, 15, 1)) {
-+            exc_return = true;
-+            user = false;
-+        } else {
-+            /* LDM (user) does not allow writeback.  */
-+            if (a->w) {
-+                unallocated_encoding(s);
-+                return true;
-+            }
-+        }
-+    }
-+
-+    list = a->list;
-+    n = ctpop16(list);
-+    /* TODO: test invalid n == 0 case */
-+
-+    addr = op_addr_block_pre(s, a, n);
-+    mem_idx = get_mem_index(s);
-+    loaded_base = false;
-+    loaded_var = NULL;
-+
-+    for (i = j = 0; i < 16; i++) {
-+        if (!(list & (1 << i))) {
-+            continue;
-+        }
-+
-+        tmp = tcg_temp_new_i32();
-+        gen_aa32_ld32u(s, tmp, addr, mem_idx);
-+        if (user) {
-+            tmp2 = tcg_const_i32(i);
-+            gen_helper_set_user_reg(cpu_env, tmp2, tmp);
-+            tcg_temp_free_i32(tmp2);
-+            tcg_temp_free_i32(tmp);
-+        } else if (i == a->rn) {
-+            loaded_var = tmp;
-+            loaded_base = true;
-+        } else if (i == 15 && exc_return) {
-+            store_pc_exc_ret(s, tmp);
-+        } else {
-+            store_reg_from_load(s, i, tmp);
-+        }
-+
-+        /* No need to add after the last transfer.  */
-+        if (++j != n) {
-+            tcg_gen_addi_i32(addr, addr, 4);
-+        }
-+    }
-+
-+    op_addr_block_post(s, a, addr, n);
-+
-+    if (loaded_base) {
-+        store_reg(s, a->rn, loaded_var);
-+    }
-+
-+    if (exc_return) {
-+        /* Restore CPSR from SPSR.  */
-+        tmp = load_cpu_field(spsr);
-+        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-+            gen_io_start();
-+        }
-+        gen_helper_cpsr_write_eret(cpu_env, tmp);
-+        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-+            gen_io_end();
-+        }
-+        tcg_temp_free_i32(tmp);
-+        /* Must exit loop to check un-masked IRQs */
-+        s->base.is_jmp = DISAS_EXIT;
-+    }
-+    return true;
-+}
-+
-+static bool trans_LDM_a32(DisasContext *s, arg_ldst_block *a)
-+{
-+    return do_ldm(s, a);
-+}
-+
-+static bool trans_LDM_t32(DisasContext *s, arg_ldst_block *a)
-+{
-+    /* Writeback register in register list is UNPREDICTABLE for T32. */
-+    if (a->w && (a->list & (1 << a->rn))) {
-+        unallocated_encoding(s);
-+        return true;
-+    }
-+    return do_ldm(s, a);
 +}
 +
  /*
-  * Legacy decoder.
+  * Multiply and multiply accumulate
   */
-@@ -10062,139 +10288,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-         case 0x5:
-         case 0x6:
-         case 0x7:
--            /* All done in decodetree.  Reach here for illegal ops.  */
--            goto illegal_op;
-         case 0x08:
-         case 0x09:
--            {
--                int j, n, loaded_base;
--                bool exc_return = false;
--                bool is_load = extract32(insn, 20, 1);
--                bool user = false;
--                TCGv_i32 loaded_var;
--                /* load/store multiple words */
--                /* XXX: store correct base if write back */
--                if (insn & (1 << 22)) {
--                    /* LDM (user), LDM (exception return) and STM (user) */
--                    if (IS_USER(s))
--                        goto illegal_op; /* only usable in supervisor mode */
--
--                    if (is_load && extract32(insn, 15, 1)) {
--                        exc_return = true;
--                    } else {
--                        user = true;
--                    }
--                }
--                rn = (insn >> 16) & 0xf;
--                addr = load_reg(s, rn);
--
--                /* compute total size */
--                loaded_base = 0;
--                loaded_var = NULL;
--                n = 0;
--                for (i = 0; i < 16; i++) {
--                    if (insn & (1 << i))
--                        n++;
--                }
--                /* XXX: test invalid n == 0 case ? */
--                if (insn & (1 << 23)) {
--                    if (insn & (1 << 24)) {
--                        /* pre increment */
--                        tcg_gen_addi_i32(addr, addr, 4);
--                    } else {
--                        /* post increment */
--                    }
--                } else {
--                    if (insn & (1 << 24)) {
--                        /* pre decrement */
--                        tcg_gen_addi_i32(addr, addr, -(n * 4));
--                    } else {
--                        /* post decrement */
--                        if (n != 1)
--                        tcg_gen_addi_i32(addr, addr, -((n - 1) * 4));
--                    }
--                }
--                j = 0;
--                for (i = 0; i < 16; i++) {
--                    if (insn & (1 << i)) {
--                        if (is_load) {
--                            /* load */
--                            tmp = tcg_temp_new_i32();
--                            gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
--                            if (user) {
--                                tmp2 = tcg_const_i32(i);
--                                gen_helper_set_user_reg(cpu_env, tmp2, tmp);
--                                tcg_temp_free_i32(tmp2);
--                                tcg_temp_free_i32(tmp);
--                            } else if (i == rn) {
--                                loaded_var = tmp;
--                                loaded_base = 1;
--                            } else if (i == 15 && exc_return) {
--                                store_pc_exc_ret(s, tmp);
--                            } else {
--                                store_reg_from_load(s, i, tmp);
--                            }
--                        } else {
--                            /* store */
--                            if (i == 15) {
--                                tmp = tcg_temp_new_i32();
--                                tcg_gen_movi_i32(tmp, read_pc(s));
--                            } else if (user) {
--                                tmp = tcg_temp_new_i32();
--                                tmp2 = tcg_const_i32(i);
--                                gen_helper_get_user_reg(tmp, cpu_env, tmp2);
--                                tcg_temp_free_i32(tmp2);
--                            } else {
--                                tmp = load_reg(s, i);
--                            }
--                            gen_aa32_st32(s, tmp, addr, get_mem_index(s));
--                            tcg_temp_free_i32(tmp);
+@@ -10724,17 +10735,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                         }
+                         store_reg(s, rd, tmp);
+                     } else {
+-                        /* Add/sub 12-bit immediate.  */
+-                        if (insn & (1 << 23)) {
+-                            imm = -imm;
 -                        }
--                        j++;
--                        /* no need to add after the last transfer */
--                        if (j != n)
--                            tcg_gen_addi_i32(addr, addr, 4);
--                    }
--                }
--                if (insn & (1 << 21)) {
--                    /* write back */
--                    if (insn & (1 << 23)) {
--                        if (insn & (1 << 24)) {
--                            /* pre increment */
+-                        tmp = add_reg_for_lit(s, rn, imm);
+-                        if (rn == 13 && rd == 13) {
+-                            /* ADD SP, SP, imm or SUB SP, SP, imm */
+-                            store_sp_checked(s, tmp);
 -                        } else {
--                            /* post increment */
--                            tcg_gen_addi_i32(addr, addr, 4);
+-                            store_reg(s, rd, tmp);
 -                        }
--                    } else {
--                        if (insn & (1 << 24)) {
--                            /* pre decrement */
--                            if (n != 1)
--                                tcg_gen_addi_i32(addr, addr, -((n - 1) * 4));
--                        } else {
--                            /* post decrement */
--                            tcg_gen_addi_i32(addr, addr, -(n * 4));
--                        }
--                    }
--                    store_reg(s, rn, addr);
--                } else {
--                    tcg_temp_free_i32(addr);
--                }
--                if (loaded_base) {
--                    store_reg(s, rn, loaded_var);
--                }
--                if (exc_return) {
--                    /* Restore CPSR from SPSR.  */
--                    tmp = load_cpu_field(spsr);
--                    if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
--                        gen_io_start();
--                    }
--                    gen_helper_cpsr_write_eret(cpu_env, tmp);
--                    tcg_temp_free_i32(tmp);
--                    /* Must exit loop to check un-masked IRQs */
--                    s->base.is_jmp = DISAS_EXIT;
--                }
--            }
--            break;
-+            /* All done in decodetree.  Reach here for illegal ops.  */
-+            goto illegal_op;
-         case 0xa:
-         case 0xb:
-             {
-@@ -10461,73 +10558,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                             insn & (1 << 21));
++                        /* Add/sub 12-bit immediate, in decodetree */
++                        goto illegal_op;
+                     }
                  }
              } else {
--                int i, loaded_base = 0;
--                TCGv_i32 loaded_var;
--                bool wback = extract32(insn, 21, 1);
--                /* Load/store multiple.  */
--                addr = load_reg(s, rn);
--                offset = 0;
--                for (i = 0; i < 16; i++) {
--                    if (insn & (1 << i))
--                        offset += 4;
--                }
--
--                if (insn & (1 << 24)) {
--                    tcg_gen_addi_i32(addr, addr, -offset);
--                }
--
--                if (s->v8m_stackcheck && rn == 13 && wback) {
--                    /*
--                     * If the writeback is incrementing SP rather than
--                     * decrementing it, and the initial SP is below the
--                     * stack limit but the final written-back SP would
--                     * be above, then then we must not perform any memory
--                     * accesses, but it is IMPDEF whether we generate
--                     * an exception. We choose to do so in this case.
--                     * At this point 'addr' is the lowest address, so
--                     * either the original SP (if incrementing) or our
--                     * final SP (if decrementing), so that's what we check.
--                     */
--                    gen_helper_v8m_stackcheck(cpu_env, addr);
--                }
--
--                loaded_var = NULL;
--                for (i = 0; i < 16; i++) {
--                    if ((insn & (1 << i)) == 0)
--                        continue;
--                    if (insn & (1 << 20)) {
--                        /* Load.  */
--                        tmp = tcg_temp_new_i32();
--                        gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
--                        if (i == rn) {
--                            loaded_var = tmp;
--                            loaded_base = 1;
--                        } else {
--                            store_reg_from_load(s, i, tmp);
--                        }
--                    } else {
--                        /* Store.  */
--                        tmp = load_reg(s, i);
--                        gen_aa32_st32(s, tmp, addr, get_mem_index(s));
--                        tcg_temp_free_i32(tmp);
--                    }
--                    tcg_gen_addi_i32(addr, addr, 4);
--                }
--                if (loaded_base) {
--                    store_reg(s, rn, loaded_var);
--                }
--                if (wback) {
--                    /* Base register writeback.  */
--                    if (insn & (1 << 24)) {
--                        tcg_gen_addi_i32(addr, addr, -offset);
--                    }
--                    /* Fault if writeback register is in register list.  */
--                    if (insn & (1 << rn))
--                        goto illegal_op;
--                    store_reg(s, rn, addr);
--                } else {
--                    tcg_temp_free_i32(addr);
--                }
-+                /* Load/store multiple, in decodetree */
-+                goto illegal_op;
-             }
-         }
-         break;
 diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index 341882e637..1267a689e2 100644
+index c7f156be6d..aac991664d 100644
 --- a/target/arm/a32.decode
 +++ b/target/arm/a32.decode
-@@ -40,6 +40,7 @@
- &mrs_bank        rd r sysm
- &ldst_rr         p w u rn rt rm shimm shtype
- &ldst_ri         p w u rn rt imm
-+&ldst_block      rn i b u w list
- &strex           rn rd rt rt2 imm
- &ldrex           rn rt rt2 imm
- &bfx             rd rn lsb widthm1
-@@ -514,3 +515,8 @@ SMMLA            .... 0111 0101 .... .... .... 0001 ....      @rdamn
- SMMLAR           .... 0111 0101 .... .... .... 0011 ....      @rdamn
- SMMLS            .... 0111 0101 .... .... .... 1101 ....      @rdamn
- SMMLSR           .... 0111 0101 .... .... .... 1111 ....      @rdamn
-+
-+# Block data transfer
-+
-+STM              ---- 100 b:1 i:1 u:1 w:1 0 rn:4 list:16   &ldst_block
-+LDM_a32          ---- 100 b:1 i:1 u:1 w:1 1 rn:4 list:16   &ldst_block
+@@ -30,6 +30,7 @@
+ &rrrr            rd rn rm ra
+ &rrr             rd rn rm
+ &rr              rd rm
++&ri              rd imm
+ &r               rm
+ &i               imm
+ &msr_reg         rn r mask
 diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index f315fde0f4..f1e2b934f8 100644
+index 5116c6165a..be4e5f087c 100644
 --- a/target/arm/t32.decode
 +++ b/target/arm/t32.decode
-@@ -37,6 +37,7 @@
- &mrs_bank        !extern rd r sysm
- &ldst_rr         !extern p w u rn rt rm shimm shtype
- &ldst_ri         !extern p w u rn rt imm
-+&ldst_block      !extern rn i b u w list
- &strex           !extern rn rd rt rt2 imm
- &ldrex           !extern rn rt rt2 imm
- &bfx             !extern rd rn lsb widthm1
-@@ -563,3 +564,12 @@ SXTAB16          1111 1010 0010 .... 1111 .... 10.. ....      @rrr_rot
- UXTAB16          1111 1010 0011 .... 1111 .... 10.. ....      @rrr_rot
- SXTAB            1111 1010 0100 .... 1111 .... 10.. ....      @rrr_rot
- UXTAB            1111 1010 0101 .... 1111 .... 10.. ....      @rrr_rot
+@@ -27,6 +27,7 @@
+ &rrrr            !extern rd rn rm ra
+ &rrr             !extern rd rn rm
+ &rr              !extern rd rm
++&ri              !extern rd imm
+ &r               !extern rm
+ &i               !extern imm
+ &msr_reg         !extern rn r mask
+@@ -121,6 +122,24 @@ SBC_rri          1111 0.0 1011 . .... 0 ... .... ........     @s_rri_rot
+ }
+ RSB_rri          1111 0.0 1110 . .... 0 ... .... ........     @s_rri_rot
+ 
++# Data processing (plain binary immediate)
 +
-+# Load/store multiple
++%imm12_26_12_0   26:1 12:3 0:8
++%neg12_26_12_0   26:1 12:3 0:8 !function=negate
++@s0_rri_12       .... ... .... . rn:4 . ... rd:4 ........ \
++                 &s_rri_rot imm=%imm12_26_12_0 rot=0 s=0
 +
-+@ldstm           .... .... .. w:1 . rn:4 list:16              &ldst_block u=0
++{
++  ADR            1111 0.1 0000 0 1111 0 ... rd:4 ........ \
++                 &ri imm=%imm12_26_12_0
++  ADD_rri        1111 0.1 0000 0 .... 0 ... .... ........     @s0_rri_12
++}
++{
++  ADR            1111 0.1 0101 0 1111 0 ... rd:4 ........ \
++                 &ri imm=%neg12_26_12_0
++  SUB_rri        1111 0.1 0101 0 .... 0 ... .... ........     @s0_rri_12
++}
 +
-+STM_t32          1110 1000 10.0 .... ................         @ldstm i=1 b=0
-+STM_t32          1110 1001 00.0 .... ................         @ldstm i=0 b=1
-+LDM_t32          1110 1000 10.1 .... ................         @ldstm i=1 b=0
-+LDM_t32          1110 1001 00.1 .... ................         @ldstm i=0 b=1
+ # Multiply and multiply accumulate
+ 
+ @s0_rnadm        .... .... .... rn:4 ra:4 rd:4 .... rm:4      &s_rrrr s=0
 -- 
 2.17.1
 
