@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6640BC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 15:44:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D581EC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 15:47:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3877E22CEA
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 15:44:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3877E22CEA
+	by mail.kernel.org (Postfix) with ESMTPS id ABA5622CEA
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 15:47:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABA5622CEA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5XSI-0005Rs-6s
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 11:44:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34064)
+	id 1i5XVc-0006iX-Fk
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 11:47:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5XQb-0004XC-E8
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 11:42:38 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5XTy-0006Bk-58
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 11:46:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5XQa-0000wq-AT
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 11:42:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35977)
+ (envelope-from <eblake@redhat.com>) id 1i5XTw-0002gY-Vs
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 11:46:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49530)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i5XQW-0000tG-C7; Wed, 04 Sep 2019 11:42:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i5XTu-0002fg-GB; Wed, 04 Sep 2019 11:46:02 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0801E307D868;
- Wed,  4 Sep 2019 15:42:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CA60F3099F9F;
+ Wed,  4 Sep 2019 15:46:01 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B5BB35D9C9;
- Wed,  4 Sep 2019 15:42:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1360B194B2;
+ Wed,  4 Sep 2019 15:46:01 +0000 (UTC)
 To: Denis Plotnikov <dplotnikov@virtuozzo.com>, armbru@redhat.com,
  qemu-devel@nongnu.org
 References: <20190904152915.30755-1-dplotnikov@virtuozzo.com>
- <20190904152915.30755-2-dplotnikov@virtuozzo.com>
+ <20190904152915.30755-3-dplotnikov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <fdc02079-9e79-7e23-bf80-b358fb9e6764@redhat.com>
-Date: Wed, 4 Sep 2019 10:42:28 -0500
+Message-ID: <181c6937-f0f7-29f4-f763-46cc7ea7defd@redhat.com>
+Date: Wed, 4 Sep 2019 10:46:00 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190904152915.30755-2-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190904152915.30755-3-dplotnikov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="e18TxEGla0bKvIh5fSsQcZ5J8wVTTclP3"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="bH4HlDIM9Dcx71QEAOTzEaqe4Kc75UizQ"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 04 Sep 2019 15:42:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Wed, 04 Sep 2019 15:46:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] qcow2: introduce compression type
- feature
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] qcow2: rework the cluster
+ compression routine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,75 +105,36 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---e18TxEGla0bKvIh5fSsQcZ5J8wVTTclP3
-Content-Type: multipart/mixed; boundary="cMzMBBmc2n3JwEyKHbkxNGtGheHfP99nW";
+--bH4HlDIM9Dcx71QEAOTzEaqe4Kc75UizQ
+Content-Type: multipart/mixed; boundary="ViFxEOWiz0mWk2ETBSda3hFewepBRkOeQ";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Denis Plotnikov <dplotnikov@virtuozzo.com>, armbru@redhat.com,
  qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, den@virtuozzo.com,
  vsementsov@virtuozzo.com, qemu-block@nongnu.org
-Message-ID: <fdc02079-9e79-7e23-bf80-b358fb9e6764@redhat.com>
-Subject: Re: [PATCH v5 1/3] qcow2: introduce compression type feature
+Message-ID: <181c6937-f0f7-29f4-f763-46cc7ea7defd@redhat.com>
+Subject: Re: [PATCH v5 2/3] qcow2: rework the cluster compression routine
 References: <20190904152915.30755-1-dplotnikov@virtuozzo.com>
- <20190904152915.30755-2-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190904152915.30755-2-dplotnikov@virtuozzo.com>
+ <20190904152915.30755-3-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190904152915.30755-3-dplotnikov@virtuozzo.com>
 
---cMzMBBmc2n3JwEyKHbkxNGtGheHfP99nW
+--ViFxEOWiz0mWk2ETBSda3hFewepBRkOeQ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/4/19 10:29 AM, Denis Plotnikov wrote:
-> The patch adds some preparation parts for incompatible compression type=
-
-> feature to QCOW2 header that indicates that *all* compressed clusters
-> must be (de)compressed using a certain compression type.
->=20
-> It is implied that the compression type is set on the image creation an=
-d
-> can be changed only later by image conversion, thus compression type
-> defines the only compression algorithm used for the image.
->=20
-> The goal of the feature is to add support of other compression algorith=
-ms
-> to qcow2. For example, ZSTD which is more effective on compression than=
- ZLIB.
-> It works roughly 2x faster than ZLIB providing a comparable compression=
- ratio
-> and therefore provides a performance advantage in backup scenarios.
->=20
-> The default compression is ZLIB. Images created with ZLIB compression t=
-ype
-> are backward compatible with older qemu versions.
+> The patch allow to process image compression type defined
+> in the image header and choose an appropriate method for
+> image clusters (de)compression.
 >=20
 > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 > ---
+>  block/qcow2-threads.c | 77 +++++++++++++++++++++++++++++++++++--------=
 
-> +++ b/docs/interop/qcow2.txt
-
-> @@ -165,6 +170,18 @@ in the description of a field.
->                      Length of the header structure in bytes. For versi=
-on 2
->                      images, the length is always assumed to be 72 byte=
-s.
-> =20
-> +        104 - 107:  compression_type
-> +                    Defines the compression method used for compressed=
- clusters.
-> +                    A single compression type is applied to all compre=
-ssed image
-> +                    clusters.
-> +                    The compression type is set on image creation only=
-=2E
-
-This sentence adds nothing for me; you could delete it, and the spec
-would still be just as useful (and less questionable about whether I can
-'qemu-img amend' an image to use a different compression type in-place
-by rewriting all existing compressed clusters).
-
-With or without that sentence,
-
+>  1 file changed, 63 insertions(+), 14 deletions(-)
+>=20
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -182,24 +143,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---cMzMBBmc2n3JwEyKHbkxNGtGheHfP99nW--
+--ViFxEOWiz0mWk2ETBSda3hFewepBRkOeQ--
 
---e18TxEGla0bKvIh5fSsQcZ5J8wVTTclP3
+--bH4HlDIM9Dcx71QEAOTzEaqe4Kc75UizQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1v22QACgkQp6FrSiUn
-Q2qT1Af+NbaYsqsj1QJ0+DkrKZLHnlqP6Hx00qcQZg1SkA+2tEdI+VTAi47Kgo5s
-hARR3Ox0QmpjNIekwRmJRxoKTWbNuaLytUoQEMCl1vU9uwEVkHCPPZkMciRQK4RN
-/Y8MSrNBiv0JxlZ7lewmF3Fz78fDgjobZOeHYX1ZPBJ1fHMiErnfhNPh2ghFsSEu
-0ZcjQf8MhbVa4yAUgpMhCi3Im6HJ683xeIcqMyyzA1GwysClHgerBigOtcqfoIdy
-FAmYRv8MVV1x2uxdWphKWZ1TDH27XBispNFpJz70L1/XgekDF7FaWZBY6rYbnZ+e
-84017g1P8F6jSjjrOknl4xYWe+bLqA==
-=hkak
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1v3DgACgkQp6FrSiUn
+Q2osTwgAsFKPKYeXYWGuexJpoj2Wa1zZKstHq1wmQMAQhZOthC2XhxoB59sNUP9z
+v/aB00QWWqvlkBs6ffYkkeKf2pbTbTEaX/TCTQ3VGEhEJKXhfbmgwLlXC5y9NHvy
+q2YrAy04pwXPrWgKL1L6Vu1euj/6Tq+RVd49mIqXFtTxDt1Z3uQyzPXBXeeCBIrY
+LYGCDKiV5jJTBytKx3/4K3Nt0MeZ8iXIc947MbAxhinf1M6S902r6S7VCFBzl3Gr
+imdcqvaUGzsVXKwhuW2gogBBHvO2zLu08UN0f6mIZAHB+N9ssWRKAx7ujuWVrsaz
+0/LmVoKz2p18/u5RzHmJn5Fwg4EeMA==
+=WMUH
 -----END PGP SIGNATURE-----
 
---e18TxEGla0bKvIh5fSsQcZ5J8wVTTclP3--
+--bH4HlDIM9Dcx71QEAOTzEaqe4Kc75UizQ--
 
