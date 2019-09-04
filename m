@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA1FC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08275C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:22:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 573B4208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9B1922CF5
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:22:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nKLxRsbD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573B4208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t9LNCLqq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B1922CF5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5bn1-0007Kr-Pc
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:22:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41299)
+	id 1i5bna-0008Iv-H0
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:22:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b0x-0005Ys-5p
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0w-0005XQ-5C
  for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b0t-0003B8-15
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0s-00039o-4V
  for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:22 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39060)
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38492)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5b0s-00039G-GB
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:18 -0400
-Received: by mail-pl1-x641.google.com with SMTP id bd8so3713619plb.6
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:18 -0700 (PDT)
+ id 1i5b0r-00035G-MG
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:17 -0400
+Received: by mail-pg1-x541.google.com with SMTP id d10so7223689pgo.5
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=QO3IBs61SUEB1dyssLo6yzRJXGICvl8lJuuHe5SABa4=;
- b=nKLxRsbD9qVwU7AV2bUR2h5Flog47pBDBLggJR/s4mautgkbdP7gh3jngNlkJDF4I0
- gK3CB9GvbaAvnfHoujqVwMEEU63KNcI50Ty9Q+Dwy4ismaU9WbL4erabtcjtzjbrHRLW
- TLBVQvPuYH/oDnAsOoa8ARU8jBak+bSmQbJiPbLx70mw8QN0qBJUwYQ1MVvHxUESGhrR
- 0FzL6WYcBAnq6d73Ypc+kkkYV5ASNqPg4JyuEcS7V+QJ3ePgTlNjVzd45QskXg80uq2x
- m1q8kQ45CYcOxmNhoRqsX/xyTOYLhqVhu9e1C5vbyUOLlM/YDQW4WHEAdRm3Opd3/k1Q
- sl6Q==
+ bh=fMRa2kGO1W6JycMdagL8+nOz15aN9a5pAkRiDJ3RJXk=;
+ b=t9LNCLqqeK9QG+WOaFCZF8UD/ZNxAlbiKE59zZVqeg29cGvwLhpNXZ9Mk2/VZaDhIL
+ Yk4rKljlbV+t7T/mB04uEEBWJPUjYPyUYiZTJfaFDTpFZdIpNDZQeuuRA6kRb/SNCb0C
+ ast6nklDU97wbUjwBw6OY/gxbN1geFzoYvIX5ijd18aYNlM6NeSBJ+PNxKPR5ucTsmnh
+ VujDO4DhgUB/VuuHNb8C4QLHI+3tuzyFOR61UqJKTxBxsEtjN/4CjJODcdC5H6s+r7MN
+ Br5hQJA9OxydauMkXJ+5pkk3Gd4ilpWk37mnMAt7fdW8yaOeP1qqPXSBh5iF+4CDYcnL
+ 2pUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=QO3IBs61SUEB1dyssLo6yzRJXGICvl8lJuuHe5SABa4=;
- b=Q5JKsnQAUIF3xjsuSJZERf38u2GpvfszVne+raByBuHQKlZHE0l667+CPrq3g8pLHE
- 72VT/D0IE8aqDcP4DuKIPqNyZwOVvlUaUKbbe79EueD2SlN6Xcv1pF1A3vu10/PDaSqV
- 3lKb/of5WlualTIVRFInprV/DjS4mDsjyWbQ/U5K8gpJZPQ3PPla9UpD9mnHOQ6YFiB0
- 76woEypkZRn4RQbIXaxOLHQckSllrd9+7DApdU0soiFgU9Zo3zRmMv6ECpmjJtU2iIPu
- exvSjf4OnGuV48PHjwwH+VouoO9/4QYAtFcHlRyfNRmSN1M9KYIuM+bhZAPIOZkqL3cg
- uC6w==
-X-Gm-Message-State: APjAAAU9+VITpgR6lYK4LUqwM7gTq6BQ3KTDXgYz1BXNroxvTlIlz2QF
- p0b5j1m8+Map2vw/q0RP/X7Ms/kd2is=
-X-Google-Smtp-Source: APXvYqyh+UJy/tO+k6FJ1Kn/ThVhBjk35MFpIp/M4lwmBno2tRRuPBvFXZakRY4mXlcdQaM+bEmwmA==
-X-Received: by 2002:a17:902:848c:: with SMTP id
- c12mr42247324plo.47.1567625537068; 
- Wed, 04 Sep 2019 12:32:17 -0700 (PDT)
+ bh=fMRa2kGO1W6JycMdagL8+nOz15aN9a5pAkRiDJ3RJXk=;
+ b=RXbJAUnjGlvrzk/d6wmDl98HxgLF5vj07NBYkdBKz69MIMwFtpZGWg6Yog3ftLPgJD
+ lZzyPorR2n0ek/6TIPG3NrjMKAlfnoEaVIYNHlu06OO2NXx9SENkRKlgk8n8wwzQ+R8W
+ 3CNeprxS++h2uY5O0a/VePLn+8jNe5eZnslw3/vG/t3De9aGcb0l+TgvsalrSjGGTyQN
+ QK/WIh5AL6zAYplYieqTmSsqv2B0TgxGYtlRfm6kk/z7tATlXxcLQz6DzXiSI6we/NpO
+ UoJuyMsQUWzRMlUv9iCoHUncqCAVrmrQRzWGOC66jugZayc1N4h00sFyI2PwvzAEvKiy
+ e4+A==
+X-Gm-Message-State: APjAAAW9567M18ieJvp2U0AIa9PVFaa8xnPP87s1ixay2KCHAZwRCm9A
+ NJ8MCiOYzX++wo7K+agkG7d7fGg0434=
+X-Google-Smtp-Source: APXvYqyD1mqj7A/UT4YyQN+pinDnU3X/x7LgvR+J9dc01QHRx2AzmcZHQdfxGmoxIUXvTPMCwL1ydA==
+X-Received: by 2002:a65:6557:: with SMTP id a23mr36594161pgw.439.1567625533378; 
+ Wed, 04 Sep 2019 12:32:13 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.16
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:32:16 -0700 (PDT)
+ Wed, 04 Sep 2019 12:32:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:30:50 -0700
-Message-Id: <20190904193059.26202-61-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 12:30:47 -0700
+Message-Id: <20190904193059.26202-58-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
 References: <20190904193059.26202-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v4 60/69] target/arm: Split gen_nop_hint
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v4 57/69] target/arm: Convert T16,
+ Change processor state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,110 +96,162 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that all callers pass a constant value, split the switch
-statement into the individual trans_* functions.
+Add a check for ARMv6 in trans_CPS.  We had this correct in
+the T16 path, but had previously forgotten the check on the
+A32 and T32 paths.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 67 +++++++++++++++---------------------------
- 1 file changed, 24 insertions(+), 43 deletions(-)
+v3: Fix cps architecture checks.  Rename s/v6m/v7m/g
+---
+ target/arm/translate.c | 84 +++++++++++++++++++-----------------------
+ target/arm/t16.decode  | 12 ++++++
+ 2 files changed, 50 insertions(+), 46 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 69092c12c3..d076c962ea 100644
+index 09c05de320..ce394ddb00 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3061,46 +3061,6 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
-     gen_rfe(s, pc, load_cpu_field(spsr));
+@@ -7496,6 +7496,11 @@ static int negate(DisasContext *s, int x)
+     return -x;
  }
  
--/*
-- * For WFI we will halt the vCPU until an IRQ. For WFE and YIELD we
-- * only call the helper when running single threaded TCG code to ensure
-- * the next round-robin scheduled vCPU gets a crack. In MTTCG mode we
-- * just skip this instruction. Currently the SEV/SEVL instructions
-- * which are *one* of many ways to wake the CPU from WFE are not
-- * implemented so we can't sleep like WFI does.
-- */
--static void gen_nop_hint(DisasContext *s, int val)
--{
--    switch (val) {
--        /* When running in MTTCG we don't generate jumps to the yield and
--         * WFE helpers as it won't affect the scheduling of other vCPUs.
--         * If we wanted to more completely model WFE/SEV so we don't busy
--         * spin unnecessarily we would need to do something more involved.
--         */
--    case 1: /* yield */
--        if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
--            gen_set_pc_im(s, s->base.pc_next);
--            s->base.is_jmp = DISAS_YIELD;
--        }
--        break;
--    case 3: /* wfi */
--        gen_set_pc_im(s, s->base.pc_next);
--        s->base.is_jmp = DISAS_WFI;
--        break;
--    case 2: /* wfe */
--        if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
--            gen_set_pc_im(s, s->base.pc_next);
--            s->base.is_jmp = DISAS_WFE;
--        }
--        break;
--    case 4: /* sev */
--    case 5: /* sevl */
--        /* TODO: Implement SEV, SEVL and WFE.  May help SMP performance.  */
--    default: /* nop */
--        break;
--    }
--}
--
- #define CPU_V001 cpu_V0, cpu_V0, cpu_V1
- 
- static inline void gen_neon_add(int size, TCGv_i32 t0, TCGv_i32 t1)
-@@ -8194,19 +8154,40 @@ DO_SMLAWX(SMLAWT, 1, 1)
- 
- static bool trans_YIELD(DisasContext *s, arg_YIELD *a)
++static int plus_2(DisasContext *s, int x)
++{
++    return x + 2;
++}
++
+ static int times_2(DisasContext *s, int x)
  {
--    gen_nop_hint(s, 1);
-+    /*
-+     * When running single-threaded TCG code, use the helper to ensure that
-+     * the next round-robin scheduled vCPU gets a crack.  When running in
-+     * MTTCG we don't generate jumps to the helper as it won't affect the
-+     * scheduling of other vCPUs.
-+     */
-+    if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
-+        gen_set_pc_im(s, s->base.pc_next);
-+        s->base.is_jmp = DISAS_YIELD;
+     return x * 2;
+@@ -10268,7 +10273,7 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
+ {
+     uint32_t mask, val;
+ 
+-    if (arm_dc_feature(s, ARM_FEATURE_M)) {
++    if (!ENABLE_ARCH_6 || arm_dc_feature(s, ARM_FEATURE_M)) {
+         return false;
+     }
+     if (IS_USER(s)) {
+@@ -10302,6 +10307,36 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
+     return true;
+ }
+ 
++static bool trans_CPS_v7m(DisasContext *s, arg_CPS_v7m *a)
++{
++    TCGv_i32 tmp, addr;
++
++    if (!arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
 +    }
-     return true;
- }
- 
- static bool trans_WFE(DisasContext *s, arg_WFE *a)
- {
--    gen_nop_hint(s, 2);
-+    /*
-+     * When running single-threaded TCG code, use the helper to ensure that
-+     * the next round-robin scheduled vCPU gets a crack.  In MTTCG mode we
-+     * just skip this instruction.  Currently the SEV/SEVL instructions,
-+     * which are *one* of many ways to wake the CPU from WFE, are not
-+     * implemented so we can't sleep like WFI does.
-+     */
-+    if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
-+        gen_set_pc_im(s, s->base.pc_next);
-+        s->base.is_jmp = DISAS_WFE;
++    if (IS_USER(s)) {
++        /* Implemented as NOP in user mode.  */
++        return true;
 +    }
-     return true;
- }
++
++    tmp = tcg_const_i32(a->im);
++    /* FAULTMASK */
++    if (a->F) {
++        addr = tcg_const_i32(19);
++        gen_helper_v7m_msr(cpu_env, addr, tmp);
++        tcg_temp_free_i32(addr);
++    }
++    /* PRIMASK */
++    if (a->I) {
++        addr = tcg_const_i32(16);
++        gen_helper_v7m_msr(cpu_env, addr, tmp);
++        tcg_temp_free_i32(addr);
++    }
++    tcg_temp_free_i32(tmp);
++    gen_lookup_tb(s);
++    return true;
++}
++
+ /*
+  * Clear-Exclusive, Barriers
+  */
+@@ -10908,51 +10943,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+             break;
+         }
  
- static bool trans_WFI(DisasContext *s, arg_WFI *a)
- {
--    gen_nop_hint(s, 3);
-+    /* For WFI, halt the vCPU until an IRQ. */
-+    gen_set_pc_im(s, s->base.pc_next);
-+    s->base.is_jmp = DISAS_WFI;
-     return true;
- }
+-        case 6:
+-            switch ((insn >> 5) & 7) {
+-            case 2:
+-                /* setend */
+-                ARCH(6);
+-                if (((insn >> 3) & 1) != !!(s->be_data == MO_BE)) {
+-                    gen_helper_setend(cpu_env);
+-                    s->base.is_jmp = DISAS_UPDATE;
+-                }
+-                break;
+-            case 3:
+-                /* cps */
+-                ARCH(6);
+-                if (IS_USER(s)) {
+-                    break;
+-                }
+-                if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-                    tmp = tcg_const_i32((insn & (1 << 4)) != 0);
+-                    /* FAULTMASK */
+-                    if (insn & 1) {
+-                        addr = tcg_const_i32(19);
+-                        gen_helper_v7m_msr(cpu_env, addr, tmp);
+-                        tcg_temp_free_i32(addr);
+-                    }
+-                    /* PRIMASK */
+-                    if (insn & 2) {
+-                        addr = tcg_const_i32(16);
+-                        gen_helper_v7m_msr(cpu_env, addr, tmp);
+-                        tcg_temp_free_i32(addr);
+-                    }
+-                    tcg_temp_free_i32(tmp);
+-                    gen_lookup_tb(s);
+-                } else {
+-                    if (insn & (1 << 4)) {
+-                        shift = CPSR_A | CPSR_I | CPSR_F;
+-                    } else {
+-                        shift = 0;
+-                    }
+-                    gen_set_psr_im(s, ((insn & 7) << 6), 0, shift);
+-                }
+-                break;
+-            default:
+-                goto undef;
+-            }
+-            break;
++        case 6: /* setend, cps; in decodetree */
++            goto illegal_op;
  
+         default:
+             goto undef;
+diff --git a/target/arm/t16.decode b/target/arm/t16.decode
+index b5b5086e8a..032902a1f4 100644
+--- a/target/arm/t16.decode
++++ b/target/arm/t16.decode
+@@ -29,6 +29,8 @@
+ &ldst_rr         !extern p w u rn rt rm shimm shtype
+ &ldst_ri         !extern p w u rn rt imm
+ &ldst_block      !extern rn i b u w list
++&setend          !extern E
++&cps             !extern mode imod M A I F
+ 
+ # Set S if the instruction is outside of an IT block.
+ %s               !function=t16_setflags
+@@ -183,3 +185,13 @@ SXTAH           1011 0010 00 ... ...            @extend
+ SXTAB           1011 0010 01 ... ...            @extend
+ UXTAH           1011 0010 10 ... ...            @extend
+ UXTAB           1011 0010 11 ... ...            @extend
++
++# Change processor state
++
++%imod           4:1 !function=plus_2
++
++SETEND          1011 0110 010 1 E:1 000         &setend
++{
++  CPS           1011 0110 011 . 0 A:1 I:1 F:1   &cps mode=0 M=0 %imod
++  CPS_v7m       1011 0110 011 im:1 00 I:1 F:1
++}
 -- 
 2.17.1
 
