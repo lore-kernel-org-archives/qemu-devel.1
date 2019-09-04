@@ -2,103 +2,60 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF27C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 00:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE10C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 00:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B94C922CF8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 00:50:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XZ2Xtctf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B94C922CF8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3BF0021897
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 00:53:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BF0021897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5JVd-0007qA-HU
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 20:50:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58647)
+	id 1i5JYG-0000Tq-GK
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 20:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1i5JUs-0007Kb-0t
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:50:06 -0400
+ (envelope-from <crosa@redhat.com>) id 1i5JXD-0008K2-Qb
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:52:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1i5JUq-0007Cy-9Q
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:50:05 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:44070)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1i5JUp-0007Bb-RG
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:50:04 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x840nSrx059394;
- Wed, 4 Sep 2019 00:49:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=KO+71rJCKmc/vYCZrWhHj76wP62oBCWWFSMRZzdpIo0=;
- b=XZ2Xtctf3fu6ebAoua212Hg3dpLUjfJWydmMJd4R7RiciOSHqCr5t4pKmnsHX2gZLtvB
- Ygo9H/7rBypi3qyR+/Y0WILu246n7G391N3HLl+gOn6atybk9mdtK99gINk8Dw3qzn5w
- K/I0rGO7jP82MRfQNAFAxKjJbm9kueFSx8bbjMHCn7aZy/cgL2sHa72j9O2Qb/MjEC1y
- 9A2gUuZCrbWqF1FXnJSnuGDUqDt7Yz6oHOl9uDdzUUGllecqrzAX7UOEWl8MN7LwMtZA
- 3waf72/owzAAP9ahx56XyWfV6kCg1XO/SuYimROwn7qj1hUPYqfyMdMqt9kif7y9uSUZ SQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 2ut32bg06c-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 04 Sep 2019 00:49:59 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83L8OvD174155;
- Tue, 3 Sep 2019 21:16:31 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 2usu51vmrb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 03 Sep 2019 21:16:31 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x83LGUQr018018;
- Tue, 3 Sep 2019 21:16:30 GMT
-Received: from [10.152.34.2] (/10.152.34.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 03 Sep 2019 14:16:29 -0700
-To: Gerd Hoffmann <kraxel@redhat.com>, elena.ufimtseva@oracle.com
-References: <20190617181459.29139-1-elena.ufimtseva@oracle.com>
- <20190618051227.fic3k5ihwwj4zji7@sirius.home.kraxel.org>
-From: Jag Raman <jag.raman@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <fbb4a8fa-9d6c-c21d-7224-8e8af1fb1601@oracle.com>
-Date: Tue, 3 Sep 2019 17:16:28 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <crosa@redhat.com>) id 1i5JXA-0000zF-P5
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:52:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60554)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i5JXA-0000yP-HB
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:52:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0A4BC3680A;
+ Wed,  4 Sep 2019 00:52:27 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-123-245.rdu2.redhat.com
+ [10.10.123.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 368BD60A9F;
+ Wed,  4 Sep 2019 00:52:20 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Date: Tue,  3 Sep 2019 20:52:18 -0400
+Message-Id: <20190904005218.12536-1-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190618051227.fic3k5ihwwj4zji7@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909030213
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909040005
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [RFC PATCH v2 01/35] multi-process: memory: alloc
- RAM from file at offset
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Wed, 04 Sep 2019 00:52:27 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] Fedora images: use URLs from stable
+ "archives.fedoraproject.org"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,50 +67,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: john.g.johnson@oracle.com, konrad.wilk@oracle.com, qemu-devel@nongnu.org,
- ross.lagerwall@citrix.com, liran.alon@oracle.com, stefanha@redhat.com,
- pbonzini@redhat.com, kanth.ghatraju@oracle.com, rth@twiddle.net
+Cc: Yash Mankad <ymankad@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16 test,
+from tests/acceptance/linux_initrd.py, is currently failing to fetch
+the "vmlinuz" file.  The reason for the failure is that the Fedora
+project retires older versions from the "dl.fedoraproject.org" URL,
+and keeps them in "archives.fedoraproject.org".  As an added note,
+that test uses a Fedora 28 image, because of the specific Linux kernel
+version requirements of the test.
 
+For the sake of stability, let's use URLs from the archived and
+supposedely ever stable URLs.  The good news is that the currently
+supported versions are also hosted on the later.  This change limits
+itself to change the URLs, while keeping the fetched files the same
+(as can be evidenced by the unchanged hashes).
 
-On 6/18/2019 1:12 AM, Gerd Hoffmann wrote:
-> On Mon, Jun 17, 2019 at 11:14:59AM -0700, elena.ufimtseva@oracle.com wrote:
->> From: Jagannathan Raman <jag.raman@oracle.com>
->>
->> Allow RAM MemoryRegion to be created from an offset in a file, instead
->> of allocating at offset of 0 by default. This is needed to synchronize
->> RAM between QEMU & remote process.
->> This will be needed for the following patches.
-> 
-> Details please.   vhost-user works fine without this ...
+Documentation and the "vm tests" fedora definition were also updated.
 
-Hi Gerd,
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ qemu-doc.texi                          |  6 +++---
+ tests/acceptance/boot_linux_console.py | 25 +++++++++++++++----------
+ tests/acceptance/linux_initrd.py       |  5 +++--
+ tests/vm/fedora                        |  2 +-
+ 4 files changed, 22 insertions(+), 16 deletions(-)
 
-Sorry for the delayed response.
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 577d1e8376..37795f86fb 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -440,15 +440,15 @@ of <protocol>.
+=20
+ Example: boot from a remote Fedora 20 live ISO image
+ @example
+-qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttp://dl.fedoraproject.=
+org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-2=
+0-1.iso,readonly
++qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttps://archives.fedorap=
+roject.org/pub/archive/fedora/linux/releases/20/Live/x86_64/Fedora-Live-D=
+esktop-x86_64-20-1.iso,readonly
+=20
+-qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
+ttp://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedor=
+a-Live-Desktop-x86_64-20-1.iso,readonly
++qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
+ttp://archives.fedoraproject.org/pub/archive/fedora/linux/releases/20/Liv=
+e/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
+ @end example
+=20
+ Example: boot from a remote Fedora 20 cloud image using a local overlay =
+for
+ writes, copy-on-read, and a readahead of 64k
+ @example
+-qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
+, "file.url":"https://dl.fedoraproject.org/pub/fedora/linux/releases/20/I=
+mages/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"6=
+4k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
++qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
+, "file.url":"http://archives.fedoraproject.org/pub/archive/fedora/linux/=
+releases/20/Images/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.=
+readahead":"64k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
+=20
+ qemu-system-x86_64 -drive file=3D/tmp/Fedora-x86_64-20-20131211.1-sda.qc=
+ow2,copy-on-read=3Don
+ @end example
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+index 2504ef0150..8a9a314ab4 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -76,8 +76,9 @@ class BootLinuxConsole(Test):
+         :avocado: tags=3Darch:x86_64
+         :avocado: tags=3Dmachine:pc
+         """
+-        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora/l=
+inux/'
+-                      'releases/29/Everything/x86_64/os/images/pxeboot/v=
+mlinuz')
++        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
+fedora'
++                      '/linux/releases/29/Everything/x86_64/os/images/px=
+eboot'
++                      '/vmlinuz')
+         kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+=20
+@@ -250,8 +251,9 @@ class BootLinuxConsole(Test):
+         :avocado: tags=3Darch:aarch64
+         :avocado: tags=3Dmachine:virt
+         """
+-        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora/l=
+inux/'
+-                      'releases/29/Everything/aarch64/os/images/pxeboot/=
+vmlinuz')
++        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
+fedora'
++                      '/linux/releases/29/Everything/aarch64/os/images/p=
+xeboot'
++                      '/vmlinuz')
+         kernel_hash =3D '8c73e469fc6ea06a58dc83a628fc695b693b8493'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+=20
+@@ -271,8 +273,9 @@ class BootLinuxConsole(Test):
+         :avocado: tags=3Darch:arm
+         :avocado: tags=3Dmachine:virt
+         """
+-        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora/l=
+inux/'
+-                      'releases/29/Everything/armhfp/os/images/pxeboot/v=
+mlinuz')
++        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
+fedora'
++                      '/linux/releases/29/Everything/armhfp/os/images/px=
+eboot'
++                      '/vmlinuz')
+         kernel_hash =3D 'e9826d741b4fb04cadba8d4824d1ed3b7fb8b4d4'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+=20
+@@ -318,8 +321,9 @@ class BootLinuxConsole(Test):
+         :avocado: tags=3Darch:s390x
+         :avocado: tags=3Dmachine:s390_ccw_virtio
+         """
+-        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora-s=
+econdary/'
+-                      'releases/29/Everything/s390x/os/images/kernel.img=
+')
++        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive'
++                      '/fedora-secondary/releases/29/Everything/s390x/os=
+/images'
++                      '/kernel.img')
+         kernel_hash =3D 'e8e8439103ef8053418ef062644ffd46a7919313'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+=20
+@@ -360,8 +364,9 @@ class BootLinuxConsole(Test):
+         :avocado: tags=3Darch:ppc64
+         :avocado: tags=3Dmachine:pseries
+         """
+-        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora-s=
+econdary/'
+-                      'releases/29/Everything/ppc64le/os/ppc/ppc64/vmlin=
+uz')
++        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive'
++                      '/fedora-secondary/releases/29/Everything/ppc64le/=
+os'
++                      '/ppc/ppc64/vmlinuz')
+         kernel_hash =3D '3fe04abfc852b66653b8c3c897a59a689270bc77'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+=20
+diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_in=
+itrd.py
+index 23be5a63aa..c61d9826a4 100644
+--- a/tests/acceptance/linux_initrd.py
++++ b/tests/acceptance/linux_initrd.py
+@@ -54,8 +54,9 @@ class LinuxInitrd(Test):
+         QEMU has supported up to 4 GiB initrd for recent kernel
+         Expect guest can reach 'Unpacking initramfs...'
+         """
+-        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28/'
+-                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
++        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
+fedora'
++                      '/linux/releases/28/Everything/x86_64/os/images/px=
+eboot/'
++                      'vmlinuz')
+         kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
+         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+         max_size =3D 2 * (1024 ** 3) + 1
+diff --git a/tests/vm/fedora b/tests/vm/fedora
+index e8fa5bf0d2..7fec1479fb 100755
+--- a/tests/vm/fedora
++++ b/tests/vm/fedora
+@@ -23,7 +23,7 @@ class FedoraVM(basevm.BaseVM):
+     name =3D "fedora"
+     arch =3D "x86_64"
+=20
+-    base =3D "http://dl.fedoraproject.org/pub/fedora/linux/releases/30/"
++    base =3D "https://archives.fedoraproject.org/pub/archive/fedora/linu=
+x/releases/30/"
+     link =3D base + "Server/x86_64/iso/Fedora-Server-netinst-x86_64-30-1=
+.2.iso"
+     repo =3D base + "Server/x86_64/os/"
+     full =3D base + "Everything/x86_64/os/"
+--=20
+2.21.0
 
-vhost-user doesn't use qemu_ram_alloc_from_fd(), it directly calls
-mmap() to map the RAM onto the remote process.
-
-Secondly, vhost-user uses its own functions (like vu_gpa_to_va()) for
-address translation, whereas multi-process uses QEMU's existing
-functions (address_space_rw()). Therefore, multi-process needs to use
-qemu_ram_alloc_from_fd().
-
-Lastly, updates to the system memory (received via MemoryListener) are
-often in segments and not contiguous. Therefore, mapping these segments
-in the remote process is possible only if we are able to allocate a
-MemoryRegion at an offset in the memory backend.
-
-Thanks!
---
-Jag
-
-> 
-> cheers,
->    Gerd
-> 
-> 
 
