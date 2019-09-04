@@ -2,84 +2,90 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A19CDC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 426A7C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:53:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 669B52070C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:53:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1AA32087E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:53:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V/9uNM7q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669B52070C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PCX6xUy/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1AA32087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cH0-0004rZ-S6
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:53:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41474)
+	id 1i5cHV-0005ZI-07
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:53:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49833)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b13-0005cv-Cd
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:31 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5bvJ-0008CE-RQ
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b10-0003KG-Um
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:29 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43224)
+ (envelope-from <alex.bennee@linaro.org>) id 1i5bvC-0006g9-NX
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:37 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:37678)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5b0y-0003HU-U1
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:25 -0400
-Received: by mail-pf1-x444.google.com with SMTP id d15so4402143pfo.10
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:24 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i5bvB-0006er-Ee
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:30 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id r195so215296wme.2
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:30:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=VYZV/zdp2JerFG4ZPo6G3uzAjb1Br+I2f89wbKWVC8A=;
- b=V/9uNM7qgsoR3NIi+cKH/0++FBpIoU7LmUYFtCBnsCivHLFAoFyZvz8Xi9t13wXIOo
- zk5QT+QED/Gi12rPWf8pk1t+RDrb4Z5jdKeTDrbCxjKHAB5APwkudCtjk/7mbsbL+9TS
- hovgJo/08r60d46E2eQA53GE9ILADG1Ua8GlfkSbPlIxfj94g1olSsXbejOJKcCoGm50
- nOydBviW8XZCkhZnQUIIQ8cBHP8fyOQhe79qGfj/8KNek5mZqJTFezL7A6Othtp7Ci/2
- QeJEe2WV383jfgWUQQKvCaKvxqHxmGimlLfM3g2FmLrkyOdH/YUT+m77bwufpDuotqBu
- 8pYg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=P/I2OnZViMdHt3FAidu0SleYqkts7IpxERv4eYEqeXc=;
+ b=PCX6xUy/9pyy7C6kxmT2gz9AhhIZrXdeu1D+vBoSOkzU1iA7E1H946AqcKNgXQ4VZw
+ x11wB+sGwptYNddX+N9rKIHzN3bY7xlMXr6XCKAc0gKnuH4LvOadPCWrNaM5WuGbfx+6
+ 9IgnLjnNuvKLnkXKpsjSaj98iNAeP+4jk837pcVTp3VDQLTyoYfgsR1bGUxsGq38SxnW
+ yba/xdJNpGuv6U9TaC0I1tpRu1ry4wq1sXLWx4F9lYHESs2FidOY6J2VyH9nnHSeI+fc
+ EZxS4k5Qvry69r0lPi2jGB3kf73NVgLf0xL/JO8UFmuw7UC83YoTek3SnbJ/RymVLj/7
+ 7YCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=VYZV/zdp2JerFG4ZPo6G3uzAjb1Br+I2f89wbKWVC8A=;
- b=W1srCzv3J0LlDMUdS3IAkGBO4eTEh+7d7a7DbiOz839zzpaG7P069EVCzZW5fhuqDO
- yKODmSN0Wv8ED/dXIDQvlRDjflopP0T4lfB30zLwv23+5Iva1smd/GN5+idCny9X4xEA
- TW8prSx21MZ/ziKamI/ySH/WvNjw8lORp+TlLEYlqq7jpvx6Sls9OHpq3xcsahwhwiw7
- pwJvNy1UOqmUzNR00cWZG22L9KI9yzgHmx6zrJfP1/OMB49Fm51cTuDurKhhGwcxTYWw
- BSSIAb3TPRLoKcLeZ66nykk1ebWSkk5/BWTHeRqveyY1WF9sTO6+PTm2CeVEYowVXuuI
- JwFw==
-X-Gm-Message-State: APjAAAVt8DwoPYe1HIC7CoDGud7Rz6NgdH+obb00VzqrTKJcE1Ovbj2E
- WoS7GieC1lA8jra4fR97bGl0l0vIoCg=
-X-Google-Smtp-Source: APXvYqySDzkV5npXSlDRhOHpZ05cCNarJctNDMRf4t/NRtUTQAbT5HSqFfm1xpBSR7RpPKKAd0VIOw==
-X-Received: by 2002:a62:e802:: with SMTP id c2mr12575057pfi.212.1567625543381; 
- Wed, 04 Sep 2019 12:32:23 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.22
+ :references:mime-version:content-transfer-encoding;
+ bh=P/I2OnZViMdHt3FAidu0SleYqkts7IpxERv4eYEqeXc=;
+ b=gd10JdqmZN7lz3PyelT4IoCNbqsUVp2HT9ze+Hdk/asxcq1YN0Uh96cvvdcdDpt84k
+ g3/RIJNkX3zVegJlzbApt9wVe3nWQDZJ9ZY3vffIQCbTSfV1ko42InicdkRH/C9rBqlw
+ APMqOyyjfO25vtFajq+ssjdj9CvUbkYHZQPeqG7/JzqPZydnW1jGYu/lUulDgMwhPYMD
+ 5auCWN0c9fUg7G1tkcgUtygRl840nflsCSB4OeaPJX21blxQP5YpXWehyEkL75lQRNSw
+ P/MSefF7neSuM2wHkMxVoczss8D6tl4Xt629W47uMOKeHS0BAulLkNtATsA7izhseqYE
+ HBWg==
+X-Gm-Message-State: APjAAAVE7xPTfT/VdOJkYNnCEqO8J65+z3ql2kZwHsOsKKRFQVtxtM4d
+ 64+Y3inU/PnAtOCEKq0HGMjlgg==
+X-Google-Smtp-Source: APXvYqzdL9EPx8voDN8XTSjq2sMjGwJitPEkMK8Ryl9KczKSoD72Ogg2xKb+I+CreFB3KNS8P+xm9g==
+X-Received: by 2002:a1c:9c96:: with SMTP id f144mr111670wme.96.1567629027460; 
+ Wed, 04 Sep 2019 13:30:27 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d18sm31755302wra.91.2019.09.04.13.30.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:32:22 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ Wed, 04 Sep 2019 13:30:25 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D5CBF1FF9F;
+ Wed,  4 Sep 2019 21:30:14 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:30:55 -0700
-Message-Id: <20190904193059.26202-66-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
-References: <20190904193059.26202-1-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 21:29:46 +0100
+Message-Id: <20190904203013.9028-16-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v4 65/69] target/arm: Convert T16,
- load (literal)
+X-Received-From: 2a00:1450:4864:20::32b
+Subject: [Qemu-devel] [PATCH v1 15/42] tests/docker: move our m68k cross
+ compile to Buster
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,119 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate.c | 42 ++----------------------------------------
- target/arm/t16.decode  |  4 ++++
- 2 files changed, 6 insertions(+), 40 deletions(-)
+Now Buster is released we can stop relying on the movable feast that
+is Sid for our cross-compiler for building tests.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d409afd55f..4f4c77fc89 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -982,14 +982,6 @@ static inline void gen_aa32_ld##SUFF(DisasContext *s, TCGv_i32 val,      \
-                                      TCGv_i32 a32, int index)            \
- {                                                                        \
-     gen_aa32_ld_i32(s, val, a32, index, OPC | s->be_data);               \
--}                                                                        \
--static inline void gen_aa32_ld##SUFF##_iss(DisasContext *s,              \
--                                           TCGv_i32 val,                 \
--                                           TCGv_i32 a32, int index,      \
--                                           ISSInfo issinfo)              \
--{                                                                        \
--    gen_aa32_ld##SUFF(s, val, a32, index);                               \
--    disas_set_da_iss(s, OPC, issinfo);                                   \
- }
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/Makefile.include                     | 2 +-
+ tests/docker/dockerfiles/debian-m68k-cross.docker | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index ba5a624eaec..62f2733eb66 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -101,9 +101,9 @@ docker-image-debian-win64-cross: docker-image-debian9-mxe
+ docker-image-debian-alpha-cross: docker-image-debian10
+ docker-image-debian-arm64-cross: docker-image-debian10
+ docker-image-debian-hppa-cross: docker-image-debian10
++docker-image-debian-m68k-cross: docker-image-debian10
+ docker-image-debian-powerpc-cross: docker-image-debian10
  
- #define DO_GEN_ST(SUFF, OPC)                                             \
-@@ -997,14 +989,6 @@ static inline void gen_aa32_st##SUFF(DisasContext *s, TCGv_i32 val,      \
-                                      TCGv_i32 a32, int index)            \
- {                                                                        \
-     gen_aa32_st_i32(s, val, a32, index, OPC | s->be_data);               \
--}                                                                        \
--static inline void gen_aa32_st##SUFF##_iss(DisasContext *s,              \
--                                           TCGv_i32 val,                 \
--                                           TCGv_i32 a32, int index,      \
--                                           ISSInfo issinfo)              \
--{                                                                        \
--    gen_aa32_st##SUFF(s, val, a32, index);                               \
--    disas_set_da_iss(s, OPC, issinfo | ISSIsWrite);                      \
- }
+-docker-image-debian-m68k-cross: docker-image-debian-sid
+ docker-image-debian-sh4-cross: docker-image-debian-sid
+ docker-image-debian-sparc64-cross: docker-image-debian-sid
+ docker-image-debian-mips64-cross: docker-image-debian-sid
+diff --git a/tests/docker/dockerfiles/debian-m68k-cross.docker b/tests/docker/dockerfiles/debian-m68k-cross.docker
+index 4311c9cf86d..25edc80e9a3 100644
+--- a/tests/docker/dockerfiles/debian-m68k-cross.docker
++++ b/tests/docker/dockerfiles/debian-m68k-cross.docker
+@@ -1,10 +1,9 @@
+ #
+ # Docker cross-compiler target
+ #
+-# This docker target builds on the debian sid base image which
+-# contains cross compilers for Debian "ports" targets.
++# This docker target builds on the debian Buster base image.
+ #
+-FROM qemu:debian-sid
++FROM qemu:debian10
  
- static inline void gen_aa32_frob64(DisasContext *s, TCGv_i64 val)
-@@ -1053,9 +1037,7 @@ static inline void gen_aa32_st64(DisasContext *s, TCGv_i64 val,
-     gen_aa32_st_i64(s, val, a32, index, MO_Q | s->be_data);
- }
- 
--DO_GEN_LD(8s, MO_SB)
- DO_GEN_LD(8u, MO_UB)
--DO_GEN_LD(16s, MO_SW)
- DO_GEN_LD(16u, MO_UW)
- DO_GEN_LD(32u, MO_UL)
- DO_GEN_ST(8, MO_UB)
-@@ -10754,11 +10736,10 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
- 
- static void disas_thumb_insn(DisasContext *s, uint32_t insn)
- {
--    uint32_t val, rd;
-+    uint32_t val;
-     int32_t offset;
-     TCGv_i32 tmp;
-     TCGv_i32 tmp2;
--    TCGv_i32 addr;
- 
-     if (disas_t16(s, insn)) {
-         return;
-@@ -10768,26 +10749,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-     switch (insn >> 12) {
-     case 0: case 1: /* add/sub (3reg, 2reg imm), shift imm; in decodetree */
-     case 2: case 3: /* add, sub, cmp, mov (reg, imm), in decodetree */
--        goto illegal_op;
--    case 4:
--        if (insn & (1 << 11)) {
--            rd = (insn >> 8) & 7;
--            /* load pc-relative.  Bit 1 of PC is ignored.  */
--            addr = add_reg_for_lit(s, 15, (insn & 0xff) * 4);
--            tmp = tcg_temp_new_i32();
--            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s),
--                               rd | ISSIs16Bit);
--            tcg_temp_free_i32(addr);
--            store_reg(s, rd, tmp);
--            break;
--        }
--
--        /*
--         * - Data-processing (two low registers), in decodetree
--         * - data processing extended, branch and exchange, in decodetree
--         */
--        goto illegal_op;
--
-+    case 4: /* ldr lit, data proc (2reg), data proc ext, bx; in decodetree */
-     case 5: /* load/store register offset, in decodetree */
-     case 6: /* load/store word immediate offset, in decodetree */
-     case 7: /* load/store byte immediate offset, in decodetree */
-diff --git a/target/arm/t16.decode b/target/arm/t16.decode
-index 79a1d66d6c..0b4da411e0 100644
---- a/target/arm/t16.decode
-+++ b/target/arm/t16.decode
-@@ -113,6 +113,10 @@ LDRH_ri         10001 ..... ... ...             @ldst_ri_2
- STR_ri          10010 ... ........              @ldst_spec_i rn=13
- LDR_ri          10011 ... ........              @ldst_spec_i rn=13
- 
-+# Load (PC-relative)
-+
-+LDR_ri          01001 ... ........              @ldst_spec_i rn=15
-+
- # Add PC/SP (immediate)
- 
- ADR             10100 rd:3 ........             imm=%imm8_0x4
+ RUN apt update && \
+     DEBIAN_FRONTEND=noninteractive eatmydata \
 -- 
-2.17.1
+2.20.1
 
 
