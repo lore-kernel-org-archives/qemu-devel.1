@@ -7,86 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3679AC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41803C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:39:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFDAB208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C410208E4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:39:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tINgPuPL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFDAB208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U7dq5PIA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C410208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5czJ-0005Kp-Bq
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:38:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54133)
+	id 1i5czY-0005kn-Ds
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:39:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52946)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5cDV-0001uy-W7
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:49:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9f-0006Lo-VV
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5cDU-0002Qq-OM
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:49:25 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:38990)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9e-0006wr-6O
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:27 -0400
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:36738)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5cDU-0002QH-IA
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:49:24 -0400
-Received: by mail-wm1-x331.google.com with SMTP id q12so255804wmj.4
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:49:24 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i5c9d-0006uS-Rr
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:26 -0400
+Received: by mail-pf1-x432.google.com with SMTP id y22so43020pfr.3
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:45:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=shdEgCVsEVOTDp+jCd0tUk+kAdVtVP18WfvdQSOvOYE=;
- b=tINgPuPL+iaIB2ahUfBaaN0yzZQMa0m77Nn06PM+xqZPmDSJLhWACVSe2klWID5HTe
- IrOWj8ywF+z1jukjUocj3ZtHQWZxkuBAyA+lsyIyXUXLW2KQh6UnkI1cty28cjd8jsW6
- 9d018mApjtgz+/jcyQ8K64Oat3Ydq1gOfUwpFaPN5VyY2jHBg5QE1FBDyRo4gvJuDU06
- cpgDRNhXDcxDn5aAqYaZzstphDS4CVtoKxgbunsT1J5Dy1r3kTx5vJaz0IN/J+KFTiEr
- fd4LG0bBUGKig+2xWc3jOh9NboG3fmWzmEFaxFPySU56PCBcaNjZkCjHjZKY2Bf09OXR
- fLNw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=NowncHpSDSkPNMutAvoqlBrylOrG45DqZfrkIkTwcGo=;
+ b=U7dq5PIApEKMxfyC3GQLtXN64XNtz7tZ0YKauAe1qs31PFMxrzyRzGbyhkJtqIt+q1
+ R0NVD6GMI/TyJzv0Y8X2LROpA+PFNuUEEjg/XccJxKfXIcwzMyVj78fsdVDJ4F1sSZ9x
+ 9Dp8WO5Qb9+MnWLnkWOu8SrNud9mkxZDyCOK5ppBY1M2hKF7UG3bAea/frFi+lLIYrB1
+ tc6X5w3keVpPfWyYU0acsyZMtvnwqcN0VawP1qzf+WNxqOYvA18XlRq2msw9/6JTCAVS
+ Ki+HpdGrGcgjA8QXUln7Ti0Bs8SWwKFlgS4ablsJgtSE1gNw+K22m7H4grcDzGvdEHax
+ tIMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=shdEgCVsEVOTDp+jCd0tUk+kAdVtVP18WfvdQSOvOYE=;
- b=me/EcPZ1jx97Pkos0gejeYY9+HABwgjJFUbJP4bhsRuLecq5eiiu3qELSUX9o3ivr4
- LU6xKUO6+ETXp17XYNmzRrr5lemn2kvPOv7x94wOTo47Z4KzMhn7fcL/MAbItZiTcIlK
- /8lIeqMpHlD6kmSHlB4CCTz3MaUYFid1jrqRZ97Nkf9rVilGsWs9KMTD1ss1iNBvUVdw
- yYHqvemwpCDvvK0Ld7FtCVcyjo39bd0phOzBB7MZoPGYWeMJNV8tKnwC9ArlTIek1fXu
- 3aTXjq4f8MGvnzXRvHPU8Wb2Hnyy+laAWL3PAfi+CXFvXpmi/cYOsR10j7HX2Q7PCo3y
- 4sBw==
-X-Gm-Message-State: APjAAAXsoEBpcInhdzZ0Can8l8bCKruadR9c2IppBt8RmYEhffyGsrU1
- CJ0fEoq+v+oO8D9FZ3Lt5HGrfQ==
-X-Google-Smtp-Source: APXvYqw4cZbtx7wMbk9ZKaz3Swq5QHgdgEe2XGESwNtjgnCasaS6xcWNak/jrEADQBeLiRh2KL/ewQ==
-X-Received: by 2002:a05:600c:cf:: with SMTP id
- u15mr158427wmm.168.1567630163382; 
- Wed, 04 Sep 2019 13:49:23 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d18sm31841389wra.91.2019.09.04.13.49.22
+ :references;
+ bh=NowncHpSDSkPNMutAvoqlBrylOrG45DqZfrkIkTwcGo=;
+ b=KoAs6dmrIJE6CD9BpH0HnCDFMweRmuTD7T9t/rOs7YUHFhH0tb9Ylmnk2kRKJSPFy1
+ RfpQdwpijZSBSWnp4lqd2FmGurPFin6qogPuPV9g8l6Pv/m/oyWw3W9vjeTsOY6w1nbn
+ AAzqtlAIFO00AL8tUss7l+OkdaHhgYM4eBh6ix2gnVs1heu5TFG6uGOkSY5FtFQBlg8S
+ Dw0isHSTMoXmVCcXzSRyyOhXtDOQowIC52EIi3hAFVDtkc36FwKUT8b8JsVo5JdW4dF1
+ GDEWcXF/2W/vOg9TlRRD4SFSdfJB+P5e4rl4HYUwusmK0QywyekgPBg4Le6DLZQPwHey
+ 1Amg==
+X-Gm-Message-State: APjAAAUtXnDS4qSn0iHW9EiUKPwh0i6qOkEKTNYO1IwQaY6lMbRZ4Pfj
+ tSLwfK2kMiJRoP/NpcAPT27JducvHeM=
+X-Google-Smtp-Source: APXvYqyp3kBv11Aqqp+e7O1pfnBQWxooid3mIazeAY/dh2AOB0dEPlt2PzuitzvVJioRsOeislviqA==
+X-Received: by 2002:a17:90a:f0c9:: with SMTP id
+ fa9mr120822pjb.137.1567629924024; 
+ Wed, 04 Sep 2019 13:45:24 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id n66sm8104610pfn.90.2019.09.04.13.45.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:49:22 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 44A2E1FFB7;
- Wed,  4 Sep 2019 21:30:16 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Wed, 04 Sep 2019 13:45:23 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:30:02 +0100
-Message-Id: <20190904203013.9028-32-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Wed,  4 Sep 2019 13:45:06 -0700
+Message-Id: <20190904204507.32457-13-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190904204507.32457-1-richard.henderson@linaro.org>
+References: <20190904204507.32457-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
-Subject: [Qemu-devel] [PATCH v1 31/42] .travis.yml: Increase cache timeout
- from 3min to 20min
+X-Received-From: 2607:f8b0:4864:20::432
+Subject: [Qemu-devel] [PULL 12/13] target/openrisc: Implement l.adrp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,41 +91,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+This was added to the 1.3 spec.
 
-We are going to cache few gigabytes, increase the cache timeout
-to avoid build failures when uploading our cache.
-
-See https://docs.travis-ci.com/user/caching/#setting-the-timeout
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Stafford Horne <shorne@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- .travis.yml | 1 +
- 1 file changed, 1 insertion(+)
+ target/openrisc/disas.c      |  1 +
+ target/openrisc/translate.c  | 13 +++++++++++++
+ target/openrisc/insns.decode |  2 ++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/.travis.yml b/.travis.yml
-index 612caabc6cf..8c376d22239 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -6,6 +6,7 @@ language: c
- compiler:
-   - gcc
- cache:
-+  timeout: 1200
-   ccache: true
+diff --git a/target/openrisc/disas.c b/target/openrisc/disas.c
+index e51cbb24c6..ce112640b9 100644
+--- a/target/openrisc/disas.c
++++ b/target/openrisc/disas.c
+@@ -98,6 +98,7 @@ INSN(sw,     "%d(r%d), r%d", a->i, a->a, a->b)
+ INSN(sb,     "%d(r%d), r%d", a->i, a->a, a->b)
+ INSN(sh,     "%d(r%d), r%d", a->i, a->a, a->b)
+ INSN(nop,    "")
++INSN(adrp,   "r%d, %d", a->d, a->i)
+ INSN(addi,   "r%d, r%d, %d", a->d, a->a, a->i)
+ INSN(addic,  "r%d, r%d, %d", a->d, a->a, a->i)
+ INSN(muli,   "r%d, r%d, %d", a->d, a->a, a->i)
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index 6e8bc23568..6addbac8d6 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -799,6 +799,19 @@ static bool trans_l_nop(DisasContext *dc, arg_l_nop *a)
+     return true;
+ }
  
++static bool trans_l_adrp(DisasContext *dc, arg_l_adrp *a)
++{
++    if (!check_v1_3(dc)) {
++        return false;
++    }
++    check_r0_write(dc, a->d);
++
++    tcg_gen_movi_i32(cpu_R(dc, a->d),
++                     (dc->base.pc_next & TARGET_PAGE_MASK) +
++                     ((target_long)a->i << TARGET_PAGE_BITS));
++    return true;
++}
++
+ static bool trans_l_addi(DisasContext *dc, arg_rri *a)
+ {
+     TCGv t0;
+diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
+index 71e0d740db..0d6f7c29f8 100644
+--- a/target/openrisc/insns.decode
++++ b/target/openrisc/insns.decode
+@@ -102,6 +102,8 @@ l_maci          010011 ----- a:5 i:s16
+ l_movhi         000110 d:5 ----0 k:16
+ l_macrc         000110 d:5 ----1 00000000 00000000
  
++l_adrp          000010 d:5 i:s21
++
+ ####
+ # Arithmetic Instructions
+ ####
 -- 
-2.20.1
+2.17.1
 
 
