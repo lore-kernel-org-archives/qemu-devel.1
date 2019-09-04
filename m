@@ -2,56 +2,94 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_ADSP_NXDOMAIN,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAEC2C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49176C3A5A8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:54:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B17AD21883
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:52:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B17AD21883
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.con
+	by mail.kernel.org (Postfix) with ESMTPS id 2386D2073F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:54:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2386D2073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Um3-00027N-6E
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 08:52:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47849)
+	id 1i5Unh-0003wf-T8
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 08:54:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqr-0004r1-PC
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:23 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5Ujz-0000nP-84
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:50:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqq-00004y-6m
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:21 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:40562)
+ (envelope-from <eblake@redhat.com>) id 1i5Ujy-00023c-3V
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:50:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32896)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.con>)
- id 1i5Rqm-0008Pn-Pr; Wed, 04 Sep 2019 05:45:16 -0400
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id 8837596F57;
- Wed,  4 Sep 2019 09:38:52 +0000 (UTC)
-From: damien.hedde@greensocs.con
-To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 11:38:38 +0200
-Message-Id: <20190904093843.8765-5-damien.hedde@greensocs.con>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190904093843.8765-1-damien.hedde@greensocs.con>
-References: <20190904093843.8765-1-damien.hedde@greensocs.con>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i5Ujt-00020Q-80; Wed, 04 Sep 2019 08:50:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 18465301899A;
+ Wed,  4 Sep 2019 12:50:20 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 399FA60920;
+ Wed,  4 Sep 2019 12:50:09 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ John Snow <jsnow@redhat.com>
+References: <20190903145634.20237-1-eblake@redhat.com>
+ <9bde61cf-b4a7-fb11-7b8d-12cf8a2dc558@redhat.com>
+ <a49c5a8d-b77a-a2fe-fb02-673971ccd70b@redhat.com>
+ <e7d1f571-9e0b-9fd0-5921-e182a2bc92ca@redhat.com>
+ <20190904081809.GB19582@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <1238dfef-a3e1-4b07-5dd4-6e925d98196f@redhat.com>
+Date: Wed, 4 Sep 2019 07:50:08 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190904081809.GB19582@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 04 Sep 2019 12:50:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-X-Mailman-Approved-At: Wed, 04 Sep 2019 08:47:47 -0400
-Subject: [Qemu-devel] [PATCH v6 4/9] qdev-monitor: print the device's clock
- with info qtree
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] docs: Update preferred NBD
+ device syntax
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,72 +101,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- berrange@redhat.com, ehabkost@redhat.com, alistair@alistair23.me,
- mark.burton@greensocs.com, pbonzini@redhat.com, qemu-arm@nongnu.org,
- marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
+Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ libvirt-list@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Damien Hedde <damien.hedde@greensocs.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ
+Content-Type: multipart/mixed; boundary="myW2zeMR5ke1XZXLUpsLtjj2yoTaJvkQb";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, libvirt-list@redhat.com,
+ qemu-block@nongnu.org
+Message-ID: <1238dfef-a3e1-4b07-5dd4-6e925d98196f@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] docs: Update preferred NBD
+ device syntax
+References: <20190903145634.20237-1-eblake@redhat.com>
+ <9bde61cf-b4a7-fb11-7b8d-12cf8a2dc558@redhat.com>
+ <a49c5a8d-b77a-a2fe-fb02-673971ccd70b@redhat.com>
+ <e7d1f571-9e0b-9fd0-5921-e182a2bc92ca@redhat.com>
+ <20190904081809.GB19582@redhat.com>
+In-Reply-To: <20190904081809.GB19582@redhat.com>
 
-This prints the clocks attached to a DeviceState when using "info qtree" =
-monitor
-command. For every clock, it displays the direction, the name and if the
-clock is forwarded. For input clock, it displays also the frequency.
+--myW2zeMR5ke1XZXLUpsLtjj2yoTaJvkQb
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-This is based on the original work of Frederic Konrad.
+On 9/4/19 3:18 AM, Daniel P. Berrang=C3=A9 wrote:
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- qdev-monitor.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+>>>>> -Syntax for specifying a NBD device using TCP
+>>>>> +Syntax for specifying a NBD device using TCP, in preferred URI for=
+m:
+>>>>> +``nbd://<server-ip>[:<port>]/[<export>]''
+>>>>> +
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index a0003bf2a9..d5b8be956b 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -19,6 +19,7 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
-+#include "hw/clock.h"
- #include "monitor/monitor.h"
- #include "monitor/qdev.h"
- #include "sysemu/arch_init.h"
-@@ -689,6 +690,7 @@ static void qdev_print(Monitor *mon, DeviceState *dev=
-, int indent)
-     ObjectClass *class;
-     BusState *child;
-     NamedGPIOList *ngl;
-+    NamedClockList *clk;
-=20
-     qdev_printf("dev: %s, id \"%s\"\n", object_get_typename(OBJECT(dev))=
-,
-                 dev->id ? dev->id : "");
-@@ -703,6 +705,17 @@ static void qdev_print(Monitor *mon, DeviceState *de=
-v, int indent)
-                         ngl->num_out);
-         }
-     }
-+    QLIST_FOREACH(clk, &dev->clocks, node) {
-+        if (clk->out) {
-+            qdev_printf("clock-out%s \"%s\"\n",
-+                        clk->forward ? " (fw)" : "",
-+                        clk->name);
-+        } else {
-+            qdev_printf("clock-in%s \"%s\" freq_hz=3D%" PRIu64"\n",
-+                        clk->forward ? " (fw)" : "",
-+                        clk->name, clock_get_frequency(clk->in));
-+        }
-+    }
-     class =3D object_get_class(OBJECT(dev));
-     do {
-         qdev_print_props(mon, dev, DEVICE_CLASS(class)->props, indent);
+>>>>>  ``nbd:<server-ip>:<port>[:exportname=3D<export>]''
+>>>>>
+
+>=20
+> In general libvirt should never use the psuedo-URI/URI syntax for
+> anything. We're moving towards use of blockdev, so will have the
+> dot separated key syntax on the cli and equiv in QMP.
+
+There's a difference between '-drive' (which sort of implies the
+file=3DURI... syntax) and '-blockdev + -device' (where you use the
+dot-separated syntax).  Yes, we should document and encourage the use of
+-blockdev even more (at which point URIs are not needed, whether or not
+they are the preferred URI or the old form); but as long as -drive can
+only take a non-dotted representation, we should still be choosing the
+non-dotted representation that is at least reusable among other projects
+that also use URI syntax for NBD drives.
+
+>=20
+> I hope this means we'll stop using the URIs in migration, but will
+> defer to peter for specifics.
+>=20
+> I always think it is a shame that QEMU has done so much work on
+> blockdev, but all QEMU's docs still largely use the many legacy
+> syntaxes. IOW, we should make these NBD examples use the modern
+> non-URI syntax too.
+
+Agreed, but that is separate patches to this one.
+
 --=20
-2.22.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
+
+--myW2zeMR5ke1XZXLUpsLtjj2yoTaJvkQb--
+
+--UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1vswAACgkQp6FrSiUn
+Q2rP/Qf/RrKelF5fdyk7A5WDCmXChtY97+fIk95rWcFsl8zkJHQ36LUQ1ghvOZIC
+wG74xqO1f79EObeo6gC4tXsuxe8f5kbVIZb6URrTiUi6Irb4ixaLQGV3regs5WeA
+I2KvQl7rbCr58Gq+tdynFX4+k2n2lkXplUnAEgvhG+BYjGJ2PnqENqZLhprokep6
+naWPRduD6tsD2PH2jAibX+ofIFD1J1TQBRIs5b0m1VkuDU+MMTi+Mlad8xn9aT7/
+LKDPJ+5TU7ug99slVJv4LfO+ZwncOH8AjU9QQwNFRxUGWHq7b6xDtRTQsl/GuS57
+MvUcwLmS3BDcx9yF68Mt6zcZ3A/SSw==
+=dhSu
+-----END PGP SIGNATURE-----
+
+--UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ--
 
