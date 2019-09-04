@@ -6,59 +6,87 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C28C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1943C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5696422CEA
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:11:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5696422CEA
+	by mail.kernel.org (Postfix) with ESMTPS id C9D7022CED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:19:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9D7022CED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5W03-0002E2-Bo
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:11:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44856)
+	id 1i5W7u-0004Zg-PJ
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:19:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46909)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i5Vyy-0001N8-1A
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:10:01 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5W6u-0003wK-Dp
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i5Vyw-0001hp-Mp
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:09:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36786)
+ (envelope-from <eblake@redhat.com>) id 1i5W6t-0000FE-4q
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:18:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53998)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i5Vyt-0001f1-Fa; Wed, 04 Sep 2019 10:09:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5W6r-0000Dl-2n
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:18:11 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1978A30860CA;
- Wed,  4 Sep 2019 14:09:54 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-221.ams2.redhat.com
- [10.36.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADDC65DC1E;
- Wed,  4 Sep 2019 14:09:51 +0000 (UTC)
-Date: Wed, 4 Sep 2019 16:09:49 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Peter Lieven <pl@kamp.de>
-Message-ID: <20190904140949.GC21246@localhost.localdomain>
-References: <20190903133524.11755-1-pl@kamp.de>
+ by mx1.redhat.com (Postfix) with ESMTPS id 81B2310A8123
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 14:18:07 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 46AF160166;
+ Wed,  4 Sep 2019 14:18:00 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190904130047.25808-1-thuth@redhat.com>
+ <20190904130047.25808-4-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <0f73aded-f267-3a19-4958-a9e250778122@redhat.com>
+Date: Wed, 4 Sep 2019 09:17:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190903133524.11755-1-pl@kamp.de>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 04 Sep 2019 14:09:54 +0000 (UTC)
+In-Reply-To: <20190904130047.25808-4-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="oAnfZBVf945g5XjdeHNJQNrREljktoHD0"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Wed, 04 Sep 2019 14:18:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH V3] block/vhdx: add check for truncated
- image files
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] tests/libqos: Replace clock_step
+ with qtest_clock_step in virtio code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,66 +98,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: codyprime@gmail.com, mreitz@redhat.com, jhf@kamp.de, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 03.09.2019 um 15:35 hat Peter Lieven geschrieben:
-> qemu is currently not able to detect truncated vhdx image files.
-> Add a basic check if all allocated blocks are reachable at open and
-> report all errors during bdrv_co_check.
-> 
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oAnfZBVf945g5XjdeHNJQNrREljktoHD0
+Content-Type: multipart/mixed; boundary="XT4OytQhQ4DWsiUx9oac9Gx5nl5k2WTJY";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <0f73aded-f267-3a19-4958-a9e250778122@redhat.com>
+Subject: Re: [PATCH v2 3/6] tests/libqos: Replace clock_step with
+ qtest_clock_step in virtio code
+References: <20190904130047.25808-1-thuth@redhat.com>
+ <20190904130047.25808-4-thuth@redhat.com>
+In-Reply-To: <20190904130047.25808-4-thuth@redhat.com>
+
+--XT4OytQhQ4DWsiUx9oac9Gx5nl5k2WTJY
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 9/4/19 8:00 AM, Thomas Huth wrote:
+> Library functions should not rely on functions that require global_qtes=
+t
+> (since they might get used in tests that deal with multiple states).
+> Commit 1999a70a05ad603d ("Make generic virtio code independent from
+> global_qtest") already tried to clean the libqos virtio code, but I
+> missed to replace the clock_step() function. Thus change it now to
+> qtest_clock_step() instead.
+> The logic of the qvirtio_wait_config_isr() function is now pushed
+> to the virtio-mmio.c and virtio-pci.c files instead, since we can
+> get the QTestState here easily.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> V3: - check for bdrv_getlength failure [Kevin]
->     - use uint32_t for i [Kevin]
->     - check for BAT entry overflow [Kevin]
->     - break on !errcnt in second check
-> 
-> V2: - add error reporting [Kevin]
->     - use bdrv_getlength instead of bdrv_get_allocated_file_size [Kevin]
->     - factor out BAT entry check and add error reporting for region
->       overlaps
->     - already check on vhdx_open
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Something still seems to be wrong with this patch:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-    213      fail       [15:50:13] [15:50:14]      (last: 2s)    output mismatch (see 213.out.bad)
-    --- /home/kwolf/source/qemu/tests/qemu-iotests/213.out  2019-06-28 14:19:50.065797707 +0200
-    +++ /home/kwolf/source/qemu/tests/qemu-iotests/213.out.bad      2019-09-04 15:50:14.582053976 +0200
-    @@ -46,10 +46,8 @@
-     {"execute": "job-dismiss", "arguments": {"id": "job0"}}
-     {"return": {}}
 
-    -image: TEST_IMG
-    -file format: IMGFMT
-    -virtual size: 32 MiB (33554432 bytes)
-    -cluster_size: 268435456
-    +qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
-    +qemu-img: Could not open 'TEST_IMG': Could not open 'TEST_IMG': Invalid argument
+--XT4OytQhQ4DWsiUx9oac9Gx5nl5k2WTJY--
 
-     === Invalid BlockdevRef ===
+--oAnfZBVf945g5XjdeHNJQNrREljktoHD0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I can reproduce this manually with the following qemu-img invocations.
-It seems all three options must be given to reproduce the error:
+-----BEGIN PGP SIGNATURE-----
 
-    $ ./qemu-img create -f vhdx -o block_size=268435456,subformat=fixed,block_state_zero=off /tmp/test.vhdx 32M
-    Formatting '/tmp/test.vhdx', fmt=vhdx size=33554432 log_size=1048576 block_size=268435456 subformat=fixed block_state_zero=off
-    $ ./qemu-img info /tmp/test.vhdx
-    qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
-    qemu-img: Could not open '/tmp/test.vhdx': Could not open '/tmp/test.vhdx': Invalid argument
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1vx5gACgkQp6FrSiUn
+Q2opkAgAiR0y3WE4rMxzT2QCaXK66FyNEyDS4+D2iPz2YHU6lEimBJ2IiBKXjJFp
+Hajy+ay9mvHVz6E13AvvCJoWeEqUxhNGyeV7D4KVXaneJRpkDy1UslYPC/sqMmKT
+t6FDtSufaDUzrY14wGxmAOPeKvUkM5/yVa+cVMYvT75OwYW2sfnKRRJvpXdS3WH0
+xM1OUzvAz0I5UUBVdHUtka3aWzvoaJ8ZKxhcxmXXWimq1DjXltVqcBi2xO01Y8+p
+TbDw0BNImTfGx274+VXi5jLMaAA1aX5x+cqgkGSzKKg2eIjtHv2I8Q9G7mAkKACb
++boTpP5GC1AJWhPD7oDOaXmB4EYQyA==
+=8GT1
+-----END PGP SIGNATURE-----
 
-If I add the offsets to the error message (would probably nice to have),
-I get:
-
-    qemu-img: VHDX BAT entry 0 offset 8388608 points after end of file (41943040). Image has probably been truncated.
-
-So it seems that the file is large enough to hold 32M + metadata, but we
-don't increase the file size to hold a full block (256M). Is this a
-problem in the way we create images or are partial blocks at the end
-expected?
-
-Kevin
+--oAnfZBVf945g5XjdeHNJQNrREljktoHD0--
 
