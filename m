@@ -2,87 +2,65 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10658C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:39:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B96C41514
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8C4722CF7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:39:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C4722CF7
+	by mail.kernel.org (Postfix) with ESMTPS id 6FE6122CF7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:40:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FE6122CF7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5VVZ-0005bK-BJ
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:39:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57884)
+	id 1i5VWm-0006py-Lz
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:40:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i5V6F-00058L-RP
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:13:30 -0400
+ (envelope-from <quintela@redhat.com>) id 1i5VC8-0001iJ-5r
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i5V6E-0007XY-4o
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:13:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43842)
+ (envelope-from <quintela@redhat.com>) id 1i5VC6-0004cs-U3
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:19:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60222)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i5V6D-0007Wz-To
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:13:26 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <quintela@redhat.com>)
+ id 1i5VC3-0004Zh-QZ; Wed, 04 Sep 2019 09:19:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4C72D641C2
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 13:13:24 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id g2so757826wmk.5
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 06:13:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=34lGvCBEes50QxProvXYAUO/YjszUbBzHY34WbUGDnk=;
- b=ewm0y7udmWj56k65+5b02/hPHfgbMckpVDXMB/MZMLL4MHE9/aEdx6Iu9Dl2cWWzl7
- +F/di6I9W9CrUOisxSnbrkcFV8e+i0eHG5QQxc01426JRg56gu+3re3HxSAtG37Skk82
- c4bdl+iF+2Jo6RgVlFKEkn06+HBwJ+C5d/b3oXbXo1z7tI4kRYqKfc28WyYnpgZLB1Nt
- pFsrr+UUYU8leWzd8RJTY1oad+oczMIiM6gU4Yp3D+yW3H3NgoVZpK6Bw8rbKzvlSPI/
- nyz1XnObceuswKH5ZsS2nXu7aH4ennLzr19K5UScXzWVp1rJsIiuXuAF3enjC66g0hJC
- PmGA==
-X-Gm-Message-State: APjAAAVdDE6tnJDZWxka4QSuajh+zkXGmu554Hz7K/eRfAK+lWHAfk+q
- VIdkpoKKT81gZiKdqeIMk2D5pXYoSMrV9htUkh0l8NYlGnK+/dKtZPveJBhRwvx+TeGY4KGnebH
- QS6CmJeOkDj2BmT0=
-X-Received: by 2002:a05:6000:2:: with SMTP id h2mr5690530wrx.309.1567602802804; 
- Wed, 04 Sep 2019 06:13:22 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxbM/6Fj1XFOJ/hGtyuMZMSZ+OvXwv4mW1sIDB01ZjQ4dhT5ovxra4WeuoLHjCOaVH1HZmKAQ==
-X-Received: by 2002:a05:6000:2:: with SMTP id h2mr5690515wrx.309.1567602802637; 
- Wed, 04 Sep 2019 06:13:22 -0700 (PDT)
-Received: from [10.201.33.84] ([195.166.127.210])
- by smtp.gmail.com with ESMTPSA id q26sm3148719wmf.45.2019.09.04.06.13.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Sep 2019 06:13:22 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20190903153633.6651-1-peter.maydell@linaro.org>
- <20190903153633.6651-13-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <eebc49ff-47a8-368d-f10f-8f5c1fef1060@redhat.com>
-Date: Wed, 4 Sep 2019 15:13:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 0F1C418C8929;
+ Wed,  4 Sep 2019 13:19:27 +0000 (UTC)
+Received: from redhat.com (ovpn-117-170.ams2.redhat.com [10.36.117.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 811096060D;
+ Wed,  4 Sep 2019 13:19:23 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+In-Reply-To: <22efeb99-70d7-13dc-407e-b6fcbce31797@redhat.com> (Eric Blake's
+ message of "Wed, 4 Sep 2019 07:39:01 -0500")
+References: <20190820104836.3093-1-quintela@redhat.com>
+ <20190820104836.3093-5-quintela@redhat.com>
+ <22efeb99-70d7-13dc-407e-b6fcbce31797@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Wed, 04 Sep 2019 15:19:21 +0200
+Message-ID: <87blw0kxly.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20190903153633.6651-13-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Wed, 04 Sep 2019 13:19:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 12/21] hw/arm: Use sysbus_init_child_obj for
- correct reference counting
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] socket: Add num connections to
+ qio_net_listener_open_sync()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,47 +72,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: quintela@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/3/19 5:36 PM, Peter Maydell wrote:
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> Both object_initialize() and qdev_set_parent_bus() increase the
-> reference counter of the new object, so one of the references has
-> to be dropped afterwards to get the reference counting right.
-> In machine model code this refcount leak is not particularly
-> problematic because (unlike devices) machines will never be
-> created on demand via QMP, and they are never destroyed.
-> But in any case let's use the new sysbus_init_child_obj() instead
-> to get the reference counting here right.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Message-id: 20190823143249.8096-4-philmd@redhat.com
-> [PMM: rewrote commit message]
+Eric Blake <eblake@redhat.com> wrote:
+> On 8/20/19 5:48 AM, Juan Quintela wrote:
+>> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  blockdev-nbd.c            | 2 +-
+>>  chardev/char-socket.c     | 2 +-
+>>  include/io/net-listener.h | 2 ++
+>>  io/net-listener.c         | 3 ++-
+>>  migration/socket.c        | 2 +-
+>>  qemu-nbd.c                | 2 +-
+>>  ui/vnc.c                  | 4 ++--
+>>  7 files changed, 10 insertions(+), 7 deletions(-)
+>
+> Just now noticing this one, even though the pull request is already sent.=
+..
+>
+>>=20
+>> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+>> index 7a71da447f..c621686131 100644
+>> --- a/blockdev-nbd.c
+>> +++ b/blockdev-nbd.c
+>> @@ -101,7 +101,7 @@ void nbd_server_start(SocketAddress *addr, const cha=
+r *tls_creds,
+>>      qio_net_listener_set_name(nbd_server->listener,
+>>                                "nbd-listener");
+>>=20=20
+>> -    if (qio_net_listener_open_sync(nbd_server->listener, addr, errp) < =
+0) {
+>> +    if (qio_net_listener_open_sync(nbd_server->listener, addr, 1, errp)=
+ < 0) {
+>>          goto error;
+>>      }
+>
+> Does this interfere with the ability to have more than one client
+> connect to an NBD server during pull-mode incremental backup?  Or can
+> you still have multiple simultaneous clients, provided that the server
+> has finished accepting the connection from the first before the second
+> one starts?
 
-Thank you very much Peter!
+It is exactly the same than the old code.  Old code always use one.  We
+need to have more than one for multifd.
 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/arm/exynos4_boards.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-> index f69358a5ba8..2781d8bd419 100644
-> --- a/hw/arm/exynos4_boards.c
-> +++ b/hw/arm/exynos4_boards.c
-> @@ -131,8 +131,8 @@ exynos4_boards_init_common(MachineState *machine,
->      exynos4_boards_init_ram(s, get_system_memory(),
->                              exynos4_board_ram_size[board_type]);
-> =20
-> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_EXYNOS4210_SOC);
-> -    qdev_set_parent_bus(DEVICE(&s->soc), sysbus_get_default());
-> +    sysbus_init_child_obj(OBJECT(machine), "soc",
-> +                          &s->soc, sizeof(s->soc), TYPE_EXYNOS4210_SOC=
-);
->      object_property_set_bool(OBJECT(&s->soc), true, "realized",
->                               &error_fatal);
+Once told that, if the connections don't start "very" simultaneosly
+(i..e. With multifd we start <num channels> connections in paraller),
+you will never notice that the backlog is one (sie of queue of pending
+connections nowadays).
+
+
+>
+>> +++ b/qemu-nbd.c
+>> @@ -1054,7 +1054,7 @@ int main(int argc, char **argv)
+>>      server =3D qio_net_listener_new();
+>>      if (socket_activation =3D=3D 0) {
+>>          saddr =3D nbd_build_socket_address(sockpath, bindto, port);
+>> -        if (qio_net_listener_open_sync(server, saddr, &local_err) < 0) {
+>> +        if (qio_net_listener_open_sync(server, saddr, 1, &local_err) < =
+0) {
+>
+> Here, 'qemu-nbd -e $n' allows up to $n simultaneous clients.  Should we
+> be feeding in that number, instead of a hard-coded 1, to make it easier
+> for those clients to connect simultaneously?
+>
+> We can make such changes as a followup patch.
+
+From the man page:
+
+       The backlog argument defines the maximum length to which the  queue =
+ of
+       pending  connections  for  sockfd  may  grow.
+
+So, except if you plan to start multiples connections at the same time,
+you don't care.  And if the old code worked, this one makes no
+difference.
+
+To explain multifd problem, I was creating 10 threads, and each launched
+a connect.  On the receiving side, I only got 8 connections, 2 of them
+were missing.
+
+Later, Juan.
 
