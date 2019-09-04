@@ -2,61 +2,90 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 372FAC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0186C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:27:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A3F520449
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:26:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A3F520449
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8927520449
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:27:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cAnDLgN4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8927520449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cna-0000Dm-Gd
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:26:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53322)
+	id 1i5coJ-0001E9-Ts
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:27:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51663)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i5cBd-0008EJ-53
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:30 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c40-00014e-9Q
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i5cBb-0000lS-KF
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:29 -0400
-Received: from 15.mo6.mail-out.ovh.net ([188.165.39.161]:56049)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5cBb-0000kY-Cx
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:27 -0400
-Received: from player691.ha.ovh.net (unknown [10.109.143.246])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id A5AE71DE909
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 22:47:25 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player691.ha.ovh.net (Postfix) with ESMTPSA id E83EE98B27DC;
- Wed,  4 Sep 2019 20:47:18 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed,  4 Sep 2019 22:46:46 +0200
-Message-Id: <20190904204659.13878-3-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190904204659.13878-1-clg@kaod.org>
-References: <20190904204659.13878-1-clg@kaod.org>
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c3y-0003ZE-W6
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:36 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:34614)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i5c3y-0003YX-M5
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:34 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id y135so3360195wmc.1
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:39:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7DN2Mz1jlphjeBD6Hgfr/tcOfOE2X7DGMlU3BQxiSxE=;
+ b=cAnDLgN4AEjP9y/AdcF7Qad0MexMWbLi1FxkPzh9cRZnESXJki8NPyezG2BsNCb3M3
+ jWfhihJNGNNHMwhNx+ccV003tzJRxqy+r5hlDET37Gve1DGLbN1eLBGkLtbdphMtTyIU
+ SBXJRRl1ec4eoTmYp7KMWY9PATyjKc0aW5u3qP1gV1lf+4p4LcQtcr/rNXMMRmh4IA8V
+ n/vy+ptkxGP3qjBcUMia/RX+1xUuVXSNV84+khTdnGpH9I3imoXbh/ZxOR4SWyot9BQT
+ oNu7zAPjAXGUULtyOLRj7oRnQSibj7NiZyNETobSnQEa2mDnmvtcjjWDG8EvYwnVRTIC
+ swxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=7DN2Mz1jlphjeBD6Hgfr/tcOfOE2X7DGMlU3BQxiSxE=;
+ b=GrG2Hlxjl9w3+sezSFLcr6pDilDIRxAk5aA2YkmxN55y1pTXnGs3uh+bApzozK/IAW
+ 0Pg7l1GzOjqMoDi2231s4DaSwkUJdGTu8wnvQnL9tK1pOWmuEsiWsGgJxO0iuJJvMNQL
+ Jch5+cnKyRCmXpLDxJGs57GlLzaS9RhiJjo/hgvP3aw92OA/ID6QdYF8qYjy++XdrL2p
+ 4a9e0S/CyMjkOtpujUbtlEsTDm0pGLhCR0FCFt44Hwp7U7Nu015TTTX9ZnniuT1MgmgR
+ jkQQ+PLIc+118ZNV2dxI9J+5WL5uoj6mWhYgLzBT+rH00m6PLzBaNl0H0BG4TlVeOuBk
+ JzpA==
+X-Gm-Message-State: APjAAAXdp+HqhPWxkxtUY7LVRQH6NB4JEi6wGc7Z0uNvr51q/2Ht7bP9
+ b2kCa72aFaZ5viq55rkn0ZFibw==
+X-Google-Smtp-Source: APXvYqwxZ/3qH4xAUQVEL6xftra8LeqVUoazzpo1a3ZpbXlrwkniQHVStG3lkhotvwZbI17u2RKSuA==
+X-Received: by 2002:a7b:c7cc:: with SMTP id z12mr132592wmk.80.1567629573695;
+ Wed, 04 Sep 2019 13:39:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a18sm4336262wrh.25.2019.09.04.13.39.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Sep 2019 13:39:31 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CAD6E1FF8C;
+ Wed,  4 Sep 2019 21:30:15 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 21:29:57 +0100
+Message-Id: <20190904203013.9028-27-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2512164171111303953
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejhedgudehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.39.161
-Subject: [Qemu-devel] [RFC PATCH 02/15] aspeed/timer: Introduce an object
- class per SoC
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32e
+Subject: [Qemu-devel] [PATCH v1 26/42] tests/docker: add debian-amd64-cross
+ for non-x86 hosts
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,231 +97,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It prepares ground for register differences between SoCs.
+When building on a non-x86 host we need to setup the x86 build like
+any other cross compiler.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/hw/timer/aspeed_timer.h |  15 +++++
- hw/arm/aspeed_soc.c             |   3 +-
- hw/timer/aspeed_timer.c         | 107 ++++++++++++++++++++++++++++----
- 3 files changed, 113 insertions(+), 12 deletions(-)
+ tests/docker/Makefile.include                 |  6 +++++
+ .../dockerfiles/debian-amd64-cross.docker     | 22 +++++++++++++++++++
+ 2 files changed, 28 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian-amd64-cross.docker
 
-diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_ti=
-mer.h
-index 1fb949e16710..a791fee276f4 100644
---- a/include/hw/timer/aspeed_timer.h
-+++ b/include/hw/timer/aspeed_timer.h
-@@ -28,6 +28,9 @@
- #define ASPEED_TIMER(obj) \
-     OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER);
- #define TYPE_ASPEED_TIMER "aspeed.timer"
-+#define TYPE_ASPEED_2400_TIMER TYPE_ASPEED_TIMER "-ast2400"
-+#define TYPE_ASPEED_2500_TIMER TYPE_ASPEED_TIMER "-ast2500"
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 2c8cb790ad0..cb0961a69e4 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -87,7 +87,13 @@ endif
+ 
+ # Enforce dependencies for composite images
+ docker-image-debian9-mxe: docker-image-debian9
++ifeq ($(ARCH),x86_64)
+ docker-image-debian-amd64: docker-image-debian9
++DOCKER_PARTIAL_IMAGES += debian-amd64-cross
++else
++docker-image-debian-amd64-cross: docker-image-debian10
++DOCKER_PARTIAL_IMAGES += debian-amd64
++endif
+ docker-image-debian-armel-cross: docker-image-debian9
+ docker-image-debian-armhf-cross: docker-image-debian9
+ docker-image-debian-mips-cross: docker-image-debian9
+diff --git a/tests/docker/dockerfiles/debian-amd64-cross.docker b/tests/docker/dockerfiles/debian-amd64-cross.docker
+new file mode 100644
+index 00000000000..5d890419251
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-amd64-cross.docker
+@@ -0,0 +1,22 @@
++#
++# Docker x86_64 cross target
++#
++# This docker target is used on non-x86_64 machines which need the
++# x86_64 cross compilers installed.
++#
++FROM qemu:debian10
++MAINTAINER Alex Bennée <alex.bennee@linaro.org>
 +
- #define ASPEED_TIMER_NR_TIMERS 8
-=20
- typedef struct AspeedTimer {
-@@ -60,4 +63,16 @@ typedef struct AspeedTimerCtrlState {
-     AspeedSCUState *scu;
- } AspeedTimerCtrlState;
-=20
-+#define ASPEED_TIMER_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AspeedTimerClass, (klass), TYPE_ASPEED_TIMER)
-+#define ASPEED_TIMER_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AspeedTimerClass, (obj), TYPE_ASPEED_TIMER)
++# Add the foreign architecture we want and install dependencies
++RUN dpkg --add-architecture amd64
++RUN apt update && \
++    DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt install -y --no-install-recommends \
++        crossbuild-essential-amd64
++RUN apt update && \
++    DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt build-dep -yy -a amd64 --arch-only qemu
 +
-+typedef struct AspeedTimerClass {
-+    SysBusDeviceClass parent_class;
-+
-+    uint64_t (*read)(AspeedTimerCtrlState *s, hwaddr offset);
-+    void (*write)(AspeedTimerCtrlState *s, hwaddr offset, uint64_t value=
-);
-+} AspeedTimerClass;
-+
- #endif /* ASPEED_TIMER_H */
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index c3821a562733..26e03486f9b7 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -182,8 +182,9 @@ static void aspeed_soc_init(Object *obj)
-     sysbus_init_child_obj(obj, "rtc", OBJECT(&s->rtc), sizeof(s->rtc),
-                           TYPE_ASPEED_RTC);
-=20
-+    snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
-     sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
--                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
-+                          sizeof(s->timerctrl), typename);
-     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
-                                    OBJECT(&s->scu), &error_abort);
-=20
-diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
-index 2bda826882d9..c78bc1bd2d25 100644
---- a/hw/timer/aspeed_timer.c
-+++ b/hw/timer/aspeed_timer.c
-@@ -253,13 +253,8 @@ static uint64_t aspeed_timer_read(void *opaque, hwad=
-dr offset, unsigned size)
-     case 0x40 ... 0x8c: /* Timers 5 - 8 */
-         value =3D aspeed_timer_get_value(&s->timers[(offset >> 4) - 1], =
-reg);
-         break;
--    /* Illegal */
--    case 0x38:
--    case 0x3C:
-     default:
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
--                __func__, offset);
--        value =3D 0;
-+        value =3D ASPEED_TIMER_GET_CLASS(s)->read(s, offset);
-         break;
-     }
-     trace_aspeed_timer_read(offset, size, value);
-@@ -453,12 +448,8 @@ static void aspeed_timer_write(void *opaque, hwaddr =
-offset, uint64_t value,
-     case 0x40 ... 0x8c:
-         aspeed_timer_set_value(s, (offset >> TIMER_NR_REGS) - 1, reg, tv=
-);
-         break;
--    /* Illegal */
--    case 0x38:
--    case 0x3C:
-     default:
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
--                __func__, offset);
-+        ASPEED_TIMER_GET_CLASS(s)->write(s, offset, value);
-         break;
-     }
- }
-@@ -472,6 +463,64 @@ static const MemoryRegionOps aspeed_timer_ops =3D {
-     .valid.unaligned =3D false,
- };
-=20
-+static uint64_t aspeed_2400_timer_read(AspeedTimerCtrlState *s, hwaddr o=
-ffset)
-+{
-+    uint64_t value;
-+
-+    switch (offset) {
-+    case 0x38:
-+    case 0x3C:
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
-+                __func__, offset);
-+        value =3D 0;
-+        break;
-+    }
-+    return value;
-+}
-+
-+static void aspeed_2400_timer_write(AspeedTimerCtrlState *s, hwaddr offs=
-et,
-+                                    uint64_t value)
-+{
-+    switch (offset) {
-+    case 0x38:
-+    case 0x3C:
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
-+                __func__, offset);
-+        break;
-+    }
-+}
-+
-+static uint64_t aspeed_2500_timer_read(AspeedTimerCtrlState *s, hwaddr o=
-ffset)
-+{
-+    uint64_t value;
-+
-+    switch (offset) {
-+    case 0x38:
-+    case 0x3C:
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
-+                __func__, offset);
-+        value =3D 0;
-+        break;
-+    }
-+    return value;
-+}
-+
-+static void aspeed_2500_timer_write(AspeedTimerCtrlState *s, hwaddr offs=
-et,
-+                                    uint64_t value)
-+{
-+    switch (offset) {
-+    case 0x38:
-+    case 0x3C:
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
-+                __func__, offset);
-+        break;
-+    }
-+}
-+
- static void aspeed_init_one_timer(AspeedTimerCtrlState *s, uint8_t id)
- {
-     AspeedTimer *t =3D &s->timers[id];
-@@ -570,11 +619,47 @@ static const TypeInfo aspeed_timer_info =3D {
-     .parent =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(AspeedTimerCtrlState),
-     .class_init =3D timer_class_init,
-+    .class_size =3D sizeof(AspeedTimerClass),
-+    .abstract   =3D true,
-+};
-+
-+static void aspeed_2400_timer_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedTimerClass *awc =3D ASPEED_TIMER_CLASS(klass);
-+
-+    dc->desc =3D "ASPEED 2400 Timer";
-+    awc->read =3D aspeed_2400_timer_read;
-+    awc->write =3D aspeed_2400_timer_write;
-+}
-+
-+static const TypeInfo aspeed_2400_timer_info =3D {
-+    .name =3D TYPE_ASPEED_2400_TIMER,
-+    .parent =3D TYPE_ASPEED_TIMER,
-+    .class_init =3D aspeed_2400_timer_class_init,
-+};
-+
-+static void aspeed_2500_timer_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedTimerClass *awc =3D ASPEED_TIMER_CLASS(klass);
-+
-+    dc->desc =3D "ASPEED 2500 Timer";
-+    awc->read =3D aspeed_2500_timer_read;
-+    awc->write =3D aspeed_2500_timer_write;
-+}
-+
-+static const TypeInfo aspeed_2500_timer_info =3D {
-+    .name =3D TYPE_ASPEED_2500_TIMER,
-+    .parent =3D TYPE_ASPEED_TIMER,
-+    .class_init =3D aspeed_2500_timer_class_init,
- };
-=20
- static void aspeed_timer_register_types(void)
- {
-     type_register_static(&aspeed_timer_info);
-+    type_register_static(&aspeed_2400_timer_info);
-+    type_register_static(&aspeed_2500_timer_info);
- }
-=20
- type_init(aspeed_timer_register_types)
---=20
-2.21.0
++# Specify the cross prefix for this image (see tests/docker/common.rc)
++ENV QEMU_CONFIGURE_OPTS --cross-prefix=x86_64-linux-gnu-
++ENV DEF_TARGET_LIST x86_64-softmmu,x86_64-linux-user,i386-softmmu,i386-linux-user
+-- 
+2.20.1
 
 
