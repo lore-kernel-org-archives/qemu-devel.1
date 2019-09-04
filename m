@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CEC2C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B78C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:38:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 491F2206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2FDA208E4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:38:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fnGC5dr5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 491F2206B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ptVHTZ5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2FDA208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5c2a-00079m-6y
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:38:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41501)
+	id 1i5c3B-00080O-58
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:38:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b15-0005dr-Bp
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:33 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0n-0005NE-9v
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b13-0003N7-BP
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:30 -0400
-Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:44811)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0l-000332-8e
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:13 -0400
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:41494)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5b11-0003J3-9w
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:29 -0400
-Received: by mail-pf1-x435.google.com with SMTP id q21so8881001pfn.11
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:26 -0700 (PDT)
+ id 1i5b0j-0002xn-9u
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:11 -0400
+Received: by mail-pl1-x62d.google.com with SMTP id m9so10055597pls.8
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ubjb98obYB0wcr0PkhZrvGjTKBKP700KuYx4LrhjRCk=;
- b=fnGC5dr5sDsjett47yIJEN9Of0JrUcyoeppmr5Qh4LB6cNBWhsckqvU5cTE8lpAHEx
- r8Ih/AEiuDrykNM3qjQWxFWR+jjJaLlsjxe9mg1TpwaVsT+RnZl9huleOuQSAG835P79
- d/C2lrMy6NecLtog9sLd5wE6f7q4Gn2O/7ukzRdFtk7Fv54Pts+pFWsnar2VZ0ESCn1Y
- hei9Pgi0PcyBK4QHejEVrCVuOs+5re1vjz8E42CHCLQRvE7jXnBOvgH1sISdNxGI6hyw
- TcS9ct4nuGS6ZuqPUww/QbokyjRXMtnjhQ7/Z1CxLsP5FXm73LahSLKzsgvasxXST37I
- U79g==
+ bh=mvEFFgpnrevoU+lFhaPzzFj5g1KNJYV0Nc7dBdlUE/w=;
+ b=ptVHTZ5pCK4x2SKJbJUky/7nYPfFcEFhzxz/9NLAUKkyY2bo+dJml+ycY3W/9hDVLp
+ BC1ElBZzE8A+2o3b/o3rR1O+kWNKeStrpPDyB4XPv5x7RV6LcmHz3AjEuwABU4K0rP1F
+ sxvBFp0ELizYO4TdIOr7crjzXymYMb7EiJiC/wB5pUEMuU0lOvU4MtJeQ4vnqPr+tlTI
+ luJs4DDy/umrZVPa/3o5P4B2OOvmwPXECTq0x/Gc4bXvOChniIfV6brkTeAXm3R2MHcb
+ Pn9JcddA1bdJUkBbEjWXjNGmOUfZtFr4HcxgIBUcPAcsoHhW++T/q8ybaNloLUrnj//r
+ tmnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=ubjb98obYB0wcr0PkhZrvGjTKBKP700KuYx4LrhjRCk=;
- b=dqXP83yZQKTgevfEVDVVHHCUElCN+ZpJ11Y8EyOlWsL6+xQe1CDrcQGsQ11sGe2RYI
- VGA8VPtSJBLI6JvrH5TVdLAFe914m1oOKxvaiu0xnAgsBIh378snfv+v7uecTr/qqNhA
- Fum5j2aS/MYEuQZxA2KGvNzzVAmB669pbCKtRXmIkJ0qZamZqdHuCu4kAcozsetIkWF2
- hreKiaINWdLE9R72Ri0l+Bx5KnIMHa5JnuzocdjdqddJoy6vMl4PRpRfSYP6d0O5m+Cj
- /M4weMCraVyeCerSHmae9uz6ZpwoGE83Olyhgc3qIGL3n0RU89vJjR5nDWe6U08ytJCI
- lABg==
-X-Gm-Message-State: APjAAAUepV2WpSrHkJLKF24Ysdex7ZBg+d5jtTe+hTFteq+g/ykGW0RW
- qXVRaDwW3mDBzcBbTEcUOGCmN7MJ2Zo=
-X-Google-Smtp-Source: APXvYqzUkpyiUrSHb6gzJRa9DtGOUg+tXICQVH0ofPcFhNpasc+qZOnqsyYZkf3F2t5yIjU3dZ6YVQ==
-X-Received: by 2002:a63:6f8f:: with SMTP id k137mr36325209pgc.90.1567625544802; 
- Wed, 04 Sep 2019 12:32:24 -0700 (PDT)
+ bh=mvEFFgpnrevoU+lFhaPzzFj5g1KNJYV0Nc7dBdlUE/w=;
+ b=bNPUGS2ulw2Qq2sPAm5e+Y8Dt1J5XOw8alqjawSwTnuNms2gOxE4peOyZ3gGiXMOZG
+ vj8djZzjkUPtfrnBo+yymJA8Jvz38JGCuVxrNd3TOQY+Kvz2/7wqy498X5Iw2FHCTtT/
+ 3E4cPKVLArvbEKCxkyngV+198ls9k0qaT27H7yp7gXMwqjDS5+WcYmZ8ZSjgJVEAqxoE
+ Tq4Ynj2mTrtayToMNCqmp4T/8VkQ/DG0ya6aDLRbVD+8dL6WiHIpjbxfFkkeBKlBc7V5
+ +kiVKPiOfeVZng+0gxxQxR5HlfHSTqAl67xfwVMbEpiIqLSbfrzr25//ebUoJBdbMn1k
+ isnA==
+X-Gm-Message-State: APjAAAVAM9UsJMJsxybhLi2CpLg7A0UiFd3DKPjuYbK852PrBYItE+fw
+ vfamIr9kfovxZQKkWjspTuID411akew=
+X-Google-Smtp-Source: APXvYqyv8XicDnwQanoC2IvuGVAdIbWJq+dXjUXTh9T2BYo4l19d/B4hThOGZ6zACOc2GGkqINwStA==
+X-Received: by 2002:a17:902:36a:: with SMTP id 97mr4447000pld.75.1567625523206; 
+ Wed, 04 Sep 2019 12:32:03 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.23
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:32:24 -0700 (PDT)
+ Wed, 04 Sep 2019 12:32:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:30:56 -0700
-Message-Id: <20190904193059.26202-67-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 12:30:39 -0700
+Message-Id: <20190904193059.26202-50-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
 References: <20190904193059.26202-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::435
-Subject: [Qemu-devel] [PATCH v4 66/69] target/arm: Convert T16,
- Unconditional branch
+X-Received-From: 2607:f8b0:4864:20::62d
+Subject: [Qemu-devel] [PATCH v4 49/69] target/arm: Convert T16 add pc/sp
+ (immediate)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,51 +99,57 @@ Sender: "Qemu-devel"
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 9 ++-------
- target/arm/t16.decode  | 6 ++++++
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ target/arm/translate.c | 12 +-----------
+ target/arm/t16.decode  |  7 +++++++
+ 2 files changed, 8 insertions(+), 11 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4f4c77fc89..3238ccbf1e 100644
+index 4ae73d1c92..d8a4c7bf99 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -10736,7 +10736,6 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+@@ -10868,19 +10868,9 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     case 7: /* load/store byte immediate offset, in decodetree */
+     case 8: /* load/store halfword immediate offset, in decodetree */
+     case 9: /* load/store from stack, in decodetree */
++    case 10: /* add PC/SP (immediate), in decodetree */
+         goto illegal_op;
  
- static void disas_thumb_insn(DisasContext *s, uint32_t insn)
- {
--    uint32_t val;
-     int32_t offset;
-     TCGv_i32 tmp;
-     TCGv_i32 tmp2;
-@@ -10780,12 +10779,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-             gen_bx(s, tmp);
-             break;
-         }
--        /* unconditional branch */
--        val = read_pc(s);
--        offset = ((int32_t)insn << 21) >> 21;
--        val += offset << 1;
--        gen_jmp(s, val);
+-    case 10:
+-        /*
+-         * 0b1010_xxxx_xxxx_xxxx
+-         *  - Add PC/SP (immediate)
+-         */
+-        rd = (insn >> 8) & 7;
+-        val = (insn & 0xff) * 4;
+-        tmp = add_reg_for_lit(s, insn & (1 << 11) ? 13 : 15, val);
+-        store_reg(s, rd, tmp);
 -        break;
-+        /* unconditional branch, in decodetree */
-+        goto illegal_op;
- 
-     case 15:
-         /* thumb_insn_is_16bit() ensures we can't get here for
+-
+     case 11:
+         /* misc */
+         op = (insn >> 8) & 0xf;
 diff --git a/target/arm/t16.decode b/target/arm/t16.decode
-index 0b4da411e0..a4c89dba61 100644
+index 1cf79789ac..71b3e8f02e 100644
 --- a/target/arm/t16.decode
 +++ b/target/arm/t16.decode
-@@ -266,3 +266,9 @@ LDM_t16         1011 110 ......... \
-   SVC           1101 1111 imm:8                 &i
-   B_cond_thumb  1101 cond:4 ........            &ci imm=%imm8_0x2
- }
+@@ -23,6 +23,7 @@
+ &s_rrr_shr       !extern s rn rd rm rs shty
+ &s_rri_rot       !extern s rn rd imm rot
+ &s_rrrr          !extern s rd rn rm ra
++&ri              !extern rd imm
+ &ldst_rr         !extern p w u rn rt rm shimm shtype
+ &ldst_ri         !extern p w u rn rt imm
+ 
+@@ -102,3 +103,9 @@ LDRH_ri         10001 ..... ... ...             @ldst_ri_2
+ 
+ STR_ri          10010 ... ........              @ldst_spec_i rn=13
+ LDR_ri          10011 ... ........              @ldst_spec_i rn=13
 +
-+# Unconditional Branch
++# Add PC/SP (immediate)
 +
-+%imm11_0x2      0:s11 !function=times_2
-+
-+B               11100 ...........               &i imm=%imm11_0x2
++ADR             10100 rd:3 ........             imm=%imm8_0x4
++ADD_rri         10101 rd:3 ........ \
++                &s_rri_rot rn=13 s=0 rot=0 imm=%imm8_0x4  # SP
 -- 
 2.17.1
 
