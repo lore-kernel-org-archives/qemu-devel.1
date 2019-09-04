@@ -2,91 +2,80 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F3EC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEA7C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E012921726
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2A3521726
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:11:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gOav/tuu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E012921726
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ay8TcTV5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A3521726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cYD-00006W-Dc
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:10:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49822)
+	id 1i5cYS-0000Wx-8w
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:11:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52748)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bvJ-0008Bt-MG
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:44 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9Q-0005x4-Ho
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bvA-0006f4-FX
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:31 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:56318)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9P-0006f5-9N
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:12 -0400
+Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:41255)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5bv9-0006dL-Hz
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:28 -0400
-Received: by mail-wm1-x331.google.com with SMTP id g207so182165wmg.5
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:30:27 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i5c9P-0006eN-1q
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:11 -0400
+Received: by mail-pg1-x52b.google.com with SMTP id x15so63333pgg.8
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:45:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=zh8cJOMlQoU86gylTdnIBMbDSjCDSeGhH9/trBdCYUA=;
- b=gOav/tuua1E4hp8ziE/1je/+tdtkNkgZUpWFXm2jAFqUB5HsZLjUd0GZRxVOZv1gm6
- iJKaKaGzuY7EYwN8A4Ks8dIu6v1s+fckqkZqgKR51m5u2alDiKU9z2ptwG5FfOxnq3zi
- 40/v+4BDg9Vw0Jn1qVl+xht4HPrqsYNo5JfL/qobiaJLRHUwm2UAQ/Kh26EsaTjsbNZW
- lwXoPHDMvP8XOBMtCbqSQvwjKBd5S6IKEMccFBsf7nQCPzRfYTlV9bZEphWgRnRauGe1
- sq+e48t+T/9ue+4UuuJlezWPaDFYtERf2kpotGArdxgKzzaC3nUkTN9FOQoDIOSJPfZL
- 0AZw==
+ h=from:to:cc:subject:date:message-id;
+ bh=WLSDFQUCkqM7061s/ajWo6nIAdaEYh/nXuIw+ucQ/cY=;
+ b=ay8TcTV54/sy4d8ilpOrnTfng7qF/1gvh1o7877NFpGGXHnfayjYGzeAhvkpdLjuk1
+ 2heBL6Hp5LzW5xF9Fm5pXMDQxmr33V7/W1oTB6NCo+AiKpmCADG+wWVoXbgC80cIF8bx
+ Er/6nfHFeL9gB2+f/WEDpPAn92D2lFi38NaNM5Udj8ojD3PbwMmoP3CnPE5EJUFMaElV
+ CIuUVr2OntOe9bFmcx4Vpxq92SEhWpO6ePuP33TngWqH0wkcguxL9UxfJKgwCfhtb2n8
+ wRqpGPFm5MUPQ1630wHsf8CcBcHsqYzbLee6vK+vYtqi+O7oahImf3oViof95WI5WojR
+ j9sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=zh8cJOMlQoU86gylTdnIBMbDSjCDSeGhH9/trBdCYUA=;
- b=EtDYLzF5z5xoz5Dm/9kvmUYIwaYJ4JmFSV3x4EUrbLZ0+La3UyI3//aHSlaBlScFIT
- WZcfKY6cIyWTfjvv6KnNsWbKWWY3ifZq+i9NOpovV2dKzNAl+z9bHkQ31jf91W9CwbuP
- o5qtQ8+npLmH7KbBtqCHIgXOq8JS6HPXE6TysJeqy++S7TpJ8X9aGJc/a0jTjkqcTQt4
- oxyi10uvzvuJZcffLWgmRmgXFe7CyZp48sPq0k/2WwXZ3kDm8z7kC1ZHFrwMueqXXp8O
- x9N9pniV4wDrPJmFHBsJIdvjC+TW0HspJKCFB6Q0zQAe9VkSnZ9CHx792BMgOlqyKxfL
- 82og==
-X-Gm-Message-State: APjAAAUSTmUae45jtZin/4ZTJWs8ukDWM406PpGuta0dTnFjOiEytRX/
- ny5t63ahAQTUcriunfjNuSgr9g==
-X-Google-Smtp-Source: APXvYqxTKm5hvm+VzFha5tugezzMxqoAIxnWWvEKjuzcPaiY8F8awFnO8nkYyg+hVQnWGILoYdsADA==
-X-Received: by 2002:a05:600c:23cd:: with SMTP id
- p13mr89932wmb.148.1567629026315; 
- Wed, 04 Sep 2019 13:30:26 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b136sm130137wme.18.2019.09.04.13.30.18
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=WLSDFQUCkqM7061s/ajWo6nIAdaEYh/nXuIw+ucQ/cY=;
+ b=omg5bwuBUoMMenH+j+0SRDFPk/hqjurkiFhS3Y6nNwgYG5Ut3IIvWVYCwkSRVTWANQ
+ ELNvTxNpQaCU46bj9w9KyCLFYGHXEtrmnK/up9R3hA8dqPZe3To9wMKBdrBOC2rJ5IC/
+ CU6W7bDhxw0LGndxGdVKM54zc47hJit4wO6ibRcSrnF5MkxmlmNJzpIGXlR1WTTWLQsp
+ wZbzfej2i2rqgtc5DaW3l1QyQBh5Ryi4cYuKOp2ekDC7Rxx35Jm+pVfP6kHag6zia1gz
+ rb2TSM8HKNmLflFIWbliJ4jbt5qpnlZbSeeWfPOGcB9FyaidsMhd9Se9Oz1AeJkOmfgx
+ ONlQ==
+X-Gm-Message-State: APjAAAUn5sOnx/GERouOSN37TZ2GGnme0ROc/32HWF1ytb4hgOtfc3W4
+ I94t7KrWpMokcW9n3orVh8kiloYxqXQ=
+X-Google-Smtp-Source: APXvYqzcRVT/HULwD2WIBsDt9RXso00uhzNmXkjq+fhvqcehaE88aagRv9RO3qWNb0bEogQjoJqxZQ==
+X-Received: by 2002:a65:4c4d:: with SMTP id l13mr69015pgr.156.1567629909042;
+ Wed, 04 Sep 2019 13:45:09 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id n66sm8104610pfn.90.2019.09.04.13.45.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:30:25 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BF38A1FF9E;
- Wed,  4 Sep 2019 21:30:14 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Wed, 04 Sep 2019 13:45:08 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:29:45 +0100
-Message-Id: <20190904203013.9028-15-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Wed,  4 Sep 2019 13:44:54 -0700
+Message-Id: <20190904204507.32457-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
-Subject: [Qemu-devel] [PATCH v1 14/42] tests/docker: move our HPPA cross
- compile to Buster
+X-Received-From: 2607:f8b0:4864:20::52b
+Subject: [Qemu-devel] [PULL 00/13] target/openrisc updates
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,58 +87,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now Buster is released we can stop relying on the movable feast that
-is Sid for our cross-compiler for building tests.
+The following changes since commit a8b5ad8e1faef0d1bb3e550530328e8ec76fe87c:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include                     | 2 +-
- tests/docker/dockerfiles/debian-hppa-cross.docker | 5 ++---
- 2 files changed, 3 insertions(+), 4 deletions(-)
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-09-04 17:22:34 +0100)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index e7379f1d732..ba5a624eaec 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -100,9 +100,9 @@ docker-image-debian-win64-cross: docker-image-debian9-mxe
- 
- docker-image-debian-alpha-cross: docker-image-debian10
- docker-image-debian-arm64-cross: docker-image-debian10
-+docker-image-debian-hppa-cross: docker-image-debian10
- docker-image-debian-powerpc-cross: docker-image-debian10
- 
--docker-image-debian-hppa-cross: docker-image-debian-sid
- docker-image-debian-m68k-cross: docker-image-debian-sid
- docker-image-debian-sh4-cross: docker-image-debian-sid
- docker-image-debian-sparc64-cross: docker-image-debian-sid
-diff --git a/tests/docker/dockerfiles/debian-hppa-cross.docker b/tests/docker/dockerfiles/debian-hppa-cross.docker
-index ee6d9a24ce8..5c68b2d3304 100644
---- a/tests/docker/dockerfiles/debian-hppa-cross.docker
-+++ b/tests/docker/dockerfiles/debian-hppa-cross.docker
-@@ -1,10 +1,9 @@
- #
- # Docker cross-compiler target
- #
--# This docker target builds on the debian sid base image which
--# contains cross compilers for Debian "ports" targets.
-+# This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian-sid
-+FROM qemu:debian10
- 
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
--- 
-2.20.1
+are available in the Git repository at:
 
+  https://github.com/rth7680/qemu.git tags/pull-or1k-20190904
+
+for you to fetch changes up to 9e3bab08d3e3f5808cc35a59af1912bfb6fe96fd:
+
+  target/openrisc: Update cpu "any" to v1.3 (2019-09-04 13:01:56 -0700)
+
+----------------------------------------------------------------
+Updates for arch v1.3.
+
+----------------------------------------------------------------
+Richard Henderson (13):
+      target/openrisc: Add DisasContext parameter to check_r0_write
+      target/openrisc: Replace cpu register array with a function
+      target/openrisc: Cache R0 in DisasContext
+      target/openrisc: Make VR and PPC read-only
+      target/openrisc: Move VR, UPR, DMMCFGR, IMMCFGR to cpu init
+      target/openrisc: Add VR2 and AVR special processor registers
+      target/openrisc: Fix lf.ftoi.s
+      target/openrisc: Check CPUCFG_OF32S for float insns
+      target/openrisc: Add support for ORFPX64A32
+      target/openrisc: Implement unordered fp comparisons
+      target/openrisc: Implement move to/from FPCSR
+      target/openrisc: Implement l.adrp
+      target/openrisc: Update cpu "any" to v1.3
+
+ linux-user/openrisc/target_elf.h |   2 +-
+ target/openrisc/cpu.h            |  24 +-
+ target/openrisc/helper.h         |   6 +
+ target/openrisc/cpu.c            |  30 +-
+ target/openrisc/disas.c          |  81 +++++
+ target/openrisc/fpu_helper.c     |  49 ++-
+ target/openrisc/machine.c        |  11 +
+ target/openrisc/sys_helper.c     |  38 ++-
+ target/openrisc/translate.c      | 716 +++++++++++++++++++++++++++++----------
+ target/openrisc/insns.decode     |  45 +++
+ 10 files changed, 774 insertions(+), 228 deletions(-)
 
