@@ -2,91 +2,71 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5280C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFCDEC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:20:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CF8822CF5
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:19:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF8822CF5
+	by mail.kernel.org (Postfix) with ESMTPS id A458722CED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:20:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A458722CED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5W8P-0005AQ-Mg
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47013)
+	id 1i5W9Y-0006Yt-Qb
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:20:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5W7R-0004Kh-3D
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:18:46 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1i5W8X-0005az-1S
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:19:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5W7P-0000ut-2V
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:18:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58574)
+ (envelope-from <eric.auger@redhat.com>) id 1i5W8U-00024h-Tj
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:19:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60282)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5W7N-0000ss-0w
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:18:42 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1i5W8Q-00022E-Ft; Wed, 04 Sep 2019 10:19:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C9BA52A09A2
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 14:18:38 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC06F19D7A;
- Wed,  4 Sep 2019 14:18:34 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190904130047.25808-1-thuth@redhat.com>
- <20190904130047.25808-5-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <316fa560-ebb6-9ad4-be6e-8dc004df1daa@redhat.com>
-Date: Wed, 4 Sep 2019 09:18:33 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id 1966610F23F6;
+ Wed,  4 Sep 2019 14:19:45 +0000 (UTC)
+Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8546B1001958;
+ Wed,  4 Sep 2019 14:19:35 +0000 (UTC)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20190730172137.23114-1-eric.auger@redhat.com>
+ <20190730172137.23114-15-eric.auger@redhat.com>
+ <20190730153305-mutt-send-email-mst@kernel.org>
+ <a0e88a60-083b-2730-5db8-7bba0299974b@redhat.com>
+ <20190801090027-mutt-send-email-mst@kernel.org>
+ <ff726b89-a1b1-9b9e-a767-ef72da520053@redhat.com>
+ <20190901023827-mutt-send-email-mst@kernel.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8dd239b8-6d0b-3795-76d0-e8ead4b847ef@redhat.com>
+Date: Wed, 4 Sep 2019 16:19:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190904130047.25808-5-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="18QuPpgQiOgjJMvzsub8ZBo3MZAtecG4v"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 04 Sep 2019 14:18:38 +0000 (UTC)
+In-Reply-To: <20190901023827-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Wed, 04 Sep 2019 14:19:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] tests: Remove unnecessary
- global_qtest references
+Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 14/15] virtio-iommu-pci: Add
+ virtio iommu pci support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,69 +78,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com, peter.maydell@linaro.org,
+ tn@semihalf.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org, bharat.bhushan@nxp.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---18QuPpgQiOgjJMvzsub8ZBo3MZAtecG4v
-Content-Type: multipart/mixed; boundary="GsU5hxZXftUlGvQG4v0wEWTQrssx0DmzH";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <316fa560-ebb6-9ad4-be6e-8dc004df1daa@redhat.com>
-Subject: Re: [PATCH v2 4/6] tests: Remove unnecessary global_qtest references
-References: <20190904130047.25808-1-thuth@redhat.com>
- <20190904130047.25808-5-thuth@redhat.com>
-In-Reply-To: <20190904130047.25808-5-thuth@redhat.com>
+Hi Michael,
 
---GsU5hxZXftUlGvQG4v0wEWTQrssx0DmzH
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 9/1/19 8:40 AM, Michael S. Tsirkin wrote:
+> On Thu, Aug 01, 2019 at 03:49:37PM +0200, Auger Eric wrote:
+>> Hi Michael,
+>>
+>> On 8/1/19 3:06 PM, Michael S. Tsirkin wrote:
+>>> On Thu, Aug 01, 2019 at 02:15:03PM +0200, Auger Eric wrote:
+>>>> Hi Michael,
+>>>>
+>>>> On 7/30/19 9:35 PM, Michael S. Tsirkin wrote:
+>>>>> On Tue, Jul 30, 2019 at 07:21:36PM +0200, Eric Auger wrote:
+>>>>>> This patch adds virtio-iommu-pci, which is the pci proxy for
+>>>>>> the virtio-iommu device.
+>>>>>>
+>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>
+>>>>> This part I'm not sure we should merge just yet.  The reason being I
+>>>>> think we should limit it to mmio where DT can be used to describe iommu
+>>>>> topology. For PCI I don't see why we shouldn't always expose this
+>>>>> in the config space, and I think it's preferable not to
+>>>>> need to support a mix of DT,ACPI and PCI as options.
+>>>>
+>>>> For context, some discussion related to this topic already arose on v7
+>>>> revision of the driver:
+>>>>
+>>>> [1] Re: [PATCH v7 0/7] Add virtio-iommu driver
+>>>> https://lore.kernel.org/linux-pci/87a7ioby9u.fsf@morokweng.localdomain/
+>>>>
+>>>> Some additional thoughts.
+>>>>
+>>>> First considering DT boot.
+>>>>
+>>>> THE DT description features an iommu-map property in the
+>>>> pci-host-ecam-generic node that describes which RIDs are handled by the
+>>>> virtio-iommu and a possible offset/mask to be applied inbetween the RID
+>>>> and the streamID at the input of the IOMMU
+>>>> (Documentation/devicetree/bindings/pci/pci-iommu.txt)
+>>>>
+>>>> As far as I understand when a DMA capable device is setup, its DMA
+>>>> configuration is built using that call chain:
+>>>>
+>>>> pci_dma_configure
+>>>> |_ of_dma_configure
+>>>>    |_ of_iommu_configure
+>>>>       |_ of_pci_iommu_init
+>>>>          |_ of_map_rid
+>>>>
+>>>> I understand you would like the iommu-map/iommu-map-mask info to be
+>>>> exposed directly into the config space of the device instead of inside
+>>>> the DT or IORT table. Assuming a module is initialized sufficiently
+>>>> early to retrieve this info, we would need the resulting info to be
+>>>> consolidated to allow pci_dma_configure chain to work seemlessly. This
+>>>> sounds a significant impact on above kernel infrastructure.
+>>>
+>>> I don't really know what consolidated means.
+>>> It is pretty common for IOMMUs to expose config through
+>>> PCI registers. This typically happens as a fixup.
+>> I meant: instead of retrieving the info through the of_* code you need
+>> to interoperate with the module to retrieve the same info and detect
+>> when you need to take that path instead of the of one.
+> 
+> The way to do it would be with a quirk,
+> and the quirk would not be part of the
+> virtio module - it can poke at the device using
+> virtio_pci_cfg_cap.
 
-On 9/4/19 8:00 AM, Thomas Huth wrote:
-> We are going to remove global_qtest from the main libqtest library
-> soon, so tests that do not urgently need global_qtest anymore
-> should be cleaned from the unnecessary references.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/ahci-test.c        | 1 -
->  tests/bios-tables-test.c | 1 -
->  tests/ivshmem-test.c     | 3 ---
->  tests/rtas-test.c        | 1 -
->  4 files changed, 6 deletions(-)
+I got this preliminary quirk function working. However it only works for
+a DECLARE_PCI_FIXUP_ENABLE quirk. In an EARLY quirk, the guest crashes
+on the first ioread that attempts to read the BAR as mem accesses are
+not enabled yet I guess.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+So assuming I get the proper system config data in the device
+configuration, the iommu bindings will be set up late.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+By the way I have not yet attempted to generate iommu bindings from the
+quirk function (job done in drivers/acpi/arm64/iort.c) which does not
+sound to be straightforward.
+> 
+>>>
+>>> I would write a tiny driver to do exactly that,
+>>> and run it from the fixup.
+>>>
+>>>
+>>>> This comes in addition to the development of the "small module that
+>>>> loads early and pokes at the IOMMU sufficiently to get the data about
+>>>> which devices use the IOMMU out of it using standard virtio config
+>>>> space" evoked in [1] + the definition of the data formats to be put in
+>>>> the very cfg space.
+>>>
+>>> That last part is true but that's exactly why I propose we
+>>> wait on this patch a bit.
+>>>
+>>>> With ACPI I understand we have the same kind of infrastructure:
+>>>> drivers/acpi/arm64/iort.c currently extracts the mapping between RC RIDs
+>>>> and IOMMU streamids
+>>>>
+>>>> pci_dma_configure(
+>>>> |_ acpi_dma_configure
+>>>>    |_ iort_iommu_configure
+>>>>       |_ iort_pci_iommu_init
+>>>>          |_ iort_node_map_id
+>>>>             |_ iort_id_map
+>>>>
+>>>> Maybe I fail to see the easy and right way to do the integration at
+>>>> kernel level but I am a bit frightened by the efforts that would be
+>>>> requested to follow your suggestion, whereas the DT infra is ready and
+>>>> fully upstreamed to accept the use case.
+>>>
+>>> Did you take a look at drivers/pci/quirks.c and how these run?
+>>> I think it's just a question of adding DECLARE_PCI_FIXUP_CLASS_EARLY
+>>> and running your hook from there.
+>> I will do and trace the code.
+>>>
+>>>
+>>>> For ACPI I agree AFAIK IORT was primarily defined by ARM, for ARM but we
+>>>> prototyped IORT integration with x86 and it worked for pc machine
+>>>> without major trouble.
+>>>>
+>>>> I sent the kernel and qemu patches prototyping this IORT integration:
+>>>>
+>>>> https://github.com/eauger/linux/tree/virtio-iommu-v0.9-iort-x86
+>>>> https://github.com/eauger/qemu/tree/v3.1.0-rc3-virtio-iommu-v0.9-x86
+>>>>
+>>>> There ACPI IORT was built for PC machine and the integration effort at
+>>>> both kernel and QEMU level was low. This work would need to be rebased
+>>>> and depends on kernel ACPI related patches that are not yet upstreamed
+>>>> though.
+>>>>
+>>>> Thanks
+>>>>
+>>>> Eric
+>>>
+>>> In the end it might turn out you are right.  But it does us no harm to
+>>> delay this just a bit, and for now limit things to ARM where it's
+>>> already used and where alternatives exist.
+>> So if my understanding is correct, at the moment you would accept a DT
+>> integration using MMIO. Is that correct? Meanwhile we can prototype your
+>> suggestion.
+>>
+>> Thanks
+>>
+>> Eric
+> 
+> Right.
 
+Thank you for the confirmation. However I am not sure Peter will accept
+to get the device integrated as a virtio-mmio device and then deprecated
+in favor of a virtio-pci device, all the more so work was prepared to
+get a PCI integration. Peter?
 
---GsU5hxZXftUlGvQG4v0wEWTQrssx0DmzH--
+Thanks
 
---18QuPpgQiOgjJMvzsub8ZBo3MZAtecG4v
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1vx7kACgkQp6FrSiUn
-Q2ooOAf+ICnW5b2QqSvdX81GhDBldIDZTsJvR1W2mlPMTE5HtBwXTan9fZjoe4EI
-VycKgdMZSYFFyCOllW6EblAgXwXLrSa7TnIUzN5+yXOsZCuo9E1najs4y+ZdmZHq
-mVtlJpUoCTRphdD6leUyAHtiUE6n4n0d68mcu+ETN/+8pKwpvbSWRn99VZIogi1M
-+m9WCw1PfdZ8TqenpF542od5ng4u/U7k4DdwnAXtbmHqlvBP2sUg18+j+DKgpodd
-Rkhlt/9nXZtgExbGJ1gWkH1pebRawahPjE+W3F/ath7rxZE7ZnOQF+JBq8MDErFo
-KEncAyScZgTPvbXYm+88LzmyA2ZUHA==
-=n5ib
------END PGP SIGNATURE-----
-
---18QuPpgQiOgjJMvzsub8ZBo3MZAtecG4v--
+Eric
+> 
+>>>
+>>>
+>>>>>
+>>>>>> ---
+>>>>>>
+>>>>>> v8 -> v9:
+>>>>>> - add the msi-bypass property
+>>>>>> - create virtio-iommu-pci.c
+>>>>>> ---
+>>>>>>  hw/virtio/Makefile.objs          |  1 +
+>>>>>>  hw/virtio/virtio-iommu-pci.c     | 88 ++++++++++++++++++++++++++++++++
+>>>>>>  include/hw/pci/pci.h             |  1 +
+>>>>>>  include/hw/virtio/virtio-iommu.h |  1 +
+>>>>>>  qdev-monitor.c                   |  1 +
+>>>>>>  5 files changed, 92 insertions(+)
+>>>>>>  create mode 100644 hw/virtio/virtio-iommu-pci.c
+>>>>>>
+>>>>>> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+>>>>>> index f42e4dd94f..80ca719f1c 100644
+>>>>>> --- a/hw/virtio/Makefile.objs
+>>>>>> +++ b/hw/virtio/Makefile.objs
+>>>>>> @@ -27,6 +27,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+>>>>>>  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+>>>>>>  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+>>>>>>  obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
+>>>>>> +obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu-pci.o
+>>>>>>  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
+>>>>>>  obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
+>>>>>>  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
+>>>>>> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
+>>>>>> new file mode 100644
+>>>>>> index 0000000000..f9977096bd
+>>>>>> --- /dev/null
+>>>>>> +++ b/hw/virtio/virtio-iommu-pci.c
+>>>>>> @@ -0,0 +1,88 @@
+>>>>>> +/*
+>>>>>> + * Virtio IOMMU PCI Bindings
+>>>>>> + *
+>>>>>> + * Copyright (c) 2019 Red Hat, Inc.
+>>>>>> + * Written by Eric Auger
+>>>>>> + *
+>>>>>> + *  This program is free software; you can redistribute it and/or modify
+>>>>>> + *  it under the terms of the GNU General Public License version 2 or
+>>>>>> + *  (at your option) any later version.
+>>>>>> + */
+>>>>>> +
+>>>>>> +#include "qemu/osdep.h"
+>>>>>> +
+>>>>>> +#include "virtio-pci.h"
+>>>>>> +#include "hw/virtio/virtio-iommu.h"
+>>>>>> +
+>>>>>> +typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
+>>>>>> +
+>>>>>> +/*
+>>>>>> + * virtio-iommu-pci: This extends VirtioPCIProxy.
+>>>>>> + *
+>>>>>> + */
+>>>>>> +#define VIRTIO_IOMMU_PCI(obj) \
+>>>>>> +        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
+>>>>>> +
+>>>>>> +struct VirtIOIOMMUPCI {
+>>>>>> +    VirtIOPCIProxy parent_obj;
+>>>>>> +    VirtIOIOMMU vdev;
+>>>>>> +};
+>>>>>> +
+>>>>>> +static Property virtio_iommu_pci_properties[] = {
+>>>>>> +    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
+>>>>>> +    DEFINE_PROP_BOOL("msi-bypass", VirtIOIOMMUPCI, vdev.msi_bypass, true),
+>>>>>> +    DEFINE_PROP_END_OF_LIST(),
+>>>>>> +};
+>>>>>> +
+>>>>>> +static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>>>>>> +{
+>>>>>> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(vpci_dev);
+>>>>>> +    DeviceState *vdev = DEVICE(&dev->vdev);
+>>>>>> +
+>>>>>> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+>>>>>> +    object_property_set_link(OBJECT(dev),
+>>>>>> +                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
+>>>>>> +                             "primary-bus", errp);
+>>>>>> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void virtio_iommu_pci_class_init(ObjectClass *klass, void *data)
+>>>>>> +{
+>>>>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>>>>> +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+>>>>>> +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+>>>>>> +    k->realize = virtio_iommu_pci_realize;
+>>>>>> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>>>>>> +    dc->props = virtio_iommu_pci_properties;
+>>>>>> +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+>>>>>> +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_IOMMU;
+>>>>>> +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+>>>>>> +    pcidev_k->class_id = PCI_CLASS_OTHERS;
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void virtio_iommu_pci_instance_init(Object *obj)
+>>>>>> +{
+>>>>>> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(obj);
+>>>>>> +
+>>>>>> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+>>>>>> +                                TYPE_VIRTIO_IOMMU);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info = {
+>>>>>> +    .base_name             = TYPE_VIRTIO_IOMMU_PCI,
+>>>>>> +    .generic_name          = "virtio-iommu-pci",
+>>>>>> +    .transitional_name     = "virtio-iommu-pci-transitional",
+>>>>>> +    .non_transitional_name = "virtio-iommu-pci-non-transitional",
+>>>>>> +    .instance_size = sizeof(VirtIOIOMMUPCI),
+>>>>>> +    .instance_init = virtio_iommu_pci_instance_init,
+>>>>>> +    .class_init    = virtio_iommu_pci_class_init,
+>>>>>> +};
+>>>>>> +
+>>>>>> +static void virtio_iommu_pci_register(void)
+>>>>>> +{
+>>>>>> +    virtio_pci_types_register(&virtio_iommu_pci_info);
+>>>>>> +}
+>>>>>> +
+>>>>>> +type_init(virtio_iommu_pci_register)
+>>>>>> +
+>>>>>> +
+>>>>>> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+>>>>>> index aaf1b9f70d..492ea7e68d 100644
+>>>>>> --- a/include/hw/pci/pci.h
+>>>>>> +++ b/include/hw/pci/pci.h
+>>>>>> @@ -86,6 +86,7 @@ extern bool pci_available;
+>>>>>>  #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
+>>>>>>  #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
+>>>>>>  #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
+>>>>>> +#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
+>>>>>>  
+>>>>>>  #define PCI_VENDOR_ID_REDHAT             0x1b36
+>>>>>>  #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
+>>>>>> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
+>>>>>> index 56c8b4e57f..893ac65c0b 100644
+>>>>>> --- a/include/hw/virtio/virtio-iommu.h
+>>>>>> +++ b/include/hw/virtio/virtio-iommu.h
+>>>>>> @@ -25,6 +25,7 @@
+>>>>>>  #include "hw/pci/pci.h"
+>>>>>>  
+>>>>>>  #define TYPE_VIRTIO_IOMMU "virtio-iommu-device"
+>>>>>> +#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-device-base"
+>>>>>>  #define VIRTIO_IOMMU(obj) \
+>>>>>>          OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
+>>>>>>  
+>>>>>> diff --git a/qdev-monitor.c b/qdev-monitor.c
+>>>>>> index 58222c2211..74cf090c61 100644
+>>>>>> --- a/qdev-monitor.c
+>>>>>> +++ b/qdev-monitor.c
+>>>>>> @@ -63,6 +63,7 @@ static const QDevAlias qdev_alias_table[] = {
+>>>>>>      { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X },
+>>>>>>      { "virtio-input-host-pci", "virtio-input-host",
+>>>>>>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
+>>>>>> +    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
+>>>>>>      { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
+>>>>>>      { "virtio-keyboard-pci", "virtio-keyboard",
+>>>>>>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
+>>>>>> -- 
+>>>>>> 2.20.1
+>>>>>
+>>>
 
