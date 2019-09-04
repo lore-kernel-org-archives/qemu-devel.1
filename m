@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C6CC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:24:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD68FC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F13A822CED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:24:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F13A822CED
+	by mail.kernel.org (Postfix) with ESMTPS id 904DF22CF5
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:26:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 904DF22CF5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5WCj-0000Jv-3k
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:24:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48185)
+	id 1i5WFE-0001ew-L2
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5WC1-0008GZ-AP
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:23:30 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5WEM-0001DG-Pi
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5WBz-0004ZI-Qx
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:23:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33598)
+ (envelope-from <eblake@redhat.com>) id 1i5WEL-0005ll-Px
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:25:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56734)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5WBz-0004Yw-GV
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:23:27 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5WEL-0005lG-HA
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:25:53 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A586E307D868
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 14:23:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C5ECE2BFD2
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 14:25:52 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 743FF1001947;
- Wed,  4 Sep 2019 14:23:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C191C5DA8C;
+ Wed,  4 Sep 2019 14:25:48 +0000 (UTC)
 To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190904130047.25808-1-thuth@redhat.com>
- <20190904130047.25808-6-thuth@redhat.com>
+ <20190904130047.25808-7-thuth@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <f374e357-8822-52c4-ff8d-44f9790565c7@redhat.com>
-Date: Wed, 4 Sep 2019 09:23:22 -0500
+Message-ID: <d6081f50-78cc-b638-70c2-1b86a2812b38@redhat.com>
+Date: Wed, 4 Sep 2019 09:25:48 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190904130047.25808-6-thuth@redhat.com>
+In-Reply-To: <20190904130047.25808-7-thuth@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="25GrX05xG9gAtR0ZHBKdM2aOL2mXKrqoT"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="1OhBAPDwHFKRTkvDVWY204hr2YpiRWMy7"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 04 Sep 2019 14:23:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Wed, 04 Sep 2019 14:25:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] tests/libqtest: Move global_test
- wrapper function into a separate header
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] tests/libqtest: Use
+ libqtest-single.h in tests that require global_qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,103 +104,43 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---25GrX05xG9gAtR0ZHBKdM2aOL2mXKrqoT
-Content-Type: multipart/mixed; boundary="AWD9Xe3eH02vpd1mbat9LtN1pxMSjKkAt";
+--1OhBAPDwHFKRTkvDVWY204hr2YpiRWMy7
+Content-Type: multipart/mixed; boundary="dpUrp4eD452DxkPubicZDtkrGvUGNmoY6";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
  qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <f374e357-8822-52c4-ff8d-44f9790565c7@redhat.com>
-Subject: Re: [PATCH v2 5/6] tests/libqtest: Move global_test wrapper function
- into a separate header
+Message-ID: <d6081f50-78cc-b638-70c2-1b86a2812b38@redhat.com>
+Subject: Re: [PATCH v2 6/6] tests/libqtest: Use libqtest-single.h in tests
+ that require global_qtest
 References: <20190904130047.25808-1-thuth@redhat.com>
- <20190904130047.25808-6-thuth@redhat.com>
-In-Reply-To: <20190904130047.25808-6-thuth@redhat.com>
+ <20190904130047.25808-7-thuth@redhat.com>
+In-Reply-To: <20190904130047.25808-7-thuth@redhat.com>
 
---AWD9Xe3eH02vpd1mbat9LtN1pxMSjKkAt
+--dpUrp4eD452DxkPubicZDtkrGvUGNmoY6
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/4/19 8:00 AM, Thomas Huth wrote:
-> We want libqtest.h to become completely independen from global_qtest
-
-independent
-
-> (so that the wrapper functions are not used by accident anymore). As
-> a first step, move the wrapper functions into a separate header file.
+> Tests that require global_qtest or the related wrapper functions now
+> use the libqtest-single.h header that is dedicated for everything
+> related to global_qtest. The core libqtest.c and libqtest.h files are
+> now completely indepedent from global_qtest, so that the core library
+> is now not depending on a global state anymore.
 >=20
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  MAINTAINERS             |   2 +-
->  tests/libqtest-single.h | 311 ++++++++++++++++++++++++++++++++++++++++=
 
->  tests/libqtest.c        |  11 --
->  tests/libqtest.h        | 287 +-----------------------------------
->  4 files changed, 313 insertions(+), 298 deletions(-)
->  create mode 100644 tests/libqtest-single.h
->=20
+>  32 files changed, 33 insertions(+), 36 deletions(-)
 
-> +/**
-> + * qmp:
-> + * @fmt...: QMP message to send to qemu, formatted like
-> + * qobject_from_jsonf_nofail().  See parse_escape() for what's
-> + * supported after '%'.
-> + *
-> + * Sends a QMP message to QEMU and returns the response.
-> + */
-> +GCC_FMT_ATTR(1, 2)
-> +static inline QDict *qmp(const char *fmt, ...)
-> +{
-
-I'm a bit surprised gcc doesn't complain about inlining a va_arg
-function, but since it works, I'm fine with the approach.
-
-> +++ b/tests/libqtest.c
-> @@ -1106,17 +1106,6 @@ void qtest_memset(QTestState *s, uint64_t addr, =
-uint8_t pattern, size_t size)
->      qtest_rsp(s, 0);
->  }
-> =20
-> -QDict *qmp(const char *fmt, ...)
-> -{
-> -    va_list ap;
-> -    QDict *response;
-> -
-> -    va_start(ap, fmt);
-> -    response =3D qtest_vqmp(global_qtest, fmt, ap);
-> -    va_end(ap);
-> -    return response;
-> -}
-> -
-
-Nice - we've reduced the use of global_qtest to just a single optional
-header!
-
-> +++ b/tests/libqtest.h
-
-> -/**
-> - * clock_step:
-> - * @step: Number of nanoseconds to advance the clock by.
-> - *
-> - * Advance the QEMU_CLOCK_VIRTUAL by @step nanoseconds.
-> - *
-> - * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds=
-=2E
-> - */
-> -static inline int64_t clock_step(int64_t step)
-> -{
-> -    return qtest_clock_step(global_qtest, step);
-> -}
-> +#include "libqtest-single.h"
-
-Well, almost.  I guess this commit is the code motion, and the next one
-actually fixes clients to track the rename, so this #include is
-temporary (I hope).  It's just churn to put a TODO comment in this
-commit that would get removed in the next.  So,
+Big list, but looks reasonable and mechanical.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks again for seeing this through to conclusion (my RFC patches that
+kicked off the idea are now a few years old...).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -208,24 +148,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---AWD9Xe3eH02vpd1mbat9LtN1pxMSjKkAt--
+--dpUrp4eD452DxkPubicZDtkrGvUGNmoY6--
 
---25GrX05xG9gAtR0ZHBKdM2aOL2mXKrqoT
+--1OhBAPDwHFKRTkvDVWY204hr2YpiRWMy7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1vyNoACgkQp6FrSiUn
-Q2rllQf8DpUiaGeOyoHIJ3zrm3flqIhjej/nR3vib1wLVt+04KCgZpWgk7GNEkXs
-QlSRdcyoray0mkgsRKMofYEPEekzfAC3cFXEQZiYdOTTWR6S2gtM7hQXA/Y1pJWr
-DPf1L635qhXJb5HOAgAdrbi0HG78pbi7nbFUWS80QWX9wnOMbWLpiYZHWwbftx7n
-khkDSGs8e3BvAVIcyDw27LrtBq4jq4AHPcRmi6peAOUqLf5+MLMbyEaNQdwFcNCq
-twVT/n1ctpBHjf8QpvNemglE/TlstulS6ArhgKkanSUnWvt4sZslithunlI0Pe5w
-K971kZaF+LXrcpMb54LK3o5w7NjlUQ==
-=i827
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1vyWwACgkQp6FrSiUn
+Q2oSagf/YJoy9ANx8w6a2MJK0k0T+3XDEVp+ITcBgeXsjz7QuHgHr9XnWGa65dVa
+mNr3hRMJnZYZwajdKUtCf5gqLkxjPSb7uVddJkq0ncdClg0NivjZ5eXhviV1277T
+TjnSSGUE3z8ru/27dUGEFFcN2I8Tm/iKLXoUouq/tZlEiQUqPaFieGeQ9oWQ7A9v
+8OyU4F3JvJ+eWO9Zq6YRCHN3htx86PNvCMxN/7VMuUhsERtnCtQp9aN4hxFqR7ly
+KNIlPK/UWRRWn1IrNyfdyEprDGuy7r45SDv0EscRyU6p198lEKo4i22ADVPHLRrn
+EY8WjRVwK4DMcJ/ntmiAeC402dvsxw==
+=LloT
 -----END PGP SIGNATURE-----
 
---25GrX05xG9gAtR0ZHBKdM2aOL2mXKrqoT--
+--1OhBAPDwHFKRTkvDVWY204hr2YpiRWMy7--
 
