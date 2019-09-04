@@ -2,56 +2,59 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2114AC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FCEC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:26:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB7992168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:26:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB7992168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id C08612168B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:26:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C08612168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5VIe-00010G-JW
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:26:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54902)
+	id 1i5VIm-0001Am-R4
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:26:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i5Utv-0001el-GR
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:44 -0400
+ (envelope-from <thuth@redhat.com>) id 1i5UuH-00027Y-Da
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i5Utt-00089q-Py
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46855 helo=mail.rt-rk.com)
+ (envelope-from <thuth@redhat.com>) id 1i5UuF-0008Kz-Qv
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56226)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i5Utt-00088U-D0
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:41 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 7F4251A2168;
- Wed,  4 Sep 2019 14:59:34 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 52DBC1A21F1;
- Wed,  4 Sep 2019 14:59:34 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 14:59:28 +0200
-Message-Id: <1567601968-26946-9-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1567601968-26946-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1567601968-26946-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v6 8/8] linux-user: Add support for
- FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5UuF-0008Kf-J6
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:03 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CE13FC050E12
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 13:01:02 +0000 (UTC)
+Received: from thuth.com (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 848B91001B02;
+ Wed,  4 Sep 2019 13:01:01 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>,
+	qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 15:00:45 +0200
+Message-Id: <20190904130047.25808-5-thuth@redhat.com>
+In-Reply-To: <20190904130047.25808-1-thuth@redhat.com>
+References: <20190904130047.25808-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Wed, 04 Sep 2019 13:01:02 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 4/6] tests: Remove unnecessary global_qtest
+ references
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,91 +66,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, amarkovic@wavecomp.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+We are going to remove global_qtest from the main libqtest library
+soon, so tests that do not urgently need global_qtest anymore
+should be cleaned from the unnecessary references.
 
-FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
-for controlling error reporting of a floppy drive.
-
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- linux-user/ioctls.h        |  2 ++
- linux-user/syscall_defs.h  | 19 +++++++++++++++++++
- linux-user/syscall_types.h |  7 +++++++
- 3 files changed, 28 insertions(+)
+ tests/ahci-test.c        | 1 -
+ tests/bios-tables-test.c | 1 -
+ tests/ivshmem-test.c     | 3 ---
+ tests/rtas-test.c        | 1 -
+ 4 files changed, 6 deletions(-)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 622874b..0c75d03 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -118,6 +118,8 @@
-      IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
-      IOCTL(FDFMTEND, 0, TYPE_NULL)
-      IOCTL(FDFLUSH, 0, TYPE_NULL)
-+     IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-+     IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-      IOCTL(FDRESET, 0, TYPE_NULL)
-      IOCTL(FDRAWCMD, 0, TYPE_NULL)
-      IOCTL(FDTWADDLE, 0, TYPE_NULL)
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 834a085..7c5b614 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -890,12 +890,31 @@ struct target_pollfd {
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index 086811e602..c8d42ceea0 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -200,7 +200,6 @@ static void ahci_shutdown(AHCIQState *ahci)
+ {
+     QOSState *qs = ahci->parent;
  
- /* From <linux/fd.h> */
+-    assert(!global_qtest);
+     ahci_clean_mem(ahci);
+     free_ahci_device(ahci->dev);
+     g_free(ahci);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index a356ac3489..9b3d8b0d1b 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -626,7 +626,6 @@ static void test_acpi_one(const char *params, test_data *data)
+         test_smbios_structs(data);
+     }
  
-+struct target_floppy_max_errors {
-+    abi_uint        abort;
-+    abi_uint        read_track;
-+    abi_uint        reset;
-+    abi_uint        recal;
-+    abi_uint        reporting;
-+};
-+
-+struct target_format_descr {
-+    abi_uint        device;
-+    abi_uint        head;
-+    abi_uint        track;
-+};
-+
- #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
- #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
- #define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
- #define TARGET_FDFMTTRK      TARGET_IOW(2, 0x48, struct target_format_descr)
- #define TARGET_FDFMTEND       TARGET_IO(2, 0x49)
-+#define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
- #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
-+#define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c,                               \
-+                                        struct target_floppy_max_errors)
-+#define TARGET_FDGETMAXERRS  TARGET_IOR(2, 0x0e,                               \
-+                                        struct target_floppy_max_errors)
- #define TARGET_FDRESET        TARGET_IO(2, 0x54)
- #define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
- #define TARGET_FDTWADDLE      TARGET_IO(2, 0x59)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index d82d1a5..5ba7c34 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -261,6 +261,13 @@ STRUCT(blkpg_ioctl_arg,
-        TYPE_INT, /* datalen */
-        TYPE_PTRVOID) /* data */
+-    assert(!global_qtest);
+     qtest_quit(data->qts);
+     g_free(args);
+ }
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index b76457948b..be9aa92a61 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -100,7 +100,6 @@ static inline void write_mem(IVState *s, uint64_t off,
  
-+STRUCT(floppy_max_errors,
-+       TYPE_INT,     /* abort */
-+       TYPE_INT,     /* read_track */
-+       TYPE_INT,     /* reset */
-+       TYPE_INT,     /* recal */
-+       TYPE_INT)     /* reporting */
-+
- STRUCT(format_descr,
-        TYPE_INT,     /* device */
-        TYPE_INT,     /* head */
+ static void cleanup_vm(IVState *s)
+ {
+-    assert(!global_qtest);
+     g_free(s->dev);
+     qtest_shutdown(s->qs);
+ }
+@@ -388,7 +387,6 @@ static void test_ivshmem_hotplug(void)
+ 
+     qts = qtest_init("-object memory-backend-ram,size=1M,id=mb1");
+ 
+-    global_qtest = qts;  /* TODO: Get rid of global_qtest here */
+     qtest_qmp_device_add(qts, "ivshmem-plain", "iv1",
+                          "{'addr': %s, 'memdev': 'mb1'}",
+                          stringify(PCI_SLOT_HP));
+@@ -397,7 +395,6 @@ static void test_ivshmem_hotplug(void)
+     }
+ 
+     qtest_quit(qts);
+-    global_qtest = NULL;
+ }
+ 
+ static void test_ivshmem_memdev(void)
+diff --git a/tests/rtas-test.c b/tests/rtas-test.c
+index ee888676ed..167b42db38 100644
+--- a/tests/rtas-test.c
++++ b/tests/rtas-test.c
+@@ -14,7 +14,6 @@ static void test_rtas_get_time_of_day(void)
+     time_t t1, t2;
+ 
+     qs = qtest_spapr_boot("-machine pseries");
+-    global_qtest = qs->qts;
+ 
+     t1 = time(NULL);
+     ret = qrtas_get_time_of_day(qs->qts, &qs->alloc, &tm, &ns);
 -- 
-2.7.4
+2.18.1
 
 
