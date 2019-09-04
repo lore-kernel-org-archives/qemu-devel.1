@@ -2,79 +2,84 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C79C5C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A19CDC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8039C208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 669B52070C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D3wzFt+q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8039C208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V/9uNM7q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669B52070C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cFE-0003OA-1k
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:51:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44159)
+	id 1i5cH0-0004rZ-S6
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:53:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i5bIS-0007H5-DF
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:50:30 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b13-0005cv-Cd
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i5bIO-0007wm-DW
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:50:28 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:34218)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b10-0003KG-Um
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:29 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43224)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i5bIM-0007uj-Fe; Wed, 04 Sep 2019 15:50:24 -0400
-Received: by mail-lj1-x241.google.com with SMTP id x18so20882163ljh.1;
- Wed, 04 Sep 2019 12:50:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=w5qJGJe9+19hRZkyehnZPNTyNBTfEbfEcG6cKooXbAQ=;
- b=D3wzFt+qV6ZFD9ORJyIYh2CCVvOuFnSFZ039ktF8gHas73NhC5+1aHyzUb5d/5gDCc
- Na/EP6gi5qxNgE0/1SiU21YFlcB83gW15Sbb7EdpcuIuj3pVwATYljsI6WN1wkux7Kep
- fp66EbMST/rpClAuTpaZ4cjm4ykU7rmujaP/v6h6Icpw1kY6T+nbDf1Cwn+W6iRght/Q
- VT+ik6zwuiAY7vuk+OqLClPMXdvfmsERoggVLIs6XMAqV3IVtTFM/K+7iY5NZ1r53CJi
- IjliGvKRtF+D4a44yJBr6zj89kPZEDnsqssNHcgJbj6SIhNiNSsGeB8VyungzT1aYyma
- PZLg==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i5b0y-0003HU-U1
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:25 -0400
+Received: by mail-pf1-x444.google.com with SMTP id d15so4402143pfo.10
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=VYZV/zdp2JerFG4ZPo6G3uzAjb1Br+I2f89wbKWVC8A=;
+ b=V/9uNM7qgsoR3NIi+cKH/0++FBpIoU7LmUYFtCBnsCivHLFAoFyZvz8Xi9t13wXIOo
+ zk5QT+QED/Gi12rPWf8pk1t+RDrb4Z5jdKeTDrbCxjKHAB5APwkudCtjk/7mbsbL+9TS
+ hovgJo/08r60d46E2eQA53GE9ILADG1Ua8GlfkSbPlIxfj94g1olSsXbejOJKcCoGm50
+ nOydBviW8XZCkhZnQUIIQ8cBHP8fyOQhe79qGfj/8KNek5mZqJTFezL7A6Othtp7Ci/2
+ QeJEe2WV383jfgWUQQKvCaKvxqHxmGimlLfM3g2FmLrkyOdH/YUT+m77bwufpDuotqBu
+ 8pYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=w5qJGJe9+19hRZkyehnZPNTyNBTfEbfEcG6cKooXbAQ=;
- b=dTmVt8xy9PeWCvQIvwiYd5C6BJ21z+9aS1Qcm2idvuAPW1tx3Pd4579I18JaXN6FUw
- s38CD1BPJ7ISyN/6d3yYdgy9Mn/JhHXLraYesTTfx/kEmOpHI/JfLGz/GQ9QXfkui8Aj
- OWahvslIPPQ8CJHNkOX0utEpcZ5gZHiZyTibzwSJqpoyyRZNXFb/aEF1MIxFTOthuSoo
- tMgIfCTUZGV/uA2odhmMpBKxSIDvJ3OeCvh4FuEOg4BENvwVwK5MdKJw/nRDZiAoSQ6C
- uhmOxCqeujE6LvM2g6v6w/3TV0b5iOzc+3sNH5zviUDKiXnZHIr8j4FEQFx43WUxA5u9
- x/4g==
-X-Gm-Message-State: APjAAAXS8/C/9Ih3NMtGvebVzUy7V+hILwh7L0nrw1U2eWu4ehN9C3xW
- fa4aS/TvpswVkU1eYFW8LZIkSskh+EBHwhFBocM=
-X-Google-Smtp-Source: APXvYqzuz3aq6kXCsyzRPO4Fl3alQWOvoWPThT6EgW2o1QuxJss4VhNMnjIM9X8pcOo8uVPUH0H+PlWEpqkrSLM+EVM=
-X-Received: by 2002:a2e:b4c9:: with SMTP id r9mr12827824ljm.196.1567626620347; 
- Wed, 04 Sep 2019 12:50:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <1567306391-2682-1-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1567306391-2682-1-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 4 Sep 2019 12:49:53 -0700
-Message-ID: <CAKmqyKNrBtZFEp3JCL0N5Kbw2f9cG6gu3YG+b9pTKaprHysjCw@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=VYZV/zdp2JerFG4ZPo6G3uzAjb1Br+I2f89wbKWVC8A=;
+ b=W1srCzv3J0LlDMUdS3IAkGBO4eTEh+7d7a7DbiOz839zzpaG7P069EVCzZW5fhuqDO
+ yKODmSN0Wv8ED/dXIDQvlRDjflopP0T4lfB30zLwv23+5Iva1smd/GN5+idCny9X4xEA
+ TW8prSx21MZ/ziKamI/ySH/WvNjw8lORp+TlLEYlqq7jpvx6Sls9OHpq3xcsahwhwiw7
+ pwJvNy1UOqmUzNR00cWZG22L9KI9yzgHmx6zrJfP1/OMB49Fm51cTuDurKhhGwcxTYWw
+ BSSIAb3TPRLoKcLeZ66nykk1ebWSkk5/BWTHeRqveyY1WF9sTO6+PTm2CeVEYowVXuuI
+ JwFw==
+X-Gm-Message-State: APjAAAVt8DwoPYe1HIC7CoDGud7Rz6NgdH+obb00VzqrTKJcE1Ovbj2E
+ WoS7GieC1lA8jra4fR97bGl0l0vIoCg=
+X-Google-Smtp-Source: APXvYqySDzkV5npXSlDRhOHpZ05cCNarJctNDMRf4t/NRtUTQAbT5HSqFfm1xpBSR7RpPKKAd0VIOw==
+X-Received: by 2002:a62:e802:: with SMTP id c2mr12575057pfi.212.1567625543381; 
+ Wed, 04 Sep 2019 12:32:23 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Sep 2019 12:32:22 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 12:30:55 -0700
+Message-Id: <20190904193059.26202-66-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
+References: <20190904193059.26202-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v7 00/30] riscv: sifive_u: Improve the
- emulation fidelity of sifive_u machine
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v4 65/69] target/arm: Convert T16,
+ load (literal)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,214 +91,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 31, 2019 at 7:54 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> As of today, the QEMU 'sifive_u' machine is a special target that does
-> not boot the upstream OpenSBI/U-Boot firmware images built for the real
-> SiFive HiFive Unleashed board. Hence OpenSBI supports a special platform
-> "qemu/sifive_u". For U-Boot, the sifive_fu540_defconfig is referenced
-> in the OpenSBI doc as its payload, but that does not boot at all due
-> to various issues in current QEMU 'sifive_u' machine codes.
->
-> This series aims to improve the emulation fidelity of sifive_u machine,
-> so that the upstream OpenSBI, U-Boot and kernel images built for the
-> SiFive HiFive Unleashed board can be used out of the box without any
-> special hack.
->
-> The major changes include:
-> - Heterogeneous harts creation supported, so that we can create a CPU
->   that exactly mirrors the real hardware: 1 E51 + 4 U54.
-> - Implemented a PRCI model for FU540
-> - Implemented an OTP model for FU540, primarily used for storing serial
->   number of the board
-> - Fixed GEM support that was seriously broken on sifive_u
-> - Synced device tree with upstream Linux kernel on sifive_u
->
-> OpenSBI v0.4 image built for sifive/fu540 is included as the default
-> bios image for 'sifive_u' machine.
->
-> The series is tested against OpenSBI v0.4 image for sifive/fu540
-> paltform, U-Boot v2019.10-rc1 image for sifive_fu540_defconfig,
-> and Linux kernel v5.3-rc3 image with the following patch:
->
-> macb: Update compatibility string for SiFive FU540-C000 [1]
->
-> OpenSBI + U-Boot, ping/tftpboot with U-Boot MACB driver works well.
-> Boot Linux 64-bit defconfig image, verified that system console on
-> the serial 0 and ping host work pretty well.
->
-> An OpenSBI patch [2] was sent to drop the special "qemu/sifive_u" platform
-> support in OpenSBI. The original plan was to get the drop patch applied
-> after this QEMU series is merged. However after discussion in the OpenSBI
-> mailing list, it seems the best option for us is to let OpenSBI continue
-> shipping the special "qemu/sifive_u" platform support to work with QEMU
-> version <= 4.1 and deprecate the support sometime in the future. A patch
-> will need to be sent to OpenSBI mailing list to update its document.
->
-> v4 is now rebased on Palmer's QEMU RISC-V repo "for-master" branch.
-> Dropped the following v3 patch that was already done by someone else.
-> - riscv: sifive_u: Generate an aliases node in the device tree
-> - riscv: sifive_u: Support loading initramfs
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate.c | 42 ++----------------------------------------
+ target/arm/t16.decode  |  4 ++++
+ 2 files changed, 6 insertions(+), 40 deletions(-)
 
-I'm having trouble applying this. Do you mind sharing a public git branch?
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index d409afd55f..4f4c77fc89 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -982,14 +982,6 @@ static inline void gen_aa32_ld##SUFF(DisasContext *s, TCGv_i32 val,      \
+                                      TCGv_i32 a32, int index)            \
+ {                                                                        \
+     gen_aa32_ld_i32(s, val, a32, index, OPC | s->be_data);               \
+-}                                                                        \
+-static inline void gen_aa32_ld##SUFF##_iss(DisasContext *s,              \
+-                                           TCGv_i32 val,                 \
+-                                           TCGv_i32 a32, int index,      \
+-                                           ISSInfo issinfo)              \
+-{                                                                        \
+-    gen_aa32_ld##SUFF(s, val, a32, index);                               \
+-    disas_set_da_iss(s, OPC, issinfo);                                   \
+ }
+ 
+ #define DO_GEN_ST(SUFF, OPC)                                             \
+@@ -997,14 +989,6 @@ static inline void gen_aa32_st##SUFF(DisasContext *s, TCGv_i32 val,      \
+                                      TCGv_i32 a32, int index)            \
+ {                                                                        \
+     gen_aa32_st_i32(s, val, a32, index, OPC | s->be_data);               \
+-}                                                                        \
+-static inline void gen_aa32_st##SUFF##_iss(DisasContext *s,              \
+-                                           TCGv_i32 val,                 \
+-                                           TCGv_i32 a32, int index,      \
+-                                           ISSInfo issinfo)              \
+-{                                                                        \
+-    gen_aa32_st##SUFF(s, val, a32, index);                               \
+-    disas_set_da_iss(s, OPC, issinfo | ISSIsWrite);                      \
+ }
+ 
+ static inline void gen_aa32_frob64(DisasContext *s, TCGv_i64 val)
+@@ -1053,9 +1037,7 @@ static inline void gen_aa32_st64(DisasContext *s, TCGv_i64 val,
+     gen_aa32_st_i64(s, val, a32, index, MO_Q | s->be_data);
+ }
+ 
+-DO_GEN_LD(8s, MO_SB)
+ DO_GEN_LD(8u, MO_UB)
+-DO_GEN_LD(16s, MO_SW)
+ DO_GEN_LD(16u, MO_UW)
+ DO_GEN_LD(32u, MO_UL)
+ DO_GEN_ST(8, MO_UB)
+@@ -10754,11 +10736,10 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+ 
+ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+ {
+-    uint32_t val, rd;
++    uint32_t val;
+     int32_t offset;
+     TCGv_i32 tmp;
+     TCGv_i32 tmp2;
+-    TCGv_i32 addr;
+ 
+     if (disas_t16(s, insn)) {
+         return;
+@@ -10768,26 +10749,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     switch (insn >> 12) {
+     case 0: case 1: /* add/sub (3reg, 2reg imm), shift imm; in decodetree */
+     case 2: case 3: /* add, sub, cmp, mov (reg, imm), in decodetree */
+-        goto illegal_op;
+-    case 4:
+-        if (insn & (1 << 11)) {
+-            rd = (insn >> 8) & 7;
+-            /* load pc-relative.  Bit 1 of PC is ignored.  */
+-            addr = add_reg_for_lit(s, 15, (insn & 0xff) * 4);
+-            tmp = tcg_temp_new_i32();
+-            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s),
+-                               rd | ISSIs16Bit);
+-            tcg_temp_free_i32(addr);
+-            store_reg(s, rd, tmp);
+-            break;
+-        }
+-
+-        /*
+-         * - Data-processing (two low registers), in decodetree
+-         * - data processing extended, branch and exchange, in decodetree
+-         */
+-        goto illegal_op;
+-
++    case 4: /* ldr lit, data proc (2reg), data proc ext, bx; in decodetree */
+     case 5: /* load/store register offset, in decodetree */
+     case 6: /* load/store word immediate offset, in decodetree */
+     case 7: /* load/store byte immediate offset, in decodetree */
+diff --git a/target/arm/t16.decode b/target/arm/t16.decode
+index 79a1d66d6c..0b4da411e0 100644
+--- a/target/arm/t16.decode
++++ b/target/arm/t16.decode
+@@ -113,6 +113,10 @@ LDRH_ri         10001 ..... ... ...             @ldst_ri_2
+ STR_ri          10010 ... ........              @ldst_spec_i rn=13
+ LDR_ri          10011 ... ........              @ldst_spec_i rn=13
+ 
++# Load (PC-relative)
++
++LDR_ri          01001 ... ........              @ldst_spec_i rn=15
++
+ # Add PC/SP (immediate)
+ 
+ ADR             10100 rd:3 ........             imm=%imm8_0x4
+-- 
+2.17.1
 
-Alistair
-
->
-> The following v3 patch was dropped too due to a different cluster approach
-> suggested by Richard Henderson is used in v4:
-> - riscv: hart: Support heterogeneous harts population
->
-> [1]: https://patchwork.kernel.org/patch/11050003/
-> [2]: http://lists.infradead.org/pipermail/opensbi/2019-August/000335.html
->
-> Changes in v7:
-> - use `s->hartid_base + idx` directly
->
-> Changes in v6:
-> - use s->hartid_base directly, instead of an extra variable
-> - generate u cpus unconditionally (not test ms->smp.cpus > 1)
->   since the minimal required number of cpu is now 2, due to
->   this patch is reordered
-> - fix incorrectly indented comment lines
-> - remove unneeded brackets around assignment
->
-> Changes in v5:
-> - new patch to change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
->   in various sifive models
-> - new patch to remove the unnecessary include of target/riscv/cpu.h
-> - change to use defines instead of enums
-> - change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_prci
-> - creating a 32-bit val variable and using that instead of casting
->   everywhere in sifive_u_prci_write()
-> - move all register initialization to sifive_u_prci_reset() function
-> - drop sifive_u_prci_create()
-> - s/codes that worked/code that works/g
-> - create sifive_u_prci block directly in the machine codes, instead
->   of calling sifive_u_prci_create()
-> - change to use defines instead of enums
-> - change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_otp
-> - creating a 32-bit val variable and using that instead of casting
->   everywhere in sifive_u_otp_write()
-> - move all register initialization to sifive_u_otp_reset() function
-> - drop sifive_u_otp_create()
-> - create sifive_u_otp block directly in the machine codes, instead
->   of calling sifive_u_otp_create()
-> - add the missing "local-mac-address" property in the ethernet node
->
-> Changes in v4:
-> - remove 2 more "linux,phandle" instances in sifive_u.c and spike.c
->   after rebasing on Palmer's QEMU RISC-V tree
-> - change create_fdt() to return void in sifive_u.c too, after rebasing
->   on Palmer's QEMU RISC-V tree
-> - new patch to remove executable attribute of opensbi images
-> - prefix all macros/variables/functions with SIFIVE_E/sifive_e
->   in the sifive_e_prci driver
-> - new patch to add a "hartid-base" property to RISC-V hart array
-> - changed to create clusters for each cpu type
-> - prefix all macros/variables/functions with SIFIVE_U/sifive_u
->   in the sifive_u_prci driver
-> - prefix all macros/variables/functions with SIFIVE_U/sifive_u
->   in the sifive_u_otp driver
-> - new patch to remove handcrafted clock nodes for UART and ethernet
->
-> Changes in v3:
-> - use management cpu count + 1 for the min_cpus
-> - changed to use macros for management and compute cpu count
-> - update IRQ numbers of both UARTs to match hardware as well
->
-> Changes in v2:
-> - keep the PLIC compatible string unchanged as OpenSBI uses that
->   for DT fix up
-> - drop patch "riscv: sifive: Move sifive_mmio_emulate() to a common place"
-> - new patch "riscv: sifive_e: Drop sifive_mmio_emulate()"
-> - update the file header to indicate at least 2 harts are created
-> - fixed the "interrupts-extended" property size
-> - use create_unimplemented_device() to create the GEM management
->   block instead of sifive_mmio_emulate()
-> - add "phy-handle" property to the ethernet node
->
-> Bin Meng (30):
->   riscv: hw: Remove superfluous "linux,phandle" property
->   riscv: hw: Use qemu_fdt_setprop_cell() for property with only 1 cell
->   riscv: hw: Remove not needed PLIC properties in device tree
->   riscv: hw: Change create_fdt() to return void
->   riscv: hw: Change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
->   riscv: hw: Remove the unnecessary include of target/riscv/cpu.h
->   riscv: roms: Remove executable attribute of opensbi images
->   riscv: sifive_u: Remove the unnecessary include of prci header
->   riscv: sifive: Rename sifive_prci.{c,h} to sifive_e_prci.{c,h}
->   riscv: sifive_e: prci: Fix a typo of hfxosccfg register programming
->   riscv: sifive_e: prci: Update the PRCI register block size
->   riscv: sifive_e: Drop sifive_mmio_emulate()
->   riscv: Add a sifive_cpu.h to include both E and U cpu type defines
->   riscv: hart: Extract hart realize to a separate routine
->   riscv: hart: Add a "hartid-base" property to RISC-V hart array
->   riscv: sifive_u: Set the minimum number of cpus to 2
->   riscv: sifive_u: Update hart configuration to reflect the real FU540
->     SoC
->   riscv: sifive_u: Update PLIC hart topology configuration string
->   riscv: sifive: Implement PRCI model for FU540
->   riscv: sifive_u: Generate hfclk and rtcclk nodes
->   riscv: sifive_u: Add PRCI block to the SoC
->   riscv: sifive_u: Reference PRCI clocks in UART and ethernet nodes
->   riscv: sifive_u: Update UART base addresses and IRQs
->   riscv: sifive_u: Change UART node name in device tree
->   riscv: roms: Update default bios for sifive_u machine
->   riscv: sifive: Implement a model for SiFive FU540 OTP
->   riscv: sifive_u: Instantiate OTP memory with a serial number
->   riscv: sifive_u: Fix broken GEM support
->   riscv: sifive_u: Remove handcrafted clock nodes for UART and ethernet
->   riscv: sifive_u: Update model and compatible strings in device tree
->
->  hw/riscv/Makefile.objs                       |   4 +-
->  hw/riscv/riscv_hart.c                        |  34 ++--
->  hw/riscv/sifive_e.c                          |  27 ++-
->  hw/riscv/sifive_e_prci.c                     | 123 +++++++++++++
->  hw/riscv/sifive_prci.c                       | 123 -------------
->  hw/riscv/sifive_test.c                       |   6 +-
->  hw/riscv/sifive_u.c                          | 255 ++++++++++++++++++---------
->  hw/riscv/sifive_u_otp.c                      | 190 ++++++++++++++++++++
->  hw/riscv/sifive_u_prci.c                     | 169 ++++++++++++++++++
->  hw/riscv/sifive_uart.c                       |  10 +-
->  hw/riscv/spike.c                             |   1 -
->  hw/riscv/virt.c                              |  40 ++---
->  include/hw/riscv/riscv_hart.h                |   1 +
->  include/hw/riscv/sifive_cpu.h                |  31 ++++
->  include/hw/riscv/sifive_e.h                  |   7 +-
->  include/hw/riscv/sifive_e_prci.h             |  71 ++++++++
->  include/hw/riscv/sifive_prci.h               |  69 --------
->  include/hw/riscv/sifive_u.h                  |  31 ++--
->  include/hw/riscv/sifive_u_otp.h              |  80 +++++++++
->  include/hw/riscv/sifive_u_prci.h             |  91 ++++++++++
->  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin
->  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 40968 -> 45064 bytes
->  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin
->  roms/Makefile                                |   4 +-
->  24 files changed, 1007 insertions(+), 360 deletions(-)
->  create mode 100644 hw/riscv/sifive_e_prci.c
->  delete mode 100644 hw/riscv/sifive_prci.c
->  create mode 100644 hw/riscv/sifive_u_otp.c
->  create mode 100644 hw/riscv/sifive_u_prci.c
->  create mode 100644 include/hw/riscv/sifive_cpu.h
->  create mode 100644 include/hw/riscv/sifive_e_prci.h
->  delete mode 100644 include/hw/riscv/sifive_prci.h
->  create mode 100644 include/hw/riscv/sifive_u_otp.h
->  create mode 100644 include/hw/riscv/sifive_u_prci.h
->  mode change 100755 => 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
->  mode change 100755 => 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
->  mode change 100755 => 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
->
-> --
-> 2.7.4
->
->
 
