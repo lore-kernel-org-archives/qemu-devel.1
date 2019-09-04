@@ -2,60 +2,91 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0383C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3679AC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3D8820674
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:37:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D8820674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFDAB208E4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:38:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tINgPuPL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFDAB208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cxa-00034E-FY
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:37:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53986)
+	id 1i5czJ-0005Kp-Bq
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:38:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54133)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i5cD4-0001MB-NH
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:59 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5cDV-0001uy-W7
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:49:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i5cD3-0002AY-DZ
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:58 -0400
-Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:60614)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5cD3-00029t-7q
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:57 -0400
-Received: from player691.ha.ovh.net (unknown [10.109.146.53])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 5E4B4117E70
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 22:48:56 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player691.ha.ovh.net (Postfix) with ESMTPSA id CCAF698B2A19;
- Wed,  4 Sep 2019 20:48:49 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed,  4 Sep 2019 22:46:59 +0200
-Message-Id: <20190904204659.13878-16-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190904204659.13878-1-clg@kaod.org>
-References: <20190904204659.13878-1-clg@kaod.org>
+ (envelope-from <alex.bennee@linaro.org>) id 1i5cDU-0002Qq-OM
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:49:25 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:38990)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i5cDU-0002QH-IA
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:49:24 -0400
+Received: by mail-wm1-x331.google.com with SMTP id q12so255804wmj.4
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:49:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=shdEgCVsEVOTDp+jCd0tUk+kAdVtVP18WfvdQSOvOYE=;
+ b=tINgPuPL+iaIB2ahUfBaaN0yzZQMa0m77Nn06PM+xqZPmDSJLhWACVSe2klWID5HTe
+ IrOWj8ywF+z1jukjUocj3ZtHQWZxkuBAyA+lsyIyXUXLW2KQh6UnkI1cty28cjd8jsW6
+ 9d018mApjtgz+/jcyQ8K64Oat3Ydq1gOfUwpFaPN5VyY2jHBg5QE1FBDyRo4gvJuDU06
+ cpgDRNhXDcxDn5aAqYaZzstphDS4CVtoKxgbunsT1J5Dy1r3kTx5vJaz0IN/J+KFTiEr
+ fd4LG0bBUGKig+2xWc3jOh9NboG3fmWzmEFaxFPySU56PCBcaNjZkCjHjZKY2Bf09OXR
+ fLNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=shdEgCVsEVOTDp+jCd0tUk+kAdVtVP18WfvdQSOvOYE=;
+ b=me/EcPZ1jx97Pkos0gejeYY9+HABwgjJFUbJP4bhsRuLecq5eiiu3qELSUX9o3ivr4
+ LU6xKUO6+ETXp17XYNmzRrr5lemn2kvPOv7x94wOTo47Z4KzMhn7fcL/MAbItZiTcIlK
+ /8lIeqMpHlD6kmSHlB4CCTz3MaUYFid1jrqRZ97Nkf9rVilGsWs9KMTD1ss1iNBvUVdw
+ yYHqvemwpCDvvK0Ld7FtCVcyjo39bd0phOzBB7MZoPGYWeMJNV8tKnwC9ArlTIek1fXu
+ 3aTXjq4f8MGvnzXRvHPU8Wb2Hnyy+laAWL3PAfi+CXFvXpmi/cYOsR10j7HX2Q7PCo3y
+ 4sBw==
+X-Gm-Message-State: APjAAAXsoEBpcInhdzZ0Can8l8bCKruadR9c2IppBt8RmYEhffyGsrU1
+ CJ0fEoq+v+oO8D9FZ3Lt5HGrfQ==
+X-Google-Smtp-Source: APXvYqw4cZbtx7wMbk9ZKaz3Swq5QHgdgEe2XGESwNtjgnCasaS6xcWNak/jrEADQBeLiRh2KL/ewQ==
+X-Received: by 2002:a05:600c:cf:: with SMTP id
+ u15mr158427wmm.168.1567630163382; 
+ Wed, 04 Sep 2019 13:49:23 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d18sm31841389wra.91.2019.09.04.13.49.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Sep 2019 13:49:22 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 44A2E1FFB7;
+ Wed,  4 Sep 2019 21:30:16 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 21:30:02 +0100
+Message-Id: <20190904203013.9028-32-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2537778391939910417
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejhedgudehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.111.180
-Subject: [Qemu-devel] [RFC PATCH 15/15] aspeed/soc: Add ASPEED Video stub
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::331
+Subject: [Qemu-devel] [PATCH v1 31/42] .travis.yml: Increase cache timeout
+ from 3min to 20min
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,61 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Stanley <joel@jms.id.au>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+We are going to cache few gigabytes, increase the cache timeout
+to avoid build failures when uploading our cache.
+
+See https://docs.travis-ci.com/user/caching/#setting-the-timeout
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/arm/aspeed_soc.h | 1 +
- hw/arm/aspeed_soc.c         | 5 +++++
- 2 files changed, 6 insertions(+)
+ .travis.yml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 9e06a6ad4fbd..ef5b93e5e9cf 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -99,6 +99,7 @@ enum {
-     ASPEED_SDMC,
-     ASPEED_SCU,
-     ASPEED_ADC,
-+    ASPEED_VIDEO,
-     ASPEED_SRAM,
-     ASPEED_SDHCI,
-     ASPEED_GPIO,
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index c3f99849b7f0..b9da49e16f2d 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -102,6 +102,7 @@ static const hwaddr aspeed_soc_ast2600_memmap[] =3D {
-     [ASPEED_SCU]       =3D 0x1E6E2000,
-     [ASPEED_XDMA]      =3D 0x1E6E7000,
-     [ASPEED_ADC]       =3D 0x1E6E9000,
-+    [ASPEED_VIDEO]     =3D 0x1E700000,
-     [ASPEED_SDHCI]     =3D 0x1E740000,
-     [ASPEED_GPIO]      =3D 0x1E780000,
-     [ASPEED_GPIO_1_8V] =3D 0x1E780800,
-@@ -371,6 +372,10 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
-or **errp)
-     create_unimplemented_device("aspeed_soc.io", sc->info->memmap[ASPEED=
-_IOMEM],
-                                 ASPEED_SOC_IOMEM_SIZE);
-=20
-+    /* Video engine stub */
-+    create_unimplemented_device("aspeed.video", sc->info->memmap[ASPEED_=
-VIDEO],
-+                                0x1000);
-+
-     if (s->num_cpus > sc->info->num_cpus) {
-         warn_report("%s: invalid number of CPUs %d, using default %d",
-                     sc->info->name, s->num_cpus, sc->info->num_cpus);
---=20
-2.21.0
+diff --git a/.travis.yml b/.travis.yml
+index 612caabc6cf..8c376d22239 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -6,6 +6,7 @@ language: c
+ compiler:
+   - gcc
+ cache:
++  timeout: 1200
+   ccache: true
+ 
+ 
+-- 
+2.20.1
 
 
