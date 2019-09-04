@@ -2,82 +2,122 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB28FC3A5A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 16:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD65AC3A5A8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6466A2053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 16:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9732721726
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:09:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RjCaEtcH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6466A2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="afmZyYAD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9732721726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5YIs-0000hA-EK
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 12:38:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43249)
+	id 1i5YmK-0000OM-Ix
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 13:09:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47813)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i5YHl-0008PK-BN
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 12:37:35 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i5Ylb-0008J2-9T
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:08:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i5YHj-0004Hf-BS
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 12:37:33 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44319)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i5YHi-0004G1-W5; Wed, 04 Sep 2019 12:37:31 -0400
-Received: by mail-lj1-x241.google.com with SMTP id u14so13718607ljj.11;
- Wed, 04 Sep 2019 09:37:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4F7RcvqouPKF8nKeu2qeDpyCGtQ7VrPoOreh9r7TMaI=;
- b=RjCaEtcHiFxtw2aA37PDw6/4lW7ONEe9MAdpAn2kHL9TdvjFHvkD2iuDSZ9lz0mBa1
- RvafnvPbDmrcxLa9iKzvhH7ScUkcIfv/XXn2fJAFrzb9fNmIFr3t9n1vmsudBGTr06JU
- J8c4WHVF/kmpOHypoQ1lz69RRnF02GfoJlK/iwLE+9e7BSBfwUChqLe5oP1WZxAlW2UX
- FwHlaLnzBXDC6nz1Dtg5JFF2R7GjGc2mBWLi/XFiaqzc9EpqhoiG8MDBFSUZZP2SNHW4
- 1NED2dv4mP6p8VZiYdi8O2iQI5geidN8oVZLh5C7CsPCxbdXGvfyCv2Q2VocW1Zkrjhp
- Tq1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4F7RcvqouPKF8nKeu2qeDpyCGtQ7VrPoOreh9r7TMaI=;
- b=Fh+dEhcl4TuiYS720ROGDmsgx5iA17AgtFxp77RiYWcFZ8gkPO9v4x37fS6GnsfNev
- KxIBb4VsUuStyF1sp+f16a+OCR8xVXp2lo6WlUko0UNAQbUr6PywSHmse/kSvAq4WisL
- Nf19XDzQ5MVpZmrPwfEiRFpah3vi+MBogn2A9O3i0y4Q2z/tbVPuSL+2ZGVegtT/TpfP
- ouRQ9HPlXSY7SX+UdSWGuInYNo2QfFFDNoLvq40JDH6JmDno/sHkZg599yMjGZUHNJjY
- zok2OilsePr6K+ge7gIptu/bNNjZDehBKOpHMtvGDtjNfsrhbpv149t8F93BmMo9W698
- 4Q4g==
-X-Gm-Message-State: APjAAAWDb5yOu+ikWhFF06yX5fnwJCxGa/zSSbEmO+f778URuoSEGrml
- lU/avfPSpVoQjGe+3F7ZZltCQBoF6LIX6TP9luU=
-X-Google-Smtp-Source: APXvYqx4q2+lnnCsVRzgaqDEBgaGttpRaGMAZF2Ivqdpeku/qkfWKWYDkIBTp72dhvtHQLthQ9lARns61p4kWqz+Ljo=
-X-Received: by 2002:a05:651c:109:: with SMTP id
- a9mr23411306ljb.33.1567615049420; 
- Wed, 04 Sep 2019 09:37:29 -0700 (PDT)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i5YlZ-0005Cy-Ta
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:08:23 -0400
+Received: from mail-eopbgr00118.outbound.protection.outlook.com
+ ([40.107.0.118]:13455 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i5YlW-0005BT-9o; Wed, 04 Sep 2019 13:08:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=itppC8sZh9TGtJzouq0a+/WUl1ChbpXBHdjl/nrDKxwPJ2MGFR98PGLIML9cOy6K0BxRHBZTJLA926r1zOBO6j1U2sfTf4cWMkJX14/u9DexIg02MW7gXvxHWZoesuywQt4IwOCpzeBnIGejZVHm+R3Bti/TNWhH0YMertZ/P2B+81jTdzf+IZdi2r6Z2LPAvGjQdtkecdCoejuPoIKjmnPt50Uh0HAURnhPo+s3j/ujF0SQww7wO0l99nJbEmvSHYYFUzVu8xW80jdf/TUyL7IEGVAnwtFDYZQP0eujticke9/iMk1MdopRlmwm8yAerFfVedyHmCF8lsbBST5ifA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u1kGGWtF2EyI9Pw8mcZ/Ps+7K+b3H0B8PZ0wty64Jvw=;
+ b=bf8rEyN44a/9xp90G6zXC7NoY/94boRi7DY7FjRFm/XmhMF47WVgIojiCYJfuRvWPT660rY5y9o06IlQEtfsFniMRVeDFG9bPBZcOmuTbzw0Vh5n1Qab+N96i9ubDFnah+Y5WRccjNGUQkZCBY70gp7YpeUI4w4hVvUZqUdhdtVRADLqrPcQ66T67XKbc3jOGPsr+eX1F0g3HPgbbe/6cQ9gHhDPjqruw4cwKvs0IeAS15iw10NmB/fIWzO3VSuQR5eL002shTZHSA+G35oIZIo3V4LzYkW3BGPsbovOygMAvI3Sl/nJ5591wDSCFonTY932P8/K9H6cajU7m2N2xA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u1kGGWtF2EyI9Pw8mcZ/Ps+7K+b3H0B8PZ0wty64Jvw=;
+ b=afmZyYADilWGYFpv3sZL/q3fmCqNX5EgpiB/ld7EZdfrt3fb2VeeVcJkY0fWQkqK4Wbx0tpt/Q1N7aYgixJTeg/oxQ1UZ1ub4ubvq6S2etojR599L31niDdEHEWU946xLzr8X9fMwdFxi7iBRpkRre18ihDh1dGg5STBrqN+aVc=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4092.eurprd08.prod.outlook.com (20.179.9.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2220.20; Wed, 4 Sep 2019 17:08:15 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2220.022; Wed, 4 Sep 2019
+ 17:08:15 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH 1/5] nbd: Improve per-export flag handling
+ in server
+Thread-Index: AQHVWcKKpZ1kXbNK00iz+Po90P7KVacb0yaA
+Date: Wed, 4 Sep 2019 17:08:15 +0000
+Message-ID: <d1ec0e0d-791a-4a19-ec45-e5dbdb8f0106@virtuozzo.com>
+References: <25ead363-4f37-5450-b985-1876374e314d@redhat.com>
+ <20190823143726.27062-1-eblake@redhat.com>
+ <20190823143726.27062-2-eblake@redhat.com>
+In-Reply-To: <20190823143726.27062-2-eblake@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0301CA0016.eurprd03.prod.outlook.com
+ (2603:10a6:3:76::26) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190904200813206
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 772ec01c-8c4c-44f3-9518-08d7315a79ac
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4092; 
+x-ms-traffictypediagnostic: DB8PR08MB4092:
+x-microsoft-antispam-prvs: <DB8PR08MB4092C1CDB679750AD8FDAB23C1B80@DB8PR08MB4092.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0150F3F97D
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39850400004)(366004)(396003)(376002)(346002)(136003)(189003)(199004)(86362001)(66556008)(66946007)(305945005)(31696002)(256004)(66476007)(386003)(25786009)(7736002)(71190400001)(71200400001)(2501003)(6506007)(229853002)(476003)(11346002)(64756008)(2616005)(5660300002)(486006)(446003)(66446008)(4326008)(3846002)(8936002)(186003)(6116002)(36756003)(99286004)(53936002)(316002)(14454004)(6436002)(76176011)(478600001)(54906003)(52116002)(6486002)(6512007)(110136005)(6246003)(2906002)(26005)(31686004)(8676002)(102836004)(81156014)(81166006)(66066001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4092;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: HLyxIS1KpqJzv9IkPIVhT2D/D14BkdBGHHLr7CAMbpQxwqjEvHK0IZeIUV9PLURSC8UIJLNN+lKWpgKq/95TkwHCBtyUt/EVbEKEqgbNOwQZ2kmJcEZCTd+t3FVV18q1tSNQ1hpP8CvJfA9Lr5CV96jYQ/p/oGaz8rrM20fqgySfXs0IoRl7Md6ZMtixB10/6eCkVJK6Wm14m0fO2bA3VfxPV3wwlCK8f3+qNCssq1jPDmGVY6vYtRDfsw2Iv/8soeZcjYmebxSUYRL/KZPGg23fKRZZ7tb7jZ02ro/R3aCOoIIdAzeQvwp36KdBSGuTWnz9BhJL/sR6P7ldLowXBeH566Fy7cCiDUYHHOdv+3MrHL8n1rKZmru9+12+BFs6Sf/aRLwTNeQ8ujAx++OCjDC/Mouj1/pg1EFrEH8ZDt4=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2D718742F8112148800E572CD5B23118@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1567306391-2682-1-git-send-email-bmeng.cn@gmail.com>
- <1567306391-2682-27-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1567306391-2682-27-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 4 Sep 2019 09:37:02 -0700
-Message-ID: <CAKmqyKMHmRYMgv_ex-8XFzr3KSLhUC-DdNA+6JPdmjGojmX-4A@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v7 26/30] riscv: sifive: Implement a model
- for SiFive FU540 OTP
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 772ec01c-8c4c-44f3-9518-08d7315a79ac
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2019 17:08:15.7207 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rzbRtrb+9DxMETn9r2DA5yRUkwV68jvE3oUL3Aai1YKZKHWi7EAJo603qlENhcpGHYn5BV5dPrrL35c0i8i0jHWpTEacEVJjL6K0zeRvmc0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4092
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.118
+Subject: Re: [Qemu-devel] [PATCH 1/5] nbd: Improve per-export flag handling
+ in server
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,357 +129,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "nbd@other.debian.org" <nbd@other.debian.org>,
+ "libguestfs@redhat.com" <libguestfs@redhat.com>, "open
+ list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 31, 2019 at 8:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> This implements a simple model for SiFive FU540 OTP (One-Time
-> Programmable) Memory interface, primarily for reading out the
-> stored serial number from the first 1 KiB of the 16 KiB OTP
-> memory reserved by SiFive for internal use.
->
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->
-> ---
->
-> Changes in v7: None
-> Changes in v6: None
-> Changes in v5:
-> - change to use defines instead of enums
-> - change to use qemu_log_mask(LOG_GUEST_ERROR,...) in sifive_u_otp
-> - creating a 32-bit val variable and using that instead of casting
->   everywhere in sifive_u_otp_write()
-> - move all register initialization to sifive_u_otp_reset() function
-> - drop sifive_u_otp_create()
->
-> Changes in v4:
-> - prefix all macros/variables/functions with SIFIVE_U/sifive_u
->   in the sifive_u_otp driver
->
-> Changes in v3: None
-> Changes in v2: None
->
->  hw/riscv/Makefile.objs          |   1 +
->  hw/riscv/sifive_u_otp.c         | 190 ++++++++++++++++++++++++++++++++++++++++
->  include/hw/riscv/sifive_u_otp.h |  80 +++++++++++++++++
->  3 files changed, 271 insertions(+)
->  create mode 100644 hw/riscv/sifive_u_otp.c
->  create mode 100644 include/hw/riscv/sifive_u_otp.h
->
-> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-> index b95bbd5..fc3c6dd 100644
-> --- a/hw/riscv/Makefile.objs
-> +++ b/hw/riscv/Makefile.objs
-> @@ -8,6 +8,7 @@ obj-$(CONFIG_SIFIVE) += sifive_gpio.o
->  obj-$(CONFIG_SIFIVE) += sifive_plic.o
->  obj-$(CONFIG_SIFIVE) += sifive_test.o
->  obj-$(CONFIG_SIFIVE_U) += sifive_u.o
-> +obj-$(CONFIG_SIFIVE_U) += sifive_u_otp.o
->  obj-$(CONFIG_SIFIVE_U) += sifive_u_prci.o
->  obj-$(CONFIG_SIFIVE) += sifive_uart.o
->  obj-$(CONFIG_SPIKE) += spike.o
-> diff --git a/hw/riscv/sifive_u_otp.c b/hw/riscv/sifive_u_otp.c
-> new file mode 100644
-> index 0000000..7d65a85
-> --- /dev/null
-> +++ b/hw/riscv/sifive_u_otp.c
-> @@ -0,0 +1,190 @@
-> +/*
-> + * QEMU SiFive U OTP (One-Time Programmable) Memory interface
-> + *
-> + * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
-> + *
-> + * Simple model of the OTP to emulate register reads made by the SDK BSP
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "qemu/log.h"
-> +#include "qemu/module.h"
-> +#include "hw/riscv/sifive_u_otp.h"
-> +
-> +static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    SiFiveUOTPState *s = opaque;
-> +
-> +    switch (addr) {
-> +    case SIFIVE_U_OTP_PA:
-> +        return s->pa;
-> +    case SIFIVE_U_OTP_PAIO:
-> +        return s->paio;
-> +    case SIFIVE_U_OTP_PAS:
-> +        return s->pas;
-> +    case SIFIVE_U_OTP_PCE:
-> +        return s->pce;
-> +    case SIFIVE_U_OTP_PCLK:
-> +        return s->pclk;
-> +    case SIFIVE_U_OTP_PDIN:
-> +        return s->pdin;
-> +    case SIFIVE_U_OTP_PDOUT:
-> +        if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
-> +            (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
-> +            (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
-> +            return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
-> +        } else {
-> +            return 0xff;
-> +        }
-> +    case SIFIVE_U_OTP_PDSTB:
-> +        return s->pdstb;
-> +    case SIFIVE_U_OTP_PPROG:
-> +        return s->pprog;
-> +    case SIFIVE_U_OTP_PTC:
-> +        return s->ptc;
-> +    case SIFIVE_U_OTP_PTM:
-> +        return s->ptm;
-> +    case SIFIVE_U_OTP_PTM_REP:
-> +        return s->ptm_rep;
-> +    case SIFIVE_U_OTP_PTR:
-> +        return s->ptr;
-> +    case SIFIVE_U_OTP_PTRIM:
-> +        return s->ptrim;
-> +    case SIFIVE_U_OTP_PWE:
-> +        return s->pwe;
-> +    }
-> +
-> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: read: addr=0x%x\n",
-> +                  __func__, (int)addr);
-
-Don't cast addr to an int, use the correct macros.
-
-> +    return 0;
-> +}
-> +
-> +static void sifive_u_otp_write(void *opaque, hwaddr addr,
-> +                               uint64_t val64, unsigned int size)
-> +{
-> +    SiFiveUOTPState *s = opaque;
-> +    uint32_t val32 = (uint32_t)val64;
-> +
-> +    switch (addr) {
-> +    case SIFIVE_U_OTP_PA:
-> +        s->pa = val32 & SIFIVE_U_OTP_PA_MASK;
-> +        break;
-> +    case SIFIVE_U_OTP_PAIO:
-> +        s->paio = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PAS:
-> +        s->pas = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PCE:
-> +        s->pce = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PCLK:
-> +        s->pclk = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PDIN:
-> +        s->pdin = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PDOUT:
-> +        /* read-only */
-> +        break;
-> +    case SIFIVE_U_OTP_PDSTB:
-> +        s->pdstb = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PPROG:
-> +        s->pprog = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PTC:
-> +        s->ptc = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PTM:
-> +        s->ptm = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PTM_REP:
-> +        s->ptm_rep = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PTR:
-> +        s->ptr = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PTRIM:
-> +        s->ptrim = val32;
-> +        break;
-> +    case SIFIVE_U_OTP_PWE:
-> +        s->pwe = val32;
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%x v=0x%x\n",
-> +                      __func__, (int)addr, (int)val64);
-
-Same here.
-
-With those fixed:
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps sifive_u_otp_ops = {
-> +    .read = sifive_u_otp_read,
-> +    .write = sifive_u_otp_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4
-> +    }
-> +};
-> +
-> +static Property sifive_u_otp_properties[] = {
-> +    DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void sifive_u_otp_realize(DeviceState *dev, Error **errp)
-> +{
-> +    SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
-> +
-> +    memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_otp_ops, s,
-> +                          TYPE_SIFIVE_U_OTP, SIFIVE_U_OTP_REG_SIZE);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-> +}
-> +
-> +static void sifive_u_otp_reset(DeviceState *dev)
-> +{
-> +    SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
-> +
-> +    /* Initialize all fuses' initial value to 0xFFs */
-> +    memset(s->fuse, 0xff, sizeof(s->fuse));
-> +
-> +    /* Make a valid content of serial number */
-> +    s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
-> +    s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
-> +}
-> +
-> +static void sifive_u_otp_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->props = sifive_u_otp_properties;
-> +    dc->realize = sifive_u_otp_realize;
-> +    dc->reset = sifive_u_otp_reset;
-> +}
-> +
-> +static const TypeInfo sifive_u_otp_info = {
-> +    .name          = TYPE_SIFIVE_U_OTP,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(SiFiveUOTPState),
-> +    .class_init    = sifive_u_otp_class_init,
-> +};
-> +
-> +static void sifive_u_otp_register_types(void)
-> +{
-> +    type_register_static(&sifive_u_otp_info);
-> +}
-> +
-> +type_init(sifive_u_otp_register_types)
-> diff --git a/include/hw/riscv/sifive_u_otp.h b/include/hw/riscv/sifive_u_otp.h
-> new file mode 100644
-> index 0000000..6392975
-> --- /dev/null
-> +++ b/include/hw/riscv/sifive_u_otp.h
-> @@ -0,0 +1,80 @@
-> +/*
-> + * QEMU SiFive U OTP (One-Time Programmable) Memory interface
-> + *
-> + * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_SIFIVE_U_OTP_H
-> +#define HW_SIFIVE_U_OTP_H
-> +
-> +#define SIFIVE_U_OTP_PA         0x00
-> +#define SIFIVE_U_OTP_PAIO       0x04
-> +#define SIFIVE_U_OTP_PAS        0x08
-> +#define SIFIVE_U_OTP_PCE        0x0C
-> +#define SIFIVE_U_OTP_PCLK       0x10
-> +#define SIFIVE_U_OTP_PDIN       0x14
-> +#define SIFIVE_U_OTP_PDOUT      0x18
-> +#define SIFIVE_U_OTP_PDSTB      0x1C
-> +#define SIFIVE_U_OTP_PPROG      0x20
-> +#define SIFIVE_U_OTP_PTC        0x24
-> +#define SIFIVE_U_OTP_PTM        0x28
-> +#define SIFIVE_U_OTP_PTM_REP    0x2C
-> +#define SIFIVE_U_OTP_PTR        0x30
-> +#define SIFIVE_U_OTP_PTRIM      0x34
-> +#define SIFIVE_U_OTP_PWE        0x38
-> +
-> +#define SIFIVE_U_OTP_PCE_EN     (1 << 0)
-> +
-> +#define SIFIVE_U_OTP_PDSTB_EN   (1 << 0)
-> +
-> +#define SIFIVE_U_OTP_PTRIM_EN   (1 << 0)
-> +
-> +#define SIFIVE_U_OTP_PA_MASK        0xfff
-> +#define SIFIVE_U_OTP_NUM_FUSES      0x1000
-> +#define SIFIVE_U_OTP_SERIAL_ADDR    0xfc
-> +
-> +#define SIFIVE_U_OTP_REG_SIZE       0x1000
-> +
-> +#define TYPE_SIFIVE_U_OTP           "riscv.sifive.u.otp"
-> +
-> +#define SIFIVE_U_OTP(obj) \
-> +    OBJECT_CHECK(SiFiveUOTPState, (obj), TYPE_SIFIVE_U_OTP)
-> +
-> +typedef struct SiFiveUOTPState {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +
-> +    /*< public >*/
-> +    MemoryRegion mmio;
-> +    uint32_t pa;
-> +    uint32_t paio;
-> +    uint32_t pas;
-> +    uint32_t pce;
-> +    uint32_t pclk;
-> +    uint32_t pdin;
-> +    uint32_t pdstb;
-> +    uint32_t pprog;
-> +    uint32_t ptc;
-> +    uint32_t ptm;
-> +    uint32_t ptm_rep;
-> +    uint32_t ptr;
-> +    uint32_t ptrim;
-> +    uint32_t pwe;
-> +    uint32_t fuse[SIFIVE_U_OTP_NUM_FUSES];
-> +    /* config */
-> +    uint32_t serial;
-> +} SiFiveUOTPState;
-> +
-> +#endif /* HW_SIFIVE_U_OTP_H */
-> --
-> 2.7.4
->
->
+MjMuMDguMjAxOSAxNzozNywgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2hlbiBjcmVhdGluZyBhIHJl
+YWQtb25seSBpbWFnZSwgd2UgYXJlIHN0aWxsIGFkdmVydGlzaW5nIHN1cHBvcnQgZm9yDQo+IFRS
+SU0gYW5kIFdSSVRFX1pFUk9FUyB0byB0aGUgY2xpZW50LCBldmVuIHRob3VnaCB0aGUgY2xpZW50
+IHNob3VsZCBub3QNCj4gYmUgaXNzdWluZyB0aG9zZSBjb21tYW5kcy4gIEJ1dCBzZWVpbmcgdGhp
+cyByZXF1aXJlcyBsb29raW5nIGFjcm9zcw0KPiBtdWx0aXBsZSBmdW5jdGlvbnM6DQo+IA0KPiBB
+bGwgY2FsbGVycyB0byBuYmRfZXhwb3J0X25ldygpIHBhc3NlZCBhIHNpbmdsZSBmbGFnIGJhc2Vk
+IHNvbGVseSBvbg0KPiB3aGV0aGVyIHRoZSBleHBvcnQgYWxsb3dzIHdyaXRlcy4gIExhdGVyLCB3
+ZSB0aGVuIHBhc3MgYSBjb25zdGFudCBzZXQNCj4gb2YgZmxhZ3MgdG8gbmJkX25lZ290aWF0ZV9v
+cHRpb25zKCkgKG5hbWVseSwgdGhlIHNldCBvZiBmbGFncyB3aGljaCB3ZQ0KPiBhbHdheXMgc3Vw
+cG9ydCwgYXQgbGVhc3QgZm9yIHdyaXRhYmxlIGltYWdlcyksIHdoaWNoIGlzIHRoZW4gZnVydGhl
+cg0KPiBkeW5hbWljYWxseSBtb2RpZmllZCBiYXNlZCBvbiBjbGllbnQgcmVxdWVzdHMgZm9yIHN0
+cnVjdHVyZWQgb3B0aW9ucy4NCj4gRmluYWxseSwgd2hlbiBwcm9jZXNzaW5nIE5CRF9PUFRfRVhQ
+T1JUX05BTUUgb3IgTkJEX09QVF9FWFBPUlRfR08gd2UNCj4gYml0d2lzZS1vciB0aGUgb3JpZ2lu
+YWwgY2FsbGVyJ3MgZmxhZyB3aXRoIHRoZSBydW50aW1lIHNldCBvZiBmbGFncw0KPiB3ZSd2ZSBi
+dWlsdCB1cCBvdmVyIHNldmVyYWwgZnVuY3Rpb25zLg0KPiANCj4gTGV0J3MgcmVmYWN0b3IgdGhp
+bmdzIHRvIGluc3RlYWQgY29tcHV0ZSBhIGJhc2VsaW5lIG9mIGZsYWdzIGFzIHNvb24NCj4gYXMg
+cG9zc2libGUsIGluIG5iZF9leHBvcnRfbmV3KCksIGFuZCBjaGFuZ2luZyB0aGUgc2lnbmF0dXJl
+IGZvciB0aGUNCj4gY2FsbGVycyB0byBwYXNzIGluIGEgc2ltcGxlciBib29sIHJhdGhlciB0aGFu
+IGhhdmluZyB0byBmaWd1cmUgb3V0DQo+IGZsYWdzLiAgV2UgY2FuIHRoZW4gZ2V0IHJpZCBvZiB0
+aGUgJ215ZmxhZ3MnIHBhcmFtZXRlciB0byB2YXJpb3VzDQo+IGZ1bmN0aW9ucywgYW5kIGluc3Rl
+YWQgcmVmZXIgdG8gY2xpZW50IGZvciBldmVyeXRoaW5nIHdlIG5lZWQgKHdlDQo+IHN0aWxsIGhh
+dmUgdG8gcGVyZm9ybSBhIGJpdHdpc2UtT1IgZHVyaW5nIE5CRF9PUFRfRVhQT1JUX05BTUUgYW5k
+DQo+IE5CRF9PUFRfRVhQT1JUX0dPLCBidXQgaXQncyBlYXNpZXIgdG8gc2VlIHdoYXQgaXMgYmVp
+bmcgY29tcHV0ZWQpLg0KPiBUaGlzIGxldHMgdXMgcXVpdCBhZHZlcnRpc2luZyBzZW5zZWxlc3Mg
+ZmxhZ3MgZm9yIHJlYWQtb25seSBpbWFnZXMsIGFzDQo+IHdlbGwgYXMgbWFraW5nIHRoZSBuZXh0
+IHBhdGNoIGZvciBleHBvc2luZyBGQVNUX1pFUk8gc3VwcG9ydCBlYXNpZXIgdG8NCj4gd3JpdGUu
+DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlPGVibGFrZUByZWRoYXQuY29tPg0KDQpS
+ZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0
+dW96em8uY29tPg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
