@@ -2,65 +2,90 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1CAC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A3BC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:57:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95C1121883
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:56:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C1121883
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E3C42087E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:57:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X/GcwSiX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E3C42087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cKZ-0000w9-5k
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:56:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45095)
+	id 1i5cLT-00028P-DN
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:57:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51580)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i5bPB-0008IO-5t
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:57:26 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c3v-0000vK-Cw
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i5bP8-0004Xa-C6
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:57:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40482)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i5bP8-0004X5-3B
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:57:22 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 696D610C6354;
- Wed,  4 Sep 2019 19:57:20 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-245.rdu2.redhat.com
- [10.10.123.245])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A422B6092F;
- Wed,  4 Sep 2019 19:57:19 +0000 (UTC)
-Date: Wed, 4 Sep 2019 15:57:17 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190904195717.GA2311@localhost.localdomain>
-References: <20190829013125.GG16342@umbus.fritz.box>
- <20190830175648.GE3694@habkost.net>
- <20190831014834.GC12065@umbus.fritz.box>
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c3t-0003U7-UX
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:31 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:46212)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i5c3t-0003TU-Nt
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:29 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id h7so169706wrt.13
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:39:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=a+GIa0BNDG6/Dqc09MJyrBtI2tjBB0sKr2+tPxT00to=;
+ b=X/GcwSiXEqGZOpL/Cc8ROh8kd37pNJMxOPNTRgZDaVfh0U/ipmWgMYXsDlzOfpuD2c
+ yg7fmRQmj7RKGP1FM2RVvTZkmYLx+QauQV93AvjTMXzeAHBnYK3kDTu/w4okLeaEjnmp
+ azOM0Jqm1XW2qG4o3+/t3QWxGfgK1XwxNStz/UC+fSDIug0kh1wWl9aVbpl4jiClyJbi
+ NCLQFW6vDIAf9HF7b7a9XJCZTYSwzz1k2erh5ztgAOmh1PUU3ImzGPyGditAGo/p0Lu2
+ OD76u0XxhZyKbfssZ+fmVNAfGfJuYIKmqOpC8cCxywtjQkLuq4Md0PpnlOUS+IKf5klN
+ 8R2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=a+GIa0BNDG6/Dqc09MJyrBtI2tjBB0sKr2+tPxT00to=;
+ b=HQyqzzAc+Dw3BGPlreRR9tvcwyQzRNOZlce7xNdX3jCyQve1AOhkvk/m5EoHYUW8TB
+ EOxt47FLtdJyttd2SdPaiL9AbpibKKPEdgfo7MxJZXbY9XHDeh/+RoA9auKAVcF7Yo3B
+ iCGktlp0kBfuenYhY7mefTMWdrmPfcCMy9kmYz5P1TwzW6pf231Z5yso4B5tCRygh1Bc
+ ymZ4mS+jRzXG5Um/RxLSQN8ez2fCUH9qAWn78PH85H9LsxcsQx7dHalXi1zRDp94ijnT
+ 2Nwa1TuvJfqnBlbQ1tj+751X4ZgnW0greDPQY+caMQ64Mc8QM1tnaIe5FhtZrnanMY+f
+ 9QOw==
+X-Gm-Message-State: APjAAAW/MB4ZkiOpzg4J4iLP9Qo3kH+WLsOsqg7OfZ30bTUntO4hwgMS
+ 41k+Up35yOAxs+Gj23FJUafc6A==
+X-Google-Smtp-Source: APXvYqymb3dDoSczTMTBSNEmM8Yyeb+fBZGSG9oQZHp/wByJIFNGfmD2n7cWOIZuKFBFDDp4l5HAOA==
+X-Received: by 2002:adf:e390:: with SMTP id e16mr2585833wrm.29.1567629568663; 
+ Wed, 04 Sep 2019 13:39:28 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x5sm20483706wrg.69.2019.09.04.13.39.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Sep 2019 13:39:26 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0BFA01FFA5;
+ Wed,  4 Sep 2019 21:30:15 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 21:29:48 +0100
+Message-Id: <20190904203013.9028-18-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190831014834.GC12065@umbus.fritz.box>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Wed, 04 Sep 2019 19:57:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Cryptic errors from PIP install if missing
- openssl-devel
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42d
+Subject: [Qemu-devel] [PATCH v1 17/42] tests/docker: move our sh4 cross
+ compile to Buster
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,92 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ldoktor@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 31, 2019 at 11:48:34AM +1000, David Gibson wrote:
-> On Fri, Aug 30, 2019 at 02:56:48PM -0300, Eduardo Habkost wrote:
-> > On Thu, Aug 29, 2019 at 11:31:25AM +1000, David Gibson wrote:
-> > > If I attempt to run "make check-acceptance" on my POWER9, RHEL8.1
-> > > machine when the openssl-devel package isn't installed, I get the
-> > > following very cryptic error:
-> > > 
-> > >   VENV    /home/dwg/qemu/build/rhel8/tests/venv
-> > >   PIP     /home/dwg/qemu/tests/requirements.txt
-> > > Command "/home/dwg/qemu/build/rhel8/tests/venv/bin/python -u -c "import setuptools, tokenize;__file__='/tmp/pip-build-la4el5r5/cryptography/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))" install --record /tmp/pip-1efs22iz-record/install-record.txt --single-version-externally-managed --compile --install-headers /home/dwg/qemu/build/rhel8/tests/venv/include/site/python3.6/cryptography" failed with error code 1 in /tmp/pip-build-la4el5r5/cryptography/
-> > > 
-> > > Using V=1 doesn't give any more useful information, and it's not
-> > > (easily) possible to manually re-run the given command since it relies
-> > > on things in /tmp that are removed once the attempt finishes.
-> > 
-> > V=1 is supposed to show the actual pip command being run.  I see
-> > it here:
-> > 
-> >   $ make check-venv V=1
-> >   [...]
-> >   python3 -B -m venv --system-site-packages /home/ehabkost/rh/proj/virt/qemu/tests/venv
-> > * /home/ehabkost/rh/proj/virt/qemu/tests/venv/bin/python -m pip -q install -r /home/ehabkost/rh/proj/virt/qemu/tests/requirements.txt
-> >   You are using pip version 19.0.3, however version 19.2.3 is available.
-> >   You should consider upgrading via the 'pip install --upgrade pip' command.
-> >   touch /home/ehabkost/rh/proj/virt/qemu/tests/venv
-> > 
-> > Can you reproduce the problem if you re-run the pip command?
-> 
-> Yes, I can, but it's basically just the same error without any extra
-> information.
-> 
-> > > I only figured out it was openssl-devel being missing that was the
-> > > problem by (mostly) guesswork.  It would be really great if we could
-> > > generate a more helpful error here.
-> > 
-> > I don't think there's much we can do about it, as the error is generated by a
-> > package being built by pip.
-> > 
-> > There's one thing we can do to make it slightly better: not passing `-q` to pip
-> > if running with V=1, so people can see which packages are being installed and
-> > which one is generating the error.
-> 
-> That sounds like a good start to me.
-> 
-> > > In addition, if I rerun "make check-acceptance" it no longer even
-> > > attempts the PIP install, since tests/venv already exists in my build
-> > > environment.  It then sort of works, but I think it might be hitting
-> > > other errors because of the missing python packages.  Sorry that's a
-> > > bit vague - I also seem to be getting unrelated errors that I'm still
-> > > trying to figure out.
-> > 
-> > This sounds like a bug and we need to fix it.
-> 
-> I agree.
+Now Buster is released we can stop relying on the movable feast that
+is Sid for our cross-compiler for building tests.
 
-Hi David,
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/Makefile.include                    | 2 +-
+ tests/docker/dockerfiles/debian-sh4-cross.docker | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-I've pushed a branch here (most of the commits have already been sent
-separately):
-
-   https://github.com/clebergnu/qemu/tree/ppc64
-
-I've tested on a RHEL 8 ppc64le Power 9, and it seems to work for me.
-My steps for building QEMU:
-
-  - Configured with: '/home/cleber/src/qemu/configure' '--enable-slirp=git' '--python=/usr/bin/python3' '--target-list=x86_64-softmmu,ppc64-softmmu,arm-softmmu,aarch64-softmmu,mips-softmmu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,sh4-softmmu,s390x-softmmu,alpha-softmmu,m68k-softmmu,riscv64-softmmu'
-  - make
-  - make check-acceptance
-
-Would you be able to test if that branch works smoothly for you?
-
-Thanks,
-- Cleber.
-
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 50c5e64212a..e946aae14fa 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -103,9 +103,9 @@ docker-image-debian-arm64-cross: docker-image-debian10
+ docker-image-debian-hppa-cross: docker-image-debian10
+ docker-image-debian-m68k-cross: docker-image-debian10
+ docker-image-debian-powerpc-cross: docker-image-debian10
++docker-image-debian-sh4-cross: docker-image-debian10
+ docker-image-debian-sparc64-cross: docker-image-debian10
+ 
+-docker-image-debian-sh4-cross: docker-image-debian-sid
+ docker-image-debian-mips64-cross: docker-image-debian-sid
+ docker-image-debian-riscv64-cross: docker-image-debian-sid
+ docker-image-debian-ppc64-cross: docker-image-debian-sid
+diff --git a/tests/docker/dockerfiles/debian-sh4-cross.docker b/tests/docker/dockerfiles/debian-sh4-cross.docker
+index 29983b2d75b..9d7663764e4 100644
+--- a/tests/docker/dockerfiles/debian-sh4-cross.docker
++++ b/tests/docker/dockerfiles/debian-sh4-cross.docker
+@@ -1,10 +1,9 @@
+ #
+ # Docker cross-compiler target
+ #
+-# This docker target builds on the debian sid base image which
+-# contains cross compilers for Debian "ports" targets.
++# This docker target builds on the debian Buster base image.
+ #
+-FROM qemu:debian-sid
++FROM qemu:debian10
+ 
+ RUN apt update && \
+     DEBIAN_FRONTEND=noninteractive eatmydata \
+-- 
+2.20.1
 
 
