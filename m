@@ -2,54 +2,58 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3950EC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 06:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DA4C3A5AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 07:07:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08C0C22CF5
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 06:51:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08C0C22CF5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
+	by mail.kernel.org (Postfix) with ESMTPS id CA6872087E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 07:07:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA6872087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5P8Q-0007Ho-5n
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 02:51:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45438)
+	id 1i5POG-0002s8-CW
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 03:07:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1i5P7e-0006pw-TI
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 02:50:31 -0400
+ (envelope-from <clg@kaod.org>) id 1i5PME-0001Gr-Ta
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:05:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1i5P7d-00054e-Px
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 02:50:30 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:49520
- helo=sipsolutions.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1i5P7d-00052p-JK
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 02:50:29 -0400
-Received: by sipsolutions.net with esmtpsa
- (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.92.1) (envelope-from <johannes@sipsolutions.net>)
- id 1i5P7X-0007vs-TB; Wed, 04 Sep 2019 08:50:24 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 09:50:21 +0300
-Message-Id: <20190904065021.1360-1-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <clg@kaod.org>) id 1i5PMC-00068V-5d
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:05:33 -0400
+Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:46291)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5PMB-0005zA-VY
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:05:32 -0400
+Received: from player690.ha.ovh.net (unknown [10.109.159.191])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id 1AE29202506
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 09:05:19 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player690.ha.ovh.net (Postfix) with ESMTPSA id B9D7D94DC69A;
+ Wed,  4 Sep 2019 07:05:13 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed,  4 Sep 2019 09:04:56 +0200
+Message-Id: <20190904070506.1052-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:191:4433::2
-Subject: [Qemu-devel] [PATCH] libvhost-user: introduce and use
- vu_has_protocol_feature()
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 7074873541930683153
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejgedgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 188.165.54.143
+Subject: [Qemu-devel] [PATCH 00/10] Aspeed: machine extensions and fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,91 +65,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Johannes Berg <johannes.berg@intel.com>, Tiwei Bie <tiwei.bie@intel.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Johannes Berg <johannes.berg@intel.com>
+Hello,
 
-This simplifies the various has_feature() checks, we already
-have vu_has_feature() but it checks features, not protocol
-features.
+This series improves the current models of the Aspeed machines in QEMU
+and adds new ones. It also prepares ground for the models of the
+Aspeed AST2600 SoC by calculating the model typenames using the SoC
+name.
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- contrib/libvhost-user/libvhost-user.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+You will find patches for :
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index fcf4a8a00ed2..fba291c13db4 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -94,6 +94,11 @@ bool vu_has_feature(VuDev *dev,
-     return has_feature(dev->features, fbit);
- }
- 
-+static inline bool vu_has_protocol_feature(VuDev *dev, unsigned int fbit)
-+{
-+    return has_feature(dev->protocol_features, fbit);
-+}
-+
- static const char *
- vu_request_to_string(unsigned int req)
- {
-@@ -951,8 +956,7 @@ vu_check_queue_inflights(VuDev *dev, VuVirtq *vq)
- {
-     int i = 0;
- 
--    if (!has_feature(dev->protocol_features,
--        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-+    if (!vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-         return 0;
-     }
- 
-@@ -1097,8 +1101,7 @@ bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *vq, int fd,
- 
-     vmsg.fd_num = fd_num;
- 
--    if (!has_feature(dev->protocol_features,
--                     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) {
-+    if (!vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) {
-         return false;
-     }
- 
-@@ -2199,8 +2202,7 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
- static int
- vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
- {
--    if (!has_feature(dev->protocol_features,
--        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-+    if (!vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-         return 0;
-     }
- 
-@@ -2217,8 +2219,7 @@ vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
- static int
- vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
- {
--    if (!has_feature(dev->protocol_features,
--        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-+    if (!vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-         return 0;
-     }
- 
-@@ -2234,8 +2235,7 @@ vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
- static int
- vu_queue_inflight_post_put(VuDev *dev, VuVirtq *vq, int desc_idx)
- {
--    if (!has_feature(dev->protocol_features,
--        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-+    if (!vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-         return 0;
-     }
- 
--- 
-2.23.0
+ - DMA support for the SMC controller, now using address_space_stl/ldl_le
+ - GPIO v5 model from Rashmica
+
+Thanks,
+
+C.
+
+Christian Svensson (1):
+  aspeed/smc: Calculate checksum on normal DMA
+
+C=C3=A9dric Le Goater (7):
+  aspeed: Remove unused SoC definitions
+  aspeed: Use consistent typenames
+  aspeed/smc: Add support for DMAs
+  aspeed/smc: Add DMA calibration settings
+  aspeed/smc: Inject errors in DMA checksum
+  aspeed/scu: Introduce per-SoC SCU types
+  aspeed/scu: Introduce a aspeed_scu_get_apb_freq() routine
+
+Rashmica Gupta (2):
+  hw/gpio: Add basic Aspeed GPIO model for AST2400 and AST2500
+  aspeed: add a GPIO controller to the SoC
+
+ include/hw/arm/aspeed_soc.h   |   4 +-
+ include/hw/gpio/aspeed_gpio.h | 100 ++++
+ include/hw/misc/aspeed_scu.h  |  21 +-
+ include/hw/ssi/aspeed_smc.h   |   7 +
+ hw/arm/aspeed.c               |   2 +
+ hw/arm/aspeed_soc.c           |  63 ++-
+ hw/gpio/aspeed_gpio.c         | 884 ++++++++++++++++++++++++++++++++++
+ hw/misc/aspeed_scu.c          | 102 ++--
+ hw/ssi/aspeed_smc.c           | 335 ++++++++++++-
+ hw/timer/aspeed_timer.c       |   3 +-
+ hw/gpio/Makefile.objs         |   1 +
+ 11 files changed, 1418 insertions(+), 104 deletions(-)
+ create mode 100644 include/hw/gpio/aspeed_gpio.h
+ create mode 100644 hw/gpio/aspeed_gpio.c
+
+--=20
+2.21.0
 
 
