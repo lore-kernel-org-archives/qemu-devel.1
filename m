@@ -7,84 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A5EC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7E0C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52BC4208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:43:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69D8321726
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:43:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DThbwQFo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52BC4208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eIPILYG8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D8321726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5bBo-0007qx-S7
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 15:43:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39845)
+	id 1i5bCA-0008PV-0A
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 15:43:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40010)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5azr-0004Ed-DL
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5azx-0004N0-DH
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5azp-0002Aq-Bx
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:15 -0400
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:40180)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5azv-0002G5-0S
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:21 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40303)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5azp-00029s-1q
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:13 -0400
-Received: by mail-pf1-x430.google.com with SMTP id x127so1219634pfb.7
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:31:12 -0700 (PDT)
+ id 1i5azu-0002FI-N5
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:18 -0400
+Received: by mail-pl1-x641.google.com with SMTP id y10so4121915pll.7
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:31:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qTBjneugtZF+JoWXJ5FX48BYqpDgfu4BcdXmC9Vl7mc=;
- b=DThbwQFoX4lrYPGrFakxxGuxvnL9WS4y8KglsDchw1r2YrIJLI5zFITZGthASxkvKV
- 94ZwvDXjVXNLUeJoD0XXl70UilJ3M3LGBZN1FQAG7C4IbGwBmAXvsu+WjGSJvZTTM2HU
- HSJkt66aMtBxiAhCjy+XU9ZTO+ZGnJnxvhRF/KzHc+RiZdwreIq7l1VdvxDsCqQYkESW
- Iw8R0/pGnq/LySiMttD9wpipucZkVpM3QxaVDaX/Siq6IsLHxTs1q9msTIcpkh+Y8ly3
- CfxZIz2pf7S/fIK16tY2YkMSqB/4wByf3C8017xXW+RYqZKCSt1kqenZLcId2r0rZkLu
- aTVA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=m4MAJXgoOrMBvW2yiXtAmVUpQTazbzn/T7aZQnWvwi0=;
+ b=eIPILYG8yjvEJv8JQUxy5uo0zPkPhAqyeATFr5S5HCoNLWrGabXRpyhz6fHUYsZfOh
+ /U5cnMnFUcDUT0BWe9qOO9kvo6D/LR/KYWHmgliL25xoK5CxVkaWZXXeJ5baaTjECM06
+ lwgkO+dXUQKX6dfUZS3yJBf74nuaCeLgGNRlJMt9SMUf60WWaO6pSxtIr8nN7Ynfvk/4
+ Nb+eQu5n0MvUuZ9LKgHj3CdnCjSLv4kIAw4NBc4hAgQmys/F7LlBHqERm1bO50TSk7CG
+ XiufRqX3PBJFtKgXGzJrz7BD0Aujn7Nidy+fijEEkaZrZDM5B7TOg+2aVr5XlHod5ZES
+ K3rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=qTBjneugtZF+JoWXJ5FX48BYqpDgfu4BcdXmC9Vl7mc=;
- b=Pjagj5p2n+cnJhvnDyHGYx9eyh6JRHrw2zfmTPFD6XyYawVTJN2Ut2Zw4y2n5PWDXB
- 6zf7sJvTm+IVmPhpJSwOSxMifttqW1biGWA4eActmk8ogGZJRRwW9umq2CcmxLhxACZP
- yPV4B4BXA183bZK8mE/JXxud7nYIKsD02PMIAQSsmDYNaYV9Q60ORkOd5C0YH+JWGtJ/
- jDTbgXbxKoPfJwQn+6O4iXtyGjCaoZUogdVV5vxOfo10+CXHcIMsUK7+ZUeGT5ioz/nm
- 2MhcMUSNlexESRvBLuC5teQSmb+SmhmpUxLCh9gyBeHRrzMrvWqsVNKi6xEMPJfurVcH
- SEFQ==
-X-Gm-Message-State: APjAAAUzdHr7hDJYN8PdUu2DDZh2flIIZNxSrAAY3okWd+Ipu8CY11wU
- HE4CyPz92zx42OBbXwNnC4BcVkPdKg0=
-X-Google-Smtp-Source: APXvYqx2oNVa2Ek+gdx0Ko+C4ZqqVYmkBtmIuwWV6W9A22cHRMzKFgR3+56cfbwHaR7KVqL2Jm4rmw==
-X-Received: by 2002:a17:90a:7783:: with SMTP id
- v3mr6417490pjk.109.1567625470998; 
- Wed, 04 Sep 2019 12:31:10 -0700 (PDT)
+ :references;
+ bh=m4MAJXgoOrMBvW2yiXtAmVUpQTazbzn/T7aZQnWvwi0=;
+ b=PX4yF8HjoaKriyClnURbT+qGMJ7ExWS1thqhyMyLEubAN+SrT7UZHpwn8VfTDSEcFb
+ GeMurW/lLp929zzIb7iPhRWAkKyh0KkLEEHvmK2sfb+QHufpK3jcwFKoEkM2QNazNkiT
+ brEZxUnzedadbJyw7knUNyKrrt7IIZe8qNlRdusVbBikAicMWHlcXTMgHVIB/rvrsa2x
+ nD6fqJgQnrFzzkQUpI10CWfjCX72cGubJ6mZASVfemYZ5LGsGYmE7N+sR7ick0qmYG1g
+ OOrxhye/Blb/lXfiA3PfmQtP58foTCLEH4HWLg09gq0FmuvRR3+YzJEJhAixuT8j6pNJ
+ 5ExQ==
+X-Gm-Message-State: APjAAAWHe1Vq/5WXfiDYTClb+uP3LK6GR1P8SCF3gfJytg3Lm+RnDbB0
+ RukbMUxXT/WT/DIqwYz2hwbtD2tVMLM=
+X-Google-Smtp-Source: APXvYqwY0hV7cT1SCsZvaiCbIL1mD12RgT1WE8Ynn2+lUjbHfmifERONiAczKXH7KyEV3PdCfPxytQ==
+X-Received: by 2002:a17:902:a415:: with SMTP id
+ p21mr18461988plq.319.1567625477232; 
+ Wed, 04 Sep 2019 12:31:17 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.31.10
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.31.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:31:10 -0700 (PDT)
+ Wed, 04 Sep 2019 12:31:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:29:58 -0700
-Message-Id: <20190904193059.26202-9-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 12:30:03 -0700
+Message-Id: <20190904193059.26202-14-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
 References: <20190904193059.26202-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::430
-Subject: [Qemu-devel] [PATCH v4 08/69] target/arm: Convert Saturating
- addition and subtraction
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [PATCH v4 13/69] target/arm: Convert MRS/MSR (banked,
+ register)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,170 +97,365 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+The m-profile and a-profile decodings overlap.  Only return false
+for the case of wrong profile; handle UNDEFINED for permission failure
+directly.  This ensures that we don't accidentally pass an insn that
+applies to the wrong profile.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 75 +++++++++++++++++++++++++++---------------
- target/arm/a32.decode  | 10 ++++++
- target/arm/t32.decode  |  9 +++++
- 3 files changed, 67 insertions(+), 27 deletions(-)
+ target/arm/translate.c | 226 ++++++++++++++++++-----------------------
+ target/arm/a32.decode  |  14 +++
+ target/arm/t32.decode  |  40 ++++++--
+ 3 files changed, 142 insertions(+), 138 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 8d70f15a4f..ddb2c764a1 100644
+index 58bfbb8ed9..02dd4a2ab8 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -8128,6 +8128,48 @@ static bool trans_UMAAL(DisasContext *s, arg_UMAAL *a)
+@@ -8320,6 +8320,93 @@ static bool trans_MSR_imm(DisasContext *s, arg_MSR_imm *a)
      return true;
  }
  
 +/*
-+ * Saturating addition and subtraction
++ * Miscellaneous instructions
 + */
 +
-+static bool op_qaddsub(DisasContext *s, arg_rrr *a, bool add, bool doub)
++static bool trans_MRS_bank(DisasContext *s, arg_MRS_bank *a)
 +{
-+    TCGv_i32 t0, t1;
-+
-+    if (s->thumb
-+        ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
-+        : !ENABLE_ARCH_5TE) {
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
 +        return false;
 +    }
-+
-+    t0 = load_reg(s, a->rm);
-+    t1 = load_reg(s, a->rn);
-+    if (doub) {
-+        gen_helper_add_saturate(t1, cpu_env, t1, t1);
-+    }
-+    if (add) {
-+        gen_helper_add_saturate(t0, cpu_env, t0, t1);
-+    } else {
-+        gen_helper_sub_saturate(t0, cpu_env, t0, t1);
-+    }
-+    tcg_temp_free_i32(t1);
-+    store_reg(s, a->rd, t0);
++    gen_mrs_banked(s, a->r, a->sysm, a->rd);
 +    return true;
 +}
 +
-+#define DO_QADDSUB(NAME, ADD, DOUB) \
-+static bool trans_##NAME(DisasContext *s, arg_rrr *a)    \
-+{                                                        \
-+    return op_qaddsub(s, a, ADD, DOUB);                  \
++static bool trans_MSR_bank(DisasContext *s, arg_MSR_bank *a)
++{
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
++    }
++    gen_msr_banked(s, a->r, a->sysm, a->rn);
++    return true;
 +}
 +
-+DO_QADDSUB(QADD, true, false)
-+DO_QADDSUB(QSUB, false, false)
-+DO_QADDSUB(QDADD, true, true)
-+DO_QADDSUB(QDSUB, false, true)
++static bool trans_MRS_reg(DisasContext *s, arg_MRS_reg *a)
++{
++    TCGv_i32 tmp;
 +
-+#undef DO_QADDSUB
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
++    }
++    if (a->r) {
++        if (IS_USER(s)) {
++            unallocated_encoding(s);
++            return true;
++        }
++        tmp = load_cpu_field(spsr);
++    } else {
++        tmp = tcg_temp_new_i32();
++        gen_helper_cpsr_read(tmp, cpu_env);
++    }
++    store_reg(s, a->rd, tmp);
++    return true;
++}
++
++static bool trans_MSR_reg(DisasContext *s, arg_MSR_reg *a)
++{
++    TCGv_i32 tmp;
++    uint32_t mask = msr_mask(s, a->mask, a->r);
++
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
++    }
++    tmp = load_reg(s, a->rn);
++    if (gen_set_psr(s, mask, a->r, tmp)) {
++        unallocated_encoding(s);
++    }
++    return true;
++}
++
++static bool trans_MRS_v7m(DisasContext *s, arg_MRS_v7m *a)
++{
++    TCGv_i32 tmp;
++
++    if (!arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
++    }
++    tmp = tcg_const_i32(a->sysm);
++    gen_helper_v7m_mrs(tmp, cpu_env, tmp);
++    store_reg(s, a->rd, tmp);
++    return true;
++}
++
++static bool trans_MSR_v7m(DisasContext *s, arg_MSR_v7m *a)
++{
++    TCGv_i32 addr, reg;
++
++    if (!arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
++    }
++    addr = tcg_const_i32((a->mask << 10) | a->sysm);
++    reg = load_reg(s, a->rn);
++    gen_helper_v7m_msr(cpu_env, addr, reg);
++    tcg_temp_free_i32(addr);
++    tcg_temp_free_i32(reg);
++    gen_lookup_tb(s);
++    return true;
++}
 +
  /*
   * Legacy decoder.
   */
-@@ -8537,21 +8579,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             store_reg(s, rd, tmp);
-             break;
-         }
--        case 0x5: /* saturating add/subtract */
--            ARCH(5TE);
--            rd = (insn >> 12) & 0xf;
--            rn = (insn >> 16) & 0xf;
--            tmp = load_reg(s, rm);
--            tmp2 = load_reg(s, rn);
--            if (op1 & 2)
--                gen_helper_add_saturate(tmp2, cpu_env, tmp2, tmp2);
--            if (op1 & 1)
--                gen_helper_sub_saturate(tmp, cpu_env, tmp, tmp2);
--            else
--                gen_helper_add_saturate(tmp, cpu_env, tmp, tmp2);
--            tcg_temp_free_i32(tmp2);
--            store_reg(s, rd, tmp);
--            break;
-+        case 0x5:
-+            /* Saturating addition and subtraction.  */
-+            /* All done in decodetree.  Reach here for illegal ops.  */
-+            goto illegal_op;
-         case 0x6: /* ERET */
-             if (op1 != 3) {
-                 goto illegal_op;
-@@ -10024,18 +10055,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-             op = ((insn >> 17) & 0x38) | ((insn >> 4) & 7);
-             if (op < 4) {
-                 /* Saturating add/subtract.  */
--                if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)) {
--                    goto illegal_op;
+@@ -8604,46 +8691,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+         sh = (insn >> 4) & 0xf;
+         rm = insn & 0xf;
+         switch (sh) {
+-        case 0x0: /* MSR, MRS */
+-            if (insn & (1 << 9)) {
+-                /* MSR (banked) and MRS (banked) */
+-                int sysm = extract32(insn, 16, 4) |
+-                    (extract32(insn, 8, 1) << 4);
+-                int r = extract32(insn, 22, 1);
+-
+-                if (op1 & 1) {
+-                    /* MSR (banked) */
+-                    gen_msr_banked(s, r, sysm, rm);
+-                } else {
+-                    /* MRS (banked) */
+-                    int rd = extract32(insn, 12, 4);
+-
+-                    gen_mrs_banked(s, r, sysm, rd);
 -                }
--                tmp = load_reg(s, rn);
--                tmp2 = load_reg(s, rm);
--                if (op & 1)
--                    gen_helper_add_saturate(tmp, cpu_env, tmp, tmp);
--                if (op & 2)
--                    gen_helper_sub_saturate(tmp, cpu_env, tmp2, tmp);
--                else
--                    gen_helper_add_saturate(tmp, cpu_env, tmp, tmp2);
--                tcg_temp_free_i32(tmp2);
-+                /* All done in decodetree.  Reach here for illegal ops.  */
-+                goto illegal_op;
+-                break;
+-            }
+-
+-            /* MSR, MRS (for PSRs) */
+-            if (op1 & 1) {
+-                /* PSR = reg */
+-                tmp = load_reg(s, rm);
+-                i = ((op1 & 2) != 0);
+-                if (gen_set_psr(s, msr_mask(s, (insn >> 16) & 0xf, i), i, tmp))
+-                    goto illegal_op;
+-            } else {
+-                /* reg = PSR */
+-                rd = (insn >> 12) & 0xf;
+-                if (op1 & 2) {
+-                    if (IS_USER(s))
+-                        goto illegal_op;
+-                    tmp = load_cpu_field(spsr);
+-                } else {
+-                    tmp = tcg_temp_new_i32();
+-                    gen_helper_cpsr_read(tmp, cpu_env);
+-                }
+-                store_reg(s, rd, tmp);
+-            }
+-            break;
++        case 0x0:
++            /* MSR/MRS (banked/register) */
++            /* All done in decodetree.  Illegal ops already signalled.  */
++            g_assert_not_reached();
+         case 0x1:
+             if (op1 == 1) {
+                 /* branch/exchange thumb (bx).  */
+@@ -10513,40 +10564,9 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                 } else {
+                     op = (insn >> 20) & 7;
+                     switch (op) {
+-                    case 0: /* msr cpsr.  */
+-                        if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-                            tmp = load_reg(s, rn);
+-                            /* the constant is the mask and SYSm fields */
+-                            addr = tcg_const_i32(insn & 0xfff);
+-                            gen_helper_v7m_msr(cpu_env, addr, tmp);
+-                            tcg_temp_free_i32(addr);
+-                            tcg_temp_free_i32(tmp);
+-                            gen_lookup_tb(s);
+-                            break;
+-                        }
+-                        /* fall through */
+-                    case 1: /* msr spsr.  */
+-                        if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-                            goto illegal_op;
+-                        }
+-
+-                        if (extract32(insn, 5, 1)) {
+-                            /* MSR (banked) */
+-                            int sysm = extract32(insn, 8, 4) |
+-                                (extract32(insn, 4, 1) << 4);
+-                            int r = op & 1;
+-
+-                            gen_msr_banked(s, r, sysm, rm);
+-                            break;
+-                        }
+-
+-                        /* MSR (for PSRs) */
+-                        tmp = load_reg(s, rn);
+-                        if (gen_set_psr(s,
+-                              msr_mask(s, (insn >> 8) & 0xf, op == 1),
+-                              op == 1, tmp))
+-                            goto illegal_op;
+-                        break;
++                    case 0: /* msr cpsr, in decodetree  */
++                    case 1: /* msr spsr, in decodetree  */
++                        goto illegal_op;
+                     case 2: /* cps, nop-hint.  */
+                         /* nop hints in decodetree */
+                         /* Implemented as NOP in user mode.  */
+@@ -10638,61 +10658,9 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                         }
+                         gen_exception_return(s, tmp);
+                         break;
+-                    case 6: /* MRS */
+-                        if (extract32(insn, 5, 1) &&
+-                            !arm_dc_feature(s, ARM_FEATURE_M)) {
+-                            /* MRS (banked) */
+-                            int sysm = extract32(insn, 16, 4) |
+-                                (extract32(insn, 4, 1) << 4);
+-
+-                            gen_mrs_banked(s, 0, sysm, rd);
+-                            break;
+-                        }
+-
+-                        if (extract32(insn, 16, 4) != 0xf) {
+-                            goto illegal_op;
+-                        }
+-                        if (!arm_dc_feature(s, ARM_FEATURE_M) &&
+-                            extract32(insn, 0, 8) != 0) {
+-                            goto illegal_op;
+-                        }
+-
+-                        /* mrs cpsr */
+-                        tmp = tcg_temp_new_i32();
+-                        if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-                            addr = tcg_const_i32(insn & 0xff);
+-                            gen_helper_v7m_mrs(tmp, cpu_env, addr);
+-                            tcg_temp_free_i32(addr);
+-                        } else {
+-                            gen_helper_cpsr_read(tmp, cpu_env);
+-                        }
+-                        store_reg(s, rd, tmp);
+-                        break;
+-                    case 7: /* MRS */
+-                        if (extract32(insn, 5, 1) &&
+-                            !arm_dc_feature(s, ARM_FEATURE_M)) {
+-                            /* MRS (banked) */
+-                            int sysm = extract32(insn, 16, 4) |
+-                                (extract32(insn, 4, 1) << 4);
+-
+-                            gen_mrs_banked(s, 1, sysm, rd);
+-                            break;
+-                        }
+-
+-                        /* mrs spsr.  */
+-                        /* Not accessible in user mode.  */
+-                        if (IS_USER(s) || arm_dc_feature(s, ARM_FEATURE_M)) {
+-                            goto illegal_op;
+-                        }
+-
+-                        if (extract32(insn, 16, 4) != 0xf ||
+-                            extract32(insn, 0, 8) != 0) {
+-                            goto illegal_op;
+-                        }
+-
+-                        tmp = load_cpu_field(spsr);
+-                        store_reg(s, rd, tmp);
+-                        break;
++                    case 6: /* MRS, in decodetree */
++                    case 7: /* MSR, in decodetree */
++                        goto illegal_op;
+                     }
+                 }
              } else {
-                 switch (op) {
-                 case 0x0a: /* rbit */
 diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index 87bbb2eec2..7791be5590 100644
+index 3d5c5408f9..6ee12c1140 100644
 --- a/target/arm/a32.decode
 +++ b/target/arm/a32.decode
-@@ -27,6 +27,7 @@
- &s_rri_rot       s rn rd imm rot
+@@ -29,6 +29,10 @@
  &s_rrrr          s rd rn rm ra
  &rrrr            rd rn rm ra
-+&rrr             rd rn rm
+ &rrr             rd rn rm
++&msr_reg         rn r mask
++&mrs_reg         rd r
++&msr_bank        rn r sysm
++&mrs_bank        rd r sysm
  
  # Data-processing (register)
  
-@@ -122,3 +123,12 @@ UMULL            .... 0000 100 . .... .... .... 1001 ....     @s_rdamn
- UMLAL            .... 0000 101 . .... .... .... 1001 ....     @s_rdamn
- SMULL            .... 0000 110 . .... .... .... 1001 ....     @s_rdamn
- SMLAL            .... 0000 111 . .... .... .... 1001 ....     @s_rdamn
+@@ -177,3 +181,13 @@ SMULTT           .... 0001 0110 .... 0000 .... 1110 ....      @rd0mn
+   MSR_imm        .... 0011 0010 .... 1111 .... .... ....      @msr_i r=0
+ }
+ MSR_imm          .... 0011 0110 .... 1111 .... .... ....      @msr_i r=1
 +
-+# Saturating addition and subtraction
++# Miscellaneous instructions
 +
-+@rndm            ---- .... .... rn:4 rd:4 .... .... rm:4      &rrr
++%sysm            8:1 16:4
 +
-+QADD             .... 0001 0000 .... .... 0000 0101 ....      @rndm
-+QSUB             .... 0001 0010 .... .... 0000 0101 ....      @rndm
-+QDADD            .... 0001 0100 .... .... 0000 0101 ....      @rndm
-+QDSUB            .... 0001 0110 .... .... 0000 0101 ....      @rndm
++MRS_bank         ---- 0001 0 r:1 00 .... rd:4 001. 0000 0000  &mrs_bank %sysm
++MSR_bank         ---- 0001 0 r:1 10 .... 1111 001. 0000 rn:4  &msr_bank %sysm
++
++MRS_reg          ---- 0001 0 r:1 00 1111   rd:4 0000 0000 0000  &mrs_reg
++MSR_reg          ---- 0001 0 r:1 10 mask:4 1111 0000 0000 rn:4  &msr_reg
 diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index 40cc69aee3..7c6226e0af 100644
+index ccb7cdd4ef..98b682e7ec 100644
 --- a/target/arm/t32.decode
 +++ b/target/arm/t32.decode
-@@ -24,6 +24,7 @@
- &s_rri_rot       !extern s rn rd imm rot
+@@ -26,6 +26,10 @@
  &s_rrrr          !extern s rd rn rm ra
  &rrrr            !extern rd rn rm ra
-+&rrr             !extern rd rn rm
+ &rrr             !extern rd rn rm
++&msr_reg         !extern rn r mask
++&mrs_reg         !extern rd r
++&msr_bank        !extern rn r sysm
++&mrs_bank        !extern rd r sysm
  
  # Data-processing (register)
  
-@@ -117,6 +118,7 @@ RSB_rri          1111 0.0 1110 . .... 0 ... .... ........     @s_rri_rot
- @s0_rnadm        .... .... .... rn:4 ra:4 rd:4 .... rm:4      &s_rrrr s=0
- @s0_rn0dm        .... .... .... rn:4 .... rd:4 .... rm:4      &s_rrrr ra=0 s=0
- @rnadm           .... .... .... rn:4 ra:4 rd:4 .... rm:4      &rrrr
-+@rndm            .... .... .... rn:4 .... rd:4 .... rm:4      &rrr
+@@ -170,16 +174,34 @@ QDSUB            1111 1010 1000 .... 1111 .... 1011 ....      @rndm
  
+ # Branches and miscellaneous control
+ 
++%msr_sysm        4:1 8:4
++%mrs_sysm        4:1 16:4
++
  {
-   MUL            1111 1011 0000 .... 1111 .... 0000 ....      @s0_rn0dm
-@@ -128,3 +130,10 @@ UMULL            1111 1011 1010 .... .... .... 0000 ....      @s0_rnadm
- SMLAL            1111 1011 1100 .... .... .... 0000 ....      @s0_rnadm
- UMLAL            1111 1011 1110 .... .... .... 0000 ....      @s0_rnadm
- UMAAL            1111 1011 1110 .... .... .... 0110 ....      @rnadm
-+
-+# Data-processing (two source registers)
-+
-+QADD             1111 1010 1000 .... 1111 .... 1000 ....      @rndm
-+QSUB             1111 1010 1000 .... 1111 .... 1010 ....      @rndm
-+QDADD            1111 1010 1000 .... 1111 .... 1001 ....      @rndm
-+QDSUB            1111 1010 1000 .... 1111 .... 1011 ....      @rndm
+-  YIELD          1111 0011 1010 1111 1000 0000 0000 0001
+-  WFE            1111 0011 1010 1111 1000 0000 0000 0010
+-  WFI            1111 0011 1010 1111 1000 0000 0000 0011
++  {
++    YIELD        1111 0011 1010 1111 1000 0000 0000 0001
++    WFE          1111 0011 1010 1111 1000 0000 0000 0010
++    WFI          1111 0011 1010 1111 1000 0000 0000 0011
+ 
+-  # TODO: Implement SEV, SEVL; may help SMP performance.
+-  # SEV          1111 0011 1010 1111 1000 0000 0000 0100
+-  # SEVL         1111 0011 1010 1111 1000 0000 0000 0101
++    # TODO: Implement SEV, SEVL; may help SMP performance.
++    # SEV        1111 0011 1010 1111 1000 0000 0000 0100
++    # SEVL       1111 0011 1010 1111 1000 0000 0000 0101
+ 
+-  # The canonical nop ends in 0000 0000, but the whole rest
+-  # of the space is "reserved hint, behaves as nop".
+-  NOP            1111 0011 1010 1111 1000 0000 ---- ----
++    # The canonical nop ends in 0000 0000, but the whole rest
++    # of the space is "reserved hint, behaves as nop".
++    NOP          1111 0011 1010 1111 1000 0000 ---- ----
++  }
++  # Note that the v7m insn overlaps both the normal and banked insn.
++  {
++    MRS_bank     1111 0011 111 r:1 .... 1000 rd:4   001. 0000  \
++                 &mrs_bank sysm=%mrs_sysm
++    MRS_reg      1111 0011 111 r:1 1111 1000 rd:4   0000 0000  &mrs_reg
++    MRS_v7m      1111 0011 111 0   1111 1000 rd:4   sysm:8
++  }
++  {
++    MSR_bank     1111 0011 100 r:1 rn:4 1000 ....   001. 0000  \
++                 &msr_bank sysm=%msr_sysm
++    MSR_reg      1111 0011 100 r:1 rn:4 1000 mask:4 0000 0000  &msr_reg
++    MSR_v7m      1111 0011 100 0   rn:4 1000 mask:2 00 sysm:8
++  }
+ }
 -- 
 2.17.1
 
