@@ -2,92 +2,117 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C79C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14547C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D51472073F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:19:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51472073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D209C2339D
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:24:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D209C2339D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5NhZ-0005h2-Sg
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 01:19:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33809)
+	id 1i5NmS-000789-IU
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 01:24:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ymankad@redhat.com>) id 1i5Ngo-0005HZ-Bd
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:18:43 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i5Nln-0006ch-AB
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:23:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ymankad@redhat.com>) id 1i5Ngl-0001ZL-MN
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:18:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38808)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ymankad@redhat.com>) id 1i5Ngl-0001YW-Dz
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:18:39 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EB2354E924;
- Wed,  4 Sep 2019 05:18:37 +0000 (UTC)
-Received: from apollo.usersys.redhat.com (ovpn-123-158.rdu2.redhat.com
- [10.10.123.158])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A31485C207;
- Wed,  4 Sep 2019 05:18:28 +0000 (UTC)
-To: Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
- qemu-devel@nongnu.org
-References: <20190904005218.12536-1-crosa@redhat.com>
-From: Yash Mankad <ymankad@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1i5Nlm-0004sx-9G
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:23:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:55875)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1i5Nlj-0004od-QK; Wed, 04 Sep 2019 01:23:48 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MHXWL-1i0lCx0eVF-00DZNH; Wed, 04 Sep 2019 07:23:26 +0200
+To: Josh Kunz <jkz@google.com>
+References: <20190816233422.16715-1-jkz@google.com>
+ <5b4df64c-40e4-70cd-753e-f52e2b547c18@vivier.eu>
+ <CADgy-2tzD0FVXbKtadSL1JuMWW_TEzFP2ZD0hzA4PUnxh1Xz0g@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
-Autocrypt: addr=ymankad@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFecwEYBCAC7QUnuTKRrz39gLumVG+KNB8XmHqHKypYPMkdJNLx33LAhmDVEeBEB6Zyn
- ryVtNClL4GVrmDOROp53kIkJh4uSAeu71w3/RJLrrHIs/NlFZ1cH3hEAwShLKYkXoVfqBN3m
- zhbqyndmPy8fviOIDcyzEBEIDbgsLgMebJTAto/ihLgEeG9dMF4qUuCcb3sWIao/WHSr9XHB
- OtZnvVUGueIM3DqEC2g5BN8025riOOL3UGRmIctJR+2dM+j0aCIbARGv1B66o300gJfjxm24
- /CbD/I6Wt2PHrNv/d4nXjfNElaBCiVw9513m2maFJeFaSPJpAGZjyDN/niNcpvxg6XaLABEB
- AAG0P1lhc2ggTWFua2FkIChTb2Z0d2FyZSBFbmdpbmVlciBhdCBSZWQgSGF0KSA8eW1hbmth
- ZEByZWRoYXQuY29tPokBNwQTAQgAIQUCV5zARgIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIX
- gAAKCRBjP1s2LzTrMJhfB/9mRNS3eMAy17wRSjnR1/AtNZ2qwBbyjnor0+Q7UfYUXKvFBNJo
- LnX6zphFJ/fZMqIM5BrE7T90Mm5Qy3qoK1c0QibN97OECrPn9epGPKiiI+1WZrIX9S3crCui
- hyIS4IuOOmgtVJx+akWCbfYPaybNsTPLBFJZ0+aATSe9Nbeb4XUS3RAqlRUEdejNGxxtKLtZ
- xgXsmL/il6Fp4EX53H1+d83Rk4V+S2KvMfrFEB+mxF7JFUv0E071br42po/EDnYj2wLM/STh
- Fgp5LO4qTPrwD8mllibLSF6ZCrjNYW1EctJF7oYbfFXwPUh9LWh0opKwzo8ne5ZN/4hzexHU
- 4MnquQENBFecwEYBCACnrkQgxRis8b1DRRIWu+Gxxp4Xv85c19A3IyNudvihSNSSV8mSZ+ei
- 9Xev80IhgExf+1MeTPvuWmD1FogqC5Pi6bEs29ZZvSde+DH1BeVoKVn4zY+rCSqyrlRfx8Zd
- xJXIICfOgfDRjDf0nKPiI14ujdT0zMOPJHQ8wf267kMWmS32eQPTLJmemhl9WhEett+i1WLq
- 84DjbEhtkTO6FdboEcTN1fMSpkXz+jgfvgCCZIfJJ+AI/V/VjBBn264VdDdOE/AFfc6B1QYf
- 6X3npdUmXjlE5QIadoaOHf6e+qMSEchKfMa9ban0dH1THVAm2Z8Ji+l0tNYJ/e3mndXcVJv7
- ABEBAAGJAR8EGAEIAAkFAlecwEYCGwwACgkQYz9bNi806zAlVwgAj0auI5iVWxdCEnxGDAFC
- 7uuZeBfiRGUwnaeRLcs2N6zLdN7Y9aoLv0RMrQhTP1DiIOi2xuCiUeGAY533fIpQOtE+AHgY
- fFqUG9gwK9Web5Tec+SNOBXeULRd8flo3RIkKMUR6RBynHkvEt2WbGRfr4gP6RuYzwBL1EWv
- nigkhVXsLA+hyut5C8OMXcxG61vbat2duyBgqROV0UbMau9Nr+t5w2isusgHe3fia1h5uwsh
- 3UDO4xAD/Il16hZqcPbgKW3+S7uR3V2LKwCqX0S/9gYwaIfiBgvEt7EAbj2YZfYvcWjbBwDu
- stjeTrSRCejEli4lN7PsSM6/NaLsIPKMgQ==
-Message-ID: <1c64a595-252f-6a39-00db-84c94116637f@redhat.com>
-Date: Wed, 4 Sep 2019 01:18:26 -0400
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <6301d7f2-d0b2-d7a5-3bb2-e33c4ca518fd@vivier.eu>
+Date: Wed, 4 Sep 2019 07:23:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190904005218.12536-1-crosa@redhat.com>
+In-Reply-To: <CADgy-2tzD0FVXbKtadSL1JuMWW_TEzFP2ZD0hzA4PUnxh1Xz0g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 04 Sep 2019 05:18:38 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:G3BDuDVzXfsvUcY1OjuFH3vp3EaPswyV2+OIdC3KHkp/OqkQKAx
+ 4FAY4gNArO4q0fgGnylvkGZMJiAOMKKal8RRuuOIRGlvGDbYmISkENzgoVd0+HTurA3kEO2
+ ema6tfWokBE5PacYk6TE4D0BFLxvI9bBL0gIp+vbUTDAnbHoR9KQeSjjJDH+/wid6QmS/TA
+ RCRmi426kFLd9GQ+C5zUQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+Gmg+OrdODk=:0qW7CkIfDLCTtmyGmajIOL
+ XX19A2QlJfqWgLQGqriXJFKtZN2OkrCiUoYxHCDdQn/rUFBKiXDdpT6AUAVHN4iSRxhdZyf3m
+ A888Ad15euu/EgBhgXvd8bQpxfoJz7fE514XWca+e8zRxkJkjnjVfSZIkTo6I/oHze54dRhcQ
+ 3HZcLdTPYFyHVdqVb2YYDAH1BmVDBf65isZBQ9rj4ymZzz91N9MJI2GUkIasUI9u8Umcj/5ZF
+ ydsyhMmCFPa0xunPGA3KQR70kZstiwjZnfiaKXHqpU6MfGnZQ+dXQXVy82ld2pEHtCVlUgi3G
+ In+TwWGA8v3PqTTNHyfLvvhfJqpBTZBO2uJPvwBDmFpEIKM0bwpfeAXsn34JfPE3i79g0Su9o
+ 5TXr7KdsBf4RwBNbU7BQ1ouFQmq9b4zIAkPrH1afOYGdaSyFR34S5+3aLZA7+LVpq1cO6Bg/1
+ Rg4hYdckS5yAExYXrBedg2eKtl3GJLcwJePvDf1tPIk7oA+b+2ObLbM7RHS4UKtAYQZ+G5kaF
+ hUbs5xcfqwJWEUJbu+S0dl6Il5t8izmJ9lpdEu9UnEV+dUjoz2TYg5HTQ54hFou8k9Qj32Vfx
+ +Z2oRrtzBseq2LhQy90q4OU/DW5hBdnuJne0B2HS3p5oQxWddkKp+RGN8z0oHRW61DwuCzPS5
+ 9mFOXvFia5eEweoym45KrC98ZCIlviH+GK59TDIC6sW1p6LEidUb6JBxYcwxY8591fGMwuhCV
+ plRhkdnaT4Q1pwn6IqKid0R9e+VQIPwlc6QYCsviPb0DLaYVWlVAupffsip1xdahZH6KA1z1p
+ xhSCBtLa96DQs62xqEb2RaFWcFS8W7JAXm1JK0k0eLvbRkCx+k=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] Fedora images: use URLs from stable
- "archives.fedoraproject.org"
+X-Received-From: 212.227.126.130
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Support gdb 'qOffsets' query
+ for ELF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,211 +124,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Le 03/09/2019 à 21:19, Josh Kunz a écrit :
+> The `Data` and `Code` flags in `qOffsets` are actually section offsets
+> rather than segment offsets. GDB relocates the symbols in those sections
+> relative to their location in the binary. So we have to use `load_bias`.
+> 
+> See here for a more detailed
+> description: https://sourceware.org/gdb/onlinedocs/gdb/General-Query-Packets.html#General-Query-Packets
+> 
 
+Thank you for the details.
 
-On 9/3/19 8:52 PM, Cleber Rosa wrote:
-> The LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16 test,
-> from tests/acceptance/linux_initrd.py, is currently failing to fetch
-> the "vmlinuz" file.  The reason for the failure is that the Fedora
-> project retires older versions from the "dl.fedoraproject.org" URL,
-> and keeps them in "archives.fedoraproject.org".  As an added note,
-> that test uses a Fedora 28 image, because of the specific Linux kernel
-> version requirements of the test.
->
-> For the sake of stability, let's use URLs from the archived and
-> supposedely ever stable URLs.  The good news is that the currently
-> supported versions are also hosted on the later.  This change limits
-> itself to change the URLs, while keeping the fetched files the same
-> (as can be evidenced by the unchanged hashes).
->
-> Documentation and the "vm tests" fedora definition were also updated.
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  qemu-doc.texi                          |  6 +++---
->  tests/acceptance/boot_linux_console.py | 25 +++++++++++++++----------
->  tests/acceptance/linux_initrd.py       |  5 +++--
->  tests/vm/fedora                        |  2 +-
->  4 files changed, 22 insertions(+), 16 deletions(-)
->
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 577d1e8376..37795f86fb 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -440,15 +440,15 @@ of <protocol>.
-> =20
->  Example: boot from a remote Fedora 20 live ISO image
->  @example
-> -qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttp://dl.fedoraprojec=
-t.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64=
--20-1.iso,readonly
-> +qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttps://archives.fedor=
-aproject.org/pub/archive/fedora/linux/releases/20/Live/x86_64/Fedora-Live=
--Desktop-x86_64-20-1.iso,readonly
-> =20
-> -qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3D=
-http://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedo=
-ra-Live-Desktop-x86_64-20-1.iso,readonly
-> +qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3D=
-http://archives.fedoraproject.org/pub/archive/fedora/linux/releases/20/Li=
-ve/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
->  @end example
-> =20
->  Example: boot from a remote Fedora 20 cloud image using a local overla=
-y for
->  writes, copy-on-read, and a readahead of 64k
->  @example
-> -qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http=
-",, "file.url":"https://dl.fedoraproject.org/pub/fedora/linux/releases/20=
-/Images/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":=
-"64k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-> +qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http=
-",, "file.url":"http://archives.fedoraproject.org/pub/archive/fedora/linu=
-x/releases/20/Images/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "fil=
-e.readahead":"64k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-> =20
->  qemu-system-x86_64 -drive file=3D/tmp/Fedora-x86_64-20-20131211.1-sda.=
-qcow2,copy-on-read=3Don
->  @end example
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index 2504ef0150..8a9a314ab4 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -76,8 +76,9 @@ class BootLinuxConsole(Test):
->          :avocado: tags=3Darch:x86_64
->          :avocado: tags=3Dmachine:pc
->          """
-> -        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora=
-/linux/'
-> -                      'releases/29/Everything/x86_64/os/images/pxeboot=
-/vmlinuz')
-> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
-e/fedora'
-> +                      '/linux/releases/29/Everything/x86_64/os/images/=
-pxeboot'
-> +                      '/vmlinuz')
->          kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> =20
-> @@ -250,8 +251,9 @@ class BootLinuxConsole(Test):
->          :avocado: tags=3Darch:aarch64
->          :avocado: tags=3Dmachine:virt
->          """
-> -        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora=
-/linux/'
-> -                      'releases/29/Everything/aarch64/os/images/pxeboo=
-t/vmlinuz')
-> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
-e/fedora'
-> +                      '/linux/releases/29/Everything/aarch64/os/images=
-/pxeboot'
-> +                      '/vmlinuz')
->          kernel_hash =3D '8c73e469fc6ea06a58dc83a628fc695b693b8493'
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> =20
-> @@ -271,8 +273,9 @@ class BootLinuxConsole(Test):
->          :avocado: tags=3Darch:arm
->          :avocado: tags=3Dmachine:virt
->          """
-> -        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora=
-/linux/'
-> -                      'releases/29/Everything/armhfp/os/images/pxeboot=
-/vmlinuz')
-> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
-e/fedora'
-> +                      '/linux/releases/29/Everything/armhfp/os/images/=
-pxeboot'
-> +                      '/vmlinuz')
->          kernel_hash =3D 'e9826d741b4fb04cadba8d4824d1ed3b7fb8b4d4'
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> =20
-> @@ -318,8 +321,9 @@ class BootLinuxConsole(Test):
->          :avocado: tags=3Darch:s390x
->          :avocado: tags=3Dmachine:s390_ccw_virtio
->          """
-> -        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora=
--secondary/'
-> -                      'releases/29/Everything/s390x/os/images/kernel.i=
-mg')
-> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
-e'
-> +                      '/fedora-secondary/releases/29/Everything/s390x/=
-os/images'
-> +                      '/kernel.img')
->          kernel_hash =3D 'e8e8439103ef8053418ef062644ffd46a7919313'
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> =20
-> @@ -360,8 +364,9 @@ class BootLinuxConsole(Test):
->          :avocado: tags=3Darch:ppc64
->          :avocado: tags=3Dmachine:pseries
->          """
-> -        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora=
--secondary/'
-> -                      'releases/29/Everything/ppc64le/os/ppc/ppc64/vml=
-inuz')
-> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
-e'
-> +                      '/fedora-secondary/releases/29/Everything/ppc64l=
-e/os'
-> +                      '/ppc/ppc64/vmlinuz')
->          kernel_hash =3D '3fe04abfc852b66653b8c3c897a59a689270bc77'
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> =20
-> diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_=
-initrd.py
-> index 23be5a63aa..c61d9826a4 100644
-> --- a/tests/acceptance/linux_initrd.py
-> +++ b/tests/acceptance/linux_initrd.py
-> @@ -54,8 +54,9 @@ class LinuxInitrd(Test):
->          QEMU has supported up to 4 GiB initrd for recent kernel
->          Expect guest can reach 'Unpacking initramfs...'
->          """
-> -        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28=
-/'
-> -                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
-> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
-e/fedora'
-> +                      '/linux/releases/28/Everything/x86_64/os/images/=
-pxeboot/'
-> +                      'vmlinuz')
->          kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
->          max_size =3D 2 * (1024 ** 3) + 1
-> diff --git a/tests/vm/fedora b/tests/vm/fedora
-> index e8fa5bf0d2..7fec1479fb 100755
-> --- a/tests/vm/fedora
-> +++ b/tests/vm/fedora
-> @@ -23,7 +23,7 @@ class FedoraVM(basevm.BaseVM):
->      name =3D "fedora"
->      arch =3D "x86_64"
-> =20
-> -    base =3D "http://dl.fedoraproject.org/pub/fedora/linux/releases/30=
-/"
-> +    base =3D "https://archives.fedoraproject.org/pub/archive/fedora/li=
-nux/releases/30/"
->      link =3D base + "Server/x86_64/iso/Fedora-Server-netinst-x86_64-30=
--1.2.iso"
->      repo =3D base + "Server/x86_64/os/"
->      full =3D base + "Everything/x86_64/os/"
-
-Thanks for the fix Cleber.
-
-Reviewed-by: Yash Mankad <ymankad@redhat.com>
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
