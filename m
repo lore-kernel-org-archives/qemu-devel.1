@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0743DC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB7CC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:54:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7A2721883
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:54:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 575BF21883
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 19:54:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h0I4AGCh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7A2721883
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xo4CiaJ2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 575BF21883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5bMV-0003bx-HL
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 15:54:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40149)
+	id 1i5bMm-0003zi-Vc
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 15:54:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b03-0004V3-3D
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b08-0004cd-Re
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b01-0002Lo-6V
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:26 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42778)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b06-0002QL-O9
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:32 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36832)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5b00-0002Kz-To
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:25 -0400
-Received: by mail-pg1-x541.google.com with SMTP id p3so11766631pgb.9
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:31:24 -0700 (PDT)
+ id 1i5b06-0002Pp-EV
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:30 -0400
+Received: by mail-pf1-x442.google.com with SMTP id y22so8276700pfr.3
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:31:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=kFutySvY3dUNUb39wtRAtuDmuWFVewtZdUowhmVNFME=;
- b=h0I4AGChQmOFpnuu3N8eLh1aCtt0OYY01ThVKLyDf1codyYb9MBPqYJkTFsIaL7DSe
- wx6bw3zaPkpyi6cVULO4livkYrv2suKfyZP2Ztg3OrEa0wc/NXfUVhvG01QikwRXSy5X
- SBg95LZmRxqhUYXdEfqFNoU/36Ra2NMIiKyOErO0cMfZ5y6MuT7m3JYBm15vlZdYKs48
- jWY+UNuGofxNcRlr7gXzOH1H2BqnkzEq7C0mKfaWaQP097FO1FZ1ucq78uPaiME6642r
- x/K8QKi1X//1Hh8x19V/jwezVeDXJilutJROgfTjBSme8RpTrPMTojssPIczPBDEZ2Q2
- dFTA==
+ bh=w4KLvtnzbGeNcUZz918DD9xSWUWeMSJ2fRY4zLuIN7M=;
+ b=Xo4CiaJ2viHwnNykF9aQFpzgH/WazLxvqgaLL1+oZC9xYBHkAoGfSLdhKqdU92db2G
+ OyoM71AXfDwwIUU4xwwVxyC19ZJxx4sxtO4PlWLRsCgM4RVSolrIcNtdErudmyq3QOAd
+ q/LYCPMFrUXthM2djMOmsTJ1s0GTQuBMoF33XS55pYcvk5OwGwbASVDQ5nigjNXLuplu
+ PX25wihAvAdArplzvZiBjWz3NrBu8ZFuSqgqJxiILNo/AWV3SsPB5OxsbGAsD9pXV0j5
+ uQsibc81/wpocRqBua9h4qwXlxufykJzhkq8ykQ15CI6w/IKC2nxVvCFEyWCCedmPdh0
+ dW5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=kFutySvY3dUNUb39wtRAtuDmuWFVewtZdUowhmVNFME=;
- b=NqmvDpWT/pbPLaQ9V/d/+l4058cCobA6uIWaSHVKPC1yULk8VMp1IV2VcEXqQ4iGOL
- ZJFdXP6tQ11eLV2WmUXs1wKLfyacB5G3McakgKjZDs3Fs/3e4Ey/bEgfpk+RfxFAqUJF
- auNB9SAMJWL4NPxlFPGIohnFzMuPWcu4+uro6sqnm/gNyMULl4ro2bsVBbcREQSu4ALa
- bRVJAlaADJGlkQTyV/IPY1RY5/ZcG9xa+QsimebTiWetsVNvhuc0A00fYA3iJi/MY6u3
- A21upbNluuxf2K+6gLH0jjcZ/3dPloZ2kzSCuqOGnlInWvehIwQD7uHh+EajrmHiHzJP
- mh1Q==
-X-Gm-Message-State: APjAAAWUL2U1KBeBo7BlhpUnoCRUpA/rIqEVmui293q6zpu2LIrbCnpS
- jhIOBuc3v8XhoUIHTOPa9g0dvj+V04I=
-X-Google-Smtp-Source: APXvYqwOojm5WqWPK5A7zcamAMoGbVrBkkKS425pPqEFCpIVgst3RfzqjnxM91SFBim6Xm3B5yWf+w==
-X-Received: by 2002:a65:4507:: with SMTP id n7mr24803865pgq.86.1567625483476; 
- Wed, 04 Sep 2019 12:31:23 -0700 (PDT)
+ bh=w4KLvtnzbGeNcUZz918DD9xSWUWeMSJ2fRY4zLuIN7M=;
+ b=KCXMyN1M8u+00hdcPDv2Z0DNP+y1BLUzFapqN67Q/WtAyIH6KCv5yVzcmUaJU+B+ln
+ PpkuFvYerRoUFtJgebi4YKo7vmXf5a75kljc5Jjo3ppMzuk035p580CSbZaIKWOa6jta
+ wlujYK4QEc6FoSqS/jl3gyiFH+GChagkkht5tWLdx3szceWRNtwJtP2/WMqZfOSWwHuS
+ hvQR0WvQ7hFzCRRgKtSZyNp/Nz4WTxEJ5c7yrsswJ5ry306si/DDV435YOdUwpT2EtjG
+ Le9Xg3D2+nDc5hY0K2VrDxenASWSb0mItZtec7SNYDDWQn+vcpJZEwWuj8c3krER/oJY
+ EvyQ==
+X-Gm-Message-State: APjAAAWnsFc1JX2TSrdF6g4NuQgBpVWDitCXF7sNLaykqGs1nqakWmFy
+ lQ1hM2XMSkyB2lvseilAvv1vVt89Sks=
+X-Google-Smtp-Source: APXvYqx3SzPP2IxI/lCtnKHBikx7qIT/taVd1nwO4Jv7aVG/nO+lPyW1zlgl1mSl/zfYL810B81n7g==
+X-Received: by 2002:a65:4b8b:: with SMTP id t11mr36313870pgq.130.1567625488997; 
+ Wed, 04 Sep 2019 12:31:28 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.31.22
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.31.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:31:22 -0700 (PDT)
+ Wed, 04 Sep 2019 12:31:27 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:30:08 -0700
-Message-Id: <20190904193059.26202-19-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 12:30:12 -0700
+Message-Id: <20190904193059.26202-23-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
 References: <20190904193059.26202-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [PATCH v4 18/69] target/arm: Convert the rest of A32
- Miscelaneous instructions
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PATCH v4 22/69] target/arm: Diagnose UNPREDICTABLE
+ ldrex/strex cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,226 +99,111 @@ Sender: "Qemu-devel"
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Call unallocated_encoding for IS_USER.
----
- target/arm/translate.c | 127 +++++++++++++++--------------------------
- target/arm/a32.decode  |   8 +++
- target/arm/t32.decode  |   5 ++
- 3 files changed, 58 insertions(+), 82 deletions(-)
+ target/arm/translate.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9589e9bbb9..750331071b 100644
+index ec80c9cbbc..9338873a4a 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -8524,6 +8524,47 @@ static bool trans_ERET(DisasContext *s, arg_ERET *a)
-     return true;
- }
- 
-+static bool trans_HLT(DisasContext *s, arg_HLT *a)
-+{
-+    gen_hlt(s, a->imm);
-+    return true;
-+}
-+
-+static bool trans_BKPT(DisasContext *s, arg_BKPT *a)
-+{
-+    if (!ENABLE_ARCH_5) {
-+        return false;
-+    }
-+    gen_exception_bkpt_insn(s, syn_aa32_bkpt(a->imm, false));
-+    return true;
-+}
-+
-+static bool trans_HVC(DisasContext *s, arg_HVC *a)
-+{
-+    if (!ENABLE_ARCH_7 || arm_dc_feature(s, ARM_FEATURE_M)) {
-+        return false;
-+    }
-+    if (IS_USER(s)) {
-+        unallocated_encoding(s);
-+    } else {
-+        gen_hvc(s, a->imm);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SMC(DisasContext *s, arg_SMC *a)
-+{
-+    if (!ENABLE_ARCH_6K || arm_dc_feature(s, ARM_FEATURE_M)) {
-+        return false;
-+    }
-+    if (IS_USER(s)) {
-+        unallocated_encoding(s);
-+    } else {
-+        gen_smc(s);
-+    }
-+    return true;
-+}
-+
- /*
-  * Legacy decoder.
-  */
-@@ -8804,68 +8845,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-     } else if ((insn & 0x0f900000) == 0x01000000
-                && (insn & 0x00000090) != 0x00000090) {
-         /* miscellaneous instructions */
--        op1 = (insn >> 21) & 3;
--        sh = (insn >> 4) & 0xf;
--        rm = insn & 0xf;
--        switch (sh) {
--        case 0x0:
--            /* MSR/MRS (banked/register) */
--            /* All done in decodetree.  Illegal ops already signalled.  */
--            g_assert_not_reached();
--        case 0x1: /* bx, clz */
--        case 0x2: /* bxj */
--        case 0x3: /* blx */
--        case 0x4: /* crc32 */
--            /* All done in decodetree.  Illegal ops reach here.  */
--            goto illegal_op;
--        case 0x5: /* Saturating addition and subtraction.  */
--        case 0x6: /* ERET */
--            /* All done in decodetree.  Reach here for illegal ops.  */
--            goto illegal_op;
--        case 7:
--        {
--            int imm16 = extract32(insn, 0, 4) | (extract32(insn, 8, 12) << 4);
--            switch (op1) {
--            case 0:
--                /* HLT */
--                gen_hlt(s, imm16);
--                break;
--            case 1:
--                /* bkpt */
--                ARCH(5);
--                gen_exception_bkpt_insn(s, syn_aa32_bkpt(imm16, false));
--                break;
--            case 2:
--                /* Hypervisor call (v7) */
--                ARCH(7);
--                if (IS_USER(s)) {
--                    goto illegal_op;
--                }
--                gen_hvc(s, imm16);
--                break;
--            case 3:
--                /* Secure monitor call (v6+) */
--                ARCH(6K);
--                if (IS_USER(s)) {
--                    goto illegal_op;
--                }
--                gen_smc(s);
--                break;
--            default:
--                g_assert_not_reached();
--            }
--            break;
--        }
--        case 0x8:
--        case 0xa:
--        case 0xc:
--        case 0xe:
--            /* Halfword multiply and multiply accumulate.  */
--            /* All done in decodetree.  Reach here for illegal ops.  */
--            goto illegal_op;
--        default:
--            goto illegal_op;
--        }
-+        /* All done in decodetree.  Illegal ops reach here.  */
-+        goto illegal_op;
-     } else if (((insn & 0x0e000000) == 0 &&
-                 (insn & 0x00000090) != 0x90) ||
-                ((insn & 0x0e000000) == (1 << 25))) {
-@@ -10539,26 +10520,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                     goto illegal_op;
- 
-                 if (insn & (1 << 26)) {
--                    if (arm_dc_feature(s, ARM_FEATURE_M)) {
--                        goto illegal_op;
--                    }
--                    if (!(insn & (1 << 20))) {
--                        /* Hypervisor call (v7) */
--                        int imm16 = extract32(insn, 16, 4) << 12
--                            | extract32(insn, 0, 12);
--                        ARCH(7);
--                        if (IS_USER(s)) {
--                            goto illegal_op;
--                        }
--                        gen_hvc(s, imm16);
--                    } else {
--                        /* Secure monitor call (v6+) */
--                        ARCH(6K);
--                        if (IS_USER(s)) {
--                            goto illegal_op;
--                        }
--                        gen_smc(s);
--                    }
-+                    /* hvc, smc, in decodetree */
-+                    goto illegal_op;
-                 } else {
-                     op = (insn >> 20) & 7;
-                     switch (op) {
-diff --git a/target/arm/a32.decode b/target/arm/a32.decode
-index 52a66dd1d5..c7f156be6d 100644
---- a/target/arm/a32.decode
-+++ b/target/arm/a32.decode
-@@ -31,6 +31,7 @@
- &rrr             rd rn rm
- &rr              rd rm
- &r               rm
-+&i               imm
- &msr_reg         rn r mask
- &mrs_reg         rd r
- &msr_bank        rn r sysm
-@@ -196,9 +197,11 @@ CRC32CW          .... 0001 0100 .... .... 0010 0100 ....      @rndm
- # Miscellaneous instructions
- 
- %sysm            8:1 16:4
-+%imm16_8_0       8:12 0:4
- 
- @rm              ---- .... .... .... .... .... .... rm:4      &r
- @rdm             ---- .... .... .... rd:4 .... .... rm:4      &rr
-+@i16             ---- .... .... .... .... .... .... ....      &i imm=%imm16_8_0
- 
- MRS_bank         ---- 0001 0 r:1 00 .... rd:4 001. 0000 0000  &mrs_bank %sysm
- MSR_bank         ---- 0001 0 r:1 10 .... 1111 001. 0000 rn:4  &msr_bank %sysm
-@@ -213,3 +216,8 @@ BLX_r            .... 0001 0010 1111 1111 1111 0011 ....      @rm
- CLZ              .... 0001 0110 1111 .... 1111 0001 ....      @rdm
- 
- ERET             ---- 0001 0110 0000 0000 0000 0110 1110
-+
-+HLT              .... 0001 0000 .... .... .... 0111 ....      @i16
-+BKPT             .... 0001 0010 .... .... .... 0111 ....      @i16
-+HVC              .... 0001 0100 .... .... .... 0111 ....      @i16
-+SMC              ---- 0001 0110 0000 0000 0000 0111 imm:4     &i
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index 6236d28b99..5116c6165a 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -28,6 +28,7 @@
- &rrr             !extern rd rn rm
- &rr              !extern rd rm
- &r               !extern rm
-+&i               !extern imm
- &msr_reg         !extern rn r mask
- &mrs_reg         !extern rd r
- &msr_bank        !extern rn r sysm
-@@ -189,6 +190,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
- 
- %msr_sysm        4:1 8:4
- %mrs_sysm        4:1 16:4
-+%imm16_16_0      16:4 0:12
- 
+@@ -8912,6 +8912,18 @@ static bool op_strex(DisasContext *s, arg_STREX *a, MemOp mop, bool rel)
  {
-   {
-@@ -226,4 +228,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-     SUB_rri      1111 0011 1101 1110 1000 1111 imm:8 \
-                  &s_rri_rot rot=0 s=1 rd=15 rn=14
-   }
-+  SMC            1111 0111 1111 imm:4 1000 0000 0000 0000     &i
-+  HVC            1111 0111 1110 ....  1000 .... .... ....     \
-+                 &i imm=%imm16_16_0
- }
+     TCGv_i32 addr;
+ 
++    /* We UNDEF for these UNPREDICTABLE cases.  */
++    if (a->rd == 15 || a->rn == 15 || a->rt == 15
++        || a->rd == a->rn || a->rd == a->rt
++        || (s->thumb && (a->rd == 13 || a->rt == 13))
++        || (mop == MO_64
++            && (a->rt2 == 15
++                || a->rd == a->rt2 || a->rt == a->rt2
++                || (s->thumb && a->rt2 == 13)))) {
++        unallocated_encoding(s);
++        return true;
++    }
++
+     if (rel) {
+         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+     }
+@@ -8938,6 +8950,7 @@ static bool trans_STREXD_a32(DisasContext *s, arg_STREX *a)
+     if (!ENABLE_ARCH_6K) {
+         return false;
+     }
++    /* We UNDEF for these UNPREDICTABLE cases.  */
+     if (a->rt & 1) {
+         unallocated_encoding(s);
+         return true;
+@@ -8980,6 +8993,7 @@ static bool trans_STLEXD_a32(DisasContext *s, arg_STREX *a)
+     if (!ENABLE_ARCH_8) {
+         return false;
+     }
++    /* We UNDEF for these UNPREDICTABLE cases.  */
+     if (a->rt & 1) {
+         unallocated_encoding(s);
+         return true;
+@@ -9019,8 +9033,13 @@ static bool op_stl(DisasContext *s, arg_STL *a, MemOp mop)
+     if (!ENABLE_ARCH_8) {
+         return false;
+     }
+-    addr = load_reg(s, a->rn);
++    /* We UNDEF for these UNPREDICTABLE cases.  */
++    if (a->rn == 15 || a->rt == 15) {
++        unallocated_encoding(s);
++        return true;
++    }
+ 
++    addr = load_reg(s, a->rn);
+     tmp = load_reg(s, a->rt);
+     tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+     gen_aa32_st_i32(s, tmp, addr, get_mem_index(s), mop | s->be_data);
+@@ -9050,6 +9069,16 @@ static bool op_ldrex(DisasContext *s, arg_LDREX *a, MemOp mop, bool acq)
+ {
+     TCGv_i32 addr;
+ 
++    /* We UNDEF for these UNPREDICTABLE cases.  */
++    if (a->rn == 15 || a->rt == 15
++        || (s->thumb && a->rt == 13)
++        || (mop == MO_64
++            && (a->rt2 == 15 || a->rt == a->rt2
++                || (s->thumb && a->rt2 == 13)))) {
++        unallocated_encoding(s);
++        return true;
++    }
++
+     addr = tcg_temp_local_new_i32();
+     load_reg_var(s, addr, a->rn);
+     tcg_gen_addi_i32(addr, addr, a->imm);
+@@ -9076,6 +9105,7 @@ static bool trans_LDREXD_a32(DisasContext *s, arg_LDREX *a)
+     if (!ENABLE_ARCH_6K) {
+         return false;
+     }
++    /* We UNDEF for these UNPREDICTABLE cases.  */
+     if (a->rt & 1) {
+         unallocated_encoding(s);
+         return true;
+@@ -9118,6 +9148,7 @@ static bool trans_LDAEXD_a32(DisasContext *s, arg_LDREX *a)
+     if (!ENABLE_ARCH_8) {
+         return false;
+     }
++    /* We UNDEF for these UNPREDICTABLE cases.  */
+     if (a->rt & 1) {
+         unallocated_encoding(s);
+         return true;
+@@ -9157,8 +9188,13 @@ static bool op_lda(DisasContext *s, arg_LDA *a, MemOp mop)
+     if (!ENABLE_ARCH_8) {
+         return false;
+     }
+-    addr = load_reg(s, a->rn);
++    /* We UNDEF for these UNPREDICTABLE cases.  */
++    if (a->rn == 15 || a->rt == 15) {
++        unallocated_encoding(s);
++        return true;
++    }
+ 
++    addr = load_reg(s, a->rn);
+     tmp = tcg_temp_new_i32();
+     gen_aa32_ld_i32(s, tmp, addr, get_mem_index(s), mop | s->be_data);
+     disas_set_da_iss(s, mop, a->rt | ISSIsAcqRel);
 -- 
 2.17.1
 
