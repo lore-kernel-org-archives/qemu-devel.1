@@ -2,63 +2,72 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08752C3A5A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 18:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E61AC3A5A8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 18:35:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D683A208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 18:11:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D683A208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1984920820
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 18:35:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1984920820
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Zke-0004m9-PH
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 14:11:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56816)
+	id 1i5a8K-0002U0-39
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 14:35:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i5Zjs-0004NC-Tp
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 14:10:42 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i5a6m-0001Fm-4G
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 14:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i5Zjq-00037A-96
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 14:10:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59772)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i5Zjp-00036o-W4
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 14:10:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 211121026FFB
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 18:10:37 +0000 (UTC)
-Received: from localhost (ovpn-116-88.ams2.redhat.com [10.36.116.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 59D6E5D70D;
- Wed,  4 Sep 2019 18:10:31 +0000 (UTC)
-Date: Wed, 4 Sep 2019 19:10:30 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190904181030.GA26826@stefanha-x1.localdomain>
-References: <20190829104133.17418-1-stefanha@redhat.com>
- <20190903153539.GM2744@work-vm>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="45Z9DzgjV8m4Oswq"
-Content-Disposition: inline
-In-Reply-To: <20190903153539.GM2744@work-vm>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Wed, 04 Sep 2019 18:10:37 +0000 (UTC)
+ (envelope-from <palmer@dabbelt.com>) id 1i5a6k-0006Ex-MH
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 14:34:19 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42110)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i5a6k-0006EE-HE
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 14:34:18 -0400
+Received: by mail-pg1-f196.google.com with SMTP id p3so11677239pgb.9
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 11:34:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=H3EMGVk+VziFSQFJg30Na4b8TOSh34z5w7VWeuyW3mI=;
+ b=a2M0p+4s3XO0VZyY1V17GWvuaJKNdKIQXmwqNWGdO0SoKeDqptCgCt0hlA7vmJXjXS
+ NQaXIY6pTs5CGgONNSeIpEN+v+8WhVR5berfdYkSxZCDxybkZ2IgEy+NX1aS2ReTRa2d
+ +6TxP2R2Tlwbo/gvNBAjCj0+aVUFlofLCNL1DppRG0AyrFDxCV+opa9tF6w6NJt3Yx3G
+ ib2C4EMyohmZ806zyEJJFEaf4GyB81rMy5j+rck/PMWrrXbkrxHMyz13WshbVlICvI5+
+ A/1Y9xBiP1gt3Hp7WHNSTBbrcCSKC0Gmy8ZkRPpmMMTVEEQVaLlXIYo1F/1Ow3zLIpLR
+ Zw/g==
+X-Gm-Message-State: APjAAAVy0kAFgkkq4LKBwX40a7JKaTldPiAr/k8XwNC1hnm1EN8POyYY
+ VGuzLaGoK7+5LeX4HJ2rvHRe1g==
+X-Google-Smtp-Source: APXvYqxvJEjtoZZb2+O8G/q70O/eCzuPCkKX8ZZd94TcyC4N7FeGkCXtqD+1pmM/pEtq+OnQlfw21Q==
+X-Received: by 2002:a65:6547:: with SMTP id a7mr35723636pgw.65.1567622055917; 
+ Wed, 04 Sep 2019 11:34:15 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id b13sm3152922pjz.10.2019.09.04.11.34.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Sep 2019 11:34:15 -0700 (PDT)
+Date: Wed, 04 Sep 2019 11:34:15 -0700 (PDT)
+X-Google-Original-Date: Wed, 04 Sep 2019 11:34:08 PDT (-0700)
+In-Reply-To: <CAEUhbmXh_tYqubC4nF6PymQW795ExfPUN9Ap1u7PNPN2hws=CA@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bmeng.cn@gmail.com, Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <mhng-fd27972e-5f98-4fdb-b4dc-bd020f4fe8e2@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] virtiofsd: add man page
+ [fuzzy]
+X-Received-From: 209.85.215.196
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH] riscv: sifive_e: Correct
+ various SoC IP block sizes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,93 +79,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
+ Chih-Min Chao <chihmin.chao@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 03 Sep 2019 20:41:52 PDT (-0700), bmeng.cn@gmail.com wrote:
+> Palmer,
+>
+> On Wed, Aug 14, 2019 at 5:34 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>>
+>> Hi Palmer,
+>>
+>> On Wed, Aug 7, 2019 at 10:53 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>> >
+>> > On Wed, Aug 7, 2019 at 5:06 AM Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> > >
+>> > > On 8/5/19 8:43 AM, Bin Meng wrote:
+>> > > > On Mon, Aug 5, 2019 at 2:14 PM Chih-Min Chao <chihmin.chao@sifive.com> wrote:
+>> > > >> On Sat, Aug 3, 2019 at 8:27 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>> > > >>>
+>> > > >>> Some of the SoC IP block sizes are wrong. Correct them according
+>> > > >>> to the FE310 manual.
+>> > > >>>
+>> > > >>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>> > > >>> ---
+>> > > >>>
+>> > > >>>  hw/riscv/sifive_e.c | 6 +++---
+>> > > >>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>> > > >>>
+>> > > >>> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+>> > > >>> index 2a499d8..9655847 100644
+>> > > >>> --- a/hw/riscv/sifive_e.c
+>> > > >>> +++ b/hw/riscv/sifive_e.c
+>> > > >>> @@ -53,13 +53,13 @@ static const struct MemmapEntry {
+>> > > >>>      hwaddr base;
+>> > > >>>      hwaddr size;
+>> > > >>>  } sifive_e_memmap[] = {
+>> > > >>> -    [SIFIVE_E_DEBUG] =    {        0x0,      0x100 },
+>> > > >>> +    [SIFIVE_E_DEBUG] =    {        0x0,     0x1000 },
+>> > > >>>      [SIFIVE_E_MROM] =     {     0x1000,     0x2000 },
+>> > > >>>      [SIFIVE_E_OTP] =      {    0x20000,     0x2000 },
+>> > > >>>      [SIFIVE_E_CLINT] =    {  0x2000000,    0x10000 },
+>> > > >>>      [SIFIVE_E_PLIC] =     {  0xc000000,  0x4000000 },
+>> > > >>> -    [SIFIVE_E_AON] =      { 0x10000000,     0x8000 },
+>> > > >>> -    [SIFIVE_E_PRCI] =     { 0x10008000,     0x8000 },
+>> > > >>> +    [SIFIVE_E_AON] =      { 0x10000000,     0x1000 },
+>> > > >>> +    [SIFIVE_E_PRCI] =     { 0x10008000,     0x1000 },
+>> > > >>>      [SIFIVE_E_OTP_CTRL] = { 0x10010000,     0x1000 },
+>> > > >>>      [SIFIVE_E_GPIO0] =    { 0x10012000,     0x1000 },
+>> > > >>>      [SIFIVE_E_UART0] =    { 0x10013000,     0x1000 },
+>> > > >>> --
+>> > > >>> 2.7.4
+>> > > >>>
+>> > > >>
+>> > > >> It seems the modification follows  E310-G002(Hifive1 Rev B) spec and the origin is for E310-G000(Hifive1) spec.
+>> > > >> There should be some way to specify different board version with different memory map or we have policy, always support the latest spec.
+>> > >
+>> > > I agree with Chao, it would be cleaner to have two different boards
+>> > > (machines).
+>> > > Since the SoCs are very similar, you could add a 'revision' property and
+>> > > use it to select the correct map.
+>> > >
+>> >
+>> > I am not sure if adding two different machines will bring us a lot of
+>> > benefits, since the only difference is the SoC revision with different
+>> > block sizes.
+>> >
+>> > > >>
+>> > > >
+>> > > > Yes, I checked both specs. The older spec says these bigger sizes,
+>> > > > however their register sizes fit well in the smaller range as well. So
+>> > > > I think the modification works well for both.
+>> > >
+>> > > This is OK for the PRCI, since sifive_prci_create() does not use
+>> > > memmap[SIFIVE_E_PRCI].size.
+>> > >
+>> > > However the AON case is borderline, since you shrink it from 32KiB to 4KiB.
+>> > >
+>> >
+>> > AON is not implemented anyway currently. And I checked the FE310 old
+>> > spec, its register block size is still within the 4KiB range, so
+>> > shrinking the size should be fine for both old and new SoC.
+>> >
+>> > > BTW (not related to this patch) it is odd a function named
+>> > > sifive_mmio_emulate() creates a RAM region with memory_region_init_ram()
+>> > > and does not use the UnimplementedDevice (see make_unimp_dev() in
+>> > > hw/arm/musca.c).
+>> > >
+>>
+>> What's your suggestion regarding this patch?
+>
+> Ping?
 
---45Z9DzgjV8m4Oswq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry, I missed this the first time around.  In retrospect, it looks like we 
+ended up with the wrong naming scheme for boards: sifive_e is very ambiguous, 
+as there are many boards that look like this.  We'd originally chosen a more 
+explicit scheme (something like "sifive-fe310-g000"), but that was NAK'd as 
+resulting in too many machine types.
 
-On Tue, Sep 03, 2019 at 04:35:39PM +0100, Dr. David Alan Gilbert wrote:
-> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  Makefile                         |  7 +++
-> >  contrib/virtiofsd/virtiofsd.texi | 85 ++++++++++++++++++++++++++++++++
-> >  2 files changed, 92 insertions(+)
-> >  create mode 100644 contrib/virtiofsd/virtiofsd.texi
-> >=20
-> > diff --git a/Makefile b/Makefile
-> > index a3dfdd6fa8..cc18025753 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -334,6 +334,9 @@ DOCS+=3Ddocs/qemu-cpu-models.7
-> >  ifdef CONFIG_VIRTFS
-> >  DOCS+=3Dfsdev/virtfs-proxy-helper.1
-> >  endif
-> > +ifdef CONFIG_LINUX
->=20
-> Is there a reason that's CONFIG_LINUX not CONFIG_VHOST_USER_FS ?
-> (Although I guess it's guest vs daemon so the two are independent?)
-
-Yes, this is virtiofsd, not vhost-user-fs-pci.  We don't have a
-CONFIG_VIRTIOFSD.
-
-> > +DOCS+=3Dcontrib/virtiofsd/virtiofsd.1
-> > +endif
-> >  ifdef CONFIG_TRACE_SYSTEMTAP
-> >  DOCS+=3Dscripts/qemu-trace-stap.1
-> >  endif
-> > @@ -834,6 +837,9 @@ ifdef CONFIG_VIRTFS
-> >  	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
-> >  	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
-> >  endif
-> > +ifdef CONFIG_LINUX
-> > +	$(INSTALL_DATA) contrib/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
->=20
-> I had to fix that to contrib/virtiofsd/virtiofsd.1 to get make install
-> happy.
-
-Thanks for spotting it!
-
-> > +@c man begin DESCRIPTION
-> > +
-> > +Share a host directory tree with a guest through a virtio-fs device.  =
-This
-> > +program is a vhost-user backend that implements the virtio-fs device. =
- Each
-> > +virtio-fs device instance requires its own virtiofsd process.
-> > +
-> > +This program is designed to work with QEMU's @code{--device vhost-user=
--fs-pci}
->=20
-> Should we include the -pci there?
->=20
-> (Merged with the path fix above)
-
-We could also be more general and say "vhost-user virtio-fs device" to
-avoid the issue.
-
-Stefan
-
---45Z9DzgjV8m4Oswq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1v/hYACgkQnKSrs4Gr
-c8jtAQgAna0dQRA6RKpt4vAGNm9rRvw0sQ7/Vua3kBzhTp6kQPk5W7VIpLh+HHcs
-STKfJ5Fvy7nH0FV8w9vrJmv6BsrP6/Jw3I2ZRv+I2/usHLA1sZRcYdX+a7nk3w+/
-y1HkwJeG9NOkoYWBBEvUHN+aZlVcefypy1aH3NdSTTvi8vNcABXXu+vMfLVN/rGO
-h0nX/3mFs7IFYI3DY45wFT3fQavVo5tSo7pjM5WeIx3I3JppxdhxWtTMzQoBIpCC
-LcSZ8SX9Sxc6rNWWpAFtbCGAzrDCFpO0SdrrcownX2ryXvGeW8pD4Uz209VZUwIB
-tpANPWJpOghUCN1FeMl+BF9QEQOpFw==
-=NByF
------END PGP SIGNATURE-----
-
---45Z9DzgjV8m4Oswq--
+Peter: would you be OK deprecating "sifive_e" and adding "sifive-fe310-g000" 
+and "sifive-fe310-g002" targets?  We'll end up with a lot of machines this way, 
+but I don't see another way to closely match what's out there.  In embedded 
+land there isn't really any runtime portability, so if the memory maps don't 
+match exactly then it's not a useful target for users.
 
