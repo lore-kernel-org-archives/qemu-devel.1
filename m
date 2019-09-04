@@ -2,81 +2,55 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10616C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2177DC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAEFF22DBF
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:04:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEFF22DBF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC4B122CF5
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:04:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC4B122CF5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5U18-0007Qv-P1
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 08:04:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43320)
+	id 1i5U1p-0007um-7n
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 08:04:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1i5TyS-0006AZ-Nb
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:01:22 -0400
+ (envelope-from <f.gruenbichler@proxmox.com>) id 1i5Typ-0006VO-KQ
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1i5TyQ-0002QO-9B
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:01:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43676)
+ (envelope-from <f.gruenbichler@proxmox.com>) id 1i5Tyn-0002lP-O8
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:01:43 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:28941)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i5TyP-0002K6-SY
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:01:18 -0400
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C0349C034E71
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 12:01:09 +0000 (UTC)
-Received: by mail-qk1-f198.google.com with SMTP id o133so22807529qke.4
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 05:01:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=X9XmHG9IenejdNjceVKSVG6airvhvIr2qQFz1tJGSd0=;
- b=J9Gdgza+VRFxqpSASq2lQ3NOmIzTCsVSCWZUL4DxMqTnoqj/WIa7DtFUVKbVmAvAef
- j/jbcLEqCnUB8sikN2buZMPwYf5xHjW51FNiOwX4FCBnVK4swPDVC01JTWZO6oUvSOPX
- 4bLm0Nd1n7FZgdc55sz49htgyZWM7jx4SO31XLf0XWNaFz4OqX8kjNGpyf2mlQ6RCR35
- brJJ5VUNZJH++l0j95v0skB7F3A8aybD7UDiXpeWEK+m5e9zkN7/dtKsFAMZDWmwsbl4
- MayY1Od80JOOhE3WfEFZ1kvjZI0Ze+ICX8m3v8DTZAaS32K/HNruMx1oyfD0QeHVWPrN
- GQRQ==
-X-Gm-Message-State: APjAAAVSg6MfaV1aiTmsUd0PNwZ3phc3W+QhoH/jpldVfx/hgxDpjozq
- XziW9dVCElLKEutcoPLjS3xl6NdsGMc1uqzqC0lUTx7n1qH9qbRvGW/TagLk58e13AWJJrZz4Ou
- 93bSqqJlWyVwtilE=
-X-Received: by 2002:a37:ef17:: with SMTP id j23mr10993842qkk.426.1567598468543; 
- Wed, 04 Sep 2019 05:01:08 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxBS/ElY7imbNqpgfKMgIzTfl7so2XQ9nZ5HW9eTjBYQZC3o3c/X0/VXbut+xJn3VEgJRpmdA==
-X-Received: by 2002:a37:ef17:: with SMTP id j23mr10993822qkk.426.1567598468376; 
- Wed, 04 Sep 2019 05:01:08 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
- by smtp.gmail.com with ESMTPSA id d19sm2023498qkk.101.2019.09.04.05.01.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 05:01:07 -0700 (PDT)
-Date: Wed, 4 Sep 2019 08:01:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190820163005.1880-1-jusual@redhat.com>
-References: <20190904120026.3220-1-mst@redhat.com>
+ (Exim 4.71) (envelope-from <f.gruenbichler@proxmox.com>)
+ id 1i5Tyb-0002U2-Se; Wed, 04 Sep 2019 08:01:30 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id CBBA04683B;
+ Wed,  4 Sep 2019 14:01:19 +0200 (CEST)
+Date: Wed, 04 Sep 2019 14:01:15 +0200
+From: Fabian =?iso-8859-1?q?Gr=FCnbichler?= <f.gruenbichler@proxmox.com>
+To: John Snow <jsnow@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <5777a218-1ba4-78e0-ef73-bdfeecf04b25@redhat.com>
+ <436c161e-fe05-da2c-835c-562da489ba82@virtuozzo.com>
+ <2cd9d887-0a14-771a-3cee-64f9a50056d1@redhat.com>
+In-Reply-To: <2cd9d887-0a14-771a-3cee-64f9a50056d1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190904120026.3220-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
+User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1567596886.bl8mxp5grx.astroid@nora.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/6] virtio-pci: Add Function Level Reset support
+X-Received-From: 212.186.127.180
+Subject: Re: [Qemu-devel] QEMU bitmap backup usability FAQ
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,102 +62,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Julia Suvorova <jusual@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ Nir Soffer <nsoffer@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190904120103.n65AHfxkqLCwWXYPslgMzvDspXGb0bpnl5TEognppNw@z>
 
-From: Julia Suvorova <jusual@redhat.com>
+On August 21, 2019 11:19 pm, John Snow wrote:
+>=20
+>=20
+> On 8/21/19 10:21 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> [CC Nikolay]
+>>=20
+>> 21.08.2019 1:25, John Snow wrote:
+>>> Hi, downstream here at Red Hat I've been fielding some questions about
+>>> the usability and feature readiness of Bitmaps (and related features) i=
+n
+>>> QEMU.
+>>>
+>>> Here are some questions I answered internally that I am copying to the
+>>> list for two reasons:
+>>>
+>>> (1) To make sure my answers are actually correct, and
+>>> (2) To share this pseudo-reference with the community at large.
+>>>
+>>> This is long, and mostly for reference. There's a summary at the bottom
+>>> with some todo items and observations about the usability of the featur=
+e
+>>> as it exists in QEMU.
+>>>
+>>> Before too long, I intend to send a more summarized "roadmap" mail whic=
+h
+>>> details all of the current and remaining work to be done in and around
+>>> the bitmaps feature in QEMU.
+>>>
+>>>
+>>> Questions:
+>>>
+>>>> "What format(s) is/are required for this functionality?"
+>>>
+>>>  From the QEMU API, any format can be used to create and author
+>>> incremental backups. The only known format limitations are:
+>>>
+>>> 1. Persistent bitmaps cannot be created on any format except qcow2,
+>>> although there are hooks to add support to other formats at a later dat=
+e
+>>> if desired.
+>>>
+>>> DANGER CAVEAT #1: Adding bitmaps to QEMU by default creates transient
+>>> bitmaps instead of persistent ones.
+>>>
+>>> Possible TODO: Allow users to 'upgrade' transient bitmaps to persistent
+>>> ones in case they made a mistake.
+>>=20
+>> I doubt, as in my opinion real users of Qemu are not people but libvirt,=
+ which
+>> should never make such mistake.
+>>=20
+>=20
+> Right, that's largely been the consensus here; but there is some concern
+> that libvirt might not be the only user of QEMU, so I felt it was worth
+> documenting some of the crucial moments where it was "easy" to get it wro=
+ng.
+>=20
+> I think like it or not, the API that QEMU presents has to be considered
+> on its own without libvirt because it's not a given that libvirt will
+> forever and always be the only user of QEMU.
+>=20
+> I do think that any problems of this kind that can be solved in libvirt
+> are not immediate, crucial action items. libvirt WILL be the major user
+> of these features.
 
-Using FLR becomes convenient in cases where resetting the bus is
-impractical, for example, when debugging the behavior of individual
-functions.
+Chiming in with a bit of vacation-induced delay - libvirt is definitely=20
+not the only user of QEMU's QMP interface - we at Proxmox use QEMU=20
+directly in our Proxmox VE product (usually a rather recent version,=20
+currently 4.0 with some cherry-picks and custom patches) and have been=20
+doing so for quite a while (the earliest reference in git that I can=20
+find is for QEMU 0.11.1, but there was SVN before that..).
 
-Signed-off-by: Julia Suvorova <jusual@redhat.com>
-Message-Id: <20190820163005.1880-1-jusual@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/core/machine.c      |  4 +++-
- hw/virtio/virtio-pci.c | 10 ++++++++++
- hw/virtio/virtio-pci.h |  4 ++++
- 3 files changed, 17 insertions(+), 1 deletion(-)
+IIRC, we currently only use the bitmap features for our own custom=20
+backup jobs (shipped in our patched QEMU packages[1]), and are planning=20
+to integrate differential mirroring on top of storage-level/ZFS=20
+snapshots once that has stabilized upstream.
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 83cd1bfeec..829ada099e 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -27,7 +27,9 @@
- #include "hw/pci/pci.h"
- #include "hw/mem/nvdimm.h"
- 
--GlobalProperty hw_compat_4_1[] = {};
-+GlobalProperty hw_compat_4_1[] = {
-+    { "virtio-pci", "x-pcie-flr-init", "off" },
-+};
- const size_t hw_compat_4_1_len = G_N_ELEMENTS(hw_compat_4_1);
- 
- GlobalProperty hw_compat_4_0[] = {
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 8babd92e59..0075b3e2af 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -601,6 +601,10 @@ static void virtio_write_config(PCIDevice *pci_dev, uint32_t address,
- 
-     pci_default_write_config(pci_dev, address, val, len);
- 
-+    if (proxy->flags & VIRTIO_PCI_FLAG_INIT_FLR) {
-+        pcie_cap_flr_write_config(pci_dev, address, val, len);
-+    }
-+
-     if (range_covers_byte(address, len, PCI_COMMAND) &&
-         !(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
-         virtio_pci_stop_ioeventfd(proxy);
-@@ -1777,6 +1781,10 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
-             pcie_ats_init(pci_dev, 256);
-         }
- 
-+        if (proxy->flags & VIRTIO_PCI_FLAG_INIT_FLR) {
-+            /* Set Function Level Reset capability bit */
-+            pcie_cap_flr_init(pci_dev);
-+        }
-     } else {
-         /*
-          * make future invocations of pci_is_express() return false
-@@ -1844,6 +1852,8 @@ static Property virtio_pci_properties[] = {
-                     VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT, true),
-     DEFINE_PROP_BIT("x-pcie-pm-init", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_INIT_PM_BIT, true),
-+    DEFINE_PROP_BIT("x-pcie-flr-init", VirtIOPCIProxy, flags,
-+                    VIRTIO_PCI_FLAG_INIT_FLR_BIT, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 292275acb1..e2eaaa9182 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -44,6 +44,7 @@ enum {
-     VIRTIO_PCI_FLAG_INIT_DEVERR_BIT,
-     VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
-     VIRTIO_PCI_FLAG_INIT_PM_BIT,
-+    VIRTIO_PCI_FLAG_INIT_FLR_BIT,
- };
- 
- /* Need to activate work-arounds for buggy guests at vmstate load. */
-@@ -80,6 +81,9 @@ enum {
- /* Init Power Management */
- #define VIRTIO_PCI_FLAG_INIT_PM (1 << VIRTIO_PCI_FLAG_INIT_PM_BIT)
- 
-+/* Init Function Level Reset capability */
-+#define VIRTIO_PCI_FLAG_INIT_FLR (1 << VIRTIO_PCI_FLAG_INIT_FLR_BIT)
-+
- typedef struct {
-     MSIMessage msg;
-     int virq;
--- 
-MST
+That being said, the same basic guidelines apply to us that apply to=20
+libvirt - our users are (normally) also not talking QMP manually, our=20
+stack does it for them. Misuse of QMP interfaces is thus a bug in our=20
+software, and not a mistake made by its user. We do expose HMP over our=20
+API, but that is more for convenience of power users than any real use=20
+case that I am aware of.
+
+1: patches #20-24 from https://git.proxmox.com/?p=3Dpve-qemu.git;a=3Dtree;f=
+=3Ddebian/patches/pve;h=3D46bd31d60fe2c03571d9d29c7ee80f208206d37e;hb=3Dref=
+s/heads/master
+=
 
 
