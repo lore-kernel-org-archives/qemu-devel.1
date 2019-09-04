@@ -2,79 +2,105 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71903C3A5A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 16:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A161CC3A5A8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 16:31:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D16E21881
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 16:27:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CFB521881
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 16:31:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="pmeZXDRE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D16E21881
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="WIOsIEe1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CFB521881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Y7v-0005gp-5J
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 12:27:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41010)
+	id 1i5YC2-00075o-JO
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 12:31:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42429)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1i5Y3p-0004NB-EC
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 12:23:10 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1i5YAk-0006TG-NO
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 12:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1i5Y3n-0004jr-PD
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 12:23:09 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:52468)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1i5Y3k-0004j0-07; Wed, 04 Sep 2019 12:23:04 -0400
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id AE6B096F65;
- Wed,  4 Sep 2019 16:23:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1567614182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=rcVMLpC6xOMKCz5Bixxm42D7b9+MZ27ZtTCp7nDstqY=;
- b=pmeZXDREXbdjrzGPyxl3mMUQx4iq7DqJ1ipk5RKwU4wymD7J2V9/5gXuvNeC/4pA8d522P
- ymI4zqMMGY9AQh6YQcMqueOOU2OlWzcYen3lD+GdVgGsJH9viFH3+TrnNcKtaQqN6fPi4P
- J7ClqwGFbMmSmdO7fVpk5kzU6gifhd4=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 18:22:47 +0200
-Message-Id: <20190904162247.24095-1-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.22.0
+ (envelope-from <jag.raman@oracle.com>) id 1i5YAi-0000IV-Rf
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 12:30:18 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:42768)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1i5YAi-0000GM-K4
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 12:30:16 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x84GTNmP094999;
+ Wed, 4 Sep 2019 16:30:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=u0tlfT+ts86C9zZeJ3wauBmhS9hH7sc599MPoUAR9rk=;
+ b=WIOsIEe1XeaeebizToUJEuv/2GhIILdnIot/sDxTcaXGaJXjEzszc8paOXgBHKVcc6Mn
+ sdWyiGT718erK0MfuOWDzotFukHfoYT66eeSpggfzslSpJeUvPrNcTgSZz6nO6v9gnQi
+ Sts4fEJSHh9rVikRO4WXCesAUPcdScs39FWTKrqWhQ4lW0R3U9P1Hpq1DR2gckL6hZVB
+ dTneecQvg4mTOfCkpCQHjgPSziXiIxjpLOzRlMijQlUcZwAN6iJ8wxOFi7XKtl7RGaK2
+ t6q4H0n3dFJJLvCMlAR8JfBbQutY+RoQ6+ZIKFlUpcVb1m7YcsVzceJN8hDYMsyE6rTP lg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 2utgt9r0js-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Sep 2019 16:30:03 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x84GSb09157855;
+ Wed, 4 Sep 2019 16:30:02 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 2usu5220mw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Sep 2019 16:30:02 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x84GTxbg018970;
+ Wed, 4 Sep 2019 16:30:00 GMT
+Received: from [10.152.34.2] (/10.152.34.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 04 Sep 2019 09:29:59 -0700
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <cover.1567534653.git.jag.raman@oracle.com>
+ <20190904091817.GE19582@redhat.com>
+From: Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <a891c113-d3c2-3e59-b54c-89f1dfa6c201@oracle.com>
+Date: Wed, 4 Sep 2019 12:29:57 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1567614182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=rcVMLpC6xOMKCz5Bixxm42D7b9+MZ27ZtTCp7nDstqY=;
- b=QYI+5qgETDB1GPxwXYCRtKbX19Oycdu7ls9Dti64gG3HWsYqoUcMuiOA2NbXE2XmZhIduh
- YOtF6PThxuua3WBkimmenHFdrky7Rn532bxi3ebSOGmt94c77grM2T0oXMt60iKDVklGy3
- DcQawa1mukgy3NhjD2zKr5hnbQM17bk=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1567614182; a=rsa-sha256; cv=none;
- b=A+T2eN69i1V1m0qxLTfmqceV+q3rMDsqIIT3+hQM2fO8rl0VT2kNtLtu4oSF8LHVStqlkB
- QPxODdadVLdGWENxekPWpm6WgxTY4CQ96WeX8CYyCgeJxTR5U306TP9uajVzt8bPCW9ZsW
- WLuCyb++nxGxEnhAMU7ZmU72dv5yUww=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
+In-Reply-To: <20190904091817.GE19582@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909040162
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909040163
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [PATCH] hw/arm/raspi: avoid reparenting the sd card
- during qbus tree reset
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ x84GTNmP094999
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: Re: [Qemu-devel] [RFC v3 PATCH 00/45] Initial support of
+ multi-process qemu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,136 +112,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- qemu-arm@nongnu.org, philmd@redhat.com, Andrew.Baumann@microsoft.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
+ john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ quintela@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ ross.lagerwall@citrix.com, mreitz@redhat.com, kanth.ghatraju@oracle.com,
+ kraxel@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ liran.alon@oracle.com, marcandre.lureau@gmail.com, kwolf@redhat.com,
+ dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the raspi machine, the sd card can be on several sd bus (in reality
-there is one bus but several controllers). It is initially created in
-the "sd-bus" child in the gpio peripheral. Then is moved (parent bus
-changes) during machine reset in the "sdhci-bus". It can be moved again
-by software between the "sdhci-bus" and another bus ("bcm2835-sdhost-bus"=
-).
-Here's the corresponding qbus tree of the raspi machine:
- + sysbus
-   * bcm2835_gpio
-     + sd-bus
-       * sd-card
-   * bcm2835-sdhost
-     + bcm2835-sdhost-bus
-   * generic-sdhci
-     + sdhci-bus
 
-During the initial machine reset, the sd card is moved. Since reset is
-based on qbus tree, moving the card during the reset seems odd (it change=
-s
-the qbus tree). In this case, because of the order the qbus tree is
-walked, the sd card ends up being reset twice; the effective reset order =
-call
-follows:
- 1 sd-card
- 2 sd-bus
- 3 bcm2835_gpio        -> move the sd-card to sdhci_bus
- 4 bcm2835-sdhost-bus
- 5 bcm2835-sdhost
- 6 sd-card             (again)
- 7 sdhci-bus
- 8 generic-sdhci
 
-This patch adds a raspi machine reset method which moves the sd card
-to the sdhci-bus before doing the whole reset (which will try to do the
-move too). By anticipating the move we avoid changing the qdev tree while
-resetting it.
+On 9/4/2019 5:18 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Sep 03, 2019 at 04:37:26PM -0400, Jagannathan Raman wrote:
+>> Started with the presentation in October 2017 made by Marc-Andre (Red =
+Hat)
+>> and Konrad Wilk (Oracle) [1], and continued by Jag's BoF at KVM Forum =
+2018,
+>> the multi-process project is now a prototype and presented in this pat=
+chset.
+>>
+>> This first series enables the emulation of lsi53c895a in a separate pr=
+ocess.
+>>
+>> We posted the Proof Of Concept patches [2] before the BoF session in 2=
+018.
+>> Subsequently, we posted RFC v1 [3] & RFC v2 [4] of this series.
+>>
+>> Thanks to the v1 & v2 review, we were able to incorporate the feedback=
+ into
+>> our goals.
+>>
+>> In the summer of 2019, we participated in a conference with folks at R=
+edHat,
+>> who provided us with feedback to improve the design of this project.
+>>
+>> We want to present version 3 of this series which incorporates the fee=
+dback
+>> we received for v2 & the enhancements suggested in the conference. Fol=
+lowing
+>> are the improvements made in this series:
+>=20
+> This patch series fails to apply to git master when I attempt and confi=
+rmed
+> by patchew's failed attempt too
+>=20
+>    https://patchew.org/QEMU/cover.1567534653.git.jag.raman@oracle.com/
+>=20
+> Can you do one of the following
+>=20
+>   - Tell us what git hash it was based on instead of master
 
-In consequence the step 1 is skipped in the previous list: when reset sta=
-rts
-the sd-card is already not a child of bcm2835_gpio.
+Hi Daniel,
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
----
-This is a follow-up of this discussion
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg06954.html
+These patches are based on the latest release, v4.1.0. They are on top
+of the following git hash:
+9e06029aea3 Update version for v4.1.0 release
 
-I did not have much comments about my last proposal so I thought I'd fina=
-lize
-a corresponding patch since it is small instead of doing a ping.
+> or
+>   - provide a pointer to a publically accessible git repo with it appli=
+ed
 
-Feel free to comment,
-Damien
----
- hw/arm/raspi.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+They are also publicly available from the following gitub repo.:
+https://github.com/oracle/qemu.git  [branch multi-process-qemu-v0.3]
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 74c062d05e..19b032546b 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -21,6 +21,7 @@
- #include "hw/loader.h"
- #include "hw/arm/boot.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/reset.h"
-=20
- #define SMPBOOT_ADDR    0x300 /* this should leave enough space for ATAG=
-S */
- #define MVBAR_ADDR      0x400 /* secure vectors */
-@@ -214,6 +215,32 @@ static void raspi_init(MachineState *machine, int ve=
-rsion)
-     setup_boot(machine, version, machine->ram_size - vcram_size);
- }
-=20
-+static void raspi_reset(MachineState *machine)
-+{
-+    BCM2835GpioState *gpio;
-+
-+    gpio =3D BCM2835_GPIO(object_resolve_path("gpio", NULL));
-+
-+    /*
-+     * Put the sd-card on sdhci bus as the bcm2835_gpio's reset
-+     * procedure will do during qemu_devices_reset().
-+     *
-+     * Note: we do this here to avoid doing it during following
-+     * qemu_devices_reset() so that we don't modify the qbus tree during=
- the
-+     * reset (which is based on it).
-+     *
-+     * Note: sd-card can be on sdbus, sdbus_sdhci or sdbus_sdhost. So at=
- least
-+     * one of the following sdbus_reparent_card is useless. This is not =
-a
-+     * problem because sdbus_reparent_card is a no-op if the source does=
- not
-+     * has a card.
-+     */
-+    sdbus_reparent_card(&gpio->sdbus, gpio->sdbus_sdhci);
-+    sdbus_reparent_card(gpio->sdbus_sdhost, gpio->sdbus_sdhci);
-+
-+    /* then do the classical reset */
-+    qemu_devices_reset();
-+}
-+
- static void raspi2_init(MachineState *machine)
- {
-     raspi_init(machine, 2);
-@@ -223,6 +250,7 @@ static void raspi2_machine_init(MachineClass *mc)
- {
-     mc->desc =3D "Raspberry Pi 2";
-     mc->init =3D raspi2_init;
-+    mc->reset =3D raspi_reset;
-     mc->block_default_type =3D IF_SD;
-     mc->no_parallel =3D 1;
-     mc->no_floppy =3D 1;
-@@ -245,6 +273,7 @@ static void raspi3_machine_init(MachineClass *mc)
- {
-     mc->desc =3D "Raspberry Pi 3";
-     mc->init =3D raspi3_init;
-+    mc->reset =3D raspi_reset;
-     mc->block_default_type =3D IF_SD;
-     mc->no_parallel =3D 1;
-     mc->no_floppy =3D 1;
---=20
-2.22.0
+Thanks!
+--
+Jag
 
+> or
+>   - Repost with based on current git master
+>=20
+> Regards,
+> Daniel
+>=20
 
