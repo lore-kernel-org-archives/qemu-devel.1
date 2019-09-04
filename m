@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 803BBC3A5A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 07:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E258C3A5A8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 07:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57AC22087E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 07:11:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57AC22087E
+	by mail.kernel.org (Postfix) with ESMTPS id 256A92087E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 07:11:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256A92087E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5PRf-00075W-MF
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 03:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47982)
+	id 1i5PS2-0007Lo-1Q
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 03:11:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i5PN7-0002NN-4F
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:06:30 -0400
+ (envelope-from <clg@kaod.org>) id 1i5PMj-0001sb-ST
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i5PN5-0006n4-Je
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:06:28 -0400
-Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:40204)
+ (envelope-from <clg@kaod.org>) id 1i5PMi-0006X7-KK
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:06:05 -0400
+Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:47490)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5PN5-0006ll-Db
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:06:27 -0400
-Received: from player690.ha.ovh.net (unknown [10.108.57.153])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 8A64D18C342
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 09:06:25 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5PMi-0006WE-EZ
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 03:06:04 -0400
+Received: from player690.ha.ovh.net (unknown [10.108.42.184])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 28A9C683BC
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 09:06:03 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player690.ha.ovh.net (Postfix) with ESMTPSA id E214094DCBEF;
- Wed,  4 Sep 2019 07:06:18 +0000 (UTC)
+ by player690.ha.ovh.net (Postfix) with ESMTPSA id 94FA794DC957;
+ Wed,  4 Sep 2019 07:05:56 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed,  4 Sep 2019 09:05:05 +0200
-Message-Id: <20190904070506.1052-10-clg@kaod.org>
+Date: Wed,  4 Sep 2019 09:05:02 +0200
+Message-Id: <20190904070506.1052-7-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190904070506.1052-1-clg@kaod.org>
 References: <20190904070506.1052-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 7093450890386901777
+X-Ovh-Tracer-Id: 7087258442873342737
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejgedgudduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejgedgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.162.229
-Subject: [Qemu-devel] [PATCH 09/10] aspeed/scu: Introduce per-SoC SCU types
+X-Received-From: 46.105.50.32
+Subject: [Qemu-devel] [PATCH 06/10] aspeed/smc: Add DMA calibration settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,206 +74,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-and use a class AspeedSCUClass to define each SoC characteristics.
+When doing calibration, the SPI clock rate in the CE0 Control Register
+and the read delay cycles in the Read Timing Compensation Register are
+set using bit[11:4] of the DMA Control Register.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Acked-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/misc/aspeed_scu.h | 15 +++++++
- hw/arm/aspeed_soc.c          |  3 +-
- hw/misc/aspeed_scu.c         | 83 ++++++++++++++++++++----------------
- 3 files changed, 64 insertions(+), 37 deletions(-)
+ hw/ssi/aspeed_smc.c | 64 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 63 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
-index 38996adc59fe..90dd4dadedeb 100644
---- a/include/hw/misc/aspeed_scu.h
-+++ b/include/hw/misc/aspeed_scu.h
-@@ -15,6 +15,8 @@
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index c1a45c10dc14..7a0cd7607fd0 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -77,6 +77,10 @@
+ #define   CTRL_CMD_MASK            0xff
+ #define   CTRL_DUMMY_HIGH_SHIFT    14
+ #define   CTRL_AST2400_SPI_4BYTE   (1 << 13)
++#define CE_CTRL_CLOCK_FREQ_SHIFT   8
++#define CE_CTRL_CLOCK_FREQ_MASK    0xf
++#define CE_CTRL_CLOCK_FREQ(div)                                         =
+\
++    (((div) & CE_CTRL_CLOCK_FREQ_MASK) << CE_CTRL_CLOCK_FREQ_SHIFT)
+ #define   CTRL_DUMMY_LOW_SHIFT     6 /* 2 bits [7:6] */
+ #define   CTRL_CE_STOP_ACTIVE      (1 << 2)
+ #define   CTRL_CMD_MODE_MASK       0x3
+@@ -112,7 +116,7 @@
+ #define   DMA_CTRL_DELAY_SHIFT  8
+ #define   DMA_CTRL_FREQ_MASK    0xf
+ #define   DMA_CTRL_FREQ_SHIFT   4
+-#define   DMA_CTRL_MODE         (1 << 3)
++#define   DMA_CTRL_CALIB        (1 << 3)
+ #define   DMA_CTRL_CKSUM        (1 << 2)
+ #define   DMA_CTRL_WRITE        (1 << 1)
+ #define   DMA_CTRL_ENABLE       (1 << 0)
+@@ -811,6 +815,60 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr=
+ addr, unsigned int size)
+     }
+ }
 =20
- #define TYPE_ASPEED_SCU "aspeed.scu"
- #define ASPEED_SCU(obj) OBJECT_CHECK(AspeedSCUState, (obj), TYPE_ASPEED_=
-SCU)
-+#define TYPE_ASPEED_2400_SCU TYPE_ASPEED_SCU "-ast2400"
-+#define TYPE_ASPEED_2500_SCU TYPE_ASPEED_SCU "-ast2500"
-=20
- #define ASPEED_SCU_NR_REGS (0x1A8 >> 2)
-=20
-@@ -45,6 +47,19 @@ typedef struct AspeedSCUState {
-=20
- extern bool is_supported_silicon_rev(uint32_t silicon_rev);
-=20
-+#define ASPEED_SCU_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AspeedSCUClass, (klass), TYPE_ASPEED_SCU)
-+#define ASPEED_SCU_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AspeedSCUClass, (obj), TYPE_ASPEED_SCU)
++static uint8_t aspeed_smc_hclk_divisor(uint8_t hclk_mask)
++{
++    /* HCLK/1 .. HCLK/16 */
++    const uint8_t hclk_divisors[] =3D {
++        15, 7, 14, 6, 13, 5, 12, 4, 11, 3, 10, 2, 9, 1, 8, 0
++    };
++    int i;
 +
-+typedef struct  AspeedSCUClass {
-+    SysBusDeviceClass parent_class;
++    for (i =3D 0; i < ARRAY_SIZE(hclk_divisors); i++) {
++        if (hclk_mask =3D=3D hclk_divisors[i]) {
++            return i + 1;
++        }
++    }
 +
-+    const uint32_t *resets;
-+    uint32_t (*calc_hpll)(AspeedSCUState *s);
-+    uint32_t apb_divider;
-+}  AspeedSCUClass;
++    qemu_log_mask(LOG_GUEST_ERROR, "invalid HCLK mask %x", hclk_mask);
++    return 0;
++}
 +
- #define ASPEED_SCU_PROT_KEY      0x1688A8A8
-=20
++/*
++ * When doing calibration, the SPI clock rate in the CE0 Control
++ * Register and the read delay cycles in the Read Timing Compensation
++ * Register are set using bit[11:4] of the DMA Control Register.
++ */
++static void aspeed_smc_dma_calibration(AspeedSMCState *s)
++{
++    uint8_t delay =3D
++        (s->regs[R_DMA_CTRL] >> DMA_CTRL_DELAY_SHIFT) & DMA_CTRL_DELAY_M=
+ASK;
++    uint8_t hclk_mask =3D
++        (s->regs[R_DMA_CTRL] >> DMA_CTRL_FREQ_SHIFT) & DMA_CTRL_FREQ_MAS=
+K;
++    uint8_t hclk_div =3D aspeed_smc_hclk_divisor(hclk_mask);
++    uint32_t hclk_shift =3D (hclk_div - 1) << 2;
++    uint8_t cs;
++
++    /*
++     * The Read Timing Compensation Register values apply to all CS on
++     * the SPI bus and only HCLK/1 - HCLK/5 can have tunable delays
++     */
++    if (hclk_div && hclk_div < 6) {
++        s->regs[s->r_timings] &=3D ~(0xf << hclk_shift);
++        s->regs[s->r_timings] |=3D delay << hclk_shift;
++    }
++
++    /*
++     * TODO: compute the CS from the DMA address and the segment
++     * registers. This is not really a problem for now because the
++     * Timing Register values apply to all CS and software uses CS0 to
++     * do calibration.
++     */
++    cs =3D 0;
++    s->regs[s->r_ctrl0 + cs] &=3D
++        ~(CE_CTRL_CLOCK_FREQ_MASK << CE_CTRL_CLOCK_FREQ_SHIFT);
++    s->regs[s->r_ctrl0 + cs] |=3D CE_CTRL_CLOCK_FREQ(hclk_div);
++}
++
  /*
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index da508c99c335..cf1d0cf921ba 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -161,8 +161,9 @@ static void aspeed_soc_init(Object *obj)
-                                 &error_abort, NULL);
+  * Accumulate the result of the reads to provide a checksum that will
+  * be used to validate the read timing settings.
+@@ -826,6 +884,10 @@ static void aspeed_smc_dma_checksum(AspeedSMCState *=
+s)
+         return;
      }
 =20
-+    snprintf(typename, sizeof(typename), "aspeed.scu-%s", socname);
-     sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
--                          TYPE_ASPEED_SCU);
-+                          typename);
-     qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
-                          sc->info->silicon_rev);
-     object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index 268cb24e565c..d284458b9b3d 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -166,23 +166,10 @@ static uint32_t aspeed_scu_get_random(void)
-=20
- static void aspeed_scu_set_apb_freq(AspeedSCUState *s)
- {
--    uint32_t apb_divider;
--
--    switch (s->silicon_rev) {
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--        apb_divider =3D 2;
--        break;
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        apb_divider =3D 4;
--        break;
--    default:
--        g_assert_not_reached();
--    }
-+    AspeedSCUClass *asc =3D ASPEED_SCU_GET_CLASS(s);
-=20
-     s->apb_freq =3D s->hpll / (SCU_CLK_GET_PCLK_DIV(s->regs[CLK_SEL]) + =
-1)
--        / apb_divider;
-+        / asc->apb_divider;
- }
-=20
- static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned si=
-ze)
-@@ -303,7 +290,7 @@ static const uint32_t hpll_ast2400_freqs[][4] =3D {
-     { 400, 375, 350, 425 }, /* 25MHz */
- };
-=20
--static uint32_t aspeed_scu_calc_hpll_ast2400(AspeedSCUState *s)
-+static uint32_t aspeed_2400_scu_calc_hpll(AspeedSCUState *s)
- {
-     uint32_t hpll_reg =3D s->regs[HPLL_PARAM];
-     uint8_t freq_select;
-@@ -334,7 +321,7 @@ static uint32_t aspeed_scu_calc_hpll_ast2400(AspeedSC=
-UState *s)
-     return hpll_ast2400_freqs[clk_25m_in][freq_select] * 1000000;
- }
-=20
--static uint32_t aspeed_scu_calc_hpll_ast2500(AspeedSCUState *s)
-+static uint32_t aspeed_2500_scu_calc_hpll(AspeedSCUState *s)
- {
-     uint32_t hpll_reg   =3D s->regs[HPLL_PARAM];
-     uint32_t multiplier =3D 1;
-@@ -357,25 +344,9 @@ static uint32_t aspeed_scu_calc_hpll_ast2500(AspeedS=
-CUState *s)
- static void aspeed_scu_reset(DeviceState *dev)
- {
-     AspeedSCUState *s =3D ASPEED_SCU(dev);
--    const uint32_t *reset;
--    uint32_t (*calc_hpll)(AspeedSCUState *s);
--
--    switch (s->silicon_rev) {
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--        reset =3D ast2400_a0_resets;
--        calc_hpll =3D aspeed_scu_calc_hpll_ast2400;
--        break;
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        reset =3D ast2500_a1_resets;
--        calc_hpll =3D aspeed_scu_calc_hpll_ast2500;
--        break;
--    default:
--        g_assert_not_reached();
--    }
-+    AspeedSCUClass *asc =3D ASPEED_SCU_GET_CLASS(dev);
-=20
--    memcpy(s->regs, reset, sizeof(s->regs));
-+    memcpy(s->regs, asc->resets, sizeof(s->regs));
-     s->regs[SILICON_REV] =3D s->silicon_rev;
-     s->regs[HW_STRAP1] =3D s->hw_strap1;
-     s->regs[HW_STRAP2] =3D s->hw_strap2;
-@@ -385,7 +356,7 @@ static void aspeed_scu_reset(DeviceState *dev)
-      * All registers are set. Now compute the frequencies of the main cl=
-ocks
-      */
-     s->clkin =3D aspeed_scu_get_clkin(s);
--    s->hpll =3D calc_hpll(s);
-+    s->hpll =3D asc->calc_hpll(s);
-     aspeed_scu_set_apb_freq(s);
- }
-=20
-@@ -459,11 +430,51 @@ static const TypeInfo aspeed_scu_info =3D {
-     .parent =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(AspeedSCUState),
-     .class_init =3D aspeed_scu_class_init,
-+    .class_size    =3D sizeof(AspeedSCUClass),
-+    .abstract      =3D true,
-+};
++    if (s->regs[R_DMA_CTRL] & DMA_CTRL_CALIB) {
++        aspeed_smc_dma_calibration(s);
++    }
 +
-+static void aspeed_2400_scu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedSCUClass *asc =3D ASPEED_SCU_CLASS(klass);
-+
-+    dc->desc =3D "ASPEED 2400 System Control Unit";
-+    asc->resets =3D ast2400_a0_resets;
-+    asc->calc_hpll =3D aspeed_2400_scu_calc_hpll;
-+    asc->apb_divider =3D 2;
-+}
-+
-+static const TypeInfo aspeed_2400_scu_info =3D {
-+    .name =3D TYPE_ASPEED_2400_SCU,
-+    .parent =3D TYPE_ASPEED_SCU,
-+    .instance_size =3D sizeof(AspeedSCUState),
-+    .class_init =3D aspeed_2400_scu_class_init,
-+};
-+
-+static void aspeed_2500_scu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedSCUClass *asc =3D ASPEED_SCU_CLASS(klass);
-+
-+    dc->desc =3D "ASPEED 2500 System Control Unit";
-+    asc->resets =3D ast2500_a1_resets;
-+    asc->calc_hpll =3D aspeed_2500_scu_calc_hpll;
-+    asc->apb_divider =3D 4;
-+}
-+
-+static const TypeInfo aspeed_2500_scu_info =3D {
-+    .name =3D TYPE_ASPEED_2500_SCU,
-+    .parent =3D TYPE_ASPEED_SCU,
-+    .instance_size =3D sizeof(AspeedSCUState),
-+    .class_init =3D aspeed_2500_scu_class_init,
- };
-=20
- static void aspeed_scu_register_types(void)
- {
-     type_register_static(&aspeed_scu_info);
-+    type_register_static(&aspeed_2400_scu_info);
-+    type_register_static(&aspeed_2500_scu_info);
- }
-=20
- type_init(aspeed_scu_register_types);
+     while (s->regs[R_DMA_LEN]) {
+         data =3D address_space_ldl_le(&s->flash_as, s->regs[R_DMA_FLASH_=
+ADDR],
+                                     MEMTXATTRS_UNSPECIFIED, &result);
 --=20
 2.21.0
 
