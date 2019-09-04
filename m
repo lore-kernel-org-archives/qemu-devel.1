@@ -2,62 +2,66 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB13C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 08:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 277BBC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 08:38:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0388621670
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 08:35:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0388621670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DCAF920870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 08:38:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCAF920870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5QlJ-0008Jh-VE
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 04:35:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34355)
+	id 1i5Qng-0001xJ-4j
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 04:38:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34764)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1i5Qj6-00078O-It
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 04:33:22 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1i5QmT-0001V6-7b
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 04:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1i5Qj0-0005zv-Ng
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 04:33:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58114)
+ (envelope-from <yan.y.zhao@intel.com>) id 1i5QmP-0007LM-IT
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 04:36:44 -0400
+Received: from mga07.intel.com ([134.134.136.100]:48658)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1i5Qir-0005w7-48; Wed, 04 Sep 2019 04:33:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B96FD3002A2F;
- Wed,  4 Sep 2019 08:32:59 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6459660606;
- Wed,  4 Sep 2019 08:32:55 +0000 (UTC)
-Date: Wed, 4 Sep 2019 10:32:52 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190904083252.7pmmjvbynik7dk33@kamzik.brq.redhat.com>
-References: <20190802122540.26385-1-drjones@redhat.com>
- <20190810013112.28732-1-richard.henderson@linaro.org>
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1i5QmP-0007IF-59
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 04:36:41 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 04 Sep 2019 01:36:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,465,1559545200"; d="scan'208";a="266585192"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga001.jf.intel.com with ESMTP; 04 Sep 2019 01:36:29 -0700
+Date: Wed, 4 Sep 2019 04:28:51 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Message-ID: <20190904082851.GA12379@joy-OptiPlex-7040>
+References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
+ <1566845753-18993-2-git-send-email-kwankhede@nvidia.com>
+ <20190828145045.20f2a7b3@x1.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D55312B@SHSMSX104.ccr.corp.intel.com>
+ <20190830101517.6b42df0a@x1.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D560CE1@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190810013112.28732-1-richard.henderson@linaro.org>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 04 Sep 2019 08:32:59 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] HACK: Centralize sve property checks
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D560CE1@SHSMSX104.ccr.corp.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.100
+Subject: Re: [Qemu-devel] [PATCH v8 01/13] vfio: KABI for migration interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,778 +73,581 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
- eric.auger@redhat.com, qemu-arm@nongnu.org, imammedo@redhat.com,
- alex.bennee@linaro.org, Dave.Martin@arm.com
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
+ Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 09, 2019 at 06:31:12PM -0700, Richard Henderson wrote:
-> As promised, an experiment in unifying the checks.
+On Tue, Sep 03, 2019 at 02:05:46PM +0800, Tian, Kevin wrote:
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: Saturday, August 31, 2019 12:15 AM
+> > 
+> > On Fri, 30 Aug 2019 07:25:59 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > 
+> > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > Sent: Thursday, August 29, 2019 4:51 AM
+> > > >
+> > > > On Tue, 27 Aug 2019 00:25:41 +0530
+> > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > > >
+> > > > > - Defined MIGRATION region type and sub-type.
+> > > > > - Used 3 bits to define VFIO device states.
+> > > > >     Bit 0 => _RUNNING
+> > > > >     Bit 1 => _SAVING
+> > > > >     Bit 2 => _RESUMING
+> > > > >     Combination of these bits defines VFIO device's state during migration
+> > > > >     _STOPPED => All bits 0 indicates VFIO device stopped.
+> > > > >     _RUNNING => Normal VFIO device running state.
+> > > > >     _SAVING | _RUNNING => vCPUs are running, VFIO device is running
+> > but
+> > > > start
+> > > > >                           saving state of device i.e. pre-copy state
+> > > > >     _SAVING  => vCPUs are stoppped, VFIO device should be stopped, and
+> > > > >                           save device state,i.e. stop-n-copy state
+> > > > >     _RESUMING => VFIO device resuming state.
+> > > > >     _SAVING | _RESUMING => Invalid state if _SAVING and _RESUMING
+> > bits
+> > > > are set
+> > > > >     Bits 3 - 31 are reserved for future use. User should perform
+> > > > >     read-modify-write operation on this field.
+> > > > > - Defined vfio_device_migration_info structure which will be placed at
+> > 0th
+> > > > >   offset of migration region to get/set VFIO device related information.
+> > > > >   Defined members of structure and usage on read/write access:
+> > > > >     * device_state: (read/write)
+> > > > >         To convey VFIO device state to be transitioned to. Only 3 bits are
+> > used
+> > > > >         as of now, Bits 3 - 31 are reserved for future use.
+> > > > >     * pending bytes: (read only)
+> > > > >         To get pending bytes yet to be migrated for VFIO device.
+> > > > >     * data_offset: (read only)
+> > > > >         To get data offset in migration region from where data exist during
+> > > > >         _SAVING, from where data should be written by user space
+> > application
+> > > > >         during _RESUMING state and while read dirty pages bitmap.
+> > > > >     * data_size: (read/write)
+> > > > >         To get and set size of data copied in migration region during
+> > _SAVING
+> > > > >         and _RESUMING state.
+> > > > >     * start_pfn, page_size, total_pfns: (write only)
+> > > > >         To get bitmap of dirty pages from vendor driver from given
+> > > > >         start address for total_pfns.
+> > > > >     * copied_pfns: (read only)
+> > > > >         To get number of pfns bitmap copied in migration region.
+> > > > >         Vendor driver should copy the bitmap with bits set only for
+> > > > >         pages to be marked dirty in migration region. Vendor driver
+> > > > >         should return VFIO_DEVICE_DIRTY_PFNS_NONE if there are 0 pages
+> > > > dirty in
+> > > > >         requested range. Vendor driver should return
+> > > > VFIO_DEVICE_DIRTY_PFNS_ALL
+> > > > >         to mark all pages in the section as dirty.
+> > > > >
+> > > > > Migration region looks like:
+> > > > >  ------------------------------------------------------------------
+> > > > > |vfio_device_migration_info|    data section                      |
+> > > > > |                          |     ///////////////////////////////  |
+> > > > >  ------------------------------------------------------------------
+> > > > >  ^                              ^                              ^
+> > > > >  offset 0-trapped part        data_offset                 data_size
+> > > > >
+> > > > > Data section is always followed by vfio_device_migration_info
+> > > > > structure in the region, so data_offset will always be non-0.
+> > > > > Offset from where data is copied is decided by kernel driver, data
+> > > > > section can be trapped or mapped depending on how kernel driver
+> > > > > defines data section. If mmapped, then data_offset should be page
+> > > > > aligned, where as initial section which contain
+> > vfio_device_migration_info
+> > > > > structure might not end at offset which is page aligned.
+> > > > > Data_offset can be same or different for device data and dirty pages
+> > bitmap.
+> > > > > Vendor driver should decide whether to partition data section and how
+> > to
+> > > > > partition the data section. Vendor driver should return data_offset
+> > > > > accordingly.
+> > > > >
+> > > > > For user application, data is opaque. User should write data in the same
+> > > > > order as received.
+> > > > >
+> > > > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > > > > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > > > > ---
+> > > > >  linux-headers/linux/vfio.h | 148
+> > > > +++++++++++++++++++++++++++++++++++++++++++++
+> > > > >  1 file changed, 148 insertions(+)
+> > > > >
+> > > > > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> > > > > index 24f505199f83..4bc0236b0898 100644
+> > > > > --- a/linux-headers/linux/vfio.h
+> > > > > +++ b/linux-headers/linux/vfio.h
+> > > > > @@ -372,6 +372,154 @@ struct vfio_region_gfx_edid {
+> > > > >   */
+> > > > >  #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+> > > > >
+> > > > > +/* Migration region type and sub-type */
+> > > > > +#define VFIO_REGION_TYPE_MIGRATION	        (3)
+> > > > > +#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
+> > > > > +
+> > > > > +/**
+> > > > > + * Structure vfio_device_migration_info is placed at 0th offset of
+> > > > > + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device
+> > > > related migration
+> > > > > + * information. Field accesses from this structure are only supported at
+> > > > their
+> > > > > + * native width and alignment, otherwise the result is undefined and
+> > > > vendor
+> > > > > + * drivers should return an error.
+> > > > > + *
+> > > > > + * device_state: (read/write)
+> > > > > + *      To indicate vendor driver the state VFIO device should be
+> > > > transitioned
+> > > > > + *      to. If device state transition fails, write on this field return error.
+> > > > > + *      It consists of 3 bits:
+> > > > > + *      - If bit 0 set, indicates _RUNNING state. When its reset, that
+> > indicates
+> > > > > + *        _STOPPED state. When device is changed to _STOPPED, driver
+> > should
+> > > > stop
+> > > > > + *        device before write() returns.
+> > > > > + *      - If bit 1 set, indicates _SAVING state.
+> > > > > + *      - If bit 2 set, indicates _RESUMING state.
+> > >
+> > > please add a few words to explain _SAVING and _RESUMING, similar to
+> > > what you did for _RUNNING.
+> > >
+> > > > > + *      Bits 3 - 31 are reserved for future use. User should perform
+> > > > > + *      read-modify-write operation on this field.
+> > > > > + *      _SAVING and _RESUMING bits set at the same time is invalid state.
+> > >
+> > > what about _RUNNING | _RESUMING? Is it allowed?
+> > 
+> > I think this would be post-copy migration, which I assume is
+> > theoretically supportable, but not necessarily (and not currently)
+> > supported by vendor drivers.  I'm not sure how a vendor driver reports
+> > the lack of this support though.
 > 
-> I believe that I've tested for all of the same conditions, modulo the
-> timing at which they are emitted.  As before, only one error is reported,
-> so if multiple errors exist you can't rely on which error is seen.
+> Yan is working on post-copy now. I talked to her about this open.
+> She will respond later after some thinking. Ideally we need a way
+> that user space can use to verify which combinations are available 
+> before starting the post-copy process. It's not good to blindly start
+> post-copy and then fail due to failure to switch to desired state on
+> the dest machine.
+>
+hi,
+May I know what vendor driver is supposed to do in _RESUMING state currently?
+Could I understand it as that loading device data is only permitted in _RESUMING state,
+and rejected otherwise?
+If this understanding is right, is _LOADING a better name for it?
+Then _SAVING and _LOADING is mutually exclusive obviously,
+and we can clean the _LOADING state in .load_cleanup in qemu.
+Then, state _LOADING | _RUNNING would only appear when VM has started up and
+migration is still not completed.
+
+And for postcopy, I guess anyway an extra POSTCOPY state needs to be introduced.
+because in POSTCOPY state, vendor driver in target side needs to listen
+to faulted pages and requests them from source vm, it has to be set when
+migration is in postcopy stage (before VM running and after .load_setup) and
+it is not necssarily equal to state _LOADING or state _LOADING|_RUNNING.
+
+Thanks
+Yan
+
+
+> > 
+> > > > > + *
+> > > > > + * pending bytes: (read only)
+> > > > > + *      Number of pending bytes yet to be migrated from vendor driver
+> > > > > + *
+> > > > > + * data_offset: (read only)
+> > > > > + *      User application should read data_offset in migration region from
+> > > > where
+> > > > > + *      user application should read device data during _SAVING state or
+> > > > write
+> > > > > + *      device data during _RESUMING state or read dirty pages bitmap.
+> > See
+> > > > below
+> > > > > + *      for detail of sequence to be followed.
+> > > > > + *
+> > > > > + * data_size: (read/write)
+> > > > > + *      User application should read data_size to get size of data copied
+> > in
+> > > > > + *      migration region during _SAVING state and write size of data
+> > copied
+> > > > in
+> > > > > + *      migration region during _RESUMING state.
+> > > > > + *
+> > > > > + * start_pfn: (write only)
+> > > > > + *      Start address pfn to get bitmap of dirty pages from vendor driver
+> > > > duing
+> > > > > + *      _SAVING state.
+> > > > > + *
+> > > > > + * page_size: (write only)
+> > > > > + *      User application should write the page_size of pfn.
+> > > > > + *
+> > > > > + * total_pfns: (write only)
+> > > > > + *      Total pfn count from start_pfn for which dirty bitmap is requested.
+> > > > > + *
+> > > > > + * copied_pfns: (read only)
+> > >
+> > > 'copied' gives the impression as if the page content is copied. what about
+> > > 'dirty_pfns'? btw can this field merge with total_pfns?
+> > 
+> > I don't agree with the implication that copied implies page content,
+> > we're working with a bitmap, so this is easily disproved.  I think the
+> > intent of 'copied' is to differentiate that 'total' is how many the
+> > user asked for, and 'copied' is how many they got.  It's not obvious to
+> > me whether there's anything that would prevent duplicate use of one
+> > register, ie. write total, read copied.  I'm not sure I see a huge
+> > advantage to it either though.
 > 
-> I think there's value in splitting the sve_map_vq bitmap such that the
-> initialized state can be easily manipulated with bitmap functions.
+> It's fine. I just had the impression that many kernel interfaces are 
+> designed in such way, i.e., having the same field to carry-in user
+> requested number and then carry-out actually handled number.
 > 
-> The diffstat is promising.  Lemme know what you think.
-
-Hi Richard,
-
-Thanks for this!
-
-I'm back after a long context switch away from this work. There is indeed
-a nice number of lines reduced. I applied this (with a couple minor fixups
-for kvm code) and lightly tested it (primarily with tcg, other than the
-sve-not-supported-with-this-kvm path). It works for me. I wouldn't say
-this approach is less complex, but with the LOC reduction, then I'm happy
-to get started on integrating it into the v4 series. How would you suggest
-I apply credit for it? I can give you authorship for any patches that
-mainly contain your code. Or I can keep authorship and add mentions of
-your contributions in the commit messages. Just let me know your
-preference.
-
-I also have a couple comments below on the patch.
-
+> > 
+> > > > > + *      pfn count for which dirty bitmap is copied to migration region.
+> > > > > + *      Vendor driver should copy the bitmap with bits set only for pages
+> > to
+> > > > be
+> > > > > + *      marked dirty in migration region.
+> > > > > + *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if
+> > > > none of the
+> > > > > + *        pages are dirty in requested range or rest of the range.
+> > > > > + *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to
+> > mark
+> > > > all
+> > > > > + *        pages dirty in the given range or rest of the range.
+> > > > > + *      - Vendor driver should return pfn count for which bitmap is
+> > written in
+> > > > > + *        the region.
+> > > > > + *
+> > > > > + * Migration region looks like:
+> > > > > + *  ------------------------------------------------------------------
+> > > > > + * |vfio_device_migration_info|    data section                      |
+> > > > > + * |                          |     ///////////////////////////////  |
+> > > > > + * ------------------------------------------------------------------
+> > > > > + *   ^                              ^                             ^
+> > > > > + *  offset 0-trapped part        data_offset                 data_size
+> > >
+> > > 'data_size' -> "data_offset + data_size"
+> > 
+> > The diagram sort of implies that, but I don't think this is correct.  I
+> > believe it's more like:
+> > 
+> > data_offset = data_start_offset
+> > data_size = data_end_offset - data_start_offset
 > 
+> I'm fine with replacing data_offset & data_size with data_start_
+> offset & data_end_offset.
 > 
-> r~
+> > 
+> > > > > + *
+> > > > > + * Data section is always followed by vfio_device_migration_info
+> > structure
+> > >
+> > > Data section is always following ..., or ... structure is always followed by
+> > > data section.
+> > 
+> > The vfio_device_migration struct is always at the zero'th offset of the
+> > region, the data section is theoretically the remainder, but the used
+> > range of the data section is defined by the vendor driver via
+> > data_offset.
 > 
-> ---
->  target/arm/cpu.h     |  16 +-
->  target/arm/cpu.c     |  12 +-
->  target/arm/cpu64.c   | 502 ++++++++++++++-----------------------------
->  target/arm/monitor.c |   7 +
->  4 files changed, 190 insertions(+), 347 deletions(-)
+> Isn't original description incorrect here? It implied data section sits at
+> offset zero, and then migration info...
 > 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 7993085bea..924476480b 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -184,11 +184,11 @@ typedef struct {
->  
->  #ifdef TARGET_AARCH64
->  # define ARM_MAX_VQ    16
-> -void arm_cpu_sve_finalize(ARMCPU *cpu);
-> +void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
->  uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq);
->  #else
->  # define ARM_MAX_VQ    1
-> -static inline void arm_cpu_sve_finalize(ARMCPU *cpu) { }
-> +static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
->  static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
->  { return 0; }
->  #endif
-> @@ -924,12 +924,14 @@ struct ARMCPU {
->      /*
->       * In sve_vq_map each set bit is a supported vector length of
->       * (bit-number + 1) * 16 bytes, i.e. each bit number + 1 is the vector
-> -     * length in quadwords. We need a map size twice the maximum
-> -     * quadword length though because we use two bits for each vector
-> -     * length in order to track four states: uninitialized, uninitialized
-> -     * but supported by KVM, off, and on.
-> +     * length in quadwords.
-> +     *
-> +     * While processing properties during initialization, corresponding
-> +     * sve_vq_init bits are set for bits in sve_vq_map that have been
-> +     * set by properties.
->       */
-> -    DECLARE_BITMAP(sve_vq_map, ARM_MAX_VQ * 2);
-> +    DECLARE_BITMAP(sve_vq_map, ARM_MAX_VQ);
-> +    DECLARE_BITMAP(sve_vq_init, ARM_MAX_VQ);
->  };
->  
->  void arm_cpu_post_init(Object *obj);
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 604f5c3651..a113c30def 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1255,8 +1255,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> -    if (cpu_isar_feature(aa64_sve, cpu)) {
-> -        arm_cpu_sve_finalize(cpu);
-> +    if (arm_feature(env, ARM_FEATURE_AARCH64)) {
-> +        arm_cpu_sve_finalize(cpu, &local_err);
-> +        if (local_err != NULL) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
->      }
->  
->      if (arm_feature(env, ARM_FEATURE_AARCH64) &&
-> @@ -2656,7 +2660,9 @@ static void arm_host_initfn(Object *obj)
->      ARMCPU *cpu = ARM_CPU(obj);
->  
->      kvm_arm_set_cpu_features_from_host(cpu);
-> -    aarch64_add_sve_properties(obj);
-> +    if (arm_feature(env, ARM_FEATURE_AARCH64)) {
-
-&cpu->env
-
-> +        aarch64_add_sve_properties(obj);
-> +    }
->      arm_cpu_post_init(obj);
->  }
->  
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 0313eec88a..7c7e54ad78 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -257,165 +257,168 @@ static void aarch64_a72_initfn(Object *obj)
->      define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
->  }
->  
-> -/*
-> - * While we eventually use cpu->sve_vq_map as a typical bitmap, where each vq
-> - * has only two states (off/on), until we've finalized the map at realize time
-> - * we use an extra bit, at the vq - 1 + ARM_MAX_VQ bit number, to also allow
-> - * tracking of the uninitialized state and the uninitialized but supported by
-> - * KVM state. The arm_vq_state typedef and following functions allow us to more
-> - * easily work with the bitmap.
-> - */
-> -typedef enum arm_vq_state {
-> -    ARM_VQ_OFF,
-> -    ARM_VQ_ON,
-> -    ARM_VQ_UNINITIALIZED,
-> -    ARM_VQ_UNINITIALIZED_KVM_SUPPORTED
-> -    /*
-> -     * More states cannot be added without adding bits to sve_vq_map
-> -     * and modifying its supporting functions.
-> -     */
-> -} arm_vq_state;
-> -
-> -static arm_vq_state arm_cpu_vq_map_get(ARMCPU *cpu, uint32_t vq)
-> +void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
->  {
-> -    assert(vq <= ARM_MAX_VQ);
-> -
-> -    return test_bit(vq - 1, cpu->sve_vq_map) |
-> -           test_bit(vq - 1 + ARM_MAX_VQ, cpu->sve_vq_map) << 1;
-> -}
-> -
-> -static void arm_cpu_vq_map_set(ARMCPU *cpu, uint32_t vq, arm_vq_state state)
-> -{
-> -    assert(vq <= ARM_MAX_VQ);
-> -    assert(state == ARM_VQ_OFF || state == ARM_VQ_ON);
-> -
-> -    clear_bit(vq - 1 + ARM_MAX_VQ, cpu->sve_vq_map);
-> -
-> -    if (state == ARM_VQ_ON) {
-> -        set_bit(vq - 1, cpu->sve_vq_map);
-> -    } else {
-> -        clear_bit(vq - 1, cpu->sve_vq_map);
-> -    }
-> -}
-> -
-> -static bool arm_cpu_vq_kvm_supported(ARMCPU *cpu, uint32_t vq)
-> -{
-> -    return arm_cpu_vq_map_get(cpu, vq) != ARM_VQ_UNINITIALIZED;
-> -}
-> -
-> -static bool arm_cpu_vq_uninitialized(ARMCPU *cpu, uint32_t vq)
-> -{
-> -    arm_vq_state vq_state = arm_cpu_vq_map_get(cpu, vq);
-> -
-> -    if (kvm_enabled()) {
-> -        return vq_state == ARM_VQ_UNINITIALIZED_KVM_SUPPORTED;
-> -    }
-> -
-> -    return vq_state == ARM_VQ_UNINITIALIZED;
-> -}
-> -
-> -/*
-> - * Uninitialized vector lengths need a default value to use in case we need
-> - * to query their value prior to map finalization. Additionally map finalizing
-> - * itself needs to determine what value to assign uninitialized vector lengths.
-> - * The default is determined as follows:
-> - *
-> - *  * When no vector lengths have been explicitly enabled, i.e. either no
-> - *    input has been provided by the user at all, or vector lengths have
-> - *    only been disabled, then all uninitialized vector lengths default 'ON'.
-> - *
-> - *  * When one or more vector lengths have been enabled, then all uninitialized
-> - *    vector lengths default 'OFF'. Note, when checking for enabled vector
-> - *    lengths we do not discriminate between user-enabled vector lengths and
-> - *    auto-enabled vector lengths (which were auto-enabled in order to satisfy
-> - *    the user-enabled vector lengths). This implies the default can never
-> - *    transition back to 'ON', even if the user-enabled and auto-enabled vector
-> - *    lengths that initially transitioned it to 'OFF' are later disabled, as at
-> - *    least one vector length must remain enabled unless the SVE feature is
-> - *    completely disabled. If SVE is completely disabled then all vector
-> - *    lengths are effectively 'OFF'.
-> - */
-> -static bool arm_cpu_vq_map_get_default(ARMCPU *cpu)
-> -{
-> -    uint32_t vq;
-> -
-> -    for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
-> -        if (arm_cpu_vq_map_get(cpu, vq) == ARM_VQ_ON) {
-> -            return false;
-> -        }
-> -    }
-> -
-> -    return true;
-> -}
-> -
-> -/*
-> - * We need to be able to track the number of enabled (or will-be enabled)
-> - * vector lengths in order to ensure we never drop to zero. If the default
-> - * is 'ON', then we count enabled and uninitialized vector lengths. Otherwise,
-> - * if the default is 'OFF', then we only count enabled vector lengths.
-> - */
-> -static int arm_cpu_num_vqs_available(ARMCPU *cpu)
-> -{
-> -    uint32_t vq;
-> -    bool defval;
-> -    int num = 0;
-> -
-> -    defval = arm_cpu_vq_map_get_default(cpu);
-> -
-> -    for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
-> -        if (arm_cpu_vq_map_get(cpu, vq) == ARM_VQ_ON) {
-> -            ++num;
-> -        } else if (defval && arm_cpu_vq_uninitialized(cpu, vq)) {
-> -            ++num;
-> -        }
-> -    }
-> -
-> -    return num;
-> -}
-> -
-> -static void arm_cpu_vq_map_init(ARMCPU *cpu)
-> -{
-> -    /* Set all vq's to 0b10 (ARM_VQ_UNINITIALIZED) */
-> -    bitmap_clear(cpu->sve_vq_map, 0, ARM_MAX_VQ);
-> -    bitmap_set(cpu->sve_vq_map, ARM_MAX_VQ, ARM_MAX_VQ);
-> -
-> -    if (kvm_enabled()) {
-> -        /*
-> -         * As the upper bits of the ARM_VQ_UNINITIALIZED_KVM_SUPPORTED (0b11)
-> -         * states have already been set with the bitmap_set() above, we only
-> -         * need to OR in the lower bits.
-> -         */
-> -        DECLARE_BITMAP(kvm_supported, ARM_MAX_VQ);
-> +    DECLARE_BITMAP(kvm_supported, ARM_MAX_VQ);
-> +    DECLARE_BITMAP(test, ARM_MAX_VQ);
-> +    uint32_t vq, max_vq = 0;
->  
-> +    /* Collect the set of VQ supported by KVM. */
-> +    if (kvm_enabled() && kvm_arm_sve_supported(CPU(cpu))) {
->          kvm_arm_sve_get_vls(CPU(cpu), kvm_supported);
-> -        bitmap_or(cpu->sve_vq_map, cpu->sve_vq_map, kvm_supported, ARM_MAX_VQ);
-> +    } else {
-> +        bitmap_zero(kvm_supported, ARM_MAX_VQ);
->      }
-> -}
->  
-> -void arm_cpu_sve_finalize(ARMCPU *cpu)
-> -{
-> -    bool defval = arm_cpu_vq_map_get_default(cpu);
-> -    uint32_t vq, max_vq;
-> +    /*
-> +     * Process explicit sve<N> properties.
-> +     * From the properties, sve_vq_map<N> implies sve_vq_init<N>.
-> +     * Check first for any sve<N> enabled.
-> +     */
-> +    if (!bitmap_empty(cpu->sve_vq_map, ARM_MAX_VQ)) {
-> +        max_vq = find_last_bit(cpu->sve_vq_map, ARM_MAX_VQ) + 1;
->  
-> -    for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
-> -        if (kvm_enabled() && !arm_cpu_vq_kvm_supported(cpu, vq)) {
-> -            arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
-> -        } else if (arm_cpu_vq_uninitialized(cpu, vq)) {
-> -            if (defval) {
-> -                arm_cpu_vq_map_set(cpu, vq, ARM_VQ_ON);
-> -            } else {
-> -                arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
-> +        if (cpu->sve_max_vq && max_vq > cpu->sve_max_vq) {
-> +            error_setg(errp, "cannot enable sve%d", max_vq * 128);
-> +            error_append_hint(errp, "sve%d is larger than the maximum vector "
-> +                              "length, sve-max-vq=%d (%d bits)\n",
-> +                              max_vq * 128, cpu->sve_max_vq,
-> +                              cpu->sve_max_vq * 128);
-> +            return;
-> +        }
-> +
-> +        /* Propagate enabled bits down through required powers-of-two. */
-> +        for (vq = pow2floor(max_vq); vq >= 1; vq >>= 1) {
-> +            if (!test_bit(vq - 1, cpu->sve_vq_init)) {
-> +                set_bit(vq - 1, cpu->sve_vq_map);
-> +                set_bit(vq - 1, cpu->sve_vq_init);
->              }
->          }
-
-While the architecture requires this, so all hardware should also
-require it / depend on it, I would only do this propagation in the
-non-KVM path. When KVM is enabled I prefer giving KVM full authority
-over what vector lengths may be enabled. The reasoning is for the
-unlikely case of KVM possibly trying to workaround some hardware
-errata involving power-of-2 vector lengths.
-
-> +
-> +        /*
-> +         * For KVM we have to automatically enable all supported unitialized
-> +         * lengths, even when the smaller lengths are not all powers-of-two.
-> +         */
-> +        if (kvm_enabled()) {
-> +            if (!kvm_arm_sve_supported(CPU(cpu))) {
-> +                error_setg(errp, "cannot enable sve%d", max_vq);
-
-max_vq * 128
-
-> +                error_append_hint(errp, "SVE not supported by "
-> +                                  "KVM on this host\n");
-> +                return;
-> +            }
-> +            bitmap_andnot(test, kvm_supported, cpu->sve_vq_init, max_vq);
-> +            bitmap_or(cpu->sve_vq_map, cpu->sve_vq_map, test, max_vq);
-> +            bitmap_or(cpu->sve_vq_init, cpu->sve_vq_init, test, max_vq);
-> +        }
-> +    } else if (cpu->sve_max_vq == 0) {
-> +        /*
-> +         * No explicit bits enabled, and no implicit bits from sve-max-vq.
-> +         */
-> +        if (!cpu_isar_feature(aa64_sve, cpu)) {
-> +            /* SVE is disabled and so are all vector lengths.  Good. */
-> +            return;
-> +        }
-> +
-> +        /* Disabling a power-of-two disables all larger lengths. */
-> +        if (test_bit(0, cpu->sve_vq_init)) {
-> +            error_setg(errp, "cannot disable sve128");
-> +            error_append_hint(errp, "Disabling sve128 results in all vector "
-> +                              "lengths being disabled.\n");
-> +            error_append_hint(errp, "With SVE enabled, at least one vector "
-> +                                  "length must be enabled.\n");
-> +
-> +            return;
-> +        }
-> +        for (vq = 2; vq <= ARM_MAX_VQ; vq <<= 1) {
-> +            if (test_bit(vq - 1, cpu->sve_vq_init)) {
-> +                break;
-> +            }
-> +        }
-> +        max_vq = (vq <= ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ);
-> +
-> +        /* Enable all supported bits other than those explicit disabled. */
-> +        if (kvm_enabled()) {
-> +            bitmap_andnot(cpu->sve_vq_map, kvm_supported,
-> +                          cpu->sve_vq_init, max_vq);
-> +        } else {
-> +            bitmap_complement(cpu->sve_vq_map, cpu->sve_vq_init, max_vq);
-> +        }
-> +        bitmap_set(cpu->sve_vq_init, 0, max_vq);
-> +        max_vq = find_last_bit(cpu->sve_vq_map, max_vq) + 1;
->      }
->  
-> -    max_vq = arm_cpu_vq_map_next_smaller(cpu, ARM_MAX_VQ + 1);
-> +    /*
-> +     * Process the sve-max-vq property.
-> +     * Note that we know from the above that no bit above
-> +     * sve-max-vq is currently set.
-> +     */
-> +    if (cpu->sve_max_vq != 0) {
-> +        max_vq = cpu->sve_max_vq;
->  
-> -    if (!cpu->sve_max_vq) {
-> -        cpu->sve_max_vq = max_vq;
-> +        if (!test_bit(max_vq - 1, cpu->sve_vq_map) &&
-> +            test_bit(max_vq - 1, cpu->sve_vq_init)) {
-> +            error_setg(errp, "cannot disable sve%d", max_vq * 128);
-> +            error_append_hint(errp, "The maximum vector length must be "
-> +                              "enabled, sve-max-vq=%d (%d bits)\n",
-> +                              max_vq, max_vq * 128);
-> +            return;
-> +        }
-> +
-> +        /* Set all bits not explicitly set within sve-max-vq.  */
-> +        bitmap_complement(test, cpu->sve_vq_init, max_vq);
-> +        bitmap_or(cpu->sve_vq_map, cpu->sve_vq_map, test, max_vq);
->      }
->  
-> -    assert(max_vq && cpu->sve_max_vq == max_vq);
-> +    /*
-> +     * At this point we will have found max_vq.  All bits implied from
-> +     * other properties are set or clear in cpu->sve_vq_map.
-> +     * All bits implied from other sve<N> are set in cpu->sve_vq_init.
-> +     * If sve_vq_map<N> & !sve_vq_init<N>, then the bit must have come
-> +     * sve-max-vq.
-> +     */
-> +    assert(max_vq != 0);
-> +
-> +    /* Ensure all required powers-of-two are enabled. */
-> +    for (vq = pow2floor(max_vq); vq >= 1; vq >>= 1) {
-> +        if (!test_bit(vq - 1, cpu->sve_vq_map)) {
-> +            error_setg(errp, "cannot disable sve%d", vq * 128);
-> +            error_append_hint(errp, "sve%d is required as it "
-> +                              "is a power-of-2 length smaller than "
-> +                              "the maximum, sve%d\n",
-> +                              vq * 128, max_vq * 128);
-> +            return;
-> +        }
-> +    }
-> +
-> +    /* Ensure the set of lengths matches what KVM supports. */
-> +    if (kvm_enabled()) {
-> +        bitmap_xor(test, cpu->sve_vq_map, kvm_supported, max_vq);
-> +        if (!bitmap_empty(test, max_vq)) {
-> +            vq = find_last_bit(test, max_vq);
-> +            if (!test_bit(vq - 1, cpu->sve_vq_map)) {
-> +                error_setg(errp, "cannot disable sve%d", vq * 128);
-> +                error_append_hint(errp, "The KVM host requires all "
-> +                                  "supported vector lengths smaller "
-> +                                  "than %d bits to also be enabled.\n",
-> +                                  max_vq * 128);
-> +            } else if (test_bit(vq - 1, cpu->sve_vq_init)) {
-> +                error_setg(errp, "cannot enable sve%d", vq * 128);
-> +                error_append_hint(errp, "This KVM host does not support "
-> +                                  "the vector length %d-bits.\n", vq * 128);
-> +            } else {
-> +                error_setg(errp, "cannot set sve-max-vq=%d", cpu->sve_max_vq);
-> +                error_append_hint(errp, "This KVM host does not support "
-> +                                  "the vector length %d-bits.\n", vq * 128);
-> +                error_append_hint(errp, "It may not be possible to use "
-> +                                  "sve-max-vq with this KVM host. Try "
-> +                                  "using only sve<vl-bits> properties.\n");
-> +            }
-> +            return;
-> +        }
-> +    }
-> +
-> +    /* From now on sve_max_vq is the actual maximum supported length. */
-> +    cpu->sve_max_vq = max_vq;
->  }
->  
->  uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
-> @@ -427,6 +430,7 @@ uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
->       * to find the maximum vq enabled, which may be ARM_MAX_VQ, but this
->       * function always returns the next smaller than the input.
->       */
-> +    assert(vq > 1);
->      assert(vq <= ARM_MAX_VQ + 1);
->  
->      bitnum = find_last_bit(cpu->sve_vq_map, vq - 1);
-> @@ -437,7 +441,15 @@ static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *name,
->                                     void *opaque, Error **errp)
->  {
->      ARMCPU *cpu = ARM_CPU(obj);
-> -    visit_type_uint32(v, name, &cpu->sve_max_vq, errp);
-> +    uint32_t value;
-> +
-> +    /* All vector lengths are disabled when SVE is off. */
-> +    if (!cpu_isar_feature(aa64_sve, cpu)) {
-> +        value = 0;
-> +    } else {
-> +        value = cpu->sve_max_vq;
-> +    }
-> +    visit_type_uint32(v, name, &value, errp);
->  }
->  
->  static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
-> @@ -445,7 +457,6 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
->  {
->      ARMCPU *cpu = ARM_CPU(obj);
->      Error *err = NULL;
-> -    uint32_t vq;
->  
->      visit_type_uint32(v, name, &cpu->sve_max_vq, &err);
->      if (err) {
-> @@ -465,27 +476,6 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
->                            ARM_MAX_VQ);
->          return;
->      }
-> -
-> -    for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
-> -        if (vq <= cpu->sve_max_vq) {
-> -            char tmp[8];
-> -
-> -            sprintf(tmp, "sve%d", vq * 128);
-> -            object_property_set_bool(obj, true, tmp, &err);
-> -            if (err) {
-> -                if (kvm_enabled()) {
-> -                    error_append_hint(&err, "It is not possible to use "
-> -                                      "sve-max-vq with this KVM host. Try "
-> -                                      "using only sve<vl-bits> "
-> -                                      "properties.\n");
-> -                }
-> -                error_propagate(errp, err);
-> -                return;
-> -            }
-> -        } else if (arm_cpu_vq_map_get(cpu, vq) == ARM_VQ_ON) {
-> -            arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
-> -        }
-> -    }
->  }
->  
->  static void cpu_arm_get_sve_vq(Object *obj, Visitor *v, const char *name,
-> @@ -493,24 +483,14 @@ static void cpu_arm_get_sve_vq(Object *obj, Visitor *v, const char *name,
->  {
->      ARMCPU *cpu = ARM_CPU(obj);
->      uint32_t vq = atoi(&name[3]) / 128;
-> -    arm_vq_state vq_state = arm_cpu_vq_map_get(cpu, vq);
->      bool value;
->  
-> +    /* All vector lengths are disabled when SVE is off. */
->      if (!cpu_isar_feature(aa64_sve, cpu)) {
-> -        /* All vector lengths are disabled when SVE is off. */
->          value = false;
-> -    } else if (vq_state == ARM_VQ_ON) {
-> -        value = true;
-> -    } else if (vq_state == ARM_VQ_OFF) {
-> -        value = false;
-> -    } else if (kvm_enabled() && !arm_cpu_vq_kvm_supported(cpu, vq)) {
-> -        value = false;
-> -    } else if (arm_cpu_vq_map_get_default(cpu)) {
-> -        value = true;
->      } else {
-> -        value = false;
-> +        value = test_bit(vq - 1, cpu->sve_vq_map);
->      }
-> -
->      visit_type_bool(v, name, &value, errp);
->  }
->  
-> @@ -519,7 +499,6 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
->  {
->      ARMCPU *cpu = ARM_CPU(obj);
->      uint32_t vq = atoi(&name[3]) / 128;
-> -    uint32_t max_vq = 0;
->      Error *err = NULL;
->      bool value;
->  
-> @@ -529,146 +508,12 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
->          return;
->      }
->  
-> -    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-> -        error_setg(errp, "cannot enable %s", name);
-> -        error_append_hint(errp, "SVE not supported by KVM on this host\n");
-> -        return;
-> -    }
-> -
-> -    /*
-> -     * We need to know the maximum vector length, which may just currently
-> -     * be the maximum length, in order to validate the enabling/disabling
-> -     * of this vector length.
-> -     */
-> -    if (!cpu->sve_max_vq) {
-> -        for (max_vq = ARM_MAX_VQ; max_vq >= 1; --max_vq) {
-> -            if (arm_cpu_vq_map_get(cpu, max_vq) == ARM_VQ_ON) {
-> -                break;
-> -            }
-> -        }
-> -    }
-> -
-> -    if (cpu->sve_max_vq && value && vq > cpu->sve_max_vq) {
-> -        error_setg(errp, "cannot enable %s", name);
-> -        error_append_hint(errp, "vq=%d (%d bits) is larger than the "
-> -                          "maximum vector length, sve-max-vq=%d "
-> -                          "(%d bits)\n", vq, vq * 128,
-> -                          cpu->sve_max_vq, cpu->sve_max_vq * 128);
-> -    } else if (cpu->sve_max_vq && !value && vq == cpu->sve_max_vq) {
-> -        error_setg(errp, "cannot disable %s", name);
-> -        error_append_hint(errp, "The maximum vector length must be "
-> -                          "enabled, sve-max-vq=%d (%d bits)\n",
-> -                          cpu->sve_max_vq, cpu->sve_max_vq * 128);
-> -    } else if (!kvm_enabled() && cpu->sve_max_vq && !value &&
-> -               vq < cpu->sve_max_vq && is_power_of_2(vq)) {
-> -        error_setg(errp, "cannot disable %s", name);
-> -        error_append_hint(errp, "vq=%d (%d bits) is required as it is a "
-> -                          "power-of-2 length smaller than the maximum, "
-> -                          "sve-max-vq=%d (%d bits)\n", vq, vq * 128,
-> -                          cpu->sve_max_vq, cpu->sve_max_vq * 128);
-> -    } else if (!kvm_enabled() && max_vq && !value && vq < max_vq &&
-> -               is_power_of_2(vq)) {
-> -        error_setg(errp, "cannot disable %s", name);
-> -        error_append_hint(errp, "Vector length %d-bits is required as it "
-> -                          "is a power-of-2 length smaller than another "
-> -                          "enabled vector length. Disable all larger vector "
-> -                          "lengths first.\n", vq * 128);
-> -    } else if (kvm_enabled() && !value && vq < max_vq &&
-> -                arm_cpu_vq_kvm_supported(cpu, vq)) {
-> -        error_setg(errp, "cannot disable %s", name);
-> -        error_append_hint(errp, "Vector length %d-bits is a KVM supported "
-> -                          "length smaller than another enabled vector "
-> -                          "length. Disable all larger vector lengths "
-> -                          "first.\n", vq * 128);
-> -    } else if (kvm_enabled() && value && !arm_cpu_vq_kvm_supported(cpu, vq)) {
-> -        error_setg(errp, "cannot enable %s", name);
-> -        error_append_hint(errp, "This KVM host does not support "
-> -                          "the vector length %d-bits.\n", vq * 128);
-> +    if (value) {
-> +        set_bit(vq - 1, cpu->sve_vq_map);
->      } else {
-> -        uint32_t s;
-> -
-> -        if (value) {
-> -            bool fail = false;
-> -
-> -            /*
-> -             * Enabling a vector length automatically enables all
-> -             * uninitialized power-of-2 lengths smaller than it, as
-> -             * per the architecture.
-> -             *
-> -             * For KVM we have to automatically enable all supported,
-> -             * uninitialized lengths smaller than this length, even
-> -             * when the smaller lengths are not power-of-2's.
-> -             */
-> -            for (s = 1; s < vq; ++s) {
-> -                if (kvm_enabled() || is_power_of_2(s)) {
-> -                    if (arm_cpu_vq_uninitialized(cpu, s)) {
-> -                        arm_cpu_vq_map_set(cpu, s, ARM_VQ_ON);
-> -                    } else if (arm_cpu_vq_map_get(cpu, s) == ARM_VQ_OFF) {
-> -                        fail = true;
-> -                        break;
-> -                    }
-> -                }
-> -            }
-> -
-> -            if (!kvm_enabled() && fail) {
-> -                error_setg(errp, "cannot enable %s", name);
-> -                error_append_hint(errp, "Vector length %d-bits is disabled "
-> -                                  "and is a power-of-2 length smaller than "
-> -                                  "%s. All power-of-2 vector lengths smaller "
-> -                                  "than the maximum length are required.\n",
-> -                                  s * 128, name);
-> -
-> -            } else if (fail) {
-> -                error_setg(errp, "cannot enable %s", name);
-> -                error_append_hint(errp, "Vector length %d-bits is disabled "
-> -                                  "and the KVM host requires all supported "
-> -                                  "vector lengths smaller than %s to also be "
-> -                                  "enabled.\n", s * 128, name);
-> -            } else {
-> -                arm_cpu_vq_map_set(cpu, vq, ARM_VQ_ON);
-> -            }
-> -        } else {
-> -            /*
-> -             * When disabling vector lengths with KVM enabled if the vq wasn't
-> -             * supported then we leave it in the ARM_VQ_UNINITIALIZED state in
-> -             * order to keep that unsupported information. It'll be set to OFF
-> -             * later when we finalize the map.
-> -             *
-> -             * We would have errored-out already if we were attempting to
-> -             * disable a power-of-2 vector length less than another enabled
-> -             * vector length, but there may be uninitialized vector lengths
-> -             * larger than a power-of-2 vector length that we're disabling.
-> -             * We disable all of those lengths now too, as they can no longer
-> -             * be enabled. Additionally, for KVM, we have to automatically
-> -             * disable all supported, uninitialized lengths larger than this
-> -             * length, even when this length is not a power-of-2.
-> -             */
-> -            if (kvm_enabled() || is_power_of_2(vq)) {
-> -                for (s = vq + 1; s <= ARM_MAX_VQ; ++s) {
-> -                    if (!kvm_enabled() || arm_cpu_vq_kvm_supported(cpu, vq)) {
-> -                        arm_cpu_vq_map_set(cpu, s, ARM_VQ_OFF);
-> -                    }
-> -                }
-> -            }
-> -
-> -            if (!kvm_enabled() || arm_cpu_vq_kvm_supported(cpu, vq)) {
-> -                arm_cpu_vq_map_set(cpu, vq, ARM_VQ_OFF);
-> -            }
-> -
-> -            /*
-> -             * We just disabled one or more vector lengths. We need to make
-> -             * sure we didn't disable them all when SVE is enabled.
-> -             */
-> -            if (cpu_isar_feature(aa64_sve, cpu) &&
-> -                !arm_cpu_num_vqs_available(cpu)) {
-> -                error_setg(errp, "cannot disable %s", name);
-> -                error_append_hint(errp, "Disabling %s results in all vector "
-> -                                  "lengths being disabled.\n", name);
-> -                error_append_hint(errp, "With SVE enabled, at least one vector "
-> -                                  "length must be enabled.\n");
-> -            }
-> -        }
-> +        clear_bit(vq - 1, cpu->sve_vq_map);
->      }
-> +    set_bit(vq - 1, cpu->sve_vq_init);
->  }
->  
->  static void cpu_arm_get_sve(Object *obj, Visitor *v, const char *name,
-> @@ -702,32 +547,15 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
->      t = cpu->isar.id_aa64pfr0;
->      t = FIELD_DP64(t, ID_AA64PFR0, SVE, value);
->      cpu->isar.id_aa64pfr0 = t;
-> -
-> -    /*
-> -     * When SVE is enabled ensure that we have at least one vector
-> -     * length available.
-> -     */
-> -    if (cpu_isar_feature(aa64_sve, cpu) && !arm_cpu_num_vqs_available(cpu)) {
-> -        error_setg(errp, "cannot enable SVE");
-> -        error_append_hint(errp, "All possible SVE vector lengths have "
-> -                          "been disabled.\n");
-> -    }
->  }
->  
->  void aarch64_add_sve_properties(Object *obj)
->  {
-> -    ARMCPU *cpu = ARM_CPU(obj);
->      uint32_t vq;
->  
->      object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
->                          cpu_arm_set_sve, NULL, NULL, &error_fatal);
->  
-> -    /*
-> -     * sve_vq_map uses a special state while setting properties, so
-> -     * we initialize it here with its init function and finalize it
-> -     * in arm_cpu_realizefn().
-> -     */
-> -    arm_cpu_vq_map_init(cpu);
->      for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
->          char name[8];
->          sprintf(name, "sve%d", vq * 128);
-> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-> index e2d559c230..433cbe9b53 100644
-> --- a/target/arm/monitor.c
-> +++ b/target/arm/monitor.c
-> @@ -195,6 +195,9 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
->          if (!err) {
->              visit_check_struct(visitor, &err);
->          }
-> +        if (!err) {
-> +            arm_cpu_sve_finalize(ARM_CPU(obj), &err);
-> +        }
->          visit_end_struct(visitor, NULL);
->          visit_free(visitor);
->          if (err) {
-> @@ -202,6 +205,10 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
->              error_propagate(errp, err);
->              return NULL;
->          }
-> +    } else {
-> +        Error *err = NULL;
-> +        arm_cpu_sve_finalize(ARM_CPU(obj), &err);
-> +        assert(err == NULL);
->      }
-
-Should we already introduce a function that will collect all
-finalizers together now, rather than sprinkling around 
-arm_cpu_sve_finalize() calls? Something like
-
-void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
-{
-  arm_cpu_sve_finalize(cpu, errp);
-}
-
-Of course we can introduce it when/if we add other finalizers
-later, but I guess the vfp-neon finalizer should be coming
-soon anyway.
-
->  
->      expansion_info = g_new0(CpuModelExpansionInfo, 1);
-> -- 
-> 2.17.1
+> > 
+> > > > > + * in the region, so data_offset will always be non-0. Offset from where
+> > > > data
+> > > > > + * is copied is decided by kernel driver, data section can be trapped or
+> > > > > + * mapped or partitioned, depending on how kernel driver defines data
+> > > > section.
+> > > > > + * Data section partition can be defined as mapped by sparse mmap
+> > > > capability.
+> > > > > + * If mmapped, then data_offset should be page aligned, where as
+> > initial
+> > > > section
+> > > > > + * which contain vfio_device_migration_info structure might not end at
+> > > > offset
+> > > > > + * which is page aligned.
+> > > > > + * Data_offset can be same or different for device data and dirty pages
+> > > > bitmap.
+> > > > > + * Vendor driver should decide whether to partition data section and
+> > how
+> > > > to
+> > > > > + * partition the data section. Vendor driver should return data_offset
+> > > > > + * accordingly.
+> > >
+> > > Here lacks of high-level summary about how to differentiate reading device
+> > > state from reading dirty page bitmap, when both use the same interface
+> > > (data_offset) to convey information to user space.
+> > >
+> > > From below sequence example, looks reading device state is initiated by
+> > > reading pending_bytes, while reading dirty bitmap is marked by writing
+> > > start_pfn. In case of shared data region between two operations, they have
+> > > to be mutually-exclusive i.e. one must wait for the other to complete. Even
+> > > when the region is partitioned, data_offset itself could be raced if pending_
+> > > bytes and start_pfn are accessed at the same time. How do we expect the
+> > > application to cope with it? Isn't it too limiting with such design?
+> > >
+> > > Since you anyway invent different sets of fields for two operations, why not
+> > > forcing partitioned flavor and then introduce two data_offset fields for each
+> > > other? This way the application is free to intermix device state and dirty
+> > > page collection for whatever needs.
+> > 
+> > AIUI, it's the user's responsibility to consume the data they've
+> > asked to be provided before they perform the next operation, but the
+> > user can alternate between device state and dirty pages at will.  I
+> > agree though that the lifecycle of the data with regard to the vendor
+> > driver is lacking.  Nothing seems to indicate to the vendor driver that
+> > the data is consumed other than starting the next operation or turning
+> > off _SAVING.
+> > 
+> > > > > + *
+> > > > > + * Sequence to be followed for _SAVING|_RUNNING device state or
+> > pre-
+> > > > copy phase
+> > > > > + * and for _SAVING device state or stop-and-copy phase:
+> > > > > + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
+> > > > > + * b. read data_offset, indicates kernel driver to write data to staging
+> > > > buffer.
+> > > > > + * c. read data_size, amount of data in bytes written by vendor driver in
+> > > > > + *    migration region.
+> > > > > + * d. read data_size bytes of data from data_offset in the migration
+> > region.
+> > > > > + * e. process data.
+> > > > > + * f. Loop through a to e.
+> > > >
+> > > > Something needs to be said here about the availability of the data, for
+> > > > example, what indicates to the vendor driver that the above operation is
+> > > > complete?  Is the data immutable?
+> > >
+> > > I guess the vendor driver just continues to track pending_bytes for dirtied
+> > > device state, until exiting _SAVING state. Data is copied only when
+> > > pending_bytes is read by userspace. Copied data is immutable if data
+> > region
+> > > is mmapped. But yes, this part needs clarification.
+> > >
+> > > >
+> > > > > + *
+> > > > > + * To copy system memory content during migration, vendor driver
+> > should
+> > > > be able
+> > > > > + * to report system memory pages which are dirtied by that driver. For
+> > such
+> > > > > + * dirty page reporting, user application should query for a range of
+> > GFNs
+> > > > > + * relative to device address space (IOVA), then vendor driver should
+> > > > provide
+> > > > > + * the bitmap of pages from this range which are dirtied by him through
+> > > > > + * migration region where each bit represents a page and bit set to 1
+> > > > represents
+> > > > > + * that the page is dirty.
+> > > > > + * User space application should take care of copying content of system
+> > > > memory
+> > > > > + * for those pages.
+> > > >
+> > > > Can we say that device state and dirty pfn operations on the data
+> > > > area may be intermixed in any order the user chooses?
+> > >
+> > > this part is very opaque from previous description. Now I'm inclined to
+> > > vote for no-intermix design. There is really no good to force some
+> > > dependency between retrieving device state and dirty page bitmap.
+> > 
+> > I'm confused, the state of the device continues to change so long as it
+> > is _RUNNING.  The device may also continue to dirty pages in the
+> > _RUNNING state.  So how could we not have both occurring at the same
+> > time and therefore must support the user deciding which to sample in
+> > each iteration?
 > 
+> I may not make it clear. Actually I'm with you on that device state and
+> dirty pages are changed in parallel in the _RUNNING state. and two are
+> irrelevant by definition. Then why did we design an interface, as this
+> patch suggested, having two states sharing the same region thus forcing 
+> the application to manage unnecessary contention in-between? For
+> example, if the application creates two threads, with one to collect 
+> dirty page bitmaps and the other to dump device state, such design 
+> requires the application to protect the data region between two 
+> threads - one thread has to wait until the other drains the new state 
+> reported by kernel driver, otherwise the data region will be messed.
 > 
-
-Thanks,
-drew
+> On the other hand, if we explicitly design two sub-regions for device
+> state and dirty bitmap and split the control interface, two can
+> be enquired simultaneously. As earlier discussed, two states already
+> have most of their control fields separate except data_offset. Now 
+> just move one step further to have two data_offset, then two states
+> are completely decoupled and the application is lock-free to access 
+> any sub-region at any time.
+> 
+> > 
+> > > > Should we specify that bits accumulate since EITHER a) _SAVING state is
+> > > > enabled or b) a given pfn was last reported via the below sequence (ie.
+> > > > dirty bits are cleared once reported)?
+> > > >
+> > > > How does QEMU handle the fact that IOVAs are potentially dynamic while
+> > > > performing the live portion of a migration?  For example, each time a
+> > > > guest driver calls dma_map_page() or dma_unmap_page(), a
+> > > > MemoryRegionSection pops in or out of the AddressSpace for the device
+> > > > (I'm assuming a vIOMMU where the device AddressSpace is not
+> > > > system_memory).  I don't see any QEMU code that intercepts that change
+> > > > in the AddressSpace such that the IOVA dirty pfns could be recorded and
+> > > > translated to GFNs.  The vendor driver can't track these beyond getting
+> > > > an unmap notification since it only knows the IOVA pfns, which can be
+> > > > re-used with different GFN backing.  Once the DMA mapping is torn down,
+> > > > it seems those dirty pfns are lost in the ether.  If this works in QEMU,
+> > > > please help me find the code that handles it.
+> > >
+> > > I'm curious about this part too. Interestingly, I didn't find any log_sync
+> > > callback registered by emulated devices in Qemu. Looks dirty pages
+> > > by emulated DMAs are recorded in some implicit way. But KVM always
+> > > reports dirty page in GFN instead of IOVA, regardless of the presence of
+> > > vIOMMU. If Qemu also tracks dirty pages in GFN for emulated DMAs
+> > >  (translation can be done when DMA happens), then we don't need
+> > > worry about transient mapping from IOVA to GFN. Along this way we
+> > > also want GFN-based dirty bitmap being reported through VFIO,
+> > > similar to what KVM does. For vendor drivers, it needs to translate
+> > > from IOVA to HVA to GFN when tracking DMA activities on VFIO
+> > > devices. IOVA->HVA is provided by VFIO. for HVA->GFN, it can be
+> > > provided by KVM but I'm not sure whether it's exposed now.
+> > >
+> > > >
+> > > > > + *
+> > > > > + * Steps to get dirty page bitmap:
+> > > > > + * a. write start_pfn, page_size and total_pfns.
+> > > >
+> > > > This is not well specified.  Is it intended that the user write all
+> > > > three of these on every iteration, or could they write start_pfn=0,
+> > > > page_size=4K, total_pfns=1, complete the steps below, then write
+> > > > start_pfn=1 and immediately begin the next iteration?  They've written
+> > > > all three, though not all on the current iteration, does that count?
+> > > > Furthermore, could the user simple re-read copied_pfns to determine if
+> > > > anything in the previously setup range has been re-dirtied?
+> > > >
+> > > > IOW, are these three "registers" sticky or do the below operations
+> > > > invalidate them?  If they're invalidated, then there needs to be a
+> > > > mechanism to generate an error, such as below.
+> > > >
+> > > > > + * b. read copied_pfns. Vendor driver should take one of the below
+> > action:
+> > > > > + *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if
+> > > > driver
+> > > > > + *       doesn't have any page to report dirty in given range or rest of the
+> > > > > + *       range. Exit the loop.
+> > > > > + *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to
+> > mark
+> > > > all
+> > > > > + *       pages dirty for given range or rest of the range. User space
+> > > > > + *       application mark all pages in the range as dirty and exit the loop.
+> > > > > + *     - Vendor driver should return copied_pfns and provide bitmap for
+> > > > > + *       copied_pfn in migration region.
+> > > >
+> > > > Read returns errno if the pre-requisite registers are not valid?
+> > > >
+> > > > > + * c. read data_offset, where vendor driver has written bitmap.
+> > > > > + * d. read bitmap from the migration region from data_offset.
+> > > > > + * e. Iterate through steps a to d while (total copied_pfns < total_pfns)
+> > > >
+> > > > It seems like the intent here is that the user effectively does:
+> > > >
+> > > > start_pfn += copied_pfns
+> > > > total_pfns -= copied_pfns
+> > > > page_size = page_size?
+> > > >
+> > > > But are they under any obligation to do so?
+> > > >
+> > > > Also same question above regarding data availability/life-cycle.  Is
+> > > > the vendor driver responsible for making the data available
+> > > > indefinitely?  Seems it's only released at the next iteration, or
+> > > > re-use of the data area for another operation, or clearing of the
+> > > > _SAVING state bit.
+> > > >
+> > > > > + * Sequence to be followed while _RESUMING device state:
+> > > > > + * While data for this device is available, repeat below steps:
+> > > > > + * a. read data_offset from where user application should write data.
+> > > > > + * b. write data of data_size to migration region from data_offset.
+> > > > > + * c. write data_size which indicates vendor driver that data is written
+> > in
+> > > > > + *    staging buffer.
+> > > > > + *
+> > > > > + * For user application, data is opaque. User should write data in the
+> > same
+> > > > > + * order as received.
+> > > >
+> > > > Additionally, implicit synchronization between _SAVING and _RESUMING
+> > > > ends within the vendor driver is assumed.
+> > > >
+> > > > Are there any assumptions we haven't covered with respect to mmaps?
+> > > > For instance, can the user setup mmaps at any time or only during
+> > > > certain device states?  Are there recommended best practices for users
+> > > > to only setup mmaps during _SAVING or _RESUMING?  If we had a revoke
+> > > > mechanism, it might be nice to use it when either of these bits are
+> > > > cleared.  Thanks,
+> > >
+> > > another open for mmaps is how many pages to map. copied_pfns
+> > > carries only the number of copied pages. They scatter in the bitmap
+> > > while application doesn't know how long the bitmap is. Do we
+> > > expect the application to map pages one-by-one, until scanned
+> > > dirty pages is equal to copied_pfns?
+> > 
+> > I think we expect userspace to mmap according to the sparse mmap
+> > capability of the region.  The vendor driver then chooses whether to
+> > expose the current data set within the mmap region, outside the mmap
+> > region, or some mix of both, depending on their requirements.  Thanks,
+> 
+> Thanks, it makes sense.
+> 
+> > 
+> > Alex
+> > 
+> > > > > + */
+> > > > > +
+> > > > > +struct vfio_device_migration_info {
+> > > > > +        __u32 device_state;         /* VFIO device state */
+> > > > > +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
+> > > > > +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
+> > > > > +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
+> > > > > +#define VFIO_DEVICE_STATE_MASK
+> > (VFIO_DEVICE_STATE_RUNNING | \
+> > > > > +                                     VFIO_DEVICE_STATE_SAVING | \
+> > > > > +                                     VFIO_DEVICE_STATE_RESUMING)
+> > > > > +#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_SAVING
+> > | \
+> > > > > +                                     VFIO_DEVICE_STATE_RESUMING)
+> > > > > +        __u32 reserved;
+> > > > > +        __u64 pending_bytes;
+> > > > > +        __u64 data_offset;
+> > > > > +        __u64 data_size;
+> > > > > +        __u64 start_pfn;
+> > > > > +        __u64 page_size;
+> > > > > +        __u64 total_pfns;
+> > > > > +        __u64 copied_pfns;
+> > > > > +#define VFIO_DEVICE_DIRTY_PFNS_NONE     (0)
+> > > > > +#define VFIO_DEVICE_DIRTY_PFNS_ALL      (~0ULL)
+> > > > > +} __attribute__((packed));
+> > > > > +
+> > > > >  /*
+> > > > >   * The MSIX mappable capability informs that MSIX data of a BAR can
+> > be
+> > > > mmapped
+> > > > >   * which allows direct access to non-MSIX registers which happened to
+> > be
+> > > > within
+> > >
+> 
 
