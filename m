@@ -2,84 +2,61 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D05C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:25:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 372FAC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:26:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A41FC20449
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:25:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UMnStrVY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41FC20449
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0A3F520449
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:26:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A3F520449
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cmG-0006rA-WD
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:25:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52901)
+	id 1i5cna-0000Dm-Gd
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:26:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5c9d-0006Je-UJ
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:27 -0400
+ (envelope-from <clg@kaod.org>) id 1i5cBd-0008EJ-53
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5c9b-0006sI-Dg
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:25 -0400
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:36736)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5c9b-0006rb-4w
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:23 -0400
-Received: by mail-pf1-x430.google.com with SMTP id y22so42968pfr.3
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=slEwt35AByzjU9Ubr6zMEmDVhlGjx8ZzwD/PYybphKw=;
- b=UMnStrVYvd/RNYanNLDF9REk42LeewIj8RBhxFMm9wS+KyxQXrllGOm/d7j+khGdLg
- dPbbRfM+mqAjUsJzOQ8HOrZHxnlo4VMvUlFc7ju/SfaQ3FuDCt4d6cpJ0qKL84GKPOc9
- INq0MxB/BJENzLalp6LH7QTtPhz9QPksOOaViLI+gO/Lf/swUphHGUqptg7Qsgj56BZF
- qeVnN0WsCKz3jwM9M648Vj4WYIYPnMEQU6f7fA0zLgbAsxnKGLZlXwaVR2PK0JDlHTgZ
- MRClU4ITUO+s2WhBE3PwfU4pBOqQ4wCQyXJliw+IGVnMDI7Jx5t9Es7lDIYZ1WAmfKS+
- uaBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=slEwt35AByzjU9Ubr6zMEmDVhlGjx8ZzwD/PYybphKw=;
- b=eSF20GWxQknqJ217zn8c32mqd2CGA+2HxjgycFceHZRMvIke5uTLcxWNJSUeLsP0J8
- iaHnkwsJXCF8N6OFHuWoW6HNwytivk+qsvCydNwpj6s9FLoBjVdZ32LU2JLqaAJSMwO+
- DuDWF4moFz457ya3zoSF3ALY9Bf4Wej0NhcGXJRY62LZapK3Wm/G71e8t26AgPz60urj
- w/zC1MQhkqNDsW0JZHksExzL5veEprncOggJBnhd7hTqeHc577PHXfcDHcQ71k28nztD
- UxFhVN2399GU+rVxg6HydhO+hg/cLjEmbQH/8dDjL8tBz51wXaNCGyZ5I27z3G/yhWnN
- NQAA==
-X-Gm-Message-State: APjAAAWg3JJpQ7jP0S01NtR7HR9BNkddlsFmDxy5s9FkdUhr9dRP0ITf
- w4OQlOiboxBpPLSZhDnzPP7rKunOWIc=
-X-Google-Smtp-Source: APXvYqyyA0nIi9efCgUCgecygo2myZ3ti58mF5EZbcBFW6PnwpSrP4aFvHTyEhdB6avFnLMV7AAbqg==
-X-Received: by 2002:aa7:93a8:: with SMTP id x8mr15781391pff.151.1567629921841; 
- Wed, 04 Sep 2019 13:45:21 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id n66sm8104610pfn.90.2019.09.04.13.45.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:45:20 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 13:45:04 -0700
-Message-Id: <20190904204507.32457-11-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190904204507.32457-1-richard.henderson@linaro.org>
-References: <20190904204507.32457-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::430
-Subject: [Qemu-devel] [PULL 10/13] target/openrisc: Implement unordered fp
- comparisons
+ (envelope-from <clg@kaod.org>) id 1i5cBb-0000lS-KF
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:29 -0400
+Received: from 15.mo6.mail-out.ovh.net ([188.165.39.161]:56049)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5cBb-0000kY-Cx
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:27 -0400
+Received: from player691.ha.ovh.net (unknown [10.109.143.246])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id A5AE71DE909
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 22:47:25 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player691.ha.ovh.net (Postfix) with ESMTPSA id E83EE98B27DC;
+ Wed,  4 Sep 2019 20:47:18 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed,  4 Sep 2019 22:46:46 +0200
+Message-Id: <20190904204659.13878-3-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190904204659.13878-1-clg@kaod.org>
+References: <20190904204659.13878-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 2512164171111303953
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejhedgudehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 188.165.39.161
+Subject: [Qemu-devel] [RFC PATCH 02/15] aspeed/timer: Introduce an object
+ class per SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,259 +68,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These were added to the 1.3 spec.  For OF32S, validate AVR.
-But OF64A32 is itself new to 1.3 so no extra check needed.
+It prepares ground for register differences between SoCs.
 
-Reviewed-by: Stafford Horne <shorne@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/openrisc/helper.h     |  4 ++
- target/openrisc/disas.c      | 24 ++++++++++
- target/openrisc/fpu_helper.c | 20 +++++++++
- target/openrisc/translate.c  | 85 ++++++++++++++++++++++++++++++++++++
- target/openrisc/insns.decode | 12 +++++
- 5 files changed, 145 insertions(+)
+ include/hw/timer/aspeed_timer.h |  15 +++++
+ hw/arm/aspeed_soc.c             |   3 +-
+ hw/timer/aspeed_timer.c         | 107 ++++++++++++++++++++++++++++----
+ 3 files changed, 113 insertions(+), 12 deletions(-)
 
-diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
-index 94b823580e..d847814a28 100644
---- a/target/openrisc/helper.h
-+++ b/target/openrisc/helper.h
-@@ -52,6 +52,10 @@ DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_RWG, tl, env, i64, i64)
- FOP_CMP(eq)
- FOP_CMP(lt)
- FOP_CMP(le)
-+FOP_CMP(un)
-+FOP_CMP(ueq)
-+FOP_CMP(ule)
-+FOP_CMP(ult)
- #undef FOP_CMP
- 
- /* interrupt */
-diff --git a/target/openrisc/disas.c b/target/openrisc/disas.c
-index 4de5c632de..e51cbb24c6 100644
---- a/target/openrisc/disas.c
-+++ b/target/openrisc/disas.c
-@@ -166,6 +166,12 @@ FP_INSN(sfgt, s, "r%d, r%d", a->a, a->b)
- FP_INSN(sfge, s, "r%d, r%d", a->a, a->b)
- FP_INSN(sflt, s, "r%d, r%d", a->a, a->b)
- FP_INSN(sfle, s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfun, s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfueq, s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfuge, s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfugt, s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfule, s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfult, s, "r%d, r%d", a->a, a->b)
- 
- FP_INSN(add, d,  "r%d,r%d, r%d,r%d, r%d,r%d",
-         a->d, a->d + a->dp + 1,
-@@ -222,3 +228,21 @@ FP_INSN(sflt, d, "r%d,r%d, r%d,r%d",
- FP_INSN(sfle, d, "r%d,r%d, r%d,r%d",
-         a->a, a->a + a->ap + 1,
-         a->b, a->b + a->bp + 1)
-+FP_INSN(sfun, d, "r%d,r%d, r%d,r%d",
-+        a->a, a->a + a->ap + 1,
-+        a->b, a->b + a->bp + 1)
-+FP_INSN(sfueq, d, "r%d,r%d, r%d,r%d",
-+        a->a, a->a + a->ap + 1,
-+        a->b, a->b + a->bp + 1)
-+FP_INSN(sfuge, d, "r%d,r%d, r%d,r%d",
-+        a->a, a->a + a->ap + 1,
-+        a->b, a->b + a->bp + 1)
-+FP_INSN(sfugt, d, "r%d,r%d, r%d,r%d",
-+        a->a, a->a + a->ap + 1,
-+        a->b, a->b + a->bp + 1)
-+FP_INSN(sfule, d, "r%d,r%d, r%d,r%d",
-+        a->a, a->a + a->ap + 1,
-+        a->b, a->b + a->bp + 1)
-+FP_INSN(sfult, d, "r%d,r%d, r%d,r%d",
-+        a->a, a->a + a->ap + 1,
-+        a->b, a->b + a->bp + 1)
-diff --git a/target/openrisc/fpu_helper.c b/target/openrisc/fpu_helper.c
-index 9d7dfc0fb9..7bcef9dc53 100644
---- a/target/openrisc/fpu_helper.c
-+++ b/target/openrisc/fpu_helper.c
-@@ -135,4 +135,24 @@ target_ulong helper_float_ ## name ## _s(CPUOpenRISCState *env,           \
- FLOAT_CMP(le, le)
- FLOAT_CMP(lt, lt)
- FLOAT_CMP(eq, eq_quiet)
-+FLOAT_CMP(un, unordered_quiet)
- #undef FLOAT_CMP
+diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_ti=
+mer.h
+index 1fb949e16710..a791fee276f4 100644
+--- a/include/hw/timer/aspeed_timer.h
++++ b/include/hw/timer/aspeed_timer.h
+@@ -28,6 +28,9 @@
+ #define ASPEED_TIMER(obj) \
+     OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER);
+ #define TYPE_ASPEED_TIMER "aspeed.timer"
++#define TYPE_ASPEED_2400_TIMER TYPE_ASPEED_TIMER "-ast2400"
++#define TYPE_ASPEED_2500_TIMER TYPE_ASPEED_TIMER "-ast2500"
 +
-+#define FLOAT_UCMP(name, expr) \
-+target_ulong helper_float_ ## name ## _d(CPUOpenRISCState *env,           \
-+                                         uint64_t fdt0, uint64_t fdt1)    \
-+{                                                                         \
-+    int r = float64_compare_quiet(fdt0, fdt1, &env->fp_status);           \
-+    return expr;                                                          \
-+}                                                                         \
-+target_ulong helper_float_ ## name ## _s(CPUOpenRISCState *env,           \
-+                                         uint32_t fdt0, uint32_t fdt1)    \
-+{                                                                         \
-+    int r = float32_compare_quiet(fdt0, fdt1, &env->fp_status);           \
-+    return expr;                                                          \
-+}
+ #define ASPEED_TIMER_NR_TIMERS 8
+=20
+ typedef struct AspeedTimer {
+@@ -60,4 +63,16 @@ typedef struct AspeedTimerCtrlState {
+     AspeedSCUState *scu;
+ } AspeedTimerCtrlState;
+=20
++#define ASPEED_TIMER_CLASS(klass) \
++     OBJECT_CLASS_CHECK(AspeedTimerClass, (klass), TYPE_ASPEED_TIMER)
++#define ASPEED_TIMER_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(AspeedTimerClass, (obj), TYPE_ASPEED_TIMER)
 +
-+FLOAT_UCMP(ueq, r == float_relation_equal || r == float_relation_unordered)
-+FLOAT_UCMP(ult, r == float_relation_less || r == float_relation_unordered)
-+FLOAT_UCMP(ule, r != float_relation_greater)
-+#undef FLOAT_UCMP
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index b8ef485903..6e8bc23568 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -46,6 +46,7 @@ typedef struct DisasContext {
-     uint32_t tb_flags;
-     uint32_t delayed_branch;
-     uint32_t cpucfgr;
-+    uint32_t avr;
- 
-     /* If not -1, jmp_pc contains this value and so is a direct jump.  */
-     target_ulong jmp_pc_imm;
-@@ -141,6 +142,11 @@ static void gen_illegal_exception(DisasContext *dc)
-     dc->base.is_jmp = DISAS_NORETURN;
++typedef struct AspeedTimerClass {
++    SysBusDeviceClass parent_class;
++
++    uint64_t (*read)(AspeedTimerCtrlState *s, hwaddr offset);
++    void (*write)(AspeedTimerCtrlState *s, hwaddr offset, uint64_t value=
+);
++} AspeedTimerClass;
++
+ #endif /* ASPEED_TIMER_H */
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index c3821a562733..26e03486f9b7 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -182,8 +182,9 @@ static void aspeed_soc_init(Object *obj)
+     sysbus_init_child_obj(obj, "rtc", OBJECT(&s->rtc), sizeof(s->rtc),
+                           TYPE_ASPEED_RTC);
+=20
++    snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
+     sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
+-                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
++                          sizeof(s->timerctrl), typename);
+     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
+                                    OBJECT(&s->scu), &error_abort);
+=20
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index 2bda826882d9..c78bc1bd2d25 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -253,13 +253,8 @@ static uint64_t aspeed_timer_read(void *opaque, hwad=
+dr offset, unsigned size)
+     case 0x40 ... 0x8c: /* Timers 5 - 8 */
+         value =3D aspeed_timer_get_value(&s->timers[(offset >> 4) - 1], =
+reg);
+         break;
+-    /* Illegal */
+-    case 0x38:
+-    case 0x3C:
+     default:
+-        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
+-                __func__, offset);
+-        value =3D 0;
++        value =3D ASPEED_TIMER_GET_CLASS(s)->read(s, offset);
+         break;
+     }
+     trace_aspeed_timer_read(offset, size, value);
+@@ -453,12 +448,8 @@ static void aspeed_timer_write(void *opaque, hwaddr =
+offset, uint64_t value,
+     case 0x40 ... 0x8c:
+         aspeed_timer_set_value(s, (offset >> TIMER_NR_REGS) - 1, reg, tv=
+);
+         break;
+-    /* Illegal */
+-    case 0x38:
+-    case 0x3C:
+     default:
+-        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
+-                __func__, offset);
++        ASPEED_TIMER_GET_CLASS(s)->write(s, offset, value);
+         break;
+     }
  }
- 
-+static bool check_v1_3(DisasContext *dc)
+@@ -472,6 +463,64 @@ static const MemoryRegionOps aspeed_timer_ops =3D {
+     .valid.unaligned =3D false,
+ };
+=20
++static uint64_t aspeed_2400_timer_read(AspeedTimerCtrlState *s, hwaddr o=
+ffset)
 +{
-+    return dc->avr >= 0x01030000;
++    uint64_t value;
++
++    switch (offset) {
++    case 0x38:
++    case 0x3C:
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
++                __func__, offset);
++        value =3D 0;
++        break;
++    }
++    return value;
 +}
 +
- static bool check_of32s(DisasContext *dc)
++static void aspeed_2400_timer_write(AspeedTimerCtrlState *s, hwaddr offs=
+et,
++                                    uint64_t value)
++{
++    switch (offset) {
++    case 0x38:
++    case 0x3C:
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
++                __func__, offset);
++        break;
++    }
++}
++
++static uint64_t aspeed_2500_timer_read(AspeedTimerCtrlState *s, hwaddr o=
+ffset)
++{
++    uint64_t value;
++
++    switch (offset) {
++    case 0x38:
++    case 0x3C:
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
++                __func__, offset);
++        value =3D 0;
++        break;
++    }
++    return value;
++}
++
++static void aspeed_2500_timer_write(AspeedTimerCtrlState *s, hwaddr offs=
+et,
++                                    uint64_t value)
++{
++    switch (offset) {
++    case 0x38:
++    case 0x3C:
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
++                __func__, offset);
++        break;
++    }
++}
++
+ static void aspeed_init_one_timer(AspeedTimerCtrlState *s, uint8_t id)
  {
-     return dc->cpucfgr & CPUCFGR_OF32S;
-@@ -1265,6 +1271,54 @@ static bool trans_lf_sfle_s(DisasContext *dc, arg_ab *a)
-     return do_fpcmp(dc, a, gen_helper_float_le_s, false, false);
+     AspeedTimer *t =3D &s->timers[id];
+@@ -570,11 +619,47 @@ static const TypeInfo aspeed_timer_info =3D {
+     .parent =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(AspeedTimerCtrlState),
+     .class_init =3D timer_class_init,
++    .class_size =3D sizeof(AspeedTimerClass),
++    .abstract   =3D true,
++};
++
++static void aspeed_2400_timer_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    AspeedTimerClass *awc =3D ASPEED_TIMER_CLASS(klass);
++
++    dc->desc =3D "ASPEED 2400 Timer";
++    awc->read =3D aspeed_2400_timer_read;
++    awc->write =3D aspeed_2400_timer_write;
++}
++
++static const TypeInfo aspeed_2400_timer_info =3D {
++    .name =3D TYPE_ASPEED_2400_TIMER,
++    .parent =3D TYPE_ASPEED_TIMER,
++    .class_init =3D aspeed_2400_timer_class_init,
++};
++
++static void aspeed_2500_timer_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    AspeedTimerClass *awc =3D ASPEED_TIMER_CLASS(klass);
++
++    dc->desc =3D "ASPEED 2500 Timer";
++    awc->read =3D aspeed_2500_timer_read;
++    awc->write =3D aspeed_2500_timer_write;
++}
++
++static const TypeInfo aspeed_2500_timer_info =3D {
++    .name =3D TYPE_ASPEED_2500_TIMER,
++    .parent =3D TYPE_ASPEED_TIMER,
++    .class_init =3D aspeed_2500_timer_class_init,
+ };
+=20
+ static void aspeed_timer_register_types(void)
+ {
+     type_register_static(&aspeed_timer_info);
++    type_register_static(&aspeed_2400_timer_info);
++    type_register_static(&aspeed_2500_timer_info);
  }
- 
-+static bool trans_lf_sfueq_s(DisasContext *dc, arg_ab *a)
-+{
-+    if (!check_v1_3(dc)) {
-+        return false;
-+    }
-+    return do_fpcmp(dc, a, gen_helper_float_ueq_s, false, false);
-+}
-+
-+static bool trans_lf_sfult_s(DisasContext *dc, arg_ab *a)
-+{
-+    if (!check_v1_3(dc)) {
-+        return false;
-+    }
-+    return do_fpcmp(dc, a, gen_helper_float_ult_s, false, false);
-+}
-+
-+static bool trans_lf_sfugt_s(DisasContext *dc, arg_ab *a)
-+{
-+    if (!check_v1_3(dc)) {
-+        return false;
-+    }
-+    return do_fpcmp(dc, a, gen_helper_float_ult_s, false, true);
-+}
-+
-+static bool trans_lf_sfule_s(DisasContext *dc, arg_ab *a)
-+{
-+    if (!check_v1_3(dc)) {
-+        return false;
-+    }
-+    return do_fpcmp(dc, a, gen_helper_float_ule_s, false, false);
-+}
-+
-+static bool trans_lf_sfuge_s(DisasContext *dc, arg_ab *a)
-+{
-+    if (!check_v1_3(dc)) {
-+        return false;
-+    }
-+    return do_fpcmp(dc, a, gen_helper_float_ule_s, false, true);
-+}
-+
-+static bool trans_lf_sfun_s(DisasContext *dc, arg_ab *a)
-+{
-+    if (!check_v1_3(dc)) {
-+        return false;
-+    }
-+    return do_fpcmp(dc, a, gen_helper_float_un_s, false, false);
-+}
-+
- static bool check_pair(DisasContext *dc, int r, int p)
- {
-     return r + 1 + p < 32;
-@@ -1490,6 +1544,36 @@ static bool trans_lf_sfle_d(DisasContext *dc, arg_ab_pair *a)
-     return do_dpcmp(dc, a, gen_helper_float_le_d, false, false);
- }
- 
-+static bool trans_lf_sfueq_d(DisasContext *dc, arg_ab_pair *a)
-+{
-+    return do_dpcmp(dc, a, gen_helper_float_ueq_d, false, false);
-+}
-+
-+static bool trans_lf_sfule_d(DisasContext *dc, arg_ab_pair *a)
-+{
-+    return do_dpcmp(dc, a, gen_helper_float_ule_d, false, false);
-+}
-+
-+static bool trans_lf_sfuge_d(DisasContext *dc, arg_ab_pair *a)
-+{
-+    return do_dpcmp(dc, a, gen_helper_float_ule_d, false, true);
-+}
-+
-+static bool trans_lf_sfult_d(DisasContext *dc, arg_ab_pair *a)
-+{
-+    return do_dpcmp(dc, a, gen_helper_float_ult_d, false, false);
-+}
-+
-+static bool trans_lf_sfugt_d(DisasContext *dc, arg_ab_pair *a)
-+{
-+    return do_dpcmp(dc, a, gen_helper_float_ult_d, false, true);
-+}
-+
-+static bool trans_lf_sfun_d(DisasContext *dc, arg_ab_pair *a)
-+{
-+    return do_dpcmp(dc, a, gen_helper_float_un_d, false, false);
-+}
-+
- static void openrisc_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcb, DisasContext, base);
-@@ -1500,6 +1584,7 @@ static void openrisc_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
-     dc->tb_flags = dc->base.tb->flags;
-     dc->delayed_branch = (dc->tb_flags & TB_FLAGS_DFLAG) != 0;
-     dc->cpucfgr = env->cpucfgr;
-+    dc->avr = env->avr;
-     dc->jmp_pc_imm = -1;
- 
-     bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
-diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
-index 334d4e9668..71e0d740db 100644
---- a/target/openrisc/insns.decode
-+++ b/target/openrisc/insns.decode
-@@ -190,6 +190,12 @@ lf_sfgt_s       110010 ----- a:5 b:5 --- 00001010
- lf_sfge_s       110010 ----- a:5 b:5 --- 00001011
- lf_sflt_s       110010 ----- a:5 b:5 --- 00001100
- lf_sfle_s       110010 ----- a:5 b:5 --- 00001101
-+lf_sfueq_s      110010 ----- a:5 b:5 --- 00101000
-+lf_sfuge_s      110010 ----- a:5 b:5 --- 00101011
-+lf_sfugt_s      110010 ----- a:5 b:5 --- 00101010
-+lf_sfule_s      110010 ----- a:5 b:5 --- 00101101
-+lf_sfult_s      110010 ----- a:5 b:5 --- 00101100
-+lf_sfun_s       110010 ----- a:5 b:5 --- 00101110
- 
- ####
- # DP Instructions
-@@ -218,3 +224,9 @@ lf_sfgt_d       110010 00000 ..... ..... 0.. 00011010  @ab_pair
- lf_sfge_d       110010 00000 ..... ..... 0.. 00011011  @ab_pair
- lf_sflt_d       110010 00000 ..... ..... 0.. 00011100  @ab_pair
- lf_sfle_d       110010 00000 ..... ..... 0.. 00011101  @ab_pair
-+lf_sfueq_d      110010 00000 ..... ..... 0.. 00111000  @ab_pair
-+lf_sfuge_d      110010 00000 ..... ..... 0.. 00111011  @ab_pair
-+lf_sfugt_d      110010 00000 ..... ..... 0.. 00111010  @ab_pair
-+lf_sfule_d      110010 00000 ..... ..... 0.. 00111101  @ab_pair
-+lf_sfult_d      110010 00000 ..... ..... 0.. 00111100  @ab_pair
-+lf_sfun_d       110010 00000 ..... ..... 0.. 00111110  @ab_pair
--- 
-2.17.1
+=20
+ type_init(aspeed_timer_register_types)
+--=20
+2.21.0
 
 
