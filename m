@@ -2,56 +2,78 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_ADSP_NXDOMAIN,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 640A1C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B0BC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:01:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D8802073F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:58:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D8802073F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.con
+	by mail.kernel.org (Postfix) with ESMTPS id 7D1372073F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:01:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="muFZCFOT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D1372073F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Us4-0008Vm-A5
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 08:58:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47918)
+	id 1i5UuO-00010M-4n
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:01:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqu-0004s5-Db
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:26 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1i5UpX-0006QI-Di
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqs-00008W-JW
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:24 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:40566)
+ (envelope-from <damien.hedde@greensocs.com>) id 1i5UpW-0005WF-5K
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:56:11 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:45856)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.con>)
- id 1i5Rqm-0008Po-VN; Wed, 04 Sep 2019 05:45:17 -0400
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1i5UpS-0005St-NB; Wed, 04 Sep 2019 08:56:07 -0400
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id C467A96F5D;
- Wed,  4 Sep 2019 09:38:54 +0000 (UTC)
-From: damien.hedde@greensocs.con
+ by beetle.greensocs.com (Postfix) with ESMTPS id E8D4B96F65;
+ Wed,  4 Sep 2019 12:56:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1567601764;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=1+QpTuKPzLpqWk6K/fjFevUQyfLtfTdEWCHGyh/r7YE=;
+ b=muFZCFOTKGhiD0N4ppTsXwIsQbYUu0McDe43x77pZmOBHEekxahMyP+r90uF19NeIt2B0L
+ bNmxw5ZQ2ggyuaQJ4Z4b9eB/5KtVNzQqIekBHiv6dvzG1eR4qnDCyHJiV8cr/B650K13hC
+ /bRIGtZYp45UeXpMogUhCNJLrAs34+c=
+From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 11:38:41 +0200
-Message-Id: <20190904093843.8765-8-damien.hedde@greensocs.con>
+Date: Wed,  4 Sep 2019 14:55:22 +0200
+Message-Id: <20190904125531.27545-1-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190904093843.8765-1-damien.hedde@greensocs.con>
-References: <20190904093843.8765-1-damien.hedde@greensocs.con>
 MIME-Version: 1.0
-X-Spam: Yes
+Content-Type: text/plain; charset=UTF-8
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1567601764;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=1+QpTuKPzLpqWk6K/fjFevUQyfLtfTdEWCHGyh/r7YE=;
+ b=q1VbuwFVd6CqvwaWkDQHtFJYFTZCJF3JClFXLFu6y7x3R0sgk2gl7c3enyG2WO/cV+dA+d
+ B+VsNEhnJx/aZ3JCkWLdh/F7o4p0unBVYlWjMeJL2kWsWRebFUuZWTzbCU0uBYBsc5FxKT
+ vGg6iuDSBsD+fuqpcBoXQ8TJwZfC+Pk=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1567601764; a=rsa-sha256; cv=none;
+ b=oCRTpWdqjcJM76aUF9NVb35JPTQz2A9NM4uHSLXwDgsDpRPYuboeldaRQ4veiUO3fraWBv
+ 0qykfxbpQPaPOCW7XQCiyraW5WP/7oMcTQo4wimjblIVNbxsT04khRbGa2nHIOXtcZfZTe
+ UwPsbwy67XwR9x7s7wyfgF7ABMdmo/k=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
-X-Mailman-Approved-At: Wed, 04 Sep 2019 08:47:47 -0400
-Subject: [Qemu-devel] [PATCH v6 7/9] hw/misc/zynq_slcr: add clock generation
- for uarts
+Subject: [Qemu-devel] [PATCH v6 0/9] Clock framework API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,245 +93,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Damien Hedde <damien.hedde@greensocs.com>
+This series aims to add a way to model clock distribution in qemu. This a=
+llows
+to model the clock tree of a platform allowing us to inspect clock
+configuration and detect problems such as disabled clock or bad configure=
+d
+pll.
 
-Switch the slcr to multi-phase reset and add some clocks:
-+ the main input clock (ps_clk)
-+ the reference clock outputs for each uart (uart0 & 1)
+The added clock api is very similar the the gpio api for devices. We can =
+add
+input and output and connect them together.
 
-The clock frequencies are computed using the internal pll & uart configur=
-ation
-registers and the ps_clk frequency.
+Very few changes since v5 in the core patches: we were waiting for multi =
+phase
+ability to allow proper initialization of the clock tree. So this is almo=
+st a
+simple rebase on top of the current "Multi-phase reset mechanism" series.
+Based-on: <20190821163341.16309-1-damien.hedde@greensocs.com>
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
----
- hw/misc/zynq_slcr.c | 145 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 142 insertions(+), 3 deletions(-)
+Changes since v5:
+ - drop the "-port" in file names
+ - new patch 2, extracted from patch 1 (to fix some problem with linux-us=
+er builds)
+ - patch 3, minor modification to better match gpios api and allow non de=
+vice-related clock
+   (I've dropped the reviewed-by, see the patch message for the details o=
+f what has changed).
+ - patch 6, Philippe's comments and various improvement
+ - patches 7/8/9, multi-phase reset addition and scope reduced to uart re=
+f clocks
 
-diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
-index b9a38272d9..fa2ac608eb 100644
---- a/hw/misc/zynq_slcr.c
-+++ b/hw/misc/zynq_slcr.c
-@@ -22,6 +22,7 @@
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "hw/registerfields.h"
-+#include "hw/qdev-clock.h"
-=20
- #ifndef ZYNQ_SLCR_ERR_DEBUG
- #define ZYNQ_SLCR_ERR_DEBUG 0
-@@ -45,6 +46,12 @@ REG32(LOCKSTA, 0x00c)
- REG32(ARM_PLL_CTRL, 0x100)
- REG32(DDR_PLL_CTRL, 0x104)
- REG32(IO_PLL_CTRL, 0x108)
-+/* fields for [ARM|DDR|IO]_PLL_CTRL registers */
-+    FIELD(xxx_PLL_CTRL, PLL_RESET, 0, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_PWRDWN, 1, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_BYPASS_QUAL, 3, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_BYPASS_FORCE, 4, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_FPDIV, 12, 7)
- REG32(PLL_STATUS, 0x10c)
- REG32(ARM_PLL_CFG, 0x110)
- REG32(DDR_PLL_CFG, 0x114)
-@@ -64,6 +71,10 @@ REG32(SMC_CLK_CTRL, 0x148)
- REG32(LQSPI_CLK_CTRL, 0x14c)
- REG32(SDIO_CLK_CTRL, 0x150)
- REG32(UART_CLK_CTRL, 0x154)
-+    FIELD(UART_CLK_CTRL, CLKACT0, 0, 1)
-+    FIELD(UART_CLK_CTRL, CLKACT1, 1, 1)
-+    FIELD(UART_CLK_CTRL, SRCSEL,  4, 2)
-+    FIELD(UART_CLK_CTRL, DIVISOR, 8, 6)
- REG32(SPI_CLK_CTRL, 0x158)
- REG32(CAN_CLK_CTRL, 0x15c)
- REG32(CAN_MIOCLK_CTRL, 0x160)
-@@ -179,11 +190,106 @@ typedef struct ZynqSLCRState {
-     MemoryRegion iomem;
-=20
-     uint32_t regs[ZYNQ_SLCR_NUM_REGS];
-+
-+    ClockIn *ps_clk;
-+    ClockOut *uart0_ref_clk;
-+    ClockOut *uart1_ref_clk;
- } ZynqSLCRState;
-=20
--static void zynq_slcr_reset(DeviceState *d)
-+/*
-+ * return the output frequency of ARM/DDR/IO pll
-+ * using input frequency and PLL_CTRL register
-+ */
-+static uint64_t zynq_slcr_compute_pll(uint64_t input, uint32_t ctrl_reg)
-+{
-+    uint32_t mult =3D ((ctrl_reg & R_xxx_PLL_CTRL_PLL_FPDIV_MASK) >>
-+            R_xxx_PLL_CTRL_PLL_FPDIV_SHIFT);
-+
-+    /* first, check if pll is bypassed */
-+    if (ctrl_reg & R_xxx_PLL_CTRL_PLL_BYPASS_FORCE_MASK) {
-+        return input;
-+    }
-+
-+    /* is pll disabled ? */
-+    if (ctrl_reg & (R_xxx_PLL_CTRL_PLL_RESET_MASK |
-+                    R_xxx_PLL_CTRL_PLL_PWRDWN_MASK)) {
-+        return 0;
-+    }
-+
-+    return input * mult;
-+}
-+
-+/*
-+ * return the output frequency of a clock given:
-+ * + the frequencies in an array corresponding to mux's indexes
-+ * + the register xxx_CLK_CTRL value
-+ * + enable bit index in ctrl register
-+ *
-+ * This function make the assumption that ctrl_reg value is organized as=
- follow:
-+ * + bits[13:8] clock divisor
-+ * + bits[5:4]  clock mux selector (index in array)
-+ * + bits[index] clock enable
-+ */
-+static uint64_t zynq_slcr_compute_clock(const uint64_t mux[],
-+                                        uint32_t ctrl_reg,
-+                                        unsigned index)
-+{
-+    uint32_t srcsel =3D extract32(ctrl_reg, 4, 2); /* bits [5:4] */
-+    uint32_t divisor =3D extract32(ctrl_reg, 8, 6); /* bits [13:8] */
-+
-+    /* first, check if clock is enabled */
-+    if (((ctrl_reg >> index) & 1u) =3D=3D 0) {
-+        return 0;
-+    }
-+
-+    /*
-+     * according to the Zynq technical ref. manual UG585 v1.12.2 in
-+     * "Clocks" chapter, section 25.10.1 page 705" the range of the divi=
-sor
-+     * is [1;63].
-+     * So divide the source while avoiding division-by-zero.
-+     */
-+    return mux[srcsel] / (divisor ? divisor : 1u);
-+}
-+
-+/*
-+ * macro helper around zynq_slcr_compute_clock to avoid repeating
-+ * the register name.
-+ */
-+#define ZYNQ_COMPUTE_CLOCK(_state, _plls, _reg, _enable_field) \
-+    zynq_slcr_compute_clock((_plls), (_state)->regs[R_ ## _reg], \
-+            R_ ## _reg ## _ ## _enable_field ## _SHIFT)
-+
-+static void zynq_slcr_compute_clocks(ZynqSLCRState *s)
-+{
-+    uint64_t ps_clk =3D clock_get_frequency(s->ps_clk);
-+
-+    /* consider all output clocks are disabled while in reset */
-+    if (device_is_resetting(DEVICE(s))) {
-+        ps_clk =3D 0;
-+    }
-+
-+    uint64_t io_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_IO_PLL_C=
-TRL]);
-+    uint64_t arm_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_ARM_PLL=
-_CTRL]);
-+    uint64_t ddr_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_DDR_PLL=
-_CTRL]);
-+
-+    uint64_t uart_mux[4] =3D {io_pll, io_pll, arm_pll, ddr_pll};
-+
-+    /* compute uartX reference clocks */
-+    clock_set_frequency(s->uart0_ref_clk,
-+            ZYNQ_COMPUTE_CLOCK(s, uart_mux, UART_CLK_CTRL, CLKACT0));
-+    clock_set_frequency(s->uart1_ref_clk,
-+            ZYNQ_COMPUTE_CLOCK(s, uart_mux, UART_CLK_CTRL, CLKACT1));
-+}
-+
-+static void zynq_slcr_ps_clk_callback(void *opaque)
-+{
-+    ZynqSLCRState *s =3D (ZynqSLCRState *) opaque;
-+    zynq_slcr_compute_clocks(s);
-+}
-+
-+static void zynq_slcr_reset_init(Object *obj, ResetType type)
- {
--    ZynqSLCRState *s =3D ZYNQ_SLCR(d);
-+    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-     int i;
-=20
-     DB_PRINT("RESET\n");
-@@ -277,6 +383,21 @@ static void zynq_slcr_reset(DeviceState *d)
-     s->regs[R_DDRIOB + 12] =3D 0x00000021;
- }
-=20
-+static void zynq_slcr_reset_hold(Object *obj)
-+{
-+    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-+
-+    /* will disable all output clocks */
-+    zynq_slcr_compute_clocks(s);
-+}
-+
-+static void zynq_slcr_reset_exit(Object *obj)
-+{
-+    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-+
-+    /* will compute output clocks according to ps_clk and registers */
-+    zynq_slcr_compute_clocks(s);
-+}
-=20
- static bool zynq_slcr_check_offset(hwaddr offset, bool rnw)
- {
-@@ -409,6 +530,12 @@ static void zynq_slcr_write(void *opaque, hwaddr off=
-set,
-             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-         }
-         break;
-+    case R_IO_PLL_CTRL:
-+    case R_ARM_PLL_CTRL:
-+    case R_DDR_PLL_CTRL:
-+    case R_UART_CLK_CTRL:
-+        zynq_slcr_compute_clocks(s);
-+        break;
-     }
- }
-=20
-@@ -418,6 +545,13 @@ static const MemoryRegionOps slcr_ops =3D {
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
- };
-=20
-+static const ClockPortInitArray zynq_slcr_clocks =3D {
-+    QDEV_CLOCK_IN(ZynqSLCRState, ps_clk, zynq_slcr_ps_clk_callback),
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart0_ref_clk),
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart1_ref_clk),
-+    QDEV_CLOCK_END
-+};
-+
- static void zynq_slcr_init(Object *obj)
- {
-     ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-@@ -425,6 +559,8 @@ static void zynq_slcr_init(Object *obj)
-     memory_region_init_io(&s->iomem, obj, &slcr_ops, s, "slcr",
-                           ZYNQ_SLCR_MMIO_SIZE);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
-+
-+    qdev_init_clocks(DEVICE(obj), zynq_slcr_clocks);
- }
-=20
- static const VMStateDescription vmstate_zynq_slcr =3D {
-@@ -440,9 +576,12 @@ static const VMStateDescription vmstate_zynq_slcr =3D=
- {
- static void zynq_slcr_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
-=20
-     dc->vmsd =3D &vmstate_zynq_slcr;
--    dc->reset =3D zynq_slcr_reset;
-+    rc->phases.init =3D zynq_slcr_reset_init;
-+    rc->phases.hold =3D zynq_slcr_reset_hold;
-+    rc->phases.exit =3D zynq_slcr_reset_exit;
- }
-=20
- static const TypeInfo zynq_slcr_info =3D {
+The patches are organised as follows:
++ Patches 1 to 5 adds the clock support in qemu (1, 4 and 5 are already r=
+eviewed and
+  also a big part of the 3)
++ Patch 6 add some documentation in docs/devel
++ Patches 7 to 9 adds the uart's clocks to the xilinx_zynq platform as an
+example for this framework. It updates the zynq's slcr clock controller, =
+the=20
+cadence_uart device, and the zynq toplevel platform.
+
+I've tested this patchset on the xilinx-zynq-a9 machine with the buildroo=
+t's
+zynq_zc706_defconfig which package the Xilinx's Linux.
+Clocks are correctly updated and we ends up with a configured baudrate of=
+ 115601
+on the console uart (for a theoretical 115200) which is nice. "cadence_ua=
+rt*" and
+"clock*" traces can be enabled to see what's going on in this platform.
+
+Any comments and suggestion are welcomed.
+
+Thanks to the Xilinx QEMU team who sponsored this development.
+
+Damien Hedde (9):
+  hw/core/clock: introduce clock objects
+  hw/core/clock-vmstate: define a vmstate entry for clock state
+  qdev: add clock input&output support to devices.
+  qdev-monitor: print the device's clock with info qtree
+  qdev-clock: introduce an init array to ease the device construction
+  docs/clocks: add device's clock documentation
+  hw/misc/zynq_slcr: add clock generation for uarts
+  hw/char/cadence_uart: add clock support
+  hw/arm/xilinx_zynq: connect uart clocks to slcr
+
+ Makefile.objs                  |   1 +
+ docs/devel/clock.txt           | 246 +++++++++++++++++++++++++++++++++
+ hw/arm/xilinx_zynq.c           |  64 +++++++--
+ hw/char/cadence_uart.c         |  85 ++++++++++--
+ hw/char/trace-events           |   3 +
+ hw/core/Makefile.objs          |   4 +-
+ hw/core/clock-vmstate.c        |  25 ++++
+ hw/core/clock.c                | 144 +++++++++++++++++++
+ hw/core/qdev-clock.c           | 181 ++++++++++++++++++++++++
+ hw/core/qdev.c                 |  32 +++++
+ hw/core/trace-events           |   6 +
+ hw/misc/zynq_slcr.c            | 145 ++++++++++++++++++-
+ include/hw/char/cadence_uart.h |   1 +
+ include/hw/clock.h             | 133 ++++++++++++++++++
+ include/hw/qdev-clock.h        | 134 ++++++++++++++++++
+ include/hw/qdev-core.h         |  14 ++
+ qdev-monitor.c                 |  13 ++
+ tests/Makefile.include         |   1 +
+ 18 files changed, 1210 insertions(+), 22 deletions(-)
+ create mode 100644 docs/devel/clock.txt
+ create mode 100644 hw/core/clock-vmstate.c
+ create mode 100644 hw/core/clock.c
+ create mode 100644 hw/core/qdev-clock.c
+ create mode 100644 include/hw/clock.h
+ create mode 100644 include/hw/qdev-clock.h
+
 --=20
 2.22.0
 
