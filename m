@@ -2,60 +2,84 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE10C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 00:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D81C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 01:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BF0021897
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 00:53:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BF0021897
+	by mail.kernel.org (Postfix) with ESMTPS id 960742077B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 01:46:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 960742077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5JYG-0000Tq-GK
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 20:53:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58899)
+	id 1i5KNM-00007D-O9
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 21:46:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i5JXD-0008K2-Qb
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:52:33 -0400
+ (envelope-from <peterx@redhat.com>) id 1i5KLZ-0007nk-Tp
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:44:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i5JXA-0000zF-P5
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:52:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60554)
+ (envelope-from <peterx@redhat.com>) id 1i5KLX-000683-Gn
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:44:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44176)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i5JXA-0000yP-HB
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 20:52:28 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i5KLX-00067P-9V
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:44:31 -0400
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0A4BC3680A;
- Wed,  4 Sep 2019 00:52:27 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-123-245.rdu2.redhat.com
- [10.10.123.245])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 368BD60A9F;
- Wed,  4 Sep 2019 00:52:20 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Date: Tue,  3 Sep 2019 20:52:18 -0400
-Message-Id: <20190904005218.12536-1-crosa@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C3865368CF
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 01:44:29 +0000 (UTC)
+Received: by mail-pf1-f197.google.com with SMTP id t24so5204956pfe.23
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 18:44:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=4o8FHxgaqFbS/PgjXmIAyIKGNCQJb6xAwRHqIacJmR4=;
+ b=IoFCJVo+Ji12C6eV2HkXgrXPYKKeRcBnaBV0XNruUDp2Nn5Hh1d5PyEa6Mz3oUaYcU
+ KEXLlDQrIxradlst5fCzgzsWGyysGucYGjCCyt8e5ekU8dmrjxnP7oNUAkeEkT7T+q8k
+ cS79/SFa9gIUu3rwhd5mnYa0UAALdE0cqQZOjF+oPE2/mRpxXsSiQIlCtN5dKoM9+EXh
+ EL8m3G/GXMm2B8UzUIwaNrFtoRiowMWPk6op6uc/rVIhuHDgm2Fyt7JvZiUgnsSGtLlq
+ fvqTY/7ntgD4gFs5l/iIMoVB7pkiYvDzM8FBSV5FcOCi1NILlyUVnth3kiyJioSDkYei
+ 3brw==
+X-Gm-Message-State: APjAAAXBTRakZlGu1WLahECIlE4sMKev5F1y/gCMRla03D31Gw8w07Uv
+ Yd4EZb/03+THZbbxjhbIsVgZ8sBVrNJ5mvZQ0fNEAPxS4bIzzEfniWOFAfHiClmgPalqNklS/0P
+ y/kiPsE/WWIYwlf8=
+X-Received: by 2002:aa7:908b:: with SMTP id i11mr41686330pfa.199.1567561469304; 
+ Tue, 03 Sep 2019 18:44:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyQiKGO6lteuXApmjmh9TKN7aOS3CJc5HNY38iZ8+1EjYK9Gcnj6PmYdFPX4TZx0cjmlCEqYA==
+X-Received: by 2002:aa7:908b:: with SMTP id i11mr41686315pfa.199.1567561469099; 
+ Tue, 03 Sep 2019 18:44:29 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id c138sm394749pfc.80.2019.09.03.18.44.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Sep 2019 18:44:28 -0700 (PDT)
+Date: Wed, 4 Sep 2019 09:44:16 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Message-ID: <20190904014416.GB30402@xz-x1>
+References: <20190730172137.23114-1-eric.auger@redhat.com>
+ <20190730172137.23114-9-eric.auger@redhat.com>
+ <20190819081143.GA13560@xz-x1>
+ <b5e2ff32-eed8-829e-ffd4-2b62ed6b2fda@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Wed, 04 Sep 2019 00:52:27 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b5e2ff32-eed8-829e-ffd4-2b62ed6b2fda@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] Fedora images: use URLs from stable
- "archives.fedoraproject.org"
+Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 08/15] virtio-iommu: Implement
+ map/unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,203 +91,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yash Mankad <ymankad@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, mst@redhat.com,
+ tn@semihalf.com, qemu-devel@nongnu.org, alex.williamson@redhat.com,
+ qemu-arm@nongnu.org, jean-philippe@linaro.org, bharat.bhushan@nxp.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16 test,
-from tests/acceptance/linux_initrd.py, is currently failing to fetch
-the "vmlinuz" file.  The reason for the failure is that the Fedora
-project retires older versions from the "dl.fedoraproject.org" URL,
-and keeps them in "archives.fedoraproject.org".  As an added note,
-that test uses a Fedora 28 image, because of the specific Linux kernel
-version requirements of the test.
+On Tue, Sep 03, 2019 at 01:37:11PM +0200, Auger Eric wrote:
+> Hi Peter,
+> 
+> On 8/19/19 10:11 AM, Peter Xu wrote:
+> > On Tue, Jul 30, 2019 at 07:21:30PM +0200, Eric Auger wrote:
+> > 
+> > [...]
+> > 
+> >> +    mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
+> >> +
+> >> +    while (mapping) {
+> >> +        viommu_interval current;
+> >> +        uint64_t low  = mapping->virt_addr;
+> >> +        uint64_t high = mapping->virt_addr + mapping->size - 1;
+> >> +
+> >> +        current.low = low;
+> >> +        current.high = high;
+> >> +
+> >> +        if (low == interval.low && size >= mapping->size) {
+> >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
+> >> +            interval.low = high + 1;
+> >> +            trace_virtio_iommu_unmap_left_interval(current.low, current.high,
+> >> +                interval.low, interval.high);
+> >> +        } else if (high == interval.high && size >= mapping->size) {
+> >> +            trace_virtio_iommu_unmap_right_interval(current.low, current.high,
+> >> +                interval.low, interval.high);
+> >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
+> >> +            interval.high = low - 1;
+> >> +        } else if (low > interval.low && high < interval.high) {
+> >> +            trace_virtio_iommu_unmap_inc_interval(current.low, current.high);
+> >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
+> >> +        } else {
+> >> +            break;
+> >> +        }
+> >> +        if (interval.low >= interval.high) {
+> >> +            return VIRTIO_IOMMU_S_OK;
+> >> +        } else {
+> >> +            mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
+> >> +        }
+> >> +    }
+> >> +
+> >> +    if (mapping) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR,
+> >> +                      "****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
+> >> +                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported\n",
+> >> +                     __func__, interval.low, size,
+> >> +                     mapping->virt_addr, mapping->size);
+> >> +    } else {
+> >> +        return VIRTIO_IOMMU_S_OK;
+> >> +    }
+> >> +
+> >> +    return VIRTIO_IOMMU_S_INVAL;
+> > 
+> > Could the above chunk be simplified as something like below?
+> > 
+> >   while ((mapping = g_tree_lookup(domain->mappings, &interval))) {
+> >     g_tree_remove(domain->mappings, mapping);
+> >   }
+> Indeed the code could be simplified. I only need to make sure I don't
+> split an existing mapping.
 
-For the sake of stability, let's use URLs from the archived and
-supposedely ever stable URLs.  The good news is that the currently
-supported versions are also hosted on the later.  This change limits
-itself to change the URLs, while keeping the fetched files the same
-(as can be evidenced by the unchanged hashes).
+Hmm... Do we need to still split an existing mapping if necessary?
+For example when with this mapping:
 
-Documentation and the "vm tests" fedora definition were also updated.
+  iova=0x1000, size=0x2000, phys=ADDR1, flags=FLAGS1
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- qemu-doc.texi                          |  6 +++---
- tests/acceptance/boot_linux_console.py | 25 +++++++++++++++----------
- tests/acceptance/linux_initrd.py       |  5 +++--
- tests/vm/fedora                        |  2 +-
- 4 files changed, 22 insertions(+), 16 deletions(-)
+And if we want to unmap the range (iova=0, size=0x2000), then we
+should split the existing mappping and leave this one:
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 577d1e8376..37795f86fb 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -440,15 +440,15 @@ of <protocol>.
-=20
- Example: boot from a remote Fedora 20 live ISO image
- @example
--qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttp://dl.fedoraproject.=
-org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-2=
-0-1.iso,readonly
-+qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttps://archives.fedorap=
-roject.org/pub/archive/fedora/linux/releases/20/Live/x86_64/Fedora-Live-D=
-esktop-x86_64-20-1.iso,readonly
-=20
--qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
-ttp://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedor=
-a-Live-Desktop-x86_64-20-1.iso,readonly
-+qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
-ttp://archives.fedoraproject.org/pub/archive/fedora/linux/releases/20/Liv=
-e/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
- @end example
-=20
- Example: boot from a remote Fedora 20 cloud image using a local overlay =
-for
- writes, copy-on-read, and a readahead of 64k
- @example
--qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
-, "file.url":"https://dl.fedoraproject.org/pub/fedora/linux/releases/20/I=
-mages/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"6=
-4k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-+qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
-, "file.url":"http://archives.fedoraproject.org/pub/archive/fedora/linux/=
-releases/20/Images/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.=
-readahead":"64k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-=20
- qemu-system-x86_64 -drive file=3D/tmp/Fedora-x86_64-20-20131211.1-sda.qc=
-ow2,copy-on-read=3Don
- @end example
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-index 2504ef0150..8a9a314ab4 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -76,8 +76,9 @@ class BootLinuxConsole(Test):
-         :avocado: tags=3Darch:x86_64
-         :avocado: tags=3Dmachine:pc
-         """
--        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora/l=
-inux/'
--                      'releases/29/Everything/x86_64/os/images/pxeboot/v=
-mlinuz')
-+        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
-fedora'
-+                      '/linux/releases/29/Everything/x86_64/os/images/px=
-eboot'
-+                      '/vmlinuz')
-         kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
-@@ -250,8 +251,9 @@ class BootLinuxConsole(Test):
-         :avocado: tags=3Darch:aarch64
-         :avocado: tags=3Dmachine:virt
-         """
--        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora/l=
-inux/'
--                      'releases/29/Everything/aarch64/os/images/pxeboot/=
-vmlinuz')
-+        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
-fedora'
-+                      '/linux/releases/29/Everything/aarch64/os/images/p=
-xeboot'
-+                      '/vmlinuz')
-         kernel_hash =3D '8c73e469fc6ea06a58dc83a628fc695b693b8493'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
-@@ -271,8 +273,9 @@ class BootLinuxConsole(Test):
-         :avocado: tags=3Darch:arm
-         :avocado: tags=3Dmachine:virt
-         """
--        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora/l=
-inux/'
--                      'releases/29/Everything/armhfp/os/images/pxeboot/v=
-mlinuz')
-+        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
-fedora'
-+                      '/linux/releases/29/Everything/armhfp/os/images/px=
-eboot'
-+                      '/vmlinuz')
-         kernel_hash =3D 'e9826d741b4fb04cadba8d4824d1ed3b7fb8b4d4'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
-@@ -318,8 +321,9 @@ class BootLinuxConsole(Test):
-         :avocado: tags=3Darch:s390x
-         :avocado: tags=3Dmachine:s390_ccw_virtio
-         """
--        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora-s=
-econdary/'
--                      'releases/29/Everything/s390x/os/images/kernel.img=
-')
-+        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive'
-+                      '/fedora-secondary/releases/29/Everything/s390x/os=
-/images'
-+                      '/kernel.img')
-         kernel_hash =3D 'e8e8439103ef8053418ef062644ffd46a7919313'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
-@@ -360,8 +364,9 @@ class BootLinuxConsole(Test):
-         :avocado: tags=3Darch:ppc64
-         :avocado: tags=3Dmachine:pseries
-         """
--        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora-s=
-econdary/'
--                      'releases/29/Everything/ppc64le/os/ppc/ppc64/vmlin=
-uz')
-+        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive'
-+                      '/fedora-secondary/releases/29/Everything/ppc64le/=
-os'
-+                      '/ppc/ppc64/vmlinuz')
-         kernel_hash =3D '3fe04abfc852b66653b8c3c897a59a689270bc77'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
-diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_in=
-itrd.py
-index 23be5a63aa..c61d9826a4 100644
---- a/tests/acceptance/linux_initrd.py
-+++ b/tests/acceptance/linux_initrd.py
-@@ -54,8 +54,9 @@ class LinuxInitrd(Test):
-         QEMU has supported up to 4 GiB initrd for recent kernel
-         Expect guest can reach 'Unpacking initramfs...'
-         """
--        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28/'
--                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
-+        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
-fedora'
-+                      '/linux/releases/28/Everything/x86_64/os/images/px=
-eboot/'
-+                      'vmlinuz')
-         kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-         max_size =3D 2 * (1024 ** 3) + 1
-diff --git a/tests/vm/fedora b/tests/vm/fedora
-index e8fa5bf0d2..7fec1479fb 100755
---- a/tests/vm/fedora
-+++ b/tests/vm/fedora
-@@ -23,7 +23,7 @@ class FedoraVM(basevm.BaseVM):
-     name =3D "fedora"
-     arch =3D "x86_64"
-=20
--    base =3D "http://dl.fedoraproject.org/pub/fedora/linux/releases/30/"
-+    base =3D "https://archives.fedoraproject.org/pub/archive/fedora/linu=
-x/releases/30/"
-     link =3D base + "Server/x86_64/iso/Fedora-Server-netinst-x86_64-30-1=
-.2.iso"
-     repo =3D base + "Server/x86_64/os/"
-     full =3D base + "Everything/x86_64/os/"
---=20
-2.21.0
+  iova=0x2000, size=0x1000, phys=(ADDR1+0x1000), flags=FLAGS1
 
+Right?
+
+> 
+> Also I needed to use g_tree_lookup_extended to retrieve the actual key
+> to remove. The usage of g_tree_lookup_extended() allows me to remove the
+> virt_addr and size fields from the mapping value value struct as those
+> info can be retrieved from the key.
+
+True.  Thanks,
+
+-- 
+Peter Xu
 
