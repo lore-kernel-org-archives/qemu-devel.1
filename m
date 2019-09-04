@@ -2,87 +2,90 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF20C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B208C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:05:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5834620674
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:03:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44A3720674
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:05:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bYbwQdUS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5834620674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ttPaSj+p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44A3720674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cRX-00085Z-NX
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:03:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49672)
+	id 1i5cSa-0000oT-RP
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:05:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bv7-00087Q-G6
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:29 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c3z-00012j-3U
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bv3-0006WK-6B
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:25 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36457)
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c3x-0003YB-NK
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:34 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:32874)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5bv1-0006Ug-8E
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:19 -0400
-Received: by mail-wm1-x344.google.com with SMTP id p13so220057wmh.1
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:30:17 -0700 (PDT)
+ id 1i5c3x-0003Xa-Gh
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:33 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id r17so3372465wme.0
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:39:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=R/OdRV+hVfip7mTA91Yh+fBiJcl66+BykfGmRYjg0bE=;
- b=bYbwQdUSB0Hjffw02dO5cJv6Xtt4DXtrv21mIPISpGVKoLhcvuAy0pbosJhTskq6uP
- pg4kXhyDBMzUYfAyfOXlgkzPkLpUr79jLnV4Sz50AnHfleTVpRloaZZW5G/lUcQ+7tWU
- vOzJTCq9EeCvn7nduMm9lbNTJK6Ku1D1iBEOFQHlckqAIb/R0EcD/+9LOCKKWcYY11Em
- jMYCX41nbKNCE9PJWBNh4WJMDqLl1wXQlUtDO7E80TmovEXqiprTDQyErt+KNQlQMo0q
- ER2yFbelVvVFZiCIkBIW5abLAzn/7Yo5b8pRPIjlYk7wd7dOJmCyMDa86+aMK/gAIn1y
- ljcA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=3YyKCQsfgzvXKSHDv5mJ/Ups/NVidIa51ccen10JgYE=;
+ b=ttPaSj+pg0CsO+J+ADN+B9sIbM2YYgljcdeFQGiiPsYypwqS+dkCGm9wG0TEiGnv4R
+ hnROhgSeJRT56ul6B1hpTeikKX7cC3PmvCoK3n0icuSKoQNw2vKcLaNFsv39lr5zhvNO
+ LQdpAZswinUdUOdc5MQFnZFx2C/VN0mz7y2mbfWJ2uWuiYDcaUHhCu4YA+8g8tIlDoe2
+ fHPbNt+rwybRzdBRGcyT8wlWaCmebAcDRDh99cBxAVvleejUOcAIJReDkaf+bU+Cn7uj
+ 6pe0LzymFdkXdGiOaT8ASNA4OwhVNugh618r25pZJKn7jsY/dwhbbJ0i8gBov129qfI+
+ opdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=R/OdRV+hVfip7mTA91Yh+fBiJcl66+BykfGmRYjg0bE=;
- b=NutIJ3YK2YyC/LW9QjczPexZXPs1caBtvLxumAIOOZ6gCLXcfjEDOfftNunAZPOmbf
- irKxU77focUWvWXRiiX4GtRn9FzXVE5D3CgvhTerI15l8Sy5+XMtBdKNYRnMdhG5Tgch
- z4vsl+/ekAdDedpyuhnBB5dnZVXZrZV2Ge4tn3H350yaMzKu2VduQw4+J1mEK06WYsCU
- PauCcS/T2ZxOR9GuV9ZYOak8DL9PflGqij3hERx0e4yce1tTddt/dnRIS8IqulG/Dvhj
- 6Y+6233WmZY1WzJL7/2BM7XbN2b1dm6jWxLEB5zpLjP00q6b3LFeuARy2eU7wFSvr2BZ
- UY+w==
-X-Gm-Message-State: APjAAAVq8t00iWbnErRbVaFi/oTqstQ1yojUEdLL19WWiqIx25ZJptbu
- l08GafTDcahjGJ77acMERdvlRw==
-X-Google-Smtp-Source: APXvYqzXQI6mD3R1ZIw8PKhVzAs0Ow6P4UNi7WicGkLrUgdpkI+WyxXOgpk/SCrJLGNF73Bz4JU0Tg==
-X-Received: by 2002:a7b:cb81:: with SMTP id m1mr101926wmi.124.1567629016671;
- Wed, 04 Sep 2019 13:30:16 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=3YyKCQsfgzvXKSHDv5mJ/Ups/NVidIa51ccen10JgYE=;
+ b=FqH2kzE+xWVQqNMJUWvnsuyHLi+Rm8P6hGS3UWgfevULAFXn1atuu8nRjnqfBnLweg
+ XE2BORq+aEze6TLHUgj5LOKtFnDQ9GjJwNQ0Ie3aFChjjPVLNvI58eRKXRjJxrNqA/MW
+ F93x/v6TIS44Nks8v1V901gGoZDf4uD3N+ADQOAfdHp2fhNXMoQZLq7KU8lu03Ivtbg0
+ e8xsaHszaEVIu/8qBqMfZj2rhYmD5ENkhRe0I7GEiw0TrcnLVC39F0tTn8iY23F17xEQ
+ gzPQuqbEVi5cmpTvJZUP7J8232qCtkQ991uYKlG4NBDoOFx562hOINcTBypLd2JZylAf
+ Kw6w==
+X-Gm-Message-State: APjAAAUPQPr0+md1GtprxTtTQRo51s3/DVo0czag3SoE2rFAq2NV/CrO
+ oucevjvGBl/rJIbCdmuQeoy6+g==
+X-Google-Smtp-Source: APXvYqzjKjzJG1aCTK6brZfIaFla0XtWTIP6rpRTHuDLrakmnP7ZCsY1NsmKBInyuRYDSy/u9FLajg==
+X-Received: by 2002:a1c:9e0b:: with SMTP id h11mr123107wme.144.1567629572522; 
+ Wed, 04 Sep 2019 13:39:32 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g24sm32321464wrb.35.2019.09.04.13.30.13
+ by smtp.gmail.com with ESMTPSA id t13sm26606401wra.70.2019.09.04.13.39.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:30:14 -0700 (PDT)
+ Wed, 04 Sep 2019 13:39:31 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5A1711FF87;
- Wed,  4 Sep 2019 21:30:13 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id A95F71FFBD;
+ Wed,  4 Sep 2019 21:30:16 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:29:31 +0100
-Message-Id: <20190904203013.9028-1-alex.bennee@linaro.org>
+Date: Wed,  4 Sep 2019 21:30:07 +0100
+Message-Id: <20190904203013.9028-37-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH  v1 00/42] current testing/next queue (podman,
- docker, ci)
+X-Received-From: 2a00:1450:4864:20::32e
+Subject: [Qemu-devel] [PATCH v1 36/42] .travis.yml: Document how the build
+ matrix use caches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,194 +98,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, cota@braap.org,
  stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
  aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi All,
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Here is the current status of my testing/next queue. It brings
-together a number of different series as well as some CI fixes that
-may be coming in view different trees. So in order we have:
+We will set the CACHE_NAME variable to improve the caching
+of various jobs using the same characteristics. Document it
+first.
 
-Some fixes to for podman. This is a relatively new alternative to
-docker and it works well but needs a little tweak to ensure we can
-also use it from cross compiling check-tcg tests.
+See https://docs.travis-ci.com/user/caching/#caches-and-build-matrices
 
-Paolo's tcg Makefile disentanglement which reduces some of the
-Makefile hackage by having a tcg check specific configure step. I've
-made a few minor tweaks to the configure script to fix up -static
-handling and setting of make variables.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ .travis.yml | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-There is then a set of clean-ups to the dockerfiles whhich allow them
-to default a target list in the dockerfile environment which can then
-be overridden. I then update a bunch of the images to buster which
-allows us to drop the rather hokey sid based approach we were using.
-
-The next major chunk is Phillipe's caching changes which make a
-considerable difference when constantly rebuild the same tree,
-especially if all you are messing around with is ancillary scripts.
-
-Finally there are a few more CI fixes including one slightly hacky
-change to deal with variation in python3 implementations.
-
-Please review ;-)
-
-Alex Bennée (27):
-  configure: clean-up container cross compile detect
-  tests/docker: fix "cc" command to work with podman
-  tests/tcg: add .gitignore for in source builds
-  tests/docker: move DEF_TARGET_LIST setting to common.rc
-  tests/docker: set DEF_TARGET_LIST for some containers
-  tests/docker: add Buster to DOCKER_PARTIAL_IMAGES
-  tests/docker: move our arm64 cross compile to Buster
-  tests/docker: move our powerpc cross compile to Buster
-  tests/docker: move our Alpha cross compile to Buster
-  tests/docker: move our HPPA cross compile to Buster
-  tests/docker: move our m68k cross compile to Buster
-  tests/docker: move our sparc64 cross compile to Buster
-  tests/docker: move our sh4 cross compile to Buster
-  tests/docker: move our mips64 cross compile to Buster
-  tests/docker: move our riscv64 cross compile to Buster
-  tests/docker: move our ppc64 cross compile to Buster
-  tests/docker: drop debian-sid image
-  tests/docker: drop powerpc-user image for QEMU cross builds
-  tests/docker: add debian-xtensa-cross to DEBIAN_PARTIAL_IMAGES
-  tests/docker: add debian9-mxe to DEBIAN_PARTIAL_IMAGES
-  tests/docker: avoid $SHELL invoke bash directly
-  tests/docker: add debian-amd64-cross for non-x86 hosts
-  tests/docker: use --arch-only for installing deps
-  tests/docker: add more images to PARTIAL_IMAGES when not on x86_64
-  configure: check if --no-pie is supported first
-  tests/docker: --disable-libssh on ubuntu1804 builds
-  tests/docker: don't always encoding for subprocess.check_output
-
-Cleber Rosa (1):
-  Fedora images: use URLs from stable "archives.fedoraproject.org"
-
-Paolo Bonzini (3):
-  tests/tcg: use EXTRA_CFLAGS everywhere
-  tests/tcg: cleanup Makefile inclusions
-  tests/tcg: move configuration to a sub-shell script
-
-Philippe Mathieu-Daudé (10):
-  .travis.yml: Enable multiple caching features
-  .travis.yml: Increase cache timeout from 3min to 20min
-  .travis.yml: Cache Python PIP packages
-  .travis.yml: Cache Avocado cache
-  .travis.yml: Improve ccache use
-  .travis.yml: Enable ccache on OSX
-  .travis.yml: Document how the build matrix use caches
-  .travis.yml: Cache Linux/GCC 'debug profile' jobs together
-  .travis.yml: Cache Linux/GCC 'non-debug profile' jobs together
-  .travis.yml: Cache Linux/Clang jobs together
-
-Thomas Huth (1):
-  hw/misc: Mark most objects as "common" code to speed up compilation a
-    litte bit
-
- .travis.yml                                   |  39 ++-
- Makefile                                      |   1 +
- Makefile.target                               |   3 -
- configure                                     | 168 ++-----------
- hw/misc/Makefile.objs                         |  90 +++----
- qemu-doc.texi                                 |   6 +-
- tests/Makefile.include                        |  25 +-
- tests/acceptance/boot_linux_console.py        |  25 +-
- tests/acceptance/linux_initrd.py              |   5 +-
- tests/docker/Makefile.include                 |  61 +++--
- tests/docker/common.rc                        |   4 +
- tests/docker/docker.py                        |  51 ++--
- .../dockerfiles/debian-alpha-cross.docker     |   7 +-
- .../dockerfiles/debian-amd64-cross.docker     |  22 ++
- .../dockerfiles/debian-arm64-cross.docker     |   7 +-
- .../dockerfiles/debian-armel-cross.docker     |   3 +-
- .../dockerfiles/debian-armhf-cross.docker     |   3 +-
- .../debian-buster-arm64-cross.docker          |  16 --
- .../dockerfiles/debian-hppa-cross.docker      |   5 +-
- .../dockerfiles/debian-m68k-cross.docker      |   5 +-
- .../dockerfiles/debian-mips-cross.docker      |   7 +-
- .../dockerfiles/debian-mips64-cross.docker    |   5 +-
- .../dockerfiles/debian-mips64el-cross.docker  |   3 +-
- .../dockerfiles/debian-mipsel-cross.docker    |   2 +-
- .../dockerfiles/debian-powerpc-cross.docker   |   8 +-
- .../debian-powerpc-user-cross.docker          |  15 --
- .../dockerfiles/debian-ppc64-cross.docker     |   7 +-
- .../dockerfiles/debian-ppc64el-cross.docker   |   3 +-
- .../dockerfiles/debian-riscv64-cross.docker   |   5 +-
- .../dockerfiles/debian-s390x-cross.docker     |   3 +-
- .../dockerfiles/debian-sh4-cross.docker       |   5 +-
- tests/docker/dockerfiles/debian-sid.docker    |  41 ---
- .../dockerfiles/debian-sparc64-cross.docker   |   5 +-
- tests/docker/dockerfiles/ubuntu1804.docker    |   3 +
- tests/docker/run                              |   4 +-
- tests/docker/test-build                       |   1 -
- tests/docker/test-mingw                       |   1 -
- tests/docker/test-quick                       |   1 -
- tests/tcg/.gitignore                          |   5 +
- tests/tcg/Makefile.include                    |  88 -------
- tests/tcg/Makefile.prereqs                    |  18 ++
- tests/tcg/Makefile.probe                      |  31 ---
- tests/tcg/Makefile.qemu                       |  95 +++++++
- tests/tcg/{Makefile => Makefile.target}       |  15 +-
- tests/tcg/aarch64/Makefile.include            |   8 -
- tests/tcg/aarch64/Makefile.softmmu-target     |   4 +-
- tests/tcg/aarch64/Makefile.target             |  12 +-
- tests/tcg/alpha/Makefile.include              |   2 -
- tests/tcg/alpha/Makefile.softmmu-target       |   4 +-
- tests/tcg/arm/Makefile.include                |   8 -
- tests/tcg/arm/Makefile.softmmu-target         |   6 +-
- tests/tcg/configure.sh                        | 234 ++++++++++++++++++
- tests/tcg/cris/Makefile.include               |   6 -
- tests/tcg/hppa/Makefile.include               |   2 -
- tests/tcg/i386/Makefile.include               |   9 -
- tests/tcg/i386/Makefile.softmmu-target        |  12 +-
- tests/tcg/i386/Makefile.target                |  13 +-
- tests/tcg/m68k/Makefile.include               |   2 -
- tests/tcg/minilib/Makefile.target             |   2 +-
- tests/tcg/mips/Makefile.include               |  20 --
- tests/tcg/ppc/Makefile.include                |  10 -
- tests/tcg/riscv/Makefile.include              |  10 -
- tests/tcg/s390x/Makefile.include              |   2 -
- tests/tcg/sh4/Makefile.include                |   4 -
- tests/tcg/sparc64/Makefile.include            |   2 -
- tests/tcg/x86_64/Makefile.softmmu-target      |  36 +++
- tests/tcg/x86_64/Makefile.target              |   7 +-
- tests/tcg/xtensa/Makefile.include             |  11 -
- tests/tcg/xtensa/Makefile.softmmu-target      |   4 +-
- tests/vm/fedora                               |   2 +-
- 70 files changed, 693 insertions(+), 656 deletions(-)
- create mode 100644 tests/docker/dockerfiles/debian-amd64-cross.docker
- delete mode 100644 tests/docker/dockerfiles/debian-buster-arm64-cross.docker
- delete mode 100644 tests/docker/dockerfiles/debian-powerpc-user-cross.docker
- delete mode 100644 tests/docker/dockerfiles/debian-sid.docker
- create mode 100644 tests/tcg/.gitignore
- delete mode 100644 tests/tcg/Makefile.include
- create mode 100644 tests/tcg/Makefile.prereqs
- delete mode 100644 tests/tcg/Makefile.probe
- create mode 100644 tests/tcg/Makefile.qemu
- rename tests/tcg/{Makefile => Makefile.target} (90%)
- delete mode 100644 tests/tcg/aarch64/Makefile.include
- delete mode 100644 tests/tcg/alpha/Makefile.include
- delete mode 100644 tests/tcg/arm/Makefile.include
- create mode 100755 tests/tcg/configure.sh
- delete mode 100644 tests/tcg/cris/Makefile.include
- delete mode 100644 tests/tcg/hppa/Makefile.include
- delete mode 100644 tests/tcg/i386/Makefile.include
- delete mode 100644 tests/tcg/m68k/Makefile.include
- delete mode 100644 tests/tcg/mips/Makefile.include
- delete mode 100644 tests/tcg/ppc/Makefile.include
- delete mode 100644 tests/tcg/riscv/Makefile.include
- delete mode 100644 tests/tcg/s390x/Makefile.include
- delete mode 100644 tests/tcg/sh4/Makefile.include
- delete mode 100644 tests/tcg/sparc64/Makefile.include
- create mode 100644 tests/tcg/x86_64/Makefile.softmmu-target
- delete mode 100644 tests/tcg/xtensa/Makefile.include
-
+diff --git a/.travis.yml b/.travis.yml
+index 2dd26486abc..ab3e4ebaadf 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -6,6 +6,12 @@ language: c
+ compiler:
+   - gcc
+ cache:
++  # There is one cache per branch and compiler version.
++  # characteristics of each job are used to identify the cache:
++  # - OS name (currently, linux, osx, or windows)
++  # - OS distribution (for Linux, xenial, trusty, or precise)
++  # - macOS image name (e.g., xcode7.2)
++  # - Names and values of visible environment variables set in .travis.yml or Settings panel
+   timeout: 1200
+   ccache: true
+   pip: true
 -- 
 2.20.1
 
