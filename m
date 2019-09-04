@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_ADSP_NXDOMAIN,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DEFFC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:05:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6E4C3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:05:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32CD12186A
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:05:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32CD12186A
+	by mail.kernel.org (Postfix) with ESMTPS id 242B42186A
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:05:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 242B42186A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.con
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Uyb-0005N0-3r
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:05:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47909)
+	id 1i5Uys-0005u0-7n
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:05:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqu-0004ry-1v
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:26 -0400
+ (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqw-0004tT-Ep
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqr-00007C-2S
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:23 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:40546)
+ (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqu-0000AP-3q
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:26 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:40558)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.con>)
- id 1i5Rql-0008N0-Gp; Wed, 04 Sep 2019 05:45:15 -0400
+ id 1i5Rqm-0008Pj-QO; Wed, 04 Sep 2019 05:45:17 -0400
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id 1D1CC96F5C;
- Wed,  4 Sep 2019 09:38:54 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id E2D9D96F56;
+ Wed,  4 Sep 2019 09:38:51 +0000 (UTC)
 From: damien.hedde@greensocs.con
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 11:38:40 +0200
-Message-Id: <20190904093843.8765-7-damien.hedde@greensocs.con>
+Date: Wed,  4 Sep 2019 11:38:37 +0200
+Message-Id: <20190904093843.8765-4-damien.hedde@greensocs.con>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190904093843.8765-1-damien.hedde@greensocs.con>
 References: <20190904093843.8765-1-damien.hedde@greensocs.con>
@@ -50,8 +50,8 @@ Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
 X-Mailman-Approved-At: Wed, 04 Sep 2019 08:47:47 -0400
-Subject: [Qemu-devel] [PATCH v6 6/9] docs/clocks: add device's clock
- documentation
+Subject: [Qemu-devel] [PATCH v6 3/9] qdev: add clock input&output support to
+ devices.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,329 +73,428 @@ Sender: "Qemu-devel"
 
 From: Damien Hedde <damien.hedde@greensocs.com>
 
-Add the documentation about the clock inputs and outputs in devices.
+Add functions to easily add input or output clocks to a device.
+A clock objects is added as a child of the device.
+The api is very similar the gpio's one.
 
 This is based on the original work of Frederic Konrad.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
----
- docs/devel/clock.txt | 246 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 246 insertions(+)
- create mode 100644 docs/devel/clock.txt
 
-diff --git a/docs/devel/clock.txt b/docs/devel/clock.txt
+---
+I've removed the reviewed-by/tested-by of Philippe because I did a small
+modification.
+
+qdev_connect_clock() which allowed to connect an input to an output is
+now split in 2:
++ qdev_get_clock_in() which gets a given input from a device
++ qdev_connect_clock_out() which connect a given output to a clock
+(previously fetched by qdev_get_clock_in())
+This part is located in (qdev-clock.[c|h]).
+It better matches gpios api and also add the possibility to connect a
+device's input clock to a random output clock (used in patch 9).
+
+Also add missing qdev-clock in the test-qdev-global-props so that tests
+pass.
+---
+ hw/core/Makefile.objs   |   2 +-
+ hw/core/qdev-clock.c    | 155 ++++++++++++++++++++++++++++++++++++++++
+ hw/core/qdev.c          |  32 +++++++++
+ include/hw/qdev-clock.h |  67 +++++++++++++++++
+ include/hw/qdev-core.h  |  14 ++++
+ tests/Makefile.include  |   1 +
+ 6 files changed, 270 insertions(+), 1 deletion(-)
+ create mode 100644 hw/core/qdev-clock.c
+ create mode 100644 include/hw/qdev-clock.h
+
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index 8fcebf2e67..4523d3b5c7 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -1,5 +1,5 @@
+ # core qdev-related obj files, also used by *-user:
+-common-obj-y +=3D qdev.o qdev-properties.o
++common-obj-y +=3D qdev.o qdev-properties.o qdev-clock.o
+ common-obj-y +=3D bus.o reset.o
+ common-obj-y +=3D resettable.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D qdev-fw.o
+diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
 new file mode 100644
-index 0000000000..18f79922d0
+index 0000000000..bebdd8fa15
 --- /dev/null
-+++ b/docs/devel/clock.txt
-@@ -0,0 +1,246 @@
-+
-+What are clocks
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Clocks are objects representing input and output clocks of objects. They=
- are
-+QOM objects developed for the purpose of modeling the distribution of cl=
-ocks in
-+QEMU.
-+
-+This allows us to model the clock distribution of a platform and detect
-+configuration errors in the clock tree such as badly configured PLL, clo=
-ck
-+source selection or disabled clock.
-+
-+The objects are ClockIn for the input and ClockOut for the output. The Q=
-OM
-+names are respectively CLOCK_IN and CLOCK_OUT.
-+
-+CLOCK_IN and CLOCK_OUT are typically child of some device and created in=
- a
-+similar way as gpios. ClockIn and ClockOut of different devices can be
-+connected together. It is possible to create a clock which is not relate=
-d
-+to a device; for example to model a clock source of a machine.
-+
-+Here is an example of devices with clocks:
-+
-+                             +-------------------+     +----------------=
-----+
-+                             |      Device B     |     |      Device C  =
-    |
-+  +--------------------+     |           +-----+ |     | +-----+        =
-    |
-+  |      Device A      |     |           |Clock|>>----->>|Clock|        =
-    |
-+  |            +-----+ |     | +-----+   |Out 3| |     | |In  5|        =
-    |
-+  |            |Clock|>>--+-->>|Clock|   +-----+ |     | +-----+        =
-    |
-+  |            |Out 1| |  |  | |In 2 |   +-----+ |     | +-----+        =
-    |
-+  |            +-----+ |  |  | +-----+   |Clock|>>----->>|Clock|        =
-    |
-+  +--------------------+  |  |           |Out 4| |     | |In  6|        =
-    |
-+                          |  |           +-----+ |     | +-----+        =
-    |
-+                          |  +-------------------+     +----------------=
-----+
-+                          |
-+                          |  +--------------------+
-+                          |  |      Device D      |
-+                          |  | +-----+            |
-+                          +-->>|Clock|            |
-+                             | |In  7|            |
-+                             | +-----+            |
-+                             +--------------------+
-+
-+Clocks are defined in include/hw/clock.h header and device related funct=
-ions
-+are defined in hw/qdev-clock.h header.
-+
-+The clock state
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The state of a clock is its frequency; it is stored as an integer repres=
-enting
-+it in Hertz. The special value of 0 is used to represent the clock being
-+inactive or gated. The clocks do not model the signal itself (pin toggli=
-ng)
-+or other properties such as the duty cycle.
-+
-+Only the CLOCK_IN object keeps the value of a clock; this allows a devic=
-e to
-+fetch the current input frequency at any time. When an output is updated=
-, the
-+value is immediately propagated to all connected CLOCK_IN.
-+
-+Adding clocks to a device
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-+
-+Adding clocks to a device must be done during the init method of the Dev=
-ice
-+instance.
-+
-+To add an input clock to a device, the function qdev_init_clock_in must =
-be used.
-+It takes the name, a callback, and an opaque parameter for the clock.
-+Output is more simple, only the name is required. Typically:
-+qdev_init_clock_in(DEVICE(dev), "clk_in", clk_in_callback, dev);
-+qdev_init_clock_out(DEVICE(dev), "clk_out");
-+
-+Both functions return the created ClockIn/ClockOut pointer, which should=
- be saved
-+in the device's state structure for further use.
-+
-+These objects will be automatically deleted by the QOM reference mechani=
-sm.
-+
-+Note that it is possible to create a static array describing clock input=
-s and
-+outputs. The function qdev_init_clocks() must be called with the array a=
-s
-+parameter to initialize the clocks: it has the same behaviour as calling=
- the
-+qdev_init_clock_in/out() for each clock in the array. To ease the array
-+construction, some macros are defined in include/hw/qdev-clock.h.
-+As an example, the following creates 2 clocks to a device: 1 input and 1
-+output.
-+
-+/* device structure containing pointer to the clock objects */
-+typedef struct MyDeviceState {
-+    DeviceState parent_obj;
-+    ClockIn *clk_in;
-+    ClockOut *clk_out;
-+} MyDeviceState;
-+
++++ b/hw/core/qdev-clock.c
+@@ -0,0 +1,155 @@
 +/*
-+ * callback for the input clock (see "Callback on input clock change" se=
-ction
-+ * below for more information).
++ * Device's clock
++ *
++ * Copyright GreenSocs 2016-2018
++ *
++ * Authors:
++ *  Frederic Konrad <fred.konrad@greensocs.com>
++ *  Damien Hedde <damien.hedde@greensocs.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + */
-+static void clk_in_callback(void *opaque);
 +
-+/*
-+ * static array describing clocks:
-+ * + a clock input named "clk_in", whose pointer is stored in clk_in
-+ *   field of a MyDeviceState structure with callback clk_in_callback.
-+ * + a clock output named "clk_out" whose pointer is stored in clk_out
-+ *   field of a MyDeviceState structure.
-+ */
-+static const ClockPortInitArray mydev_clocks =3D {
-+    QDEV_CLOCK_IN(MyDeviceState, clk_in, clk_in_callback),
-+    QDEV_CLOCK_OUT(MyDeviceState, clk_out),
-+    QDEV_CLOCK_END
-+};
++#include "qemu/osdep.h"
++#include "hw/qdev-clock.h"
++#include "hw/qdev-core.h"
++#include "qapi/error.h"
 +
-+/* device initialization function */
-+static void mydev_init(Object *obj)
++static NamedClockList *qdev_init_clocklist(DeviceState *dev, const char =
+*name,
++        bool forward)
 +{
-+    /* cast to MyDeviceState */
-+    MyDeviceState *mydev =3D MYDEVICE(obj);
-+    /* create and fill the pointer fields in the MyDeviceState */
-+    qdev_init_clocks(mydev, mydev_clocks);
-+    [...]
++    NamedClockList *ncl;
++
++    /*
++     * The clock path will be computed by the device's realize function =
+call.
++     * This is required to ensure the clock's canonical path is right an=
+d log
++     * messages are meaningfull.
++     */
++    assert(name);
++    assert(!dev->realized);
++
++    /* The ncl structure will be freed in device's finalize function cal=
+l */
++    ncl =3D g_malloc0(sizeof(*ncl));
++    ncl->name =3D g_strdup(name);
++    ncl->forward =3D forward;
++
++    QLIST_INSERT_HEAD(&dev->clocks, ncl, node);
++    return ncl;
 +}
 +
-+Connecting two clocks together
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
++ClockOut *qdev_init_clock_out(DeviceState *dev, const char *name)
++{
++    NamedClockList *ncl;
++    Object *clk;
 +
-+Let's say we have 2 devices A and B. A has an output clock named "clk_ou=
-t" and
-+B has an input clock named "clk_in".
++    ncl =3D qdev_init_clocklist(dev, name, false);
 +
-+The clocks are connected together using the function qdev_connect_clock:
-+qdev_connect_clock(B, "clk_in", A, "clk_out", &error_abort);
-+The device which has the input must be the first argument.
++    clk =3D object_new(TYPE_CLOCK_OUT);
 +
-+It is possible to connect several input clocks to the same output. Every
-+input callback will be called when the output changes.
++    /* will fail if name already exists */
++    object_property_add_child(OBJECT(dev), name, clk, &error_abort);
++    object_unref(clk); /* remove the initial ref made by object_new */
 +
-+It is not possible to disconnect a clock or to change the clock connecti=
-on
-+after it is done.
++    ncl->out =3D CLOCK_OUT(clk);
++    return ncl->out;
++}
 +
-+Unconnected input clocks
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++ClockIn *qdev_init_clock_in(DeviceState *dev, const char *name,
++                        ClockCallback *callback, void *opaque)
++{
++    NamedClockList *ncl;
++    Object *clk;
 +
-+A newly created input clock has a stored frequency value of 0. It means =
-the
-+clock will be considered as disabled until one sets a new frequency to t=
-he
-+output clock it is connected to. If the clock remains unconnected it wil=
-l
-+always keep its initial value of 0.
-+If this is not the wanted behaviour, clock_init_frequency should be call=
-ed
-+on the ClockIn object during device instance init.
-+For example:
-+clk =3D qdev_init_clock_in(DEVICE(dev), "clk-in", clk_in_callback, dev);
-+clock_init_frequency(clk, 100 * 1000 * 1000); // default value is 100Mhz
++    ncl =3D qdev_init_clocklist(dev, name, false);
 +
-+Using clock input frequency
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-+
-+A device can get the current frequency of an input using the
-+clock_get_frequency(). It returns the last set frequency (or the init va=
-lue).
-+
-+It is also possible to register a callback on input clock frequency chan=
-ges.
-+Here is an example:
-+void clock_callback(void *opaque) {
-+    MyDeviceState *s =3D (MyDeviceState *) opaque;
++    clk =3D object_new(TYPE_CLOCK_IN);
 +    /*
-+     * opaque may not be the device state pointer, but most probably it =
-is.
-+     * (It depends on what is given to the qdev_init_clock_in function)
++     * the ref initialized by object_new will be cleared during dev fina=
+lize.
++     * It allows us to safely remove the callback.
 +     */
 +
-+    /* do something with the new frequency */
-+    fprintf(stdout, "device new frequency is %" PRIu64 "Hz\n",
-+                    clock_get_frequency(dev->my_clk_input));
-+}
++    /* will fail if name already exists */
++    object_property_add_child(OBJECT(dev), name, clk, &error_abort);
 +
-+Changing a clock output
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+A device can change its outputs using the clock_set_frequency function. =
-It
-+will trigger updates on every connected inputs.
-+
-+For example, let's say that we have an output clock "clkout" and we have=
- a
-+pointer to it in the device state because we did the following in init p=
-hase:
-+dev->clkout =3D qdev_init_clock_out(DEVICE(dev), "clkout");
-+
-+Then at any time (apart from the cases listed below), it is possible to
-+change the clock value by doing:
-+clock_set_frequency(dev->clkout, 1000 * 1000 * 1000); /* 1Ghz */
-+This operation must be done while holding the qemu io lock.
-+
-+One can change clocks only when it is allowed to have side effects on ot=
-her
-+objects. In consequence, it is forbidden:
-++ during migration,
-++ and in the init phase of reset.
-+
-+Forwarding clocks
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Sometimes, one needs to forward, or inherit, a clock from another device=
-.
-+Typically, when doing device composition, a device might expose a sub-de=
-vice's
-+clock without interfering with it.
-+The function qdev_pass_clock() can be used to achieve this behaviour. No=
-te, that
-+it is possible to expose the clock under a different name. This works fo=
-r both
-+inputs or outputs.
-+
-+For example, if device B is a child of device A, device_a_instance_init =
-may
-+do something like this:
-+void device_a_instance_init(Object *obj)
-+{
-+    AState *A =3D DEVICE_A(obj);
-+    BState *B;
-+    /* create B object as child of A */
-+    [...]
-+    /* forward B's clock to A */
-+    qdev_pass_clock(A, "b_clk", B, "clk");
-+    /*
-+     * Now A has a clock "b_clk" which forwards to
-+     * the "clk" of its child B.
-+     */
-+}
-+
-+This function does not return any clock object. It is not possible to ad=
-d
-+a callback on a forwarded input clock: in the above example, only B can =
-use
-+the clock.
-+
-+Migration
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Only the ClockIn object has a state. ClockOut is not concerned by migrat=
-ion.
-+
-+In case the frequency of in input clock is needed for a device's migrati=
-on,
-+this state must be migrated. The VMSTATE_CLOCKIN macro defines an entry =
-to
-+be added in a vmstate description.
-+
-+For example, if a device has a clock input and the device state looks li=
-ke:
-+MyDeviceState {
-+    DeviceState parent_obj;
-+    ClockIn *clk;
-+};
-+
-+Then, to add the clock frequency to the device's migrated state, the vms=
-tate
-+description is:
-+VMStateDescription my_device_vmstate =3D {
-+    .name =3D "my_device",
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_CLOCKIN(clk, MyDeviceState),
-+        VMSTATE_END_OF_LIST()
++    ncl->in =3D CLOCK_IN(clk);
++    if (callback) {
++        clock_set_callback(ncl->in, callback, opaque);
 +    }
++    return ncl->in;
++}
++
++static NamedClockList *qdev_get_clocklist(DeviceState *dev, const char *=
+name)
++{
++    NamedClockList *ncl;
++
++    QLIST_FOREACH(ncl, &dev->clocks, node) {
++        if (strcmp(name, ncl->name) =3D=3D 0) {
++            return ncl;
++        }
++    }
++
++    return NULL;
++}
++
++void qdev_pass_clock(DeviceState *dev, const char *name,
++                     DeviceState *container, const char *cont_name)
++{
++    NamedClockList *original_ncl, *ncl;
++    Object **clk;
++
++    assert(container && cont_name);
++
++    original_ncl =3D qdev_get_clocklist(container, cont_name);
++    assert(original_ncl); /* clock must exist in origin */
++
++    ncl =3D qdev_init_clocklist(dev, name, true);
++
++    if (ncl->out) {
++        clk =3D (Object **)&ncl->out;
++    } else {
++        clk =3D (Object **)&ncl->in;
++    }
++
++    /* will fail if name already exists */
++    object_property_add_link(OBJECT(dev), name, object_get_typename(*clk=
+),
++                             clk, NULL, OBJ_PROP_LINK_STRONG, &error_abo=
+rt);
++}
++
++ClockIn *qdev_get_clock_in(DeviceState *dev, const char *name)
++{
++    NamedClockList *ncl;
++
++    assert(dev && name);
++
++    ncl =3D qdev_get_clocklist(dev, name);
++    return ncl ? ncl->in : NULL;
++}
++
++static ClockOut *qdev_get_clock_out(DeviceState *dev, const char *name)
++{
++    NamedClockList *ncl;
++
++    assert(dev && name);
++
++    ncl =3D qdev_get_clocklist(dev, name);
++    return ncl ? ncl->out : NULL;
++}
++
++void qdev_connect_clock_out(DeviceState *dev, const char *name, ClockIn =
+*clk,
++                            Error **errp)
++{
++    ClockOut *clkout =3D qdev_get_clock_out(dev, name);
++
++    if (!clk) {
++        error_setg(errp, "NULL input clock");
++        return;
++    }
++
++    if (!clkout) {
++        error_setg(errp, "no output clock '%s' in device", name);
++        return;
++    }
++
++    clock_connect(clk, clkout);
++}
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 9095f2b9c1..eae6cd3e09 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -37,6 +37,7 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/boards.h"
+ #include "hw/sysbus.h"
++#include "hw/clock.h"
+ #include "migration/vmstate.h"
+=20
+ bool qdev_hotplug =3D false;
+@@ -821,6 +822,7 @@ static void device_set_realized(Object *obj, bool val=
+ue, Error **errp)
+     DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
+     HotplugHandler *hotplug_ctrl;
+     BusState *bus;
++    NamedClockList *clk;
+     Error *local_err =3D NULL;
+     bool unattached_parent =3D false;
+     static int unattached_count;
+@@ -869,6 +871,15 @@ static void device_set_realized(Object *obj, bool va=
+lue, Error **errp)
+          */
+         g_free(dev->canonical_path);
+         dev->canonical_path =3D object_get_canonical_path(OBJECT(dev));
++        QLIST_FOREACH(clk, &dev->clocks, node) {
++            if (clk->forward) {
++                continue;
++            } else if (clk->in !=3D NULL) {
++                clock_in_setup_canonical_path(clk->in);
++            } else {
++                clock_out_setup_canonical_path(clk->out);
++            }
++        }
+=20
+         if (qdev_get_vmsd(dev)) {
+             if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(de=
+v), dev,
+@@ -999,6 +1010,7 @@ static void device_initfn(Object *obj)
+                              (Object **)&dev->parent_bus, NULL, 0,
+                              &error_abort);
+     QLIST_INIT(&dev->gpios);
++    QLIST_INIT(&dev->clocks);
+ }
+=20
+ static void device_post_init(Object *obj)
+@@ -1015,6 +1027,7 @@ static void device_post_init(Object *obj)
+ static void device_finalize(Object *obj)
+ {
+     NamedGPIOList *ngl, *next;
++    NamedClockList *clk, *clk_next;
+=20
+     DeviceState *dev =3D DEVICE(obj);
+=20
+@@ -1028,6 +1041,25 @@ static void device_finalize(Object *obj)
+          */
+     }
+=20
++    QLIST_FOREACH_SAFE(clk, &dev->clocks, node, clk_next) {
++        QLIST_REMOVE(clk, node);
++        if (!clk->forward && clk->in) {
++            /*
++             * if this clock is not forwarded, clk->in is a child of dev=
+.
++             * At this point the child property and associated reference=
+ is
++             * already deleted but we kept a ref on clk->in to ensure it=
+ lives
++             * up to this point and we can safely remove the callback.
++             * It avoids having a lost callback to a deleted device if t=
+he
++             * clk->in is still referenced somewhere else (eg: by a cloc=
+k
++             * output).
++             */
++            clock_clear_callback(clk->in);
++            object_unref(OBJECT(clk->in));
++        }
++        g_free(clk->name);
++        g_free(clk);
++    }
++
+     /* Only send event if the device had been completely realized */
+     if (dev->pending_deleted_event) {
+         g_assert(dev->canonical_path);
+diff --git a/include/hw/qdev-clock.h b/include/hw/qdev-clock.h
+new file mode 100644
+index 0000000000..c4ea912fdc
+--- /dev/null
++++ b/include/hw/qdev-clock.h
+@@ -0,0 +1,67 @@
++#ifndef QDEV_CLOCK_H
++#define QDEV_CLOCK_H
++
++#include "hw/clock.h"
++
++/**
++ * qdev_init_clock_in:
++ * @dev: the device in which to add a clock
++ * @name: the name of the clock (can't be NULL).
++ * @callback: optional callback to be called on update or NULL.
++ * @opaque:   argument for the callback
++ * @returns: a pointer to the newly added clock
++ *
++ * Add a input clock to device @dev as a clock named @name.
++ * This adds a child<> property.
++ * The callback will be called with @dev as opaque parameter.
++ */
++ClockIn *qdev_init_clock_in(DeviceState *dev, const char *name,
++                            ClockCallback *callback, void *opaque);
++
++/**
++ * qdev_init_clock_out:
++ * @dev: the device to add a clock to
++ * @name: the name of the clock (can't be NULL).
++ * @callback: optional callback to be called on update or NULL.
++ * @returns: a pointer to the newly added clock
++ *
++ * Add a output clock to device @dev as a clock named @name.
++ * This adds a child<> property.
++ */
++ClockOut *qdev_init_clock_out(DeviceState *dev, const char *name);
++
++/**
++ * qdev_get_clock_in:
++ * @dev: the device which has the clock
++ * @name: the name of the clock (can't be NULL).
++ * @returns: a pointer to the clock
++ *
++ * Get the clock @name from @dev or NULL if does not exists.
++ */
++ClockIn *qdev_get_clock_in(DeviceState *dev, const char *name);
++
++/**
++ * qdev_connect_clock_out:
++ * @dev: the device which has the clock
++ * @name: the name of the clock (can't be NULL).
++ * @errp: error report
++ *
++ * Connect @clk to the output clock @name of @dev.
++ * Reports an error if clk is NULL or @name does not exists in @dev.
++ */
++void qdev_connect_clock_out(DeviceState *dev, const char *name, ClockIn =
+*clk,
++                            Error **errp);
++
++/**
++ * qdev_pass_clock:
++ * @dev: the device to forward the clock to
++ * @name: the name of the clock to be added (can't be NULL)
++ * @container: the device which already has the clock
++ * @cont_name: the name of the clock in the container device
++ *
++ * Add a clock @name to @dev which forward to the clock @cont_name in @c=
+ontainer
++ */
++void qdev_pass_clock(DeviceState *dev, const char *name,
++                     DeviceState *container, const char *cont_name);
++
++#endif /* QDEV_CLOCK_H */
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index eb11f0f801..60a65f6142 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -131,6 +131,19 @@ struct NamedGPIOList {
+     QLIST_ENTRY(NamedGPIOList) node;
+ };
+=20
++typedef struct NamedClockList NamedClockList;
++
++typedef struct ClockIn ClockIn;
++typedef struct ClockOut ClockOut;
++
++struct NamedClockList {
++    char *name;
++    bool forward;
++    ClockIn *in;
++    ClockOut *out;
++    QLIST_ENTRY(NamedClockList) node;
 +};
 +
-+When adding a input clock support to an existing device, you must care a=
-bout
-+migration compatibility. To this end, you can use the clock_init_frequen=
-cy in
-+a pre_load function to setup a default value in case the source vm does =
-not
-+migrate the frequency.
+ /**
+  * DeviceState:
+  * @realized: Indicates whether the device has been fully constructed.
+@@ -152,6 +165,7 @@ struct DeviceState {
+     int hotplugged;
+     BusState *parent_bus;
+     QLIST_HEAD(, NamedGPIOList) gpios;
++    QLIST_HEAD(, NamedClockList) clocks;
+     QLIST_HEAD(, BusState) child_bus;
+     int num_child_bus;
+     int instance_id_alias;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f0b4628cc6..5c54beb29e 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -566,6 +566,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qde=
+v-global-props.o \
+ 	hw/core/irq.o \
+ 	hw/core/fw-path-provider.o \
+ 	hw/core/reset.o \
++	hw/core/clock.o \
+ 	$(test-qapi-obj-y)
+ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+ 	migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
 --=20
 2.22.0
 
