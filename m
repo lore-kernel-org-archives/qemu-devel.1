@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A2BC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 06:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A043C3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 06:37:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FC4822CF5
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 06:35:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC4822CF5
+	by mail.kernel.org (Postfix) with ESMTPS id 4055B22CF5
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 06:37:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4055B22CF5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Osw-0000h0-QD
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 02:35:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42941)
+	id 1i5Ouw-0002ow-EM
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 02:37:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42937)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1i5Ono-0006Vs-Jt
+ (envelope-from <quintela@redhat.com>) id 1i5Ono-0006Vn-IM
  for qemu-devel@nongnu.org; Wed, 04 Sep 2019 02:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1i5Onn-0003tt-5u
+ (envelope-from <quintela@redhat.com>) id 1i5Onn-0003tV-21
  for qemu-devel@nongnu.org; Wed, 04 Sep 2019 02:30:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48678)
+Received: from mx1.redhat.com ([209.132.183.28]:50064)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <quintela@redhat.com>)
- id 1i5Onh-0003TZ-64; Wed, 04 Sep 2019 02:29:53 -0400
+ id 1i5One-0003cG-3w; Wed, 04 Sep 2019 02:29:51 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA7EB806D1;
- Wed,  4 Sep 2019 06:29:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F2AFF10F23F3;
+ Wed,  4 Sep 2019 06:29:42 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-17.ams2.redhat.com [10.36.116.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B764219C4F;
- Wed,  4 Sep 2019 06:29:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 177CD19C4F;
+ Wed,  4 Sep 2019 06:29:34 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 08:29:13 +0200
-Message-Id: <20190904062915.6488-4-quintela@redhat.com>
+Date: Wed,  4 Sep 2019 08:29:14 +0200
+Message-Id: <20190904062915.6488-5-quintela@redhat.com>
 In-Reply-To: <20190904062915.6488-1-quintela@redhat.com>
 References: <20190904062915.6488-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 04 Sep 2019 06:29:34 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Wed, 04 Sep 2019 06:29:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/5] socket: Add num connections to
- qio_channel_socket_async()
+Subject: [Qemu-devel] [PULL 4/5] socket: Add num connections to
+ qio_net_listener_open_sync()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,140 +83,141 @@ Sender: "Qemu-devel"
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/io/channel-socket.h    |  2 ++
- io/channel-socket.c            | 30 +++++++++++++++++++++++-------
- io/trace-events                |  2 +-
- tests/test-io-channel-socket.c |  2 +-
- 4 files changed, 27 insertions(+), 9 deletions(-)
+ blockdev-nbd.c            | 2 +-
+ chardev/char-socket.c     | 2 +-
+ include/io/net-listener.h | 2 ++
+ io/net-listener.c         | 3 ++-
+ migration/socket.c        | 2 +-
+ qemu-nbd.c                | 2 +-
+ ui/vnc.c                  | 4 ++--
+ 7 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
-index ed88e5b8c1..777ff5954e 100644
---- a/include/io/channel-socket.h
-+++ b/include/io/channel-socket.h
-@@ -140,6 +140,7 @@ int qio_channel_socket_listen_sync(QIOChannelSocket *=
-ioc,
-  * qio_channel_socket_listen_async:
-  * @ioc: the socket channel object
-  * @addr: the address to listen to
-+ * @num: the expected ammount of connections
-  * @callback: the function to invoke on completion
-  * @opaque: user data to pass to @callback
-  * @destroy: the function to free @opaque
-@@ -155,6 +156,7 @@ int qio_channel_socket_listen_sync(QIOChannelSocket *=
-ioc,
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 7a71da447f..c621686131 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -101,7 +101,7 @@ void nbd_server_start(SocketAddress *addr, const char=
+ *tls_creds,
+     qio_net_listener_set_name(nbd_server->listener,
+                               "nbd-listener");
+=20
+-    if (qio_net_listener_open_sync(nbd_server->listener, addr, errp) < 0=
+) {
++    if (qio_net_listener_open_sync(nbd_server->listener, addr, 1, errp) =
+< 0) {
+         goto error;
+     }
+=20
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 03f03407b0..185fe38dda 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -1170,7 +1170,7 @@ static int qmp_chardev_open_socket_server(Chardev *=
+chr,
+     qio_net_listener_set_name(s->listener, name);
+     g_free(name);
+=20
+-    if (qio_net_listener_open_sync(s->listener, s->addr, errp) < 0) {
++    if (qio_net_listener_open_sync(s->listener, s->addr, 1, errp) < 0) {
+         object_unref(OBJECT(s->listener));
+         s->listener =3D NULL;
+         return -1;
+diff --git a/include/io/net-listener.h b/include/io/net-listener.h
+index 8081ac58a2..fb101703e3 100644
+--- a/include/io/net-listener.h
++++ b/include/io/net-listener.h
+@@ -95,6 +95,7 @@ void qio_net_listener_set_name(QIONetListener *listener=
+,
+  * qio_net_listener_open_sync:
+  * @listener: the network listener object
+  * @addr: the address to listen on
++ * @num: the amount of expected connections
+  * @errp: pointer to a NULL initialized error object
+  *
+  * Synchronously open a listening connection on all
+@@ -104,6 +105,7 @@ void qio_net_listener_set_name(QIONetListener *listen=
+er,
   */
- void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
-                                      SocketAddress *addr,
-+                                     int num,
-                                      QIOTaskFunc callback,
-                                      gpointer opaque,
-                                      GDestroyNotify destroy,
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index 6258c25983..b74f5b92a0 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -220,14 +220,27 @@ int qio_channel_socket_listen_sync(QIOChannelSocket=
- *ioc,
- }
+ int qio_net_listener_open_sync(QIONetListener *listener,
+                                SocketAddress *addr,
++                               int num,
+                                Error **errp);
 =20
+ /**
+diff --git a/io/net-listener.c b/io/net-listener.c
+index dc81150318..5d8a226872 100644
+--- a/io/net-listener.c
++++ b/io/net-listener.c
+@@ -62,6 +62,7 @@ static gboolean qio_net_listener_channel_func(QIOChanne=
+l *ioc,
 =20
-+struct QIOChannelListenWorkerData {
-+    SocketAddress *addr;
-+    int num; /* amount of expected connections */
-+};
-+
-+static void qio_channel_listen_worker_free(gpointer opaque)
-+{
-+    struct QIOChannelListenWorkerData *data =3D opaque;
-+
-+    qapi_free_SocketAddress(data->addr);
-+    g_free(data);
-+}
-+
- static void qio_channel_socket_listen_worker(QIOTask *task,
-                                              gpointer opaque)
+ int qio_net_listener_open_sync(QIONetListener *listener,
+                                SocketAddress *addr,
++                               int num,
+                                Error **errp)
  {
-     QIOChannelSocket *ioc =3D QIO_CHANNEL_SOCKET(qio_task_get_source(tas=
-k));
--    SocketAddress *addr =3D opaque;
-+    struct QIOChannelListenWorkerData *data =3D opaque;
-     Error *err =3D NULL;
+     QIODNSResolver *resolver =3D qio_dns_resolver_get_instance();
+@@ -82,7 +83,7 @@ int qio_net_listener_open_sync(QIONetListener *listener=
+,
+     for (i =3D 0; i < nresaddrs; i++) {
+         QIOChannelSocket *sioc =3D qio_channel_socket_new();
 =20
--    qio_channel_socket_listen_sync(ioc, addr, 1, &err);
-+    qio_channel_socket_listen_sync(ioc, data->addr, data->num, &err);
+-        if (qio_channel_socket_listen_sync(sioc, resaddrs[i], 1,
++        if (qio_channel_socket_listen_sync(sioc, resaddrs[i], num,
+                                            err ? NULL : &err) =3D=3D 0) =
+{
+             success =3D true;
 =20
-     qio_task_set_error(task, err);
- }
-@@ -235,6 +248,7 @@ static void qio_channel_socket_listen_worker(QIOTask =
-*task,
+diff --git a/migration/socket.c b/migration/socket.c
+index 98efdc0286..e63f5e1612 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -181,7 +181,7 @@ static void socket_start_incoming_migration(SocketAdd=
+ress *saddr,
 =20
- void qio_channel_socket_listen_async(QIOChannelSocket *ioc,
-                                      SocketAddress *addr,
-+                                     int num,
-                                      QIOTaskFunc callback,
-                                      gpointer opaque,
-                                      GDestroyNotify destroy,
-@@ -242,16 +256,18 @@ void qio_channel_socket_listen_async(QIOChannelSock=
-et *ioc,
- {
-     QIOTask *task =3D qio_task_new(
-         OBJECT(ioc), callback, opaque, destroy);
--    SocketAddress *addrCopy;
-+    struct QIOChannelListenWorkerData *data;
+     qio_net_listener_set_name(listener, "migration-socket-listener");
 =20
--    addrCopy =3D QAPI_CLONE(SocketAddress, addr);
-+    data =3D g_new0(struct QIOChannelListenWorkerData, 1);
-+    data->addr =3D QAPI_CLONE(SocketAddress, addr);
-+    data->num =3D num;
-=20
-     /* socket_listen() blocks in DNS lookups, so we must use a thread */
--    trace_qio_channel_socket_listen_async(ioc, addr);
-+    trace_qio_channel_socket_listen_async(ioc, addr, num);
-     qio_task_run_in_thread(task,
-                            qio_channel_socket_listen_worker,
--                           addrCopy,
--                           (GDestroyNotify)qapi_free_SocketAddress,
-+                           data,
-+                           qio_channel_listen_worker_free,
-                            context);
- }
-=20
-diff --git a/io/trace-events b/io/trace-events
-index 2e6aa1d749..d7bc70b966 100644
---- a/io/trace-events
-+++ b/io/trace-events
-@@ -18,7 +18,7 @@ qio_channel_socket_connect_async(void *ioc, void *addr)=
- "Socket connect async io
- qio_channel_socket_connect_fail(void *ioc) "Socket connect fail ioc=3D%p=
-"
- qio_channel_socket_connect_complete(void *ioc, int fd) "Socket connect c=
-omplete ioc=3D%p fd=3D%d"
- qio_channel_socket_listen_sync(void *ioc, void *addr, int num) "Socket l=
-isten sync ioc=3D%p addr=3D%p num=3D%d"
--qio_channel_socket_listen_async(void *ioc, void *addr) "Socket listen as=
-ync ioc=3D%p addr=3D%p"
-+qio_channel_socket_listen_async(void *ioc, void *addr, int num) "Socket =
-listen async ioc=3D%p addr=3D%p num=3D%d"
- qio_channel_socket_listen_fail(void *ioc) "Socket listen fail ioc=3D%p"
- qio_channel_socket_listen_complete(void *ioc, int fd) "Socket listen com=
-plete ioc=3D%p fd=3D%d"
- qio_channel_socket_dgram_sync(void *ioc, void *localAddr, void *remoteAd=
-dr) "Socket dgram sync ioc=3D%p localAddr=3D%p remoteAddr=3D%p"
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socke=
-t.c
-index 613ada32c0..d43083a766 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -113,7 +113,7 @@ static void test_io_channel_setup_async(SocketAddress=
- *listen_addr,
-=20
-     lioc =3D qio_channel_socket_new();
-     qio_channel_socket_listen_async(
--        lioc, listen_addr,
-+        lioc, listen_addr, 1,
-         test_io_channel_complete, &data, NULL, NULL);
-=20
-     g_main_loop_run(data.loop);
+-    if (qio_net_listener_open_sync(listener, saddr, errp) < 0) {
++    if (qio_net_listener_open_sync(listener, saddr, 1, errp) < 0) {
+         object_unref(OBJECT(listener));
+         return;
+     }
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 049645491d..83b6c32d73 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -1054,7 +1054,7 @@ int main(int argc, char **argv)
+     server =3D qio_net_listener_new();
+     if (socket_activation =3D=3D 0) {
+         saddr =3D nbd_build_socket_address(sockpath, bindto, port);
+-        if (qio_net_listener_open_sync(server, saddr, &local_err) < 0) {
++        if (qio_net_listener_open_sync(server, saddr, 1, &local_err) < 0=
+) {
+             object_unref(OBJECT(server));
+             error_report_err(local_err);
+             exit(EXIT_FAILURE);
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 649ce93cd2..bd16746022 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3765,7 +3765,7 @@ static int vnc_display_listen(VncDisplay *vd,
+         qio_net_listener_set_name(vd->listener, "vnc-listen");
+         for (i =3D 0; i < nsaddr; i++) {
+             if (qio_net_listener_open_sync(vd->listener,
+-                                           saddr[i],
++                                           saddr[i], 1,
+                                            errp) < 0)  {
+                 return -1;
+             }
+@@ -3780,7 +3780,7 @@ static int vnc_display_listen(VncDisplay *vd,
+         qio_net_listener_set_name(vd->wslistener, "vnc-ws-listen");
+         for (i =3D 0; i < nwsaddr; i++) {
+             if (qio_net_listener_open_sync(vd->wslistener,
+-                                           wsaddr[i],
++                                           wsaddr[i], 1,
+                                            errp) < 0)  {
+                 return -1;
+             }
 --=20
 2.21.0
 
