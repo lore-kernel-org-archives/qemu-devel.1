@@ -2,88 +2,65 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 383ADC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1CAC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 010FC2087E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:55:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FhUaeGM7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 010FC2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 95C1121883
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:56:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C1121883
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cJp-0008Mf-K1
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:55:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49739)
+	id 1i5cKZ-0000w9-5k
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:56:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45095)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bvA-00088V-Kh
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:37 -0400
+ (envelope-from <crosa@redhat.com>) id 1i5bPB-0008IO-5t
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:57:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bv7-0006cM-GM
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:28 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:50207)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5bv7-0006VL-7f
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:25 -0400
-Received: by mail-wm1-x330.google.com with SMTP id c10so210720wmc.0
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:30:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=HEMOxdR8sWTXFxNsuCTbT1Ih44COKmCRkMbmTbJ7YXE=;
- b=FhUaeGM70uKRCvJLf4PhrNgTkqs2nipOly7UYdwyjkAKeuzv86wo5aGXjXzwzPz/tR
- xF/9BHsi3cPDex9iQKN1b6ZVdlQcld2eNoY3nd7sTE6xfdoKzmvjGbW8uD2WJuG44UyN
- tPkPtDWo0/FKfOZonEiyCCtZ27GeWi6fknWvzFumkM7ZZRgZjNrQD9q6vjTeBhkNcClr
- wVrpPdOlzMjm0O1rE09ShrqvW/ntbIEZZ57mNqYTokjbGSsuzBOpY5JzWKQ4O0BN7jEe
- 85xijmYf7JYJV+XBcbtkNR3f+PeTyY9Pu5ZHt0kGZsolb81D9KPzGq8oXOHR2pJuyCRb
- BLZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=HEMOxdR8sWTXFxNsuCTbT1Ih44COKmCRkMbmTbJ7YXE=;
- b=nVxKYRiQZNFrKLdE9OxggX0V0sfZtyTUb7a46y3SkGdC8GEe+P0s+gN0q8Nlbjsn5J
- E29Gu/inMyGYfmMusU+xDd3HRtfhyS6Jx70mEJ984rMjia+XOBAfyQOYcqUmeZinGQEj
- kI4EOe5TeQtGXncFe0xX9U3Se4w5rcvPNmQA5m0MZqG27loBUzVa+gYDmm1zp+XNn+FW
- GnDgtE3F25ISDUDW1a5WqMHJwEvQCVNDv5jOSlIOyn6yQDNnRn/DJt90ikNjjSLWlo2f
- +CPR3hV3sWGpTosG5NKYbPhqjiCGqPluf3waXP2BrYdzWk0v+EE6O0HUIV27+mCMjRqS
- trHA==
-X-Gm-Message-State: APjAAAV2D1GHshwN8caTBOaDDAVslgHB5ERXLGOkpmJQx7Exc3qo4Mgw
- bQ00z0bB1hjcZ90fqxS0y30M1Q==
-X-Google-Smtp-Source: APXvYqzxA+8yHQHEJJT8fuiqnv0Rf8lvGik68HNmmIMK6qMMoNV4Bf39fcmed18ehmN99R1YZ7DQPQ==
-X-Received: by 2002:a7b:cc94:: with SMTP id p20mr69074wma.171.1567629017945;
- Wed, 04 Sep 2019 13:30:17 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 74sm165778wma.15.2019.09.04.13.30.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:30:14 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B799D1FF91;
- Wed,  4 Sep 2019 21:30:13 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:29:35 +0100
-Message-Id: <20190904203013.9028-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
+ (envelope-from <crosa@redhat.com>) id 1i5bP8-0004Xa-C6
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:57:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40482)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i5bP8-0004X5-3B
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:57:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 696D610C6354;
+ Wed,  4 Sep 2019 19:57:20 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-245.rdu2.redhat.com
+ [10.10.123.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A422B6092F;
+ Wed,  4 Sep 2019 19:57:19 +0000 (UTC)
+Date: Wed, 4 Sep 2019 15:57:17 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190904195717.GA2311@localhost.localdomain>
+References: <20190829013125.GG16342@umbus.fritz.box>
+ <20190830175648.GE3694@habkost.net>
+ <20190831014834.GC12065@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::330
-Subject: [Qemu-devel] [PATCH v1 04/42] tests/tcg: use EXTRA_CFLAGS everywhere
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190831014834.GC12065@umbus.fritz.box>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Wed, 04 Sep 2019 19:57:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Cryptic errors from PIP install if missing
+ openssl-devel
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,129 +72,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Peter Maydell <peter.maydell@linaro.org>,
- berrange@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- stefanb@linux.vnet.ibm.com, richard.henderson@linaro.org, f4bug@amsat.org,
- Max Filippov <jcmvbkbc@gmail.com>, cota@braap.org, stefanha@redhat.com,
- marcandre.lureau@redhat.com, pbonzini@redhat.com,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, aurelien@aurel32.net,
- Richard Henderson <rth@twiddle.net>
+Cc: ldoktor@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+On Sat, Aug 31, 2019 at 11:48:34AM +1000, David Gibson wrote:
+> On Fri, Aug 30, 2019 at 02:56:48PM -0300, Eduardo Habkost wrote:
+> > On Thu, Aug 29, 2019 at 11:31:25AM +1000, David Gibson wrote:
+> > > If I attempt to run "make check-acceptance" on my POWER9, RHEL8.1
+> > > machine when the openssl-devel package isn't installed, I get the
+> > > following very cryptic error:
+> > > 
+> > >   VENV    /home/dwg/qemu/build/rhel8/tests/venv
+> > >   PIP     /home/dwg/qemu/tests/requirements.txt
+> > > Command "/home/dwg/qemu/build/rhel8/tests/venv/bin/python -u -c "import setuptools, tokenize;__file__='/tmp/pip-build-la4el5r5/cryptography/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))" install --record /tmp/pip-1efs22iz-record/install-record.txt --single-version-externally-managed --compile --install-headers /home/dwg/qemu/build/rhel8/tests/venv/include/site/python3.6/cryptography" failed with error code 1 in /tmp/pip-build-la4el5r5/cryptography/
+> > > 
+> > > Using V=1 doesn't give any more useful information, and it's not
+> > > (easily) possible to manually re-run the given command since it relies
+> > > on things in /tmp that are removed once the attempt finishes.
+> > 
+> > V=1 is supposed to show the actual pip command being run.  I see
+> > it here:
+> > 
+> >   $ make check-venv V=1
+> >   [...]
+> >   python3 -B -m venv --system-site-packages /home/ehabkost/rh/proj/virt/qemu/tests/venv
+> > * /home/ehabkost/rh/proj/virt/qemu/tests/venv/bin/python -m pip -q install -r /home/ehabkost/rh/proj/virt/qemu/tests/requirements.txt
+> >   You are using pip version 19.0.3, however version 19.2.3 is available.
+> >   You should consider upgrading via the 'pip install --upgrade pip' command.
+> >   touch /home/ehabkost/rh/proj/virt/qemu/tests/venv
+> > 
+> > Can you reproduce the problem if you re-run the pip command?
+> 
+> Yes, I can, but it's basically just the same error without any extra
+> information.
+> 
+> > > I only figured out it was openssl-devel being missing that was the
+> > > problem by (mostly) guesswork.  It would be really great if we could
+> > > generate a more helpful error here.
+> > 
+> > I don't think there's much we can do about it, as the error is generated by a
+> > package being built by pip.
+> > 
+> > There's one thing we can do to make it slightly better: not passing `-q` to pip
+> > if running with V=1, so people can see which packages are being installed and
+> > which one is generating the error.
+> 
+> That sounds like a good start to me.
+> 
+> > > In addition, if I rerun "make check-acceptance" it no longer even
+> > > attempts the PIP install, since tests/venv already exists in my build
+> > > environment.  It then sort of works, but I think it might be hitting
+> > > other errors because of the missing python packages.  Sorry that's a
+> > > bit vague - I also seem to be getting unrelated errors that I'm still
+> > > trying to figure out.
+> > 
+> > This sounds like a bug and we need to fix it.
+> 
+> I agree.
 
-For i386 specifically, this allows using the host GCC
-to compile the i386 tests.  But, it should really be
-done for all targets, unless we want to pass $(EXTRA_CFLAGS)
-directly as part of $(CC).
+Hi David,
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190807143523.15917-2-pbonzini@redhat.com>
----
- tests/tcg/aarch64/Makefile.softmmu-target | 4 ++--
- tests/tcg/alpha/Makefile.softmmu-target   | 4 ++--
- tests/tcg/arm/Makefile.softmmu-target     | 2 +-
- tests/tcg/i386/Makefile.softmmu-target    | 4 ++--
- tests/tcg/minilib/Makefile.target         | 2 +-
- tests/tcg/xtensa/Makefile.softmmu-target  | 4 ++--
- 6 files changed, 10 insertions(+), 10 deletions(-)
+I've pushed a branch here (most of the commits have already been sent
+separately):
 
-diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
-index 2e560e4d08e..4c4aaf61dd3 100644
---- a/tests/tcg/aarch64/Makefile.softmmu-target
-+++ b/tests/tcg/aarch64/Makefile.softmmu-target
-@@ -22,11 +22,11 @@ LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
- .PRECIOUS: $(CRT_OBJS)
- 
- %.o: $(CRT_PATH)/%.S
--	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -x assembler-with-cpp -c $< -o $@
- 
- # Build and link the tests
- %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
--	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
- 
- memory: CFLAGS+=-DCHECK_UNALIGNED=1
- 
-diff --git a/tests/tcg/alpha/Makefile.softmmu-target b/tests/tcg/alpha/Makefile.softmmu-target
-index 3c0f34cc692..09193a62d68 100644
---- a/tests/tcg/alpha/Makefile.softmmu-target
-+++ b/tests/tcg/alpha/Makefile.softmmu-target
-@@ -22,11 +22,11 @@ LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
- .PRECIOUS: $(CRT_OBJS)
- 
- %.o: $(CRT_PATH)/%.S
--	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -x assembler-with-cpp -c $< -o $@
- 
- # Build and link the tests
- %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
--	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
- 
- memory: CFLAGS+=-DCHECK_UNALIGNED=0
- 
-diff --git a/tests/tcg/arm/Makefile.softmmu-target b/tests/tcg/arm/Makefile.softmmu-target
-index 49d48d8a1c3..2deb06e6e46 100644
---- a/tests/tcg/arm/Makefile.softmmu-target
-+++ b/tests/tcg/arm/Makefile.softmmu-target
-@@ -18,7 +18,7 @@ CFLAGS+=-Wl,--build-id=none -x assembler-with-cpp
- LDFLAGS+=-nostdlib -N -static
- 
- %: %.S %.ld
--	$(CC) $(CFLAGS) $(ASFLAGS) $< -o $@ $(LDFLAGS) -T $(ARM_SRC)/$@.ld
-+	$(CC) $(CFLAGS) $(ASFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS) -T $(ARM_SRC)/$@.ld
- 
- # Specific Test Rules
- 
-diff --git a/tests/tcg/i386/Makefile.softmmu-target b/tests/tcg/i386/Makefile.softmmu-target
-index 0a4364868ce..cee342017e5 100644
---- a/tests/tcg/i386/Makefile.softmmu-target
-+++ b/tests/tcg/i386/Makefile.softmmu-target
-@@ -32,11 +32,11 @@ TESTS+=$(MULTIARCH_TESTS)
- .PRECIOUS: $(CRT_OBJS)
- 
- %.o: $(CRT_PATH)/%.S
--	$(CC) $(CFLAGS) -c $< -o $@
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
- 
- # Build and link the tests
- %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
--	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
- 
- memory: CFLAGS+=-DCHECK_UNALIGNED=1
- 
-diff --git a/tests/tcg/minilib/Makefile.target b/tests/tcg/minilib/Makefile.target
-index 3ed8077d0f9..c821d2806a9 100644
---- a/tests/tcg/minilib/Makefile.target
-+++ b/tests/tcg/minilib/Makefile.target
-@@ -18,4 +18,4 @@ MINILIB_INC=-isystem $(SYSTEM_MINILIB_SRC)
- .PRECIOUS: $(MINILIB_OBJS)
- 
- %.o: $(SYSTEM_MINILIB_SRC)/%.c
--	$(CC) $(CFLAGS) -c $< -o $@
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
-diff --git a/tests/tcg/xtensa/Makefile.softmmu-target b/tests/tcg/xtensa/Makefile.softmmu-target
-index 8212d96b81d..9530cac2ad9 100644
---- a/tests/tcg/xtensa/Makefile.softmmu-target
-+++ b/tests/tcg/xtensa/Makefile.softmmu-target
-@@ -34,9 +34,9 @@ $(XTENSA_USABLE_TESTS): linker.ld macros.inc $(CRT) Makefile.softmmu-target
- 
- # special rule for common blobs
- %.o: %.S
--	$(CC) $(XTENSA_INC) $($*_ASFLAGS) $(ASFLAGS) -c $< -o $@
-+	$(CC) $(XTENSA_INC) $($*_ASFLAGS) $(ASFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
- 
- %: %.S
--	$(CC) $(XTENSA_INC) $(ASFLAGS) $< -o $@ $(LDFLAGS) $(NOSTDFLAGS) $(CRT)
-+	$(CC) $(XTENSA_INC) $(ASFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS) $(NOSTDFLAGS) $(CRT)
- 
- endif
--- 
-2.20.1
+   https://github.com/clebergnu/qemu/tree/ppc64
+
+I've tested on a RHEL 8 ppc64le Power 9, and it seems to work for me.
+My steps for building QEMU:
+
+  - Configured with: '/home/cleber/src/qemu/configure' '--enable-slirp=git' '--python=/usr/bin/python3' '--target-list=x86_64-softmmu,ppc64-softmmu,arm-softmmu,aarch64-softmmu,mips-softmmu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,sh4-softmmu,s390x-softmmu,alpha-softmmu,m68k-softmmu,riscv64-softmmu'
+  - make
+  - make check-acceptance
+
+Would you be able to test if that branch works smoothly for you?
+
+Thanks,
+- Cleber.
+
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
+
 
 
