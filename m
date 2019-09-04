@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA5AC3A5A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFEBC3A5A8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:24:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 962622087E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B9092087E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:24:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pDrdlb2r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 962622087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGyo3sSR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B9092087E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Z1Z-0003Dz-60
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 13:24:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48608)
+	id 1i5Z1c-0003Ij-U3
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 13:24:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5Yql-0001jg-SE
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:45 -0400
+ id 1i5Yqo-0001lf-0N
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5Yqk-0007AW-Jw
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:43 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51644)
+ id 1i5Yql-0007BO-Rz
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:45 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54461)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5Yqj-0007A1-MG; Wed, 04 Sep 2019 13:13:41 -0400
-Received: by mail-wm1-x344.google.com with SMTP id k1so4154652wmi.1;
- Wed, 04 Sep 2019 10:13:41 -0700 (PDT)
+ id 1i5Yql-0007Am-EV; Wed, 04 Sep 2019 13:13:43 -0400
+Received: by mail-wm1-x344.google.com with SMTP id k2so4122799wmj.4;
+ Wed, 04 Sep 2019 10:13:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fquUmVkncxEMfeAsRc3/6BsqyJ3/ccTKHRFzefWvbc4=;
- b=pDrdlb2rH6HXIVh5RptUMn3al7DtlWvRcvKpBaPq53spQUKpEKQ8tu2amFuF36KcB1
- m0xhE9u/BWG35kTr/duYfN+6ZpnvRO3m8IqMnljYOymenAdTX22gVSG3Y5HVn4hx+wuN
- 4TY4rPvOUVTYpQV5MliBprE8tdGbsVkF67cHWQ6/dPredUf+NkOePIQ1iGd6dGT0e4lD
- IlRtNNsbGvFz9SAxxV/YyURoh7b0iNsTslvE5mVaAkOxu5TUGJxHSVLFTSvvS4W+ta/M
- WF74ijiw1jQpfVBvvERdwQZ7WKDth9Sf5SbO3O63n0PgA8mHsGBUEZR78lpgPnRCADw0
- 1Lig==
+ bh=S7qhLshgv8PC8yoBGkMqEzXE2knLg4gMrxiA4d+K3Q4=;
+ b=dGyo3sSR6uVtDir2QlRv6W4C/7BKr7vf0E/P/R5Hn4SRjQZ1GWlLhy9QRhIhMzIUZB
+ izQwPHqe+gcqBElAT5hxOlkorLat4II+sM5Gh0Vgcu2WUwky+JK1gDzDXCLmRPi7leeA
+ zcynqY2BObh8zN1IKSa7NxVtUknIf81gMd2K9qwTB8IQUjBNsYE23LWiK4NDIsTDYBVB
+ IoIr2Ws3dF5KsI2S3Une0Go/ZPahwWsg1yq42Ynr3NqqVntsbWc4qyHNCmGhxZIurVDi
+ z9q2sDDDyRy74iMnvVV9x5N7kZdQ+S/5nD8LnbzewYdgV0yKxp9Gmu1MHr3+unbqx6op
+ 38hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=fquUmVkncxEMfeAsRc3/6BsqyJ3/ccTKHRFzefWvbc4=;
- b=DdaWThf8lTQCei+iygxqZAK+wqD+WHjl+5xdahGNFuSBCHB6Jfnyn2HVliB5s7GPAR
- EEZLXQmbJvftXYKkm7Uu0x9GJPPEeJ4XYjG7Dcy+N6KyKQ+xUWnJ5LuNAxMSmjeVMBA8
- 87um/BbMVmgNNknJLfIb6AIabNRmGoYBQqJYl9IcGCl00h8atg3567GJuf5656vFBroK
- msFmro1JJfw0oBxesYz0DqgfPG/WDiNv/r6wBSb/TPOXkFjrp7tpm2vlAGCqBEYcRZA1
- xchYn01mUR5ro8BnZpwwQTmsyivBKkBe365EVESQjEOHnjFAamPMkpA8yYXED7t6OVJh
- NVkQ==
-X-Gm-Message-State: APjAAAU9N8u+YqbMXv5ceFAR3Rb+/uGFx3VDLWc76z2Qs68O7m0SorAF
- hyIiJiQ1kGuh157sXqkaDsQ=
-X-Google-Smtp-Source: APXvYqwU6MyaKzsoxz9MLfPE23lpSKADVPHZtTUJSSKe27uUWigfDMQ8nQcAcb3dE6u8zcLk6l3bug==
-X-Received: by 2002:a7b:cb93:: with SMTP id m19mr224180wmi.157.1567617220721; 
- Wed, 04 Sep 2019 10:13:40 -0700 (PDT)
+ bh=S7qhLshgv8PC8yoBGkMqEzXE2knLg4gMrxiA4d+K3Q4=;
+ b=bvDCGagMDdahgpiONJdAS5PT7BwwNXDY8xi/tQNkGg10nMZvyCINMNjgrL+MUJO7Sj
+ OEt2+RQ+7TN6YErPKphl9ZnzmiG8Y8ActoSeMIbi+0KiaRcCvHXtsfxq/66rmlNd3CV2
+ RqTP+IFxj6NTzPDOz3ySp9W1hNRd1AGgZbvx3nuvBuH9ZrvPgUEHuQkGUKHHbGQxgNjj
+ Ec9jUFPuMNZJl5mh6f1vgZMmNil9v5V2hpviDv1cyFo6Ry4YvZNgszyXp+h9FTtv1mAG
+ WfiJRhQlsgxJHTLzUBMlVVwvDDDyh4xT0mRr+U7b6ejDfwF3e2V383JgIFvekqFDzs9J
+ mqOQ==
+X-Gm-Message-State: APjAAAWxNRhWS5JdMmJft1707mIHtkc9xslysXTAGv/2qSaxXQhsyiG9
+ UrlUqAUpsfQt7TZMN8Xlfi4=
+X-Google-Smtp-Source: APXvYqwb+qEXd9UBIbhWFdBp7a2PntQMMVxI+YBAKS6LSrEv/iCIhobmuvObBkPJ5JNlXx4E0J5IRg==
+X-Received: by 2002:a1c:4b11:: with SMTP id y17mr5254736wma.2.1567617222530;
+ Wed, 04 Sep 2019 10:13:42 -0700 (PDT)
 Received: from x1w.redhat.com ([195.166.127.210])
- by smtp.gmail.com with ESMTPSA id p19sm2339512wmg.31.2019.09.04.10.13.39
+ by smtp.gmail.com with ESMTPSA id p19sm2339512wmg.31.2019.09.04.10.13.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 10:13:40 -0700 (PDT)
+ Wed, 04 Sep 2019 10:13:41 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Esteban Bosse <estebanbosse@gmail.com>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org,
  Pekka Enberg <penberg@iki.fi>,
  =?UTF-8?q?Zolt=C3=A1n=20Baldaszti?= <bztemail@gmail.com>
-Date: Wed,  4 Sep 2019 19:13:14 +0200
-Message-Id: <20190904171315.8354-14-f4bug@amsat.org>
+Date: Wed,  4 Sep 2019 19:13:15 +0200
+Message-Id: <20190904171315.8354-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190904171315.8354-1-f4bug@amsat.org>
 References: <20190904171315.8354-1-f4bug@amsat.org>
@@ -87,8 +87,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [RFC PATCH 13/14] hw/arm/bcm2838: Map the PCIe memory
- space
+Subject: [Qemu-devel] [RFC PATCH 14/14] hw/arm/raspi: Add the Raspberry Pi
+ 4B board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,51 +110,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BCM2711 has a BCM54213 Gigabit Ethernet block mapped
-in the PCIe range.
+The Raspberry Pi 4 uses a BCM2711 SoC (based on a BCM2838).
+The SoC can handle up to 8GiB of SDRAM, but we limit it to 4GiB
+(no 8GiB models in the market yet).
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-FIXME: create the bcm54213-geth in raspi.c?
----
- hw/arm/bcm2836.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/arm/raspi.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index d89d7cd71d..39190a108f 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -15,6 +15,7 @@
- #include "hw/arm/bcm2836.h"
- #include "hw/arm/raspi_platform.h"
- #include "hw/sysbus.h"
-+#include "hw/misc/unimp.h"
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index b4db39661f..59ee2f82b4 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -39,11 +39,13 @@ enum BoardIdChip {
+     C_BCM2835 = 0,
+     C_BCM2836 = 1,
+     C_BCM2837 = 2,
++    C_BCM2711 = 3,
+ };
  
- struct BCM283XInfo {
-     const char *name;
-@@ -60,6 +61,8 @@ static const BCM283XInfo bcm283x_socs[] = {
- #define GIC_VIFACE_OTHER_OFS(cpu)  (0x5000 + (cpu) * 0x200)
- #define GIC_VCPU_OFS                0x6000
+ enum BoardIdType {
+     T_2B = 0x04,
+     T_3B = 0x08,
++    T_4B = 0x11,
+ };
  
-+#define PCIE_BASE                   0x7d500000
-+
- static void bcm2836_init(Object *obj)
- {
-     BCM283XState *s = BCM283X(obj);
-@@ -238,6 +241,13 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
-         qdev_connect_gpio_out(DEVICE(&s->cpus[n]), GTIMER_SEC,
-                 qdev_get_gpio_in_named(DEVICE(&s->control), "cntpsirq", n));
-     }
-+
-+    /* bcm2838 kludge to easily create PCIe */
-+    if (info->gic_base) {
-+        create_unimplemented_device("bcm2838-pcie", PCIE_BASE, 0x100000);
-+        create_unimplemented_device("bcm54213-geth",
-+                                    PCIE_BASE + 0x80000, 0x10000);
-+    }
+ enum BoardIdRevision {
+@@ -56,6 +58,7 @@ enum BoardIdRevision {
+ static const char *processor_typename[] = {
+     [C_BCM2836] = TYPE_BCM2836,
+     [C_BCM2837] = TYPE_BCM2837,
++    [C_BCM2711] = TYPE_BCM2838,
+ };
+ 
+ typedef struct BoardInfo BoardInfo;
+@@ -90,6 +93,12 @@ static const BoardInfo bcm283x_boards[] = {
+         .ram_size_min = 1 * GiB,
+         .ram_size_max = 1 * GiB,
+     },
++    [4] = {
++        .board_id = 0xc42,
++        .board_rev = { T_4B, R_1_1, C_BCM2711, M_SONY_UK },
++        .ram_size_min = 1 * GiB,
++        .ram_size_max = 4 * GiB,
++    },
+ };
+ 
+ typedef struct RasPiState {
+@@ -336,4 +345,24 @@ static void raspi3_machine_init(MachineClass *mc)
+     mc->default_ram_size = 1 * GiB;
  }
- 
- static Property bcm2836_props[] = {
+ DEFINE_MACHINE("raspi3", raspi3_machine_init)
+-#endif
++
++static void raspi4_init(MachineState *machine)
++{
++    raspi_init(machine, 4);
++}
++
++static void raspi4_machine_init(MachineClass *mc)
++{
++    mc->desc = "Raspberry Pi 4B";
++    mc->init = raspi4_init;
++    mc->block_default_type = IF_SD;
++    mc->no_parallel = 1;
++    mc->no_floppy = 1;
++    mc->no_cdrom = 1;
++    mc->max_cpus = BCM283X_NCPUS;
++    mc->min_cpus = BCM283X_NCPUS;
++    mc->default_cpus = BCM283X_NCPUS;
++    mc->default_ram_size = 1 * GiB;
++}
++DEFINE_MACHINE("raspi4", raspi4_machine_init)
++#endif /* TARGET_AARCH64 */
 -- 
 2.20.1
 
