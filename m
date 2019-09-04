@@ -2,114 +2,81 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0B8C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 04:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6519DC3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 04:25:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB9A522CEA
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 04:21:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9A522CEA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 358AE21883
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 04:25:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 358AE21883
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5MnH-0004P6-Qk
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 00:21:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55749)
+	id 1i5Mr3-0005ZI-Bj
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 00:25:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56165)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i5Mli-0003tF-PB
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:19:43 -0400
+ (envelope-from <kevin.tian@intel.com>) id 1i5Mpr-00057w-PT
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i5Mlg-0005GM-7F
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:19:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53330)
+ (envelope-from <kevin.tian@intel.com>) id 1i5Mpp-000758-Ue
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:23:59 -0400
+Received: from mga12.intel.com ([192.55.52.136]:56596)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5Mlf-0005FS-VL
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:19:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 26522281D1;
- Wed,  4 Sep 2019 04:19:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-69.ams2.redhat.com [10.36.116.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5052160920;
- Wed,  4 Sep 2019 04:19:34 +0000 (UTC)
-To: Yury Kotov <yury-kotov@yandex-team.ru>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <20190903162246.18524-1-yury-kotov@yandex-team.ru>
- <20190903162246.18524-3-yury-kotov@yandex-team.ru>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <ced2a481-9089-6d0a-2934-b9714d053254@redhat.com>
-Date: Wed, 4 Sep 2019 06:19:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190903162246.18524-3-yury-kotov@yandex-team.ru>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+ id 1i5Mpp-00073i-Hi; Wed, 04 Sep 2019 00:23:57 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 03 Sep 2019 21:23:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,465,1559545200"; d="scan'208";a="194584313"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by orsmga002.jf.intel.com with ESMTP; 03 Sep 2019 21:23:53 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 3 Sep 2019 21:23:53 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.86]) with mapi id 14.03.0439.000;
+ Wed, 4 Sep 2019 12:23:51 +0800
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Peter Xu <peterx@redhat.com>, Auger Eric <eric.auger@redhat.com>
+Thread-Topic: [PATCH for-4.2 v10 08/15] virtio-iommu: Implement map/unmap
+Thread-Index: AQHVRvt45mqYxba1WEGcL7R8WepU8acBt2WAgBfMYYCAAOysAIAAsfiA
+Date: Wed, 4 Sep 2019 04:23:50 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D561F28@SHSMSX104.ccr.corp.intel.com>
+References: <20190730172137.23114-1-eric.auger@redhat.com>
+ <20190730172137.23114-9-eric.auger@redhat.com>
+ <20190819081143.GA13560@xz-x1>
+ <b5e2ff32-eed8-829e-ffd4-2b62ed6b2fda@redhat.com>
+ <20190904014416.GB30402@xz-x1>
+In-Reply-To: <20190904014416.GB30402@xz-x1>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Wed, 04 Sep 2019 04:19:38 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] tests/libqtest: Allow setting
- expected exit status
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDhjZDkxNTAtNTkwYS00Y2VhLTg3YzMtOTVkYzUzMjkzYWRhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiXC9lTUUxcU5lQ0toNkU4N2dBNEp6c0Fwdjc5VjFrc2xSanhFSFJXazdWYnhsMHdlbkNlTURnV0pCWVUrNDNJRFgifQ==
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.136
+Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 08/15] virtio-iommu: Implement
+ map/unmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,111 +88,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "mst@redhat.com" <mst@redhat.com>, "tn@semihalf.com" <tn@semihalf.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/09/2019 18.22, Yury Kotov wrote:
-> Add qtest_set_expected_status function to set expected exit status of
-> child process. By default expected exit status is 0.
-> 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> ---
->  tests/libqtest.c | 36 +++++++++++++++++++++---------------
->  tests/libqtest.h |  9 +++++++++
->  2 files changed, 30 insertions(+), 15 deletions(-)
-> 
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 2713b86cf7..a79d4887ae 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -43,6 +43,7 @@ struct QTestState
->      int qmp_fd;
->      pid_t qemu_pid;  /* our child QEMU process */
->      int wstatus;
-> +    int expected_status;
->      bool big_endian;
->      bool irq_level[MAX_IRQ];
->      GString *rx;
-> @@ -113,6 +114,11 @@ bool qtest_probe_child(QTestState *s)
->      return false;
->  }
->  
-> +void qtest_set_expected_status(QTestState *s, int status)
-> +{
-> +    s->expected_status = status;
-> +}
-> +
->  static void kill_qemu(QTestState *s)
->  {
->      pid_t pid = s->qemu_pid;
-> @@ -126,24 +132,23 @@ static void kill_qemu(QTestState *s)
->      }
->  
->      /*
-> -     * We expect qemu to exit with status 0; anything else is
-> +     * Check whether qemu exited with expected exit status; anything else is
->       * fishy and should be logged with as much detail as possible.
->       */
->      wstatus = s->wstatus;
-> -    if (wstatus) {
-> -        if (WIFEXITED(wstatus)) {
-> -            fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-> -                    "process but encountered exit status %d\n",
-> -                    __FILE__, __LINE__, WEXITSTATUS(wstatus));
-> -        } else if (WIFSIGNALED(wstatus)) {
-> -            int sig = WTERMSIG(wstatus);
-> -            const char *signame = strsignal(sig) ?: "unknown ???";
-> -            const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-> -
-> -            fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-> -                    "from signal %d (%s)%s\n",
-> -                    __FILE__, __LINE__, sig, signame, dump);
-> -        }
-> +    if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) != s->expected_status) {
-> +        fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-> +                "process but encountered exit status %d (expected %d)\n",
-> +                __FILE__, __LINE__, WEXITSTATUS(wstatus), s->expected_status);
-> +        abort();
-> +    } else if (WIFSIGNALED(wstatus)) {
-> +        int sig = WTERMSIG(wstatus);
-> +        const char *signame = strsignal(sig) ?: "unknown ???";
-> +        const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-> +
-> +        fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-> +                "from signal %d (%s)%s\n",
-> +                __FILE__, __LINE__, sig, signame, dump);
->          abort();
->      }
->  }
-> @@ -248,6 +253,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
->      g_test_message("starting QEMU: %s", command);
->  
->      s->wstatus = 0;
-> +    s->expected_status = 0;
->      s->qemu_pid = fork();
->      if (s->qemu_pid == 0) {
->          setenv("QEMU_AUDIO_DRV", "none", true);
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 07ea35867c..c00bca94af 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -997,4 +997,13 @@ void qmp_assert_error_class(QDict *rsp, const char *class);
->   */
->  bool qtest_probe_child(QTestState *s);
->  
-> +/**
-> + * qtest_set_expected_status:
-> + * @s: QTestState instance to operate on.
-> + * @status: an expected exit status.
-> + *
-> + * Set expected exit status of the child.
-> + */
-> +void qtest_set_expected_status(QTestState *s, int status);
-> +
->  #endif
-> 
-
-Acked-by: Thomas Huth <thuth@redhat.com>
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBXZWRu
+ZXNkYXksIFNlcHRlbWJlciA0LCAyMDE5IDk6NDQgQU0NCj4gDQo+IE9uIFR1ZSwgU2VwIDAzLCAy
+MDE5IGF0IDAxOjM3OjExUE0gKzAyMDAsIEF1Z2VyIEVyaWMgd3JvdGU6DQo+ID4gSGkgUGV0ZXIs
+DQo+ID4NCj4gPiBPbiA4LzE5LzE5IDEwOjExIEFNLCBQZXRlciBYdSB3cm90ZToNCj4gPiA+IE9u
+IFR1ZSwgSnVsIDMwLCAyMDE5IGF0IDA3OjIxOjMwUE0gKzAyMDAsIEVyaWMgQXVnZXIgd3JvdGU6
+DQo+ID4gPg0KPiA+ID4gWy4uLl0NCj4gPiA+DQo+ID4gPj4gKyAgICBtYXBwaW5nID0gZ190cmVl
+X2xvb2t1cChkb21haW4tPm1hcHBpbmdzLCAoZ3BvaW50ZXIpKCZpbnRlcnZhbCkpOw0KPiA+ID4+
+ICsNCj4gPiA+PiArICAgIHdoaWxlIChtYXBwaW5nKSB7DQo+ID4gPj4gKyAgICAgICAgdmlvbW11
+X2ludGVydmFsIGN1cnJlbnQ7DQo+ID4gPj4gKyAgICAgICAgdWludDY0X3QgbG93ICA9IG1hcHBp
+bmctPnZpcnRfYWRkcjsNCj4gPiA+PiArICAgICAgICB1aW50NjRfdCBoaWdoID0gbWFwcGluZy0+
+dmlydF9hZGRyICsgbWFwcGluZy0+c2l6ZSAtIDE7DQo+ID4gPj4gKw0KPiA+ID4+ICsgICAgICAg
+IGN1cnJlbnQubG93ID0gbG93Ow0KPiA+ID4+ICsgICAgICAgIGN1cnJlbnQuaGlnaCA9IGhpZ2g7
+DQo+ID4gPj4gKw0KPiA+ID4+ICsgICAgICAgIGlmIChsb3cgPT0gaW50ZXJ2YWwubG93ICYmIHNp
+emUgPj0gbWFwcGluZy0+c2l6ZSkgew0KPiA+ID4+ICsgICAgICAgICAgICBnX3RyZWVfcmVtb3Zl
+KGRvbWFpbi0+bWFwcGluZ3MsIChncG9pbnRlcikoJmN1cnJlbnQpKTsNCj4gPiA+PiArICAgICAg
+ICAgICAgaW50ZXJ2YWwubG93ID0gaGlnaCArIDE7DQo+ID4gPj4gKyAgICAgICAgICAgIHRyYWNl
+X3ZpcnRpb19pb21tdV91bm1hcF9sZWZ0X2ludGVydmFsKGN1cnJlbnQubG93LA0KPiBjdXJyZW50
+LmhpZ2gsDQo+ID4gPj4gKyAgICAgICAgICAgICAgICBpbnRlcnZhbC5sb3csIGludGVydmFsLmhp
+Z2gpOw0KPiA+ID4+ICsgICAgICAgIH0gZWxzZSBpZiAoaGlnaCA9PSBpbnRlcnZhbC5oaWdoICYm
+IHNpemUgPj0gbWFwcGluZy0+c2l6ZSkgew0KPiA+ID4+ICsgICAgICAgICAgICB0cmFjZV92aXJ0
+aW9faW9tbXVfdW5tYXBfcmlnaHRfaW50ZXJ2YWwoY3VycmVudC5sb3csDQo+IGN1cnJlbnQuaGln
+aCwNCj4gPiA+PiArICAgICAgICAgICAgICAgIGludGVydmFsLmxvdywgaW50ZXJ2YWwuaGlnaCk7
+DQo+ID4gPj4gKyAgICAgICAgICAgIGdfdHJlZV9yZW1vdmUoZG9tYWluLT5tYXBwaW5ncywgKGdw
+b2ludGVyKSgmY3VycmVudCkpOw0KPiA+ID4+ICsgICAgICAgICAgICBpbnRlcnZhbC5oaWdoID0g
+bG93IC0gMTsNCj4gPiA+PiArICAgICAgICB9IGVsc2UgaWYgKGxvdyA+IGludGVydmFsLmxvdyAm
+JiBoaWdoIDwgaW50ZXJ2YWwuaGlnaCkgew0KPiA+ID4+ICsgICAgICAgICAgICB0cmFjZV92aXJ0
+aW9faW9tbXVfdW5tYXBfaW5jX2ludGVydmFsKGN1cnJlbnQubG93LA0KPiBjdXJyZW50LmhpZ2gp
+Ow0KPiA+ID4+ICsgICAgICAgICAgICBnX3RyZWVfcmVtb3ZlKGRvbWFpbi0+bWFwcGluZ3MsIChn
+cG9pbnRlcikoJmN1cnJlbnQpKTsNCj4gPiA+PiArICAgICAgICB9IGVsc2Ugew0KPiA+ID4+ICsg
+ICAgICAgICAgICBicmVhazsNCj4gPiA+PiArICAgICAgICB9DQo+ID4gPj4gKyAgICAgICAgaWYg
+KGludGVydmFsLmxvdyA+PSBpbnRlcnZhbC5oaWdoKSB7DQo+ID4gPj4gKyAgICAgICAgICAgIHJl
+dHVybiBWSVJUSU9fSU9NTVVfU19PSzsNCj4gPiA+PiArICAgICAgICB9IGVsc2Ugew0KPiA+ID4+
+ICsgICAgICAgICAgICBtYXBwaW5nID0gZ190cmVlX2xvb2t1cChkb21haW4tPm1hcHBpbmdzLA0K
+PiAoZ3BvaW50ZXIpKCZpbnRlcnZhbCkpOw0KPiA+ID4+ICsgICAgICAgIH0NCj4gPiA+PiArICAg
+IH0NCj4gPiA+PiArDQo+ID4gPj4gKyAgICBpZiAobWFwcGluZykgew0KPiA+ID4+ICsgICAgICAg
+IHFlbXVfbG9nX21hc2soTE9HX0dVRVNUX0VSUk9SLA0KPiA+ID4+ICsgICAgICAgICAgICAgICAg
+ICAgICAgIioqKioqKiAlczogVW5tYXAgMHglIlBSSXg2NCIgc2l6ZT0weCUiUFJJeDY0DQo+ID4g
+Pj4gKyAgICAgICAgICAgICAgICAgICAgICIgZnJvbSAweCUiUFJJeDY0IiBzaXplPTB4JSJQUkl4
+NjQiIGlzIG5vdCBzdXBwb3J0ZWRcbiIsDQo+ID4gPj4gKyAgICAgICAgICAgICAgICAgICAgIF9f
+ZnVuY19fLCBpbnRlcnZhbC5sb3csIHNpemUsDQo+ID4gPj4gKyAgICAgICAgICAgICAgICAgICAg
+IG1hcHBpbmctPnZpcnRfYWRkciwgbWFwcGluZy0+c2l6ZSk7DQo+ID4gPj4gKyAgICB9IGVsc2Ug
+ew0KPiA+ID4+ICsgICAgICAgIHJldHVybiBWSVJUSU9fSU9NTVVfU19PSzsNCj4gPiA+PiArICAg
+IH0NCj4gPiA+PiArDQo+ID4gPj4gKyAgICByZXR1cm4gVklSVElPX0lPTU1VX1NfSU5WQUw7DQo+
+ID4gPg0KPiA+ID4gQ291bGQgdGhlIGFib3ZlIGNodW5rIGJlIHNpbXBsaWZpZWQgYXMgc29tZXRo
+aW5nIGxpa2UgYmVsb3c/DQo+ID4gPg0KPiA+ID4gICB3aGlsZSAoKG1hcHBpbmcgPSBnX3RyZWVf
+bG9va3VwKGRvbWFpbi0+bWFwcGluZ3MsICZpbnRlcnZhbCkpKSB7DQo+ID4gPiAgICAgZ190cmVl
+X3JlbW92ZShkb21haW4tPm1hcHBpbmdzLCBtYXBwaW5nKTsNCj4gPiA+ICAgfQ0KPiA+IEluZGVl
+ZCB0aGUgY29kZSBjb3VsZCBiZSBzaW1wbGlmaWVkLiBJIG9ubHkgbmVlZCB0byBtYWtlIHN1cmUg
+SSBkb24ndA0KPiA+IHNwbGl0IGFuIGV4aXN0aW5nIG1hcHBpbmcuDQo+IA0KPiBIbW0uLi4gRG8g
+d2UgbmVlZCB0byBzdGlsbCBzcGxpdCBhbiBleGlzdGluZyBtYXBwaW5nIGlmIG5lY2Vzc2FyeT8N
+Cj4gRm9yIGV4YW1wbGUgd2hlbiB3aXRoIHRoaXMgbWFwcGluZzoNCj4gDQo+ICAgaW92YT0weDEw
+MDAsIHNpemU9MHgyMDAwLCBwaHlzPUFERFIxLCBmbGFncz1GTEFHUzENCj4gDQo+IEFuZCBpZiB3
+ZSB3YW50IHRvIHVubWFwIHRoZSByYW5nZSAoaW92YT0wLCBzaXplPTB4MjAwMCksIHRoZW4gd2UN
+Cj4gc2hvdWxkIHNwbGl0IHRoZSBleGlzdGluZyBtYXBwcGluZyBhbmQgbGVhdmUgdGhpcyBvbmU6
+DQo+IA0KPiAgIGlvdmE9MHgyMDAwLCBzaXplPTB4MTAwMCwgcGh5cz0oQUREUjErMHgxMDAwKSwg
+ZmxhZ3M9RkxBR1MxDQo+IA0KPiBSaWdodD8NCj4gDQoNCnZpcnRpby1pb21tdSBzcGVjIGV4cGxp
+Y2l0bHkgZGlzYWxsb3dzIHBhcnRpYWwgdW5tYXAuDQoNCjUuMTEuNi42LjEgRHJpdmVyIFJlcXVp
+cmVtZW50czogVU5NQVAgcmVxdWVzdA0KDQpUaGUgZmlyc3QgYWRkcmVzcyBvZiBhIHJhbmdlIE1V
+U1QgZWl0aGVyIGJlIHRoZSBmaXJzdCBhZGRyZXNzIG9mIGEgDQptYXBwaW5nIG9yIGJlIG91dHNp
+ZGUgYW55IG1hcHBpbmcuIFRoZSBsYXN0IGFkZHJlc3Mgb2YgYSByYW5nZSANCk1VU1QgZWl0aGVy
+IGJlIHRoZSBsYXN0IGFkZHJlc3Mgb2YgYSBtYXBwaW5nIG9yIGJlIG91dHNpZGUgYW55IA0KbWFw
+cGluZy4NCg0KNS4xMS42LjYuMiBEZXZpY2UgUmVxdWlyZW1lbnRzOiBVTk1BUCByZXF1ZXN0DQoN
+CklmIGEgbWFwcGluZyBhZmZlY3RlZCBieSB0aGUgcmFuZ2UgaXMgbm90IGNvdmVyZWQgaW4gaXRz
+IGVudGlyZXR5IA0KYnkgdGhlIHJhbmdlICh0aGUgVU5NQVAgcmVxdWVzdCB3b3VsZCBzcGxpdCB0
+aGUgbWFwcGluZyksIA0KdGhlbiB0aGUgZGV2aWNlIFNIT1VMRCBzZXQgdGhlIHJlcXVlc3Qgc3Rh
+dHVzIHRvIFZJUlRJT19JT01NVQ0KX1NfUkFOR0UsIGFuZCBTSE9VTEQgTk9UIHJlbW92ZSBhbnkg
+bWFwcGluZy4NCg0KVGhhbmtzDQpLZXZpbg0K
 
