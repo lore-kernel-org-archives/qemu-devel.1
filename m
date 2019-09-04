@@ -2,80 +2,59 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30AEFC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DBC7C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0F5322CED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:35:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=redhat-com.20150623.gappssmtp.com header.i=@redhat-com.20150623.gappssmtp.com header.b="fmSgrfLy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F5322CED
+	by mail.kernel.org (Postfix) with ESMTPS id DB51A22CEA
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:35:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB51A22CEA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5VRZ-0000qK-1l
+	id 1i5VRZ-0000rN-Tf
 	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:35:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33506)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1i5VPD-0007b6-GS
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:33:05 -0400
+ (envelope-from <thuth@redhat.com>) id 1i5UuD-0001zr-6Z
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1i5VPB-0003Q0-Cm
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:33:03 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:44289)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1i5VP7-0003MW-HM
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:33:00 -0400
-Received: by mail-qt1-x843.google.com with SMTP id u40so15746836qth.11
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 06:32:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=redhat-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ceeIGKVFh0XdwW26L6qvRjcU41Jt7b+hs5MlypX8YIY=;
- b=fmSgrfLyq9NkHoW/YeQRZ9z0R9j8gjBFKvaRRPG/mqhWA2xz0+Ow7LJZaWwMjar9Xw
- QIa1etF9L/B3vZD9nKTNC95HaHQogajgdZmeDg5OdHxrJW3y/A7BJtArC+hUY+7pgkRr
- CQFdaty59nhC4r2nzxXKzQKOMuLhupn9+QuqDPIM62TIB5+sx2obuqxyYbTL2RKF3qr/
- O8PUwucACO4QNim4Vv7TqmZ1Ue/Mq50yJTTRvopC8XuE4MSejIYW8wDJ5Ds0pxXXG0Yb
- sMfAiYAvJMz34aCS2R734LITuHF2HpiOzFO7htisOtOzhNyEfq+8A9RXLlAFWzpYBgCR
- qWBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ceeIGKVFh0XdwW26L6qvRjcU41Jt7b+hs5MlypX8YIY=;
- b=PjrdaVtOZhmeMKNGH0FoHrk7GndrvuJQ8WfMm6Wp/fiwVOOqORSEaImFOxttH0T0Px
- 6bhDTHMdKVPMOyqrmUsKDq0Ss2MrJdxe3ApmPxpddiJ9PfW83yDBFNeidU6O7P+OSwht
- V8s3ntoedbxnfUvwq78BvbaPJ+DRPLXkjvvESFRstNYEm3wAzK2MDuEjM2KqwyMOsuaH
- XgxBugot3yaECPTaipFiW4RuMmN9zMsOZORdCAbSuKX2xK8l7g3Bf+4Q/SthC077kd9w
- 1nxMEHSYe6G9MT2K8/pLY3R5xicbBc4FQtX6qq4kc/9Z7aHSxKemQD2/ZfWhhiBJHQQa
- 7/Mw==
-X-Gm-Message-State: APjAAAVX/TFxlcI3l0fId/3npeDhLzhM0/HYA+lnqJdP0J3xaPRegB8F
- /9/zYpGbqvk9SuzZgZ4OyO/2+qN9/HtUcKzHHmZQFg==
-X-Google-Smtp-Source: APXvYqzekI8g4TyIJGeXYf8lWW9PMYAxfukIGaarB8ENzStTTVOZFPsDWMInfJzJKb8n9aTkOdX2QJMTw1EOJ/esFOM=
-X-Received: by 2002:ac8:60d6:: with SMTP id i22mr6098225qtm.250.1567603970897; 
- Wed, 04 Sep 2019 06:32:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190807143523.15917-1-pbonzini@redhat.com>
-In-Reply-To: <20190807143523.15917-1-pbonzini@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 4 Sep 2019 15:32:37 +0200
-Message-ID: <CAHFMJ7tA08jsVVJCCcMp3Q+FA3PBKcYNq+yFS7y6Sw5f_K4_oA@mail.gmail.com>
-To: qemu-devel <qemu-devel@nongnu.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::843
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] tests/tcg: disentangle makefiles
+ (envelope-from <thuth@redhat.com>) id 1i5UuB-0008IN-6n
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45218)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5UuA-0008I1-Vd
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 12FF011A03
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 13:00:58 +0000 (UTC)
+Received: from thuth.com (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 873D51001B1A;
+ Wed,  4 Sep 2019 13:00:56 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>,
+	qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 15:00:42 +0200
+Message-Id: <20190904130047.25808-2-thuth@redhat.com>
+In-Reply-To: <20190904130047.25808-1-thuth@redhat.com>
+References: <20190904130047.25808-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Wed, 04 Sep 2019 13:00:58 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 1/6] tests/migration: Do not use functions
+ anymore that rely on global_qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,94 +66,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping?
+The migration tests deal with multiple test states, so we really should
+not use functions here that rely on the single global_qtest variable.
+Switch from qtest_start() to qtest_init() to make sure that global_qtest
+is not set anymore. This also revealed a regression in the migrate()
+function: It has once been converted to use the qtest_qmp() function,
+but commit b5bbd3f315d686bd511 ("Clean up string interpolation into QMP,
+part 2") accidentally reverted it back to qmp().
 
-Paolo
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/migration-test.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index b87ba99a9e..a9f81cc185 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -490,7 +490,7 @@ static void migrate(QTestState *who, const char *uri, const char *fmt, ...)
+     g_assert(!qdict_haskey(args, "uri"));
+     qdict_put_str(args, "uri", uri);
+ 
+-    rsp = qmp("{ 'execute': 'migrate', 'arguments': %p}", args);
++    rsp = qtest_qmp(who, "{ 'execute': 'migrate', 'arguments': %p}", args);
+ 
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+@@ -625,7 +625,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         cmd_dst = tmp;
+     }
+ 
+-    *from = qtest_start(cmd_src);
++    *from = qtest_init(cmd_src);
+     g_free(cmd_src);
+ 
+     *to = qtest_init(cmd_dst);
+@@ -715,7 +715,7 @@ static void test_deprecated(void)
+ {
+     QTestState *from;
+ 
+-    from = qtest_start("-machine none");
++    from = qtest_init("-machine none");
+ 
+     deprecated_set_downtime(from, 0.12345);
+     deprecated_set_speed(from, 12345);
+-- 
+2.18.1
 
 
-Il mer 7 ago 2019, 16:35 Paolo Bonzini <pbonzini@redhat.com> ha scritto:
-
-> The tests/tcg rely a lot on per-target informations from
-> the QEMU makefiles, but most of the definitions in there
-> aren't really relevant to TCG tests.
->
-> This series is just a cleanup, but it could also be
-> a useful start in making it possible to compile tests/tcg
-> out of QEMU's tree, and/or making it a submodule, and/or
-> unifying the system emulation tests with kvm-unit-tests.
->
-> Paolo
->
-> v1->v2: fix configure from fresh directory, do not use $SHELL
->
-> Paolo Bonzini (3):
->   tests/tcg: use EXTRA_CFLAGS everywhere
->   tests/tcg: cleanup Makefile inclusions
->   tests/tcg: move configuration to a sub-shell script
->
->  Makefile                                  |   1 +
->  Makefile.target                           |   3 -
->  configure                                 | 155 ++-------------
->  tests/Makefile.include                    |  25 +--
->  tests/tcg/Makefile.include                |  88 ---------
->  tests/tcg/Makefile.prereqs                |  18 ++
->  tests/tcg/Makefile.probe                  |  31 ---
->  tests/tcg/Makefile.qemu                   |  95 +++++++++
->  tests/tcg/{Makefile => Makefile.target}   |  15 +-
->  tests/tcg/aarch64/Makefile.include        |   8 -
->  tests/tcg/aarch64/Makefile.softmmu-target |   4 +-
->  tests/tcg/aarch64/Makefile.target         |  12 +-
->  tests/tcg/alpha/Makefile.include          |   2 -
->  tests/tcg/alpha/Makefile.softmmu-target   |   4 +-
->  tests/tcg/arm/Makefile.include            |   8 -
->  tests/tcg/arm/Makefile.softmmu-target     |   6 +-
->  tests/tcg/configure.sh                    | 228 ++++++++++++++++++++++
->  tests/tcg/cris/Makefile.include           |   6 -
->  tests/tcg/hppa/Makefile.include           |   2 -
->  tests/tcg/i386/Makefile.include           |   9 -
->  tests/tcg/i386/Makefile.softmmu-target    |  12 +-
->  tests/tcg/i386/Makefile.target            |  13 +-
->  tests/tcg/m68k/Makefile.include           |   2 -
->  tests/tcg/minilib/Makefile.target         |   2 +-
->  tests/tcg/mips/Makefile.include           |  20 --
->  tests/tcg/ppc/Makefile.include            |  10 -
->  tests/tcg/riscv/Makefile.include          |  10 -
->  tests/tcg/s390x/Makefile.include          |   2 -
->  tests/tcg/sh4/Makefile.include            |   4 -
->  tests/tcg/sparc64/Makefile.include        |   2 -
->  tests/tcg/x86_64/Makefile.softmmu-target  |  36 ++++
->  tests/tcg/x86_64/Makefile.target          |   7 +-
->  tests/tcg/xtensa/Makefile.include         |  11 --
->  tests/tcg/xtensa/Makefile.softmmu-target  |   4 +-
->  34 files changed, 435 insertions(+), 420 deletions(-)
->  delete mode 100644 tests/tcg/Makefile.include
->  create mode 100644 tests/tcg/Makefile.prereqs
->  delete mode 100644 tests/tcg/Makefile.probe
->  create mode 100644 tests/tcg/Makefile.qemu
->  rename tests/tcg/{Makefile => Makefile.target} (90%)
->  delete mode 100644 tests/tcg/aarch64/Makefile.include
->  delete mode 100644 tests/tcg/alpha/Makefile.include
->  delete mode 100644 tests/tcg/arm/Makefile.include
->  create mode 100644 tests/tcg/configure.sh
->  delete mode 100644 tests/tcg/cris/Makefile.include
->  delete mode 100644 tests/tcg/hppa/Makefile.include
->  delete mode 100644 tests/tcg/i386/Makefile.include
->  delete mode 100644 tests/tcg/m68k/Makefile.include
->  delete mode 100644 tests/tcg/mips/Makefile.include
->  delete mode 100644 tests/tcg/ppc/Makefile.include
->  delete mode 100644 tests/tcg/riscv/Makefile.include
->  delete mode 100644 tests/tcg/s390x/Makefile.include
->  delete mode 100644 tests/tcg/sh4/Makefile.include
->  delete mode 100644 tests/tcg/sparc64/Makefile.include
->  create mode 100644 tests/tcg/x86_64/Makefile.softmmu-target
->  delete mode 100644 tests/tcg/xtensa/Makefile.include
->
-> --
-> 2.21.0
->
->
