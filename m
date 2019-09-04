@@ -7,85 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E07C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36144C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5000320828
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:14:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00E9920828
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:14:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fi/wmRpi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5000320828
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rJ71HQIa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E9920828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cbv-00045j-Q5
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:14:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49918)
+	id 1i5cc9-0004O2-E6
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:14:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52808)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bvX-0008Ef-95
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:52 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9V-00065W-Ov
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bvQ-0006na-1N
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:47 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39899)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9U-0006ix-6T
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:17 -0400
+Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:41274)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5bvJ-0006gG-GW
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:37 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id q12so204919wmj.4
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:30:31 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i5c9T-0006i9-Si
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:16 -0400
+Received: by mail-pl1-x633.google.com with SMTP id m9so89326pls.8
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=oAvhvXME+54VRvS2clCGoY6uoOz3RlYmcJNO8CHCVtg=;
- b=fi/wmRpikBCTtuVs8qLRK2S41gp7mSNTVakc9Z/KQfmhySE42cIANt+mHhQgxfKYyc
- NsPPZSN5Hkox5M8KkIGk5uylwF+/wfKMw6p5vEZTL3+fmv23St28W6iiAv9aqOqZu5gA
- eM++Wa9mVNK2I1o5IF6wl8nH+teS8NqolAsQpJzVEWzuPkwa2lNFi7ea1oNahqEWoqhz
- svBEb+MaSsQK439yVGpvH/YjLgnxFdpm3RNB0fiUnpIRZ9if54VOAZ5XIxGA43RgrOLG
- 0jxl3hOfYykyU5Br8CqIojDCUgrQLPJCIsJoftezM2uUfGbysJKdqXwTJ1b85Rl5HPuN
- ZEeA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=NUB/rqkFfUKu2v7QerAjMtUtZI3FXJ/o9W4GMo7Gy60=;
+ b=rJ71HQIaqEkUSz+KMQTIDAlS5TDNBjaTyZSB+VAlpy6Zv5f4wCKn4afr6ClPGN/X98
+ W/vLXrqavlnupmZaz6G7zNdCUx1ts/J54iqRSBbRSqqqeLnbYgFVSrmrrfQ/nLBbXsPf
+ vgAOo/L6FB/7QcQEaNGWssDg67zAfSKvXnL0FIXLu2WcpkDWFWzIAeuLVGNaQM8RZu/R
+ K7hye+ej+wRFHkZpAWEh2Vd/VhyO1vqmCRcQNcAllLzkgN8GUp8ryCM8TmS565F6V47I
+ UsOUVlVQnUmV4pEc4zC/vJC3rN/LUvVEJg8cg9ygGw+VV2Jt2kS+VT8p7OHlPRUY1otK
+ hNSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=oAvhvXME+54VRvS2clCGoY6uoOz3RlYmcJNO8CHCVtg=;
- b=h69zmiOTl9jouC2S1yKDOIhJ9PXUIfmjSh9k2Az+KJOWFmr3tYdmRM01D+Snylmk8/
- bxxj95nOXMZxNnVzEy09gybZDcBQFp8nftZ3hXK1e/f5bB3VFyoW3mpQ+gELqTODNa8n
- C+VzaArI5OD42VV6tWpkiKMRoosJlom5nmel17i4csPWC3YrYVyBVZTencd9GpGefx3W
- /O8U5pKwXzwnqxQVw3p7jWjI1kFbTktbszhqozN+xopZ1kgxrLzAGPtmoXef1rURwIOc
- 67rvoYXydX/GE7dpVcgM7jMwtMXxfWpQLLC/cTiK34v7zH3xr6WvCJhFdYzf4Mk8PUKy
- n7sA==
-X-Gm-Message-State: APjAAAVGiQ/d/i10hRO0yzccjv2W0VOO0GwaDaKzUWH05x5efO5iRUkm
- U7/k+gnzG/PH8a7SbhdKKo5BCg==
-X-Google-Smtp-Source: APXvYqyNIiehEryY2KOUCwvdv6Ksh7xrU+fbfoDBwOp+yVqOAiK1MgKiX155VzrRZ+OlJA0He4GRag==
-X-Received: by 2002:a7b:cf37:: with SMTP id m23mr90494wmg.53.1567629030159;
- Wed, 04 Sep 2019 13:30:30 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f13sm20944033wrr.5.2019.09.04.13.30.19
+ :references;
+ bh=NUB/rqkFfUKu2v7QerAjMtUtZI3FXJ/o9W4GMo7Gy60=;
+ b=uoDkX4Of/MVKvbqNCFbNV1cFvLH5ykQ3p34LLcg4TlQji+zvKiBFDju0tB4XYkIbdH
+ +kh9Bu1ZUW4db/k9eIgPhKHfyEiMBD4Vbvg9bX3EbusqWjhDTw764+B6vKM/0v6fuzui
+ ASGxFXslQ/nKQJY4GLuELNfMf8K1+g5vzNK+9CChTaPSDrP1jT3Z4QyD1kf0KAUAUSqn
+ 5UrgSwBurGkCk2x6bXcRQkV7y4BWPndYttsb9hlHNz1OhcrkRaNjwJ5PabBNqw7Klz5n
+ TnEpcLHwy2PiRSQ1ZeyMDtq02nCzUr4g0m0vW84ikbe1KQiuqENN0iGfUCjeAp2xxNRS
+ fTZA==
+X-Gm-Message-State: APjAAAX6oDTC2+fdg2PIxNLq4Zb2Bm8AlJW7/2pLuYAGDbypICXFK5Kv
+ xbrVUxXdfDbM+Qy4MdqeT11t4NXQUu4=
+X-Google-Smtp-Source: APXvYqxwESrnler3/xq6dF7Eag8X9MvmJxWRbEN6Uwe25yJSt8pElJ79FUbcpwERgizPMnVzsAX6hQ==
+X-Received: by 2002:a17:902:a415:: with SMTP id
+ p21mr18702282plq.319.1567629914328; 
+ Wed, 04 Sep 2019 13:45:14 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id n66sm8104610pfn.90.2019.09.04.13.45.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:30:25 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 377A01FFA6;
- Wed,  4 Sep 2019 21:30:15 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Wed, 04 Sep 2019 13:45:13 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:29:50 +0100
-Message-Id: <20190904203013.9028-20-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Wed,  4 Sep 2019 13:44:58 -0700
+Message-Id: <20190904204507.32457-5-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190904204507.32457-1-richard.henderson@linaro.org>
+References: <20190904204507.32457-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
-Subject: [Qemu-devel] [PATCH v1 19/42] tests/docker: move our riscv64 cross
- compile to Buster
+X-Received-From: 2607:f8b0:4864:20::633
+Subject: [Qemu-devel] [PULL 04/13] target/openrisc: Make VR and PPC read-only
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,59 +91,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now Buster is released we can stop relying on the movable feast that
-is Sid for our cross-compiler for building tests.
+These SPRs are read-only.  The writes can simply be ignored,
+as we already do for other read-only (or missing) registers.
+There is no reason to mask the value in env->vr.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Stafford Horne <shorne@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/docker/Makefile.include                        | 2 +-
- tests/docker/dockerfiles/debian-riscv64-cross.docker | 5 ++---
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ target/openrisc/cpu.h        |  3 ---
+ target/openrisc/sys_helper.c | 10 +---------
+ 2 files changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 896c1c5a601..93190b1e2a2 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -104,10 +104,10 @@ docker-image-debian-hppa-cross: docker-image-debian10
- docker-image-debian-m68k-cross: docker-image-debian10
- docker-image-debian-mips64-cross: docker-image-debian10
- docker-image-debian-powerpc-cross: docker-image-debian10
-+docker-image-debian-riscv64-cross: docker-image-debian10
- docker-image-debian-sh4-cross: docker-image-debian10
- docker-image-debian-sparc64-cross: docker-image-debian10
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 561f0f7fad..755282f95d 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -68,9 +68,6 @@ enum {
+                                       (reg) |= ((v & 0x1f) << 2);\
+                                   } while (0)
  
--docker-image-debian-riscv64-cross: docker-image-debian-sid
- docker-image-debian-ppc64-cross: docker-image-debian-sid
- docker-image-travis: NOUSER=1
+-/* Version Register */
+-#define SPR_VR 0xFFFF003F
+-
+ /* Interrupt */
+ #define NR_IRQS  32
  
-diff --git a/tests/docker/dockerfiles/debian-riscv64-cross.docker b/tests/docker/dockerfiles/debian-riscv64-cross.docker
-index 221697f9d11..5e2d6ddb600 100644
---- a/tests/docker/dockerfiles/debian-riscv64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-riscv64-cross.docker
-@@ -1,10 +1,9 @@
- #
- # Docker cross-compiler target
- #
--# This docker target builds on the debian sid base image which
--# contains cross compilers for Debian "ports" targets.
-+# This docker target builds on the debian Buster base image.
- #
--FROM qemu:debian-sid
-+FROM qemu:debian10
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index 1053409a04..d20f48b659 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -39,10 +39,6 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     int idx;
  
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
+     switch (spr) {
+-    case TO_SPR(0, 0): /* VR */
+-        env->vr = rb;
+-        break;
+-
+     case TO_SPR(0, 11): /* EVBAR */
+         env->evbar = rb;
+         break;
+@@ -62,10 +58,6 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+         cpu_set_sr(env, rb);
+         break;
+ 
+-    case TO_SPR(0, 18): /* PPC */
+-        env->ppc = rb;
+-        break;
+-
+     case TO_SPR(0, 32): /* EPCR */
+         env->epcr = rb;
+         break;
+@@ -204,7 +196,7 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
+ 
+     switch (spr) {
+     case TO_SPR(0, 0): /* VR */
+-        return env->vr & SPR_VR;
++        return env->vr;
+ 
+     case TO_SPR(0, 1): /* UPR */
+         return env->upr;    /* TT, DM, IM, UP present */
 -- 
-2.20.1
+2.17.1
 
 
