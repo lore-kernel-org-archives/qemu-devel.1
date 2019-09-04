@@ -2,88 +2,67 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E22AAC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F328C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAD3F2168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:16:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD3F2168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D80CD21670
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:21:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D80CD21670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5daC-0006kx-NG
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 18:16:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34083)
+	id 1i5deg-0001LO-3c
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 18:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1i5cxc-0003cr-RW
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:37:06 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i5dae-0007K8-Cp
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 18:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1i5cxZ-0003UO-Ld
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:37:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53062)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i5cxZ-0003U9-Cg
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:37:01 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4FCFC83F3F
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 21:37:00 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id b15so16717wrp.21
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 14:37:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=G/GDuOLnVngEBHwGh++uLS5RwJ2iJCA1po9Ku89opVQ=;
- b=qGtjMHZc61MS+UQpb1cp8fxXEJJ8PrPt6Z40jD3LZGJhhgworRCCnaN2921w2RHaDJ
- WgAPL24pDC4R9Nb/zdVSq5SpClIWaSv36YVDvUkAGXLEZs6DREnzE/H4INik5iNNaruz
- FffSLQkcIHej/W4llaN+TputdIw3eFcWyIN7UvIaRYo4HYFE/RDYUMAS63Qd+xBtZ+F5
- UE/8Htcjl2/+vZtOpV5zcDBqMTmFWurWSoVAJeISddLfljrd5rpIcLAqjJS5gWQdDibq
- H1ZW7DlZrFKsaAWRbRb03MNKG/M3YjgUMnz9GgEbzDpySu84o8Y/6bTGIkOAwHhpxkcv
- qJgg==
-X-Gm-Message-State: APjAAAXyaICf70P5M60frAbUAwipzcUIPvkW8E6nfPCV1IIMCPtvbCVX
- 0mAx0PLf315JreoihTsXiGmPdqxbx1RCg/QlAgummNvD5J9ZUwCPPXG2VLWBSLPu3+SzLrXWQQF
- uB7TkRCUXKkNEjHk=
-X-Received: by 2002:a5d:6691:: with SMTP id l17mr22258971wru.262.1567633019016; 
- Wed, 04 Sep 2019 14:36:59 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy7rqd2HDqwcWAm9PSG1pdz8E6/nIz5Uxw9azXFnicvgSaO9wEy5M/KWQvrgPoKKFisGKUv8A==
-X-Received: by 2002:a5d:6691:: with SMTP id l17mr22258954wru.262.1567633018724; 
- Wed, 04 Sep 2019 14:36:58 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
- by smtp.gmail.com with ESMTPSA id j22sm151199wre.45.2019.09.04.14.36.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 14:36:57 -0700 (PDT)
-Date: Wed, 4 Sep 2019 17:36:48 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20190904171550-mutt-send-email-mst@kernel.org>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-15-eric.auger@redhat.com>
- <20190730153305-mutt-send-email-mst@kernel.org>
- <a0e88a60-083b-2730-5db8-7bba0299974b@redhat.com>
- <20190801090027-mutt-send-email-mst@kernel.org>
- <ff726b89-a1b1-9b9e-a767-ef72da520053@redhat.com>
- <20190901023827-mutt-send-email-mst@kernel.org>
- <8dd239b8-6d0b-3795-76d0-e8ead4b847ef@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1i5dac-00039N-1M
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 18:17:24 -0400
+Resent-Date: Wed, 04 Sep 2019 18:17:23 -0400
+Resent-Message-Id: <E1i5dac-00039N-1M@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21559)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i5dab-00037o-2o
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 18:17:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1567635402; cv=none; d=zoho.com; s=zohoarc; 
+ b=NZiBv2WorX0Y8as/mF8Ai1wIAwGIBeeb2fvSJvzFvche7vQnpYfXyxqBBbvqzQkzMYF3qcM0u9ZIBXXnHoTiKb32X8N8D4TjDvppptuq+Fr6i8WAYYILxoABmTc+qEXltcYuugSp6gXWggAudAs3A5+fBJge5fuwIxDunoe3VgY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1567635402;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=Pjs5fB/roeDccsMRVc0SZid1TUPuxvoTWFqUnJlgUtA=; 
+ b=jJvkafz4uLwEQys1OKP6qGTIZLrhbc/g5v6qwXcqaT3l07OUu7nW78vTWlh7vnwUjGH79YA7gijOiMZIhG+wO+x7sOGEtJHuTZLzGIpysoOdA59GZmt47dEM1SaP1XqVl0KAapZJanVdU07zpDBggwncQ0nXQcbGDprOwVnedlE=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1567635394519245.3575090697194;
+ Wed, 4 Sep 2019 15:16:34 -0700 (PDT)
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+Message-ID: <156763539263.25727.1603605035536443699@5dec9699b7de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8dd239b8-6d0b-3795-76d0-e8ead4b847ef@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alex.bennee@linaro.org
+Date: Wed, 4 Sep 2019 15:16:34 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 14/15] virtio-iommu-pci: Add
- virtio iommu pci support
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v1 00/42] current testing/next queue
+ (podman, docker, ci)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,338 +74,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com, peter.maydell@linaro.org,
- tn@semihalf.com, qemu-devel@nongnu.org, peterx@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, f4bug@amsat.org,
+ cota@braap.org, stefanha@redhat.com, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com, alex.bennee@linaro.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 04, 2019 at 04:19:33PM +0200, Auger Eric wrote:
-> Hi Michael,
-> 
-> On 9/1/19 8:40 AM, Michael S. Tsirkin wrote:
-> > On Thu, Aug 01, 2019 at 03:49:37PM +0200, Auger Eric wrote:
-> >> Hi Michael,
-> >>
-> >> On 8/1/19 3:06 PM, Michael S. Tsirkin wrote:
-> >>> On Thu, Aug 01, 2019 at 02:15:03PM +0200, Auger Eric wrote:
-> >>>> Hi Michael,
-> >>>>
-> >>>> On 7/30/19 9:35 PM, Michael S. Tsirkin wrote:
-> >>>>> On Tue, Jul 30, 2019 at 07:21:36PM +0200, Eric Auger wrote:
-> >>>>>> This patch adds virtio-iommu-pci, which is the pci proxy for
-> >>>>>> the virtio-iommu device.
-> >>>>>>
-> >>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>>>>
-> >>>>> This part I'm not sure we should merge just yet.  The reason being I
-> >>>>> think we should limit it to mmio where DT can be used to describe iommu
-> >>>>> topology. For PCI I don't see why we shouldn't always expose this
-> >>>>> in the config space, and I think it's preferable not to
-> >>>>> need to support a mix of DT,ACPI and PCI as options.
-> >>>>
-> >>>> For context, some discussion related to this topic already arose on v7
-> >>>> revision of the driver:
-> >>>>
-> >>>> [1] Re: [PATCH v7 0/7] Add virtio-iommu driver
-> >>>> https://lore.kernel.org/linux-pci/87a7ioby9u.fsf@morokweng.localdomain/
-> >>>>
-> >>>> Some additional thoughts.
-> >>>>
-> >>>> First considering DT boot.
-> >>>>
-> >>>> THE DT description features an iommu-map property in the
-> >>>> pci-host-ecam-generic node that describes which RIDs are handled by the
-> >>>> virtio-iommu and a possible offset/mask to be applied inbetween the RID
-> >>>> and the streamID at the input of the IOMMU
-> >>>> (Documentation/devicetree/bindings/pci/pci-iommu.txt)
-> >>>>
-> >>>> As far as I understand when a DMA capable device is setup, its DMA
-> >>>> configuration is built using that call chain:
-> >>>>
-> >>>> pci_dma_configure
-> >>>> |_ of_dma_configure
-> >>>>    |_ of_iommu_configure
-> >>>>       |_ of_pci_iommu_init
-> >>>>          |_ of_map_rid
-> >>>>
-> >>>> I understand you would like the iommu-map/iommu-map-mask info to be
-> >>>> exposed directly into the config space of the device instead of inside
-> >>>> the DT or IORT table. Assuming a module is initialized sufficiently
-> >>>> early to retrieve this info, we would need the resulting info to be
-> >>>> consolidated to allow pci_dma_configure chain to work seemlessly. This
-> >>>> sounds a significant impact on above kernel infrastructure.
-> >>>
-> >>> I don't really know what consolidated means.
-> >>> It is pretty common for IOMMUs to expose config through
-> >>> PCI registers. This typically happens as a fixup.
-> >> I meant: instead of retrieving the info through the of_* code you need
-> >> to interoperate with the module to retrieve the same info and detect
-> >> when you need to take that path instead of the of one.
-> > 
-> > The way to do it would be with a quirk,
-> > and the quirk would not be part of the
-> > virtio module - it can poke at the device using
-> > virtio_pci_cfg_cap.
-> 
-> I got this preliminary quirk function working. However it only works for
-> a DECLARE_PCI_FIXUP_ENABLE quirk. In an EARLY quirk, the guest crashes
-> on the first ioread that attempts to read the BAR as mem accesses are
-> not enabled yet I guess.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkwNDIwMzAxMy45MDI4
+LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0gg
+IHYxIDAwLzQyXSBjdXJyZW50IHRlc3RpbmcvbmV4dCBxdWV1ZSAocG9kbWFuLCBkb2NrZXIsIGNp
+KQpNZXNzYWdlLWlkOiAyMDE5MDkwNDIwMzAxMy45MDI4LTEtYWxleC5iZW5uZWVAbGluYXJvLm9y
+ZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJh
+c2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwowZmJiZDJiIHRlc3RzL2RvY2tlcjogZG9uJ3QgYWx3YXlzIGVuY29kaW5nIGZvciBz
+dWJwcm9jZXNzLmNoZWNrX291dHB1dAo1YjJhZDgxIHRlc3RzL2RvY2tlcjogLS1kaXNhYmxlLWxp
+YnNzaCBvbiB1YnVudHUxODA0IGJ1aWxkcwpjM2VlMWFlIEZlZG9yYSBpbWFnZXM6IHVzZSBVUkxz
+IGZyb20gc3RhYmxlICJhcmNoaXZlcy5mZWRvcmFwcm9qZWN0Lm9yZyIKOTQyNDAzYSAudHJhdmlz
+LnltbDogQ2FjaGUgTGludXgvQ2xhbmcgam9icyB0b2dldGhlcgo1ZTI3YTYzIC50cmF2aXMueW1s
+OiBDYWNoZSBMaW51eC9HQ0MgJ25vbi1kZWJ1ZyBwcm9maWxlJyBqb2JzIHRvZ2V0aGVyCmViMzM4
+N2MgLnRyYXZpcy55bWw6IENhY2hlIExpbnV4L0dDQyAnZGVidWcgcHJvZmlsZScgam9icyB0b2dl
+dGhlcgpiODhmMmJiIC50cmF2aXMueW1sOiBEb2N1bWVudCBob3cgdGhlIGJ1aWxkIG1hdHJpeCB1
+c2UgY2FjaGVzCmE2NTVjNjcgLnRyYXZpcy55bWw6IEVuYWJsZSBjY2FjaGUgb24gT1NYCjVmZmVl
+MDkgLnRyYXZpcy55bWw6IEltcHJvdmUgY2NhY2hlIHVzZQphZmY3NWQyIC50cmF2aXMueW1sOiBD
+YWNoZSBBdm9jYWRvIGNhY2hlCmYxNmM3NWIgLnRyYXZpcy55bWw6IENhY2hlIFB5dGhvbiBQSVAg
+cGFja2FnZXMKMDgzMzM2OSAudHJhdmlzLnltbDogSW5jcmVhc2UgY2FjaGUgdGltZW91dCBmcm9t
+IDNtaW4gdG8gMjBtaW4KMGI3ZWUxYSAudHJhdmlzLnltbDogRW5hYmxlIG11bHRpcGxlIGNhY2hp
+bmcgZmVhdHVyZXMKY2M3M2U1NyBjb25maWd1cmU6IGNoZWNrIGlmIC0tbm8tcGllIGlzIHN1cHBv
+cnRlZCBmaXJzdAowOGI5YTMzIHRlc3RzL2RvY2tlcjogYWRkIG1vcmUgaW1hZ2VzIHRvIFBBUlRJ
+QUxfSU1BR0VTIHdoZW4gbm90IG9uIHg4Nl82NAo1Y2MxZjFmIHRlc3RzL2RvY2tlcjogdXNlIC0t
+YXJjaC1vbmx5IGZvciBpbnN0YWxsaW5nIGRlcHMKMDEzNDQ1MCB0ZXN0cy9kb2NrZXI6IGFkZCBk
+ZWJpYW4tYW1kNjQtY3Jvc3MgZm9yIG5vbi14ODYgaG9zdHMKMmE3MGI4ZCB0ZXN0cy9kb2NrZXI6
+IGF2b2lkICRTSEVMTCBpbnZva2UgYmFzaCBkaXJlY3RseQozZDI4YWIxIHRlc3RzL2RvY2tlcjog
+YWRkIGRlYmlhbjktbXhlIHRvIERFQklBTl9QQVJUSUFMX0lNQUdFUwozMjQ2OTZmIHRlc3RzL2Rv
+Y2tlcjogYWRkIGRlYmlhbi14dGVuc2EtY3Jvc3MgdG8gREVCSUFOX1BBUlRJQUxfSU1BR0VTCmM0
+NjVmYWEgdGVzdHMvZG9ja2VyOiBkcm9wIHBvd2VycGMtdXNlciBpbWFnZSBmb3IgUUVNVSBjcm9z
+cyBidWlsZHMKMjEzZWViNiB0ZXN0cy9kb2NrZXI6IGRyb3AgZGViaWFuLXNpZCBpbWFnZQo5ZjJm
+MjFjIHRlc3RzL2RvY2tlcjogbW92ZSBvdXIgcHBjNjQgY3Jvc3MgY29tcGlsZSB0byBCdXN0ZXIK
+Zjg5OGEwOSB0ZXN0cy9kb2NrZXI6IG1vdmUgb3VyIHJpc2N2NjQgY3Jvc3MgY29tcGlsZSB0byBC
+dXN0ZXIKYTYwYTdiOSB0ZXN0cy9kb2NrZXI6IG1vdmUgb3VyIG1pcHM2NCBjcm9zcyBjb21waWxl
+IHRvIEJ1c3RlcgoyZTA1MjAzIHRlc3RzL2RvY2tlcjogbW92ZSBvdXIgc2g0IGNyb3NzIGNvbXBp
+bGUgdG8gQnVzdGVyCmRiY2RmNDggdGVzdHMvZG9ja2VyOiBtb3ZlIG91ciBzcGFyYzY0IGNyb3Nz
+IGNvbXBpbGUgdG8gQnVzdGVyCjFjM2JlZmEgdGVzdHMvZG9ja2VyOiBtb3ZlIG91ciBtNjhrIGNy
+b3NzIGNvbXBpbGUgdG8gQnVzdGVyCjY1NGJjYWUgdGVzdHMvZG9ja2VyOiBtb3ZlIG91ciBIUFBB
+IGNyb3NzIGNvbXBpbGUgdG8gQnVzdGVyCjBlNzI1YTQgdGVzdHMvZG9ja2VyOiBtb3ZlIG91ciBB
+bHBoYSBjcm9zcyBjb21waWxlIHRvIEJ1c3RlcgpjYTNhMTNlIHRlc3RzL2RvY2tlcjogbW92ZSBv
+dXIgcG93ZXJwYyBjcm9zcyBjb21waWxlIHRvIEJ1c3RlcgpiOTJiODIwIHRlc3RzL2RvY2tlcjog
+bW92ZSBvdXIgYXJtNjQgY3Jvc3MgY29tcGlsZSB0byBCdXN0ZXIKMzg4ZjcwMyB0ZXN0cy9kb2Nr
+ZXI6IGFkZCBCdXN0ZXIgdG8gRE9DS0VSX1BBUlRJQUxfSU1BR0VTCjEwMmQwNGEgdGVzdHMvZG9j
+a2VyOiBzZXQgREVGX1RBUkdFVF9MSVNUIGZvciBzb21lIGNvbnRhaW5lcnMKZmMyOTAyNiB0ZXN0
+cy9kb2NrZXI6IG1vdmUgREVGX1RBUkdFVF9MSVNUIHNldHRpbmcgdG8gY29tbW9uLnJjCjU2Y2Q2
+MzYgdGVzdHMvdGNnOiBhZGQgLmdpdGlnbm9yZSBmb3IgaW4gc291cmNlIGJ1aWxkcwozYmFkNTQw
+IHRlc3RzL3RjZzogbW92ZSBjb25maWd1cmF0aW9uIHRvIGEgc3ViLXNoZWxsIHNjcmlwdAo1Zjg5
+MzUyIHRlc3RzL3RjZzogY2xlYW51cCBNYWtlZmlsZSBpbmNsdXNpb25zCmU5YWYyNzYgdGVzdHMv
+dGNnOiB1c2UgRVhUUkFfQ0ZMQUdTIGV2ZXJ5d2hlcmUKZGFjNmI5NCB0ZXN0cy9kb2NrZXI6IGZp
+eCAiY2MiIGNvbW1hbmQgdG8gd29yayB3aXRoIHBvZG1hbgplZWZlZmY0IGNvbmZpZ3VyZTogY2xl
+YW4tdXAgY29udGFpbmVyIGNyb3NzIGNvbXBpbGUgZGV0ZWN0CjFjZDdhOGIgaHcvbWlzYzogTWFy
+ayBtb3N0IG9iamVjdHMgYXMgImNvbW1vbiIgY29kZSB0byBzcGVlZCB1cCBjb21waWxhdGlvbiBh
+IGxpdHRlIGJpdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS80MiBDaGVja2luZyBjb21taXQgMWNk
+N2E4YmY2MDVkIChody9taXNjOiBNYXJrIG1vc3Qgb2JqZWN0cyBhcyAiY29tbW9uIiBjb2RlIHRv
+IHNwZWVkIHVwIGNvbXBpbGF0aW9uIGEgbGl0dGUgYml0KQoyLzQyIENoZWNraW5nIGNvbW1pdCBl
+ZWZlZmY0ZjU3ZjcgKGNvbmZpZ3VyZTogY2xlYW4tdXAgY29udGFpbmVyIGNyb3NzIGNvbXBpbGUg
+ZGV0ZWN0KQozLzQyIENoZWNraW5nIGNvbW1pdCBkYWM2Yjk0MzRlYjEgKHRlc3RzL2RvY2tlcjog
+Zml4ICJjYyIgY29tbWFuZCB0byB3b3JrIHdpdGggcG9kbWFuKQo0LzQyIENoZWNraW5nIGNvbW1p
+dCBlOWFmMjc2ZTkyMmEgKHRlc3RzL3RjZzogdXNlIEVYVFJBX0NGTEFHUyBldmVyeXdoZXJlKQo1
+LzQyIENoZWNraW5nIGNvbW1pdCA1Zjg5MzUyZWEzMjQgKHRlc3RzL3RjZzogY2xlYW51cCBNYWtl
+ZmlsZSBpbmNsdXNpb25zKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
+LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM4NDogCnJlbmFtZSBmcm9tIHRlc3Rz
+L3RjZy9NYWtlZmlsZS5wcm9iZQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzNDEgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggNS80MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzQyIENo
+ZWNraW5nIGNvbW1pdCAzYmFkNTQwMjc1MDkgKHRlc3RzL3RjZzogbW92ZSBjb25maWd1cmF0aW9u
+IHRvIGEgc3ViLXNoZWxsIHNjcmlwdCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
+ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzA2OiAKZGVsZXRlZCBm
+aWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTIwOiBG
+SUxFOiB0ZXN0cy90Y2cvY29uZmlndXJlLnNoOjE3NDoKKyAgICAgIGNvbnRhaW5lcl9jcm9zc19j
+Yz0vb3B0LzIwMTguMDIveHRlbnNhLWRjMjMyYi1lbGYvYmluL3h0ZW5zYS1kYzIzMmItZWxmLWdj
+YwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzkyNjogRklMRTogdGVzdHMvdGNn
+L2NvbmZpZ3VyZS5zaDoxODA6CisgIGVjaG8gIiMgQXV0b21hdGljYWxseSBnZW5lcmF0ZWQgYnkg
+Y29uZmlndXJlIC0gZG8gbm90IG1vZGlmeSIgPiAkY29uZmlnX3RhcmdldF9tYWsKCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojOTUzOiBGSUxFOiB0ZXN0cy90Y2cvY29uZmlndXJlLnNo
+OjIwNzoKKyAgICBpZiAhIGRvX2NvbXBpbGVyICIkdGFyZ2V0X2NvbXBpbGVyIiAkdGFyZ2V0X2Nv
+bXBpbGVyX2NmbGFncyAtbyAkVE1QRSAkVE1QQyAtc3RhdGljIDsgdGhlbgoKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzk1NTogRklMRTogdGVzdHMvdGNnL2NvbmZpZ3VyZS5zaDoy
+MDk6CisgICAgICBpZiAhIGRvX2NvbXBpbGVyICIkdGFyZ2V0X2NvbXBpbGVyIiAkdGFyZ2V0X2Nv
+bXBpbGVyX2NmbGFncyAtbyAkVE1QRSAkVE1QQyA7IHRoZW4KCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM5Njg6IEZJTEU6IHRlc3RzL3RjZy9jb25maWd1cmUuc2g6MjIyOgorICBp
+ZiB0ZXN0ICRnb3RfY3Jvc3NfY2MgPSBubyAmJiB0ZXN0ICIkZG9ja2VyIiAhPSBubyAmJiB0ZXN0
+IC1uICIkY29udGFpbmVyX2ltYWdlIjsgdGhlbgoKdG90YWw6IDEgZXJyb3JzLCA1IHdhcm5pbmdz
+LCA4NjMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi80MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKNy80MiBDaGVja2luZyBjb21taXQgNTZjZDYzNmNjYmJiICh0ZXN0cy90Y2c6IGFkZCAuZ2l0
+aWdub3JlIGZvciBpbiBzb3VyY2UgYnVpbGRzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNDogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDUgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggNy80MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo4LzQyIENoZWNraW5n
+IGNvbW1pdCBmYzI5MDI2Y2I0N2UgKHRlc3RzL2RvY2tlcjogbW92ZSBERUZfVEFSR0VUX0xJU1Qg
+c2V0dGluZyB0byBjb21tb24ucmMpCjkvNDIgQ2hlY2tpbmcgY29tbWl0IDEwMmQwNGE1YzU5YSAo
+dGVzdHMvZG9ja2VyOiBzZXQgREVGX1RBUkdFVF9MSVNUIGZvciBzb21lIGNvbnRhaW5lcnMpCjEw
+LzQyIENoZWNraW5nIGNvbW1pdCAzODhmNzAzNDMxNzIgKHRlc3RzL2RvY2tlcjogYWRkIEJ1c3Rl
+ciB0byBET0NLRVJfUEFSVElBTF9JTUFHRVMpCjExLzQyIENoZWNraW5nIGNvbW1pdCBiOTJiODIw
+ODIxMTUgKHRlc3RzL2RvY2tlcjogbW92ZSBvdXIgYXJtNjQgY3Jvc3MgY29tcGlsZSB0byBCdXN0
+ZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
+SU5FUlMgbmVlZCB1cGRhdGluZz8KIzU3OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzQyIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEyLzQyIENoZWNraW5nIGNvbW1pdCBjYTNhMTNlOTVm
+M2MgKHRlc3RzL2RvY2tlcjogbW92ZSBvdXIgcG93ZXJwYyBjcm9zcyBjb21waWxlIHRvIEJ1c3Rl
+cikKMTMvNDIgQ2hlY2tpbmcgY29tbWl0IDBlNzI1YTQxOWQzMSAodGVzdHMvZG9ja2VyOiBtb3Zl
+IG91ciBBbHBoYSBjcm9zcyBjb21waWxlIHRvIEJ1c3RlcikKMTQvNDIgQ2hlY2tpbmcgY29tbWl0
+IDY1NGJjYWUzYmVhZCAodGVzdHMvZG9ja2VyOiBtb3ZlIG91ciBIUFBBIGNyb3NzIGNvbXBpbGUg
+dG8gQnVzdGVyKQoxNS80MiBDaGVja2luZyBjb21taXQgMWMzYmVmYTE0NzQ0ICh0ZXN0cy9kb2Nr
+ZXI6IG1vdmUgb3VyIG02OGsgY3Jvc3MgY29tcGlsZSB0byBCdXN0ZXIpCjE2LzQyIENoZWNraW5n
+IGNvbW1pdCBkYmNkZjQ4NmJlYWIgKHRlc3RzL2RvY2tlcjogbW92ZSBvdXIgc3BhcmM2NCBjcm9z
+cyBjb21waWxlIHRvIEJ1c3RlcikKMTcvNDIgQ2hlY2tpbmcgY29tbWl0IDJlMDUyMDMwMGZkZiAo
+dGVzdHMvZG9ja2VyOiBtb3ZlIG91ciBzaDQgY3Jvc3MgY29tcGlsZSB0byBCdXN0ZXIpCjE4LzQy
+IENoZWNraW5nIGNvbW1pdCBhNjBhN2I5ZDY0YmUgKHRlc3RzL2RvY2tlcjogbW92ZSBvdXIgbWlw
+czY0IGNyb3NzIGNvbXBpbGUgdG8gQnVzdGVyKQoxOS80MiBDaGVja2luZyBjb21taXQgZjg5OGEw
+OWM3ZmM2ICh0ZXN0cy9kb2NrZXI6IG1vdmUgb3VyIHJpc2N2NjQgY3Jvc3MgY29tcGlsZSB0byBC
+dXN0ZXIpCjIwLzQyIENoZWNraW5nIGNvbW1pdCA5ZjJmMjFjNDgwZTcgKHRlc3RzL2RvY2tlcjog
+bW92ZSBvdXIgcHBjNjQgY3Jvc3MgY29tcGlsZSB0byBCdXN0ZXIpCjIxLzQyIENoZWNraW5nIGNv
+bW1pdCAyMTNlZWI2ZGVmMWUgKHRlc3RzL2RvY2tlcjogZHJvcCBkZWJpYW4tc2lkIGltYWdlKQpX
+QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
+IG5lZWQgdXBkYXRpbmc/CiMyODogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIxLzQyIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjIyLzQyIENoZWNraW5nIGNvbW1pdCBjNDY1ZmFhZmRlZjggKHRl
+c3RzL2RvY2tlcjogZHJvcCBwb3dlcnBjLXVzZXIgaW1hZ2UgZm9yIFFFTVUgY3Jvc3MgYnVpbGRz
+KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
+RVJTIG5lZWQgdXBkYXRpbmc/CiMzNTogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyMi80MiBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoyMy80MiBDaGVja2luZyBjb21taXQgMzI0Njk2ZjljMzYy
+ICh0ZXN0cy9kb2NrZXI6IGFkZCBkZWJpYW4teHRlbnNhLWNyb3NzIHRvIERFQklBTl9QQVJUSUFM
+X0lNQUdFUykKMjQvNDIgQ2hlY2tpbmcgY29tbWl0IDNkMjhhYjFjZmY2ZSAodGVzdHMvZG9ja2Vy
+OiBhZGQgZGViaWFuOS1teGUgdG8gREVCSUFOX1BBUlRJQUxfSU1BR0VTKQoyNS80MiBDaGVja2lu
+ZyBjb21taXQgMmE3MGI4ZGY3MDFhICh0ZXN0cy9kb2NrZXI6IGF2b2lkICRTSEVMTCBpbnZva2Ug
+YmFzaCBkaXJlY3RseSkKMjYvNDIgQ2hlY2tpbmcgY29tbWl0IDAxMzQ0NTAyY2JhYSAodGVzdHMv
+ZG9ja2VyOiBhZGQgZGViaWFuLWFtZDY0LWNyb3NzIGZvciBub24teDg2IGhvc3RzKQpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDM1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDI2LzQyIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCjI3LzQyIENoZWNraW5nIGNvbW1pdCA1Y2MxZjFmZDU2MDUgKHRlc3RzL2RvY2tl
+cjogdXNlIC0tYXJjaC1vbmx5IGZvciBpbnN0YWxsaW5nIGRlcHMpCjI4LzQyIENoZWNraW5nIGNv
+bW1pdCAwOGI5YTMzMTAxMTkgKHRlc3RzL2RvY2tlcjogYWRkIG1vcmUgaW1hZ2VzIHRvIFBBUlRJ
+QUxfSU1BR0VTIHdoZW4gbm90IG9uIHg4Nl82NCkKMjkvNDIgQ2hlY2tpbmcgY29tbWl0IGNjNzNl
+NTc2ODg3YSAoY29uZmlndXJlOiBjaGVjayBpZiAtLW5vLXBpZSBpcyBzdXBwb3J0ZWQgZmlyc3Qp
+CjMwLzQyIENoZWNraW5nIGNvbW1pdCAwYjdlZTFhM2JmZWEgKC50cmF2aXMueW1sOiBFbmFibGUg
+bXVsdGlwbGUgY2FjaGluZyBmZWF0dXJlcykKMzEvNDIgQ2hlY2tpbmcgY29tbWl0IDA4MzMzNjkx
+NmJhMCAoLnRyYXZpcy55bWw6IEluY3JlYXNlIGNhY2hlIHRpbWVvdXQgZnJvbSAzbWluIHRvIDIw
+bWluKQozMi80MiBDaGVja2luZyBjb21taXQgZjE2Yzc1YmM0MGFjICgudHJhdmlzLnltbDogQ2Fj
+aGUgUHl0aG9uIFBJUCBwYWNrYWdlcykKMzMvNDIgQ2hlY2tpbmcgY29tbWl0IGFmZjc1ZDIyZDA0
+NCAoLnRyYXZpcy55bWw6IENhY2hlIEF2b2NhZG8gY2FjaGUpCjM0LzQyIENoZWNraW5nIGNvbW1p
+dCA1ZmZlZTA5ZGE3OTUgKC50cmF2aXMueW1sOiBJbXByb3ZlIGNjYWNoZSB1c2UpCjM1LzQyIENo
+ZWNraW5nIGNvbW1pdCBhNjU1YzY3MDExZDAgKC50cmF2aXMueW1sOiBFbmFibGUgY2NhY2hlIG9u
+IE9TWCkKMzYvNDIgQ2hlY2tpbmcgY29tbWl0IGI4OGYyYmIzYmQ5YiAoLnRyYXZpcy55bWw6IERv
+Y3VtZW50IGhvdyB0aGUgYnVpbGQgbWF0cml4IHVzZSBjYWNoZXMpCjM3LzQyIENoZWNraW5nIGNv
+bW1pdCBlYjMzODdjZjk5NGQgKC50cmF2aXMueW1sOiBDYWNoZSBMaW51eC9HQ0MgJ2RlYnVnIHBy
+b2ZpbGUnIGpvYnMgdG9nZXRoZXIpCjM4LzQyIENoZWNraW5nIGNvbW1pdCA1ZTI3YTYzYWVlOTQg
+KC50cmF2aXMueW1sOiBDYWNoZSBMaW51eC9HQ0MgJ25vbi1kZWJ1ZyBwcm9maWxlJyBqb2JzIHRv
+Z2V0aGVyKQozOS80MiBDaGVja2luZyBjb21taXQgOTQyNDAzYTFhZDljICgudHJhdmlzLnltbDog
+Q2FjaGUgTGludXgvQ2xhbmcgam9icyB0b2dldGhlcikKNDAvNDIgQ2hlY2tpbmcgY29tbWl0IGMz
+ZWUxYWVjNGZhZiAoRmVkb3JhIGltYWdlczogdXNlIFVSTHMgZnJvbSBzdGFibGUgImFyY2hpdmVz
+LmZlZG9yYXByb2plY3Qub3JnIikKNDEvNDIgQ2hlY2tpbmcgY29tbWl0IDViMmFkODFiYjRhMSAo
+dGVzdHMvZG9ja2VyOiAtLWRpc2FibGUtbGlic3NoIG9uIHVidW50dTE4MDQgYnVpbGRzKQo0Mi80
+MiBDaGVja2luZyBjb21taXQgMGZiYmQyYjU3ZGQ3ICh0ZXN0cy9kb2NrZXI6IGRvbid0IGFsd2F5
+cyBlbmNvZGluZyBmb3Igc3VicHJvY2Vzcy5jaGVja19vdXRwdXQpCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTA0MjAzMDEzLjkwMjgtMS1h
+bGV4LmJlbm5lZUBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
+aGF0LmNvbQ==
 
-This is why I suggested using virtio_pci_cfg_cap.
-This allows bar access when mem accesses are disabled.
- 
-
-> So assuming I get the proper system config data in the device
-> configuration, the iommu bindings will be set up late.
-
-If it all works with a late quirk, then great.
-If not we can fall back to config cycles.
-
-> By the way I have not yet attempted to generate iommu bindings from the
-> quirk function (job done in drivers/acpi/arm64/iort.c) which does not
-> sound to be straightforward.
-> > 
-> >>>
-> >>> I would write a tiny driver to do exactly that,
-> >>> and run it from the fixup.
-> >>>
-> >>>
-> >>>> This comes in addition to the development of the "small module that
-> >>>> loads early and pokes at the IOMMU sufficiently to get the data about
-> >>>> which devices use the IOMMU out of it using standard virtio config
-> >>>> space" evoked in [1] + the definition of the data formats to be put in
-> >>>> the very cfg space.
-> >>>
-> >>> That last part is true but that's exactly why I propose we
-> >>> wait on this patch a bit.
-> >>>
-> >>>> With ACPI I understand we have the same kind of infrastructure:
-> >>>> drivers/acpi/arm64/iort.c currently extracts the mapping between RC RIDs
-> >>>> and IOMMU streamids
-> >>>>
-> >>>> pci_dma_configure(
-> >>>> |_ acpi_dma_configure
-> >>>>    |_ iort_iommu_configure
-> >>>>       |_ iort_pci_iommu_init
-> >>>>          |_ iort_node_map_id
-> >>>>             |_ iort_id_map
-> >>>>
-> >>>> Maybe I fail to see the easy and right way to do the integration at
-> >>>> kernel level but I am a bit frightened by the efforts that would be
-> >>>> requested to follow your suggestion, whereas the DT infra is ready and
-> >>>> fully upstreamed to accept the use case.
-> >>>
-> >>> Did you take a look at drivers/pci/quirks.c and how these run?
-> >>> I think it's just a question of adding DECLARE_PCI_FIXUP_CLASS_EARLY
-> >>> and running your hook from there.
-> >> I will do and trace the code.
-> >>>
-> >>>
-> >>>> For ACPI I agree AFAIK IORT was primarily defined by ARM, for ARM but we
-> >>>> prototyped IORT integration with x86 and it worked for pc machine
-> >>>> without major trouble.
-> >>>>
-> >>>> I sent the kernel and qemu patches prototyping this IORT integration:
-> >>>>
-> >>>> https://github.com/eauger/linux/tree/virtio-iommu-v0.9-iort-x86
-> >>>> https://github.com/eauger/qemu/tree/v3.1.0-rc3-virtio-iommu-v0.9-x86
-> >>>>
-> >>>> There ACPI IORT was built for PC machine and the integration effort at
-> >>>> both kernel and QEMU level was low. This work would need to be rebased
-> >>>> and depends on kernel ACPI related patches that are not yet upstreamed
-> >>>> though.
-> >>>>
-> >>>> Thanks
-> >>>>
-> >>>> Eric
-> >>>
-> >>> In the end it might turn out you are right.  But it does us no harm to
-> >>> delay this just a bit, and for now limit things to ARM where it's
-> >>> already used and where alternatives exist.
-> >> So if my understanding is correct, at the moment you would accept a DT
-> >> integration using MMIO. Is that correct? Meanwhile we can prototype your
-> >> suggestion.
-> >>
-> >> Thanks
-> >>
-> >> Eric
-> > 
-> > Right.
-> 
-> Thank you for the confirmation. However I am not sure Peter will accept
-> to get the device integrated as a virtio-mmio device and then deprecated
-> in favor of a virtio-pci device, all the more so work was prepared to
-> get a PCI integration. Peter?
-> 
-> Thanks
-> 
-> Eric
-> > 
-> >>>
-> >>>
-> >>>>>
-> >>>>>> ---
-> >>>>>>
-> >>>>>> v8 -> v9:
-> >>>>>> - add the msi-bypass property
-> >>>>>> - create virtio-iommu-pci.c
-> >>>>>> ---
-> >>>>>>  hw/virtio/Makefile.objs          |  1 +
-> >>>>>>  hw/virtio/virtio-iommu-pci.c     | 88 ++++++++++++++++++++++++++++++++
-> >>>>>>  include/hw/pci/pci.h             |  1 +
-> >>>>>>  include/hw/virtio/virtio-iommu.h |  1 +
-> >>>>>>  qdev-monitor.c                   |  1 +
-> >>>>>>  5 files changed, 92 insertions(+)
-> >>>>>>  create mode 100644 hw/virtio/virtio-iommu-pci.c
-> >>>>>>
-> >>>>>> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> >>>>>> index f42e4dd94f..80ca719f1c 100644
-> >>>>>> --- a/hw/virtio/Makefile.objs
-> >>>>>> +++ b/hw/virtio/Makefile.objs
-> >>>>>> @@ -27,6 +27,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
-> >>>>>>  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
-> >>>>>>  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
-> >>>>>>  obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
-> >>>>>> +obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu-pci.o
-> >>>>>>  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
-> >>>>>>  obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
-> >>>>>>  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
-> >>>>>> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
-> >>>>>> new file mode 100644
-> >>>>>> index 0000000000..f9977096bd
-> >>>>>> --- /dev/null
-> >>>>>> +++ b/hw/virtio/virtio-iommu-pci.c
-> >>>>>> @@ -0,0 +1,88 @@
-> >>>>>> +/*
-> >>>>>> + * Virtio IOMMU PCI Bindings
-> >>>>>> + *
-> >>>>>> + * Copyright (c) 2019 Red Hat, Inc.
-> >>>>>> + * Written by Eric Auger
-> >>>>>> + *
-> >>>>>> + *  This program is free software; you can redistribute it and/or modify
-> >>>>>> + *  it under the terms of the GNU General Public License version 2 or
-> >>>>>> + *  (at your option) any later version.
-> >>>>>> + */
-> >>>>>> +
-> >>>>>> +#include "qemu/osdep.h"
-> >>>>>> +
-> >>>>>> +#include "virtio-pci.h"
-> >>>>>> +#include "hw/virtio/virtio-iommu.h"
-> >>>>>> +
-> >>>>>> +typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
-> >>>>>> +
-> >>>>>> +/*
-> >>>>>> + * virtio-iommu-pci: This extends VirtioPCIProxy.
-> >>>>>> + *
-> >>>>>> + */
-> >>>>>> +#define VIRTIO_IOMMU_PCI(obj) \
-> >>>>>> +        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
-> >>>>>> +
-> >>>>>> +struct VirtIOIOMMUPCI {
-> >>>>>> +    VirtIOPCIProxy parent_obj;
-> >>>>>> +    VirtIOIOMMU vdev;
-> >>>>>> +};
-> >>>>>> +
-> >>>>>> +static Property virtio_iommu_pci_properties[] = {
-> >>>>>> +    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
-> >>>>>> +    DEFINE_PROP_BOOL("msi-bypass", VirtIOIOMMUPCI, vdev.msi_bypass, true),
-> >>>>>> +    DEFINE_PROP_END_OF_LIST(),
-> >>>>>> +};
-> >>>>>> +
-> >>>>>> +static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> >>>>>> +{
-> >>>>>> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(vpci_dev);
-> >>>>>> +    DeviceState *vdev = DEVICE(&dev->vdev);
-> >>>>>> +
-> >>>>>> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> >>>>>> +    object_property_set_link(OBJECT(dev),
-> >>>>>> +                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
-> >>>>>> +                             "primary-bus", errp);
-> >>>>>> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> >>>>>> +}
-> >>>>>> +
-> >>>>>> +static void virtio_iommu_pci_class_init(ObjectClass *klass, void *data)
-> >>>>>> +{
-> >>>>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> >>>>>> +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-> >>>>>> +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-> >>>>>> +    k->realize = virtio_iommu_pci_realize;
-> >>>>>> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> >>>>>> +    dc->props = virtio_iommu_pci_properties;
-> >>>>>> +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-> >>>>>> +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_IOMMU;
-> >>>>>> +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
-> >>>>>> +    pcidev_k->class_id = PCI_CLASS_OTHERS;
-> >>>>>> +}
-> >>>>>> +
-> >>>>>> +static void virtio_iommu_pci_instance_init(Object *obj)
-> >>>>>> +{
-> >>>>>> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(obj);
-> >>>>>> +
-> >>>>>> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> >>>>>> +                                TYPE_VIRTIO_IOMMU);
-> >>>>>> +}
-> >>>>>> +
-> >>>>>> +static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info = {
-> >>>>>> +    .base_name             = TYPE_VIRTIO_IOMMU_PCI,
-> >>>>>> +    .generic_name          = "virtio-iommu-pci",
-> >>>>>> +    .transitional_name     = "virtio-iommu-pci-transitional",
-> >>>>>> +    .non_transitional_name = "virtio-iommu-pci-non-transitional",
-> >>>>>> +    .instance_size = sizeof(VirtIOIOMMUPCI),
-> >>>>>> +    .instance_init = virtio_iommu_pci_instance_init,
-> >>>>>> +    .class_init    = virtio_iommu_pci_class_init,
-> >>>>>> +};
-> >>>>>> +
-> >>>>>> +static void virtio_iommu_pci_register(void)
-> >>>>>> +{
-> >>>>>> +    virtio_pci_types_register(&virtio_iommu_pci_info);
-> >>>>>> +}
-> >>>>>> +
-> >>>>>> +type_init(virtio_iommu_pci_register)
-> >>>>>> +
-> >>>>>> +
-> >>>>>> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> >>>>>> index aaf1b9f70d..492ea7e68d 100644
-> >>>>>> --- a/include/hw/pci/pci.h
-> >>>>>> +++ b/include/hw/pci/pci.h
-> >>>>>> @@ -86,6 +86,7 @@ extern bool pci_available;
-> >>>>>>  #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
-> >>>>>>  #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
-> >>>>>>  #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
-> >>>>>> +#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
-> >>>>>>  
-> >>>>>>  #define PCI_VENDOR_ID_REDHAT             0x1b36
-> >>>>>>  #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
-> >>>>>> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-> >>>>>> index 56c8b4e57f..893ac65c0b 100644
-> >>>>>> --- a/include/hw/virtio/virtio-iommu.h
-> >>>>>> +++ b/include/hw/virtio/virtio-iommu.h
-> >>>>>> @@ -25,6 +25,7 @@
-> >>>>>>  #include "hw/pci/pci.h"
-> >>>>>>  
-> >>>>>>  #define TYPE_VIRTIO_IOMMU "virtio-iommu-device"
-> >>>>>> +#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-device-base"
-> >>>>>>  #define VIRTIO_IOMMU(obj) \
-> >>>>>>          OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
-> >>>>>>  
-> >>>>>> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> >>>>>> index 58222c2211..74cf090c61 100644
-> >>>>>> --- a/qdev-monitor.c
-> >>>>>> +++ b/qdev-monitor.c
-> >>>>>> @@ -63,6 +63,7 @@ static const QDevAlias qdev_alias_table[] = {
-> >>>>>>      { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X },
-> >>>>>>      { "virtio-input-host-pci", "virtio-input-host",
-> >>>>>>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
-> >>>>>> +    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
-> >>>>>>      { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
-> >>>>>>      { "virtio-keyboard-pci", "virtio-keyboard",
-> >>>>>>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
-> >>>>>> -- 
-> >>>>>> 2.20.1
-> >>>>>
-> >>>
 
