@@ -6,80 +6,82 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D81C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 01:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D0DC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 01:59:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 960742077B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 01:46:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 960742077B
+	by mail.kernel.org (Postfix) with ESMTPS id 3471321883
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 01:59:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3471321883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5KNM-00007D-O9
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 21:46:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36775)
+	id 1i5Ka8-0002ma-9V
+	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 21:59:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38489)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1i5KLZ-0007nk-Tp
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:44:34 -0400
+ (envelope-from <peterx@redhat.com>) id 1i5KZO-0002IP-Sq
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1i5KLX-000683-Gn
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:44:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44176)
+ (envelope-from <peterx@redhat.com>) id 1i5KZN-0007Ay-4L
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:58:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35354)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i5KLX-00067P-9V
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:44:31 -0400
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197])
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i5KZM-0007AU-ST
+ for qemu-devel@nongnu.org; Tue, 03 Sep 2019 21:58:49 -0400
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C3865368CF
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 01:44:29 +0000 (UTC)
-Received: by mail-pf1-f197.google.com with SMTP id t24so5204956pfe.23
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 18:44:29 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id CF0C7C002966
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 01:58:47 +0000 (UTC)
+Received: by mail-pf1-f200.google.com with SMTP id g1so12245768pfo.4
+ for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 18:58:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=4o8FHxgaqFbS/PgjXmIAyIKGNCQJb6xAwRHqIacJmR4=;
- b=IoFCJVo+Ji12C6eV2HkXgrXPYKKeRcBnaBV0XNruUDp2Nn5Hh1d5PyEa6Mz3oUaYcU
- KEXLlDQrIxradlst5fCzgzsWGyysGucYGjCCyt8e5ekU8dmrjxnP7oNUAkeEkT7T+q8k
- cS79/SFa9gIUu3rwhd5mnYa0UAALdE0cqQZOjF+oPE2/mRpxXsSiQIlCtN5dKoM9+EXh
- EL8m3G/GXMm2B8UzUIwaNrFtoRiowMWPk6op6uc/rVIhuHDgm2Fyt7JvZiUgnsSGtLlq
- fvqTY/7ntgD4gFs5l/iIMoVB7pkiYvDzM8FBSV5FcOCi1NILlyUVnth3kiyJioSDkYei
- 3brw==
-X-Gm-Message-State: APjAAAXBTRakZlGu1WLahECIlE4sMKev5F1y/gCMRla03D31Gw8w07Uv
- Yd4EZb/03+THZbbxjhbIsVgZ8sBVrNJ5mvZQ0fNEAPxS4bIzzEfniWOFAfHiClmgPalqNklS/0P
- y/kiPsE/WWIYwlf8=
-X-Received: by 2002:aa7:908b:: with SMTP id i11mr41686330pfa.199.1567561469304; 
- Tue, 03 Sep 2019 18:44:29 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyQiKGO6lteuXApmjmh9TKN7aOS3CJc5HNY38iZ8+1EjYK9Gcnj6PmYdFPX4TZx0cjmlCEqYA==
-X-Received: by 2002:aa7:908b:: with SMTP id i11mr41686315pfa.199.1567561469099; 
- Tue, 03 Sep 2019 18:44:29 -0700 (PDT)
+ bh=A7PjX/SXFR8o/059W3/K/OOcmKUuFkR+MHHL591vpNM=;
+ b=FM9cQNpx9P/YE/ypxbhsP+sZymWmFsIuSfxxTWNIlN9FNJyv23y5wO7ZdcZ4J4EloI
+ tiAYkr6Xh9mBud0LjdjroW5YuFfR4QaZ/QVeOZekEtutQrY6s+V5x/fpssv98/mMk9za
+ 1wsm/8WPeerXBFOkD3xCYOwR2PuAnNtubc+o/u1GkWb1YYNOidAzPHa/Kd1ac8Ao9VTM
+ ZZguUnXc/Zb+5C3Q0o7G+n2J0NsLnLIjtr2b13SWorVDW2zh9ebAOHXZUImyNXmfaenV
+ hjYru9Chj+d3Zz7DhPb7o6z9Jfhc52l1tAoqDqSEUkeg4n6c7UAEO8KlunZXjcGt2m1R
+ IQoQ==
+X-Gm-Message-State: APjAAAUB8s/e3jQ0YfEI6qdMurm8vR9V3PgObdXzM9uds4Ggq0AfuLKO
+ jV4Usa4yX9kMl1zTtkafP662ExfoUx6k3AfQUiwnrzaKUyfcyNrfXvdDu+mUdk9rcV9dobiwmhO
+ QN8yf08AMXD7Y1nM=
+X-Received: by 2002:a17:90a:ec12:: with SMTP id
+ l18mr2387375pjy.6.1567562327380; 
+ Tue, 03 Sep 2019 18:58:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz3xRN9b/kQltE2OHfi/gcz2/8r/liM/andAIuu11sSpgjbhc86RHfO1Z7aY/SGJwsOymXHzg==
+X-Received: by 2002:a17:90a:ec12:: with SMTP id
+ l18mr2387347pjy.6.1567562327152; 
+ Tue, 03 Sep 2019 18:58:47 -0700 (PDT)
 Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id c138sm394749pfc.80.2019.09.03.18.44.23
+ by smtp.gmail.com with ESMTPSA id s19sm4929268pfe.86.2019.09.03.18.58.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 18:44:28 -0700 (PDT)
-Date: Wed, 4 Sep 2019 09:44:16 +0800
+ Tue, 03 Sep 2019 18:58:46 -0700 (PDT)
+Date: Wed, 4 Sep 2019 09:58:34 +0800
 From: Peter Xu <peterx@redhat.com>
 To: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20190904014416.GB30402@xz-x1>
+Message-ID: <20190904015834.GC30402@xz-x1>
 References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-9-eric.auger@redhat.com>
- <20190819081143.GA13560@xz-x1>
- <b5e2ff32-eed8-829e-ffd4-2b62ed6b2fda@redhat.com>
+ <20190730172137.23114-10-eric.auger@redhat.com>
+ <20190819082424.GB13560@xz-x1>
+ <d3759ba2-6ae6-2ae4-a71e-69965285f3f4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b5e2ff32-eed8-829e-ffd4-2b62ed6b2fda@redhat.com>
+In-Reply-To: <d3759ba2-6ae6-2ae4-a71e-69965285f3f4@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 08/15] virtio-iommu: Implement
- map/unmap
+Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 09/15] virtio-iommu: Implement
+ translate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,86 +101,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 03, 2019 at 01:37:11PM +0200, Auger Eric wrote:
+On Tue, Sep 03, 2019 at 01:45:22PM +0200, Auger Eric wrote:
 > Hi Peter,
 > 
-> On 8/19/19 10:11 AM, Peter Xu wrote:
-> > On Tue, Jul 30, 2019 at 07:21:30PM +0200, Eric Auger wrote:
+> On 8/19/19 10:24 AM, Peter Xu wrote:
+> > On Tue, Jul 30, 2019 at 07:21:31PM +0200, Eric Auger wrote:
+> >> @@ -464,19 +464,75 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+> >>                                              int iommu_idx)
+> >>  {
+> >>      IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
+> >> +    VirtIOIOMMU *s = sdev->viommu;
+> >>      uint32_t sid;
+> >> +    viommu_endpoint *ep;
+> >> +    viommu_mapping *mapping;
+> >> +    viommu_interval interval;
+> >> +    bool bypass_allowed;
+> >> +
+> >> +    interval.low = addr;
+> >> +    interval.high = addr + 1;
+> >>  
+> >>      IOMMUTLBEntry entry = {
+> >>          .target_as = &address_space_memory,
+> >>          .iova = addr,
+> >>          .translated_addr = addr,
+> >> -        .addr_mask = ~(hwaddr)0,
+> >> +        .addr_mask = (1 << ctz32(s->config.page_size_mask)) - 1,
+> >>          .perm = IOMMU_NONE,
+> >>      };
+> >>  
+> >> +    bypass_allowed = virtio_has_feature(s->acked_features,
+> >> +                                        VIRTIO_IOMMU_F_BYPASS);
+> >> +
+> >>      sid = virtio_iommu_get_sid(sdev);
+> >>  
+> >>      trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
+> >> +    qemu_mutex_lock(&s->mutex);
+> >> +
+> >> +    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(sid));
+> >> +    if (!ep) {
+> >> +        if (!bypass_allowed) {
+> >> +            error_report("%s sid=%d is not known!!", __func__, sid);
 > > 
-> > [...]
-> > 
-> >> +    mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
-> >> +
-> >> +    while (mapping) {
-> >> +        viommu_interval current;
-> >> +        uint64_t low  = mapping->virt_addr;
-> >> +        uint64_t high = mapping->virt_addr + mapping->size - 1;
-> >> +
-> >> +        current.low = low;
-> >> +        current.high = high;
-> >> +
-> >> +        if (low == interval.low && size >= mapping->size) {
-> >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
-> >> +            interval.low = high + 1;
-> >> +            trace_virtio_iommu_unmap_left_interval(current.low, current.high,
-> >> +                interval.low, interval.high);
-> >> +        } else if (high == interval.high && size >= mapping->size) {
-> >> +            trace_virtio_iommu_unmap_right_interval(current.low, current.high,
-> >> +                interval.low, interval.high);
-> >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
-> >> +            interval.high = low - 1;
-> >> +        } else if (low > interval.low && high < interval.high) {
-> >> +            trace_virtio_iommu_unmap_inc_interval(current.low, current.high);
-> >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
-> >> +        } else {
-> >> +            break;
-> >> +        }
-> >> +        if (interval.low >= interval.high) {
-> >> +            return VIRTIO_IOMMU_S_OK;
-> >> +        } else {
-> >> +            mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
-> >> +        }
-> >> +    }
-> >> +
-> >> +    if (mapping) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                      "****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
-> >> +                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported\n",
-> >> +                     __func__, interval.low, size,
-> >> +                     mapping->virt_addr, mapping->size);
-> >> +    } else {
-> >> +        return VIRTIO_IOMMU_S_OK;
-> >> +    }
-> >> +
-> >> +    return VIRTIO_IOMMU_S_INVAL;
-> > 
-> > Could the above chunk be simplified as something like below?
-> > 
-> >   while ((mapping = g_tree_lookup(domain->mappings, &interval))) {
-> >     g_tree_remove(domain->mappings, mapping);
-> >   }
-> Indeed the code could be simplified. I only need to make sure I don't
-> split an existing mapping.
-
-Hmm... Do we need to still split an existing mapping if necessary?
-For example when with this mapping:
-
-  iova=0x1000, size=0x2000, phys=ADDR1, flags=FLAGS1
-
-And if we want to unmap the range (iova=0, size=0x2000), then we
-should split the existing mappping and leave this one:
-
-  iova=0x2000, size=0x1000, phys=(ADDR1+0x1000), flags=FLAGS1
-
-Right?
-
+> > Maybe use error_report_once() to avoid DOS attack?  Also would it be
+> > good to unify the debug prints?  I see both error_report() and
+> > qemu_log_mask() are used in the whole patchset.  Or is that attempted?
 > 
-> Also I needed to use g_tree_lookup_extended to retrieve the actual key
-> to remove. The usage of g_tree_lookup_extended() allows me to remove the
-> virt_addr and size fields from the mapping value value struct as those
-> info can be retrieved from the key.
+> I switched to error_report_once()
+> 
+> I understand that qemu_log_mask() should be used whenever the root cause
+> is a bad action of the guest OS (in below case, the EP was not attached
+> to any domain). Above, there is an EP that attempts to talk through the
+> IOMMU and this was not expected (rather a platform description issue or
+> a qemu bug).
 
-True.  Thanks,
+I see. It's a bit unclear at least to me on how to use these.  I have
+seen, and used error_report*() to report guest misbehaves as well just
+for the debugging and triaging simply because error_report*() will
+always be there even without "-d" (because when issue happens most
+users are without it...).  Then with these information captured by
+either libvirt or direct QEMU users we can triage guest bugs easier.
+I hope I'm not severly wrong, and please feel free to use
+qemu_log_mask() no matter what.
+
+Regards,
 
 -- 
 Peter Xu
