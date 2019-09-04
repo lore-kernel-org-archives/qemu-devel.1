@@ -2,86 +2,84 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DC7C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8E1C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:50:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35ADD20870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:38:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35ADD20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 620FC23400
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 05:50:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620FC23400
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Nzo-0002C8-Cd
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 01:38:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35713)
+	id 1i5OB9-0004xW-KF
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 01:50:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1i5Nz5-0001hp-JW
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:37:36 -0400
+ (envelope-from <kevin.tian@intel.com>) id 1i5O7k-0003hj-2h
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:46:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1i5Nz4-0003CA-CJ
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:37:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53104)
+ (envelope-from <kevin.tian@intel.com>) id 1i5O7f-00086t-3R
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:46:30 -0400
+Received: from mga05.intel.com ([192.55.52.43]:58268)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i5Nz4-0003Bn-45
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 01:37:34 -0400
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 418BF3C919
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 05:37:33 +0000 (UTC)
-Received: by mail-pf1-f199.google.com with SMTP id z13so12821694pfr.15
- for <qemu-devel@nongnu.org>; Tue, 03 Sep 2019 22:37:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=7Xok+yVyZiHneq3LIxnYfTEQeUGrDhjEYQBclKpyfow=;
- b=fLAWrcKp2zrmI8pLXiZ33wLwdhGNfcZgUJnJodbShFcIfnv+sUDiB6+psbs7r1yF1I
- yogTzpcXfEOBN80Qd/ZbFV7tZ5ZO/M+HqJvdtTdyuR1RNEgCBLN1gPW/FL0PrDl/lMBi
- /k3TZgayz8++nxEz7ZONfcRRQjiobOJsO5xYugy/9CyJKCz7kxaNpRqMhZ4l+TuspqMb
- 38A0MrFqTjnOjdIoTtIeUBAeJMWHorN3zIkGq8E/HY4fjnSDMFJYCc2pYdmc6DRPhYxY
- G/D/IzO8HWfa9lPnH4wJEVBoTw/MmlYCmQFhrI8LanvnLzWWZspftWEg/Pq2PhWilJKg
- GvMQ==
-X-Gm-Message-State: APjAAAXBFx+NNam0RvYOFDmQa3oAWAx52p23maxtsu30ART8YGjYyigW
- AN36Mb52f1DGzEGQm1MvktJcZ/b3l5zy80yzlwBOH28gJhLj0plbqgolKkCz0NxGhadPIehvfzq
- tgC82YGjLyau4ncQ=
-X-Received: by 2002:a17:90a:36ae:: with SMTP id
- t43mr3130343pjb.7.1567575452782; 
- Tue, 03 Sep 2019 22:37:32 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzW56BTfwF78nOwopA6XKobjQVflEO/3NlYpNzLtFdnErpwfto8Xo2/g1hoaR5qB5KwXGyN8g==
-X-Received: by 2002:a17:90a:36ae:: with SMTP id
- t43mr3130314pjb.7.1567575452475; 
- Tue, 03 Sep 2019 22:37:32 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id c1sm21790274pfd.117.2019.09.03.22.37.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Sep 2019 22:37:31 -0700 (PDT)
-Date: Wed, 4 Sep 2019 13:37:20 +0800
-From: Peter Xu <peterx@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Message-ID: <20190904053720.GG30402@xz-x1>
+ (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+ id 1i5O7c-000836-3G; Wed, 04 Sep 2019 01:46:25 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 03 Sep 2019 22:46:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,465,1559545200"; d="scan'208";a="173457118"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by orsmga007.jf.intel.com with ESMTP; 03 Sep 2019 22:46:16 -0700
+Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 3 Sep 2019 22:46:15 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 3 Sep 2019 22:46:15 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.86]) with mapi id 14.03.0439.000;
+ Wed, 4 Sep 2019 13:46:13 +0800
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Thread-Topic: [PATCH for-4.2 v10 08/15] virtio-iommu: Implement map/unmap
+Thread-Index: AQHVRvt45mqYxba1WEGcL7R8WepU8acBt2WAgBfMYYCAAOysAIAAsfiA//+PJgCAAIeL0A==
+Date: Wed, 4 Sep 2019 05:46:13 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D562270@SHSMSX104.ccr.corp.intel.com>
 References: <20190730172137.23114-1-eric.auger@redhat.com>
  <20190730172137.23114-9-eric.auger@redhat.com>
  <20190819081143.GA13560@xz-x1>
  <b5e2ff32-eed8-829e-ffd4-2b62ed6b2fda@redhat.com>
  <20190904014416.GB30402@xz-x1>
  <AADFC41AFE54684AB9EE6CBC0274A5D19D561F28@SHSMSX104.ccr.corp.intel.com>
+ <20190904053720.GG30402@xz-x1>
+In-Reply-To: <20190904053720.GG30402@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNGRhNzBiMGYtMjRjMi00MmJlLTlkMTQtMWRkYjU5MDBhMjliIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNENtaVN1WGwzY2oyRWJcL2dzbjI5eFoxMTcyQTJTSjdXSjhtclA1NEFLUWc4ZXp0amZ6YTREVnRTVllcL1MzbGpoIn0=
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D561F28@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.43
 Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 08/15] virtio-iommu: Implement
  map/unmap
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,119 +106,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 04, 2019 at 04:23:50AM +0000, Tian, Kevin wrote:
-> > From: Peter Xu [mailto:peterx@redhat.com]
-> > Sent: Wednesday, September 4, 2019 9:44 AM
-> > 
-> > On Tue, Sep 03, 2019 at 01:37:11PM +0200, Auger Eric wrote:
-> > > Hi Peter,
-> > >
-> > > On 8/19/19 10:11 AM, Peter Xu wrote:
-> > > > On Tue, Jul 30, 2019 at 07:21:30PM +0200, Eric Auger wrote:
-> > > >
-> > > > [...]
-> > > >
-> > > >> +    mapping = g_tree_lookup(domain->mappings, (gpointer)(&interval));
-> > > >> +
-> > > >> +    while (mapping) {
-> > > >> +        viommu_interval current;
-> > > >> +        uint64_t low  = mapping->virt_addr;
-> > > >> +        uint64_t high = mapping->virt_addr + mapping->size - 1;
-> > > >> +
-> > > >> +        current.low = low;
-> > > >> +        current.high = high;
-> > > >> +
-> > > >> +        if (low == interval.low && size >= mapping->size) {
-> > > >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
-> > > >> +            interval.low = high + 1;
-> > > >> +            trace_virtio_iommu_unmap_left_interval(current.low,
-> > current.high,
-> > > >> +                interval.low, interval.high);
-> > > >> +        } else if (high == interval.high && size >= mapping->size) {
-> > > >> +            trace_virtio_iommu_unmap_right_interval(current.low,
-> > current.high,
-> > > >> +                interval.low, interval.high);
-> > > >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
-> > > >> +            interval.high = low - 1;
-> > > >> +        } else if (low > interval.low && high < interval.high) {
-> > > >> +            trace_virtio_iommu_unmap_inc_interval(current.low,
-> > current.high);
-> > > >> +            g_tree_remove(domain->mappings, (gpointer)(&current));
-> > > >> +        } else {
-> > > >> +            break;
-> > > >> +        }
-> > > >> +        if (interval.low >= interval.high) {
-> > > >> +            return VIRTIO_IOMMU_S_OK;
-> > > >> +        } else {
-> > > >> +            mapping = g_tree_lookup(domain->mappings,
-> > (gpointer)(&interval));
-> > > >> +        }
-> > > >> +    }
-> > > >> +
-> > > >> +    if (mapping) {
-> > > >> +        qemu_log_mask(LOG_GUEST_ERROR,
-> > > >> +                      "****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
-> > > >> +                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported\n",
-> > > >> +                     __func__, interval.low, size,
-> > > >> +                     mapping->virt_addr, mapping->size);
-> > > >> +    } else {
-> > > >> +        return VIRTIO_IOMMU_S_OK;
-> > > >> +    }
-> > > >> +
-> > > >> +    return VIRTIO_IOMMU_S_INVAL;
-> > > >
-> > > > Could the above chunk be simplified as something like below?
-> > > >
-> > > >   while ((mapping = g_tree_lookup(domain->mappings, &interval))) {
-> > > >     g_tree_remove(domain->mappings, mapping);
-> > > >   }
-> > > Indeed the code could be simplified. I only need to make sure I don't
-> > > split an existing mapping.
-> > 
-> > Hmm... Do we need to still split an existing mapping if necessary?
-> > For example when with this mapping:
-> > 
-> >   iova=0x1000, size=0x2000, phys=ADDR1, flags=FLAGS1
-> > 
-> > And if we want to unmap the range (iova=0, size=0x2000), then we
-> > should split the existing mappping and leave this one:
-> > 
-> >   iova=0x2000, size=0x1000, phys=(ADDR1+0x1000), flags=FLAGS1
-> > 
-> > Right?
-> > 
-> 
-> virtio-iommu spec explicitly disallows partial unmap.
-> 
-> 5.11.6.6.1 Driver Requirements: UNMAP request
-> 
-> The first address of a range MUST either be the first address of a 
-> mapping or be outside any mapping. The last address of a range 
-> MUST either be the last address of a mapping or be outside any 
-> mapping.
-> 
-> 5.11.6.6.2 Device Requirements: UNMAP request
-> 
-> If a mapping affected by the range is not covered in its entirety 
-> by the range (the UNMAP request would split the mapping), 
-> then the device SHOULD set the request status to VIRTIO_IOMMU
-> _S_RANGE, and SHOULD NOT remove any mapping.
-
-I see, thanks Kevin.
-
-Though why so strict?  (Sorry if I missed some discussions
-... pointers welcomed...)
-
-What I'm thinking is when we want to allocate a bunch of buffers
-(e.g., 1M) while we will also need to be able to free them with
-smaller chunks (e.g., 4K), then it would be even better that we allow
-to allocate a whole 1M buffer within the guest and map it as a whole,
-then we can selectively unmap the pages after used.  If with the
-strict rule, we'll need to map one by one, that can be a total of
-1M/4K roundtrips.
-
-Regards,
-
--- 
-Peter Xu
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBXZWRu
+ZXNkYXksIFNlcHRlbWJlciA0LCAyMDE5IDE6MzcgUE0NCj4gDQo+IE9uIFdlZCwgU2VwIDA0LCAy
+MDE5IGF0IDA0OjIzOjUwQU0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+ID4gRnJvbTog
+UGV0ZXIgWHUgW21haWx0bzpwZXRlcnhAcmVkaGF0LmNvbV0NCj4gPiA+IFNlbnQ6IFdlZG5lc2Rh
+eSwgU2VwdGVtYmVyIDQsIDIwMTkgOTo0NCBBTQ0KPiA+ID4NCj4gPiA+IE9uIFR1ZSwgU2VwIDAz
+LCAyMDE5IGF0IDAxOjM3OjExUE0gKzAyMDAsIEF1Z2VyIEVyaWMgd3JvdGU6DQo+ID4gPiA+IEhp
+IFBldGVyLA0KPiA+ID4gPg0KPiA+ID4gPiBPbiA4LzE5LzE5IDEwOjExIEFNLCBQZXRlciBYdSB3
+cm90ZToNCj4gPiA+ID4gPiBPbiBUdWUsIEp1bCAzMCwgMjAxOSBhdCAwNzoyMTozMFBNICswMjAw
+LCBFcmljIEF1Z2VyIHdyb3RlOg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gWy4uLl0NCj4gPiA+ID4g
+Pg0KPiA+ID4gPiA+PiArICAgIG1hcHBpbmcgPSBnX3RyZWVfbG9va3VwKGRvbWFpbi0+bWFwcGlu
+Z3MsDQo+IChncG9pbnRlcikoJmludGVydmFsKSk7DQo+ID4gPiA+ID4+ICsNCj4gPiA+ID4gPj4g
+KyAgICB3aGlsZSAobWFwcGluZykgew0KPiA+ID4gPiA+PiArICAgICAgICB2aW9tbXVfaW50ZXJ2
+YWwgY3VycmVudDsNCj4gPiA+ID4gPj4gKyAgICAgICAgdWludDY0X3QgbG93ICA9IG1hcHBpbmct
+PnZpcnRfYWRkcjsNCj4gPiA+ID4gPj4gKyAgICAgICAgdWludDY0X3QgaGlnaCA9IG1hcHBpbmct
+PnZpcnRfYWRkciArIG1hcHBpbmctPnNpemUgLSAxOw0KPiA+ID4gPiA+PiArDQo+ID4gPiA+ID4+
+ICsgICAgICAgIGN1cnJlbnQubG93ID0gbG93Ow0KPiA+ID4gPiA+PiArICAgICAgICBjdXJyZW50
+LmhpZ2ggPSBoaWdoOw0KPiA+ID4gPiA+PiArDQo+ID4gPiA+ID4+ICsgICAgICAgIGlmIChsb3cg
+PT0gaW50ZXJ2YWwubG93ICYmIHNpemUgPj0gbWFwcGluZy0+c2l6ZSkgew0KPiA+ID4gPiA+PiAr
+ICAgICAgICAgICAgZ190cmVlX3JlbW92ZShkb21haW4tPm1hcHBpbmdzLCAoZ3BvaW50ZXIpKCZj
+dXJyZW50KSk7DQo+ID4gPiA+ID4+ICsgICAgICAgICAgICBpbnRlcnZhbC5sb3cgPSBoaWdoICsg
+MTsNCj4gPiA+ID4gPj4gKyAgICAgICAgICAgIHRyYWNlX3ZpcnRpb19pb21tdV91bm1hcF9sZWZ0
+X2ludGVydmFsKGN1cnJlbnQubG93LA0KPiA+ID4gY3VycmVudC5oaWdoLA0KPiA+ID4gPiA+PiAr
+ICAgICAgICAgICAgICAgIGludGVydmFsLmxvdywgaW50ZXJ2YWwuaGlnaCk7DQo+ID4gPiA+ID4+
+ICsgICAgICAgIH0gZWxzZSBpZiAoaGlnaCA9PSBpbnRlcnZhbC5oaWdoICYmIHNpemUgPj0gbWFw
+cGluZy0+c2l6ZSkgew0KPiA+ID4gPiA+PiArICAgICAgICAgICAgdHJhY2VfdmlydGlvX2lvbW11
+X3VubWFwX3JpZ2h0X2ludGVydmFsKGN1cnJlbnQubG93LA0KPiA+ID4gY3VycmVudC5oaWdoLA0K
+PiA+ID4gPiA+PiArICAgICAgICAgICAgICAgIGludGVydmFsLmxvdywgaW50ZXJ2YWwuaGlnaCk7
+DQo+ID4gPiA+ID4+ICsgICAgICAgICAgICBnX3RyZWVfcmVtb3ZlKGRvbWFpbi0+bWFwcGluZ3Ms
+IChncG9pbnRlcikoJmN1cnJlbnQpKTsNCj4gPiA+ID4gPj4gKyAgICAgICAgICAgIGludGVydmFs
+LmhpZ2ggPSBsb3cgLSAxOw0KPiA+ID4gPiA+PiArICAgICAgICB9IGVsc2UgaWYgKGxvdyA+IGlu
+dGVydmFsLmxvdyAmJiBoaWdoIDwgaW50ZXJ2YWwuaGlnaCkgew0KPiA+ID4gPiA+PiArICAgICAg
+ICAgICAgdHJhY2VfdmlydGlvX2lvbW11X3VubWFwX2luY19pbnRlcnZhbChjdXJyZW50LmxvdywN
+Cj4gPiA+IGN1cnJlbnQuaGlnaCk7DQo+ID4gPiA+ID4+ICsgICAgICAgICAgICBnX3RyZWVfcmVt
+b3ZlKGRvbWFpbi0+bWFwcGluZ3MsIChncG9pbnRlcikoJmN1cnJlbnQpKTsNCj4gPiA+ID4gPj4g
+KyAgICAgICAgfSBlbHNlIHsNCj4gPiA+ID4gPj4gKyAgICAgICAgICAgIGJyZWFrOw0KPiA+ID4g
+PiA+PiArICAgICAgICB9DQo+ID4gPiA+ID4+ICsgICAgICAgIGlmIChpbnRlcnZhbC5sb3cgPj0g
+aW50ZXJ2YWwuaGlnaCkgew0KPiA+ID4gPiA+PiArICAgICAgICAgICAgcmV0dXJuIFZJUlRJT19J
+T01NVV9TX09LOw0KPiA+ID4gPiA+PiArICAgICAgICB9IGVsc2Ugew0KPiA+ID4gPiA+PiArICAg
+ICAgICAgICAgbWFwcGluZyA9IGdfdHJlZV9sb29rdXAoZG9tYWluLT5tYXBwaW5ncywNCj4gPiA+
+IChncG9pbnRlcikoJmludGVydmFsKSk7DQo+ID4gPiA+ID4+ICsgICAgICAgIH0NCj4gPiA+ID4g
+Pj4gKyAgICB9DQo+ID4gPiA+ID4+ICsNCj4gPiA+ID4gPj4gKyAgICBpZiAobWFwcGluZykgew0K
+PiA+ID4gPiA+PiArICAgICAgICBxZW11X2xvZ19tYXNrKExPR19HVUVTVF9FUlJPUiwNCj4gPiA+
+ID4gPj4gKyAgICAgICAgICAgICAgICAgICAgICAiKioqKioqICVzOiBVbm1hcCAweCUiUFJJeDY0
+IiBzaXplPTB4JSJQUkl4NjQNCj4gPiA+ID4gPj4gKyAgICAgICAgICAgICAgICAgICAgICIgZnJv
+bSAweCUiUFJJeDY0IiBzaXplPTB4JSJQUkl4NjQiIGlzIG5vdCBzdXBwb3J0ZWRcbiIsDQo+ID4g
+PiA+ID4+ICsgICAgICAgICAgICAgICAgICAgICBfX2Z1bmNfXywgaW50ZXJ2YWwubG93LCBzaXpl
+LA0KPiA+ID4gPiA+PiArICAgICAgICAgICAgICAgICAgICAgbWFwcGluZy0+dmlydF9hZGRyLCBt
+YXBwaW5nLT5zaXplKTsNCj4gPiA+ID4gPj4gKyAgICB9IGVsc2Ugew0KPiA+ID4gPiA+PiArICAg
+ICAgICByZXR1cm4gVklSVElPX0lPTU1VX1NfT0s7DQo+ID4gPiA+ID4+ICsgICAgfQ0KPiA+ID4g
+PiA+PiArDQo+ID4gPiA+ID4+ICsgICAgcmV0dXJuIFZJUlRJT19JT01NVV9TX0lOVkFMOw0KPiA+
+ID4gPiA+DQo+ID4gPiA+ID4gQ291bGQgdGhlIGFib3ZlIGNodW5rIGJlIHNpbXBsaWZpZWQgYXMg
+c29tZXRoaW5nIGxpa2UgYmVsb3c/DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiAgIHdoaWxlICgobWFw
+cGluZyA9IGdfdHJlZV9sb29rdXAoZG9tYWluLT5tYXBwaW5ncywgJmludGVydmFsKSkpIHsNCj4g
+PiA+ID4gPiAgICAgZ190cmVlX3JlbW92ZShkb21haW4tPm1hcHBpbmdzLCBtYXBwaW5nKTsNCj4g
+PiA+ID4gPiAgIH0NCj4gPiA+ID4gSW5kZWVkIHRoZSBjb2RlIGNvdWxkIGJlIHNpbXBsaWZpZWQu
+IEkgb25seSBuZWVkIHRvIG1ha2Ugc3VyZSBJIGRvbid0DQo+ID4gPiA+IHNwbGl0IGFuIGV4aXN0
+aW5nIG1hcHBpbmcuDQo+ID4gPg0KPiA+ID4gSG1tLi4uIERvIHdlIG5lZWQgdG8gc3RpbGwgc3Bs
+aXQgYW4gZXhpc3RpbmcgbWFwcGluZyBpZiBuZWNlc3Nhcnk/DQo+ID4gPiBGb3IgZXhhbXBsZSB3
+aGVuIHdpdGggdGhpcyBtYXBwaW5nOg0KPiA+ID4NCj4gPiA+ICAgaW92YT0weDEwMDAsIHNpemU9
+MHgyMDAwLCBwaHlzPUFERFIxLCBmbGFncz1GTEFHUzENCj4gPiA+DQo+ID4gPiBBbmQgaWYgd2Ug
+d2FudCB0byB1bm1hcCB0aGUgcmFuZ2UgKGlvdmE9MCwgc2l6ZT0weDIwMDApLCB0aGVuIHdlDQo+
+ID4gPiBzaG91bGQgc3BsaXQgdGhlIGV4aXN0aW5nIG1hcHBwaW5nIGFuZCBsZWF2ZSB0aGlzIG9u
+ZToNCj4gPiA+DQo+ID4gPiAgIGlvdmE9MHgyMDAwLCBzaXplPTB4MTAwMCwgcGh5cz0oQUREUjEr
+MHgxMDAwKSwgZmxhZ3M9RkxBR1MxDQo+ID4gPg0KPiA+ID4gUmlnaHQ/DQo+ID4gPg0KPiA+DQo+
+ID4gdmlydGlvLWlvbW11IHNwZWMgZXhwbGljaXRseSBkaXNhbGxvd3MgcGFydGlhbCB1bm1hcC4N
+Cj4gPg0KPiA+IDUuMTEuNi42LjEgRHJpdmVyIFJlcXVpcmVtZW50czogVU5NQVAgcmVxdWVzdA0K
+PiA+DQo+ID4gVGhlIGZpcnN0IGFkZHJlc3Mgb2YgYSByYW5nZSBNVVNUIGVpdGhlciBiZSB0aGUg
+Zmlyc3QgYWRkcmVzcyBvZiBhDQo+ID4gbWFwcGluZyBvciBiZSBvdXRzaWRlIGFueSBtYXBwaW5n
+LiBUaGUgbGFzdCBhZGRyZXNzIG9mIGEgcmFuZ2UNCj4gPiBNVVNUIGVpdGhlciBiZSB0aGUgbGFz
+dCBhZGRyZXNzIG9mIGEgbWFwcGluZyBvciBiZSBvdXRzaWRlIGFueQ0KPiA+IG1hcHBpbmcuDQo+
+ID4NCj4gPiA1LjExLjYuNi4yIERldmljZSBSZXF1aXJlbWVudHM6IFVOTUFQIHJlcXVlc3QNCj4g
+Pg0KPiA+IElmIGEgbWFwcGluZyBhZmZlY3RlZCBieSB0aGUgcmFuZ2UgaXMgbm90IGNvdmVyZWQg
+aW4gaXRzIGVudGlyZXR5DQo+ID4gYnkgdGhlIHJhbmdlICh0aGUgVU5NQVAgcmVxdWVzdCB3b3Vs
+ZCBzcGxpdCB0aGUgbWFwcGluZyksDQo+ID4gdGhlbiB0aGUgZGV2aWNlIFNIT1VMRCBzZXQgdGhl
+IHJlcXVlc3Qgc3RhdHVzIHRvIFZJUlRJT19JT01NVQ0KPiA+IF9TX1JBTkdFLCBhbmQgU0hPVUxE
+IE5PVCByZW1vdmUgYW55IG1hcHBpbmcuDQo+IA0KPiBJIHNlZSwgdGhhbmtzIEtldmluLg0KPiAN
+Cj4gVGhvdWdoIHdoeSBzbyBzdHJpY3Q/ICAoU29ycnkgaWYgSSBtaXNzZWQgc29tZSBkaXNjdXNz
+aW9ucw0KPiAuLi4gcG9pbnRlcnMgd2VsY29tZWQuLi4pDQo+IA0KPiBXaGF0IEknbSB0aGlua2lu
+ZyBpcyB3aGVuIHdlIHdhbnQgdG8gYWxsb2NhdGUgYSBidW5jaCBvZiBidWZmZXJzDQo+IChlLmcu
+LCAxTSkgd2hpbGUgd2Ugd2lsbCBhbHNvIG5lZWQgdG8gYmUgYWJsZSB0byBmcmVlIHRoZW0gd2l0
+aA0KPiBzbWFsbGVyIGNodW5rcyAoZS5nLiwgNEspLCB0aGVuIGl0IHdvdWxkIGJlIGV2ZW4gYmV0
+dGVyIHRoYXQgd2UgYWxsb3cNCj4gdG8gYWxsb2NhdGUgYSB3aG9sZSAxTSBidWZmZXIgd2l0aGlu
+IHRoZSBndWVzdCBhbmQgbWFwIGl0IGFzIGEgd2hvbGUsDQo+IHRoZW4gd2UgY2FuIHNlbGVjdGl2
+ZWx5IHVubWFwIHRoZSBwYWdlcyBhZnRlciB1c2VkLiAgSWYgd2l0aCB0aGUNCj4gc3RyaWN0IHJ1
+bGUsIHdlJ2xsIG5lZWQgdG8gbWFwIG9uZSBieSBvbmUsIHRoYXQgY2FuIGJlIGEgdG90YWwgb2YN
+Cj4gMU0vNEsgcm91bmR0cmlwcy4NCj4gDQoNClNvcnJ5IEkgZm9yZ290IHRoZSBvcmlnaW5hbCBk
+aXNjdXNzaW9uLiBOZWVkIEplYW4gdG8gcmVzcG9uZC4gOi0pDQoNCkEgcG9zc2libGUgcmVhc29u
+IGlzIHRoYXQgbm8gc3VjaCB1c2FnZSBleGlzdHMgdG9kYXksIHRodXMgc2ltcGxpZmljYXRpb24N
+CndhcyBtYWRlPyANCg0KVGhhbmtzDQpLZXZpbg0K
 
