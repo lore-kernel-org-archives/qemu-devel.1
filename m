@@ -2,50 +2,61 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24692C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 09:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C8FC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 09:18:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1C3021670
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 09:14:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1C3021670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 790052339E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 09:18:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 790052339E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5RN0-0005zt-H9
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 05:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40674)
+	id 1i5RQc-0001Cl-SY
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 05:18:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i5RKH-0003wy-3W
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:11:42 -0400
+ (envelope-from <tiwei.bie@intel.com>) id 1i5RDW-0005Op-4C
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:04:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i5RKF-0004mi-Aq
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:11:40 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47466)
+ (envelope-from <tiwei.bie@intel.com>) id 1i5RDT-0001oB-1G
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:04:41 -0400
+Received: from mga07.intel.com ([134.134.136.100]:50904)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1i5RKE-0004kw-Ul; Wed, 04 Sep 2019 05:11:39 -0400
-Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1i5RKB-000708-5B; Wed, 04 Sep 2019 12:11:35 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Wed,  4 Sep 2019 12:11:18 +0300
-Message-Id: <1567588284-975381-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v8 0/6] Allow Valgrind checking all QEMU
- processes
+ (Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1i5RDJ-0001gB-3R
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:04:32 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 04 Sep 2019 02:04:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,465,1559545200"; d="scan'208";a="266592088"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.71])
+ by orsmga001.jf.intel.com with ESMTP; 04 Sep 2019 02:04:22 -0700
+Date: Wed, 4 Sep 2019 17:01:55 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Message-ID: <20190904090154.GA12778@___>
+References: <20190903200422.11693-1-johannes@sipsolutions.net>
+ <20190904020655.GA30746@___>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190904020655.GA30746@___>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.100
+Subject: Re: [Qemu-devel] [PATCH v2] libvhost-user: fix SLAVE_SEND_FD
+ handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,50 +68,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org, jsnow@redhat.com
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org, Johannes Berg <johannes.berg@intel.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the current implementation of the QEMU bash iotests, only qemu-io
-processes may be run under the Valgrind with the switch '-valgrind'.
-Let's allow the common.rc bash script running all other QEMU processes,
-such as qemu-kvm, qemu-img, qemu-ndb and qemu-vxhs, under the Valgrind.
+On Wed, Sep 04, 2019 at 10:06:55AM +0800, Tiwei Bie wrote:
+> On Tue, Sep 03, 2019 at 11:04:22PM +0300, Johannes Berg wrote:
+> > From: Johannes Berg <johannes.berg@intel.com>
+> > 
+> > It doesn't look like this could possibly work properly since
+> > VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD is defined to 10, but the
+> > dev->protocol_features has a bitmap. I suppose the peer this
+> > was tested with also supported VHOST_USER_PROTOCOL_F_LOG_SHMFD,
+> > in which case the test would always be false, but nevertheless
+> > the code seems wrong.
+> 
+> Ooops.. I tested `tests/vhost-user-bridge -H`. But as you
+> said it worked because VHOST_USER_PROTOCOL_F_LOG_SHMFD has
+> been negotiated. Thanks for spotting this!
+> 
+> > 
+> > Use has_feature() to fix this.
+> > 
+> > Fixes: d84599f56c82 ("libvhost-user: support host notifier")
+> 
+> Cc: qemu-stable@nongnu.org
+> 
+> > Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> > ---
+> >  contrib/libvhost-user/libvhost-user.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+> > index 6a02eaffc672..fcf4a8a00ed2 100644
+> > --- a/contrib/libvhost-user/libvhost-user.c
+> > +++ b/contrib/libvhost-user/libvhost-user.c
+> > @@ -1097,7 +1097,8 @@ bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *vq, int fd,
+> >  
+> >      vmsg.fd_num = fd_num;
+> >  
+> > -    if ((dev->protocol_features & VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD) == 0) {
+> > +    if (!has_feature(dev->protocol_features,
+> > +                     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) {
+> 
+> We have both of has_feature() and vu_has_feature() called by
+> other code in this file directly. Not sure which one is preferred..
+> Personally, I think vu_has_feature() might be better.
 
-v8:
-  01: Fix for the optimization made in v7 where the iotests 039 and 051
-      did not pass being run under the Valgrind. NO_VALGRIND variable
-      has been introduced to complete the optimization logic (patch 2/6).
+Thanks for the patch introducing vu_has_protocol_feature().
+This fix looks good to me. Thanks a lot!
 
-  Discussed in the email threads with the message IDs:
-  <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-  <1560276131-683243-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-  <1566834628-485525-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-
-Andrey Shinkevich (6):
-  iotests: allow Valgrind checking all QEMU processes
-  iotests: exclude killed processes from running under Valgrind
-  iotests: Add casenotrun report to bash tests
-  iotests: Valgrind fails with nonexistent directory
-  iotests: extended timeout under Valgrind
-  iotests: extend sleeping time under Valgrind
-
- tests/qemu-iotests/028       |   6 ++-
- tests/qemu-iotests/039       |   5 +++
- tests/qemu-iotests/039.out   |  30 +++----------
- tests/qemu-iotests/051       |   4 ++
- tests/qemu-iotests/061       |   2 +
- tests/qemu-iotests/061.out   |  12 +----
- tests/qemu-iotests/137       |   1 +
- tests/qemu-iotests/137.out   |   6 +--
- tests/qemu-iotests/183       |   9 +++-
- tests/qemu-iotests/192       |   6 ++-
- tests/qemu-iotests/247       |   6 ++-
- tests/qemu-iotests/common.rc | 105 +++++++++++++++++++++++++++++++++++--------
- 12 files changed, 130 insertions(+), 62 deletions(-)
-
--- 
-1.8.3.1
-
+I'm not the maintainer. But anyway, if this helps:
+Reviewed-by: Tiwei Bie <tiwei.bie@intel.com>
 
