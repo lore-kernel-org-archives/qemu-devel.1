@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B759C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF7BC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:24:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1836B21726
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:23:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23E0621726
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:24:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NaaG8ZLN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1836B21726
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sWmnukhB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23E0621726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5boq-00013I-Ky
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:23:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41164)
+	id 1i5bpY-000263-My
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:24:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40877)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b0t-0005Ue-Fz
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:22 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0Z-0005GD-Rn
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b0r-00038C-6L
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:18 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41614)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0X-0002rv-WE
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:59 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42782)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5b0p-00032a-2Z
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:16 -0400
-Received: by mail-pf1-x444.google.com with SMTP id b13so7278059pfo.8
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:11 -0700 (PDT)
+ id 1i5b0X-0002qm-L6
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:31:57 -0400
+Received: by mail-pg1-x542.google.com with SMTP id p3so11767558pgb.9
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:31:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=2ZLJXIt+PxkZztXfn8SSMwPCXqB6/2ClBwSngJqOcn0=;
- b=NaaG8ZLNhX8Qy2ol5roo4uPyavVNw2s6y1m3T9xd2N3wMDU/P596CPskjDAgFJmw3Q
- mCtHHONltqaXLZcA1TP8V+EQi4Fkiw/28RNF0WPYYtyuxsZwpLONazBFcGyim+V3dGgy
- B1XsGdEqXHrYMP3dTJv510w+5EkbpPakTdMHFnelX/qwEHl7C9ccYdMkneoOD2+moDx4
- hnyQFhhoRHF2f3HXoKu6G0I6dXwTsFtslsi57bek3IsFuV4oPGXOaTMYkuxT5jlmAiJn
- FHEkvaW+H7fbvN5aCUgRbXAODP83H/JjyqNR/YqWOMBUdErbQFdIa8JLLvjrxdNKe9Br
- HxeQ==
+ bh=3YTIbEYYLxo/KQorAmZTbgiM25Lefa2PHYOLeWCcYi0=;
+ b=sWmnukhBDGqqcv9TjfJdZ4SDcjn9MSCaKDM1tJlw3hc3tFSxec9rouYA6YODRBk0o7
+ n94gEhbxKULseowqcYiiBCewkSsYUt8yq+el1xfOtPtk12nql1NRSzE7ZknirJ2Xcbd5
+ ANt7aIWg/D1iLHRXqxnubmvKCKvXIHfTHrO4SgDq5tioVMz1lHYX7VZNzXRoxSmEZMQX
+ jWSaxVv7e6fGN5ciAUK3BkJsRoz+mTHBpcesf1guc1o/EAkSKx2PWE3Ec9K87205CoUS
+ LSLZMszDz8c1KSyKVlXoWjVSgrHfFA6yUZg8ZUO1na9EJTx1ae9wTM/rvhmx4WyYe7xU
+ DZJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=2ZLJXIt+PxkZztXfn8SSMwPCXqB6/2ClBwSngJqOcn0=;
- b=T4D8mSPpvYwgPUeL2KyvQlkJdZcJclXLgMJg0+WjF7VVoXMTpi+etoAoy+kliGnuzP
- AdYLK/nXNpprY6LzaUgJATR+IMDTZACrRueNP3Kuzuil3hGUhrNiS3ZaBOnLvsfwdUsx
- mXwJXtBZYNyf5Rtpu/XmT2MKph5HvL6ifWnqPMxm10pUFUKYtiwtM2PuIw2F4OkMuZ7C
- rxpQ1QyBR/qf2ELceRnqHThU/uGD+bdCg5FNJXAlmI8d/IlVfZODvmiRY+gnADz3RPG3
- GfQICeR0o1WsWdLuWTOwItP9LBqkcB+x4NpGXlGNDqbaYyN3czQV0H89ZTwFjmgcEC/x
- 1VMg==
-X-Gm-Message-State: APjAAAWd4qOU5ecB4fV0QaCd/0JBzG7tMiTzk5XOhZpPVlFBOVYbocwY
- cLCHWIwc8s9NPkHYoH5i+e1E17UrHag=
-X-Google-Smtp-Source: APXvYqxSwifAiH/CDS01PQwJRfpC8b+wjX9sTekw0oXwpCqEK4HC15vaohBqdbUH4alaW0ZdxBtjBQ==
-X-Received: by 2002:a63:e306:: with SMTP id f6mr35952958pgh.39.1567625529806; 
- Wed, 04 Sep 2019 12:32:09 -0700 (PDT)
+ bh=3YTIbEYYLxo/KQorAmZTbgiM25Lefa2PHYOLeWCcYi0=;
+ b=TdJmOILL9+7AjrPvSnocMTxYAiZMYKrr3erJzrJaytKX6Gz8DQUGTRxPPrTT3LLMq1
+ RpZDQcx7ohQBlRIy9mNss07suGQB9BZXW0yCfD5E9kmvxbYn+DdDcGZnnjdj085Bpuop
+ aBUUbVC5IDflvjdQWL99m5earcPxJVO3ZaXli/n5t2DXyiM22c1AyulRAURDFEFaBZqR
+ t+kyhbJ5Qx6knzl0mOtvq9GZfcPOtI+Z3Mu1Xg+n1DXUlPUDa4pCc+erdQJIxcL+JJEv
+ jPDr94x33bLKAg0OcfYwglO1k5kp0mOiF0yaOuLmaBQZ6nwPhQBgkyDlG/Jc/Qz12XSj
+ NGxg==
+X-Gm-Message-State: APjAAAWz5mwICENaTe+oJmlV7kqu7wcZ7JrxD/X1mkJy+NCB1Ibdl9KH
+ 21CvVGjqvgX03WDEGq2z5c+dd/cfEAo=
+X-Google-Smtp-Source: APXvYqxeXi/ceqN0XHAoOunUdbpcpnq/5W8WjrkMgDm0AyORoB8C0RwshAs0bQ5OPQVwMv92XfPiGA==
+X-Received: by 2002:a63:f048:: with SMTP id s8mr35777496pgj.26.1567625516138; 
+ Wed, 04 Sep 2019 12:31:56 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.08
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.31.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:32:08 -0700 (PDT)
+ Wed, 04 Sep 2019 12:31:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:30:44 -0700
-Message-Id: <20190904193059.26202-55-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 12:30:33 -0700
+Message-Id: <20190904193059.26202-44-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
 References: <20190904193059.26202-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v4 54/69] target/arm: Convert T16 add, compare,
- move (two high registers)
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v4 43/69] target/arm: Simplify disas_thumb2_insn
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,96 +95,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Fold away all of the cases that now just goto illegal_op,
+because all of their internal bits are now in decodetree.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 49 ++----------------------------------------
- target/arm/t16.decode  | 10 +++++++++
- 2 files changed, 12 insertions(+), 47 deletions(-)
+ target/arm/translate.c | 79 ++----------------------------------------
+ 1 file changed, 3 insertions(+), 76 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e6ef935247..73c8863134 100644
+index 46c27ea6a8..f68e09ff1f 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -10745,55 +10745,10 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-             store_reg(s, rd, tmp);
-             break;
+@@ -10552,9 +10552,6 @@ static bool thumb_insn_is_16bit(DisasContext *s, uint32_t pc, uint32_t insn)
+ /* Translate a 32-bit thumb instruction. */
+ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+ {
+-    uint32_t rn;
+-    int op;
+-
+     /*
+      * ARMv6-M supports a limited subset of Thumb2 instructions.
+      * Other Thumb1 architectures allow only 32-bit
+@@ -10595,34 +10592,10 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+     }
+     /* fall back to legacy decoder */
+ 
+-    rn = (insn >> 16) & 0xf;
+     switch ((insn >> 25) & 0xf) {
+     case 0: case 1: case 2: case 3:
+         /* 16-bit instructions.  Should never happen.  */
+         abort();
+-    case 4:
+-        /* All in decodetree */
+-        goto illegal_op;
+-    case 5:
+-        /* All in decodetree */
+-        goto illegal_op;
+-    case 13: /* Misc data processing.  */
+-        op = ((insn >> 22) & 6) | ((insn >> 7) & 1);
+-        if (op < 4 && (insn & 0xf000) != 0xf000)
+-            goto illegal_op;
+-        switch (op) {
+-        case 0: /* Register controlled shift, in decodetree */
+-        case 1: /* Sign/zero extend, in decodetree */
+-        case 2: /* SIMD add/subtract, in decodetree */
+-        case 3: /* Other data processing, in decodetree */
+-            goto illegal_op;
+-        case 4: case 5:
+-            /* 32-bit multiply.  Sum of absolute differences, in decodetree */
+-            goto illegal_op;
+-        case 6: case 7: /* 64-bit multiply, Divide, in decodetree */
+-            goto illegal_op;
+-        }
+-        break;
+     case 6: case 7: case 14: case 15:
+         /* Coprocessor.  */
+         if (arm_dc_feature(s, ARM_FEATURE_M)) {
+@@ -10651,6 +10624,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                 }
+ 
+                 if (arm_dc_feature(s, ARM_FEATURE_VFP)) {
++                    uint32_t rn = (insn >> 16) & 0xf;
+                     TCGv_i32 fptr = load_reg(s, rn);
+ 
+                     if (extract32(insn, 20, 1)) {
+@@ -10709,50 +10683,6 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             }
          }
--        if (insn & (1 << 10)) {
--            /* 0b0100_01xx_xxxx_xxxx
--             * - data processing extended, branch and exchange
--             */
--            rd = (insn & 7) | ((insn >> 4) & 8);
--            rm = (insn >> 3) & 0xf;
--            op = (insn >> 8) & 3;
--            switch (op) {
--            case 0: /* add */
--                tmp = load_reg(s, rd);
--                tmp2 = load_reg(s, rm);
--                tcg_gen_add_i32(tmp, tmp, tmp2);
--                tcg_temp_free_i32(tmp2);
--                if (rd == 13) {
--                    /* ADD SP, SP, reg */
--                    store_sp_checked(s, tmp);
+         break;
+-    case 8: case 9: case 10: case 11:
+-        if (insn & (1 << 15)) {
+-            /* Branches, misc control.  */
+-            if (insn & 0x5000) {
+-                /* Unconditional branch, in decodetree */
+-                goto illegal_op;
+-            } else if (((insn >> 23) & 7) == 7) {
+-                /* Misc control */
+-                if (insn & (1 << 13))
+-                    goto illegal_op;
+-
+-                if (insn & (1 << 26)) {
+-                    /* hvc, smc, in decodetree */
+-                    goto illegal_op;
 -                } else {
--                    store_reg(s, rd, tmp);
+-                    op = (insn >> 20) & 7;
+-                    switch (op) {
+-                    case 0: /* msr cpsr, in decodetree  */
+-                    case 1: /* msr spsr, in decodetree  */
+-                        goto illegal_op;
+-                    case 2: /* cps, nop-hint, in decodetree */
+-                        goto illegal_op;
+-                    case 3: /* Special control operations, in decodetree */
+-                    case 4: /* bxj, in decodetree */
+-                        goto illegal_op;
+-                    case 5: /* Exception return.  */
+-                    case 6: /* MRS, in decodetree */
+-                    case 7: /* MSR, in decodetree */
+-                        goto illegal_op;
+-                    }
 -                }
--                break;
--            case 1: /* cmp */
--                tmp = load_reg(s, rd);
--                tmp2 = load_reg(s, rm);
--                gen_sub_CC(tmp, tmp, tmp2);
--                tcg_temp_free_i32(tmp2);
--                tcg_temp_free_i32(tmp);
--                break;
--            case 2: /* mov/cpy */
--                tmp = load_reg(s, rm);
--                if (rd == 13) {
--                    /* MOV SP, reg */
--                    store_sp_checked(s, tmp);
--                } else {
--                    store_reg(s, rd, tmp);
--                }
--                break;
--            case 3:
--                /* 0b0100_0111_xxxx_xxxx
--                 * - branch [and link] exchange thumb register
--                 * In decodetree
--                 */
+-            } else {
+-                /* Conditional branch, in decodetree */
 -                goto illegal_op;
 -            }
--            break;
+-        } else {
+-            /*
+-             * 0b1111_0xxx_xxxx_0xxx_xxxx_xxxx
+-             *  - Data-processing (modified immediate, plain binary immediate)
+-             * All in decodetree.
+-             */
+-            goto illegal_op;
 -        }
- 
-         /*
--         * 0b0100_00xx_xxxx_xxxx
--         *  - Data-processing (two low registers), in decodetree
-+         * - Data-processing (two low registers), in decodetree
-+         * - data processing extended, branch and exchange, in decodetree
-          */
+-        break;
+     case 12:
+         if ((insn & 0x01100000) == 0x01000000) {
+             if (disas_neon_ls_insn(s, insn)) {
+@@ -10760,14 +10690,11 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             }
+             break;
+         }
+-        /* Load/store single data item, in decodetree */
          goto illegal_op;
+     default:
+-        goto illegal_op;
++    illegal_op:
++        unallocated_encoding(s);
+     }
+-    return;
+-illegal_op:
+-    unallocated_encoding(s);
+ }
  
-diff --git a/target/arm/t16.decode b/target/arm/t16.decode
-index edddbfb9b8..5a570484e3 100644
---- a/target/arm/t16.decode
-+++ b/target/arm/t16.decode
-@@ -146,6 +146,16 @@ CMP_xri         00101 ... ........              @arith_1i s=1
- ADD_rri         00110 ... ........              @arith_1i %s
- SUB_rri         00111 ... ........              @arith_1i %s
- 
-+# Add, compare, move (two high registers)
-+
-+%reg_0_7        7:1 0:3
-+@addsub_2h      .... .... . rm:4 ... \
-+                &s_rrr_shi rd=%reg_0_7 rn=%reg_0_7 shim=0 shty=0
-+
-+ADD_rrri        0100 0100 . .... ...            @addsub_2h s=0
-+CMP_xrri        0100 0101 . .... ...            @addsub_2h s=1
-+MOV_rxri        0100 0110 . .... ...            @addsub_2h s=0
-+
- # Branch and exchange
- 
- @branchr        .... .... . rm:4 ...            &r
+ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
 -- 
 2.17.1
 
