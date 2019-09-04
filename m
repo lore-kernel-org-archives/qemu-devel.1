@@ -7,85 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0186C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07DFAC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:29:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8927520449
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:27:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B161120657
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cAnDLgN4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8927520449
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fQ9FYqH0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B161120657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5coJ-0001E9-Ts
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:27:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51663)
+	id 1i5cpq-0002jQ-AP
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:29:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5c40-00014e-9Q
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:40 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9S-0005zq-Jz
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5c3y-0003ZE-W6
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:36 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:34614)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9Q-0006fU-4I
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:14 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38780)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5c3y-0003YX-M5
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:34 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id y135so3360195wmc.1
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:39:34 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i5c9P-0006f0-SB
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:12 -0400
+Received: by mail-pf1-x442.google.com with SMTP id h195so36729pfe.5
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=7DN2Mz1jlphjeBD6Hgfr/tcOfOE2X7DGMlU3BQxiSxE=;
- b=cAnDLgN4AEjP9y/AdcF7Qad0MexMWbLi1FxkPzh9cRZnESXJki8NPyezG2BsNCb3M3
- jWfhihJNGNNHMwhNx+ccV003tzJRxqy+r5hlDET37Gve1DGLbN1eLBGkLtbdphMtTyIU
- SBXJRRl1ec4eoTmYp7KMWY9PATyjKc0aW5u3qP1gV1lf+4p4LcQtcr/rNXMMRmh4IA8V
- n/vy+ptkxGP3qjBcUMia/RX+1xUuVXSNV84+khTdnGpH9I3imoXbh/ZxOR4SWyot9BQT
- oNu7zAPjAXGUULtyOLRj7oRnQSibj7NiZyNETobSnQEa2mDnmvtcjjWDG8EvYwnVRTIC
- swxw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ahxD9fosMvb1g5phzerFB+P0cZoPHlkyqtQ2Wc64cSg=;
+ b=fQ9FYqH0+U7b2+59Xv0YlyCWmlmeVKSyKcAKW+mIO17JQL4fX7nyAh7Z7BJkBbTtb/
+ KlSgoGbFQBU3zmyx78NTo0bKVaG5SZZKVSjasbysVpXjAle8ai5UIRWppS5d1truVhlL
+ vpRvkTYyI+ISAEA9Ni1c28nAACxWclFvPe5wO7osJTpsBBRl5c55LSpmTFPEyBi7a+2g
+ dFQK0dGFRS9iljNoPCTPXwTQ6a74LC9ZT1Yb9tyLOdCJz2C/bcNM46MjKj8HNcF1jvx4
+ s0s8zY98+Qtxeyww/Xo+OsxOFhJb8WypaaRClK4WzJekivVbQNIzurcwjCdeKuuKl0pD
+ lrYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=7DN2Mz1jlphjeBD6Hgfr/tcOfOE2X7DGMlU3BQxiSxE=;
- b=GrG2Hlxjl9w3+sezSFLcr6pDilDIRxAk5aA2YkmxN55y1pTXnGs3uh+bApzozK/IAW
- 0Pg7l1GzOjqMoDi2231s4DaSwkUJdGTu8wnvQnL9tK1pOWmuEsiWsGgJxO0iuJJvMNQL
- Jch5+cnKyRCmXpLDxJGs57GlLzaS9RhiJjo/hgvP3aw92OA/ID6QdYF8qYjy++XdrL2p
- 4a9e0S/CyMjkOtpujUbtlEsTDm0pGLhCR0FCFt44Hwp7U7Nu015TTTX9ZnniuT1MgmgR
- jkQQ+PLIc+118ZNV2dxI9J+5WL5uoj6mWhYgLzBT+rH00m6PLzBaNl0H0BG4TlVeOuBk
- JzpA==
-X-Gm-Message-State: APjAAAXdp+HqhPWxkxtUY7LVRQH6NB4JEi6wGc7Z0uNvr51q/2Ht7bP9
- b2kCa72aFaZ5viq55rkn0ZFibw==
-X-Google-Smtp-Source: APXvYqwxZ/3qH4xAUQVEL6xftra8LeqVUoazzpo1a3ZpbXlrwkniQHVStG3lkhotvwZbI17u2RKSuA==
-X-Received: by 2002:a7b:c7cc:: with SMTP id z12mr132592wmk.80.1567629573695;
- Wed, 04 Sep 2019 13:39:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a18sm4336262wrh.25.2019.09.04.13.39.26
+ :references;
+ bh=ahxD9fosMvb1g5phzerFB+P0cZoPHlkyqtQ2Wc64cSg=;
+ b=CcKNdCoeqh7N9U9GCaWOskDtKJpeWmdsR38mApjGMTmrEi0G+owOyN3Ld0maPiDSgE
+ t4rNqoqCIrEPMFd1qC3HiudLnZBoU3EgLguZG7KXqn3fymZ1yhNfsiVUYESOh4NCtFR9
+ rMVMOFo96fA9FOraIADK1vEogdKcs9LIndUKNIJb7sE/FB5qWyKEYbzOC5KK45deFsjJ
+ QCkKcgmmKKWX4UAXhOOTyfuZnNWMaDeXwKEh3VreQum8ac3s+vquXuIjjJjRYg0hNIWB
+ AaVZ7Gxvi5yIK9mGqqXZdnpeUlJqZMBS6bvatI9lV8t8jaqeFrjccinv/HqdOsNrthDQ
+ CLWw==
+X-Gm-Message-State: APjAAAWwOl/VNfEGmyA4b5Kgkuwoa0yapFKDylIyM+eQPYeHMF48cwAh
+ HQ3/pNJNRbCe4LyTysqCaQ31wMpETi4=
+X-Google-Smtp-Source: APXvYqzVDdznNGhxI6HXwg8kfm6VmFGRRxG0mAalqnGeV3RgS++n1NGZ5gqgvODJnLVuTLnRXrHaig==
+X-Received: by 2002:a62:e80e:: with SMTP id c14mr47206pfi.4.1567629910311;
+ Wed, 04 Sep 2019 13:45:10 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id n66sm8104610pfn.90.2019.09.04.13.45.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:39:31 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CAD6E1FF8C;
- Wed,  4 Sep 2019 21:30:15 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Wed, 04 Sep 2019 13:45:09 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:29:57 +0100
-Message-Id: <20190904203013.9028-27-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Wed,  4 Sep 2019 13:44:55 -0700
+Message-Id: <20190904204507.32457-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190904204507.32457-1-richard.henderson@linaro.org>
+References: <20190904204507.32457-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
-Subject: [Qemu-devel] [PATCH v1 26/42] tests/docker: add debian-amd64-cross
- for non-x86 hosts
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PULL 01/13] target/openrisc: Add DisasContext
+ parameter to check_r0_write
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,73 +91,376 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When building on a non-x86 host we need to setup the x86 build like
-any other cross compiler.
+We will need this context in the next patch.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Stafford Horne <shorne@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/docker/Makefile.include                 |  6 +++++
- .../dockerfiles/debian-amd64-cross.docker     | 22 +++++++++++++++++++
- 2 files changed, 28 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-amd64-cross.docker
+ target/openrisc/translate.c | 96 +++++++++++++++++++------------------
+ 1 file changed, 49 insertions(+), 47 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 2c8cb790ad0..cb0961a69e4 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -87,7 +87,13 @@ endif
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index b189c506c5..8d72edf9b7 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -163,14 +163,16 @@ static void check_ov64s(DisasContext *dc)
+ }
+ #endif*/
  
- # Enforce dependencies for composite images
- docker-image-debian9-mxe: docker-image-debian9
-+ifeq ($(ARCH),x86_64)
- docker-image-debian-amd64: docker-image-debian9
-+DOCKER_PARTIAL_IMAGES += debian-amd64-cross
-+else
-+docker-image-debian-amd64-cross: docker-image-debian10
-+DOCKER_PARTIAL_IMAGES += debian-amd64
-+endif
- docker-image-debian-armel-cross: docker-image-debian9
- docker-image-debian-armhf-cross: docker-image-debian9
- docker-image-debian-mips-cross: docker-image-debian9
-diff --git a/tests/docker/dockerfiles/debian-amd64-cross.docker b/tests/docker/dockerfiles/debian-amd64-cross.docker
-new file mode 100644
-index 00000000000..5d890419251
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-amd64-cross.docker
-@@ -0,0 +1,22 @@
-+#
-+# Docker x86_64 cross target
-+#
-+# This docker target is used on non-x86_64 machines which need the
-+# x86_64 cross compilers installed.
-+#
-+FROM qemu:debian10
-+MAINTAINER Alex Bennée <alex.bennee@linaro.org>
-+
-+# Add the foreign architecture we want and install dependencies
-+RUN dpkg --add-architecture amd64
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        crossbuild-essential-amd64
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt build-dep -yy -a amd64 --arch-only qemu
-+
-+# Specify the cross prefix for this image (see tests/docker/common.rc)
-+ENV QEMU_CONFIGURE_OPTS --cross-prefix=x86_64-linux-gnu-
-+ENV DEF_TARGET_LIST x86_64-softmmu,x86_64-linux-user,i386-softmmu,i386-linux-user
+-/* We're about to write to REG.  On the off-chance that the user is
+-   writing to R0, re-instate the architectural register.  */
+-#define check_r0_write(reg)             \
+-    do {                                \
+-        if (unlikely(reg == 0)) {       \
+-            cpu_R[0] = cpu_R0;          \
+-        }                               \
+-    } while (0)
++/*
++ * We're about to write to REG.  On the off-chance that the user is
++ * writing to R0, re-instate the architectural register.
++ */
++static void check_r0_write(DisasContext *dc, int reg)
++{
++    if (unlikely(reg == 0)) {
++        cpu_R[0] = cpu_R0;
++    }
++}
+ 
+ static void gen_ove_cy(DisasContext *dc)
+ {
+@@ -436,98 +438,98 @@ static void gen_msbu(DisasContext *dc, TCGv srca, TCGv srcb)
+ 
+ static bool trans_l_add(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_add(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_addc(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_addc(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_sub(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_sub(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_and(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_and_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_or(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_or_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_xor(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_xor_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_sll(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_shl_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_srl(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_shr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_sra(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_sar_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_ror(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_rotr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_exths(DisasContext *dc, arg_da *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_ext16s_tl(cpu_R[a->d], cpu_R[a->a]);
+     return true;
+ }
+ 
+ static bool trans_l_extbs(DisasContext *dc, arg_da *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_ext8s_tl(cpu_R[a->d], cpu_R[a->a]);
+     return true;
+ }
+ 
+ static bool trans_l_exthz(DisasContext *dc, arg_da *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_ext16u_tl(cpu_R[a->d], cpu_R[a->a]);
+     return true;
+ }
+ 
+ static bool trans_l_extbz(DisasContext *dc, arg_da *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_ext8u_tl(cpu_R[a->d], cpu_R[a->a]);
+     return true;
+ }
+@@ -536,7 +538,7 @@ static bool trans_l_cmov(DisasContext *dc, arg_dab *a)
+ {
+     TCGv zero;
+ 
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     zero = tcg_const_tl(0);
+     tcg_gen_movcond_tl(TCG_COND_NE, cpu_R[a->d], cpu_sr_f, zero,
+                        cpu_R[a->a], cpu_R[a->b]);
+@@ -546,7 +548,7 @@ static bool trans_l_cmov(DisasContext *dc, arg_dab *a)
+ 
+ static bool trans_l_ff1(DisasContext *dc, arg_da *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_ctzi_tl(cpu_R[a->d], cpu_R[a->a], -1);
+     tcg_gen_addi_tl(cpu_R[a->d], cpu_R[a->d], 1);
+     return true;
+@@ -554,7 +556,7 @@ static bool trans_l_ff1(DisasContext *dc, arg_da *a)
+ 
+ static bool trans_l_fl1(DisasContext *dc, arg_da *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_clzi_tl(cpu_R[a->d], cpu_R[a->a], TARGET_LONG_BITS);
+     tcg_gen_subfi_tl(cpu_R[a->d], TARGET_LONG_BITS, cpu_R[a->d]);
+     return true;
+@@ -562,28 +564,28 @@ static bool trans_l_fl1(DisasContext *dc, arg_da *a)
+ 
+ static bool trans_l_mul(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_mul(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_mulu(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_mulu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_div(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_div(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+ 
+ static bool trans_l_divu(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_divu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+     return true;
+ }
+@@ -671,7 +673,7 @@ static bool trans_l_lwa(DisasContext *dc, arg_load *a)
+ {
+     TCGv ea;
+ 
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     ea = tcg_temp_new();
+     tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
+     tcg_gen_qemu_ld_tl(cpu_R[a->d], ea, dc->mem_idx, MO_TEUL);
+@@ -685,7 +687,7 @@ static void do_load(DisasContext *dc, arg_load *a, MemOp mop)
+ {
+     TCGv ea;
+ 
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     ea = tcg_temp_new();
+     tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
+     tcg_gen_qemu_ld_tl(cpu_R[a->d], ea, dc->mem_idx, mop);
+@@ -798,7 +800,7 @@ static bool trans_l_addi(DisasContext *dc, arg_rri *a)
+ {
+     TCGv t0;
+ 
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     t0 = tcg_const_tl(a->i);
+     gen_add(dc, cpu_R[a->d], cpu_R[a->a], t0);
+     tcg_temp_free(t0);
+@@ -809,7 +811,7 @@ static bool trans_l_addic(DisasContext *dc, arg_rri *a)
+ {
+     TCGv t0;
+ 
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     t0 = tcg_const_tl(a->i);
+     gen_addc(dc, cpu_R[a->d], cpu_R[a->a], t0);
+     tcg_temp_free(t0);
+@@ -820,7 +822,7 @@ static bool trans_l_muli(DisasContext *dc, arg_rri *a)
+ {
+     TCGv t0;
+ 
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     t0 = tcg_const_tl(a->i);
+     gen_mul(dc, cpu_R[a->d], cpu_R[a->a], t0);
+     tcg_temp_free(t0);
+@@ -839,28 +841,28 @@ static bool trans_l_maci(DisasContext *dc, arg_l_maci *a)
+ 
+ static bool trans_l_andi(DisasContext *dc, arg_rrk *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_andi_tl(cpu_R[a->d], cpu_R[a->a], a->k);
+     return true;
+ }
+ 
+ static bool trans_l_ori(DisasContext *dc, arg_rrk *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_ori_tl(cpu_R[a->d], cpu_R[a->a], a->k);
+     return true;
+ }
+ 
+ static bool trans_l_xori(DisasContext *dc, arg_rri *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_xori_tl(cpu_R[a->d], cpu_R[a->a], a->i);
+     return true;
+ }
+ 
+ static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+ 
+     if (is_user(dc)) {
+         gen_illegal_exception(dc);
+@@ -927,42 +929,42 @@ static bool trans_l_msbu(DisasContext *dc, arg_ab *a)
+ 
+ static bool trans_l_slli(DisasContext *dc, arg_dal *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_shli_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+     return true;
+ }
+ 
+ static bool trans_l_srli(DisasContext *dc, arg_dal *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_shri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+     return true;
+ }
+ 
+ static bool trans_l_srai(DisasContext *dc, arg_dal *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_sari_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+     return true;
+ }
+ 
+ static bool trans_l_rori(DisasContext *dc, arg_dal *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_rotri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+     return true;
+ }
+ 
+ static bool trans_l_movhi(DisasContext *dc, arg_l_movhi *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_movi_tl(cpu_R[a->d], a->k << 16);
+     return true;
+ }
+ 
+ static bool trans_l_macrc(DisasContext *dc, arg_l_macrc *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     tcg_gen_trunc_i64_tl(cpu_R[a->d], cpu_mac);
+     tcg_gen_movi_i64(cpu_mac, 0);
+     return true;
+@@ -1134,7 +1136,7 @@ static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a)
+ static void do_fp2(DisasContext *dc, arg_da *a,
+                    void (*fn)(TCGv, TCGv_env, TCGv))
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     fn(cpu_R[a->d], cpu_env, cpu_R[a->a]);
+     gen_helper_update_fpcsr(cpu_env);
+ }
+@@ -1142,7 +1144,7 @@ static void do_fp2(DisasContext *dc, arg_da *a,
+ static void do_fp3(DisasContext *dc, arg_dab *a,
+                    void (*fn)(TCGv, TCGv_env, TCGv, TCGv))
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     fn(cpu_R[a->d], cpu_env, cpu_R[a->a], cpu_R[a->b]);
+     gen_helper_update_fpcsr(cpu_env);
+ }
+@@ -1206,7 +1208,7 @@ static bool trans_lf_ftoi_s(DisasContext *dc, arg_da *a)
+ 
+ static bool trans_lf_madd_s(DisasContext *dc, arg_dab *a)
+ {
+-    check_r0_write(a->d);
++    check_r0_write(dc, a->d);
+     gen_helper_float_madd_s(cpu_R[a->d], cpu_env, cpu_R[a->d],
+                             cpu_R[a->a], cpu_R[a->b]);
+     gen_helper_update_fpcsr(cpu_env);
 -- 
-2.20.1
+2.17.1
 
 
