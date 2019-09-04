@@ -2,56 +2,57 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 767AAC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:28:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24565C3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:31:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BD3E22CEA
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:28:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BD3E22CEA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE58022CEA
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:31:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE58022CEA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5VLB-0003lm-Br
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:28:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54931)
+	id 1i5VO8-0006Hl-TH
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:31:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i5Utx-0001gv-FO
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:46 -0400
+ (envelope-from <thuth@redhat.com>) id 1i5UuE-00023K-7T
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i5Uts-000885-4g
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:45 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44152 helo=mail.rt-rk.com)
+ (envelope-from <thuth@redhat.com>) id 1i5Uu9-0008HD-5S
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33990)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i5Utr-0007RO-M9
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:39 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 5D9D71A1DCC;
- Wed,  4 Sep 2019 14:59:34 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 2EFAD1A20C7;
- Wed,  4 Sep 2019 14:59:34 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 14:59:23 +0200
-Message-Id: <1567601968-26946-4-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1567601968-26946-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1567601968-26946-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v6 3/8] linux-user: Add support for FIOGETOWN
- and FIOSETOWN ioctls
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5Uu8-0008Gw-UP
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:00:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2E3B318B3D89
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 13:00:56 +0000 (UTC)
+Received: from thuth.com (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B505C1001B02;
+ Wed,  4 Sep 2019 13:00:51 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>,
+	qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 15:00:41 +0200
+Message-Id: <20190904130047.25808-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Wed, 04 Sep 2019 13:00:56 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 0/6] Make the core libqtest library
+ independe from global_qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,58 +64,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, amarkovic@wavecomp.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+global_qtest and the related wrapper functions often caused trouble in
+the past - if they are used somewhere in the libqtest or libqos library
+code, it's hard to write tests that properly track multiple test states
+(like migration tests).
 
-FIOGETOWN and FIOSETOWN ioctls have platform-specific definitions,
-hence non-standard definition in QEMU too.
+This patch series finally gets rid of the remaining global_qtest
+dependencies in the core libqtest code. The first patches are used to
+clean up some files that should not use global_qtest anymore, then the
+wrapper functions and the global_qtest definition get moved to a separate
+header file called libqtest-single.h - which then should only be used in
+tests that track only a single test state.
 
-Other than that, they both have a single integer argument, and their
-functionality is emulated in a straightforward way.
+v2:
+ - Do not add parameter to qvirtio_wait_config_isr(), but push the logic
+   into virtio-mmio.c and virtio-pci.c instead since we have access to
+   the test state here (as suggested by Laurent).
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 4 ++++
- 2 files changed, 6 insertions(+)
+Thomas Huth (6):
+  tests/migration: Do not use functions anymore that rely on
+    global_qtest
+  tests/libqos/e1000e: Make e1000e libqos functions independent from
+    global_qtest
+  tests/libqos: Replace clock_step with qtest_clock_step in virtio code
+  tests: Remove unnecessary global_qtest references
+  tests/libqtest: Move global_test wrapper function into a separate
+    header
+  tests/libqtest: Use libqtest-single.h in tests that require
+    global_qtest
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index cd9b6f9..1830de9 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -177,6 +177,8 @@
- #endif
- #endif /* CONFIG_USBFS */
- 
-+  IOCTL(FIOGETOWN, IOC_R, MK_PTR(TYPE_INT))
-+  IOCTL(FIOSETOWN, IOC_W, MK_PTR(TYPE_INT))
-   IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
-   IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-   IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 19a1d39..498223b 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -758,10 +758,14 @@ struct target_pollfd {
- 
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
-+#define TARGET_FIOGETOWN       TARGET_IOR('f', 123, int)
-+#define TARGET_FIOSETOWN       TARGET_IOW('f', 124, int)
- #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
- #define TARGET_SIOCSPGRP       TARGET_IOW('s', 8, pid_t)
- #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
- #else
-+#define TARGET_FIOGETOWN       0x8903
-+#define TARGET_FIOSETOWN       0x8901
- #define TARGET_SIOCATMARK      0x8905
- #define TARGET_SIOCSPGRP       0x8902
- #define TARGET_SIOCGPGRP       0x8904
+ MAINTAINERS                   |   2 +-
+ tests/ahci-test.c             |   1 -
+ tests/bios-tables-test.c      |   1 -
+ tests/cpu-plug-test.c         |   2 +-
+ tests/display-vga-test.c      |   2 +-
+ tests/e1000e-test.c           |   2 +-
+ tests/fdc-test.c              |   2 +-
+ tests/i440fx-test.c           |   2 +-
+ tests/i82801b11-test.c        |   2 +-
+ tests/intel-hda-test.c        |   2 +-
+ tests/ioh3420-test.c          |   2 +-
+ tests/ipmi-kcs-test.c         |   3 +-
+ tests/ivshmem-test.c          |   3 -
+ tests/libqos/e1000e.c         |  16 +-
+ tests/libqos/virtio-mmio.c    |  14 +-
+ tests/libqos/virtio-pci.c     |  14 +-
+ tests/libqos/virtio.c         |  20 +--
+ tests/libqos/virtio.h         |   6 +-
+ tests/libqtest-single.h       | 315 ++++++++++++++++++++++++++++++++++
+ tests/libqtest.c              |  13 --
+ tests/libqtest.h              | 289 -------------------------------
+ tests/m25p80-test.c           |   2 +-
+ tests/migration-test.c        |   6 +-
+ tests/qos-test.c              |   2 +-
+ tests/rtas-test.c             |   1 -
+ tests/rtc-test.c              |   2 +-
+ tests/rtl8139-test.c          |   2 +-
+ tests/test-arm-mptimer.c      |   2 +-
+ tests/test-netfilter.c        |   2 +-
+ tests/test-x86-cpuid-compat.c |   2 +-
+ tests/tmp105-test.c           |   2 +-
+ tests/tpm-crb-test.c          |   2 +-
+ tests/tpm-tests.c             |   2 +-
+ tests/tpm-tis-test.c          |   2 +-
+ tests/usb-hcd-ohci-test.c     |   2 +-
+ tests/usb-hcd-uhci-test.c     |   2 +-
+ tests/usb-hcd-xhci-test.c     |   2 +-
+ tests/vhost-user-test.c       |   2 +-
+ tests/virtio-blk-test.c       |   5 +-
+ tests/virtio-ccw-test.c       |   2 +-
+ tests/virtio-net-test.c       |   2 +-
+ tests/virtio-scsi-test.c      |   2 +-
+ tests/virtio-serial-test.c    |   2 +-
+ 43 files changed, 396 insertions(+), 367 deletions(-)
+ create mode 100644 tests/libqtest-single.h
+
 -- 
-2.7.4
+2.18.1
 
 
