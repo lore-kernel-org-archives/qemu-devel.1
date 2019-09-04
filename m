@@ -2,93 +2,80 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FA8EC3A5A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C45C3A5A8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09A4F2087E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:32:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 951522087E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:34:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nwAHdrV/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09A4F2087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W5VXxHeh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951522087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Z8x-0002wX-Tv
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 13:32:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48597)
+	id 1i5ZAv-0004ja-83
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 13:34:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48999)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5Yql-0001jJ-4v
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5YtY-0004Ym-VE
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5Yqi-00079o-Gw
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:42 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37646)
+ (envelope-from <peter.maydell@linaro.org>) id 1i5YtX-0000H2-LB
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:16:36 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43691)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5Yqi-00079F-61; Wed, 04 Sep 2019 13:13:40 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r195so4718355wme.2;
- Wed, 04 Sep 2019 10:13:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ykU8gHuJpolHJspGCXGN29S68B/lyOH0ZSECMmtfWFc=;
- b=nwAHdrV/F312+N2AYbJx6mKzV27iers+camiq0oFZq6n1KozJ0fJanVtuGG9z4OBcV
- KcR/IZI5QcRUTDBGpR0ismGy1gPDFidpNqFvlLFyytxpDBN9MN6t20RfZ0k4yqeEmALE
- S1WJzlcRsPddON2EjlvO+YOLjsoB3Py27ok8CqYJ2mYJzXG0oSzveTHEamoTlfjRQ+24
- GC4J7DbIudF4F7FpFo0/8+csN6uOTUQuEhD0Hdy3myG0VAM21fm/iMCpNEFlZxarylY9
- bFT7SzqNdJv6USHZWWawIjCbfW72d4VcuT7CxaP+f0pa/+m6idqMuoBluSU4vswRJr37
- iOzQ==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i5YtX-0000GW-Ce
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:16:35 -0400
+Received: by mail-oi1-x241.google.com with SMTP id t84so6739887oih.10
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 10:16:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GqjLFHty95w3E88rXM1g2m0OYNZXzk1Ys1O66a5hIKI=;
+ b=W5VXxHehBKES7OUExrTlNlu3YP+Gfwa4BwOS/wUTom8WunHAEIsbG8jt+HRX5K6cts
+ QxHKoOIi5aRoDKCAyQqgt5sow4Mn5dEJayrDP9UFWdQkAg2oKoj7j0In9A8q7iyMHUUb
+ 4UjllqqC5TSV1zmipshZJT4Sup1F+bN0zVACh7/LcHo99CCN8kCzx2unx9Elu0y30CW7
+ NQ0o44e+CgAWZ0KRP+gdYv/U+WifudIJB+oXYTHPFiHnd0pAfEDfBrABA5zIaQEvEi5X
+ qi3NfvbY5EdHnTN+ZZUPFE6McSvttCvzZad4DPQ8vNKeIzz7o2kVri6/rWHqt/RAtSkl
+ 9Mhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ykU8gHuJpolHJspGCXGN29S68B/lyOH0ZSECMmtfWFc=;
- b=SPBR01v9AzQTqbbkyWPHbkOh66OXXZ+tpr/Z3ZTAvD9YF5pIHvuWCLZ60aVcUqsQJj
- wkZ+G34MQdYa5FUMUqCnmLs+G5zOH8Gj3wn0LjFaLKq+SltUq4/b7E0esALNcNql6bMw
- k/43DSpJv55z6GpMEt3/ibDZ3jd/BqK1HcrWlSQchpfKQzbknw+Q7eQFyN451QPCtK9S
- 5zfYgnIi5TmCkb0FT6hbNumoyu877SuGKu+RRtZPareg1M5f9gyHAWZyovDk0Ika5XZ7
- pMDog/nY5ZUiXOhUgwhqN7OOwhp9UBK5WVXcNO0MkiZ9eTdN0SrZ9fm1plrdV0S6dsuf
- IUsw==
-X-Gm-Message-State: APjAAAXhwo12l29Xw9pfV4eatzyuV08HZs+GejLxAiiMaSZOC2XX8L8T
- 1n6JIELekhhPHL59zCOY0sQ=
-X-Google-Smtp-Source: APXvYqz2YZDBItjO+3mfovnvKCHf5ru/BZACfoT6KRQKNbNg1WcF3u4wgMfDz8uRkX2MtTpc0t7KBA==
-X-Received: by 2002:a1c:b745:: with SMTP id h66mr5243020wmf.70.1567617219090; 
- Wed, 04 Sep 2019 10:13:39 -0700 (PDT)
-Received: from x1w.redhat.com ([195.166.127.210])
- by smtp.gmail.com with ESMTPSA id p19sm2339512wmg.31.2019.09.04.10.13.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 10:13:38 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Esteban Bosse <estebanbosse@gmail.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org,
- Pekka Enberg <penberg@iki.fi>,
- =?UTF-8?q?Zolt=C3=A1n=20Baldaszti?= <bztemail@gmail.com>
-Date: Wed,  4 Sep 2019 19:13:13 +0200
-Message-Id: <20190904171315.8354-13-f4bug@amsat.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904171315.8354-1-f4bug@amsat.org>
-References: <20190904171315.8354-1-f4bug@amsat.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GqjLFHty95w3E88rXM1g2m0OYNZXzk1Ys1O66a5hIKI=;
+ b=daXdNLIlQAH4iD5wECp7fRCfoMUs0yaFtFHUESUeU2s+XWv2thnOJrAunNqC6twDC3
+ CMtLD0p+E5MgAAaAz11TP1B1X+lnyHtJQxTnTkNHd207BFXJ5IwhoQWhV734RNy4WnVB
+ GqJsPOarK8eaaZ3Mwg2lOmZyT4E7C4fn0Uo8IrY6cFlrlMQPUsz9Q+nYx7GAwYcqBOK2
+ IrzfH3Iksz72DetzHMF5z4ygso5LrXdTGZaDqi+xXxQi/p/UFTkTENQO89bRGlCLkIsO
+ 0j0qBPDk19zWQXp11XvrdT7EAlE5z7Zc62n59J1kJAkNG6N3B6Bo60NF867VKpBpTtD0
+ uSkw==
+X-Gm-Message-State: APjAAAUV1Lggs3796Gx77O2jvvt35Am9ERWE0D1xP5iIwE1BGfglM4nb
+ zT1mvy1IJbWWG0sQ7ysWIS6a+j7jQ1es7RVZ2fdSNw==
+X-Google-Smtp-Source: APXvYqxKz4w2I1rHeRefZSRYlqOaWgxOdfuMN22MUrsVWXt5H1lWjT3RoZLWmjI4QqpQqls09z4r0ryJqOnkicAfZF0=
+X-Received: by 2002:aca:53d4:: with SMTP id h203mr4075151oib.146.1567617393850; 
+ Wed, 04 Sep 2019 10:16:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20190904120026.3220-1-mst@redhat.com>
+In-Reply-To: <20190904120026.3220-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 4 Sep 2019 18:16:22 +0100
+Message-ID: <CAFEAcA81njPTBexgyjsQ1h2M9oUjaoWNq6kLkYDWJf4djKJ_8g@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [RFC PATCH 12/14] hw/arm/bcm2836: Add the BCM2838
- which uses a GICv2
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PULL 0/6] virtio, vhost: fixes, features,
+ cleanups.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,254 +87,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BCM2838 is improvement of the BCM2837:
-- Cortex-A72 instead of the A53
-- peripheral block and local soc controller are mapped differently,
-- GICv2
-- PCIe block
-- exhanced MMU to address over 4GiB of SDRAM
+On Wed, 4 Sep 2019 at 13:00, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> The following changes since commit 379d83f2c92879f4418aa9c57fd1fcbc3c82d384:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-aug-29-2019' into staging (2019-09-04 10:16:00 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to eeb39263aa9b05b4ac3f8d8e957958071834a7b6:
+>
+>   libvhost-user: introduce and use vu_has_protocol_feature() (2019-09-04 07:53:12 -0400)
+>
+> ----------------------------------------------------------------
+> virtio,vhost: fixes, features, cleanups.
+>
+> FLR support.
+> Misc fixes, cleanups.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
 
-See https://www.raspberrypi.org/forums/viewtopic.php?t=244479&start=25
-and https://patchwork.kernel.org/patch/11053097/
 
-This patch starts mapping the GICv2 but interrupt lines are NOT
-wired (yet).
+Applied, thanks.
 
-This is enough to start running the Ubuntu kernel8.img from [1].
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-Extract the kernel with:
-
-  $ mkdir bootpart
-  $ guestfish \
-      --ro \
-      -a ubuntu-18.04.3-preinstalled-server-arm64+raspi4.img \
-      -m /dev/sda1
-  Welcome to guestfish, the guest filesystem shell for
-  editing virtual machine filesystems and disk images.
-
-  ><fs> ls /
-  COPYING.linux
-  LICENCE.broadcom
-  System.map
-  armstub8-gic.bin
-  bcm2710-rpi-3-b-plus.dtb
-  bcm2710-rpi-3-b.dtb
-  bcm2710-rpi-cm3.dtb
-  bcm2711-rpi-4-b.dtb
-  bcm2837-rpi-3-b-plus.dtb
-  bcm2837-rpi-3-b.dtb
-  cmdline.txt
-  config.txt
-  fixup4.dat
-  fixup4cd.dat
-  fixup4db.dat
-  fixup4x.dat
-  kernel8.img
-  overlays
-  start4.elf
-  start4cd.elf
-  start4db.elf
-  start4x.elf
-  ><fs> copy-out / bootpart/
-  ><fs> q
-
-Then some progress can be noticed running:
-
-  $ qemu-system-aarch64 -d unimp,guest_errors,int,in_asm \
-      -M raspi4 \
-      -kernel bootpart/kernel8.img \
-      -dtb bootpart/bcm2711-rpi-4-b.dtb \
-      -initrd bootpart/boot/initrd.img \
-      -append \
-         "earlycon=pl011,0xfe201000 console=ttyAMA0 console=tty1 loglevel=8"
-
-Not very interesting, but it runs until configuring the GIC.
-(remove 'in_asm' if too verbose).
-
-TODO:
-
-- wire IRQs to the GIC :)
-
-- map the SPI bootrom from [3] (boot sequence: [4])
-
-- per [2] we could try booting without using the GIC, adding "enable_gic=0"
-  in config.txt. this variable is parsed by the firmware:
-
-  $ fgrep -r enable_gic bootpart
-  Binary file bootpart/start4x.elf matches
-  Binary file bootpart/start4.elf matches
-  Binary file bootpart/start4db.elf matches
-  Binary file bootpart/start4cd.elf matches
-  bootpart/config.txt:enable_gic=1
-
-  the stub [5] doesn't seem to check a register for it.
-  maybe it falls back to kernel7l?
-
-- decompile start4.elf to check how 'enable_gic' is used
-  using vc4 toolchain from [6]
-
-[1] https://github.com/TheRemote/Ubuntu-Server-raspi4-unofficial/releases
-[2] https://jamesachambers.com/raspberry-pi-ubuntu-server-18-04-2-installation-guide/
-[3] https://www.raspberrypi.org/documentation/hardware/raspberrypi/booteeprom.md
-[4] https://raspberrypi.stackexchange.com/questions/10442/what-is-the-boot-sequence
-[5] https://github.com/raspberrypi/tools/commit/7f4a937e1bacbc111a22552169bc890b4bb26a94#diff-8c41083e9fa0c98f1c3015e11b897444
-[6] https://github.com/christinaa/rpi-open-firmware
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/bcm2836.c         | 75 ++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/bcm2836.h |  3 ++
- 2 files changed, 78 insertions(+)
-
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 019e67b906..d89d7cd71d 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -21,6 +21,7 @@ struct BCM283XInfo {
-     const char *cpu_type;
-     hwaddr peri_base; /* Peripheral base address seen by the CPU */
-     hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
-+    hwaddr gic_base;
-     int clusterid;
- };
- 
-@@ -40,9 +41,25 @@ static const BCM283XInfo bcm283x_socs[] = {
-         .ctrl_base = 0x40000000,
-         .clusterid = 0x0,
-     },
-+    {
-+        .name = TYPE_BCM2838,
-+        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a72"),
-+        .peri_base = 0xfe000000,
-+        .ctrl_base = 0xff800000,
-+        .gic_base = 0x40000,
-+    },
- #endif
- };
- 
-+#define GIC_NUM_IRQS                256
-+
-+#define GIC_BASE_OFS                0x0000
-+#define GIC_DIST_OFS                0x1000
-+#define GIC_CPU_OFS                 0x2000
-+#define GIC_VIFACE_THIS_OFS         0x4000
-+#define GIC_VIFACE_OTHER_OFS(cpu)  (0x5000 + (cpu) * 0x200)
-+#define GIC_VCPU_OFS                0x6000
-+
- static void bcm2836_init(Object *obj)
- {
-     BCM283XState *s = BCM283X(obj);
-@@ -55,6 +72,11 @@ static void bcm2836_init(Object *obj)
-                                 info->cpu_type, &error_abort, NULL);
-     }
- 
-+    if (info->gic_base) {
-+        sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
-+                              TYPE_ARM_GIC);
-+    }
-+
-     sysbus_init_child_obj(obj, "control", &s->control, sizeof(s->control),
-                           TYPE_BCM2836_CONTROL);
- 
-@@ -115,6 +137,59 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
- 
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, info->ctrl_base);
- 
-+    /* bcm2838 GICv2 */
-+    if (info->gic_base) {
-+        object_property_set_uint(OBJECT(&s->gic), 2, "revision", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        object_property_set_uint(OBJECT(&s->gic),
-+                                 BCM283X_NCPUS, "num-cpu", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        object_property_set_uint(OBJECT(&s->gic),
-+                                 32 + GIC_NUM_IRQS, "num-irq", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        object_property_set_bool(OBJECT(&s->gic),
-+                                 true, "has-virtualization-extensions", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        object_property_set_bool(OBJECT(&s->gic), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 0,
-+                        info->ctrl_base + info->gic_base + GIC_DIST_OFS);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 1,
-+                        info->ctrl_base + info->gic_base + GIC_CPU_OFS);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 2,
-+                        info->ctrl_base + info->gic_base + GIC_VIFACE_THIS_OFS);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 3,
-+                        info->ctrl_base + info->gic_base + GIC_VCPU_OFS);
-+
-+        for (n = 0; n < BCM283X_NCPUS; n++) {
-+            sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 4 + n,
-+                            info->ctrl_base + info->gic_base
-+                            + GIC_VIFACE_OTHER_OFS(n));
-+        }
-+
-+        /* TODO wire IRQs!!! */
-+    }
-+
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
-         qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-irq", 0));
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 1,
-diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index 97187f72be..31c8fb90bd 100644
---- a/include/hw/arm/bcm2836.h
-+++ b/include/hw/arm/bcm2836.h
-@@ -13,6 +13,7 @@
- 
- #include "hw/arm/bcm2835_peripherals.h"
- #include "hw/intc/bcm2836_control.h"
-+#include "hw/intc/arm_gic.h"
- #include "target/arm/cpu.h"
- 
- #define TYPE_BCM283X "bcm283x"
-@@ -26,6 +27,7 @@
-  */
- #define TYPE_BCM2836 "bcm2836"
- #define TYPE_BCM2837 "bcm2837"
-+#define TYPE_BCM2838 "bcm2838"
- 
- typedef struct BCM283XState {
-     /*< private >*/
-@@ -36,6 +38,7 @@ typedef struct BCM283XState {
-     uint32_t enabled_cpus;
- 
-     ARMCPU cpus[BCM283X_NCPUS];
-+    GICState gic;
-     BCM2836ControlState control;
-     BCM2835PeripheralState peripherals;
- } BCM283XState;
--- 
-2.20.1
-
+-- PMM
 
