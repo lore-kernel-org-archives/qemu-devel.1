@@ -7,85 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9F8C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9858C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08D55208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71960208E4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:42:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PHKa70Go"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D55208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oAWMyx+O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71960208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5c5e-0002EF-Fx
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:41:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49671)
+	id 1i5c6X-00038U-2m
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:42:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41058)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bv7-00087P-Dq
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0p-0005QE-8K
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5bv3-0006WD-5N
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:24 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:36559)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5b0n-00034A-3p
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:15 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37432)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5bv0-0006Tq-Bq
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:19 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id p13so219948wmh.1
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:30:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i5b0l-0002yr-21
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:11 -0400
+Received: by mail-pf1-x444.google.com with SMTP id y9so13912269pfl.4
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Bl9ihYzO31h1s8ixDSGDQc1ywiHdznbrQuxAbSXVm60=;
- b=PHKa70GoOt1ksj6K7Pm57YYEZXh2NY+KMfCeGOCxUuEC1KsBWhso8V3imC1lo5/it2
- 3L0IPQiDaTjjo6ommUF5i40l+Y5+cAw8WUzDK4MCpGDq+h4v616oy/uaOmi7rJLuovVz
- y8TET4QanafUn7EpUAknlA2/noDqzuQJj4pSHC8ZRFZnKHnSnBUWp0H49NYNnXXNkJYj
- ReUyo/FZfNBe/vMl3omHAcRTsM2edX/P1l49B67UMQ7PeaekBG097Z8ZmC17fGpBtLg1
- 6dO7tWMCNdYKWbkU2AyAxbMPwc8LZIYSEUzhcvxJI5vzP5bWFO9snYUvssh/fj7BzVAk
- c9hA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=w0yZvSWJxMpGMZQus1AoRlEpuCLgbCFvsCSBHnvLgJY=;
+ b=oAWMyx+OInAyeHVBRTYQ0211CU9f7YQQu7eHhi0OtBesm6zLBmEq4gf0IAnKFOltPU
+ FKqnJxVRtrbo0daKSFCCZxQHxGDhHrvx0UwxrpjDBHWNdI50D9d4+Okda5HrDKAlRBAa
+ XCNHiXgJS0RaUzzpBG6aMA4PvDSaUmgY61v0ysv2xMJAP443bsF8l6TmdKYeIGbiIVKh
+ BJ487Djgb1nLzYlDBW/Y6mfmewyiEIlU5m7YHGwrB6yAcgOlTqLcVCx/AbOQj4k3kqs7
+ vP38dqCyHKO54mAMSc225E7JzZ5IGQlDoCVCYyvU+Svt4po73TMEDYbt0CFoJxXJR1c1
+ 71Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Bl9ihYzO31h1s8ixDSGDQc1ywiHdznbrQuxAbSXVm60=;
- b=B+QqNN58y53RKv/EVhuu80e6x++XEaKOzHXtdlVkT+MPzslNOUAaHIjko/xy3V34OJ
- 0GJyrlxYa+UI9vjOh1BP5Wb24yVj8YxmnGIScYK+rMo+7JQDoDVIhTKhruzhpUiVKURX
- J7JH4zf9uZRAVwmW/ph2SYRUrdpHFENpH4Uwg1QYSAaKsLCsrux2ZMgkCuxDE9Ct0Q09
- K97pfhWNwdu25F/jZ/4gJ/onSUL2kcQIIKudCd4bedHu+Gp+cvrRr4TBEQfbyaEW6Jm0
- 26b8UYUnxo3c0kItNcxxv++9q/jfL6rz9JEH+gxkK6FWV0mapY1CgzScxrxdi2C5dvlF
- 3ENg==
-X-Gm-Message-State: APjAAAUehuQxrmekPMm2nVUOzzx7jF8ogk2zFlgPzyXxogz5DW02XA2S
- HJSKi+nxI/ziK0EfqCEzZC5ZGw==
-X-Google-Smtp-Source: APXvYqzxxAM6dMFSVpnUKjDUVMUHeYU1NW4uEeuY0l7aIa6oMmDjLUBxpLo/wHdhnvIWgya1BdPMrQ==
-X-Received: by 2002:a1c:9ec9:: with SMTP id h192mr82931wme.105.1567629015091; 
- Wed, 04 Sep 2019 13:30:15 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j1sm16570133wrg.24.2019.09.04.13.30.13
+ :references;
+ bh=w0yZvSWJxMpGMZQus1AoRlEpuCLgbCFvsCSBHnvLgJY=;
+ b=LaUY3Z5uL8gq1a+J2B5o0EudKMjVZDoMGlZ0621aYz7pDnin2C0pyn4hwe1x/nNofZ
+ 2jDy0mlI0+vRb1sckcR8ZVV9FswChvEB8Bqgc7LxneJHTJfTR6aWY7DrGBOietn+kBeX
+ FHtMjDV343EerWYVa2qEi6YvJW2iCyZbKQBXxvBtibVX27t/giwVkpAKC3MTkzrM4EeQ
+ lZfBMgMowWb94Uyp4UUWxqKSHSE66Gss4xCt71O1BkFtAtkhyg7FO9Ih5jHv5+NIglI1
+ p3jgAuJZ33PIikFhLQ+mI5pfBg0QQHn57KqmSdxRHTm6e9BFZnaXTkS8NH4b9OU8AdlP
+ iz7Q==
+X-Gm-Message-State: APjAAAUbyBWHTgadpo8Asck02BLzw7xPh8/clGlrcwMe3RLYKwKUXJa9
+ XdMH92sFc2lqQp9LmRa01DSNEBpg1Yg=
+X-Google-Smtp-Source: APXvYqzDmzn2ArF2IUTIOfAmxP6op311GEPsnDAViWTSHhSS5FOzm+s1OKHauysgb9jGLdn0Ju6heQ==
+X-Received: by 2002:a63:b346:: with SMTP id x6mr36949199pgt.218.1567625524723; 
+ Wed, 04 Sep 2019 12:32:04 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:30:14 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8408C1FF8F;
- Wed,  4 Sep 2019 21:30:13 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Wed, 04 Sep 2019 12:32:03 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:29:33 +0100
-Message-Id: <20190904203013.9028-3-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Wed,  4 Sep 2019 12:30:40 -0700
+Message-Id: <20190904193059.26202-51-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
+References: <20190904193059.26202-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32a
-Subject: [Qemu-devel] [PATCH v1 02/42] configure: clean-up container cross
- compile detect
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v4 50/69] target/arm: Convert T16 load/store
+ multiple
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,101 +91,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The introduction of podman support inadvertently broke configure's
-detect of the container support as the configure probe didn't specify
-an engine type. To fix this in docker.py:
-
-  - only (re)set USE_ENGINE if --engine is specified
-  - enhance the output so docker is no longer just yes
-
-In the configure script we can at least start cleaning up the
-detecting and naming of variables. To avoid too much churn the
-conversion of the various make DOCKER_foo variables has been left for
-future clean-ups.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- configure              | 10 +++++-----
- tests/docker/docker.py |  7 ++++---
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ target/arm/translate.c | 48 ++++++++----------------------------------
+ target/arm/t16.decode  |  8 +++++++
+ 2 files changed, 17 insertions(+), 39 deletions(-)
 
-diff --git a/configure b/configure
-index 95134c0180b..94845fc5101 100755
---- a/configure
-+++ b/configure
-@@ -495,7 +495,7 @@ qed="yes"
- parallels="yes"
- sheepdog="yes"
- libxml2=""
--docker="no"
-+container="no"
- debug_mutex="no"
- libpmem=""
- default_devices="yes"
-@@ -5894,14 +5894,14 @@ EOF
- fi
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index d8a4c7bf99..f9d4b619fa 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10092,6 +10092,14 @@ static bool trans_LDM_t32(DisasContext *s, arg_ldst_block *a)
+     return do_ldm(s, a, 2);
+ }
  
- ##########################################
--# Docker and cross-compiler support
-+# Container based cross-compiler support
- #
- # This is specifically for building test
- # cases for foreign architectures, not
- # cross-compiling QEMU itself.
++static bool trans_LDM_t16(DisasContext *s, arg_ldst_block *a)
++{
++    /* Writeback is conditional on the base register not being loaded.  */
++    a->w = !(a->list & (1 << a->rn));
++    /* BitCount(list) < 1 is UNPREDICTABLE */
++    return do_ldm(s, a, 1);
++}
++
+ /*
+  * Branch, branch with link
+  */
+@@ -10869,6 +10877,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     case 8: /* load/store halfword immediate offset, in decodetree */
+     case 9: /* load/store from stack, in decodetree */
+     case 10: /* add PC/SP (immediate), in decodetree */
++    case 12: /* load/store multiple, in decodetree */
+         goto illegal_op;
  
--if has "docker"; then
--    docker=$($python $source_path/tests/docker/docker.py probe)
-+if has "docker" || has "podman"; then
-+    container=$($python $source_path/tests/docker/docker.py probe)
- fi
+     case 11:
+@@ -11092,45 +11101,6 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+         }
+         break;
  
- ##########################################
-@@ -6474,7 +6474,7 @@ echo "qed support       $qed"
- echo "parallels support $parallels"
- echo "sheepdog support  $sheepdog"
- echo "capstone          $capstone"
--echo "docker            $docker"
-+echo "container support $container"
- echo "libpmem support   $libpmem"
- echo "libudev           $libudev"
- echo "default devices   $default_devices"
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 4bba29e104e..e23209f71ee 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -536,9 +536,9 @@ class ProbeCommand(SubCommand):
-         try:
-             docker = Docker()
-             if docker._command[0] == "docker":
--                print("yes")
-+                print("docker")
-             elif docker._command[0] == "sudo":
--                print("sudo")
-+                print("sudo docker")
-             elif docker._command[0] == "podman":
-                 print("podman")
-         except Exception:
-@@ -651,7 +651,8 @@ def main():
-         cmd.args(subp)
-         subp.set_defaults(cmdobj=cmd)
-     args, argv = parser.parse_known_args()
--    USE_ENGINE = args.engine
-+    if args.engine:
-+        USE_ENGINE = args.engine
-     return args.cmdobj.run(args, argv)
+-    case 12:
+-    {
+-        /* load/store multiple */
+-        TCGv_i32 loaded_var = NULL;
+-        rn = (insn >> 8) & 0x7;
+-        addr = load_reg(s, rn);
+-        for (i = 0; i < 8; i++) {
+-            if (insn & (1 << i)) {
+-                if (insn & (1 << 11)) {
+-                    /* load */
+-                    tmp = tcg_temp_new_i32();
+-                    gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
+-                    if (i == rn) {
+-                        loaded_var = tmp;
+-                    } else {
+-                        store_reg(s, i, tmp);
+-                    }
+-                } else {
+-                    /* store */
+-                    tmp = load_reg(s, i);
+-                    gen_aa32_st32(s, tmp, addr, get_mem_index(s));
+-                    tcg_temp_free_i32(tmp);
+-                }
+-                /* advance to the next address */
+-                tcg_gen_addi_i32(addr, addr, 4);
+-            }
+-        }
+-        if ((insn & (1 << rn)) == 0) {
+-            /* base reg not in list: base register writeback */
+-            store_reg(s, rn, addr);
+-        } else {
+-            /* base reg in list: if load, complete it now */
+-            if (insn & (1 << 11)) {
+-                store_reg(s, rn, loaded_var);
+-            }
+-            tcg_temp_free_i32(addr);
+-        }
+-        break;
+-    }
+     case 13:
+         /* conditional branch or swi */
+         cond = (insn >> 8) & 0xf;
+diff --git a/target/arm/t16.decode b/target/arm/t16.decode
+index 71b3e8f02e..a7a437f930 100644
+--- a/target/arm/t16.decode
++++ b/target/arm/t16.decode
+@@ -26,6 +26,7 @@
+ &ri              !extern rd imm
+ &ldst_rr         !extern p w u rn rt rm shimm shtype
+ &ldst_ri         !extern p w u rn rt imm
++&ldst_block      !extern rn i b u w list
  
- 
+ # Set S if the instruction is outside of an IT block.
+ %s               !function=t16_setflags
+@@ -109,3 +110,10 @@ LDR_ri          10011 ... ........              @ldst_spec_i rn=13
+ ADR             10100 rd:3 ........             imm=%imm8_0x4
+ ADD_rri         10101 rd:3 ........ \
+                 &s_rri_rot rn=13 s=0 rot=0 imm=%imm8_0x4  # SP
++
++# Load/store multiple
++
++@ldstm          ..... rn:3 list:8               &ldst_block i=1 b=0 u=0 w=1
++
++STM             11000 ... ........              @ldstm
++LDM_t16         11001 ... ........              @ldstm
 -- 
-2.20.1
+2.17.1
 
 
