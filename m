@@ -6,85 +6,77 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E187C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D9FC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:31:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEE14206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:28:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18D49206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 14:31:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OjXNObO8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE14206B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dFXq1MOy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18D49206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5WGu-0002Xi-2M
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:28:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49138)
+	id 1i5WJz-0003eJ-7t
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 10:31:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5WGC-000290-Iz
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:27:49 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5WIo-0003C0-H3
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5WGB-0006bn-93
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:27:48 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37053)
+ (envelope-from <peter.maydell@linaro.org>) id 1i5WIn-0007mK-CL
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:30:30 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:36678)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5WGB-0006az-1C
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:27:47 -0400
-Received: by mail-wm1-x341.google.com with SMTP id r195so4049121wme.2
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 07:27:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i5WIn-0007kY-6L
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 10:30:29 -0400
+Received: by mail-oi1-x230.google.com with SMTP id k20so9560086oih.3
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 07:30:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=bPpGmuwKU+Oh6azYselaBDRQz9FshZg6zrB2CPnR/aQ=;
- b=OjXNObO88rr5SCvbZShip70MUFDOjtAFuOP8T8kbPGxpPLutdbrRvynqteIADIPlOi
- BADME2/e0q5LBN29jynxJiAi33vICLSigqdWxk1Un6XMsIwyTCHOSPWko1Zjm14TJxXQ
- 9bX2B4Ld5rndMS5xg8u9plo8aog9ozcalIQYQ7UxYipLj8ahwFKsKjQFDZveDVNoRMjW
- eTU+fSlZPmsBGGmL/HxZ37vF/tsa02AaJxHj8Y9kMiKnRUskZVA8+YYm+wHNRHY1WXis
- 7TY3KRF0cAdTTryGCR3bMmyWxrpyX1EqkmeSCwK2T19R8BOgzDac5j+wpwLyTsIdTOdp
- tjSA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7FJcFskP6edwP+8yYUSQ515QB9NmEd0rx7CjKUECjRM=;
+ b=dFXq1MOyTEkv6LQinsHTK3N26MxEEhnn2zZev17DtEzl0V6YSOX6RMbSK8ryf22K5h
+ B5qBoiL2grLFTKYo+N2LCXFdkABaJcgahVM2Je+uo3D4MgYwzxcghG4cH8Z1cTMTRlbM
+ 5UeW/jFYlcEE8Pz+6S0KnDUhKB7mLUbn3xrkEkb1mBxrgop2duoHDPaHMZwJkN/MtWW9
+ V2/D1wiuwFivEDgxAvOYi9BCu4yCzNPmK9JIUUnWkpz19o2AGUe714E2sNJo5tgkgO+h
+ m7yxJgyJ3wBa5Rhxr7mKloZgvwVJFlRqMY33Eds33fVOy2pGzjSmXsHVAMMjN7nTEoug
+ AsUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=bPpGmuwKU+Oh6azYselaBDRQz9FshZg6zrB2CPnR/aQ=;
- b=QDxmU7o795YLGKXsQztZOkjS5o/xMiSDgjwLjckwGBTr6E+FhVUEW9/o+9spGGHGJG
- pWnf/MsNHRdEvQOraScBsF1dN0JRSiccxQA8s/Vr/W1YGxIwwhDwvwb0g6w66vc5b0dF
- bKVZAJDGBfO0YzcdXIQmrILEuACGgN4zA9qiaPFrvy4v9kfit6oeYffBS51+lTrEdpka
- VvT5EqMWpSYbp4t8k8uFLGG16iUi3COhSeXSuLgzMeDeIM7Hs3xPZDhORWogxuSNgJk/
- YqeL3lhgHZl7gpSd72QA8IoQuZp/PQkOQyRz7n3Bo7b+SbA6sEvpDdg1zqRC14YTafq3
- JELQ==
-X-Gm-Message-State: APjAAAVPsMaVSYqpEedApE1n8oEniqDl+y0H2Rag9NGjdlNZzDyjcDiv
- aXebrtUmFBQ86MXWiu/GP3X2oNrjZr8=
-X-Google-Smtp-Source: APXvYqxbtRg5A8SPfwbgdh3pUf3kkHKbhFs+yS6zDhRKz3C2ZrRNPiUnD5aG1K3OpL8/ggEDj+jACw==
-X-Received: by 2002:a1c:1f44:: with SMTP id f65mr4555950wmf.11.1567607264228; 
- Wed, 04 Sep 2019 07:27:44 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g73sm5244784wme.10.2019.09.04.07.27.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 07:27:43 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E05A51FF87;
- Wed,  4 Sep 2019 15:27:42 +0100 (BST)
-References: <20190807143523.15917-1-pbonzini@redhat.com>
- <CAHFMJ7tA08jsVVJCCcMp3Q+FA3PBKcYNq+yFS7y6Sw5f_K4_oA@mail.gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-In-reply-to: <CAHFMJ7tA08jsVVJCCcMp3Q+FA3PBKcYNq+yFS7y6Sw5f_K4_oA@mail.gmail.com>
-Date: Wed, 04 Sep 2019 15:27:42 +0100
-Message-ID: <87blw06srl.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7FJcFskP6edwP+8yYUSQ515QB9NmEd0rx7CjKUECjRM=;
+ b=jYFvgVF//4E3xt4Gi22KAJxYkvfHnfz54dVuV11Y4ONntfByJlY34Kr5Z+v2m+SIGu
+ vQ09fxBc3I7eeEkvUwxp53jVd1zNNh8jgrpDlZvWz8zgfL86eW8GWVCq66ltcT23zocs
+ ZAcca1kyb/BQzo6DYfvMH2yB23InkER5znwrG3W2+OXpsvMfvnN9m5qhl3xtGEo2UQLu
+ tz7RNVV/EYTBNqnqPNI7qXuynfVNmWCwHv1zE4nPM2u1qq7+s80AvhfwWuxjBMbqMMeh
+ fTkroDesSbXMwtEjlCJQN3VjJK4MZvZGVZlGSuZFT9NpkQdv8XGNpwT2HJArPKgsZZyu
+ 7w2w==
+X-Gm-Message-State: APjAAAWcx1Vk/nH3ia1gQVm0OcqXsjOGQx5DlEmYiTjO0b0GTIaxAMym
+ yqkyMLvD3l0CO8/ayu4S1HQznE6kQ0RlDryjnPi+hA==
+X-Google-Smtp-Source: APXvYqyb4N7tTXtuq+EIBa3H1SISbIf/G52zcPjsrus8EcpsO8RmRVSuFeqEZt5omwnDJEX78WyHZfsBESovj3lq+J0=
+X-Received: by 2002:aca:4814:: with SMTP id v20mr3567514oia.98.1567607427540; 
+ Wed, 04 Sep 2019 07:30:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <cover.1566503584.git.qemu_oss@crudebyte.com>
+ <21182000.2zn5IIMESL@silver>
+ <20190902173432.20f2637b@bahia.lan> <2734436.Mu773bgsdE@silver>
+ <87r24xqjoz.fsf@fsf.org>
+In-Reply-To: <87r24xqjoz.fsf@fsf.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 4 Sep 2019 15:30:16 +0100
+Message-ID: <CAFEAcA8yfdJk74rybVCdc0gJDoAHO99LWHwvGVfh6CgueH6cfA@mail.gmail.com>
+To: Ian Kelling <iank@fsf.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] tests/tcg: disentangle makefiles
+X-Received-From: 2607:f8b0:4864:20::230
+Subject: Re: [Qemu-devel] DMARC/DKIM and qemu-devel list settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,107 +88,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, antonios.motakis@huawei.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 3 Sep 2019 at 20:11, Ian Kelling <iank@fsf.org> wrote:
+> I don't know who has the Qemu-devel list admin password, but whoever has
+> it can adopt the unmodified message fix by changing
+> dmarc_moderation_action to Accept here:
+> https://lists.nongnu.org/mailman/admin/qemu-devel/privacy/sender and
+> remove subject_prefix here
+> https://lists.nongnu.org/mailman/admin/qemu-devel/general
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+I'm one of the list admins, at least for the main qemu-devel
+list; some of the sublists have different admins (and
+perhaps different settings -- there's no way to conveniently
+say "manage all 5 of these lists with the same policies,
+so it's easy for them to get out of sync, deliberately
+or accidentally).
 
-> Ping?
+I have been considering whether we change how we're handling
+the DMARC problem for the list. I picked munge-the-email
+initially because I think we didn't really understand the
+consequences in terms of patchmail, and also because there
+was a group of subscribers who complained that they liked
+the [qemu-devel] tag, used it for filtering email, etc.
+I think overall my opinion has shifted to thinking that
+the downsides of munge-the-email are too great and we should
+indeed switch to not modifying the message at all.
 
-Sorry I should have said I've queued it to testing/next. I'll post the
-series shortly after I've squashed the last annoying python 3.<>6
-problem.
-
->
-> Paolo
->
->
-> Il mer 7 ago 2019, 16:35 Paolo Bonzini <pbonzini@redhat.com> ha scritto:
->
->> The tests/tcg rely a lot on per-target informations from
->> the QEMU makefiles, but most of the definitions in there
->> aren't really relevant to TCG tests.
->>
->> This series is just a cleanup, but it could also be
->> a useful start in making it possible to compile tests/tcg
->> out of QEMU's tree, and/or making it a submodule, and/or
->> unifying the system emulation tests with kvm-unit-tests.
->>
->> Paolo
->>
->> v1->v2: fix configure from fresh directory, do not use $SHELL
->>
->> Paolo Bonzini (3):
->>   tests/tcg: use EXTRA_CFLAGS everywhere
->>   tests/tcg: cleanup Makefile inclusions
->>   tests/tcg: move configuration to a sub-shell script
->>
->>  Makefile                                  |   1 +
->>  Makefile.target                           |   3 -
->>  configure                                 | 155 ++-------------
->>  tests/Makefile.include                    |  25 +--
->>  tests/tcg/Makefile.include                |  88 ---------
->>  tests/tcg/Makefile.prereqs                |  18 ++
->>  tests/tcg/Makefile.probe                  |  31 ---
->>  tests/tcg/Makefile.qemu                   |  95 +++++++++
->>  tests/tcg/{Makefile =3D> Makefile.target}   |  15 +-
->>  tests/tcg/aarch64/Makefile.include        |   8 -
->>  tests/tcg/aarch64/Makefile.softmmu-target |   4 +-
->>  tests/tcg/aarch64/Makefile.target         |  12 +-
->>  tests/tcg/alpha/Makefile.include          |   2 -
->>  tests/tcg/alpha/Makefile.softmmu-target   |   4 +-
->>  tests/tcg/arm/Makefile.include            |   8 -
->>  tests/tcg/arm/Makefile.softmmu-target     |   6 +-
->>  tests/tcg/configure.sh                    | 228 ++++++++++++++++++++++
->>  tests/tcg/cris/Makefile.include           |   6 -
->>  tests/tcg/hppa/Makefile.include           |   2 -
->>  tests/tcg/i386/Makefile.include           |   9 -
->>  tests/tcg/i386/Makefile.softmmu-target    |  12 +-
->>  tests/tcg/i386/Makefile.target            |  13 +-
->>  tests/tcg/m68k/Makefile.include           |   2 -
->>  tests/tcg/minilib/Makefile.target         |   2 +-
->>  tests/tcg/mips/Makefile.include           |  20 --
->>  tests/tcg/ppc/Makefile.include            |  10 -
->>  tests/tcg/riscv/Makefile.include          |  10 -
->>  tests/tcg/s390x/Makefile.include          |   2 -
->>  tests/tcg/sh4/Makefile.include            |   4 -
->>  tests/tcg/sparc64/Makefile.include        |   2 -
->>  tests/tcg/x86_64/Makefile.softmmu-target  |  36 ++++
->>  tests/tcg/x86_64/Makefile.target          |   7 +-
->>  tests/tcg/xtensa/Makefile.include         |  11 --
->>  tests/tcg/xtensa/Makefile.softmmu-target  |   4 +-
->>  34 files changed, 435 insertions(+), 420 deletions(-)
->>  delete mode 100644 tests/tcg/Makefile.include
->>  create mode 100644 tests/tcg/Makefile.prereqs
->>  delete mode 100644 tests/tcg/Makefile.probe
->>  create mode 100644 tests/tcg/Makefile.qemu
->>  rename tests/tcg/{Makefile =3D> Makefile.target} (90%)
->>  delete mode 100644 tests/tcg/aarch64/Makefile.include
->>  delete mode 100644 tests/tcg/alpha/Makefile.include
->>  delete mode 100644 tests/tcg/arm/Makefile.include
->>  create mode 100644 tests/tcg/configure.sh
->>  delete mode 100644 tests/tcg/cris/Makefile.include
->>  delete mode 100644 tests/tcg/hppa/Makefile.include
->>  delete mode 100644 tests/tcg/i386/Makefile.include
->>  delete mode 100644 tests/tcg/m68k/Makefile.include
->>  delete mode 100644 tests/tcg/mips/Makefile.include
->>  delete mode 100644 tests/tcg/ppc/Makefile.include
->>  delete mode 100644 tests/tcg/riscv/Makefile.include
->>  delete mode 100644 tests/tcg/s390x/Makefile.include
->>  delete mode 100644 tests/tcg/sh4/Makefile.include
->>  delete mode 100644 tests/tcg/sparc64/Makefile.include
->>  create mode 100644 tests/tcg/x86_64/Makefile.softmmu-target
->>  delete mode 100644 tests/tcg/xtensa/Makefile.include
->>
->> --
->> 2.21.0
->>
->>
-
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
 
