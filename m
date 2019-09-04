@@ -7,78 +7,85 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60701C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9F8C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AC42208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08D55208E4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 20:41:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J7HnLA4g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC42208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PHKa70Go"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D55208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5c5K-000205-9c
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:40:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41529)
+	id 1i5c5e-0002EF-Fx
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 16:41:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49671)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b17-0005eO-85
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:35 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5bv7-00087P-Dq
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i5b15-0003Pz-At
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:33 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38495)
+ (envelope-from <alex.bennee@linaro.org>) id 1i5bv3-0006WD-5N
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:24 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:36559)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i5b14-0003La-EJ
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 15:32:31 -0400
-Received: by mail-pg1-x543.google.com with SMTP id d10so7224056pgo.5
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 12:32:28 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i5bv0-0006Tq-Bq
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:30:19 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id p13so219948wmh.1
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:30:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=xM5PgyYOOv0mxKWZUoslajtfwKtehkeOEG0dCYT++iA=;
- b=J7HnLA4gZUweUgFUA/RP2tEKRY1pTK13ZQ/cKyGZH6pVy6DKYVfSv1xmX4zSblG+Wr
- hNWjdAK55jiBqAAkoMxKpeJrRlXJ4Ej/zqriMJuP7bZENW2VEnfzV39ck1WReKJYKrEO
- 2zmKsid0O0dLnaIkWTWoiDWQhVUDW6ianfo7tjW3Gy3CD4zOR0tfqJs10Cv6lLdnYQHo
- L7f5T0L8FBTsN4Ni6HHPMOBtGQQPlNvZFDHX/FHR95BhUpoPh26EQt/f70QtBrKnsY66
- 0IJt1GgoIvu4olQ37vU2D+G/oLdcm2wnYbTOy7HBEUx4kKG+lyjwJyoIjfoDYM3edMPB
- pi0w==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Bl9ihYzO31h1s8ixDSGDQc1ywiHdznbrQuxAbSXVm60=;
+ b=PHKa70GoOt1ksj6K7Pm57YYEZXh2NY+KMfCeGOCxUuEC1KsBWhso8V3imC1lo5/it2
+ 3L0IPQiDaTjjo6ommUF5i40l+Y5+cAw8WUzDK4MCpGDq+h4v616oy/uaOmi7rJLuovVz
+ y8TET4QanafUn7EpUAknlA2/noDqzuQJj4pSHC8ZRFZnKHnSnBUWp0H49NYNnXXNkJYj
+ ReUyo/FZfNBe/vMl3omHAcRTsM2edX/P1l49B67UMQ7PeaekBG097Z8ZmC17fGpBtLg1
+ 6dO7tWMCNdYKWbkU2AyAxbMPwc8LZIYSEUzhcvxJI5vzP5bWFO9snYUvssh/fj7BzVAk
+ c9hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=xM5PgyYOOv0mxKWZUoslajtfwKtehkeOEG0dCYT++iA=;
- b=HU+D/gVHw817gRHtf3KdlIhns5x2UGvIEwj0+FVnajUrWnlW4UNjIHNHEmyzEtfD5G
- KlwGCxsJ1v2WzocyboffLAfOXq4+1qNU4XPKDKOsjfk/EtmNM/R3wIF1EnFr3OmoNAPC
- 1gaZIOyWIQzTGKJKJpBombDtWc51VNIvPsJ9NBeoVGGGJZB8CX0fl0fU+EpzkO6ZF1KL
- VIYzXRd727l+l+7VREub8/z0QZ3dI6LoMnxuY/WvkNJab2RZHq6LiVdQ8F80j75tvbV9
- cMnII7Lb9nj8btQQzxiMIelGlhWwMWtSdCQoYDdBi2WvT9MV/2fyxYkmBkkLxJhff+fP
- Qzaw==
-X-Gm-Message-State: APjAAAV+lqgJJBomLDXD+TnbGYiCi8AUanGD6MTk3Vrc5zOfO5/T4acw
- BHJzW4gY2+H9n970O+sy2b7KnRvDMHw=
-X-Google-Smtp-Source: APXvYqz3kXLjg2n7yv6ve/YFHdz1itiHOiyVbAX1/DbzGUDReO6ib6HcyKWL7pAP90DtPMg+2MvF+A==
-X-Received: by 2002:a63:6d6:: with SMTP id 205mr37640948pgg.262.1567625546919; 
- Wed, 04 Sep 2019 12:32:26 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f6sm18999174pga.50.2019.09.04.12.32.25
+ :references:mime-version:content-transfer-encoding;
+ bh=Bl9ihYzO31h1s8ixDSGDQc1ywiHdznbrQuxAbSXVm60=;
+ b=B+QqNN58y53RKv/EVhuu80e6x++XEaKOzHXtdlVkT+MPzslNOUAaHIjko/xy3V34OJ
+ 0GJyrlxYa+UI9vjOh1BP5Wb24yVj8YxmnGIScYK+rMo+7JQDoDVIhTKhruzhpUiVKURX
+ J7JH4zf9uZRAVwmW/ph2SYRUrdpHFENpH4Uwg1QYSAaKsLCsrux2ZMgkCuxDE9Ct0Q09
+ K97pfhWNwdu25F/jZ/4gJ/onSUL2kcQIIKudCd4bedHu+Gp+cvrRr4TBEQfbyaEW6Jm0
+ 26b8UYUnxo3c0kItNcxxv++9q/jfL6rz9JEH+gxkK6FWV0mapY1CgzScxrxdi2C5dvlF
+ 3ENg==
+X-Gm-Message-State: APjAAAUehuQxrmekPMm2nVUOzzx7jF8ogk2zFlgPzyXxogz5DW02XA2S
+ HJSKi+nxI/ziK0EfqCEzZC5ZGw==
+X-Google-Smtp-Source: APXvYqzxxAM6dMFSVpnUKjDUVMUHeYU1NW4uEeuY0l7aIa6oMmDjLUBxpLo/wHdhnvIWgya1BdPMrQ==
+X-Received: by 2002:a1c:9ec9:: with SMTP id h192mr82931wme.105.1567629015091; 
+ Wed, 04 Sep 2019 13:30:15 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j1sm16570133wrg.24.2019.09.04.13.30.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 12:32:26 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ Wed, 04 Sep 2019 13:30:14 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8408C1FF8F;
+ Wed,  4 Sep 2019 21:30:13 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 12:30:58 -0700
-Message-Id: <20190904193059.26202-69-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190904193059.26202-1-richard.henderson@linaro.org>
-References: <20190904193059.26202-1-richard.henderson@linaro.org>
+Date: Wed,  4 Sep 2019 21:29:33 +0100
+Message-Id: <20190904203013.9028-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [PATCH v4 68/69] target/arm: Clean up disas_thumb_insn
+X-Received-From: 2a00:1450:4864:20::32a
+Subject: [Qemu-devel] [PATCH v1 02/42] configure: clean-up container cross
+ compile detect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,60 +97,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that everything is converted, remove the rest of
-the legacy decode.
+The introduction of podman support inadvertently broke configure's
+detect of the container support as the configure probe didn't specify
+an engine type. To fix this in docker.py:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+  - only (re)set USE_ENGINE if --engine is specified
+  - enhance the output so docker is no longer just yes
+
+In the configure script we can at least start cleaning up the
+detecting and naming of variables. To avoid too much churn the
+conversion of the various make DOCKER_foo variables has been left for
+future clean-ups.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/translate.c | 27 ++-------------------------
- 1 file changed, 2 insertions(+), 25 deletions(-)
+ configure              | 10 +++++-----
+ tests/docker/docker.py |  7 ++++---
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index a99a5c2eef..2412dde631 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -10770,32 +10770,9 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+diff --git a/configure b/configure
+index 95134c0180b..94845fc5101 100755
+--- a/configure
++++ b/configure
+@@ -495,7 +495,7 @@ qed="yes"
+ parallels="yes"
+ sheepdog="yes"
+ libxml2=""
+-docker="no"
++container="no"
+ debug_mutex="no"
+ libpmem=""
+ default_devices="yes"
+@@ -5894,14 +5894,14 @@ EOF
+ fi
  
- static void disas_thumb_insn(DisasContext *s, uint32_t insn)
- {
--    if (disas_t16(s, insn)) {
--        return;
-+    if (!disas_t16(s, insn)) {
-+        unallocated_encoding(s);
-     }
--    /* fall back to legacy decoder */
--
--    switch (insn >> 12) {
--    case 0: case 1: /* add/sub (3reg, 2reg imm), shift imm; in decodetree */
--    case 2: case 3: /* add, sub, cmp, mov (reg, imm), in decodetree */
--    case 4: /* ldr lit, data proc (2reg), data proc ext, bx; in decodetree */
--    case 5: /* load/store register offset, in decodetree */
--    case 6: /* load/store word immediate offset, in decodetree */
--    case 7: /* load/store byte immediate offset, in decodetree */
--    case 8: /* load/store halfword immediate offset, in decodetree */
--    case 9: /* load/store from stack, in decodetree */
--    case 10: /* add PC/SP (immediate), in decodetree */
--    case 11: /* misc, in decodetree */
--    case 12: /* load/store multiple, in decodetree */
--    case 13: /* conditional branch or swi, in decodetree */
--    case 14:
--    case 15:
--        /* branches, in decodetree */
--        goto illegal_op;
--    }
--    return;
--illegal_op:
--    unallocated_encoding(s);
- }
+ ##########################################
+-# Docker and cross-compiler support
++# Container based cross-compiler support
+ #
+ # This is specifically for building test
+ # cases for foreign architectures, not
+ # cross-compiling QEMU itself.
  
- static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
+-if has "docker"; then
+-    docker=$($python $source_path/tests/docker/docker.py probe)
++if has "docker" || has "podman"; then
++    container=$($python $source_path/tests/docker/docker.py probe)
+ fi
+ 
+ ##########################################
+@@ -6474,7 +6474,7 @@ echo "qed support       $qed"
+ echo "parallels support $parallels"
+ echo "sheepdog support  $sheepdog"
+ echo "capstone          $capstone"
+-echo "docker            $docker"
++echo "container support $container"
+ echo "libpmem support   $libpmem"
+ echo "libudev           $libudev"
+ echo "default devices   $default_devices"
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 4bba29e104e..e23209f71ee 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -536,9 +536,9 @@ class ProbeCommand(SubCommand):
+         try:
+             docker = Docker()
+             if docker._command[0] == "docker":
+-                print("yes")
++                print("docker")
+             elif docker._command[0] == "sudo":
+-                print("sudo")
++                print("sudo docker")
+             elif docker._command[0] == "podman":
+                 print("podman")
+         except Exception:
+@@ -651,7 +651,8 @@ def main():
+         cmd.args(subp)
+         subp.set_defaults(cmdobj=cmd)
+     args, argv = parser.parse_known_args()
+-    USE_ENGINE = args.engine
++    if args.engine:
++        USE_ENGINE = args.engine
+     return args.cmdobj.run(args, argv)
+ 
+ 
 -- 
-2.17.1
+2.20.1
 
 
