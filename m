@@ -2,61 +2,91 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F400EC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D258C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6C6420657
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:29:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6C6420657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4527A20657
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:31:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aVW9+QGf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4527A20657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cqY-0003nS-9J
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:29:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53347)
+	id 1i5crx-00052J-EL
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:31:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i5cBj-0008ND-63
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:37 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c42-00015d-Uq
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i5cBh-0000q3-Tg
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:35 -0400
-Received: from 3.mo7.mail-out.ovh.net ([46.105.34.113]:59746)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5cBh-0000ow-M9
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:33 -0400
-Received: from player691.ha.ovh.net (unknown [10.109.160.230])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 30EC31305D1
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 22:47:32 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player691.ha.ovh.net (Postfix) with ESMTPSA id 763CD98B27EF;
- Wed,  4 Sep 2019 20:47:25 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed,  4 Sep 2019 22:46:47 +0200
-Message-Id: <20190904204659.13878-4-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190904204659.13878-1-clg@kaod.org>
-References: <20190904204659.13878-1-clg@kaod.org>
+ (envelope-from <alex.bennee@linaro.org>) id 1i5c40-0003aa-S1
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:37 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34757)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i5c40-0003Zp-DJ
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:36 -0400
+Received: by mail-wm1-x341.google.com with SMTP id y135so3360236wmc.1
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:39:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Y72pQsH2+pAgJI3zXLgFu0D9M3OSNR6cGitEr7LgzBM=;
+ b=aVW9+QGfM2cmEphKcYy9RxM+R59bNWc9o5f8QdQifQuUuP04tHNrIzbpRYWvAW9hhD
+ 8CsQ/a8OsgBjnsCMnjqKN/tdfVIfSA2vI2FSH+Q5TFvEkXYQ+gyKWBPFcQPhLhl3BL9i
+ z7tXqXhVLfppHGjGDdBmpJNY11aZrjFqMG70RMVad0ma4XGJSaeF562KMBU2ojo6ayBy
+ UfclIGgNAhLNhpqJs8S5ZGmI6B92YSijbM4I35ACCdiOaLRBZSbeACwBEFCARLUfWs39
+ X66lNC2OPOvxyIucysw4qjjXzqZBqMyykk89VjQmvriSwCJ1BsZ8yL7jVqA6wMaXEcqt
+ QxnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Y72pQsH2+pAgJI3zXLgFu0D9M3OSNR6cGitEr7LgzBM=;
+ b=fR+SYJUx5MHv7V/lYle+o0cjcosxSDHSokapmId6YuO26nAV3/xsz3iMj3ImKlkyu3
+ rR1vGyCBFwI/m7iDI5noWIvd0zfbjDY555BvJQ35AX/M9H3riBXu0y1pYoWOD75EOrxK
+ BwoLNwHgtgzcZIk2ViJ2Fmhhk9wrlvUKoExHcAHyCwvpztS/Jc5gvoNvwucoeATmHHbi
+ NnHjRJA/cuTVMgq1Jf7W1r1tYXPFad2vbicKKbKj8dP/wQPEqFz2JqIlhtTKnyx/30kn
+ xpeIYsQBfsNdchZWZWioqZULrdAFdesTSmX1lmFCAI2gxqagxq/UFXoOU2+24izgTN6j
+ 7MBQ==
+X-Gm-Message-State: APjAAAUfwHtwhkRYH87xxMtwgQSro6qVSXbMG9alqWZ/KmWiS5ceJPX+
+ yC6XZwhPk9iRKa6bGMyC3BArvA==
+X-Google-Smtp-Source: APXvYqzbf5nKlhw8nXXMWXhB4eSYvDFAEYPn1GdpJ78pkbB2mvBz5mwXFz/159K5wPsLJF3SEiAWjw==
+X-Received: by 2002:a05:600c:2111:: with SMTP id
+ u17mr149945wml.64.1567629575276; 
+ Wed, 04 Sep 2019 13:39:35 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u83sm5732761wme.0.2019.09.04.13.39.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Sep 2019 13:39:31 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id B39ED1FFAF;
+ Wed,  4 Sep 2019 21:30:15 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 21:29:56 +0100
+Message-Id: <20190904203013.9028-26-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2513853021181676305
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejhedgudehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.34.113
-Subject: [Qemu-devel] [RFC PATCH 03/15] aspeed/timer: Add support for
- control register 3
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH v1 25/42] tests/docker: avoid $SHELL invoke
+ bash directly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,102 +98,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The AST2500 timer has a third control register that is used to
-implement a set-to-clear feature for the main control register.
+On some images SHELL is pointing at a limited /bin/sh which doesn't
+understand noprofile/norc. Given the run script is running bash just
+invoke it directly.
 
-This models the behaviour expected by the AST2500 while maintaining
-the same behaviour for the AST2400.
-
-Based on previous work from Joel Stanley.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/hw/timer/aspeed_timer.h |  1 +
- hw/timer/aspeed_timer.c         | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+)
+ tests/docker/run | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_ti=
-mer.h
-index a791fee276f4..1e0288ebc49f 100644
---- a/include/hw/timer/aspeed_timer.h
-+++ b/include/hw/timer/aspeed_timer.h
-@@ -58,6 +58,7 @@ typedef struct AspeedTimerCtrlState {
-=20
-     uint32_t ctrl;
-     uint32_t ctrl2;
-+    uint32_t ctrl3;
-     AspeedTimer timers[ASPEED_TIMER_NR_TIMERS];
-=20
-     AspeedSCUState *scu;
-diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
-index c78bc1bd2d25..d70e78a0293e 100644
---- a/hw/timer/aspeed_timer.c
-+++ b/hw/timer/aspeed_timer.c
-@@ -498,6 +498,8 @@ static uint64_t aspeed_2500_timer_read(AspeedTimerCtr=
-lState *s, hwaddr offset)
-=20
-     switch (offset) {
-     case 0x38:
-+        value =3D s->ctrl3 & BIT(0);
-+        break;
-     case 0x3C:
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
-@@ -511,9 +513,24 @@ static uint64_t aspeed_2500_timer_read(AspeedTimerCt=
-rlState *s, hwaddr offset)
- static void aspeed_2500_timer_write(AspeedTimerCtrlState *s, hwaddr offs=
-et,
-                                     uint64_t value)
- {
-+    const uint32_t tv =3D (uint32_t)(value & 0xFFFFFFFF);
-+    uint8_t command;
-+
-     switch (offset) {
-     case 0x38:
-+        command =3D (value >> 1) & 0xFF;
-+        if (command =3D=3D 0xAE) {
-+            s->ctrl3 =3D 0x1;
-+        } else if (command =3D=3D 0xEA) {
-+            s->ctrl3 =3D 0x0;
-+        }
-+        break;
-     case 0x3C:
-+        if (s->ctrl3 & BIT(0)) {
-+            aspeed_timer_set_ctrl(s, s->ctrl & ~tv);
-+        }
-+        break;
-+
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
-"\n",
-                 __func__, offset);
-@@ -574,6 +591,7 @@ static void aspeed_timer_reset(DeviceState *dev)
-     }
-     s->ctrl =3D 0;
-     s->ctrl2 =3D 0;
-+    s->ctrl3 =3D 0;
- }
-=20
- static const VMStateDescription vmstate_aspeed_timer =3D {
-@@ -597,6 +615,7 @@ static const VMStateDescription vmstate_aspeed_timer_=
-state =3D {
-     .fields =3D (VMStateField[]) {
-         VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
-         VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
-+        VMSTATE_UINT32(ctrl3, AspeedTimerCtrlState),
-         VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
-                              ASPEED_TIMER_NR_TIMERS, 1, vmstate_aspeed_t=
-imer,
-                              AspeedTimer),
---=20
-2.21.0
+diff --git a/tests/docker/run b/tests/docker/run
+index 1014871fec0..8edc7026ee3 100755
+--- a/tests/docker/run
++++ b/tests/docker/run
+@@ -62,7 +62,7 @@ echo "* Prepared to run command:"
+ echo "  $CMD"
+ echo "* Hit Ctrl-D to continue, or type 'exit 1' to abort"
+ echo
+-$SHELL --noprofile --norc
++env bash --noprofile --norc
+ 
+ if "$CMD"; then
+     exit 0
+@@ -72,7 +72,7 @@ elif test -n "$DEBUG"; then
+     echo "* Hit Ctrl-D to exit"
+     echo
+     # Force error after shell exits
+-    $SHELL --noprofile --norc && exit 1
++    env bash --noprofile --norc && exit 1
+ else
+     exit 1
+ fi
+-- 
+2.20.1
 
 
