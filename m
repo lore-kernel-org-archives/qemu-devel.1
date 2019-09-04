@@ -2,87 +2,114 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B9FC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 03:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0B8C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 04:21:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D11F206A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 03:43:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DcQml3Ew"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D11F206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB9A522CEA
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 04:21:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9A522CEA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5MCD-0007JF-GB
-	for qemu-devel@archiver.kernel.org; Tue, 03 Sep 2019 23:43:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51607)
+	id 1i5MnH-0004P6-Qk
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 00:21:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1i5MBO-0006Sc-GO
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 23:42:11 -0400
+ (envelope-from <thuth@redhat.com>) id 1i5Mli-0003tF-PB
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:19:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1i5MBN-0004jw-Ce
- for qemu-devel@nongnu.org; Tue, 03 Sep 2019 23:42:10 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:46749)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1i5MBK-0004hp-L3; Tue, 03 Sep 2019 23:42:06 -0400
-Received: by mail-ed1-x544.google.com with SMTP id i8so7222140edn.13;
- Tue, 03 Sep 2019 20:42:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=s4A5Dr/9Mb0BF/Nej5sbT6N6KbH5L2YJnKZ4eyjuYk0=;
- b=DcQml3EwHnjJDLk9WCxNmafTOgoj1axVXAJSO8jFDpd6XPzRXk9pPU9cI0ryzNDFCd
- zjScfV95EQs5qp5sPuKN2z6GNd1UiBHiG7e4ZgpOanJKtVpBlbtfycMQmsOnzV946Fwa
- wrXBi30Z7sZVRjEjHy1APYasdQMEIcwVHied3W7NojnfxzuHuNMIIdN0RKcJRlu4x5Wy
- +8OF60shGhneXSzv9B4vlnWvQuXLP8sM4xrgSz8NmCgWeKHD1PUZ3Xf1SIB8F3BEFG7X
- mN8mUfCx1Od3XzbC/Wwvf7WxvvPltuTHFEAGWx7gXY/GemPM/Hwb2kkwhpvKRP0H3IK6
- +dmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=s4A5Dr/9Mb0BF/Nej5sbT6N6KbH5L2YJnKZ4eyjuYk0=;
- b=gZ79+JYYdudaGxh7pnFRTOKE2+ivo8oJ5Jen/57MnSDrfa2K8wzXgXiGQOA2uwB+Zt
- EANaeWGuILeWPX+9uD7MKIYaqd6MuSNt2kQ0bBvGBFBcIJVFxA2Is+PerJb3x4cggSZi
- mbyl94j0N5KBEw9VY++72i+9VBvcoFCrzjkCO7bBs326Sr1emZ2DtbhsIF61a47zfUwg
- dEdPgoRix+YtYFjTeVp3HA3CsRrJucm8mQfoHB4Csb2E0LYfI8DHZns/UVRE2Vm8zlqc
- q3Ape4BAm4bmJ08NbN62DYrjFiIyf+ob58MECvzL1DxLnlH1k1hB3fWB+rfes39HfvmR
- CFJg==
-X-Gm-Message-State: APjAAAVPquiNndmeR9lZJCknWgOx9C2JjyFW6XDSo4KWa0J8U73djHPF
- BbsFp41sMDBMmJgBtdMGDWKztslZiPn2z7W01n0=
-X-Google-Smtp-Source: APXvYqxwXU3jx5XU6VKcnYKDQfnmp5Z8zVLz9Kw3c3VrCCfi+yssCmzWny35xSB1LFVw7q1oF9FDXKFJhLCbicBpzho=
-X-Received: by 2002:aa7:d59a:: with SMTP id r26mr6566049edq.137.1567568523530; 
- Tue, 03 Sep 2019 20:42:03 -0700 (PDT)
+ (envelope-from <thuth@redhat.com>) id 1i5Mlg-0005GM-7F
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:19:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53330)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5Mlf-0005FS-VL
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 00:19:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 26522281D1;
+ Wed,  4 Sep 2019 04:19:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5052160920;
+ Wed,  4 Sep 2019 04:19:34 +0000 (UTC)
+To: Yury Kotov <yury-kotov@yandex-team.ru>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>
+References: <20190903162246.18524-1-yury-kotov@yandex-team.ru>
+ <20190903162246.18524-3-yury-kotov@yandex-team.ru>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <ced2a481-9089-6d0a-2934-b9714d053254@redhat.com>
+Date: Wed, 4 Sep 2019 06:19:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1564792052-6469-1-git-send-email-bmeng.cn@gmail.com>
- <CAEiOBXWQ02uRQQOpP=Rauq8WZnYtoxNqjM--Rpi5tHX2W0bGsw@mail.gmail.com>
- <CAEUhbmU-TdVocONETkSV-+DtX_66+8J8m3yYeph3P1i_3C9LzQ@mail.gmail.com>
- <11403b54-d41a-3083-7794-2c699a223479@redhat.com>
- <CAEUhbmV7_75mCPE7dOzBt7xWo1Lxj43HL4+Hxz=Zs3Ota03a5w@mail.gmail.com>
- <CAEUhbmVTUj6PPWxGnTW6Fp5ruVz_TeUXU9s2gyvGY9C=1y_NxQ@mail.gmail.com>
-In-Reply-To: <CAEUhbmVTUj6PPWxGnTW6Fp5ruVz_TeUXU9s2gyvGY9C=1y_NxQ@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 4 Sep 2019 11:41:52 +0800
-Message-ID: <CAEUhbmXh_tYqubC4nF6PymQW795ExfPUN9Ap1u7PNPN2hws=CA@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::544
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH] riscv: sifive_e: Correct
- various SoC IP block sizes
+In-Reply-To: <20190903162246.18524-3-yury-kotov@yandex-team.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Wed, 04 Sep 2019 04:19:38 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] tests/libqtest: Allow setting
+ expected exit status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,113 +121,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Chih-Min Chao <chihmin.chao@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Palmer,
+On 03/09/2019 18.22, Yury Kotov wrote:
+> Add qtest_set_expected_status function to set expected exit status of
+> child process. By default expected exit status is 0.
+> 
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> ---
+>  tests/libqtest.c | 36 +++++++++++++++++++++---------------
+>  tests/libqtest.h |  9 +++++++++
+>  2 files changed, 30 insertions(+), 15 deletions(-)
+> 
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 2713b86cf7..a79d4887ae 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -43,6 +43,7 @@ struct QTestState
+>      int qmp_fd;
+>      pid_t qemu_pid;  /* our child QEMU process */
+>      int wstatus;
+> +    int expected_status;
+>      bool big_endian;
+>      bool irq_level[MAX_IRQ];
+>      GString *rx;
+> @@ -113,6 +114,11 @@ bool qtest_probe_child(QTestState *s)
+>      return false;
+>  }
+>  
+> +void qtest_set_expected_status(QTestState *s, int status)
+> +{
+> +    s->expected_status = status;
+> +}
+> +
+>  static void kill_qemu(QTestState *s)
+>  {
+>      pid_t pid = s->qemu_pid;
+> @@ -126,24 +132,23 @@ static void kill_qemu(QTestState *s)
+>      }
+>  
+>      /*
+> -     * We expect qemu to exit with status 0; anything else is
+> +     * Check whether qemu exited with expected exit status; anything else is
+>       * fishy and should be logged with as much detail as possible.
+>       */
+>      wstatus = s->wstatus;
+> -    if (wstatus) {
+> -        if (WIFEXITED(wstatus)) {
+> -            fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
+> -                    "process but encountered exit status %d\n",
+> -                    __FILE__, __LINE__, WEXITSTATUS(wstatus));
+> -        } else if (WIFSIGNALED(wstatus)) {
+> -            int sig = WTERMSIG(wstatus);
+> -            const char *signame = strsignal(sig) ?: "unknown ???";
+> -            const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
+> -
+> -            fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
+> -                    "from signal %d (%s)%s\n",
+> -                    __FILE__, __LINE__, sig, signame, dump);
+> -        }
+> +    if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) != s->expected_status) {
+> +        fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
+> +                "process but encountered exit status %d (expected %d)\n",
+> +                __FILE__, __LINE__, WEXITSTATUS(wstatus), s->expected_status);
+> +        abort();
+> +    } else if (WIFSIGNALED(wstatus)) {
+> +        int sig = WTERMSIG(wstatus);
+> +        const char *signame = strsignal(sig) ?: "unknown ???";
+> +        const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
+> +
+> +        fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
+> +                "from signal %d (%s)%s\n",
+> +                __FILE__, __LINE__, sig, signame, dump);
+>          abort();
+>      }
+>  }
+> @@ -248,6 +253,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+>      g_test_message("starting QEMU: %s", command);
+>  
+>      s->wstatus = 0;
+> +    s->expected_status = 0;
+>      s->qemu_pid = fork();
+>      if (s->qemu_pid == 0) {
+>          setenv("QEMU_AUDIO_DRV", "none", true);
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 07ea35867c..c00bca94af 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -997,4 +997,13 @@ void qmp_assert_error_class(QDict *rsp, const char *class);
+>   */
+>  bool qtest_probe_child(QTestState *s);
+>  
+> +/**
+> + * qtest_set_expected_status:
+> + * @s: QTestState instance to operate on.
+> + * @status: an expected exit status.
+> + *
+> + * Set expected exit status of the child.
+> + */
+> +void qtest_set_expected_status(QTestState *s, int status);
+> +
+>  #endif
+> 
 
-On Wed, Aug 14, 2019 at 5:34 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Palmer,
->
-> On Wed, Aug 7, 2019 at 10:53 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > On Wed, Aug 7, 2019 at 5:06 AM Philippe Mathieu-Daud=C3=A9 <philmd@redh=
-at.com> wrote:
-> > >
-> > > On 8/5/19 8:43 AM, Bin Meng wrote:
-> > > > On Mon, Aug 5, 2019 at 2:14 PM Chih-Min Chao <chihmin.chao@sifive.c=
-om> wrote:
-> > > >> On Sat, Aug 3, 2019 at 8:27 AM Bin Meng <bmeng.cn@gmail.com> wrote=
-:
-> > > >>>
-> > > >>> Some of the SoC IP block sizes are wrong. Correct them according
-> > > >>> to the FE310 manual.
-> > > >>>
-> > > >>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> > > >>> ---
-> > > >>>
-> > > >>>  hw/riscv/sifive_e.c | 6 +++---
-> > > >>>  1 file changed, 3 insertions(+), 3 deletions(-)
-> > > >>>
-> > > >>> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> > > >>> index 2a499d8..9655847 100644
-> > > >>> --- a/hw/riscv/sifive_e.c
-> > > >>> +++ b/hw/riscv/sifive_e.c
-> > > >>> @@ -53,13 +53,13 @@ static const struct MemmapEntry {
-> > > >>>      hwaddr base;
-> > > >>>      hwaddr size;
-> > > >>>  } sifive_e_memmap[] =3D {
-> > > >>> -    [SIFIVE_E_DEBUG] =3D    {        0x0,      0x100 },
-> > > >>> +    [SIFIVE_E_DEBUG] =3D    {        0x0,     0x1000 },
-> > > >>>      [SIFIVE_E_MROM] =3D     {     0x1000,     0x2000 },
-> > > >>>      [SIFIVE_E_OTP] =3D      {    0x20000,     0x2000 },
-> > > >>>      [SIFIVE_E_CLINT] =3D    {  0x2000000,    0x10000 },
-> > > >>>      [SIFIVE_E_PLIC] =3D     {  0xc000000,  0x4000000 },
-> > > >>> -    [SIFIVE_E_AON] =3D      { 0x10000000,     0x8000 },
-> > > >>> -    [SIFIVE_E_PRCI] =3D     { 0x10008000,     0x8000 },
-> > > >>> +    [SIFIVE_E_AON] =3D      { 0x10000000,     0x1000 },
-> > > >>> +    [SIFIVE_E_PRCI] =3D     { 0x10008000,     0x1000 },
-> > > >>>      [SIFIVE_E_OTP_CTRL] =3D { 0x10010000,     0x1000 },
-> > > >>>      [SIFIVE_E_GPIO0] =3D    { 0x10012000,     0x1000 },
-> > > >>>      [SIFIVE_E_UART0] =3D    { 0x10013000,     0x1000 },
-> > > >>> --
-> > > >>> 2.7.4
-> > > >>>
-> > > >>
-> > > >> It seems the modification follows  E310-G002(Hifive1 Rev B) spec a=
-nd the origin is for E310-G000(Hifive1) spec.
-> > > >> There should be some way to specify different board version with d=
-ifferent memory map or we have policy, always support the latest spec.
-> > >
-> > > I agree with Chao, it would be cleaner to have two different boards
-> > > (machines).
-> > > Since the SoCs are very similar, you could add a 'revision' property =
-and
-> > > use it to select the correct map.
-> > >
-> >
-> > I am not sure if adding two different machines will bring us a lot of
-> > benefits, since the only difference is the SoC revision with different
-> > block sizes.
-> >
-> > > >>
-> > > >
-> > > > Yes, I checked both specs. The older spec says these bigger sizes,
-> > > > however their register sizes fit well in the smaller range as well.=
- So
-> > > > I think the modification works well for both.
-> > >
-> > > This is OK for the PRCI, since sifive_prci_create() does not use
-> > > memmap[SIFIVE_E_PRCI].size.
-> > >
-> > > However the AON case is borderline, since you shrink it from 32KiB to=
- 4KiB.
-> > >
-> >
-> > AON is not implemented anyway currently. And I checked the FE310 old
-> > spec, its register block size is still within the 4KiB range, so
-> > shrinking the size should be fine for both old and new SoC.
-> >
-> > > BTW (not related to this patch) it is odd a function named
-> > > sifive_mmio_emulate() creates a RAM region with memory_region_init_ra=
-m()
-> > > and does not use the UnimplementedDevice (see make_unimp_dev() in
-> > > hw/arm/musca.c).
-> > >
->
-> What's your suggestion regarding this patch?
-
-Ping?
-
-Regards,
-Bin
+Acked-by: Thomas Huth <thuth@redhat.com>
 
