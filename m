@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753E2C3A5A8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1E6C41514
 	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:15:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4231221726
+	by mail.kernel.org (Postfix) with ESMTPS id 9A60421726
 	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 17:15:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F5QoSQQn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4231221726
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nV2g+n9z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A60421726
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Yst-0003Ee-JT
+	id 1i5Yst-0003GY-TK
 	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 13:15:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48325)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5YqQ-0001IP-4J
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:22 -0400
+ id 1i5YqR-0001Ia-J8
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5YqP-0006yc-4O
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:22 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37643)
+ id 1i5YqQ-0006zE-Kk
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 13:13:23 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33135)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i5YqO-0006yF-U7; Wed, 04 Sep 2019 13:13:21 -0400
-Received: by mail-wm1-x342.google.com with SMTP id r195so4717309wme.2;
- Wed, 04 Sep 2019 10:13:20 -0700 (PDT)
+ id 1i5YqQ-0006yr-Ec; Wed, 04 Sep 2019 13:13:22 -0400
+Received: by mail-wr1-x443.google.com with SMTP id u16so22125904wrr.0;
+ Wed, 04 Sep 2019 10:13:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=voiG7DWCSdFTStaEL19HrjsIseLBzBfq9/zOs+pAh+4=;
- b=F5QoSQQn9lWthvpWyrS2ePfhHwzA6EJHxfekKenJN0c18EnLqz3KAhcG3ZIBCf4E/q
- xE1skhSM/IMpFgWWUFs6xfJEiucb/V7b6gjmdxWvq7iTPq/XHo5HY40sx0s31zf3m/oh
- 02Bb2Sj29VaQ288BVZ75cPJewS39PX3o2fSqNUE1ZVDDaJAnoDBKnQ5gtWJlDGI/x5GX
- DcaVwU+lRM2nnrDj/re8zdzLBXfgY46FkrqxRAXTZwbQwmvDRhnQk0GIrs4aUHd6Jp7Y
- PIBPD2F+nKER7Esxkn58oJH6ALphmkjExJ417wAsJrf66NJyaMpVmmbUypjpIh6kprfc
- Lywg==
+ bh=Re5SoK9LBlh1OETVvBHDiEijPJqBMr7rX5bmU56TmLo=;
+ b=nV2g+n9zeC4s2DMuvnV4wNpvw/73bDuCwOGe3RG8IZx8f1Z9tIpvnucKfqSRJJzxnT
+ gHOsRpczq2RmGpFD0ec7ngCYP8D5AiTTT4wBmqtRXXMKZMIogd7+VU01gh2Pw/OTsGhQ
+ 9UPaPgktdOqKDBoR13CvLjphtTt20pnr5n32HCRlA6LmxCdJVZVDfuFKwANvd6GAhFRa
+ i+L7WUECBtVf0AH4yzcSleXyaMmbC/Fwfyt3BZSyasTeV/PxQybWeY3ZyHVEJu90puL4
+ eobNLU7ZmwTQFWy+Rj5FtXMPmOg1OJtOC0yQlESBxBsDGRYYitGBKBTBkh4IopM++k11
+ 2jcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=voiG7DWCSdFTStaEL19HrjsIseLBzBfq9/zOs+pAh+4=;
- b=OvS4Kxx+Q1skfZ+WPy+a1/ee1TAOxQ2pIV2aREpA0qepmha6SQ0ui5SltW6WorgeXe
- xcBbAeVgtOgVmEzsZJys9RT8l23SsQTHhltJ6l1WYgtd8I0kGkX2Kml+ww+jjPXri5Kc
- aiFlWYs8RvSXJQ3zhCg/kaOxBAVCXJDVeqiZtblmBhRSYq14GeXBQUOcGCosZOtkOsaB
- DXkYHcj85jT8v6IQi2D+GcS+X3+99B9hPbUKSSKxCX0/rlEyqrtITyW1DfxqzMe5mitl
- XE0rj9nC3PSYRFrbDoW9CaQpDRrbVQLTYiOZowljGfEsWZ4t+RV1dVHo34qrOdsJiA1B
- uDCg==
-X-Gm-Message-State: APjAAAVTtczqZHj/5bpqqUJ51VZ4Vd+FpELB9sCIbrHIZDKl67Q4BwcR
- 59OQOiJp9yInwJ0vgAzDC10=
-X-Google-Smtp-Source: APXvYqzBwRWU4J7GwgmLjJBorifDNzYqwpTh/zahtmZ1lnkaaK3FcvFf1OQKRni6r+6xIZqi+Nl43A==
-X-Received: by 2002:a1c:7f86:: with SMTP id a128mr5520752wmd.104.1567617199881; 
- Wed, 04 Sep 2019 10:13:19 -0700 (PDT)
+ bh=Re5SoK9LBlh1OETVvBHDiEijPJqBMr7rX5bmU56TmLo=;
+ b=AxafNZINv6RQeqzGn9+ZmF2xrSoCp3f+nHn+iXDkEsdHtZwoaLUEvgFQi20p8E8aQx
+ TjVMtfaUnBkPsxgiqPmYMSomWZkS9i3gL0pZqE9LYp6gjmOpWUTEOfbz5croh1yrBtVH
+ U/efyCGRHt35MacRYiYpN+oFOqC9jk8ZpkavRK+t3mFf/9RT+S5ay+karBYx3n5d1mux
+ n2moncBE+Xx20i2LMRCoFt8h9woomMimbd4z3SYNAUbNAiGXY1/AvuRF1r1smDjCLWUp
+ 026uAB+MGIaaV/9AFjbOaNBDCEd2ifnluyTn3faZdBEUQgAFxy0m25qa925N64rlKQnz
+ gq8g==
+X-Gm-Message-State: APjAAAVkOTLpOCJPw5qX66w/GQbz2nDhd19S7v1k4zmidm2UZh+PSvUC
+ yR8FsfWFZpuj22cQuRFke7k=
+X-Google-Smtp-Source: APXvYqxqFsgbbB5cSLHO8aHW+LjhxGc8JcZOj/pdM62vUI87Od70LG3yV1cjZD725KRr2aAR7AbFsQ==
+X-Received: by 2002:adf:ff8a:: with SMTP id j10mr1475139wrr.334.1567617201524; 
+ Wed, 04 Sep 2019 10:13:21 -0700 (PDT)
 Received: from x1w.redhat.com ([195.166.127.210])
- by smtp.gmail.com with ESMTPSA id p19sm2339512wmg.31.2019.09.04.10.13.18
+ by smtp.gmail.com with ESMTPSA id p19sm2339512wmg.31.2019.09.04.10.13.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 10:13:19 -0700 (PDT)
+ Wed, 04 Sep 2019 10:13:20 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Esteban Bosse <estebanbosse@gmail.com>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org,
  Pekka Enberg <penberg@iki.fi>,
  =?UTF-8?q?Zolt=C3=A1n=20Baldaszti?= <bztemail@gmail.com>
-Date: Wed,  4 Sep 2019 19:13:02 +0200
-Message-Id: <20190904171315.8354-2-f4bug@amsat.org>
+Date: Wed,  4 Sep 2019 19:13:03 +0200
+Message-Id: <20190904171315.8354-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190904171315.8354-1-f4bug@amsat.org>
 References: <20190904171315.8354-1-f4bug@amsat.org>
@@ -86,9 +86,9 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH 01/14] hw/arm/raspi: Use the IEC binary prefix
- definitions
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH 02/14] hw/misc/bcm2835_property: Add FIXME
+ comment for uninitialized memory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,35 +110,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-IEC binary prefixes ease code review: the unit is explicit.
+We are returning unintialized memory, this is probably unsafe.
 
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/raspi.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/misc/bcm2835_property.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 74c062d05e..615d755879 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -230,7 +230,7 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->max_cpus = BCM283X_NCPUS;
-     mc->min_cpus = BCM283X_NCPUS;
-     mc->default_cpus = BCM283X_NCPUS;
--    mc->default_ram_size = 1024 * 1024 * 1024;
-+    mc->default_ram_size = 1 * GiB;
-     mc->ignore_memory_transaction_failures = true;
- };
- DEFINE_MACHINE("raspi2", raspi2_machine_init)
-@@ -252,7 +252,7 @@ static void raspi3_machine_init(MachineClass *mc)
-     mc->max_cpus = BCM283X_NCPUS;
-     mc->min_cpus = BCM283X_NCPUS;
-     mc->default_cpus = BCM283X_NCPUS;
--    mc->default_ram_size = 1024 * 1024 * 1024;
-+    mc->default_ram_size = 1 * GiB;
- }
- DEFINE_MACHINE("raspi3", raspi3_machine_init)
- #endif
+diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
+index d86d510572..399f0d9dd5 100644
+--- a/hw/misc/bcm2835_property.c
++++ b/hw/misc/bcm2835_property.c
+@@ -57,6 +57,7 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
+         case 0x00010001: /* Get board model */
+             qemu_log_mask(LOG_UNIMP,
+                           "bcm2835_property: %x get board model NYI\n", tag);
++            /* FIXME returning uninitialized memory */
+             resplen = 4;
+             break;
+         case 0x00010002: /* Get board revision */
+@@ -70,6 +71,7 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
+         case 0x00010004: /* Get board serial */
+             qemu_log_mask(LOG_UNIMP,
+                           "bcm2835_property: %x get board serial NYI\n", tag);
++            /* FIXME returning uninitialized memory */
+             resplen = 8;
+             break;
+         case 0x00010005: /* Get ARM memory */
 -- 
 2.20.1
 
