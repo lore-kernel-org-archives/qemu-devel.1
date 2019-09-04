@@ -2,80 +2,86 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B9EC3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 10:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99AABC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 11:22:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51A9022DBF
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 10:50:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 642E822CED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 11:22:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bbV0yhod"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A9022DBF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NgH+EeWs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642E822CED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5SrP-00014B-9X
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 06:49:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59615)
+	id 1i5TN9-0000CV-Hv
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 07:22:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5Sqc-0000NJ-AP
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 06:49:11 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i5TLd-00075s-Tj
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 07:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5Sqa-0000d6-U3
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 06:49:09 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41316)
+ (envelope-from <alex.bennee@linaro.org>) id 1i5TLc-0007Ca-Ga
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 07:21:13 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52978)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5Sqa-0000bz-Oo
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 06:49:08 -0400
-Received: by mail-ot1-x341.google.com with SMTP id o101so20088917ota.8
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 03:49:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i5TLc-0007BT-7w
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 07:21:12 -0400
+Received: by mail-wm1-x342.google.com with SMTP id t17so2874829wmi.2
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 04:21:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=e1jw3hspecwMHjLO7Arwx9CldcMxSKAz9Ekmi/2ze/k=;
- b=bbV0yhodlBxQS+blf6PQLN3DmtNGMXBWGecGLtT41HRTQ0e/gFVuw22dQ5zaCfB5o7
- e3LMeJX7u4idnc+v5xng0u+1Db1rAPQE4C7W2Kp6dII6APoMKQ3nyvypSVVLVZBx9xbh
- bm0bInpRNrwHhW+yUA0IPzeFrHdFfoak/G9lej1RpRzjBbU8YRGOgBRobA5qNVyeSy6p
- N3KKMhSYuWsOZdyesUBb15dgH6YQwo5YsekCvpIb3CAHMy0bDzHIBEsj1BWv2/Ae4dnt
- lwjehCRX8dymOQrFpNaw164ZVXKxkG3JXKfHzby3tCwRtU1ucS8rnWSy2iA1z7HWIDap
- yf+g==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=27MdaX+gehdwlrQBcjnPAqiSCpVbJJsljj5uWs5cQMk=;
+ b=NgH+EeWsrFB9kDuaAPcCeXDkZxxwzfNjVLQ8H2+OriuyEM/OM7FkIOeE0ThIMJimki
+ Mv7T2RQrmsE0usaPhz48z8fKa8ivoFloSjbJmqalWNaS1OR9N9qy/aGJtnAa7vOxmW9q
+ D2Aj99GbizEYCRxEQSp2x1+8mmEfoCUKdpkzP9agS+reWwfaKhrqUKiSz4pVoidUZ5ig
+ xFcCX4MAXe4imAS6ssfYa2RsInMV61/hB7SDDS64M1jxmf/ZqErdR+ZCvBFGojVYUnt5
+ YXu5cJvsrOo3f9UhiJwsDaLOy+o8dtB9XwzymwLtKPiJH3Voh7aevARYOy96RE94dplp
+ ZWmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=e1jw3hspecwMHjLO7Arwx9CldcMxSKAz9Ekmi/2ze/k=;
- b=E9hdWDhEvWFff4IyEHL9vcxHrimLuTjj39xjiD/JlhXuV4qb/i5x2Z21QXjC8VhgLf
- 0RGUcfGlTQbpDg2hE2AdK/jvmkhQO2/EtVTiYmEB8yY9efZ8imxX8vl0sHxy9FfBsuie
- Dy6yQsIf7yU8hSn6UVAOMEZNfK7RIaSB++CCNXwvpIti4HhCOqUVNQGVkA/IVN1vwW57
- 8DJjS1fU/mhLUCNwRIZ6Jutp9dHkzjAiPpJai2g2X1nFWQC4SRi9OjPJaaVQIiKB8nQ2
- ul7ApnusKQJWSsr1wXILRepW1jmW2yJm5OhhCD1bvbFzByrzYkIi/eRkqbOOnbLtRp9f
- 8WkQ==
-X-Gm-Message-State: APjAAAWoGRzZkEGgh9LS0oUEfqgu0lYJfeKPTKEcnn9MzhPvMSOCjbYe
- wR3qWl0alXThl8g0ufc1fFvahAa2UZpArEMIArFlgg==
-X-Google-Smtp-Source: APXvYqwy2TO9Uvlpbg4RroW9L9ZCpM+Hqns/+DFhrCP384qqZSIrfG4nBYUGqw93ydnpPoQJ8WxzIl/12ot808adSBU=
-X-Received: by 2002:a9d:5e10:: with SMTP id d16mr32866520oti.91.1567594147703; 
- Wed, 04 Sep 2019 03:49:07 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=27MdaX+gehdwlrQBcjnPAqiSCpVbJJsljj5uWs5cQMk=;
+ b=Geonwj6AqjB5h5dks8SVCo2lloIjFE7SMn3M2xKKrgef4PIVtsojszTDE/GN3v5YmL
+ nQhhWuIo7Bfo5w68Nv7dflWjIop/fUH8KFMdUenuoW61hIbGbXwXF5U9BG12iG8aBkw3
+ kMD/5zs//r/8AzXVShEoSOffck84yPDluod4mr5TcacjvskH/6bmT3+J2GB1X2sMBrIB
+ dXBGd9w92/g16VS58ERpw6kg0YaMyD2ii8iSnO9fmUnBAKaPfDg1yOeG9UAzW7yl2CZv
+ JPSYOhGW7s8CWs5AnV70GDwfhS/q6AtFxQesS2m3ZODm5/o6DNiyp0Tf0YEpR9c5dlDs
+ yI3g==
+X-Gm-Message-State: APjAAAXoYTkErZlBOZ0+OApNGMCzD9bgs/j1o0ak0Yj6+DQzgtKok54b
+ M5bqVYhRny1iVy1uAc0WFf+S/Q==
+X-Google-Smtp-Source: APXvYqzT9V69jUG5W9KO22PEwt5UMmiz2Ec/k2682srtCYux5tZ4mcOooHxsUeAOpG2GB82dOTDU/A==
+X-Received: by 2002:a1c:be19:: with SMTP id o25mr3759877wmf.54.1567596071165; 
+ Wed, 04 Sep 2019 04:21:11 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v7sm21764006wru.87.2019.09.04.04.21.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Sep 2019 04:21:09 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0C73B1FF87;
+ Wed,  4 Sep 2019 12:21:09 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 12:21:03 +0100
+Message-Id: <20190904112108.2341-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190820210720.18976-1-richard.henderson@linaro.org>
- <dacbea19-9692-0288-9b64-8500d0cf232a@linaro.org>
-In-Reply-To: <dacbea19-9692-0288-9b64-8500d0cf232a@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 4 Sep 2019 11:48:56 +0100
-Message-ID: <CAFEAcA8MfTTPrsTQhXUPHWAy_KeC-3ZztFtKM0jyQHZoBYqRJw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v5 00/17] target/arm: Reduce overhead of
- cpu_get_tb_cpu_state
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH  v2 0/5] fixed up semihosting fixups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,36 +93,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 21 Aug 2019 at 00:54, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> However, while working on this patch set, I noticed that we have a lot of
-> unnecessary overlap between A- and M- profile in the TBFLAGs.  Thus point 4
-> above and the completely separate rebuild_hflags_m32().
->
-> If we rearrange things like the appended, then we recover 4 bits.
+Hi Peter,
 
-You can't make the THUMB bit A-profile only: we need it in
-M-profile too, so we can correctly generate code that takes
-the InvalidState exception for attempts to execute with the
-Thumb bit not set.
+Here is version 2 of the ARM semi-hosting cleanup patches. The re-base
+had failed due to a change in the gen_exception_internal_insn API
+which now takes the PC instead of offset from pc_next. There is also
+the a minor indentation fix.
 
-If you want to make VFPEN be A-profile only you need to
-do something so we don't look at it for M-profile: currently
-we set it always-1 for M-profile so we don't trip the code
-that causes us to take an exception if it's 0.
+Alex Bennée (4):
+  target/arm: handle M-profile semihosting at translate time
+  target/arm: handle A-profile T32 semihosting at translate time
+  target/arm: handle A-profile A32 semihosting at translate time
+  target/arm: remove run time semihosting checks
 
-Otherwise seems reasonable. My overall question is: how bad
-is it if we just start using bits in the cs_base word?
-If we try to get too tricky with using the same bits for
-different purposes it opens the door for accidentally writing
-code where we use a bit that isn't actually set correctly
-for all the situations where we're using it.
+Emilio G. Cota (1):
+  atomic_template: fix indentation in GEN_ATOMIC_HELPER
 
-thanks
--- PMM
+ accel/tcg/atomic_template.h |  2 +-
+ target/arm/helper.c         | 96 +++++++++----------------------------
+ target/arm/m_helper.c       | 18 +++----
+ target/arm/translate.c      | 64 +++++++++++++++++++++----
+ 4 files changed, 85 insertions(+), 95 deletions(-)
+
+-- 
+2.20.1
+
 
