@@ -2,94 +2,56 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_ADSP_NXDOMAIN,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49176C3A5A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 394BCC3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2386D2073F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:54:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2386D2073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0F77A2073F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 12:55:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F77A2073F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.con
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5Unh-0003wf-T8
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 08:54:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52106)
+	id 1i5Uou-00054G-2Z
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 08:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5Ujz-0000nP-84
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:50:29 -0400
+ (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqr-0004qp-Ez
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5Ujy-00023c-3V
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 08:50:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32896)
+ (envelope-from <damien.hedde@greensocs.con>) id 1i5Rqp-0008VX-LF
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 05:45:21 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:40538)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i5Ujt-00020Q-80; Wed, 04 Sep 2019 08:50:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 18465301899A;
- Wed,  4 Sep 2019 12:50:20 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 399FA60920;
- Wed,  4 Sep 2019 12:50:09 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- John Snow <jsnow@redhat.com>
-References: <20190903145634.20237-1-eblake@redhat.com>
- <9bde61cf-b4a7-fb11-7b8d-12cf8a2dc558@redhat.com>
- <a49c5a8d-b77a-a2fe-fb02-673971ccd70b@redhat.com>
- <e7d1f571-9e0b-9fd0-5921-e182a2bc92ca@redhat.com>
- <20190904081809.GB19582@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <1238dfef-a3e1-4b07-5dd4-6e925d98196f@redhat.com>
-Date: Wed, 4 Sep 2019 07:50:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.con>)
+ id 1i5Rql-0008Mw-HZ; Wed, 04 Sep 2019 05:45:15 -0400
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 3147996F59;
+ Wed,  4 Sep 2019 09:38:53 +0000 (UTC)
+From: damien.hedde@greensocs.con
+To: qemu-devel@nongnu.org
+Date: Wed,  4 Sep 2019 11:38:39 +0200
+Message-Id: <20190904093843.8765-6-damien.hedde@greensocs.con>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190904093843.8765-1-damien.hedde@greensocs.con>
+References: <20190904093843.8765-1-damien.hedde@greensocs.con>
 MIME-Version: 1.0
-In-Reply-To: <20190904081809.GB19582@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 04 Sep 2019 12:50:20 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] docs: Update preferred NBD
- device syntax
+X-Received-From: 5.135.226.135
+X-Mailman-Approved-At: Wed, 04 Sep 2019 08:47:47 -0400
+Subject: [Qemu-devel] [PATCH v6 5/9] qdev-clock: introduce an init array to
+ ease the device construction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,96 +63,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- libvirt-list@redhat.com
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com, alistair@alistair23.me,
+ mark.burton@greensocs.com, pbonzini@redhat.com, qemu-arm@nongnu.org,
+ marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ
-Content-Type: multipart/mixed; boundary="myW2zeMR5ke1XZXLUpsLtjj2yoTaJvkQb";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, libvirt-list@redhat.com,
- qemu-block@nongnu.org
-Message-ID: <1238dfef-a3e1-4b07-5dd4-6e925d98196f@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] docs: Update preferred NBD
- device syntax
-References: <20190903145634.20237-1-eblake@redhat.com>
- <9bde61cf-b4a7-fb11-7b8d-12cf8a2dc558@redhat.com>
- <a49c5a8d-b77a-a2fe-fb02-673971ccd70b@redhat.com>
- <e7d1f571-9e0b-9fd0-5921-e182a2bc92ca@redhat.com>
- <20190904081809.GB19582@redhat.com>
-In-Reply-To: <20190904081809.GB19582@redhat.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
 
---myW2zeMR5ke1XZXLUpsLtjj2yoTaJvkQb
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Introduce a function and macro helpers to setup several clocks
+in a device from a static array description.
 
-On 9/4/19 3:18 AM, Daniel P. Berrang=C3=A9 wrote:
+An element of the array describes the clock (name and direction) as
+well as the related callback and an optional offset to store the
+created object pointer in the device state structure.
 
->>>>> -Syntax for specifying a NBD device using TCP
->>>>> +Syntax for specifying a NBD device using TCP, in preferred URI for=
-m:
->>>>> +``nbd://<server-ip>[:<port>]/[<export>]''
->>>>> +
+The array must be terminated by a special element QDEV_CLOCK_END.
 
->>>>>  ``nbd:<server-ip>:<port>[:exportname=3D<export>]''
->>>>>
+This is based on the original work of Frederic Konrad.
 
->=20
-> In general libvirt should never use the psuedo-URI/URI syntax for
-> anything. We're moving towards use of blockdev, so will have the
-> dot separated key syntax on the cli and equiv in QMP.
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/core/qdev-clock.c    | 26 ++++++++++++++++
+ include/hw/qdev-clock.h | 67 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+)
 
-There's a difference between '-drive' (which sort of implies the
-file=3DURI... syntax) and '-blockdev + -device' (where you use the
-dot-separated syntax).  Yes, we should document and encourage the use of
--blockdev even more (at which point URIs are not needed, whether or not
-they are the preferred URI or the old form); but as long as -drive can
-only take a non-dotted representation, we should still be choosing the
-non-dotted representation that is at least reusable among other projects
-that also use URI syntax for NBD drives.
-
->=20
-> I hope this means we'll stop using the URIs in migration, but will
-> defer to peter for specifics.
->=20
-> I always think it is a shame that QEMU has done so much work on
-> blockdev, but all QEMU's docs still largely use the many legacy
-> syntaxes. IOW, we should make these NBD examples use the modern
-> non-URI syntax too.
-
-Agreed, but that is separate patches to this one.
-
+diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
+index bebdd8fa15..32ad45c061 100644
+--- a/hw/core/qdev-clock.c
++++ b/hw/core/qdev-clock.c
+@@ -153,3 +153,29 @@ void qdev_connect_clock_out(DeviceState *dev, const =
+char *name, ClockIn *clk,
+=20
+     clock_connect(clk, clkout);
+ }
++
++void qdev_init_clocks(DeviceState *dev, const ClockPortInitArray clocks)
++{
++    const struct ClockPortInitElem *elem;
++
++    assert(dev);
++    assert(clocks);
++
++    for (elem =3D &clocks[0]; elem->name !=3D NULL; elem++) {
++        /* offset cannot be inside the DeviceState part */
++        assert(elem->offset =3D=3D 0 || elem->offset > sizeof(DeviceStat=
+e));
++        if (elem->is_output) {
++            ClockOut *clk;
++            clk =3D qdev_init_clock_out(dev, elem->name);
++            if (elem->offset) {
++                *(ClockOut **)(((void *) dev) + elem->offset) =3D clk;
++            }
++        } else {
++            ClockIn *clk;
++            clk =3D qdev_init_clock_in(dev, elem->name, elem->callback, =
+dev);
++            if (elem->offset) {
++                *(ClockIn **)(((void *) dev) + elem->offset) =3D clk;
++            }
++        }
++    }
++}
+diff --git a/include/hw/qdev-clock.h b/include/hw/qdev-clock.h
+index c4ea912fdc..b6edb9421b 100644
+--- a/include/hw/qdev-clock.h
++++ b/include/hw/qdev-clock.h
+@@ -64,4 +64,71 @@ void qdev_connect_clock_out(DeviceState *dev, const ch=
+ar *name, ClockIn *clk,
+ void qdev_pass_clock(DeviceState *dev, const char *name,
+                      DeviceState *container, const char *cont_name);
+=20
++/**
++ * ClockInitElem:
++ * @name: name of the clock (can't be NULL)
++ * @is_output: indicates whether the clock is input or output
++ * @callback: for inputs, optional callback to be called on clock's upda=
+te
++ * with device as opaque
++ * @offset: optional offset to store the ClockIn or ClockOut pointer in =
+device
++ * state structure (0 means unused)
++ */
++struct ClockPortInitElem {
++    const char *name;
++    bool is_output;
++    ClockCallback *callback;
++    size_t offset;
++};
++
++#define clock_offset_value(_type, _devstate, _field) \
++    (offsetof(_devstate, _field) + \
++     type_check(_type *, typeof_field(_devstate, _field)))
++
++#define QDEV_CLOCK(_is_output, _type, _devstate, _field, _callback) { \
++    .name =3D (stringify(_field)), \
++    .is_output =3D _is_output, \
++    .callback =3D _callback, \
++    .offset =3D clock_offset_value(_type, _devstate, _field), \
++}
++
++/**
++ * QDEV_CLOCK_(IN|OUT):
++ * @_devstate: structure type. @dev argument of qdev_init_clocks below m=
+ust be
++ * a pointer to that same type.
++ * @_field: a field in @_devstate (must be ClockIn* or ClockOut*)
++ * @_callback: (for input only) callback (or NULL) to be called with the=
+ device
++ * state as argument
++ *
++ * The name of the clock will be derived from @_field
++ */
++#define QDEV_CLOCK_IN(_devstate, _field, _callback) \
++    QDEV_CLOCK(false, ClockIn, _devstate, _field, _callback)
++
++#define QDEV_CLOCK_OUT(_devstate, _field) \
++    QDEV_CLOCK(true, ClockOut, _devstate, _field, NULL)
++
++/**
++ * QDEV_CLOCK_IN_NOFIELD:
++ * @_name: name of the clock
++ * @_callback: callback (or NULL) to be called with the device state as =
+argument
++ */
++#define QDEV_CLOCK_IN_NOFIELD(_name, _callback) { \
++    .name =3D _name, \
++    .is_output =3D false, \
++    .callback =3D _callback, \
++    .offset =3D 0, \
++}
++
++#define QDEV_CLOCK_END { .name =3D NULL }
++
++typedef struct ClockPortInitElem ClockPortInitArray[];
++
++/**
++ * qdev_init_clocks:
++ * @dev: the device to add clocks
++ * @clocks: a QDEV_CLOCK_END-terminated array which contains the
++ * clocks information.
++ */
++void qdev_init_clocks(DeviceState *dev, const ClockPortInitArray clocks)=
+;
++
+ #endif /* QDEV_CLOCK_H */
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.22.0
 
-
---myW2zeMR5ke1XZXLUpsLtjj2yoTaJvkQb--
-
---UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1vswAACgkQp6FrSiUn
-Q2rP/Qf/RrKelF5fdyk7A5WDCmXChtY97+fIk95rWcFsl8zkJHQ36LUQ1ghvOZIC
-wG74xqO1f79EObeo6gC4tXsuxe8f5kbVIZb6URrTiUi6Irb4ixaLQGV3regs5WeA
-I2KvQl7rbCr58Gq+tdynFX4+k2n2lkXplUnAEgvhG+BYjGJ2PnqENqZLhprokep6
-naWPRduD6tsD2PH2jAibX+ofIFD1J1TQBRIs5b0m1VkuDU+MMTi+Mlad8xn9aT7/
-LKDPJ+5TU7ug99slVJv4LfO+ZwncOH8AjU9QQwNFRxUGWHq7b6xDtRTQsl/GuS57
-MvUcwLmS3BDcx9yF68Mt6zcZ3A/SSw==
-=dhSu
------END PGP SIGNATURE-----
-
---UYjwqpU3c29dUcptpBkoSv9YwiFNZViqZ--
 
