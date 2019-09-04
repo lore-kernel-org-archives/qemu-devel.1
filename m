@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A88C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E1BC3A5AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:46:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39547208E4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:46:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39547208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 19A03208E4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:46:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A03208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5d6F-0005TA-TE
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:45:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53517)
+	id 1i5d6l-00067p-Sw
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:46:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i5cCI-0000dW-Am
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:11 -0400
+ (envelope-from <clg@kaod.org>) id 1i5cBr-00006Q-39
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i5cCG-0001fN-Ee
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:10 -0400
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:45700)
+ (envelope-from <clg@kaod.org>) id 1i5cBp-00013h-CJ
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:42 -0400
+Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:43057)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5cCG-0001ex-8S
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:08 -0400
-Received: from player691.ha.ovh.net (unknown [10.109.159.90])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id C9B131408D2
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 22:48:06 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5cBp-0000z0-47
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:47:41 -0400
+Received: from player691.ha.ovh.net (unknown [10.109.160.23])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 10CD21097D3
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 22:47:39 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player691.ha.ovh.net (Postfix) with ESMTPSA id 4F5B098B286B;
- Wed,  4 Sep 2019 20:47:59 +0000 (UTC)
+ by player691.ha.ovh.net (Postfix) with ESMTPSA id 0BF9698B2814;
+ Wed,  4 Sep 2019 20:47:32 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed,  4 Sep 2019 22:46:52 +0200
-Message-Id: <20190904204659.13878-9-clg@kaod.org>
+Date: Wed,  4 Sep 2019 22:46:48 +0200
+Message-Id: <20190904204659.13878-5-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190904204659.13878-1-clg@kaod.org>
 References: <20190904204659.13878-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2523704641194855185
+X-Ovh-Tracer-Id: 2516104820903217937
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejhedgudehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.111.220
-Subject: [Qemu-devel] [RFC PATCH 08/15] watchdog/aspeed: Introduce an object
- class per SoC
+X-Received-From: 46.105.61.98
+Subject: [Qemu-devel] [RFC PATCH 04/15] aspeed/timer: Add support for AST2600
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,293 +74,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It cleanups the current models for the Aspeed AST2400 and AST2500 SoCs
-and prepares ground for future SoCs.
+The AST2600 timer has a third control register that is used to
+implement a set-to-clear feature for the main control register.
+
+On the AST2600, it is not configurable via 0x38 (control register 3)
+as it is on the AST2500.
+
+Based on previous work from Joel Stanley.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/watchdog/wdt_aspeed.h |  18 ++++-
- hw/arm/aspeed_soc.c              |   9 ++-
- hw/watchdog/wdt_aspeed.c         | 122 ++++++++++++++++---------------
- 3 files changed, 86 insertions(+), 63 deletions(-)
+ include/hw/timer/aspeed_timer.h |  1 +
+ hw/timer/aspeed_timer.c         | 51 +++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_a=
-speed.h
-index 8c5691ce2047..796342764e2e 100644
---- a/include/hw/watchdog/wdt_aspeed.h
-+++ b/include/hw/watchdog/wdt_aspeed.h
-@@ -16,6 +16,8 @@
- #define TYPE_ASPEED_WDT "aspeed.wdt"
- #define ASPEED_WDT(obj) \
-     OBJECT_CHECK(AspeedWDTState, (obj), TYPE_ASPEED_WDT)
-+#define TYPE_ASPEED_2400_WDT TYPE_ASPEED_WDT "-ast2400"
-+#define TYPE_ASPEED_2500_WDT TYPE_ASPEED_WDT "-ast2500"
+diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_ti=
+mer.h
+index 1e0288ebc49f..69b1377af01e 100644
+--- a/include/hw/timer/aspeed_timer.h
++++ b/include/hw/timer/aspeed_timer.h
+@@ -30,6 +30,7 @@
+ #define TYPE_ASPEED_TIMER "aspeed.timer"
+ #define TYPE_ASPEED_2400_TIMER TYPE_ASPEED_TIMER "-ast2400"
+ #define TYPE_ASPEED_2500_TIMER TYPE_ASPEED_TIMER "-ast2500"
++#define TYPE_ASPEED_2600_TIMER TYPE_ASPEED_TIMER "-ast2600"
 =20
- #define ASPEED_WDT_REGS_MAX        (0x20 / 4)
+ #define ASPEED_TIMER_NR_TIMERS 8
 =20
-@@ -30,8 +32,20 @@ typedef struct AspeedWDTState {
-=20
-     AspeedSCUState *scu;
-     uint32_t pclk_freq;
--    uint32_t silicon_rev;
--    uint32_t ext_pulse_width_mask;
- } AspeedWDTState;
-=20
-+#define ASPEED_WDT_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AspeedWDTClass, (klass), TYPE_ASPEED_WDT)
-+#define ASPEED_WDT_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AspeedWDTClass, (obj), TYPE_ASPEED_WDT)
-+
-+typedef struct AspeedWDTClass {
-+    SysBusDeviceClass parent_class;
-+
-+    uint32_t offset;
-+    uint32_t ext_pulse_width_mask;
-+    uint32_t reset_ctrl_reg;
-+    void (*reset_pulse)(AspeedWDTState *s, uint32_t property);
-+}  AspeedWDTClass;
-+
- #endif /* WDT_ASPEED_H */
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index aaf18d3e42f1..5c5fcb810944 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -214,10 +214,9 @@ static void aspeed_soc_init(Object *obj)
-                               "max-ram-size", &error_abort);
-=20
-     for (i =3D 0; i < sc->info->wdts_num; i++) {
-+        snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
-         sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
--                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
--        qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
--                                    sc->info->silicon_rev);
-+                              sizeof(s->wdt[i]), typename);
-         object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
-                                        OBJECT(&s->scu), &error_abort);
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index d70e78a0293e..7f73d0c75337 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -538,6 +538,40 @@ static void aspeed_2500_timer_write(AspeedTimerCtrlS=
+tate *s, hwaddr offset,
      }
-@@ -384,13 +383,15 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
-ror **errp)
-=20
-     /* Watch dog */
-     for (i =3D 0; i < sc->info->wdts_num; i++) {
-+        AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(&s->wdt[i]);
-+
-         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized", &=
-err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0,
--                        sc->info->memmap[ASPEED_WDT] + i * 0x20);
-+                        sc->info->memmap[ASPEED_WDT] + i * awc->offset);
-     }
-=20
-     /* Net */
-diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-index 9b932134172c..9e241b7c8da4 100644
---- a/hw/watchdog/wdt_aspeed.c
-+++ b/hw/watchdog/wdt_aspeed.c
-@@ -54,21 +54,6 @@ static bool aspeed_wdt_is_enabled(const AspeedWDTState=
- *s)
-     return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
  }
 =20
--static bool is_ast2500(const AspeedWDTState *s)
--{
--    switch (s->silicon_rev) {
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        return true;
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--    default:
--        break;
--    }
--
--    return false;
--}
--
- static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned si=
-ze)
- {
-     AspeedWDTState *s =3D ASPEED_WDT(opaque);
-@@ -124,6 +109,7 @@ static void aspeed_wdt_write(void *opaque, hwaddr off=
-set, uint64_t data,
-                              unsigned size)
- {
-     AspeedWDTState *s =3D ASPEED_WDT(opaque);
-+    AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(s);
-     bool enable =3D data & WDT_CTRL_ENABLE;
-=20
-     offset >>=3D 2;
-@@ -153,24 +139,13 @@ static void aspeed_wdt_write(void *opaque, hwaddr o=
-ffset, uint64_t data,
-         }
-         break;
-     case WDT_RESET_WIDTH:
--    {
--        uint32_t property =3D data & WDT_POLARITY_MASK;
--
--        if (property && is_ast2500(s)) {
--            if (property =3D=3D WDT_ACTIVE_HIGH_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_ACTIVE_HIG=
-H;
--            } else if (property =3D=3D WDT_ACTIVE_LOW_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_ACTIVE_HI=
-GH;
--            } else if (property =3D=3D WDT_PUSH_PULL_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_PUSH_PULL;
--            } else if (property =3D=3D WDT_OPEN_DRAIN_MAGIC) {
--                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_PUSH_PULL=
-;
--            }
-+        if (awc->reset_pulse) {
-+            awc->reset_pulse(s, data & WDT_POLARITY_MASK);
-         }
--        s->regs[WDT_RESET_WIDTH] &=3D ~s->ext_pulse_width_mask;
--        s->regs[WDT_RESET_WIDTH] |=3D data & s->ext_pulse_width_mask;
-+        s->regs[WDT_RESET_WIDTH] &=3D ~awc->ext_pulse_width_mask;
-+        s->regs[WDT_RESET_WIDTH] |=3D data & awc->ext_pulse_width_mask;
-         break;
--    }
-+
-     case WDT_TIMEOUT_STATUS:
-     case WDT_TIMEOUT_CLEAR:
-         qemu_log_mask(LOG_UNIMP,
-@@ -226,9 +201,10 @@ static void aspeed_wdt_reset(DeviceState *dev)
- static void aspeed_wdt_timer_expired(void *dev)
- {
-     AspeedWDTState *s =3D ASPEED_WDT(dev);
-+    uint32_t reset_ctrl_reg =3D ASPEED_WDT_GET_CLASS(s)->reset_ctrl_reg;
-=20
-     /* Do not reset on SDRAM controller reset */
--    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
-+    if (s->scu->regs[reset_ctrl_reg] & SCU_RESET_SDRAM) {
-         timer_del(s->timer);
-         s->regs[WDT_CTRL] =3D 0;
-         return;
-@@ -256,25 +232,6 @@ static void aspeed_wdt_realize(DeviceState *dev, Err=
-or **errp)
-     }
-     s->scu =3D ASPEED_SCU(obj);
-=20
--    if (!is_supported_silicon_rev(s->silicon_rev)) {
--        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
--                s->silicon_rev);
--        return;
--    }
--
--    switch (s->silicon_rev) {
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--        s->ext_pulse_width_mask =3D 0xff;
--        break;
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        s->ext_pulse_width_mask =3D 0xfffff;
--        break;
--    default:
--        g_assert_not_reached();
--    }
--
-     s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_expir=
-ed, dev);
-=20
-     /* FIXME: This setting should be derived from the SCU hw strapping
-@@ -287,20 +244,15 @@ static void aspeed_wdt_realize(DeviceState *dev, Er=
-ror **errp)
-     sysbus_init_mmio(sbd, &s->iomem);
- }
-=20
--static Property aspeed_wdt_properties[] =3D {
--    DEFINE_PROP_UINT32("silicon-rev", AspeedWDTState, silicon_rev, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
- static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
-+    dc->desc =3D "ASPEED Watchdog Controller";
-     dc->realize =3D aspeed_wdt_realize;
-     dc->reset =3D aspeed_wdt_reset;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     dc->vmsd =3D &vmstate_aspeed_wdt;
--    dc->props =3D aspeed_wdt_properties;
- }
-=20
- static const TypeInfo aspeed_wdt_info =3D {
-@@ -308,12 +260,68 @@ static const TypeInfo aspeed_wdt_info =3D {
-     .name  =3D TYPE_ASPEED_WDT,
-     .instance_size  =3D sizeof(AspeedWDTState),
-     .class_init =3D aspeed_wdt_class_init,
-+    .class_size    =3D sizeof(AspeedWDTClass),
-+    .abstract      =3D true,
-+};
-+
-+static void aspeed_2400_wdt_class_init(ObjectClass *klass, void *data)
++static uint64_t aspeed_2600_timer_read(AspeedTimerCtrlState *s, hwaddr o=
+ffset)
 +{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedWDTClass *awc =3D ASPEED_WDT_CLASS(klass);
++    uint64_t value;
 +
-+    dc->desc =3D "ASPEED 2400 Watchdog Controller";
-+    awc->offset =3D 0x20;
-+    awc->ext_pulse_width_mask =3D 0xff;
-+    awc->reset_ctrl_reg =3D SCU_RESET_CONTROL1;
++    switch (offset) {
++    case 0x38:
++    case 0x3C:
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
++                __func__, offset);
++        value =3D 0;
++        break;
++    }
++    return value;
 +}
 +
-+static const TypeInfo aspeed_2400_wdt_info =3D {
-+    .name =3D TYPE_ASPEED_2400_WDT,
-+    .parent =3D TYPE_ASPEED_WDT,
-+    .instance_size =3D sizeof(AspeedWDTState),
-+    .class_init =3D aspeed_2400_wdt_class_init,
-+};
-+
-+static void aspeed_2500_wdt_reset_pulse(AspeedWDTState *s, uint32_t prop=
-erty)
++static void aspeed_2600_timer_write(AspeedTimerCtrlState *s, hwaddr offs=
+et,
++                                    uint64_t value)
 +{
-+    if (property) {
-+        if (property =3D=3D WDT_ACTIVE_HIGH_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_ACTIVE_HIGH;
-+        } else if (property =3D=3D WDT_ACTIVE_LOW_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_ACTIVE_HIGH;
-+        } else if (property =3D=3D WDT_PUSH_PULL_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_PUSH_PULL;
-+        } else if (property =3D=3D WDT_OPEN_DRAIN_MAGIC) {
-+            s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_PUSH_PULL;
-+        }
++    const uint32_t tv =3D (uint32_t)(value & 0xFFFFFFFF);
++
++    switch (offset) {
++    case 0x3C:
++        aspeed_timer_set_ctrl(s, s->ctrl & ~tv);
++        break;
++
++    case 0x38:
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx =
+"\n",
++                __func__, offset);
++        break;
 +    }
 +}
 +
-+static void aspeed_2500_wdt_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedWDTClass *awc =3D ASPEED_WDT_CLASS(klass);
-+
-+    dc->desc =3D "ASPEED 2500 Watchdog Controller";
-+    awc->offset =3D 0x20;
-+    awc->ext_pulse_width_mask =3D 0xfffff;
-+    awc->reset_ctrl_reg =3D SCU_RESET_CONTROL1;
-+    awc->reset_pulse =3D aspeed_2500_wdt_reset_pulse;
-+}
-+
-+static const TypeInfo aspeed_2500_wdt_info =3D {
-+    .name =3D TYPE_ASPEED_2500_WDT,
-+    .parent =3D TYPE_ASPEED_WDT,
-+    .instance_size =3D sizeof(AspeedWDTState),
-+    .class_init =3D aspeed_2500_wdt_class_init,
+ static void aspeed_init_one_timer(AspeedTimerCtrlState *s, uint8_t id)
+ {
+     AspeedTimer *t =3D &s->timers[id];
+@@ -674,11 +708,28 @@ static const TypeInfo aspeed_2500_timer_info =3D {
+     .class_init =3D aspeed_2500_timer_class_init,
  };
 =20
- static void wdt_aspeed_register_types(void)
++static void aspeed_2600_timer_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    AspeedTimerClass *awc =3D ASPEED_TIMER_CLASS(klass);
++
++    dc->desc =3D "ASPEED 2600 Timer";
++    awc->read =3D aspeed_2600_timer_read;
++    awc->write =3D aspeed_2600_timer_write;
++}
++
++static const TypeInfo aspeed_2600_timer_info =3D {
++    .name =3D TYPE_ASPEED_2600_TIMER,
++    .parent =3D TYPE_ASPEED_TIMER,
++    .class_init =3D aspeed_2600_timer_class_init,
++};
++
+ static void aspeed_timer_register_types(void)
  {
-     watchdog_add_model(&model);
-     type_register_static(&aspeed_wdt_info);
-+    type_register_static(&aspeed_2400_wdt_info);
-+    type_register_static(&aspeed_2500_wdt_info);
+     type_register_static(&aspeed_timer_info);
+     type_register_static(&aspeed_2400_timer_info);
+     type_register_static(&aspeed_2500_timer_info);
++    type_register_static(&aspeed_2600_timer_info);
  }
 =20
- type_init(wdt_aspeed_register_types)
+ type_init(aspeed_timer_register_types)
 --=20
 2.21.0
 
