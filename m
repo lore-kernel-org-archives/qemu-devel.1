@@ -2,92 +2,62 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B1CC3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F16C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:54:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A53920828
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:52:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Mik7EO0F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A53920828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id C3B2620828
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:54:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3B2620828
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5dCw-0003X6-9l
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:52:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56081)
+	id 1i5dEL-0005SE-RN
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:54:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=143ed7f17=dmitry.fomichev@wdc.com>)
- id 1i5cOy-0006Jj-E8
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:01:18 -0400
+ (envelope-from <clg@kaod.org>) id 1i5cCy-0001GA-Gt
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=143ed7f17=dmitry.fomichev@wdc.com>)
- id 1i5cOt-0007bI-1e
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:01:16 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:52304)
+ (envelope-from <clg@kaod.org>) id 1i5cCw-00026K-TF
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:52 -0400
+Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:40134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=143ed7f17=dmitry.fomichev@wdc.com>)
- id 1i5cOp-0007Wm-Hf; Wed, 04 Sep 2019 17:01:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1567630868; x=1599166868;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=NLbSy76QN5WmjCTE4UUALAVdKCC0nk7AnaWJw993qa0=;
- b=Mik7EO0F5CBFzOfC+bo+dQeRaO49vLLSeOlVu1jMunND9TbBGJOY3Ta/
- 4PPlO4NoX8IeBWo3s6yhvFotzPh/d7GmIQzQ5XlZGKbOdrMeGAcmMiayt
- rylZ2N3CfS2og9qVhfup6+hDGA+W7GLRnwB58Z9t7p5VI+kUzGe0QTy8v
- SdVso8lnctNyNlbesen0Rf/CWPRhas8IMbe12jyvJ4V8AwPSukkf6hu4Y
- hz5VRsPRa57/w/jogbSsi58J52eO6yRzCXIqQgAAOpnWS3B7W47B9Nc8i
- CJR50zxpF+D3LV9SRBCmCmYsZs5Jj3zq16uNbKw2YBQ9WPi64qyaFvu+W w==;
-IronPort-SDR: oaVdDQfaYevYGrA5uKZKXSb8dEPaCbvwPkvIOdsBkDE0eE/ZxJZ1cydqHyl/hA0H//up4qNWB+
- Sabzg4nWwYGaWUjnD+byv2BgjoD+RTD2+vMVpH2WQ4FR8AnJFyUcK/I60knlIfWD2riJFOT2LJ
- YrkPG5a+jBhNbAQXmp27jy5f6bQ0evPO1PyujLyXs29dvYGszW5Bk/6unL7Z1etlwaw/6lbt0s
- aPwBcfl9ITamBx3TiZuiiSIliAPhXCVogO8uOr0WSib9YWfWZHp0GYKFbklqSmPEJSe2f27o2i
- CgI=
-X-IronPort-AV: E=Sophos;i="5.64,468,1559491200"; d="scan'208";a="117451660"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2019 05:01:03 +0800
-IronPort-SDR: rJvOILvfiz/apJKTGKEwxa/KctgWXLyXTnTZFtimTCFpgOyBBKgtvT4wl9Q1n6XkB7WeMDvgHk
- eCHPhnkjTLgecUdkrvCD4DSYI1Pn/o+vZOyLsv8Wuo/IBQhVuDOPhl0k7KIPc9e2shhUFs0v9O
- MTd2DsAEuYmjM87LpY9rzxaEdxBBw4PWf51N79OYqYL7kjr383SFXU9OdH2tdZzfX2GS+TfAjB
- EyCuhZtfS/ZJLk4325byURDrXXSZxyQjegKF2Qqgl+yjndr+ljghkKylBVnfeMQHhVInHEgJUm
- 8Six/4xLZWG5QpiQi7ERXvmR
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Sep 2019 13:58:00 -0700
-IronPort-SDR: IbDXOoxcT3kKpx+XY8g/ZupGR7ax4CoqzReY9KPDfwQ6w94lL6D6mfGeTxOr2ibsXnjNBGWg5b
- YN3zFixs4gAy/Qmog9dgOjY60cpqbeV3z7U9e39GIf7Zg85jR+YY8rl32cxb6WjPLjSx/xyNe+
- HBVBJ9l5QjeQFU3xLUx/+bK7WwcofdMarux/WNC2quf/nV0YVfrIlL5NxcJunmquQaDdJ9uN0C
- 0KL/rGvBdNgcfBFCg8Ye5N3oJB2Zy54DrGq7XlsTWx+5gX6sMPFd0C87no5jqaLJDZoWSZF+7i
- BXA=
-WDCIronportException: Internal
-Received: from dhcp-10-88-173-181.hgst.com ([10.88.173.181])
- by uls-op-cesaip01.wdc.com with ESMTP; 04 Sep 2019 14:01:02 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
-Date: Wed,  4 Sep 2019 17:00:57 -0400
-Message-Id: <20190904210100.10501-2-dmitry.fomichev@wdc.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i5cCw-00024j-8F
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:48:50 -0400
+Received: from player691.ha.ovh.net (unknown [10.108.54.36])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9303C24A244
+ for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 22:48:48 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player691.ha.ovh.net (Postfix) with ESMTPSA id 09A7998B29E0;
+ Wed,  4 Sep 2019 20:48:42 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed,  4 Sep 2019 22:46:58 +0200
+Message-Id: <20190904204659.13878-15-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190904210100.10501-1-dmitry.fomichev@wdc.com>
-References: <20190904210100.10501-1-dmitry.fomichev@wdc.com>
+In-Reply-To: <20190904204659.13878-1-clg@kaod.org>
+References: <20190904204659.13878-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.154.42
-Subject: [Qemu-devel] [PATCH v6 1/4] block: Add zoned device model property
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 2535526593377962769
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudejhedgudehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.121.55.239
+Subject: [Qemu-devel] [RFC PATCH 14/15] aspeed: add support for the Aspeed
+ MII controller of the AST2600
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,120 +69,315 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit adds Zoned Device Model (as defined in T10 ZBC and
-T13 ZAC standards) as a block driver property, along with some
-useful access functions.
+The AST2600 SoC has an extra controller to set the PHY registers.
 
-A new backend driver permission, BLK_PERM_SUPPORT_HM_ZONED, is also
-introduced. Only the drivers having this permission will be allowed
-to open host managed zoned block devices.
-
-No code is added yet to initialize or check the value of this new
-property, therefore this commit doesn't change any functionality.
-
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- block.c                   | 15 +++++++++++++++
- include/block/block.h     | 19 ++++++++++++++++++-
- include/block/block_int.h |  3 +++
- 3 files changed, 36 insertions(+), 1 deletion(-)
+ include/hw/arm/aspeed_soc.h |   5 ++
+ include/hw/net/ftgmac100.h  |  17 ++++
+ hw/arm/aspeed_soc.c         |  25 ++++++
+ hw/net/ftgmac100.c          | 162 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 209 insertions(+)
 
-diff --git a/block.c b/block.c
-index 874a29a983..69f565e1e9 100644
---- a/block.c
-+++ b/block.c
-@@ -4679,6 +4679,21 @@ void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr)
-     *nb_sectors_ptr = nb_sectors < 0 ? 0 : nb_sectors;
- }
- 
-+BdrvZonedModel bdrv_get_zoned_model(BlockDriverState *bs)
-+{
-+    return bs->bl.zoned_model;
-+}
-+
-+bool bdrv_is_hm_zoned(BlockDriverState *bs)
-+{
-+    /*
-+     * Host Aware zone devices are supposed to be able to work
-+     * just like regular block devices. Thus, we only consider
-+     * Host Managed devices to be zoned here.
-+     */
-+    return bdrv_get_zoned_model(bs) == BDRV_ZONED_MODEL_HM;
-+}
-+
- bool bdrv_is_sg(BlockDriverState *bs)
- {
-     return bs->sg;
-diff --git a/include/block/block.h b/include/block/block.h
-index 124ad40809..28d065ed80 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -271,18 +271,33 @@ enum {
-      */
-     BLK_PERM_GRAPH_MOD          = 0x10,
- 
-+    /**
-+     * This permission is required to open host-managed zoned block devices.
-+     */
-+    BLK_PERM_SUPPORT_HM_ZONED   = 0x20,
-+
-     BLK_PERM_ALL                = 0x1f,
- 
-     DEFAULT_PERM_PASSTHROUGH    = BLK_PERM_CONSISTENT_READ
-                                  | BLK_PERM_WRITE
-                                  | BLK_PERM_WRITE_UNCHANGED
--                                 | BLK_PERM_RESIZE,
-+                                 | BLK_PERM_RESIZE
-+                                 | BLK_PERM_SUPPORT_HM_ZONED,
- 
-     DEFAULT_PERM_UNCHANGED      = BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH,
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index 30b67a09f13c..9e06a6ad4fbd 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -52,6 +52,7 @@ typedef struct AspeedSoCState {
+     AspeedSDMCState sdmc;
+     AspeedWDTState wdt[ASPEED_WDTS_NUM];
+     FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
++    AspeedMiiState mii[ASPEED_MACS_NUM];
+     AspeedGPIOState gpio;
+     AspeedGPIOState gpio_1_8v;
+     AspeedSDHCIState sdhci;
+@@ -120,6 +121,10 @@ enum {
+     ASPEED_ETH2,
+     ASPEED_ETH3,
+     ASPEED_ETH4,
++    ASPEED_MII1,
++    ASPEED_MII2,
++    ASPEED_MII3,
++    ASPEED_MII4,
+     ASPEED_SDRAM,
+     ASPEED_XDMA,
  };
- 
- char *bdrv_perm_names(uint64_t perm);
- 
+diff --git a/include/hw/net/ftgmac100.h b/include/hw/net/ftgmac100.h
+index 94cfe0533297..ab37e7b2b8ae 100644
+--- a/include/hw/net/ftgmac100.h
++++ b/include/hw/net/ftgmac100.h
+@@ -66,4 +66,21 @@ typedef struct FTGMAC100State {
+     uint32_t rxdes0_edorr;
+ } FTGMAC100State;
+=20
++#define TYPE_ASPEED_MII "aspeed-mmi"
++#define ASPEED_MII(obj) OBJECT_CHECK(AspeedMiiState, (obj), TYPE_ASPEED_=
+MII)
++
 +/*
-+ * Known zoned device models.
++ * AST2600 MII controller
 + */
-+typedef enum {
-+    BDRV_ZONED_MODEL_NONE, /* Regular block device */
-+    BDRV_ZONED_MODEL_HA,   /* Host-aware zoned block device */
-+    BDRV_ZONED_MODEL_HM,   /* Host-managed zoned block device */
-+} BdrvZonedModel;
++typedef struct AspeedMiiState {
++    /*< private >*/
++    SysBusDevice parent_obj;
 +
- /* disk I/O throttling */
- void bdrv_init(void);
- void bdrv_init_with_whitelist(void);
-@@ -359,6 +374,8 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
- BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOpts *opts,
-                                BlockDriverState *in_bs, Error **errp);
- void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
-+BdrvZonedModel bdrv_get_zoned_model(BlockDriverState *bs);
-+bool bdrv_is_hm_zoned(BlockDriverState *bs);
- void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
- int bdrv_commit(BlockDriverState *bs);
- int bdrv_change_backing_file(BlockDriverState *bs,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 0422acdf1c..928cbae9a5 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -635,6 +635,9 @@ typedef struct BlockLimits {
- 
-     /* maximum number of iovec elements */
-     int max_iov;
++    FTGMAC100State *nic;
 +
-+    /* Zoned device model. Zero value indicates a regular block device */
-+    BdrvZonedModel zoned_model;
- } BlockLimits;
- 
- typedef struct BdrvOpBlocker BdrvOpBlocker;
--- 
++    MemoryRegion iomem;
++    uint32_t phycr;
++    uint32_t phydata;
++} AspeedMiiState;
++
+ #endif
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 8069de8d5a36..c3f99849b7f0 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -89,6 +89,10 @@ static const hwaddr aspeed_soc_ast2600_memmap[] =3D {
+     [ASPEED_FMC]       =3D 0x1E620000,
+     [ASPEED_SPI1]      =3D 0x1E630000,
+     [ASPEED_SPI2]      =3D 0x1E641000,
++    [ASPEED_MII1]      =3D 0x1E650000,
++    [ASPEED_MII2]      =3D 0x1E650008,
++    [ASPEED_MII3]      =3D 0x1E650010,
++    [ASPEED_MII4]      =3D 0x1E650018,
+     [ASPEED_ETH1]      =3D 0x1E660000,
+     [ASPEED_ETH3]      =3D 0x1E670000,
+     [ASPEED_ETH2]      =3D 0x1E680000,
+@@ -313,6 +317,14 @@ static void aspeed_soc_init(Object *obj)
+     for (i =3D 0; i < sc->info->macs_num; i++) {
+         sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac100[=
+i]),
+                               sizeof(s->ftgmac100[i]), TYPE_FTGMAC100);
++
++        if (ASPEED_IS_AST2600(sc->info->silicon_rev)) {
++            sysbus_init_child_obj(obj, "mii[*]", &s->mii[i], sizeof(s->m=
+ii[i]),
++                                  TYPE_ASPEED_MII);
++            object_property_add_const_link(OBJECT(&s->mii[i]), "nic",
++                                           OBJECT(&s->ftgmac100[i]),
++                                           &error_abort);
++        }
+     }
+=20
+     sysbus_init_child_obj(obj, "xdma", OBJECT(&s->xdma), sizeof(s->xdma)=
+,
+@@ -562,6 +574,19 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
+or **errp)
+                         sc->info->memmap[ASPEED_ETH1 + i]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
+                            aspeed_soc_get_irq(s, ASPEED_ETH1 + i));
++
++
++        if (ASPEED_IS_AST2600(sc->info->silicon_rev)) {
++            object_property_set_bool(OBJECT(&s->mii[i]), true, "realized=
+",
++                                     &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
++
++            sysbus_mmio_map(SYS_BUS_DEVICE(&s->mii[i]), 0,
++                            sc->info->memmap[ASPEED_MII1 + i]);
++        }
+     }
+=20
+     /* XDMA */
+diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+index 04c78e85170b..eb8b441461a1 100644
+--- a/hw/net/ftgmac100.c
++++ b/hw/net/ftgmac100.c
+@@ -15,6 +15,7 @@
+ #include "hw/irq.h"
+ #include "hw/net/ftgmac100.h"
+ #include "sysemu/dma.h"
++#include "qapi/error.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "net/checksum.h"
+@@ -1087,9 +1088,170 @@ static const TypeInfo ftgmac100_info =3D {
+     .class_init =3D ftgmac100_class_init,
+ };
+=20
++/*
++ * AST2600 MII controller
++ */
++#define ASPEED_MII_PHYCR_FIRE        BIT(31)
++#define ASPEED_MII_PHYCR_ST_22       BIT(28)
++#define ASPEED_MII_PHYCR_OP(x)       ((x) & (ASPEED_MII_PHYCR_OP_WRITE |=
+ \
++                                             ASPEED_MII_PHYCR_OP_READ))
++#define ASPEED_MII_PHYCR_OP_WRITE    BIT(26)
++#define ASPEED_MII_PHYCR_OP_READ     BIT(27)
++#define ASPEED_MII_PHYCR_DATA(x)     (x & 0xffff)
++#define ASPEED_MII_PHYCR_PHY(x)      (((x) >> 21) & 0x1f)
++#define ASPEED_MII_PHYCR_REG(x)      (((x) >> 16) & 0x1f)
++
++#define ASPEED_MII_PHYDATA_IDLE      BIT(16)
++
++static void aspeed_mii_transition(AspeedMiiState *s, bool fire)
++{
++    if (fire) {
++        s->phycr |=3D ASPEED_MII_PHYCR_FIRE;
++        s->phydata &=3D ~ASPEED_MII_PHYDATA_IDLE;
++    } else {
++        s->phycr &=3D ~ASPEED_MII_PHYCR_FIRE;
++        s->phydata |=3D ASPEED_MII_PHYDATA_IDLE;
++    }
++}
++
++static void aspeed_mii_do_phy_ctl(AspeedMiiState *s)
++{
++    uint8_t reg;
++    uint16_t data;
++
++    if (!(s->phycr & ASPEED_MII_PHYCR_ST_22)) {
++        aspeed_mii_transition(s, !ASPEED_MII_PHYCR_FIRE);
++        qemu_log_mask(LOG_UNIMP, "%s: unsupported ST code\n", __func__);
++        return;
++    }
++
++    /* Nothing to do */
++    if (!(s->phycr & ASPEED_MII_PHYCR_FIRE)) {
++        return;
++    }
++
++    reg =3D ASPEED_MII_PHYCR_REG(s->phycr);
++    data =3D ASPEED_MII_PHYCR_DATA(s->phycr);
++
++    switch (ASPEED_MII_PHYCR_OP(s->phycr)) {
++    case ASPEED_MII_PHYCR_OP_WRITE:
++        do_phy_write(s->nic, reg, data);
++        break;
++    case ASPEED_MII_PHYCR_OP_READ:
++        s->phydata =3D (s->phydata & ~0xffff) | do_phy_read(s->nic, reg)=
+;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid OP code %08x\n",
++                      __func__, s->phycr);
++    }
++
++    aspeed_mii_transition(s, !ASPEED_MII_PHYCR_FIRE);
++}
++
++static uint64_t aspeed_mii_read(void *opaque, hwaddr addr, unsigned size=
+)
++{
++    AspeedMiiState *s =3D ASPEED_MII(opaque);
++
++    switch (addr) {
++    case 0x0:
++        return s->phycr;
++    case 0x4:
++        return s->phydata;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static void aspeed_mii_write(void *opaque, hwaddr addr,
++                             uint64_t value, unsigned size)
++{
++    AspeedMiiState *s =3D ASPEED_MII(opaque);
++
++    switch (addr) {
++    case 0x0:
++        s->phycr =3D value & ~(s->phycr & ASPEED_MII_PHYCR_FIRE);
++        break;
++    case 0x4:
++        s->phydata =3D value & ~(0xffff | ASPEED_MII_PHYDATA_IDLE);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    aspeed_mii_transition(s, !!(s->phycr & ASPEED_MII_PHYCR_FIRE));
++    aspeed_mii_do_phy_ctl(s);
++}
++
++static const MemoryRegionOps aspeed_mii_ops =3D {
++    .read =3D aspeed_mii_read,
++    .write =3D aspeed_mii_write,
++    .valid.min_access_size =3D 4,
++    .valid.max_access_size =3D 4,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
++};
++
++static void aspeed_mii_reset(DeviceState *dev)
++{
++    AspeedMiiState *s =3D ASPEED_MII(dev);
++
++    s->phycr =3D 0;
++    s->phydata =3D 0;
++
++    aspeed_mii_transition(s, !!(s->phycr & ASPEED_MII_PHYCR_FIRE));
++};
++
++static void aspeed_mii_realize(DeviceState *dev, Error **errp)
++{
++    AspeedMiiState *s =3D ASPEED_MII(dev);
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    Object *obj;
++    Error *local_err =3D NULL;
++
++    obj =3D object_property_get_link(OBJECT(dev), "nic", &local_err);
++    if (!obj) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "required link 'nic' not found: ");
++        return;
++    }
++
++    s->nic =3D FTGMAC100(obj);
++
++    memory_region_init_io(&s->iomem, OBJECT(dev), &aspeed_mii_ops, s,
++                          TYPE_ASPEED_MII, 0x8);
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static const VMStateDescription vmstate_aspeed_mii =3D {
++    .name =3D TYPE_ASPEED_MII,
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32(phycr, FTGMAC100State),
++        VMSTATE_UINT32(phydata, FTGMAC100State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++static void aspeed_mii_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->vmsd =3D &vmstate_aspeed_mii;
++    dc->reset =3D aspeed_mii_reset;
++    dc->realize =3D aspeed_mii_realize;
++    dc->desc =3D "Aspeed MII controller";
++}
++
++static const TypeInfo aspeed_mii_info =3D {
++    .name =3D TYPE_ASPEED_MII,
++    .parent =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(AspeedMiiState),
++    .class_init =3D aspeed_mii_class_init,
++};
++
+ static void ftgmac100_register_types(void)
+ {
+     type_register_static(&ftgmac100_info);
++    type_register_static(&aspeed_mii_info);
+ }
+=20
+ type_init(ftgmac100_register_types)
+--=20
 2.21.0
 
 
