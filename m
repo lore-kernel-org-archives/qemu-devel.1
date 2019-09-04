@@ -2,59 +2,82 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EE5C3A5A7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D335C3A5A7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:39:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A6B420820
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:38:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6B420820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6631122CF7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 13:39:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="AqCDIFCa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6631122CF7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5VUH-0004FQ-7V
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:38:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55131)
+	id 1i5VVQ-00051Q-Bg
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 09:39:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i5UuM-0002Ej-Ku
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:13 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1i5Uxq-00059g-FH
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:04:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i5UuK-0008OG-3B
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47046)
+ (envelope-from <damien.hedde@greensocs.com>) id 1i5Uxo-0001vJ-Jm
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:04:46 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:46398)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5UuJ-0008Nb-H3
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 09:01:07 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B0111875224
- for <qemu-devel@nongnu.org>; Wed,  4 Sep 2019 13:01:06 +0000 (UTC)
-Received: from thuth.com (ovpn-116-69.ams2.redhat.com [10.36.116.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F7A610002B8;
- Wed,  4 Sep 2019 13:01:05 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>,
-	qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 15:00:47 +0200
-Message-Id: <20190904130047.25808-7-thuth@redhat.com>
-In-Reply-To: <20190904130047.25808-1-thuth@redhat.com>
-References: <20190904130047.25808-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Wed, 04 Sep 2019 13:01:06 +0000 (UTC)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1i5Uxi-0001pc-7k; Wed, 04 Sep 2019 09:04:38 -0400
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 56FD296F65;
+ Wed,  4 Sep 2019 13:04:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1567602275;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=azQBI/68e6QFd1ohvuIkRp8dnRdTdZtTAqRXho1rwls=;
+ b=AqCDIFCaPrZQy0thlJqLVz/iYL8I36kWr+t9smBFItX9xErfI6mc9A6g0kZi7VafwJIgXb
+ t2TRE1HbQkJ+7p/CNCPqD7iak0GXQOyQo1Xsq1lrJTer7XoUkjN70syMLdAJTZ3EWiWUik
+ G+6Xf/eEidzAwsOmLHoBJa/45KJ5D2U=
+To: qemu-devel@nongnu.org
+References: <20190904093843.8765-1-damien.hedde@greensocs.con>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <6df157cb-cdb4-a019-3463-e1468d410f4e@greensocs.com>
+Date: Wed, 4 Sep 2019 15:04:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190904093843.8765-1-damien.hedde@greensocs.con>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1567602275;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=azQBI/68e6QFd1ohvuIkRp8dnRdTdZtTAqRXho1rwls=;
+ b=RILxfyyRHtm/oYc8z7bKBYqlotwKPgNmL8U42Jbu38pEehlqvTw8mepuxgqfdGKpb2llV5
+ yKdsbwPDx3YmqH7x8fc5oBAijB1BRAe2l+2dS+w0nppqHxrrqbrf/ecAc6WCz3WwHBmx60
+ WwHyUoy1WoLgbMgktETzEXrdeSrWchE=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1567602275; a=rsa-sha256; cv=none;
+ b=zchS1JlCEKvpsc/pEUO5mOED74Po1oumUD54rB2dMpyQeSUe5qfcI0e3RWgvZ0zUfsi9GB
+ OutXzO58SAnKHMM0oilQe7s4ysveuqc08wmso93s1BVH9Tt/xTPeUckhjZMJy6rML8UI4b
+ oT4yU2bZFJKbhbtCTES1reA2waFM1VY=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 6/6] tests/libqtest: Use libqtest-single.h
- in tests that require global_qtest
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH v6 0/9] Clock framework API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,482 +89,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ alistair@alistair23.me, mark.burton@greensocs.com, qemu-arm@nongnu.org,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com,
+ edgar.iglesias@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tests that require global_qtest or the related wrapper functions now
-use the libqtest-single.h header that is dedicated for everything
-related to global_qtest. The core libqtest.c and libqtest.h files are
-now completely indepedent from global_qtest, so that the core library
-is now not depending on a global state anymore.
+I did a typo in the reply-to address. I just resent the series with the
+proper one.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/cpu-plug-test.c         | 2 +-
- tests/display-vga-test.c      | 2 +-
- tests/e1000e-test.c           | 2 +-
- tests/fdc-test.c              | 2 +-
- tests/i440fx-test.c           | 2 +-
- tests/i82801b11-test.c        | 2 +-
- tests/intel-hda-test.c        | 2 +-
- tests/ioh3420-test.c          | 2 +-
- tests/ipmi-kcs-test.c         | 3 +--
- tests/libqtest-single.h       | 4 ++++
- tests/libqtest.c              | 2 --
- tests/libqtest.h              | 4 ----
- tests/m25p80-test.c           | 2 +-
- tests/qos-test.c              | 2 +-
- tests/rtc-test.c              | 2 +-
- tests/rtl8139-test.c          | 2 +-
- tests/test-arm-mptimer.c      | 2 +-
- tests/test-netfilter.c        | 2 +-
- tests/test-x86-cpuid-compat.c | 2 +-
- tests/tmp105-test.c           | 2 +-
- tests/tpm-crb-test.c          | 2 +-
- tests/tpm-tests.c             | 2 +-
- tests/tpm-tis-test.c          | 2 +-
- tests/usb-hcd-ohci-test.c     | 2 +-
- tests/usb-hcd-uhci-test.c     | 2 +-
- tests/usb-hcd-xhci-test.c     | 2 +-
- tests/vhost-user-test.c       | 2 +-
- tests/virtio-blk-test.c       | 2 +-
- tests/virtio-ccw-test.c       | 2 +-
- tests/virtio-net-test.c       | 2 +-
- tests/virtio-scsi-test.c      | 2 +-
- tests/virtio-serial-test.c    | 2 +-
- 32 files changed, 33 insertions(+), 36 deletions(-)
+Sorry for that...
+Damien
 
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index 3049620854..776407e1b6 100644
---- a/tests/cpu-plug-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -10,7 +10,7 @@
- #include "qemu/osdep.h"
- 
- #include "qemu-common.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qapi/qmp/qdict.h"
- 
- struct PlugTestData {
-diff --git a/tests/display-vga-test.c b/tests/display-vga-test.c
-index bd176dcf3a..ace3bb28e0 100644
---- a/tests/display-vga-test.c
-+++ b/tests/display-vga-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- static void pci_cirrus(void)
- {
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index 93628c588d..1a232a663a 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -26,7 +26,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu-common.h"
- #include "libqos/pci-pc.h"
- #include "qemu/sockets.h"
-diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-index 31cd3295c1..26b69f7c5c 100644
---- a/tests/fdc-test.c
-+++ b/tests/fdc-test.c
-@@ -25,7 +25,7 @@
- #include "qemu/osdep.h"
- 
- 
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qapi/qmp/qdict.h"
- #include "qemu-common.h"
- 
-diff --git a/tests/i440fx-test.c b/tests/i440fx-test.c
-index 69205b58a8..1f57d9684b 100644
---- a/tests/i440fx-test.c
-+++ b/tests/i440fx-test.c
-@@ -14,7 +14,7 @@
- 
- #include "qemu/osdep.h"
- 
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "libqos/pci.h"
- #include "libqos/pci-pc.h"
- #include "hw/pci/pci_regs.h"
-diff --git a/tests/i82801b11-test.c b/tests/i82801b11-test.c
-index a6e31594c9..4345da338b 100644
---- a/tests/i82801b11-test.c
-+++ b/tests/i82801b11-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- /* Tests only initialization so far. TODO: Replace with functional tests */
- static void nop(void)
-diff --git a/tests/intel-hda-test.c b/tests/intel-hda-test.c
-index b782b2e944..fc25ccc33c 100644
---- a/tests/intel-hda-test.c
-+++ b/tests/intel-hda-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- #define HDA_ID "hda0"
- #define CODEC_DEVICES " -device hda-output,bus=" HDA_ID ".0" \
-diff --git a/tests/ioh3420-test.c b/tests/ioh3420-test.c
-index b54c4b9f11..f6ca43cca7 100644
---- a/tests/ioh3420-test.c
-+++ b/tests/ioh3420-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- /* Tests only initialization so far. TODO: Replace with functional tests */
- static void nop(void)
-diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-index a2354c10c7..693a6aacb5 100644
---- a/tests/ipmi-kcs-test.c
-+++ b/tests/ipmi-kcs-test.c
-@@ -24,8 +24,7 @@
- 
- #include "qemu/osdep.h"
- 
--
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- #define IPMI_IRQ        5
- 
-diff --git a/tests/libqtest-single.h b/tests/libqtest-single.h
-index 49259558a5..6f1bb1331c 100644
---- a/tests/libqtest-single.h
-+++ b/tests/libqtest-single.h
-@@ -11,6 +11,10 @@
- #ifndef LIBQTEST_SINGLE_H
- #define LIBQTEST_SINGLE_H
- 
-+#include "libqtest.h"
-+
-+QTestState *global_qtest __attribute__((common, weak));
-+
- /**
-  * qtest_start:
-  * @args: other arguments to pass to QEMU
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index e5101d9d3a..0a6b91737e 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -35,8 +35,6 @@
- #define SOCKET_TIMEOUT 50
- #define SOCKET_MAX_FDS 16
- 
--QTestState *global_qtest;
--
- struct QTestState
- {
-     int fd;
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 6a7d7e41ad..c8cffe5d68 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -22,8 +22,6 @@
- 
- typedef struct QTestState QTestState;
- 
--extern QTestState *global_qtest;
--
- /**
-  * qtest_initf:
-  * @fmt...: Format for creating other arguments to pass to QEMU, formatted
-@@ -641,8 +639,6 @@ void qtest_add_abrt_handler(GHookFunc fn, const void *data);
- void qtest_qmp_assert_success(QTestState *qts, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
- 
--#include "libqtest-single.h"
--
- QDict *qmp_fd_receive(int fd);
- void qmp_fd_vsend_fds(int fd, int *fds, size_t fds_num,
-                       const char *fmt, va_list ap) GCC_FMT_ATTR(4, 0);
-diff --git a/tests/m25p80-test.c b/tests/m25p80-test.c
-index 055f7246a8..50c6b79fb3 100644
---- a/tests/m25p80-test.c
-+++ b/tests/m25p80-test.c
-@@ -25,7 +25,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/bswap.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- /*
-  * ASPEED SPI Controller registers
-diff --git a/tests/qos-test.c b/tests/qos-test.c
-index 3c0071b3b7..fd70d73ea5 100644
---- a/tests/qos-test.c
-+++ b/tests/qos-test.c
-@@ -18,7 +18,7 @@
- 
- #include "qemu/osdep.h"
- #include <getopt.h>
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index 509be707e3..6309b0ef6c 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -13,7 +13,7 @@
- 
- #include "qemu/osdep.h"
- 
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/timer.h"
- #include "hw/timer/mc146818rtc_regs.h"
- 
-diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
-index d6d0c24909..4506049264 100644
---- a/tests/rtl8139-test.c
-+++ b/tests/rtl8139-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "libqos/pci-pc.h"
- #include "qemu/timer.h"
- #include "qemu-common.h"
-diff --git a/tests/test-arm-mptimer.c b/tests/test-arm-mptimer.c
-index 156a39f50d..7a56d56da9 100644
---- a/tests/test-arm-mptimer.c
-+++ b/tests/test-arm-mptimer.c
-@@ -9,7 +9,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/timer.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- #define TIMER_BLOCK_SCALE(s)    ((((s) & 0xff) + 1) * 10)
- 
-diff --git a/tests/test-netfilter.c b/tests/test-netfilter.c
-index e47075dd06..22927ee6ab 100644
---- a/tests/test-netfilter.c
-+++ b/tests/test-netfilter.c
-@@ -9,7 +9,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qapi/qmp/qdict.h"
- 
- /* add a netfilter to a netdev and then remove it */
-diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
-index e75b959950..772287bdb4 100644
---- a/tests/test-x86-cpuid-compat.c
-+++ b/tests/test-x86-cpuid-compat.c
-@@ -4,7 +4,7 @@
- #include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qbool.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- 
- static char *get_cpu0_qom_path(void)
- {
-diff --git a/tests/tmp105-test.c b/tests/tmp105-test.c
-index f599309a4a..f930a96b83 100644
---- a/tests/tmp105-test.c
-+++ b/tests/tmp105-test.c
-@@ -9,7 +9,7 @@
- 
- #include "qemu/osdep.h"
- 
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "libqos/qgraph.h"
- #include "libqos/i2c.h"
- #include "qapi/qmp/qdict.h"
-diff --git a/tests/tpm-crb-test.c b/tests/tpm-crb-test.c
-index a139caa51d..632fb7fbd8 100644
---- a/tests/tpm-crb-test.c
-+++ b/tests/tpm-crb-test.c
-@@ -15,7 +15,7 @@
- 
- #include "hw/acpi/tpm.h"
- #include "io/channel-socket.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/module.h"
- #include "tpm-emu.h"
- 
-diff --git a/tests/tpm-tests.c b/tests/tpm-tests.c
-index e640777aa9..6e45a0ba85 100644
---- a/tests/tpm-tests.c
-+++ b/tests/tpm-tests.c
-@@ -15,7 +15,7 @@
- #include "qemu/osdep.h"
- #include <glib/gstdio.h>
- 
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "tpm-tests.h"
- 
- static bool
-diff --git a/tests/tpm-tis-test.c b/tests/tpm-tis-test.c
-index 92a7e95aad..dcf30e05b7 100644
---- a/tests/tpm-tis-test.c
-+++ b/tests/tpm-tis-test.c
-@@ -17,7 +17,7 @@
- 
- #include "hw/acpi/tpm.h"
- #include "io/channel-socket.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/module.h"
- #include "tpm-emu.h"
- 
-diff --git a/tests/usb-hcd-ohci-test.c b/tests/usb-hcd-ohci-test.c
-index 0cd73b7363..19d760f3fb 100644
---- a/tests/usb-hcd-ohci-test.c
-+++ b/tests/usb-hcd-ohci-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/module.h"
- #include "libqos/usb.h"
- #include "libqos/qgraph.h"
-diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
-index 2eef8e3d1c..7a117b64d9 100644
---- a/tests/usb-hcd-uhci-test.c
-+++ b/tests/usb-hcd-uhci-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "libqos/libqos.h"
- #include "libqos/usb.h"
- #include "libqos/libqos-pc.h"
-diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
-index 01845371f9..10ef9d2a91 100644
---- a/tests/usb-hcd-xhci-test.c
-+++ b/tests/usb-hcd-xhci-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "libqos/usb.h"
- 
- 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 6ae8a23688..91ea373ba5 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -10,7 +10,7 @@
- 
- #include "qemu/osdep.h"
- 
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qemu/config-file.h"
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 45375dc4ff..ed13167392 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -9,7 +9,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/bswap.h"
- #include "qemu/module.h"
- #include "standard-headers/linux/virtio_blk.h"
-diff --git a/tests/virtio-ccw-test.c b/tests/virtio-ccw-test.c
-index 9f445ef4ad..d05236407b 100644
---- a/tests/virtio-ccw-test.c
-+++ b/tests/virtio-ccw-test.c
-@@ -14,7 +14,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "libqos/virtio.h"
- 
- static void virtio_balloon_nop(void)
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 840875aaae..a08e2ffe12 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -9,7 +9,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/iov.h"
- #include "qemu/module.h"
- #include "qapi/qmp/qdict.h"
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 09348765d7..7c8f9b27f8 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -9,7 +9,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/module.h"
- #include "scsi/constants.h"
- #include "libqos/libqos-pc.h"
-diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
-index e584ad76e8..2541034822 100644
---- a/tests/virtio-serial-test.c
-+++ b/tests/virtio-serial-test.c
-@@ -8,7 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu/module.h"
- #include "libqos/virtio-serial.h"
- 
--- 
-2.18.1
-
+On 9/4/19 11:38 AM, damien.hedde@greensocs.con wrote:
+> From: Damien Hedde <damien.hedde@greensocs.com>
+> 
+> This series aims to add a way to model clock distribution in qemu. This allows
+> to model the clock tree of a platform allowing us to inspect clock
+> configuration and detect problems such as disabled clock or bad configured
+> pll.
+> 
+> The added clock api is very similar the the gpio api for devices. We can add
+> input and output and connect them together.
+> 
+> Very few changes since v5 in the core patches: we were waiting for multi phase
+> ability to allow proper initialization of the clock tree. So this is almost a
+> simple rebase on top of the current "Multi-phase reset mechanism" series.
+> Based-on: <20190821163341.16309-1-damien.hedde@greensocs.com>
+> 
+> Changes since v5:
+>  - drop the "-port" in file names
+>  - new patch 2, extracted from patch 1 (to fix some problem with linux-user builds)
+>  - patch 3, minor modification to better match gpios api and allow non device-related clock
+>    (I've dropped the reviewed-by, see the patch message for the details of what has changed).
+>  - patch 6, Philippe's comments and various improvement
+>  - patches 7/8/9, multi-phase reset addition and scope reduced to uart ref clocks
+> 
+> The patches are organised as follows:
+> + Patches 1 to 5 adds the clock support in qemu (1, 4 and 5 are already reviewed and
+>   also a big part of the 3)
+> + Patch 6 add some documentation in docs/devel
+> + Patches 7 to 9 adds the uart's clocks to the xilinx_zynq platform as an
+> example for this framework. It updates the zynq's slcr clock controller, the 
+> cadence_uart device, and the zynq toplevel platform.
+> 
+> I've tested this patchset on the xilinx-zynq-a9 machine with the buildroot's
+> zynq_zc706_defconfig which package the Xilinx's Linux.
+> Clocks are correctly updated and we ends up with a configured baudrate of 115601
+> on the console uart (for a theoretical 115200) which is nice. "cadence_uart*" and
+> "clock*" traces can be enabled to see what's going on in this platform.
+> 
+> Any comments and suggestion are welcomed.
+> 
+> Thanks to the Xilinx QEMU team who sponsored this development.
+> 
+> Damien Hedde (9):
+>   hw/core/clock: introduce clock objects
+>   hw/core/clock-vmstate: define a vmstate entry for clock state
+>   qdev: add clock input&output support to devices.
+>   qdev-monitor: print the device's clock with info qtree
+>   qdev-clock: introduce an init array to ease the device construction
+>   docs/clocks: add device's clock documentation
+>   hw/misc/zynq_slcr: add clock generation for uarts
+>   hw/char/cadence_uart: add clock support
+>   hw/arm/xilinx_zynq: connect uart clocks to slcr
+> 
+>  Makefile.objs                  |   1 +
+>  docs/devel/clock.txt           | 246 +++++++++++++++++++++++++++++++++
+>  hw/arm/xilinx_zynq.c           |  64 +++++++--
+>  hw/char/cadence_uart.c         |  85 ++++++++++--
+>  hw/char/trace-events           |   3 +
+>  hw/core/Makefile.objs          |   4 +-
+>  hw/core/clock-vmstate.c        |  25 ++++
+>  hw/core/clock.c                | 144 +++++++++++++++++++
+>  hw/core/qdev-clock.c           | 181 ++++++++++++++++++++++++
+>  hw/core/qdev.c                 |  32 +++++
+>  hw/core/trace-events           |   6 +
+>  hw/misc/zynq_slcr.c            | 145 ++++++++++++++++++-
+>  include/hw/char/cadence_uart.h |   1 +
+>  include/hw/clock.h             | 133 ++++++++++++++++++
+>  include/hw/qdev-clock.h        | 134 ++++++++++++++++++
+>  include/hw/qdev-core.h         |  14 ++
+>  qdev-monitor.c                 |  13 ++
+>  tests/Makefile.include         |   1 +
+>  18 files changed, 1210 insertions(+), 22 deletions(-)
+>  create mode 100644 docs/devel/clock.txt
+>  create mode 100644 hw/core/clock-vmstate.c
+>  create mode 100644 hw/core/clock.c
+>  create mode 100644 hw/core/qdev-clock.c
+>  create mode 100644 include/hw/clock.h
+>  create mode 100644 include/hw/qdev-clock.h
+> 
 
