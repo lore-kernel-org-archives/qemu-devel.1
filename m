@@ -2,92 +2,137 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3C2C3A59E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A36C3A59E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:12:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4719C20820
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:10:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FDC220820
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 22:12:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AKe/Oq4A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4719C20820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eaubJY14";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="wDARwnEh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDC220820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5dUI-000258-DB
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 18:10:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56078)
+	id 1i5dWL-0003fY-Hy
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 18:12:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=143ed7f17=dmitry.fomichev@wdc.com>)
- id 1i5cOy-0006Jh-EH
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:01:18 -0400
+ (envelope-from <prvs=143ed7f17=Dmitry.Fomichev@wdc.com>)
+ id 1i5cZK-0001t8-N7
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=143ed7f17=dmitry.fomichev@wdc.com>)
- id 1i5cOt-0007bC-0Y
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:01:16 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:52308)
+ (envelope-from <prvs=143ed7f17=Dmitry.Fomichev@wdc.com>)
+ id 1i5cZJ-0008Lf-JI
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 17:11:58 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:53352)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=143ed7f17=dmitry.fomichev@wdc.com>)
- id 1i5cOp-0007X8-EZ; Wed, 04 Sep 2019 17:01:07 -0400
+ (Exim 4.71) (envelope-from <prvs=143ed7f17=Dmitry.Fomichev@wdc.com>)
+ id 1i5cZG-0008FA-Ct; Wed, 04 Sep 2019 17:11:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1567630867; x=1599166867;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=LPK5dv7NDBXIbuHf7ST8MYcA/NaQLO9UasvmcvccZu0=;
- b=AKe/Oq4A8aSkJR/PD5brS3TKiL5bkbRrPPWTlKkhEr5SMLYJrZODy1pq
- 2kwPLhw5oFxwNdTUYFGYu1bIeFKY4xNLlt3ecid9EXKFL03Om+I+RjlBQ
- 7A5FM6AyKrKlPWsy3zDJFCMeHukk2/Mja/oqcpbUTPYeKqEdLJlPgfeGT
- Cf/ETlNX4DRVms2GNVGRXAnLUnmjwHfZImY7hveH06Oztf6zqJ4eANzld
- fOiOo4tnA5G8eX529cCxuRuT/LgP5ztDqO0Fkrwte1vsJyre6qaHmpyW8
- SmSq6nZsDpimjZt+s8gapbGfoagMAzTGdNTOF8bXiGIyW78lEP2A5mUb7 Q==;
-IronPort-SDR: 2R7GuYyY6Tuj6dacHV55eIMJnzBgsRLxpq+zyprLLsrBpe5NcaRPhnSKc8MH+4/QFALI9x5hhR
- lDzDPtb/oLY0B545h0eYf+ir4/A6RAtP9dtO+FG/eeR4WEXCmJ9j0Yxjq1XCjt7Qc8CwUuEp0V
- OicX4bUnxVxEejKN42JUlB8kK6RpQBObTQZMMcLIfdtc0BcYUNt1/nFPjPOhDLIwGzQqrY5QMG
- 4YWfp/Asl0GC79phfw8ZuBAoxFhn6OH8g2Erh5g9mo7pQwhhsjDqiOomO5bcRahK4Dz2Lah8u4
- RSs=
-X-IronPort-AV: E=Sophos;i="5.64,468,1559491200"; d="scan'208";a="117451661"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2019 05:01:04 +0800
-IronPort-SDR: HVnHIv23UbwaJZt+pgfCJYhBmf30iHrQXV+/sbFdXHzPue5hG2monWpgJIVXJyFC3DrattTv3s
- PNa+xOwHqL64IqPVTvKfL7sSViOroQyxOhUisWYNjiP/sbW2tJYfuHAGeX2llmNPW8piR1yeZP
- 5veBR6KLBZgyH5a+oE9AFUHqRM0ACJG0p78Bzi1kd9Oope9vPofomZvIQeVeWJb6g8FR5V93IK
- jJb+7VBJ3WF/52vw2HYWZVdF6GODE617g89mUV0up2uSdbA6CxgGno/hojmHl34CjdZZ4faEhd
- +nIutWjbpX5Zb8DRm3sGvyZY
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Sep 2019 13:58:01 -0700
-IronPort-SDR: y9e8+neQLroy0eQNSwHL/xZOw84PdorXa1Ip0129/hx1itYP55WMHycJhhPVwHB2cbD9fQCaMt
- Agkz8DmK7wCVqN8uO3SM9xd7cSU6Um1y1EhAD4Exl1n8be9JKHeItOJSy5CzTAMg/SO02L+7fw
- zJlfzwjccnkEH2EbzJae4Ly1RDIwEiO1sFKCl6O5h/Cb9zhn0whylWTbQkenlXP+I4yt49rMIH
- VmowHurfx+qhVG0khK0vuhdUpR4l6Y2HseifEXNve437cnMYCuxuViHgJDc0ni/iH2kKs26Faa
- OU4=
-WDCIronportException: Internal
-Received: from dhcp-10-88-173-181.hgst.com ([10.88.173.181])
- by uls-op-cesaip01.wdc.com with ESMTP; 04 Sep 2019 14:01:03 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
-Date: Wed,  4 Sep 2019 17:00:58 -0400
-Message-Id: <20190904210100.10501-3-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190904210100.10501-1-dmitry.fomichev@wdc.com>
-References: <20190904210100.10501-1-dmitry.fomichev@wdc.com>
+ t=1567631515; x=1599167515;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-id:content-transfer-encoding: mime-version;
+ bh=grd16iG8V30dFpFKtbl3V7w+PL/FwOH497hYSiSVhLw=;
+ b=eaubJY14j9KmrYgRhZDopexqlcbuxBmvLTchpXj281tA4gNEjKhGpPlW
+ DgJTyA6TG7gjOfNFqlYK1f/jp8L0JoLyfNkSwjHIC0AzHxOcWOhai8Cpp
+ 97f9iyks7v6j780l6EkHXuKpDVUMfChjNPUMMGnYe03GZcD8ditUeqnlf
+ 437BIXFz68UElMRdL8YT2zAwyvxXNzbaKjU7SPqiKzcxojY2CZe1lT8yG
+ X0EU9G01jZRbpOmy0KXkSuHBYYR/mWkjjqBPLl+L6vekPN2Lt0b51eC+z
+ p9wEjTSXrQqwE6HTm4C6ySXMojSb8hPalWgXvxm9rM2RoWK7thG5VLdVF Q==;
+IronPort-SDR: 5ueE3f0S8UD4UeVrmoceKQjfvRdZ/ct1rWBj1y8FHO91K79LrKe47wrhKd2tdxxLKt7/uvJsCF
+ E/Vs8rrVe4GZJm3nICas1nvh3kLMfJz7+hiLlLsOFFGEcl3I3+yN/4HqiRdYO2cqWx9bn4rIEg
+ +cta9ggV0AK2YopsgNLrT4WppdYqSVjSeagrC96bkdNKmbFlz7nahacHcTkRHI251hjsGT5gkI
+ Sta/EAetmIq/qoMxv+xXdiWBgn50GOIZpPIF12oKWad4v4Uv6YrKcqZmKvu7UcAEBW1h9zJ9N3
+ m4o=
+X-IronPort-AV: E=Sophos;i="5.64,468,1559491200"; d="scan'208";a="117452693"
+Received: from mail-sn1nam04lp2059.outbound.protection.outlook.com (HELO
+ NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.59])
+ by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2019 05:11:48 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=abd6i27ilsd8xBhZMtrb3fc/WGvevchgtQyAR1rB/rtJKWsClY/9X27xRfjresBy7A2HW7HFu8vScMVH1L7uJU+pG5rpkCub4N2AjRQlAq8DrrCple8iCUU9gwOrLG+LBCInwlcs2zJcjeXLIDfWwsGBP6bKI5VLx3D2VpyfY6MJ1lHs61mH71yNTpXb+5KtlmVkokywnMDdSkg7HM2lbMQBAUWgh7QWxVc9ik7gZhKCdmQZBBIt7CLDRDzPwpvaaYm6cg/WHh4k+RarqcANxPhxyliKf7qyUiOAHPg6YJl4Geco5JlJ9s38WjtokKyf1fzhFHAE1EMjrHRSygC5FA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=grd16iG8V30dFpFKtbl3V7w+PL/FwOH497hYSiSVhLw=;
+ b=QRUUDsPonjrKUHt5YeHt/+bgzxnRS6+2aTV+QUMJjJXxWtQedWT/wAjlaeMSFk+CnoNudgZ1P4xkCH1/QyD0arsLvU11pHeRMzSiKTn5MQMPUKOTtedGQ50N67IwJTH9S0iA/+TzbG3P1USvHR41ZacwBdfbM3Mwk5u2ibaxYOcUsCDbhiAkTCC/Bm09AHFv1/tw+df70SHFcPlyyrMxx1Ye17pTAWVV9URv9EjfQjDQ4jw7TN1Tllr0hxV7aC8g6ZHlXu2EeT8u6gOyEFv+hgloLIIq49a2qSYmESKGGPEHAdNM0TaIgxJUKV/kA4vSqm5Z436fygUSp+kY3c8fIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=grd16iG8V30dFpFKtbl3V7w+PL/FwOH497hYSiSVhLw=;
+ b=wDARwnEhW3zsVfGjlO3XsoudXFl6apuExob932YBzuDcuDhfvFqhOpjO4mOecynOzz/OSMds4kPtmyZZwml7h/8KB27GWBJJTv4OBiloAh7aK0ebaLUXG07MHy3+8Dpd1UDmywQqicg90nPh589SnDrmVwbChBylVDGPDSoS4M4=
+Received: from CO2PR04MB2328.namprd04.prod.outlook.com (10.166.95.11) by
+ CO2PR04MB2165.namprd04.prod.outlook.com (10.166.214.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2220.18; Wed, 4 Sep 2019 21:11:45 +0000
+Received: from CO2PR04MB2328.namprd04.prod.outlook.com
+ ([fe80::b44d:f58f:f4bd:fdea]) by CO2PR04MB2328.namprd04.prod.outlook.com
+ ([fe80::b44d:f58f:f4bd:fdea%12]) with mapi id 15.20.2199.027; Wed, 4 Sep 2019
+ 21:11:45 +0000
+From: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
+To: "stefanha@gmail.com" <stefanha@gmail.com>
+Thread-Topic: [Qemu-block] [PATCH v5 0/4] virtio/block: handle zoned backing
+ devices
+Thread-Index: AQHVWevkc1m1eVB3CUakRZKW6UwiPacQVbWAgAvBKAA=
+Date: Wed, 4 Sep 2019 21:11:45 +0000
+Message-ID: <5f53bb6ca5f6281cf92f446a97b8823bdcded8da.camel@wdc.com>
+References: <20190823194927.23278-1-dmitry.fomichev@wdc.com>
+ <20190828094133.GG5573@stefanha-x1.localdomain>
+In-Reply-To: <20190828094133.GG5573@stefanha-x1.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Dmitry.Fomichev@wdc.com; 
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bfc88857-5f3e-42c2-28c1-08d7317c7e03
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
+ SRVR:CO2PR04MB2165; 
+x-ms-traffictypediagnostic: CO2PR04MB2165:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CO2PR04MB2165EF6859CC3E21727A3806E1B80@CO2PR04MB2165.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0150F3F97D
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(346002)(376002)(136003)(396003)(39860400002)(366004)(54094003)(189003)(199004)(1361003)(54906003)(14454004)(76176011)(25786009)(478600001)(4326008)(316002)(4744005)(11346002)(305945005)(6246003)(8936002)(66066001)(446003)(91956017)(76116006)(71190400001)(71200400001)(99286004)(66476007)(66556008)(64756008)(66446008)(6116002)(66946007)(3846002)(5660300002)(1411001)(6506007)(486006)(36756003)(5640700003)(2906002)(229853002)(102836004)(6512007)(81156014)(6916009)(1730700003)(8676002)(81166006)(53936002)(26005)(118296001)(186003)(6486002)(2501003)(6436002)(2616005)(476003)(7736002)(256004)(2351001)(86362001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:CO2PR04MB2165;
+ H:CO2PR04MB2328.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: XQq6G20PEHH1VPzrYfDEhxsd6fO84zcp0MgioWBmkXTlE3HeznGfiKFXJP5McaZULRTPJVfbrpiTra7JquWWbosWZUXajh4Krjx0pFc5YogUJf//UdPaFcc1Vgz1I9JJW5oJRM2+Q/4LQ8WF6oH6wKmIwm9neRB0S7zuqIBxE33P40vrvQZht/hODVq/VfPYuuDwOzZCePNguIlfXwWUWBMMpwGF63mes9d3mPKAtQtSwEtDvy7NOAoQ4R+K/z8d7bP+lbw5EYLPREI9uyNOP3UDfNXdDyYDTU0nTX1PNAfIm1DAj2VElI6OBAhLJ4zw/99F8O6PVhtUerL7CvDxMtelPa2uy84Smz5MEIRC3BTidSKaXy3FqNLq1zC9rvOIup8h/s8eGJx7vRsi4DXUU+ekJkW4kSQFBFjo9IKkH18=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <92DB6E1D8F16AD4D9863070B1DF51561@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfc88857-5f3e-42c2-28c1-08d7317c7e03
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2019 21:11:45.4327 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dZ6wX5KZdv/rKpfxxXEipnVy256FbCXyxOgSWQ5LU4JSAlP491677mr/HY5Y3Ng9iTRb+f+QVBTBMajqUZbHdQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO2PR04MB2165
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
 X-Received-From: 216.71.154.42
-Subject: [Qemu-devel] [PATCH v6 2/4] raw: Recognize zoned backing devices
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 0/4] virtio/block: handle
+ zoned backing devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,185 +144,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The purpose of this patch is to recognize a zoned block device (ZBD)
-when it is opened as a raw file. The new code initializes the zoned
-model propery introduced by the previous commit.
-
-This commit is Linux-specific as it gets the Zoned Block Device Model
-value (none/host-managed/host-aware) from sysfs on the host.
-
-In order to avoid code duplication in file-posix.c, a common helper
-function is added to read values of sysfs entries under
-/sys/block/<dev>/queue. This way, the existing function that reads
-the value of "max_segments" entry and the the new function that reads
-"zoned" value both share the same helper code.
-
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- block/file-posix.c | 75 ++++++++++++++++++++++++++++++++++++++--------
- block/io.c         |  5 ++++
- 2 files changed, 67 insertions(+), 13 deletions(-)
-
-diff --git a/block/file-posix.c b/block/file-posix.c
-index fbeb0068db..c7e1aff6eb 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1067,15 +1067,13 @@ static int sg_get_max_transfer_length(int fd)
- #endif
- }
- 
--static int sg_get_max_segments(int fd)
-+static int hdev_read_blk_queue_entry(int fd, const char *key,
-+    char *buf, int buf_len)
- {
- #ifdef CONFIG_LINUX
--    char buf[32];
--    const char *end;
-     char *sysfspath = NULL;
-     int ret;
-     int sysfd = -1;
--    long max_segments;
-     struct stat st;
- 
-     if (fstat(fd, &st)) {
-@@ -1083,23 +1081,45 @@ static int sg_get_max_segments(int fd)
-         goto out;
-     }
- 
--    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/max_segments",
--                                major(st.st_rdev), minor(st.st_rdev));
-+    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/%s",
-+                                major(st.st_rdev), minor(st.st_rdev), key);
-     sysfd = open(sysfspath, O_RDONLY);
-     if (sysfd == -1) {
-         ret = -errno;
-         goto out;
-     }
-     do {
--        ret = read(sysfd, buf, sizeof(buf) - 1);
-+        ret = read(sysfd, buf, buf_len - 1);
-     } while (ret == -1 && errno == EINTR);
-     if (ret < 0) {
-         ret = -errno;
--        goto out;
-     } else if (ret == 0) {
-         ret = -EIO;
-+    }
-+out:
-+    if (sysfd != -1) {
-+        close(sysfd);
-+    }
-+    g_free(sysfspath);
-+    return ret;
-+#else
-+    return -ENOTSUP;
-+#endif
-+}
-+
-+static int sg_get_max_segments(int fd)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    const char *end;
-+    int ret;
-+    long max_segments;
-+
-+    ret = hdev_read_blk_queue_entry(fd, "max_segments", buf, sizeof(buf));
-+    if (ret < 0) {
-         goto out;
-     }
-+
-     buf[ret] = 0;
-     /* The file is ended with '\n', pass 'end' to accept that. */
-     ret = qemu_strtol(buf, &end, 10, &max_segments);
-@@ -1108,22 +1128,45 @@ static int sg_get_max_segments(int fd)
-     }
- 
- out:
--    if (sysfd != -1) {
--        close(sysfd);
--    }
--    g_free(sysfspath);
-     return ret;
- #else
-     return -ENOTSUP;
- #endif
- }
- 
-+static BdrvZonedModel hdev_get_zoned_model(int fd)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    BdrvZonedModel zm = BDRV_ZONED_MODEL_NONE;
-+    int ret;
-+
-+    ret = hdev_read_blk_queue_entry(fd, "zoned", buf, sizeof(buf));
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-+    buf[ret - 1] = '\0'; /* replace the newline character with NULL */
-+    if (strcmp(buf, "host-managed") == 0) {
-+        zm = BDRV_ZONED_MODEL_HM;
-+    } else if (strcmp(buf, "host-aware") == 0) {
-+        zm = BDRV_ZONED_MODEL_HA;
-+    }
-+
-+out:
-+    return zm;
-+#else
-+    return BDRV_ZONED_MODEL_NONE;
-+#endif
-+}
-+
- static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-+    int ret;
- 
-     if (bs->sg) {
--        int ret = sg_get_max_transfer_length(s->fd);
-+        ret = sg_get_max_transfer_length(s->fd);
- 
-         if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
-             bs->bl.max_transfer = pow2floor(ret);
-@@ -1133,6 +1176,12 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-         if (ret > 0) {
-             bs->bl.max_transfer = MIN(bs->bl.max_transfer, ret * getpagesize());
-         }
-+
-+    }
-+
-+    ret = hdev_get_zoned_model(s->fd);
-+    if (ret >= 0) {
-+        bs->bl.zoned_model = ret;
-     }
- 
-     raw_probe_alignment(bs, s->fd, errp);
-diff --git a/block/io.c b/block/io.c
-index 0fa10831ed..147c320061 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -157,6 +157,11 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
-             return;
-         }
-         bdrv_merge_limits(&bs->bl, &bs->file->bs->bl);
-+
-+        /* Propagate zoned model */
-+        if (!bs->probed) {
-+            bs->bl.zoned_model = bs->file->bs->bl.zoned_model;
-+        }
-     } else {
-         bs->bl.min_mem_alignment = 512;
-         bs->bl.opt_mem_alignment = getpagesize();
--- 
-2.21.0
-
+T24gV2VkLCAyMDE5LTA4LTI4IGF0IDEwOjQxICswMTAwLCBTdGVmYW4gSGFqbm9jemkgd3JvdGU6
+DQo+IE9uIEZyaSwgQXVnIDIzLCAyMDE5IGF0IDAzOjQ5OjIzUE0gLTA0MDAsIERtaXRyeSBGb21p
+Y2hldiB3cm90ZToNCj4gPiBEbWl0cnkgRm9taWNoZXYgKDQpOg0KPiA+ICAgYmxvY2s6IEFkZCB6
+b25lZCBkZXZpY2UgbW9kZWwgcHJvcGVydHkNCj4gPiAgIHJhdzogUmVjb2duaXplIHpvbmVkIGJh
+Y2tpbmcgZGV2aWNlcw0KPiA+ICAgYmxvY2svaWRlL3Njc2k6IFNldCBCTEtfUEVSTV9TVVBQT1JU
+X1pPTkVEDQo+ID4gICByYXc6IERvbid0IG9wZW4gWkJEcyBpZiBiYWNrZW5kIGNhbid0IGhhbmRs
+ZSB0aGVtDQo+IA0KPiBUaGUgb3ZlcmFsbCBhcHByb2FjaCBsb29rcyBnb29kLg0KPiANCj4gSSB3
+b25kZXIgaWYgYmRydl9nZXRfem9uZWRfaW5mbygpIGlzIHJlYWxseSBuZWVkZWQgc2luY2Ugem9u
+ZV9tb2RlbCBpcw0KPiBwYXJ0IG9mIEJsb2NrTGltaXRzIGFuZCBpcyBhbHJlYWR5IGZldGNoZWQg
+dmlhIGJkcnZfcmVmcmVzaF9saW1pdHMoKS4NCj4gV2FzIGl0IGludHJvZHVjZWQgYmVjYXVzZSB0
+aGUgYmxvY2sgbGltaXRzIGhhdmVuJ3QgYmVlbiBvciBjYW5ub3QgYmUNCj4gZmV0Y2hlZCB3aGVu
+IHpvbmVfbW9kZWwgaXMgcXVlcmllZCB0aGUgZmlyc3QgdGltZT8gIEl0IHdvdWxkIGJlIG5pY2Ug
+dG8NCj4gZ2V0IHJpZCBvZiBiZHJ2X2dldF96b25lZF9pbmZvKCkgaWYgcG9zc2libGUuDQoNClN0
+ZWZhbiwNCg0KVGhhbmsgeW91IGZvciB5b3VyIHJldmlldy4gSSd2ZSBqdXN0IHNlbnQgb3V0IHRo
+ZSBuZXcgdmVyc2lvbiBvZiB0aGUNCnBhdGNoc2V0LCB2NiwgdGhhdCBhZGRyZXNzZXMgeW91IGNv
+bW1lbnRzLiBJIHdhcyBhYmxlIHRvIGdldCByaWQgb2YNCmJkcnZfZ2V0X3pvbmVkX2luZm8oKSB0
+ZW1wbGF0ZSBmdW5jdGlvbiBhcyBhIHBhcnQgb2YgdGhlIGxhdGVzdCBjaGFuZ2VzLg0KDQpCZXN0
+IHJlZ2FyZHMsDQpEbWl0cnkNCg==
 
