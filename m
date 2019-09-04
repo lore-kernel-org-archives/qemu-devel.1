@@ -2,89 +2,85 @@ Return-Path: <SRS0=c3jH=W7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD91C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A61C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:19:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB4F420828
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1BD920828
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Sep 2019 21:19:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eOKovI64"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4F420828
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MSddaqDm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1BD920828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5cgE-0007ja-6t
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:19:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51509)
+	id 1i5cgO-00080B-Ow
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 17:19:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5c3r-0000pk-BY
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9X-0006A1-Vn
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5c3q-0003Qz-5h
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:27 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:55350)
+ (envelope-from <richard.henderson@linaro.org>) id 1i5c9W-0006lB-B0
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:19 -0400
+Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:42625)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5c3p-0003QF-VX
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:39:26 -0400
-Received: by mail-wm1-x336.google.com with SMTP id g207so204892wmg.5
- for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:39:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i5c9W-0006kd-3P
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 16:45:18 -0400
+Received: by mail-pl1-x630.google.com with SMTP id y1so84045plp.9
+ for <qemu-devel@nongnu.org>; Wed, 04 Sep 2019 13:45:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=PIODOTVy4HDE3zFxAtxJ3smi6AAB4cF2pRQrP6evZ/U=;
- b=eOKovI64ggTWYbvl4vwuZOMrD3G3UNKZc50/ewN/tTWAk5Xl+IsVaZ9WTWhOf6LVBC
- KFFiEeR7m/E2Sx1Fi2xqWeU3W34X9Qs8y0bwzSBnHuyhwv8fyzqKViGFM+WkD5dyCr50
- 4xg3VomLtYHoQGQX2W2OSJUBVxdMI++zYZdL/3ist2PF/AI6cbXdTbOvX2wB54aq6g6N
- k/ocvipcTBrLhkReSCHspq7aT6t+IDPoHEg278aI4T7wbZCD74EGD76i5zBP4+v/+Zps
- OOGFEhfkwX2yZ1zu1YGRlty1gGpm3ld446zoGWd0+qo3lY7VS63+8NyF7V20F0ivDutw
- eR1Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ddiXQUCU6+mV9b5HLraEW0nl5fo+95ic0hgqPUZ1sNk=;
+ b=MSddaqDmsvrs+IxiQ14B8VDMy7wNo0Vt2EYZJek1dggV55FDVT0x5GlL6VdgzTMJbF
+ MZ6ITu1ZxAt5wF9NnqfKZpC6cXe4iABpMf06vO7spIL72gfM9Lc6mRq/0qL5rz7Zta8o
+ uU/E/rUhTLzMwppzep0CN4Jr40qIEdDorlKLqkavJ17VNaBxRLyhEXDlQGvmDKc3Vcw3
+ ktnpyndyd+qQQ53KAKQZScG1vw2/ljECNAYMposijavMiD6+tdYUJ52B/bxkPVy8195T
+ fgPqz5owYB9BVfwXfz7Dri6xE9W0MTkUMexTNelWBJOjUo8Gh078podmqKKDxF5PGfwp
+ HvEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PIODOTVy4HDE3zFxAtxJ3smi6AAB4cF2pRQrP6evZ/U=;
- b=GSh/8Yp6xtu5DyTjkA2CMUf8BpuIc6WwT/GUz24VrfbhyBiuXk4b6ZghLLaiYbLFnp
- omg5BopcQmCoGP+zuXwI/UNDO6lttq8mn0PFJqSeHSl18bodgXC9xtOgTRqHVfB/RpzK
- pLLkxT1teTo10wYQeGDOOavh6bXMDezujvD2eKscQO3CouGoU/M6KkhnOe+aRW0x3qrA
- hCXUTkXqrXZgmHj7NAwhFD9h+1j1Y/K1uGz1qRT7IRlIQ3qsh7YxsCQRDJ7zBlHtlq8n
- BdyAkT04WN1j0qFYCI0kWZsuMPqfSOvF9XfrLSVA3m5vZyMZtdQVuMtTgAGTA3k5OmCD
- GlPw==
-X-Gm-Message-State: APjAAAViywWOryHOQEgd+KOULqliDKzFeuOchcrkhWc6P6pb6xfA99HY
- xbw8yoKRvhm2JHfla2dlXSAUHg==
-X-Google-Smtp-Source: APXvYqxijLN3khc6JjBLJETmWttdIC7iHrIDKJbXX+ITnNC16dhk02dRmSv3IUhIfVW2Kqyf0kH0iA==
-X-Received: by 2002:a7b:ce8f:: with SMTP id q15mr128286wmj.106.1567629564909; 
- Wed, 04 Sep 2019 13:39:24 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a205sm183512wmd.44.2019.09.04.13.39.22
+ :references;
+ bh=ddiXQUCU6+mV9b5HLraEW0nl5fo+95ic0hgqPUZ1sNk=;
+ b=pj1aJHC05FpLTjxWuJVl0gt2t60+F516VfNwyPv1L79maAOPcGm893l0K+h8ZGwIIl
+ etFkfO1qb6GB52a49Lk4uVgXGSLF6Pl/mw6T5sFiDjpLw/owAW4K6b0W7VSR21/gLciW
+ 5F+Ve0L0QSdwWJJ6j1SzBbymcSqaTQMy8JGKGaaAYqAmYSKYJTqpggaW5o0NdlGq1DE5
+ GZFLIOZzcIpZ4IaTFr/TgOdEV2ig5LZl3rfMJdR3nNk5fEZ4dmefVxEAtkGHyQj7ApCU
+ 7xBeMyExOAiA2/NN84IpPAW3hgda8/N6TJQFx1V/z9CsDiVJQPgC5uB6sQEkWFPXsQcJ
+ 2WpQ==
+X-Gm-Message-State: APjAAAVxuVCRGAQHVLz2r1eIbjZ1uaASHYjg0mrfa2gCLW+ms5in0VtU
+ SkVkG5UFp+JbWTQ4FEo7SLlh3SE1KUg=
+X-Google-Smtp-Source: APXvYqwkZjoiyyWMGTdG56oMaWgURYtLJW7ZrM7zvQcaTbXF+PbxrKS8lAM0gaOySDvqIJp7lpZ+pQ==
+X-Received: by 2002:a17:902:ab96:: with SMTP id
+ f22mr43907220plr.147.1567629916793; 
+ Wed, 04 Sep 2019 13:45:16 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id n66sm8104610pfn.90.2019.09.04.13.45.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Sep 2019 13:39:23 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 58D201FFB8;
- Wed,  4 Sep 2019 21:30:16 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Wed, 04 Sep 2019 13:45:16 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  4 Sep 2019 21:30:03 +0100
-Message-Id: <20190904203013.9028-33-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904203013.9028-1-alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Wed,  4 Sep 2019 13:45:00 -0700
+Message-Id: <20190904204507.32457-7-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190904204507.32457-1-richard.henderson@linaro.org>
+References: <20190904204507.32457-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
-Subject: [Qemu-devel] [PATCH v1 32/42] .travis.yml: Cache Python PIP packages
+X-Received-From: 2607:f8b0:4864:20::630
+Subject: [Qemu-devel] [PULL 06/13] target/openrisc: Add VR2 and AVR special
+ processor registers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,40 +92,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Update the CPUCFG bits to arch v1.3.
+Include support for AVRP for cpu "any".
 
-We always install the same packages ever and ever, cache them.
-
-See https://docs.travis-ci.com/user/caching/#pip-cache
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- .travis.yml | 1 +
- 1 file changed, 1 insertion(+)
+ target/openrisc/cpu.h        | 11 +++++++----
+ target/openrisc/cpu.c        |  8 ++++++--
+ target/openrisc/sys_helper.c |  6 ++++++
+ 3 files changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index 8c376d22239..d51125c9569 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -8,6 +8,7 @@ compiler:
- cache:
-   timeout: 1200
-   ccache: true
-+  pip: true
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 18d7445e74..71c5959828 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -96,11 +96,12 @@ enum {
+     CPUCFGR_OF32S = (1 << 7),
+     CPUCFGR_OF64S = (1 << 8),
+     CPUCFGR_OV64S = (1 << 9),
+-    /* CPUCFGR_ND = (1 << 10), */
+-    /* CPUCFGR_AVRP = (1 << 11), */
++    CPUCFGR_ND = (1 << 10),
++    CPUCFGR_AVRP = (1 << 11),
+     CPUCFGR_EVBARP = (1 << 12),
+-    /* CPUCFGR_ISRP = (1 << 13), */
+-    /* CPUCFGR_AECSRP = (1 << 14), */
++    CPUCFGR_ISRP = (1 << 13),
++    CPUCFGR_AECSRP = (1 << 14),
++    CPUCFGR_OF64A32S = (1 << 15),
+ };
  
+ /* DMMU configure register */
+@@ -280,6 +281,8 @@ typedef struct CPUOpenRISCState {
  
- addons:
+     /* Fields from here on are preserved across CPU reset. */
+     uint32_t vr;              /* Version register */
++    uint32_t vr2;             /* Version register 2 */
++    uint32_t avr;             /* Architecture version register */
+     uint32_t upr;             /* Unit presence register */
+     uint32_t cpucfgr;         /* CPU configure register */
+     uint32_t dmmucfgr;        /* DMMU configure register */
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index d9f447e90c..9f566ad883 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -126,9 +126,13 @@ static void openrisc_any_initfn(Object *obj)
+ {
+     OpenRISCCPU *cpu = OPENRISC_CPU(obj);
+ 
+-    cpu->env.vr = 0x13000000;
++    cpu->env.vr = 0x13000040;   /* Obsolete VER + UVRP for new SPRs */
++    cpu->env.vr2 = 0;           /* No version specific id */
++    cpu->env.avr = 0x01010000;  /* Architecture v1.1 */
++
+     cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP | UPR_PMP;
+-    cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_EVBARP;
++    cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S |
++                       CPUCFGR_AVRP | CPUCFGR_EVBARP;
+ 
+     /* 1Way, TLB_SIZE entries.  */
+     cpu->env.dmmucfgr = (DMMUCFGR_NTW & (0 << 2))
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index a2b1f52294..cf8e637b08 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -210,6 +210,12 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
+     case TO_SPR(0, 4): /* IMMUCFGR */
+         return env->immucfgr;
+ 
++    case TO_SPR(0, 9): /* VR2 */
++        return env->vr2;
++
++    case TO_SPR(0, 10): /* AVR */
++        return env->avr;
++
+     case TO_SPR(0, 11): /* EVBAR */
+         return env->evbar;
+ 
 -- 
-2.20.1
+2.17.1
 
 
