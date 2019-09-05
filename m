@@ -2,72 +2,94 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3C6C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F43C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:46:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 872362070C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:18:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872362070C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B639206BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:46:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B639206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5xGY-0002YT-Lv
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 15:17:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45113)
+	id 1i5xiY-0000WA-SI
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 15:46:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i5xFZ-00020P-4c
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:16:59 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5xhd-0008W1-Ci
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:45:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i5xFX-0003UY-9r
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:16:56 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:38574)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i5xFX-0003TL-0j
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:16:55 -0400
-Received: by mail-pf1-f196.google.com with SMTP id h195so2432772pfe.5
- for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 12:16:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=iDHG0BDVBB8epY4Vv2q/BqiF9tL6/6irQjK8zuxQYWY=;
- b=EU2OSl6iXV3q/ttoVDBF2pI9gSo+G3GP6+vavB3WUidDUrqDjLkHqnwMARhZIcUB98
- NtUixWfEwe+aKAsZuX7qyZWMPmcT3CsFCX97dskxnFVG5n1bdRe0ZWURCg3igatTUX5r
- t9oNiB5z6oXmX+YqN8i5skEj2vwLg6H5sPWW9Hbg4i2+mEWrygZRDJWDmU8VRRZ+1BRX
- te98XP4bWv2VT/HUN//TLXgYfP8ikUDg2burxHzlRxKygOBUSzinywFh13wJ/DJLIyLB
- UxprMZsTIcmE+gPqJBzzD/QlJrc/yL6ndQNMi9cK/zb/LnkBxy1lJ3bwWudgWqWq5WpR
- hUyg==
-X-Gm-Message-State: APjAAAXTx+4gU9sUwN3SMzKO4ggZXaQceBRjUId03C8Hr6QKG7FdnWxd
- oKirIWF2IqvaAJ+hxDsUC4iepxWS2OA=
-X-Google-Smtp-Source: APXvYqzUIHNrQ3B+aRSQp3DHHG9RDU1Vl8NoiwOCCZ5uKwCSLUhIbYybptv7XR4BSmFUQL50ytrk/A==
-X-Received: by 2002:a62:ee0a:: with SMTP id e10mr5918604pfi.197.1567711013322; 
- Thu, 05 Sep 2019 12:16:53 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id k5sm2534680pjs.1.2019.09.05.12.16.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Sep 2019 12:16:52 -0700 (PDT)
-Date: Thu, 05 Sep 2019 12:16:52 -0700 (PDT)
-X-Google-Original-Date: Thu, 05 Sep 2019 12:16:43 PDT (-0700)
-In-Reply-To: <CAEUhbmX-czUP9e9CcN69kjkw2VZJaRcEc+F0SVbRXYkaecv9MQ@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: bmeng.cn@gmail.com
-Message-ID: <mhng-0cc8e543-568d-44a0-8408-1d2e439939e2@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <eblake@redhat.com>) id 1i5xha-0007G5-EE
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:45:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34452)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5xha-0007F9-6V
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:45:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 582A310A8122;
+ Thu,  5 Sep 2019 19:45:52 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A3675D6A3;
+ Thu,  5 Sep 2019 19:45:50 +0000 (UTC)
+To: Yury Kotov <yury-kotov@yandex-team.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>
+References: <20190826103726.25538-1-yury-kotov@yandex-team.ru>
+ <20190826103726.25538-2-yury-kotov@yandex-team.ru>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <79c7fa75-063b-700f-fcc8-4f71781f9664@redhat.com>
+Date: Thu, 5 Sep 2019 14:45:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190826103726.25538-2-yury-kotov@yandex-team.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Thu, 05 Sep 2019 19:45:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.196
-Subject: Re: [Qemu-devel] [PATCH v2] riscv: sifive_test: Add reset
- functionality
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] qemu-thread: Add qemu_cond_timedwait
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,41 +101,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+Cc: "open list:Overall" <qemu-devel@nongnu.org>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 05 Sep 2019 08:57:44 PDT (-0700), bmeng.cn@gmail.com wrote:
-> Hi Palmer,
->
-> On Thu, Sep 5, 2019 at 11:55 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->>
->> This adds a reset opcode for sifive_test device to trigger a system
->> reset for testing purpose.
->>
->> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
->>
->> ---
->>
->> Changes in v2:
->> - fix build error in the "for-master" branch of Palmer's RISC-V repo
->>   that was rebased on QEMU master
->>
->>  hw/riscv/sifive_test.c         | 4 ++++
->>  include/hw/riscv/sifive_test.h | 3 ++-
->>  2 files changed, 6 insertions(+), 1 deletion(-)
->>
->
-> Please drop the already applied v1 patch in your "for-master" branch
-> and apply this v2.
->
-> After you rebased the "for-master' branch, this patch no longer build
-> any more due to changes in QEMU master.
->
-> Regards,
-> Bin
+On 8/26/19 5:37 AM, Yury Kotov wrote:
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> ---
 
-Thanks!
+Rather sparse on the commit message details.
+
+>  include/qemu/thread.h    | 18 ++++++++++++++++++
+>  util/qemu-thread-posix.c | 40 ++++++++++++++++++++++++++++------------
+>  util/qemu-thread-win32.c | 16 ++++++++++++++++
+>  util/qsp.c               | 18 ++++++++++++++++++
+>  4 files changed, 80 insertions(+), 12 deletions(-)
+> 
+
+> +++ b/util/qemu-thread-posix.c
+> @@ -36,6 +36,18 @@ static void error_exit(int err, const char *msg)
+>      abort();
+>  }
+>  
+> +static void compute_abs_deadline(struct timespec *ts, int ms)
+> +{
+> +    struct timeval tv;
+> +    gettimeofday(&tv, NULL);
+> +    ts->tv_nsec = tv.tv_usec * 1000 + (ms % 1000) * 1000000;
+> +    ts->tv_sec = tv.tv_sec + ms / 1000;
+> +    if (ts->tv_nsec >= 1000000000) {
+> +        ts->tv_sec++;
+> +        ts->tv_nsec -= 1000000000;
+> +    }
+
+I don't know if any named constants would make this easier or harder to
+read (such as USEC_PER_SEC 1000000 or NSEC_PER_SEC 1000000000), but the
+conversion from relative ms to absolute timespec looks correct. [1]
+
+> +void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
+> +                              const char *file, const int line)
+> +{
+> +    int err;
+> +    struct timespec ts;
+> +
+> +    assert(cond->initialized);
+> +    trace_qemu_mutex_unlock(mutex, file, line);
+> +    compute_abs_deadline(&ts, ms);
+> +    err = pthread_cond_timedwait(&cond->cond, &mutex->lock, &ts);
+> +    trace_qemu_mutex_locked(mutex, file, line);
+> +    if (err && err != ETIMEDOUT) {
+> +        error_exit(err, __func__);
+> +    }
+> +}
+
+However, this function returning void looks odd.  Although ETIMEDOUT is
+the one error that guarantees that mutex is reobtained (all other errors
+occur before the mutex is given up in the first place), and even though
+the man page warns that you MUST recheck the condition variable in a
+while loop regardless of success or failure (it might be a spurious
+successful wake-up due to a broadcast where neither the condition nor
+the timeout has actually been reached yet; or it might be a race where
+the function reports a timeout immediately before the condition variable
+became available after all), it still seems like callers might like to
+know if a timeout happened, without having to calculate an ending
+absolute time themselves.
+
+
+>  
+> -static void compute_abs_deadline(struct timespec *ts, int ms)
+> -{
+> -    struct timeval tv;
+
+[1] Oh, you mixed code motion with new code, but the commit message
+didn't mention that.  It's not necessarily worth splitting the patch,
+but at least mentioning it would be worthwhile.
+
+> +++ b/util/qemu-thread-win32.c
+> @@ -145,6 +145,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *file, con
+>      qemu_mutex_post_lock(mutex, file, line);
+>  }
+>  
+> +void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
+> +                              const char *file, const int line)
+> +{
+> +    int rc = 0;
+> +
+> +    assert(cond->initialized);
+> +    trace_qemu_mutex_unlock(mutex, file, line);
+> +    if (!SleepConditionVariableSRW(&cond->var, &mutex->lock, ms, 0)) {
+> +        rc = GetLastError();
+> +    }
+> +    trace_qemu_mutex_locked(mutex, file, line);
+> +    if (rc && rc != ERROR_TIMEOUT) {
+> +        error_exit(rc, __func__);
+> +    }
+> +}
+
+I am less certain that this implementation is correct, but on the
+surface it seems okay.
+
+
+>  
+> +static void
+> +qsp_cond_timedwait(QemuCond *cond, QemuMutex *mutex, int ms,
+> +                   const char *file, int line)
+> +{
+> +    QSPEntry *e;
+> +    int64_t t0, t1;
+> +
+> +    t0 = get_clock();
+> +    qemu_cond_timedwait_impl(cond, mutex, ms, file, line);
+> +    t1 = get_clock();
+> +
+> +    e = qsp_entry_get(cond, file, line, QSP_CONDVAR);
+> +    qsp_entry_record(e, t1 - t0);
+> +}
+
+Another function where a bool or int return (to distinguish success from
+timeout) might be worthwhile to some callers.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
