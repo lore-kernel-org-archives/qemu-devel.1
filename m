@@ -2,104 +2,64 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E4A0C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 782A9C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:11:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A920D2082C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:10:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PNfizHMF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A920D2082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id CEFD020640
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:11:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEFD020640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5tOd-0008Ks-7b
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 11:10:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39724)
+	id 1i5tPl-0001FA-Fs
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 11:11:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1i5tMr-0006gu-4g
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:08:15 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i5tKT-0005RO-E9
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:05:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1i5tMo-0001d7-BS
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:08:12 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:54052)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1i5tMn-0001be-QD
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:08:10 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85F76le056386;
- Thu, 5 Sep 2019 15:07:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=1CuojXYGP/huYoiQZ5EIJHtZPWB2y2BspqueRIuhvFU=;
- b=PNfizHMFaynsOQrUlqZe3P1t3exSXQjQcDL659S4zsLrvVqgEa86aIx80bqd2xGtT2+w
- Ekgm2ULEMiEcDuO4Oc/bnkmsNZnSjgZfln8vLiL02CfJDcnu67I8SNN5gB/88jWKUvVZ
- fy7BqPc3vEvxx5ybgJUC5iGXoHc67B51yHMdGv/kXntUblwAPHqet8d9n1tAer4RzI2Q
- gNVs3NjA02mec0tZUokJzL3N1MojcXiaev/eJraJKlfhxScCHIEmLx32mxksrEq9SbMf
- HnMfzbuo3+v4ZK1hIbO+ESG8G8QTz1ZgJohTJziyDAQuGRnLH3ufLskQxa9gZDWafKJr fQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 2uu4q70062-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 05 Sep 2019 15:07:50 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85EmFa1145193;
- Thu, 5 Sep 2019 15:07:50 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3020.oracle.com with ESMTP id 2utvr3r5yh-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 05 Sep 2019 15:07:50 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x85F7lIE026784;
- Thu, 5 Sep 2019 15:07:47 GMT
-Received: from [10.152.34.2] (/10.152.34.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 05 Sep 2019 08:07:47 -0700
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <cover.1567534653.git.jag.raman@oracle.com>
- <3bf3631115123d4a6a360b41ef0aaa47b40ff08d.1567534653.git.jag.raman@oracle.com>
- <20190904081129.GA2828@work-vm>
-From: Jag Raman <jag.raman@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <2b0b3ce0-06d6-e953-66fd-ead53110c0a9@oracle.com>
-Date: Thu, 5 Sep 2019 11:07:44 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <dgilbert@redhat.com>) id 1i5tKQ-0000bx-9c
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:05:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57884)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5tKP-0000bl-Vv
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:05:42 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3A6023D965
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 15:05:41 +0000 (UTC)
+Received: from work-vm (ovpn-117-197.ams2.redhat.com [10.36.117.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B0B3D19C69;
+ Thu,  5 Sep 2019 15:05:31 +0000 (UTC)
+Date: Thu, 5 Sep 2019 16:05:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, mst@redhat.com
+Message-ID: <20190905150529.GL2700@work-vm>
+References: <20190823175657.12085-1-dgilbert@redhat.com>
+ <20190823175657.12085-2-dgilbert@redhat.com>
+ <20190826173242.4d9f1f70.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190904081129.GA2828@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9370
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909050143
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9370
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909050143
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [RFC v3 PATCH 01/45] multi-process: memory: alloc
- RAM from file at offset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190826173242.4d9f1f70.cohuck@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Thu, 05 Sep 2019 15:05:41 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] virtio: add vhost-user-fs base
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,194 +71,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
- john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
- mreitz@redhat.com, kanth.ghatraju@oracle.com, kraxel@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, liran.alon@oracle.com,
- marcandre.lureau@gmail.com, kwolf@redhat.com, rth@twiddle.net
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 9/4/2019 4:11 AM, Dr. David Alan Gilbert wrote:
-> * Jagannathan Raman (jag.raman@oracle.com) wrote:
->> Allow RAM MemoryRegion to be created from an offset in a file, instead
->> of allocating at offset of 0 by default. This is needed to synchronize
->> RAM between QEMU & remote process.
->> This will be needed for the following patches.
->>
->> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
->> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
->> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->> ---
->>   exec.c                    | 11 +++++++----
->>   include/exec/ram_addr.h   |  2 +-
->>   include/qemu/mmap-alloc.h |  3 ++-
->>   memory.c                  |  2 +-
->>   util/mmap-alloc.c         |  7 ++++---
->>   util/oslib-posix.c        |  2 +-
->>   6 files changed, 16 insertions(+), 11 deletions(-)
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Fri, 23 Aug 2019 18:56:56 +0100
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 > 
-> I'm surprised this doesn't change something in
-> vhost-user.c:vhost_user_set_mem_table so that the vhost-user client
-> knows what it's mapping?
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > The virtio-fs virtio device provides shared file system access using
+> > the FUSE protocol carried ovew virtio.
+> > The actual file server is implemented in an external vhost-user-fs device
+> > backend process.
+> > 
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  configure                                   |  13 +
+> >  hw/virtio/Makefile.objs                     |   1 +
+> >  hw/virtio/vhost-user-fs.c                   | 297 ++++++++++++++++++++
+> >  include/hw/virtio/vhost-user-fs.h           |  45 +++
+> >  include/standard-headers/linux/virtio_fs.h  |  41 +++
+> >  include/standard-headers/linux/virtio_ids.h |   1 +
+> >  6 files changed, 398 insertions(+)
+> >  create mode 100644 hw/virtio/vhost-user-fs.c
+> >  create mode 100644 include/hw/virtio/vhost-user-fs.h
+> >  create mode 100644 include/standard-headers/linux/virtio_fs.h
+> > 
+> 
+> > diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
+> > new file mode 100644
+> > index 0000000000..72e270d869
+> > --- /dev/null
+> > +++ b/hw/virtio/vhost-user-fs.c
+> > @@ -0,0 +1,297 @@
+> > +/*
+> > + * Vhost-user filesystem virtio device
+> > + *
+> > + * Copyright 2018 Red Hat, Inc.
+> 
+> Should that be 2018, 2019? (Also for vhost-user-fs.h.)
 
-Hi Dave,
+Will fix.
 
-vhost-user does not use the functions addressed in this patch for
-mapping the RAM onto the remote process. It calls mmap() for this
-purpose (vu_set_mem_table_exec()).
+> > + *
+> > + * Authors:
+> > + *  Stefan Hajnoczi <stefanha@redhat.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * (at your option) any later version.  See the COPYING file in the
+> > + * top-level directory.
+> > + */
+> > +
+> 
+> (...)
 
-Thanks!
+??
+
+> > +static void vuf_start(VirtIODevice *vdev)
+> > +{
+> > +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> > +    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> > +    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> > +    int ret;
+> > +    int i;
+> > +
+> > +    if (!k->set_guest_notifiers) {
+> > +        error_report("binding does not support guest notifiers");
+> > +        return;
+> > +    }
+> > +
+> > +    ret = vhost_dev_enable_notifiers(&fs->vhost_dev, vdev);
+> > +    if (ret < 0) {
+> > +        error_report("Error enabling host notifiers: %d", -ret);
+> > +        return;
+> > +    }
+> > +
+> > +    ret = k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, true);
+> > +    if (ret < 0) {
+> > +        error_report("Error binding guest notifier: %d", -ret);
+> > +        goto err_host_notifiers;
+> > +    }
+> > +
+> > +    fs->vhost_dev.acked_features = vdev->guest_features;
+> > +    ret = vhost_dev_start(&fs->vhost_dev, vdev);
+> > +    if (ret < 0) {
+> > +        error_report("Error starting vhost: %d", -ret);
+> > +        goto err_guest_notifiers;
+> > +    }
+> > +
+> > +    /*
+> > +     * guest_notifier_mask/pending not used yet, so just unmask
+> > +     * everything here.  virtio-pci will do the right thing by
+> > +     * enabling/disabling irqfd.
+> 
+> I still think referring to virtio-pci doing the right thing is not the
+> right thing here :) Can you spell out _what_ the right thing actually
+> is?
+
+mst: Can you look at this?
+
+This appears to be a chunk of code that's copied into many vhost files;
+it's in at least vhost-user.c, vhost-user-blk.c, vhost-scsi-common.c and
+vhost-vsock.c - it seemns to go back until at least 2013.
+
+> > +     */
+> > +    for (i = 0; i < fs->vhost_dev.nvqs; i++) {
+> > +        vhost_virtqueue_mask(&fs->vhost_dev, vdev, i, false);
+> > +    }
+> > +
+> > +    return;
+> > +
+> > +err_guest_notifiers:
+> > +    k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, false);
+> > +err_host_notifiers:
+> > +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
+> > +}
+> > +
+> 
+> (...)
+> 
+> > diff --git a/include/standard-headers/linux/virtio_fs.h b/include/standard-headers/linux/virtio_fs.h
+> > new file mode 100644
+> > index 0000000000..00bd7a6fa7
+> > --- /dev/null
+> > +++ b/include/standard-headers/linux/virtio_fs.h
+> 
+> This will probably be imported from the Linux source code, right? If
+> yes, this should go into a separate patch (and the headers update patch
+> probably needs an update.)
+
+OK, will do.
+
+> > @@ -0,0 +1,41 @@
+> > +#ifndef _LINUX_VIRTIO_FS_H
+> > +#define _LINUX_VIRTIO_FS_H
+> > +/* This header is BSD licensed so anyone can use the definitions to implement
+> > + * compatible drivers/servers.
+> > + *
+> > + * Redistribution and use in source and binary forms, with or without
+> > + * modification, are permitted provided that the following conditions
+> > + * are met:
+> > + * 1. Redistributions of source code must retain the above copyright
+> > + *    notice, this list of conditions and the following disclaimer.
+> > + * 2. Redistributions in binary form must reproduce the above copyright
+> > + *    notice, this list of conditions and the following disclaimer in the
+> > + *    documentation and/or other materials provided with the distribution.
+> > + * 3. Neither the name of IBM nor the names of its contributors
+> > + *    may be used to endorse or promote products derived from this software
+> > + *    without specific prior written permission.
+> > + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
+> > + * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> > + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> > + * ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR CONTRIBUTORS BE LIABLE
+> > + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+> > + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+> > + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> > + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+> > + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+> > + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+> > + * SUCH DAMAGE. */
+> > +#include "standard-headers/linux/types.h"
+> > +#include "standard-headers/linux/virtio_ids.h"
+> > +#include "standard-headers/linux/virtio_config.h"
+> > +#include "standard-headers/linux/virtio_types.h"
+> > +
+> > +struct virtio_fs_config {
+> > +	/* Filesystem name (UTF-8, not NUL-terminated, padded with NULs) */
+> > +	uint8_t tag[36];
+> > +
+> > +	/* Number of request queues */
+> > +	uint32_t num_request_queues;
+> > +} QEMU_PACKED;
+> > +
+> > +#endif /* _LINUX_VIRTIO_FS_H */
+> > diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
+> > index 32b2f94d1f..73fc004807 100644
+> > --- a/include/standard-headers/linux/virtio_ids.h
+> > +++ b/include/standard-headers/linux/virtio_ids.h
+> 
+> This should also go into that separate patch.
+
+OK.
+
+Dave
+
+> > @@ -43,6 +43,7 @@
+> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
+> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> > +#define VIRTIO_ID_FS           26 /* virtio filesystem */
+> >  #define VIRTIO_ID_PMEM         27 /* virtio pmem */
+> >  
+> >  #endif /* _LINUX_VIRTIO_IDS_H */
+> 
+> Otherwise, looks good to me.
 --
-Jag
-
-> 
-> Dave
-> 
->> diff --git a/exec.c b/exec.c
->> index 3e78de3..b3f1aa9 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -1885,6 +1885,7 @@ static void *file_ram_alloc(RAMBlock *block,
->>                               ram_addr_t memory,
->>                               int fd,
->>                               bool truncate,
->> +                            off_t offset,
->>                               Error **errp)
->>   {
->>       MachineState *ms = MACHINE(qdev_get_machine());
->> @@ -1936,7 +1937,8 @@ static void *file_ram_alloc(RAMBlock *block,
->>       }
->>   
->>       area = qemu_ram_mmap(fd, memory, block->mr->align,
->> -                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
->> +                         block->flags & RAM_SHARED, block->flags & RAM_PMEM,
->> +                         offset);
->>       if (area == MAP_FAILED) {
->>           error_setg_errno(errp, errno,
->>                            "unable to map backing store for guest RAM");
->> @@ -2325,7 +2327,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
->>   #ifdef CONFIG_POSIX
->>   RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->>                                    uint32_t ram_flags, int fd,
->> -                                 Error **errp)
->> +                                 off_t offset, Error **errp)
->>   {
->>       RAMBlock *new_block;
->>       Error *local_err = NULL;
->> @@ -2370,7 +2372,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->>       new_block->used_length = size;
->>       new_block->max_length = size;
->>       new_block->flags = ram_flags;
->> -    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
->> +    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, offset,
->> +                                     errp);
->>       if (!new_block->host) {
->>           g_free(new_block);
->>           return NULL;
->> @@ -2400,7 +2403,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
->>           return NULL;
->>       }
->>   
->> -    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
->> +    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
->>       if (!block) {
->>           if (created) {
->>               unlink(mem_path);
->> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
->> index b7b2e60..15837a1 100644
->> --- a/include/exec/ram_addr.h
->> +++ b/include/exec/ram_addr.h
->> @@ -164,7 +164,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
->>                                      Error **errp);
->>   RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->>                                    uint32_t ram_flags, int fd,
->> -                                 Error **errp);
->> +                                 off_t offset, Error **errp);
->>   
->>   RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
->>                                     MemoryRegion *mr, Error **errp);
->> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
->> index e786266..4f57985 100644
->> --- a/include/qemu/mmap-alloc.h
->> +++ b/include/qemu/mmap-alloc.h
->> @@ -25,7 +25,8 @@ void *qemu_ram_mmap(int fd,
->>                       size_t size,
->>                       size_t align,
->>                       bool shared,
->> -                    bool is_pmem);
->> +                    bool is_pmem,
->> +                    off_t start);
->>   
->>   void qemu_ram_munmap(int fd, void *ptr, size_t size);
->>   
->> diff --git a/memory.c b/memory.c
->> index 5d8c9a9..debed5e 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -1622,7 +1622,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
->>       mr->destructor = memory_region_destructor_ram;
->>       mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
->>                                              share ? RAM_SHARED : 0,
->> -                                           fd, &err);
->> +                                           fd, 0, &err);
->>       mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
->>       if (err) {
->>           mr->size = int128_zero();
->> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
->> index f7f177d..4b727bd 100644
->> --- a/util/mmap-alloc.c
->> +++ b/util/mmap-alloc.c
->> @@ -86,7 +86,8 @@ void *qemu_ram_mmap(int fd,
->>                       size_t size,
->>                       size_t align,
->>                       bool shared,
->> -                    bool is_pmem)
->> +                    bool is_pmem,
->> +                    off_t start)
->>   {
->>       int flags;
->>       int map_sync_flags = 0;
->> @@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
->>       offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
->>   
->>       ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
->> -               flags | map_sync_flags, fd, 0);
->> +               flags | map_sync_flags, fd, start);
->>   
->>       if (ptr == MAP_FAILED && map_sync_flags) {
->>           if (errno == ENOTSUP) {
->> @@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
->>            * we will remove these flags to handle compatibility.
->>            */
->>           ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
->> -                   flags, fd, 0);
->> +                   flags, fd, start);
->>       }
->>   
->>       if (ptr == MAP_FAILED) {
->> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
->> index fe0309c..f6a243f 100644
->> --- a/util/oslib-posix.c
->> +++ b/util/oslib-posix.c
->> @@ -204,7 +204,7 @@ void *qemu_memalign(size_t alignment, size_t size)
->>   void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
->>   {
->>       size_t align = QEMU_VMALLOC_ALIGN;
->> -    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
->> +    void *ptr = qemu_ram_mmap(-1, size, align, shared, false, 0);
->>   
->>       if (ptr == MAP_FAILED) {
->>           return NULL;
->> -- 
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
