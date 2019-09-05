@@ -2,88 +2,80 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8606AC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 20:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F6EC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 20:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5BC8206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 20:48:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5BC8206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43FDE20674
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 20:51:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqxuKRJ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43FDE20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5yfo-0004vd-CN
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 16:48:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32797)
+	id 1i5yim-0006Cy-6z
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 16:51:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33211)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5yf6-0004Uc-Ax
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:47:25 -0400
+ (envelope-from <jcmvbkbc@gmail.com>) id 1i5yht-0005dg-H3
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:50:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5yf3-0001Pt-VA
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:47:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58356)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5yf3-0001P3-Ml
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:47:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 29AA03087958
- for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 20:47:20 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE00660BE1
- for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 20:47:19 +0000 (UTC)
-To: qemu-devel@nongnu.org
-References: <20190905182132.3563-1-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <680d8393-124e-bb00-425a-0ad15a2c96ec@redhat.com>
-Date: Thu, 5 Sep 2019 15:47:19 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <jcmvbkbc@gmail.com>) id 1i5yhr-0003nV-Hx
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:50:17 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:44461)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1i5yhp-0003lU-KI
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:50:15 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id y21so1371511ybi.11
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 13:50:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=z0ouXPBMSp+HSq3seITSkUyxFWOxT/dHi8uKotdMr0I=;
+ b=cqxuKRJ4B219B+UPV4hcqrF+biqWuGI+B0RQflVhNy7gWPYdiSr3P2n1BoOqfKwDti
+ Z5ILMzkyRFFj9mY9X1lTpuHTwI23tJNT1HRTN3BLNXnx4j13N30qz1Twee5m2E/5AQ/M
+ Uh9VrDVqT9qj2SmPfSqDIZEfAdKGclVGJBZfNoEnLCOn8nl07PQ6xcqmSYMXsgoATHLj
+ J4IuMy5IuHddpzLXJHfz3qGra91/2O82s49rGXm6TKssfhZ6oh0VmxO9o4m7UI6jhzEd
+ BY1fGdjAJxN0UbOK+NBUSxkULX3olwylCXTEB+AqSqpCjjy8/9EXW5MEiv3e0U/oZNMG
+ AL9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=z0ouXPBMSp+HSq3seITSkUyxFWOxT/dHi8uKotdMr0I=;
+ b=EqqqtYWTfzRfIqXzo/87cKMsB6Ijojy8fNa9DKx4lK1E7iVEyvuz5Sp7tO8nZYeM6D
+ vBatx1FVcPKuX+QErn/MxcrmnOK6+qIFWfsnyOY5EcdiMqiJXaB0selY7GTUxu7B9KiK
+ ebzHrOjaw38tjCMTOGOUOmNztw4Zcu5qObM7j/WfpaJyznHVHhrw3tT3GAqGBNKv+Ucq
+ PpBnOtdYos+v4jx/IPp8zFo+sVnk9HKSHBFcB1ApN5H1e1TihIRxL3m7J8w7UPP0CCAI
+ Vr9cWFSD1z6T9nbpbjrLSs2gURDYKPubdK2Urosd8sXuckGv1/YNKYTDdOprQsXbxcn3
+ X5dA==
+X-Gm-Message-State: APjAAAW+GalMQDWeGkqiDQ5VV2WnQkFIW8jEVAFMN9fV3Sz/NcZUUP3k
+ iAFSrHMCEYEyRpAIDaaolfreBIPipMaCsUe3N1xs6vgt
+X-Google-Smtp-Source: APXvYqxa34x2Rt50CmrxFbRczkTUVPE3mopRXy0+uFnEwbRegGlFahp1ekJ+jXsJ3mhaZijitg2XopLXSH5yDYh+qI0=
+X-Received: by 2002:a25:5f49:: with SMTP id h9mr3734062ybm.25.1567716612641;
+ Thu, 05 Sep 2019 13:50:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190905182132.3563-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="NsGseYMRAhpBCXIGgmEHdajaCsIMdxfH0"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 05 Sep 2019 20:47:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 0/9] NBD patches through 2019-09-05
+References: <20190826195806.15998-1-jcmvbkbc@gmail.com>
+In-Reply-To: <20190826195806.15998-1-jcmvbkbc@gmail.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 5 Sep 2019 13:50:01 -0700
+Message-ID: <CAMo8BfLQErOxW_xcTGt1_hsqKzwqNxZDHtzct3-2JxeRPpEN9Q@mail.gmail.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b44
+Subject: Re: [Qemu-devel] [PATCH v3] target/xtensa: linux-user: add call0
+ ABI support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,75 +87,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NsGseYMRAhpBCXIGgmEHdajaCsIMdxfH0
-Content-Type: multipart/mixed; boundary="N1C7B9IXSaqFMtsDqMBR2elUE1hdJlQW9";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <680d8393-124e-bb00-425a-0ad15a2c96ec@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/9] NBD patches through 2019-09-05
-References: <20190905182132.3563-1-eblake@redhat.com>
-In-Reply-To: <20190905182132.3563-1-eblake@redhat.com>
+Hi Laurent,
 
---N1C7B9IXSaqFMtsDqMBR2elUE1hdJlQW9
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On Mon, Aug 26, 2019 at 12:58 PM Max Filippov <jcmvbkbc@gmail.com> wrote:
+>
+> Xtensa binaries built for call0 ABI don't rotate register window on
+> function calls and returns. Invocation of signal handlers from the
+> kernel is therefore different in windowed and call0 ABIs.
+> There's currently no way to determine xtensa ELF binary ABI from the
+> binary itself. Add handler for the -xtensa-abi-call0 command line
+> parameter/QEMU_XTENSA_ABI_CALL0 envitonment variable to the qemu-user
+> and record ABI choice. Use it to initialize PS.WOE in xtensa_cpu_reset.
+> Check PS.WOE in setup_rt_frame to determine how a signal should be
+> delivered.
+>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+> Changes v2->v3:
+>
+> - revert to checking PS.WOE in the setup_rt_frame
+>
+> Changes v1->v2:
+>
+> - move handling of QEMU_XTENSA_ABI_CALL0 to linux-user/main.c
+> - check xtensa_abi_call0 instead of PS.WOE in the setup_rt_frame
+>
+>  linux-user/main.c          | 17 +++++++++++++++++
+>  linux-user/xtensa/signal.c | 25 +++++++++++++++++--------
+>  target/xtensa/cpu.c        | 24 ++++++++++++++++++++----
+>  target/xtensa/cpu.h        |  3 +++
+>  4 files changed, 57 insertions(+), 12 deletions(-)
 
-n 9/5/19 1:21 PM, Eric Blake wrote:
-> The following changes since commit eac2f39602e0423adf56be410c9a22c31fec=
-9a81:
->=20
->   target/arm: Inline gen_bx_im into callers (2019-09-05 13:23:04 +0100)=
+Could you please take a look at the most recent (v3) version of
+this change?
 
->=20
-> are available in the Git repository at:
->=20
->   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-09-05
->=20
-> for you to fetch changes up to 73bddca33cb1749ddcbcc1e9972a77d93000553b=
-:
->=20
->   nbd: Implement server use of NBD FAST_ZERO (2019-09-05 10:48:46 -0500=
-)
->=20
+The corresponding linux change is queued here:
+https://github.com/jcmvbkbc/linux-xtensa/commit/09f8a6db20e6ed8eab1b2b23d09d2458f6e15062
 
->       nbd: Prepare for NBD_CMD_FLAG_FAST_ZERO
->       nbd: Implement client use of NBD FAST_ZERO
->       nbd: Implement server use of NBD FAST_ZERO
-
-These cause failures in iotests 223 and 233; I'll post a v2 pull request
-shortly fixing that.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---N1C7B9IXSaqFMtsDqMBR2elUE1hdJlQW9--
-
---NsGseYMRAhpBCXIGgmEHdajaCsIMdxfH0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1xdFcACgkQp6FrSiUn
-Q2rneAf/V6No7plq4nzn70Dsf056phQ8V+ims9QFZVRtKb/BQ7Yb8jOFv2pOCWJ1
-zbcIorU4FBm1hV1XcDQ/0AG1djyKlJ0nn4gL8JjtXrkS5UC9lsH0U2164ViIXieu
-IVKI5qiqs3jOIZ1IDXYDUUnP8ygDI5m34PDNDFyHO150SFmhqxucrWHxfvAVg+P0
-9DTWgcA8Mo0eEGwYcnt/DKzr+mhASTtiGlt3J7J3hXi5fNNLwxdWy/HlmU5lkK/2
-QewWXkGX15KRkF4uFRXSQSjUyeKBp6gpF4a+TUMFOtrwT9f3yXFZilxeyz8op6xV
-7OuoOmRPNYwrePPJiwzfLNpFI4HFCw==
-=oHNR
------END PGP SIGNATURE-----
-
---NsGseYMRAhpBCXIGgmEHdajaCsIMdxfH0--
+-- 
+Thanks.
+-- Max
 
