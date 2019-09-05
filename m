@@ -2,91 +2,109 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99844C3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D933C64E95
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:58:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AAB72082C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:54:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bo7kf47F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AAB72082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 18CFB20820
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:58:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18CFB20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5sDH-0002eR-KZ
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 09:54:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51592)
+	id 1i5sHc-0005Mo-3k
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 09:58:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52861)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i5sCE-0001dW-9a
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:53:12 -0400
+ (envelope-from <thuth@redhat.com>) id 1i5sGw-0004w9-1a
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i5sCC-0007rh-DY
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:53:10 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56188)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i5sCC-0007rC-15
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:53:08 -0400
-Received: by mail-wm1-x341.google.com with SMTP id g207so2894438wmg.5
- for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 06:53:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=jvQSQWirlVyujTR96qV2+Mq0FBny+ywIzibWcHE3Tok=;
- b=bo7kf47FCELKXH0g+aJEqHRT6yuBRxcWo0iybT7mU9BAbWn4ndpX2nguJD5yEPnk+w
- iW9kh7V/puccrU8oXi7HZ26cdYCtGe9GQ2jlRTDQDfcKv45kjHDsIbITBlUxZi/Eyi3V
- UbgCxAx8KXwRAK7x5mTYpnlRUjsYZAU1lLNo65Hr6A+0+AQmqj3woHj7T2ufoqu9yfdc
- K+6GMYFIC+weUQvEan+iStJqC87IELw6DNantdfKlVYxQALBfXq+JZI/Fbb5q3n8el4+
- BPizBw0tSV+E1jhTopmVEw11O+QEsGiPv6S6rSf80vpr6KfAUbo914R+WFPqSbVptD+V
- PR7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=jvQSQWirlVyujTR96qV2+Mq0FBny+ywIzibWcHE3Tok=;
- b=r2cvRFBE9ZmtfzGJ9V65uIOPOeEWaxgQbhZuy4yJiIDQMc2B8ccSfhpIyJOS5P8v+H
- Df6xoRYDK+IHXITvCh1GULWVSmtIOQP32X+yeC+qb4UIlcyuhTCVQFgnEyxS6u0OEEeQ
- YyEz9LcuVQLejYe0H3YaaJsr6olZNxB7++XHWcQLxGntZwK9PYoKB43mn9dJCJhDl8rs
- C5JFbC/b364B+siN5soGiR4TgECy0dIBcP65arrGIRp9nK3OgpmdfNFnRDZ7PyVn39U4
- K++McY2ByGXbvnVteYqWI7Trm9MnI4AkjBCCwiblnsskBojTjivDgD23w9KJt+GaFDWU
- 1Jwg==
-X-Gm-Message-State: APjAAAUGAIJbAgpbu1ntfd6apczONbcZY7YfzBu2Q/tTprPqJSgConTD
- Jsek4kueQIgvqLGLTf8OF/O+gQ==
-X-Google-Smtp-Source: APXvYqyEmSgW8JcbeVkh2PqhkG4QxWtP8oLHUE9bOJCEv2gmAg/i6XBI2igV4u8L1ON0nfRgo7cbTw==
-X-Received: by 2002:a1c:f20a:: with SMTP id s10mr3208294wmc.145.1567691586726; 
- Thu, 05 Sep 2019 06:53:06 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t25sm1710845wmj.29.2019.09.05.06.53.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Sep 2019 06:53:06 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 595631FF87;
- Thu,  5 Sep 2019 14:53:05 +0100 (BST)
-References: <20190820210720.18976-1-richard.henderson@linaro.org>
- <20190820210720.18976-17-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190820210720.18976-17-richard.henderson@linaro.org>
-Date: Thu, 05 Sep 2019 14:53:05 +0100
-Message-ID: <87a7bi97em.fsf@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1i5sGt-0006bw-LA
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:58:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45382)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5sGt-0006Yn-CI
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:57:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D129A10C6976;
+ Thu,  5 Sep 2019 13:57:57 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-96.ams2.redhat.com [10.36.116.96])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D19261000343;
+ Thu,  5 Sep 2019 13:57:56 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>
+References: <20190905111729.1197-1-thuth@redhat.com>
+ <20190905142120.1edb7895@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <9b9263d5-9a83-eb55-fa73-ffe55cd49647@redhat.com>
+Date: Thu, 5 Sep 2019 15:57:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190905142120.1edb7895@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v5 16/17] target/arm: Rebuild hflags at EL
- changes and MSR writes
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Thu, 05 Sep 2019 13:57:57 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] gitlab-ci.yml: Install libattr1-dev and
+ libcap-dev to test virtio-9p
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,106 +116,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 05/09/2019 14.21, Greg Kurz wrote:
+> On Thu,  5 Sep 2019 13:17:29 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> So far the gitlab-ci was not testing virtio-9p yet, since we did not
+>> install libattr1-dev and libcap-dev in any of the pipelines. Do it
+>> now to get some more test coverage.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  .gitlab-ci.yml | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+>> index cd4c03372b..ed8067f5cf 100644
+>> --- a/.gitlab-ci.yml
+>> +++ b/.gitlab-ci.yml
+>> @@ -59,7 +59,7 @@ build-user:
+>>  
+>>  build-clang:
+>>   script:
+>> - - apt-get install -y -qq clang libsdl2-dev
+>> + - apt-get install -y -qq clang libsdl2-dev libattr1-dev libcap-dev
+>>        xfslibs-dev libiscsi-dev libnfs-dev libseccomp-dev gnutls-dev librbd-dev
+>>   - ./configure --cc=clang --cxx=clang++ --enable-werror
+>>        --target-list="alpha-softmmu arm-softmmu m68k-softmmu mips64-softmmu
+> 
+> I don't know gitlab-ci at all but shouldn't these libs be added to some
+> other builds as well ?
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Currently the "features" are distributed over the different pipelines,
+so that the build in total does not take too long. Looking at how long
+the travis stuff takes, I'd also like to try to keep it short here.
 
-> Now setting, but not relying upon, env->hflags.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/syscall.c       |  1 +
->  target/arm/cpu.c           |  1 +
->  target/arm/helper-a64.c    |  3 +++
->  target/arm/helper.c        |  2 ++
->  target/arm/machine.c       |  1 +
->  target/arm/op_helper.c     |  1 +
->  target/arm/translate-a64.c |  6 +++++-
->  target/arm/translate.c     | 18 ++++++++++++++++--
->  8 files changed, 30 insertions(+), 3 deletions(-)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 8b41a03901..be01c33759 100644
-<snip>
-
-I had to manually fix these up due to the patch failing to apply. I
-think because 9e9b10c64911 removes the gen_io_end() calls.
-
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index fc3e5f5c38..4412c60383 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1777,11 +1777,15 @@ static void handle_sys(DisasContext *s, uint32_t =
-insn, bool isread,
->          /* I/O operations must end the TB here (whether read or write) */
->          gen_io_end();
->          s->base.is_jmp =3D DISAS_UPDATE;
-> -    } else if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
-> +    }
-> +    if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
->          /* We default to ending the TB on a coprocessor register write,
->           * but allow this to be suppressed by the register definition
->           * (usually only necessary to work around guest bugs).
->           */
-> +        TCGv_i32 tcg_el =3D tcg_const_i32(s->current_el);
-> +        gen_helper_rebuild_hflags_a64(cpu_env, tcg_el);
-> +        tcg_temp_free_i32(tcg_el);
->          s->base.is_jmp =3D DISAS_UPDATE;
->      }
->  }
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index d948757131..2f7beca065 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -7130,6 +7130,8 @@ static int disas_coproc_insn(DisasContext *s, uint3=
-2_t insn)
->      ri =3D get_arm_cp_reginfo(s->cp_regs,
->              ENCODE_CP_REG(cpnum, is64, s->ns, crn, crm, opc1, opc2));
->      if (ri) {
-> +        bool need_exit_tb;
-> +
->          /* Check access permissions */
->          if (!cp_access_ok(s->current_el, ri, isread)) {
->              return 1;
-> @@ -7301,15 +7303,27 @@ static int disas_coproc_insn(DisasContext *s, uin=
-t32_t insn)
->              }
->          }
->
-> +        need_exit_tb =3D false;
->          if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_C=
-P_IO)) {
->              /* I/O operations must end the TB here (whether read or writ=
-e) */
->              gen_io_end();
-> -            gen_lookup_tb(s);
-> -        } else if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
-> +            need_exit_tb =3D true;
-> +        }
-> +        if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
->              /* We default to ending the TB on a coprocessor register wri=
-te,
->               * but allow this to be suppressed by the register definition
->               * (usually only necessary to work around guest bugs).
->               */
-> +            TCGv_i32 tcg_el =3D tcg_const_i32(s->current_el);
-> +            if (arm_dc_feature(s, ARM_FEATURE_M)) {
-> +                gen_helper_rebuild_hflags_m32(cpu_env, tcg_el);
-> +            } else {
-> +                gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
-> +            }
-> +            tcg_temp_free_i32(tcg_el);
-> +            need_exit_tb =3D true;
-> +        }
-> +        if (need_exit_tb) {
->              gen_lookup_tb(s);
->          }
-
-
---
-Alex Benn=C3=A9e
+ Thomas
 
