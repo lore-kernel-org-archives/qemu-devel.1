@@ -2,65 +2,58 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4882FC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 613CBC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:23:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5ED620820
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:20:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5ED620820
+	by mail.kernel.org (Postfix) with ESMTPS id BF08620820
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:23:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF08620820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5tYj-00072a-67
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 11:20:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41956)
+	id 1i5tbV-0001Ot-Pd
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 11:23:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i5tWY-0005ZQ-P9
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:18:16 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i5ta1-0008T4-NL
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i5tWV-0006Lt-Sx
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:18:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36076)
+ (envelope-from <stefanha@redhat.com>) id 1i5ta0-0007au-5K
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:21:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50494)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5tWV-0006LY-Ku
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:18:11 -0400
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i5tZz-0007a6-Uw
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:21:48 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 714E187521F;
- Thu,  5 Sep 2019 15:18:10 +0000 (UTC)
-Received: from work-vm (ovpn-117-197.ams2.redhat.com [10.36.117.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A56BB19C69;
- Thu,  5 Sep 2019 15:17:58 +0000 (UTC)
-Date: Thu, 5 Sep 2019 16:17:56 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Jag Raman <jag.raman@oracle.com>
-Message-ID: <20190905151756.GM2700@work-vm>
-References: <cover.1567534653.git.jag.raman@oracle.com>
- <3bf3631115123d4a6a360b41ef0aaa47b40ff08d.1567534653.git.jag.raman@oracle.com>
- <20190904081129.GA2828@work-vm>
- <2b0b3ce0-06d6-e953-66fd-ead53110c0a9@oracle.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C2039307D915;
+ Thu,  5 Sep 2019 15:21:46 +0000 (UTC)
+Received: from localhost (ovpn-117-222.ams2.redhat.com [10.36.117.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B50C619C69;
+ Thu,  5 Sep 2019 15:21:37 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org,
+	virtio-fs@redhat.com
+Date: Thu,  5 Sep 2019 16:21:33 +0100
+Message-Id: <20190905152136.30637-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2b0b3ce0-06d6-e953-66fd-ead53110c0a9@oracle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Thu, 05 Sep 2019 15:18:10 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Thu, 05 Sep 2019 15:21:46 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v3 PATCH 01/45] multi-process: memory: alloc
- RAM from file at offset
+Subject: [Qemu-devel] [RFC 0/3] virtiofsd: get/set log level via DBus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,195 +65,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
- john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
- mreitz@redhat.com, kanth.ghatraju@oracle.com, kraxel@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, liran.alon@oracle.com,
- marcandre.lureau@gmail.com, kwolf@redhat.com, rth@twiddle.net
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Eryu Guan <eguan@linux.alibaba.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Jag Raman (jag.raman@oracle.com) wrote:
-> 
-> 
-> On 9/4/2019 4:11 AM, Dr. David Alan Gilbert wrote:
-> > * Jagannathan Raman (jag.raman@oracle.com) wrote:
-> > > Allow RAM MemoryRegion to be created from an offset in a file, instead
-> > > of allocating at offset of 0 by default. This is needed to synchronize
-> > > RAM between QEMU & remote process.
-> > > This will be needed for the following patches.
-> > > 
-> > > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> > > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> > > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > > ---
-> > >   exec.c                    | 11 +++++++----
-> > >   include/exec/ram_addr.h   |  2 +-
-> > >   include/qemu/mmap-alloc.h |  3 ++-
-> > >   memory.c                  |  2 +-
-> > >   util/mmap-alloc.c         |  7 ++++---
-> > >   util/oslib-posix.c        |  2 +-
-> > >   6 files changed, 16 insertions(+), 11 deletions(-)
-> > 
-> > I'm surprised this doesn't change something in
-> > vhost-user.c:vhost_user_set_mem_table so that the vhost-user client
-> > knows what it's mapping?
-> 
-> Hi Dave,
-> 
-> vhost-user does not use the functions addressed in this patch for
-> mapping the RAM onto the remote process. It calls mmap() for this
-> purpose (vu_set_mem_table_exec()).
+It is likely that virtiofsd will need to support "management commands" fo=
+r
+reconfiguring it at runtime.  The first use case was proposed by Eryu Gua=
+n for
+getting/setting the current log level.
 
-It should at least check that the file it's sending over set-mem-table
-has a 0 offset, otherwise things could get confused if someone tries
-to run a vhost-user device on a system that's also running multi-process
-(which should be a whole world of fun!)
+I promised to try out DBus as the management interface because it has a r=
+ich
+feature set and is accessible from most programming languages.  It should=
+ be
+able to support all the use cases we come up with.
 
-dave
+This patch series is a prototype that implements the get-log-level and
+set-log-level management commands via DBus.  Use the new virtiofsctl tool=
+ to
+talk to a running virtiofsd process:
 
-> Thanks!
-> --
-> Jag
-> 
-> > 
-> > Dave
-> > 
-> > > diff --git a/exec.c b/exec.c
-> > > index 3e78de3..b3f1aa9 100644
-> > > --- a/exec.c
-> > > +++ b/exec.c
-> > > @@ -1885,6 +1885,7 @@ static void *file_ram_alloc(RAMBlock *block,
-> > >                               ram_addr_t memory,
-> > >                               int fd,
-> > >                               bool truncate,
-> > > +                            off_t offset,
-> > >                               Error **errp)
-> > >   {
-> > >       MachineState *ms = MACHINE(qdev_get_machine());
-> > > @@ -1936,7 +1937,8 @@ static void *file_ram_alloc(RAMBlock *block,
-> > >       }
-> > >       area = qemu_ram_mmap(fd, memory, block->mr->align,
-> > > -                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
-> > > +                         block->flags & RAM_SHARED, block->flags & RAM_PMEM,
-> > > +                         offset);
-> > >       if (area == MAP_FAILED) {
-> > >           error_setg_errno(errp, errno,
-> > >                            "unable to map backing store for guest RAM");
-> > > @@ -2325,7 +2327,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
-> > >   #ifdef CONFIG_POSIX
-> > >   RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-> > >                                    uint32_t ram_flags, int fd,
-> > > -                                 Error **errp)
-> > > +                                 off_t offset, Error **errp)
-> > >   {
-> > >       RAMBlock *new_block;
-> > >       Error *local_err = NULL;
-> > > @@ -2370,7 +2372,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-> > >       new_block->used_length = size;
-> > >       new_block->max_length = size;
-> > >       new_block->flags = ram_flags;
-> > > -    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
-> > > +    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, offset,
-> > > +                                     errp);
-> > >       if (!new_block->host) {
-> > >           g_free(new_block);
-> > >           return NULL;
-> > > @@ -2400,7 +2403,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-> > >           return NULL;
-> > >       }
-> > > -    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
-> > > +    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
-> > >       if (!block) {
-> > >           if (created) {
-> > >               unlink(mem_path);
-> > > diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> > > index b7b2e60..15837a1 100644
-> > > --- a/include/exec/ram_addr.h
-> > > +++ b/include/exec/ram_addr.h
-> > > @@ -164,7 +164,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-> > >                                      Error **errp);
-> > >   RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-> > >                                    uint32_t ram_flags, int fd,
-> > > -                                 Error **errp);
-> > > +                                 off_t offset, Error **errp);
-> > >   RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-> > >                                     MemoryRegion *mr, Error **errp);
-> > > diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-> > > index e786266..4f57985 100644
-> > > --- a/include/qemu/mmap-alloc.h
-> > > +++ b/include/qemu/mmap-alloc.h
-> > > @@ -25,7 +25,8 @@ void *qemu_ram_mmap(int fd,
-> > >                       size_t size,
-> > >                       size_t align,
-> > >                       bool shared,
-> > > -                    bool is_pmem);
-> > > +                    bool is_pmem,
-> > > +                    off_t start);
-> > >   void qemu_ram_munmap(int fd, void *ptr, size_t size);
-> > > diff --git a/memory.c b/memory.c
-> > > index 5d8c9a9..debed5e 100644
-> > > --- a/memory.c
-> > > +++ b/memory.c
-> > > @@ -1622,7 +1622,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-> > >       mr->destructor = memory_region_destructor_ram;
-> > >       mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
-> > >                                              share ? RAM_SHARED : 0,
-> > > -                                           fd, &err);
-> > > +                                           fd, 0, &err);
-> > >       mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-> > >       if (err) {
-> > >           mr->size = int128_zero();
-> > > diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> > > index f7f177d..4b727bd 100644
-> > > --- a/util/mmap-alloc.c
-> > > +++ b/util/mmap-alloc.c
-> > > @@ -86,7 +86,8 @@ void *qemu_ram_mmap(int fd,
-> > >                       size_t size,
-> > >                       size_t align,
-> > >                       bool shared,
-> > > -                    bool is_pmem)
-> > > +                    bool is_pmem,
-> > > +                    off_t start)
-> > >   {
-> > >       int flags;
-> > >       int map_sync_flags = 0;
-> > > @@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
-> > >       offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
-> > >       ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
-> > > -               flags | map_sync_flags, fd, 0);
-> > > +               flags | map_sync_flags, fd, start);
-> > >       if (ptr == MAP_FAILED && map_sync_flags) {
-> > >           if (errno == ENOTSUP) {
-> > > @@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
-> > >            * we will remove these flags to handle compatibility.
-> > >            */
-> > >           ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
-> > > -                   flags, fd, 0);
-> > > +                   flags, fd, start);
-> > >       }
-> > >       if (ptr == MAP_FAILED) {
-> > > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > > index fe0309c..f6a243f 100644
-> > > --- a/util/oslib-posix.c
-> > > +++ b/util/oslib-posix.c
-> > > @@ -204,7 +204,7 @@ void *qemu_memalign(size_t alignment, size_t size)
-> > >   void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
-> > >   {
-> > >       size_t align = QEMU_VMALLOC_ALIGN;
-> > > -    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
-> > > +    void *ptr = qemu_ram_mmap(-1, size, align, shared, false, 0);
-> > >       if (ptr == MAP_FAILED) {
-> > >           return NULL;
-> > > -- 
-> > > 1.8.3.1
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  # dbus-run-session ./virtiofsd ...
+  ...
+  Using dbus address unix:abstract=3D/tmp/dbus-H9WBbpjk3O,guid=3D0be16ace=
+fb868e6025a8737f5d7124d2
+  # export DBUS_SESSION_BUS_ADDRESS=3Dunix:abstract=3D/tmp/dbus-H9WBbpjk3=
+O,guid=3D0be16acefb868e6025a8737f5d7124d2
+  # ./virtiofsctl set-log-level err
+
+Most of the work is done by gdbus-codegen(1).  It generates code for the
+org.qemu.Virtiofsd.xml interface definition.  Our code can use the simple
+virtiofsd_get/set_log_level() APIs and it will make corresponding DBus ca=
+lls.
+
+I'm pretty happy with this approach because the code is straightforward. =
+ It
+hasn't even triggered seccomp failures yet :).
+
+Error handling is a little problematic.  I noticed that virtiofsctl silen=
+tly
+returns success even if it cannot talk to virtiofsd.  This is due to the =
+code
+generated by gdbus-codegen(1) which has no error reporting :(.  This can =
+be
+solved by writing more low-level GDBus code instead of using the high-lev=
+el
+generated bindings.
+
+What do you think about this approach?
+
+Stefan Hajnoczi (3):
+  virtiofsd: add org.qemu.Virtiofsd interface
+  virtiofsd: add DBus server to handle log level changes
+  virtiofsd: add virtiofsctl command-line management tool
+
+ configure                                |   7 +
+ Makefile                                 |  16 +++
+ Makefile.objs                            |   1 +
+ contrib/virtiofsd/Makefile.objs          |  10 +-
+ contrib/virtiofsd/dbus.h                 |   9 ++
+ contrib/virtiofsd/dbus.c                 | 162 +++++++++++++++++++++++
+ contrib/virtiofsd/passthrough_ll.c       |   8 +-
+ contrib/virtiofsd/virtiofsctl.c          |  55 ++++++++
+ .gitignore                               |   1 +
+ contrib/virtiofsd/org.qemu.Virtiofsd.xml |   7 +
+ 10 files changed, 274 insertions(+), 2 deletions(-)
+ create mode 100644 contrib/virtiofsd/dbus.h
+ create mode 100644 contrib/virtiofsd/dbus.c
+ create mode 100644 contrib/virtiofsd/virtiofsctl.c
+ create mode 100644 contrib/virtiofsd/org.qemu.Virtiofsd.xml
+
+--=20
+2.21.0
+
 
