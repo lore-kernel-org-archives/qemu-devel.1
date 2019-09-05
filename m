@@ -2,116 +2,104 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 464F2C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 14:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E4A0C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B1D6206CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 14:53:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A920D2082C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 15:10:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="alraJ4vt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B1D6206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PNfizHMF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A920D2082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5t8b-0007JA-7M
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 10:53:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36032)
+	id 1i5tOd-0008Ks-7b
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 11:10:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1i5t7r-0006pF-Pg
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:52:45 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1i5tMr-0006gu-4g
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1i5t7p-000885-TV
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:52:42 -0400
-Received: from mail-eopbgr20134.outbound.protection.outlook.com
- ([40.107.2.134]:19614 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ (envelope-from <jag.raman@oracle.com>) id 1i5tMo-0001d7-BS
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:08:12 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:54052)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1i5t7p-00086G-5R; Thu, 05 Sep 2019 10:52:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MUp/FoUMK1ykR3XrO6sorKlPXxqGgtMcTxnkkU7SHCi6suYkaLuuBK7Ow82NcUefd58ry73NzTtYYW4yzb1YTviZGExhFJEV+91dI+TjXLwPiv0jm1i6tqyKbG9rbhAXZ+aMlfOtyw/LXO/MfTLkKj3s9NaPt6X1bd+jKS0XdTdWK80n9/HT/CezdFrZgNaYzkXzN38/o1D+W8Frh+ME7++ra6TWZ8cjjGGxv7NqqKOddyQlj85MEfotlzyqcUoSddlSOKCuR28RexB9xrq9O6QHAPvyqLgSRGd6hHVDb5IZLrmJbeEG/19xGGeOUQBYDf9u5rXr1nZYOu/KUYiwrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V/iuCxWa47fmVGm6vaG4Y23dLnWnW0jsYJt0idWnF2Q=;
- b=LZnEKq2rnQFYy9jquGbHGv914y0pKznbTvdz32uX+ceWBSYkuTXc7ABHztly6ekrDZ+7OT6IdBbP3S4BazhNPm4tTAZa5VIAeSxJODHYj6gkalFa3BRwJ/O3yZiTkQKGwND4zkyof84P+xWzqX+47HR68huyl4g8Hz195xR32x+nzMU5xsCJQRMmcSqA4azlpGQS+4y6+5/QY+RbbaqawwMckVR/hzQAP4cUQqB79e7FOJ6mWyxtYGsbE9JBRxxYEybQtQt/6Grt44pra7/8F3gKYRA8ZI/FNafmjA92ijYYFzcEcIAsvaNXOK0GXR+c1Bw7pZahVezCB2zvVp71mg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V/iuCxWa47fmVGm6vaG4Y23dLnWnW0jsYJt0idWnF2Q=;
- b=alraJ4vttHt/IeTjBECZ6qn6Rr7I0Nir2V+4lwHtVOLoymrt/Z2mgK3xpEGzoQ/da4zDd9Ovt+kJrZDiKH1jAf9sRzXMDYdITUK03h7gOklzuz5yY6kFDnyCU783kZRxZGF4OYA7IaBDSN1kDjm1sFvRBxb7M3f+HYvF4o9Fv+4=
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
- AM0PR08MB3425.eurprd08.prod.outlook.com (20.177.109.30) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2220.21; Thu, 5 Sep 2019 14:52:38 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::302b:b479:1322:9d31]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::302b:b479:1322:9d31%5]) with mapi id 15.20.2241.014; Thu, 5 Sep 2019
- 14:52:38 +0000
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v5 3/3] qcow2: add zstd cluster compression
-Thread-Index: AQHVYzruEZDsZDoirUyQ0IuQtSHLpKcctO0AgABxzQCAAAXtgA==
-Date: Thu, 5 Sep 2019 14:52:37 +0000
-Message-ID: <ff1d7775-0ded-3791-2db6-51773af5b5e4@virtuozzo.com>
-References: <20190904152915.30755-1-dplotnikov@virtuozzo.com>
- <20190904152915.30755-4-dplotnikov@virtuozzo.com>
- <2ff3dc82-ea8c-10a8-fb4c-8081abc3775e@redhat.com>
- <1feb49e1-bab1-ac10-3232-95d696995b96@virtuozzo.com>
- <829a32ee-0a5a-7bc6-e696-d3315ec53c13@redhat.com>
-In-Reply-To: <829a32ee-0a5a-7bc6-e696-d3315ec53c13@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=dplotnikov@virtuozzo.com; 
-x-originating-ip: [31.180.210.224]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2ded0807-83e9-4ee0-6027-08d73210b1e0
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600166)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:AM0PR08MB3425; 
-x-ms-traffictypediagnostic: AM0PR08MB3425:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB3425907746EA1F3477F78C9DCFBB0@AM0PR08MB3425.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1332;
-x-forefront-prvs: 015114592F
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(39840400004)(346002)(376002)(396003)(136003)(199004)(189003)(186003)(76176011)(53936002)(2201001)(99286004)(64756008)(26005)(4744005)(6512007)(86362001)(31696002)(102836004)(66556008)(66476007)(66446008)(3846002)(6116002)(7736002)(8936002)(256004)(81166006)(81156014)(8676002)(6486002)(31686004)(66946007)(36756003)(5660300002)(478600001)(71200400001)(71190400001)(53546011)(305945005)(6506007)(6246003)(6436002)(316002)(66066001)(446003)(76116006)(2616005)(4326008)(14454004)(229853002)(476003)(110136005)(54906003)(25786009)(2501003)(486006)(2906002)(11346002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3425;
- H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: LgvyKd09UTrPr0LOmkwq7vBD2pSMeh0gIs3OdcqtocRIg2AL1PtiLySBla+JPXeASH9TkDTSpiiABAwRn5H3JtOIQZgyiJaOdjrwuptCtCf54X7BwRMmw2Cg7GEdeQDi7EoTr8sceIivbK1phsl31DmqiVpOKx8LPHnIImSirA3/16BNhYA/A6W553UXlBu7tEzOF1SfSOjOItoJ57UggI+YNBs6hAntyyHrqzq2weQ1W18HxzDNmCbf0/QGXxktPmVzDKfRzqFncVd4c33PwhAjhH4/9YlZMoZMPyV6lw661pPc2DFUHkBTD7rltiO+BqfMXShT+wH2Zk0WmTwYWio8m4jRTh3+bHyh66mzExPaNOSextbYE6B9wNKKvuBjOGQZloAp+iAZF1Vt7ilVVBDhLeUy1dCdeWro9avb7o0=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6B74CEC9C0D19E4293F25B2443FE6EE4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1i5tMn-0001be-QD
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 11:08:10 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85F76le056386;
+ Thu, 5 Sep 2019 15:07:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=1CuojXYGP/huYoiQZ5EIJHtZPWB2y2BspqueRIuhvFU=;
+ b=PNfizHMFaynsOQrUlqZe3P1t3exSXQjQcDL659S4zsLrvVqgEa86aIx80bqd2xGtT2+w
+ Ekgm2ULEMiEcDuO4Oc/bnkmsNZnSjgZfln8vLiL02CfJDcnu67I8SNN5gB/88jWKUvVZ
+ fy7BqPc3vEvxx5ybgJUC5iGXoHc67B51yHMdGv/kXntUblwAPHqet8d9n1tAer4RzI2Q
+ gNVs3NjA02mec0tZUokJzL3N1MojcXiaev/eJraJKlfhxScCHIEmLx32mxksrEq9SbMf
+ HnMfzbuo3+v4ZK1hIbO+ESG8G8QTz1ZgJohTJziyDAQuGRnLH3ufLskQxa9gZDWafKJr fQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2uu4q70062-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 05 Sep 2019 15:07:50 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85EmFa1145193;
+ Thu, 5 Sep 2019 15:07:50 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3020.oracle.com with ESMTP id 2utvr3r5yh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 05 Sep 2019 15:07:50 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x85F7lIE026784;
+ Thu, 5 Sep 2019 15:07:47 GMT
+Received: from [10.152.34.2] (/10.152.34.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 05 Sep 2019 08:07:47 -0700
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <cover.1567534653.git.jag.raman@oracle.com>
+ <3bf3631115123d4a6a360b41ef0aaa47b40ff08d.1567534653.git.jag.raman@oracle.com>
+ <20190904081129.GA2828@work-vm>
+From: Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <2b0b3ce0-06d6-e953-66fd-ead53110c0a9@oracle.com>
+Date: Thu, 5 Sep 2019 11:07:44 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ded0807-83e9-4ee0-6027-08d73210b1e0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Sep 2019 14:52:37.9762 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: eiNM+OWDhqpDyJwjKX5VZnnUnu3VFmfNzaw2QxlF9reA41c1bjulhF49VZDJBbFNa/xV9FQGhLXBLJA1hCFhLhV/MChPWcycC91mmpa3N4M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3425
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.2.134
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] qcow2: add zstd cluster compression
+In-Reply-To: <20190904081129.GA2828@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9370
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909050143
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9370
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909050143
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.78
+Subject: Re: [Qemu-devel] [RFC v3 PATCH 01/45] multi-process: memory: alloc
+ RAM from file at offset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,29 +111,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
+ john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
+ mreitz@redhat.com, kanth.ghatraju@oracle.com, kraxel@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com, liran.alon@oracle.com,
+ marcandre.lureau@gmail.com, kwolf@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gMDUuMDkuMjAxOSAxNzozMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gOS81LzE5IDI6NDQg
-QU0sIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4NCj4NCj4+Pj4gKw0KPj4+PiArICAgIHNfc2l6
-ZSA9IGJlMzJfdG9fY3B1KCooY29uc3QgdWludDMyX3QgKikgc3JjKTsNCj4+PiBBcyB3cml0dGVu
-LCB0aGlzIGxvb2tzIGxpa2UgeW91IG1heSBiZSBkZXJlZmVyZW5jaW5nIGFuIHVuYWxpZ25lZA0K
-Pj4+IHBvaW50ZXIuICBJdCBzbyBoYXBwZW5zIHRoYXQgYmUzMl90b19jcHUoKSBhcHBsaWVzICYg
-dG8geW91ciAqIHRvIGdldA0KPj4+IGJhY2sgYXQgdGhlIHJhdyBwb2ludGVyLCBhbmQgdGhlbiBp
-cyBjYXJlZnVsIHRvIGhhbmRsZSB1bmFsaWduZWQNCj4+PiBwb2ludGVycywgc28gaXQgd29ya3M7
-IGJ1dCBpdCB3b3VsZCBsb29rIGEgbG90IG5pY2VyIGFzIG1lcmVseToNCj4+Pg0KPj4+IHNfc2l6
-ZSA9IGJlMzJfdG9fY3B1KHNyYyk7DQo+PiB5ZXMsIGJ1dCBJIGNhbid0IHVzZSBiZTMyX3RvX2Nw
-dSgqc3JjKSBzaW5jZSBzcmMgaXMgYSB2b2lkIHBvaW50ZXINCj4gVGhlbiB3ZSBuZWVkIHRoZSBj
-b3JyZWN0IGxkKl9wIGZ1bmN0aW9uOyBzb3JyeSBmb3IgbGVhZGluZyB5b3UgZG93biB0aGUNCj4g
-d3JvbmcgcGF0aC4gIExvb2tzIGxpa2UgdGhlIHJpZ2h0IG9uZSBpczoNCj4NCj4gc19zaXplID0g
-bGRsX2JlX3Aoc3JjKQ0KPg0KPiAoaW5jbHVkZS9xZW11L2Jzd2FwLmggaGFzIHNvbWUgZ29vZCBj
-b21tZW50cywgYnV0IHlvdSBoYXZlIHRvIGtub3cgdGhleQ0KPiBleGlzdC4uLikNCg0KTm8gcHJv
-YmxlbSwgdGhhdCBoYXBwZW5zLiBCeSB0aGUgd2F5LCBJJ3ZlIGFscmVhZHkgc2VudCB0aGUgc2Vy
-aWVzIHVzaW5nIA0KbGRsX2JlX3ANCg0KVGhhbmtzIQ0KDQpEZW5pcw0KDQo+DQoNCg==
+
+
+On 9/4/2019 4:11 AM, Dr. David Alan Gilbert wrote:
+> * Jagannathan Raman (jag.raman@oracle.com) wrote:
+>> Allow RAM MemoryRegion to be created from an offset in a file, instead
+>> of allocating at offset of 0 by default. This is needed to synchronize
+>> RAM between QEMU & remote process.
+>> This will be needed for the following patches.
+>>
+>> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+>> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+>> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+>> ---
+>>   exec.c                    | 11 +++++++----
+>>   include/exec/ram_addr.h   |  2 +-
+>>   include/qemu/mmap-alloc.h |  3 ++-
+>>   memory.c                  |  2 +-
+>>   util/mmap-alloc.c         |  7 ++++---
+>>   util/oslib-posix.c        |  2 +-
+>>   6 files changed, 16 insertions(+), 11 deletions(-)
+> 
+> I'm surprised this doesn't change something in
+> vhost-user.c:vhost_user_set_mem_table so that the vhost-user client
+> knows what it's mapping?
+
+Hi Dave,
+
+vhost-user does not use the functions addressed in this patch for
+mapping the RAM onto the remote process. It calls mmap() for this
+purpose (vu_set_mem_table_exec()).
+
+Thanks!
+--
+Jag
+
+> 
+> Dave
+> 
+>> diff --git a/exec.c b/exec.c
+>> index 3e78de3..b3f1aa9 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -1885,6 +1885,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>>                               ram_addr_t memory,
+>>                               int fd,
+>>                               bool truncate,
+>> +                            off_t offset,
+>>                               Error **errp)
+>>   {
+>>       MachineState *ms = MACHINE(qdev_get_machine());
+>> @@ -1936,7 +1937,8 @@ static void *file_ram_alloc(RAMBlock *block,
+>>       }
+>>   
+>>       area = qemu_ram_mmap(fd, memory, block->mr->align,
+>> -                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
+>> +                         block->flags & RAM_SHARED, block->flags & RAM_PMEM,
+>> +                         offset);
+>>       if (area == MAP_FAILED) {
+>>           error_setg_errno(errp, errno,
+>>                            "unable to map backing store for guest RAM");
+>> @@ -2325,7 +2327,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+>>   #ifdef CONFIG_POSIX
+>>   RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>>                                    uint32_t ram_flags, int fd,
+>> -                                 Error **errp)
+>> +                                 off_t offset, Error **errp)
+>>   {
+>>       RAMBlock *new_block;
+>>       Error *local_err = NULL;
+>> @@ -2370,7 +2372,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>>       new_block->used_length = size;
+>>       new_block->max_length = size;
+>>       new_block->flags = ram_flags;
+>> -    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
+>> +    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, offset,
+>> +                                     errp);
+>>       if (!new_block->host) {
+>>           g_free(new_block);
+>>           return NULL;
+>> @@ -2400,7 +2403,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+>>           return NULL;
+>>       }
+>>   
+>> -    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
+>> +    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
+>>       if (!block) {
+>>           if (created) {
+>>               unlink(mem_path);
+>> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+>> index b7b2e60..15837a1 100644
+>> --- a/include/exec/ram_addr.h
+>> +++ b/include/exec/ram_addr.h
+>> @@ -164,7 +164,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+>>                                      Error **errp);
+>>   RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>>                                    uint32_t ram_flags, int fd,
+>> -                                 Error **errp);
+>> +                                 off_t offset, Error **errp);
+>>   
+>>   RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+>>                                     MemoryRegion *mr, Error **errp);
+>> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+>> index e786266..4f57985 100644
+>> --- a/include/qemu/mmap-alloc.h
+>> +++ b/include/qemu/mmap-alloc.h
+>> @@ -25,7 +25,8 @@ void *qemu_ram_mmap(int fd,
+>>                       size_t size,
+>>                       size_t align,
+>>                       bool shared,
+>> -                    bool is_pmem);
+>> +                    bool is_pmem,
+>> +                    off_t start);
+>>   
+>>   void qemu_ram_munmap(int fd, void *ptr, size_t size);
+>>   
+>> diff --git a/memory.c b/memory.c
+>> index 5d8c9a9..debed5e 100644
+>> --- a/memory.c
+>> +++ b/memory.c
+>> @@ -1622,7 +1622,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+>>       mr->destructor = memory_region_destructor_ram;
+>>       mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
+>>                                              share ? RAM_SHARED : 0,
+>> -                                           fd, &err);
+>> +                                           fd, 0, &err);
+>>       mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>>       if (err) {
+>>           mr->size = int128_zero();
+>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+>> index f7f177d..4b727bd 100644
+>> --- a/util/mmap-alloc.c
+>> +++ b/util/mmap-alloc.c
+>> @@ -86,7 +86,8 @@ void *qemu_ram_mmap(int fd,
+>>                       size_t size,
+>>                       size_t align,
+>>                       bool shared,
+>> -                    bool is_pmem)
+>> +                    bool is_pmem,
+>> +                    off_t start)
+>>   {
+>>       int flags;
+>>       int map_sync_flags = 0;
+>> @@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
+>>       offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
+>>   
+>>       ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
+>> -               flags | map_sync_flags, fd, 0);
+>> +               flags | map_sync_flags, fd, start);
+>>   
+>>       if (ptr == MAP_FAILED && map_sync_flags) {
+>>           if (errno == ENOTSUP) {
+>> @@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
+>>            * we will remove these flags to handle compatibility.
+>>            */
+>>           ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
+>> -                   flags, fd, 0);
+>> +                   flags, fd, start);
+>>       }
+>>   
+>>       if (ptr == MAP_FAILED) {
+>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+>> index fe0309c..f6a243f 100644
+>> --- a/util/oslib-posix.c
+>> +++ b/util/oslib-posix.c
+>> @@ -204,7 +204,7 @@ void *qemu_memalign(size_t alignment, size_t size)
+>>   void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+>>   {
+>>       size_t align = QEMU_VMALLOC_ALIGN;
+>> -    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
+>> +    void *ptr = qemu_ram_mmap(-1, size, align, shared, false, 0);
+>>   
+>>       if (ptr == MAP_FAILED) {
+>>           return NULL;
+>> -- 
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
