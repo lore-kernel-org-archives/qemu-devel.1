@@ -2,52 +2,59 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F039C3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 09:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DDDC3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 09:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4230221743
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 09:35:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4230221743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A4A420825
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 09:45:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A4A420825
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5oAs-0001Wa-BN
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 05:35:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46017)
+	id 1i5oKK-0003ho-C5
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 05:45:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1i5o6t-00062O-Tw
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 05:31:26 -0400
+ (envelope-from <pl@kamp.de>) id 1i5oJ5-0003An-8K
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 05:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1i5o6r-00019T-Rx
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 05:31:23 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38104)
+ (envelope-from <pl@kamp.de>) id 1i5oJ3-0007X7-SS
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 05:43:58 -0400
+Received: from kerio.kamp.de ([195.62.97.192]:45013)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1i5o6r-00017L-Gb; Thu, 05 Sep 2019 05:31:21 -0400
-Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1i5o6o-0004LP-7d; Thu, 05 Sep 2019 12:31:18 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: armbru@redhat.com,
-	qemu-devel@nongnu.org
-Date: Thu,  5 Sep 2019 12:31:07 +0300
-Message-Id: <20190905093109.12261-2-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20190905093109.12261-1-dplotnikov@virtuozzo.com>
-References: <20190905093109.12261-1-dplotnikov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v6 1/3] qcow2: introduce compression type
- feature
+ (Exim 4.71) (envelope-from <pl@kamp.de>)
+ id 1i5oJ3-0007TU-MF; Thu, 05 Sep 2019 05:43:57 -0400
+X-Footer: a2FtcC5kZQ==
+Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
+ by kerio.kamp.de with ESMTPSA
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
+ Thu, 5 Sep 2019 11:43:45 +0200
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190903134442.15653-1-pl@kamp.de>
+ <20190903145650.GO4582@localhost.localdomain>
+ <1BDCDF9A-2146-43FE-AF4B-145F479AFD2B@kamp.de>
+ <20190904093459.GA21246@localhost.localdomain>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <d3d2014b-d57e-cff1-d605-859fe94f84fc@kamp.de>
+Date: Thu, 5 Sep 2019 11:43:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190904093459.GA21246@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 195.62.97.192
+Subject: Re: [Qemu-devel] [PATCH] block/nfs: add support for nfs_umount
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,367 +66,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: ronniesahlberg@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch adds some preparation parts for incompatible compression type
-feature to QCOW2 header that indicates that *all* compressed clusters
-must be (de)compressed using a certain compression type.
+Am 04.09.19 um 11:34 schrieb Kevin Wolf:
+> Am 03.09.2019 um 21:52 hat Peter Lieven geschrieben:
+>>
+>>> Am 03.09.2019 um 16:56 schrieb Kevin Wolf <kwolf@redhat.com>:
+>>>
+>>> Am 03.09.2019 um 15:44 hat Peter Lieven geschrieben:
+>>>> libnfs recently added support for unmounting. Add support
+>>>> in Qemu too.
+>>>>
+>>>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>>> Looks trivial enough to review even for me. :-)
+>>>
+>>> Thanks, applied to the block branch.
+>>>
+>>> Kevin
+>> I am not sure what the reason is, but with this patch I sometimes run
+>> into nfs_process_read being called for a cdrom mounted from nfs after
+>> I ejected it (and the whole nfs client context is already destroyed).
+> Does this mean that nfs_umount() gets some response, but we don't
+> properly wait for it? Or is some older request still in flight?
 
-It is implied that the compression type is set on the image creation and
-can be changed only later by image conversion, thus compression type
-defines the only compression algorithm used for the image.
 
-The goal of the feature is to add support of other compression algorithms
-to qcow2. For example, ZSTD which is more effective on compression than ZLIB.
-It works roughly 2x faster than ZLIB providing a comparable compression ratio
-and therefore provides a performance advantage in backup scenarios.
+nfs_umount itself is a sync call and should only terminate when
 
-The default compression is ZLIB. Images created with ZLIB compression type
-are backward compatible with older qemu versions.
+the call is done. But there is an independent I/O handler in that
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- block/qcow2.c             | 91 +++++++++++++++++++++++++++++++++++++++
- block/qcow2.h             | 26 ++++++++---
- docs/interop/qcow2.txt    | 18 +++++++-
- include/block/block_int.h |  1 +
- qapi/block-core.json      | 22 +++++++++-
- 5 files changed, 148 insertions(+), 10 deletions(-)
+function polling on the fd. (wait_for_nfs_reply in libnfs-sync.c).
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 039bdc2f7e..2884b9d9f2 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1197,6 +1197,32 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
-     return ret;
- }
- 
-+static int check_compression_type(BDRVQcow2State *s, Error **errp)
-+{
-+    switch (s->compression_type) {
-+    case QCOW2_COMPRESSION_TYPE_ZLIB:
-+        break;
-+
-+    default:
-+        error_setg(errp, "qcow2: unknown compression type: %u",
-+                   s->compression_type);
-+        return -ENOTSUP;
-+    }
-+
-+    /*
-+     * if the compression type differs from QCOW2_COMPRESSION_TYPE_ZLIB
-+     * the incompatible feature flag must be set
-+     */
-+
-+    if (s->compression_type != QCOW2_COMPRESSION_TYPE_ZLIB &&
-+        !(s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION_TYPE)) {
-+            error_setg(errp, "qcow2: Invalid compression type setting");
-+            return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
- /* Called with s->lock held.  */
- static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-                                       int flags, Error **errp)
-@@ -1312,6 +1338,35 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     s->compatible_features      = header.compatible_features;
-     s->autoclear_features       = header.autoclear_features;
- 
-+    /*
-+     * Handle compression type
-+     * Older qcow2 images don't contain the compression type header.
-+     * Distinguish them by the header length and use
-+     * the only valid (default) compression type in that case
-+     */
-+    if (header.header_length > offsetof(QCowHeader, compression_type)) {
-+        /* sanity check that we can read a compression type */
-+        size_t min_len = offsetof(QCowHeader, compression_type) +
-+                         sizeof(header.compression_type);
-+        if (header.header_length < min_len) {
-+            error_setg(errp,
-+                       "Could not read compression type, "
-+                       "qcow2 header is too short");
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+
-+        header.compression_type = be32_to_cpu(header.compression_type);
-+        s->compression_type = header.compression_type;
-+    } else {
-+        s->compression_type = QCOW2_COMPRESSION_TYPE_ZLIB;
-+    }
-+
-+    ret = check_compression_type(s, errp);
-+    if (ret) {
-+        goto fail;
-+    }
-+
-     if (s->incompatible_features & ~QCOW2_INCOMPAT_MASK) {
-         void *feature_table = NULL;
-         qcow2_read_extensions(bs, header.header_length, ext_end,
-@@ -2516,6 +2571,12 @@ int qcow2_update_header(BlockDriverState *bs)
-     total_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-     refcount_table_clusters = s->refcount_table_size >> (s->cluster_bits - 3);
- 
-+    ret = check_compression_type(s, NULL);
-+
-+    if (ret) {
-+        goto fail;
-+    }
-+
-     *header = (QCowHeader) {
-         /* Version 2 fields */
-         .magic                  = cpu_to_be32(QCOW_MAGIC),
-@@ -2538,6 +2599,7 @@ int qcow2_update_header(BlockDriverState *bs)
-         .autoclear_features     = cpu_to_be64(s->autoclear_features),
-         .refcount_order         = cpu_to_be32(s->refcount_order),
-         .header_length          = cpu_to_be32(header_length),
-+        .compression_type       = cpu_to_be32(s->compression_type),
-     };
- 
-     /* For older versions, write a shorter header */
-@@ -2635,6 +2697,11 @@ int qcow2_update_header(BlockDriverState *bs)
-                 .bit  = QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
-                 .name = "lazy refcounts",
-             },
-+            {
-+                .type = QCOW2_FEAT_TYPE_INCOMPATIBLE,
-+                .bit  = QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
-+                .name = "compression type",
-+            },
-         };
- 
-         ret = header_ext_add(buf, QCOW2_EXT_MAGIC_FEATURE_TABLE,
-@@ -3202,6 +3269,7 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         .refcount_table_offset      = cpu_to_be64(cluster_size),
-         .refcount_table_clusters    = cpu_to_be32(1),
-         .refcount_order             = cpu_to_be32(refcount_order),
-+        .compression_type           = cpu_to_be32(QCOW2_COMPRESSION_TYPE_ZLIB),
-         .header_length              = cpu_to_be32(sizeof(*header)),
-     };
- 
-@@ -3221,6 +3289,21 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-             cpu_to_be64(QCOW2_AUTOCLEAR_DATA_FILE_RAW);
-     }
- 
-+    if (qcow2_opts->has_compression_type &&
-+        qcow2_opts->compression_type != QCOW2_COMPRESSION_TYPE_ZLIB) {
-+
-+        switch (qcow2_opts->compression_type) {
-+        default:
-+            error_setg_errno(errp, -EINVAL, "Unknown compression type");
-+            goto out;
-+        }
-+
-+        header->compression_type = cpu_to_be32(qcow2_opts->compression_type);
-+
-+        header->incompatible_features |=
-+            cpu_to_be64(QCOW2_INCOMPAT_COMPRESSION_TYPE);
-+    }
-+
-     ret = blk_pwrite(blk, 0, header, cluster_size, 0);
-     g_free(header);
-     if (ret < 0) {
-@@ -3402,6 +3485,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
-         { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
-         { BLOCK_OPT_COMPAT_LEVEL,       "version" },
-         { BLOCK_OPT_DATA_FILE_RAW,      "data-file-raw" },
-+        { BLOCK_OPT_COMPRESSION_TYPE,   "compression-type" },
-         { NULL, NULL },
-     };
- 
-@@ -4598,6 +4682,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-             .data_file          = g_strdup(s->image_data_file),
-             .has_data_file_raw  = has_data_file(bs),
-             .data_file_raw      = data_file_is_raw(bs),
-+            .compression_type   = s->compression_type,
-         };
-     } else {
-         /* if this assertion fails, this probably means a new version was
-@@ -5163,6 +5248,12 @@ static QemuOptsList qcow2_create_opts = {
-             .help = "Width of a reference count entry in bits",
-             .def_value_str = "16"
-         },
-+        {
-+            .name = BLOCK_OPT_COMPRESSION_TYPE,
-+            .type = QEMU_OPT_STRING,
-+            .help = "Compression method used for image clusters compression",
-+            .def_value_str = "zlib"
-+        },
-         { /* end of list */ }
-     }
- };
-diff --git a/block/qcow2.h b/block/qcow2.h
-index fc1b0d3c1e..659e4f852a 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -140,6 +140,7 @@ typedef struct QCowHeader {
- 
-     uint32_t refcount_order;
-     uint32_t header_length;
-+    uint32_t compression_type;
- } QEMU_PACKED QCowHeader;
- 
- typedef struct QEMU_PACKED QCowSnapshotHeader {
-@@ -203,16 +204,20 @@ enum {
- 
- /* Incompatible feature bits */
- enum {
--    QCOW2_INCOMPAT_DIRTY_BITNR      = 0,
--    QCOW2_INCOMPAT_CORRUPT_BITNR    = 1,
--    QCOW2_INCOMPAT_DATA_FILE_BITNR  = 2,
--    QCOW2_INCOMPAT_DIRTY            = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
--    QCOW2_INCOMPAT_CORRUPT          = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
--    QCOW2_INCOMPAT_DATA_FILE        = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-+    QCOW2_INCOMPAT_DIRTY_BITNR            = 0,
-+    QCOW2_INCOMPAT_CORRUPT_BITNR          = 1,
-+    QCOW2_INCOMPAT_DATA_FILE_BITNR        = 2,
-+    QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR = 3,
-+    QCOW2_INCOMPAT_DIRTY                  = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
-+    QCOW2_INCOMPAT_CORRUPT                = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
-+    QCOW2_INCOMPAT_DATA_FILE              = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-+    QCOW2_INCOMPAT_COMPRESSION_TYPE       =
-+        1 << QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
- 
-     QCOW2_INCOMPAT_MASK             = QCOW2_INCOMPAT_DIRTY
-                                     | QCOW2_INCOMPAT_CORRUPT
--                                    | QCOW2_INCOMPAT_DATA_FILE,
-+                                    | QCOW2_INCOMPAT_DATA_FILE
-+                                    | QCOW2_INCOMPAT_COMPRESSION_TYPE,
- };
- 
- /* Compatible feature bits */
-@@ -359,6 +364,13 @@ typedef struct BDRVQcow2State {
- 
-     bool metadata_preallocation_checked;
-     bool metadata_preallocation;
-+    /*
-+     * Compression type used for the image. Default: 0 - ZLIB
-+     * The image compression type is set on image creation.
-+     * The only way to change the compression type is to convert the image
-+     * with the desired compression type set
-+     */
-+    Qcow2CompressionType compression_type;
- } BDRVQcow2State;
- 
- typedef struct Qcow2COWRegion {
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index af5711e533..59e09caacf 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -109,7 +109,12 @@ in the description of a field.
-                                 An External Data File Name header extension may
-                                 be present if this bit is set.
- 
--                    Bits 3-63:  Reserved (set to 0)
-+                    Bit 3:      Compression type bit. The bit must be set if
-+                                the compression type differs from default of zlib.
-+                                If the compression type is default the bit should
-+                                be unset.
-+
-+                    Bits 4-63:  Reserved (set to 0)
- 
-          80 -  87:  compatible_features
-                     Bitmask of compatible features. An implementation can
-@@ -165,6 +170,17 @@ in the description of a field.
-                     Length of the header structure in bytes. For version 2
-                     images, the length is always assumed to be 72 bytes.
- 
-+        104 - 107:  compression_type
-+                    Defines the compression method used for compressed clusters.
-+                    A single compression type is applied to all compressed image
-+                    clusters.
-+                    The default compression type is zlib (value: 0).
-+                    When the compression type differs from the default
-+                    the compression type bit (incompatible feature bit 3)
-+                    must be set.
-+                    Available compression type values:
-+                        0: zlib <https://www.zlib.net/> (default)
-+
- Directly after the image header, optional sections called header extensions can
- be stored. Each extension has a structure like the following:
- 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 3aa1e832a8..4b254802e5 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -58,6 +58,7 @@
- #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
- #define BLOCK_OPT_DATA_FILE         "data_file"
- #define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
-+#define BLOCK_OPT_COMPRESSION_TYPE  "compression_type"
- 
- #define BLOCK_PROBE_BUF_SIZE        512
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0d43d4f37c..2c002ca6a9 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -78,6 +78,8 @@
- #
- # @bitmaps: A list of qcow2 bitmap details (since 4.0)
- #
-+# @compression-type: the image cluster compression method (since 4.2)
-+#
- # Since: 1.7
- ##
- { 'struct': 'ImageInfoSpecificQCow2',
-@@ -89,7 +91,8 @@
-       '*corrupt': 'bool',
-       'refcount-bits': 'int',
-       '*encrypt': 'ImageInfoSpecificQCow2Encryption',
--      '*bitmaps': ['Qcow2BitmapInfo']
-+      '*bitmaps': ['Qcow2BitmapInfo'],
-+      'compression-type': 'Qcow2CompressionType'
-   } }
- 
- ##
-@@ -4274,6 +4277,18 @@
-   'data': [ 'v2', 'v3' ] }
- 
- 
-+##
-+# @Qcow2CompressionType:
-+#
-+# Compression type used in qcow2 image file
-+#
-+# @zlib:  zlib compression, see <http://zlib.net/>
-+#
-+# Since: 4.2
-+##
-+{ 'enum': 'Qcow2CompressionType',
-+  'data': [ 'zlib' ] }
-+
- ##
- # @BlockdevCreateOptionsQcow2:
- #
-@@ -4297,6 +4312,8 @@
- #                   allowed values: off, falloc, full, metadata)
- # @lazy-refcounts   True if refcounts may be updated lazily (default: off)
- # @refcount-bits    Width of reference counts in bits (default: 16)
-+# @compression-type The image cluster compression method
-+#                   (default: zlib, since 4.2)
- #
- # Since: 2.12
- ##
-@@ -4312,7 +4329,8 @@
-             '*cluster-size':    'size',
-             '*preallocation':   'PreallocMode',
-             '*lazy-refcounts':  'bool',
--            '*refcount-bits':   'int' } }
-+            '*refcount-bits':   'int',
-+            '*compression-type': 'Qcow2CompressionType' } }
- 
- ##
- # @BlockdevCreateOptionsQed:
--- 
-2.17.0
+This is why I thought the right solution is to stop the Qemu I/O handler
+
+before calling nfs_close and nfs_umount. nfs_close also uses this
+
+sync I/O handler, but for some reason it seems not to make trouble.
+
+
+The other solution would be to use the async versions of close and umount,
+
+but that would make the code in Qemu more complex.
+
+
+Peter
+
 
 
