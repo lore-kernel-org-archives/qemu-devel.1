@@ -2,63 +2,89 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C70C3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB9FC3A5AA
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:36:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D54221883
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:35:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D54221883
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
+	by mail.kernel.org (Postfix) with ESMTPS id F124C21883
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F124C21883
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5p6o-0001Mw-Dw
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:35:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34963)
+	id 1i5p7m-0002I2-Sd
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pl@kamp.de>) id 1i5p3u-000072-Fj
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:32:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1i5p4a-0000cV-3i
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:33:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pl@kamp.de>) id 1i5p3s-0003w0-2R
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:32:21 -0400
-Received: from kerio.kamp.de ([195.62.97.192]:45533)
+ (envelope-from <philmd@redhat.com>) id 1i5p4Y-0004Ra-TP
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:33:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59114)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pl@kamp.de>)
- id 1i5p3o-0003ug-Qz; Thu, 05 Sep 2019 06:32:18 -0400
-X-Footer: a2FtcC5kZQ==
-Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
- by kerio.kamp.de with ESMTPSA
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
- Thu, 5 Sep 2019 12:32:10 +0200
-To: ronnie sahlberg <ronniesahlberg@gmail.com>
-References: <20190903134442.15653-1-pl@kamp.de>
- <20190903145650.GO4582@localhost.localdomain>
- <1BDCDF9A-2146-43FE-AF4B-145F479AFD2B@kamp.de>
- <20190904093459.GA21246@localhost.localdomain>
- <d3d2014b-d57e-cff1-d605-859fe94f84fc@kamp.de>
- <CAN05THRnjGZeN+gjP7PNPAZtcvaGNdZekKqr5zA7VQKJ5vbeWA@mail.gmail.com>
- <80ebb253-c5f0-0fa9-f9b0-2372917e58e4@kamp.de>
- <CAN05THSJBYuG=GiZ1J10qci+8mT0qcd=mcG-n4sGZRjbdUMq4Q@mail.gmail.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <024ab961-472a-76ee-03d2-abf3737e350e@kamp.de>
-Date: Thu, 5 Sep 2019 12:32:12 +0200
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i5p4Y-0004Qs-Lj
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:33:02 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 92AF387648
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 10:33:01 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id b9so794143wrt.5
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 03:33:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9RMBRmu5TY7gCeyRrb25rDg7vQUUMtC7fHf/hUJINyM=;
+ b=UXPtL7Y62p7okI7JEkJS3GDVisyKUfdDt5tHJSnFnzE5nxdfFRCh/flh226NQ8TzLm
+ yngLR0IJoYZRqecM40V1RScFCppOhaq5pQbZQKkBkNYXdVPNkvmhi2OilwVwMPp1NsNy
+ Ygk9YRbFbJyOB+XKU5TSmZFSp1ul4PDjW4jFTySYlppZ8zBSxWwqxI8e7dR9Aplu9fme
+ 6hq8jVPjXhCN/ISBRFT2++zLrzIGtJ1VdF0s2VjOwmOsKv/63eh9WeY1Fo1f+YtEESiP
+ 1iBp0+EV5nE0wM4FwZwPvbAxLrix5OFZfqpUrSOOuhmcyOMUMbvYVscgFfh9t4XxrWb/
+ 8Lcg==
+X-Gm-Message-State: APjAAAX52PJqgwzP0nR1PVF4cqLxkj6z2rDzWtbqlE2KRIyb/ECJDfmZ
+ T+uvL0wdz3SpGqTZg+npfMMVLxLk55xSxvzUkq+Z7lXps6qznMXdrHr2asnK5aRcHy05ktOS+Hz
+ eTRZzYuxFnXXyr/c=
+X-Received: by 2002:a1c:540c:: with SMTP id i12mr2530399wmb.90.1567679580356; 
+ Thu, 05 Sep 2019 03:33:00 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxhe4WgJIwZfZyaF7zkbH99qu4TdD0KCCJyh//WhdrzkJ85nXOi6Gd4IH4rqIab6m1wTzWZnw==
+X-Received: by 2002:a1c:540c:: with SMTP id i12mr2530389wmb.90.1567679580181; 
+ Thu, 05 Sep 2019 03:33:00 -0700 (PDT)
+Received: from [192.168.1.48] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id m62sm2952897wmm.35.2019.09.05.03.32.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Sep 2019 03:32:59 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
+ <20190904203013.9028-42-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <52e5767e-df13-9a94-e1c2-3798af3090c8@redhat.com>
+Date: Thu, 5 Sep 2019 12:32:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAN05THSJBYuG=GiZ1J10qci+8mT0qcd=mcG-n4sGZRjbdUMq4Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190904203013.9028-42-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 195.62.97.192
-Subject: Re: [Qemu-devel] [PATCH] block/nfs: add support for nfs_umount
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 41/42] tests/docker: --disable-libssh on
+ ubuntu1804 builds
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,136 +96,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 05.09.19 um 12:28 schrieb ronnie sahlberg:
-> On Thu, Sep 5, 2019 at 8:16 PM Peter Lieven <pl@kamp.de> wrote:
->> Am 05.09.19 um 12:05 schrieb ronnie sahlberg:
->>> On Thu, Sep 5, 2019 at 7:43 PM Peter Lieven <pl@kamp.de> wrote:
->>>> Am 04.09.19 um 11:34 schrieb Kevin Wolf:
->>>>> Am 03.09.2019 um 21:52 hat Peter Lieven geschrieben:
->>>>>>> Am 03.09.2019 um 16:56 schrieb Kevin Wolf <kwolf@redhat.com>:
->>>>>>>
->>>>>>> Am 03.09.2019 um 15:44 hat Peter Lieven geschrieben:
->>>>>>>> libnfs recently added support for unmounting. Add support
->>>>>>>> in Qemu too.
->>>>>>>>
->>>>>>>> Signed-off-by: Peter Lieven <pl@kamp.de>
->>>>>>> Looks trivial enough to review even for me. :-)
->>>>>>>
->>>>>>> Thanks, applied to the block branch.
->>>>>>>
->>>>>>> Kevin
->>>>>> I am not sure what the reason is, but with this patch I sometimes run
->>>>>> into nfs_process_read being called for a cdrom mounted from nfs after
->>>>>> I ejected it (and the whole nfs client context is already destroyed).
->>>>> Does this mean that nfs_umount() gets some response, but we don't
->>>>> properly wait for it? Or is some older request still in flight?
->>>> nfs_umount itself is a sync call and should only terminate when
->>>>
->>>> the call is done. But there is an independent I/O handler in that
->>>>
->>>> function polling on the fd. (wait_for_nfs_reply in libnfs-sync.c).
->>>>
->>>> This is why I thought the right solution is to stop the Qemu I/O handler
->>>>
->>>> before calling nfs_close and nfs_umount. nfs_close also uses this
->>>>
->>>> sync I/O handler, but for some reason it seems not to make trouble.
->>>>
->>>>
->>>> The other solution would be to use the async versions of close and umount,
->>>>
->>>> but that would make the code in Qemu more complex.
->>>>
->>>>
->>> NFS umount is pretty messy so I think you should continue using the
->>> sync version.
->>> In NFSv3 (there is no mount protocol in v4)  the Mount call (fetch the
->>> root filehandle)
->>> and the Umount calls (tell server we should no longer show up in
->>> showexports -a output)
->>> are not part of the NFS protocol but a different service running on a
->>> separate port.
->>>
->>> This does not map well to libnfs since it is centered around a "struct
->>> nfs_context".
->>>
->>> To use nfs_umount() from QEMU I would suggest :
->>> 1, make sure all commands in flight have finished, because you will
->>> soon disconnect from the NFS server and will never receive any
->>> in-flight responses.
->>> 2, unregister the nfs->fh filedescriptor from your eventsystem.
->>> Because the fd is about to be closed so there is great chance it will
->>> be recycled for a completely different purpose if you open any other
->>> files from qemu.
->>>
->>> 3, call nfs_umount()   Internally this will close the socket to the
->>> NFS server, then go through thr process to open a new socket to the
->>> portmapper to discover the mount server, then close that socket and
->>> reconnect a new socket again to the mount server and perform the UMNT
->>> call.
->>
->> What we currently do in Qemu is:
->>
->>
->> 1) bdrv_drain
->>
->> 2) bdrv_close which in the end calls nfs_client_close from block/nfs.c.
->>
->>     There we call:
->>
->>     2a) nfs_close(client->fh)
->>
->>     2b) aio_set_fd_handler(NULL)
->>
->>     2c) nfs_destroy_context(client->context);
->>
->>
->> My first patch added a nfs_umount between 2a) and 2b) so that we have
->>
->>     2a) nfs_close(client->fh)
->>
->>     2b) nfs_umount(client->context)
->>
->>     2c) aio_set_fd_handler(NULL)
->>
->>     2d) nfs_destroy_context(client->context);
->>
->>
->> This leads to triggering to assertion for an uninitialized client->mutex which is called from an invocation
->>
->> of nfs_process_read after nfs_destroy_context was called.
->>
->>
->> If I change the order as following I see no more assertions:
->>
->>     2a) aio_set_fd_handler(NULL)
->>
->>     2b) nfs_close(client->fh)
->>
->>     2c) nfs_umount(client->context)
->>
->>     2d) nfs_destroy_context(client->context);
-> That makes sense and looks correct to me.
+On 9/4/19 10:30 PM, Alex Benn=C3=A9e wrote:
+> Currently this stops the mega:
+>=20
+>   make docker-test-build
+>=20
+> from working. Once the source is patched to deal with the case this
+> workaround can be removed.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  tests/docker/dockerfiles/ubuntu1804.docker | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/=
+dockerfiles/ubuntu1804.docker
+> index 44bbf0f77ae..883f9bcf31c 100644
+> --- a/tests/docker/dockerfiles/ubuntu1804.docker
+> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
+> @@ -56,3 +56,6 @@ RUN apt-get update && \
+>      DEBIAN_FRONTEND=3Dnoninteractive apt-get -y install $PACKAGES
+>  RUN dpkg -l $PACKAGES | sort > /packages.txt
+>  ENV FEATURES clang pyyaml sdl2
+> +
+> +# https://bugs.launchpad.net/qemu/+bug/1838763
+> +ENV QEMU_CONFIGURE_OPTS --disable-libssh
+>=20
 
-
-I am unsure if we should acquire the client->mutex before we fiddle with
-
-the aio_handler because in theory there could be something happen to the
-
-nfs_fd in the background.
-
-
-Best,
-
-Peter
-
-
-
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
