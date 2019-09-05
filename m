@@ -2,91 +2,77 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B5ADC3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 11:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 275CDC3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 11:58:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A1AA20870
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 11:44:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA4602339D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 11:58:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0rPzfm5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A1AA20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="BG/T3YnE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA4602339D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5qBG-0002Ys-Dn
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 07:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54476)
+	id 1i5qPW-0004vA-QG
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 07:58:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57534)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i5qAP-00025a-7z
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 07:43:11 -0400
+ (envelope-from <zhlb29@foxmail.com>) id 1i5qOo-0004T7-1i
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 07:58:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i5qAN-0005Zc-99
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 07:43:09 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39692)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i5qAN-0005ZP-43
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 07:43:07 -0400
-Received: by mail-ot1-x344.google.com with SMTP id n7so1836083otk.6
- for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 04:43:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=cSdKaHFuB5dbLe4H5RKqkHFPXHCLLXUvf1glSkBSrCk=;
- b=X0rPzfm5WZAYhGB3dx2AHzh80IAHozHApFEkFc2v80FctVHnfVxzl8al9KjI3Nd8/D
- 8alpkeGcuronYFfhayByLnz8bzfnKstEofWpkEMTjgl30df/DtTU0yY0a61fXkdrKf6V
- fwe6+TAWhQIwtSTRy0D+fmlQogFzMePFgSNSMPIgcMYfIqkMZzaOXERDToLX4SIOdlhw
- RaqhoAKkCJi/DCRxP5GCKVsKJ7BzXtxGYp+uc2Gn1FsXq6OR894qneO7DJVX0dhjlPWi
- cXrA//rgaulpxM2vAhcgjcz+zBHuhAoTDisMn2iSa4hyWR+biYUmKX2ndIh+JIa8XSH3
- /zRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=cSdKaHFuB5dbLe4H5RKqkHFPXHCLLXUvf1glSkBSrCk=;
- b=nx5UGgfm1VuYzKrygH9n1HP773Z2KayCbAPTALK9/nh5+HDbwQoZ4wfnQL3Za4IkK+
- myr+YyyEW85ndgYj13yMqieioqnBzc6K0sgwyOUZspF563kbOqGkPvsW62VWxqheomsh
- EPRYMAq7j2bB74zeDtBgfVSiNA4WMAiJcjcfl0wEvGsqw31TE194Hxrl1iWxz60nKFcu
- xWNBlNIXLLeZcthurJ160oBLxwUaWrqsz9b1a96zdpsarWcVSYJKy7CTtsItm9S7Du5P
- rCKElTlpeWpJZ7pTMkchFBblUN1nWNp+aZy7flneuQkvEvtOrV29VrKCLyw+B5BYZp0Q
- 5PbA==
-X-Gm-Message-State: APjAAAVDeIQPiKdZcjP8gEJaw/umPjSkWeorLfjtsaoHesiI4afBMqkE
- r/Mh8KgsbAxDQS2GNzqsu19qHeP86xKCOWqmiuI=
-X-Google-Smtp-Source: APXvYqz25qRDm8XgLvXhnsV6rUvFxUtWRnS3keYTdMm+KSanzyNdHuALictjplgUa/ewJnYT3a2I2iZXox4wurVreeI=
-X-Received: by 2002:a9d:7989:: with SMTP id h9mr1570314otm.295.1567683786229; 
- Thu, 05 Sep 2019 04:43:06 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
- Thu, 5 Sep 2019 04:43:05 -0700 (PDT)
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
- Thu, 5 Sep 2019 04:43:05 -0700 (PDT)
-In-Reply-To: <db28c297-290b-3641-d87a-67fde65312a8@ilande.co.uk>
-References: <20190629130017.2973-1-richard.henderson@linaro.org>
- <5746cc58-c132-ef29-6ff4-da07c6086dac@ilande.co.uk>
- <3fe632b7-e83c-9b26-9338-1d7a9c881e0d@linaro.org>
- <CABLmASFUnBnn2DZidKFAiaMb7gExYttgvEv12uce9EPi6NL9Qw@mail.gmail.com>
- <f1eeb1de-a6e7-bb83-3501-705382da4b14@ilande.co.uk>
- <CAL1e-=gtgzRHzZyX9r69_zB5-v-ThYeuxBameoF12TBs59M95w@mail.gmail.com>
- <db28c297-290b-3641-d87a-67fde65312a8@ilande.co.uk>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 5 Sep 2019 13:43:05 +0200
-Message-ID: <CAL1e-=ibwvMWj3T8iPAyDqhsRTnxUZPxhos6BaVoOtbTWO9WPg@mail.gmail.com>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <zhlb29@foxmail.com>) id 1i5qOm-0003nW-EI
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 07:58:01 -0400
+Received: from smtpbg501.qq.com ([203.205.250.101]:54837 helo=smtpbg.qq.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1i5qOl-0003io-Ck
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 07:58:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+ s=s201512; t=1567684666;
+ bh=xL6bpqY75bkjHONBKgccgcIFVg147uqdKRQLfVRDnYw=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=BG/T3YnEXeQm08rS9RrD0ys8DVB0VTIgKJx8rQCgpRI4tybTs02PdTwvdNsLRmOk6
+ IdcDTye73a7Mh1iYvULJNtNUR2dJ2yU6RRmYM3nY4pvnvXZKCMRujgr7YWyXBN+lcG
+ HliUrTofB1wpCYH9/WMrl0Q8d15E7gGqd4z1wF7c=
+X-QQ-SSF: 000100000000009000000000000000G
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 124.200.70.7
+In-Reply-To: <CAL1e-=hWOXgnTbC0Y2v_CMZOMmQLgdToBAsi+XaW7+9uyN55CA@mail.gmail.com>
+References: <tencent_3156C5EA2695B7CD53C6114C@qq.com>
+ <CAL1e-=hWOXgnTbC0Y2v_CMZOMmQLgdToBAsi+XaW7+9uyN55CA@mail.gmail.com>
+X-QQ-STYLE: 
+X-QQ-mid: webenglish1t1567684664t812879
+From: "=?utf-8?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
+To: "=?utf-8?B?QWxla3NhbmRhciBNYXJrb3ZpYw==?=" <aleksandar.m.mail@gmail.com>
+Mime-Version: 1.0
+Date: Thu, 5 Sep 2019 19:57:44 +0800
+X-Priority: 3
+Message-ID: <tencent_23ACCA1A48AFB09124C52E70@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-ReplyHash: 2018763698
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Thu, 05 Sep 2019 19:57:45 +0800 (CST)
+Feedback-ID: webenglish:foxmail.com:bgweb:bgweb1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 203.205.250.101
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v6 00/16] tcg/ppc: Add vector opcodes
+Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,153 +84,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: =?utf-8?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping for Richard
-
-03.09.2019. 20.34, "Mark Cave-Ayland" <mark.cave-ayland@ilande.co.uk> =D1=
-=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> On 03/09/2019 18:37, Aleksandar Markovic wrote:
->
-> > On Tue, Sep 3, 2019 at 7:05 PM Mark Cave-Ayland <
-> > mark.cave-ayland@ilande.co.uk> wrote:
-> >
-> >> On 01/07/2019 19:34, Howard Spoelstra wrote:
-> >>
-> >>> On Mon, Jul 1, 2019 at 12:30 PM Richard Henderson <
-> >>> richard.henderson@linaro.org> wrote:
-> >>>
-> >>>> On 6/30/19 7:58 PM, Mark Cave-Ayland wrote:
-> >>>>> I don't have space for a full set of images on the G4, however I've
-> >>>> tried boot tests
-> >>>>> on installer CDs for MacOS 9, OS X 10.2, Linux and HelenOS and it
-looks
-> >>>> good here.
-> >>>>>
-> >>>>> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> [PPC32]
-> >>>>
-> >>>> Thanks!
-> >>>>
-> >>>> Hi
-> >>>
-> >>> I just compiled the v6 set applied to current master on my G5, Ubuntu
-16.
-> >>> command line:
-> >>> ./qemu-system-ppc -L pc-bios -boot c m 512 -M mac99,via=3Dpmu \
-> >>> -netdev user,id=3Dnet1 -device sungem,netdev=3Dnet1 \
-> >>> -drive file=3D10.3.img,format=3Draw,media=3Ddisk \
-> >>>
-> >>> With no specific cpu set, Mac OS 9.2 hard disk image and 9.2 iso do
-not
-> >> get
-> >>> to the desktop, they just hang while still in the openbios window.
-They
-> >>> need -cpu G4 on the command line to get to the desktop.
-> >>>
-> >>> OSX 10.3 installed image boots to desktop.
-> >>> OSX 10.3 iso boots to installer
-> >>> OSX 10.4 installed image boots to desktop.
-> >>> OSX 10.4 iso boot to installer
-> >>> OSX 10.5 installed image boots to desktop.
-> >>> OSX 10.5 iso boots to installer
-> >>>
-> >>> So there seems to be a difference between hosts: If ran on a G4 host
-> >> there
-> >>> is no need to add -cpu G4 to run Mac OS 9.x, while there is when ran
-on a
-> >>> G5 host.
-> >>
-> >> Are there any outstanding issues with this patchset now, or is it
-ready to
-> >> be merged?
-> >> I'm really looking forward to seeing the improved performance when
-testing
-> >> QEMU on my
-> >> Mac Mini :)
-> >>
-> >>
-> > Howard pointed to some illogical quirks of command line:
-> >
-> >> If ran on a G4 host there is no need to add -cpu G4 to run Mac OS 9.x,
-> >> while there is when ran on a G5 host.
-> >
-> > I am not sure if Howard says that this is a consequence of this series
-> > though.
->
-> No, that has been an existing issue for a long time :)
->
-> > Overall, I think this is a very good series - however, I had a number o=
-f
-> > minor
-> > objections to multiple patches, that don't affect (or affect in a
-minimal
-> > way)
-> > provided functionality - those objections are not addressed, nor
-properly
-> > discussed - but I do think they should be addressed in order to get the
-> > series
-> > in a better shape before upstreaming.
->
-> I've had a quick look at some of your review comments, and certainly I
-can see how
-> the earlier revisions have benefited from your feedback. There has been a
-lot of
-> positive discussion, and Richard has taken the time to respond and update
-the
-> patchset over several weeks to its latest revision.
->
-> AFAICT the only remaining issue is that related to the ISA flags, but to
-me this
-> isn't something that should prevent the patchset being merged. I can
-certainly see
-> how the current flags implementation may not be considered technically
-correct, but
-> then from your comments I don't see that it would be something that would
-be
-> particularly difficult to change at a later date either.
->
-> The things that are important to me are i) is the patchset functionally
-correct and
-> ii) is it understandable and maintainable. I would say that the first
-point is
-> clearly true (both myself and Howard have spent a lot of time testing
-it), and given
-> that I had to delve into these patches to fix the R2 register issue on
-32-bit PPC
-> then I can confirm that the contents of the patches were a reasonably
-accurate
-> representation of the changes described within. And that's from someone
-like me who
-> is mostly still a TCG beginner :)
->
-> From a slightly more selfish position as the PPC Mac machine maintainer,
-these
-> patches make a significant difference to me in that they reduce the MacOS
-boot times
-> during everyday testing. Now for someone like myself who works on QEMU as
-a hobby
-> outside of family life and a full time job, those few minutes are really
-important to
-> me and soon add up really quickly during testing.
->
-> I would really like these patches to be merged soon, since the worst
-thing that can
-> happen is that the patchset ends up bit-rotting and then all the time and
-effort put
-> into writing, testing and reviewing the patches by Richard, Howard,
-David, myself and
-> indeed your review time will all end up going to waste.
->
->
-> ATB,
->
-> Mark.
->
+RG8geW91IGtub3cgd2hlcmUgaW4gdGhlIHNvdXJjZSBmaWxlIEkgc2hvdWxkIGxvb2sgaW50
+byB0byBhZGQgbXkgY3VzdG9tIGxvZ2dpbmcgZnVuY3Rpb25hbGl0eT8NCg0KDQpPciwgd291
+bGQgeW91IHN1Z2dlc3QgdXNpbmcgZ2RiIHRvIGxvb2sgYXQgbXkgdGFyZ2V0IHJlZ2lzdGVy
+IGFuZCBtZW1vcnkgY29udGVudHM/IFRoZSBhbnN3ZXIgaW4gdGhpcyBsaW5rIGJlbG93IGxv
+b2tzIHJlYWxseSBwcm9taXNpbmcuIEknbSBnb25uYSBnaXZlIGl0IGEgdHJ5IGZpcnN0Lg0K
+DQpodHRwczovL3N0YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy8zOTUwMzk5Ny9ob3ctdG8t
+cnVuLWEtc2luZ2xlLWxpbmUtb2YtYXNzZW1ibHktdGhlbi1zZWUtcjEtYW5kLWNvbmRpdGlv
+bi1mbGFncw0KDQoNCg0KSG93ZXZlciwgaWYgSSBhbSBhYmxlIHRvIGN1c3RvbWl6ZSBsb2cs
+IGl0IHdpbGwgYmUgc3VwZXIgY29udmVuaWVudC4NCg0KDQoNCkNoZWVycywNCg0KTGlibw0K
+DQoNCg0KLS0tLS0tLS0tLS0tLS0tLS0tIE9yaWdpbmFsIC0tLS0tLS0tLS0tLS0tLS0tLQ0K
+RnJvbTogICJBbGVrc2FuZGFyIE1hcmtvdmljIjs8YWxla3NhbmRhci5tLm1haWxAZ21haWwu
+Y29tPjsNClNlbmQgdGltZTogVGh1cnNkYXksIFNlcCA1LCAyMDE5IDY6NTQgUE0NClRvOiAi
+TGlibyBaaG91Ijx6aGxiMjlAZm94bWFpbC5jb20+OyANCkNjOiAicWVtdS1kZXZlbCI8cWVt
+dS1kZXZlbEBub25nbnUub3JnPjsgDQpTdWJqZWN0OiAgUmU6IFtRZW11LWRldmVsXSBRRU1V
+IGFzIElTUyAoSW5zdHJ1Y3Rpb24gU2V0IFNpbXVsYXRvcikNCg0KDQoNCjA0LjA5LjIwMTku
+IDA1LjIzLCAiTGlibyBaaG91IiA8emhsYjI5QGZveG1haWwuY29tPiA/0LUg0L3QsNC/0LjR
+gdCw0L4v0LvQsDoNCj4NCj4gSGkgQWxla3NhbmRhciwNCj4NCj4gSSBoYXZlIHNwZW50IHNv
+bWUgdGltZSBsb29raW5nIGF0IHlvdXIgTVhVIEFTRSBwYXRjaC4gSXQncyBzdXBlciBoZWxw
+ZnVsLg0KSSBuZWVkIHRvIGRvIGV4YWN0bHkgdGhlIHNhbWUgdGhpbmcgYXMgeW91IGRpZC4N
+Cj4NCj4gTm93IEkganVzdCBuZWVkIGEgd2F5IHRvIG9ic2VydmUgdGhlIG1lbW9yeSBhbmQg
+cmVnaXN0ZXIgZmlsZSBjb250ZW50cyB0bw0KZGVidWcgbXkgaW5zdHJ1Y3Rpb24gc2V0IHNp
+bXVsYXRvci4gSSBwbGF5ZWQgd2l0aCB0aGUgIi1kIiBzd2l0Y2ggdG8gbG9nIGENCmJ1bmNo
+IG9mIGluZm9ybWF0aW9uLCBidXQgaXQgc2VlbXMgdGhhdCBub25lIG9mIHRoZSBpdGVtcyBp
+cyBvZiBteQ0KaW50ZXJlc3QuIFRoZSAiLWQgY3B1X3Jlc2V0IiBvcHRpb24gZGlzcGxheXMg
+YWxsIHplcm9zIGluIHRoZSBHUFIgbG9nLg0KPg0KDQpJdCBsb29rcyB5b3UgbmVlZCBhIGN1
+c3RvbSBsb2dnaW5nIHRhaWxvcmVkIHRvIHlvdXIgbmVlZHMsIGJhc2VkIG9uDQppbnRlcmNl
+cHRpbmcgdGhlIGluc3RydWN0aW9ucyB5b3UgYWRkZWQuDQoNCkFsZWtzYW5kYXINCg0KPiBQ
+bGVhc2UgdGFrZSB5b3VyIHRpbWUsIGFzIEkgZnVsbHkgdW5kZXJzdGFuZCB5b3UgbmVlZCB0
+byB3b3JrIG9uIFFlbXUNCndoaWxlIGFuc3dlcmluZyBhbGwgbXkgcXVlc3Rpb25zLiBBZ2Fp
+biwgdGhhbmsgeW91IHZlcnkgbXVjaCBmb3IgeW91ciBoZWxwIQ0KPg0KPiBDaGVlcnMsDQo+
+IExpYm8NCj4=
