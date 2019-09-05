@@ -2,78 +2,63 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B60DC3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 922D2C3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:25:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FEE0206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:19:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s21ZRlRq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FEE0206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 988D2206CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:25:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 988D2206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5rfM-0006ZM-6X
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 09:19:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45179)
+	id 1i5rlB-0002d7-Fh
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 09:25:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46550)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i5re6-0005mD-QB
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:17:55 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i5rkW-0001xI-05
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i5re5-0002oo-Ih
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:17:54 -0400
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:42266)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i5re5-0002oN-Cj
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:17:53 -0400
-Received: by mail-ot1-x331.google.com with SMTP id c10so2101286otd.9
- for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 06:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=kkPAVFPH9w2NGxoeNi9HMM1m8MOep6sH/qhA8PIe174=;
- b=s21ZRlRquEFs7rsR8J6/kcHHFZ1Grj5MyIsfDG8cL81ovhwmt9Lq6RXmZXrtWG9oyU
- PW4E8f6DdlOpt8VCz4yEYevKndZsYq61la7983ScflNcjwyGUKBOxv+4jPMweKeGtZ7y
- jCbX7EI2F1+rNEx6Pi+4QrYXCmrWeK79GEGgbibDlknh5BdaYdypTHo0UeO9r9UYhoaO
- gHtXU3YDpaP85ttwvtAI4aL0NP/2moMbhgHv+CK//j6eREYkeTNcaoROPBjJJmrrI3M1
- IPT7aNsmDYgmLIVAJAj5tFtdP/veOXgkilDTqtAoZdvghTr0fu+y+/P07LbU7anoebPe
- mJgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=kkPAVFPH9w2NGxoeNi9HMM1m8MOep6sH/qhA8PIe174=;
- b=uJVbQqDRVnms+4vB+xrNQDOmDKPZYSBj5OzGAy/lEv0l1+VsXxiVNt70F9y1zcFpgP
- e+/ry1oAxLGNSoQge2IYOHeytM/GcjXP1PVdZr7lCZsLDgbUbcv1zQjG1XS7TCJE7qwD
- zdTBcJPtU6GYI1sQ4CyF2KA72R9K5vMoPHlO5548WmqqGP/FQfR8dtrWFDzV3UnHbPjx
- NBxyF2P++QVXE6MOPNSbUMYFwVCsMX/ob3T/J+RMv5q6TEjn9BUtCRdsRs2OBMc4Y7Yd
- PRFjhjKlLwAHpsEYHt5HpoSbX4LMn73YpawTVIGITyfH5pDKN5sDV8+kWdNs/AnJM5c3
- WyFQ==
-X-Gm-Message-State: APjAAAUrWxVDtqnOuZCVNAW2KnRApquA3F1EAtPyyFSffbYA+NFNNdJl
- FpvKmQuPjfcsWXMR7ai9XsdcHCSkt4CDC73j/lOWCrfTvBs=
-X-Google-Smtp-Source: APXvYqxJecPnRHPMmWzjS4uFi/o0RuPjkn5R9G44/VhM1GIxVTSCS1sHtjLTLhwUrntdlmnNYQUBX9iWg4Eeaw1JYts=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr2568481oti.135.1567689472263; 
- Thu, 05 Sep 2019 06:17:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAFEAcA88YR0mU2N=-immpWVFCnnU6fJsorZYHSyerfMO72iZaA@mail.gmail.com>
-In-Reply-To: <CAFEAcA88YR0mU2N=-immpWVFCnnU6fJsorZYHSyerfMO72iZaA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Sep 2019 14:17:40 +0100
-Message-ID: <CAFEAcA9vHZc=s+2f7-a88DsLPph=PE2noz+ai+q5tM+KGabkSg@mail.gmail.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
+ (envelope-from <mlevitsk@redhat.com>) id 1i5rkU-0004jr-Uv
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:24:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49030)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i5rkR-0004iU-Cv; Thu, 05 Sep 2019 09:24:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2BBFC875221;
+ Thu,  5 Sep 2019 13:24:25 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA47B5C1D4;
+ Thu,  5 Sep 2019 13:24:20 +0000 (UTC)
+Message-ID: <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Date: Thu, 05 Sep 2019 16:24:19 +0300
+In-Reply-To: <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
+References: <20190825071541.10389-1-mlevitsk@redhat.com>
+ <20190825071541.10389-3-mlevitsk@redhat.com>
+ <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
+ <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::331
-Subject: Re: [Qemu-devel] test-aio-multithread assertion
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Thu, 05 Sep 2019 13:24:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,44 +70,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Ferlan <jferlan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Sep 2019 at 12:50, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> Hi; I've been seeing intermittently on the BSDs this assertion
-> running test-aio-multithread as part of 'make check':
->
-> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> tests/test-aio-multithread -m=quick -k --tap < /dev/null |
-> ./scripts/tap-drive
-> r.pl --test-name="test-aio-multithread"
-> PASS 1 test-aio-multithread /aio/multi/lifecycle
-> PASS 2 test-aio-multithread /aio/multi/schedule
-> ERROR - too few tests run (expected 5, got 2)
-> Assertion failed: (!qemu_lockcnt_count(&ctx->list_lock)), function
-> aio_ctx_finalize, file /home/qemu/qemu-test.kaRA0o/src/util/async.c,
-> line 283.
-> Abort trap (core dumped)
-> gmake: *** [/home/qemu/qemu-test.kaRA0o/src/tests/Makefile.include:905:
-> check-unit] Error 1
->
-> Anybody got any ideas?
+On Wed, 2019-08-28 at 12:03 +0300, Maxim Levitsky wrote:
+> On Tue, 2019-08-27 at 18:29 -0400, John Snow wrote:
+> > 
+> > On 8/25/19 3:15 AM, Maxim Levitsky wrote:
+> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > ---
+> > >  block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+> > >  block/trace-events |  2 ++
+> > >  2 files changed, 85 insertions(+)
+> > > 
+> > > diff --git a/block/nvme.c b/block/nvme.c
+> > > index f8bd11e19a..dd041f39c9 100644
+> > > --- a/block/nvme.c
+> > > +++ b/block/nvme.c
+> > > @@ -112,6 +112,7 @@ typedef struct {
+> > >      bool plugged;
+> > >  
+> > >      bool supports_write_zeros;
+> > > +    bool supports_discard;
+> > >  
+> > >      CoMutex dma_map_lock;
+> > >      CoQueue dma_flush_queue;
+> > > @@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+> > >  
+> > >      oncs = le16_to_cpu(idctrl->oncs);
+> > >      s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
+> > > +    s->supports_discard = (oncs & NVME_ONCS_DSM) != 0;
+> > 
+> > Same comment -- checking !!(register & FIELD) is nicer than the
+> > negative. (I'm actually not sure even the !! is needed, but it seems to
+> > be a QEMU-ism and I've caught myself using it...)
+> 
+> All right, no problem to use !!
+> 
+> > 
+> > Rest looks good to me on a skim, but I'm not very well-versed in NVME.
+> 
+> Thanks!
+> 
 
-Here's a different intermittent assertion on Netbsd from test-aio-multithread:
+Kind ping about this patch series.
 
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-tests/test-aio-multithread -m=quick
--k --tap < /dev/null | ./scripts/tap-driver.pl
---test-name="test-aio-multithread"
-PASS 1 test-aio-multithread /aio/multi/lifecycle
-PASS 2 test-aio-multithread /aio/multi/schedule
-assertion "QSLIST_EMPTY(&ctx->scheduled_coroutines)" failed: file
-"util/async.c", line 279, function "
-aio_ctx_finalize"
-ERROR - too few tests run (expected 5, got 2)
+Apart from using !!, do you think that this patch series
+can be merged, or should I do anything else?
+Which tree do you think this should be committed to?
 
-thanks
--- PMM
+I kind of want to see that merged before the freeze
+starts, if there are no objections,
+to reduce the amount of pending stuff in my queue.
+
+
+[...]
+
+
+
+Best regards,
+	Maxim Levitsky
+
 
