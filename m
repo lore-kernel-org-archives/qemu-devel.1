@@ -2,58 +2,82 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35DFC3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20A7C3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:06:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD46C206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:03:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD46C206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
+	by mail.kernel.org (Postfix) with ESMTPS id 79C0A206BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:06:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1AkwN/b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C0A206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5ocM-0002kw-PP
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:03:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51625)
+	id 1i5oef-0004Go-NB
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:06:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52368)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pl@kamp.de>) id 1i5ob6-0002Eq-2y
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:02:37 -0400
+ (envelope-from <ronniesahlberg@gmail.com>) id 1i5ody-0003lV-5P
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:05:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pl@kamp.de>) id 1i5ob4-0006nZ-9n
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:02:35 -0400
-Received: from kerio.kamp.de ([195.62.97.192]:45223)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pl@kamp.de>)
- id 1i5ob4-0006lc-1I; Thu, 05 Sep 2019 06:02:34 -0400
-X-Footer: a2FtcC5kZQ==
-Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
- by kerio.kamp.de with ESMTPSA
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
- Thu, 5 Sep 2019 12:02:27 +0200
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190903133524.11755-1-pl@kamp.de>
- <20190904140949.GC21246@localhost.localdomain>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <e3964790-286f-5e65-01c7-c71c74c23475@kamp.de>
-Date: Thu, 5 Sep 2019 12:02:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <ronniesahlberg@gmail.com>) id 1i5odw-00082x-Pl
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:05:34 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:45737)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ronniesahlberg@gmail.com>)
+ id 1i5odt-0007wd-To; Thu, 05 Sep 2019 06:05:30 -0400
+Received: by mail-io1-xd43.google.com with SMTP id f12so3394737iog.12;
+ Thu, 05 Sep 2019 03:05:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UICZ8ZwvUMvJTsWYscxu6CwtwXdRKBHdesacFacMtq4=;
+ b=f1AkwN/bAvv2kdPcLMEFvELXC64ltemMkY6IbOtw6uKn5gJcozT8E6yenS6tar6yj8
+ UNJPx0koygKE98K8JEEZnGL1hDRyxht56AR2eHuSfJFAqU8hZ6t1BvKWjjpteXLwktIG
+ BCy2JEAuiWRGy9CPYlgPWJMc8h1RJBiaggVNtZwrJ/8vavA6k6FPsqxJL9dVpQVcVWl3
+ WhjyE2m42LVlOZwNeDStyP/0GDlrXHWHrOtbCVhBDNZLheBF70b514YbIDrqcXjJ9rdO
+ PdP0eEqTxKv+wAP5A/RjKzveFHuBtbIlsQTzuOMhuakMbO2fg3S9P0JVuWGj8a/FKfDa
+ mLmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UICZ8ZwvUMvJTsWYscxu6CwtwXdRKBHdesacFacMtq4=;
+ b=iaIASe2RwdfyuqBAMBLGGd5IVpJJuSZ1Gbo85OUjMLQ/GlPeNwzhS1GVcg5NVUQB62
+ 0a+5rEapTx+zHaS2bTrvlIiWr0c6MJ0FaDw055Wnv2pUszxBTp7G06epsCJgLcUypCha
+ olSpSYuU5NAaJjFxOcMtqz/ryjKEOaBnRwCxTEWRV2r+CMDQCaa58gQoDrXrZ+eIuNPp
+ EaJGisiT/qrkFKxADCfiXHhSZth451FBjE4vZHq8cCmVmmig8KQ9HKSXKQVtmCqAs7MP
+ VgBUeWS4Ubo5nSl4S+z0RBf8Bfwqr16rf/5L7HP6NRTBIX1XJ3IguuHCPLTKljeKCu8F
+ HLgQ==
+X-Gm-Message-State: APjAAAV0330dAbyqwGr5eCD0BIVWTEKCakcQVho6430rE1McTFc6DeXi
+ hqSOdNSOlUJtSbG0Bg4jAyzWkDRkH8oUW/hLaDY=
+X-Google-Smtp-Source: APXvYqyVRLrvrDmEaqaM7YO9HCd1HvjCyMD+TJjNwDhd21KnUHvKfgjZiD8ABtMSt8blwVDZVfxNLLqMJDA3Tfvz5eM=
+X-Received: by 2002:a6b:8d06:: with SMTP id p6mr2967825iod.219.1567677928192; 
+ Thu, 05 Sep 2019 03:05:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190904140949.GC21246@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 195.62.97.192
-Subject: Re: [Qemu-devel] [PATCH V3] block/vhdx: add check for truncated
- image files
+References: <20190903134442.15653-1-pl@kamp.de>
+ <20190903145650.GO4582@localhost.localdomain>
+ <1BDCDF9A-2146-43FE-AF4B-145F479AFD2B@kamp.de>
+ <20190904093459.GA21246@localhost.localdomain>
+ <d3d2014b-d57e-cff1-d605-859fe94f84fc@kamp.de>
+In-Reply-To: <d3d2014b-d57e-cff1-d605-859fe94f84fc@kamp.de>
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
+Date: Thu, 5 Sep 2019 20:05:16 +1000
+Message-ID: <CAN05THRnjGZeN+gjP7PNPAZtcvaGNdZekKqr5zA7VQKJ5vbeWA@mail.gmail.com>
+To: Peter Lieven <pl@kamp.de>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
+Subject: Re: [Qemu-devel] [PATCH] block/nfs: add support for nfs_umount
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,103 +89,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: codyprime@gmail.com, mreitz@redhat.com, jhf@kamp.de, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 04.09.19 um 16:09 schrieb Kevin Wolf:
-> Am 03.09.2019 um 15:35 hat Peter Lieven geschrieben:
->> qemu is currently not able to detect truncated vhdx image files.
->> Add a basic check if all allocated blocks are reachable at open and
->> report all errors during bdrv_co_check.
->>
->> Signed-off-by: Peter Lieven <pl@kamp.de>
->> ---
->> V3: - check for bdrv_getlength failure [Kevin]
->>      - use uint32_t for i [Kevin]
->>      - check for BAT entry overflow [Kevin]
->>      - break on !errcnt in second check
->>
->> V2: - add error reporting [Kevin]
->>      - use bdrv_getlength instead of bdrv_get_allocated_file_size [Kevin]
->>      - factor out BAT entry check and add error reporting for region
->>        overlaps
->>      - already check on vhdx_open
-> Something still seems to be wrong with this patch:
+On Thu, Sep 5, 2019 at 7:43 PM Peter Lieven <pl@kamp.de> wrote:
 >
->      213      fail       [15:50:13] [15:50:14]      (last: 2s)    output mismatch (see 213.out.bad)
->      --- /home/kwolf/source/qemu/tests/qemu-iotests/213.out  2019-06-28 14:19:50.065797707 +0200
->      +++ /home/kwolf/source/qemu/tests/qemu-iotests/213.out.bad      2019-09-04 15:50:14.582053976 +0200
->      @@ -46,10 +46,8 @@
->       {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->       {"return": {}}
+> Am 04.09.19 um 11:34 schrieb Kevin Wolf:
+> > Am 03.09.2019 um 21:52 hat Peter Lieven geschrieben:
+> >>
+> >>> Am 03.09.2019 um 16:56 schrieb Kevin Wolf <kwolf@redhat.com>:
+> >>>
+> >>> Am 03.09.2019 um 15:44 hat Peter Lieven geschrieben:
+> >>>> libnfs recently added support for unmounting. Add support
+> >>>> in Qemu too.
+> >>>>
+> >>>> Signed-off-by: Peter Lieven <pl@kamp.de>
+> >>> Looks trivial enough to review even for me. :-)
+> >>>
+> >>> Thanks, applied to the block branch.
+> >>>
+> >>> Kevin
+> >> I am not sure what the reason is, but with this patch I sometimes run
+> >> into nfs_process_read being called for a cdrom mounted from nfs after
+> >> I ejected it (and the whole nfs client context is already destroyed).
+> > Does this mean that nfs_umount() gets some response, but we don't
+> > properly wait for it? Or is some older request still in flight?
 >
->      -image: TEST_IMG
->      -file format: IMGFMT
->      -virtual size: 32 MiB (33554432 bytes)
->      -cluster_size: 268435456
->      +qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
->      +qemu-img: Could not open 'TEST_IMG': Could not open 'TEST_IMG': Invalid argument
 >
->       === Invalid BlockdevRef ===
+> nfs_umount itself is a sync call and should only terminate when
 >
-> I can reproduce this manually with the following qemu-img invocations.
-> It seems all three options must be given to reproduce the error:
+> the call is done. But there is an independent I/O handler in that
 >
->      $ ./qemu-img create -f vhdx -o block_size=268435456,subformat=fixed,block_state_zero=off /tmp/test.vhdx 32M
->      Formatting '/tmp/test.vhdx', fmt=vhdx size=33554432 log_size=1048576 block_size=268435456 subformat=fixed block_state_zero=off
->      $ ./qemu-img info /tmp/test.vhdx
->      qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
->      qemu-img: Could not open '/tmp/test.vhdx': Could not open '/tmp/test.vhdx': Invalid argument
+> function polling on the fd. (wait_for_nfs_reply in libnfs-sync.c).
 >
-> If I add the offsets to the error message (would probably nice to have),
-> I get:
+> This is why I thought the right solution is to stop the Qemu I/O handler
 >
->      qemu-img: VHDX BAT entry 0 offset 8388608 points after end of file (41943040). Image has probably been truncated.
+> before calling nfs_close and nfs_umount. nfs_close also uses this
 >
-> So it seems that the file is large enough to hold 32M + metadata, but we
-> don't increase the file size to hold a full block (256M). Is this a
-> problem in the way we create images or are partial blocks at the end
-> expected?
+> sync I/O handler, but for some reason it seems not to make trouble.
 >
-> Kevin
+>
+> The other solution would be to use the async versions of close and umount,
+>
+> but that would make the code in Qemu more complex.
+>
+>
+
+NFS umount is pretty messy so I think you should continue using the
+sync version.
+In NFSv3 (there is no mount protocol in v4)  the Mount call (fetch the
+root filehandle)
+and the Umount calls (tell server we should no longer show up in
+showexports -a output)
+are not part of the NFS protocol but a different service running on a
+separate port.
+
+This does not map well to libnfs since it is centered around a "struct
+nfs_context".
+
+To use nfs_umount() from QEMU I would suggest :
+1, make sure all commands in flight have finished, because you will
+soon disconnect from the NFS server and will never receive any
+in-flight responses.
+2, unregister the nfs->fh filedescriptor from your eventsystem.
+Because the fd is about to be closed so there is great chance it will
+be recycled for a completely different purpose if you open any other
+files from qemu.
+
+3, call nfs_umount()   Internally this will close the socket to the
+NFS server, then go through thr process to open a new socket to the
+portmapper to discover the mount server, then close that socket and
+reconnect a new socket again to the mount server and perform the UMNT
+call.
+
+ronnie sahlberg
 
 
-A short look into the VHDX spec [1] seems to suggest that a VHDX File can only grow in Block increments.
-
-See page 8 in the definition of blocks: "Allocation of new space for a virtual hard disk that supports dynamic growth
-
-of the virtual hard disk file is done in fixes size units defined as blocks."
-
-
-Peter
-
-
-[1] https://www.microsoft.com/en-us/download/confirmation.aspx?id=34750
-
-
-
-
--- 
-
-Mit freundlichen Grüßen
-
-Peter Lieven
-
-...........................................................
-
-   KAMP Netzwerkdienste GmbH
-   Vestische Str. 89-91 | 46117 Oberhausen
-   Tel: +49 (0) 208.89 402-50 | Fax: +49 (0) 208.89 402-40
-   pl@kamp.de | http://www.kamp.de
-
-   Geschäftsführer: Heiner Lante | Michael Lante
-   Amtsgericht Duisburg | HRB Nr. 12154
-   USt-Id-Nr.: DE 120607556
-
-...........................................................
-
-
+> Peter
+>
+>
 
