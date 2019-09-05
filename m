@@ -2,94 +2,77 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E69BC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F8A3C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 20:04:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B50920692
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:57:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B50920692
+	by mail.kernel.org (Postfix) with ESMTPS id 8F0F320692
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 20:04:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F0F320692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5xt0-0002xt-82
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 15:57:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51956)
+	id 1i5xzP-0004dN-Ct
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 16:04:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53610)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5xsL-0002ZG-V3
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:57:03 -0400
+ (envelope-from <mlureau@redhat.com>) id 1i5xyc-0004BC-V3
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5xsK-0005UO-3W
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:57:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38210)
+ (envelope-from <mlureau@redhat.com>) id 1i5xyb-0002M5-75
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:03:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53342)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5xsJ-0005TP-Rb
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:57:00 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1i5xya-0002LR-VZ
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 16:03:29 -0400
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5E965877A63;
- Thu,  5 Sep 2019 19:56:58 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 350BD194B9;
- Thu,  5 Sep 2019 19:56:57 +0000 (UTC)
-To: Yury Kotov <yury-kotov@yandex-team.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Stefan Weil <sw@weilnetz.de>
-References: <20190826103726.25538-1-yury-kotov@yandex-team.ru>
- <20190826103726.25538-3-yury-kotov@yandex-team.ru>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <57c35118-a8c4-83cd-6f14-4e428a75238d@redhat.com>
-Date: Thu, 5 Sep 2019 14:56:56 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 537168535C
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 20:03:27 +0000 (UTC)
+Received: by mail-oi1-f200.google.com with SMTP id g204so1648826oif.14
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 13:03:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3cktYCYISHOCqTUPXgN85eKDe/k6NvMksb0O90iekwQ=;
+ b=s9zGTAqQYhTjs/rGyeXRn/s374wWnWqgxMKOwOflZRv5Vn3hc9CIOm5MFZdzXYpneC
+ VjnXrfR+OvQCK6zYPlsC+ccVAtotyy7uIUnwu0wL9DnyZ3VLlYh4FMJykL6XwgJyHhEG
+ Xq6jrT4C4uUYnGeDsj9Y/TmFSU0j8mXSZxSOH9Eg54CrCGHNEOjH0K/Zm9SPZ3+OHuu0
+ 0Bfzj0dYIHD8KwpyZheXapD5Ie0vHGxJvSu+sbY8xXMyhjOWQH7WKoAfntSHB0sJmWx/
+ BX1C5T0+pRRuU6e8mS7Tqs6lFnHNls02akOI5PRyO8imJeiNpGfBwVDysXXxkyUBuLUl
+ 2usA==
+X-Gm-Message-State: APjAAAWdHlmevu7AisGlZEBnZfsM8lv6V3PDCvgSHbI7VpGI6yohEDdp
+ 01k27x9g712hs2v6D02PZm//cQz0GyfyfOOy/mFtk8TCOev6oFnKn+PvLCQbOPCd+guNYPEV20F
+ fVuDcAdGMdD8+LRlESGi1aZ1lWoxbeiw=
+X-Received: by 2002:a9d:1cf:: with SMTP id e73mr4090912ote.38.1567713806565;
+ Thu, 05 Sep 2019 13:03:26 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxRlGnuSBW83wZO0B2djsQaRAnO3imspeV/25EcFlEqUmfx0wTEWjB9GSv2sypayDhgvKXqRrsS+yJn409tWJs=
+X-Received: by 2002:a9d:1cf:: with SMTP id e73mr4090895ote.38.1567713806334;
+ Thu, 05 Sep 2019 13:03:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190826103726.25538-3-yury-kotov@yandex-team.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 05 Sep 2019 19:56:58 +0000 (UTC)
+References: <20190905152136.30637-1-stefanha@redhat.com>
+ <20190905152136.30637-4-stefanha@redhat.com>
+ <20190905171248.GP2700@work-vm>
+In-Reply-To: <20190905171248.GP2700@work-vm>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 6 Sep 2019 00:03:15 +0400
+Message-ID: <CAMxuvaw_Vyy8Xya9dCP_K9acqZmmUCK7-=GcJJJ_mv7CZiM3wQ@mail.gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] cpus: Fix throttling during vm_stop
+Subject: Re: [Qemu-devel] [RFC 3/3] virtiofsd: add virtiofsctl command-line
+ management tool
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,66 +84,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:Overall" <qemu-devel@nongnu.org>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
+Cc: virtio-fs@redhat.com, Eryu Guan <eguan@linux.alibaba.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/26/19 5:37 AM, Yury Kotov wrote:
-> Throttling thread sleeps in VCPU thread. For high throttle percentage
-> this sleep is more than 10ms. E.g. for 60% - 15ms, for 99% - 990ms.
-> vm_stop() kicks all VCPUs and waits for them. It's called at the end of
-> migration and because of the long sleep the migration downtime might be
-> more than 100ms even for downtime-limit 1ms.
-> Use qemu_cond_timedwait for high percentage to wake up during vm_stop.
-> 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> ---
->  cpus.c | 25 +++++++++++++++++--------
->  1 file changed, 17 insertions(+), 8 deletions(-)
-> 
+Hi
 
-> @@ -790,11 +792,20 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
->  
->      pct = (double)cpu_throttle_get_percentage()/100;
->      throttle_ratio = pct / (1 - pct);
-> -    sleeptime_ns = (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
-> -
-> -    qemu_mutex_unlock_iothread();
-> -    g_usleep(sleeptime_ns / 1000); /* Convert ns to us for usleep call */
-> -    qemu_mutex_lock_iothread();
-> +    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
-> +    sleeptime_ns = (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS + 1);
+On Thu, Sep 5, 2019 at 9:13 PM Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > virtiofsctl can control a running virtiofsd process:
+> >
+> >   usage: ./virtiofsctl COMMAND [args...]
+> >
+> >   Commands:
+> >     get-log-level       - show current log level
+> >     set-log-level LEVEL - set current log level to one of
+> >                           "err", "warning", "info", "debug"
+> >
+> > Make sure it is running in the same DBus session as virtiofsd.  This may
+> > require setting the DBUS_SESSION_BUS_ADDRESS environment variable to the
+> > same value as used by virtiofsd.
+> >
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  Makefile                        |  3 ++
+> >  Makefile.objs                   |  1 +
+> >  contrib/virtiofsd/Makefile.objs |  3 ++
+> >  contrib/virtiofsd/virtiofsctl.c | 55 +++++++++++++++++++++++++++++++++
+> >  4 files changed, 62 insertions(+)
+> >  create mode 100644 contrib/virtiofsd/virtiofsctl.c
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 6b1af33348..d7ed9e7669 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -419,6 +419,7 @@ dummy := $(call unnest-vars,, \
+> >                  ivshmem-client-obj-y \
+> >                  ivshmem-server-obj-y \
+> >                  virtiofsd-obj-y \
+> > +                virtiofsctl-obj-y \
+> >                  rdmacm-mux-obj-y \
+> >                  libvhost-user-obj-y \
+> >                  vhost-user-scsi-obj-y \
+> > @@ -661,6 +662,8 @@ contrib/virtiofsd/gdbus_generated.c-timestamp: $(SRC_PATH)/contrib/virtiofsd/org
+> >
+> >  virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
+> >       $(call LINK, $^)
+> > +virtiofsctl$(EXESUF): $(virtiofsctl-obj-y)
+> > +     $(call LINK, $^)
+> >  endif
+> >
+> >  vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) libqemuutil.a libqemustub.a
+> > diff --git a/Makefile.objs b/Makefile.objs
+> > index dfdd7d56ea..326a8abb8e 100644
+> > --- a/Makefile.objs
+> > +++ b/Makefile.objs
+> > @@ -126,6 +126,7 @@ rdmacm-mux-obj-y = contrib/rdmacm-mux/
+> >  vhost-user-input-obj-y = contrib/vhost-user-input/
+> >  vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
+> >  virtiofsd-obj-y = contrib/virtiofsd/
+> > +virtiofsctl-obj-y = contrib/virtiofsd/
+> >
+> >  ######################################################################
+> >  trace-events-subdirs =
+> > diff --git a/contrib/virtiofsd/Makefile.objs b/contrib/virtiofsd/Makefile.objs
+> > index d59ab60f3d..3f944d493e 100644
+> > --- a/contrib/virtiofsd/Makefile.objs
+> > +++ b/contrib/virtiofsd/Makefile.objs
+> > @@ -11,6 +11,9 @@ virtiofsd-obj-y = buffer.o \
+> >                    gdbus_generated.o \
+> >                    dbus.o
+> >
+> > +virtiofsctl-obj-y = virtiofsctl.o \
+> > +                    gdbus_generated.o
+> > +
+> >  seccomp.o-cflags := $(SECCOMP_CFLAGS)
+> >  seccomp.o-libs := $(SECCOMP_LIBS)
+> >
+> > diff --git a/contrib/virtiofsd/virtiofsctl.c b/contrib/virtiofsd/virtiofsctl.c
+> > new file mode 100644
+> > index 0000000000..39bee2b881
+> > --- /dev/null
+> > +++ b/contrib/virtiofsd/virtiofsctl.c
+> > @@ -0,0 +1,55 @@
+> > +#include <stdio.h>
+> > +#include "gdbus_generated.h"
+> > +
+> > +static void get_log_level(Virtiofsd *virtiofsd)
+> > +{
+> > +    const char *value = virtiofsd_get_log_level(virtiofsd);
+> > +
+> > +    printf("%s\n", value ? value : "(null)");
+> > +}
+> > +
+> > +static void set_log_level(Virtiofsd *virtiofsd, const char *value)
+> > +{
+> > +    virtiofsd_set_log_level(virtiofsd, value);
+> > +}
+> > +
+> > +static void usage(const char *progname)
+> > +{
+> > +    printf("usage: %s COMMAND [args...]\n", progname);
+> > +    printf("\n");
+> > +    printf("Commands:\n");
+> > +    printf("  get-log-level       - show current log level\n");
+> > +    printf("  set-log-level LEVEL - set current log level to one of\n");
+> > +    printf("                        \"err\", \"warning\", \"info\", \"debug\"\n");
+> > +    exit(0);
+> > +}
+> > +
+> > +int main(int argc, char **argv)
+> > +{
+> > +    Virtiofsd *virtiofsd;
+> > +    GError *error = NULL;
+> > +
+> > +    if (argc < 2) {
+> > +        usage(argv[0]);
+> > +    }
+> > +
+> > +    virtiofsd = virtiofsd_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+> > +            G_DBUS_PROXY_FLAGS_NONE, "org.qemu.virtiofsd",
+> > +            "/org/qemu/virtiofsd", NULL, &error);
+> > +    if (error) {
+> > +        fprintf(stderr, "%s\n", error->message);
+> > +        g_error_free(error);
+> > +        return 1;
+> > +    }
+> > +
+> > +    if (strcmp(argv[0], "get-log-level") == 0) {
+>
+> This and the one below works a lot better with argv[1] !
+>
+> (I wonder if a little python script would be better for these type of
+> wrappers).
 
-The cast to int64_t is not strictly necessary here, but doesn't hurt
-(since it shows you DO know you are going from double to 64-bit int).
+Or just plain gdbus/busctl calls (which already has bash completion
+fwiw), and/or eventually a shell script.
 
-> +    endtime_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + sleeptime_ns;
-> +    while (sleeptime_ns > 0 && !cpu->stop) {
-> +        if (sleeptime_ns > SCALE_MS) {
-> +            qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
-> +                                sleeptime_ns / SCALE_MS);
-> +        } else {
-> +            qemu_mutex_unlock_iothread();
-> +            g_usleep(sleeptime_ns / SCALE_US);
-> +            qemu_mutex_lock_iothread();
-> +        }
-> +        sleeptime_ns = endtime_ns - qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> +    }
-
-Looks reasonable.
-
-(I wonder if an alternative approach, of doing a poll() or similar
-instead of g_usleep, and using a pipe-to-self where we write to the pipe
-in the same scenarios where cpu->halt_cond would be broadcast, in order
-to wake up the sleeping poll in a responsive manner, would be any easier
-or more efficient - but don't rewrite the patch just because of my question)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+>
+> Dave
+>
+> > +        get_log_level(virtiofsd);
+> > +    } else if (strcmp(argv[0], "set-log-level") == 0) {
+>
+> > +        if (argc != 3) {
+> > +            usage(argv[0]);
+> > +        }
+> > +        set_log_level(virtiofsd, argv[2]);
+> > +    }
+> > +    g_object_unref(virtiofsd);
+> > +    return 0;
+> > +}
+> > --
+> > 2.21.0
+> >
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
