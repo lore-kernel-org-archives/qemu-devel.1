@@ -4,87 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 731F5C3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD36C3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48F1722DBF
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:41:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F1722DBF
+	by mail.kernel.org (Postfix) with ESMTPS id 6FAB9206BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:49:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FAB9206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5pD7-0008Oe-JX
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:41:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36697)
+	id 1i5pKI-0002HQ-Eb
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i5pBV-0007SI-Tb
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:40:15 -0400
+ (envelope-from <philmd@redhat.com>) id 1i5pJM-0001WL-K3
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i5pBU-0002tK-KW
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:40:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38632)
+ (envelope-from <philmd@redhat.com>) id 1i5pJK-0004Fc-Rf
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:48:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41676)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i5pBU-0002sj-Al
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:40:12 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i5pJK-0004BN-Hm
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:48:18 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 629B4C055673
- for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 10:40:11 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id j11so326518wmh.2
- for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 03:40:11 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8CA20C055673
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 10:48:09 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id b9so809933wrt.5
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 03:48:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=rzNkkpZhVs40qoLTLY2VtbAEoZDa1XPa/NCoUNkxRkQ=;
- b=qA/oXZViLYo8eA5n89Q0F8qAJdToTwxcECDd46MGy8QmPLNNKfOY9Hktjeg3yQSc7l
- 6yxyXggBbj209Pk2FdO06/FVrwOUPkEH8Wj7GCYdYvtYGP987u4zCaxfsuEa70ickW/4
- vwBAUzUkickSYse0fbAhSbBuCguCBkmZNfGpOenkGI1tgea/cKda1YWCDcW8tN/uidxI
- eG9mlnGRGN3/xLVapR4/sNGALj56E4YWcwqmcAoH7kqUoMcCMrJzzDxrNnhtryqX8Nau
- GQasSvh1P+bcldYx+MHHj2VU6GBu4aDDEbANPE/CFVwgevthqRZ7Wp27t8viBf4GiVV4
- FifQ==
-X-Gm-Message-State: APjAAAX3aDpzcXADDR3b65DWh+gkbZHwBIuzKKQW5ioyek4WFAjs+R2W
- c6nJcUDqWk1mG238LWLlWkTG7VoMCkiGuO1yhMRzK8kEjcB077CzVR/mSD+J6fyTOZrAj/Pctxf
- WIHPueLypHNc+Z50=
-X-Received: by 2002:adf:fb4b:: with SMTP id c11mr1910586wrs.176.1567680010107; 
- Thu, 05 Sep 2019 03:40:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzrYH9l/NdM5kjZYnFn1Y7Ty260Mv3AEKMcuf2r5LRSEvPKY22w9GKcPSziTxoRF3TFL3lvRw==
-X-Received: by 2002:adf:fb4b:: with SMTP id c11mr1910561wrs.176.1567680009938; 
- Thu, 05 Sep 2019 03:40:09 -0700 (PDT)
+ bh=YiJ7qMxZZrpWWgP5whvFQXJ+AM92m75a5pQYG7z5M2o=;
+ b=bmkEmrZSSkKtfHAwH8H8jVL0zm1s7vQuerNErVJz2vV5z4XD0de28PcRXDMH5pIZfm
+ Jda6VsFa3PSkU5yxOH36S2Pae1s+BNWF7TSOtx636kqAmiqlzW6tacpje5JsxKvxL3cj
+ Wcd2WpHr0csDRJE9OiAXnTWgCppccX3VGpcPTtuxRBRyqHKUMbsrcx9+r397ApGHpvhH
+ jKkPX89uPU1DudT6Iew2lEw+O812WmkgY1EAonS5NcNazZmmSBzTQdDNtZY6KGV19ZJd
+ K1aXIUGHWkJxb5KZ//KEhnJSBKQSU8Vy5HrNn9zO28rA68PCR/r44+aLmWgxzTiGq7uC
+ UlPQ==
+X-Gm-Message-State: APjAAAVQWgumtGXYar2GUstpNGX6+pxPaY0xrLe3qbThKpxSrEw9ie+0
+ fBdPsaxiRbvR91UaOR7u+rH5subCCHRdizct+TunPHshyao6a6YkbqMRbDwUxiPE1JN4WRzLE81
+ jqPh8/T6XGN3ZiWc=
+X-Received: by 2002:a1c:ca02:: with SMTP id a2mr2587664wmg.127.1567680488330; 
+ Thu, 05 Sep 2019 03:48:08 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwXIlD7yzcW84+7EWOWNTXwsTIdEE+fUJeCJ+FBQSCM3NPT+mPCAEFm9xJ4LZEWZG1egOBMoQ==
+X-Received: by 2002:a1c:ca02:: with SMTP id a2mr2587648wmg.127.1567680488115; 
+ Thu, 05 Sep 2019 03:48:08 -0700 (PDT)
 Received: from [192.168.1.48] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id a7sm2355344wra.43.2019.09.05.03.40.08
+ by smtp.gmail.com with ESMTPSA id t203sm2781008wmf.42.2019.09.05.03.48.07
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 05 Sep 2019 03:40:09 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
- <20190904203013.9028-26-alex.bennee@linaro.org>
+ Thu, 05 Sep 2019 03:48:07 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190904193059.26202-1-richard.henderson@linaro.org>
+ <20190904193059.26202-61-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <c27ec42d-ef09-4db7-4950-9b0af2215bbf@redhat.com>
-Date: Thu, 5 Sep 2019 12:40:07 +0200
+Message-ID: <4ca91971-bfdd-976a-5b9d-d38b42f826a7@redhat.com>
+Date: Thu, 5 Sep 2019 12:48:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190904203013.9028-26-alex.bennee@linaro.org>
+In-Reply-To: <20190904193059.26202-61-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 25/42] tests/docker: avoid $SHELL invoke
- bash directly
+Subject: Re: [Qemu-devel] [PATCH v4 60/69] target/arm: Split gen_nop_hint
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,63 +94,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/19 10:29 PM, Alex Benn=C3=A9e wrote:
-> On some images SHELL is pointing at a limited /bin/sh which doesn't
-> understand noprofile/norc. Given the run script is running bash just
-> invoke it directly.
+On 9/4/19 9:30 PM, Richard Henderson wrote:
+> Now that all callers pass a constant value, split the switch
+> statement into the individual trans_* functions.
 >=20
-
-This fixes:
-
-  $ make docker-test-build@IMAGE DEBUG=3D1
-  [...]
-  + echo '  ./test-build'
-  ./test-build
-  + echo '* Hit Ctrl-D to continue, or type '\''exit 1'\'' to abort'
-  * Hit Ctrl-D to continue, or type 'exit 1' to abort
-  + echo
-  + /bin/sh --noprofile --norc
-  /bin/sh: 0: Illegal option --
-
-Fixes: 2b0c4fa13f3
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 67 +++++++++++++++---------------------------
+>  1 file changed, 24 insertions(+), 43 deletions(-)
+>=20
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 69092c12c3..d076c962ea 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -3061,46 +3061,6 @@ static void gen_exception_return(DisasContext *s=
+, TCGv_i32 pc)
+>      gen_rfe(s, pc, load_cpu_field(spsr));
+>  }
+> =20
+> -/*
+> - * For WFI we will halt the vCPU until an IRQ. For WFE and YIELD we
+> - * only call the helper when running single threaded TCG code to ensur=
+e
+> - * the next round-robin scheduled vCPU gets a crack. In MTTCG mode we
+> - * just skip this instruction. Currently the SEV/SEVL instructions
+> - * which are *one* of many ways to wake the CPU from WFE are not
+> - * implemented so we can't sleep like WFI does.
+> - */
+> -static void gen_nop_hint(DisasContext *s, int val)
+> -{
+> -    switch (val) {
+> -        /* When running in MTTCG we don't generate jumps to the yield =
+and
+> -         * WFE helpers as it won't affect the scheduling of other vCPU=
+s.
+> -         * If we wanted to more completely model WFE/SEV so we don't b=
+usy
+> -         * spin unnecessarily we would need to do something more invol=
+ved.
+> -         */
+> -    case 1: /* yield */
+> -        if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
+> -            gen_set_pc_im(s, s->base.pc_next);
+> -            s->base.is_jmp =3D DISAS_YIELD;
+> -        }
+> -        break;
+> -    case 3: /* wfi */
+> -        gen_set_pc_im(s, s->base.pc_next);
+> -        s->base.is_jmp =3D DISAS_WFI;
+> -        break;
+> -    case 2: /* wfe */
+> -        if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
+> -            gen_set_pc_im(s, s->base.pc_next);
+> -            s->base.is_jmp =3D DISAS_WFE;
+> -        }
+> -        break;
+> -    case 4: /* sev */
+> -    case 5: /* sevl */
+> -        /* TODO: Implement SEV, SEVL and WFE.  May help SMP performanc=
+e.  */
+> -    default: /* nop */
+> -        break;
+> -    }
+> -}
+> -
+>  #define CPU_V001 cpu_V0, cpu_V0, cpu_V1
+> =20
+>  static inline void gen_neon_add(int size, TCGv_i32 t0, TCGv_i32 t1)
+> @@ -8194,19 +8154,40 @@ DO_SMLAWX(SMLAWT, 1, 1)
+> =20
+>  static bool trans_YIELD(DisasContext *s, arg_YIELD *a)
+>  {
+> -    gen_nop_hint(s, 1);
+> +    /*
+> +     * When running single-threaded TCG code, use the helper to ensure=
+ that
+> +     * the next round-robin scheduled vCPU gets a crack.  When running=
+ in
+> +     * MTTCG we don't generate jumps to the helper as it won't affect =
+the
+> +     * scheduling of other vCPUs.
+> +     */
+> +    if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
+> +        gen_set_pc_im(s, s->base.pc_next);
+> +        s->base.is_jmp =3D DISAS_YIELD;
+> +    }
+>      return true;
+>  }
+> =20
+>  static bool trans_WFE(DisasContext *s, arg_WFE *a)
+>  {
+> -    gen_nop_hint(s, 2);
+> +    /*
+> +     * When running single-threaded TCG code, use the helper to ensure=
+ that
+> +     * the next round-robin scheduled vCPU gets a crack.  In MTTCG mod=
+e we
+> +     * just skip this instruction.  Currently the SEV/SEVL instruction=
+s,
+> +     * which are *one* of many ways to wake the CPU from WFE, are not
+> +     * implemented so we can't sleep like WFI does.
+> +     */
+> +    if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
+> +        gen_set_pc_im(s, s->base.pc_next);
+> +        s->base.is_jmp =3D DISAS_WFE;
+> +    }
+>      return true;
+>  }
+> =20
+>  static bool trans_WFI(DisasContext *s, arg_WFI *a)
+>  {
+> -    gen_nop_hint(s, 3);
+> +    /* For WFI, halt the vCPU until an IRQ. */
+> +    gen_set_pc_im(s, s->base.pc_next);
+> +    s->base.is_jmp =3D DISAS_WFI;
+>      return true;
+>  }
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  tests/docker/run | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/docker/run b/tests/docker/run
-> index 1014871fec0..8edc7026ee3 100755
-> --- a/tests/docker/run
-> +++ b/tests/docker/run
-> @@ -62,7 +62,7 @@ echo "* Prepared to run command:"
->  echo "  $CMD"
->  echo "* Hit Ctrl-D to continue, or type 'exit 1' to abort"
->  echo
-> -$SHELL --noprofile --norc
-> +env bash --noprofile --norc
-> =20
->  if "$CMD"; then
->      exit 0
-> @@ -72,7 +72,7 @@ elif test -n "$DEBUG"; then
->      echo "* Hit Ctrl-D to exit"
->      echo
->      # Force error after shell exits
-> -    $SHELL --noprofile --norc && exit 1
-> +    env bash --noprofile --norc && exit 1
->  else
->      exit 1
->  fi
->=20
+
 
