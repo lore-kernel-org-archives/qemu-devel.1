@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F43C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E69BC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:57:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B639206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:46:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B639206BB
+	by mail.kernel.org (Postfix) with ESMTPS id 9B50920692
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:57:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B50920692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5xiY-0000WA-SI
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 15:46:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50033)
+	id 1i5xt0-0002xt-82
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 15:57:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51956)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5xhd-0008W1-Ci
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:45:58 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5xsL-0002ZG-V3
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:57:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5xha-0007G5-EE
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:45:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34452)
+ (envelope-from <eblake@redhat.com>) id 1i5xsK-0005UO-3W
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:57:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38210)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5xha-0007F9-6V
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:45:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5xsJ-0005TP-Rb
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:57:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 582A310A8122;
- Thu,  5 Sep 2019 19:45:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5E965877A63;
+ Thu,  5 Sep 2019 19:56:58 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A3675D6A3;
- Thu,  5 Sep 2019 19:45:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 350BD194B9;
+ Thu,  5 Sep 2019 19:56:57 +0000 (UTC)
 To: Yury Kotov <yury-kotov@yandex-team.ru>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  Juan Quintela <quintela@redhat.com>,
@@ -48,7 +48,7 @@ To: Yury Kotov <yury-kotov@yandex-team.ru>,
  Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
  Stefan Weil <sw@weilnetz.de>
 References: <20190826103726.25538-1-yury-kotov@yandex-team.ru>
- <20190826103726.25538-2-yury-kotov@yandex-team.ru>
+ <20190826103726.25538-3-yury-kotov@yandex-team.ru>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -75,21 +75,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <79c7fa75-063b-700f-fcc8-4f71781f9664@redhat.com>
-Date: Thu, 5 Sep 2019 14:45:50 -0500
+Message-ID: <57c35118-a8c4-83cd-6f14-4e428a75238d@redhat.com>
+Date: Thu, 5 Sep 2019 14:56:56 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190826103726.25538-2-yury-kotov@yandex-team.ru>
+In-Reply-To: <20190826103726.25538-3-yury-kotov@yandex-team.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Thu, 05 Sep 2019 19:45:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.69]); Thu, 05 Sep 2019 19:56:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] qemu-thread: Add qemu_cond_timedwait
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] cpus: Fix throttling during vm_stop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,119 +108,56 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/26/19 5:37 AM, Yury Kotov wrote:
+> Throttling thread sleeps in VCPU thread. For high throttle percentage
+> this sleep is more than 10ms. E.g. for 60% - 15ms, for 99% - 990ms.
+> vm_stop() kicks all VCPUs and waits for them. It's called at the end of
+> migration and because of the long sleep the migration downtime might be
+> more than 100ms even for downtime-limit 1ms.
+> Use qemu_cond_timedwait for high percentage to wake up during vm_stop.
+> 
 > Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 > ---
-
-Rather sparse on the commit message details.
-
->  include/qemu/thread.h    | 18 ++++++++++++++++++
->  util/qemu-thread-posix.c | 40 ++++++++++++++++++++++++++++------------
->  util/qemu-thread-win32.c | 16 ++++++++++++++++
->  util/qsp.c               | 18 ++++++++++++++++++
->  4 files changed, 80 insertions(+), 12 deletions(-)
+>  cpus.c | 25 +++++++++++++++++--------
+>  1 file changed, 17 insertions(+), 8 deletions(-)
 > 
 
-> +++ b/util/qemu-thread-posix.c
-> @@ -36,6 +36,18 @@ static void error_exit(int err, const char *msg)
->      abort();
->  }
+> @@ -790,11 +792,20 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
 >  
-> +static void compute_abs_deadline(struct timespec *ts, int ms)
-> +{
-> +    struct timeval tv;
-> +    gettimeofday(&tv, NULL);
-> +    ts->tv_nsec = tv.tv_usec * 1000 + (ms % 1000) * 1000000;
-> +    ts->tv_sec = tv.tv_sec + ms / 1000;
-> +    if (ts->tv_nsec >= 1000000000) {
-> +        ts->tv_sec++;
-> +        ts->tv_nsec -= 1000000000;
+>      pct = (double)cpu_throttle_get_percentage()/100;
+>      throttle_ratio = pct / (1 - pct);
+> -    sleeptime_ns = (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
+> -
+> -    qemu_mutex_unlock_iothread();
+> -    g_usleep(sleeptime_ns / 1000); /* Convert ns to us for usleep call */
+> -    qemu_mutex_lock_iothread();
+> +    /* Add 1ns to fix double's rounding error (like 0.9999999...) */
+> +    sleeptime_ns = (int64_t)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS + 1);
+
+The cast to int64_t is not strictly necessary here, but doesn't hurt
+(since it shows you DO know you are going from double to 64-bit int).
+
+> +    endtime_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + sleeptime_ns;
+> +    while (sleeptime_ns > 0 && !cpu->stop) {
+> +        if (sleeptime_ns > SCALE_MS) {
+> +            qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
+> +                                sleeptime_ns / SCALE_MS);
+> +        } else {
+> +            qemu_mutex_unlock_iothread();
+> +            g_usleep(sleeptime_ns / SCALE_US);
+> +            qemu_mutex_lock_iothread();
+> +        }
+> +        sleeptime_ns = endtime_ns - qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
 > +    }
 
-I don't know if any named constants would make this easier or harder to
-read (such as USEC_PER_SEC 1000000 or NSEC_PER_SEC 1000000000), but the
-conversion from relative ms to absolute timespec looks correct. [1]
+Looks reasonable.
 
-> +void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
-> +                              const char *file, const int line)
-> +{
-> +    int err;
-> +    struct timespec ts;
-> +
-> +    assert(cond->initialized);
-> +    trace_qemu_mutex_unlock(mutex, file, line);
-> +    compute_abs_deadline(&ts, ms);
-> +    err = pthread_cond_timedwait(&cond->cond, &mutex->lock, &ts);
-> +    trace_qemu_mutex_locked(mutex, file, line);
-> +    if (err && err != ETIMEDOUT) {
-> +        error_exit(err, __func__);
-> +    }
-> +}
+(I wonder if an alternative approach, of doing a poll() or similar
+instead of g_usleep, and using a pipe-to-self where we write to the pipe
+in the same scenarios where cpu->halt_cond would be broadcast, in order
+to wake up the sleeping poll in a responsive manner, would be any easier
+or more efficient - but don't rewrite the patch just because of my question)
 
-However, this function returning void looks odd.  Although ETIMEDOUT is
-the one error that guarantees that mutex is reobtained (all other errors
-occur before the mutex is given up in the first place), and even though
-the man page warns that you MUST recheck the condition variable in a
-while loop regardless of success or failure (it might be a spurious
-successful wake-up due to a broadcast where neither the condition nor
-the timeout has actually been reached yet; or it might be a race where
-the function reports a timeout immediately before the condition variable
-became available after all), it still seems like callers might like to
-know if a timeout happened, without having to calculate an ending
-absolute time themselves.
-
-
->  
-> -static void compute_abs_deadline(struct timespec *ts, int ms)
-> -{
-> -    struct timeval tv;
-
-[1] Oh, you mixed code motion with new code, but the commit message
-didn't mention that.  It's not necessarily worth splitting the patch,
-but at least mentioning it would be worthwhile.
-
-> +++ b/util/qemu-thread-win32.c
-> @@ -145,6 +145,22 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *file, con
->      qemu_mutex_post_lock(mutex, file, line);
->  }
->  
-> +void qemu_cond_timedwait_impl(QemuCond *cond, QemuMutex *mutex, int ms,
-> +                              const char *file, const int line)
-> +{
-> +    int rc = 0;
-> +
-> +    assert(cond->initialized);
-> +    trace_qemu_mutex_unlock(mutex, file, line);
-> +    if (!SleepConditionVariableSRW(&cond->var, &mutex->lock, ms, 0)) {
-> +        rc = GetLastError();
-> +    }
-> +    trace_qemu_mutex_locked(mutex, file, line);
-> +    if (rc && rc != ERROR_TIMEOUT) {
-> +        error_exit(rc, __func__);
-> +    }
-> +}
-
-I am less certain that this implementation is correct, but on the
-surface it seems okay.
-
-
->  
-> +static void
-> +qsp_cond_timedwait(QemuCond *cond, QemuMutex *mutex, int ms,
-> +                   const char *file, int line)
-> +{
-> +    QSPEntry *e;
-> +    int64_t t0, t1;
-> +
-> +    t0 = get_clock();
-> +    qemu_cond_timedwait_impl(cond, mutex, ms, file, line);
-> +    t1 = get_clock();
-> +
-> +    e = qsp_entry_get(cond, file, line, QSP_CONDVAR);
-> +    qsp_entry_record(e, t1 - t0);
-> +}
-
-Another function where a bool or int return (to distinguish success from
-timeout) might be worthwhile to some callers.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
