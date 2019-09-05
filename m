@@ -2,64 +2,89 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC13DC41514
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 731F5C3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A68CB22CF6
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:39:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A68CB22CF6
+	by mail.kernel.org (Postfix) with ESMTPS id 48F1722DBF
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 10:41:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F1722DBF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5pBD-00070E-08
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:39:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36028)
+	id 1i5pD7-0008Oe-JX
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 06:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i5p7q-0002wD-1Z
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:36:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1i5pBV-0007SI-Tb
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:40:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i5p7o-0007VH-LD
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:36:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47060)
+ (envelope-from <philmd@redhat.com>) id 1i5pBU-0002tK-KW
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:40:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38632)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5p7o-0007UV-Es
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:36:24 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i5pBU-0002sj-Al
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 06:40:12 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B6BEE3CA16
- for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 10:36:23 +0000 (UTC)
-Received: from work-vm (ovpn-117-197.ams2.redhat.com [10.36.117.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EB441001281;
- Thu,  5 Sep 2019 10:36:16 +0000 (UTC)
-Date: Thu, 5 Sep 2019 11:36:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190905103613.GK2700@work-vm>
-References: <20190905082947.6633-1-stefanha@redhat.com>
- <6e9ff4f7-2906-3c11-8191-05cff3e60f53@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 629B4C055673
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 10:40:11 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id j11so326518wmh.2
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 03:40:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rzNkkpZhVs40qoLTLY2VtbAEoZDa1XPa/NCoUNkxRkQ=;
+ b=qA/oXZViLYo8eA5n89Q0F8qAJdToTwxcECDd46MGy8QmPLNNKfOY9Hktjeg3yQSc7l
+ 6yxyXggBbj209Pk2FdO06/FVrwOUPkEH8Wj7GCYdYvtYGP987u4zCaxfsuEa70ickW/4
+ vwBAUzUkickSYse0fbAhSbBuCguCBkmZNfGpOenkGI1tgea/cKda1YWCDcW8tN/uidxI
+ eG9mlnGRGN3/xLVapR4/sNGALj56E4YWcwqmcAoH7kqUoMcCMrJzzDxrNnhtryqX8Nau
+ GQasSvh1P+bcldYx+MHHj2VU6GBu4aDDEbANPE/CFVwgevthqRZ7Wp27t8viBf4GiVV4
+ FifQ==
+X-Gm-Message-State: APjAAAX3aDpzcXADDR3b65DWh+gkbZHwBIuzKKQW5ioyek4WFAjs+R2W
+ c6nJcUDqWk1mG238LWLlWkTG7VoMCkiGuO1yhMRzK8kEjcB077CzVR/mSD+J6fyTOZrAj/Pctxf
+ WIHPueLypHNc+Z50=
+X-Received: by 2002:adf:fb4b:: with SMTP id c11mr1910586wrs.176.1567680010107; 
+ Thu, 05 Sep 2019 03:40:10 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzrYH9l/NdM5kjZYnFn1Y7Ty260Mv3AEKMcuf2r5LRSEvPKY22w9GKcPSziTxoRF3TFL3lvRw==
+X-Received: by 2002:adf:fb4b:: with SMTP id c11mr1910561wrs.176.1567680009938; 
+ Thu, 05 Sep 2019 03:40:09 -0700 (PDT)
+Received: from [192.168.1.48] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id a7sm2355344wra.43.2019.09.05.03.40.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Sep 2019 03:40:09 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
+ <20190904203013.9028-26-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c27ec42d-ef09-4db7-4950-9b0af2215bbf@redhat.com>
+Date: Thu, 5 Sep 2019 12:40:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <6e9ff4f7-2906-3c11-8191-05cff3e60f53@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 05 Sep 2019 10:36:23 +0000 (UTC)
+In-Reply-To: <20190904203013.9028-26-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH RESEND 0/2] virtiofsd: use
- "fuse_log.h" APIs instead of <err.h>
+Subject: Re: [Qemu-devel] [PATCH v1 25/42] tests/docker: avoid $SHELL invoke
+ bash directly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,47 +96,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> Hi Stefan,
+On 9/4/19 10:29 PM, Alex Benn=C3=A9e wrote:
+> On some images SHELL is pointing at a limited /bin/sh which doesn't
+> understand noprofile/norc. Given the run script is running bash just
+> invoke it directly.
 >=20
-> On 9/5/19 10:29 AM, Stefan Hajnoczi wrote:
-> > warn(3), warnx(3), err(3), and errx(3) print to stderr even when the =
---syslog
-> > option was given.  In this case messages to stderr are likely to be l=
-ost and
-> > this makes troubleshooting hard.  Use "fuse_log.h" APIs instead of <e=
-rr.h>.
-> >=20
-> > Stefan Hajnoczi (2):
-> >   virtiofsd: replace warn(3) and warnx(3) with fuse_warning()
-> >   virtiofsd: replace err(3) and errx(3) with fuse_err()
->=20
-> Is this a straight RESEND or are there any changes in this series?
->=20
-> I'm asking because IIRC your first series had:
-> - Reviewed-by: Jun Piao <piaojun@huawei.com>
-> - Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->=20
-> If this isn't a RESEND then I'll review it again.
 
-I'll pick those reviews up.
+This fixes:
 
-Dave
+  $ make docker-test-build@IMAGE DEBUG=3D1
+  [...]
+  + echo '  ./test-build'
+  ./test-build
+  + echo '* Hit Ctrl-D to continue, or type '\''exit 1'\'' to abort'
+  * Hit Ctrl-D to continue, or type 'exit 1' to abort
+  + echo
+  + /bin/sh --noprofile --norc
+  /bin/sh: 0: Illegal option --
 
-> Thanks,
+Fixes: 2b0c4fa13f3
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  tests/docker/run | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> Phil.
+> diff --git a/tests/docker/run b/tests/docker/run
+> index 1014871fec0..8edc7026ee3 100755
+> --- a/tests/docker/run
+> +++ b/tests/docker/run
+> @@ -62,7 +62,7 @@ echo "* Prepared to run command:"
+>  echo "  $CMD"
+>  echo "* Hit Ctrl-D to continue, or type 'exit 1' to abort"
+>  echo
+> -$SHELL --noprofile --norc
+> +env bash --noprofile --norc
+> =20
+>  if "$CMD"; then
+>      exit 0
+> @@ -72,7 +72,7 @@ elif test -n "$DEBUG"; then
+>      echo "* Hit Ctrl-D to exit"
+>      echo
+>      # Force error after shell exits
+> -    $SHELL --noprofile --norc && exit 1
+> +    env bash --noprofile --norc && exit 1
+>  else
+>      exit 1
+>  fi
 >=20
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
