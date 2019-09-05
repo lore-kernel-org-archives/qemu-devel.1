@@ -2,111 +2,58 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C5F7C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:54:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A4D0C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 18:23:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DBCF206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:54:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DBCF206BB
+	by mail.kernel.org (Postfix) with ESMTPS id 4CB302070C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 18:23:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CB302070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5vxz-0000TC-EB
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 13:54:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56106)
+	id 1i5wPl-00085i-5z
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 14:23:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i5vxF-0008VK-00
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:53:58 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5wO3-0006Wa-Np
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 14:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i5vxC-0002Bo-Ju
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:53:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55956)
+ (envelope-from <eblake@redhat.com>) id 1i5wO1-0005pZ-4G
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 14:21:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55542)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1i5vxC-0002Am-CM
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:53:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5wO0-0005kf-VI
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 14:21:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E24323175285;
- Thu,  5 Sep 2019 17:53:52 +0000 (UTC)
-Received: from [10.36.116.74] (ovpn-116-74.ams2.redhat.com [10.36.116.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 81F6F600CC;
- Thu,  5 Sep 2019 17:53:43 +0000 (UTC)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
- <20190904203013.9028-3-alex.bennee@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <a269df37-2452-e703-82dc-a4f2b7f3a2da@redhat.com>
-Date: Thu, 5 Sep 2019 19:53:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 4E6BCC055673
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 18:21:35 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1C5BC5D6A3
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 18:21:34 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu,  5 Sep 2019 13:21:23 -0500
+Message-Id: <20190905182132.3563-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190904203013.9028-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 05 Sep 2019 17:53:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Thu, 05 Sep 2019 18:21:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 02/42] configure: clean-up container
- cross compile detect
+Subject: [Qemu-devel] [PULL 0/9] NBD patches through 2019-09-05
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,117 +65,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.09.19 22:29, Alex Benn=C3=A9e wrote:
-> The introduction of podman support inadvertently broke configure's
-> detect of the container support as the configure probe didn't specify
-> an engine type. To fix this in docker.py:
->=20
->   - only (re)set USE_ENGINE if --engine is specified
->   - enhance the output so docker is no longer just yes
->=20
-> In the configure script we can at least start cleaning up the
-> detecting and naming of variables. To avoid too much churn the
-> conversion of the various make DOCKER_foo variables has been left for
-> future clean-ups.
+The following changes since commit eac2f39602e0423adf56be410c9a22c31fec9a=
+81:
 
-This is not only a "clean-up" but an actual fix :) (maybe add a Fixes: ta=
-g).
+  target/arm: Inline gen_bx_im into callers (2019-09-05 13:23:04 +0100)
 
-This makes it work again for me.
+are available in the Git repository at:
 
-t460s: ~/git/qemu mvc $ tests/docker/docker.py probe
-docker
+  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-09-05
 
-Thanks!
+for you to fetch changes up to 73bddca33cb1749ddcbcc1e9972a77d93000553b:
 
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  configure              | 10 +++++-----
->  tests/docker/docker.py |  7 ++++---
->  2 files changed, 9 insertions(+), 8 deletions(-)
->=20
-> diff --git a/configure b/configure
-> index 95134c0180b..94845fc5101 100755
-> --- a/configure
-> +++ b/configure
-> @@ -495,7 +495,7 @@ qed=3D"yes"
->  parallels=3D"yes"
->  sheepdog=3D"yes"
->  libxml2=3D""
-> -docker=3D"no"
-> +container=3D"no"
->  debug_mutex=3D"no"
->  libpmem=3D""
->  default_devices=3D"yes"
-> @@ -5894,14 +5894,14 @@ EOF
->  fi
-> =20
->  ##########################################
-> -# Docker and cross-compiler support
-> +# Container based cross-compiler support
->  #
->  # This is specifically for building test
->  # cases for foreign architectures, not
->  # cross-compiling QEMU itself.
-> =20
-> -if has "docker"; then
-> -    docker=3D$($python $source_path/tests/docker/docker.py probe)
-> +if has "docker" || has "podman"; then
-> +    container=3D$($python $source_path/tests/docker/docker.py probe)
->  fi
-> =20
->  ##########################################
-> @@ -6474,7 +6474,7 @@ echo "qed support       $qed"
->  echo "parallels support $parallels"
->  echo "sheepdog support  $sheepdog"
->  echo "capstone          $capstone"
-> -echo "docker            $docker"
-> +echo "container support $container"
->  echo "libpmem support   $libpmem"
->  echo "libudev           $libudev"
->  echo "default devices   $default_devices"
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 4bba29e104e..e23209f71ee 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -536,9 +536,9 @@ class ProbeCommand(SubCommand):
->          try:
->              docker =3D Docker()
->              if docker._command[0] =3D=3D "docker":
-> -                print("yes")
-> +                print("docker")
->              elif docker._command[0] =3D=3D "sudo":
-> -                print("sudo")
-> +                print("sudo docker")
->              elif docker._command[0] =3D=3D "podman":
->                  print("podman")
->          except Exception:
-> @@ -651,7 +651,8 @@ def main():
->          cmd.args(subp)
->          subp.set_defaults(cmdobj=3Dcmd)
->      args, argv =3D parser.parse_known_args()
-> -    USE_ENGINE =3D args.engine
-> +    if args.engine:
-> +        USE_ENGINE =3D args.engine
->      return args.cmdobj.run(args, argv)
-> =20
-> =20
->=20
+  nbd: Implement server use of NBD FAST_ZERO (2019-09-05 10:48:46 -0500)
 
+----------------------------------------------------------------
+nbd patches for 2019-09-05
+
+- Advertise NBD_FLAG_CAN_MULTI_CONN on readonly images
+- Tolerate larger set of server error responses during handshake
+- More precision on handling fallocate() failures due to alignment
+- Better documentation of NBD connection URIs
+- Implement new extension NBD_CMD_FLAG_FAST_ZERO to benefit qemu-img conv=
+ert
+
+----------------------------------------------------------------
+Andrey Shinkevich (1):
+      block: workaround for unaligned byte range in fallocate()
+
+Eric Blake (8):
+      nbd: Advertise multi-conn for shared read-only connections
+      nbd: Use g_autofree in a few places
+      nbd: Tolerate more errors to structured reply request
+      docs: Update preferred NBD device syntax
+      nbd: Improve per-export flag handling in server
+      nbd: Prepare for NBD_CMD_FLAG_FAST_ZERO
+      nbd: Implement client use of NBD FAST_ZERO
+      nbd: Implement server use of NBD FAST_ZERO
+
+ docs/interop/nbd.txt |  2 ++
+ qemu-doc.texi        | 11 +++++--
+ include/block/nbd.h  |  6 +++-
+ block/io.c           |  2 +-
+ block/file-posix.c   |  7 +++++
+ block/nbd.c          | 18 ++++++-----
+ blockdev-nbd.c       |  3 +-
+ nbd/client.c         | 85 +++++++++++++++++++++++++---------------------=
+------
+ nbd/common.c         |  5 ++++
+ nbd/server.c         | 83 ++++++++++++++++++++++++++++------------------=
+----
+ qemu-nbd.c           |  7 +++--
+ nbd/trace-events     |  2 +-
+ 12 files changed, 134 insertions(+), 97 deletions(-)
 
 --=20
+2.21.0
 
-Thanks,
-
-David / dhildenb
 
