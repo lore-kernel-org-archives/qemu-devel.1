@@ -6,138 +6,59 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD913C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C0AC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:30:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B07B4206A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:29:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07B4206A3
+	by mail.kernel.org (Postfix) with ESMTPS id DBE4E206A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:30:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBE4E206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5vZO-0002HC-K0
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 13:29:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51452)
+	id 1i5vaW-0003XQ-V2
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 13:30:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i5vXp-0001dg-Og
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:27:42 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i5vXt-0001gl-CG
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:27:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i5vXo-0005Gt-NP
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:27:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29080)
+ (envelope-from <dgilbert@redhat.com>) id 1i5vXr-0005I2-Tl
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:27:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38112)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i5vXl-0005Fv-Mo; Thu, 05 Sep 2019 13:27:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5vXr-0005Hq-L2
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:27:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6B6E1302C070;
- Thu,  5 Sep 2019 17:27:36 +0000 (UTC)
-Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0908860BE1;
- Thu,  5 Sep 2019 17:27:32 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190825071541.10389-1-mlevitsk@redhat.com>
- <20190825071541.10389-3-mlevitsk@redhat.com>
- <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
- <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
- <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
-Date: Thu, 5 Sep 2019 13:27:32 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id B8EE1308302F;
+ Thu,  5 Sep 2019 17:27:42 +0000 (UTC)
+Received: from work-vm (ovpn-117-197.ams2.redhat.com [10.36.117.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E55F710001B7;
+ Thu,  5 Sep 2019 17:27:34 +0000 (UTC)
+Date: Thu, 5 Sep 2019 18:27:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190905172732.GQ2700@work-vm>
+References: <20190905152136.30637-1-stefanha@redhat.com>
+ <20190905152136.30637-3-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190905152136.30637-3-stefanha@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 05 Sep 2019 17:27:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Thu, 05 Sep 2019 17:27:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
+Subject: Re: [Qemu-devel] [RFC 2/3] virtiofsd: add DBus server to handle log
+ level changes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,77 +70,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- John Ferlan <jferlan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: virtio-fs@redhat.com,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Eryu Guan <eguan@linux.alibaba.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 9/5/19 9:24 AM, Maxim Levitsky wrote:
-> On Wed, 2019-08-28 at 12:03 +0300, Maxim Levitsky wrote:
->> On Tue, 2019-08-27 at 18:29 -0400, John Snow wrote:
->>>
->>> On 8/25/19 3:15 AM, Maxim Levitsky wrote:
->>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->>>> ---
->>>>  block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
->>>>  block/trace-events |  2 ++
->>>>  2 files changed, 85 insertions(+)
->>>>
->>>> diff --git a/block/nvme.c b/block/nvme.c
->>>> index f8bd11e19a..dd041f39c9 100644
->>>> --- a/block/nvme.c
->>>> +++ b/block/nvme.c
->>>> @@ -112,6 +112,7 @@ typedef struct {
->>>>      bool plugged;
->>>>  
->>>>      bool supports_write_zeros;
->>>> +    bool supports_discard;
->>>>  
->>>>      CoMutex dma_map_lock;
->>>>      CoQueue dma_flush_queue;
->>>> @@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
->>>>  
->>>>      oncs = le16_to_cpu(idctrl->oncs);
->>>>      s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
->>>> +    s->supports_discard = (oncs & NVME_ONCS_DSM) != 0;
->>>
->>> Same comment -- checking !!(register & FIELD) is nicer than the
->>> negative. (I'm actually not sure even the !! is needed, but it seems to
->>> be a QEMU-ism and I've caught myself using it...)
->>
->> All right, no problem to use !!
->>
->>>
->>> Rest looks good to me on a skim, but I'm not very well-versed in NVME.
->>
->> Thanks!
->>
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> Introduce a DBus server thread that runs alongside the other virtiofsd
+> threads.  It processes changes to the /org/qemu/virtiofsd object which
+> can be accessed at the org.qemu.virtiofsd location on the bus.
 > 
-> Kind ping about this patch series.
+> This code does not use locking because we are the only writer to the
+> int current_log_level variable.  More advanced management commands would
+> require locking to prevent race conditions with the other threads.
 > 
-> Apart from using !!, do you think that this patch series
-> can be merged, or should I do anything else?
-> Which tree do you think this should be committed to?
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+OK, that is less complex than I'd feared.
+I guess there's something probably nice to do with name/integer mapping
+for warning levels that we could use from one of the libraries.
+
+Dave
+
+> ---
+>  contrib/virtiofsd/Makefile.objs    |   3 +-
+>  contrib/virtiofsd/dbus.h           |   9 ++
+>  contrib/virtiofsd/dbus.c           | 162 +++++++++++++++++++++++++++++
+>  contrib/virtiofsd/passthrough_ll.c |   8 +-
+>  4 files changed, 180 insertions(+), 2 deletions(-)
+>  create mode 100644 contrib/virtiofsd/dbus.h
+>  create mode 100644 contrib/virtiofsd/dbus.c
 > 
-> I kind of want to see that merged before the freeze
-> starts, if there are no objections,
-> to reduce the amount of pending stuff in my queue.
+> diff --git a/contrib/virtiofsd/Makefile.objs b/contrib/virtiofsd/Makefile.objs
+> index 9b2af1bc23..d59ab60f3d 100644
+> --- a/contrib/virtiofsd/Makefile.objs
+> +++ b/contrib/virtiofsd/Makefile.objs
+> @@ -8,7 +8,8 @@ virtiofsd-obj-y = buffer.o \
+>                    helper.o \
+>                    passthrough_ll.o \
+>                    seccomp.o \
+> -                  gdbus_generated.o
+> +                  gdbus_generated.o \
+> +                  dbus.o
+>  
+>  seccomp.o-cflags := $(SECCOMP_CFLAGS)
+>  seccomp.o-libs := $(SECCOMP_LIBS)
+> diff --git a/contrib/virtiofsd/dbus.h b/contrib/virtiofsd/dbus.h
+> new file mode 100644
+> index 0000000000..aa18e47408
+> --- /dev/null
+> +++ b/contrib/virtiofsd/dbus.h
+> @@ -0,0 +1,9 @@
+> +#ifndef DBUS_H
+> +#define DBUS_H
+> +
+> +#include <stdbool.h>
+> +
+> +bool setup_dbus(void);
+> +void cleanup_dbus(void);
+> +
+> +#endif /* DBUS_H */
+> diff --git a/contrib/virtiofsd/dbus.c b/contrib/virtiofsd/dbus.c
+> new file mode 100644
+> index 0000000000..bc2308e34b
+> --- /dev/null
+> +++ b/contrib/virtiofsd/dbus.c
+> @@ -0,0 +1,162 @@
+> +#include <assert.h>
+> +#include <stdio.h>
+> +#include <glib.h>
+> +#include "fuse_log.h"
+> +#include "dbus.h"
+> +#include "gdbus_generated.h"
+> +
+> +static GThread *the_dbus_thread;
+> +static GMainContext *the_dbus_context;
+> +static GMainLoop *the_dbus_loop;
+> +
+> +/* Set the string property based on the current log level */
+> +static void refresh_log_level(Virtiofsd *virtiofsd)
+> +{
+> +    switch (current_log_level) {
+> +        case LOG_ERR:
+> +            virtiofsd_set_log_level(virtiofsd, "err");
+> +            break;
+> +        case LOG_WARNING:
+> +            virtiofsd_set_log_level(virtiofsd, "warning");
+> +            break;
+> +        case LOG_INFO:
+> +            virtiofsd_set_log_level(virtiofsd, "info");
+> +            break;
+> +        case LOG_DEBUG:
+> +            virtiofsd_set_log_level(virtiofsd, "debug");
+> +            break;
+> +    }
+> +}
+> +
+> +/* Handle changes to Virtiofsd object properties */
+> +static void notify(GObject *object, GParamSpec *pspec)
+> +{
+> +    Virtiofsd *virtiofsd = VIRTIOFSD(object);
+> +
+> +    fprintf(stderr, "%s %s\n", __func__, pspec->name);
+> +
+> +    if (strcmp(pspec->name, "log-level") == 0) {
+> +        const char *s = virtiofsd_get_log_level(virtiofsd);
+> +
+> +        if (strcmp(s, "err") == 0) {
+> +            current_log_level = LOG_ERR;
+> +        } else if (strcmp(s, "warning") == 0) {
+> +            current_log_level = LOG_WARNING;
+> +        } else if (strcmp(s, "info") == 0) {
+> +            current_log_level = LOG_INFO;
+> +        } else if (strcmp(s, "debug") == 0) {
+> +            current_log_level = LOG_DEBUG;
+> +        } else {
+> +            /* Invalid, reset the log level property */
+> +            refresh_log_level(virtiofsd);
+> +        }
+> +    }
+> +}
+> +
+> +typedef struct {
+> +    Virtiofsd *virtiofsd;
+> +    pthread_barrier_t *started;
+> +} GBusOwnNameData;
+> +
+> +static void bus_acquired(GDBusConnection *connection, const gchar *name,
+> +        gpointer user_data)
+> +{
+> +    GBusOwnNameData *data = user_data;
+> +    GError *error = NULL;
+> +
+> +    if (!g_dbus_interface_skeleton_export(
+> +                G_DBUS_INTERFACE_SKELETON(data->virtiofsd),
+> +                connection, "/org/qemu/virtiofsd", &error)) {
+> +        fuse_err("g_dbus_interface_skeleton_export: %s\n", error->message);
+> +        g_error_free(error);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +}
+> +
+> +static void name_acquired(GDBusConnection *connection, const gchar *name,
+> +        gpointer user_data)
+> +{
+> +    GBusOwnNameData *data = user_data;
+> +
+> +    pthread_barrier_wait(data->started);
+> +}
+> +
+> +static void name_lost(GDBusConnection *connection, const gchar *name,
+> +        gpointer user_data)
+> +{
+> +    if (connection) {
+> +        fuse_err("unable to own dbus name\n");
+> +    } else {
+> +        fuse_err("unable to connect to dbus\n");
+> +    }
+> +    exit(EXIT_FAILURE);
+> +}
+> +
+> +static gpointer dbus_thread(gpointer opaque)
+> +{
+> +    GBusOwnNameData data;
+> +    Virtiofsd *virtiofsd;
+> +    guint owner_id;
+> +
+> +    g_main_context_push_thread_default(the_dbus_context);
+> +
+> +    virtiofsd = virtiofsd_skeleton_new();
+> +    refresh_log_level(virtiofsd);
+> +    g_signal_connect(virtiofsd, "notify", G_CALLBACK(notify), NULL);
+> +
+> +    data.virtiofsd = virtiofsd;
+> +    data.started = opaque;
+> +
+> +    owner_id = g_bus_own_name(G_BUS_TYPE_SESSION, "org.qemu.virtiofsd",
+> +            G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE, bus_acquired, name_acquired,
+> +            name_lost, &data, NULL);
+> +
+> +    g_main_loop_run(the_dbus_loop);
+> +    g_bus_unown_name(owner_id);
+> +    g_object_unref(virtiofsd);
+> +
+> +    g_main_context_pop_thread_default(the_dbus_context);
+> +    return NULL;
+> +}
+> +
+> +/**
+> + * Start DBus server thread.
+> + *
+> + * Returns: true on success, false on failure
+> + */
+> +bool setup_dbus(void)
+> +{
+> +    pthread_barrier_t started;
+> +
+> +    assert(!the_dbus_thread);
+> +
+> +    fuse_info("Using dbus address %s\n",
+> +              getenv("DBUS_SESSION_BUS_ADDRESS") ?: "(null)");
+> +
+> +    pthread_barrier_init(&started, NULL, 2);
+> +
+> +    the_dbus_context = g_main_context_new();
+> +    the_dbus_loop = g_main_loop_new(the_dbus_context, FALSE);
+> +    the_dbus_thread = g_thread_new("dbus-thread", dbus_thread, &started);
+> +
+> +    pthread_barrier_wait(&started);
+> +    pthread_barrier_destroy(&started);
+> +
+> +    return true;
+> +}
+> +
+> +/**
+> + * Stop DBus server thread.
+> + */
+> +void cleanup_dbus(void)
+> +{
+> +    g_main_loop_quit(the_dbus_loop);
+> +    g_thread_join(the_dbus_thread);
+> +    the_dbus_thread = NULL;
+> +
+> +    g_main_loop_unref(the_dbus_loop);
+> +    the_dbus_loop = NULL;
+> +
+> +    g_main_context_unref(the_dbus_context);
+> +    the_dbus_context = NULL;
+> +}
+> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthrough_ll.c
+> index 0ef01b7e3f..0ddd7d280a 100644
+> --- a/contrib/virtiofsd/passthrough_ll.c
+> +++ b/contrib/virtiofsd/passthrough_ll.c
+> @@ -66,6 +66,7 @@
+>  #include <gmodule.h>
+>  #include "fuse_log.h"
+>  #include "seccomp.h"
+> +#include "dbus.h"
+>  
+>  /* Keep track of inode posix locks for each owner. */
+>  struct lo_inode_plock {
+> @@ -2989,6 +2990,9 @@ int main(int argc, char *argv[])
+>  	if (fuse_session_mount(se) != 0)
+>  	    goto err_out3;
+>  
+> +	if (!setup_dbus())
+> +	    goto err_out4;
+> +
+>  	fuse_daemonize(opts.foreground);
+>  
+>  	if (lo.ireg_sock != -1) {
+> @@ -2998,7 +3002,7 @@ int main(int argc, char *argv[])
+>  		if (ret) {
+>  			warnx("pthread_create: %s", strerror(ret));
+>  			ret = 1;
+> -			goto err_out4;
+> +			goto err_out5;
+>  		}
+>  
+>  		get_shared(&lo, &lo.root);
+> @@ -3014,6 +3018,8 @@ int main(int argc, char *argv[])
+>  	/* Block until ctrl+c or fusermount -u */
+>          ret = virtio_loop(se);
+>  
+> +err_out5:
+> +	cleanup_dbus();
+>  err_out4:
+>  	fuse_session_unmount(se);
+>  err_out3:
+> -- 
+> 2.21.0
 > 
-
-Didn't I ask a few other things?
-
-like not using "res30" because you've moved the fields around, and
-trying to be consistent about "zeros" vs "zeroes".
-
-Removing "+#define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) &
-0x10)" because it's unused.
-
-You also probably require review (or at least an ACK) from Keith Busch
-who maintains this file.
-
---js
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
