@@ -2,50 +2,49 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9DC5C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 14:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D112BC43140
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 14:44:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0331D205ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 14:38:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0331D205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 13FC42082C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 14:44:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13FC42082C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5suN-0001l5-O2
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 10:38:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33497)
+	id 1i5szY-0003ct-Sy
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 10:44:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i5sth-0001KF-5I
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:38:06 -0400
+ (envelope-from <eblake@redhat.com>) id 1i5syo-0003Ai-4X
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i5ste-0000U5-PD
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:38:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57282)
+ (envelope-from <eblake@redhat.com>) id 1i5sym-0003Cn-Rg
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:43:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58460)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5std-0000RU-1j
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:38:01 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i5sym-0003CI-IZ
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 10:43:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 21494C00A170;
- Thu,  5 Sep 2019 14:38:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AC32C190C007;
+ Thu,  5 Sep 2019 14:43:19 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D06260C18;
- Thu,  5 Sep 2019 14:37:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B33521001281;
+ Thu,  5 Sep 2019 14:43:18 +0000 (UTC)
 To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Jagannathan Raman <jag.raman@oracle.com>
-References: <cover.1567534653.git.jag.raman@oracle.com>
- <51220007b0f8a34cc72ff2847f5deb1f85c9c0e4.1567534653.git.jag.raman@oracle.com>
- <20190904082258.GC19582@redhat.com>
+ qemu-devel@nongnu.org
+References: <20190829165036.9773-1-berrange@redhat.com>
+ <20190829165036.9773-3-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,22 +71,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <7b558814-d17e-e135-ee0f-e92632545d93@redhat.com>
-Date: Thu, 5 Sep 2019 09:37:21 -0500
+Message-ID: <556b3065-f1c0-1338-36fd-20090aef90c2@redhat.com>
+Date: Thu, 5 Sep 2019 09:43:17 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190904082258.GC19582@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 05 Sep 2019 14:38:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190829165036.9773-3-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="WLkMaEcP67Pz1g7vPakPT9Ou2yHbxPelY"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Thu, 05 Sep 2019 14:43:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v3 PATCH 07/45] multi-process: define
- proxy-link object
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] docs: merge HACKING.rst contents
+ into CODING_STYLE.rst
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +98,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, mst@redhat.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
- john.g.johnson@oracle.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/19 3:22 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Sep 03, 2019 at 04:37:33PM -0400, Jagannathan Raman wrote:
->> Defines proxy-link object which forms the communication link between
->> QEMU & emulation program.
->> Adds functions to configure members of proxy-link object instance.
->> Adds functions to send and receive messages over the communication
->> channel.
->> Adds GMainLoop to handle events received on the communication channel.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WLkMaEcP67Pz1g7vPakPT9Ou2yHbxPelY
+Content-Type: multipart/mixed; boundary="jn70bQlGA8f6SOlRpFG1av6hP7ieCdOg4";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <556b3065-f1c0-1338-36fd-20090aef90c2@redhat.com>
+Subject: Re: [PATCH v3 2/4] docs: merge HACKING.rst contents into
+ CODING_STYLE.rst
+References: <20190829165036.9773-1-berrange@redhat.com>
+ <20190829165036.9773-3-berrange@redhat.com>
+In-Reply-To: <20190829165036.9773-3-berrange@redhat.com>
 
->> +
->> +#ifndef PROXY_LINK_H
->> +#define PROXY_LINK_H
->> +
->> +#include <stddef.h>
->> +#include <stdint.h>
->> +#include <glib.h>
+--jn70bQlGA8f6SOlRpFG1av6hP7ieCdOg4
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 8/29/19 11:50 AM, Daniel P. Berrang=C3=A9 wrote:
+> The split of information between the two docs is rather arbitary and
+> unclear. It is simpler for contributors if all the information is in
+> one file.
 >=20
-> I'm guessing this is the cause - nothing should be including this
-> directly - it is pulled  in for you via qemu/osdep.h
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  CODING_STYLE.rst | 296 ++++++++++++++++++++++++++++++++++++++++++++++
+>  HACKING.rst      | 300 -----------------------------------------------=
+
+>  README.rst       |   2 +-
+>  3 files changed, 297 insertions(+), 301 deletions(-)
+>  delete mode 100644 HACKING.rst
 >=20
->> +#include <pthread.h>
->> +
->> +#include "qemu/osdep.h"
 
-For that matter, "qemu/osdep.h" should ALWAYS be listed first, before
-any system headers, and inclusion of <stddef.h> and <stdint.h> is also
-redundant, just as the <glib.h>.
-
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
+
+
+--jn70bQlGA8f6SOlRpFG1av6hP7ieCdOg4--
+
+--WLkMaEcP67Pz1g7vPakPT9Ou2yHbxPelY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1xHwUACgkQp6FrSiUn
+Q2qEtggApbAyZZrNh1nF9aHLD2x0zNeKTe/1VTKgpiNMUB3aISqKOoWaQdTsXU52
+kOzfGEaFWf6WvVjJpXUQnR2DAf+t1cJ7quwgZQ+9sfa41Km7Z8KufVkAyIXCOGUs
+9LMWG6FsB3pFck6HdH50oSBPTXSVAn/VpGi6TbiE6IJmZO9OkhXSklQO85VE9d/Y
+l/ymr31ZSuiO1SUovGe5evdgHWM3hkhEGXRDkRoWaT7bExpehtpsDehANFWq2rTJ
+0/9s2qqAwQ+5j4ofb+JB+Z2I1d6nE8WpScRw1xSO4Y8E2iBCgMZNTpapNi3G4Dca
+6mcWpMsvsycgBx/YJ4SrnzDNPtSCWQ==
+=y4re
+-----END PGP SIGNATURE-----
+
+--WLkMaEcP67Pz1g7vPakPT9Ou2yHbxPelY--
 
