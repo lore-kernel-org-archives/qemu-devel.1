@@ -2,56 +2,58 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 592D0C3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 08:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D740C3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 08:34:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3294720870
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 08:33:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3294720870
+	by mail.kernel.org (Postfix) with ESMTPS id 3355120870
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 08:34:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3355120870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5nDG-000135-EH
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 04:33:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33025)
+	id 1i5nDN-00019N-3W
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 04:34:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i5nAO-0007jA-Mu
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 04:30:58 -0400
+ (envelope-from <thuth@redhat.com>) id 1i5nAW-0007qN-Ct
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 04:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i5nAN-0005lX-9C
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 04:30:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50888)
+ (envelope-from <thuth@redhat.com>) id 1i5nAS-0005qR-M3
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 04:31:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43598)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5nAN-0005kj-1f
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 04:30:55 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i5nAS-0005q2-Ba
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 04:31:00 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1A8871918641;
- Thu,  5 Sep 2019 08:30:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8F63180038D;
+ Thu,  5 Sep 2019 08:30:59 +0000 (UTC)
 Received: from thuth.com (ovpn-116-96.ams2.redhat.com [10.36.116.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 655E95D704;
- Thu,  5 Sep 2019 08:30:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E2925D704;
+ Thu,  5 Sep 2019 08:30:58 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  5 Sep 2019 10:30:41 +0200
-Message-Id: <20190905083049.11645-1-thuth@redhat.com>
+Date: Thu,  5 Sep 2019 10:30:46 +0200
+Message-Id: <20190905083049.11645-6-thuth@redhat.com>
+In-Reply-To: <20190905083049.11645-1-thuth@redhat.com>
+References: <20190905083049.11645-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Thu, 05 Sep 2019 08:30:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.69]); Thu, 05 Sep 2019 08:30:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 0/8] qtests and misc patches
+Subject: [Qemu-devel] [PULL 5/8] tests/libqtest: Move global_test wrapper
+ function into a separate header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,83 +70,685 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- Hi Peter,
+We want libqtest.h to become completely independent from global_qtest
+(so that the wrapper functions are not used by accident anymore). As
+a first step, move the wrapper functions into a separate header file.
 
-the following changes since commit a8b5ad8e1faef0d1bb3e550530328e8ec76fe87c:
+The new header is only included from libqtest.h for now, so that there
+is no difference to the users of libqtest.h yet. In the next patch, we
+will switch this, so that the users of the global_qtest-related
+functions will be using libqtest-single.h directly and libqtest.h
+becomes completely independent of this.
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-09-04 17:22:34 +0100)
-
-are available in the Git repository at:
-
-  https://gitlab.com/huth/qemu.git tags/pull-request-2019-09-05
-
-for you to fetch changes up to 7bb21c0ac301e423b483dd7fc171b0d7b56de2cf:
-
-  qemu-doc: Do not hard-code the name of the QEMU binary (2019-09-05 09:45:09 +0200)
-
-----------------------------------------------------------------
-- Make the core libqtest library independent from global_qtest
-- Clean up docs from hard-coded qemu-system-* names
-----------------------------------------------------------------
-
-Thomas Huth (8):
-      tests/migration: Do not use functions anymore that rely on global_qtest
-      tests/libqos/e1000e: Make e1000e libqos functions independent from global_qtest
-      tests/libqos: Replace clock_step with qtest_clock_step in virtio code
-      tests: Remove unnecessary global_qtest references
-      tests/libqtest: Move global_test wrapper function into a separate header
-      tests/libqtest: Use libqtest-single.h in tests that require global_qtest
-      tests/vm: Take the J=x setting into account for the vm-boot-ssh targets, too
-      qemu-doc: Do not hard-code the name of the QEMU binary
-
- MAINTAINERS                   |   2 +-
- docs/qemu-block-drivers.texi  |  72 +++++-----
- docs/qemu-cpu-models.texi     |  10 +-
- qemu-doc.texi                 |  81 +++++------
- qemu-options.hx               | 128 ++++++++---------
- tests/ahci-test.c             |   1 -
- tests/bios-tables-test.c      |   1 -
- tests/cpu-plug-test.c         |   2 +-
- tests/display-vga-test.c      |   2 +-
- tests/e1000e-test.c           |   2 +-
- tests/fdc-test.c              |   2 +-
- tests/i440fx-test.c           |   2 +-
- tests/i82801b11-test.c        |   2 +-
- tests/intel-hda-test.c        |   2 +-
- tests/ioh3420-test.c          |   2 +-
- tests/ipmi-kcs-test.c         |   3 +-
- tests/ivshmem-test.c          |   3 -
- tests/libqos/e1000e.c         |  16 ++-
- tests/libqos/virtio-mmio.c    |  14 +-
- tests/libqos/virtio-pci.c     |  14 +-
- tests/libqos/virtio.c         |  20 +--
- tests/libqos/virtio.h         |   6 +-
- tests/libqtest-single.h       | 315 ++++++++++++++++++++++++++++++++++++++++++
- tests/libqtest.c              |  13 --
- tests/libqtest.h              | 289 --------------------------------------
- tests/m25p80-test.c           |   2 +-
- tests/migration-test.c        |   6 +-
- tests/qos-test.c              |   2 +-
- tests/rtas-test.c             |   1 -
- tests/rtc-test.c              |   2 +-
- tests/rtl8139-test.c          |   2 +-
- tests/test-arm-mptimer.c      |   2 +-
- tests/test-netfilter.c        |   2 +-
- tests/test-x86-cpuid-compat.c |   2 +-
- tests/tmp105-test.c           |   2 +-
- tests/tpm-crb-test.c          |   2 +-
- tests/tpm-tests.c             |   2 +-
- tests/tpm-tis-test.c          |   2 +-
- tests/usb-hcd-ohci-test.c     |   2 +-
- tests/usb-hcd-uhci-test.c     |   2 +-
- tests/usb-hcd-xhci-test.c     |   2 +-
- tests/vhost-user-test.c       |   2 +-
- tests/virtio-blk-test.c       |   5 +-
- tests/virtio-ccw-test.c       |   2 +-
- tests/virtio-net-test.c       |   2 +-
- tests/virtio-scsi-test.c      |   2 +-
- tests/virtio-serial-test.c    |   2 +-
- tests/vm/Makefile.include     |   1 +
- 48 files changed, 546 insertions(+), 509 deletions(-)
+Message-Id: <20190904130047.25808-6-thuth@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS             |   2 +-
+ tests/libqtest-single.h | 311 ++++++++++++++++++++++++++++++++++++++++
+ tests/libqtest.c        |  11 --
+ tests/libqtest.h        | 287 +-----------------------------------
+ 4 files changed, 313 insertions(+), 298 deletions(-)
  create mode 100644 tests/libqtest-single.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c4c90f732d..65d8a7c2d2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2079,7 +2079,7 @@ R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: qtest.c
+ F: accel/qtest.c
+-F: tests/libqtest.*
++F: tests/libqtest*
+ F: tests/libqos/
+ F: tests/*-test.c
+ 
+diff --git a/tests/libqtest-single.h b/tests/libqtest-single.h
+new file mode 100644
+index 0000000000..49259558a5
+--- /dev/null
++++ b/tests/libqtest-single.h
+@@ -0,0 +1,311 @@
++/*
++ * QTest - wrappers for test with single QEMU instances
++ *
++ * Copyright IBM, Corp. 2012
++ * Copyright Red Hat, Inc. 2012
++ * Copyright SUSE LINUX Products GmbH 2013
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#ifndef LIBQTEST_SINGLE_H
++#define LIBQTEST_SINGLE_H
++
++/**
++ * qtest_start:
++ * @args: other arguments to pass to QEMU
++ *
++ * Start QEMU and assign the resulting #QTestState to a global variable.
++ * The global variable is used by "shortcut" functions documented below.
++ *
++ * Returns: #QTestState instance.
++ */
++static inline QTestState *qtest_start(const char *args)
++{
++    global_qtest = qtest_init(args);
++    return global_qtest;
++}
++
++/**
++ * qtest_end:
++ *
++ * Shut down the QEMU process started by qtest_start().
++ */
++static inline void qtest_end(void)
++{
++    if (!global_qtest) {
++        return;
++    }
++    qtest_quit(global_qtest);
++    global_qtest = NULL;
++}
++
++/**
++ * qmp:
++ * @fmt...: QMP message to send to qemu, formatted like
++ * qobject_from_jsonf_nofail().  See parse_escape() for what's
++ * supported after '%'.
++ *
++ * Sends a QMP message to QEMU and returns the response.
++ */
++GCC_FMT_ATTR(1, 2)
++static inline QDict *qmp(const char *fmt, ...)
++{
++    va_list ap;
++    QDict *response;
++
++    va_start(ap, fmt);
++    response = qtest_vqmp(global_qtest, fmt, ap);
++    va_end(ap);
++    return response;
++}
++
++/**
++ * qmp_eventwait:
++ * @s: #event event to wait for.
++ *
++ * Continuously polls for QMP responses until it receives the desired event.
++ */
++static inline void qmp_eventwait(const char *event)
++{
++    return qtest_qmp_eventwait(global_qtest, event);
++}
++
++/**
++ * get_irq:
++ * @num: Interrupt to observe.
++ *
++ * Returns: The level of the @num interrupt.
++ */
++static inline bool get_irq(int num)
++{
++    return qtest_get_irq(global_qtest, num);
++}
++
++/**
++ * outb:
++ * @addr: I/O port to write to.
++ * @value: Value being written.
++ *
++ * Write an 8-bit value to an I/O port.
++ */
++static inline void outb(uint16_t addr, uint8_t value)
++{
++    qtest_outb(global_qtest, addr, value);
++}
++
++/**
++ * outw:
++ * @addr: I/O port to write to.
++ * @value: Value being written.
++ *
++ * Write a 16-bit value to an I/O port.
++ */
++static inline void outw(uint16_t addr, uint16_t value)
++{
++    qtest_outw(global_qtest, addr, value);
++}
++
++/**
++ * outl:
++ * @addr: I/O port to write to.
++ * @value: Value being written.
++ *
++ * Write a 32-bit value to an I/O port.
++ */
++static inline void outl(uint16_t addr, uint32_t value)
++{
++    qtest_outl(global_qtest, addr, value);
++}
++
++/**
++ * inb:
++ * @addr: I/O port to read from.
++ *
++ * Reads an 8-bit value from an I/O port.
++ *
++ * Returns: Value read.
++ */
++static inline uint8_t inb(uint16_t addr)
++{
++    return qtest_inb(global_qtest, addr);
++}
++
++/**
++ * inw:
++ * @addr: I/O port to read from.
++ *
++ * Reads a 16-bit value from an I/O port.
++ *
++ * Returns: Value read.
++ */
++static inline uint16_t inw(uint16_t addr)
++{
++    return qtest_inw(global_qtest, addr);
++}
++
++/**
++ * inl:
++ * @addr: I/O port to read from.
++ *
++ * Reads a 32-bit value from an I/O port.
++ *
++ * Returns: Value read.
++ */
++static inline uint32_t inl(uint16_t addr)
++{
++    return qtest_inl(global_qtest, addr);
++}
++
++/**
++ * writeb:
++ * @addr: Guest address to write to.
++ * @value: Value being written.
++ *
++ * Writes an 8-bit value to guest memory.
++ */
++static inline void writeb(uint64_t addr, uint8_t value)
++{
++    qtest_writeb(global_qtest, addr, value);
++}
++
++/**
++ * writew:
++ * @addr: Guest address to write to.
++ * @value: Value being written.
++ *
++ * Writes a 16-bit value to guest memory.
++ */
++static inline void writew(uint64_t addr, uint16_t value)
++{
++    qtest_writew(global_qtest, addr, value);
++}
++
++/**
++ * writel:
++ * @addr: Guest address to write to.
++ * @value: Value being written.
++ *
++ * Writes a 32-bit value to guest memory.
++ */
++static inline void writel(uint64_t addr, uint32_t value)
++{
++    qtest_writel(global_qtest, addr, value);
++}
++
++/**
++ * writeq:
++ * @addr: Guest address to write to.
++ * @value: Value being written.
++ *
++ * Writes a 64-bit value to guest memory.
++ */
++static inline void writeq(uint64_t addr, uint64_t value)
++{
++    qtest_writeq(global_qtest, addr, value);
++}
++
++/**
++ * readb:
++ * @addr: Guest address to read from.
++ *
++ * Reads an 8-bit value from guest memory.
++ *
++ * Returns: Value read.
++ */
++static inline uint8_t readb(uint64_t addr)
++{
++    return qtest_readb(global_qtest, addr);
++}
++
++/**
++ * readw:
++ * @addr: Guest address to read from.
++ *
++ * Reads a 16-bit value from guest memory.
++ *
++ * Returns: Value read.
++ */
++static inline uint16_t readw(uint64_t addr)
++{
++    return qtest_readw(global_qtest, addr);
++}
++
++/**
++ * readl:
++ * @addr: Guest address to read from.
++ *
++ * Reads a 32-bit value from guest memory.
++ *
++ * Returns: Value read.
++ */
++static inline uint32_t readl(uint64_t addr)
++{
++    return qtest_readl(global_qtest, addr);
++}
++
++/**
++ * readq:
++ * @addr: Guest address to read from.
++ *
++ * Reads a 64-bit value from guest memory.
++ *
++ * Returns: Value read.
++ */
++static inline uint64_t readq(uint64_t addr)
++{
++    return qtest_readq(global_qtest, addr);
++}
++
++/**
++ * memread:
++ * @addr: Guest address to read from.
++ * @data: Pointer to where memory contents will be stored.
++ * @size: Number of bytes to read.
++ *
++ * Read guest memory into a buffer.
++ */
++static inline void memread(uint64_t addr, void *data, size_t size)
++{
++    qtest_memread(global_qtest, addr, data, size);
++}
++
++/**
++ * memwrite:
++ * @addr: Guest address to write to.
++ * @data: Pointer to the bytes that will be written to guest memory.
++ * @size: Number of bytes to write.
++ *
++ * Write a buffer to guest memory.
++ */
++static inline void memwrite(uint64_t addr, const void *data, size_t size)
++{
++    qtest_memwrite(global_qtest, addr, data, size);
++}
++
++/**
++ * clock_step_next:
++ *
++ * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
++ *
++ * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
++ */
++static inline int64_t clock_step_next(void)
++{
++    return qtest_clock_step_next(global_qtest);
++}
++
++/**
++ * clock_step:
++ * @step: Number of nanoseconds to advance the clock by.
++ *
++ * Advance the QEMU_CLOCK_VIRTUAL by @step nanoseconds.
++ *
++ * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
++ */
++static inline int64_t clock_step(int64_t step)
++{
++    return qtest_clock_step(global_qtest, step);
++}
++
++#endif
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 2713b86cf7..e5101d9d3a 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1106,17 +1106,6 @@ void qtest_memset(QTestState *s, uint64_t addr, uint8_t pattern, size_t size)
+     qtest_rsp(s, 0);
+ }
+ 
+-QDict *qmp(const char *fmt, ...)
+-{
+-    va_list ap;
+-    QDict *response;
+-
+-    va_start(ap, fmt);
+-    response = qtest_vqmp(global_qtest, fmt, ap);
+-    va_end(ap);
+-    return response;
+-}
+-
+ void qtest_qmp_assert_success(QTestState *qts, const char *fmt, ...)
+ {
+     va_list ap;
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 07ea35867c..6a7d7e41ad 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -628,45 +628,6 @@ void qtest_add_data_func_full(const char *str, void *data,
+ 
+ void qtest_add_abrt_handler(GHookFunc fn, const void *data);
+ 
+-/**
+- * qtest_start:
+- * @args: other arguments to pass to QEMU
+- *
+- * Start QEMU and assign the resulting #QTestState to a global variable.
+- * The global variable is used by "shortcut" functions documented below.
+- *
+- * Returns: #QTestState instance.
+- */
+-static inline QTestState *qtest_start(const char *args)
+-{
+-    global_qtest = qtest_init(args);
+-    return global_qtest;
+-}
+-
+-/**
+- * qtest_end:
+- *
+- * Shut down the QEMU process started by qtest_start().
+- */
+-static inline void qtest_end(void)
+-{
+-    if (!global_qtest) {
+-        return;
+-    }
+-    qtest_quit(global_qtest);
+-    global_qtest = NULL;
+-}
+-
+-/**
+- * qmp:
+- * @fmt...: QMP message to send to qemu, formatted like
+- * qobject_from_jsonf_nofail().  See parse_escape() for what's
+- * supported after '%'.
+- *
+- * Sends a QMP message to QEMU and returns the response.
+- */
+-QDict *qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+-
+ /**
+  * qtest_qmp_assert_success:
+  * @qts: QTestState instance to operate on
+@@ -680,253 +641,7 @@ QDict *qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void qtest_qmp_assert_success(QTestState *qts, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
+ 
+-/*
+- * qmp_eventwait:
+- * @s: #event event to wait for.
+- *
+- * Continuously polls for QMP responses until it receives the desired event.
+- */
+-static inline void qmp_eventwait(const char *event)
+-{
+-    return qtest_qmp_eventwait(global_qtest, event);
+-}
+-
+-/**
+- * get_irq:
+- * @num: Interrupt to observe.
+- *
+- * Returns: The level of the @num interrupt.
+- */
+-static inline bool get_irq(int num)
+-{
+-    return qtest_get_irq(global_qtest, num);
+-}
+-
+-/**
+- * outb:
+- * @addr: I/O port to write to.
+- * @value: Value being written.
+- *
+- * Write an 8-bit value to an I/O port.
+- */
+-static inline void outb(uint16_t addr, uint8_t value)
+-{
+-    qtest_outb(global_qtest, addr, value);
+-}
+-
+-/**
+- * outw:
+- * @addr: I/O port to write to.
+- * @value: Value being written.
+- *
+- * Write a 16-bit value to an I/O port.
+- */
+-static inline void outw(uint16_t addr, uint16_t value)
+-{
+-    qtest_outw(global_qtest, addr, value);
+-}
+-
+-/**
+- * outl:
+- * @addr: I/O port to write to.
+- * @value: Value being written.
+- *
+- * Write a 32-bit value to an I/O port.
+- */
+-static inline void outl(uint16_t addr, uint32_t value)
+-{
+-    qtest_outl(global_qtest, addr, value);
+-}
+-
+-/**
+- * inb:
+- * @addr: I/O port to read from.
+- *
+- * Reads an 8-bit value from an I/O port.
+- *
+- * Returns: Value read.
+- */
+-static inline uint8_t inb(uint16_t addr)
+-{
+-    return qtest_inb(global_qtest, addr);
+-}
+-
+-/**
+- * inw:
+- * @addr: I/O port to read from.
+- *
+- * Reads a 16-bit value from an I/O port.
+- *
+- * Returns: Value read.
+- */
+-static inline uint16_t inw(uint16_t addr)
+-{
+-    return qtest_inw(global_qtest, addr);
+-}
+-
+-/**
+- * inl:
+- * @addr: I/O port to read from.
+- *
+- * Reads a 32-bit value from an I/O port.
+- *
+- * Returns: Value read.
+- */
+-static inline uint32_t inl(uint16_t addr)
+-{
+-    return qtest_inl(global_qtest, addr);
+-}
+-
+-/**
+- * writeb:
+- * @addr: Guest address to write to.
+- * @value: Value being written.
+- *
+- * Writes an 8-bit value to guest memory.
+- */
+-static inline void writeb(uint64_t addr, uint8_t value)
+-{
+-    qtest_writeb(global_qtest, addr, value);
+-}
+-
+-/**
+- * writew:
+- * @addr: Guest address to write to.
+- * @value: Value being written.
+- *
+- * Writes a 16-bit value to guest memory.
+- */
+-static inline void writew(uint64_t addr, uint16_t value)
+-{
+-    qtest_writew(global_qtest, addr, value);
+-}
+-
+-/**
+- * writel:
+- * @addr: Guest address to write to.
+- * @value: Value being written.
+- *
+- * Writes a 32-bit value to guest memory.
+- */
+-static inline void writel(uint64_t addr, uint32_t value)
+-{
+-    qtest_writel(global_qtest, addr, value);
+-}
+-
+-/**
+- * writeq:
+- * @addr: Guest address to write to.
+- * @value: Value being written.
+- *
+- * Writes a 64-bit value to guest memory.
+- */
+-static inline void writeq(uint64_t addr, uint64_t value)
+-{
+-    qtest_writeq(global_qtest, addr, value);
+-}
+-
+-/**
+- * readb:
+- * @addr: Guest address to read from.
+- *
+- * Reads an 8-bit value from guest memory.
+- *
+- * Returns: Value read.
+- */
+-static inline uint8_t readb(uint64_t addr)
+-{
+-    return qtest_readb(global_qtest, addr);
+-}
+-
+-/**
+- * readw:
+- * @addr: Guest address to read from.
+- *
+- * Reads a 16-bit value from guest memory.
+- *
+- * Returns: Value read.
+- */
+-static inline uint16_t readw(uint64_t addr)
+-{
+-    return qtest_readw(global_qtest, addr);
+-}
+-
+-/**
+- * readl:
+- * @addr: Guest address to read from.
+- *
+- * Reads a 32-bit value from guest memory.
+- *
+- * Returns: Value read.
+- */
+-static inline uint32_t readl(uint64_t addr)
+-{
+-    return qtest_readl(global_qtest, addr);
+-}
+-
+-/**
+- * readq:
+- * @addr: Guest address to read from.
+- *
+- * Reads a 64-bit value from guest memory.
+- *
+- * Returns: Value read.
+- */
+-static inline uint64_t readq(uint64_t addr)
+-{
+-    return qtest_readq(global_qtest, addr);
+-}
+-
+-/**
+- * memread:
+- * @addr: Guest address to read from.
+- * @data: Pointer to where memory contents will be stored.
+- * @size: Number of bytes to read.
+- *
+- * Read guest memory into a buffer.
+- */
+-static inline void memread(uint64_t addr, void *data, size_t size)
+-{
+-    qtest_memread(global_qtest, addr, data, size);
+-}
+-
+-/**
+- * memwrite:
+- * @addr: Guest address to write to.
+- * @data: Pointer to the bytes that will be written to guest memory.
+- * @size: Number of bytes to write.
+- *
+- * Write a buffer to guest memory.
+- */
+-static inline void memwrite(uint64_t addr, const void *data, size_t size)
+-{
+-    qtest_memwrite(global_qtest, addr, data, size);
+-}
+-
+-/**
+- * clock_step_next:
+- *
+- * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
+- *
+- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+- */
+-static inline int64_t clock_step_next(void)
+-{
+-    return qtest_clock_step_next(global_qtest);
+-}
+-
+-/**
+- * clock_step:
+- * @step: Number of nanoseconds to advance the clock by.
+- *
+- * Advance the QEMU_CLOCK_VIRTUAL by @step nanoseconds.
+- *
+- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+- */
+-static inline int64_t clock_step(int64_t step)
+-{
+-    return qtest_clock_step(global_qtest, step);
+-}
++#include "libqtest-single.h"
+ 
+ QDict *qmp_fd_receive(int fd);
+ void qmp_fd_vsend_fds(int fd, int *fds, size_t fds_num,
+-- 
+2.18.1
+
 
