@@ -2,68 +2,72 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AFDC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 02:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C6FC3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 03:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D7AB206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 02:39:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7AB206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id B97D0206BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 03:32:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B97D0206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5hgR-0008LC-8N
-	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 22:39:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52653)
+	id 1i5iVe-00084g-T9
+	for qemu-devel@archiver.kernel.org; Wed, 04 Sep 2019 23:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i5hfk-0007wI-E5
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 22:38:58 -0400
+ (envelope-from <bounces@canonical.com>) id 1i5iUA-0007YW-I7
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 23:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i5hfi-00029T-Cd
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 22:38:56 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60963 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1i5hfg-0001vh-Ot
- for qemu-devel@nongnu.org; Wed, 04 Sep 2019 22:38:54 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46P4cz17Qbz9sNT; Thu,  5 Sep 2019 12:38:43 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1567651123;
- bh=mdVr2a2qDcAlf/csiQh4T630fvQLer7O4WeQhQu0S6s=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=WV3tEzR8EToItLAtpZfATrErvG1eR7O3I3KAuGuRWGAVoX3nAiMXPC0q3XdEok4Xm
- DqmbvJjeu0vdCT+mCsH5lTxKFUOarDGtEXSIZvQPzvJXePw0oqDSzpTAJKPR3ZT0BW
- TnilnlgR9++dhwW5EA2B9MO5Pa3POU9o/4uXI4Qw=
-Date: Thu, 5 Sep 2019 12:09:24 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190905020924.GB2120@umbus.fritz.box>
-References: <20190829013125.GG16342@umbus.fritz.box>
- <20190830175648.GE3694@habkost.net>
- <20190831014834.GC12065@umbus.fritz.box>
- <20190904195717.GA2311@localhost.localdomain>
+ (envelope-from <bounces@canonical.com>) id 1i5iU2-0003RC-62
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 23:30:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54386)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i5iTv-0003Jx-B4
+ for qemu-devel@nongnu.org; Wed, 04 Sep 2019 23:30:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i5iTq-0006HH-Kl
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 03:30:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 99DF82E80C7
+ for <qemu-devel@nongnu.org>; Thu,  5 Sep 2019 03:30:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
-Content-Disposition: inline
-In-Reply-To: <20190904195717.GA2311@localhost.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] Cryptic errors from PIP install if missing
- openssl-devel
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Sep 2019 03:24:04 -0000
+From: James Harvey <jamespharvey20@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jamespharvey20
+X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
+X-Launchpad-Bug-Modifier: James Harvey (jamespharvey20)
+Message-Id: <156765384458.824.9301349840467221970.malonedeb@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 18be958a4b6a04e8f024b837af9373257dd3def5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1842787] [NEW] Writes permanently hang with very
+ heavy I/O on virtio-scsi - worse on virtio-blk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -72,163 +76,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ldoktor@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: Bug 1842787 <1842787@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
 
---FkmkrVfFsRoUs1wW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Up to date Arch Linux on host and guest.  linux 5.2.11.  QEMU 4.1.0.
+Full command line at bottom.
 
-On Wed, Sep 04, 2019 at 03:57:17PM -0400, Cleber Rosa wrote:
-> On Sat, Aug 31, 2019 at 11:48:34AM +1000, David Gibson wrote:
-> > On Fri, Aug 30, 2019 at 02:56:48PM -0300, Eduardo Habkost wrote:
-> > > On Thu, Aug 29, 2019 at 11:31:25AM +1000, David Gibson wrote:
-> > > > If I attempt to run "make check-acceptance" on my POWER9, RHEL8.1
-> > > > machine when the openssl-devel package isn't installed, I get the
-> > > > following very cryptic error:
-> > > >=20
-> > > >   VENV    /home/dwg/qemu/build/rhel8/tests/venv
-> > > >   PIP     /home/dwg/qemu/tests/requirements.txt
-> > > > Command "/home/dwg/qemu/build/rhel8/tests/venv/bin/python -u -c "im=
-port setuptools, tokenize;__file__=3D'/tmp/pip-build-la4el5r5/cryptography/=
-setup.py';f=3Dgetattr(tokenize, 'open', open)(__file__);code=3Df.read().rep=
-lace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))" install=
- --record /tmp/pip-1efs22iz-record/install-record.txt --single-version-exte=
-rnally-managed --compile --install-headers /home/dwg/qemu/build/rhel8/tests=
-/venv/include/site/python3.6/cryptography" failed with error code 1 in /tmp=
-/pip-build-la4el5r5/cryptography/
-> > > >=20
-> > > > Using V=3D1 doesn't give any more useful information, and it's not
-> > > > (easily) possible to manually re-run the given command since it rel=
-ies
-> > > > on things in /tmp that are removed once the attempt finishes.
-> > >=20
-> > > V=3D1 is supposed to show the actual pip command being run.  I see
-> > > it here:
-> > >=20
-> > >   $ make check-venv V=3D1
-> > >   [...]
-> > >   python3 -B -m venv --system-site-packages /home/ehabkost/rh/proj/vi=
-rt/qemu/tests/venv
-> > > * /home/ehabkost/rh/proj/virt/qemu/tests/venv/bin/python -m pip -q in=
-stall -r /home/ehabkost/rh/proj/virt/qemu/tests/requirements.txt
-> > >   You are using pip version 19.0.3, however version 19.2.3 is availab=
-le.
-> > >   You should consider upgrading via the 'pip install --upgrade pip' c=
-ommand.
-> > >   touch /home/ehabkost/rh/proj/virt/qemu/tests/venv
-> > >=20
-> > > Can you reproduce the problem if you re-run the pip command?
-> >=20
-> > Yes, I can, but it's basically just the same error without any extra
-> > information.
-> >=20
-> > > > I only figured out it was openssl-devel being missing that was the
-> > > > problem by (mostly) guesswork.  It would be really great if we could
-> > > > generate a more helpful error here.
-> > >=20
-> > > I don't think there's much we can do about it, as the error is genera=
-ted by a
-> > > package being built by pip.
-> > >=20
-> > > There's one thing we can do to make it slightly better: not passing `=
--q` to pip
-> > > if running with V=3D1, so people can see which packages are being ins=
-talled and
-> > > which one is generating the error.
-> >=20
-> > That sounds like a good start to me.
-> >=20
-> > > > In addition, if I rerun "make check-acceptance" it no longer even
-> > > > attempts the PIP install, since tests/venv already exists in my bui=
-ld
-> > > > environment.  It then sort of works, but I think it might be hitting
-> > > > other errors because of the missing python packages.  Sorry that's a
-> > > > bit vague - I also seem to be getting unrelated errors that I'm sti=
-ll
-> > > > trying to figure out.
-> > >=20
-> > > This sounds like a bug and we need to fix it.
-> >=20
-> > I agree.
->=20
-> Hi David,
->=20
-> I've pushed a branch here (most of the commits have already been sent
-> separately):
->=20
->    https://github.com/clebergnu/qemu/tree/ppc64
->=20
-> I've tested on a RHEL 8 ppc64le Power 9, and it seems to work for me.
-> My steps for building QEMU:
->=20
->   - Configured with: '/home/cleber/src/qemu/configure' '--enable-slirp=3D=
-git' '--python=3D/usr/bin/python3' '--target-list=3Dx86_64-softmmu,ppc64-so=
-ftmmu,arm-softmmu,aarch64-softmmu,mips-softmmu,mipsel-softmmu,mips64-softmm=
-u,mips64el-softmmu,sh4-softmmu,s390x-softmmu,alpha-softmmu,m68k-softmmu,ris=
-cv64-softmmu'
->   - make
->   - make check-acceptance
->=20
-> Would you be able to test if that branch works smoothly for you?
+Host gives QEMU two thin LVM volumes.  The first is the root filesystem,
+and the second is for heavy I/O, on a Samsung 970 Evo 1TB.
 
-So, with this tree I'm no longer getting problems if openssl-devel is
-not installed, so that much looks good.
+When maxing out the I/O on the second virtual block device using virtio-
+blk, I often get a "lockup" in about an hour or two.  From the advise of
+iggy in IRC, I switched over to virtio-scsi.  It ran perfectly for a few
+days, but then "locked up" in the same way.
 
-I am getting some different errors - I was seeing this before (with
-openssl-devel installed) sometimes, but only sometimes.  I haven't yet
-worked out a pattern for when they appeared.  They also don't appear
-to be fatal, the rest of the tests seem to be running ok.  Any ideas?
+By "lockup", I mean writes to the second virtual block device
+permanently hang.  I can read files from it, but even "touch foo" never
+times out, cannot be "kill -9"'ed, and is stuck in uninterruptible
+sleep.
 
- VENV    /home/dwg/qemu/build/rhel8/tests/venv
-  PIP     /home/dwg/qemu/tests/requirements.txt
-  AVOCADO tests/acceptance
-Error running method "run" of plugin "html": 'Namespace' object has no attr=
-ibute 'get'
-Error running method "run" of plugin "varianter_cit": 'Namespace' object ha=
-s no attribute 'get'
-JOB ID     : 6808bb316632af2bf7652586b3fbb22ac497e090
-JOB LOG    : /home/dwg/qemu/build/rhel8/tests/results/job-2019-09-04T22.06-=
-6808bb3/job.log
-Error running method "initialize" of plugin "varianter_cit": 'Namespace' ob=
-ject has no attribute 'get'
-Error running method "initialize" of plugin "yaml_to_mux": 'Namespace' obje=
-ct has no attribute 'get'
- (01/34) /home/dwg/qemu/tests/acceptance/boot_linux_console.py:BootLinuxCon=
-sole.test_x86_64_pc: PASS (4.45 s)
+When this happens, writes to the first virtual block device with the
+root filesystem are fine, so the O/S itself remains responsive.
 
-=2E..
+The second virtual block device uses BTRFS.  But, I have also tried XFS
+and reproduced the issue.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+In guest, when this starts, it starts logging "task X blocked for more
+than Y seconds".  Below is an example of one of these.  At this point,
+anything that is or does in the future write to this block device gets
+stuck in uninterruptible sleep.
 
---FkmkrVfFsRoUs1wW
-Content-Type: application/pgp-signature; name="signature.asc"
+-----
 
------BEGIN PGP SIGNATURE-----
+INFO: task kcompactd:232 blocked for more than 860 seconds.
+      Not tained 5.2.11-1 #1
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messae.
+kcompactd0      D    0   232      2 0x80004000
+Call Trace:
+ ? __schedule+0x27f/0x6d0
+ schedule+0x3d/0xc0
+ io_schedule+0x12/0x40
+ __lock_page+0x14a/0x250
+ ? add_to_page_cache_lru+0xe0/0xe0
+ migrate_pages+0x803/0xb70
+ ? isolate_migratepages_block+0x9f0/0x9f0
+ ? __reset_isolation_suitable+0x110/0x110
+ compact_zone+0x6a2/0xd30
+ kcompactd_do_work+0x134/0x260
+ ? kvm_clock_read+0x14/0x30
+ ? kvm_sched_clock_read+0x5/0x10
+ kcompactd+0xd3/0x220
+ ? wait_woken+0x80/0x80
+ kthread+0xfd/0x130
+ ? kcompactd_do_work+0x260/0x260
+ ? kthread_park+0x80/0x80
+ ret_from_fork+0x35/0x40
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1wblQACgkQbDjKyiDZ
-s5KSDBAA5MaCceG5L8GsuEoLvsvtni0/2O6mUaUYXfw0OPXmTeFr9C7zC5Iw1SGV
-lRqe2Sosx5M3dOhT2SGLivte3lvgyONBscPPZh0BFQEUnp/05tudYgu8E7i5FCXO
-L1J6KlNb2fym6/+Ag+FXRclYblOi6IY0BFv4jEWVsEksVuch4CGHu7J4XPqkaN/q
-69amsz584H4wOzo8sAbgMG0vHy/wYyxmhV94uhiv5/yiLdoECOcjrdhtr5u4hgzG
-5Y5+QWfIT/XTYkCAGqymYAH5vTxa8QaAPK1zjm/v8A4V8j5ugPffZQr56YIFPcnH
-OwUgT7Iu98aL1vhepwgokYPUh39rQVREHIuHrrOxcW9+UO+51NeqsUK1lDn+s2VQ
-b3Sb6f7VyxMs27RQbPrrcDgwq8JqZR4/Q+DPPDAD6Ma5Gp0OcJU3Ef+seHMfM3AE
-0Q0gJygGp2rM7/gm4zDlmk888Nzk8q5KUp5WK31o4RmyNC4vUpankosXVEA5cs+J
-MlbXAlwteHqINt7eL4KB+Ayn/XoQM+E4TrmVPmyw8SoExi2y6mpq9gx2un94jErc
-+lqFz/GPn1QlPRJ6515gQp4ZhLAv14f+RDydLjCKpIMChoUaXoKifir2qjjqDF5M
-YkJqhl9OCoMqq4a8rL4cQYwCmxOFsx74XK4doX9d57tDx1vfCcs=
-=gm91
------END PGP SIGNATURE-----
+-----
 
---FkmkrVfFsRoUs1wW--
+In guest, there are no other dmesg/journalctl entries other than
+"task...blocked".
+
+On host, there are no dmesg/journalctl entries whatsoever.  Everything
+else in host continues to work fine, including other QEMU VM's on the
+same underlying SSD (but obviously different lvm volumes.)
+
+I understand there might not be enough to go on here, and I also
+understand it's possible this isn't a QEMU bug.  Happy to run given
+commands or patches to help diagnose what's going on here.
+
+I'm now running a custom compiled QEMU 4.1.0, with debug symbols, so I
+can get a meaningful backtrace from the host point of view.
+
+-----
+
+/usr/bin/qemu-system-x86_64
+   -name arch,process=3Dqemu:arch
+   -no-user-config
+   -nodefaults
+   -nographic
+   -uuid 0528162b-2371-41d5-b8da-233fe61b6458
+   -pidfile /tmp/0528162b-2371-41d5-b8da-233fe61b6458.pid
+   -machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=3Doff
+   -cpu SandyBridge-IBRS
+   -smp cpus=3D24,cores=3D12,threads=3D1,sockets=3D2
+   -m 24G
+   -drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovmf/x64/OVMF=
+_CODE.fd
+   -drive if=3Dpflash,format=3Draw,readonly,file=3D/var/qemu/0528162b-2371-=
+41d5-b8da-233fe61b6458.fd
+   -monitor telnet:localhost:8000,server,nowait,nodelay
+   -spice unix,addr=3D/tmp/0528162b-2371-41d5-b8da-233fe61b6458.sock,disabl=
+e-ticketing
+   -device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0
+   -device virtio-vga,bus=3Dpcie.1,addr=3D0
+   -usbdevice tablet
+   -netdev bridge,id=3Dnetwork0,br=3Dbr0
+   -device virtio-net-pci,netdev=3Dnetwork0,mac=3D02:37:de:79:19:09,bus=3Dp=
+cie.0,addr=3D3
+   -device virtio-scsi-pci,id=3Dscsi1
+   -drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/arch_root,if=3Dnone,=
+discard=3Dunmap
+   -device scsi-hd,drive=3Dhd0,bootindex=3D1
+   -drive driver=3Draw,node-name=3Dhd1,file=3D/dev/lvm/arch_nvme,if=3Dnone,=
+discard=3Dunmap
+   -device scsi-hd,drive=3Dhd1,bootindex=3D2
+
+-----
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Summary changed:
+
+- irtiWrites permanently hang with very heavy I/O on vo-scsi - worse on vir=
+tio-blk
++ Writes permanently hang with very heavy I/O on virtio-scsi - worse on vir=
+tio-blk
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1842787
+
+Title:
+  Writes permanently hang with very heavy I/O on virtio-scsi - worse on
+  virtio-blk
+
+Status in QEMU:
+  New
+
+Bug description:
+  Up to date Arch Linux on host and guest.  linux 5.2.11.  QEMU 4.1.0.
+  Full command line at bottom.
+
+  Host gives QEMU two thin LVM volumes.  The first is the root
+  filesystem, and the second is for heavy I/O, on a Samsung 970 Evo 1TB.
+
+  When maxing out the I/O on the second virtual block device using
+  virtio-blk, I often get a "lockup" in about an hour or two.  From the
+  advise of iggy in IRC, I switched over to virtio-scsi.  It ran
+  perfectly for a few days, but then "locked up" in the same way.
+
+  By "lockup", I mean writes to the second virtual block device
+  permanently hang.  I can read files from it, but even "touch foo"
+  never times out, cannot be "kill -9"'ed, and is stuck in
+  uninterruptible sleep.
+
+  When this happens, writes to the first virtual block device with the
+  root filesystem are fine, so the O/S itself remains responsive.
+
+  The second virtual block device uses BTRFS.  But, I have also tried
+  XFS and reproduced the issue.
+
+  In guest, when this starts, it starts logging "task X blocked for more
+  than Y seconds".  Below is an example of one of these.  At this point,
+  anything that is or does in the future write to this block device gets
+  stuck in uninterruptible sleep.
+
+  -----
+
+  INFO: task kcompactd:232 blocked for more than 860 seconds.
+        Not tained 5.2.11-1 #1
+  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messae.
+  kcompactd0      D    0   232      2 0x80004000
+  Call Trace:
+   ? __schedule+0x27f/0x6d0
+   schedule+0x3d/0xc0
+   io_schedule+0x12/0x40
+   __lock_page+0x14a/0x250
+   ? add_to_page_cache_lru+0xe0/0xe0
+   migrate_pages+0x803/0xb70
+   ? isolate_migratepages_block+0x9f0/0x9f0
+   ? __reset_isolation_suitable+0x110/0x110
+   compact_zone+0x6a2/0xd30
+   kcompactd_do_work+0x134/0x260
+   ? kvm_clock_read+0x14/0x30
+   ? kvm_sched_clock_read+0x5/0x10
+   kcompactd+0xd3/0x220
+   ? wait_woken+0x80/0x80
+   kthread+0xfd/0x130
+   ? kcompactd_do_work+0x260/0x260
+   ? kthread_park+0x80/0x80
+   ret_from_fork+0x35/0x40
+
+  -----
+
+  In guest, there are no other dmesg/journalctl entries other than
+  "task...blocked".
+
+  On host, there are no dmesg/journalctl entries whatsoever.  Everything
+  else in host continues to work fine, including other QEMU VM's on the
+  same underlying SSD (but obviously different lvm volumes.)
+
+  I understand there might not be enough to go on here, and I also
+  understand it's possible this isn't a QEMU bug.  Happy to run given
+  commands or patches to help diagnose what's going on here.
+
+  I'm now running a custom compiled QEMU 4.1.0, with debug symbols, so I
+  can get a meaningful backtrace from the host point of view.
+
+  -----
+
+  /usr/bin/qemu-system-x86_64
+     -name arch,process=3Dqemu:arch
+     -no-user-config
+     -nodefaults
+     -nographic
+     -uuid 0528162b-2371-41d5-b8da-233fe61b6458
+     -pidfile /tmp/0528162b-2371-41d5-b8da-233fe61b6458.pid
+     -machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=3Doff
+     -cpu SandyBridge-IBRS
+     -smp cpus=3D24,cores=3D12,threads=3D1,sockets=3D2
+     -m 24G
+     -drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovmf/x64/OV=
+MF_CODE.fd
+     -drive if=3Dpflash,format=3Draw,readonly,file=3D/var/qemu/0528162b-237=
+1-41d5-b8da-233fe61b6458.fd
+     -monitor telnet:localhost:8000,server,nowait,nodelay
+     -spice unix,addr=3D/tmp/0528162b-2371-41d5-b8da-233fe61b6458.sock,disa=
+ble-ticketing
+     -device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0
+     -device virtio-vga,bus=3Dpcie.1,addr=3D0
+     -usbdevice tablet
+     -netdev bridge,id=3Dnetwork0,br=3Dbr0
+     -device virtio-net-pci,netdev=3Dnetwork0,mac=3D02:37:de:79:19:09,bus=
+=3Dpcie.0,addr=3D3
+     -device virtio-scsi-pci,id=3Dscsi1
+     -drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/arch_root,if=3Dnon=
+e,discard=3Dunmap
+     -device scsi-hd,drive=3Dhd0,bootindex=3D1
+     -drive driver=3Draw,node-name=3Dhd1,file=3D/dev/lvm/arch_nvme,if=3Dnon=
+e,discard=3Dunmap
+     -device scsi-hd,drive=3Dhd1,bootindex=3D2
+
+  -----
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1842787/+subscriptions
 
