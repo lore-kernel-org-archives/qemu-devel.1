@@ -2,111 +2,73 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D406AC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 18:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE7DC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C47352070C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 18:39:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47352070C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5DB18206BA
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 19:02:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB18206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5wf7-0001yU-Pr
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 14:39:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36870)
+	id 1i5x1R-0006tt-Lv
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 15:02:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41682)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i5we2-0001Kc-Md
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 14:38:11 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i5x00-0006Co-AF
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i5we0-0006gG-Rf
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 14:38:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53396)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1i5we0-0006g2-Jl
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 14:38:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A6FA930860B9;
- Thu,  5 Sep 2019 18:38:07 +0000 (UTC)
-Received: from [10.36.116.74] (ovpn-116-74.ams2.redhat.com [10.36.116.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE29D5D9CA;
- Thu,  5 Sep 2019 18:37:57 +0000 (UTC)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
- <20190904203013.9028-3-alex.bennee@linaro.org>
- <a269df37-2452-e703-82dc-a4f2b7f3a2da@redhat.com> <871rwu8uc4.fsf@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <8d5278bd-3ac4-6f2f-00e6-4ed8fdb93085@redhat.com>
-Date: Thu, 5 Sep 2019 20:37:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <871rwu8uc4.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 05 Sep 2019 18:38:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <palmer@dabbelt.com>) id 1i5wzy-0003Sx-KZ
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:00:52 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:37016)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i5wzu-0003QW-8q
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 15:00:47 -0400
+Received: by mail-pf1-f196.google.com with SMTP id y9so2387368pfl.4
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 12:00:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=tf5VoUHpIl0cyY+phCUalvQNDnk/AIZu9nPIzaFjdU0=;
+ b=kLf2s2Plgp26EW1hrkTw9ZxUxHqrrHFMucDyB5jTwWhEumvC/XCLY9Ab1ZXC2CQL5U
+ ezUTpV5srBnr2ftopLPYYQO/bikcD8+gWn1IXaFBxq7MBRpQFqc9jy7cCdu0t18IG2GQ
+ 0anTLHjprtMi91llU+GTz+KasIUzwxjD3P0B2KzdfcEGLpLC6SWEVHS6Qr6uyTxF24iD
+ 1U/l9sjupP3f3KsSYCszICKsVfjz/a4i1/5E6ZIljIzKZFbE1pOdC2XybPCzW/d02+zn
+ JK5DDWcPmAjU1lZN0oulH28EXZLXePmyNqjBt6bpidiPQEFfu6mu9ARKg0q4vPLbkxiX
+ vS+Q==
+X-Gm-Message-State: APjAAAXd6spgyAGp1Oll4KwniIKY/PZYb4auFpZjqntLGJZ8YkZkgfXE
+ vCY7x2IMZ9u1f695K4hcWrkp5w==
+X-Google-Smtp-Source: APXvYqyl19+IuR6d0WckgPzSxn5rvZ8rUQt98qnoCvlL3sVetBrcc6LGwBzH+28tTIAmzgcSZV/F5A==
+X-Received: by 2002:a17:90a:b383:: with SMTP id
+ e3mr5558930pjr.85.1567710042609; 
+ Thu, 05 Sep 2019 12:00:42 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id r3sm3341994pfr.101.2019.09.05.12.00.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Sep 2019 12:00:41 -0700 (PDT)
+Date: Thu, 05 Sep 2019 12:00:41 -0700 (PDT)
+X-Google-Original-Date: Thu, 05 Sep 2019 10:58:27 PDT (-0700)
+In-Reply-To: <CAEUhbmWGHbBXO+NtkfxJc1tHNLKY_nLPKQ_L=MVsyuToZ02e9w@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-1e0d1887-7084-4997-bcc4-a254d05f629a@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 02/42] configure: clean-up container
- cross compile detect
+ [fuzzy]
+X-Received-From: 209.85.210.196
+Subject: Re: [Qemu-devel] [PATCH v7 00/30] riscv: sifive_u: Improve the
+ emulation fidelity of sifive_u machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,47 +80,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, qemu-devel@nongnu.org,
- cota@braap.org, stefanha@redhat.com, pbonzini@redhat.com,
- marcandre.lureau@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- aurelien@aurel32.net
+Cc: alistair23@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>,
+ qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05.09.19 20:35, Alex Benn=C3=A9e wrote:
->=20
-> David Hildenbrand <david@redhat.com> writes:
->=20
->> On 04.09.19 22:29, Alex Benn=C3=A9e wrote:
->>> The introduction of podman support inadvertently broke configure's
->>> detect of the container support as the configure probe didn't specify
->>> an engine type. To fix this in docker.py:
->>>
->>>   - only (re)set USE_ENGINE if --engine is specified
->>>   - enhance the output so docker is no longer just yes
->>>
->>> In the configure script we can at least start cleaning up the
->>> detecting and naming of variables. To avoid too much churn the
->>> conversion of the various make DOCKER_foo variables has been left for
->>> future clean-ups.
+On Thu, 05 Sep 2019 08:25:46 PDT (-0700), bmeng.cn@gmail.com wrote:
+> Hi Alistair,
+>
+> On Thu, Sep 5, 2019 at 3:50 AM Alistair Francis <alistair23@gmail.com> wrote:
 >>
->> This is not only a "clean-up" but an actual fix :) (maybe add a Fixes:
->> tag).
->=20
-> Done... do I get a Tested-by: ?
+>> On Sat, Aug 31, 2019 at 7:54 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>> >
+>> > As of today, the QEMU 'sifive_u' machine is a special target that does
+>> > not boot the upstream OpenSBI/U-Boot firmware images built for the real
+>> > SiFive HiFive Unleashed board. Hence OpenSBI supports a special platform
+>> > "qemu/sifive_u". For U-Boot, the sifive_fu540_defconfig is referenced
+>> > in the OpenSBI doc as its payload, but that does not boot at all due
+>> > to various issues in current QEMU 'sifive_u' machine codes.
+>> >
+>> > This series aims to improve the emulation fidelity of sifive_u machine,
+>> > so that the upstream OpenSBI, U-Boot and kernel images built for the
+>> > SiFive HiFive Unleashed board can be used out of the box without any
+>> > special hack.
+>> >
+>> > The major changes include:
+>> > - Heterogeneous harts creation supported, so that we can create a CPU
+>> >   that exactly mirrors the real hardware: 1 E51 + 4 U54.
+>> > - Implemented a PRCI model for FU540
+>> > - Implemented an OTP model for FU540, primarily used for storing serial
+>> >   number of the board
+>> > - Fixed GEM support that was seriously broken on sifive_u
+>> > - Synced device tree with upstream Linux kernel on sifive_u
+>> >
+>> > OpenSBI v0.4 image built for sifive/fu540 is included as the default
+>> > bios image for 'sifive_u' machine.
+>> >
+>> > The series is tested against OpenSBI v0.4 image for sifive/fu540
+>> > paltform, U-Boot v2019.10-rc1 image for sifive_fu540_defconfig,
+>> > and Linux kernel v5.3-rc3 image with the following patch:
+>> >
+>> > macb: Update compatibility string for SiFive FU540-C000 [1]
+>> >
+>> > OpenSBI + U-Boot, ping/tftpboot with U-Boot MACB driver works well.
+>> > Boot Linux 64-bit defconfig image, verified that system console on
+>> > the serial 0 and ping host work pretty well.
+>> >
+>> > An OpenSBI patch [2] was sent to drop the special "qemu/sifive_u" platform
+>> > support in OpenSBI. The original plan was to get the drop patch applied
+>> > after this QEMU series is merged. However after discussion in the OpenSBI
+>> > mailing list, it seems the best option for us is to let OpenSBI continue
+>> > shipping the special "qemu/sifive_u" platform support to work with QEMU
+>> > version <= 4.1 and deprecate the support sometime in the future. A patch
+>> > will need to be sent to OpenSBI mailing list to update its document.
+>> >
+>> > v4 is now rebased on Palmer's QEMU RISC-V repo "for-master" branch.
+>> > Dropped the following v3 patch that was already done by someone else.
+>> > - riscv: sifive_u: Generate an aliases node in the device tree
+>> > - riscv: sifive_u: Support loading initramfs
+>>
+>> I'm having trouble applying this. Do you mind sharing a public git branch?
+>
+> So I see Palmer has rebased his "for-master" branch against QEMU
+> master and now this patch series cannot be applied cleanly.
+>
+> Even worse, the current "for-master" branch has build errors for QEMU RISC-V.
 
-Most certainly, you saved me quite some time today:
-
-Tested-by: David Hildenbrand <david@redhat.com>
-
-Thanks!
-
---=20
-
-Thanks,
-
-David / dhildenb
+Sorry, I haven't gotten around to fixing up the patch queue for now.  It's 
+always OK to just send stuff against Peter's master, particularly if it's a big 
+patch set like this, as that's more likely to be a stable base for testing.
 
