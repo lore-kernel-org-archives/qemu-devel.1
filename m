@@ -2,110 +2,67 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 299F9C43140
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 16:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44670C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 16:24:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D069A2137B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 16:20:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D069A2137B
+	by mail.kernel.org (Postfix) with ESMTPS id EB035207E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 16:24:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB035207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5uV2-0006UX-1D
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 12:20:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33200)
+	id 1i5uZ4-0007y5-AV
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 12:24:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i5uUE-0005nS-63
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 12:19:55 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i5uYR-0007SM-9B
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 12:24:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i5uUC-0001q9-S8
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 12:19:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52596)
+ (envelope-from <kwolf@redhat.com>) id 1i5uYQ-0004O5-2i
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 12:24:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50098)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1i5uUC-0001pg-K3
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 12:19:52 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i5uYM-0004MK-Li; Thu, 05 Sep 2019 12:24:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 64B21C08EC08;
- Thu,  5 Sep 2019 16:19:51 +0000 (UTC)
-Received: from [10.36.116.96] (ovpn-116-96.ams2.redhat.com [10.36.116.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 72A5E19C69;
- Thu,  5 Sep 2019 16:19:40 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190713143311.17620-1-marcandre.lureau@redhat.com>
- <7ba6e0be-fd12-4f21-0fb8-bf9071cb2062@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <9511c5b1-be88-1795-74fc-11a7159e5c13@redhat.com>
-Date: Thu, 5 Sep 2019 18:19:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id AB755317529C;
+ Thu,  5 Sep 2019 16:24:09 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-80.ams2.redhat.com
+ [10.36.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A14DE60920;
+ Thu,  5 Sep 2019 16:24:08 +0000 (UTC)
+Date: Thu, 5 Sep 2019 18:24:07 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190905162407.GD4911@localhost.localdomain>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-17-mreitz@redhat.com>
+ <b2f43475-224e-5003-2c51-3949e9fb2d42@virtuozzo.com>
+ <e18b1eed-6d7a-603b-f8ad-4c56795309c2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7ba6e0be-fd12-4f21-0fb8-bf9071cb2062@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 05 Sep 2019 16:19:51 +0000 (UTC)
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <e18b1eed-6d7a-603b-f8ad-4c56795309c2@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 05 Sep 2019 16:24:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] tests/docker: add podman support
+Subject: Re: [Qemu-devel] [PATCH v6 16/42] block: Flush all children in
+ generic code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,105 +74,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, berrange@redhat.com,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05.09.19 18:15, David Hildenbrand wrote:
-> On 13.07.19 16:33, Marc-Andr=C3=A9 Lureau wrote:
->> Hi,
->>
->> podman allows to run containers in a similar fashion as docker, but
->> without daemon or root privileges. Thank you podman!
->>
->> There is a weird issue with getaddrinfo(), that I reported upstream
->> https://github.com/containers/libpod/issues/3535. For now, it is
->> worked around with extra socket_check_protocol_support() checks.
->>
->> thanks
->>
->> v3:
->> - add --run-as-current-user, suggest by Paolo
->> - move podman user tweaks to docker.py
->> - rebasing
->>
->> v2:
->> - add socket_check_protocol_support() to test-char
->> - keep TAP harness happy when socket_check_protocol_support() fails
->> - removed bad AI_ADDRCONFIG patch
->> - rebased
->>
->> Marc-Andr=C3=A9 Lureau (6):
->>   docker.py: add --run-as-current-user
->>   docker.py: add podman support
->>   tests/docker: add podman support
->>   tests: specify the address family when checking bind
->>   test-char: skip tcp tests if ipv4 check failed
->>   test: skip tests if socket_check_protocol_support() failed
->>
->>  Makefile                       |  2 +-
->>  tests/Makefile.include         |  2 +-
->>  tests/docker/Makefile.include  | 10 +++++--
->>  tests/docker/docker.py         | 53 ++++++++++++++++++++++++++++++---=
--
->>  tests/socket-helpers.c         | 17 ++++++++---
->>  tests/socket-helpers.h         | 11 -------
->>  tests/test-char.c              | 19 +++++++++---
->>  tests/test-io-channel-socket.c |  4 ++-
->>  tests/test-util-sockets.c      |  4 ++-
->>  9 files changed, 91 insertions(+), 31 deletions(-)
->>
+Am 12.08.2019 um 14:58 hat Max Reitz geschrieben:
+> On 10.08.19 17:36, Vladimir Sementsov-Ogievskiy wrote:
+> > 09.08.2019 19:13, Max Reitz wrote:
+> >> If the driver does not support .bdrv_co_flush() so bdrv_co_flush()
+> >> itself has to flush the children of the given node, it should not flush
+> >> just bs->file->bs, but in fact all children.
+> >>
+> >> In any case, the BLKDBG_EVENT() should be emitted on the primary child,
+> >> because that is where a blkdebug node would be if there is any.
+> >>
+> >> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >>   block/io.c | 23 +++++++++++++++++------
+> >>   1 file changed, 17 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/block/io.c b/block/io.c
+> >> index c5a8e3e6a3..bcc770d336 100644
+> >> --- a/block/io.c
+> >> +++ b/block/io.c
+> >> @@ -2572,6 +2572,8 @@ static void coroutine_fn bdrv_flush_co_entry(voi=
+d *opaque)
+> >>  =20
+> >>   int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+> >>   {
+> >> +    BdrvChild *primary_child =3D bdrv_primary_child(bs);
+> >> +    BdrvChild *child;
+> >>       int current_gen;
+> >>       int ret =3D 0;
+> >>  =20
+> >> @@ -2601,7 +2603,7 @@ int coroutine_fn bdrv_co_flush(BlockDriverState =
+*bs)
+> >>       }
+> >>  =20
+> >>       /* Write back cached data to the OS even with cache=3Dunsafe */
+> >> -    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_OS);
+> >> +    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_OS);
+> >>       if (bs->drv->bdrv_co_flush_to_os) {
+> >>           ret =3D bs->drv->bdrv_co_flush_to_os(bs);
+> >>           if (ret < 0) {
+> >> @@ -2611,15 +2613,15 @@ int coroutine_fn bdrv_co_flush(BlockDriverStat=
+e *bs)
+> >>  =20
+> >>       /* But don't actually force it to the disk with cache=3Dunsafe */
+> >>       if (bs->open_flags & BDRV_O_NO_FLUSH) {
+> >> -        goto flush_parent;
+> >> +        goto flush_children;
+> >>       }
+> >>  =20
+> >>       /* Check if we really need to flush anything */
+> >>       if (bs->flushed_gen =3D=3D current_gen) {
+> >> -        goto flush_parent;
+> >> +        goto flush_children;
+> >>       }
+> >>  =20
+> >> -    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
+> >> +    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_DISK);
+> >>       if (!bs->drv) {
+> >>           /* bs->drv->bdrv_co_flush() might have ejected the BDS
+> >>            * (even in case of apparent success) */
+> >> @@ -2663,8 +2665,17 @@ int coroutine_fn bdrv_co_flush(BlockDriverState=
+ *bs)
+> >>       /* Now flush the underlying protocol.  It will also have BDRV_O_=
+NO_FLUSH
+> >>        * in the case of cache=3Dunsafe, so there are no useless flushe=
+s.
+> >>        */
+> >> -flush_parent:
+> >> -    ret =3D bs->file ? bdrv_co_flush(bs->file->bs) : 0;
+> >> +flush_children:
+> >> +    ret =3D 0; > +    QLIST_FOREACH(child, &bs->children, next) {
+> >> +        int this_child_ret;
+> >> +
+> >> +        this_child_ret =3D bdrv_co_flush(child->bs);
+> >> +        if (!ret) {
+> >> +            ret =3D this_child_ret;
+> >> +        }
+> >> +    }
+> >=20
+> > Hmm, you said that we want to flush only children with write-access fro=
+m parent..
 >=20
-> Most probably not related to this series. I assume I am once again doin=
-g
-> something very wrong (although this used to work). I am on Fedora 30 -
-> hope somebody can help me:
+> Good that you remember it, I must have overlooked it (when reading the
+> replies to the previous version). :-)
 >=20
-> t460s: ~/git/qemu mvc $ docker run hello-world
+> > Shouldn't we check it? Or we assume that it's always safe to call bdrv_=
+co_flush on
+> > a node?
 >=20
-> Hello from Docker!
-> This message shows that your installation appears to be working correct=
-ly.
-> [...]
->=20
-> t460s: ~/git/qemu mvc $ tests/docker/docker.py probe
-> no
->=20
-> t460s: ~/git/qemu mvc $ ./configure --target-list=3Di386-softmmu,...
-> [...]
-> docker            no
-> [...]
->=20
-> So docker is working but the configure script says I don't have docker.
-> What am I missing? (I only want to run tcg tests)
->=20
+> I think it=E2=80=99s always safe.  But checking it seems like a nice touc=
+h, yes.
 
-FWIW, reverting
+I'm not sure why we would unconditionally flush all children anyway. The
+only drivers I can think of that really need to flush more than one
+child are blkverify and quorum, and both of them already implement this.
+blkverify implements .bdrv_co_flush, so it's not affected by the change
+anyway, but quorum children will be flushed twice now.
 
-commit 9459f754134bb786edf85ca9fc00f1805e67bd74
-Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Date:   Fri Jul 12 16:46:13 2019 +0400
+But more than this, I'm worried about the overhead of needlessly
+recursing through the whole backing chain and calling flush on every
+node there.  Maybe bs->write_gen saves us so that at least this doesn't
+result in an fdatasync() call for each, but still... Without a use case,
+I'd rather not do this.
 
-    docker.py: add podman support
+Oh, well, after having written all of this, I see that qcow2 with an
+external data file is buggy... This could be fixed in the qcow2 driver,
+but maybe restricting the recursion to read-only is actually good enough
+then. Can you mention this case in the commit message and maybe build a
+test for it?
 
-    Add a --engine option to select either docker, podman or auto.
-
-
-fixes it for me
-
-t460s: ~/git/qemu mvc $ tests/docker/docker.py probe
-yes
-
-
-So there is something wrong about that patch.
-
---=20
-
-Thanks,
-
-David / dhildenb
+Kevin
 
