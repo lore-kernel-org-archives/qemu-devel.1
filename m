@@ -2,65 +2,61 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CBFC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B27AC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:41:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F089B206A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:33:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F089B206A5
+	by mail.kernel.org (Postfix) with ESMTPS id 6803D2070C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:41:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6803D2070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5vdg-0004cK-12
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 13:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52412)
+	id 1i5vlC-0006Hp-F1
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 13:41:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i5vcn-000488-J0
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:32:50 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i5vka-0005p5-HU
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i5vcm-0008BU-FD
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:32:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34406)
+ (envelope-from <dgilbert@redhat.com>) id 1i5vkZ-0003is-AB
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:40:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42132)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i5vcj-0008AV-HU; Thu, 05 Sep 2019 13:32:45 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i5vkZ-0003iG-2Y
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:40:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B420D10F2407;
- Thu,  5 Sep 2019 17:32:44 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.83])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8C1101001B17;
- Thu,  5 Sep 2019 17:32:21 +0000 (UTC)
-Message-ID: <175525aa509b64571783ea49ac02ac4f201cf01d.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Date: Thu, 05 Sep 2019 20:32:20 +0300
-In-Reply-To: <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
-References: <20190825071541.10389-1-mlevitsk@redhat.com>
- <20190825071541.10389-3-mlevitsk@redhat.com>
- <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
- <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
- <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
- <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Thu, 05 Sep 2019 17:32:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 38D7F2D7E1;
+ Thu,  5 Sep 2019 17:40:50 +0000 (UTC)
+Received: from work-vm (ovpn-117-197.ams2.redhat.com [10.36.117.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55EB560E3E;
+ Thu,  5 Sep 2019 17:40:24 +0000 (UTC)
+Date: Thu, 5 Sep 2019 18:40:21 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190905174021.GR2700@work-vm>
+References: <20190905152136.30637-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190905152136.30637-1-stefanha@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Thu, 05 Sep 2019 17:40:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
+Subject: Re: [Qemu-devel] [RFC 0/3] virtiofsd: get/set log level via DBus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,90 +68,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- John Ferlan <jferlan@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: virtio-fs@redhat.com,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Eryu Guan <eguan@linux.alibaba.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-09-05 at 13:27 -0400, John Snow wrote:
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> It is likely that virtiofsd will need to support "management commands" for
+> reconfiguring it at runtime.  The first use case was proposed by Eryu Guan for
+> getting/setting the current log level.
 > 
-> On 9/5/19 9:24 AM, Maxim Levitsky wrote:
-> > On Wed, 2019-08-28 at 12:03 +0300, Maxim Levitsky wrote:
-> > > On Tue, 2019-08-27 at 18:29 -0400, John Snow wrote:
-> > > > 
-> > > > On 8/25/19 3:15 AM, Maxim Levitsky wrote:
-> > > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > > ---
-> > > > >  block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
-> > > > >  block/trace-events |  2 ++
-> > > > >  2 files changed, 85 insertions(+)
-> > > > > 
-> > > > > diff --git a/block/nvme.c b/block/nvme.c
-> > > > > index f8bd11e19a..dd041f39c9 100644
-> > > > > --- a/block/nvme.c
-> > > > > +++ b/block/nvme.c
-> > > > > @@ -112,6 +112,7 @@ typedef struct {
-> > > > >      bool plugged;
-> > > > >  
-> > > > >      bool supports_write_zeros;
-> > > > > +    bool supports_discard;
-> > > > >  
-> > > > >      CoMutex dma_map_lock;
-> > > > >      CoQueue dma_flush_queue;
-> > > > > @@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-> > > > >  
-> > > > >      oncs = le16_to_cpu(idctrl->oncs);
-> > > > >      s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
-> > > > > +    s->supports_discard = (oncs & NVME_ONCS_DSM) != 0;
-> > > > 
-> > > > Same comment -- checking !!(register & FIELD) is nicer than the
-> > > > negative. (I'm actually not sure even the !! is needed, but it seems to
-> > > > be a QEMU-ism and I've caught myself using it...)
-> > > 
-> > > All right, no problem to use !!
-> > > 
-> > > > 
-> > > > Rest looks good to me on a skim, but I'm not very well-versed in NVME.
-> > > 
-> > > Thanks!
-> > > 
-> > 
-> > Kind ping about this patch series.
-> > 
-> > Apart from using !!, do you think that this patch series
-> > can be merged, or should I do anything else?
-> > Which tree do you think this should be committed to?
-> > 
-> > I kind of want to see that merged before the freeze
-> > starts, if there are no objections,
-> > to reduce the amount of pending stuff in my queue.
-> > 
+> I promised to try out DBus as the management interface because it has a rich
+> feature set and is accessible from most programming languages.  It should be
+> able to support all the use cases we come up with.
 > 
-> Didn't I ask a few other things?
+> This patch series is a prototype that implements the get-log-level and
+> set-log-level management commands via DBus.  Use the new virtiofsctl tool to
+> talk to a running virtiofsd process:
 > 
-> like not using "res30" because you've moved the fields around, and
-> trying to be consistent about "zeros" vs "zeroes".
+>   # dbus-run-session ./virtiofsd ...
+>   ...
+>   Using dbus address unix:abstract=/tmp/dbus-H9WBbpjk3O,guid=0be16acefb868e6025a8737f5d7124d2
+>   # export DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-H9WBbpjk3O,guid=0be16acefb868e6025a8737f5d7124d2
+>   # ./virtiofsctl set-log-level err
 > 
-> Removing "+#define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) &
-> 0x10)" because it's unused.
-
-
-All right I forgot about it, that's one of they joys of duplication of a kernel
-driver in the userspace...
-
-
+> Most of the work is done by gdbus-codegen(1).  It generates code for the
+> org.qemu.Virtiofsd.xml interface definition.  Our code can use the simple
+> virtiofsd_get/set_log_level() APIs and it will make corresponding DBus calls.
 > 
-> You also probably require review (or at least an ACK) from Keith Busch
-> who maintains this file.
+> I'm pretty happy with this approach because the code is straightforward.  It
+> hasn't even triggered seccomp failures yet :).
+
+Yes it's less complex than I'd worried.
+Now, I do think we've got to think about how qemu in general is going to
+use dbus as people were discussing it, because then we have to think
+what the security aspects are - do we need to look at some calls only
+available to some clients etc.
+
+Dave
+
+> Error handling is a little problematic.  I noticed that virtiofsctl silently
+> returns success even if it cannot talk to virtiofsd.  This is due to the code
+> generated by gdbus-codegen(1) which has no error reporting :(.  This can be
+> solved by writing more low-level GDBus code instead of using the high-level
+> generated bindings.
 > 
-> --js
-
-All right,
-	Best regards,
-		Maxim Levitsky
-
-
+> What do you think about this approach?
+> 
+> Stefan Hajnoczi (3):
+>   virtiofsd: add org.qemu.Virtiofsd interface
+>   virtiofsd: add DBus server to handle log level changes
+>   virtiofsd: add virtiofsctl command-line management tool
+> 
+>  configure                                |   7 +
+>  Makefile                                 |  16 +++
+>  Makefile.objs                            |   1 +
+>  contrib/virtiofsd/Makefile.objs          |  10 +-
+>  contrib/virtiofsd/dbus.h                 |   9 ++
+>  contrib/virtiofsd/dbus.c                 | 162 +++++++++++++++++++++++
+>  contrib/virtiofsd/passthrough_ll.c       |   8 +-
+>  contrib/virtiofsd/virtiofsctl.c          |  55 ++++++++
+>  .gitignore                               |   1 +
+>  contrib/virtiofsd/org.qemu.Virtiofsd.xml |   7 +
+>  10 files changed, 274 insertions(+), 2 deletions(-)
+>  create mode 100644 contrib/virtiofsd/dbus.h
+>  create mode 100644 contrib/virtiofsd/dbus.c
+>  create mode 100644 contrib/virtiofsd/virtiofsctl.c
+>  create mode 100644 contrib/virtiofsd/org.qemu.Virtiofsd.xml
+> 
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
