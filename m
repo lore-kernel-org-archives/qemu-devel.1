@@ -2,61 +2,82 @@ Return-Path: <SRS0=/Jg5=XA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7286EC3A5A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891C9C3A5A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:33:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B13A6206DE
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:32:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B13A6206DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4477206DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 13:33:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tbu48F0r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4477206DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5rs5-0004Nx-BM
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 09:32:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47554)
+	id 1i5rtZ-0005JK-HH
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 09:33:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47714)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i5rqi-0003rG-MO
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:30:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i5rrE-0004D3-Pf
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i5rqh-0006wn-NG
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:30:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57863)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i5rqf-0006w3-0S; Thu, 05 Sep 2019 09:30:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 06B8488311;
- Thu,  5 Sep 2019 13:30:52 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.83])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A3C81000343;
- Thu,  5 Sep 2019 13:30:50 +0000 (UTC)
-Message-ID: <84a35d4dd5a915fb879a313b0d5cd30bfa6aaa67.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Thu, 05 Sep 2019 16:30:49 +0300
-In-Reply-To: <20190712173600.14554-1-mreitz@redhat.com>
-References: <20190712173600.14554-1-mreitz@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i5rrC-00077t-Cp
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:31:28 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35866)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i5rrC-00077k-7l
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 09:31:26 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k20so1825270oih.3
+ for <qemu-devel@nongnu.org>; Thu, 05 Sep 2019 06:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=gJfPVPG7MuPxV5jp++v4Gelba9R4W+xGywWI03N4afY=;
+ b=tbu48F0rndJ+vhXCV2RkVBhM6MULsMzyktlTm5WFxDLQOEjysncBqa6s4PahZmgpE9
+ B46E+HFcojvy2WAFg44LTKwRvFcfwS6Pe/9usXXFPEpb6nYp7546+4/LTXLHo+7f04Px
+ l85IBv5OZ1ROvItPIS4s4Bzy7Wlvg92LMcooPGI9RvV7lDHUGuAdXDl9Ah/yxeTU3RbR
+ Z3Yy2E7fAYdufjwBM35fF8zw0bzmwcLdGZLf9p+9bkuQwzMuqmGOshkjaqJlwDF6q/O+
+ e1HZxhwtnupRHne29svA2lFUWQlgAJHLJRDitWJIPaeWCQ9RBbz/ZYmXrDWKgk5athIF
+ DbCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=gJfPVPG7MuPxV5jp++v4Gelba9R4W+xGywWI03N4afY=;
+ b=TZQ6zeQaw+L+3ueM07aVrwG+zk1AI9lGhDaO7GY7D4ELo9sL/F+vm4lhhcLJBsJU2O
+ +SXaUU6QzWUEiLmH0N63q/kA+RClbXXg+u9a2PJKtXV1q/nbvxhac1FOisCBp+B5heVG
+ ncF41TMKuTE3VN6UAX5/Cl/1fsBSlV7iW+5x59kUM6hdKfbO0/uwWI/hrfNyh8/QGR8e
+ XqqsNRYkfJbloXNR21etUa0oXJ3GTfsCDOKbVg+Y++32LDehVNMseOHX3gsMkmW8/nHw
+ uaMClTf1UTCinYaM8yt0wjZqRmroQ6irFaASlkqg5zNaqfXBDr8oH5PetlnnxX5UgqCM
+ uOQw==
+X-Gm-Message-State: APjAAAXqxZQqw5GuwmjghRFZAS8N/2GGpPnP/qszybHmS1cNMVKMztK5
+ rQQ2OraWCqKXCLVLxlvM035f96Fy7AMpoOPxRHZFIQ==
+X-Google-Smtp-Source: APXvYqymVd5apEfJc2iPNmSxWS3MlPWi7LlLtHb8M0+yFTVKByiQnw956VU3MAKaU+h1TLN4FMBDrQn67rwFD28Z9L4=
+X-Received: by 2002:aca:50d8:: with SMTP id e207mr2479093oib.48.1567690285290; 
+ Thu, 05 Sep 2019 06:31:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190829165036.9773-1-berrange@redhat.com>
+ <20190829165036.9773-5-berrange@redhat.com>
+In-Reply-To: <20190829165036.9773-5-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Sep 2019 14:31:14 +0100
+Message-ID: <CAFEAcA8UNsAdYn=+9Py20G-xbFC2v1aWNufviX1XFymvKm3hrQ@mail.gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 05 Sep 2019 13:30:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/7] block: Generic file
- creation fallback
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] docs: split the CODING_STYLE doc
+ into distinct groups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,29 +89,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2019-07-12 at 19:35 +0200, Max Reitz wrote:
-> Hi,
->=20
-> Kevin commented on my RFC, so I got what an RFC wants, and he didn=E2=80=
-=99t
-> object to the creation fallback part.  So I suppose I can go down that
-> route at least.  (Which was actually the more important part of the
-> series.)
->=20
-> So as in the RFC, this series adds a fallback path for creating files
-> (on the protocol layer) if the protocol driver does not support file
-> creation, but the file already exists.
->=20
+On Thu, 29 Aug 2019 at 17:59, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  CODING_STYLE.rst | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-Hi!
-Do you have any update on this patch series by a chance?
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Best regards,
-	Maxim Levitsky
-
+thanks
+-- PMM
 
