@@ -6,45 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF15CC00306
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD913C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:29:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F3C420828
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:19:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F3C420828
+	by mail.kernel.org (Postfix) with ESMTPS id B07B4206A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Sep 2019 17:29:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07B4206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i5vQH-0008Pb-NL
-	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 13:19:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49867)
+	id 1i5vZO-0002HC-K0
+	for qemu-devel@archiver.kernel.org; Thu, 05 Sep 2019 13:29:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i5vPc-0007we-NQ
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:19:14 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i5vXp-0001dg-Og
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:27:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i5vPa-0001pj-MO
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:19:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44010)
+ (envelope-from <jsnow@redhat.com>) id 1i5vXo-0005Gt-NP
+ for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:27:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29080)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1i5vPa-0001oV-C7
- for qemu-devel@nongnu.org; Thu, 05 Sep 2019 13:19:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i5vXl-0005Fv-Mo; Thu, 05 Sep 2019 13:27:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3EE7318C4283;
- Thu,  5 Sep 2019 17:19:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B6E1302C070;
+ Thu,  5 Sep 2019 17:27:36 +0000 (UTC)
 Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3C19660610;
- Thu,  5 Sep 2019 17:18:56 +0000 (UTC)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190904203013.9028-1-alex.bennee@linaro.org>
- <20190904203013.9028-4-alex.bennee@linaro.org>
- <b25bd465-bc39-936f-5c6b-114e2926aba4@redhat.com> <87ftlb841e.fsf@linaro.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0908860BE1;
+ Thu,  5 Sep 2019 17:27:32 +0000 (UTC)
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190825071541.10389-1-mlevitsk@redhat.com>
+ <20190825071541.10389-3-mlevitsk@redhat.com>
+ <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
+ <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
+ <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +123,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <ecfc298d-f025-8bb7-58cc-541bcf73ddb3@redhat.com>
-Date: Thu, 5 Sep 2019 13:18:55 -0400
+Message-ID: <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
+Date: Thu, 5 Sep 2019 13:27:32 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87ftlb841e.fsf@linaro.org>
+In-Reply-To: <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Thu, 05 Sep 2019 17:19:08 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Thu, 05 Sep 2019 17:27:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 03/42] tests/docker: fix "cc" command to
- work with podman
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,96 +149,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- Matt Heon <mheon@redhat.com>, richard.henderson@linaro.org, f4bug@amsat.org,
- qemu-devel@nongnu.org, cota@braap.org, stefanha@redhat.com,
- pbonzini@redhat.com, marcandre.lureau@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- aurelien@aurel32.net
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Ferlan <jferlan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/5/19 5:51 AM, Alex Benn=C3=A9e wrote:
->=20
-> John Snow <jsnow@redhat.com> writes:
->=20
->> On 9/4/19 4:29 PM, Alex Benn=C3=A9e wrote:
->>> Podman requires a little bit of additional magic to the uid mapping
->>> which was already done for the normal RunCommand. We simplify the
->>> logic by pushing it directly into the Docker::run method to avoid
->>> instantiating an extra Docker() object and ensure the CC command
->>> always runs as the current user.
+On 9/5/19 9:24 AM, Maxim Levitsky wrote:
+> On Wed, 2019-08-28 at 12:03 +0300, Maxim Levitsky wrote:
+>> On Tue, 2019-08-27 at 18:29 -0400, John Snow wrote:
 >>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> ---
->>>  tests/docker/docker.py     | 30 +++++++++++++++---------------
->>>  tests/tcg/Makefile.include |  2 +-
->>>  2 files changed, 16 insertions(+), 16 deletions(-)
+>>> On 8/25/19 3:15 AM, Maxim Levitsky wrote:
+>>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>>>> ---
+>>>>  block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
+>>>>  block/trace-events |  2 ++
+>>>>  2 files changed, 85 insertions(+)
+>>>>
+>>>> diff --git a/block/nvme.c b/block/nvme.c
+>>>> index f8bd11e19a..dd041f39c9 100644
+>>>> --- a/block/nvme.c
+>>>> +++ b/block/nvme.c
+>>>> @@ -112,6 +112,7 @@ typedef struct {
+>>>>      bool plugged;
+>>>>  
+>>>>      bool supports_write_zeros;
+>>>> +    bool supports_discard;
+>>>>  
+>>>>      CoMutex dma_map_lock;
+>>>>      CoQueue dma_flush_queue;
+>>>> @@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+>>>>  
+>>>>      oncs = le16_to_cpu(idctrl->oncs);
+>>>>      s->supports_write_zeros = (oncs & NVME_ONCS_WRITE_ZEROS) != 0;
+>>>> +    s->supports_discard = (oncs & NVME_ONCS_DSM) != 0;
 >>>
->>> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
->>> index e23209f71ee..8f391eb278b 100755
->>> --- a/tests/docker/docker.py
->>> +++ b/tests/docker/docker.py
->>> @@ -318,10 +318,20 @@ class Docker(object):
->>>              return False
->>>          return checksum =3D=3D _text_checksum(_dockerfile_preprocess=
-(dockerfile))
->>>
->>> -    def run(self, cmd, keep, quiet):
->>> +    def run(self, cmd, keep, quiet, as_user=3DFalse):
->>>          label =3D uuid.uuid1().hex
->>>          if not keep:
->>>              self._instances.append(label)
->>> +
->>> +        if as_user:
->>> +            uid =3D os.getuid()
->>> +            cmd =3D [ "-u", str(uid) ] + cmd
->>> +            # podman requires a bit more fiddling
->>> +            if self._command[0] =3D=3D "podman":
->>> +                cmd =3D [ "--uidmap", "%d:0:1" % uid,
->>> +                        "--uidmap", "0:1:%d" % uid,
->>> +                        "--uidmap", "%d:%d:64536" % (uid + 1, uid + =
-1)] + cmd
->>> +
+>>> Same comment -- checking !!(register & FIELD) is nicer than the
+>>> negative. (I'm actually not sure even the !! is needed, but it seems to
+>>> be a QEMU-ism and I've caught myself using it...)
 >>
->> I was having problems with constructs like these recently. I think we
->> either need to use --userns=3Dkeep-id (vastly preferred) or adjust 645=
-36
->> there to read as "65536 - uid" because not everyone will have a UID of
->> 1000.
->=20
-> From Marc-Andr=C3=A9's original commit:
->=20
->   With a user 1000, the default mapping is: 1000 (host) -> 0 (container=
-).
->=20
->   So write access to /var/tmp/ccache ends will end with permission
->   denied error.
->=20
->   With "--uidmap 1000:0:1 --uidmap 0:1:1000", the mapping is:
->   1000 (host) -> 0 (container, 1st namespace) -> 1000 (container, 2nd n=
-amespace).
->   (the rest is mumbo jumbo to avoid holes in the range of UIDs)
->=20
->   A future podman version may have an option such as --userns-keep-uid.
->   Thanks to Debarshi Ray <rishi@redhat.com> for the help!
->=20
-> So I assumed this doesn't exist for all versions of podman yet. Given
-> how new the support is I guess we could just say you need a minimum
-> version for working podman support.
->=20
+>> All right, no problem to use !!
+>>
+>>>
+>>> Rest looks good to me on a skim, but I'm not very well-versed in NVME.
+>>
+>> Thanks!
+>>
+> 
+> Kind ping about this patch series.
+> 
+> Apart from using !!, do you think that this patch series
+> can be merged, or should I do anything else?
+> Which tree do you think this should be committed to?
+> 
+> I kind of want to see that merged before the freeze
+> starts, if there are no objections,
+> to reduce the amount of pending stuff in my queue.
+> 
 
-I think that's probably fine to say. Matt Heon says that 1.4.x should be
-available in RHEL7 and RHEL8 both, and it's available in Fedora 30, so
-it should be reasonably well represented on modern development machines.
+Didn't I ask a few other things?
 
-It's also entirely optional as you may continue using docker if you wish.
+like not using "res30" because you've moved the fields around, and
+trying to be consistent about "zeros" vs "zeroes".
 
-Thanks for staging the patch to fix this; I'll try to test it out in
-conjunction with your patchset here later when time permits.
+Removing "+#define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) &
+0x10)" because it's unused.
+
+You also probably require review (or at least an ACK) from Keith Busch
+who maintains this file.
 
 --js
 
