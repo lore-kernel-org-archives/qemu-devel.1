@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8BF5C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 162A6C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:21:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91BC720674
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:19:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91BC720674
+	by mail.kernel.org (Postfix) with ESMTPS id E125E20674
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:21:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E125E20674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6BLH-0002Mv-Pa
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 06:19:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46636)
+	id 1i6BMh-0003NN-5o
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 06:21:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i6BKN-0001yL-Sg
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:18:52 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i6BLx-0002vP-8Q
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:20:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i6BKM-0000Px-Qz
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:18:51 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:40811)
+ (envelope-from <laurent@vivier.eu>) id 1i6BLw-0001s4-4W
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:20:29 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:42221)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i6BKM-0000Ov-HV
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:18:50 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i6BLv-0001oR-Qz
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:20:28 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mgvj1-1iegnJ1fnZ-00hQty; Fri, 06 Sep 2019 12:18:12 +0200
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MvJjz-1iOGKU1Ell-00rDb6; Fri, 06 Sep 2019 12:20:07 +0200
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1567601968-26946-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1567601968-26946-4-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1567601968-26946-6-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,36 +82,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <5aebdae9-2931-163e-b10d-981d6511c21e@vivier.eu>
-Date: Fri, 6 Sep 2019 12:18:07 +0200
+Message-ID: <8cf29596-ee73-740c-cd37-d3540f50cf69@vivier.eu>
+Date: Fri, 6 Sep 2019 12:20:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1567601968-26946-4-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1567601968-26946-6-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:L+83raG+93gi0vyx/06meLcyNQ1EWmWvm1GNiJbrXHYWK2L6W75
- wHwckQthxgxJJcXGRcgb/qIDe03DZpD8gplkAwEFiW9r1S1qtfT5xqb73GqB01cN4V/ocTa
- NdonvRUyFYWAeZrt0DCpFijZnmzw2ZN/elYJA9ZKZsiMlCctPSs6rXXKuxj43vVAgKXQA7F
- CEo2qRWY0MuxoTykR2iZQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:dn29yEV5kyU=:dTXtrWUpKDbjOfAprc9btM
- wxNS6JsKqq4U+5u4G8sTNscI2B54r1rqfdZMUAmL4vJ7mCi3oT5NFrk2HvwZEtkllb5LOt2sN
- s8LYnzV401iHbyCzaQG2m7wxQwJJz8UTIcWcJyWfXS81oOErSftB4hflRsOaSXkzBjvMOuKoO
- F38scQ55RD3Ydwe4OlB0WuN8LAed5h2E4XRLFk0bUO2QefP8ARJydPte0DZPBeBZVqSUHL17G
- cj1/S42tZTQGkJqZlhIYsGKM1mUhQNKWW71UaBQIV/hcmVwFbAId614KSTgq/b9jltbz8okOS
- 9688lNkq9mMTBY3NnWQVd2AG6t5EpW0LBD+9Z3z4+6m/SZdgClHKf1tGPhPOQnQE52R2naZb/
- ykO3eRXnAopv+s/K2pLW9Sa5r9HSftAD8l4bqa0LoXlbcQxOCpJIRTlr2XclHx0U8h0VV5hWQ
- SbQNiGKI2AGT5gFMaTkHHbwBOV47n0umUCMLjgk01NftutThtlQPjougg+76GUBELKJQpFqU1
- icoNF4qtU26dRyit8bkuApQO3Zu53FcYGIGwTM7zPScvfdBYGYz2OTCDJXdDMS9M/P+p4nqvu
- 958ZtfAZqJinnpuviEr91J30bSy+AA/pg6xVKPNf3tyTqMXTVSee4t/fZH5n39E4Z2O9ZNhIz
- SjQRSHiLRqyxg2xoZZmsIp+sNpiJOZKzTVuvZnb5DnqQfSxPT0ryINZAMnWIUN50RXP2+mNc0
- 1EhX9L7PhVIemhauwRTX8r/cWO99aQi3JabvmH4xRLhcj1hq5ReqgXpGDnpAIfhS0EFOIW4lU
- JeXlIjdJeKE4bqjf2wMuEHuaWu2OM2J+i6zXK/XSzy6hB22muk=
+X-Provags-ID: V03:K1:V+uVQb2oItqrV0MunCFlZItcXZrPUxDBDvPIuN4bFtp/5SVegOr
+ q/OzoTayljFEVMIbLdZCeaxumP8uboA4saZnLbnIwgdw5ikJvquOguLD+HhvuJTbaCFAekx
+ XA0Kg3Ls4rDaOZ62xqZmFkdyOX3HfEmzpVUPA7/mYXA59JBZHcnVivpKQZUygtDIxt+UGMB
+ dXZ8Ia1cvcp6eTmSXAAIw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:55HPT/K4jyU=:nswwcs/2SSNNiOwhRvwLCC
+ A0mqhMXF0fDg+wbUUfap/R5GuiSutwEIvVF/Y2XuVdyNr3Z45v2whAGfIMi06vHGhKogqd6Y/
+ UR2yujz58iivwIMQkhlFPDEBHCAcPVMuQzpwzV5Wpjmqaopri5sZ2XUH/SbzSbB5LNDupPBVY
+ TuQOYB5ZZ0jyLpCRp085MyVs68NjITfTD5sslI+cdGRc7az/WDlEnvPVE3adA3uwe3WPIjqhV
+ 1i78cQBOYny/UiAJESugLR7wT6P5ELQTq4aayz8faQG6s6KYg1PTvt26vIVrWJSqB5zLylJSB
+ 0SPOI4fZ+fzc60vYI1/11ZiqDFhY11yh78A50eVYqiqwQlabt6CT9xAE0aBWcQnw7WHsho9Hj
+ GIK9pwpflx4idmVhvbNKzMVlp/BdF30rG8pRtZi0thO/3X2z/u2dW9oL/1idYvwGMBEyKQYUP
+ xXfOTB3XvuUi4aG2olmxdVT3di1JiNnZemgf9nJQgPdGWu4ngTVCUKbeIt7+oQi3VXnnLxzcY
+ 992PAFW4fyv1W3gqkGnWOmLi35CdTR6HvcGtAgaHnL/Z9hq2bTAEn67zpwfa1TA2WusvCjV3n
+ 6ZLe5mMeSRLwNvjL6Vi5fPgR/ShUPfCMdeuuaiPptvRi6r/BOENR9/hRl19xDGVclzoPij7Pm
+ yhlpaanccTBjQ6QiiaoXUDIUoZuBkvSnCTDClUky2hxxtgVqO3V757qIaKskeHxdwbjfEG2KK
+ KPaxh2TmZVyE9L9aLkivD778a7js3dyl/Y3GQe70xUAt1m5j2NsNSYcrFFp6gXGmn7mSd7lVg
+ 0UnbOHbUpbILxPgigBVdd+zZ9RdXmEshbLWwGGRQ8g906cMjUs=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
-Subject: Re: [Qemu-devel] [PATCH v6 3/8] linux-user: Add support for
- FIOGETOWN and FIOSETOWN ioctls
+X-Received-From: 212.227.17.10
+Subject: Re: [Qemu-devel] [PATCH v6 5/8] linux-user: Add support for FDMSGON
+ and FDMSGOFF ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,50 +131,42 @@ Sender: "Qemu-devel"
 Le 04/09/2019 à 14:59, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> FIOGETOWN and FIOSETOWN ioctls have platform-specific definitions,
-> hence non-standard definition in QEMU too.
-> 
-> Other than that, they both have a single integer argument, and their
-> functionality is emulated in a straightforward way.
+> FDMSGON and FDMSGOFF switch informational messages of floppy drives
+> on and off.
 > 
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
 >  linux-user/ioctls.h       | 2 ++
->  linux-user/syscall_defs.h | 4 ++++
->  2 files changed, 6 insertions(+)
+>  linux-user/syscall_defs.h | 2 ++
+>  2 files changed, 4 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index cd9b6f9..1830de9 100644
+> index bc19448..b253469 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -177,6 +177,8 @@
+> @@ -112,6 +112,8 @@
+>       IOCTL(BLKZEROOUT, IOC_W, MK_PTR(MK_ARRAY(TYPE_ULONGLONG, 2)))
 >  #endif
->  #endif /* CONFIG_USBFS */
 >  
-> +  IOCTL(FIOGETOWN, IOC_R, MK_PTR(TYPE_INT))
-> +  IOCTL(FIOSETOWN, IOC_W, MK_PTR(TYPE_INT))
->    IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
->    IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
->    IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+> +     IOCTL(FDMSGON, 0, TYPE_NULL)
+> +     IOCTL(FDMSGOFF, 0, TYPE_NULL)
+>       IOCTL(FDFLUSH, 0, TYPE_NULL)
+>  
+>  #ifdef FIBMAP
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 19a1d39..498223b 100644
+> index 917202a..4e33ef3 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -758,10 +758,14 @@ struct target_pollfd {
+> @@ -890,6 +890,8 @@ struct target_pollfd {
 >  
->  #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
->         defined(TARGET_XTENSA)
-> +#define TARGET_FIOGETOWN       TARGET_IOR('f', 123, int)
-> +#define TARGET_FIOSETOWN       TARGET_IOW('f', 124, int)
->  #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
->  #define TARGET_SIOCSPGRP       TARGET_IOW('s', 8, pid_t)
->  #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
->  #else
-> +#define TARGET_FIOGETOWN       0x8903
-> +#define TARGET_FIOSETOWN       0x8901
->  #define TARGET_SIOCATMARK      0x8905
->  #define TARGET_SIOCSPGRP       0x8902
->  #define TARGET_SIOCGPGRP       0x8904
+>  /* From <linux/fd.h> */
+>  
+> +#define TARGET_FDMSGON        TARGET_IO(2, 0x45)
+> +#define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
+>  #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
+>  
+>  #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
 > 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
