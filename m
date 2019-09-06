@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E6FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B32C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:03:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88664206A1
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:03:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88664206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 7396A206A1
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:03:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7396A206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i69DO-0000a7-5l
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 04:03:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42129)
+	id 1i69Dc-0000pE-LM
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 04:03:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42157)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i698Q-0003mN-TD
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:24 -0400
+ (envelope-from <david@redhat.com>) id 1i698T-0003qC-LV
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i698P-0003DH-KY
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33782)
+ (envelope-from <david@redhat.com>) id 1i698S-0003HS-Dv
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59900)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i698P-0003BU-8o; Fri, 06 Sep 2019 03:58:21 -0400
+ id 1i698S-0003Gs-8C; Fri, 06 Sep 2019 03:58:24 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 934C84E924;
- Fri,  6 Sep 2019 07:58:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 86FBB3084288;
+ Fri,  6 Sep 2019 07:58:22 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-162.ams2.redhat.com [10.36.117.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E91811001284;
- Fri,  6 Sep 2019 07:58:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DC35A1001284;
+ Fri,  6 Sep 2019 07:58:20 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  6 Sep 2019 09:57:31 +0200
-Message-Id: <20190906075750.14791-10-david@redhat.com>
+Date: Fri,  6 Sep 2019 09:57:32 +0200
+Message-Id: <20190906075750.14791-11-david@redhat.com>
 In-Reply-To: <20190906075750.14791-1-david@redhat.com>
 References: <20190906075750.14791-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 06 Sep 2019 07:58:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 06 Sep 2019 07:58:23 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 09/28] s390x/tcg: MVCLU/MVCLE: Process max
- 4k bytes at a time
+Subject: [Qemu-devel] [PATCH v2 10/28] s390x/tcg: MVCS/MVCP: Check for
+ special operation exceptions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,93 +75,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-... and indicate cc=3D3 in case there is work remaining. Keep unicode
-padding simple.
-
-While reworking, properly wrap the addresses.
+Let's perform the documented checks.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mem_helper.c | 54 ++++++++++++++++++++++-----------------
- 1 file changed, 31 insertions(+), 23 deletions(-)
+ target/s390x/mem_helper.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 947a4277f0..6d8ebd18fa 100644
+index 6d8ebd18fa..041d01d63d 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -769,8 +769,8 @@ static inline uint32_t do_mvcl(CPUS390XState *env,
-                                uint64_t *src, uint64_t *srclen,
-                                uint16_t pad, int wordsize, uintptr_t ra)
+@@ -1961,12 +1961,18 @@ uint32_t HELPER(rrbe)(CPUS390XState *env, uint64_=
+t r2)
+=20
+ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_t l, uint64_t a1, uint6=
+4_t a2)
  {
--    uint64_t len =3D MIN(*srclen, *destlen);
--    uint32_t cc;
-+    int len =3D MIN(*destlen, TARGET_PAGE_SIZE);
-+    int i, cc;
++    const uint8_t psw_as =3D (env->psw.mask & PSW_MASK_ASC) >> PSW_SHIFT=
+_ASC;
+     uintptr_t ra =3D GETPC();
+     int cc =3D 0, i;
 =20
-     if (*destlen =3D=3D *srclen) {
-         cc =3D 0;
-@@ -780,32 +780,40 @@ static inline uint32_t do_mvcl(CPUS390XState *env,
-         cc =3D 2;
-     }
+     HELPER_LOG("%s: %16" PRIx64 " %16" PRIx64 " %16" PRIx64 "\n",
+                __func__, l, a1, a2);
 =20
--    /* Copy the src array */
--    fast_memmove(env, *dest, *src, len, ra);
--    *src +=3D len;
--    *srclen -=3D len;
--    *dest +=3D len;
--    *destlen -=3D len;
-+    if (!*destlen) {
-+        return cc;
++    if (!(env->psw.mask & PSW_MASK_DAT) || !(env->cregs[0] & CR0_SECONDA=
+RY) ||
++        psw_as =3D=3D AS_HOME || psw_as =3D=3D AS_ACCREG) {
++        s390_program_interrupt(env, PGM_SPECIAL_OP, ILEN_AUTO, ra);
 +    }
++
+     if (l > 256) {
+         /* max 256 */
+         l =3D 256;
+@@ -1984,12 +1990,18 @@ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_=
+t l, uint64_t a1, uint64_t a2)
 =20
--    /* Pad the remaining area */
--    if (wordsize =3D=3D 1) {
--        fast_memset(env, *dest, pad, *destlen, ra);
--        *dest +=3D *destlen;
--        *destlen =3D 0;
-+    /*
-+     * Only perform one type of type of operation (move/pad) at a time.
-+     * Process up to 4k bytes.
-+     */
-+    if (*srclen) {
-+        /* Copy the src array */
-+        len =3D MIN(len, *srclen);
-+        *destlen -=3D len;
-+        *srclen -=3D len;
-+        fast_memmove(env, *dest, *src, len, ra);
-+        *src =3D wrap_address(env, *src + len);
-+        *dest =3D wrap_address(env, *dest + len);
-+    } else if (wordsize =3D=3D 1) {
-+        /* Pad the remaining area */
-+        *destlen -=3D len;
-+        fast_memset(env, *dest, pad, len, ra);
-+        *dest =3D wrap_address(env, *dest + len);
-     } else {
--        /* If remaining length is odd, pad with odd byte first.  */
--        if (*destlen & 1) {
--            cpu_stb_data_ra(env, *dest, pad & 0xff, ra);
--            *dest +=3D 1;
--            *destlen -=3D 1;
--        }
--        /* The remaining length is even, pad using words.  */
--        for (; *destlen; *dest +=3D 2, *destlen -=3D 2) {
--            cpu_stw_data_ra(env, *dest, pad, ra);
-+        /* The remaining length selects the padding byte. */
-+        for (i =3D 0; i < len; (*destlen)--, i++) {
-+            if (*destlen & 1) {
-+                cpu_stb_data_ra(env, *dest, pad, ra);
-+            } else {
-+                cpu_stb_data_ra(env, *dest, pad >> 8, ra);
-+            }
-+            *dest =3D wrap_address(env, *dest + 1);
-         }
-     }
+ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint6=
+4_t a2)
+ {
++    const uint8_t psw_as =3D (env->psw.mask & PSW_MASK_ASC) >> PSW_SHIFT=
+_ASC;
+     uintptr_t ra =3D GETPC();
+     int cc =3D 0, i;
 =20
--    return cc;
-+    return *destlen ? 3 : cc;
- }
+     HELPER_LOG("%s: %16" PRIx64 " %16" PRIx64 " %16" PRIx64 "\n",
+                __func__, l, a1, a2);
 =20
- /* move long */
++    if (!(env->psw.mask & PSW_MASK_DAT) || !(env->cregs[0] & CR0_SECONDA=
+RY) ||
++        psw_as =3D=3D AS_HOME || psw_as =3D=3D AS_ACCREG) {
++        s390_program_interrupt(env, PGM_SPECIAL_OP, ILEN_AUTO, ra);
++    }
++
+     if (l > 256) {
+         /* max 256 */
+         l =3D 256;
 --=20
 2.21.0
 
