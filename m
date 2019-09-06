@@ -2,95 +2,67 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F337C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 906E7C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:27:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3682D2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:19:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="TuIPp8Uf";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hCImHbbY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3682D2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
+	by mail.kernel.org (Postfix) with ESMTPS id 6F0FD2082C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:27:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0FD2082C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i67b3-00011z-CJ
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 02:19:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40044)
+	id 1i67i0-0002Vm-HO
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 02:27:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair@alistair23.me>) id 1i67Sr-0002hf-2v
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:22 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i67hA-00024N-8w
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:26:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair@alistair23.me>) id 1i67Sp-0003tQ-PE
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:20 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:35689)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alistair@alistair23.me>)
- id 1i67Sp-0003tK-Lc
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:19 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailout.nyi.internal (Postfix) with ESMTP id 2907620CB1;
- Fri,  6 Sep 2019 02:11:19 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Fri, 06 Sep 2019 02:11:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm2; bh=rH9HN90l0DkIZ
- 8oRDIrruzZS+xV4QJi52UZ0IPBbxzA=; b=TuIPp8Uf8NnlQ4GEm76E8Tz811J5E
- Gb6BxGgmIT33XMyN3PKS5tffUBqaNZ/bRGMjm+BSilW8FHwJ2jLN8ZCWB0GFhqgW
- eLD3V6qDHZ5QVL2LYf3KBO7mOl/YUgsrlXne/+oEWhQg9W6yev4ig6MQEzThA5HQ
- ensIeM+XC/FlKx+VnnzeFy2BBdSvX6PtrFnwkyNS4tqObcXX5XcOnGtLz8rIMDHL
- 0eg0bKnbCc0TpAlWZrLSVJtMb9Y0hP9o7tbwyL5LGYCHRlxMjjQ4F8xJVHF6cZ6X
- AV9PoQ+Ow5+0i3Wgubc6lSjS+ppteswlXsYxVUjDk2Up59nkNhuWZPNDw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:date:from
- :in-reply-to:message-id:mime-version:references:subject:to
- :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm3; bh=rH9HN90l0DkIZ8oRDIrruzZS+xV4QJi52UZ0IPBbxzA=; b=hCImHbbY
- rEOm6CEZY67C8JZX8K9z9uWQDxDfkgmgjT1ZoS1NZ7QVZkm53KAOpQS89lvg7uIs
- q5IqChNuAMeFFdjVC+Uz3Swwf4iFuVDU/NuJ3FRQXm8MsBlRaNOzsHqO1HfyjJUd
- Y6edqDblw8wx2WP+XuloYTRG5ncUhxZFBfDzH392ZzmC8ErlFhtJ/efSk4uxqeU5
- VLYKpVtQjMSl3KxWa6zlQjKqHi9uUOd9azaADUgKiEZouvi9rby5aVcB9lwp6oKn
- 4JYzMI3IWfnZbGuklJMC21o2YxzxWDdvCYB8lYt7AQgsNoT1OABj1Jma3r33kLrO
- 99Vmd2Op9U0+1g==
-X-ME-Sender: <xms:hvhxXfZXpFivldLXefAsn2bHdZfRK42o97hZbQC9NJa2VecxfJfudQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduvddrudejkedgheelucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgjfhgggfestdekre
- dtredttdenucfhrhhomheptehlihhsthgrihhrucfhrhgrnhgtihhsuceorghlihhsthgr
- ihhrsegrlhhishhtrghirhdvfedrmhgvqeenucfkphepjeefrdelfedrkeegrddvtdekne
- curfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishhtrghirhesrghlihhsthgrihhrvdef
- rdhmvgenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:hvhxXSNMfRc5r8ZtgeP8rS-eVSvKw8AvXKGJH-zRsCLKd0SZ6lV_OA>
- <xmx:hvhxXbA8Um9CzD8PdCfiVemTxQE2GOHbC_E4PhSlA71CgbEJGE6y1Q>
- <xmx:hvhxXZJSpE6Pfl7XNRARfnAT_DdUhnp-jbbjloS2GSVba3b_L51RtQ>
- <xmx:h_hxXWW9qyOESaynEESKwJmt7Wq973a0Hb4VQubVx4sgZtCkPx_h4Q>
-Received: from alistair-xps-14z.alistair23.me
- (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
- by mail.messagingengine.com (Postfix) with ESMTPA id 65509D6005D;
- Fri,  6 Sep 2019 02:11:18 -0400 (EDT)
-From: Alistair Francis <alistair@alistair23.me>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Date: Thu,  5 Sep 2019 23:11:17 -0700
-Message-Id: <29bce768ca12da6bab0b35865917f4094380cf50.1567750222.git.alistair@alistair23.me>
-X-Mailer: git-send-email 2.22.0
+ (envelope-from <no-reply@patchew.org>) id 1i67h8-00032D-E9
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:26:07 -0400
+Resent-Date: Fri, 06 Sep 2019 02:26:07 -0400
+Resent-Message-Id: <E1i67h8-00032D-E9@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21448)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i67h8-0002yu-51
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:26:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1567751138; cv=none; d=zoho.com; s=zohoarc; 
+ b=PcM2w4VAGG0eD0go0FgJsWGbpoI7RPpMjFnz913fcpLb1ltpPy49BNIpaQ/SC9RuGmY/jIzrKcOs5BVhtpkQZxt2EzFxoVh4/f25EfmVBCIgJcU/rJ1450gY5Rg9NA4W7oX/foosAde5nCGFM4q/5BFBY8ksG9wQyLDXMz9fMD8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1567751138;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=ncmJga44DRLH3mmJTGW0uo/W/FitA7gtyXCBuhMlB3c=; 
+ b=cgPnrYnAyWwo3udPrsej5ZKn0n4SaT/wlSGUDfswKFPriUmqwoB+Cuyaa3Sb+dUUG4+yGDZgfM4QPo1A9gocOy62ooE+1wY82MkEzlBx6zjzsHVh6ufA55OGzvkcxuPitxZCDHOBU0XpPCIQzuDzdY4KmBSWpK1oPqlOfgQ6FEU=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156775113740382.23842977239724;
+ Thu, 5 Sep 2019 23:25:37 -0700 (PDT)
 In-Reply-To: <cover.1567750222.git.alistair@alistair23.me>
-References: <cover.1567750222.git.alistair@alistair23.me>
+Message-ID: <156775113612.4643.4767087241991129875@5dec9699b7de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alistair@alistair23.me
+Date: Thu, 5 Sep 2019 23:25:37 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 66.111.4.25
-Subject: [Qemu-devel] [PATCH v4 6/6] hw/arm: Add the Netduino Plus 2
+X-Received-From: 136.143.188.54
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] Add the STM32F405 and Netduino Plus
+ 2 machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,128 +74,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair@alistair23.me>
----
- MAINTAINERS            |  6 +++++
- hw/arm/Kconfig         |  3 +++
- hw/arm/Makefile.objs   |  1 +
- hw/arm/netduinoplus2.c | 58 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 68 insertions(+)
- create mode 100644 hw/arm/netduinoplus2.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4aea8cb3fa..5f23865ce3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -828,6 +828,12 @@ M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/netduino2.c
- 
-+Netduino Plus 2
-+M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
-+S: Maintained
-+F: hw/arm/netduinoplus2.c
-+
- SmartFusion2
- M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
- M: Peter Maydell <peter.maydell@linaro.org>
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 46a4f052e9..c153ac0975 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -101,6 +101,9 @@ config NETDUINOPLUS2
-     bool
-     select STM32F405_SOC
- 
-+config NETDUINOPLUS2
-+    bool
-+
- config NSERIES
-     bool
-     select OMAP
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 0191c22c4f..4267805dc9 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -11,6 +11,7 @@ obj-$(CONFIG_MAINSTONE) += mainstone.o
- obj-$(CONFIG_MICROBIT) += microbit.o
- obj-$(CONFIG_MUSICPAL) += musicpal.o
- obj-$(CONFIG_NETDUINO2) += netduino2.o
-+obj-$(CONFIG_NETDUINOPLUS2) += netduinoplus2.o
- obj-$(CONFIG_NSERIES) += nseries.o
- obj-$(CONFIG_SX1) += omap_sx1.o
- obj-$(CONFIG_CHEETAH) += palm.o
-diff --git a/hw/arm/netduinoplus2.c b/hw/arm/netduinoplus2.c
-new file mode 100644
-index 0000000000..4a75da8543
---- /dev/null
-+++ b/hw/arm/netduinoplus2.c
-@@ -0,0 +1,58 @@
-+/*
-+ * Netduino Plus 2 Machine Model
-+ *
-+ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+#include "qemu/error-report.h"
-+#include "hw/arm/stm32f405_soc.h"
-+#include "hw/arm/boot.h"
-+
-+static void netduinoplus2_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+    uint32_t kernel_entry;
-+
-+    dev = qdev_create(NULL, TYPE_STM32F405_SOC);
-+    qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m4"));
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    kernel_entry = armv7m_load_kernel(ARM_CPU(first_cpu),
-+                                      machine->kernel_filename,
-+                                      FLASH_SIZE);
-+
-+    object_property_set_int(OBJECT(first_cpu), kernel_entry,
-+                            "init-entry", &error_fatal);
-+    object_property_set_int(OBJECT(first_cpu),
-+                            SRAM_BASE_ADDRESS + (SRAM_SIZE * 2) / 3,
-+                            "init-sp", &error_fatal);
-+}
-+
-+static void netduinoplus2_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "Netduino Plus 2 Machine";
-+    mc->init = netduinoplus2_init;
-+}
-+
-+DEFINE_MACHINE("netduinoplus2", netduinoplus2_machine_init)
--- 
-2.22.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTY3NzUwMjIyLmdp
+dC5hbGlzdGFpckBhbGlzdGFpcjIzLm1lLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNl0gQWRkIHRo
+ZSBTVE0zMkY0MDUgYW5kIE5ldGR1aW5vIFBsdXMgMiBtYWNoaW5lCk1lc3NhZ2UtaWQ6IGNvdmVy
+LjE1Njc3NTAyMjIuZ2l0LmFsaXN0YWlyQGFsaXN0YWlyMjMubWUKVHlwZTogc2VyaWVzCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
+ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjhiMGVjZDQgaHcvYXJtOiBBZGQgdGhlIE5ldGR1aW5vIFBsdXMgMgo0MDdmNzNmIGh3L2FybTog
+QWRkIHRoZSBTVE0zMkY0eHggU29DCjUxMmZmZjMgaHcvbWlzYzogQWRkIHRoZSBTVE0zMkY0eHgg
+RVhUSSBkZXZpY2UKMmNhYWQ1YyBody9taXNjOiBBZGQgdGhlIFNUTTMyRjR4eCBTeXNjb25maWcg
+ZGV2aWNlCjk1NWYwNjAgdGFyZ2V0L2FybTogQWxsb3cgc2V0dGluZyBNIG1vZGUgZW50cnkgYW5k
+IHNwCmQ4MWQyN2YgYXJtdjdtOiBBbGxvdyBlbnRyeSBpbmZvcm1hdGlvbiB0byBiZSByZXR1cm5l
+ZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS82IENoZWNraW5nIGNvbW1pdCBkODFkMjdmMDk5NmEg
+KGFybXY3bTogQWxsb3cgZW50cnkgaW5mb3JtYXRpb24gdG8gYmUgcmV0dXJuZWQpCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNDogRklMRTogaHcvYXJtL2FybXY3bS5jOjMwOToK
+K3VpbnQ2NF90IGFybXY3bV9sb2FkX2tlcm5lbChBUk1DUFUgKmNwdSwgY29uc3QgY2hhciAqa2Vy
+bmVsX2ZpbGVuYW1lLCBpbnQgbWVtX3NpemUpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNTI6IEZJTEU6IGluY2x1ZGUvaHcvYXJtL2Jvb3QuaDozNjoKK3VpbnQ2NF90IGFybXY3
+bV9sb2FkX2tlcm5lbChBUk1DUFUgKmNwdSwgY29uc3QgY2hhciAqa2VybmVsX2ZpbGVuYW1lLCBp
+bnQgbWVtX3NpemUpOwoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAzMCBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCAxLzYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi82IENoZWNraW5nIGNv
+bW1pdCA5NTVmMDYwNzg2NjIgKHRhcmdldC9hcm06IEFsbG93IHNldHRpbmcgTSBtb2RlIGVudHJ5
+IGFuZCBzcCkKMy82IENoZWNraW5nIGNvbW1pdCAyY2FhZDVjNjcwMzUgKGh3L21pc2M6IEFkZCB0
+aGUgU1RNMzJGNHh4IFN5c2NvbmZpZyBkZXZpY2UpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzc3OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRp
+b25hbCBzdGF0ZW1lbnRzICg0LCA3KQojMTM1OiBGSUxFOiBody9taXNjL3N0bTMyZjR4eF9zeXNj
+ZmcuYzo1NDoKKyAgICBpZiAoZXh0cmFjdDMyKHMtPnN5c2NmZ19leHRpY3JbaWNycmVnXSwgc3Rh
+cnRiaXQsIDQpID09IGNvbmZpZykgeworICAgICAgIHFlbXVfc2V0X2lycShzLT5ncGlvX291dFtp
+cnFdLCBsZXZlbCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjIyOiBGSUxF
+OiBody9taXNjL3N0bTMyZjR4eF9zeXNjZmcuYzoxNDE6CisgICAgICAgIFZNU1RBVEVfVUlOVDMy
+X0FSUkFZKHN5c2NmZ19leHRpY3IsIFNUTTMyRjR4eFN5c2NmZ1N0YXRlLCBTWVNDRkdfTlVNX0VY
+VElDUiksCgp0b3RhbDogMSBlcnJvcnMsIDIgd2FybmluZ3MsIDI4NSBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCAzLzYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvNiBDaGVja2luZyBjb21taXQg
+NTEyZmZmM2ZhYjc2IChody9taXNjOiBBZGQgdGhlIFNUTTMyRjR4eCBFWFRJIGRldmljZSkKV0FS
+TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
+ZWVkIHVwZGF0aW5nPwojNTA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCAyODEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC82IGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCjUvNiBDaGVja2luZyBjb21taXQgNDA3ZjczZmIzMjI5IChody9hcm06IEFk
+ZCB0aGUgU1RNMzJGNHh4IFNvQykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
+ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTc6IApuZXcgZmlsZSBtb2Rl
+IDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MDQgbGluZXMgY2hlY2tlZAoK
+UGF0Y2ggNS82IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjYvNiBDaGVja2luZyBjb21taXQg
+OGIwZWNkNDEzYmRjIChody9hcm06IEFkZCB0aGUgTmV0ZHVpbm8gUGx1cyAyKQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiM1NDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDg2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9j
+b3Zlci4xNTY3NzUwMjIyLmdpdC5hbGlzdGFpckBhbGlzdGFpcjIzLm1lL3Rlc3RpbmcuY2hlY2tw
+YXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
