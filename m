@@ -2,65 +2,65 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0E3C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 12:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 309DCC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 12:34:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A192B20854
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 12:32:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A192B20854
+	by mail.kernel.org (Postfix) with ESMTPS id 052AC20854
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 12:34:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 052AC20854
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6DPc-0000U1-TI
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 08:32:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50005)
+	id 1i6DRP-0001tK-07
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 08:34:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50664)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i6DNr-0008Ff-Nl
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 08:30:36 -0400
+ (envelope-from <berrange@redhat.com>) id 1i6DQN-00015W-Iw
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 08:33:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i6DNq-0003c7-IV
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 08:30:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37742)
+ (envelope-from <berrange@redhat.com>) id 1i6DQM-0004oU-E0
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 08:33:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60451)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1i6DNj-0003ZP-QS; Fri, 06 Sep 2019 08:30:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i6DQJ-0004mp-Nl; Fri, 06 Sep 2019 08:33:07 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AC136189DAD6;
- Fri,  6 Sep 2019 12:30:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0BEF218C4274;
+ Fri,  6 Sep 2019 12:33:07 +0000 (UTC)
 Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D53B6013A;
- Fri,  6 Sep 2019 12:30:11 +0000 (UTC)
-Date: Fri, 6 Sep 2019 13:30:08 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A3F3510016EB;
+ Fri,  6 Sep 2019 12:33:01 +0000 (UTC)
+Date: Fri, 6 Sep 2019 13:32:58 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190906123008.GB5119@redhat.com>
+Message-ID: <20190906123258.GC5119@redhat.com>
 References: <20190826135103.22410-1-mlevitsk@redhat.com>
- <20190826135103.22410-6-mlevitsk@redhat.com>
+ <20190826135103.22410-7-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190826135103.22410-6-mlevitsk@redhat.com>
+In-Reply-To: <20190826135103.22410-7-mlevitsk@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 06 Sep 2019 12:30:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.62]); Fri, 06 Sep 2019 12:33:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 05/13] qcrypto-luks: simplify masterkey
- and masterkey length
+Subject: Re: [Qemu-devel] [PATCH v2 06/13] qcrypto-block: pass keyslot index
+ rather that pointer to the keyslot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,14 +81,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 26, 2019 at 04:50:55PM +0300, Maxim Levitsky wrote:
-> Let the caller allocate masterkey
-> Always use master key len from the header
+On Mon, Aug 26, 2019 at 04:50:56PM +0300, Maxim Levitsky wrote:
+> Another minor refactoring
 >=20
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  crypto/block-luks.c | 44 +++++++++++++++++++++-----------------------
->  1 file changed, 21 insertions(+), 23 deletions(-)
+>  crypto/block-luks.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+> index 331377293d..0d81f2ac61 100644
+> --- a/crypto/block-luks.c
+> +++ b/crypto/block-luks.c
+> @@ -410,7 +410,7 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgori=
+thm cipher,
+>   */
+>  static int
+>  qcrypto_block_luks_load_key(QCryptoBlock *block,
+> -                            QCryptoBlockLUKSKeySlot *slot,
+> +                            unsigned int slot_idx,
+
+FWIW, I tend to prefer 'size_t' for things which are array
+indexes especially....
+
+>                              const char *password,
+>                              QCryptoCipherAlgorithm cipheralg,
+>                              QCryptoCipherMode ciphermode,
+> @@ -424,6 +424,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+>                              Error **errp)
+>  {
+>      QCryptoBlockLUKS *luks =3D block->opaque;
+> +    const QCryptoBlockLUKSKeySlot *slot =3D &luks->header.key_slots[sl=
+ot_idx];
+>      g_autofree uint8_t *splitkey =3D NULL;
+>      size_t splitkeylen;
+>      g_autofree uint8_t *possiblekey =3D NULL;
+> @@ -580,13 +581,12 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
+>                              void *opaque,
+>                              Error **errp)
+>  {
+> -    QCryptoBlockLUKS *luks =3D block->opaque;
+>      size_t i;
+>      int rv;
+> =20
+>      for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
+>          rv =3D qcrypto_block_luks_load_key(block,
+> -                                         &luks->header.key_slots[i],
+> +                                         i,
+
+..given that 'i' is size_t here.
+
+>                                           password,
+>                                           cipheralg,
+>                                           ciphermode,
+
+With that type changed
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
