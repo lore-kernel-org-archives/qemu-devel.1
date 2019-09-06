@@ -2,92 +2,64 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC98C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:45:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB03C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:50:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83FE720650
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:45:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83FE720650
+	by mail.kernel.org (Postfix) with ESMTPS id EEE61206B8
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:50:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEE61206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6EXv-0005tO-PP
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:45:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42464)
+	id 1i6EdV-0000LT-Vh
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:50:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i6EXA-0005Rz-Jp
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:44:17 -0400
+ (envelope-from <berrange@redhat.com>) id 1i6EcW-0007tk-QX
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i6EX8-0006Z0-Vq
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:44:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42150)
+ (envelope-from <berrange@redhat.com>) id 1i6EcO-0000ry-Qd
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:49:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33548)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i6EX8-0006Yi-OK
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:44:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1i6EcD-0000mL-CR; Fri, 06 Sep 2019 09:49:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C5B134E8AC;
- Fri,  6 Sep 2019 13:44:13 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F24885D9E5;
- Fri,  6 Sep 2019 13:44:08 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Tony Nguyen <tony.nguyen@bt.com>, qemu-devel@nongnu.org
-References: <20190902012647.1761-1-tony.nguyen@bt.com>
- <41e61c1c-15b0-d028-fc23-52e2c59319d2@redhat.com>
- <93172f42-7506-65d0-5754-248c3fc31aa1@redhat.com>
- <867bdb4b-3eef-0660-6db2-a2e6a0ab5a0e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <c1159dea-d68c-1143-a000-1320a1e39fb7@redhat.com>
-Date: Fri, 6 Sep 2019 08:44:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 5352B305D637;
+ Fri,  6 Sep 2019 13:49:28 +0000 (UTC)
+Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0940860610;
+ Fri,  6 Sep 2019 13:49:20 +0000 (UTC)
+Date: Fri, 6 Sep 2019 14:49:17 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Message-ID: <20190906134917.GK5119@redhat.com>
+References: <20190830205608.18192-1-mlevitsk@redhat.com>
+ <20190830205608.18192-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <867bdb4b-3eef-0660-6db2-a2e6a0ab5a0e@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Disposition: inline
+In-Reply-To: <20190830205608.18192-3-mlevitsk@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 06 Sep 2019 13:44:13 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Fri, 06 Sep 2019 13:49:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] memory: Set notdirty_mem_ops validator
+Subject: Re: [Qemu-devel] [PATCH 02/10] qcrypto-luks: extend the create
+ options for upcoming encryption key management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,96 +71,641 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/6/19 8:24 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+On Fri, Aug 30, 2019 at 11:56:00PM +0300, Maxim Levitsky wrote:
+> Now you can specify which slot to put the encryption key to
+> Plus add 'active' option which will let  user erase the key secret
+> instead of adding it.
+> Check that it is true for creation
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  block/crypto.c             |  2 ++
+>  block/crypto.h             | 16 +++++++++++
+>  block/qcow2.c              |  2 ++
+>  crypto/block-luks.c        | 26 +++++++++++++++---
+>  qapi/crypto.json           | 19 ++++++++++++++
+>  tests/qemu-iotests/082.out | 54 ++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 115 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 6e822c6e50..a6a3e1f1d8 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -144,6 +144,8 @@ static QemuOptsList block_crypto_create_opts_luks = {
+>          BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG(""),
+>          BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG(""),
+>          BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME(""),
+> +        BLOCK_CRYPTO_OPT_DEF_LUKS_SLOT(""),
+> +        BLOCK_CRYPTO_OPT_DEF_LUKS_ACTIVE(""),
+>          { /* end of list */ }
+>      },
+>  };
+> diff --git a/block/crypto.h b/block/crypto.h
+> index b935695e79..05cc43d9bc 100644
+> --- a/block/crypto.h
+> +++ b/block/crypto.h
+> @@ -35,12 +35,14 @@
+>          "ID of the secret that provides the AES encryption key")
+>  
+>  #define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
+> +#define BLOCK_CRYPTO_OPT_LUKS_SLOT "slot"
+>  #define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
+>  #define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
+>  #define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
+>  #define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
+>  #define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
+>  #define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
+> +#define BLOCK_CRYPTO_OPT_LUKS_ACTIVE "active"
+>  
+>  #define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET(prefix)                    \
+>      BLOCK_CRYPTO_OPT_DEF_KEY_SECRET(prefix,                             \
+> @@ -88,6 +90,20 @@
+>          .help = "Time to spend in PBKDF in milliseconds",     \
+>      }
+>  
+> +#define BLOCK_CRYPTO_OPT_DEF_LUKS_SLOT(prefix)           \
+> +    {                                                         \
+> +        .name = prefix BLOCK_CRYPTO_OPT_LUKS_SLOT,       \
+> +        .type = QEMU_OPT_NUMBER,                              \
+> +        .help = "Controls the slot where the secret is added/erased",     \
+> +    }
+> +
+> +#define BLOCK_CRYPTO_OPT_DEF_LUKS_ACTIVE(prefix)           \
+> +    {                                                         \
+> +        .name = prefix BLOCK_CRYPTO_OPT_LUKS_ACTIVE,       \
+> +        .type = QEMU_OPT_BOOL,                              \
+> +        .help = "Controls if the added secret is added or erased",     \
+> +    }
 
->>>>  static const MemoryRegionOps notdirty_mem_ops =3D {
->>>>      .write =3D notdirty_mem_write,
->>>> -    .valid.accepts =3D notdirty_mem_accepts,
->>>>      .endianness =3D DEVICE_NATIVE_ENDIAN,
->>>>      .valid =3D {
->>>>          .min_access_size =3D 1,
->>>>          .max_access_size =3D 8,
->>>>          .unaligned =3D false,
->>>> +        .accepts =3D notdirty_mem_accepts,
->>>
->>> I'm surprised the compiler doesn't emit any warning...
->>
->> Same here.
->>
->> But reading
->> https://en.cppreference.com/w/c/language/struct_initialization, this i=
-s
->> compliant behavior:
->>
->> "However, when an initializer begins with a left open brace, its curre=
-nt
->> object is fully re-initialized and any prior explicit initializers for
->> any of its subobjects are ignored:"
->>
->> so it is worth filing a gcc bug asking for a QoI improvement in adding=
- a
->> warning (since the code does not violate the C standard, but does caus=
-e
->> surprises in the reinitialization of omitted members in the later {} t=
-o
->> go back to 0 in spite of the earlier initialization by nested name).
->=20
-> Just remembered another case of (correct) reinitialization in
-> hw/arm/palm.c:101:
+Do we actually need the "active" property for initial
+creation. I think its only needed for amend, so perhaps
+we shuold not register this at all ?
 
-We use nested reinitialization in multiple places. A gcc warning would
-have to be discriminating enough to NOT warn merely when something is
-listed twice...:
+> +
+>  QCryptoBlockCreateOptions *
+>  block_crypto_create_opts_init(QDict *opts, Error **errp);
+>  
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 7c5a4859f7..be4a5063e5 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -5167,6 +5167,8 @@ static QemuOptsList qcow2_create_opts = {
+>          BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),
+>          BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),
+>          BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),
+> +        BLOCK_CRYPTO_OPT_DEF_LUKS_SLOT("encrypt."),
+> +        BLOCK_CRYPTO_OPT_DEF_LUKS_ACTIVE("encrypt."),
+>          {
+>              .name = BLOCK_OPT_CLUSTER_SIZE,
+>              .type = QEMU_OPT_SIZE,
+> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+> index 3af137e364..ba20d55246 100644
+> --- a/crypto/block-luks.c
+> +++ b/crypto/block-luks.c
+> @@ -1230,6 +1230,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+>      const char *hash_alg;
+>      g_autofree char *cipher_mode_spec = NULL;
+>      uint64_t iters;
+> +    unsigned int slot_idx = 0;
+>  
+>      memcpy(&luks_opts, &options->u.luks, sizeof(luks_opts));
+>      if (!luks_opts.has_iter_time) {
+> @@ -1263,12 +1264,30 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+>      luks->ivgen_hash_alg = luks_opts.ivgen_hash_alg;
+>      luks->hash_alg = luks_opts.hash_alg;
+>  
+> +    if (luks_opts.has_active && !luks_opts.active) {
+> +        error_setg(errp,
+> +                   "For image creation, the added secret must be active!");
+> +        goto error;
+> +
+> +    }
+> +
+> +    if (luks_opts.has_slot) {
+> +        if (luks_opts.slot >= QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ||
+> +            luks_opts.slot < 0) {
+> +                error_setg(errp,
+> +                           "Invalid slot %" PRId64 " is specified",
+> +                           luks_opts.slot);
+> +                goto error;
+> +        }
+> +        slot_idx = (unsigned int)luks_opts.slot;
+> +    }
+> +
+>  
+>      /* Note we're allowing ivgen_hash_alg to be set even for
+>       * non-essiv iv generators that don't need a hash. It will
+>       * be silently ignored, for compatibility with dm-crypt */
+>  
+> -    if (!options->u.luks.key_secret) {
+> +    if (!luks_opts.has_key_secret) {
+>          error_setg(errp, "Parameter '%skey-secret' is required for cipher",
+>                     optprefix ? optprefix : "");
+>          goto error;
+> @@ -1473,11 +1492,10 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+>          goto error;
+>      }
+>  
+> -
+> -    /* populate the slot 0 with the password encrypted master key*/
+> +    /* populate one of the slots with the password encrypted master key*/
+>      /* This will also store the header */
+>      if (qcrypto_block_luks_store_key(block,
+> -                                     0,
+> +                                     slot_idx,
+>                                       password,
+>                                       masterkey,
+>                                       luks_opts.iter_time,
+> diff --git a/qapi/crypto.json b/qapi/crypto.json
+> index b2a4cff683..9b83a70634 100644
+> --- a/qapi/crypto.json
+> +++ b/qapi/crypto.json
+> @@ -190,6 +190,20 @@
+>  #                  Currently defaults to 'sha256'
+>  # @hash-alg: the master key hash algorithm
+>  #            Currently defaults to 'sha256'
+> +#
+> +# @active: Should the new secret be added (true) or erased (false)
+> +#          (amend only, since 4.2)
+> +#
+> +# @slot: The slot in which to put/erase the secret
+> +#        if not given, will select first free slot for secret addtion
+> +#        and erase all matching keyslots for erase. except last one
+> +#        (optional, since 4.2)
+> +#
+> +# @unlock-secret: The secret to use to unlock the image
+> +#        If not given, will use the secret that was used
+> +#        when opening the image.
+> +#        (optional, for amend only, since 4.2)
+> +#
+>  # @iter-time: number of milliseconds to spend in
+>  #             PBKDF passphrase processing. Currently defaults
+>  #             to 2000. (since 2.8)
+> @@ -201,7 +215,12 @@
+>              '*cipher-mode': 'QCryptoCipherMode',
+>              '*ivgen-alg': 'QCryptoIVGenAlgorithm',
+>              '*ivgen-hash-alg': 'QCryptoHashAlgorithm',
+> +
+>              '*hash-alg': 'QCryptoHashAlgorithm',
+> +            '*active' : 'bool',
+> +            '*slot': 'int',
+> +            '*unlock-secret': 'str',
+> +
+>              '*iter-time': 'int'}}
+>  
+>  
+> diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+> index 9d4ed4dc9d..5651a0b953 100644
+> --- a/tests/qemu-iotests/082.out
+> +++ b/tests/qemu-iotests/082.out
+> @@ -50,6 +50,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -58,6 +59,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -73,6 +75,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -81,6 +84,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -96,6 +100,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -104,6 +109,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -119,6 +125,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -127,6 +134,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -142,6 +150,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -150,6 +159,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -165,6 +175,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -173,6 +184,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -188,6 +200,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -196,6 +209,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -211,6 +225,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -219,6 +234,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -249,6 +265,7 @@ Supported qcow2 options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -257,6 +274,7 @@ Supported qcow2 options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -330,6 +348,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -338,6 +357,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -353,6 +373,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -361,6 +382,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -376,6 +398,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -384,6 +407,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -399,6 +423,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -407,6 +432,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -422,6 +448,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -430,6 +457,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -445,6 +473,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -453,6 +482,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -468,6 +498,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -476,6 +507,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -491,6 +523,7 @@ Supported options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -499,6 +532,7 @@ Supported options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+> @@ -529,6 +563,7 @@ Supported qcow2 options:
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -537,6 +572,7 @@ Supported qcow2 options:
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -621,6 +657,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -629,6 +666,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -645,6 +683,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -653,6 +692,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -669,6 +709,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -677,6 +718,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -693,6 +735,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -701,6 +744,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -717,6 +761,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -725,6 +770,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -741,6 +787,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -749,6 +796,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -765,6 +813,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -773,6 +822,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -789,6 +839,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -797,6 +848,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> @@ -830,6 +882,7 @@ Creation options for 'qcow2':
+>    compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+>    data_file=<str>        - File name of an external data file
+>    data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
+> +  encrypt.active=<bool (on/off)> - Controls if the added secret is added or erased
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes', 'luks'
+> @@ -838,6 +891,7 @@ Creation options for 'qcow2':
+>    encrypt.ivgen-alg=<str> - Name of IV generator algorithm
+>    encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+>    encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+> +  encrypt.slot=<num>     - Controls the slot where the secret is added/erased
+>    encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
+>    lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+>    preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+> -- 
+> 2.17.2
+> 
 
->=20
-> static struct {
->     int row;
->     int column;
-> } palmte_keymap[0x80] =3D {
->     [0 ... 0x7f] =3D { -1, -1 },
->     [0x3b] =3D { 0, 0 },	/* F1	-> Calendar */
-
-Here, [0x3b].row and [0x3b].column are listed twice, but both of the
-second listings are explicit.
-
-Similarly, in qobject/json-lexer.c:
-
-static const uint8_t json_lexer[][256] =3D  {
-    /* Relies on default initialization to IN_ERROR! */
-...
-
-    /*
-     * Two start states:
-     * - IN_START recognizes JSON tokens with our string extensions
-     * - IN_START_INTERP additionally recognizes interpolation.
-     */
-    [IN_START ... IN_START_INTERP] =3D {
-        ['"'] =3D IN_DQ_STRING,
-...
-        ['\n'] =3D IN_START,
-    },
-    [IN_START_INTERP]['%'] =3D IN_INTERP,
-};
-
-Done that way on purpose (I actually remember scratching my head on the
-best way to compress things while reviewing Markus' patch that ended up
-as 2cbd15aa6f; it took me a couple of tries off-list to end up at that
-override).
-
-...rather, the gcc warning that I envision should ONLY be when a later
-partial =3D{} causes a zero-initialization override of an earlier explici=
-t
-.member, and NOT when a later complete =3D{} or explicit member overrides
-an earlier init (whether the earlier one was explicit due to .member or
-implicit due to partial =3D{}).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
