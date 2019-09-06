@@ -2,90 +2,80 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DCCC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B08B1C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:55:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E5EC20838
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:02:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E5EC20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5CEB420838
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:55:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="p3HwjDyx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CEB420838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6IYy-00071G-Px
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 14:02:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52976)
+	id 1i6JO6-0007f2-1D
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 14:55:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i6IXj-0006LP-07
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:01:08 -0400
+ (envelope-from <scw@google.com>) id 1i6JM4-00076B-VV
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i6IXh-0000BE-Md
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:01:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52598)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i6IXc-00006d-6y; Fri, 06 Sep 2019 14:01:00 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2206881DF7;
- Fri,  6 Sep 2019 18:00:56 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 39F71194BE;
- Fri,  6 Sep 2019 18:00:55 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190906173201.7926-1-mlevitsk@redhat.com>
- <20190906173201.7926-2-mlevitsk@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <e7f3febc-63cb-ea09-0761-45ecae74ad14@redhat.com>
-Date: Fri, 6 Sep 2019 13:00:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <scw@google.com>) id 1i6JM2-0004K9-VQ
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:08 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:37996)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <scw@google.com>) id 1i6JM2-0004Hs-52
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:06 -0400
+Received: by mail-io1-xd41.google.com with SMTP id p12so15044644iog.5
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 11:53:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Z3dfBY7JQz9BktUuuaqV7uU9OBPwFADOL6tikkgBxrQ=;
+ b=p3HwjDyx4+mDIWsU+wxswI9FnoDMejyjS8qaHpLOLSHlZTsD03qdAGVpp1KnjFUjZN
+ 5IYAC21cjh3amUKf01/Jb0V6+qYRn46HFDQxwIpT4zWvPYhfhT+FqiHC5Lt0XWZqHt2o
+ kph1L+OPAtyQ51UXTSam7OYqdHvlDTTtGfOhD8uwy5DudCf4lWtTVnfPyYgRUEbSuE5M
+ fFMsF4Nec0JWseydFG4rt4aba+NI1Cu8ejKWzTat7MeT0fM4p/+ewq411Y+bTuFJ3nCX
+ 5lxVhsvBTQp9v0Hq8zBzi0dSWEeTE2BH98xAqKGCiY8LcMa22uJZfs6Nxx5+Lkk/JrN6
+ 1WhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Z3dfBY7JQz9BktUuuaqV7uU9OBPwFADOL6tikkgBxrQ=;
+ b=sjEZ/6/N82OuyYsqnzEwWce0cY1MfM4WJbGToR7OeFFZ7URZr5L760kOn9JYDNBUbT
+ XNczuxY2lfNSjrvQNt15Fmsu3rhW196n7zzAHwlYtlgrrOGkbxUh/v4dOWny0IxG67O7
+ IfnQf56KwXjBECUCz24aShXbf/SSLms4pKKF1cplzWP1NMxlAkXaayh6Lc1KATWExT3M
+ OghBcgB4mtAgkAFJTd8dYd6/3wYTvE7rgiwbmwNK8OpO3mVikd3yksgA+y5cSUsePcWQ
+ weLWPSYhpEAYkhYsCgmqJlHY+lRCcfA2ZBAzS16btLHvoWq38uQQZTLypCKsVzNTV1kX
+ OeWw==
+X-Gm-Message-State: APjAAAVAU7KLBTIzPLpfcVzkU/U5bBvnKK7VSqctH0tlhR3q2DT71zx9
+ CDARWgvD9V4CQTeCIAekJZzy9HFBBkEN5s0b7S7PRA==
+X-Google-Smtp-Source: APXvYqwlhzwckuW0S8L0s5i+BnjwOPy8wMwVLX7ctsNJKKIEIu24hEq117Wv6TBN8SVMPcoRSxOj52v1uPaLDUCwgqQ=
+X-Received: by 2002:a02:92:: with SMTP id 140mr11395301jaa.98.1567795983740;
+ Fri, 06 Sep 2019 11:53:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190906173201.7926-2-mlevitsk@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="6jvL0YYdAV73BtdHxiRduzlGLRnGZrJEe"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 06 Sep 2019 18:00:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/3] block/qcow2: refactoring of threaded
- encryption code
+References: <20190821201921.106902-1-scw@google.com>
+In-Reply-To: <20190821201921.106902-1-scw@google.com>
+Date: Fri, 6 Sep 2019 11:52:52 -0700
+Message-ID: <CAF3nBxh2uk0_kUMWNnq799BZKKqXSWctvJ+E=T2aqpFcARXNNw@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature";
+ micalg=sha-256; boundary="000000000000becfdf0591e6f27c"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d41
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] linux-user: hijack open() for thread
+ directories
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,186 +87,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+From: Shu-Chun Weng via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Shu-Chun Weng <scw@google.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6jvL0YYdAV73BtdHxiRduzlGLRnGZrJEe
-Content-Type: multipart/mixed; boundary="pIxiioNujRO128Rl0a6NK4LTubTKCVrOg";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <e7f3febc-63cb-ea09-0761-45ecae74ad14@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] block/qcow2: refactoring of threaded
- encryption code
-References: <20190906173201.7926-1-mlevitsk@redhat.com>
- <20190906173201.7926-2-mlevitsk@redhat.com>
-In-Reply-To: <20190906173201.7926-2-mlevitsk@redhat.com>
+--000000000000becfdf0591e6f27c
+Content-Type: text/plain; charset="UTF-8"
 
---pIxiioNujRO128Rl0a6NK4LTubTKCVrOg
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Ping. Any comments on this? Patchwork:
+http://patchwork.ozlabs.org/patch/1151167/
 
-On 9/6/19 12:31 PM, Maxim Levitsky wrote:
-> This commit tries to clarify few function arguments,
-> and add comments describing the encrypt/decrypt interface
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+On Wed, Aug 21, 2019 at 1:19 PM Shu-Chun Weng <scw@google.com> wrote:
+
+> Besides /proc/self|<pid>, files under /proc/thread-self and
+> /proc/self|<pid>/task/<tid> also expose host information to the guest
+> program. This patch adds them to the hijack infrastracture. Note that
+> is_proc_myself() does not check if the <tid> matches the current thread
+> and is thus only suitable for procfs files that are identical for all
+> threads in the same process.
+>
+> Behavior verified with guest program:
+>
+> long main_thread_tid;
+>
+> long gettid() {
+>   return syscall(SYS_gettid);
+> }
+>
+> void print_info(const char* cxt, const char* dir) {
+>   char buf[1024];
+>   FILE* fp;
+>
+>   snprintf(buf, sizeof(buf), "%s/cmdline", dir);
+>   fp = fopen(buf, "r");
+>
+>   if (fp == NULL) {
+>     printf("%s: can't open %s\n", cxt, buf);
+>   } else {
+>     fgets(buf, sizeof(buf), fp);
+>     printf("%s %s cmd: %s\n", cxt, dir, buf);
+>     fclose(fp);
+>   }
+>
+>   snprintf(buf, sizeof(buf), "%s/maps", dir);
+>   fp = fopen(buf, "r");
+>
+>   if (fp == NULL) {
+>     printf("%s: can't open %s\n", cxt, buf);
+>   } else {
+>     char seen[128][128];
+>     int n = 0, is_new = 0;
+>     while(fgets(buf, sizeof(buf), fp) != NULL) {
+>       const char* p = strrchr(buf, ' ');
+>       if (p == NULL || *(p + 1) == '\n') {
+>         continue;
+>       }
+>       ++p;
+>       is_new = 1;
+>       for (int i = 0; i < n; ++i) {
+>         if (strncmp(p, seen[i], sizeof(seen[i])) == 0) {
+>           is_new = 0;
+>           break;
+>         }
+>       }
+>       if (is_new) {
+>         printf("%s %s map: %s", cxt, dir, p);
+>         if (n < 128) {
+>           strncpy(seen[n], p, sizeof(seen[n]));
+>           seen[n][sizeof(seen[n]) - 1] = '\0';
+>           ++n;
+>         }
+>       }
+>     }
+>     fclose(fp);
+>   }
+> }
+>
+> void* thread_main(void* _) {
+>   char buf[1024];
+>
+>   print_info("Child", "/proc/thread-self");
+>
+>   snprintf(buf, sizeof(buf), "/proc/%ld/task/%ld", (long) getpid(),
+> main_thread_tid);
+>   print_info("Child", buf);
+>
+>   snprintf(buf, sizeof(buf), "/proc/%ld/task/%ld", (long) getpid(), (long)
+> gettid());
+>   print_info("Child", buf);
+>
+>   return NULL;
+> }
+>
+> int main() {
+>   char buf[1024];
+>   pthread_t thread;
+>   int ret;
+>
+>   print_info("Main", "/proc/thread-self");
+>   print_info("Main", "/proc/self");
+>
+>   snprintf(buf, sizeof(buf), "/proc/%ld", (long) getpid());
+>   print_info("Main", buf);
+>
+>   main_thread_tid = gettid();
+>   snprintf(buf, sizeof(buf), "/proc/self/task/%ld", main_thread_tid);
+>   print_info("Main", buf);
+>
+>   snprintf(buf, sizeof(buf), "/proc/%ld/task/%ld", (long) getpid(),
+> main_thread_tid);
+>   print_info("Main", buf);
+>
+>   if ((ret = pthread_create(&thread, NULL, &thread_main, NULL)) < 0) {
+>     printf("ptherad_create failed: %s (%d)\n", strerror(ret), ret);
+>   }
+>
+>   pthread_join(thread, NULL);
+>   return 0;
+> }
+>
+> Signed-off-by: Shu-Chun Weng <scw@google.com>
 > ---
->  block/qcow2-cluster.c |  8 +++----
->  block/qcow2-threads.c | 53 ++++++++++++++++++++++++++++++++++---------=
-
->  2 files changed, 46 insertions(+), 15 deletions(-)
->=20
-
-> +++ b/block/qcow2-threads.c
-> @@ -234,15 +234,19 @@ static int qcow2_encdec_pool_func(void *opaque)
+>  linux-user/syscall.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+>
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 8367cb138d..73fe82bcc7 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -6968,17 +6968,57 @@ static int open_self_auxv(void *cpu_env, int fd)
+>      return 0;
 >  }
-> =20
->  static int coroutine_fn
-> -qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
-> -                  uint64_t offset, void *buf, size_t len, Qcow2EncDecF=
-unc func)
-
-Pre-existing bug in alignment...
-
-> +qcow2_co_encdec(BlockDriverState *bs, uint64_t host_cluster_offset,
-> +                  uint64_t guest_offset, void *buf, size_t len,
-> +                  Qcow2EncDecFunc func)
-
-=2E..so this would be a great time to fix it.
-
->  {
->      BDRVQcow2State *s =3D bs->opaque;
-> +
-> +    uint64_t offset =3D s->crypt_physical_offset ?
-> +        host_cluster_offset + offset_into_cluster(s, guest_offset) :
-> +        guest_offset;
-> +
->      Qcow2EncDecData arg =3D {
->          .block =3D s->crypto,
-> -        .offset =3D s->crypt_physical_offset ?
-> -                      file_cluster_offset + offset_into_cluster(s, off=
-set) :
-> -                      offset,
-> +        .offset =3D offset,
-
-I'm ambivalent on whether the new 'offset' variable gains us anything.
-But it doesn't hurt.
-
-
->          .buf =3D buf,
->          .len =3D len,
->          .func =3D func,
-> @@ -251,18 +255,45 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t fi=
-le_cluster_offset,
->      return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
->  }
-> =20
+>
+> +static int consume_task_directories(const char **filename)
+> +{
+> +    if (!strncmp(*filename, "task/", strlen("task/"))) {
+> +        *filename += strlen("task/");
+> +        if (**filename < '1' || **filename > '9') {
+> +            return 0;
+> +        }
+> +        /*
+> +         * Don't care about the exact tid.
+> +         * XXX: this allows opening files under /proc/self|<pid>/task/<n>
+> where
+> +         *      <n> is not a valid thread id. Consider checking if the
+> file
+> +         *      actually exists.
+> +         */
+> +        const char *p = *filename + 1;
+> +        while (*p >= '0' && *p <= '9') {
+> +            ++p;
+> +        }
+> +        if (*p == '/') {
+> +            *filename = p + 1;
+> +            return 1;
+> +        } else {
+> +            return 0;
+> +        }
+> +    }
+> +    return 1;
+> +}
 > +
 > +/*
-> + * qcow2_co_encrypt()
-> + *
-> + * Encrypts a sector size aligned contiguous area
-> + *
-> + * @host_cluster_offset - on disk offset of the cluster in which
-> + *                        the buffer resides
-> + *
-> + * @guest_offset - guest (virtual) offset of the buffer
-> + * @buf - buffer with the data to encrypt
-> + * @len - length of the buffer
-> + *
-> + * Note that the area is not cluster aligned and might cross a cluster=
-
-> + * boundary
-
-Umm, how is it possible for a sector to cross a cluster boundary?  All
-clusters are sector-aligned, and encryption only works on aligned
-sectors.  Oh, I see - if @len is a multiple larger than sector size,
-then we have multiple sectors, and then indeed we may cross clusters.
-But then the docs about being 'a sector size aligned contiguous area' is
-not quite right.
-
-> + *
-> + *
+> + * Determines if filename refer to a procfs file for the current process
+> or any
+> + * thread within the current process. This function should only be used
+> to check
+> + * for files that have identical contents in all threads, e.g. exec,
+> maps, etc.
 > + */
->  int coroutine_fn
-> -qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-> -                 uint64_t offset, void *buf, size_t len)
-> +qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_cluster_offset,
-> +                 uint64_t guest_offset, void *buf, size_t len)
+>  static int is_proc_myself(const char *filename, const char *entry)
 >  {
-> -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-> +    return qcow2_co_encdec(bs, host_cluster_offset, guest_offset, buf,=
- len,
->                               qcrypto_block_encrypt);
+>      if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
+>          filename += strlen("/proc/");
+>          if (!strncmp(filename, "self/", strlen("self/"))) {
+>              filename += strlen("self/");
+> +            if (!consume_task_directories(&filename)) {
+> +                return 0;
+> +            }
+> +        } else if (!strncmp(filename, "thread-self/",
+> strlen("thread-self/"))) {
+> +            filename += strlen("thread-self/");
+>          } else if (*filename >= '1' && *filename <= '9') {
+>              char myself[80];
+>              snprintf(myself, sizeof(myself), "%d/", getpid());
+>              if (!strncmp(filename, myself, strlen(myself))) {
+>                  filename += strlen(myself);
+> +                if (!consume_task_directories(&filename)) {
+> +                    return 0;
+> +                }
+>              } else {
+>                  return 0;
+>              }
+> --
+> 2.23.0.rc1.153.gdeed80330f-goog
+>
+>
 
+--000000000000becfdf0591e6f27c
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Another alignment worth fixing up while in the area.
-
->  }
-> =20
-> +
-> +/*
-> + * qcow2_co_decrypt()
-> + *
-> + * Decrypts a sector size aligned contiguous area
-> + * Same function as qcow2_co_encrypt
-> + *
-> + */
-> +
->  int coroutine_fn
-> -qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-> -                 uint64_t offset, void *buf, size_t len)
-> +qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_cluster_offset,
-> +                 uint64_t guest_offset, void *buf, size_t len)
->  {
-> -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-> +    return qcow2_co_encdec(bs, host_cluster_offset, guest_offset, buf,=
- len,
->                               qcrypto_block_decrypt);
-
-and again.
-
->  }
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---pIxiioNujRO128Rl0a6NK4LTubTKCVrOg--
-
---6jvL0YYdAV73BtdHxiRduzlGLRnGZrJEe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1yntYACgkQp6FrSiUn
-Q2rVXAgAo3VwEFpB62thuE38LOs+0Wtsby3ZYhyVLKymyOyvIDk0i8vLVNJ15zz2
-zo3Go8wzTPwh5067YJWkU2MQ3nC0JHJROQsjFfwfFZTvB3PJdaOch2kWvlK4wLZ+
-cQ7zPFLs/PvaQBkGbDsfnUV+AuJTSRdWZ3LwdrpOS9LjTwYxIriUBlBNFnDeWrVv
-xNNFPDE6WxzqWAjKDWcLKX20LZdkQPs9EDoAqbdAb63fD2CfZgG4ZJchyW28LdkX
-IWT1eZ+GaM/u1qqeOzKqAItgUxzpgp4KZ3mYDehL7LzWDWlNLlRhYFPteumJG8Ee
-IeGLJOgTDC5qQnJsDqQ7XjwJSESAlA==
-=krQE
------END PGP SIGNATURE-----
-
---6jvL0YYdAV73BtdHxiRduzlGLRnGZrJEe--
+MIIS4QYJKoZIhvcNAQcCoIIS0jCCEs4CAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghBHMIIEXDCCA0SgAwIBAgIOSBtqDm4P/739RPqw/wcwDQYJKoZIhvcNAQELBQAwZDELMAkGA1UE
+BhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExOjA4BgNVBAMTMUdsb2JhbFNpZ24gUGVy
+c29uYWxTaWduIFBhcnRuZXJzIENBIC0gU0hBMjU2IC0gRzIwHhcNMTYwNjE1MDAwMDAwWhcNMjEw
+NjE1MDAwMDAwWjBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEiMCAG
+A1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBALR23lKtjlZW/17kthzYcMHHKFgywfc4vLIjfq42NmMWbXkNUabIgS8KX4PnIFsTlD6F
+GO2fqnsTygvYPFBSMX4OCFtJXoikP2CQlEvO7WooyE94tqmqD+w0YtyP2IB5j4KvOIeNv1Gbnnes
+BIUWLFxs1ERvYDhmk+OrvW7Vd8ZfpRJj71Rb+QQsUpkyTySaqALXnyztTDp1L5d1bABJN/bJbEU3
+Hf5FLrANmognIu+Npty6GrA6p3yKELzTsilOFmYNWg7L838NS2JbFOndl+ce89gM36CW7vyhszi6
+6LqqzJL8MsmkP53GGhf11YMP9EkmawYouMDP/PwQYhIiUO0CAwEAAaOCASIwggEeMA4GA1UdDwEB
+/wQEAwIBBjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEgYDVR0TAQH/BAgwBgEB/wIB
+ADAdBgNVHQ4EFgQUyzgSsMeZwHiSjLMhleb0JmLA4D8wHwYDVR0jBBgwFoAUJiSSix/TRK+xsBtt
+r+500ox4AAMwSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9ncy9n
+c3BlcnNvbmFsc2lnbnB0bnJzc2hhMmcyLmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIG
+CCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG
+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
+--000000000000becfdf0591e6f27c--
 
