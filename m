@@ -2,63 +2,56 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF3CC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B089BC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D08206BB
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:04:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D08206BB
+	by mail.kernel.org (Postfix) with ESMTPS id 88A3D206BB
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:07:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88A3D206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6C2H-0006D4-Ux
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 07:04:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58572)
+	id 1i6C5j-0007f4-NX
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 07:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i6C1O-0005Lz-Q8
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:03:20 -0400
+ (envelope-from <thuth@redhat.com>) id 1i6C4z-0007GS-LX
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i6C1M-0005z8-9P
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:03:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58464)
+ (envelope-from <thuth@redhat.com>) id 1i6C4y-0001DQ-9t
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:07:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51212)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i6C1L-0005ux-SE
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:03:16 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i6C4y-0001Cz-4p
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:07:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9EB08195D830;
- Fri,  6 Sep 2019 11:03:14 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FE4A1001B00;
- Fri,  6 Sep 2019 11:03:04 +0000 (UTC)
-Date: Fri, 6 Sep 2019 12:03:01 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190906110301.GW5119@redhat.com>
-References: <20190905152136.30637-1-stefanha@redhat.com>
- <20190905174021.GR2700@work-vm>
- <20190906102926.GF5900@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190906102926.GF5900@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 06 Sep 2019 11:03:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5C1D3307D844;
+ Fri,  6 Sep 2019 11:06:58 +0000 (UTC)
+Received: from thuth.com (ovpn-116-159.ams2.redhat.com [10.36.116.159])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BCBD15C1D4;
+ Fri,  6 Sep 2019 11:06:53 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri,  6 Sep 2019 13:06:49 +0200
+Message-Id: <20190906110649.9561-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 06 Sep 2019 11:06:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 0/3] virtiofsd: get/set log level via DBus
+Subject: [Qemu-devel] [qemu-web RFC PATCH] Update to Jekyll 4.0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,76 +63,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: virtio-fs@redhat.com,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Eryu Guan <eguan@linux.alibaba.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 06, 2019 at 11:29:26AM +0100, Stefan Hajnoczi wrote:
-> On Thu, Sep 05, 2019 at 06:40:21PM +0100, Dr. David Alan Gilbert wrote:
-> > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > > It is likely that virtiofsd will need to support "management commands" for
-> > > reconfiguring it at runtime.  The first use case was proposed by Eryu Guan for
-> > > getting/setting the current log level.
-> > > 
-> > > I promised to try out DBus as the management interface because it has a rich
-> > > feature set and is accessible from most programming languages.  It should be
-> > > able to support all the use cases we come up with.
-> > > 
-> > > This patch series is a prototype that implements the get-log-level and
-> > > set-log-level management commands via DBus.  Use the new virtiofsctl tool to
-> > > talk to a running virtiofsd process:
-> > > 
-> > >   # dbus-run-session ./virtiofsd ...
-> > >   ...
-> > >   Using dbus address unix:abstract=/tmp/dbus-H9WBbpjk3O,guid=0be16acefb868e6025a8737f5d7124d2
-> > >   # export DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-H9WBbpjk3O,guid=0be16acefb868e6025a8737f5d7124d2
-> > >   # ./virtiofsctl set-log-level err
-> > > 
-> > > Most of the work is done by gdbus-codegen(1).  It generates code for the
-> > > org.qemu.Virtiofsd.xml interface definition.  Our code can use the simple
-> > > virtiofsd_get/set_log_level() APIs and it will make corresponding DBus calls.
-> > > 
-> > > I'm pretty happy with this approach because the code is straightforward.  It
-> > > hasn't even triggered seccomp failures yet :).
-> > 
-> > Yes it's less complex than I'd worried.
-> > Now, I do think we've got to think about how qemu in general is going to
-> > use dbus as people were discussing it, because then we have to think
-> > what the security aspects are - do we need to look at some calls only
-> > available to some clients etc.
-> 
-> The approach I took in this patch series is to launch a session bus just
-> for this virtiofsd.  The abstract socket unix(7) namespace used by GDBus
-> by default does not offer any security.  I think any process on the host
-> can connect to it, regardless of uid/gid.
+- Update versions in Gemfile
+- "has_key?" has to be renamed to "key?" in category_archive_plugin.rb
+- Add .jekyll-cache to .gitignore file
 
-Other users will be able to connect(), but you'll find that the dbus
-policy causes their connections to be dropped immediately - even if
-they are the root user in fact.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .gitignore                          |  1 +
+ Gemfile                             | 15 +++------------
+ _plugins/category_archive_plugin.rb |  2 +-
+ 3 files changed, 5 insertions(+), 13 deletions(-)
 
-> A path like unix:path=/tmp/foo would allow us to use UNIX Domain Socket
-> permissions as the main security mechanism.  I'm not enthusiastic about
-> using SELinux or some kind of DBus-specific policy language if we can
-> avoid it because it's complex and obscure.
-
-Yep, that just needs you to supply a config file when launching to
-specify a desired filesystem path.
-
-I don't think it is an either/or matter - I think we'll  want all
-three in general - DAC controls on the socket, and DBus policy and
-SELinux policy. DAC controls on the socket alone are not sufficient
-if you want to separate each QEMU from each other and they're running
-the same UID which is common.
-
-Regards,
-Daniel
+diff --git a/.gitignore b/.gitignore
+index c744144..3b93b88 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,3 +2,4 @@
+ /Gemfile.lock
+ /vendor
+ /.bundle
++/.jekyll-cache
+diff --git a/Gemfile b/Gemfile
+index b01dff9..200f2c4 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -9,10 +9,10 @@ ruby RUBY_VERSION
+ #
+ # This will help ensure the proper Jekyll version is running.
+ # Happy Jekylling!
+-gem "jekyll", "3.3.0"
++gem "jekyll", "4.0.0"
+ 
+ # This is the default theme for new Jekyll sites. You may change this to anything you like.
+-gem "minima", "~> 2.0"
++gem "minima", "~> 2.5"
+ 
+ # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
+ # uncomment the line below. To upgrade, run `bundle update github-pages`.
+@@ -20,14 +20,5 @@ gem "minima", "~> 2.0"
+ 
+ # If you have any plugins, put them here!
+ group :jekyll_plugins do
+-   gem "jekyll-feed", "~> 0.6"
++   gem "jekyll-feed", "~> 0.12"
+ end
+-
+-
+-# for RHEL7
+-gem 'public_suffix', "< 3.0"
+-gem 'jekyll-watch', '= 1.5.0'
+-gem 'listen', '< 3.1'
+-gem 'ruby_dep', '< 1.4'
+-gem 'json'
+-gem 'json_pure'
+diff --git a/_plugins/category_archive_plugin.rb b/_plugins/category_archive_plugin.rb
+index c2d8b29..5f26aad 100644
+--- a/_plugins/category_archive_plugin.rb
++++ b/_plugins/category_archive_plugin.rb
+@@ -50,7 +50,7 @@ module Jekyll
+ 
+     def render(context)
+       # If the category is a variable in the current context, expand it
+-      if context.has_key?(@category)
++      if context.key?(@category)
+ 	      category = context[@category]
+       else
+ 	      category = @category
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.18.1
+
 
