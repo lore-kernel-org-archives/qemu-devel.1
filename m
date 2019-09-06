@@ -2,61 +2,92 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 524BEC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24CBC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2908320838
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:35:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2908320838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6DCED214DE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:53:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GPd9ijRj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DCED214DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6GH2-0003fM-6m
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 11:35:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44767)
+	id 1i6GYK-0007lJ-Hx
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 11:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49068)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1i6GDa-0000qk-4R
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:32:12 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i6GXD-000773-Uh
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:52:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1i6GDX-0004nR-OZ
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:32:09 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:50232
- helo=sipsolutions.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1i6GDX-0004l9-9X
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:32:07 -0400
-Received: by sipsolutions.net with esmtpsa
- (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.92.1) (envelope-from <johannes@sipsolutions.net>)
- id 1i6GDT-0005ke-OZ; Fri, 06 Sep 2019 17:32:03 +0200
-Message-ID: <fe0f3f7bfa730088454790dc2d863285c4461134.camel@sipsolutions.net>
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Date: Fri, 06 Sep 2019 17:32:02 +0200
-In-Reply-To: <20190906110340-mutt-send-email-mst@kernel.org>
-References: <20190902121233.13382-1-johannes@sipsolutions.net>
- <20190906121350.29202-1-johannes@sipsolutions.net>
- <20190906102217-mutt-send-email-mst@kernel.org>
- <be405c3ba658cdac7f68c91213c3b714ac24c1e3.camel@sipsolutions.net>
- <20190906110340-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+ (envelope-from <alex.bennee@linaro.org>) id 1i6GXC-0001mF-JD
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:52:27 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38670)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i6GXC-0001lg-Cn
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:52:26 -0400
+Received: by mail-wm1-x343.google.com with SMTP id o184so7638822wme.3
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 08:52:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=g9fR9xI4q1l87jm0NN/kPxBQzWqYFtjJ8dDkexskJT4=;
+ b=GPd9ijRjJkxpwilZRROE84i0laycN3ucyRpsDQQpeU/34Gk9dsU5M15+y6JJAsfU+Y
+ d+tC0hUuLmSNxDQXKq9K4oouirhgwJ/8agxBF0IXZNJvcfI7T0OjAr/+tPpBXCgkbwAd
+ y5sa/yVl2OtJ6wvXuGFGaBagIU98xywdpxRTyAuE5WBESsxINSCCKp2uTKRaN1eB1q7x
+ OqUZpUs8vYRR/FO0eKMhyzqYB9hOkGfYJRmJm2cw944+SCP6TO6ET9jNp+DHRTBGt//F
+ tG7KVlbpRBva0jhnzDeEQx6cjtXJYTBmMLheZ4zsCU3Gj4IPvpVG2omsw1ru+jXr4Mxt
+ AQEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=g9fR9xI4q1l87jm0NN/kPxBQzWqYFtjJ8dDkexskJT4=;
+ b=da4Vztjaf/0ir0FodPCQYJhjmz2xR3h04su5CvjtuE2RrF5Dhq10reYMIrmd9p4n5V
+ gnDXwdWw72mrV8wXGD/QOiMtGZgnYjrdryxo0fRjbM3BwYcHItwBzwvTPHX8ignGNBxv
+ 29a1U39MpXXCmauw+B+UPMRHP1Yogm6jpgm/BGs1em9H8MM4C4iUjsdgpB/A+VAeo7TJ
+ uimvPilqTkqxR4EmJKWiAErN/44F2WaJvDxz8XvR7p88H1Vwe5Iu/TeSpvwUyEIddhv9
+ CwNBHm2J+xQGqP78VzG9Odkc3qTpDWNIK7M03hTzLBhCx0xJbsquxKGFFclWLb/a7bop
+ H5Kg==
+X-Gm-Message-State: APjAAAXekKykYL8hdbOMeHPZSCXsImyV3A+OakcsWecDhMU0oIOooKdl
+ CAmmuAXnNddg+h4DxRC1KW7D7A==
+X-Google-Smtp-Source: APXvYqyFJ+3jARS1LlpMt8hosYmFhtIVDGJDf6dlGyM42CUg+Mje5tkkhgCnz3lMe0oOPbtrLQahKA==
+X-Received: by 2002:a7b:c752:: with SMTP id w18mr7538987wmk.129.1567785145035; 
+ Fri, 06 Sep 2019 08:52:25 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x6sm9987801wmf.38.2019.09.06.08.52.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Sep 2019 08:52:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9C1FF1FF87;
+ Fri,  6 Sep 2019 16:52:23 +0100 (BST)
+References: <20190820210720.18976-1-richard.henderson@linaro.org>
+ <20190820210720.18976-3-richard.henderson@linaro.org>
+ <875zm692za.fsf@linaro.org>
+ <f8112d1c-49f4-9e90-bbc2-280d91e8d8fc@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+In-reply-to: <f8112d1c-49f4-9e90-bbc2-280d91e8d8fc@linaro.org>
+Date: Fri, 06 Sep 2019 16:52:23 +0100
+Message-ID: <878sr1zako.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a01:4f8:191:4433::2
-Subject: Re: [Qemu-devel] [RFC] libvhost-user: implement
- VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 02/17] target/arm: Split out
+ rebuild_hflags_a64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,113 +99,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
 
-> Oh. Apparently qemu mailman chose this time to kick me out
-> of list subscription (too many bounces or something?)
-> so I didn't see it.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-D'oh. Well, it's really my mistake, I should've CC'ed you.
+> On 9/5/19 11:28 AM, Alex Benn=C3=A9e wrote:
+>>> -
+>>> -        if (cpu_isar_feature(aa64_bti, cpu)) {
+>>> -            /* Note that SCTLR_EL[23].BT =3D=3D SCTLR_BT1.  */
+>>> -            if (sctlr & (current_el =3D=3D 0 ? SCTLR_BT0 : SCTLR_BT1))=
+ {
+>>> -                flags =3D FIELD_DP32(flags, TBFLAG_A64, BT, 1);
+>>> -            }
+>>> +        flags =3D rebuild_hflags_a64(env, current_el, fp_el, mmu_idx);
+>>> +        if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
+>>>              flags =3D FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
+>>
+>> It seems off to only hoist part of the BTI flag check into the helper,
+>> was it just missed or is there a reason? If so it could probably do with
+>> an additional comment.
+>
+> The part of the bti stuff that is hoisted is solely based on system regis=
+ters.
+>  The BTYPE field is in PSTATE and is a very different kind of animal -- in
+> particular, it is not set by MSR.
+>
+> But also, comments in cpu.h say which fields are (not) cached in hflags, =
+and
+> BTYPE is so documented.
+>
+> Is your proposed comment really helpful here going forward, or do you just
+> think it's weird reviewing this patch, since not all BTI is treated the s=
+ame
+> after the patch?
 
-> What worries me is the load this places on the socket.
-> ATM if socket buffer is full qemu locks up, so we
-> need to be careful not to send too many messages.
+It was just weird seeing the isar_feature test twice. A mention in the
+commit "not all bti related flags will be cached so we have to test the
+feature twice" or something like that will suffice.
 
-Right, sure. I really don't think you ever want to use this extension in
-a "normal VM" use case. :-)
-
-I think the only use for this extension would be for simulation
-purposes, and even then only combined with the REPLY_ACK and SLAVE_REQ
-extensions, i.e. you explicitly *want* your virtual machine to lock up /
-wait for a response to the KICK command (and respectively, the device to
-wait for a response to the CALL command).
-
-Note that this is basically its sole purpose: ensuring exactly this
-synchronisation! Yes, it's bad for speed, but it's needed in simulation
-when time isn't "real".
-
-Let me try to explain again, most likely my previous explanation was too
-long winded. WLOG, I'll focus on the "kick" use case, the "call" is the
-same, just the other way around. I'm sure you know that the call is
-asynchronous, i.e. the VM will increment the eventfd counter, and
-"eventually" it becomes readable to the device. Now the device does
-something (as fast as it can, presumably) and returns the buffer to the
-VM.
-
-Now, imagine you're running in simulation time, i.e. "time travel" mode.
-Briefly, this hacks the idle loop of the (UML) VM to just skip forward
-when there's nothing to do, i.e. if you have a timer firing in 100ms and
-get to idle, time is immediately incremented by 100ms and the timer
-fires. For a single VM/device this is already implemented in UML, and
-while it's already very useful that's only half the story to me.
-
-Once you have multiple devices and/or VMs, you basically have to keep a
-"simulation calendar" where each participant (VM/device) can put an
-entry, and then whenever they become idle they don't immediately move
-time forward, but instead ask the calendar what's next, and the calendar
-determines who runs.
-
-Now, for these simulation cases, consider vhost-user again. It's
-absolutely necessary that the calendar is updated all the time, and the
-asynchronous nature of the call breaks that - the device cannot update
-the calendar to put an event there to process the call message.
-
-With this extension, the device would work in the following way. Assume
-that the device is idle, and waiting for the simulation calendar to tell
-it to run. Now,
-
- 1) it has an incoming call (message) from VM (which waits for reply)
- 2) the device will now put a new event on the simulation scheduler for
-    a time slot to process the message
- 3) return reply to VM
- 4) device goes back to sleep - this stuff was asynchronously handled
-    outside of the simulation basically.
-
-In a sense, the code that just ran isn't considered part of the
-simulated device, it's just the transport protocol and part of the
-simulation environment.
-
-At this point, the device is still waiting for its calendar event to be
-triggered, but now it has a new one to process the message. Now, once
-the VM goes to sleep, the scheduler will check the calendar and
-presumably tell the device to run, which runs and processes the message.
-This repeats for as long as the simulation runs, going both ways (or
-multiple ways if there are more than 2 participants).
+>
+>
+> r~
 
 
-Now, what if you didn't have this synchronisation, ie. we don't have
-this extension or we don't have REPLY_ACK or whatnot?
-
-In that case, after the step 1 above, the VM will immediately continue
-running. Let's say it'll wait for a response from the device for a few
-hundred milliseconds (of now simulated time). However, depending on the
-scheduling, the device has quite likely not yet put the new event on the
-simulation calendar (that happens in step 2 above). This means that the
-VM's calendar event to wake it up after a few hundred milliseconds will
-immediately trigger, and the simulation ends with the driver getting a
-timeout from the device.
-
-
-So - yes, while I understand your concern, I basically think this is not
-something anyone will want to use outside of such simulations. OTOH,
-there are various use cases (I'm doing device simulation, others are
-doing network simulation) that use such a behaviour, and it might be
-nice to support it in a more standard way, rather than everyone having
-their own local hacks for everything, like e.g. the VMSimInt paper(**).
-
-
-But again, like I said, no hard feelings if you think such simulation
-has no place in upstream vhost-user.
-
-
-(**) I put a copy of their qemu changes on top of 1.6.0 here:
-     https://p.sipsolutions.net/af9a68ded948c07e.txt
-
-johannes
-
+--
+Alex Benn=C3=A9e
 
