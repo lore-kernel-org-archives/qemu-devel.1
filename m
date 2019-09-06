@@ -2,50 +2,52 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7CEC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7715C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:05:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96DC82070C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:05:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96DC82070C
+	by mail.kernel.org (Postfix) with ESMTPS id 7E5222070C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:05:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E5222070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6Gjw-0005F2-64
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 12:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51320)
+	id 1i6Gk3-0005Hi-I2
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 12:05:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anton.nefedov@virtuozzo.com>) id 1i6GgC-0002Jh-H0
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:01:45 -0400
+ (envelope-from <anton.nefedov@virtuozzo.com>) id 1i6GgH-0002R7-NO
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anton.nefedov@virtuozzo.com>) id 1i6GgB-0004yD-C3
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:01:44 -0400
-Received: from relay.sw.ru ([185.231.240.75]:37874)
+ (envelope-from <anton.nefedov@virtuozzo.com>) id 1i6GgG-00058M-8D
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:01:49 -0400
+Received: from relay.sw.ru ([185.231.240.75]:37904)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
- id 1i6Gg8-0004iv-9t; Fri, 06 Sep 2019 12:01:40 -0400
+ id 1i6GgD-00051V-6a; Fri, 06 Sep 2019 12:01:45 -0400
 Received: from [172.16.25.154] (helo=xantnef-ws.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <anton.nefedov@virtuozzo.com>)
- id 1i6Gg6-0005vz-AZ; Fri, 06 Sep 2019 19:01:38 +0300
+ id 1i6GgB-0005vz-RN; Fri, 06 Sep 2019 19:01:43 +0300
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Fri,  6 Sep 2019 19:01:12 +0300
-Message-Id: <20190906160120.70239-2-anton.nefedov@virtuozzo.com>
+Date: Fri,  6 Sep 2019 19:01:16 +0300
+Message-Id: <20190906160120.70239-6-anton.nefedov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190906160120.70239-1-anton.nefedov@virtuozzo.com>
 References: <20190906160120.70239-1-anton.nefedov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v9 1/9] qapi: group BlockDeviceStats fields
+Subject: [Qemu-devel] [PATCH v9 5/9] scsi: store unmap offset and nb_sectors
+ in request struct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,64 +67,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the stat fields definition slightly more readable.
-Also reorder total_time_ns stats read-write-flush as done elsewhere.
-Cosmetic change only.
+it allows to report it in the error handler
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ hw/scsi/scsi-disk.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e6edd641f1..5ab554b54a 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -867,12 +867,12 @@
- # @flush_operations: The number of cache flush operations performed by the
- #                    device (since 0.15.0)
- #
--# @flush_total_time_ns: Total time spend on cache flushes in nano-seconds
--#                       (since 0.15.0).
-+# @rd_total_time_ns: Total time spent on reads in nanoseconds (since 0.15.0).
- #
--# @wr_total_time_ns: Total time spend on writes in nano-seconds (since 0.15.0).
-+# @wr_total_time_ns: Total time spent on writes in nanoseconds (since 0.15.0).
- #
--# @rd_total_time_ns: Total_time_spend on reads in nano-seconds (since 0.15.0).
-+# @flush_total_time_ns: Total time spent on cache flushes in nanoseconds
-+#                       (since 0.15.0).
- #
- # @wr_highest_offset: The offset after the greatest byte written to the
- #                     device.  The intended use of this information is for
-@@ -925,14 +925,18 @@
- # Since: 0.14.0
- ##
- { 'struct': 'BlockDeviceStats',
--  'data': {'rd_bytes': 'int', 'wr_bytes': 'int', 'rd_operations': 'int',
--           'wr_operations': 'int', 'flush_operations': 'int',
--           'flush_total_time_ns': 'int', 'wr_total_time_ns': 'int',
--           'rd_total_time_ns': 'int', 'wr_highest_offset': 'int',
--           'rd_merged': 'int', 'wr_merged': 'int', '*idle_time_ns': 'int',
-+  'data': {'rd_bytes': 'int', 'wr_bytes': 'int',
-+           'rd_operations': 'int', 'wr_operations': 'int',
-+           'flush_operations': 'int',
-+           'rd_total_time_ns': 'int', 'wr_total_time_ns': 'int',
-+           'flush_total_time_ns': 'int',
-+           'wr_highest_offset': 'int',
-+           'rd_merged': 'int', 'wr_merged': 'int',
-+           '*idle_time_ns': 'int',
-            'failed_rd_operations': 'int', 'failed_wr_operations': 'int',
--           'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
--           'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
-+           'failed_flush_operations': 'int',
-+           'invalid_rd_operations': 'int', 'invalid_wr_operations': 'int',
-+           'invalid_flush_operations': 'int',
-            'account_invalid': 'bool', 'account_failed': 'bool',
-            'timed_stats': ['BlockDeviceTimedStats'],
-            '*rd_latency_histogram': 'BlockLatencyHistogramInfo',
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 915641a0f1..b3dd21800d 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1608,8 +1608,6 @@ static void scsi_unmap_complete_noio(UnmapCBData *data, int ret)
+ {
+     SCSIDiskReq *r = data->r;
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+-    uint64_t sector_num;
+-    uint32_t nb_sectors;
+ 
+     assert(r->req.aiocb == NULL);
+     if (scsi_disk_req_check_error(r, ret, false)) {
+@@ -1617,16 +1615,18 @@ static void scsi_unmap_complete_noio(UnmapCBData *data, int ret)
+     }
+ 
+     if (data->count > 0) {
+-        sector_num = ldq_be_p(&data->inbuf[0]);
+-        nb_sectors = ldl_be_p(&data->inbuf[8]) & 0xffffffffULL;
+-        if (!check_lba_range(s, sector_num, nb_sectors)) {
++        r->sector = ldq_be_p(&data->inbuf[0])
++            * (s->qdev.blocksize / BDRV_SECTOR_SIZE);
++        r->sector_count = (ldl_be_p(&data->inbuf[8]) & 0xffffffffULL)
++            * (s->qdev.blocksize / BDRV_SECTOR_SIZE);
++        if (!check_lba_range(s, r->sector, r->sector_count)) {
+             scsi_check_condition(r, SENSE_CODE(LBA_OUT_OF_RANGE));
+             goto done;
+         }
+ 
+         r->req.aiocb = blk_aio_pdiscard(s->qdev.conf.blk,
+-                                        sector_num * s->qdev.blocksize,
+-                                        nb_sectors * s->qdev.blocksize,
++                                        r->sector * BDRV_SECTOR_SIZE,
++                                        r->sector_count * BDRV_SECTOR_SIZE,
+                                         scsi_unmap_complete, data);
+         data->count--;
+         data->inbuf += 16;
 -- 
 2.17.1
 
