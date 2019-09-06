@@ -2,109 +2,64 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4295FC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A39E3C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11B5E2082C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:21:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="QQiJxe8I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11B5E2082C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D5A82082C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:24:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D5A82082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6AQv-0002MO-8N
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 05:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60475)
+	id 1i6AU9-0003Lf-N8
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 05:24:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i6AQ7-0001Qi-NO
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:20:45 -0400
+ (envelope-from <berrange@redhat.com>) id 1i6ATW-0002wz-Ci
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:24:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i6AQ6-0006bw-9M
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:20:43 -0400
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:65450)
+ (envelope-from <berrange@redhat.com>) id 1i6ATS-0008Ty-Rd
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:24:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51768)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1i6AQ5-0006Zo-Tx
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:20:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1567761642;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=db169m4HoYL/ksYQKKrL+GvEwhjapCxmoxcZbgXmumI=;
- b=QQiJxe8I4Rc//UekmAb8rykRcAwOM2t+HkReNZMvhvXKisqQ5JX/I12A
- EtjHaOu/MKZP0RJ6159qeqTJKb9mMJRU6jNZEAFe90FjT/rxIsvmuY6uY
- GrPyblQ9f+o67hZBlTJjUrHzmV/nFo7m8L7fxjEqiEgmFW5zMmmMnPipr U=;
-Authentication-Results: esa3.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=Paul.Durrant@citrix.com;
- spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- Paul.Durrant@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
- Paul.Durrant@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: 8GN3mEt61KOZhuuC5/u/DMneHD7TCZGfjGTypAlmsxVPoYfnVBmZPcoQ/5jq9ElQtXv8c+GuEA
- nsjltSIskqRcBGK48KGhoRtyRyniSu/JfIlAuOCrg6cK8nZmVGaG5/BXusUVbUydQnyMfbzZQ+
- 1Fjd0mjMhMDp1OC1L4iyWmQfZgZr7eE0GFIqTXGNh1iJplC0pD4yr0ugseWioz77OYUMis1P1f
- oQZm2u7BEvfjGS0ozZCPgNB6WF3aCViYr8Q00Mv1p3u+Me4DWG3nUU1uBmstDVQLLAS2N/djej
- 0nE=
-X-SBRS: 2.7
-X-MesageID: 5229452
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,472,1559534400"; 
-   d="scan'208";a="5229452"
-From: Paul Durrant <Paul.Durrant@citrix.com>
-To: 'Chao Gao' <chao.gao@intel.com>, Roger Pau Monne <roger.pau@citrix.com>
-Thread-Topic: [RFC Patch] xen/pt: Emulate FLR capability
-Thread-Index: AQHVXkfuFLvvoAaowUSFuPbgsUcGX6cRyN6AgAx8SoCAACDqkA==
-Date: Fri, 6 Sep 2019 09:20:33 +0000
-Message-ID: <1307d03945d948fd89a6956d77c5ce28@AMSPEX02CL03.citrite.net>
-References: <1567069347-22841-1-git-send-email-chao.gao@intel.com>
- <20190829102059.bk4l7itydj73d3ua@Air-de-Roger>
- <20190906090107.GA25703@gao-cwp>
-In-Reply-To: <20190906090107.GA25703@gao-cwp>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i6ATS-0008TQ-JC
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:24:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B81C3307D88D;
+ Fri,  6 Sep 2019 09:24:08 +0000 (UTC)
+Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C42F05D9CA;
+ Fri,  6 Sep 2019 09:24:06 +0000 (UTC)
+Date: Fri, 6 Sep 2019 10:24:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190906092403.GO5119@redhat.com>
+References: <20190905134526.32146-1-berrange@redhat.com>
+ <CAFEAcA8-C4V6EQBZDvLUaL+WoLfnr4wB6tiQNAtH1wN1kRQN3Q@mail.gmail.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.145.155
-Subject: Re: [Qemu-devel] [RFC Patch] xen/pt: Emulate FLR capability
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8-C4V6EQBZDvLUaL+WoLfnr4wB6tiQNAtH1wN1kRQN3Q@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 06 Sep 2019 09:24:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 0/4] Docs patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,75 +71,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jan
- Beulich <jbeulich@suse.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Chao Gao <chao.gao@intel.com>
-> Sent: 06 September 2019 10:01
-> To: Roger Pau Monne <roger.pau@citrix.com>
-> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; Stefano Stabel=
-lini
-> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>; Pau=
-l Durrant
-> <Paul.Durrant@citrix.com>; Jan Beulich <jbeulich@suse.com>
-> Subject: Re: [RFC Patch] xen/pt: Emulate FLR capability
->=20
-> On Thu, Aug 29, 2019 at 12:21:11PM +0200, Roger Pau Monn=E9 wrote:
-> >On Thu, Aug 29, 2019 at 05:02:27PM +0800, Chao Gao wrote:
-> >> Currently, for a HVM on Xen, no reset method is virtualized. So in a V=
-M's
-> >> perspective, assigned devices cannot be reset. But some devices rely o=
-n PCI
-> >> reset to recover from hardware hangs. When being assigned to a VM, tho=
-se
-> >> devices cannot be reset and won't work any longer if a hardware hang o=
-ccurs.
-> >> We have to reboot VM to trigger PCI reset on host to recover the devic=
-e.
-> >>
-> >> This patch exposes FLR capability to VMs if the assigned device can be=
- reset on
-> >> host. When VM initiates an FLR to a device, qemu cleans up the device =
-state,
-> >> (including disabling of intx and/or MSI and unmapping BARs from guest,=
- deleting
-> >> emulated registers), then initiate PCI reset through 'reset' knob unde=
-r the
-> >> device's sysfs, finally initialize the device again.
+On Thu, Sep 05, 2019 at 04:34:33PM +0100, Peter Maydell wrote:
+> On Thu, 5 Sep 2019 at 14:45, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om> wrote:
 > >
-> >I think you likely need to deassign the device from the VM, perform
-> >the reset, and then assign the device again, so that there's no Xen
-> >internal state carried over prior to the reset?
+> > The following changes since commit 500efcfcf0fe2e0dae1d25637a13435ce7=
+b6e421:
+> >
+> >   Merge remote-tracking branch 'remotes/rth/tags/pull-or1k-20190904' =
+into staging (2019-09-05 09:33:01 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/berrange/qemu tags/docs-pull-request
+> >
+> > for you to fetch changes up to 9f8efa74d3f1cb9ceeee957ee382c2b4feb2ae=
+30:
+> >
+> >   docs: split the CODING_STYLE doc into distinct groups (2019-09-05 1=
+4:41:00 +0100)
+> >
+> > ----------------------------------------------------------------
+> >
+> > * Merges HACKING into CODING_STYLE
+> > * Converts README and CODING_STYLE docs into RST syntax
+> > * Documents use of auto cleanup functions
+> >
+> > ----------------------------------------------------------------
+> >
+> > Daniel P. Berrang=C3=A9 (4):
+> >   docs: convert README, CODING_STYLE and HACKING to RST syntax
+> >   docs: merge HACKING.rst contents into CODING_STYLE.rst
+> >   docs: document use of automatic cleanup functions in glib
+> >   docs: split the CODING_STYLE doc into distinct groups
+> >
+> >  CODING_STYLE          | 216 --------------
+> >  CODING_STYLE.rst      | 641 ++++++++++++++++++++++++++++++++++++++++=
+++
+> >  HACKING               | 257 -----------------
+> >  README =3D> README.rst  |  47 ++--
+> >  scripts/checkpatch.pl |   2 +-
 >=20
-> Yes. It is the safest way. But here I want to present the feature as FLR
-> (such that the device driver in guest can issue PCI reset whenever
-> needed and no change is needed to device driver).  Current device
-> deassignment notifies guest that the device is going to be removed
-> It is not the standard PCI reset. Is it possible to make guest unaware
-> of the device deassignment to emulate a standard PCI reset?
+> I'm going to apply this, but something I thought of looking at
+> the diffstat: should some or all of this be in the docs/devel
+> manual rather than free-floating rst files in the root directory?
 
-It should be, I would have thought. QEMU emulates all config space so any c=
-onfig access by the guest would be unaffected by de-assignment. The BARs an=
-d interrupts would be unmapped... but that's what you'd want anyway.
+The answer really hinges on whether moving CODING_STYLE into the
+docs/devel directory will make it less obvious to users.
 
-> In my mind,
-> we can expose do_pci_remove/add to qemu or rewrite them in qemu (but
-> don't remove the device from guest's PCI hierarchy). Do you think it is
-> the right direction?
+On a related point, with the prevelance of github/gitlab for
+hosting, it has become fairly common to have a top level
+CONTRIBUTING.md file, with guidance of key factors relating
+to contributing - how to submit patches, code of conduct,
+developer signoff, coding style, etc. This file doesn't
+have to contain the actual content - often people just use
+it as an index to link to all the individual topic docs:
 
-Long term I think we want to get pass-through emulation out of QEMU and int=
-o Xen.
+  https://github.com/rails/rails/blob/master/CONTRIBUTING.md
+  https://github.com/atom/atom/blob/master/CONTRIBUTING.md
+  https://gitlab.com/gitlab-org/gitlab-ce/blob/master/CONTRIBUTING.md
+  https://github.com/creativecommons/.github/blob/master/CONTRIBUTING.md
 
-  Paul
+So we could just move CODING_STYLE into the docs/devel dir and link
+to it from a CONTRIBUTING.md (well .rst) file.
 
->=20
-> Thanks
-> Chao
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
