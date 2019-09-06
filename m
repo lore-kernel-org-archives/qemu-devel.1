@@ -2,94 +2,63 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1843BC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 14:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70FBFC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 14:27:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D491020644
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 14:25:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FKn/l5zP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D491020644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 431842067B
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 14:27:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431842067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6FBS-0008CZ-4N
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 10:25:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52540)
+	id 1i6FDF-00018a-G6
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 10:27:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52943)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i6FAQ-0007ao-Pk
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 10:24:51 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i6FBy-0000Il-0u
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 10:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i6FAP-0002t7-DP
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 10:24:50 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:46401)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i6FAP-0002rg-6d
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 10:24:49 -0400
-Received: by mail-io1-xd42.google.com with SMTP id x4so13039489iog.13
- for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 07:24:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=lMiKSI/KiLROMZfuon/38GGDt/xmvodhfW5MQY62FPg=;
- b=FKn/l5zPCBj+sVhLGMtqztILxVclX8WcdF4vme2+SKV93yJkbD5qhWMwX28GYR8jld
- 3+PunhZdFOhHCP40mVxlcYKrQRQYyWzzHxBTGRnTNa7T8OA80+Wi6TZXh+9vynGODNoD
- FOR3TfZYqTzFwI/ULLZj/x2fwYIDtIz3R96eCTdLqu960OY5geI/pDS6LcK8iCqJft9y
- 3Kg/HaBqndl4w4du9NA7Opgnckk/i6eBDm/UD0nsSvwxMtbPSeRzHU8eSbJ0PzqYlJun
- lbhZqnHmM/V6Qd1y+qm7IfBnKjym0SoHv6cu22ZjOIaKGPbA3liv/W/kHWzf6qoCsoOt
- wZjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=lMiKSI/KiLROMZfuon/38GGDt/xmvodhfW5MQY62FPg=;
- b=PAaETKL7ou91ewF5vB3iziMcAUvxNUK9FLwfP0oDYMu/fgYwuSjQ3hoHnpMXG7Evo1
- R891RSs8P2j7l6wMpUr0SmjERv4VxUkAO63kXmGf5Zn0whg0QfibIZ6BvhPc8rEJ1uSh
- Lrl/wlxQJrN7QFklL8SoAIy95uIewBG9va8iqnUXEvq1pa75OmpqNciLHjIRsZc4Ub+w
- Bxp6NdzYPIQWhRJkpUOtmJ3UUbK7Bn39iig1C2EDtGqzA/Z5H8GnjVLntejEgxMIuH/8
- baBdnuhGcu2oX/e5p8nfrOj1/kPpIvnlH/1CDceivFcnfS71scwRSXKxf6+vguhFCisM
- 8fHA==
-X-Gm-Message-State: APjAAAXyOc5zO/4CvZwFltsjOvZjeV55t80O5axYngyEN4fl4YlApfik
- reOJKOLLthuNWZ4ye7eEo3f0LFlpWjqlxw==
-X-Google-Smtp-Source: APXvYqzkltsPHA/f1mwT+GjKCYyNcxxhpk9oyDlnj4q7Vgdgm9OKo3BajFQwEod83Qq5DUb2Ba39Kg==
-X-Received: by 2002:a02:a806:: with SMTP id f6mr8515311jaj.135.1567779887695; 
- Fri, 06 Sep 2019 07:24:47 -0700 (PDT)
-Received: from ?IPv6:2607:fea8:a260:81:78cf:74ad:c2b2:73ef?
- ([2607:fea8:a260:81:78cf:74ad:c2b2:73ef])
- by smtp.gmail.com with ESMTPSA id s201sm11183569ios.83.2019.09.06.07.24.46
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 06 Sep 2019 07:24:46 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
-References: <20190820210720.18976-1-richard.henderson@linaro.org>
- <20190820210720.18976-3-richard.henderson@linaro.org>
- <875zm692za.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <f8112d1c-49f4-9e90-bbc2-280d91e8d8fc@linaro.org>
-Date: Thu, 5 Sep 2019 23:26:19 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <875zm692za.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 02/17] target/arm: Split out
- rebuild_hflags_a64
+ (envelope-from <mlevitsk@redhat.com>) id 1i6FBv-00044P-QZ
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 10:26:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59836)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i6FBr-00041B-4O; Fri, 06 Sep 2019 10:26:19 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4C235883823;
+ Fri,  6 Sep 2019 14:26:18 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1F9BD5D784;
+ Fri,  6 Sep 2019 14:26:09 +0000 (UTC)
+Message-ID: <b6d1e1d73d85dbce235c160fee6320698d9fbfd3.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
+Date: Fri, 06 Sep 2019 17:26:09 +0300
+In-Reply-To: <20190906141443.GR5119@redhat.com>
+References: <20190830205608.18192-1-mlevitsk@redhat.com>
+ <20190830205608.18192-11-mlevitsk@redhat.com>
+ <20190906141443.GR5119@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 06 Sep 2019 14:26:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 10/10] iotests : add tests for encryption
+ key management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,37 +70,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/5/19 11:28 AM, Alex Bennée wrote:
->> -
->> -        if (cpu_isar_feature(aa64_bti, cpu)) {
->> -            /* Note that SCTLR_EL[23].BT == SCTLR_BT1.  */
->> -            if (sctlr & (current_el == 0 ? SCTLR_BT0 : SCTLR_BT1)) {
->> -                flags = FIELD_DP32(flags, TBFLAG_A64, BT, 1);
->> -            }
->> +        flags = rebuild_hflags_a64(env, current_el, fp_el, mmu_idx);
->> +        if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
->>              flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
-> 
-> It seems off to only hoist part of the BTI flag check into the helper,
-> was it just missed or is there a reason? If so it could probably do with
-> an additional comment.
+On Fri, 2019-09-06 at 15:14 +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Aug 30, 2019 at 11:56:08PM +0300, Maxim Levitsky wrote:
+> > Note that currently I add tests 300-302, which are
+> > placeholders to ease the rebase. In final version
+> > of these patches I will update these.
+> >=20
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  tests/qemu-iotests/087.out       |   6 +-
+> >  tests/qemu-iotests/134.out       |   2 +-
+> >  tests/qemu-iotests/158.out       |   4 +-
+> >  tests/qemu-iotests/188.out       |   2 +-
+> >  tests/qemu-iotests/189.out       |   4 +-
+> >  tests/qemu-iotests/198.out       |   4 +-
+> >  tests/qemu-iotests/300           | 202 +++++++++++++++++++++++++
+> >  tests/qemu-iotests/300.out       |  98 ++++++++++++
+> >  tests/qemu-iotests/301           |  90 +++++++++++
+> >  tests/qemu-iotests/301.out       |  30 ++++
+> >  tests/qemu-iotests/302           | 247 +++++++++++++++++++++++++++++=
+++
+> >  tests/qemu-iotests/302.out       |  18 +++
+> >  tests/qemu-iotests/common.filter |   6 +-
+> >  tests/qemu-iotests/group         |   8 +
+> >  14 files changed, 708 insertions(+), 13 deletions(-)
+> >  create mode 100755 tests/qemu-iotests/300
+> >  create mode 100644 tests/qemu-iotests/300.out
+> >  create mode 100755 tests/qemu-iotests/301
+> >  create mode 100644 tests/qemu-iotests/301.out
+> >  create mode 100644 tests/qemu-iotests/302
+> >  create mode 100644 tests/qemu-iotests/302.out
+> >=20
+> > diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
+> > index 2d92ea847b..b61ba638af 100644
+> > --- a/tests/qemu-iotests/087.out
+> > +++ b/tests/qemu-iotests/087.out
+> > @@ -34,7 +34,7 @@ QMP_VERSION
+> > =20
+> >  =3D=3D=3D Encrypted image QCow =3D=3D=3D
+> > =20
+> > -Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 encryp=
+tion=3Don encrypt.key-secret=3Dsec0
+> > +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 encryp=
+tion=3Don
+>=20
+> Why is the output format changing ? There's no code changes in
+> this patch. If the change is due to an earlier patch, then this
+> patch chunk should be put in the earlier patch that causes it.
+>=20
+> Likewise for the changed output to other files in this patch.
+>=20
+> > =20
 
-The part of the bti stuff that is hoisted is solely based on system registers.
- The BTYPE field is in PSTATE and is a very different kind of animal -- in
-particular, it is not set by MSR.
-
-But also, comments in cpu.h say which fields are (not) cached in hflags, and
-BTYPE is so documented.
-
-Is your proposed comment really helpful here going forward, or do you just
-think it's weird reviewing this patch, since not all BTI is treated the same
-after the patch?
+I tweaked the common.filter to filter more luks specific create options
+so that a test could have same output for both qcow2 and plain raw luks e=
+ncryption.
+(due to the "encrypt.*" prefix)
 
 
-r~
+I can move this in a separate patch if you think this is worth it.
+
+Best regards,
+	Maxim Levitsky
+
 
