@@ -8,80 +8,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE2D0C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B84C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:32:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C3E1207FC
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E41B8207FC
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:32:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ok1ab90t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C3E1207FC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P8ZVrJIL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E41B8207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6H8L-00085Y-4g
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 12:30:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56413)
+	id 1i6H9r-0000kl-Qf
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 12:32:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56239)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1i6GyY-0004Oj-FP
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:20:43 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1i6GyS-0004Fa-81
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1i6GyW-0004O8-U5
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:20:42 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41012)
+ (envelope-from <bmeng.cn@gmail.com>) id 1i6GyQ-0004DR-Qh
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:20:36 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44671)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1i6GyW-0004MK-NB; Fri, 06 Sep 2019 12:20:40 -0400
-Received: by mail-pf1-x442.google.com with SMTP id b13so4812627pfo.8;
- Fri, 06 Sep 2019 09:20:40 -0700 (PDT)
+ id 1i6GyQ-0004CN-5k; Fri, 06 Sep 2019 12:20:34 -0400
+Received: by mail-pf1-x441.google.com with SMTP id q21so4809596pfn.11;
+ Fri, 06 Sep 2019 09:20:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:subject:date:message-id:in-reply-to:references;
- bh=/RN9nZXvP0uSw1tz5BCNyGHsFKQ0hz+y0eelBzez5L0=;
- b=ok1ab90tU1vuv2m98ZmRJZlsv0BoDcwgP2BEKMd4e/qsIWZO1Kd/7n6/j91AsfsfRJ
- Uj/2bT9gBHgcgZKBvUbc+8d+Y4kyNFzIVC9Xq3VU+B10xbwNDnCg66bmaZXV6UcWLR3I
- nByaGPLX6SukP3tvaJS+/JrX8uOyEit6zE7NLfPyh+sBj7OBf4Oa3efV4i2ogktHsTLQ
- GqSo9CgCAmVNysnpXog3jp0lTPoQxGh8cjU7d8vMJTMK6R3EbeFZQ/aYeQfAj8JJ9yIm
- dvhBt9sdzolShzCw7X0s7KqJxlJ8IZ2KMZRaRJ4cct+ggvoPEYEX7IkF3Blb1ZFIH6b3
- xBjA==
+ bh=vf7a8GCMbH83cRyflZHrepWCwbI1OlbfFZDZAklT6m8=;
+ b=P8ZVrJILT1oyV7kohEAYnYyZFK0fCScG916ArPrhWJIoi3lfhCzqELoiJ0zSGgA8Vp
+ SI/ovMsI6+4SQqOyYKPWhwcJinx/9cGwA9GZu8ezOxhAgFEoA3La4wmWn+5fqFSTmOGO
+ SyqHIh/iZyBUeLxBOBfuKQPYAlubnoSjwpMhodBIaZLoOtNRx6iGkpRNK1XqGnd46tZu
+ 2NGoiy4RHCoLl9JiADLRS3dvJTiyzTtHRkIcfFfsMuDFQwDKeRML2kttkkG65aBR1tCq
+ yUz3t14lXSnR3EyXaQpZrxzyFcFP0e+1J+AWSreuYPkHycwKIojemAIJDb0TDDEK8PFC
+ G3bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references;
- bh=/RN9nZXvP0uSw1tz5BCNyGHsFKQ0hz+y0eelBzez5L0=;
- b=pjjhtCVlfJA5rtKPbaaNC033eSsRhKQqQNrHm12pdbwHl33xUkS2Wr4q09W3cvaRBG
- Cw/LpUaV9PCM8srY8CJFR/9J4cl2guiSo0HJG/vlS+Y4kw3eqACRdENRuDfYivISTGlO
- FMWKZV2lple2PsskiNrdxqzVSkQvZbUFGarenLHOi0JyLVRy9bUTFinbcIN7cLFE8Q2j
- VyOBnm2RxhQKbsYdlTPGuRRbukduuKUd+QqetrF9dUxr48AcLEeoQvyFI497g/amc3TX
- ozEmbujT6PkH9yVCRcGSIUZ5KOf/8UcZMxRK6Tdd1y1ZxuS7vC+OxwTViA1EmVU1VB0l
- 6PQg==
-X-Gm-Message-State: APjAAAWEBo7jPX/FBjX67WM+7G41GrHzCuLVIocsWHAzVb24JfbdJ1jS
- qhGtrBBsenZp6TLVJhflDh4=
-X-Google-Smtp-Source: APXvYqzH9YKyplTZTx7Je0P0PfWF5mIhwSCL+lMr/1tTdlV24JHRy3QC42tFF35U5iRNMEaMtMlD8g==
-X-Received: by 2002:a62:7684:: with SMTP id r126mr11227610pfc.26.1567786839992; 
- Fri, 06 Sep 2019 09:20:39 -0700 (PDT)
+ bh=vf7a8GCMbH83cRyflZHrepWCwbI1OlbfFZDZAklT6m8=;
+ b=XmyK9AYEQrYo2pU8oBR8LomXXxuYWIktyg7t2E2SJhJgmkHjnhaO3DxswZglTnd8u6
+ 8t8evv3Xg3DPewib+jLneYlzqN1AgpQM7FbbB1IAzNjfrFZw2dDmJrvnMZQNoU6p9ywL
+ SOpTXV8FtM3PjKItIo19hYrkKEV3f8YoICDAFO/BEedr/pTys5vK624w8f5RQQYB3z0j
+ hVPHQIMnh24rTx7kYu88yADS/KTHxXDnbz8jEsdkh0Alojcdj9f7RvT5z3bnN87UYY4g
+ OxTq56hk28N1JqMQ/Bde2kdg9I25zE2w/7PM5wIRDx+qvBZkuVG6CwXHFNFlCOqXBbjo
+ XU9Q==
+X-Gm-Message-State: APjAAAVrt1o3vOr1cLYtrVt+Go7Jf77FuN+WrrFgZMfGN2AtlHvF6kO+
+ 1PmB+nVD+RmObgYwtfbRcxU=
+X-Google-Smtp-Source: APXvYqy/eQSkf0haQsoe9p/j08UXcDdQXmEq9NRWaH5cKxARFuK1HbJshoDTLsxSnXnaezNLopD76g==
+X-Received: by 2002:a62:1603:: with SMTP id 3mr11794310pfw.0.1567786833348;
+ Fri, 06 Sep 2019 09:20:33 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id f89sm11146228pje.20.2019.09.06.09.20.38
+ by smtp.gmail.com with ESMTPSA id f89sm11146228pje.20.2019.09.06.09.20.32
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Fri, 06 Sep 2019 09:20:39 -0700 (PDT)
+ Fri, 06 Sep 2019 09:20:32 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Date: Fri,  6 Sep 2019 09:20:01 -0700
-Message-Id: <1567786819-22142-15-git-send-email-bmeng.cn@gmail.com>
+Date: Fri,  6 Sep 2019 09:19:54 -0700
+Message-Id: <1567786819-22142-8-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1567786819-22142-1-git-send-email-bmeng.cn@gmail.com>
 References: <1567786819-22142-1-git-send-email-bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH v8 14/32] riscv: sifive_e: Drop
- sifive_mmio_emulate()
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: [Qemu-devel] [PATCH v8 07/32] riscv: hw: Change to use
+ qemu_log_mask(LOG_GUEST_ERROR, ...) instead
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,105 +97,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use create_unimplemented_device() instead.
+Replace the call to hw_error() with qemu_log_mask(LOG_GUEST_ERROR,...)
+in various sifive models.
 
 Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 ---
 
-Changes in v8:
-- select UNIMP in sifive_e Kconfig due to applied commit
-  "hw/misc: Add a config switch for the "unimplemented" device"
-  in latest qemu/master
-
+Changes in v8: None
 Changes in v7: None
 Changes in v6: None
-Changes in v5: None
+Changes in v5:
+- new patch to change to use qemu_log_mask(LOG_GUEST_ERROR,...) instead
+  in various sifive models
+
 Changes in v4: None
 Changes in v3: None
-Changes in v2:
-- drop patch "riscv: sifive: Move sifive_mmio_emulate() to a common place"
-- new patch "riscv: sifive_e: Drop sifive_mmio_emulate()"
+Changes in v2: None
 
- hw/riscv/Kconfig    |  1 +
- hw/riscv/sifive_e.c | 23 ++++++++---------------
- 2 files changed, 9 insertions(+), 15 deletions(-)
+ hw/riscv/sifive_prci.c | 8 +++++---
+ hw/riscv/sifive_test.c | 5 +++--
+ hw/riscv/sifive_uart.c | 9 +++++----
+ 3 files changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index 8674211..33e54b0 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -12,6 +12,7 @@ config SIFIVE_E
-     bool
-     select HART
-     select SIFIVE
-+    select UNIMP
+diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
+index 562bc3d..982fbb2 100644
+--- a/hw/riscv/sifive_prci.c
++++ b/hw/riscv/sifive_prci.c
+@@ -20,6 +20,7 @@
  
- config SIFIVE_U
-     bool
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 1428a99..0f9d641 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -36,6 +36,7 @@
- #include "hw/loader.h"
+ #include "qemu/osdep.h"
  #include "hw/sysbus.h"
- #include "hw/char/serial.h"
-+#include "hw/misc/unimp.h"
++#include "qemu/log.h"
+ #include "qemu/module.h"
  #include "target/riscv/cpu.h"
- #include "hw/riscv/riscv_hart.h"
- #include "hw/riscv/sifive_plic.h"
-@@ -74,14 +75,6 @@ static const struct MemmapEntry {
-     [SIFIVE_E_DTIM] =     { 0x80000000,     0x4000 }
- };
+ #include "hw/hw.h"
+@@ -38,7 +39,8 @@ static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
+     case SIFIVE_PRCI_PLLOUTDIV:
+         return s->plloutdiv;
+     }
+-    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: read: addr=0x%x\n",
++                  __func__, (int)addr);
+     return 0;
+ }
  
--static void sifive_mmio_emulate(MemoryRegion *parent, const char *name,
--                             uintptr_t offset, uintptr_t length)
--{
--    MemoryRegion *mock_mmio = g_new(MemoryRegion, 1);
--    memory_region_init_ram(mock_mmio, NULL, name, length, &error_fatal);
--    memory_region_add_subregion(parent, offset, mock_mmio);
--}
--
- static void riscv_sifive_e_init(MachineState *machine)
- {
-     const struct MemmapEntry *memmap = sifive_e_memmap;
-@@ -172,7 +165,7 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-     sifive_clint_create(memmap[SIFIVE_E_CLINT].base,
-         memmap[SIFIVE_E_CLINT].size, ms->smp.cpus,
-         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
--    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.aon",
-+    create_unimplemented_device("riscv.sifive.e.aon",
-         memmap[SIFIVE_E_AON].base, memmap[SIFIVE_E_AON].size);
-     sifive_e_prci_create(memmap[SIFIVE_E_PRCI].base);
+@@ -66,8 +68,8 @@ static void sifive_prci_write(void *opaque, hwaddr addr,
+         s->plloutdiv = (uint32_t) val64;
+         break;
+     default:
+-        hw_error("%s: bad write: addr=0x%x v=0x%x\n",
+-                 __func__, (int)addr, (int)val64);
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%x v=0x%x\n",
++                      __func__, (int)addr, (int)val64);
+     }
+ }
  
-@@ -199,19 +192,19 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/riscv/sifive_test.c b/hw/riscv/sifive_test.c
+index 7117409..aa544e7 100644
+--- a/hw/riscv/sifive_test.c
++++ b/hw/riscv/sifive_test.c
+@@ -20,6 +20,7 @@
  
-     sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART0].base,
-         serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_E_UART0_IRQ));
--    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi0",
-+    create_unimplemented_device("riscv.sifive.e.qspi0",
-         memmap[SIFIVE_E_QSPI0].base, memmap[SIFIVE_E_QSPI0].size);
--    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm0",
-+    create_unimplemented_device("riscv.sifive.e.pwm0",
-         memmap[SIFIVE_E_PWM0].base, memmap[SIFIVE_E_PWM0].size);
-     sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
-         serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_E_UART1_IRQ));
--    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi1",
-+    create_unimplemented_device("riscv.sifive.e.qspi1",
-         memmap[SIFIVE_E_QSPI1].base, memmap[SIFIVE_E_QSPI1].size);
--    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm1",
-+    create_unimplemented_device("riscv.sifive.e.pwm1",
-         memmap[SIFIVE_E_PWM1].base, memmap[SIFIVE_E_PWM1].size);
--    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi2",
-+    create_unimplemented_device("riscv.sifive.e.qspi2",
-         memmap[SIFIVE_E_QSPI2].base, memmap[SIFIVE_E_QSPI2].size);
--    sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm2",
-+    create_unimplemented_device("riscv.sifive.e.pwm2",
-         memmap[SIFIVE_E_PWM2].base, memmap[SIFIVE_E_PWM2].size);
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
++#include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "sysemu/runstate.h"
+ #include "target/riscv/cpu.h"
+@@ -49,8 +50,8 @@ static void sifive_test_write(void *opaque, hwaddr addr,
+             break;
+         }
+     }
+-    hw_error("%s: write: addr=0x%x val=0x%016" PRIx64 "\n",
+-        __func__, (int)addr, val64);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: write: addr=0x%x val=0x%016" PRIx64 "\n",
++                  __func__, (int)addr, val64);
+ }
  
-     /* Flash memory */
+ static const MemoryRegionOps sifive_test_ops = {
+diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
+index 9de42b1..215990b 100644
+--- a/hw/riscv/sifive_uart.c
++++ b/hw/riscv/sifive_uart.c
+@@ -18,6 +18,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ #include "hw/sysbus.h"
+ #include "chardev/char.h"
+ #include "chardev/char-fe.h"
+@@ -95,8 +96,8 @@ uart_read(void *opaque, hwaddr addr, unsigned int size)
+         return s->div;
+     }
+ 
+-    hw_error("%s: bad read: addr=0x%x\n",
+-        __func__, (int)addr);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: bad read: addr=0x%x\n",
++                  __func__, (int)addr);
+     return 0;
+ }
+ 
+@@ -127,8 +128,8 @@ uart_write(void *opaque, hwaddr addr,
+         s->div = val64;
+         return;
+     }
+-    hw_error("%s: bad write: addr=0x%x v=0x%x\n",
+-        __func__, (int)addr, (int)value);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%x v=0x%x\n",
++                  __func__, (int)addr, (int)value);
+ }
+ 
+ static const MemoryRegionOps uart_ops = {
 -- 
 2.7.4
 
