@@ -2,91 +2,90 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01931C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 136C5C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:41:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2804207FC
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:39:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tHxXhu8b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2804207FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id DC8B520578
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 16:41:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC8B520578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6HGF-00011l-DJ
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 12:38:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56370)
+	id 1i6HIw-0003rU-Gc
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 12:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1i6GyW-0004MG-Nn
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:20:41 -0400
+ (envelope-from <philmd@redhat.com>) id 1i6H2q-0001dw-6Y
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:25:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1i6GyV-0004KZ-54
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:20:40 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40331)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1i6GyU-0004I4-SR; Fri, 06 Sep 2019 12:20:39 -0400
-Received: by mail-pl1-x641.google.com with SMTP id y10so3370535pll.7;
- Fri, 06 Sep 2019 09:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=Vbib0cbUUkIHQRqcWKE2WOfXQ0oindO16nPEQFzl/eg=;
- b=tHxXhu8bWiJR4lnUAWoW+LCQTkxaGXp8Ya5uyz/cZcMju71HSxf9+162I3QHwLzdWR
- KkzLCqbb9IpWYQ1TB0EwinN/Bw8upWDfDFQv2M0ZnMAmbcxlbbNODy4ERfxmU6HdY5lb
- wmX287e33R4V+MxJmHoOcRuhqSZRSybegbOWvomPQbAFDM1qrgJTP6fyyqS6V3pMlJx3
- CUvJ5n1k4k82aOYUNLmAPjGSW2oxIgbjLFaqrnfOMI3Npzi3W03Pokw/upjPuBtDNNeb
- 0Abt53U1G2FqY9a9stdzygl/VzHNnYZ3WMZQF1mRFsdKYQ3Q+TbpJHPmfplfwHrX55Dq
- dgzw==
+ (envelope-from <philmd@redhat.com>) id 1i6H2n-00073g-Gm
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:25:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54880)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i6H2n-00072j-7F
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 12:25:05 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 83C473C918
+ for <qemu-devel@nongnu.org>; Fri,  6 Sep 2019 16:25:03 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id 1so1090410wmk.4
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 09:25:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Vbib0cbUUkIHQRqcWKE2WOfXQ0oindO16nPEQFzl/eg=;
- b=FTt99TNQEGfjVlybnKbtYJ8v9Rs+oCjxOO7QtW9Q0RWJLaLHxMAWf3ldduMR+iEkiA
- Dw0fdNT/uJEyfuP1N7tRMX33es8Svvr6/zo+LAcj+aNFuzwBgS5pdUkwEnrkNbJU5gnd
- i+9to5USvYpd7h8glEKNDNohb/7bY0saKvQexzveMTJ/AnD8mAR77y7gqYR5DozVuBTF
- rT5/gHeSBP+Hmg4rTLJq9h88/lBrj6dIgzajWmIaiATFKWZqDRNVa1n7jdOcLB5FK0PG
- bpfV9/cOfWAJOKVm0QhJeMldE3lMb+57jDyFLmiHwZoNyUgt6gHw9WjYEgyBDngEl5vt
- kQUw==
-X-Gm-Message-State: APjAAAXRbd5cocsVOj4sdzN15sYBqsjLwT1EO7kG4ZXiQ8kdDUyoW9Vv
- 0EEU2QnN1t7omGauIKwrj8/Ml3EA
-X-Google-Smtp-Source: APXvYqyWVNTrYMLqJxPAOozuciHdJGiZWoQwEV5tJazwS5+LB8UZOyBA/QW5f+QohmszRj0LyDe+Mw==
-X-Received: by 2002:a17:902:aa48:: with SMTP id
- c8mr10088169plr.330.1567786838049; 
- Fri, 06 Sep 2019 09:20:38 -0700 (PDT)
-Received: from localhost.localdomain (unknown-224-80.windriver.com.
- [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id f89sm11146228pje.20.2019.09.06.09.20.37
- (version=TLS1 cipher=AES128-SHA bits=128/128);
- Fri, 06 Sep 2019 09:20:37 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Date: Fri,  6 Sep 2019 09:19:59 -0700
-Message-Id: <1567786819-22142-13-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1567786819-22142-1-git-send-email-bmeng.cn@gmail.com>
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/n7rfOXa0Gr0vTe+0rtKUocHOJlwWpwosmHm6nE4ZQ8=;
+ b=J0Zqe8ODvfbg+PPB8MtJoh9Mty+SNjE9dt+Qva/ijlEjqrwhLQIoGDtb2sDzQ9AeZS
+ QGrXin2JJMcwnav7Yx7dSmdKH62ORfb2pdrYUZJH/Q8vkG/kaCwFflI8Yc2/OSuoNqtw
+ FaRdZ09h/+V9Fus7CdExeQTm3ZdybS+IX9YmCVgaHIepbnHCxrCmuD5IosANqCOGKQFu
+ KCgnFCgC5vvX7v7u6biHNb8MrMd9KJ4JCWlnSihuRdmpiEATXRQ/gjBESdGhcp2iaLrz
+ ZYy+oAyJGKaz7Vg8yFt9WD79gZi3sgh0DX8Iyk6Bg01St4aECwFxkdkgibPahyAhm7Zv
+ jMtQ==
+X-Gm-Message-State: APjAAAU5wBCaKGezM0RsSvfugtvjuhZPSnIYChUUURIIdbDa0jQ3m+hG
+ Kh7+JJzyFEAnK51fw3+hMPUUggPEKSaijCstSvufKH/4pPW5dBwfkKaPiF4UUA/cxLUQhUoXVm1
+ EwcUjReXl56LxZ9o=
+X-Received: by 2002:a7b:cb46:: with SMTP id v6mr7385281wmj.37.1567787102335;
+ Fri, 06 Sep 2019 09:25:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwoFOX642wyvgRl1YEWYNWuRIqF3JmxKa04qyRUCtKEfiaxSKa6uiXWNKmCVzeFz3OfuyaGOw==
+X-Received: by 2002:a7b:cb46:: with SMTP id v6mr7385266wmj.37.1567787102146;
+ Fri, 06 Sep 2019 09:25:02 -0700 (PDT)
+Received: from [192.168.1.48] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id e30sm8817196wra.48.2019.09.06.09.25.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 06 Sep 2019 09:25:01 -0700 (PDT)
+To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis
+ <Alistair.Francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>,
+ qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 References: <1567786819-22142-1-git-send-email-bmeng.cn@gmail.com>
+ <1567786819-22142-10-git-send-email-bmeng.cn@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f6578928-afbb-8441-71ce-ff203775ccd0@redhat.com>
+Date: Fri, 6 Sep 2019 18:25:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v8 12/32] riscv: sifive_e: prci: Fix a typo of
- hfxosccfg register programming
+In-Reply-To: <1567786819-22142-10-git-send-email-bmeng.cn@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v8 09/32] riscv: roms: Remove executable
+ attribute of opensbi images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,40 +101,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For hfxosccfg register programming, SIFIVE_E_PRCI_HFXOSCCFG_RDY and
-SIFIVE_E_PRCI_HFXOSCCFG_EN should be used.
+On 9/6/19 6:19 PM, Bin Meng wrote:
+> Like other binary files, the executable attribute of opensbi images
+> should not be set.
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
+Ideally we'd have checkpatch warning for incorrect permissions when
+adding blobs under pc-bios/.
 
-Changes in v8: None
-Changes in v7: None
-Changes in v6: None
-Changes in v5: None
-Changes in v4: None
-Changes in v3: None
-Changes in v2: None
+>=20
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
- hw/riscv/sifive_e_prci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-diff --git a/hw/riscv/sifive_e_prci.c b/hw/riscv/sifive_e_prci.c
-index b6d32db..bfe9b13 100644
---- a/hw/riscv/sifive_e_prci.c
-+++ b/hw/riscv/sifive_e_prci.c
-@@ -91,7 +91,7 @@ static void sifive_e_prci_init(Object *obj)
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
- 
-     s->hfrosccfg = (SIFIVE_E_PRCI_HFROSCCFG_RDY | SIFIVE_E_PRCI_HFROSCCFG_EN);
--    s->hfxosccfg = (SIFIVE_E_PRCI_HFROSCCFG_RDY | SIFIVE_E_PRCI_HFROSCCFG_EN);
-+    s->hfxosccfg = (SIFIVE_E_PRCI_HFXOSCCFG_RDY | SIFIVE_E_PRCI_HFXOSCCFG_EN);
-     s->pllcfg = (SIFIVE_E_PRCI_PLLCFG_REFSEL | SIFIVE_E_PRCI_PLLCFG_BYPASS |
-                  SIFIVE_E_PRCI_PLLCFG_LOCK);
-     s->plloutdiv = SIFIVE_E_PRCI_PLLOUTDIV_DIV1;
--- 
-2.7.4
-
+> ---
+>=20
+> Changes in v8: None
+> Changes in v7: None
+> Changes in v6: None
+> Changes in v5: None
+> Changes in v4:
+> - new patch to remove executable attribute of opensbi images
+>=20
+> Changes in v3: None
+> Changes in v2: None
+>=20
+>  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin
+>  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin
+>  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin
+>  3 files changed, 0 insertions(+), 0 deletions(-)
+>  mode change 100755 =3D> 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bi=
+n
+>  mode change 100755 =3D> 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jum=
+p.bin
+>  mode change 100755 =3D> 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bi=
+n
+>=20
+> diff --git a/pc-bios/opensbi-riscv32-virt-fw_jump.bin b/pc-bios/opensbi=
+-riscv32-virt-fw_jump.bin
+> old mode 100755
+> new mode 100644
+> diff --git a/pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin b/pc-bios/ope=
+nsbi-riscv64-sifive_u-fw_jump.bin
+> old mode 100755
+> new mode 100644
+> diff --git a/pc-bios/opensbi-riscv64-virt-fw_jump.bin b/pc-bios/opensbi=
+-riscv64-virt-fw_jump.bin
+> old mode 100755
+> new mode 100644
+>=20
 
