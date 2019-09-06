@@ -2,63 +2,79 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F55C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E23BC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DD59206CD
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:36:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD59206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6764206CD
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 10:37:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BRAAjWQU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6764206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6BbV-0004bf-AY
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 06:36:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51547)
+	id 1i6BcQ-0005gy-2R
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 06:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i6Bae-00044n-MW
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:35:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i6BbD-0004bB-8M
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i6Bad-0004hA-Fi
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:35:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45394)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i6Bad-0004gq-7g
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:35:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AFE2987521E;
- Fri,  6 Sep 2019 10:35:37 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C3B6360920;
- Fri,  6 Sep 2019 10:35:25 +0000 (UTC)
-Date: Fri, 6 Sep 2019 11:35:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190906103523.GB2699@work-vm>
-References: <20190905152136.30637-1-stefanha@redhat.com>
- <20190905174021.GR2700@work-vm>
- <20190906102926.GF5900@stefanha-x1.localdomain>
+ (envelope-from <peter.maydell@linaro.org>) id 1i6BbB-0004q5-O1
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:36:14 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i6BbB-0004pi-H2
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 06:36:13 -0400
+Received: by mail-oi1-x241.google.com with SMTP id g128so4555842oib.1
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 03:36:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4q0ZsE8JB9tBhkMnXJiBoiVAJqTnzerVQBKDgZkbqI8=;
+ b=BRAAjWQUSOET0RGETYjKRx8DJXBxfBzk6RFcjVs2ErQI70YRfAv2l2ejVjpVPyETnC
+ xHO1U5pzne5aLuMf9LdaCvLAfCqkt2Sg325kDSSq9wiFyNjbs+/EonDGCOs30XVgpLX5
+ cZsE4u8kHaodwSb913xzbN1hISzm/uxlu6UXuIzP8SEWXRrU+uCGsJlyp+olkV4X8+cT
+ evITaQPa3vTnADvcl+lRHIU5FC+q/sFVwwHh4vRx9dYbPG7hib/ljLjYBjn4UUkF45Xk
+ UktRxmW9qCrORyeWxifUnpHTcnRTs/FPag9MM9vShbWHppCOigyU0vrSMGJpjMer2C91
+ DhwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4q0ZsE8JB9tBhkMnXJiBoiVAJqTnzerVQBKDgZkbqI8=;
+ b=cWco4qJ4Yy0a9lD3z7hGf3gXKR+dO5Xl7DMxB98rreHwc4eRQR9fGtVKEDMKGPREGR
+ yqeBHhYWckF7TGkEfF8xuy3JMjcjyuhlLQa8R3e+3G9Y+/tbPWoQKXhwoGYmmkLDztTe
+ tLxbyLvEet2Pt6+o96I3z+T6LEaOQoNOllQIicQb7BkZIlskg1akL+STkcwm6eTlBz1+
+ cvOkshZMO7ppW/iicLFkEZK9wYAkzzIdcMyB1txSK+mYir2a/gVB1pKHUe3/BpAIWN+h
+ IoN6mcIG3lBhTTblcGl75jwBaEwWAq+ljFMrHsvO1z/4qWSyeDkjgV6vz0VjoaLTzk0h
+ KupA==
+X-Gm-Message-State: APjAAAW2h/0y3ZMesop3nJEqNkbpJqsn2lkFYBoIOvqjJJp4WqusFQ0u
+ wQERO2OJGmk65bGDFHo1iGzjJUO3n+fQwZVU2Kcd5A==
+X-Google-Smtp-Source: APXvYqx+TAD2g9yB7KZ+6p9mB7MhiaYlLmZZ04f3L9zC+S9Y2elCWy5zDJHeoB7MXuB0R+dmcFLMEFZ1clLK6M/ipDw=
+X-Received: by 2002:aca:53d4:: with SMTP id h203mr6088251oib.146.1567766172441; 
+ Fri, 06 Sep 2019 03:36:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190906102926.GF5900@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Fri, 06 Sep 2019 10:35:37 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 0/3] virtiofsd: get/set log level via DBus
+References: <20190904162247.24095-1-damien.hedde@greensocs.com>
+In-Reply-To: <20190904162247.24095-1-damien.hedde@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Sep 2019 11:36:01 +0100
+Message-ID: <CAFEAcA89q8mwNyhivbrCcTP7c208dbwmVBjF2mmOT5s+dyQ4sQ@mail.gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/raspi: avoid reparenting the sd
+ card during qbus tree reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,70 +86,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Eryu Guan <eguan@linux.alibaba.com>, qemu-devel@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> On Thu, Sep 05, 2019 at 06:40:21PM +0100, Dr. David Alan Gilbert wrote:
-> > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > > It is likely that virtiofsd will need to support "management commands" for
-> > > reconfiguring it at runtime.  The first use case was proposed by Eryu Guan for
-> > > getting/setting the current log level.
-> > > 
-> > > I promised to try out DBus as the management interface because it has a rich
-> > > feature set and is accessible from most programming languages.  It should be
-> > > able to support all the use cases we come up with.
-> > > 
-> > > This patch series is a prototype that implements the get-log-level and
-> > > set-log-level management commands via DBus.  Use the new virtiofsctl tool to
-> > > talk to a running virtiofsd process:
-> > > 
-> > >   # dbus-run-session ./virtiofsd ...
-> > >   ...
-> > >   Using dbus address unix:abstract=/tmp/dbus-H9WBbpjk3O,guid=0be16acefb868e6025a8737f5d7124d2
-> > >   # export DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-H9WBbpjk3O,guid=0be16acefb868e6025a8737f5d7124d2
-> > >   # ./virtiofsctl set-log-level err
-> > > 
-> > > Most of the work is done by gdbus-codegen(1).  It generates code for the
-> > > org.qemu.Virtiofsd.xml interface definition.  Our code can use the simple
-> > > virtiofsd_get/set_log_level() APIs and it will make corresponding DBus calls.
-> > > 
-> > > I'm pretty happy with this approach because the code is straightforward.  It
-> > > hasn't even triggered seccomp failures yet :).
-> > 
-> > Yes it's less complex than I'd worried.
-> > Now, I do think we've got to think about how qemu in general is going to
-> > use dbus as people were discussing it, because then we have to think
-> > what the security aspects are - do we need to look at some calls only
-> > available to some clients etc.
-> 
-> The approach I took in this patch series is to launch a session bus just
-> for this virtiofsd.  The abstract socket unix(7) namespace used by GDBus
-> by default does not offer any security.  I think any process on the host
-> can connect to it, regardless of uid/gid.
-> 
-> A path like unix:path=/tmp/foo would allow us to use UNIX Domain Socket
-> permissions as the main security mechanism.
+On Wed, 4 Sep 2019 at 17:23, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+> In the raspi machine, the sd card can be on several sd bus (in reality
+> there is one bus but several controllers). It is initially created in
+> the "sd-bus" child in the gpio peripheral. Then is moved (parent bus
+> changes) during machine reset in the "sdhci-bus". It can be moved again
+> by software between the "sdhci-bus" and another bus ("bcm2835-sdhost-bus").
+> Here's the corresponding qbus tree of the raspi machine:
+>  + sysbus
+>    * bcm2835_gpio
+>      + sd-bus
+>        * sd-card
+>    * bcm2835-sdhost
+>      + bcm2835-sdhost-bus
+>    * generic-sdhci
+>      + sdhci-bus
+>
+> During the initial machine reset, the sd card is moved. Since reset is
+> based on qbus tree, moving the card during the reset seems odd (it changes
+> the qbus tree). In this case, because of the order the qbus tree is
+> walked, the sd card ends up being reset twice; the effective reset order call
+> follows:
+>  1 sd-card
+>  2 sd-bus
+>  3 bcm2835_gpio        -> move the sd-card to sdhci_bus
+>  4 bcm2835-sdhost-bus
+>  5 bcm2835-sdhost
+>  6 sd-card             (again)
+>  7 sdhci-bus
+>  8 generic-sdhci
+>
+> This patch adds a raspi machine reset method which moves the sd card
+> to the sdhci-bus before doing the whole reset (which will try to do the
+> move too). By anticipating the move we avoid changing the qdev tree while
+> resetting it.
+>
+> In consequence the step 1 is skipped in the previous list: when reset starts
+> the sd-card is already not a child of bcm2835_gpio.
 
-Yes, that I'm fine with; my worry is that there was talk of much more
-complex dbus setups coming out of the qemu world with many things being
-connected; and then we have to think about security upfront.
+The solution proposed in this patch pushes something that should
+really be the business just of the SoC model out to the machine
+model level; it would be nice to be able to avoid that.
 
->  I'm not enthusiastic about
-> using SELinux or some kind of DBus-specific policy language if we can
-> avoid it because it's complex and obscure.
-
-Right.
-
-Dave
-
-> Stefan
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
 
