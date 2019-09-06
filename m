@@ -2,64 +2,61 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66770C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7743CC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:36:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CDD620650
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:36:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CDD620650
+	by mail.kernel.org (Postfix) with ESMTPS id 4FDB320650
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:36:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FDB320650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6EPG-0007qL-Ce
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:36:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39143)
+	id 1i6EPl-0008V1-FL
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:36:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39248)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i6EOW-0007Bz-SA
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:35:22 -0400
+ (envelope-from <quintela@redhat.com>) id 1i6EOu-0007eA-Og
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i6EOV-0000q4-IY
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:35:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38604)
+ (envelope-from <quintela@redhat.com>) id 1i6EOt-00012M-Ln
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:35:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14818)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1i6EOR-0000mr-AO; Fri, 06 Sep 2019 09:35:15 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1i6EOt-00011c-Ga
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:35:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3661FA28732;
- Fri,  6 Sep 2019 13:35:14 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BE0160BAD;
- Fri,  6 Sep 2019 13:34:57 +0000 (UTC)
-Date: Fri, 6 Sep 2019 14:34:54 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190906133454.GI5119@redhat.com>
-References: <20190826135103.22410-1-mlevitsk@redhat.com>
- <20190826135103.22410-14-mlevitsk@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 25ACB1918644
+ for <qemu-devel@nongnu.org>; Fri,  6 Sep 2019 13:35:42 +0000 (UTC)
+Received: from redhat.com (ovpn-116-33.ams2.redhat.com [10.36.116.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 36E565C1D8;
+ Fri,  6 Sep 2019 13:35:40 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+In-Reply-To: <20190906130103.20961-1-peterx@redhat.com> (Peter Xu's message of
+ "Fri, 6 Sep 2019 21:01:03 +0800")
+References: <20190906130103.20961-1-peterx@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Fri, 06 Sep 2019 15:35:33 +0200
+Message-ID: <87sgp9k0nu.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190826135103.22410-14-mlevitsk@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Fri, 06 Sep 2019 13:35:14 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Fri, 06 Sep 2019 13:35:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] qcrypto-luks: implement more
- rigorous header checking
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix postcopy bw for recovery
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,114 +68,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Xiaohui Li <xiaohli@redhat.com>,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 26, 2019 at 04:51:03PM +0300, Maxim Levitsky wrote:
-> Check that keyslots don't overlap with the data,
-> and check that keyslots don't overlap with each other.
-> (this is done using naive O(n^2) nested loops,
-> but since there are just 8 keyslots, this doesn't really matter.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Peter Xu <peterx@redhat.com> wrote:
+> We've got max-postcopy-bandwidth parameter but it's not applied
+> correctly after a postcopy recovery so the recovered migration stream
+> will still eat the whole net bandwidth.  Fix that up.
+>
+> Reported-by: Xiaohui Li <xiaohli@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  crypto/block-luks.c | 46 +++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 44 insertions(+), 2 deletions(-)
-> 
-> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> index db0fb764b4..fdf4c41f8a 100644
-> --- a/crypto/block-luks.c
-> +++ b/crypto/block-luks.c
-> @@ -541,12 +541,12 @@ fail:
->  static int
->  qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **errp)
->  {
-> -    int ret;
-> +    int ret = -EINVAL;
+>  migration/migration.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-As before, no need to use errnos, just return -1 immediately.
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-> +    size_t i, j;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 8b9f2fe30a..b307813aa3 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -3327,7 +3327,8 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
 >  
->      if (memcmp(luks->header.magic, qcrypto_block_luks_magic,
->                 QCRYPTO_BLOCK_LUKS_MAGIC_LEN) != 0) {
->          error_setg(errp, "Volume is not in LUKS format");
-> -        ret = -EINVAL;
->          goto fail;
->      }
->  
-> @@ -557,6 +557,48 @@ qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **errp)
->          goto fail;
->      }
->  
-> +    /* Check all keyslots for corruption  */
-> +    for (i = 0 ; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; i++) {
-> +
-> +        const QCryptoBlockLUKSKeySlot *slot1 = &luks->header.key_slots[i];
-> +        unsigned int start1 = slot1->key_offset_sector;
-> +        unsigned int len1 =
-> +            qcrypto_block_luks_splitkeylen_sectors(luks, slot1->stripes);
-> +
-> +        if (slot1->stripes == 0) {
-> +            error_setg(errp, "Keyslot %zu is corrupted (stripes == 0)", i);
-> +            goto fail;
-> +        }
+>      if (resume) {
+>          /* This is a resumed migration */
+> -        rate_limit = INT64_MAX;
+> +        rate_limit = s->parameters.max_postcopy_bandwidth /
+> +            XFER_LIMIT_RATIO;
+>      } else {
+>          /* This is a fresh new migration */
+>          rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
 
-How about checking stripes != QCRYPTO_BLOCK_LUKS_STRIPES because
-AFAIR, you're required to use 4k stripes in luks v1.
-
-Also how about  checking    iters >= MIN_SLOT_KEY_ITERS
-
-> +
-> +        if (slot1->active != QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED &&
-> +                slot1->active != QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED) {
-
-Align the two lines with (
-
-> +            error_setg(errp,
-> +                       "Keyslot %zu state (active/disable) is corrupted", i);
-> +            goto fail;
-> +        }
-> +
-> +        if (start1 + len1 > luks->header.payload_offset_sector) {
-> +            error_setg(errp,
-> +                       "Keyslot %zu is overlapping with the encrypted payload",
-> +                       i);
-> +            goto fail;
-> +        }
-> +
-> +        for (j = i + 1 ; j < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; j++) {
-> +            const QCryptoBlockLUKSKeySlot *slot2 = &luks->header.key_slots[j];
-> +            unsigned int start2 = slot2->key_offset_sector;
-> +            unsigned int len2 =
-> +                qcrypto_block_luks_splitkeylen_sectors(luks, slot2->stripes);
-> +
-> +            if (start1 + len1 > start2 && start2 + len2 > start1) {
-> +                error_setg(errp,
-> +                           "Keyslots %zu and %zu are overlapping in the header",
-> +                           i, j);
-> +                goto fail;
-> +            }
-> +        }
-> +
-> +    }
->      return 0;
->  fail:
->      return ret;
-> -- 
-> 2.17.2
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I was confused thinking that the two assignations were the same O:-)
 
