@@ -2,64 +2,88 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4928EC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 19:06:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C3DC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 19:08:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20D382081B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 19:06:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D382081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D3E972081B
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 19:08:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7kr0N4R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E972081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6JZN-0007J8-Bb
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 15:06:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40336)
+	id 1i6Jaw-0000J2-2z
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 15:08:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i6JWZ-0005Wh-F7
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 15:04:01 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i6JYG-0006ds-UM
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 15:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i6JWW-00083V-FA
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 15:03:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54514)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1i6JWW-00082t-5r; Fri, 06 Sep 2019 15:03:56 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2A3D6793ED;
- Fri,  6 Sep 2019 19:03:55 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 27DDD10018F9;
- Fri,  6 Sep 2019 19:03:53 +0000 (UTC)
-Date: Fri, 6 Sep 2019 20:03:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Brad Campbell <lists2009@fnarfbargle.com>
-Message-ID: <20190906190351.GB20068@work-vm>
-References: <ed421291-7178-d7bc-5ed3-9863d28ceba9@fnarfbargle.com>
- <dd33a398-3c1f-0c92-2318-00ad144e1e5d@fnarfbargle.com>
- <b1782119-abbc-9678-8217-ef576dbf8c93@fnarfbargle.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i6JYF-0000yB-8a
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 15:05:44 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:47038)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i6JYE-0000wx-Lh
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 15:05:43 -0400
+Received: by mail-oi1-x243.google.com with SMTP id x7so5810124oie.13
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 12:05:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=VuFeZk6bcFV8nXTtDJxbZInrPsNA51bavqI+ylOvIqI=;
+ b=A7kr0N4RcYyRKI1ox7dfa9yEeHxZK2wBgtNTvgH580l6GIo8dlk5Wf9/koXALefVHO
+ NjHJ52mM3ZQcP1ZfjsdmCgGrK0XWvfAjicUNbAPrHdyBszLtKV6Kk62pTs0ifvmGczFn
+ U4iL0HvwgaKy+EIAuOKlSOPL7hVPu8VAzewNKXKjAyWhbmv1VDMDbFGmoC+4VWaW32em
+ Ul/KwSomm0q71JhQHF+PiAbjFPcmXPMHKfMsDMMgnFZU6fVIiUt8pnB+wSSk9mfkj20K
+ lBo6JIxnq8SDMKypZC0NNF+BYvXo81gdywT5B8Vh+MXkWGYs8KAD7HVKuYtiqQ/DecVU
+ GaRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=VuFeZk6bcFV8nXTtDJxbZInrPsNA51bavqI+ylOvIqI=;
+ b=dKWk9eitCG+DL+nNeSDAX1+Uxpjipp//G4N3wD2an4iFCQ7hZ1Z8y6nmaGr5FIy5YY
+ yMwFxZoh3Ibx38V43mqtXa9b9Ax4HZdgtDuXF/l8qAsCaLVrwv14RUQZEBPFW3Kq7IZP
+ qsSVOZ9KE/UiWYHHgj64ftIhMR2AkcQdAnspE6IZAk/IqAHCZtt6HqLOOXC0AkJz1bFh
+ yP0xbiVDqXc7g8gJvJJityJcjTU95MHZogYztJimE/o3XVC35tSu3b5oV6nhAUG6v4aE
+ nA7ei4ydLwAbEbiLfYDiOznINzOdPtM24oPpg0DkZoLfxiZZ7l4Iycdz4o9CUNaKQPri
+ uH3A==
+X-Gm-Message-State: APjAAAXAqCn655R+80Jr9DvFCGTPcyu0ykcnzVy9sSdBMEfUdSrLXZdk
+ o5A8x0UMxZ3CZie1/u9RO/UX8KtSRBnJ3c28nUw=
+X-Google-Smtp-Source: APXvYqyVxhaYj/TwVR5L1TiW8X2dGkOku75qhYEJjYnp4QWg/KCERQsGBMybsWPDmcP3NQeccNyIw7z9Bh+fFacLg28=
+X-Received: by 2002:aca:c505:: with SMTP id v5mr8044622oif.79.1567796740749;
+ Fri, 06 Sep 2019 12:05:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b1782119-abbc-9678-8217-ef576dbf8c93@fnarfbargle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 06 Sep 2019 19:03:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Cross-posted : Odd QXL/KVM performance issue with
- a Windows 7 Guest
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
+ Fri, 6 Sep 2019 12:05:40 -0700 (PDT)
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
+ Fri, 6 Sep 2019 12:05:40 -0700 (PDT)
+In-Reply-To: <20190904203013.9028-19-alex.bennee@linaro.org>
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
+ <20190904203013.9028-19-alex.bennee@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 6 Sep 2019 21:05:40 +0200
+Message-ID: <CAL1e-=i2+dDq1atGvW=wzaK5C4=D7vP13k98Nw3NMyn-t2Z=RQ@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v1 18/42] tests/docker: move our mips64
+ cross compile to Buster
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,201 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, stefanb@linux.vnet.ibm.com,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, f4bug@amsat.org, cota@braap.org, stefanha@redhat.com,
+ pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Brad Campbell (lists2009@fnarfbargle.com) wrote:
-> On 2/9/19 6:23 pm, Brad Campbell wrote:
-> 
-> > 
-> > Here is the holdup :
-> > 
-> > 11725@1567416625.003504:qxl_ring_command_check 0 native
-> > 11725@1567416625.102653:qxl_io_write 0 native addr=0 (QXL_IO_NOTIFY_CMD)
-> > val=0 size=1 async=0
-> > 
-> > ~100ms delay prior to each logged QXL_IO_NOTIFY_CMD on the AMD box which
-> > explains the performance difference. Now I just need to figure out if
-> > that lies in the guest, the guest QXL driver, QEMU or SPICE and why it
-> > exhibits on the AMD box and not the i7.
-> > 
-> > To get to this point, I recompiled the kernel on the i7 box with both
-> > AMD and Intel KVM modules. Once that was running I cloned the drive and
-> > put it in the AMD box, so the OS, software stack and all dependencies
-> > are identical.
-> 
-> Reacp :
-> 
-> I have a machine with a Windows 7 VM which is running on an i7-3770. This
-> works perfectly.
-> 
-> Clone the disk and put it in a new(ish) AMD Ryzen 1500x machine and the
-> display output using qxl/spice is now limited to ~5-7fps.
-> 
-> I originally cloned the entire machine to keep the software versions
-> identical.
-> 
-> To simplify debugging and reproduction I'm now using :
-> - An identical SPICE version to that on the i7.
-> - A fresh 64 bit Windows 7 VM.
-> - The D2D benchmark from Crystalmark 2004R7.
-> 
-> The machine is booted with :
-> 
-> qemu -enable-kvm \
->  -m 8192\
->  -rtc base=localtime\
->  -vga qxl\
->  -device qxl\
->  -global qxl-vga.guestdebug=3\
->  -global qxl-vga.cmdlog=1\
->  -global qxl-vga.vram_size=65536\
->  -global qxl.vram_size=65536\
->  -global qxl-vga.ram_size=65536\
->  -global qxl.ram_size=65536\
->  -net nic,model=virtio\
->  -net tap,ifname=tap0,script=/etc/qemu-ifup,vhost=on\
->  -usbdevice tablet\
->  -spice port=5930,disable-ticketing\
->  -device virtio-serial\
->  -chardev spicevmc,id=vdagent,name=vdagent\
->  -device virtserialport,chardev=vdagent,name=com.redhat.spice.0\
->  -smp 3,maxcpus=3,cores=3,threads=1,sockets=1\
->  -cpu qemu64,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time \
+04.09.2019. 23.59, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> =D1=98=D0=B5=
+ =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Now Buster is released we can stop relying on the movable feast that
+> is Sid for our cross-compiler for building tests.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
 
--cpu qemu64 is almost always a bad idea;  does -cpu host help ?
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Dave
-
->  -drive
-> file=/server/VM/Cadbox.raw,if=virtio,aio=threads,format=raw,cache=unsafe
-> -boot c \
->  -drive
-> file=/server/VM/Cadbox_swap.raw,if=virtio,aio=threads,format=raw,cache=unsafe
-> \
-> 
-> 
-> The D2D benchmark runs through a series of Sprites (stars) and it just
-> shuffles them around the screen.
-> 
-> With KVM enabled I get :
-> 
-> Sprite    10 - 8.66fps
-> Sprite   100 - 8.47fps
-> Sprite   500 - 8.45fps
-> Sprite  1000 - 8.18fps
-> Sprite  5000 - 7.64fps
-> Sprite 10000 - 7.26fps
-> 
-> With the identical system, with KVM disabled I get :
-> 
-> Sprite    10 - 28.97fps
-> Sprite   100 - 27.24fps
-> Sprite   500 - 23.85fps
-> Sprite  1000 - 22.00fps
-> Sprite  5000 - 11.11fps
-> Sprite 10000 -  4.50fps
-> 
-> On the i7 with the same software version and kvm enabled  :
-> 
-> Sprite    10 - 88.58fps
-> Sprite   100 - 88.35fps
-> Sprite   500 - 85.64fps
-> Sprite  1000 - 83.33fps
-> Sprite  5000 - 58.08fps
-> Sprite 10000 - 45.29fps
-> 
-> 
-> cpuinfo from the host :
-> processor	: 7
-> vendor_id	: AuthenticAMD
-> cpu family	: 23
-> model		: 1
-> model name	: AMD Ryzen 5 1500X Quad-Core Processor
-> stepping	: 1
-> microcode	: 0x8001138
-> cpu MHz		: 2877.596
-> cache size	: 512 KB
-> physical id	: 0
-> siblings	: 8
-> core id		: 5
-> cpu cores	: 4
-> apicid		: 11
-> initial apicid	: 11
-> fpu		: yes
-> fpu_exception	: yes
-> cpuid level	: 13
-> wp		: yes
-> flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat
-> pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp
-> lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni
-> pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx
-> f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse
-> 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext
-> perfctr_llc mwaitx cpb hw_pstate sme ssbd sev ibpb vmmcall fsgsbase bmi1
-> avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1
-> xsaves clzero irperf xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale
-> vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic
-> v_vmsave_vmload vgif overflow_recov succor smca
-> bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass
-> bogomips	: 6985.80
-> TLB size	: 2560 4K pages
-> clflush size	: 64
-> cache_alignment	: 64
-> address sizes	: 43 bits physical, 48 bits virtual
-> power management: ts ttp tm hwpstate eff_freq_ro [13] [14]
-> 
-> qemu configured with : PKG_CONFIG_PATH=/usr/local/libvirt/lib/pkgconfig:/usr/local/libvirt/share/pkgconfig/
-> ./configure --target-list=x86_64-softmmu --disable-gtk && make -j6
-> test:~# uname -a
-> 
-> Linux test 5.2.9 #42 SMP Tue Aug 20 16:41:13 AWST 2019 x86_64 GNU/Linux
-> 
-> test:~# zgrep KVM /proc/config.gz
-> CONFIG_HAVE_KVM=y
-> CONFIG_HAVE_KVM_IRQCHIP=y
-> CONFIG_HAVE_KVM_IRQFD=y
-> CONFIG_HAVE_KVM_IRQ_ROUTING=y
-> CONFIG_HAVE_KVM_EVENTFD=y
-> CONFIG_KVM_MMIO=y
-> CONFIG_KVM_ASYNC_PF=y
-> CONFIG_HAVE_KVM_MSI=y
-> CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT=y
-> CONFIG_KVM_VFIO=y
-> CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
-> CONFIG_KVM_COMPAT=y
-> CONFIG_HAVE_KVM_IRQ_BYPASS=y
-> CONFIG_KVM=m
-> # CONFIG_KVM_INTEL is not set
-> CONFIG_KVM_AMD=m
-> # CONFIG_KVM_MMU_AUDIT is not set
-> 
-> test:~# qemu --version
-> QEMU emulator version 4.1.50 (v4.1.0-714-g90b1e3a)
-> Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-> 
-> To be clear, I'm not chasing benchmarks. This is a real issue with trying to
-> run CAD on a Windows 7 VM on a Ryzen machine.
-> 
-> I've tried it on two machines (a 1500x and an 1800x) with the same result.
-> The same configuration on the i7 box works perfectly.
-> 
-> I've tried several versions of SPICE, multiple versions of KVM, kernels back
-> as far as 4.0 with KVM enabled, different old and new windows VMs and driver
-> versions. The only constant is it is limited on the AMD box if KVM is
-> enabled.
-> 
-> I was leaning towards it being something in the qemu/spice software stack,
-> but the fact that without kvm enabled it goes as fast as the CPU will allow
-> it would indicate perhaps the fault likes in some relationship with kvm, so
-> I'm cross-posting to qemu-devel to see if this jogs someones memory, or if
-> there are any other things I can try to attempt to solve this one.
-> 
-> Regards,
-> Brad
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+>  tests/docker/Makefile.include                       | 2 +-
+>  tests/docker/dockerfiles/debian-mips64-cross.docker | 5 ++---
+>  2 files changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
+e
+> index e946aae14fa..896c1c5a601 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -102,11 +102,11 @@ docker-image-debian-alpha-cross:
+docker-image-debian10
+>  docker-image-debian-arm64-cross: docker-image-debian10
+>  docker-image-debian-hppa-cross: docker-image-debian10
+>  docker-image-debian-m68k-cross: docker-image-debian10
+> +docker-image-debian-mips64-cross: docker-image-debian10
+>  docker-image-debian-powerpc-cross: docker-image-debian10
+>  docker-image-debian-sh4-cross: docker-image-debian10
+>  docker-image-debian-sparc64-cross: docker-image-debian10
+>
+> -docker-image-debian-mips64-cross: docker-image-debian-sid
+>  docker-image-debian-riscv64-cross: docker-image-debian-sid
+>  docker-image-debian-ppc64-cross: docker-image-debian-sid
+>  docker-image-travis: NOUSER=3D1
+> diff --git a/tests/docker/dockerfiles/debian-mips64-cross.docker
+b/tests/docker/dockerfiles/debian-mips64-cross.docker
+> index bf0073a4662..1a79505d696 100644
+> --- a/tests/docker/dockerfiles/debian-mips64-cross.docker
+> +++ b/tests/docker/dockerfiles/debian-mips64-cross.docker
+> @@ -1,10 +1,9 @@
+>  #
+>  # Docker cross-compiler target
+>  #
+> -# This docker target builds on the debian sid base image which
+> -# contains cross compilers for Debian "ports" targets.
+> +# This docker target builds on the debian Buster base image.
+>  #
+> -FROM qemu:debian-sid
+> +FROM qemu:debian10
+>
+>  RUN apt update && \
+>      DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+> --
+> 2.20.1
+>
+>
