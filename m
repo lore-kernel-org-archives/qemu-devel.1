@@ -2,68 +2,91 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 817A3C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3A7C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 12:06:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A0A5206BB
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:49:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0A5206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F632214DE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 12:06:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZDWTqJdw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F632214DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6CkJ-0005z9-DD
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 07:49:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40496)
+	id 1i6D0Z-0001l5-8M
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 08:06:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44867)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i6CjY-0005WQ-Nc
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:48:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i6Czl-00016N-2w
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 08:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i6CjW-00028M-Td
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:48:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58628)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i6CjW-00027M-Lo
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:48:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3DCFD6412E;
- Fri,  6 Sep 2019 11:48:53 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FBBC5D9CA;
- Fri,  6 Sep 2019 11:48:40 +0000 (UTC)
-Date: Fri, 6 Sep 2019 12:48:38 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190906114838.GX5119@redhat.com>
-References: <20190905152136.30637-1-stefanha@redhat.com>
- <20190905152136.30637-3-stefanha@redhat.com>
- <20190905172732.GQ2700@work-vm>
- <20190906102328.GE5900@stefanha-x1.localdomain>
- <20190906104953.GV5119@redhat.com> <20190906111223.GD2699@work-vm>
+ (envelope-from <alex.bennee@linaro.org>) id 1i6Czj-0006zI-OV
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 08:05:40 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55751)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i6Czj-0006yf-G3
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 08:05:39 -0400
+Received: by mail-wm1-x341.google.com with SMTP id g207so6227137wmg.5
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 05:05:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=PKaq9aYEPNk74e8hjoIbfDyHl7tRTrakIeUd3w1Ns4A=;
+ b=ZDWTqJdw3YLYe5R43DJUjcaX0nw1W7OsUfoQcU5fmbzLkLGpgzDf6aPCwLTr4PiUQE
+ YWNaT6MGJ9cM4+ekwWHNK10D2psZfmHN74TSiSf7RWigRrhxOnaKyXblis4nB9MAyH4w
+ mT3EJDXoDe8KSUYNyFJfv/GP7DXZtuTjkfkEDIBcyzmzbSazKEWDlWEWFr+Fb91xHZhg
+ +A/UMPnqVmkKAkyB0NNh4UrwLoXJlTH4isHEt7rE+wuW9X5Mj665fh9Z1lwdjuMWo1ob
+ /K5EeDPflBUoh2USzCZYvFx+VWdlsKvZT1f+osHnLgeuLSpfkiaQOnx+SZQoxDaUaapN
+ vj5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=PKaq9aYEPNk74e8hjoIbfDyHl7tRTrakIeUd3w1Ns4A=;
+ b=rQ3YA7A1yamhiYCd4um1EUIZktORu6iiwrrzdAbrFhpvaeai2XQnRaLC1p2RX1/DhN
+ V3bg4sUNOG/eZs4vKBGyNryQyONEOkH2NR/Tu9BnylKVsDEAlVH09RJDfz29fjtc9tN/
+ wwNCKphg5M3BSMvqHToDxwppJSHpXjgaNn0RGsgCxzCIl/T2WPrwXEXUceE5voVlq5Vo
+ vPmtx/a1dLIP0s5K6KjIOywi3CZGl67fQi2opp+Tcj8zXgtU9mLy5tdb1Bj8WsfwGmWr
+ 0ZYOuCRn3KgX5QsZZFY4Zu3H1T8y1nygvzZR1zjsh0SQ7SsGhnA0gHJHTdWppBBBs802
+ PWMg==
+X-Gm-Message-State: APjAAAWuGnEyMkyA/tQRlFLsmmTuIjt03fvwwkZTSi8oL5DWwxyybKA1
+ C7Wlz2QX0fDcy2NMa5TsFXWH+w==
+X-Google-Smtp-Source: APXvYqyP052MnoCIt9otbEFHJpS8ESKMTcsfW83K3aS+0flKo420kq7/T9BUGd9gxoplW68N5+EqxA==
+X-Received: by 2002:a1c:be02:: with SMTP id o2mr6560501wmf.109.1567771538215; 
+ Fri, 06 Sep 2019 05:05:38 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k9sm10356085wrd.7.2019.09.06.05.05.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Sep 2019 05:05:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DE00E1FF87;
+ Fri,  6 Sep 2019 13:05:36 +0100 (BST)
+References: <20190905113346.2473-1-thuth@redhat.com>
+ <20190905140701.6cc679ee@bahia.lan>
+ <fc82454c-ee11-c7a3-cccb-eeb51df35897@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+In-reply-to: <fc82454c-ee11-c7a3-cccb-eeb51df35897@redhat.com>
+Date: Fri, 06 Sep 2019 13:05:36 +0100
+Message-ID: <87blvxzl2n.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190906111223.GD2699@work-vm>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 06 Sep 2019 11:48:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 2/3] virtiofsd: add DBus server to handle log
- level changes
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH] travis.yml: Install libcap-dev for testing
+ virito-9p
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,81 +98,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: virtio-fs@redhat.com,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Eryu Guan <eguan@linux.alibaba.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 06, 2019 at 12:12:23PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Fri, Sep 06, 2019 at 11:23:28AM +0100, Stefan Hajnoczi wrote:
-> > > On Thu, Sep 05, 2019 at 06:27:32PM +0100, Dr. David Alan Gilbert wr=
-ote:
-> > > > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > > > > Introduce a DBus server thread that runs alongside the other vi=
-rtiofsd
-> > > > > threads.  It processes changes to the /org/qemu/virtiofsd objec=
-t which
-> > > > > can be accessed at the org.qemu.virtiofsd location on the bus.
-> > > > >=20
-> > > > > This code does not use locking because we are the only writer t=
-o the
-> > > > > int current_log_level variable.  More advanced management comma=
-nds would
-> > > > > require locking to prevent race conditions with the other threa=
-ds.
-> > > > >=20
-> > > > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > >=20
-> > > > OK, that is less complex than I'd feared.
-> > > > I guess there's something probably nice to do with name/integer m=
-apping
-> > > > for warning levels that we could use from one of the libraries.
-> > >=20
-> > > I used a free-form string because it's what systemd's LogLevel prop=
-erty
-> > > also does.  But I can investigate the cleanest approach for limitin=
-g it
-> > > to a set of string constants.
-> >=20
-> > There's no concept of "enums" at the DBus protocol level. Sending enu=
-ms
-> > in string form is the normal practice - avoiding integer values means
-> > you are not vulnerable to enum values changing if someone inserts a n=
-ew
-> > constant in the middlle of the enum. This same reason is why QAPI use=
-s
-> > strings for enums instead of ints.
->=20
-> Oh, I wasn't talking aobut changing protocol; I just meant there was
-> probably a neater way of doing the string look up than the opencoded wa=
-y
-> it was done.
 
-Oh sure, you can declare the enum in a header, and then run glib-mkenums
-with that header file and it will spit out the code neccessary to
-register a GEnum class. This gives you ability to do int/string conversio=
-ns
-with a simple api
+Thomas Huth <thuth@redhat.com> writes:
 
-  https://developer.gnome.org/gobject/stable/gobject-Enumeration-and-Flag=
--Types.html
-  https://developer.gnome.org/gobject/stable/glib-mkenums.html
+> On 05/09/2019 14.07, Greg Kurz wrote:
+>> On Thu,  5 Sep 2019 13:33:46 +0200
+>> Thomas Huth <thuth@redhat.com> wrote:
+>>
+>>> So far we were not testing virtio-9p in Travis yet, since we forgot to
+>>> install libcap-devel. Do it now to get some more test coverage.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>
+>> Acked-by: Greg Kurz <groug@kaod.org>
+>>
+>> and
+>>
+>> Tested-by: Greg Kurz <groug@kaod.org>
+>>
+>> Whose tree is this going through BTW ?
+>
+> According to MAINTAINERS, .travis.yml is taken care of by Alex and Fam,
+> so I hope they will pick this patch up. Otherwise, I think it could also
+> go via trivial (now on CC: ), since it's just a one-liner.
 
-It makes sense to use this, since virtiofsd is already using GObject
-via GDbus.
+Sure I'll grab it for the next iteration of testing/next - the queue is
+quite full at the moment.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+--
+Alex Benn=C3=A9e
 
