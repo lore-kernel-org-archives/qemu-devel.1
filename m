@@ -2,67 +2,64 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B682C00307
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EBADC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF84C20842
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:40:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF84C20842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 3C31220578
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:51:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fnarfbargle.com header.i=@fnarfbargle.com header.b="bfDP7C7I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C31220578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=fnarfbargle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i69mx-0000zH-22
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 04:40:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51287)
+	id 1i69xx-0003Ht-An
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 04:51:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i69lH-0007ug-AP
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:38:35 -0400
+ (envelope-from <lists2009@fnarfbargle.com>) id 1i69x9-0002cS-Aj
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i69lD-00009p-40
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:38:31 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:44113)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i69lC-0008Vt-Id
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:38:27 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M1YlB-1i84VB12T5-0038KM; Fri, 06 Sep 2019 10:38:15 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Fri,  6 Sep 2019 10:38:12 +0200
-Message-Id: <20190906083812.29487-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <lists2009@fnarfbargle.com>) id 1i69x7-0005bi-Aw
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:50:47 -0400
+Received: from ns3.fnarfbargle.com ([103.4.19.87]:38282)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lists2009@fnarfbargle.com>)
+ id 1i69x6-0005WV-Oa; Fri, 06 Sep 2019 04:50:45 -0400
+Received: from [10.8.0.1] (helo=srv.home ident=heh29303)
+ by ns3.fnarfbargle.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.84_2) (envelope-from <lists2009@fnarfbargle.com>)
+ id 1i69vC-00052y-Kj; Fri, 06 Sep 2019 16:48:46 +0800
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=fnarfbargle.com; s=mail; 
+ h=Content-Transfer-Encoding:Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:References:To:From:Subject;
+ bh=M8rSvzvv+XUy0tywBgKqVhrBaQSVsVtCpRo2Snsbe2o=; 
+ b=bfDP7C7IRxWqYPmp5VtBo/x1zJveTGGPstTU2vjGJbCqj+L8YPfDZoHTO7fPL2ewGQJa3l74eOBybb/NmDSiny01WGCXGkGWfMqNqEqmFpD63fc/3jPDQpemi+ydZfYszjjx8guiGUX2X3a4y9Rjds7ILeuRVJsM92wPTTuGhNw=;
+From: Brad Campbell <lists2009@fnarfbargle.com>
+To: qemu-discuss@nongnu.org, qemu-devel <qemu-devel@nongnu.org>
+References: <ed421291-7178-d7bc-5ed3-9863d28ceba9@fnarfbargle.com>
+ <dd33a398-3c1f-0c92-2318-00ad144e1e5d@fnarfbargle.com>
+Message-ID: <b1782119-abbc-9678-8217-ef576dbf8c93@fnarfbargle.com>
+Date: Fri, 6 Sep 2019 16:49:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MRCcaFq2g8WpbajFhmK/H4DNgFarnHQzwxZHpSmeoqpNgVswIdm
- Zbm8XfAPs7s/xavqVLrQfDZotM3HdrO8l2EVWdGTl0VSVUoLeVPBM9hJb8NNGNp9uHwGLFo
- KC3ZP7nyBDTkHmy9lbnDOq6/zlgsxCPFHndk84UK0SrL47cqEul+TZW74lf/maT/hC0XxRH
- byXPRWr3DV0OTS4Wh00qw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:jfdXGvdFfh4=:xB/2osKWtpCoVeDKbn6JkS
- aGL0e3H2bCIM1JVmaE9YkZkJ/9D4Ux8u6wJRnMMuOGR7Lfg9mTIu+a8NCF8KoTFSkv2/wnZNo
- 0rTn50m2+dcFhTvU/x8bRC7OozV1iIeZSIuxhezmiLqmn6fYKf02+guo8jntl42yw5NdF+Uie
- H6tsWymW6JKOw9ce+l6jUMKFZPf8gU5akYz1dcGnU25MYer9rcl1PBrEtanPtplp+8zMFq5p0
- /XFAswncwqHSPfihhlbLuI0ZP6tn+m4tOML9EIJeSETM5BmLPsjMGjtmkDn9DTJkluxeEfh5A
- lqA0UIBy6nnvltrNEPizDu+wJiFg+lV5Tf6y0nJC9DGrH0BI9HlNuGksvnvc0NVnxmYofnXzE
- EsslxqSlBvFjH9DUIEVUbzBQJgqswZrHFr5IfFq/RRxEp1LPgOoDXjQfyoRL+YAwZmLHA/3Cf
- 1O/V9EvLEusrQxESqQTm/nJRbn1k9vPDdgBOpZAWJ0VDtTOQocrG+imfXp38xzdlFRxVl3ycb
- a/6Xe1qYDLJhvKq/gPuI2+LAXg5o4apsNdo9P8aPShjIG1fss6eL3RN7+BxCB9M1zG84HCu9k
- FNXSs4UfM3PpJs1ichCWL9SJb1cdORdaJQ7NDreonPX+RDEhoobZhPDAMEplWsk7bC82aDbqb
- VN3SC7cCEDpfcx+82kqarETJBY8Tq+p4J/3DeVDCVbdLKWGye4U1MyW0qLUr7KxriWOGtdae4
- gebosKPInieBKX5MRhqAQHfdkJkuIkQ5Cuto5xyrHO/GwGF14jJ/RuU4zxssmMbzVH+FoAeXU
- HAtWkyvMIpMO1ZsQzmcaZ7uh6gu/BN2E06GA4XeLGTJVsyBr9w=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
-Subject: [Qemu-devel] [PATCH v3] ui: add an embedded Barrier client
+In-Reply-To: <dd33a398-3c1f-0c92-2318-00ad144e1e5d@fnarfbargle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 103.4.19.87
+Subject: [Qemu-devel] Cross-posted : Odd QXL/KVM performance issue with a
+ Windows 7 Guest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,1349 +71,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows to receive mouse and keyboard events from
-a Barrier server.
+On 2/9/19 6:23 pm, Brad Campbell wrote:
 
-This is enabled by adding the following parameter on the
-command line
+> 
+> Here is the holdup :
+> 
+> 11725@1567416625.003504:qxl_ring_command_check 0 native
+> 11725@1567416625.102653:qxl_io_write 0 native addr=0 (QXL_IO_NOTIFY_CMD) 
+> val=0 size=1 async=0
+> 
+> ~100ms delay prior to each logged QXL_IO_NOTIFY_CMD on the AMD box which 
+> explains the performance difference. Now I just need to figure out if 
+> that lies in the guest, the guest QXL driver, QEMU or SPICE and why it 
+> exhibits on the AMD box and not the i7.
+> 
+> To get to this point, I recompiled the kernel on the i7 box with both 
+> AMD and Intel KVM modules. Once that was running I cloned the drive and 
+> put it in the AMD box, so the OS, software stack and all dependencies 
+> are identical.
 
-    ... -object input-barrier,id=$id,name=$name ...
+Reacp :
 
-Where $name is the name declared in the screens section of barrier.conf
+I have a machine with a Windows 7 VM which is running on an i7-3770. 
+This works perfectly.
 
-The barrier server (barriers) must be configured and must run on the
-local host.
+Clone the disk and put it in a new(ish) AMD Ryzen 1500x machine and the 
+display output using qxl/spice is now limited to ~5-7fps.
 
-For instance:
+I originally cloned the entire machine to keep the software versions 
+identical.
 
-  section: screens
-      localhost:
-          ...
-      VM-1:
-          ...
-      end
+To simplify debugging and reproduction I'm now using :
+- An identical SPICE version to that on the i7.
+- A fresh 64 bit Windows 7 VM.
+- The D2D benchmark from Crystalmark 2004R7.
 
-  section: links
-      localhost:
-          right = VM-1
-      VM-1:
-          left = localhost
-  end
+The machine is booted with :
 
-Then on the QEMU command line:
+qemu -enable-kvm \
+  -m 8192\
+  -rtc base=localtime\
+  -vga qxl\
+  -device qxl\
+  -global qxl-vga.guestdebug=3\
+  -global qxl-vga.cmdlog=1\
+  -global qxl-vga.vram_size=65536\
+  -global qxl.vram_size=65536\
+  -global qxl-vga.ram_size=65536\
+  -global qxl.ram_size=65536\
+  -net nic,model=virtio\
+  -net tap,ifname=tap0,script=/etc/qemu-ifup,vhost=on\
+  -usbdevice tablet\
+  -spice port=5930,disable-ticketing\
+  -device virtio-serial\
+  -chardev spicevmc,id=vdagent,name=vdagent\
+  -device virtserialport,chardev=vdagent,name=com.redhat.spice.0\
+  -smp 3,maxcpus=3,cores=3,threads=1,sockets=1\
+  -cpu qemu64,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time \
+  -drive 
+file=/server/VM/Cadbox.raw,if=virtio,aio=threads,format=raw,cache=unsafe 
+-boot c \
+  -drive 
+file=/server/VM/Cadbox_swap.raw,if=virtio,aio=threads,format=raw,cache=unsafe 
+\
 
-    ... -object input-barrier,id=barrie0,name=VM-1 ...
 
-When the mouse will move out of the screen of the local host on
-the right, the mouse and the keyboard will be grabbed and all
-related events will be send to the guest OS.
+The D2D benchmark runs through a series of Sprites (stars) and it just 
+shuffles them around the screen.
 
-This is usefull when qemu is configured without emulated graphic card
-but with a VFIO attached graphic card.
+With KVM enabled I get :
 
-More information about Barrier can be found at:
+Sprite    10 - 8.66fps
+Sprite   100 - 8.47fps
+Sprite   500 - 8.45fps
+Sprite  1000 - 8.18fps
+Sprite  5000 - 7.64fps
+Sprite 10000 - 7.26fps
 
-  https://github.com/debauchee/barrier
+With the identical system, with KVM disabled I get :
 
-This avoids to install the Barrier server in the guest OS,
-for instance when it is not supported or during the installation.
+Sprite    10 - 28.97fps
+Sprite   100 - 27.24fps
+Sprite   500 - 23.85fps
+Sprite  1000 - 22.00fps
+Sprite  5000 - 11.11fps
+Sprite 10000 -  4.50fps
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
+On the i7 with the same software version and kvm enabled  :
 
-Notes:
-    v3: remove typo in barrier.txt
-    
-    v2: use qemu_input_map_xorgkbd_to_qcode[] to convert button field
-        use keyboard_layout to convert keys if button field is not available
-        fix some command in the protocol
-        add ui/input-barrier.h
-        rework read/write functions
-        add server/port properties
-        add display properties
-        rework protocol
-        allow to reconnect (object_del + object_add)
-        add documentation
+Sprite    10 - 88.58fps
+Sprite   100 - 88.35fps
+Sprite   500 - 85.64fps
+Sprite  1000 - 83.33fps
+Sprite  5000 - 58.08fps
+Sprite 10000 - 45.29fps
 
- docs/barrier.txt   | 370 ++++++++++++++++++++++
- ui/Makefile.objs   |   1 +
- ui/input-barrier.c | 750 +++++++++++++++++++++++++++++++++++++++++++++
- ui/input-barrier.h | 112 +++++++
- 4 files changed, 1233 insertions(+)
- create mode 100644 docs/barrier.txt
- create mode 100644 ui/input-barrier.c
- create mode 100644 ui/input-barrier.h
 
-diff --git a/docs/barrier.txt b/docs/barrier.txt
-new file mode 100644
-index 000000000000..b21d15015d96
---- /dev/null
-+++ b/docs/barrier.txt
-@@ -0,0 +1,370 @@
-+                                QEMU Barrier Client
-+
-+
-+* About
-+
-+    Barrier is a KVM (Keyboard-Video-Mouse) software forked from Symless's
-+    synergy 1.9 codebase.
-+
-+    See https://github.com/debauchee/barrier
-+
-+* QEMU usage
-+
-+    Generally, mouse and keyboard are grabbed through the QEMU video
-+    interface emulation.
-+
-+    But when we want to use a video graphic adapter via a PCI passthrough
-+    there is no way to provide the keyboard and mouse inputs to the VM
-+    except by plugging a second set of mouse and keyboard to the host
-+    or by installing a KVM software in the guest OS.
-+
-+    The QEMU Barrier client avoids this by implementing directly the Barrier
-+    protocol into QEMU.
-+
-+    This protocol is enabled by adding an input-barrier object to QEMU.
-+
-+    Syntax: input-barrier,id=<object-id>,name=<guest display name>
-+            [,server=<barrier server address>][,port=<barrier server port>]
-+            [,x-origin=<x-origin>][,y-origin=<y-origin>]
-+            [,width=<width>][,height=<height>]
-+
-+    The object can be added on the QEMU command line, for instance with:
-+
-+        ... -object input-barrier,id=barrier0,name=VM-1 ...
-+
-+    where VM-1 is the name the display configured int the Barrier server
-+    on the host providing the mouse and the keyboard events.
-+
-+    by default <barrier server address> is "localhost", port is 24800,
-+    <x-origin> and <y-origin> are set to 0, <width> and <height> to
-+    1920 and 1080.
-+
-+    If Barrier server is stopped QEMU needs to be reconnected manually,
-+    by removing and re-adding the input-barrier object, for instance
-+    with the help of the HMP monitor:
-+
-+        (qemu) object_del barrier0
-+        (qemu) object_add input-barrier,id=barrier0,name=VM-1
-+
-+* Message format
-+
-+    Message format between the server and client is in two parts:
-+
-+        1- the payload length is a 32bit integer in network endianness,
-+        2- the payload
-+
-+    The payload starts with a 4byte string (without NUL) which is the
-+    command. The first command between the server and the client
-+    is the only command not encoded on 4 bytes ("Barrier").
-+    The remaining part of the payload is decoded according to the command.
-+
-+* Protocol Description (from barrier/src/lib/barrier/protocol_types.h)
-+
-+    - barrierCmdHello          "Barrier"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t minor, int16_t major }
-+      Description:
-+
-+          Say hello to client
-+          minor = protocol major version number supported by server
-+          major = protocol minor version number supported by server
-+
-+    - barrierCmdHelloBack      "Barrier"
-+
-+      Direction:  client ->server
-+      Parameters: { int16_t minor, int16_t major, char *name}
-+      Description:
-+
-+          Respond to hello from server
-+          minor = protocol major version number supported by client
-+          major = protocol minor version number supported by client
-+          name  = client name
-+
-+    - barrierCmdDInfo          "DINF"
-+
-+      Direction:  client ->server
-+      Parameters: { int16_t x_origin, int16_t y_origin, int16_t width, int16_t height, int16_t x, int16_t y}
-+      Description:
-+
-+          The client screen must send this message in response to the
-+          barrierCmdQInfo message.  It must also send this message when the
-+          screen's resolution changes.  In this case, the client screen should
-+          ignore any barrierCmdDMouseMove messages until it receives a
-+          barrierCmdCInfoAck in order to prevent attempts to move the mouse off
-+          the new screen area.
-+
-+    - barrierCmdCNoop          "CNOP"
-+
-+      Direction:  client -> server
-+      Parameters: None
-+      Description:
-+
-+          No operation
-+
-+    - barrierCmdCClose         "CBYE"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Close connection
-+
-+    - barrierCmdCEnter         "CINN"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x, int16_t y, int32_t seq, int16_t modifier }
-+      Description:
-+
-+          Enter screen.
-+          x,y      = entering screen absolute coordinates
-+          seq      = sequence number, which is used to order messages between
-+                     screens.  the secondary screen must return this number
-+                     with some messages
-+          modifier = modifier key mask.  this will have bits set for each
-+                     toggle modifier key that is activated on entry to the
-+                     screen.  the secondary screen should adjust its toggle
-+                     modifiers to reflect that state.
-+
-+    - barrierCmdCLeave         "COUT"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Leaving screen.  the secondary screen should send clipboard data in
-+          response to this message for those clipboards that it has grabbed
-+          (i.e. has sent a barrierCmdCClipboard for and has not received a
-+          barrierCmdCClipboard for with a greater sequence number) and that
-+          were grabbed or have changed since the last leave.
-+
-+    - barrierCmdCClipboard     "CCLP"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t id, int32_t seq }
-+      Description:
-+
-+          Grab clipboard. Sent by screen when some other app on that screen
-+          grabs a clipboard.
-+          id  = the clipboard identifier
-+          seq = sequence number. Client must use the sequence number passed in
-+                the most recent barrierCmdCEnter.  the server always sends 0.
-+
-+    - barrierCmdCScreenSaver   "CSEC"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t started }
-+      Description:
-+
-+          Screensaver change.
-+          started = Screensaver on primary has started (1) or closed (0)
-+
-+    - barrierCmdCResetOptions  "CROP"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Reset options. Client should reset all of its options to their
-+          defaults.
-+
-+    - barrierCmdCInfoAck       "CIAK"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Resolution change acknowledgment. Sent by server in response to a
-+          client screen's barrierCmdDInfo. This is sent for every
-+          barrierCmdDInfo, whether or not the server had sent a barrierCmdQInfo.
-+
-+    - barrierCmdCKeepAlive     "CALV"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Keep connection alive. Sent by the server periodically to verify
-+          that connections are still up and running.  clients must reply in
-+          kind on receipt.  if the server gets an error sending the message or
-+          does not receive a reply within a reasonable time then the server
-+          disconnects the client.  if the client doesn't receive these (or any
-+          message) periodically then it should disconnect from the server.  the
-+          appropriate interval is defined by an option.
-+
-+    - barrierCmdDKeyDown       "DKDN"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t keyid, int16_t modifier [,int16_t button] }
-+      Description:
-+
-+          Key pressed.
-+          keyid    = X11 key id
-+          modified = modified mask
-+          button   = X11 Xkb keycode (optional)
-+
-+    - barrierCmdDKeyRepeat     "DKRP"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t keyid, int16_t modifier, int16_t repeat [,int16_t button] }
-+      Description:
-+
-+          Key auto-repeat.
-+          keyid    = X11 key id
-+          modified = modified mask
-+          repeat   = number of repeats
-+          button   = X11 Xkb keycode (optional)
-+
-+    - barrierCmdDKeyUp         "DKUP"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t keyid, int16_t modifier [,int16_t button] }
-+      Description:
-+
-+          Key released.
-+          keyid    = X11 key id
-+          modified = modified mask
-+          button   = X11 Xkb keycode (optional)
-+
-+    - barrierCmdDMouseDown     "DMDN"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t button }
-+      Description:
-+
-+          Mouse button pressed.
-+          button = button id
-+
-+    - barrierCmdDMouseUp       "DMUP"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t button }
-+      Description:
-+
-+          Mouse button release.
-+          button = button id
-+
-+    - barrierCmdDMouseMove     "DMMV"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x, int16_t y }
-+      Description:
-+
-+          Absolute mouse moved.
-+          x,y = absolute screen coordinates
-+
-+    - barrierCmdDMouseRelMove  "DMRM"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x, int16_t y }
-+      Description:
-+
-+          Relative mouse moved.
-+          x,y = r relative screen coordinates
-+
-+    - barrierCmdDMouseWheel    "DMWM"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x , int16_t y } or { int16_t y }
-+      Description:
-+
-+          Mouse scroll. The delta should be +120 for one tick forward (away
-+          from the user) or right and -120 for one tick backward (toward the
-+          user) or left.
-+          x = x delta
-+          y = y delta
-+
-+    - barrierCmdDClipboard     "DCLP"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t id, int32_t seq, int8_t mark, char *data }
-+      Description:
-+
-+          Clipboard data.
-+          id  = clipboard id
-+          seq = sequence number. The sequence number is 0 when sent by the
-+                server.  Client screens should use the/ sequence number from
-+                the most recent barrierCmdCEnter.
-+
-+    - barrierCmdDSetOptions    "DSOP"
-+
-+      Direction:  server -> client
-+      Parameters: { int32 t nb, { int32_t id, int32_t val }[] }
-+      Description:
-+
-+          Set options. Client should set the given option/value pairs.
-+          nb  = numbers of { id, val } entries
-+          id  = option id
-+          val = option new value
-+
-+    - barrierCmdDFileTransfer  "DFTR"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t mark, char *content }
-+      Description:
-+
-+          Transfer file data.
-+          mark = 0 means the content followed is the file size
-+                 1 means the content followed is the chunk data
-+                 2 means the file transfer is finished
-+
-+    - barrierCmdDDragInfo      "DDRG" int16_t char *
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t nb, char *content }
-+      Description:
-+
-+          Drag information.
-+          nb      = number of dragging objects
-+          content = object's directory
-+
-+    - barrierCmdQInfo          "QINF"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Query screen info
-+          Client should reply with a barrierCmdDInfo
-+
-+    - barrierCmdEIncompatible  "EICV"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t nb, major *minor }
-+      Description:
-+
-+          Incompatible version.
-+          major = major version
-+          minor = minor version
-+
-+    - barrierCmdEBusy          "EBSY"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Name provided when connecting is already in use.
-+
-+    - barrierCmdEUnknown       "EUNK"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Unknown client. Name provided when connecting is not in primary's
-+           screen configuration map.
-+
-+    - barrierCmdEBad           "EBAD"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Protocol violation. Server should disconnect after sending this
-+          message.
-+
-+* TO DO
-+
-+    - Enable SSL
-+    - Manage SetOptions/ResetOptions commands
-+
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index ba39080edb2b..e6da6ff047fd 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -9,6 +9,7 @@ vnc-obj-y += vnc-jobs.o
- 
- common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
- common-obj-y += input.o input-keymap.o input-legacy.o kbd-state.o
-+common-obj-y += input-barrier.o
- common-obj-$(CONFIG_LINUX) += input-linux.o
- common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
- common-obj-$(CONFIG_COCOA) += cocoa.o
-diff --git a/ui/input-barrier.c b/ui/input-barrier.c
-new file mode 100644
-index 000000000000..a2c961f285a4
---- /dev/null
-+++ b/ui/input-barrier.c
-@@ -0,0 +1,750 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/sockets.h"
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "io/channel-socket.h"
-+#include "ui/input.h"
-+#include "ui/vnc_keysym.h" /* use name2keysym from VNC as we use X11 values */
-+#include "qemu/cutils.h"
-+#include "qapi/qmp/qerror.h"
-+#include "input-barrier.h"
-+
-+#define TYPE_INPUT_BARRIER "input-barrier"
-+#define INPUT_BARRIER(obj) \
-+    OBJECT_CHECK(InputBarrier, (obj), TYPE_INPUT_BARRIER)
-+#define INPUT_BARRIER_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(InputBarrierClass, (obj), TYPE_INPUT_BARRIER)
-+#define INPUT_BARRIER_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(InputBarrierClass, (klass), TYPE_INPUT_BARRIER)
-+
-+typedef struct InputBarrier InputBarrier;
-+typedef struct InputBarrierClass InputBarrierClass;
-+
-+#define MAX_HELLO_LENGTH 1024
-+
-+struct InputBarrier {
-+    Object parent;
-+
-+    QIOChannelSocket *sioc;
-+    guint ioc_tag;
-+
-+    /* display properties */
-+    gchar *name;
-+    int16_t x_origin, y_origin;
-+    int16_t width, height;
-+
-+    /* keyboard/mouse server */
-+
-+    SocketAddress saddr;
-+
-+    char buffer[MAX_HELLO_LENGTH];
-+};
-+
-+struct InputBarrierClass {
-+    ObjectClass parent_class;
-+};
-+
-+static const char *cmd_names[] = {
-+    [barrierCmdCNoop]          = "CNOP",
-+    [barrierCmdCClose]         = "CBYE",
-+    [barrierCmdCEnter]         = "CINN",
-+    [barrierCmdCLeave]         = "COUT",
-+    [barrierCmdCClipboard]     = "CCLP",
-+    [barrierCmdCScreenSaver]   = "CSEC",
-+    [barrierCmdCResetOptions]  = "CROP",
-+    [barrierCmdCInfoAck]       = "CIAK",
-+    [barrierCmdCKeepAlive]     = "CALV",
-+    [barrierCmdDKeyDown]       = "DKDN",
-+    [barrierCmdDKeyRepeat]     = "DKRP",
-+    [barrierCmdDKeyUp]         = "DKUP",
-+    [barrierCmdDMouseDown]     = "DMDN",
-+    [barrierCmdDMouseUp]       = "DMUP",
-+    [barrierCmdDMouseMove]     = "DMMV",
-+    [barrierCmdDMouseRelMove]  = "DMRM",
-+    [barrierCmdDMouseWheel]    = "DMWM",
-+    [barrierCmdDClipboard]     = "DCLP",
-+    [barrierCmdDInfo]          = "DINF",
-+    [barrierCmdDSetOptions]    = "DSOP",
-+    [barrierCmdDFileTransfer]  = "DFTR",
-+    [barrierCmdDDragInfo]      = "DDRG",
-+    [barrierCmdQInfo]          = "QINF",
-+    [barrierCmdEIncompatible]  = "EICV",
-+    [barrierCmdEBusy]          = "EBSY",
-+    [barrierCmdEUnknown]       = "EUNK",
-+    [barrierCmdEBad]           = "EBAD",
-+    [barrierCmdHello]          = "Barrier",
-+    [barrierCmdHelloBack]      = "Barrier",
-+};
-+
-+static kbd_layout_t *kbd_layout;
-+
-+static int input_barrier_to_qcode(uint16_t keyid, uint16_t keycode)
-+{
-+    /* keycode is optional, if it is not provided use keyid */
-+    if (keycode && keycode <= qemu_input_map_xorgkbd_to_qcode_len) {
-+        return qemu_input_map_xorgkbd_to_qcode[keycode];
-+    }
-+
-+    if (keyid >= 0xE000 && keyid <= 0xEFFF) {
-+        keyid += 0x1000;
-+    }
-+
-+    /* keyid is the X11 key id */
-+    if (kbd_layout) {
-+        keycode = keysym2scancode(kbd_layout, keyid, NULL, false);
-+
-+        return qemu_input_key_number_to_qcode(keycode);
-+    }
-+
-+    return qemu_input_map_x11_to_qcode[keyid];
-+}
-+
-+static int input_barrier_to_mouse(uint8_t buttonid)
-+{
-+    switch (buttonid) {
-+    case barrierButtonLeft:
-+        return INPUT_BUTTON_LEFT;
-+    case barrierButtonMiddle:
-+        return INPUT_BUTTON_MIDDLE;
-+    case barrierButtonRight:
-+        return INPUT_BUTTON_RIGHT;
-+    case barrierButtonExtra0:
-+        return INPUT_BUTTON_SIDE;
-+    }
-+    return buttonid;
-+}
-+
-+#define read_char(x, p, l)           \
-+do {                                 \
-+    int size = sizeof(char);         \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    x = *(char *)p;                  \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define read_short(x, p, l)          \
-+do {                                 \
-+    int size = sizeof(short);        \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    x = ntohs(*(short *)p);          \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_short(p, x, l)         \
-+do {                                 \
-+    int size = sizeof(short);        \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    *(short *)p = htons(x);          \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define read_int(x, p, l)            \
-+do {                                 \
-+    int size = sizeof(int);          \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    x = ntohl(*(int *)p);            \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_int(p, x, l)           \
-+do {                                 \
-+    int size = sizeof(int);          \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    *(int *)p = htonl(x);            \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_cmd(p, c, l)           \
-+do {                                 \
-+    int size = strlen(cmd_names[c]); \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    memcpy(p, cmd_names[c], size);   \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_string(p, s, l)        \
-+do {                                 \
-+    int size = strlen(s);            \
-+    if (l < size + sizeof(int)) {    \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    *(int *)p = htonl(size);         \
-+    p += sizeof(size);               \
-+    l -= sizeof(size);               \
-+    memcpy(p, s, size);              \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+static gboolean readcmd(InputBarrier *ib, struct barrierMsg *msg)
-+{
-+    int ret, len, i;
-+    enum barrierCmd cmd;
-+    char *p;
-+
-+    ret = qio_channel_read(QIO_CHANNEL(ib->sioc), (char *)&len, sizeof(len),
-+                           NULL);
-+    if (ret < 0) {
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    len = ntohl(len);
-+    if (len > MAX_HELLO_LENGTH) {
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    ret = qio_channel_read(QIO_CHANNEL(ib->sioc), ib->buffer, len, NULL);
-+    if (ret < 0) {
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    p = ib->buffer;
-+    if (len >= strlen(cmd_names[barrierCmdHello]) &&
-+        memcmp(p, cmd_names[barrierCmdHello],
-+               strlen(cmd_names[barrierCmdHello])) == 0) {
-+        cmd = barrierCmdHello;
-+        p += strlen(cmd_names[barrierCmdHello]);
-+        len -= strlen(cmd_names[barrierCmdHello]);
-+    } else {
-+        for (cmd = 0; cmd < barrierCmdHello; cmd++) {
-+            if (memcmp(ib->buffer, cmd_names[cmd], 4) == 0) {
-+                break;
-+            }
-+        }
-+
-+        if (cmd == barrierCmdHello) {
-+            return G_SOURCE_REMOVE;
-+        }
-+        p += 4;
-+        len -= 4;
-+    }
-+
-+    msg->cmd = cmd;
-+    switch (cmd) {
-+    /* connection */
-+    case barrierCmdHello:
-+        read_short(msg->version.major, p, len);
-+        read_short(msg->version.minor, p, len);
-+        break;
-+    case barrierCmdDSetOptions:
-+        read_int(msg->set.nb, p, len);
-+        msg->set.nb /= 2;
-+        if (msg->set.nb > BARRIER_MAX_OPTIONS) {
-+            msg->set.nb = BARRIER_MAX_OPTIONS;
-+        }
-+        i = 0;
-+        while (len && i < msg->set.nb) {
-+            read_int(msg->set.option[i].id, p, len);
-+            /* it's a string, restore endianness */
-+            msg->set.option[i].id = htonl(msg->set.option[i].id);
-+            msg->set.option[i].nul = 0;
-+            read_int(msg->set.option[i].value, p, len);
-+            i++;
-+        }
-+        break;
-+    case barrierCmdQInfo:
-+        break;
-+
-+    /* mouse */
-+    case barrierCmdDMouseMove:
-+    case barrierCmdDMouseRelMove:
-+        read_short(msg->mousepos.x, p, len);
-+        read_short(msg->mousepos.y, p, len);
-+        break;
-+    case barrierCmdDMouseDown:
-+    case barrierCmdDMouseUp:
-+        read_char(msg->mousebutton.buttonid, p, len);
-+        break;
-+    case barrierCmdDMouseWheel:
-+        read_short(msg->mousepos.y, p, len);
-+        msg->mousepos.x = 0;
-+        if (len) {
-+            msg->mousepos.x = msg->mousepos.y;
-+            read_short(msg->mousepos.y, p, len);
-+        }
-+        break;
-+
-+    /* keyboard */
-+    case barrierCmdDKeyDown:
-+    case barrierCmdDKeyUp:
-+        read_short(msg->key.keyid, p, len);
-+        read_short(msg->key.modifier, p, len);
-+        msg->key.button = 0;
-+        if (len) {
-+            read_short(msg->key.button, p, len);
-+        }
-+        break;
-+    case barrierCmdDKeyRepeat:
-+        read_short(msg->repeat.keyid, p, len);
-+        read_short(msg->repeat.modifier, p, len);
-+        read_short(msg->repeat.repeat, p, len);
-+        msg->repeat.button = 0;
-+        if (len) {
-+            read_short(msg->repeat.button, p, len);
-+        }
-+        break;
-+    case barrierCmdCInfoAck:
-+    case barrierCmdCResetOptions:
-+    case barrierCmdCEnter:
-+    case barrierCmdDClipboard:
-+    case barrierCmdCKeepAlive:
-+    case barrierCmdCLeave:
-+    case barrierCmdCClose:
-+        break;
-+
-+    /* Invalid from the server */
-+    case barrierCmdHelloBack:
-+    case barrierCmdCNoop:
-+    case barrierCmdDInfo:
-+        break;
-+
-+    /* Error codes */
-+    case barrierCmdEIncompatible:
-+        read_short(msg->version.major, p, len);
-+        read_short(msg->version.minor, p, len);
-+        break;
-+    case barrierCmdEBusy:
-+    case barrierCmdEUnknown:
-+    case barrierCmdEBad:
-+        break;
-+    default:
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+static gboolean writecmd(InputBarrier *ib, struct barrierMsg *msg)
-+{
-+    char *p;
-+    int ret, i;
-+    int avail, len;
-+
-+    p = ib->buffer;
-+    avail = MAX_HELLO_LENGTH;
-+
-+    /* reserve space to store the length */
-+    p += sizeof(int);
-+    avail -= sizeof(int);
-+
-+    switch (msg->cmd) {
-+    case barrierCmdHello:
-+        if (msg->version.major < BARRIER_VERSION_MAJOR ||
-+            (msg->version.major == BARRIER_VERSION_MAJOR &&
-+             msg->version.minor < BARRIER_VERSION_MINOR)) {
-+            ib->ioc_tag = 0;
-+            return G_SOURCE_REMOVE;
-+        }
-+        write_cmd(p, barrierCmdHelloBack, avail);
-+        write_short(p, BARRIER_VERSION_MAJOR, avail);
-+        write_short(p, BARRIER_VERSION_MINOR, avail);
-+        write_string(p, ib->name, avail);
-+        break;
-+    case barrierCmdCClose:
-+        ib->ioc_tag = 0;
-+        return G_SOURCE_REMOVE;
-+    case barrierCmdQInfo:
-+        write_cmd(p, barrierCmdDInfo, avail);
-+        write_short(p, ib->x_origin, avail);
-+        write_short(p, ib->y_origin, avail);
-+        write_short(p, ib->width, avail);
-+        write_short(p, ib->height, avail);
-+        write_short(p, 0, avail);    /* warpsize (obsolete) */
-+        write_short(p, 0, avail);    /* mouse x */
-+        write_short(p, 0, avail);    /* mouse y */
-+        break;
-+    case barrierCmdCInfoAck:
-+        break;
-+    case barrierCmdCResetOptions:
-+        /* TODO: reset options */
-+        break;
-+    case barrierCmdDSetOptions:
-+        /* TODO: set options */
-+        break;
-+    case barrierCmdCEnter:
-+        break;
-+    case barrierCmdDClipboard:
-+        break;
-+    case barrierCmdCKeepAlive:
-+        write_cmd(p, barrierCmdCKeepAlive, avail);
-+        break;
-+    case barrierCmdCLeave:
-+        break;
-+
-+    /* mouse */
-+    case barrierCmdDMouseMove:
-+        qemu_input_queue_abs(NULL, INPUT_AXIS_X, msg->mousepos.x,
-+                             ib->x_origin, ib->width);
-+        qemu_input_queue_abs(NULL, INPUT_AXIS_Y, msg->mousepos.y,
-+                             ib->y_origin, ib->height);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseRelMove:
-+        qemu_input_queue_rel(NULL, INPUT_AXIS_X, msg->mousepos.x);
-+        qemu_input_queue_rel(NULL, INPUT_AXIS_Y, msg->mousepos.y);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseDown:
-+        qemu_input_queue_btn(NULL,
-+                             input_barrier_to_mouse(msg->mousebutton.buttonid),
-+                             true);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseUp:
-+        qemu_input_queue_btn(NULL,
-+                             input_barrier_to_mouse(msg->mousebutton.buttonid),
-+                             false);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseWheel:
-+        qemu_input_queue_btn(NULL, (msg->mousepos.y > 0) ? INPUT_BUTTON_WHEEL_UP
-+                             : INPUT_BUTTON_WHEEL_DOWN, true);
-+        qemu_input_event_sync();
-+        qemu_input_queue_btn(NULL, (msg->mousepos.y > 0) ? INPUT_BUTTON_WHEEL_UP
-+                             : INPUT_BUTTON_WHEEL_DOWN, false);
-+        qemu_input_event_sync();
-+        break;
-+
-+    /* keyboard */
-+    case barrierCmdDKeyDown:
-+        qemu_input_event_send_key_qcode(NULL,
-+                        input_barrier_to_qcode(msg->key.keyid, msg->key.button),
-+                                        true);
-+        break;
-+    case barrierCmdDKeyRepeat:
-+        for (i = 0; i < msg->repeat.repeat; i++) {
-+            qemu_input_event_send_key_qcode(NULL,
-+                  input_barrier_to_qcode(msg->repeat.keyid, msg->repeat.button),
-+                                            false);
-+            qemu_input_event_send_key_qcode(NULL,
-+                  input_barrier_to_qcode(msg->repeat.keyid, msg->repeat.button),
-+                                            true);
-+        }
-+        break;
-+    case barrierCmdDKeyUp:
-+        qemu_input_event_send_key_qcode(NULL,
-+                        input_barrier_to_qcode(msg->key.keyid, msg->key.button),
-+                                        false);
-+        break;
-+    default:
-+        write_cmd(p, barrierCmdEUnknown, avail);
-+        break;;
-+    }
-+
-+    len = MAX_HELLO_LENGTH - avail - sizeof(int);
-+    if (len) {
-+        p = ib->buffer;
-+        avail = sizeof(len);
-+        write_int(p, len, avail);
-+        ret = qio_channel_write(QIO_CHANNEL(ib->sioc), ib->buffer,
-+                                len + sizeof(len), NULL);
-+        if (ret < 0) {
-+            ib->ioc_tag = 0;
-+            return G_SOURCE_REMOVE;
-+        }
-+    }
-+
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+static gboolean input_barrier_event(QIOChannel *ioc G_GNUC_UNUSED,
-+                                    GIOCondition condition, void *opaque)
-+{
-+    InputBarrier *ib = opaque;
-+    int ret;
-+    struct barrierMsg msg;
-+
-+    ret = readcmd(ib, &msg);
-+    if (ret == G_SOURCE_REMOVE) {
-+        ib->ioc_tag = 0;
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    return writecmd(ib, &msg);
-+}
-+
-+static void input_barrier_complete(UserCreatable *uc, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(uc);
-+    Error *local_err = NULL;
-+
-+    if (!ib->name) {
-+        error_setg(errp, QERR_MISSING_PARAMETER, "name");
-+        return;
-+    }
-+
-+    /*
-+     * Connect to the primary
-+     * Primary is the server where the keyboard and the mouse
-+     * are connected and forwarded to the secondary (the client)
-+     */
-+
-+    ib->sioc = qio_channel_socket_new();
-+    qio_channel_set_name(QIO_CHANNEL(ib->sioc), "barrier-client");
-+
-+    qio_channel_socket_connect_sync(ib->sioc, &ib->saddr, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    qio_channel_set_delay(QIO_CHANNEL(ib->sioc), false);
-+
-+    ib->ioc_tag = qio_channel_add_watch(QIO_CHANNEL(ib->sioc), G_IO_IN,
-+                                        input_barrier_event, ib, NULL);
-+}
-+
-+static void input_barrier_instance_finalize(Object *obj)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    if (ib->ioc_tag) {
-+        g_source_remove(ib->ioc_tag);
-+        ib->ioc_tag = 0;
-+    }
-+
-+    if (ib->sioc) {
-+        qio_channel_close(QIO_CHANNEL(ib->sioc), NULL);
-+        object_unref(OBJECT(ib->sioc));
-+    }
-+    g_free(ib->name);
-+    g_free(ib->saddr.u.inet.host);
-+    g_free(ib->saddr.u.inet.port);
-+}
-+
-+static char *input_barrier_get_name(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup(ib->name);
-+}
-+
-+static void input_barrier_set_name(Object *obj, const char *value,
-+                                  Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    if (ib->name) {
-+        error_setg(errp, "name property already set");
-+        return;
-+    }
-+    ib->name = g_strdup(value);
-+}
-+
-+static char *input_barrier_get_server(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup(ib->saddr.u.inet.host);
-+}
-+
-+static void input_barrier_set_server(Object *obj, const char *value,
-+                                     Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    g_free(ib->saddr.u.inet.host);
-+    ib->saddr.u.inet.host = g_strdup(value);
-+}
-+
-+static char *input_barrier_get_port(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup(ib->saddr.u.inet.port);
-+}
-+
-+static void input_barrier_set_port(Object *obj, const char *value,
-+                                     Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    g_free(ib->saddr.u.inet.port);
-+    ib->saddr.u.inet.port = g_strdup(value);
-+}
-+
-+static void input_barrier_set_x_origin(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "x-origin property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->x_origin = result;
-+}
-+
-+static char *input_barrier_get_x_origin(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->x_origin);
-+}
-+
-+static void input_barrier_set_y_origin(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "y-origin property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->y_origin = result;
-+}
-+
-+static char *input_barrier_get_y_origin(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->y_origin);
-+}
-+
-+static void input_barrier_set_width(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "width property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->width = result;
-+}
-+
-+static char *input_barrier_get_width(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->width);
-+}
-+
-+static void input_barrier_set_height(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "height property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->height = result;
-+}
-+
-+static char *input_barrier_get_height(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->height);
-+}
-+
-+static void input_barrier_instance_init(Object *obj)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    ib->saddr.type = SOCKET_ADDRESS_TYPE_INET;
-+    ib->saddr.u.inet.host = g_strdup("localhost");
-+    ib->saddr.u.inet.port = g_strdup("24800");
-+
-+    ib->x_origin = 0;
-+    ib->y_origin = 0;
-+    ib->width = 1920;
-+    ib->height = 1080;
-+
-+    object_property_add_str(obj, "name",
-+                            input_barrier_get_name,
-+                            input_barrier_set_name, NULL);
-+    object_property_add_str(obj, "server",
-+                            input_barrier_get_server,
-+                            input_barrier_set_server, NULL);
-+    object_property_add_str(obj, "port",
-+                            input_barrier_get_port,
-+                            input_barrier_set_port, NULL);
-+    object_property_add_str(obj, "x-origin",
-+                            input_barrier_get_x_origin,
-+                            input_barrier_set_x_origin, NULL);
-+    object_property_add_str(obj, "y-origin",
-+                            input_barrier_get_y_origin,
-+                            input_barrier_set_y_origin, NULL);
-+    object_property_add_str(obj, "width",
-+                            input_barrier_get_width,
-+                            input_barrier_set_width, NULL);
-+    object_property_add_str(obj, "height",
-+                            input_barrier_get_height,
-+                            input_barrier_set_height, NULL);
-+}
-+
-+static void input_barrier_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+
-+    ucc->complete = input_barrier_complete;
-+
-+    /* always use generic keymaps */
-+    if (keyboard_layout) {
-+        /* We use X11 key id, so use VNC name2keysym */
-+        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
-+                                          &error_fatal);
-+    }
-+}
-+
-+static const TypeInfo input_barrier_info = {
-+    .name = TYPE_INPUT_BARRIER,
-+    .parent = TYPE_OBJECT,
-+    .class_size = sizeof(InputBarrierClass),
-+    .class_init = input_barrier_class_init,
-+    .instance_size = sizeof(InputBarrier),
-+    .instance_init = input_barrier_instance_init,
-+    .instance_finalize = input_barrier_instance_finalize,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void register_types(void)
-+{
-+    type_register_static(&input_barrier_info);
-+}
-+
-+type_init(register_types);
-diff --git a/ui/input-barrier.h b/ui/input-barrier.h
-new file mode 100644
-index 000000000000..e5b090590ad5
---- /dev/null
-+++ b/ui/input-barrier.h
-@@ -0,0 +1,112 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef UI_INPUT_BARRIER_H
-+#define UI_INPUT_BARRIER_H
-+
-+/* Barrier protocol */
-+#define BARRIER_VERSION_MAJOR 1
-+#define BARRIER_VERSION_MINOR 6
-+
-+enum barrierCmd {
-+    barrierCmdCNoop,
-+    barrierCmdCClose,
-+    barrierCmdCEnter,
-+    barrierCmdCLeave,
-+    barrierCmdCClipboard,
-+    barrierCmdCScreenSaver,
-+    barrierCmdCResetOptions,
-+    barrierCmdCInfoAck,
-+    barrierCmdCKeepAlive,
-+    barrierCmdDKeyDown,
-+    barrierCmdDKeyRepeat,
-+    barrierCmdDKeyUp,
-+    barrierCmdDMouseDown,
-+    barrierCmdDMouseUp,
-+    barrierCmdDMouseMove,
-+    barrierCmdDMouseRelMove,
-+    barrierCmdDMouseWheel,
-+    barrierCmdDClipboard,
-+    barrierCmdDInfo,
-+    barrierCmdDSetOptions,
-+    barrierCmdDFileTransfer,
-+    barrierCmdDDragInfo,
-+    barrierCmdQInfo,
-+    barrierCmdEIncompatible,
-+    barrierCmdEBusy,
-+    barrierCmdEUnknown,
-+    barrierCmdEBad,
-+    /* connection sequence */
-+    barrierCmdHello,
-+    barrierCmdHelloBack,
-+};
-+
-+enum {
-+   barrierButtonNone,
-+   barrierButtonLeft,
-+   barrierButtonMiddle,
-+   barrierButtonRight,
-+   barrierButtonExtra0
-+};
-+
-+struct barrierVersion {
-+    int16_t major;
-+    int16_t minor;
-+};
-+
-+struct barrierMouseButton {
-+    int8_t buttonid;
-+};
-+
-+struct barrierEnter {
-+    int16_t x;
-+    int16_t y;
-+    int32_t seqn;
-+    int16_t modifier;
-+};
-+
-+struct barrierMousePos {
-+    int16_t x;
-+    int16_t y;
-+};
-+
-+struct barrierKey {
-+    int16_t keyid;
-+    int16_t modifier;
-+    int16_t button;
-+};
-+
-+struct barrierRepeat {
-+    int16_t keyid;
-+    int16_t modifier;
-+    int16_t repeat;
-+    int16_t button;
-+};
-+
-+#define BARRIER_MAX_OPTIONS 32
-+struct barrierSet {
-+    int nb;
-+    struct {
-+        int id;
-+        char nul;
-+        int value;
-+    } option[BARRIER_MAX_OPTIONS];
-+};
-+
-+struct barrierMsg {
-+    enum barrierCmd cmd;
-+    union {
-+        struct barrierVersion version;
-+        struct barrierMouseButton mousebutton;
-+        struct barrierMousePos mousepos;
-+        struct barrierEnter enter;
-+        struct barrierKey key;
-+        struct barrierRepeat repeat;
-+        struct barrierSet set;
-+    };
-+};
-+#endif
--- 
-2.21.0
+cpuinfo from the host :
+processor	: 7
+vendor_id	: AuthenticAMD
+cpu family	: 23
+model		: 1
+model name	: AMD Ryzen 5 1500X Quad-Core Processor
+stepping	: 1
+microcode	: 0x8001138
+cpu MHz		: 2877.596
+cache size	: 512 KB
+physical id	: 0
+siblings	: 8
+core id		: 5
+cpu cores	: 4
+apicid		: 11
+initial apicid	: 11
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov 
+pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt 
+pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid 
+extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 
+sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm 
+extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw skinit wdt 
+tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb 
+hw_pstate sme ssbd sev ibpb vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed 
+adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 xsaves clzero irperf 
+xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean 
+flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload 
+vgif overflow_recov succor smca
+bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass
+bogomips	: 6985.80
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 43 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate eff_freq_ro [13] [14]
 
+qemu configured with : 
+PKG_CONFIG_PATH=/usr/local/libvirt/lib/pkgconfig:/usr/local/libvirt/share/pkgconfig/ 
+./configure --target-list=x86_64-softmmu --disable-gtk && make -j6
+test:~# uname -a
+
+Linux test 5.2.9 #42 SMP Tue Aug 20 16:41:13 AWST 2019 x86_64 GNU/Linux
+
+test:~# zgrep KVM /proc/config.gz
+CONFIG_HAVE_KVM=y
+CONFIG_HAVE_KVM_IRQCHIP=y
+CONFIG_HAVE_KVM_IRQFD=y
+CONFIG_HAVE_KVM_IRQ_ROUTING=y
+CONFIG_HAVE_KVM_EVENTFD=y
+CONFIG_KVM_MMIO=y
+CONFIG_KVM_ASYNC_PF=y
+CONFIG_HAVE_KVM_MSI=y
+CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT=y
+CONFIG_KVM_VFIO=y
+CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
+CONFIG_KVM_COMPAT=y
+CONFIG_HAVE_KVM_IRQ_BYPASS=y
+CONFIG_KVM=m
+# CONFIG_KVM_INTEL is not set
+CONFIG_KVM_AMD=m
+# CONFIG_KVM_MMU_AUDIT is not set
+
+test:~# qemu --version
+QEMU emulator version 4.1.50 (v4.1.0-714-g90b1e3a)
+Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+To be clear, I'm not chasing benchmarks. This is a real issue with 
+trying to run CAD on a Windows 7 VM on a Ryzen machine.
+
+I've tried it on two machines (a 1500x and an 1800x) with the same 
+result. The same configuration on the i7 box works perfectly.
+
+I've tried several versions of SPICE, multiple versions of KVM, kernels 
+back as far as 4.0 with KVM enabled, different old and new windows VMs 
+and driver versions. The only constant is it is limited on the AMD box 
+if KVM is enabled.
+
+I was leaning towards it being something in the qemu/spice software 
+stack, but the fact that without kvm enabled it goes as fast as the CPU 
+will allow it would indicate perhaps the fault likes in some 
+relationship with kvm, so I'm cross-posting to qemu-devel to see if this 
+jogs someones memory, or if there are any other things I can try to 
+attempt to solve this one.
+
+Regards,
+Brad
 
