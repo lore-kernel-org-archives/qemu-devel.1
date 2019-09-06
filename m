@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9366C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 07:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B61C8C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:00:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7BB32070C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 07:59:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7BB32070C
+	by mail.kernel.org (Postfix) with ESMTPS id 914172070C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:00:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 914172070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i699w-00053G-3T
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 03:59:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41869)
+	id 1i69AB-0005JG-7y
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 04:00:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i6984-0003Ji-Mj
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:01 -0400
+ (envelope-from <david@redhat.com>) id 1i698C-0003T0-Pn
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i6983-0002av-JC
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51812)
+ (envelope-from <david@redhat.com>) id 1i698B-0002nu-IL
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 03:58:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54562)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i6983-0002aG-Cp; Fri, 06 Sep 2019 03:57:59 -0400
+ id 1i698B-0002mM-C0; Fri, 06 Sep 2019 03:58:07 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B110F3175284;
- Fri,  6 Sep 2019 07:57:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A31D6307D930;
+ Fri,  6 Sep 2019 07:58:06 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-162.ams2.redhat.com [10.36.117.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EC61E1001955;
- Fri,  6 Sep 2019 07:57:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D26611001B00;
+ Fri,  6 Sep 2019 07:58:04 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  6 Sep 2019 09:57:23 +0200
-Message-Id: <20190906075750.14791-2-david@redhat.com>
+Date: Fri,  6 Sep 2019 09:57:27 +0200
+Message-Id: <20190906075750.14791-6-david@redhat.com>
 In-Reply-To: <20190906075750.14791-1-david@redhat.com>
 References: <20190906075750.14791-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 06 Sep 2019 07:57:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Fri, 06 Sep 2019 07:58:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 01/28] s390x/tcg: Reset exception_index to
- -1 instead of 0
+Subject: [Qemu-devel] [PATCH v2 05/28] s390x/tcg: MVC: Increment the length
+ once
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,54 +69,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
  David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Stefano Brivio <sbrivio@redhat.com>, qemu-s390x@nongnu.org,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We use the marker "-1" for "no exception". s390_cpu_do_interrupt() might
-get confused by that.
+Let's increment the length once.
 
+While at it, cleanup the comment. The memset() example is given as a
+programming note in the PoP, so drop the description.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mem_helper.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/s390x/mem_helper.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 29fcce426e..39ee9b3175 100644
+index 2e22c183bd..2bc2cd09c1 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1747,7 +1747,7 @@ uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t=
- a1, uint64_t a2)
+@@ -320,16 +320,20 @@ static uint32_t do_helper_mvc(CPUS390XState *env, u=
+int32_t l, uint64_t dest,
+     HELPER_LOG("%s l %d dest %" PRIx64 " src %" PRIx64 "\n",
+                __func__, l, dest, src);
 =20
-     if (env->int_pgm_code =3D=3D PGM_PROTECTION) {
-         /* retry if reading is possible */
--        cs->exception_index =3D 0;
-+        cs->exception_index =3D -1;
-         if (!s390_cpu_virt_mem_check_read(cpu, a1, 0, 1)) {
-             /* Fetching permitted; storing not permitted */
-             return 1;
-@@ -1757,7 +1757,7 @@ uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t=
- a1, uint64_t a2)
-     switch (env->int_pgm_code) {
-     case PGM_PROTECTION:
-         /* Fetching not permitted; storing not permitted */
--        cs->exception_index =3D 0;
-+        cs->exception_index =3D -1;
-         return 2;
-     case PGM_ADDRESSING:
-     case PGM_TRANS_SPEC:
-@@ -1767,7 +1767,7 @@ uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t=
- a1, uint64_t a2)
-     }
-=20
-     /* Translation not available */
--    cs->exception_index =3D 0;
-+    cs->exception_index =3D -1;
-     return 3;
- }
-=20
+-    /* mvc and memmove do not behave the same when areas overlap! */
+-    /* mvc with source pointing to the byte after the destination is the
+-       same as memset with the first source byte */
++    /* MVC always copies one more byte than specified - maximum is 256 *=
+/
++    l++;
++
++    /*
++     * "When the operands overlap, the result is obtained as if the oper=
+ands
++     * were processed one byte at a time". Only non-destructive overlaps
++     * behave like memmove().
++     */
+     if (dest =3D=3D src + 1) {
+-        fast_memset(env, dest, cpu_ldub_data_ra(env, src, ra), l + 1, ra=
+);
+-    } else if (dest < src || src + l < dest) {
+-        fast_memmove(env, dest, src, l + 1, ra);
++        fast_memset(env, dest, cpu_ldub_data_ra(env, src, ra), l, ra);
++    } else if (dest < src || src + l <=3D dest) {
++        fast_memmove(env, dest, src, l, ra);
+     } else {
+-        /* slow version with byte accesses which always work */
+-        for (i =3D 0; i <=3D l; i++) {
++        for (i =3D 0; i < l; i++) {
+             uint8_t x =3D cpu_ldub_data_ra(env, src + i, ra);
+             cpu_stb_data_ra(env, dest + i, x, ra);
+         }
 --=20
 2.21.0
 
