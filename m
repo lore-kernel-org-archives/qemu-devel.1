@@ -2,92 +2,109 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5106C43140
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4295FC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:21:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F2202082C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11B5E2082C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 09:21:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dGDr3fwe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F2202082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="QQiJxe8I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11B5E2082C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6APR-0000RL-H0
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 05:20:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60136)
+	id 1i6AQv-0002MO-8N
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 05:21:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60475)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i6AOm-0008RO-KZ
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:19:22 -0400
+ (envelope-from <Paul.Durrant@citrix.com>) id 1i6AQ7-0001Qi-NO
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i6AOl-0005nd-2V
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:19:20 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:50452)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i6AOk-0005mL-Rj
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:19:19 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id c10so5724934wmc.0
- for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 02:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=XtTovzpRzpVjkfn+un6kPDttKdycrUBPIIyrlSd0KZs=;
- b=dGDr3fwee6tOhk5HYVU8AUFRZHUl7EhC8RrE4g1buW4og8rh7yh1cTsbp1jJwhu8yz
- G7PFbMx01jRqIL4HuxjkwYsAIdQselK45vmjEcDFO60+b9RPcvNXewwKtCGvRvTGN7bY
- SNJ5uZBwUjfeeGfoZGZu9S2ct+SLTrQLVt8cySVDRwanjkBY+pGlaZraSSKwQ8y5L47X
- 4VXdcGKvwuibOzATNfEo5JJy9e475o17kCmawFBzuw+Q5bM23aFe4kI4YXlQ6/8PdDPb
- p3ybq743ZkCQMR3JuNKIcDza0/0vIPME61fve9/pciMG3Iz/e6JctVX2FxIbY8lXOCP0
- eSjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=XtTovzpRzpVjkfn+un6kPDttKdycrUBPIIyrlSd0KZs=;
- b=DVV/2n+7ROzV9gj0W+7uLnaBiptlUvFV48vST+i/RYjKRY1xyU2YU382GbmOaHM0cR
- gF8rhWqqDu7WrxIxmqi8MQotBbR7daffkwib7NxtT0vMfu8q2coHdrEHkwSgiggWUUqR
- SdUP606QFoJt949hTZpr19Q84ELCoNcdGscEe6i93XEya3Tq4cfgX9rJJbli1mUp2j4k
- W6loqFVAFDS5PWcQNtf6N3vCU+ccIdz42hhxxJ+CYYbG5w8T5FoeIxM1herEDRUNmifk
- y3cR/wMZAy310Uq5M0Oki8VlLYmp3VppkkxhylUG7kKfbBY/4mTI0tbAAccg9LVxGoj9
- fsCQ==
-X-Gm-Message-State: APjAAAWqiUK8Af3iHqdFThBqs0lWVI4WJnuoxat9586OwIF+X2aM7LP3
- ZmZNuukZwPAh2OkY8yVYBTVivA==
-X-Google-Smtp-Source: APXvYqzX1way/wqQfoTzBM/WKPztJ5BTW/zvTKz+JTuMrEyUndvqcy6Uae6pRVp9wPPYYGWlK6jCDg==
-X-Received: by 2002:a05:600c:214:: with SMTP id
- 20mr6816732wmi.112.1567761557381; 
- Fri, 06 Sep 2019 02:19:17 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d28sm6212798wrb.95.2019.09.06.02.19.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Sep 2019 02:19:16 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 99F911FF87;
- Fri,  6 Sep 2019 10:19:15 +0100 (BST)
-References: <tencent_3156C5EA2695B7CD53C6114C@qq.com>
- <CAL1e-=hWOXgnTbC0Y2v_CMZOMmQLgdToBAsi+XaW7+9uyN55CA@mail.gmail.com>
- <tencent_23ACCA1A48AFB09124C52E70@qq.com> <87blvy99y9.fsf@linaro.org>
- <tencent_541F04AB1A100DF25C334D8C@qq.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Libo Zhou <zhlb29@foxmail.com>
-In-reply-to: <tencent_541F04AB1A100DF25C334D8C@qq.com>
-Date: Fri, 06 Sep 2019 10:19:15 +0100
-Message-ID: <87zhjh7pf0.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <Paul.Durrant@citrix.com>) id 1i6AQ6-0006bw-9M
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:20:43 -0400
+Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:65450)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
+ id 1i6AQ5-0006Zo-Tx
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 05:20:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1567761642;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=db169m4HoYL/ksYQKKrL+GvEwhjapCxmoxcZbgXmumI=;
+ b=QQiJxe8I4Rc//UekmAb8rykRcAwOM2t+HkReNZMvhvXKisqQ5JX/I12A
+ EtjHaOu/MKZP0RJ6159qeqTJKb9mMJRU6jNZEAFe90FjT/rxIsvmuY6uY
+ GrPyblQ9f+o67hZBlTJjUrHzmV/nFo7m8L7fxjEqiEgmFW5zMmmMnPipr U=;
+Authentication-Results: esa3.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=Paul.Durrant@citrix.com;
+ spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ Paul.Durrant@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
+Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
+ Paul.Durrant@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="Paul.Durrant@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: 8GN3mEt61KOZhuuC5/u/DMneHD7TCZGfjGTypAlmsxVPoYfnVBmZPcoQ/5jq9ElQtXv8c+GuEA
+ nsjltSIskqRcBGK48KGhoRtyRyniSu/JfIlAuOCrg6cK8nZmVGaG5/BXusUVbUydQnyMfbzZQ+
+ 1Fjd0mjMhMDp1OC1L4iyWmQfZgZr7eE0GFIqTXGNh1iJplC0pD4yr0ugseWioz77OYUMis1P1f
+ oQZm2u7BEvfjGS0ozZCPgNB6WF3aCViYr8Q00Mv1p3u+Me4DWG3nUU1uBmstDVQLLAS2N/djej
+ 0nE=
+X-SBRS: 2.7
+X-MesageID: 5229452
+X-Ironport-Server: esa3.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,472,1559534400"; 
+   d="scan'208";a="5229452"
+From: Paul Durrant <Paul.Durrant@citrix.com>
+To: 'Chao Gao' <chao.gao@intel.com>, Roger Pau Monne <roger.pau@citrix.com>
+Thread-Topic: [RFC Patch] xen/pt: Emulate FLR capability
+Thread-Index: AQHVXkfuFLvvoAaowUSFuPbgsUcGX6cRyN6AgAx8SoCAACDqkA==
+Date: Fri, 6 Sep 2019 09:20:33 +0000
+Message-ID: <1307d03945d948fd89a6956d77c5ce28@AMSPEX02CL03.citrite.net>
+References: <1567069347-22841-1-git-send-email-chao.gao@intel.com>
+ <20190829102059.bk4l7itydj73d3ua@Air-de-Roger>
+ <20190906090107.GA25703@gao-cwp>
+In-Reply-To: <20190906090107.GA25703@gao-cwp>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32b
-Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.145.155
+Subject: Re: [Qemu-devel] [RFC Patch] xen/pt: Emulate FLR capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,135 +116,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jan
+ Beulich <jbeulich@suse.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+> -----Original Message-----
+> From: Chao Gao <chao.gao@intel.com>
+> Sent: 06 September 2019 10:01
+> To: Roger Pau Monne <roger.pau@citrix.com>
+> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; Stefano Stabel=
+lini
+> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>; Pau=
+l Durrant
+> <Paul.Durrant@citrix.com>; Jan Beulich <jbeulich@suse.com>
+> Subject: Re: [RFC Patch] xen/pt: Emulate FLR capability
+>=20
+> On Thu, Aug 29, 2019 at 12:21:11PM +0200, Roger Pau Monn=E9 wrote:
+> >On Thu, Aug 29, 2019 at 05:02:27PM +0800, Chao Gao wrote:
+> >> Currently, for a HVM on Xen, no reset method is virtualized. So in a V=
+M's
+> >> perspective, assigned devices cannot be reset. But some devices rely o=
+n PCI
+> >> reset to recover from hardware hangs. When being assigned to a VM, tho=
+se
+> >> devices cannot be reset and won't work any longer if a hardware hang o=
+ccurs.
+> >> We have to reboot VM to trigger PCI reset on host to recover the devic=
+e.
+> >>
+> >> This patch exposes FLR capability to VMs if the assigned device can be=
+ reset on
+> >> host. When VM initiates an FLR to a device, qemu cleans up the device =
+state,
+> >> (including disabling of intx and/or MSI and unmapping BARs from guest,=
+ deleting
+> >> emulated registers), then initiate PCI reset through 'reset' knob unde=
+r the
+> >> device's sysfs, finally initialize the device again.
+> >
+> >I think you likely need to deassign the device from the VM, perform
+> >the reset, and then assign the device again, so that there's no Xen
+> >internal state carried over prior to the reset?
+>=20
+> Yes. It is the safest way. But here I want to present the feature as FLR
+> (such that the device driver in guest can issue PCI reset whenever
+> needed and no change is needed to device driver).  Current device
+> deassignment notifies guest that the device is going to be removed
+> It is not the standard PCI reset. Is it possible to make guest unaware
+> of the device deassignment to emulate a standard PCI reset?
 
-Libo Zhou <zhlb29@foxmail.com> writes:
+It should be, I would have thought. QEMU emulates all config space so any c=
+onfig access by the guest would be unaffected by de-assignment. The BARs an=
+d interrupts would be unmapped... but that's what you'd want anyway.
 
-> Hi Alex,
->
->
-> I just need to log the registers and memory after the program finishes
-> its execution. Is it possible to add this functionality myself?
+> In my mind,
+> we can expose do_pci_remove/add to qemu or rewrite them in qemu (but
+> don't remove the device from guest's PCI hierarchy). Do you think it is
+> the right direction?
 
-You'll need to set some sort of breakpoint on the last instruction so
-gdb can inspect things before the program is unloaded. I think it's
-possible to wire poweroff events to the gdbstub but I haven't looked
-into that myself.
+Long term I think we want to get pass-through emulation out of QEMU and int=
+o Xen.
 
-> As for the GDB option, can you tell me the specific steps to do that? I'v=
-e tried it myself but I had no luck getting it running due to me being new =
-to all this.
->
+  Paul
 
-For linux-user:
-
-  $QEMU -g 1234 $PRG
-
-for system emulation
-
-  $QEMU -s -S
-
-and then on the gdb end:
-
-  gdb $BIN -ex "target remote localhost:1234"
-
-and then you can operate as you normally do with a gdb session. GDB has
-two scripting interfaces. The command mode is basically a list of gdb
-commands but might work for what you want. If you want to be a bit more
-programatic you can use python. See the example in
-tests/guest-debug/test-gdbstub.py
-
->
-> Thanks,
-> Libo
->
->
->
-> ------------------ Original ------------------
-> From:  "Alex Benn=C3=A9e";<alex.bennee@linaro.org>;
-> Send time: Thursday, Sep 5, 2019 8:58 PM
-> To: "qemu-devel"<qemu-devel@nongnu.org>;
-> Cc: "Aleksandar Markovic"<aleksandar.m.mail@gmail.com>;
-> Subject:  Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
->
->
->
->
-> Libo Zhou <zhlb29@foxmail.com> writes:
->
->> Do you know where in the source file I should look into to add my custom=
- logging functionality?
->>
->>
->> Or, would you suggest using gdb to look at my target register and memory=
- contents? The answer in this link below looks really promising. I'm gonna =
-give it a try first.
->>
->> https://stackoverflow.com/questions/39503997/how-to-run-a-single-line-of=
--assembly-then-see-r1-and-condition-flags
->
-> The gdbstub should allow you do full introspection and adding
-> additional registers is fairly easy, see FOO_gdb_[set|get]_reg helpers
-> in the appropriate target/FOO directories.
->
->> However, if I am able to customize log, it will be super convenient.
->
-> So you want something above what -d cpu will show you?
->
->>
->>
->>
->> Cheers,
->>
->> Libo
->>
->>
->>
->> ------------------ Original ------------------
->> From:  "Aleksandar Markovic";<aleksandar.m.mail@gmail.com>;
->> Send time: Thursday, Sep 5, 2019 6:54 PM
->> To: "Libo Zhou"<zhlb29@foxmail.com>;
->> Cc: "qemu-devel"<qemu-devel@nongnu.org>;
->> Subject:  Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
->>
->>
->>
->> 04.09.2019. 05.23, "Libo Zhou" <zhlb29@foxmail.com> ?=D0=B5 =D0=BD=D0=B0=
-=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->>>
->>> Hi Aleksandar,
->>>
->>> I have spent some time looking at your MXU ASE patch. It's super helpfu=
-l.
->> I need to do exactly the same thing as you did.
->>>
->>> Now I just need a way to observe the memory and register file contents =
-to
->> debug my instruction set simulator. I played with the "-d" switch to log=
- a
->> bunch of information, but it seems that none of the items is of my
->> interest. The "-d cpu_reset" option displays all zeros in the GPR log.
->>>
->>
->> It looks you need a custom logging tailored to your needs, based on
->> intercepting the instructions you added.
->>
->> Aleksandar
->>
->>> Please take your time, as I fully understand you need to work on Qemu
->> while answering all my questions. Again, thank you very much for your he=
-lp!
->>>
->>> Cheers,
->>> Libo
->>>
-
-
---
-Alex Benn=C3=A9e
+>=20
+> Thanks
+> Chao
 
