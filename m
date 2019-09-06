@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E42C4C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2569DC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:15:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B292E206BB
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:12:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03BC3206BB
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 06:15:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="EEeWfJjs";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NS9gHbMJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B292E206BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="KTgk318H";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xs0HuczK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03BC3206BB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i67UD-0003uL-JT
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 02:12:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39990)
+	id 1i67Wq-0006MN-Gg
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 02:15:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39943)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair@alistair23.me>) id 1i67Sk-0002Zw-94
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:16 -0400
+ (envelope-from <alistair@alistair23.me>) id 1i67Sc-0002VW-9w
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair@alistair23.me>) id 1i67Si-0003pS-Cy
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:14 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:35083)
+ (envelope-from <alistair@alistair23.me>) id 1i67Sb-0003lt-5c
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:06 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:33703)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <alistair@alistair23.me>)
- id 1i67Si-0003pF-9F
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:12 -0400
+ id 1i67Sb-0003ll-24
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 02:11:05 -0400
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailout.nyi.internal (Postfix) with ESMTP id 01E9021E92;
- Fri,  6 Sep 2019 02:11:12 -0400 (EDT)
+ by mailout.nyi.internal (Postfix) with ESMTP id D637021F83;
+ Fri,  6 Sep 2019 02:11:04 -0400 (EDT)
 Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Fri, 06 Sep 2019 02:11:12 -0400
+ by compute7.internal (MEProxy); Fri, 06 Sep 2019 02:11:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm2; bh=A6gz0ZUoFNZAQ
- lR8LrbXQMO9D2Q4JImqJgfM8Qt9LpI=; b=EEeWfJjsxpGavpWVUf/OAF3xZWwYp
- w9inRc+eLdV5M/Bf+7fNwwYOuShy7XV1VSJCV0KoSzjpYoOPp/dHjEmqwk+z1mng
- Y4e/ykat/tU66YZBYCKxOiQtSYWU1rMfMTr4HG1ap11J+UPbZIX0KgZAkaoWgHKH
- 2Pu1PyfRclAc8KFoUigkkIG7crauzEd0yxYxUKWpu5IEjLH6eLKdL2viuESFkHLJ
- b1M+IR7nm1wgUtrqxwAb14N26NofsYsYjnx2KkPzTqVYvBIOxwbb5I9FUzoBkaBR
- cQ53P/VlazaffI449FWlrJzPSEGZHcOq4CojIE3qoQNfmYBD1SbP+tDAg==
+ :mime-version:content-transfer-encoding; s=fm2; bh=jWgP1ADGwTyur
+ qv6cMs6wlleYyD1So+YWUkeKZjC4dk=; b=KTgk318HnOFwWxW9zLfEHoizqPIIQ
+ Z8j4ZBS4UW+am7PefX/sxtT+BufGzRAC4MqwKzLwFn4abMJRklI/KnzTcy3fkh0p
+ ScyZzDdXgdpqYnO+CPVb1/slVaV21LwLp39fgndBU7GmTYWuoL6JOG57L2CW4sfN
+ GXoazKqq1hV4is9GBIbr6ftXkiuqGsf7Y2MV9kVlpUhrOA79SoAjXDKdWEiTrPh0
+ txISx8SufE1OK/1ltXxxAFfyzXEv03lKMwDuVPWvq04Yl/tCF3SudM1u1E29cxRI
+ 2+hMMrMeVXLg647WUV95Rg2tAW1d+JG/OxJi9pVzswqYe/LZRh6YCcO1g==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-transfer-encoding:date:from
  :in-reply-to:message-id:mime-version:references:subject:to
  :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm3; bh=A6gz0ZUoFNZAQlR8LrbXQMO9D2Q4JImqJgfM8Qt9LpI=; b=NS9gHbMJ
- D8pZtIzbB2rLCMAyHshjpFIHMoV49T03XD2m6n808KfghTKrzISg7uqNWR/D+Np0
- StrBEeWK799r3RI6rHTD+8130tnFDojn0xwX87NrxNDfUi4KQwbIvfgLa7K82lDw
- /Y4G1w4JSQQSZocu4t+AbVmMW1xeHd0J5FAs8tZLInqy/rwj6sEroAT5D6HWa5+0
- wqbiSs/5qZeEW5JNEVA70BWx4iXWfOwjro73PFlP7dM4hdMOuJZnzCY92S3/6dBa
- JuQuuWy8nb/AymOp5vHH/m941lse1ZgiqmdzOxJ+vo8v3UB62Vi47uLs93k+XbT7
- NR05LmA+8nWgwQ==
-X-ME-Sender: <xms:f_hxXZaaplESN3Dz7vOtKaonXq40AdxmSNQ6M4zADRSWueixNahNsA>
+ fm3; bh=jWgP1ADGwTyurqv6cMs6wlleYyD1So+YWUkeKZjC4dk=; b=xs0HuczK
+ SGx+RFxOT+r4UQMivii7PDbY0w9PmY3umMsvG0ZTxqg1AXwf6a57p4fbIrl8lejB
+ lgm/DcB22hcqRPmATvITStd5idHTDJxertXQxmwcEG3CuXLISqYixukeBGaWdvwR
+ DFigbkHyHgkHIg2G09YN9Xa4whfrEp0+leIkOBbrToz2TjQJhkV0FrO5gXMo54rt
+ Te6j6Z6OQhCU7P+DMyOY4Xm9N/YQCOd4qNJgzrSTGENWRMbI9Uw824Wu4OpY1ZBt
+ AxJKHtQ5R1+VN9O0x5JE3x9SNmQo2iGF5aUSVJj0OEksiLVGZb/MtoJ2xK6zlPP9
+ QHdB7gPKvfcz4g==
+X-ME-Sender: <xms:ePhxXQmhoCNjAofFULuuVus0jXreU_1Z2DiIpPw46vptU7pnayP60w>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduvddrudejkedgheelucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgjfhgggfestdekre
@@ -70,19 +70,19 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduvddrudejkedgheelucetufdoteggod
  ihhrsegrlhhishhtrghirhdvfedrmhgvqeenucfkphepjeefrdelfedrkeegrddvtdekne
  curfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishhtrghirhesrghlihhsthgrihhrvdef
  rdhmvgenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:f_hxXcMdbB0dnAS3FQK93tx6m72uvGCl6Cv2uDnF3aF5RkEOhHu_Rw>
- <xmx:f_hxXRccEBOlbkhhBH3mHlqlPfaW5xFaqjYLQZhLMjBuEUs_qXTn1Q>
- <xmx:f_hxXaG7SOS81ATkg69RT6MDK5bnPRQ8GJ_1h0Yy8nubjXh2F8_GGw>
- <xmx:f_hxXSUoPOhv-b4RRHc-PbKCGpgiTiThnSAOFPA4tK02O4KWdLpAiQ>
+X-ME-Proxy: <xmx:ePhxXWMlyRB8pUI_hFCOfUR_Pp2aYrzxrOeoFV1V0qfjzgDbzx5t5Q>
+ <xmx:ePhxXa7-b6ugHIOa7krf7fM0kJNSxwUW7oPu9hj9VSYvXaarJbZZCg>
+ <xmx:ePhxXaZjVa81KA1azVesxWS20Wy6NVFr7TaBJrg0PyoPi4U7VB_Tkg>
+ <xmx:ePhxXXlHzU873a7klfeCH7-hwmDeqhCZYHl8Ap_0TVPlYNhDT8F-uQ>
 Received: from alistair-xps-14z.alistair23.me
  (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
- by mail.messagingengine.com (Postfix) with ESMTPA id 4FF10D6005D;
- Fri,  6 Sep 2019 02:11:11 -0400 (EDT)
+ by mail.messagingengine.com (Postfix) with ESMTPA id 442E0D60062;
+ Fri,  6 Sep 2019 02:11:04 -0400 (EDT)
 From: Alistair Francis <alistair@alistair23.me>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Date: Thu,  5 Sep 2019 23:11:10 -0700
-Message-Id: <d0c3963c40fd93e2f53a1fd546df33ee02af92b2.1567750222.git.alistair@alistair23.me>
+Date: Thu,  5 Sep 2019 23:11:03 -0700
+Message-Id: <7e78d043a9ce878166c0dd750844722aa9b54d84.1567750222.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1567750222.git.alistair@alistair23.me>
 References: <cover.1567750222.git.alistair@alistair23.me>
@@ -90,7 +90,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 66.111.4.25
-Subject: [Qemu-devel] [PATCH v4 4/6] hw/misc: Add the STM32F4xx EXTI device
+Subject: [Qemu-devel] [PATCH v4 2/6] target/arm: Allow setting M mode entry
+ and sp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,332 +108,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair@alistair23.me>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/Kconfig                   |   1 +
- hw/misc/Kconfig                  |   3 +
- hw/misc/Makefile.objs            |   1 +
- hw/misc/stm32f4xx_exti.c         | 187 +++++++++++++++++++++++++++++++
- hw/misc/trace-events             |   5 +
- include/hw/misc/stm32f4xx_exti.h |  60 ++++++++++
- 6 files changed, 257 insertions(+)
- create mode 100644 hw/misc/stm32f4xx_exti.c
- create mode 100644 include/hw/misc/stm32f4xx_exti.h
+Add M mode initial entry PC and SP properties.
 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 9019c9fa50..68a3b27685 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -311,6 +311,7 @@ config STM32F405_SOC
-     bool
-     select ARM_V7M
-     select STM32F4XX_SYSCFG
-+    select STM32F4XX_EXTI
+Signed-off-by: Alistair Francis <alistair@alistair23.me>
+---
+ target/arm/cpu.c | 52 +++++++++++++++++++++++++++++++++++++++++++-----
+ target/arm/cpu.h |  3 +++
+ 2 files changed, 50 insertions(+), 5 deletions(-)
+
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 2399c14471..315aa503f6 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -311,6 +311,9 @@ static void arm_cpu_reset(CPUState *s)
+              */
+             initial_msp = ldl_p(rom);
+             initial_pc = ldl_p(rom + 4);
++        } else if (cpu->init_sp || cpu->init_entry) {
++            initial_msp = cpu->init_sp;
++            initial_pc = cpu->init_entry;
+         } else {
+             /* Address zero not covered by a ROM blob, or the ROM blob
+              * is in non-modifiable memory and this is a second reset after
+@@ -1055,6 +1058,38 @@ static void arm_set_init_svtor(Object *obj, Visitor *v, const char *name,
+     visit_type_uint32(v, name, &cpu->init_svtor, errp);
+ }
  
- config XLNX_ZYNQMP_ARM
-     bool
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index b9097ab2e0..fa56e5d375 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -85,6 +85,9 @@ config STM32F2XX_SYSCFG
- config STM32F4XX_SYSCFG
-     bool
++static void arm_get_init_sp(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    visit_type_uint32(v, name, &cpu->init_sp, errp);
++}
++
++static void arm_set_init_sp(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    visit_type_uint32(v, name, &cpu->init_sp, errp);
++}
++
++static void arm_get_init_entry(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    visit_type_uint32(v, name, &cpu->init_entry, errp);
++}
++
++static void arm_set_init_entry(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    visit_type_uint32(v, name, &cpu->init_entry, errp);
++}
++
+ void arm_cpu_post_init(Object *obj)
+ {
+     ARMCPU *cpu = ARM_CPU(obj);
+@@ -1155,19 +1190,26 @@ void arm_cpu_post_init(Object *obj)
+         }
+     }
  
-+config STM32F4XX_EXTI
-+    bool
-+
- config MIPS_ITU
-     bool
++    /*
++     * M profile: initial value of the SP, entry and Secure VTOR.
++     * We can't just use a simple DEFINE_PROP_UINT32 for this because we want
++     * to permit the property to be set after realize.
++     */
+     if (arm_feature(&cpu->env, ARM_FEATURE_M_SECURITY)) {
+         object_property_add_link(obj, "idau", TYPE_IDAU_INTERFACE, &cpu->idau,
+                                  qdev_prop_allow_set_link_before_realize,
+                                  OBJ_PROP_LINK_STRONG,
+                                  &error_abort);
+-        /*
+-         * M profile: initial value of the Secure VTOR. We can't just use
+-         * a simple DEFINE_PROP_UINT32 for this because we want to permit
+-         * the property to be set after realize.
+-         */
+         object_property_add(obj, "init-svtor", "uint32",
+                             arm_get_init_svtor, arm_set_init_svtor,
+                             NULL, NULL, &error_abort);
++    } else if (arm_feature(&cpu->env, ARM_FEATURE_M)) {
++        object_property_add(obj, "init-sp", "uint32",
++                            arm_get_init_sp, arm_set_init_sp,
++                            NULL, NULL, &error_abort);
++        object_property_add(obj, "init-entry", "uint32",
++                            arm_get_init_entry, arm_set_init_entry,
++                            NULL, NULL, &error_abort);
+     }
  
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 51da9abf2a..fdceae0c51 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -58,6 +58,7 @@ obj-$(CONFIG_ZYNQ) += zynq_slcr.o
- obj-$(CONFIG_ZYNQ) += zynq-xadc.o
- obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
- obj-$(CONFIG_STM32F4XX_SYSCFG) += stm32f4xx_syscfg.o
-+obj-$(CONFIG_STM32F4XX_EXTI) += stm32f4xx_exti.o
- obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
- obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
-diff --git a/hw/misc/stm32f4xx_exti.c b/hw/misc/stm32f4xx_exti.c
-new file mode 100644
-index 0000000000..04ac82ae26
---- /dev/null
-+++ b/hw/misc/stm32f4xx_exti.c
-@@ -0,0 +1,187 @@
-+/*
-+ * STM32F4XX EXTI
-+ *
-+ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "hw/misc/stm32f4xx_exti.h"
-+
-+static void stm32f4xx_exti_reset(DeviceState *dev)
-+{
-+    STM32F4xxExtiState *s = STM32F4XX_EXTI(dev);
-+
-+    s->exti_imr = 0x00000000;
-+    s->exti_emr = 0x00000000;
-+    s->exti_rtsr = 0x00000000;
-+    s->exti_ftsr = 0x00000000;
-+    s->exti_swier = 0x00000000;
-+    s->exti_pr = 0x00000000;
-+}
-+
-+static void stm32f4xx_exti_set_irq(void *opaque, int irq, int level)
-+{
-+    STM32F4xxExtiState *s = opaque;
-+
-+    if (!((1 << irq) & s->exti_imr)) {
-+        /* Interrupt is masked */
-+        return;
-+    }
-+
-+    trace_stm32f4xx_exti_set_irq(irq, level);
-+
-+    if (((1 << irq) & s->exti_rtsr) && level) {
-+        /* Rising Edge */
-+        qemu_irq_pulse(s->irq[irq]);
-+        s->exti_pr |= 1 << irq;
-+    }
-+
-+    if (((1 << irq) & s->exti_ftsr) && !level) {
-+        /* Falling Edge */
-+        qemu_irq_pulse(s->irq[irq]);
-+        s->exti_pr |= 1 << irq;
-+    }
-+}
-+
-+static uint64_t stm32f4xx_exti_read(void *opaque, hwaddr addr,
-+                                     unsigned int size)
-+{
-+    STM32F4xxExtiState *s = opaque;
-+
-+    trace_stm32f4xx_exti_read(addr);
-+
-+    switch (addr) {
-+    case EXTI_IMR:
-+        return s->exti_imr;
-+    case EXTI_EMR:
-+        return s->exti_emr;
-+    case EXTI_RTSR:
-+        return s->exti_rtsr;
-+    case EXTI_FTSR:
-+        return s->exti_ftsr;
-+    case EXTI_SWIER:
-+        return s->exti_swier;
-+    case EXTI_PR:
-+        return s->exti_pr;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "STM32F4XX_exti_read: Bad offset %x\n", (int)addr);
-+        return 0;
-+    }
-+    return 0;
-+}
-+
-+static void stm32f4xx_exti_write(void *opaque, hwaddr addr,
-+                       uint64_t val64, unsigned int size)
-+{
-+    STM32F4xxExtiState *s = opaque;
-+    uint32_t value = (uint32_t) val64;
-+
-+    trace_stm32f4xx_exti_write(addr, value);
-+
-+    switch (addr) {
-+    case EXTI_IMR:
-+        s->exti_imr = value;
-+        return;
-+    case EXTI_EMR:
-+        s->exti_emr = value;
-+        return;
-+    case EXTI_RTSR:
-+        s->exti_rtsr = value;
-+        return;
-+    case EXTI_FTSR:
-+        s->exti_ftsr = value;
-+        return;
-+    case EXTI_SWIER:
-+        s->exti_swier = value;
-+        return;
-+    case EXTI_PR:
-+        /* This bit is cleared by writing a 1 to it */
-+        s->exti_pr &= ~value;
-+        return;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "STM32F4XX_exti_write: Bad offset %x\n", (int)addr);
-+    }
-+}
-+
-+static const MemoryRegionOps stm32f4xx_exti_ops = {
-+    .read = stm32f4xx_exti_read,
-+    .write = stm32f4xx_exti_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void stm32f4xx_exti_init(Object *obj)
-+{
-+    STM32F4xxExtiState *s = STM32F4XX_EXTI(obj);
-+    int i;
-+
-+    for (i = 0; i < NUM_INTERRUPT_OUT_LINES; i++) {
-+        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq[i]);
-+    }
-+
-+    memory_region_init_io(&s->mmio, obj, &stm32f4xx_exti_ops, s,
-+                          TYPE_STM32F4XX_EXTI, 0x400);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+
-+    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_exti_set_irq,
-+                      NUM_GPIO_EVENT_IN_LINES);
-+}
-+
-+static const VMStateDescription vmstate_stm32f4xx_exti = {
-+    .name = TYPE_STM32F4XX_EXTI,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(exti_imr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_emr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_rtsr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_ftsr, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_swier, STM32F4xxExtiState),
-+        VMSTATE_UINT32(exti_pr, STM32F4xxExtiState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void stm32f4xx_exti_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = stm32f4xx_exti_reset;
-+    dc->vmsd = &vmstate_stm32f4xx_exti;
-+}
-+
-+static const TypeInfo stm32f4xx_exti_info = {
-+    .name          = TYPE_STM32F4XX_EXTI,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(STM32F4xxExtiState),
-+    .instance_init = stm32f4xx_exti_init,
-+    .class_init    = stm32f4xx_exti_class_init,
-+};
-+
-+static void stm32f4xx_exti_register_types(void)
-+{
-+    type_register_static(&stm32f4xx_exti_info);
-+}
-+
-+type_init(stm32f4xx_exti_register_types)
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 3643949515..b7b9582e66 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -90,6 +90,11 @@ stm32f4xx_pulse_exti(int irq) "Pulse EXTI: %d"
- stm32f4xx_syscfg_read(uint64_t addr) "reg read: addr: 0x%" PRIx64 " "
- stm32f4xx_syscfg_write(uint64_t addr, uint64_t data) "reg write: addr: 0x%" PRIx64 " val: 0x%" PRIx64 ""
+     qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 297ad5e47a..4856d4c36b 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -805,6 +805,9 @@ struct ARMCPU {
+      */
+     uint32_t psci_conduit;
  
-+# stm32f4xx_exti
-+stm32f4xx_exti_set_irq(int irq, int leve) "Set EXTI: %d to %d"
-+stm32f4xx_exti_read(uint64_t addr) "reg read: addr: 0x%" PRIx64 " "
-+stm32f4xx_exti_write(uint64_t addr, uint64_t data) "reg write: addr: 0x%" PRIx64 " val: 0x%" PRIx64 ""
++    /* For M, initial value of the entry and SP */
++    uint32_t init_sp, init_entry;
 +
- # tz-mpc.c
- tz_mpc_reg_read(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs read: offset 0x%x data 0x%" PRIx64 " size %u"
- tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs write: offset 0x%x data 0x%" PRIx64 " size %u"
-diff --git a/include/hw/misc/stm32f4xx_exti.h b/include/hw/misc/stm32f4xx_exti.h
-new file mode 100644
-index 0000000000..707036a41b
---- /dev/null
-+++ b/include/hw/misc/stm32f4xx_exti.h
-@@ -0,0 +1,60 @@
-+/*
-+ * STM32F4XX EXTI
-+ *
-+ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HW_STM_EXTI_H
-+#define HW_STM_EXTI_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/hw.h"
-+
-+#define EXTI_IMR   0x00
-+#define EXTI_EMR   0x04
-+#define EXTI_RTSR  0x08
-+#define EXTI_FTSR  0x0C
-+#define EXTI_SWIER 0x10
-+#define EXTI_PR    0x14
-+
-+#define TYPE_STM32F4XX_EXTI "stm32f4xx-exti"
-+#define STM32F4XX_EXTI(obj) \
-+    OBJECT_CHECK(STM32F4xxExtiState, (obj), TYPE_STM32F4XX_EXTI)
-+
-+#define NUM_GPIO_EVENT_IN_LINES 16
-+#define NUM_INTERRUPT_OUT_LINES 16
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+
-+    uint32_t exti_imr;
-+    uint32_t exti_emr;
-+    uint32_t exti_rtsr;
-+    uint32_t exti_ftsr;
-+    uint32_t exti_swier;
-+    uint32_t exti_pr;
-+
-+    qemu_irq irq[NUM_INTERRUPT_OUT_LINES];
-+} STM32F4xxExtiState;
-+
-+#endif
+     /* For v8M, initial value of the Secure VTOR */
+     uint32_t init_svtor;
+ 
 -- 
 2.22.0
 
