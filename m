@@ -2,91 +2,64 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA388C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51287C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:16:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1C9F208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:14:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C9F208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 24E4A20842
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:16:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E4A20842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6E48-0007ir-14
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33960)
+	id 1i6E64-0000e4-Cw
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:16:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i6E3T-0007HG-OE
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:13:37 -0400
+ (envelope-from <berrange@redhat.com>) id 1i6E4Q-0007ze-Uw
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i6E3S-0008Jq-Hz
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:13:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59612)
+ (envelope-from <berrange@redhat.com>) id 1i6E4O-0000Ru-TZ
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:14:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36314)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i6E3S-0008J6-9d
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:13:34 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1i6E4K-0000I8-Oh; Fri, 06 Sep 2019 09:14:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E8E9302C06C;
- Fri,  6 Sep 2019 13:13:33 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C34F91001958;
- Fri,  6 Sep 2019 13:13:32 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190905134526.32146-1-berrange@redhat.com>
- <CAFEAcA8-C4V6EQBZDvLUaL+WoLfnr4wB6tiQNAtH1wN1kRQN3Q@mail.gmail.com>
- <20190906092403.GO5119@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <bc29654e-3408-898a-0a5b-0ea5628688ef@redhat.com>
-Date: Fri, 6 Sep 2019 08:13:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 6924885A03;
+ Fri,  6 Sep 2019 13:14:26 +0000 (UTC)
+Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E4196600C4;
+ Fri,  6 Sep 2019 13:14:17 +0000 (UTC)
+Date: Fri, 6 Sep 2019 14:14:14 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Message-ID: <20190906131414.GG5119@redhat.com>
+References: <20190826135103.22410-1-mlevitsk@redhat.com>
+ <20190826135103.22410-11-mlevitsk@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190906092403.GO5119@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="h9llPXsjItSppe7SNvfoNXWmXsHnsrvOx"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190826135103.22410-11-mlevitsk@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 06 Sep 2019 13:13:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Fri, 06 Sep 2019 13:14:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 0/4] Docs patches
+Subject: Re: [Qemu-devel] [PATCH v2 10/13] qcrypto-luks: refactoring:
+ extract store key function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,83 +71,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---h9llPXsjItSppe7SNvfoNXWmXsHnsrvOx
-Content-Type: multipart/mixed; boundary="OCmaa2D015iWZ6rIpmm11uPFfp79rJbwP";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <bc29654e-3408-898a-0a5b-0ea5628688ef@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/4] Docs patches
-References: <20190905134526.32146-1-berrange@redhat.com>
- <CAFEAcA8-C4V6EQBZDvLUaL+WoLfnr4wB6tiQNAtH1wN1kRQN3Q@mail.gmail.com>
- <20190906092403.GO5119@redhat.com>
-In-Reply-To: <20190906092403.GO5119@redhat.com>
+On Mon, Aug 26, 2019 at 04:51:00PM +0300, Maxim Levitsky wrote:
+> This function will be used later to store
+> new keys to the luks metadata
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  crypto/block-luks.c | 310 ++++++++++++++++++++++++++------------------
+>  1 file changed, 184 insertions(+), 126 deletions(-)
+> 
+> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+> index cc9a52c9af..d713125925 100644
+> --- a/crypto/block-luks.c
+> +++ b/crypto/block-luks.c
+> @@ -650,6 +650,176 @@ out:
+>  
+>  }
+>  
+> +/*
+> + * Given a key slot,  user password, and the master key,
+> + * will store the encrypted master key there, and update the
+> + * in-memory header. User must then write the in-memory header
+> + *
+> + * Returns:
+> + *    0 if the keyslot was written successfully
+> + *      with the provided password
+> + *   -1 if a fatal error occurred while storing the key
+> + */
+> +static int
+> +qcrypto_block_luks_store_key(QCryptoBlock *block,
+> +                             unsigned int slot_idx,
+> +                             const char *password,
+> +                             uint8_t *masterkey,
+> +                             uint64_t iter_time,
+> +                             QCryptoBlockWriteFunc writefunc,
+> +                             void *opaque,
+> +                             Error **errp)
+> +{
+> +    QCryptoBlockLUKS *luks = block->opaque;
+> +    QCryptoBlockLUKSKeySlot *slot = &luks->header.key_slots[slot_idx];
+> +    g_autofree uint8_t *splitkey = NULL;
+> +    size_t splitkeylen;
+> +    g_autofree uint8_t *slotkey = NULL;
+> +    g_autoptr(QCryptoCipher) cipher = NULL;
+> +    g_autoptr(QCryptoIVGen) ivgen = NULL;
+> +    Error *local_err = NULL;
+> +    uint64_t iters;
+> +    int ret = -1;
+> +
+> +    if (qcrypto_random_bytes(slot->salt,
+> +                             QCRYPTO_BLOCK_LUKS_SALT_LEN,
+> +                             errp) < 0) {
+> +        goto cleanup;
+> +    }
+> +
+> +    splitkeylen = luks->header.master_key_len * slot->stripes;
+> +
+> +    /*
+> +     * Determine how many iterations are required to
+> +     * hash the user password while consuming 1 second of compute
+> +     * time
+> +     */
+> +    iters = qcrypto_pbkdf2_count_iters(luks->hash_alg,
+> +                                       (uint8_t *)password, strlen(password),
+> +                                       slot->salt,
+> +                                       QCRYPTO_BLOCK_LUKS_SALT_LEN,
+> +                                       luks->header.master_key_len,
+> +                                       &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        goto cleanup;
+> +    }
+> +
+> +    if (iters > (ULLONG_MAX / iter_time)) {
+> +        error_setg_errno(errp, ERANGE,
+> +                         "PBKDF iterations %llu too large to scale",
+> +                         (unsigned long long)iters);
+> +        goto cleanup;
+> +    }
+> +
+> +    /* iter_time was in millis, but count_iters reported for secs */
+> +    iters = iters * iter_time / 1000;
+> +
+> +    if (iters > UINT32_MAX) {
+> +        error_setg_errno(errp, ERANGE,
+> +                         "PBKDF iterations %llu larger than %u",
+> +                         (unsigned long long)iters, UINT32_MAX);
+> +        goto cleanup;
+> +    }
+> +
+> +    slot->iterations =
+> +        MAX(iters, QCRYPTO_BLOCK_LUKS_MIN_SLOT_KEY_ITERS);
+> +
+> +
+> +    /*
+> +     * Generate a key that we'll use to encrypt the master
+> +     * key, from the user's password
+> +     */
+> +    slotkey = g_new0(uint8_t, luks->header.master_key_len);
+> +    if (qcrypto_pbkdf2(luks->hash_alg,
+> +                       (uint8_t *)password, strlen(password),
+> +                       slot->salt,
+> +                       QCRYPTO_BLOCK_LUKS_SALT_LEN,
+> +                       slot->iterations,
+> +                       slotkey, luks->header.master_key_len,
+> +                       errp) < 0) {
+> +        goto cleanup;
+> +    }
+> +
+> +
+> +    /*
+> +     * Setup the encryption objects needed to encrypt the
+> +     * master key material
+> +     */
+> +    cipher = qcrypto_cipher_new(luks->cipher_alg,
+> +                                luks->cipher_mode,
+> +                                slotkey, luks->header.master_key_len,
+> +                                errp);
+> +    if (!cipher) {
+> +        goto cleanup;
+> +    }
+> +
+> +    ivgen = qcrypto_ivgen_new(luks->ivgen_alg,
+> +                              luks->ivgen_cipher_alg,
+> +                              luks->ivgen_hash_alg,
+> +                              slotkey, luks->header.master_key_len,
+> +                              errp);
+> +    if (!ivgen) {
+> +        goto cleanup;
+> +    }
+> +
+> +    /*
+> +     * Before storing the master key, we need to vastly
+> +     * increase its size, as protection against forensic
+> +     * disk data recovery
+> +     */
+> +    splitkey = g_new0(uint8_t, splitkeylen);
+> +
+> +    if (qcrypto_afsplit_encode(luks->hash_alg,
+> +                               luks->header.master_key_len,
+> +                               slot->stripes,
+> +                               masterkey,
+> +                               splitkey,
+> +                               errp) < 0) {
+> +        goto cleanup;
+> +    }
+> +
+> +    /*
+> +     * Now we encrypt the split master key with the key generated
+> +     * from the user's password, before storing it
+> +     */
+> +    if (qcrypto_block_cipher_encrypt_helper(cipher, block->niv, ivgen,
+> +                                            QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+> +                                            0,
+> +                                            splitkey,
+> +                                            splitkeylen,
+> +                                            errp) < 0) {
+> +        goto cleanup;
+> +    }
+> +
+> +    /* Write out the slot's master key material. */
+> +    if (writefunc(block,
+> +                  slot->key_offset_sector *
+> +                  QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+> +                  splitkey, splitkeylen,
+> +                  opaque,
+> +                  errp) != splitkeylen) {
+> +        goto cleanup;
+> +    }
+> +
+> +    slot->active = QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED;
+> +
+> +    if (qcrypto_block_luks_store_header(block,  writefunc, opaque, errp)) {
 
---OCmaa2D015iWZ6rIpmm11uPFfp79rJbwP
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Check < 0
 
-On 9/6/19 4:24 AM, Daniel P. Berrang=C3=A9 wrote:
+> +        goto cleanup;
+> +    }
+> +
+> +    ret = 0;
+> +
+> +cleanup:
+> +    if (slotkey) {
+> +        memset(slotkey, 0, luks->header.master_key_len);
+> +    }
+> +    if (splitkey) {
+> +        memset(splitkey, 0, splitkeylen);
+> +    }
+> +    return ret;
+> +}
+> +
 
->>
->> I'm going to apply this, but something I thought of looking at
->> the diffstat: should some or all of this be in the docs/devel
->> manual rather than free-floating rst files in the root directory?
->=20
-> The answer really hinges on whether moving CODING_STYLE into the
-> docs/devel directory will make it less obvious to users.
+> +    /* populate the slot 0 with the password encrypted master key*/
+> +    /* This will also store the header */
+> +    if (qcrypto_block_luks_store_key(block,
+> +                                     0,
+> +                                     password,
+> +                                     masterkey,
+> +                                     luks_opts.iter_time,
+> +                                     writefunc,
+> +                                     opaque,
+> +                                     errp)) {
+>          goto error;
 
-A git symlink would allow us to keep the file at the top level (for easy
-location while browsing the repository) as well as under docs (for easy
-incorporation into the doc build recipes).  I don't know if tooling
-would require the original in one place (forcing the other to be the
-link), or if you can do it in either direction.
+Check < 0
 
->=20
-> So we could just move CODING_STYLE into the docs/devel dir and link
-> to it from a CONTRIBUTING.md (well .rst) file.
+> -    }
+> +     }
 
-A textual link in an actual file is slightly different than a git
-symlink, but yes, that would probably also work (even if it requires
-chasing through one more layer of files).
+Indent off by one
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+>  
+> -    memset(masterkey, 0, luks->header.master_key_len);
+> -    memset(slotkey, 0, luks->header.master_key_len);
+>  
+> +    memset(masterkey, 0, luks->header.master_key_len);
+>      return 0;
 
+The blank line was moved by accident.
 
---OCmaa2D015iWZ6rIpmm11uPFfp79rJbwP--
+>  
+>   error:
+>      if (masterkey) {
+>          memset(masterkey, 0, luks->header.master_key_len);
+>      }
+> -    if (slotkey) {
+> -        memset(slotkey, 0, luks->header.master_key_len);
+> -    }
+>  
+> 
 
---h9llPXsjItSppe7SNvfoNXWmXsHnsrvOx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1yW3sACgkQp6FrSiUn
-Q2ovtwf/Ssd9XS9j1cFp1BS8lVrGdwvPR2bokQccVXjbonv8jpjaMqhKwRMXEhHP
-vz7X7vMMoDNRqHTLpHiBBiFXfQXYVW4BsELKoT/Q2rdGHbaT87UcTOhC5QYRcaPH
-UA/piOot+rdQuLaAwTsWXDoBwlwThnIARQnkVqkJuAYpsz5oXocorvMkQ93XmHsL
-EJjp8+ZmdEriiZrId9sHh2Yk4VtjgeNqI8u8usRCna+sBlo83cK2UGLDafiZw/qX
-E44W7D65H88REnJSVaV5J62S6DaCV76EH3zv1zLq1f164Tl2d3/I9om+aoSkRjHz
-6ZBR860Bl63/3eDnEsq4tC1k6qiGZg==
-=rLBH
------END PGP SIGNATURE-----
-
---h9llPXsjItSppe7SNvfoNXWmXsHnsrvOx--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
