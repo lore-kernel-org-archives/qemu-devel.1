@@ -2,84 +2,76 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D0EC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 21:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11657C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 21:37:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86DA72070C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 21:26:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZimwDUL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86DA72070C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D95082070C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 21:37:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D95082070C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernelpath.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6LkF-00059u-EL
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 17:26:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41601)
+	id 1i6LvU-0008RU-Tv
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 17:37:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43742)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i6LjL-0004Nk-F7
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 17:25:20 -0400
+ (envelope-from <bounces@canonical.com>) id 1i6Ltx-0007XR-QD
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 17:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i6LjK-0002ux-8N
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 17:25:19 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:39881)
+ (envelope-from <bounces@canonical.com>) id 1i6Ltw-0000Kp-FG
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 17:36:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54398)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i6LjJ-0002sS-Tf; Fri, 06 Sep 2019 17:25:18 -0400
-Received: by mail-lf1-x143.google.com with SMTP id l11so6177362lfk.6;
- Fri, 06 Sep 2019 14:25:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=41vitPaR9QJU0hyMIKTOsEnYo8xWm+xShqZjqioEH/s=;
- b=hZimwDULM8L2NvaeATEUnPYm+zjrG7nQD2lh7Hwt7PBkDM6POfUCw8RujxyGdR1cII
- 7Mcd0ffQcjXkKZpjr+uiba+bwjFQ531O1JSC8F1Qwy6/ijUB9GchWr5jdRpkX5IoNRJ2
- BoGV0gUQmCLQBAkLYestpSK9U6ZvcUez+GH9C7R/PKkt8/pOZwmy9yn5M9q/UYkrKjEs
- Dm4a4REV20pohS2s76DIz8jXSeVCWUOdTk4Raqhb6wCez1TT/gQvwM4ATL12AXWuS8vu
- 8W2zX7G0rP8hp9wN6WkDPy4kKpULVmtaCKU9luli2XzViUCAgUtkE1kEmzhAcRO9llRL
- 8bWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=41vitPaR9QJU0hyMIKTOsEnYo8xWm+xShqZjqioEH/s=;
- b=V9iB8qH1wFGShojqO9joZM8H8DD/ZKWeovKHToZcY4Gb0Cl52Cb1YB/Jb1jS1p4Ren
- 64QSDdk3OshmMKBsCtlXiO1r6I5Y71MWuGLW7hKzRhlLyyDffJku0lRWEA8HnH4JNuyJ
- Vu4VBNKBITXo6K1DUR9Xs3yiL+AxJfG3cEN/AXxBufzfP73/bVwKNk0qrPdXq8wtfa5+
- maL+KMc7kQgvDgA8yWVjtR69plgvDkcH74YQ2VqxDarp64SSoH6dp+U7IAjPX/vUXH2I
- deR/v/pCXTgHeNotjvUzJhX8XUo7EgOcybUC5AnFkJjoqus7JwfprGBPUJdh2DqwK7AM
- VA3Q==
-X-Gm-Message-State: APjAAAWEimWtzgfeFg6+GVCdCYgDFFqZB3N1SBF6Pg22Bj/nlr4zycuY
- jJsTZ0Jp4D8CxuFT1NlH6XeGddl1dDsBTvxN2c8=
-X-Google-Smtp-Source: APXvYqzuM1C0sxWAwZn0iI6hvWtphG1gWjhalo7iSuEn9PwyX54TqXKz3QcKNYRyzZ9TrRthq4lD+sVnHgEdmv62/68=
-X-Received: by 2002:a19:f11c:: with SMTP id p28mr7631834lfh.44.1567805116003; 
- Fri, 06 Sep 2019 14:25:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i6Ltw-0000Jv-9P
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 17:36:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i6Ltu-0006I4-KG
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 21:36:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 97BB22E80C8
+ for <qemu-devel@nongnu.org>; Fri,  6 Sep 2019 21:36:14 +0000 (UTC)
 MIME-Version: 1.0
-References: <1567786819-22142-1-git-send-email-bmeng.cn@gmail.com>
- <1567786819-22142-2-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1567786819-22142-2-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 6 Sep 2019 14:20:56 -0700
-Message-ID: <CAKmqyKP9G5kHhMGPjXpHVNj4S5io5xtbLU4=QiNzCx9cgn9Npw@mail.gmail.com>
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH v8 01/32] riscv: hw: Remove duplicated
- "hw/hw.h" inclusion
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Sep 2019 21:22:42 -0000
+From: Rafael David Tinoco <rafaeldtinoco@kernelpath.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=In Progress; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug-Tags: qemu-img
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dannf jnsnow lizhengui rafaeldtinoco
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <156780496240.864.10410116882949423627.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a3bb8ced42f7c6f57a5fb674b12ce77cd21477dd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
+ ARM system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,66 +80,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 6, 2019 at 9:20 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Commit a27bd6c779ba ("Include hw/qdev-properties.h less") wrongly
-> added "hw/hw.h" to sifive_prci.c and sifive_test.c.
->
-> Another inclusion of "hw/hw.h" was later added via
-> commit 650d103d3ea9 ("Include hw/hw.h exactly where needed"), that
-> resulted in duplicated inclusion of "hw/hw.h".
->
-> Fixes: a27bd6c779ba ("Include hw/qdev-properties.h less")
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Alright, I couldn't reproduce this yet, I'm running same test case in a
+24 cores box and causing lots of context switches and CPU migrations in
+parallel (trying to exhaust the logic).
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Will let this running for sometime to check.
 
-Alistair
+Unfortunately this can be related QEMU AIO BH locking/primitives and
+cache coherency in the HW in question (which I got specs from:
+https://en.wikichip.org/wiki/hisilicon/kunpeng/hi1616):
 
->
-> ---
->
-> Changes in v8:
-> - newly included in v8 to ease patch inter dependencies
->
->  hw/riscv/sifive_prci.c | 1 -
->  hw/riscv/sifive_test.c | 1 -
->  2 files changed, 2 deletions(-)
->
-> diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
-> index 9837b61..562bc3d 100644
-> --- a/hw/riscv/sifive_prci.c
-> +++ b/hw/riscv/sifive_prci.c
-> @@ -19,7 +19,6 @@
->   */
->
->  #include "qemu/osdep.h"
-> -#include "hw/hw.h"
->  #include "hw/sysbus.h"
->  #include "qemu/module.h"
->  #include "target/riscv/cpu.h"
-> diff --git a/hw/riscv/sifive_test.c b/hw/riscv/sifive_test.c
-> index afbb3aa..3a14f9f 100644
-> --- a/hw/riscv/sifive_test.c
-> +++ b/hw/riscv/sifive_test.c
-> @@ -19,7 +19,6 @@
->   */
->
->  #include "qemu/osdep.h"
-> -#include "hw/hw.h"
->  #include "hw/sysbus.h"
->  #include "qemu/module.h"
->  #include "target/riscv/cpu.h"
-> --
-> 2.7.4
->
->
+l1$ size	8 MiB
+l1d$ size	4 MiB
+l1i$ size	4 MiB
+l2$ size	32 MiB
+l3$ size	64 MiB
+
+like for example when having 2 threads in different NUMA domains, or
+some other situation.
+
+I can't simulate the same since I have a SOC with:
+
+Cortex-A53 MPCore 24cores,
+
+L1 I/D=3D32KB/32KB
+L2 =3D256KB
+L3 =3D4MB
+
+and I'm not even close to L1/L2/L3 cache numbers from D06 =3Do).
+
+Just got a note that I'll be able to reproduce this in the real HW, will
+get back soon with real gdb debugging.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
+
+Title:
+  qemu-img hangs on high core count ARM system
+
+Status in QEMU:
+  Confirmed
+Status in qemu package in Ubuntu:
+  In Progress
+
+Bug description:
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760, =
+
+      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
+950)
+      at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, =
+
+      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
+.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
+
+      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+      at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
 
