@@ -6,44 +6,45 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F59C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C50FCC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ADC92081B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:23:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ADC92081B
+	by mail.kernel.org (Postfix) with ESMTPS id 9960220842
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 11:26:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9960220842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6CKk-0005wq-KX
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 07:23:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34434)
+	id 1i6CO8-0007v3-RJ
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 07:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35336)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i6CK5-0005V2-Qr
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:22:38 -0400
+ (envelope-from <thuth@redhat.com>) id 1i6CNJ-000779-Fr
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i6CK3-0005uY-L2
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:22:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45974)
+ (envelope-from <thuth@redhat.com>) id 1i6CNI-0000ms-BL
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:25:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44254)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i6CK3-0005tP-DL
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 07:22:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1i6CNI-0000lB-2x; Fri, 06 Sep 2019 07:25:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6360581127;
- Fri,  6 Sep 2019 11:22:33 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 37A6A8553B;
+ Fri,  6 Sep 2019 11:25:55 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-159.ams2.redhat.com [10.36.116.159])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8FD0A5D9CA;
- Fri,  6 Sep 2019 11:22:26 +0000 (UTC)
-To: Greg Kurz <groug@kaod.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 00ABE60605;
+ Fri,  6 Sep 2019 11:25:50 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
 References: <20190905113346.2473-1-thuth@redhat.com>
- <20190905140701.6cc679ee@bahia.lan> <20190905141848.331aba6c@bahia.lan>
+ <20190905140701.6cc679ee@bahia.lan>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -89,18 +90,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <dff80621-8d58-79e0-3198-b6ee38c28961@redhat.com>
-Date: Fri, 6 Sep 2019 13:22:25 +0200
+Message-ID: <fc82454c-ee11-c7a3-cccb-eeb51df35897@redhat.com>
+Date: Fri, 6 Sep 2019 13:25:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190905141848.331aba6c@bahia.lan>
+In-Reply-To: <20190905140701.6cc679ee@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 06 Sep 2019 11:22:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Fri, 06 Sep 2019 11:25:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH] travis.yml: Install libcap-dev for testing
@@ -116,35 +117,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
+Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/09/2019 14.18, Greg Kurz wrote:
-> On Thu, 5 Sep 2019 14:07:01 +0200
-> Greg Kurz <groug@kaod.org> wrote:
+On 05/09/2019 14.07, Greg Kurz wrote:
+> On Thu,  5 Sep 2019 13:33:46 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
->> On Thu,  5 Sep 2019 13:33:46 +0200
->> Thomas Huth <thuth@redhat.com> wrote:
+>> So far we were not testing virtio-9p in Travis yet, since we forgot to
+>> install libcap-devel. Do it now to get some more test coverage.
 >>
->>> So far we were not testing virtio-9p in Travis yet, since we forgot to
->>> install libcap-devel. Do it now to get some more test coverage.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>
->> Acked-by: Greg Kurz <groug@kaod.org>
->>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
 > 
-> Hmm... shouldn't libcap-dev be added in the "Acceptance (Functional) tests"
-> section as well, near line 260 ?
+> Acked-by: Greg Kurz <groug@kaod.org>
+> 
+> and
+> 
+> Tested-by: Greg Kurz <groug@kaod.org>
+> 
+> Whose tree is this going through BTW ?
 
-Unless there is a test for 9p in the "check-acceptance" suite, it likely
-does not make a difference - 9p would just get built one more additional
-time, but it won't be tested afterwards.
+According to MAINTAINERS, .travis.yml is taken care of by Alex and Fam,
+so I hope they will pick this patch up. Otherwise, I think it could also
+go via trivial (now on CC: ), since it's just a one-liner.
 
  Thomas
 
