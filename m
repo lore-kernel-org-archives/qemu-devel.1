@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA61C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F34C43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56B4A20838
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:33:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56B4A20838
+	by mail.kernel.org (Postfix) with ESMTPS id 01E1E20838
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 15:33:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01E1E20838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernelpath.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6GF7-0001og-Br
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 11:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44350)
+	id 1i6GF9-0001re-Tz
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 11:33:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i6GCq-0008UN-PC
+ (envelope-from <bounces@canonical.com>) id 1i6GCq-0008UO-N3
  for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i6GCh-0003m9-7H
+ (envelope-from <bounces@canonical.com>) id 1i6GCh-0003mv-LA
  for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:31:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33406)
+Received: from indium.canonical.com ([91.189.90.7]:33502)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i6GCg-0003i9-Oq
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:31:14 -0400
+ id 1i6GCh-0003kb-4d
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 11:31:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i6GCd-0005H9-Hi
- for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 15:31:11 +0000
+ id 1i6GCf-0004nS-CR
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 15:31:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 833192E80CD
- for <qemu-devel@nongnu.org>; Fri,  6 Sep 2019 15:31:11 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 5C0402E80D5
+ for <qemu-devel@nongnu.org>; Fri,  6 Sep 2019 15:31:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Sep 2019 15:12:44 -0000
+Date: Fri, 06 Sep 2019 15:16:57 -0000
 From: Rafael David Tinoco <rafaeldtinoco@kernelpath.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -59,13 +59,13 @@ X-Launchpad-Bug-Commenters: dannf jnsnow lizhengui rafaeldtinoco
 X-Launchpad-Bug-Reporter: dann frazier (dannf)
 X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
 References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <156778276451.17577.7497183627592074422.malone@gac.canonical.com>
+Message-Id: <156778301771.6413.10991238517951487967.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19044";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 27f553c841ea6f5c5fc97215f260667300b56a65
+X-Launchpad-Hash: 7c92e214a78c40ca3db78641addb4ea0a9ee38ce
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
@@ -85,24 +85,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Liz,
-
-I'll try to reproduce this issue in a Cortex-A53 aarch64 real
-environment (w/ 24 HW threads) AND in a virtual environment w/ lots of
-vCPUs... but, if it's a barrier missing - or the lack of atomicity
-and/or ordering in a primitive - then, I'm afraid the context switch in
-between vCPUs might not be the same as in real CPUs (IPIs are sent and
-handled differently and host kernel delays IPI delivery because of its
-own callbacks, before scheduling, etc...) and I could need a qemu dump
-from your environment.
-
-Would that be feasible ? Can you reproduce this nowadays ? This bug has
-aged a little, so I'm now sure!
-
-Could you provide me the dump caused by latest package available for
-your Ubuntu version ? This way I have the debug symbols to work with.
-
-Meanwhile, I'll be trying to reproduce on my side.
+OOhh nm on the virtual environment test, as I just remembered we don't
+have KVM on 2nd level for aarch64 yet (at least in ARMv8 implementing
+virt extension). I'll try to reproduce in the real env only.
 
 -- =
 
