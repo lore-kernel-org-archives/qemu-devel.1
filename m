@@ -2,92 +2,65 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 092F5C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D0DC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:19:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9936206BB
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:18:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CjOWjawg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9936206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 58E62206BB
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 13:19:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58E62206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6E80-0001ls-1n
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:18:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34741)
+	id 1i6E8k-0002ku-Bk
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 09:19:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i6E6M-0000qi-9i
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:16:35 -0400
+ (envelope-from <berrange@redhat.com>) id 1i6E80-0001vx-MQ
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i6E6H-0001lm-M8
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:16:31 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55366)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i6E6H-0001g0-8y
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:16:29 -0400
-Received: by mail-wm1-x344.google.com with SMTP id g207so6466281wmg.5
- for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 06:16:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=hbaExxadqMYBHdluaOpKu9JfRoq9G1pOGEiAk/nTcIM=;
- b=CjOWjawgeztgRgZPbZPpx63Vb8CrLvO9hVy9i7sbV5mkl37pJt8YyLpmh9St6wYE/A
- KMHSF2/ytxGvmqwFI3g5O5iMB1pk92W+DnXCbUZRPLsdL1gutCsmBAW9GJ88rpooSJnR
- epAklUbwD1en8DVxqz6ssxS7I2YxkCeWENJ3ool+dVVZHW7c+QrIvSIQCWD3YEwP7FA/
- iiEdVkIddblqmr/NU1Hw/xjoMMqCeFUJDqRZql21/eACNKzSICxUdzmIbYHohOeSr84E
- eZr0AWlZ/doMpAr4+Jt3nRrQTj7Pfocn6ODJbU7+P1FVVcU57ItX1phmlMZdULAkU5MN
- G69A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=hbaExxadqMYBHdluaOpKu9JfRoq9G1pOGEiAk/nTcIM=;
- b=Mdb3kfylIhvfwt5NQ8iYSJPRwQryhRmb3MK77Yex7Lxbx/KZa6MRIHYN1VPeDowE3I
- ZRWU00lN7PQnX5QVCdOIpTUYseZUD6nfyYWNQJmewKvlXIi2ZZyenyzJVuym7cI2eGep
- r/Ypdhp7fljQKCPjZtXhsyFZT8MKAJS0SEx2uLT9/6HjqzDFJemGcabrHsG+hwJXZlP4
- ikmIjZkkSd9f58FG28O6ysusPEWqf16ys79Z4VVre2TUIoNr5TCmYfXJgX0QXeoY78tm
- droqQZVvkZozK4ZhvTVb83yXpuiL+DRyHHEZKXGTUvsh6baxzjLC8rwEWeLWlnYNeHXB
- ilUg==
-X-Gm-Message-State: APjAAAUoNO+B8NAdf7aykfyT1FseTP11KgdLZGJJ1BcHGBSG5zSrIvkw
- A7SW9BNqlOqSmaMJk5QBjKOIGA==
-X-Google-Smtp-Source: APXvYqz3KrZG03LObFxee/SLCEcMOCvwYUKHBl+s7XFdAKlotXr7ozUh7KkrnC/F9sB7Rwm8gPrb7w==
-X-Received: by 2002:a1c:7d8e:: with SMTP id y136mr7055212wmc.83.1567775786003; 
- Fri, 06 Sep 2019 06:16:26 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i9sm1882843wmf.14.2019.09.06.06.16.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Sep 2019 06:16:25 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BE0911FF87;
- Fri,  6 Sep 2019 14:16:24 +0100 (BST)
-References: <20190906124706.19145-1-alex.bennee@linaro.org>
- <20190906124706.19145-3-alex.bennee@linaro.org>
- <CAFEAcA84VXqw+ZGP9Nv=Wy069ZU_C0WkVdv0h28GVbnzyx6w6w@mail.gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA84VXqw+ZGP9Nv=Wy069ZU_C0WkVdv0h28GVbnzyx6w6w@mail.gmail.com>
-Date: Fri, 06 Sep 2019 14:16:24 +0100
-Message-ID: <87a7bhzhsn.fsf@linaro.org>
+ (envelope-from <berrange@redhat.com>) id 1i6E7y-0004Nn-GZ
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 09:18:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37750)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1i6E7v-0004Aj-60; Fri, 06 Sep 2019 09:18:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 458A21DA9;
+ Fri,  6 Sep 2019 13:18:10 +0000 (UTC)
+Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BE44960C5E;
+ Fri,  6 Sep 2019 13:18:01 +0000 (UTC)
+Date: Fri, 6 Sep 2019 14:17:58 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Message-ID: <20190906131758.GH5119@redhat.com>
+References: <20190826135103.22410-1-mlevitsk@redhat.com>
+ <20190826135103.22410-12-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190826135103.22410-12-mlevitsk@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Fri, 06 Sep 2019 13:18:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] target/arm: handle A-profile
- semihosting at translate time
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 11/13] qcrypto-luks: refactoring:
+ simplify the math used for keyslot locations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,78 +72,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Aug 26, 2019 at 04:51:01PM +0300, Maxim Levitsky wrote:
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  crypto/block-luks.c | 64 +++++++++++++++++++++++++++++----------------
+>  1 file changed, 41 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+> index d713125925..6a43d97ce5 100644
+> --- a/crypto/block-luks.c
+> +++ b/crypto/block-luks.c
+> @@ -409,6 +409,32 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgor=
+ithm cipher,
+>      }
+>  }
+> =20
+> +/*
+> + * Returns number of sectors needed to store the key material
+> + * given number of anti forensic stripes
+> + */
+> +static int
+> +qcrypto_block_luks_splitkeylen_sectors(const QCryptoBlockLUKS *luks,
+> +                                       unsigned int stripes)
+> +{
+> +    /*
+> +     * This calculation doesn't match that shown in the spec,
+> +     * but instead follows the cryptsetup implementation.
+> +     */
+> +
+> +    size_t header_sectors =3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+> +        QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+The caller already calculated that so just pass it in
 
-> On Fri, 6 Sep 2019 at 13:47, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->>
->> As for the other semihosting calls we can resolve this at translate
->> time.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> ---
->> v2
->>   - update for change to gen_exception_internal_insn API
->> v3
->>   - update for decode tree, merge T32 & A32 commits
->>   - dropped r-b due to changes
->> ---
->>  target/arm/translate.c | 19 +++++++++++++++----
->>  1 file changed, 15 insertions(+), 4 deletions(-)
->>
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index 4cda7812bcb..ed4a97cfb44 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -10222,14 +10222,25 @@ static bool trans_CBZ(DisasContext *s, arg_CBZ=
- *a)
->>  }
->>
->>  /*
->> - * Supervisor call
->> + * Supervisor call - both T32 & A32 come here so we need to check
->> + * which mode we are in when checking for semihosting.
->>   */
->>
->>  static bool trans_SVC(DisasContext *s, arg_SVC *a)
->>  {
->> -    gen_set_pc_im(s, s->base.pc_next);
->> -    s->svc_imm =3D a->imm;
->> -    s->base.is_jmp =3D DISAS_SWI;
->> +    const uint32_t semihost_imm =3D s->thumb ? 0xab : 0x123456;
->> +
->> +    if (semihosting_enabled() &&
->> +#ifndef CONFIG_USER_ONLY
->> +        s->current_el !=3D 0 &&
->> +#endif
->> +        (a->imm =3D=3D semihost_imm)) {
->> +        gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
->> +    } else {
->> +        gen_set_pc_im(s, s->base.pc_next);
->> +        s->svc_imm =3D a->imm;
->> +        s->base.is_jmp =3D DISAS_SWI;
->> +    }
->>      return true;
->>  }
->
-> Doesn't this accidentally enable semihosting via SVC for
-> M-profile ?
+> +
+> +    size_t splitkeylen =3D luks->header.master_key_len * stripes;
+> +
+> +    /* First align the key material size to block size*/
+> +    size_t splitkeylen_sectors =3D
+> +        DIV_ROUND_UP(splitkeylen, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE);
+> +
+> +    /* Then also align the key material size to the size of the header=
+ */
+> +    return ROUND_UP(splitkeylen_sectors, header_sectors);
+> +}
+> +
+>  /*
+>   * Stores the main LUKS header, taking care of endianess
+>   */
+> @@ -1151,7 +1177,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+>      QCryptoBlockCreateOptionsLUKS luks_opts;
+>      Error *local_err =3D NULL;
+>      g_autofree uint8_t *masterkey =3D NULL;
+> -    size_t splitkeylen =3D 0;
+> +    size_t header_sectors;
+> +    size_t split_key_sectors;
+>      size_t i;
+>      g_autofree char *password;
+>      const char *cipher_alg;
+> @@ -1370,37 +1397,28 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+>          goto error;
+>      }
+> =20
+> +    /* start with the sector that follows the header*/
+> +    header_sectors =3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+> +        QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
+> +
+> +    split_key_sectors =3D
+> +        qcrypto_block_luks_splitkeylen_sectors(luks,
+> +                                               QCRYPTO_BLOCK_LUKS_STRI=
+PES);
+> =20
+> -    /* Although LUKS has multiple key slots, we're just going
+> -     * to use the first key slot */
+> -    splitkeylen =3D luks->header.master_key_len * QCRYPTO_BLOCK_LUKS_S=
+TRIPES;
+>      for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
+> -        luks->header.key_slots[i].active =3D QCRYPTO_BLOCK_LUKS_KEY_SL=
+OT_DISABLED;
+> -        luks->header.key_slots[i].stripes =3D QCRYPTO_BLOCK_LUKS_STRIP=
+ES;
+> +        QCryptoBlockLUKSKeySlot *slot =3D &luks->header.key_slots[i];
+> +        slot->active =3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED;
+> =20
+> -        /* This calculation doesn't match that shown in the spec,
+> -         * but instead follows the cryptsetup implementation.
+> -         */
+> -        luks->header.key_slots[i].key_offset_sector =3D
+> -            (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+> -             QCRYPTO_BLOCK_LUKS_SECTOR_SIZE) +
+> -            (ROUND_UP(DIV_ROUND_UP(splitkeylen, QCRYPTO_BLOCK_LUKS_SEC=
+TOR_SIZE),
+> -                      (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+> -                       QCRYPTO_BLOCK_LUKS_SECTOR_SIZE)) * i);
+> +        slot->key_offset_sector =3D header_sectors + i * split_key_sec=
+tors;
+> +        slot->stripes =3D QCRYPTO_BLOCK_LUKS_STRIPES;
+>      }
+> =20
+> -
+>      /* The total size of the LUKS headers is the partition header + ke=
+y
+>       * slot headers, rounded up to the nearest sector, combined with
+>       * the size of each master key material region, also rounded up
+>       * to the nearest sector */
+> -    luks->header.payload_offset_sector =3D
+> -        (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+> -         QCRYPTO_BLOCK_LUKS_SECTOR_SIZE) +
+> -        (ROUND_UP(DIV_ROUND_UP(splitkeylen, QCRYPTO_BLOCK_LUKS_SECTOR_=
+SIZE),
+> -                  (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+> -                   QCRYPTO_BLOCK_LUKS_SECTOR_SIZE)) *
+> -         QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
+> +    luks->header.payload_offset_sector =3D header_sectors +
+> +            QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS * split_key_sectors;
+> =20
+>      block->sector_size =3D QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
+>      block->payload_offset =3D luks->header.payload_offset_sector *
 
-We must have done that before then. Just gate it with &&
-!arm_dc_feature(s, ARM_FEATURE_M) then?
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
->
-> thanks
-> -- PMM
-
-
---
-Alex Benn=C3=A9e
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
