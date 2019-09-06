@@ -2,86 +2,63 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F13EBC43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E4CC43331
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:35:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB4AB2082C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:29:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB4AB2082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8902320842
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 08:35:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8902320842
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i69co-0000du-Ua
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 04:29:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49211)
+	id 1i69i4-0003lm-PC
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 04:35:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50207)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i69bz-0008KK-Ge
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:28:56 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1i69gP-0001zd-1P
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i69bw-0002Zw-Rd
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:28:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42334)
+ (envelope-from <zhengxiang9@huawei.com>) id 1i69gN-0005br-Bf
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:33:28 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:51114 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i69bw-0002Ya-Iy
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 04:28:52 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EEF77C049D7C
- for <qemu-devel@nongnu.org>; Fri,  6 Sep 2019 08:28:50 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id l6so2230777wrn.2
- for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 01:28:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NYd689ZzWbFE4B3MAJLt9BQIkSLX+l1SzxmZUP+/KzQ=;
- b=fdwlGZZl8y5S69V2tbVuUejiVfflacTG0a3JfR+LmeFrAUf308caolb1Rw5+gFcqQK
- eQiabxka9bVo4Nilo2Rsp6furVqT0jwHUDrkjGL5woCNIKnG3BlUTxGee9w0r+gmiGa/
- tFx+AJ1TStjd4hMeHoF4Sg02NM6vlsGURLbUd7AFvXJYp0ynB044h/hsnaU6wzWYAfSR
- Psk+idI7bBaIF0qwY+yx4YXMH7ELd79nvyYqSiYEP4Pnuo+d5NhxT1q2hzjBhbieqfyW
- uvBC0krMrqozS4XlcLPfyhaTenH56g58xOgl5ylZqjGjkNTyLQEWUDQ5koQwKTbQYnpV
- UmqQ==
-X-Gm-Message-State: APjAAAVi4YQ9md3uT3uOo2BjGyXNkAqGkRZSo84QsoNqhnRqg2DfBhPN
- MHQhFGKBJExycIqUW0VtUexdRYl+Vgvo44MZtWur7/2Iq9AJ4Rquptp8XnDlkW8xErA0CkOFRwZ
- EvURpwaf+oweZpN0=
-X-Received: by 2002:a5d:4044:: with SMTP id w4mr6330952wrp.281.1567758529045; 
- Fri, 06 Sep 2019 01:28:49 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzDrNZ4P+95MAPRhjoQxfpGC+ZGoniBR7DwRFFvm05+taFEoRNWLy2Wip35v383MoTn4xtoEg==
-X-Received: by 2002:a5d:4044:: with SMTP id w4mr6330936wrp.281.1567758528814; 
- Fri, 06 Sep 2019 01:28:48 -0700 (PDT)
-Received: from [192.168.1.48] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id p23sm1669954wma.18.2019.09.06.01.28.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Sep 2019 01:28:48 -0700 (PDT)
-To: Tony Nguyen <tony.nguyen@bt.com>, qemu-devel@nongnu.org
-References: <20190902012647.1761-1-tony.nguyen@bt.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <41e61c1c-15b0-d028-fc23-52e2c59319d2@redhat.com>
-Date: Fri, 6 Sep 2019 10:28:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1i69gI-0005WM-Tp; Fri, 06 Sep 2019 04:33:23 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id B1284F9680A2F91B9579;
+ Fri,  6 Sep 2019 16:33:15 +0800 (CST)
+Received: from HGHY1z004218071.china.huawei.com (10.177.29.32) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 6 Sep 2019 16:33:08 +0800
+From: Xiang Zheng <zhengxiang9@huawei.com>
+To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
+ <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <lersek@redhat.com>,
+ <james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+ <xuwei5@huawei.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+ <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Date: Fri, 6 Sep 2019 16:31:47 +0800
+Message-ID: <20190906083152.25716-2-zhengxiang9@huawei.com>
+X-Mailer: git-send-email 2.15.1.windows.2
+In-Reply-To: <20190906083152.25716-1-zhengxiang9@huawei.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190902012647.1761-1-tony.nguyen@bt.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.177.29.32]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] memory: Set notdirty_mem_ops validator
+X-Received-From: 45.249.212.35
+Subject: [Qemu-devel] [PATCH v18 1/6] hw/arm/virt: Introduce RAS platform
+ version and RAS machine option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,111 +70,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: wanghaibin.wang@huawei.com, zhengxiang9@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/19 3:26 AM, Tony Nguyen wrote:
-> Existing read rejecting validator was mistakenly cleared.
->=20
-> Reads dispatched to io_mem_notdirty then segfaults as there is no read
-> handler.
->=20
-> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-> ---
->  exec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/exec.c b/exec.c
-> index 1df966d17a..05d664541f 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2796,12 +2796,12 @@ static bool notdirty_mem_accepts(void *opaque, =
-hwaddr addr,
-> =20
->  static const MemoryRegionOps notdirty_mem_ops =3D {
->      .write =3D notdirty_mem_write,
-> -    .valid.accepts =3D notdirty_mem_accepts,
->      .endianness =3D DEVICE_NATIVE_ENDIAN,
->      .valid =3D {
->          .min_access_size =3D 1,
->          .max_access_size =3D 8,
->          .unaligned =3D false,
-> +        .accepts =3D notdirty_mem_accepts,
+From: Dongjiu Geng <gengdongjiu@huawei.com>
 
-I'm surprised the compiler doesn't emit any warning...
+Support RAS Virtualization feature since version 4.2, disable it by
+default in the old versions. Also add a machine option which allows user
+to enable it explicitly.
 
->      },
->      .impl =3D {
->          .min_access_size =3D 1,
->=20
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+---
+ hw/arm/virt.c         | 33 +++++++++++++++++++++++++++++++++
+ include/hw/arm/virt.h |  2 ++
+ 2 files changed, 35 insertions(+)
 
-mcayland provided a verbose backtrace running Solaris, can we amend it
-to this commit?
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index d74538b021..e0451433c8 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1783,6 +1783,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+     vms->its = value;
+ }
+ 
++static bool virt_get_ras(Object *obj, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    return vms->ras;
++}
++
++static void virt_set_ras(Object *obj, bool value, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    vms->ras = value;
++}
++
+ static char *virt_get_gic_version(Object *obj, Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+@@ -2026,6 +2040,19 @@ static void virt_instance_init(Object *obj)
+                                     "Valid values are none and smmuv3",
+                                     NULL);
+ 
++    if (vmc->no_ras) {
++        vms->ras = false;
++    } else {
++        /* Default disallows RAS instantiation */
++        vms->ras = false;
++        object_property_add_bool(obj, "ras", virt_get_ras,
++                                 virt_set_ras, NULL);
++        object_property_set_description(obj, "ras",
++                                        "Set on/off to enable/disable "
++                                        "RAS instantiation",
++                                        NULL);
++    }
++
+     vms->irqmap = a15irqmap;
+ 
+     virt_flash_create(vms);
+@@ -2058,8 +2085,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
+ 
+ static void virt_machine_4_1_options(MachineClass *mc)
+ {
++    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
++
+     virt_machine_4_2_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
++    /* Disable memory recovery feature for 4.1 as RAS support was
++     * introduced with 4.2.
++     */
++    vmc->no_ras = true;
+ }
+ DEFINE_VIRT_MACHINE(4, 1)
+ 
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index a72094204e..04ab42ca42 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -103,6 +103,7 @@ typedef struct {
+     bool disallow_affinity_adjustment;
+     bool no_its;
+     bool no_pmu;
++    bool no_ras;
+     bool claim_edge_triggered_timers;
+     bool smbios_old_sys_ver;
+     bool no_highmem_ecam;
+@@ -119,6 +120,7 @@ typedef struct {
+     bool highmem_ecam;
+     bool its;
+     bool virt;
++    bool ras;
+     int32_t gic_version;
+     VirtIOMMUType iommu;
+     struct arm_boot_info bootinfo;
+-- 
+2.19.1
 
-Thread 4 "qemu-system-spa" received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0x7ffff1d44700 (LWP 23749)]
-0x0000000000000000 in ?? ()
-(gdb) bt
-#0  0x0000000000000000 in  ()
-#1  0x00005555557eae4c in memory_region_read_with_attrs_accessor
-(mr=3D0x55555633d360 <io_mem_notdirty>, addr=3D531677168,
-value=3D0x7ffff1d42eb8, size=3D4, shift=3D0, mask=3D4294967295, attrs=3D.=
-..)
-    at /home/build/src/qemu/git/qemu/memory.c:461
-#2  0x00005555557eb1c4 in access_with_adjusted_size (addr=3D531677168,
-value=3D0x7ffff1d42eb8, size=3D4, access_size_min=3D1, access_size_max=3D=
-8,
-access_fn=3D
-    0x5555557eadf0 <memory_region_read_with_attrs_accessor>,
-mr=3D0x55555633d360 <io_mem_notdirty>, attrs=3D...) at
-/home/build/src/qemu/git/qemu/memory.c:559
-#3  0x00005555557edeb0 in memory_region_dispatch_read1
-(mr=3D0x55555633d360 <io_mem_notdirty>, addr=3D531677168,
-pval=3D0x7ffff1d42eb8, size=3D4, attrs=3D...) at
-/home/build/src/qemu/git/qemu/memory.c:1429
-#4  0x00005555557edf47 in memory_region_dispatch_read (mr=3D0x55555633d36=
-0
-<io_mem_notdirty>, addr=3D531677168, pval=3D0x7ffff1d42eb8, op=3DMO_32,
-attrs=3D...) at /home/build/src/qemu/git/qemu/memory.c:1451
-#5  0x0000555555803846 in io_readx (env=3D0x5555564b15c0,
-iotlbentry=3D0x7fffe831e190, mmu_idx=3D2, addr=3D1880588272,
-retaddr=3D140736889685638, access_type=3DMMU_DATA_LOAD, op=3DMO_32)
-    at /home/build/src/qemu/git/qemu/accel/tcg/cputlb.c:923
-#6  0x00005555558063ca in load_helper (full_load=3D0x555555805ffb
-<full_be_ldul_mmu>, code_read=3Dfalse, op=3DMO_BEUL,
-retaddr=3D140736889685638, oi=3D162, addr=3D1880588272, env=3D0x5555564b1=
-5c0)
-    at /home/build/src/qemu/git/qemu/accel/tcg/cputlb.c:1346
-#7  0x00005555558063ca in full_be_ldul_mmu (env=3D0x5555564b15c0,
-addr=3D1880588272, oi=3D162, retaddr=3D140736889685638) at
-/home/build/src/qemu/git/qemu/accel/tcg/cputlb.c:1469
-#8  0x0000555555806665 in helper_be_ldul_mmu (env=3D0x5555564b15c0,
-addr=3D1880588272, oi=3D162, retaddr=3D140736889685638) at
-/home/build/src/qemu/git/qemu/accel/tcg/cputlb.c:1476
-#9  0x00007fffdc5106cd in code_gen_buffer ()
-#10 0x00005555558280da in cpu_tb_exec (cpu=3D0x5555564a8820,
-itb=3D0x7fffdc50f7c0 <code_gen_buffer+5306259>) at
-/home/build/src/qemu/git/qemu/accel/tcg/cpu-exec.c:172
-#11 0x0000555555828ec7 in cpu_loop_exec_tb (cpu=3D0x5555564a8820,
-tb=3D0x7fffdc50f7c0 <code_gen_buffer+5306259>, last_tb=3D0x7ffff1d43598,
-tb_exit=3D0x7ffff1d43590) at
-/home/build/src/qemu/git/qemu/accel/tcg/cpu-exec.c:620
-#12 0x00005555558291d5 in cpu_exec (cpu=3D0x5555564a8820) at
-/home/build/src/qemu/git/qemu/accel/tcg/cpu-exec.c:731
-#13 0x00005555557dc460 in tcg_cpu_exec (cpu=3D0x5555564a8820) at
-/home/build/src/qemu/git/qemu/cpus.c:1445
-#14 0x00005555557dc76b in qemu_tcg_rr_cpu_thread_fn (arg=3D0x5555564a8820=
-)
-at /home/build/src/qemu/git/qemu/cpus.c:1547
-#15 0x0000555555c562d4 in qemu_thread_start (args=3D0x5555564c8020) at
-/home/build/src/qemu/git/qemu/util/qemu-thread-posix.c:502
-#16 0x00007ffff6296fa3 in start_thread (arg=3D<optimized out>) at
-pthread_create.c:486
-#17 0x00007ffff61c74cf in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-(gdb)
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
