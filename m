@@ -2,80 +2,78 @@ Return-Path: <SRS0=KBml=XB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B08B1C43331
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5720C00307
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:56:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CEB420838
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:55:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D4F9214E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Sep 2019 18:56:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="p3HwjDyx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CEB420838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="VSSFnPG0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D4F9214E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6JO6-0007f2-1D
-	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 14:55:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37646)
+	id 1i6JOr-0008Vl-F4
+	for qemu-devel@archiver.kernel.org; Fri, 06 Sep 2019 14:56:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <scw@google.com>) id 1i6JM4-00076B-VV
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:11 -0400
+ (envelope-from <scw@google.com>) id 1i6JMi-0007Oy-LM
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <scw@google.com>) id 1i6JM2-0004K9-VQ
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:08 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:37996)
+ (envelope-from <scw@google.com>) id 1i6JMh-0005M6-Dr
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:48 -0400
+Received: from mail-io1-xd2b.google.com ([2607:f8b0:4864:20::d2b]:35374)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <scw@google.com>) id 1i6JM2-0004Hs-52
- for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:06 -0400
-Received: by mail-io1-xd41.google.com with SMTP id p12so15044644iog.5
- for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 11:53:04 -0700 (PDT)
+ (Exim 4.71) (envelope-from <scw@google.com>) id 1i6JMh-0005Ik-50
+ for qemu-devel@nongnu.org; Fri, 06 Sep 2019 14:53:47 -0400
+Received: by mail-io1-xd2b.google.com with SMTP id f4so14323215ion.2
+ for <qemu-devel@nongnu.org>; Fri, 06 Sep 2019 11:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Z3dfBY7JQz9BktUuuaqV7uU9OBPwFADOL6tikkgBxrQ=;
- b=p3HwjDyx4+mDIWsU+wxswI9FnoDMejyjS8qaHpLOLSHlZTsD03qdAGVpp1KnjFUjZN
- 5IYAC21cjh3amUKf01/Jb0V6+qYRn46HFDQxwIpT4zWvPYhfhT+FqiHC5Lt0XWZqHt2o
- kph1L+OPAtyQ51UXTSam7OYqdHvlDTTtGfOhD8uwy5DudCf4lWtTVnfPyYgRUEbSuE5M
- fFMsF4Nec0JWseydFG4rt4aba+NI1Cu8ejKWzTat7MeT0fM4p/+ewq411Y+bTuFJ3nCX
- 5lxVhsvBTQp9v0Hq8zBzi0dSWEeTE2BH98xAqKGCiY8LcMa22uJZfs6Nxx5+Lkk/JrN6
- 1WhA==
+ :cc; bh=BNT/apBYVRKdNu4aRiHzrMcSDpmxfMEc8o48qXNFakc=;
+ b=VSSFnPG0Hns5hP/wAXEXkOSk76SWnGQo3SXlzOMvnYDDF+RkKJF2WkhwBltx97fkM5
+ AIpvioVQzzXBXmbSvZp/GmVVduAofzGMvjMN5P9Rvd62J14zzaxl/RsfIQt7WcuMf2I5
+ O2Yg7aXYGGjQEyGB4rJYSGls8eIllP+p/lbYF/Rs8vDJYvQLQZf3KETh6rtx6zYJ43BD
+ aDpTQD43jBjmZKLXwwCDxw7C4w3vZIFD6ryB4RC2CCNayKHWTfsbBVn/7XnQAmEAsAXd
+ ipefd7FTQmF/Fg+YkCFrUZTy1S2VmcqGV63RcHCsPwEsBGSuA6J5rYEcuA7blSxnS+Um
+ ptCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Z3dfBY7JQz9BktUuuaqV7uU9OBPwFADOL6tikkgBxrQ=;
- b=sjEZ/6/N82OuyYsqnzEwWce0cY1MfM4WJbGToR7OeFFZ7URZr5L760kOn9JYDNBUbT
- XNczuxY2lfNSjrvQNt15Fmsu3rhW196n7zzAHwlYtlgrrOGkbxUh/v4dOWny0IxG67O7
- IfnQf56KwXjBECUCz24aShXbf/SSLms4pKKF1cplzWP1NMxlAkXaayh6Lc1KATWExT3M
- OghBcgB4mtAgkAFJTd8dYd6/3wYTvE7rgiwbmwNK8OpO3mVikd3yksgA+y5cSUsePcWQ
- weLWPSYhpEAYkhYsCgmqJlHY+lRCcfA2ZBAzS16btLHvoWq38uQQZTLypCKsVzNTV1kX
- OeWw==
-X-Gm-Message-State: APjAAAVAU7KLBTIzPLpfcVzkU/U5bBvnKK7VSqctH0tlhR3q2DT71zx9
- CDARWgvD9V4CQTeCIAekJZzy9HFBBkEN5s0b7S7PRA==
-X-Google-Smtp-Source: APXvYqwlhzwckuW0S8L0s5i+BnjwOPy8wMwVLX7ctsNJKKIEIu24hEq117Wv6TBN8SVMPcoRSxOj52v1uPaLDUCwgqQ=
-X-Received: by 2002:a02:92:: with SMTP id 140mr11395301jaa.98.1567795983740;
- Fri, 06 Sep 2019 11:53:03 -0700 (PDT)
+ bh=BNT/apBYVRKdNu4aRiHzrMcSDpmxfMEc8o48qXNFakc=;
+ b=hzKVVoNDc/a9bEKSmzPiy1gjgz9aoucXglilMu3IFrwZiExnl2FYbtHhKGZ58Z5+hI
+ q0opQPrdvnt7QWh4YD2DxMg7FTIs/1iX9u7uhRueryWqACY49gcpzAGSCTCc7wRST5zm
+ YW0gSYZEDKpKgkSBUSjtOXh+AGXRvnpayzrdLrfcc2Fgi6wF7A3CsAOr9PxqrCiFpf7H
+ Va/VPhdoSazIOvKdlDPJD4o3SHQnvqwudYar+ms5oW43t1mislCn6VN09RDMIZaaOVFT
+ c4vtyWudmYee90SUxB1yZ3NxmOw/n92Tr+Lz7WxHcJFvl6mZZrO6CS1v5YkmCElKxqmi
+ 15rQ==
+X-Gm-Message-State: APjAAAXBvp/LXnE+uvqTLAxw94VOIlVImo/9R3C6boMQLa5QHu83paT7
+ CAA0fa0RSAGNGsGKxuZSRnjXWxQH/JDubqbPlDIxgQ==
+X-Google-Smtp-Source: APXvYqywGtGPJ5cpYe55jM1KSPg3VikygX91jli2DtXCaA9IfBS4w/9flQkfNAmFV3u6gzZvY1sSfx77SPBOfVfeXbo=
+X-Received: by 2002:a02:90c3:: with SMTP id c3mr11353193jag.71.1567796025776; 
+ Fri, 06 Sep 2019 11:53:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190821201921.106902-1-scw@google.com>
-In-Reply-To: <20190821201921.106902-1-scw@google.com>
-Date: Fri, 6 Sep 2019 11:52:52 -0700
-Message-ID: <CAF3nBxh2uk0_kUMWNnq799BZKKqXSWctvJ+E=T2aqpFcARXNNw@mail.gmail.com>
+References: <20190822231443.172099-1-scw@google.com>
+In-Reply-To: <20190822231443.172099-1-scw@google.com>
+Date: Fri, 6 Sep 2019 11:53:34 -0700
+Message-ID: <CAF3nBxgqTKYGJDpPZ50bzJwk+sjCed2dudsGtLLPA_Eh4P=sFA@mail.gmail.com>
 To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature";
- micalg=sha-256; boundary="000000000000becfdf0591e6f27c"
+ micalg=sha-256; boundary="0000000000003ea1310591e6f5ee"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
+X-Received-From: 2607:f8b0:4864:20::d2b
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH] linux-user: hijack open() for thread
- directories
+Subject: Re: [Qemu-devel] [PATCH 0/2] Adding some setsockopt() options
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,200 +92,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000becfdf0591e6f27c
+--0000000000003ea1310591e6f5ee
 Content-Type: text/plain; charset="UTF-8"
 
-Ping. Any comments on this? Patchwork:
-http://patchwork.ozlabs.org/patch/1151167/
+Ping. Patchwork links:
 
-On Wed, Aug 21, 2019 at 1:19 PM Shu-Chun Weng <scw@google.com> wrote:
+http://patchwork.ozlabs.org/patch/1151884/
+http://patchwork.ozlabs.org/patch/1151883/
 
-> Besides /proc/self|<pid>, files under /proc/thread-self and
-> /proc/self|<pid>/task/<tid> also expose host information to the guest
-> program. This patch adds them to the hijack infrastracture. Note that
-> is_proc_myself() does not check if the <tid> matches the current thread
-> and is thus only suitable for procfs files that are identical for all
-> threads in the same process.
+On Thu, Aug 22, 2019 at 4:14 PM Shu-Chun Weng <scw@google.com> wrote:
+
+> Shu-Chun Weng (2):
+>   linux-user: add missing UDP and IPv6 setsockopt options
+>   linux-user: time stamping options for setsockopt()
 >
-> Behavior verified with guest program:
+>  linux-user/generic/sockbits.h |  4 ++++
+>  linux-user/mips/sockbits.h    |  4 ++++
+>  linux-user/syscall.c          | 16 +++++++++++++---
+>  3 files changed, 21 insertions(+), 3 deletions(-)
 >
-> long main_thread_tid;
->
-> long gettid() {
->   return syscall(SYS_gettid);
-> }
->
-> void print_info(const char* cxt, const char* dir) {
->   char buf[1024];
->   FILE* fp;
->
->   snprintf(buf, sizeof(buf), "%s/cmdline", dir);
->   fp = fopen(buf, "r");
->
->   if (fp == NULL) {
->     printf("%s: can't open %s\n", cxt, buf);
->   } else {
->     fgets(buf, sizeof(buf), fp);
->     printf("%s %s cmd: %s\n", cxt, dir, buf);
->     fclose(fp);
->   }
->
->   snprintf(buf, sizeof(buf), "%s/maps", dir);
->   fp = fopen(buf, "r");
->
->   if (fp == NULL) {
->     printf("%s: can't open %s\n", cxt, buf);
->   } else {
->     char seen[128][128];
->     int n = 0, is_new = 0;
->     while(fgets(buf, sizeof(buf), fp) != NULL) {
->       const char* p = strrchr(buf, ' ');
->       if (p == NULL || *(p + 1) == '\n') {
->         continue;
->       }
->       ++p;
->       is_new = 1;
->       for (int i = 0; i < n; ++i) {
->         if (strncmp(p, seen[i], sizeof(seen[i])) == 0) {
->           is_new = 0;
->           break;
->         }
->       }
->       if (is_new) {
->         printf("%s %s map: %s", cxt, dir, p);
->         if (n < 128) {
->           strncpy(seen[n], p, sizeof(seen[n]));
->           seen[n][sizeof(seen[n]) - 1] = '\0';
->           ++n;
->         }
->       }
->     }
->     fclose(fp);
->   }
-> }
->
-> void* thread_main(void* _) {
->   char buf[1024];
->
->   print_info("Child", "/proc/thread-self");
->
->   snprintf(buf, sizeof(buf), "/proc/%ld/task/%ld", (long) getpid(),
-> main_thread_tid);
->   print_info("Child", buf);
->
->   snprintf(buf, sizeof(buf), "/proc/%ld/task/%ld", (long) getpid(), (long)
-> gettid());
->   print_info("Child", buf);
->
->   return NULL;
-> }
->
-> int main() {
->   char buf[1024];
->   pthread_t thread;
->   int ret;
->
->   print_info("Main", "/proc/thread-self");
->   print_info("Main", "/proc/self");
->
->   snprintf(buf, sizeof(buf), "/proc/%ld", (long) getpid());
->   print_info("Main", buf);
->
->   main_thread_tid = gettid();
->   snprintf(buf, sizeof(buf), "/proc/self/task/%ld", main_thread_tid);
->   print_info("Main", buf);
->
->   snprintf(buf, sizeof(buf), "/proc/%ld/task/%ld", (long) getpid(),
-> main_thread_tid);
->   print_info("Main", buf);
->
->   if ((ret = pthread_create(&thread, NULL, &thread_main, NULL)) < 0) {
->     printf("ptherad_create failed: %s (%d)\n", strerror(ret), ret);
->   }
->
->   pthread_join(thread, NULL);
->   return 0;
-> }
->
-> Signed-off-by: Shu-Chun Weng <scw@google.com>
-> ---
->  linux-user/syscall.c | 40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 8367cb138d..73fe82bcc7 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6968,17 +6968,57 @@ static int open_self_auxv(void *cpu_env, int fd)
->      return 0;
->  }
->
-> +static int consume_task_directories(const char **filename)
-> +{
-> +    if (!strncmp(*filename, "task/", strlen("task/"))) {
-> +        *filename += strlen("task/");
-> +        if (**filename < '1' || **filename > '9') {
-> +            return 0;
-> +        }
-> +        /*
-> +         * Don't care about the exact tid.
-> +         * XXX: this allows opening files under /proc/self|<pid>/task/<n>
-> where
-> +         *      <n> is not a valid thread id. Consider checking if the
-> file
-> +         *      actually exists.
-> +         */
-> +        const char *p = *filename + 1;
-> +        while (*p >= '0' && *p <= '9') {
-> +            ++p;
-> +        }
-> +        if (*p == '/') {
-> +            *filename = p + 1;
-> +            return 1;
-> +        } else {
-> +            return 0;
-> +        }
-> +    }
-> +    return 1;
-> +}
-> +
-> +/*
-> + * Determines if filename refer to a procfs file for the current process
-> or any
-> + * thread within the current process. This function should only be used
-> to check
-> + * for files that have identical contents in all threads, e.g. exec,
-> maps, etc.
-> + */
->  static int is_proc_myself(const char *filename, const char *entry)
->  {
->      if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
->          filename += strlen("/proc/");
->          if (!strncmp(filename, "self/", strlen("self/"))) {
->              filename += strlen("self/");
-> +            if (!consume_task_directories(&filename)) {
-> +                return 0;
-> +            }
-> +        } else if (!strncmp(filename, "thread-self/",
-> strlen("thread-self/"))) {
-> +            filename += strlen("thread-self/");
->          } else if (*filename >= '1' && *filename <= '9') {
->              char myself[80];
->              snprintf(myself, sizeof(myself), "%d/", getpid());
->              if (!strncmp(filename, myself, strlen(myself))) {
->                  filename += strlen(myself);
-> +                if (!consume_task_directories(&filename)) {
-> +                    return 0;
-> +                }
->              } else {
->                  return 0;
->              }
 > --
-> 2.23.0.rc1.153.gdeed80330f-goog
+> 2.23.0.187.g17f5b7556c-goog
 >
 >
 
---000000000000becfdf0591e6f27c
+--0000000000003ea1310591e6f5ee
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -369,14 +198,14 @@ q6/vn1qWAWn0yIn9y540GwAQvUFgX0Go5yU5bCjPU5azLNcnRB1w88U0ckd1O3HvQDLsdRV5AxFi
 BMc4qoG/XLh44ZdNpFK3kOCnO0+u27Bopk2u5ros7vPAkzQBvP7096jGgmrZ9wmtExOfP0sBZBjQ
 fP/z/1TEx0E3MYICXjCCAloCAQEwXDBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2ln
 biBudi1zYTEiMCAGA1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMQIMOrvyaMuubAlszT+y
-MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCCzSPJVJcNzyxi2o1Ik8e35zeM8hwo+
-VlrAVZYNCtNAKDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xOTA5
-MDYxODUzMDRaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglg
+MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCBeQw0T2vIHP8FpwaEtkZ2nwMoffNCw
+8fNBJkVlfydmeTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xOTA5
+MDYxODUzNDZaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglg
 hkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglghkgBZQME
-AgEwDQYJKoZIhvcNAQEBBQAEggEAjm/QtIjkCqlaMnAUpsZrd7YJpUlMfcm4ODVFaXkKBC05Hrgt
-+c+nHOlxC5nRE0pykqHv0MumTIFKt5MJm3OtWJmKiyCe7nwcxn5hH8YywVnhqsgh/ZSfEPukU6/W
-tF5nPv/KGAsqHhx3J7Rql27WWIWgtJz/hhI3s6fkv9tyDj5e7UcqvBNaWlz7hgN0W2/abD6I6+Av
-FmFaEcWXpnS4Rw7pvGQQjKWvEKTbbKgFYxupsqvMa89anFZZwr6W9c+h4S2Oq4AhG+xEap3xO3Yp
-EsZ0R3ZOJBqg00xNvr0mxu8rIXJVkJMGXN9K+j5ezTpQpm+Z2iIXWkd0aQC0n79ujA==
---000000000000becfdf0591e6f27c--
+AgEwDQYJKoZIhvcNAQEBBQAEggEAhHIlIBD0VAW8VqiK9VwqXt4dlQ5UTNIlQyUyQXjauetQV9rp
+WlbuwtG3NPp5V7ix8IpTpO1rD8DROV/GTEi/VPPZfv1TsGiOiScqeCwH4FBTaR4rlD/ZyroS6AX6
+UmssPGE4/ZPCIWIcjlQe1zs7A4JENOm370F2wCbUuhAjM49ywv3jVJxCWu3VkVNpsrhyFoXdGVvN
+JtfpzdRKK+sS/ZXFXX3cSjGWmI9ixexyECwNOwXUFTM26DEyfJj5RiciGem85DqDGNpHhQire90q
+R5oxeBDFV7grwoWCi8i84jTxm2DJz0LsM1XzR+F3SsvYGURPlgSsGpnhm+SUKim7Zg==
+--0000000000003ea1310591e6f5ee--
 
