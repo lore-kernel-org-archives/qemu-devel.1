@@ -2,120 +2,89 @@ Return-Path: <SRS0=eB96=XC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AB0C43331
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 19:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A80C43331
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 20:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9957821848
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 19:09:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="d7WgKg2e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9957821848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C3A02178F
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 20:03:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C3A02178F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6g5U-0000gm-KC
-	for qemu-devel@archiver.kernel.org; Sat, 07 Sep 2019 15:09:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51236)
+	id 1i6gvz-0005wg-0E
+	for qemu-devel@archiver.kernel.org; Sat, 07 Sep 2019 16:03:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i6g4R-000870-3j
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 15:08:28 -0400
+ (envelope-from <philmd@redhat.com>) id 1i6gvC-0005Y4-0A
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 16:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i6g4P-00030Q-Ez
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 15:08:27 -0400
-Received: from mail-eopbgr50124.outbound.protection.outlook.com
- ([40.107.5.124]:14213 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i6g4I-0002hK-3O; Sat, 07 Sep 2019 15:08:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GAnMbPKRZH27bqctPHTue5geX9u3PUI0lBMO3nX23W7MYB3j3l3XgN2eopnycxNnO4iPQu0lR2/mq+vvzm5O0DOebuMmSfH8HnTj7MpmonaI0NmQ9+3UQP2aYrzkpG0vPOtJkPRvCr1llAEmfKWDTq6Civ+fDJjc4puK4VV3qIOzSSBou97yduZ1Iv67KGoU/Ip9MYPSBSO85T/AqDkVHDWChqU+TuN+pGxMkTE5mSQseHtLOAYuqYyrU78JWiQTg5nlWuvzjIl+VYfUWvX2DHtOyupleiqTJ+UxBmMo8UnoQ7ecrRU6Hthdq1S2ySLV9ton2qyg0YzhS2jDJOwmZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WlvazzxaBN0B4Npkk0W2v/E87woqUviYRzDK4zfLGpc=;
- b=Pva0iXvL4QA1pyeWQ8AR2DDVMeKtipErg8ERVKZsgG3Lj2c/a4iSu3IND2aVkSdGYkJvMyR0uljpe5CB59fQ65fPkJzwLlLkesCC3pvWXSGgqe1kOsf9vppnc5oCdxWsN0ny+zXD0Pv4tlDUe6K4w26Z0Lk+bOTWDoujEXJG10n72I9Qx/lDIgW6s82LY1A16lpPLQeH569wu3B6dyEh43R7evqBJRwy55JK0S2pXnLB0RwEUIECvI8v/MWzjOo5qNoW7bWpFZJdpzvONHMSrIe6qy4GsIcaRBe4wCauF3UFhSY9+wiiRobtZzGuepnFqBPcV8/rXjM9FhiTdS127Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WlvazzxaBN0B4Npkk0W2v/E87woqUviYRzDK4zfLGpc=;
- b=d7WgKg2eGyZNuKZJrE1arlpezzDUZ54QCQ0+WUNYsTwCkfhOTusnd8PWt6upSzl0CKzrxRE/tEVTmI7vJbSNN/xOPlCHAdS8F/ow/e4wUldFknXFHUhOYDaWDTdoOimhmTVSYzYDi+x1CRLlirbYpPN03JTr5R20k1B5RS07qkk=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5290.eurprd08.prod.outlook.com (20.179.9.93) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2241.18; Sat, 7 Sep 2019 19:08:13 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2241.018; Sat, 7 Sep 2019
- 19:08:13 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v2 1/3] block/qcow2: refactoring of threaded encryption
- code
-Thread-Index: AQHVZO1jU8Wsr4Od2EySuqG2u22JMqcglVOA
-Date: Sat, 7 Sep 2019 19:08:13 +0000
-Message-ID: <7634baef-f42f-4603-2ec9-3f4aa6cfe278@virtuozzo.com>
-References: <20190906195750.17651-1-mlevitsk@redhat.com>
- <20190906195750.17651-2-mlevitsk@redhat.com>
-In-Reply-To: <20190906195750.17651-2-mlevitsk@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P18901CA0007.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:3:8b::17) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190907220811502
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e4c76871-a574-433f-9e6a-08d733c6bb45
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5290; 
-x-ms-traffictypediagnostic: DB8PR08MB5290:
-x-microsoft-antispam-prvs: <DB8PR08MB5290B05E1B7BC62765ADDBD1C1B50@DB8PR08MB5290.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:332;
-x-forefront-prvs: 0153A8321A
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(39840400004)(366004)(396003)(376002)(346002)(199004)(189003)(71190400001)(71200400001)(6506007)(386003)(86362001)(8676002)(81156014)(81166006)(6436002)(305945005)(54906003)(8936002)(66066001)(76176011)(2501003)(6512007)(25786009)(52116002)(7736002)(31696002)(31686004)(256004)(99286004)(6246003)(2906002)(4326008)(6486002)(110136005)(6116002)(102836004)(3846002)(14454004)(53936002)(229853002)(26005)(5660300002)(36756003)(66446008)(64756008)(66556008)(66476007)(486006)(316002)(476003)(11346002)(66946007)(2616005)(446003)(478600001)(186003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5290;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 8SQ9iZuNll+XQRWdvqHjvjlGA+/G9ORLFXMQlS9bn2WEwNkZaSd5tOLayTYPgTKFn/azcOSLOntyaZcvbtQmlNSmitrV4lYV5coR7f7/12nmwESUiGCOBPEIh5BXL0VsZcYoV76V+VyOyiuKbWGV07zPnh1HXIlp66pfR4a/dZ6Q1e/F8prBfypmBe9IdQFms1QlemHpM229ugSNV/pt91/EJc9OLHGHbPKd2GNsXjAQUKhQo2ysYsxEJYzEH1t70gBXNawdawqTp2+jh2SvyVuPMU5U3e6ztLrkrgIVYJclBGy5DbQo6tEFPYa3+BfDaVZXtrIP48oRe/MoKkmcgVf72unOJ3CQ0ItY3OHzWMNGWe3gFp0CQHZ6+SS8xxA5/SFO1J6vqCpw2EsVhq6KXDRmL/qNva7Xh+AYVBMubNc=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <22AB21B18812934F94BDA8A99E2FD8ED@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <philmd@redhat.com>) id 1i6gv9-0008O7-CE
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 16:02:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35206)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i6gv9-0008MU-46
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 16:02:55 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8BFF48BA02
+ for <qemu-devel@nongnu.org>; Sat,  7 Sep 2019 20:02:52 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id t16so4393400wro.3
+ for <qemu-devel@nongnu.org>; Sat, 07 Sep 2019 13:02:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qIBrxJvdW6A2Vzn47AcTxhnhgp6JiAJsNMrW3E0j7HY=;
+ b=a/mvpy4/AL8HeR4SazjTQmOpbiSbIo4LQJ7RB1tCdrM5FBLyZ4bKlGS3NHtJTgyT4P
+ BA6W/XoQfEAYoPeIkNibfAjkY/MHRGEgUvMbJyEYI6vsDOPN9XMOjVm8TukEUtfKlNQc
+ ohdKw63OlR3e7fWkrCm35RtNdOPK8nnqKikbFeKnpdczO7zyC0Mk88h3L0LSSUU1hNY2
+ m9QbbkSGobQ5Pim+hyWAL/h5FVjayFKQP9lNvBFkN8cUE16DJvAxnZHuW8/hF9Uhx/9a
+ +i8TlpHIF9Yh8lGq8vuTA7nQ69zD3UOBFqxagrtTm95HmMmcwuB3LQtZ84pypzb721h6
+ vO0A==
+X-Gm-Message-State: APjAAAXWKN4qhUBDr5GjKppPIJkJ4uFIBW4QbSFPRhLEf+dPwdDxnx2B
+ mLo8b1GhlELUkDq9NvJ/zxiRhE5ay3vtM80YzECWBHRQ+LcoUkG0YGbhRQ1v6US0SN9CKq0ldHY
+ J1CezznMF4xiUmQE=
+X-Received: by 2002:a1c:6c19:: with SMTP id h25mr11755959wmc.64.1567886571279; 
+ Sat, 07 Sep 2019 13:02:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyPYqtx4b/h8A2VpEPpQg9AYfaAPNrlCnK+KIgW+wd4VwYg3+OVJZsYQg8ByHRc10li9lJD1Q==
+X-Received: by 2002:a1c:6c19:: with SMTP id h25mr11755937wmc.64.1567886571056; 
+ Sat, 07 Sep 2019 13:02:51 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id v4sm16600738wrg.56.2019.09.07.13.02.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 07 Sep 2019 13:02:50 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190904203013.9028-1-alex.bennee@linaro.org>
+ <20190904203013.9028-22-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <6aeb08e3-fe22-e72c-e0dd-78d6faee57e3@redhat.com>
+Date: Sat, 7 Sep 2019 22:02:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4c76871-a574-433f-9e6a-08d733c6bb45
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2019 19:08:13.5498 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kYZ6SNvUmW+uo37DVTHTbA5UyiFVu/wejolnJ3E954fgBQ1U34NExRdf77ucgdrFAa3F9S99XPuFmmC3zmUP2Dr2p+kpQ66QJepg/uw3eps=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5290
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.124
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] block/qcow2: refactoring of
- threaded encryption code
+In-Reply-To: <20190904203013.9028-22-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 21/42] tests/docker: drop debian-sid
+ image
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,128 +96,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDYuMDkuMjAxOSAyMjo1NywgTWF4aW0gTGV2aXRza3kgd3JvdGU6DQo+IFRoaXMgY29tbWl0IHRy
-aWVzIHRvIGNsYXJpZnkgZmV3IGZ1bmN0aW9uIGFyZ3VtZW50cywNCj4gYW5kIGFkZCBjb21tZW50
-cyBkZXNjcmliaW5nIHRoZSBlbmNyeXB0L2RlY3J5cHQgaW50ZXJmYWNlDQo+IA0KPiBTaWduZWQt
-b2ZmLWJ5OiBNYXhpbSBMZXZpdHNreSA8bWxldml0c2tAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAg
-YmxvY2svcWNvdzItY2x1c3Rlci5jIHwgMTAgKysrLS0tLQ0KPiAgIGJsb2NrL3Fjb3cyLXRocmVh
-ZHMuYyB8IDYxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0NCj4g
-ICAyIGZpbGVzIGNoYW5nZWQsIDUzIGluc2VydGlvbnMoKyksIDE4IGRlbGV0aW9ucygtKQ0KPiAN
-Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYyBiL2Jsb2NrL3Fjb3cyLWNsdXN0
-ZXIuYw0KPiBpbmRleCBmMDljYzk5MmFmLi4xOTg5YjQyM2RhIDEwMDY0NA0KPiAtLS0gYS9ibG9j
-ay9xY293Mi1jbHVzdGVyLmMNCj4gKysrIGIvYmxvY2svcWNvdzItY2x1c3Rlci5jDQo+IEBAIC00
-NjMsOCArNDYzLDggQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gZG9fcGVyZm9ybV9jb3dfcmVh
-ZChCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICB9DQo+ICAgDQo+ICAgc3RhdGljIGJvb2wgY29y
-b3V0aW5lX2ZuIGRvX3BlcmZvcm1fY293X2VuY3J5cHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+
-IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRf
-dCBzcmNfY2x1c3Rlcl9vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICB1aW50NjRfdCBjbHVzdGVyX29mZnNldCwNCj4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGd1ZXN0X2NsdXN0
-ZXJfb2Zmc2V0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgdWludDY0X3QgaG9zdF9jbHVzdGVyX29mZnNldCwNCj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBvZmZzZXRfaW5fY2x1c3Rl
-ciwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1
-aW50OF90ICpidWZmZXIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgdW5zaWduZWQgYnl0ZXMpDQo+IEBAIC00NzQsOCArNDc0LDggQEAgc3RhdGlj
-IGJvb2wgY29yb3V0aW5lX2ZuIGRvX3BlcmZvcm1fY293X2VuY3J5cHQoQmxvY2tEcml2ZXJTdGF0
-ZSAqYnMsDQo+ICAgICAgICAgICBhc3NlcnQoKG9mZnNldF9pbl9jbHVzdGVyICYgfkJEUlZfU0VD
-VE9SX01BU0spID09IDApOw0KPiAgICAgICAgICAgYXNzZXJ0KChieXRlcyAmIH5CRFJWX1NFQ1RP
-Ul9NQVNLKSA9PSAwKTsNCj4gICAgICAgICAgIGFzc2VydChzLT5jcnlwdG8pOw0KPiAtICAgICAg
-ICBpZiAocWNvdzJfY29fZW5jcnlwdChicywgY2x1c3Rlcl9vZmZzZXQsDQo+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHNyY19jbHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVy
-LA0KPiArICAgICAgICBpZiAocWNvdzJfY29fZW5jcnlwdChicywgaG9zdF9jbHVzdGVyX29mZnNl
-dCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ3Vlc3RfY2x1c3Rlcl9vZmZzZXQg
-KyBvZmZzZXRfaW5fY2x1c3RlciwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJ1
-ZmZlciwgYnl0ZXMpIDwgMCkgew0KPiAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4gICAg
-ICAgICAgIH0NCj4gQEAgLTQ5Niw3ICs0OTYsNyBAQCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBk
-b19wZXJmb3JtX2Nvd193cml0ZShCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgfQ0KPiAg
-IA0KPiAgICAgICByZXQgPSBxY293Ml9wcmVfd3JpdGVfb3ZlcmxhcF9jaGVjayhicywgMCwNCj4g
-LSAgICAgICAgICAgIGNsdXN0ZXJfb2Zmc2V0ICsgb2Zmc2V0X2luX2NsdXN0ZXIsIHFpb3YtPnNp
-emUsIHRydWUpOw0KPiArICAgICAgICAgICAgICBjbHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9j
-bHVzdGVyLCBxaW92LT5zaXplLCB0cnVlKTsNCg0KDQpIbW0sIHVucmVsYXRlZCBodW5rLg0KDQo+
-ICAgICAgIGlmIChyZXQgPCAwKSB7DQo+ICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiAgICAgICB9
-DQo+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi10aHJlYWRzLmMgYi9ibG9jay9xY293Mi10aHJl
-YWRzLmMNCj4gaW5kZXggM2IxZTYzZmU0MS4uYzNjZGEwYzZhNSAxMDA2NDQNCj4gLS0tIGEvYmxv
-Y2svcWNvdzItdGhyZWFkcy5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLXRocmVhZHMuYw0KPiBAQCAt
-MjM0LDE1ICsyMzQsMTkgQEAgc3RhdGljIGludCBxY293Ml9lbmNkZWNfcG9vbF9mdW5jKHZvaWQg
-Km9wYXF1ZSkNCj4gICB9DQo+ICAgDQo+ICAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4NCj4gLXFj
-b3cyX2NvX2VuY2RlYyhCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3QgZmlsZV9jbHVzdGVy
-X29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IG9mZnNldCwgdm9pZCAqYnVm
-LCBzaXplX3QgbGVuLCBRY293MkVuY0RlY0Z1bmMgZnVuYykNCj4gK3Fjb3cyX2NvX2VuY2RlYyhC
-bG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3QgaG9zdF9jbHVzdGVyX29mZnNldCwNCj4gKyAg
-ICAgICAgICAgICAgICB1aW50NjRfdCBndWVzdF9vZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxl
-biwNCj4gKyAgICAgICAgICAgICAgICBRY293MkVuY0RlY0Z1bmMgZnVuYykNCj4gICB7DQo+ICAg
-ICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gKw0KPiArICAgIHVpbnQ2NF90
-IG9mZnNldCA9IHMtPmNyeXB0X3BoeXNpY2FsX29mZnNldCA/DQo+ICsgICAgICAgIGhvc3RfY2x1
-c3Rlcl9vZmZzZXQgKyBvZmZzZXRfaW50b19jbHVzdGVyKHMsIGd1ZXN0X29mZnNldCkgOg0KPiAr
-ICAgICAgICBndWVzdF9vZmZzZXQ7DQo+ICsNCj4gICAgICAgUWNvdzJFbmNEZWNEYXRhIGFyZyA9
-IHsNCj4gICAgICAgICAgIC5ibG9jayA9IHMtPmNyeXB0bywNCj4gLSAgICAgICAgLm9mZnNldCA9
-IHMtPmNyeXB0X3BoeXNpY2FsX29mZnNldCA/DQo+IC0gICAgICAgICAgICAgICAgICAgICAgZmls
-ZV9jbHVzdGVyX29mZnNldCArIG9mZnNldF9pbnRvX2NsdXN0ZXIocywgb2Zmc2V0KSA6DQo+IC0g
-ICAgICAgICAgICAgICAgICAgICAgb2Zmc2V0LA0KPiArICAgICAgICAub2Zmc2V0ID0gb2Zmc2V0
-LA0KPiAgICAgICAgICAgLmJ1ZiA9IGJ1ZiwNCj4gICAgICAgICAgIC5sZW4gPSBsZW4sDQo+ICAg
-ICAgICAgICAuZnVuYyA9IGZ1bmMsDQo+IEBAIC0yNTEsMTggKzI1NSw0OSBAQCBxY293Ml9jb19l
-bmNkZWMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGZpbGVfY2x1c3Rlcl9vZmZzZXQs
-DQo+ICAgICAgIHJldHVybiBxY293Ml9jb19wcm9jZXNzKGJzLCBxY293Ml9lbmNkZWNfcG9vbF9m
-dW5jLCAmYXJnKTsNCj4gICB9DQo+ICAgDQo+ICsNCj4gKy8qDQo+ICsgKiBxY293Ml9jb19lbmNy
-eXB0KCkNCj4gKyAqDQo+ICsgKiBFbmNyeXB0cyBvbmUgb3IgbW9yZSBjb250aWd1b3VzIGFsaWdu
-ZWQgc2VjdG9ycw0KPiArICoNCj4gKyAqIEBob3N0X2NsdXN0ZXJfb2Zmc2V0IC0gb24gZGlzayBv
-ZmZzZXQgb2YgdGhlIGZpcnN0IGNsdXN0ZXIgaW4gd2hpY2gNCj4gKyAqIHRoZSBlbmNyeXB0ZWQg
-ZGF0YSB3aWxsIGJlIHdyaXR0ZW4NCg0KDQpJdCdzIG5vdCBxdWl0ZSByaWdodCwgaXQncyBub3Qg
-b24gZGlzaywgYnV0IG9uIC5maWxlIGNoaWxkIG9mIHFjb3cyIG5vZGUsIHdoaWNoDQptYXkgYmUg
-YW55IG90aGVyIGZvcm1hdCBvciBwcm90b2NvbCBub2RlLi4gU28sIEkgY2FsbGVkIGl0IGZpbGVf
-Y2x1c3Rlcl9vZmZzZXQuDQpCdXQgSSdtIE9LIHdpdGggbmV3IG5hbWluZyBhbnl3YXkuIEFuZCBp
-dCBtYXkgYmUgYmV0dGVyIGZvciBlbmNyeXB0aW9uIHJlbGF0ZWQNCmxvZ2ljLi4NCg0KID4gKyAq
-IFVzZWQgYXMgYW4gaW5pdGlhbGl6YXRpb24gdmVjdG9yIGZvciBlbmNyeXB0aW9uDQoNCkhtbSwg
-aXMgaXQgZGVmYXVsdCBub3c/DQoNCj4gKyAqDQo+ICsgKiBAZ3Vlc3Rfb2Zmc2V0IC0gZ3Vlc3Qg
-KHZpcnR1YWwpIG9mZnNldCBvZiB0aGUgZmlyc3Qgc2VjdG9yIG9mIHRoZQ0KPiArICogZGF0YSB0
-byBiZSBlbmNyeXB0ZWQNCg0KSG1tLCBzdG9wLiBJdCdzIHdyb25nLiBEYXRhIHRvIGJlIGVuY3J5
-cHRlZCBpcyBpbiBidWZmZXIsIHNvLCBpdCdzIG5vdCBmaXJzdCBzZWN0b3Igb2YNCnRoZSBkYXRh
-IHRvIGJlIGVuY3J5cHRlZCwgYnV0IGZpcnN0IHNlY3RvciBpbiB3aGljaCBndWVzdCB3cml0ZXMg
-ZGF0YSAodG8gYmUgZW5jcnlwdGVkDQppbiBtZWFudGltZSkuDQoNCj4gKyAqIFVzZWQgYXMgYW4g
-aW5pdGlhbGl6YXRpb24gdmVjdG9yIGZvciBvbGRlciwgcWNvdzIgbmF0aXZlIGVuY3J5cHRpb24N
-Cj4gKyAqDQo+ICsgKiBAYnVmIC0gYnVmZmVyIHdpdGggdGhlIGRhdGEgdG8gZW5jcnlwdA0KPiAr
-ICogQGxlbiAtIGxlbmd0aCBvZiB0aGUgYnVmZmVyIChpbiBzZWN0b3Igc2l6ZSBtdWx0aXBsaWVz
-KQ0KPiArICoNCj4gKyAqIE5vdGUgdGhhdCB0aGUgZ3JvdXAgb2YgdGhlIHNlY3RvcnMsIGRvbid0
-IGhhdmUgdG8gYmUgYWxpZ25lZA0KPiArICogb24gY2x1c3RlciBib3VuZGFyeSBhbmQgY2FuIGFs
-c28gY3Jvc3MgYSBjbHVzdGVyIGJvdW5kYXJ5Lg0KDQpBbmQgSSBkb3VidCBpbiBpdCBub3cuIEkn
-bSBhZnJhaWQgdGhhdCBpZiB3ZSBjYWxsIHFjb3cyX2NvX2VuY3J5cHQgZm9yIGEgZ3JvdXANCm9m
-IHRoZSBzZWN0b3JzIGNyb3NzaW5nIGEgY2x1c3RlciBib3VuZGFyeSwgd2Ugd2lsbCBmaW5pc2gg
-dXAgd2l0aCBzaW1pbGFyIGJ1Zzogd2UnbGwNCnVzZSBmaXJzdCBjbHVzdGVyIG9mZnNldCBhcyBh
-IHZlY3RvciBmb3IgYWxsIHRoZSBzZWN0b3JzLiBXZSBzdGlsbCBuZXZlciBkbyBpdC4uIFNvLA0K
-SSB0aGluayBpdCB3b3J0aCBhc3NlcnRpb24gYW5kIGNvcnJlc3BvbmRpbmcgY29tbWVudC4NCg0K
-T3IgaXMgaXQgY29ycmVjdD8NCg0KPiArICoNCj4gKyAqDQo+ICsgKi8NCj4gICBpbnQgY29yb3V0
-aW5lX2ZuDQo+IC1xY293Ml9jb19lbmNyeXB0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRf
-dCBmaWxlX2NsdXN0ZXJfb2Zmc2V0LA0KPiAtICAgICAgICAgICAgICAgICB1aW50NjRfdCBvZmZz
-ZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbikNCj4gK3Fjb3cyX2NvX2VuY3J5cHQoQmxvY2tEcml2
-ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGhvc3RfY2x1c3Rlcl9vZmZzZXQsDQo+ICsgICAgICAgICAg
-ICAgICAgIHVpbnQ2NF90IGd1ZXN0X29mZnNldCwgdm9pZCAqYnVmLCBzaXplX3QgbGVuKQ0KPiAg
-IHsNCj4gLSAgICByZXR1cm4gcWNvdzJfY29fZW5jZGVjKGJzLCBmaWxlX2NsdXN0ZXJfb2Zmc2V0
-LCBvZmZzZXQsIGJ1ZiwgbGVuLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICBxY3J5
-cHRvX2Jsb2NrX2VuY3J5cHQpOw0KPiArICAgIHJldHVybiBxY293Ml9jb19lbmNkZWMoYnMsIGhv
-c3RfY2x1c3Rlcl9vZmZzZXQsIGd1ZXN0X29mZnNldCwgYnVmLCBsZW4sDQo+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBxY3J5cHRvX2Jsb2NrX2VuY3J5cHQpOw0KPiAgIH0NCj4gICANCj4g
-Kw0KPiArLyoNCj4gKyAqIHFjb3cyX2NvX2RlY3J5cHQoKQ0KPiArICoNCj4gKyAqIERlY3J5cHRz
-IG9uZSBvciBtb3JlIGNvbnRpZ3VvdXMgYWxpZ25lZCBzZWN0b3JzDQo+ICsgKiBTYW1lIGZ1bmN0
-aW9uIGFzIHFjb3cyX2NvX2VuY3J5cHQNCg0KSG1tLCBub3QgZXhhY3RseSBzYW1lIDopDQoNCj4g
-KyAqDQo+ICsgKi8NCj4gKw0KPiAgIGludCBjb3JvdXRpbmVfZm4NCj4gLXFjb3cyX2NvX2RlY3J5
-cHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGZpbGVfY2x1c3Rlcl9vZmZzZXQsDQo+
-IC0gICAgICAgICAgICAgICAgIHVpbnQ2NF90IG9mZnNldCwgdm9pZCAqYnVmLCBzaXplX3QgbGVu
-KQ0KPiArcWNvdzJfY29fZGVjcnlwdChCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3QgaG9z
-dF9jbHVzdGVyX29mZnNldCwNCj4gKyAgICAgICAgICAgICAgICAgdWludDY0X3QgZ3Vlc3Rfb2Zm
-c2V0LCB2b2lkICpidWYsIHNpemVfdCBsZW4pDQo+ICAgew0KPiAtICAgIHJldHVybiBxY293Ml9j
-b19lbmNkZWMoYnMsIGZpbGVfY2x1c3Rlcl9vZmZzZXQsIG9mZnNldCwgYnVmLCBsZW4sDQo+IC0g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHFjcnlwdG9fYmxvY2tfZGVjcnlwdCk7DQo+ICsg
-ICAgcmV0dXJuIHFjb3cyX2NvX2VuY2RlYyhicywgaG9zdF9jbHVzdGVyX29mZnNldCwgZ3Vlc3Rf
-b2Zmc2V0LCBidWYsIGxlbiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgIHFjcnlwdG9f
-YmxvY2tfZGVjcnlwdCk7DQo+ICAgfQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
-bWlyDQo=
+On 9/4/19 10:29 PM, Alex Benn=C3=A9e wrote:
+> Debian Sid was only ever a stop gap and thanks to the much better
+> cross compiler in the Buster release we don't need it any more. Send
+> it on its merry way.
+
+I'm not sure about this one... Why not update and keep it?
+
+-- >8 --
+-FROM debian:sid-20181011-slim
++FROM debian:sid-20190812-slim
+
+ # Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
+-ENV DEBIAN_SNAPSHOT_DATE "20181030"
++ENV DEBIAN_SNAPSHOT_DATE "20190820"
+---
+
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  tests/docker/Makefile.include              |  2 +-
+>  tests/docker/dockerfiles/debian-sid.docker | 41 ----------------------
+>  2 files changed, 1 insertion(+), 42 deletions(-)
+>  delete mode 100644 tests/docker/dockerfiles/debian-sid.docker
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index b6c04059502..59fbebbe2e6 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -6,7 +6,7 @@ DOCKER_SUFFIX :=3D .docker
+>  DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
+>  DOCKER_DEPRECATED_IMAGES :=3D debian
+>  # we don't run tests on intermediate images (used as base by another i=
+mage)
+> -DOCKER_PARTIAL_IMAGES :=3D debian debian8 debian9 debian10 debian8-mxe=
+ debian-ports debian-sid debian-bootstrap
+> +DOCKER_PARTIAL_IMAGES :=3D debian debian8 debian9 debian10 debian8-mxe=
+ debian-ports debian-bootstrap
+>  DOCKER_IMAGES :=3D $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(n=
+otdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+>  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+>  # Use a global constant ccache directory to speed up repetitive builds
+> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/=
+dockerfiles/debian-sid.docker
+> deleted file mode 100644
+> index 513459ca7f8..00000000000
+> --- a/tests/docker/dockerfiles/debian-sid.docker
+> +++ /dev/null
+> @@ -1,41 +0,0 @@
+> -#
+> -# Debian Sid Base
+> -#
+> -# A number of our guests exist as ports only. We can either use the
+> -# ports repo or get everything from Sid. However Sid is a rolling
+> -# distro which may be broken at any particular time. If you are
+> -# unlucky and try and build your images while gcc is in the process of
+> -# being uploaded this can fail. Your only recourse is to try again in
+> -# a few hours when the repos have re-synced. Once built however you
+> -# won't be affected by repo changes unless the docker recipies are
+> -# updated and trigger a re-build.
+> -#
+> -
+> -# This must be earlier than the snapshot date we are aiming for
+> -FROM debian:sid-20181011-slim
+> -
+> -# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
+> -ENV DEBIAN_SNAPSHOT_DATE "20181030"
+> -RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [=
+check-valid-until=3Dno] \1snapshot.debian.org/archive/debian/${DEBIAN_SNA=
+PSHOT_DATE} \2%" /etc/apt/sources.list
+> -
+> -# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
+> -ENV DEBIAN_SNAPSHOT_DATE "20181030"
+> -RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [=
+check-valid-until=3Dno] \1snapshot.debian.org/archive/debian/${DEBIAN_SNA=
+PSHOT_DATE} \2%" /etc/apt/sources.list
+> -
+> -# Duplicate deb line as deb-src
+> -RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/s=
+ources.list
+> -
+> -# Install common build utilities
+> -RUN apt update && \
+> -    DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata && \
+> -    DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+> -    apt install -y --no-install-recommends \
+> -        bison \
+> -        build-essential \
+> -        ca-certificates \
+> -        flex \
+> -        git \
+> -        pkg-config \
+> -        psmisc \
+> -        python \
+> -        texinfo || { echo "Failed to build - see debian-sid.docker not=
+es"; exit 1; }
+>=20
 
