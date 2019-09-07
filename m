@@ -6,85 +6,84 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FB7C43331
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 11:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CC6C43331
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 11:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1469721848
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 11:28:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1469721848
+	by mail.kernel.org (Postfix) with ESMTPS id D8A4821848
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 11:28:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8A4821848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6YtF-0004sP-F4
-	for qemu-devel@archiver.kernel.org; Sat, 07 Sep 2019 07:28:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57698)
+	id 1i6YtY-00058q-U1
+	for qemu-devel@archiver.kernel.org; Sat, 07 Sep 2019 07:28:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57310)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i6Yro-00040i-GK
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 07:26:57 -0400
+ (envelope-from <philmd@redhat.com>) id 1i6Ypg-0002XS-Lz
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 07:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i6Yrn-0002rF-BN
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 07:26:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60342)
+ (envelope-from <philmd@redhat.com>) id 1i6Ypf-0001Gh-OE
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 07:24:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42868)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i6Yrn-0002qu-3e
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 07:26:55 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i6Ypf-0001G9-GI
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 07:24:43 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 26EB6356EF
- for <qemu-devel@nongnu.org>; Sat,  7 Sep 2019 11:26:54 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id n6so3876985wrm.20
- for <qemu-devel@nongnu.org>; Sat, 07 Sep 2019 04:26:54 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8AED7793E5
+ for <qemu-devel@nongnu.org>; Sat,  7 Sep 2019 11:24:42 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id 124so3162455wmz.1
+ for <qemu-devel@nongnu.org>; Sat, 07 Sep 2019 04:24:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=FFTXzBAF85Isr0V0qM6aDWmjD1+ooR/RrynpPJC2gUE=;
- b=nKPkTOs4aw6PJiyUKqZ2aNY34JpjzokDIxdgT/h0uxFoEXCbHh16hkWeo1YxXv5vXn
- BrcewgXiPJ079GqH1ArWQIp0+p8Wg3XET/g45JPCgdam4LtpEXiIRPxOafZvdZsJmeDh
- nBBbTqjVGn83ohA3Ukp6gKYh0wByCA7XIVDd+8UZKn2ofFzjE7tiuEUeKhUmO7NwKJlD
- 9hY4EpeJG4NOj6C+Nr3UzuG4p2UNBms1XEH58XyadLFqEBVnwqWLVzRno/mjNzsMRjQY
- wgbP7O7sMiCQHq6+udk9iMzVd1ep17joUhKR46dpQqE+V+rKgPGvdAN0SnHN8om6p45H
- JNjw==
-X-Gm-Message-State: APjAAAV2s57//FDj3wKcqqZFyA0p+QQHifo3g+2d3SNBJlER1OheDFIr
- PdoUlczt+55s9QY906Mqe0mbzf9887RBnMZas3nm9Sp1jJtQ6sDElCy1P+2II2D2s08PAueo3QY
- rDR93dxzFQYZn3FE=
-X-Received: by 2002:adf:f1c4:: with SMTP id z4mr10714313wro.319.1567855612814; 
- Sat, 07 Sep 2019 04:26:52 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyjWwauQJw61zavZYQl9+K/yw07KIAnehvOeVgujR0NnMSeeIcD60dh9WIMTmkx86gxTEXrDQ==
-X-Received: by 2002:adf:f1c4:: with SMTP id z4mr10714292wro.319.1567855612595; 
- Sat, 07 Sep 2019 04:26:52 -0700 (PDT)
+ bh=v+UsSyJ5HySEyRFX80vuwudnSILo5MOPAct6eCBgr8w=;
+ b=pzADyeSIarxW+HDs08duY/ShLMuFZIv+nH5aue8XraoeXJgFduL96dn0MNDhjpB2Bd
+ 7sFne0auGpwMhoM/k0pwuq3Y5hh3t8wMPd5euYTM/mkqzDB/QeqIgEB0c3UQ1p/5tnlb
+ cBdxI0VarnrP0HhkAjRuX0+lBAh0/Rd5IvVA00EgqXyETlcxDxyCtLTeBogznnRXxYRt
+ hgQGerSRPjEYV2qvm4I9hMVB/Bex2SnDxUjyyjzzWEt4gErQLkKNLWHEDz8n0fkil1rh
+ VkplsAtsEa6qKbzXLBddnTKF7QFbNYfn9qruPRk9wG2XI280hnl+MP2vC8OtylzOxxYt
+ SEpQ==
+X-Gm-Message-State: APjAAAXkXXx3IDnSX7H6uIQuhrtYLV+PEMMC/W9/bZ0SLhX4fE+QibfG
+ Z4jAFYzAwju1lhj7ed56TdFOHeFZKCTPKGudpMRrwAlVGg1H4xkdboQ9KVE92K17Yd2bvi6Fg4y
+ eqU8rDQJbLipRD9s=
+X-Received: by 2002:a5d:448a:: with SMTP id j10mr10528113wrq.82.1567855481310; 
+ Sat, 07 Sep 2019 04:24:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyXRYX+sp6ErZdNvN2VPGiLOamo0J4g1YpF+/MCJZlR2Kdr8nttacXHXKIU2xpJts/xSJmbIQ==
+X-Received: by 2002:a5d:448a:: with SMTP id j10mr10528100wrq.82.1567855481149; 
+ Sat, 07 Sep 2019 04:24:41 -0700 (PDT)
 Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id w125sm16300320wmg.32.2019.09.07.04.26.51
+ by smtp.gmail.com with ESMTPSA id s1sm12105969wrg.80.2019.09.07.04.24.39
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 07 Sep 2019 04:26:51 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+ Sat, 07 Sep 2019 04:24:40 -0700 (PDT)
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20190904203013.9028-1-alex.bennee@linaro.org>
- <20190904203013.9028-12-alex.bennee@linaro.org>
- <9aaafb8c-d892-94f1-d573-f60cf4dfe520@redhat.com>
+ <20190904203013.9028-20-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7ea0d095-0f8d-cced-ab2d-796f42ceecbc@redhat.com>
-Date: Sat, 7 Sep 2019 13:26:50 +0200
+Message-ID: <99fd99d0-0cca-f716-25cf-72f664ca932f@redhat.com>
+Date: Sat, 7 Sep 2019 13:24:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <9aaafb8c-d892-94f1-d573-f60cf4dfe520@redhat.com>
+In-Reply-To: <20190904203013.9028-20-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 11/42] tests/docker: move our arm64
+Subject: Re: [Qemu-devel] [PATCH v1 19/42] tests/docker: move our riscv64
  cross compile to Buster
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,110 +104,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/5/19 12:35 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 9/4/19 10:29 PM, Alex Benn=C3=A9e wrote:
->> Now Buster is released we can unify our cross build images for both
->> QEMU and tests.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  tests/docker/Makefile.include                    |  5 ++---
->>  .../docker/dockerfiles/debian-arm64-cross.docker |  4 ++--
->>  .../dockerfiles/debian-buster-arm64-cross.docker | 16 ---------------=
--
->>  tests/tcg/configure.sh                           |  2 +-
->>  4 files changed, 5 insertions(+), 22 deletions(-)
->>  delete mode 100644 tests/docker/dockerfiles/debian-buster-arm64-cross=
-.docker
->>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.inc=
-lude
->> index 89881fb5f5d..48c22ae40c0 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -86,13 +86,10 @@ docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/=
-debian-bootstrap.docker
->>  endif
->> =20
->>  # Enforce dependencies for composite images
->> -docker-image-debian: docker-image-debian9
->>  docker-image-debian9-mxe: docker-image-debian9
->>  docker-image-debian-amd64: docker-image-debian9
->>  docker-image-debian-armel-cross: docker-image-debian9
->>  docker-image-debian-armhf-cross: docker-image-debian9
->> -docker-image-debian-arm64-cross: docker-image-debian9
->> -docker-image-debian-buster-arm64-cross: docker-image-debian10
->>  docker-image-debian-mips-cross: docker-image-debian9
->>  docker-image-debian-mipsel-cross: docker-image-debian9
->>  docker-image-debian-mips64el-cross: docker-image-debian9
->> @@ -101,6 +98,8 @@ docker-image-debian-s390x-cross: docker-image-debia=
-n9
->>  docker-image-debian-win32-cross: docker-image-debian9-mxe
->>  docker-image-debian-win64-cross: docker-image-debian9-mxe
->> =20
->> +docker-image-debian-arm64-cross: docker-image-debian10
->> +
->>  docker-image-debian-alpha-cross: docker-image-debian-sid
->>  docker-image-debian-hppa-cross: docker-image-debian-sid
->>  docker-image-debian-m68k-cross: docker-image-debian-sid
->> diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/test=
-s/docker/dockerfiles/debian-arm64-cross.docker
->> index 6b59ef0843a..55045ff5d5a 100644
->> --- a/tests/docker/dockerfiles/debian-arm64-cross.docker
->> +++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
->> @@ -1,9 +1,9 @@
->>  #
->>  # Docker arm64 cross-compiler target
->>  #
->> -# This docker target builds on the debian Stretch base image.
->> +# This docker target builds on the debian Buster base image.
->>  #
->> -FROM qemu:debian9
->> +FROM qemu:debian10
->> =20
->>  # Add the foreign architecture we want and install dependencies
->>  RUN dpkg --add-architecture arm64
->> diff --git a/tests/docker/dockerfiles/debian-buster-arm64-cross.docker=
- b/tests/docker/dockerfiles/debian-buster-arm64-cross.docker
->> deleted file mode 100644
->> index 52787edcc2c..00000000000
->> --- a/tests/docker/dockerfiles/debian-buster-arm64-cross.docker
->> +++ /dev/null
->> @@ -1,16 +0,0 @@
->> -#
->> -# Docker arm64 cross-compiler target
->> -#
->> -# This docker target builds on the Debian's Buster base image. There
->> -# are no QEMU pre-requistes so this image can only be used to build
->> -# test cases.
->> -#
->> -FROM qemu:debian10
->> -
->> -# Add the foreign architecture we want and install dependencies
->> -RUN dpkg --add-architecture arm64
->> -RUN apt update && \
->> -    DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata && \
->> -    DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->> -    apt-get install -y --no-install-recommends \
->> -        crossbuild-essential-arm64
->> diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
->> index 5f794b664b8..2a351a00048 100755
->> --- a/tests/tcg/configure.sh
->> +++ b/tests/tcg/configure.sh
->> @@ -95,7 +95,7 @@ for target in $target_list; do
->>    case $target in
->>      aarch64-*)
->>        # We don't have any bigendian build tools so we only use this f=
-or AArch64
->> -      container_image=3Ddebian-buster-arm64-cross
->> +      container_image=3Ddebian-arm64-cross
->>        container_cross_cc=3Daarch64-linux-gnu-gcc
->>        ;;
->>      alpha-*)
->>
+On 9/4/19 10:29 PM, Alex Benn=C3=A9e wrote:
+> Now Buster is released we can stop relying on the movable feast that
+> is Sid for our cross-compiler for building tests.
 >=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+> ---
+>  tests/docker/Makefile.include                        | 2 +-
+>  tests/docker/dockerfiles/debian-riscv64-cross.docker | 5 ++---
+>  2 files changed, 3 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index 896c1c5a601..93190b1e2a2 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -104,10 +104,10 @@ docker-image-debian-hppa-cross: docker-image-debi=
+an10
+>  docker-image-debian-m68k-cross: docker-image-debian10
+>  docker-image-debian-mips64-cross: docker-image-debian10
+>  docker-image-debian-powerpc-cross: docker-image-debian10
+> +docker-image-debian-riscv64-cross: docker-image-debian10
+>  docker-image-debian-sh4-cross: docker-image-debian10
+>  docker-image-debian-sparc64-cross: docker-image-debian10
+> =20
+> -docker-image-debian-riscv64-cross: docker-image-debian-sid
+>  docker-image-debian-ppc64-cross: docker-image-debian-sid
+>  docker-image-travis: NOUSER=3D1
+> =20
+> diff --git a/tests/docker/dockerfiles/debian-riscv64-cross.docker b/tes=
+ts/docker/dockerfiles/debian-riscv64-cross.docker
+> index 221697f9d11..5e2d6ddb600 100644
+> --- a/tests/docker/dockerfiles/debian-riscv64-cross.docker
+> +++ b/tests/docker/dockerfiles/debian-riscv64-cross.docker
+> @@ -1,10 +1,9 @@
+>  #
+>  # Docker cross-compiler target
+>  #
+> -# This docker target builds on the debian sid base image which
+> -# contains cross compilers for Debian "ports" targets.
+> +# This docker target builds on the debian Buster base image.
+>  #
+> -FROM qemu:debian-sid
+> +FROM qemu:debian10
+> =20
+>  RUN apt update && \
+>      DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+>=20
 
