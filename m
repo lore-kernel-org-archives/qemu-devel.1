@@ -2,79 +2,75 @@ Return-Path: <SRS0=eB96=XC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF38C43331
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 15:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB6BC43331
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 16:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F0A0218AC
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 15:56:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F0A0218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
+	by mail.kernel.org (Postfix) with ESMTPS id 781BE2173B
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Sep 2019 16:05:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 781BE2173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6d4f-0003hD-Qq
-	for qemu-devel@archiver.kernel.org; Sat, 07 Sep 2019 11:56:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48813)
+	id 1i6dDm-0008U8-Ld
+	for qemu-devel@archiver.kernel.org; Sat, 07 Sep 2019 12:05:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50633)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <th.huth@gmail.com>) id 1i6cwT-0003o0-2v
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 11:48:02 -0400
+ (envelope-from <bounces@canonical.com>) id 1i6d8u-0004w8-Q3
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 12:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <th.huth@gmail.com>) id 1i6cwR-0007kg-7Z
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 11:48:00 -0400
-Received: from mail-wr1-f54.google.com ([209.85.221.54]:44354)
+ (envelope-from <bounces@canonical.com>) id 1i6d8t-0000yY-5M
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 12:00:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38796)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1i6cwQ-0007jv-TT
- for qemu-devel@nongnu.org; Sat, 07 Sep 2019 11:47:59 -0400
-Received: by mail-wr1-f54.google.com with SMTP id 30so9437694wrk.11
- for <qemu-devel@nongnu.org>; Sat, 07 Sep 2019 08:47:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=3/MAIxhVMjzHPxk6i+ZNE+2r2ZgoAuT7WenvBxcwPkY=;
- b=MJyEucwEEhEh7Et/+RBPSUokCDpTv0/jvoeUhOdSXMElirgr90SoKSzdiKeEnvYgAC
- hB02tXlgAO5pp3lcjlyIQJ0EB18sCyk5xcCUgU0jh02llB+IHJekMCOui3+QDE+sBZet
- G88cYWNKAiuj6xvWIs1UaS87ZaeXMjiIF9FWtjzkPTBGbgyn+rNp7As2/uSXXpVm74fQ
- 0ufmTRgf4oGwAnvlo/f+aw7ckNUfbYLK0Oz2p6NkbNLRei9lubCFd3bC3/srFtJlFwXd
- Z8nib4wWAAh4XfUkFjz7CASfdRjTwNHTA1zS0ZZnn6Q2l4APLWmniT8JgmYfCXXoaUL5
- 3bEQ==
-X-Gm-Message-State: APjAAAVw0yc2DgFR6BkKoawU6aji/PtWA9MCmNVPEMMPGPGSgFUWaRSA
- S17spF6nDrD7tCcXq8uPJm0=
-X-Google-Smtp-Source: APXvYqxccI2ATjfH/E3hDu4P8eE+Q+iTrHjMwqSF0ATmzVO/bnmgmM2p7WIb7UPIot53TReApu2MDQ==
-X-Received: by 2002:a5d:46c4:: with SMTP id g4mr10825226wrs.189.1567871277815; 
- Sat, 07 Sep 2019 08:47:57 -0700 (PDT)
-Received: from thl530.multi.box (pD9E8385F.dip0.t-ipconnect.de.
- [217.232.56.95])
- by smtp.gmail.com with ESMTPSA id s19sm17173418wrb.14.2019.09.07.08.47.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 07 Sep 2019 08:47:57 -0700 (PDT)
-From: Thomas Huth <huth@tuxfamily.org>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Date: Sat,  7 Sep 2019 17:47:43 +0200
-Message-Id: <20190907154744.4136-8-huth@tuxfamily.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190907154744.4136-1-huth@tuxfamily.org>
-References: <20190907154744.4136-1-huth@tuxfamily.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i6d8s-0000vz-Hs
+ for qemu-devel@nongnu.org; Sat, 07 Sep 2019 12:00:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i6d8q-0000Lr-Ci
+ for <qemu-devel@nongnu.org>; Sat, 07 Sep 2019 16:00:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5BA6A2E80C7
+ for <qemu-devel@nongnu.org>; Sat,  7 Sep 2019 16:00:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 07 Sep 2019 15:51:20 -0000
+From: =?utf-8?q?Paulo_C=C3=A9sar_Pereira_de_Andrade?=
+ <paulo.cesar.pereira.de.andrade@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: paulo-cesar-pereira-de-andrade
+X-Launchpad-Bug-Reporter: =?utf-8?q?Paulo_C=C3=A9sar_Pereira_de_Andrade_=28?=
+ =?utf-8?q?paulo-cesar-pereira-de-andrade=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Paulo_C=C3=A9sar_Pereira_de_Andrade_=28?=
+ =?utf-8?q?paulo-cesar-pereira-de-andrade=29?=
+Message-Id: <156787148109.29148.9145557698070556446.malonedeb@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f90a0c694c439693a4a45bcd61528b34c842f28e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.54
-Subject: [Qemu-devel] [PULL 7/8] tests/acceptance: Add test of NeXTcube
- framebuffer using OCR
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1843133] [NEW] Possibly incorrect branch in
+ qemu-system-hppa
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,178 +79,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1843133 <1843133@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Public bug reported:
 
-Add a test of the NeXTcube framebuffer using the Tesseract OCR
-engine on a screenshot of the framebuffer device.
+I plan to release a new GNU Lightning soon.
+I no longer have access to any physical HPPA, but code that
+was tested some years ago did work on HPPA/HP-UX, and now it
+appears qemu-system-hppa incorrectly branches in code generated
+by GNU Lightning. Currently only 32 bit hppa jit generation
+supported.
 
-The test is very quick:
+In the lightning check/test tool, the code would be:
 
-  $ avocado --show=app,console run tests/acceptance/machine_m68k_nextcube.py
-  JOB ID     : 78844a92424cc495bd068c3874d542d1e20f24bc
-  JOB LOG    : /home/phil/avocado/job-results/job-2019-08-13T13.16-78844a9/job.log
-   (1/3) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_bootrom_framebuffer_size: PASS (2.16 s)
-   (2/3) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_bootrom_framebuffer_ocr_with_tesseract_v3: -
-  ue r pun Honl'ﬂx ; 5‘ 55‘
-  avg ncaaaaa 25 MHZ, memary jag m
-  Backplane slat «a
-  Ethernet address a a r a r3 2
-  Memgry sackets aea canflqured far 16MB Darlly page made stMs but have 16MB page made stMs )nstalled
-  Memgry sackets a and 1 canflqured far 16MB Darlly page made stMs but have 16MB page made stMs )nstalled
-  [...]
-  Yestlnq the rpu, 5::
-  system test raneg Errar egge 51
-  Egg: cammand
-  Default pggc devlce nut fauna
-  NEXY>I
-  PASS (2.64 s)
-   (3/3) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_bootrom_framebuffer_ocr_with_tesseract_v4: SKIP: tesseract v4 OCR tool not available
-  RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 1 | WARN 0 | INTERRUPT 0 | CANCEL 0
-  JOB TIME   : 5.35 s
+.code
+    prolog
+    movi %r0 0x7fffffff
+    movi %r1 1
+    boaddr L0 %r0 %r1
+    calli @abort
+L0:
+    ret
+    epilog
 
-Documentation on how to install tesseract:
-  https://github.com/tesseract-ocr/tesseract/wiki#installation
+The code/debug information looks like this:
+            movi r4 0x7fffffff
+            0xf8ef5018      ldil L%7ffff800,r4
+            0xf8ef501c      ldo 7ff(r4),r4
+            movi r5 0x1
+            0xf8ef5020      ldi 1,r5
+        boaddr L1 r4 r5
+            0xf8ef5024      addb,sv,n r5,r4,0xf8ef5044 :a.tst:291
+            0xf8ef5028      nop
+        calli 0xf8eeb68a
+            [...]
+    L1:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20190813134921.30602-2-philmd@redhat.com>
-Signed-off-by: Thomas Huth <huth@tuxfamily.org>
----
- tests/acceptance/machine_m68k_nextcube.py | 121 ++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
- create mode 100644 tests/acceptance/machine_m68k_nextcube.py
+Apparently it is not understanding 0x7fffffff + 1 is a signed overflow.
 
-diff --git a/tests/acceptance/machine_m68k_nextcube.py b/tests/acceptance/machine_m68k_nextcube.py
-new file mode 100644
-index 0000000000..e09cab9f20
---- /dev/null
-+++ b/tests/acceptance/machine_m68k_nextcube.py
-@@ -0,0 +1,121 @@
-+# Functional test that boots a VM and run OCR on the framebuffer
-+#
-+# Copyright (c) Philippe Mathieu-Daudé <f4bug@amsat.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import os
-+import re
-+import time
-+import logging
-+import distutils.spawn
-+
-+from avocado_qemu import Test
-+from avocado import skipUnless
-+from avocado.utils import process
-+from avocado.utils.path import find_command, CmdNotFoundError
-+
-+PIL_AVAILABLE = True
-+try:
-+    from PIL import Image
-+except ImportError:
-+    PIL_AVAILABLE = False
-+
-+
-+def tesseract_available(expected_version):
-+    try:
-+        find_command('tesseract')
-+    except CmdNotFoundError:
-+        return False
-+    res = process.run('tesseract --version')
-+    try:
-+        version = res.stdout_text.split()[1]
-+    except IndexError:
-+        version = res.stderr_text.split()[1]
-+    return int(version.split('.')[0]) == expected_version
-+
-+    match = re.match(r'tesseract\s(\d)', res)
-+    if match is None:
-+        return False
-+    # now this is guaranteed to be a digit
-+    return int(match.groups()[0]) == expected_version
-+
-+
-+class NextCubeMachine(Test):
-+
-+    timeout = 15
-+
-+    def check_bootrom_framebuffer(self, screenshot_path):
-+        rom_url = ('http://www.nextcomputers.org/NeXTfiles/Software/ROM_Files/'
-+                   '68040_Non-Turbo_Chipset/Rev_2.5_v66.BIN')
-+        rom_hash = 'b3534796abae238a0111299fc406a9349f7fee24'
-+        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
-+
-+        self.vm.set_machine('next-cube')
-+        self.vm.add_args('-bios', rom_path)
-+        self.vm.launch()
-+
-+        self.log.info('VM launched, waiting for display')
-+        # TODO: Use avocado.utils.wait.wait_for to catch the
-+        #       'displaysurface_create 1120x832' trace-event.
-+        time.sleep(2)
-+
-+        self.vm.command('human-monitor-command',
-+                        command_line='screendump %s' % screenshot_path)
-+
-+    @skipUnless(PIL_AVAILABLE, 'Python PIL not installed')
-+    def test_bootrom_framebuffer_size(self):
-+        """
-+        :avocado: tags=arch:m68k
-+        :avocado: tags=machine:next_cube
-+        :avocado: tags=device:framebuffer
-+        """
-+        screenshot_path = os.path.join(self.workdir, "dump.png")
-+        self.check_bootrom_framebuffer(screenshot_path)
-+
-+        width, height = Image.open(screenshot_path).size
-+        self.assertEqual(width, 1120)
-+        self.assertEqual(height, 832)
-+
-+    @skipUnless(tesseract_available(3), 'tesseract v3 OCR tool not available')
-+    def test_bootrom_framebuffer_ocr_with_tesseract_v3(self):
-+        """
-+        :avocado: tags=arch:m68k
-+        :avocado: tags=machine:next_cube
-+        :avocado: tags=device:framebuffer
-+        """
-+        screenshot_path = os.path.join(self.workdir, "dump.png")
-+        self.check_bootrom_framebuffer(screenshot_path)
-+
-+        console_logger = logging.getLogger('console')
-+        text = process.run("tesseract %s stdout" % screenshot_path).stdout_text
-+        for line in text.split('\n'):
-+            if len(line):
-+                console_logger.debug(line)
-+        self.assertIn('Backplane', text)
-+        self.assertIn('Ethernet address', text)
-+
-+    # Tesseract 4 adds a new OCR engine based on LSTM neural networks. The
-+    # new version is faster and more accurate than version 3. The drawback is
-+    # that it is still alpha-level software.
-+    @skipUnless(tesseract_available(4), 'tesseract v4 OCR tool not available')
-+    def test_bootrom_framebuffer_ocr_with_tesseract_v4(self):
-+        """
-+        :avocado: tags=arch:m68k
-+        :avocado: tags=machine:next_cube
-+        :avocado: tags=device:framebuffer
-+        """
-+        screenshot_path = os.path.join(self.workdir, "dump.png")
-+        self.check_bootrom_framebuffer(screenshot_path)
-+
-+        console_logger = logging.getLogger('console')
-+        proc = process.run("tesseract --oem 1 %s stdout" % screenshot_path)
-+        text = proc.stdout_text
-+        for line in text.split('\n'):
-+            if len(line):
-+                console_logger.debug(line)
-+        self.assertIn('Testing the FPU, SCC', text)
-+        self.assertIn('System test failed. Error code 51', text)
-+        self.assertIn('Boot command', text)
-+        self.assertIn('Next>', text)
--- 
-2.21.0
+Tested in Fedora with qemu-system-hppa-3.1.1-2.fc30.x86_64 and using
+the debian-10 image.
 
+To make it a bit easier to test (partially transformed the
+not so optimized code generated by lightning to gcc -S output):
+# cat a.s
+	.LEVEL 1.1
+	.text
+	.align 4
+.globl main
+	.type	main, @function
+main:
+	.PROC
+	.CALLINFO FRAME=3D64,NO_CALLS,SAVE_SP,ENTRY_GR=3D3
+	.ENTRY
+	copy %r3,%r1
+	copy %r30,%r3
+	stwm %r1,64(%r30)
+	zdepi -1,31,31,%r23
+	ldi 1,%r24
+	addb,sv,n %r24,%r23,.L0
+	nop
+	ldi 1,%r28
+	b,n .L1
+	nop
+.L0:
+	ldi 0,%r28
+.L1:
+	ldo 64(%r3),%r30
+	ldwm -64(%r30),%r3
+	bv,n %r0(%r2)
+	.EXIT
+	.PROCEND
+	.size	main, .-main
+
+# gcc a.s
+# ./a.out; echo $?
+1
+
+It should have returned 0.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1843133
+
+Title:
+  Possibly incorrect branch in qemu-system-hppa
+
+Status in QEMU:
+  New
+
+Bug description:
+  I plan to release a new GNU Lightning soon.
+  I no longer have access to any physical HPPA, but code that
+  was tested some years ago did work on HPPA/HP-UX, and now it
+  appears qemu-system-hppa incorrectly branches in code generated
+  by GNU Lightning. Currently only 32 bit hppa jit generation
+  supported.
+
+  In the lightning check/test tool, the code would be:
+
+  .code
+      prolog
+      movi %r0 0x7fffffff
+      movi %r1 1
+      boaddr L0 %r0 %r1
+      calli @abort
+  L0:
+      ret
+      epilog
+
+  The code/debug information looks like this:
+              movi r4 0x7fffffff
+              0xf8ef5018      ldil L%7ffff800,r4
+              0xf8ef501c      ldo 7ff(r4),r4
+              movi r5 0x1
+              0xf8ef5020      ldi 1,r5
+          boaddr L1 r4 r5
+              0xf8ef5024      addb,sv,n r5,r4,0xf8ef5044 :a.tst:291
+              0xf8ef5028      nop
+          calli 0xf8eeb68a
+              [...]
+      L1:
+
+  Apparently it is not understanding 0x7fffffff + 1 is a signed
+  overflow.
+
+  Tested in Fedora with qemu-system-hppa-3.1.1-2.fc30.x86_64 and using
+  the debian-10 image.
+
+  To make it a bit easier to test (partially transformed the
+  not so optimized code generated by lightning to gcc -S output):
+  # cat a.s
+  	.LEVEL 1.1
+  	.text
+  	.align 4
+  .globl main
+  	.type	main, @function
+  main:
+  	.PROC
+  	.CALLINFO FRAME=3D64,NO_CALLS,SAVE_SP,ENTRY_GR=3D3
+  	.ENTRY
+  	copy %r3,%r1
+  	copy %r30,%r3
+  	stwm %r1,64(%r30)
+  	zdepi -1,31,31,%r23
+  	ldi 1,%r24
+  	addb,sv,n %r24,%r23,.L0
+  	nop
+  	ldi 1,%r28
+  	b,n .L1
+  	nop
+  .L0:
+  	ldi 0,%r28
+  .L1:
+  	ldo 64(%r3),%r30
+  	ldwm -64(%r30),%r3
+  	bv,n %r0(%r2)
+  	.EXIT
+  	.PROCEND
+  	.size	main, .-main
+
+  # gcc a.s
+  # ./a.out; echo $?
+  1
+
+  It should have returned 0.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1843133/+subscriptions
 
