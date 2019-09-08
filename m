@@ -2,74 +2,90 @@ Return-Path: <SRS0=PtAT=XD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CDEC433EF
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 19:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00087C433EF
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:25:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ED0A2067D
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 19:41:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ED0A2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
+	by mail.kernel.org (Postfix) with ESMTPS id BDD04216C8
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:25:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxRqOsJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD04216C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i733Y-0006X5-Jz
-	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 15:41:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57048)
+	id 1i74gA-00073x-BS
+	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 17:25:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <th.huth@gmail.com>) id 1i732x-000662-43
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 15:40:27 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74do-0005OK-Ey
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <th.huth@gmail.com>) id 1i732w-0006c9-30
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 15:40:26 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37208)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74dl-0005l1-B1
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:34 -0400
+Received: from mail-qk1-x72c.google.com ([2607:f8b0:4864:20::72c]:32922)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1i732v-0006bA-Rc
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 15:40:26 -0400
-Received: by mail-wr1-f68.google.com with SMTP id i1so10969209wro.4
- for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 12:40:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+ id 1i74dh-0005j2-TL
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:31 -0400
+Received: by mail-qk1-x72c.google.com with SMTP id x134so11155733qkb.0
+ for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 14:22:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=fyZGhiKEUGgbY5xS1A2Merr8hk8W0hJ0+MbnsIX166o=;
+ b=bxRqOsJiGJCvF6mYXyNuNgszx3K9g9aA2Kq3B3Jz2ae06svL7g5khJpY0Fz0GwzDGg
+ WverXn278E29JvHmdcsAPQYzm4DENOUkIQoVfKPC2I1wkhpahhn7kAoAu49bQKszckRl
+ Ppo0rfx2a5FjsFAL5ZhurLujvHQ+P6a3Sl1QrDdtJ10jO/pVpL2L4eGSQ3yl+55fDDPF
+ rFQjuiBzhvECnda3r4J0ffhjZa21Rv2Gs5qf+wsZjejm4ATf1/Lqi+6qzQ6dph1kApZv
+ 1YcICP12Ac+84htHp8SFC3WfsD8QwTc78Ft6koMYJYPZ+/S9LZF77cIkurMXMHrNVndh
+ 0paA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=jCB43qTlXAcw0P8gWG1JY82MIYh2dV/H2n2IkDzApb8=;
- b=TG6tDkxXcSmDAzSlKqp64c5i5DmA0D5x5iBlnWUnDiI/52DnAQAz/RP56cH9EQvd7W
- w8byu3E9ujRmTpImZNPYUszf5xUZaf6LkMOiEsTNi72yUr/a56/hPh541CeMap6aP63/
- Js7UOcultHIihQd1zXyU2zhUgNuNsafqIcGE0pvBPyORd4AXbkoapAQdDJrWh85TVp3H
- 6kbvTBCafqBZ4AP1h9OcCv5qy2HkDD5JI+xgUGQx4Q7ghDZJ8vTfPsgLa5M6V++AZ7CQ
- mpxYrANZ4ZNEvg1eHATr+6QSzOfO57uWadVPbYyXwd491E72bBRrS7hVCYLBuHlRzFft
- LRJg==
-X-Gm-Message-State: APjAAAWmT6jVj6Ruap5t+tRmSiRWjQg7kohHl2mrpbyVEmVBRUn2I12u
- aw6oJKAoLHE6WvvxQ1GQ+T8=
-X-Google-Smtp-Source: APXvYqxnHVIYUJ+Kvy6t++frZ7Gc95jMpIt/eaOG1P67xxh8apcGzRONrZuWhQH+hFSHYFmwBf2BtA==
-X-Received: by 2002:adf:dc81:: with SMTP id r1mr15552473wrj.52.1567971623877; 
- Sun, 08 Sep 2019 12:40:23 -0700 (PDT)
-Received: from thl530.multi.box (pD9575A28.dip0.t-ipconnect.de. [217.87.90.40])
- by smtp.gmail.com with ESMTPSA id a6sm3888551wrr.85.2019.09.08.12.40.22
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=fyZGhiKEUGgbY5xS1A2Merr8hk8W0hJ0+MbnsIX166o=;
+ b=iMOXy/AYXJhthxu3ckoLP5Keiv1T4c985g5GXw+b10NFHW7+/B/v/FjZe5by7T+iJH
+ Hu62pKS1b8hDZcxJlutsduG3f/lwKJm6FtbVhGtF7tIlkC27yUq3pGa7bKmLQBpAdxyk
+ RCNbq/t5s/08hfnQ5QGCuvfK3Nt23duZzEWw30xcO5l9S6uGwbpq1PyT4DhuHnTh+7cL
+ AZ5XGGCpth2MxlpQtesgXvNImVwhHuhVaFivRHAp5cVXJX1yBruBhHbyFek7xWy1fzjB
+ 4yyb3xA2ZS3saOnbBVR2vaI1l5GBzfUetrWuElc6j8YRgpH2oIMmoRqkEJoSyo6BO9dH
+ 9ZLg==
+X-Gm-Message-State: APjAAAXvPkXtkl/UXcZvDkD8q+RrQJPeMdKAq8aA1AiJZrIlS7lZ6a4H
+ +lH6JSnVmI9OPzbw0AeR6p171rTw
+X-Google-Smtp-Source: APXvYqz1zwxf6/rcB32cy2n/f85/HP7e5XQl+/pZA4jwIEHO6iOS5d0HIzVFNHXJZwX9NhlRWUSJKw==
+X-Received: by 2002:a37:c0f:: with SMTP id 15mr14079912qkm.73.1567977748029;
+ Sun, 08 Sep 2019 14:22:28 -0700 (PDT)
+Received: from nullptr.home.dirty-ice.org
+ (2a01-036c-0113-6ea8-0000-0000-0000-0005.pool6.digikabel.hu.
+ [2a01:36c:113:6ea8::5])
+ by smtp.gmail.com with ESMTPSA id e2sm5488112qkg.38.2019.09.08.14.22.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Sep 2019 12:40:23 -0700 (PDT)
-Date: Sun, 8 Sep 2019 21:40:18 +0200
-From: Thomas Huth <huth@tuxfamily.org>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Message-ID: <20190908214018.6cc84109@thl530.multi.box>
-In-Reply-To: <20190813134921.30602-4-philmd@redhat.com>
-References: <20190813134921.30602-1-philmd@redhat.com>
- <20190813134921.30602-4-philmd@redhat.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ Sun, 08 Sep 2019 14:22:27 -0700 (PDT)
+From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
+ <dirty.ice.hu@gmail.com>
+X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
+ <DirtY.iCE.hu@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Sun,  8 Sep 2019 23:22:00 +0200
+Message-Id: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [RFC PATCH v3 3/3] tests/acceptance: Run commands
- sending VNC keys
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::72c
+Subject: [Qemu-devel] [PATCH v2 00/24] Audio: Mixeng-free 5.1/7.1 audio
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,29 +97,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am Tue, 13 Aug 2019 15:49:21 +0200
-schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
+Hi,
 
-> Proof of concept to interract with a framebuffer via VNC.
->=20
-> This test send 'mem' and 'help' to the firmware prompt
-> within the single X terminal opened.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> This test is limited because the '-vnc' option only allow
-> to bind TCP port. To allow parallel testing, I should try
-> to bind within a range instead of ':0'.
+This is the v2 of my patch series that makes mixeng optional and enables
+more than two audio channels.
 
-Maybe it would be better to use the "sendkey" HMP command here?
+Changes from v1:
 
- Thomas
+* renamed "mixeng" option to "mixing-engine"
+* dropped patch "audio: remove hw->samples, buffer_size_in/out pcm_ops"
+
+
+Regards,
+Zoltan
+
+Kővágó, Zoltán (24):
+  audio: api for mixeng code free backends
+  alsaaudio: port to the new audio backend api
+  coreaudio: port to the new audio backend api
+  dsoundaudio: port to the new audio backend api
+  noaudio: port to the new audio backend api
+  ossaudio: port to the new audio backend api
+  paaudio: port to the new audio backend api
+  sdlaudio: port to the new audio backend api
+  spiceaudio: port to the new audio backend api
+  wavaudio: port to the new audio backend api
+  audio: remove remains of the old backend api
+  audio: unify input and output mixeng buffer management
+  audio: common rate control code for timer based outputs
+  audio: split ctl_* functions into enable_* and volume_*
+  audio: add mixeng option (documentation)
+  audio: make mixeng optional
+  paaudio: get/put_buffer functions
+  audio: support more than two channels in volume setting
+  audio: replace shift in audio_pcm_info with bytes_per_frame
+  audio: basic support for multichannel audio
+  paaudio: channel-map option
+  usb-audio: do not count on avail bytes actually available
+  usb-audio: support more than two channels of audio
+  usbaudio: change playback counters to 64 bit
+
+ audio/Makefile.objs     |   1 -
+ audio/alsaaudio.c       | 372 ++++++++------------------
+ audio/audio.c           | 522 ++++++++++++++++++++++++++++--------
+ audio/audio.h           |  10 +
+ audio/audio_int.h       |  81 ++++--
+ audio/audio_pt_int.c    | 173 ------------
+ audio/audio_pt_int.h    |  22 --
+ audio/audio_template.h  |  31 ++-
+ audio/coreaudio.c       | 143 +++++-----
+ audio/dsound_template.h |  53 ++--
+ audio/dsoundaudio.c     | 361 +++++++------------------
+ audio/noaudio.c         |  78 +++---
+ audio/ossaudio.c        | 360 ++++++++++---------------
+ audio/paaudio.c         | 566 +++++++++++++---------------------------
+ audio/sdlaudio.c        | 104 ++++----
+ audio/spiceaudio.c      | 252 ++++++------------
+ audio/wavaudio.c        |  78 ++----
+ configure               |   5 -
+ hw/usb/dev-audio.c      | 459 +++++++++++++++++++++++++++-----
+ qapi/audio.json         |  12 +-
+ qemu-options.hx         |  15 ++
+ 21 files changed, 1689 insertions(+), 2009 deletions(-)
+ delete mode 100644 audio/audio_pt_int.c
+ delete mode 100644 audio/audio_pt_int.h
+
+-- 
+2.23.0
+
 
