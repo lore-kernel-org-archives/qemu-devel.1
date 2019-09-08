@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626FBC433EF
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 06:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5D7C4332F
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 06:17:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 274CF214DB
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 06:17:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C6C8214DB
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 06:17:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+TK8iaW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 274CF214DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FsKg+Hhf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C6C8214DB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i6qVz-0004Pw-O1
-	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 02:17:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41775)
+	id 1i6qW2-0004U7-Hq
+	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 02:17:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i6qUH-0002mT-AP
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 02:15:50 -0400
+ id 1i6qUI-0002me-FQ
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 02:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i6qUG-0002P3-3u
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 02:15:49 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32885)
+ id 1i6qUH-0002Qy-At
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 02:15:50 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50388)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1i6qUF-0002Oi-UB
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 02:15:48 -0400
-Received: by mail-wr1-x441.google.com with SMTP id u16so10442976wrr.0
- for <qemu-devel@nongnu.org>; Sat, 07 Sep 2019 23:15:47 -0700 (PDT)
+ id 1i6qUH-0002Pa-2o
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 02:15:49 -0400
+Received: by mail-wm1-x341.google.com with SMTP id c10so10339902wmc.0
+ for <qemu-devel@nongnu.org>; Sat, 07 Sep 2019 23:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=jxeBooAWNeNgyEWlgkktgHzYTcy+BTe+I6i003sho70=;
- b=U+TK8iaWtCyd3zYeMuRNoa+2FJH1sD5X/2yJeblvT74fE13ks92RW1QrBJLwhJGeB9
- VGJFXZyaO14+LFi8HjXxkuIbDoIYOeY1LCEdIFHYmDWoe9+IZ02oZmH/6N8zgh5FyXjD
- cLpI0aCwV5EUfLhdWe2ANb+ZsZJpXc+hGhQbWjHfBSlCq5F4jAKiuYPRHZufSBkREr8n
- hMj52QWkST3xHd7Oyc1VVnTUolM2MryHo6WNLZYBqVitBGkNGUPwlp9PtFdQH71nagNB
- hd8YEhm7dbBTEro+MJPpHFw/1ZQ/SBlQ0I8siCEd7OFL4r/+9+WGseJ8hIQujfXzCBQq
- 5Ihw==
+ bh=gvbw57hiwlFryOdHGOwYOwKt/bEEEiHivu3sJ0Hxopw=;
+ b=FsKg+Hhfk9Acx5bx98OBBJNNKmF5Vm3lcggSlwFvXm26IYYe2ttQsjfSGhkdPyKOw2
+ s9l4o9w9dK+QlEP09XQRqefcEKjH2ENTPFKeOoX007GPYebD80oylE2ld9F+n3HEqoGR
+ wstANu+y/Ya225zBa7EKQGevNAxiLwqvu4lZf8Xx89rhOM28/3R/wMXSpnM+s57ybpB4
+ zAoizS93dp6rcz4L6nVyu9l3vKkEWhiO+64iYeh6JFhFDZoO2zyEy7T3YobDR5c0QGh1
+ G+p5GRyGFz29SQ+UKcbXqcRsPmmsW1jBrxHZP6Ts0/7R5dF0Il12ujE8zH8OsT2obZnk
+ w5LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=jxeBooAWNeNgyEWlgkktgHzYTcy+BTe+I6i003sho70=;
- b=Ce2UYwJIe+or40Wb4akYAkOC1/SQUsm1P/03YEUQLDZ7WiUmineeysSotNEqwnnhWF
- nN2O8DCUN9I6IeQ6s0YN2pJ/cgllejxsKd4w8RfQCxbDcxg38lMGUkGr60UJlJMfleNx
- ddtElyKWkxTW5xM8x0kXX7bjMCWtglIj3vNYNwq9IuFL3XVWJoRhPIP4T5ixdj7pez78
- ptUgcGjsn06/Av7cNHeWuo3b7Dcz2GiWNlkoQWkD/Sqt//WRlcB/rIg1K9q8tpjTD6G0
- IJh20HXdLaux+aenRoSG8gsiE3QIDruihLW+Rb/+DDB6QJ8AQSkQy65Lyl7wIJAhKtAu
- MAfA==
-X-Gm-Message-State: APjAAAVoAAPeYDBZsELt/QGCZ3ts5XXYc9FPB9/i2WHCz+MS04yZU0ik
- Z90uLqXTxQV3Gd+rzDcMA5NLR2Uc
-X-Google-Smtp-Source: APXvYqyoNZWZfmh/XCJ3O3/KcjCJK03yT5XP5WsDVz3pYSe/J/oFEy/Ww4nw1/sTVdlRcz5fxr0p4Q==
-X-Received: by 2002:a5d:4107:: with SMTP id l7mr8920884wrp.303.1567923346730; 
- Sat, 07 Sep 2019 23:15:46 -0700 (PDT)
+ bh=gvbw57hiwlFryOdHGOwYOwKt/bEEEiHivu3sJ0Hxopw=;
+ b=VVejevvL6Tk2VWySy9y0ngX2lGrfe4LrEixNJ9BHFgeeFj9ukfV7bB8jrYtKZTLJ2S
+ 4wlBBpQynAtEpqR7SXvGAHydf54tgJyY7wD2IudkWK5j629ugh4MfmWYGOse/JctNau+
+ AMx+nUTw/K/m/2KUXbU2wWvGAUZ81jSJe8zckNZAJTU2psRKvad2fRukQQh1X2cb+xYs
+ UpORFjbj3dWIMcJRsjMmmrNnDKnuyV4gipdchkpJpA/hxl6nCnROTqtmrCRWzo5XygNW
+ EVcNdxc/toxNZdtCturrVIVOvSD6rZGTc5T6OFk55gHprD0lGyK2KNxbz1rgOIZE7mHl
+ Bmzg==
+X-Gm-Message-State: APjAAAXkBmIk29F3xnd1HfEUWL3uJqhhLcnKYjjpVyNjf++XnMOQZ2Xj
+ OHx7pINonFnsiUFkONvSWC/r1SLb
+X-Google-Smtp-Source: APXvYqy9wzWhZeehhEligxEhK7Ml+4Clhbz4jXngT3R6rU2xvllg8oUog1skvYeC/SoKnMolPjZ2Ag==
+X-Received: by 2002:a1c:7407:: with SMTP id p7mr14634968wmc.31.1567923347848; 
+ Sat, 07 Sep 2019 23:15:47 -0700 (PDT)
 Received: from localhost.localdomain
  (251.red-88-10-102.dynamicip.rima-tde.net. [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id g201sm15616552wmg.34.2019.09.07.23.15.45
+ by smtp.gmail.com with ESMTPSA id g201sm15616552wmg.34.2019.09.07.23.15.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 07 Sep 2019 23:15:46 -0700 (PDT)
+ Sat, 07 Sep 2019 23:15:47 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Sun,  8 Sep 2019 08:15:36 +0200
-Message-Id: <20190908061543.25136-2-f4bug@amsat.org>
+Date: Sun,  8 Sep 2019 08:15:37 +0200
+Message-Id: <20190908061543.25136-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190908061543.25136-1-f4bug@amsat.org>
 References: <20190908061543.25136-1-f4bug@amsat.org>
@@ -84,9 +84,8 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v6 1/8] linux-user/strace: Display invalid
- pointer in print_timeval()
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH v6 2/8] linux-user/strace: Add print_timezone()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,25 +107,51 @@ Sender: "Qemu-devel"
 Suggested-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- linux-user/strace.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+checkpatch error:
+ERROR: storage class should be at the beginning of the declaration
+---
+ linux-user/strace.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index c80e93b5db..f326c357a2 100644
+index f326c357a2..5ee9d62c25 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1243,8 +1243,10 @@ print_timeval(abi_ulong tv_addr, int last)
-         struct target_timeval *tv;
+@@ -63,6 +63,7 @@ UNUSED static void print_string(abi_long, int);
+ UNUSED static void print_buf(abi_long addr, abi_long len, int last);
+ UNUSED static void print_raw_param(const char *, abi_long, int);
+ UNUSED static void print_timeval(abi_ulong, int);
++UNUSED static void print_timezone(abi_ulong, int);
+ UNUSED static void print_number(abi_long, int);
+ UNUSED static void print_signal(abi_ulong, int);
+ UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
+@@ -1254,6 +1255,26 @@ print_timeval(abi_ulong tv_addr, int last)
+         gemu_log("NULL%s", get_comma(last));
+ }
  
-         tv = lock_user(VERIFY_READ, tv_addr, sizeof(*tv), 1);
--        if (!tv)
-+        if (!tv) {
-+            print_pointer(tv_addr, last);
-             return;
++static void
++print_timezone(abi_ulong tz_addr, int last)
++{
++    if (tz_addr) {
++        struct target_timezone *tz;
++
++        tz = lock_user(VERIFY_READ, tz_addr, sizeof(*tz), 1);
++        if (!tz) {
++            print_pointer(tz_addr, last);
++            return;
 +        }
-         gemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
-             tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
-         unlock_user(tv, tv_addr, 0);
++        gemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
++                 tswapal(tz->tz_minuteswest), tswapal(tz->tz_dsttime),
++                 get_comma(last));
++        unlock_user(tz, tz_addr, 0);
++    } else {
++        gemu_log("NULL%s", get_comma(last));
++    }
++}
++
+ #undef UNUSED
+ 
+ #ifdef TARGET_NR_accept
 -- 
 2.20.1
 
