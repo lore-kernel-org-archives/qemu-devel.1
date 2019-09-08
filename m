@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B07EC4360D
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:25:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27054C433EF
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:29:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 219A1216C8
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:25:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3098216C8
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:29:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwOdYHtg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219A1216C8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y44vKvtK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3098216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i74gS-0007Ng-SJ
-	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 17:25:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46313)
+	id 1i74kD-0002Ic-F3
+	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 17:29:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i74ds-0005PU-0C
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74dt-0005Rw-Lg
  for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i74dp-0005mz-6d
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:39 -0400
-Received: from mail-qt1-x82a.google.com ([2607:f8b0:4864:20::82a]:37718)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74dr-0005oB-9Y
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:41 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:46640)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i74dl-0005km-EO
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:34 -0400
-Received: by mail-qt1-x82a.google.com with SMTP id g13so13418178qtj.4
- for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 14:22:33 -0700 (PDT)
+ id 1i74dq-0005mt-4I
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:38 -0400
+Received: by mail-qt1-x844.google.com with SMTP id v11so13752102qto.13
+ for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 14:22:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0yC3VaolAFlWXBwYBJO3XpExl+N0WKggdkttIhe8OY0=;
- b=fwOdYHtgyC/LrOAupoZ9HCYp2CZoANKlY2z9W5l+6eIRKKb/Mh9Pohy4URBFi0Rmxb
- igapXuCtADdSGMoYvLl9y5w459PjQblS3U31fjl3mozV2/X830mXkigPdup4b9I8Qser
- ACpACUvecfV9tK2lcxIElCBPCcI9LxPgz0I7A/njBiLOVR2unMvoaWkz5zM1IysmgnPa
- iDg++4ZvD2GLoArrbht3eIZOjKjm7P+S2Kv++pphFL96KL19vxVX5xR2iYvq09m9kPnA
- VpRFi+bkV0Pbx85ZW+6KPDXYWFuqBBGE3ccBXzTDqIUcIrqkDj6CuzcYysJ8pa2F2utJ
- AfvQ==
+ bh=DqChsnZIXAGMvroXVL0MQvbI8g2z6bOPhBgHC6Jjg7E=;
+ b=Y44vKvtKU2mgLemYMAQ4uc++tShUwkLhJ3jxo7YZv4QpytQaQwTt+J7ZCK7VENOfxm
+ qBHTWKUArB7lJiNnWfbHBlZN03RUZncHmpEehgjNkNA6qe47DH5iwChGHzZGYENjp8bz
+ WpcIqk5H1VwYKwiZXsjH8s6TnYoMgZ+NaKdLkNTddhSTetCxXD6zbWL6R11FpcuwAYcH
+ SGxrXJJMtYG0rUHftK5EQ95q76GSUHNs7sKc4PrS3P63GMWsZTU4KtcGS3exrhkgJSAb
+ Utl/F9qD/UgOzEwzBNQqI4rgCu5Xcb5iCKGeOIaviYf4D00F/DK7j7AcA6AKNHUt/w7L
+ amhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0yC3VaolAFlWXBwYBJO3XpExl+N0WKggdkttIhe8OY0=;
- b=D3dfzGEfyQ9jp4jtvwvsMoIL/ELSElU8wVpdsoi/BqcaO0odUEgkIsVQJgJEDpAqpH
- dwCq7xHHgcQyx1Iu1immrMJKoHacoMDyPUXLAczIFZOVMBtxDS9RE9emvnd2n0BzVPvK
- M6W0o7ycwaKdyLaLSkH+Z8gL8TDbL5/EKqBRyLvjFidQNNfLDI4aengSLPS+vckxKDUo
- yhKmV+FDOks+NYvPBN6vETb60oUqKWsAGka2DmvJADQWLZHEFvIoV0MYQ5s/JTB5ox5Q
- G8Xz7NPluboBRhuxDj3IW8WTwFUjAVWqkFK5j2GbZpAMtVeB1f6u+6bBwhwROwFnbl8k
- mTQA==
-X-Gm-Message-State: APjAAAVxla3JWfindDxT63jZ2BbPqjTT7y0JL69z4MKdeA+uXh2iGvHl
- xPb69Bqw+DfQjo8eaOj5mJ0mKqTb
-X-Google-Smtp-Source: APXvYqwhFtOaZ63bFb3yMP7e3BGxaQAH0MwfOVWDCWi9C0Fmf73QA0Oh9348GJQQ7GYTAIUPoTCm7Q==
-X-Received: by 2002:ac8:23b9:: with SMTP id q54mr20946428qtq.107.1567977752308; 
- Sun, 08 Sep 2019 14:22:32 -0700 (PDT)
+ bh=DqChsnZIXAGMvroXVL0MQvbI8g2z6bOPhBgHC6Jjg7E=;
+ b=kwcgHE+W9p6GdiUwyZuRaw0++EkU6Fen/pU1+ZWuWxDqCe2J6SWY0QLh9VWb1MMim9
+ zOd6JNBR2vDMObG7mfxQkCpLKWqSbWC7RVZum7Ywh2P81U0WxZFAxKJCw5OHdIi2OaIr
+ efjybhEce3CrOQJ+YEOz+2YzXuPhc937qXPYr2KwErVaR8HsnJD6ffHdKWD+kKhgjCjq
+ 2VGs/AWLDBQqVmvlywQJfa7xndpZZd17pX/MGrvxRnz01p/1rqakbs1hAOWgBJKpC+hG
+ 95v7xQM/nLEXmtkgXNjgqAF/QFcrf2E50EnArmcr2tgBNcDT8Bt7dE2FVVTSvyv6YPxU
+ 1a1g==
+X-Gm-Message-State: APjAAAVeAjgnLo0Fv/6hmb8pckvjrzzbb8cLLxFH7NieTyQqnBrsTUes
+ sIqRzROz+gdtd+5GRrlW2VIOJ83g
+X-Google-Smtp-Source: APXvYqz3XPzj6vsjUbatiR4awQAz+eoNhnT3mFrW+LcsK+mPMWs5385ITsi79n3+tUDdQPolmmVxeg==
+X-Received: by 2002:ac8:7101:: with SMTP id z1mr7800315qto.367.1567977756480; 
+ Sun, 08 Sep 2019 14:22:36 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-6ea8-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:6ea8::5])
- by smtp.gmail.com with ESMTPSA id e2sm5488112qkg.38.2019.09.08.14.22.31
+ by smtp.gmail.com with ESMTPSA id e2sm5488112qkg.38.2019.09.08.14.22.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Sep 2019 14:22:32 -0700 (PDT)
+ Sun, 08 Sep 2019 14:22:36 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun,  8 Sep 2019 23:22:04 +0200
-Message-Id: <cfcf71fb1bd09b3a7599c77f1d31b516b2da0109.1567965065.git.DirtY.iCE.hu@gmail.com>
+Date: Sun,  8 Sep 2019 23:22:08 +0200
+Message-Id: <0fb21a31b645b0d84fa7979f770aaecd60ccca3c.1567965065.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
@@ -86,8 +86,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::82a
-Subject: [Qemu-devel] [PATCH v2 04/24] dsoundaudio: port to the new audio
+X-Received-From: 2607:f8b0:4864:20::844
+Subject: [Qemu-devel] [PATCH v2 08/24] sdlaudio: port to the new audio
  backend api
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,526 +107,133 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/dsound_template.h |  47 +++---
- audio/dsoundaudio.c     | 307 +++++++++-------------------------------
- 2 files changed, 92 insertions(+), 262 deletions(-)
+ audio/sdlaudio.c | 87 +++++++++++++++++++++++-------------------------
+ 1 file changed, 42 insertions(+), 45 deletions(-)
 
-diff --git a/audio/dsound_template.h b/audio/dsound_template.h
-index 8ece870c9e..9f10b688df 100644
---- a/audio/dsound_template.h
-+++ b/audio/dsound_template.h
-@@ -29,6 +29,8 @@
- #define BUFPTR LPDIRECTSOUNDCAPTUREBUFFER
- #define FIELD dsound_capture_buffer
- #define FIELD2 dsound_capture
-+#define HWVOICE HWVoiceIn
-+#define DSOUNDVOICE DSoundVoiceIn
- #else
- #define NAME "playback buffer"
- #define NAME2 "DirectSound"
-@@ -37,6 +39,8 @@
- #define BUFPTR LPDIRECTSOUNDBUFFER
- #define FIELD dsound_buffer
- #define FIELD2 dsound
-+#define HWVOICE HWVoiceOut
-+#define DSOUNDVOICE DSoundVoiceOut
- #endif
+diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+index 14b11f0335..f7ac8cd101 100644
+--- a/audio/sdlaudio.c
++++ b/audio/sdlaudio.c
+@@ -41,8 +41,6 @@
  
- static int glue (dsound_unlock_, TYPE) (
-@@ -72,8 +76,6 @@ static int glue (dsound_lock_, TYPE) (
-     )
- {
-     HRESULT hr;
--    LPVOID p1 = NULL, p2 = NULL;
--    DWORD blen1 = 0, blen2 = 0;
-     DWORD flag;
- 
- #ifdef DSBTYPE_IN
-@@ -81,7 +83,7 @@ static int glue (dsound_lock_, TYPE) (
- #else
-     flag = entire ? DSBLOCK_ENTIREBUFFER : 0;
- #endif
--    hr = glue(IFACE, _Lock)(buf, pos, len, &p1, &blen1, &p2, &blen2, flag);
-+    hr = glue(IFACE, _Lock)(buf, pos, len, p1p, blen1p, p2p, blen2p, flag);
- 
-     if (FAILED (hr)) {
- #ifndef DSBTYPE_IN
-@@ -96,34 +98,34 @@ static int glue (dsound_lock_, TYPE) (
-         goto fail;
-     }
- 
--    if ((p1 && (blen1 & info->align)) || (p2 && (blen2 & info->align))) {
--        dolog ("DirectSound returned misaligned buffer %ld %ld\n",
--               blen1, blen2);
--        glue (dsound_unlock_, TYPE) (buf, p1, p2, blen1, blen2);
-+    if ((p1p && *p1p && (*blen1p & info->align)) ||
-+        (p2p && *p2p && (*blen2p & info->align))) {
-+        dolog("DirectSound returned misaligned buffer %ld %ld\n",
-+              *blen1p, *blen2p);
-+        glue(dsound_unlock_, TYPE)(buf, *p1p, p2p ? *p2p : NULL, *blen1p,
-+                                   blen2p ? *blen2p : 0);
-         goto fail;
-     }
- 
--    if (!p1 && blen1) {
--        dolog ("warning: !p1 && blen1=%ld\n", blen1);
--        blen1 = 0;
-+    if (p1p && !*p1p && *blen1p) {
-+        dolog("warning: !p1 && blen1=%ld\n", *blen1p);
-+        *blen1p = 0;
-     }
- 
--    if (!p2 && blen2) {
--        dolog ("warning: !p2 && blen2=%ld\n", blen2);
--        blen2 = 0;
-+    if (p2p && !*p2p && *blen2p) {
-+        dolog("warning: !p2 && blen2=%ld\n", *blen2p);
-+        *blen2p = 0;
-     }
- 
--    *p1p = p1;
--    *p2p = p2;
--    *blen1p = blen1;
--    *blen2p = blen2;
-     return 0;
- 
-  fail:
-     *p1p = NULL - 1;
--    *p2p = NULL - 1;
-     *blen1p = -1;
--    *blen2p = -1;
-+    if (p2p) {
-+        *p2p = NULL - 1;
-+        *blen2p = -1;
-+    }
-     return -1;
- }
- 
-@@ -242,7 +244,6 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-         goto fail0;
-     }
- 
--    ds->first_time = 1;
-     obt_as.endianness = 0;
-     audio_pcm_init_info (&hw->info, &obt_as);
- 
-@@ -252,15 +253,13 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-             bc.dwBufferBytes, hw->info.align + 1
-             );
-     }
-+    hw->size_emul = bc.dwBufferBytes;
-     hw->samples = bc.dwBufferBytes >> hw->info.shift;
-     ds->s = s;
- 
- #ifdef DEBUG_DSOUND
-     dolog ("caps %ld, desc %ld\n",
-            bc.dwBufferBytes, bd.dwBufferBytes);
--
--    dolog ("bufsize %d, freq %d, chan %d, fmt %d\n",
--           hw->bufsize, settings.freq, settings.nchannels, settings.fmt);
- #endif
-     return 0;
- 
-@@ -276,3 +275,5 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
- #undef BUFPTR
- #undef FIELD
- #undef FIELD2
-+#undef HWVOICE
-+#undef DSOUNDVOICE
-diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-index 2fc118b795..96693a97e5 100644
---- a/audio/dsoundaudio.c
-+++ b/audio/dsoundaudio.c
-@@ -53,19 +53,11 @@ typedef struct {
- typedef struct {
+ typedef struct SDLVoiceOut {
      HWVoiceOut hw;
-     LPDIRECTSOUNDBUFFER dsound_buffer;
--    DWORD old_pos;
--    int first_time;
-     dsound *s;
--#ifdef DEBUG_DSOUND
--    DWORD old_ppos;
--    DWORD played;
--    DWORD mixed;
--#endif
- } DSoundVoiceOut;
+-    size_t live;
+-    size_t decr;
+ } SDLVoiceOut;
  
- typedef struct {
-     HWVoiceIn hw;
--    int first_time;
-     LPDIRECTSOUNDCAPTUREBUFFER dsound_capture_buffer;
-     dsound *s;
- } DSoundVoiceIn;
-@@ -243,11 +235,6 @@ static void GCC_FMT_ATTR (3, 4) dsound_logerr2 (
-     dsound_log_hresult (hr);
+ static struct SDLAudioState {
+@@ -184,62 +182,59 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+     SDLVoiceOut *sdl = opaque;
+     SDLAudioState *s = &glob_sdl;
+     HWVoiceOut *hw = &sdl->hw;
+-    size_t samples = len >> hw->info.shift;
+-    size_t to_mix, decr;
+ 
+-    if (s->exit || !sdl->live) {
++    if (s->exit) {
+         return;
+     }
+ 
+     /* dolog ("in callback samples=%zu live=%zu\n", samples, sdl->live); */
+ 
+-    to_mix = MIN(samples, sdl->live);
+-    decr = to_mix;
+-    while (to_mix) {
+-        size_t chunk = MIN(to_mix, hw->samples - hw->rpos);
+-        struct st_sample *src = hw->mix_buf + hw->rpos;
+-
+-        /* dolog ("in callback to_mix %zu, chunk %zu\n", to_mix, chunk); */
+-        hw->clip(buf, src, chunk);
+-        hw->rpos = (hw->rpos + chunk) % hw->samples;
+-        to_mix -= chunk;
+-        buf += chunk << hw->info.shift;
++    while (hw->pending_emul && len) {
++        size_t write_len;
++        ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
++        if (start < 0) {
++            start += hw->size_emul;
++        }
++        assert(start >= 0 && start < hw->size_emul);
++
++        write_len = MIN(MIN(hw->pending_emul, len),
++                        hw->size_emul - start);
++
++        memcpy(buf, hw->buf_emul + start, write_len);
++        hw->pending_emul -= write_len;
++        len -= write_len;
++        buf += write_len;
+     }
+-    samples -= decr;
+-    sdl->live -= decr;
+-    sdl->decr += decr;
+ 
+-    /* dolog ("done len=%zu\n", len); */
+-
+-    /* SDL2 does not clear the remaining buffer for us, so do it on our own */
+-    if (samples) {
+-        memset(buf, 0, samples << hw->info.shift);
++    /* clear remaining buffer that we couldn't fill with data */
++    if (len) {
++        memset(buf, 0, len);
+     }
  }
  
--static uint64_t usecs_to_bytes(struct audio_pcm_info *info, uint32_t usecs)
+-static size_t sdl_run_out(HWVoiceOut *hw, size_t live)
 -{
--    return muldiv64(usecs, info->bytes_per_second, 1000000);
--}
+-    size_t decr;
+-    SDLVoiceOut *sdl = (SDLVoiceOut *) hw;
 -
- #ifdef DEBUG_DSOUND
- static void print_wave_format (WAVEFORMATEX *wfx)
- {
-@@ -312,33 +299,6 @@ static int dsound_get_status_in (LPDIRECTSOUNDCAPTUREBUFFER dscb,
-     return 0;
- }
- 
--static void dsound_write_sample (HWVoiceOut *hw, uint8_t *dst, int dst_len)
--{
--    int src_len1 = dst_len;
--    int src_len2 = 0;
--    int pos = hw->rpos + dst_len;
--    struct st_sample *src1 = hw->mix_buf + hw->rpos;
--    struct st_sample *src2 = NULL;
+-    SDL_LockAudio();
 -
--    if (pos > hw->samples) {
--        src_len1 = hw->samples - hw->rpos;
--        src2 = hw->mix_buf;
--        src_len2 = dst_len - src_len1;
--        pos = src_len2;
--    }
--
--    if (src_len1) {
--        hw->clip (dst, src1, src_len1);
--    }
--
--    if (src_len2) {
--        dst = advance (dst, src_len1 << hw->info.shift);
--        hw->clip (dst, src2, src_len2);
--    }
--
--    hw->rpos = pos % hw->samples;
--}
--
- static void dsound_clear_sample (HWVoiceOut *hw, LPDIRECTSOUNDBUFFER dsb,
-                                  dsound *s)
- {
-@@ -350,7 +310,7 @@ static void dsound_clear_sample (HWVoiceOut *hw, LPDIRECTSOUNDBUFFER dsb,
-         dsb,
-         &hw->info,
-         0,
--        hw->samples << hw->info.shift,
-+        hw->size_emul,
-         &p1, &p2,
-         &blen1, &blen2,
-         1,
-@@ -454,139 +414,51 @@ static int dsound_ctl_out (HWVoiceOut *hw, int cmd, ...)
-     return 0;
- }
- 
--static size_t dsound_run_out(HWVoiceOut *hw, size_t live)
-+static void *dsound_get_buffer_out(HWVoiceOut *hw, size_t *size)
- {
--    int err;
--    HRESULT hr;
-     DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
-     LPDIRECTSOUNDBUFFER dsb = ds->dsound_buffer;
--    size_t len;
--    int hwshift;
--    DWORD blen1, blen2;
--    DWORD len1, len2;
--    DWORD decr;
--    DWORD wpos, ppos, old_pos;
--    LPVOID p1, p2;
--    size_t bufsize;
--    dsound *s = ds->s;
--    AudiodevDsoundOptions *dso = &s->dev->u.dsound;
--
--    if (!dsb) {
--        dolog ("Attempt to run empty with playback buffer\n");
--        return 0;
--    }
--
--    hwshift = hw->info.shift;
--    bufsize = hw->samples << hwshift;
--
--    hr = IDirectSoundBuffer_GetCurrentPosition (
--        dsb,
--        &ppos,
--        ds->first_time ? &wpos : NULL
--        );
--    if (FAILED (hr)) {
--        dsound_logerr (hr, "Could not get playback buffer position\n");
--        return 0;
--    }
--
--    len = live << hwshift;
--
--    if (ds->first_time) {
--        if (dso->latency) {
--            DWORD cur_blat;
-+    HRESULT hr;
-+    DWORD ppos, act_size;
-+    size_t req_size;
-+    int err;
-+    void *ret;
- 
--            cur_blat = audio_ring_dist (wpos, ppos, bufsize);
--            ds->first_time = 0;
--            old_pos = wpos;
--            old_pos +=
--                usecs_to_bytes(&hw->info, dso->latency) - cur_blat;
--            old_pos %= bufsize;
--            old_pos &= ~hw->info.align;
--        }
--        else {
--            old_pos = wpos;
--        }
--#ifdef DEBUG_DSOUND
--        ds->played = 0;
--        ds->mixed = 0;
--#endif
-+    hr = IDirectSoundBuffer_GetCurrentPosition(dsb, &ppos, NULL);
-+    if (FAILED(hr)) {
-+        dsound_logerr(hr, "Could not get playback buffer position\n");
-+        *size = 0;
-+        return NULL;
-     }
--    else {
--        if (ds->old_pos == ppos) {
--#ifdef DEBUG_DSOUND
--            dolog ("old_pos == ppos\n");
--#endif
--            return 0;
--        }
- 
--#ifdef DEBUG_DSOUND
--        ds->played += audio_ring_dist (ds->old_pos, ppos, hw->bufsize);
--#endif
--        old_pos = ds->old_pos;
--    }
-+    req_size = audio_ring_dist(ppos, hw->pos_emul, hw->size_emul);
-+    req_size = MIN(req_size, hw->size_emul - hw->pos_emul);
- 
--    if ((old_pos < ppos) && ((old_pos + len) > ppos)) {
--        len = ppos - old_pos;
--    }
--    else {
--        if ((old_pos > ppos) && ((old_pos + len) > (ppos + bufsize))) {
--            len = bufsize - old_pos + ppos;
--        }
-+    err = dsound_lock_out(dsb, &hw->info, hw->pos_emul, req_size, &ret, NULL,
-+                          &act_size, NULL, false, ds->s);
-+    if (err) {
-+        dolog("Failed to lock buffer\n");
-+        *size = 0;
-+        return NULL;
+-    if (sdl->decr > live) {
+-        ldebug ("sdl->decr %d live %d sdl->live %d\n",
+-                sdl->decr,
+-                live,
+-                sdl->live);
++#define SDL_WRAPPER_FUNC(name, ret_type, args_decl, args, fail, unlock) \
++    static ret_type glue(sdl_, name)args_decl                           \
++    {                                                                   \
++        ret_type ret;                                                   \
++                                                                        \
++        SDL_LockAudio();                                                \
++                                                                        \
++        ret = glue(audio_generic_, name)args;                           \
++                                                                        \
++        SDL_UnlockAudio();                                              \
++        return ret;                                                     \
      }
  
--    if (audio_bug(__func__, len > bufsize)) {
--        dolog("len=%zu bufsize=%zu old_pos=%ld ppos=%ld\n",
--              len, bufsize, old_pos, ppos);
--        return 0;
--    }
-+    *size = act_size;
-+    return ret;
-+}
+-    decr = MIN (sdl->decr, live);
+-    sdl->decr -= decr;
+-
+-    sdl->live = live;
++SDL_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *size),
++                 (hw, size), *size = 0, sdl_unlock)
++SDL_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
++                 (HWVoiceOut *hw, void *buf, size_t size), (hw, buf, size),
++                 /*nothing*/, sdl_unlock_and_post)
++SDL_WRAPPER_FUNC(write, size_t,
++                 (HWVoiceOut *hw, void *buf, size_t size), (hw, buf, size),
++                 /*nothing*/, sdl_unlock_and_post)
  
--    len &= ~hw->info.align;
--    if (!len) {
--        return 0;
--    }
-+static size_t dsound_put_buffer_out(HWVoiceOut *hw, void *buf, size_t len)
-+{
-+    DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
-+    LPDIRECTSOUNDBUFFER dsb = ds->dsound_buffer;
-+    int err = dsound_unlock_out(dsb, buf, NULL, len, 0);
- 
--#ifdef DEBUG_DSOUND
--    ds->old_ppos = ppos;
--#endif
--    err = dsound_lock_out (
--        dsb,
--        &hw->info,
--        old_pos,
--        len,
--        &p1, &p2,
--        &blen1, &blen2,
--        0,
--        s
--        );
-     if (err) {
-+        dolog("Failed to unlock buffer!!\n");
-         return 0;
-     }
-+    hw->pos_emul = (hw->pos_emul + len) % hw->size_emul;
- 
--    len1 = blen1 >> hwshift;
--    len2 = blen2 >> hwshift;
--    decr = len1 + len2;
+-    SDL_UnlockAudio();
 -
--    if (p1 && len1) {
--        dsound_write_sample (hw, p1, len1);
--    }
--
--    if (p2 && len2) {
--        dsound_write_sample (hw, p2, len2);
--    }
--
--    dsound_unlock_out (dsb, p1, p2, blen1, blen2);
--    ds->old_pos = (old_pos + (decr << hwshift)) % bufsize;
--
--#ifdef DEBUG_DSOUND
--    ds->mixed += decr << hwshift;
--
--    dolog ("played %lu mixed %lu diff %ld sec %f\n",
--           ds->played,
--           ds->mixed,
--           ds->mixed - ds->played,
--           abs (ds->mixed - ds->played) / (double) hw->info.bytes_per_second);
--#endif
 -    return decr;
-+    return len;
- }
+-}
++#undef SDL_WRAPPER_FUNC
  
- static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
-@@ -641,96 +513,49 @@ static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
-     return 0;
- }
- 
--static size_t dsound_run_in(HWVoiceIn *hw)
-+static void *dsound_get_buffer_in(HWVoiceIn *hw, size_t *size)
+ static void sdl_fini_out (HWVoiceOut *hw)
  {
--    int err;
--    HRESULT hr;
-     DSoundVoiceIn *ds = (DSoundVoiceIn *) hw;
-     LPDIRECTSOUNDCAPTUREBUFFER dscb = ds->dsound_capture_buffer;
--    size_t live, len, dead;
--    DWORD blen1, blen2;
--    DWORD len1, len2;
--    DWORD decr;
--    DWORD cpos, rpos;
--    LPVOID p1, p2;
--    int hwshift;
--    dsound *s = ds->s;
--
--    if (!dscb) {
--        dolog ("Attempt to run without capture buffer\n");
--        return 0;
--    }
--
--    hwshift = hw->info.shift;
--
--    live = audio_pcm_hw_get_live_in (hw);
--    dead = hw->samples - live;
--    if (!dead) {
--        return 0;
--    }
--
--    hr = IDirectSoundCaptureBuffer_GetCurrentPosition (
--        dscb,
--        &cpos,
--        ds->first_time ? &rpos : NULL
--        );
--    if (FAILED (hr)) {
--        dsound_logerr (hr, "Could not get capture buffer position\n");
--        return 0;
--    }
--
--    if (ds->first_time) {
--        ds->first_time = 0;
--        if (rpos & hw->info.align) {
--            ldebug ("warning: Misaligned capture read position %ld(%d)\n",
--                    rpos, hw->info.align);
--        }
--        hw->wpos = rpos >> hwshift;
--    }
--
--    if (cpos & hw->info.align) {
--        ldebug ("warning: Misaligned capture position %ld(%d)\n",
--                cpos, hw->info.align);
-+    HRESULT hr;
-+    DWORD cpos, act_size;
-+    size_t req_size;
-+    int err;
-+    void *ret;
-+n
-+    hr = IDirectSoundCaptureBuffer_GetCurrentPosition(dscb, &cpos, NULL);
-+    if (FAILED(hr)) {
-+        dsound_logerr(hr, "Could not get capture buffer position\n");
-+        *size = 0;
-+        return NULL;
-     }
--    cpos >>= hwshift;
- 
--    len = audio_ring_dist (cpos, hw->wpos, hw->samples);
--    if (!len) {
--        return 0;
--    }
--    len = MIN (len, dead);
-+    req_size = audio_ring_dist(cpos, hw->pos_emul, hw->size_emul);
-+    req_size = MIN(req_size, hw->size_emul - hw->pos_emul);
- 
--    err = dsound_lock_in (
--        dscb,
--        &hw->info,
--        hw->wpos << hwshift,
--        len << hwshift,
--        &p1,
--        &p2,
--        &blen1,
--        &blen2,
--        0,
--        s
--        );
-+    err = dsound_lock_in(dscb, &hw->info, hw->pos_emul, req_size, &ret, NULL,
-+                         &act_size, NULL, false, ds->s);
-     if (err) {
--        return 0;
-+        dolog("Failed to lock buffer\n");
-+        *size = 0;
-+        return NULL;
-     }
- 
--    len1 = blen1 >> hwshift;
--    len2 = blen2 >> hwshift;
--    decr = len1 + len2;
-+    *size = act_size;
-+    return ret;
-+}
- 
--    if (p1 && len1) {
--        hw->conv (hw->conv_buf + hw->wpos, p1, len1);
--    }
-+static void dsound_put_buffer_in(HWVoiceIn *hw, void *buf, size_t len)
-+{
-+    DSoundVoiceIn *ds = (DSoundVoiceIn *) hw;
-+    LPDIRECTSOUNDCAPTUREBUFFER dscb = ds->dsound_capture_buffer;
-+    int err = dsound_unlock_in(dscb, buf, NULL, len, 0);
- 
--    if (p2 && len2) {
--        hw->conv (hw->conv_buf, p2, len2);
-+    if (err) {
-+        dolog("Failed to unlock buffer!!\n");
-+        return;
-     }
--
--    dsound_unlock_in (dscb, p1, p2, blen1, blen2);
--    hw->wpos = (hw->wpos + decr) % hw->samples;
--    return decr;
-+    hw->pos_emul = (hw->pos_emul + len) % hw->size_emul;
- }
- 
- static void dsound_audio_fini (void *opaque)
-@@ -846,12 +671,16 @@ static void *dsound_audio_init(Audiodev *dev)
- static struct audio_pcm_ops dsound_pcm_ops = {
-     .init_out = dsound_init_out,
-     .fini_out = dsound_fini_out,
--    .run_out  = dsound_run_out,
-+    .write    = audio_generic_write,
-+    .get_buffer_out = dsound_get_buffer_out,
-+    .put_buffer_out = dsound_put_buffer_out,
-     .ctl_out  = dsound_ctl_out,
- 
-     .init_in  = dsound_init_in,
-     .fini_in  = dsound_fini_in,
--    .run_in   = dsound_run_in,
-+    .read     = audio_generic_read,
-+    .get_buffer_in = dsound_get_buffer_in,
-+    .put_buffer_in = dsound_put_buffer_in,
-     .ctl_in   = dsound_ctl_in
+@@ -336,7 +331,9 @@ static void sdl_audio_fini (void *opaque)
+ static struct audio_pcm_ops sdl_pcm_ops = {
+     .init_out = sdl_init_out,
+     .fini_out = sdl_fini_out,
+-    .run_out  = sdl_run_out,
++    .write    = sdl_write,
++    .get_buffer_out = sdl_get_buffer_out,
++    .put_buffer_out = sdl_put_buffer_out_nowrite,
+     .ctl_out  = sdl_ctl_out,
  };
  
 -- 
