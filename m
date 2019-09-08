@@ -8,77 +8,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D531C4360D
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:36:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE23C433EF
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:37:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7972216C8
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:36:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 930C5216C8
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:37:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjIdf9Fa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7972216C8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EIyW3JYY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 930C5216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i74r2-00005I-Ov
-	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 17:36:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46352)
+	id 1i74sA-0001L6-D5
+	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 17:37:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i74du-0005T4-Ab
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:44 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74e5-0005eu-HI
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i74dr-0005oU-I2
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:42 -0400
-Received: from mail-qk1-x730.google.com ([2607:f8b0:4864:20::730]:40367)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74e4-0005wT-Fa
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:53 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:36025)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i74dr-0005o0-6s
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:39 -0400
-Received: by mail-qk1-x730.google.com with SMTP id y144so3036573qkb.7
- for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 14:22:39 -0700 (PDT)
+ id 1i74e4-0005vv-8A
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:52 -0400
+Received: by mail-qt1-x841.google.com with SMTP id o12so13867176qtf.3
+ for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 14:22:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=DUW7OK1573+eRJ/c4anJ7nOB3W09/QGNLs1FK1NrsmM=;
- b=LjIdf9FamuJs+vN2e0hWtNUXtSnv1Za7sEkY1JsCw/WUbd3D2hHgeBvr5aNANR8SA+
- wd6NUrS3Gl5t4umT9GDXirRcxYJRfDuA2J6fUnqgSrpDvr23F+amXFhUqV+nfejiy6mC
- 6/rRMMEUmiEJgDlUYX4TmnkRLAFimqYaL8a4MnIOZVyjzr4WnIfdPltFAV2stxDCLdwk
- LGBLgBNaNejAL1QX8ZDRJJwnQDk8Y5Wx9ZoXB0Z6bTpXS1oYm3Xdxdi8p1lmPRhRNumQ
- bTsHQJW/H9QeY+6QsTUaEnKq7SrAdEWqAp3Zfe6Alop04d1Wrx08vAoZGk24kI8IhiJ6
- /dcg==
+ bh=8TTUthXqXhh1DdLxMpTCEbLpELmMAAhIVdhapb9+b1E=;
+ b=EIyW3JYYeXY+0Ce/Gt1EQ4sU8m0+4hbK9t1YHsRolUKArTIRjatmrs//WEXcIlC1d9
+ V2pwELdE/XwX8mK3HMrmBOLXxFQN+0UKHSR79ESrRviKDnDq3ZQHawbnLi1Y6EI4C5aH
+ M/ALeGyd0SLuiAd1hPtgq4XzShmbKRKAhF2u4+iyfFnMMYhwrFdAwjKrxsWp0WdlThHJ
+ vWA14/IBRBXHfgHHzyOfn96ATQF9XY0XyUSrQg75m/3CmklF7MaJuMJQfBZToOOIjnic
+ pwP7mNkNLPbQ6yESrTiLvgqb8OJ2JvTLTFDKNIVsgvUBhGpCT0B38j+FSVAtztQ24i3s
+ Pruw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=DUW7OK1573+eRJ/c4anJ7nOB3W09/QGNLs1FK1NrsmM=;
- b=GFHjjgYDWmaapIWsMhNM0Iwf6sovLaUsjArvsAYfPKQEx5i9/5bGLAxYJhYv/Vbu9K
- j8Mu9XPT1rp/YegysuQYK4InOXyuatY9NZMQUe3GWe4C9Vsj/boTE4XBBTp+h7aJqjRH
- u2TwF/gIS0XkAt9MjSG1J00tSrxFB7INZhbksqB/XbdxNH9T5NKrjpR19K8yU9uRaFuX
- VK4xnFdzKiuxoae31jQ5v80Bdan8Dy4go2zmPjPxNaOg0P4h74M0u+fpN0NUJYad9KVJ
- ozgvcWOGkLGFn+1is7olYOZRw/QJ04jV6kz9gH3tZuXcUps2qgo2EoJeDG6p/v3ykzmO
- sJGA==
-X-Gm-Message-State: APjAAAVv0DzqkoyRc9SJbXj/5gfOlY/6eFM63L9dzHnCXEXc5GYQfeHE
- sXzuJPHnMtVbgTK3ci6OVF/LQbM3
-X-Google-Smtp-Source: APXvYqyldDMXW3W9DS7DbNgJBTMqrW+mjiVPSIsomuXEVDvUiqf7h3Z4tvHGdCRi+smHVZIxce2m1Q==
-X-Received: by 2002:a05:620a:1ed:: with SMTP id
- x13mr20221514qkn.188.1567977758463; 
- Sun, 08 Sep 2019 14:22:38 -0700 (PDT)
+ bh=8TTUthXqXhh1DdLxMpTCEbLpELmMAAhIVdhapb9+b1E=;
+ b=ZNS6/thHRK9Wra/nUvTr7vBVbkX8m+FVIT40bSTp8ynzy159vZnVEN+SK0HQX5PXJz
+ VtPenQkfwW0Q+TXMbmMYurD6zFnosxiJ9ScoBN4SGaJc58XrVYNlNrqjenBZw3+M59g3
+ KWgJRguVq/opR95B8Sla5rWhFPrY71yuKXcRwZWJmQlhrqWZTjrN21qJYtTDojwlXTgl
+ X3WXOuOOTTqLLD/T9T+GUV2sewYoj7ov/Dtc8hzIicl5J0sF3DY4LdMKDsqi5T2v1WQI
+ b9eNHDI59KN23KSd6W2SV00VtpWmAiqUY5Yn+ffAuK6J+eRMQpAUkN42ZjEfUOmArgbH
+ 0XHQ==
+X-Gm-Message-State: APjAAAUkjw+wtV4CVky1IJyigEBoY8VJlsfTm7qf3OQPfQbFSi3RPLDC
+ hdkhB2wlM5MB0Wo6jxFPdanuLQI7
+X-Google-Smtp-Source: APXvYqzH87MzUWfBCruVsfG9S/ZsQY8dObs7+6fD2mVx3oKnTKiy0JAI+k4VXVlQd3wgKHSHcjrz7g==
+X-Received: by 2002:ac8:37d0:: with SMTP id e16mr20245521qtc.79.1567977771760; 
+ Sun, 08 Sep 2019 14:22:51 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-6ea8-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:6ea8::5])
- by smtp.gmail.com with ESMTPSA id e2sm5488112qkg.38.2019.09.08.14.22.37
+ by smtp.gmail.com with ESMTPSA id e2sm5488112qkg.38.2019.09.08.14.22.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Sep 2019 14:22:38 -0700 (PDT)
+ Sun, 08 Sep 2019 14:22:51 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun,  8 Sep 2019 23:22:10 +0200
-Message-Id: <f13da4b48e7220b186037fdc75d6b13a9174519d.1567965065.git.DirtY.iCE.hu@gmail.com>
+Date: Sun,  8 Sep 2019 23:22:22 +0200
+Message-Id: <18cff45473f6dab021743ebb96fcee25b711b55d.1567965065.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
@@ -87,9 +86,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::730
-Subject: [Qemu-devel] [PATCH v2 10/24] wavaudio: port to the new audio
- backend api
+X-Received-From: 2607:f8b0:4864:20::841
+Subject: [Qemu-devel] [PATCH v2 22/24] usb-audio: do not count on avail
+ bytes actually available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,117 +105,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This assumption is no longer true when mixeng is turned off.
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/wavaudio.c | 54 ++++++++----------------------------------------
- 1 file changed, 9 insertions(+), 45 deletions(-)
+ hw/usb/dev-audio.c | 28 +++++++++++++++++-----------
+ 1 file changed, 17 insertions(+), 11 deletions(-)
 
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index b6eeeb4e26..7816097db8 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -36,52 +36,28 @@ typedef struct WAVVoiceOut {
-     HWVoiceOut hw;
-     FILE *f;
-     int64_t old_ticks;
--    void *pcm_buf;
-     int total_samples;
- } WAVVoiceOut;
- 
--static size_t wav_run_out(HWVoiceOut *hw, size_t live)
-+static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
+diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
+index ae42e5a2f1..74c99b1f12 100644
+--- a/hw/usb/dev-audio.c
++++ b/hw/usb/dev-audio.c
+@@ -319,30 +319,31 @@ static int streambuf_put(struct streambuf *buf, USBPacket *p)
  {
-     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
--    size_t rpos, decr, samples;
--    uint8_t *dst;
--    struct st_sample *src;
-     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     int64_t ticks = now - wav->old_ticks;
-     int64_t bytes =
-         muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+     uint32_t free = buf->size - (buf->prod - buf->cons);
  
--    if (bytes > INT_MAX) {
--        samples = INT_MAX >> hw->info.shift;
--    }
--    else {
--        samples = bytes >> hw->info.shift;
--    }
--
-+    bytes = MIN(bytes, len);
-+    bytes = bytes >> hw->info.shift << hw->info.shift;
-     wav->old_ticks = now;
--    decr = MIN (live, samples);
--    samples = decr;
--    rpos = hw->rpos;
--    while (samples) {
--        int left_till_end_samples = hw->samples - rpos;
--        int convert_samples = MIN (samples, left_till_end_samples);
--
--        src = hw->mix_buf + rpos;
--        dst = advance (wav->pcm_buf, rpos << hw->info.shift);
--
--        hw->clip (dst, src, convert_samples);
--        if (fwrite (dst, convert_samples << hw->info.shift, 1, wav->f) != 1) {
--            dolog ("wav_run_out: fwrite of %d bytes failed\nReaons: %s\n",
--                   convert_samples << hw->info.shift, strerror (errno));
--        }
- 
--        rpos = (rpos + convert_samples) % hw->samples;
--        samples -= convert_samples;
--        wav->total_samples += convert_samples;
-+    if (bytes && fwrite(buf, bytes, 1, wav->f) != 1) {
-+        dolog("wav_write_out: fwrite of %zu bytes failed\nReaons: %s\n",
-+              bytes, strerror(errno));
+-    if (!free) {
++    if (free < USBAUDIO_PACKET_SIZE) {
+         return 0;
      }
- 
--    hw->rpos = rpos;
--    return decr;
-+    wav->total_samples += bytes >> hw->info.shift;
-+    return bytes;
+     if (p->iov.size != USBAUDIO_PACKET_SIZE) {
+         return 0;
+     }
+-    assert(free >= USBAUDIO_PACKET_SIZE);
++
+     usb_packet_copy(p, buf->data + (buf->prod % buf->size),
+                     USBAUDIO_PACKET_SIZE);
+     buf->prod += USBAUDIO_PACKET_SIZE;
+     return USBAUDIO_PACKET_SIZE;
  }
  
- /* VICE code: Store number as little endian. */
-@@ -137,13 +113,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     audio_pcm_init_info (&hw->info, &wav_as);
+-static uint8_t *streambuf_get(struct streambuf *buf)
++static uint8_t *streambuf_get(struct streambuf *buf, size_t *len)
+ {
+     uint32_t used = buf->prod - buf->cons;
+     uint8_t *data;
  
-     hw->samples = 1024;
--    wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
--    if (!wav->pcm_buf) {
--        dolog("Could not allocate buffer (%zu bytes)\n",
--              hw->samples << hw->info.shift);
--        return -1;
--    }
--
-     le_store (hdr + 22, hw->info.nchannels, 2);
-     le_store (hdr + 24, hw->info.freq, 4);
-     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
-@@ -153,8 +122,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     if (!wav->f) {
-         dolog ("Failed to open wave file `%s'\nReason: %s\n",
-                wav_path, strerror(errno));
--        g_free (wav->pcm_buf);
--        wav->pcm_buf = NULL;
-         return -1;
+     if (!used) {
++        *len = 0;
+         return NULL;
      }
- 
-@@ -208,9 +175,6 @@ static void wav_fini_out (HWVoiceOut *hw)
-                wav->f, strerror (errno));
-     }
-     wav->f = NULL;
--
--    g_free (wav->pcm_buf);
--    wav->pcm_buf = NULL;
+-    assert(used >= USBAUDIO_PACKET_SIZE);
+     data = buf->data + (buf->cons % buf->size);
+-    buf->cons += USBAUDIO_PACKET_SIZE;
++    *len = MIN(buf->prod - buf->cons,
++               buf->size - (buf->cons % buf->size));
+     return data;
  }
  
- static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
-@@ -234,7 +198,7 @@ static void wav_audio_fini (void *opaque)
- static struct audio_pcm_ops wav_pcm_ops = {
-     .init_out = wav_init_out,
-     .fini_out = wav_fini_out,
--    .run_out  = wav_run_out,
-+    .write    = wav_write_out,
-     .ctl_out  = wav_ctl_out,
- };
+@@ -374,16 +375,21 @@ static void output_callback(void *opaque, int avail)
+     USBAudioState *s = opaque;
+     uint8_t *data;
+ 
+-    for (;;) {
+-        if (avail < USBAUDIO_PACKET_SIZE) {
++    while (avail) {
++        size_t written, len;
++
++        data = streambuf_get(&s->out.buf, &len);
++        if (!data) {
+             return;
+         }
+-        data = streambuf_get(&s->out.buf);
+-        if (!data) {
++
++        written = AUD_write(s->out.voice, data, len);
++        avail -= written;
++        s->out.buf.cons += written;
++
++        if (written < len) {
+             return;
+         }
+-        AUD_write(s->out.voice, data, USBAUDIO_PACKET_SIZE);
+-        avail -= USBAUDIO_PACKET_SIZE;
+     }
+ }
  
 -- 
 2.23.0
