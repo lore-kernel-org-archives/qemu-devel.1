@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CE8C433EF
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D531C4360D
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE655216C8
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7972216C8
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Sep 2019 21:36:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m82z7gXq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE655216C8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjIdf9Fa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7972216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i74qu-0008Lj-IJ
-	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 17:36:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46492)
+	id 1i74r2-00005I-Ov
+	for qemu-devel@archiver.kernel.org; Sun, 08 Sep 2019 17:36:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46352)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i74e4-0005dx-QS
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:53 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74du-0005T4-Ab
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i74e3-0005vf-CS
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:52 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:44914)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i74dr-0005oU-I2
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:42 -0400
+Received: from mail-qk1-x730.google.com ([2607:f8b0:4864:20::730]:40367)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i74e3-0005vT-7x
- for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:51 -0400
-Received: by mail-qk1-x742.google.com with SMTP id i78so11090251qke.11
- for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 14:22:51 -0700 (PDT)
+ id 1i74dr-0005o0-6s
+ for qemu-devel@nongnu.org; Sun, 08 Sep 2019 17:22:39 -0400
+Received: by mail-qk1-x730.google.com with SMTP id y144so3036573qkb.7
+ for <qemu-devel@nongnu.org>; Sun, 08 Sep 2019 14:22:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=F6I/soIJaEjYxfRI9EDWkY2N9iUGEIeYzLkqeKMKgzM=;
- b=m82z7gXqznQIawbyOw5lUKO2ia7pX4JA/eGEV9ztfCcZCcC1yzN3MEOx+UvsAhz/Xw
- 1CxeoNAbPW9PNifklZb3MAtPuky+wK8ULobtseQKDu3y04YjsJPTBWhTs32YUDE/owUG
- 1iPq853lQ6LSM8kn0xcRcdtnhkGWHAXkpGCPf7ucG3cwR//Kk3QKaVLWb67kg3mDDVKy
- fQ33rynjK0Jdnd5VUxi0O8xrHMaYy+DelI4NROwfLAxwbuVOO7cTFx6QYpmoVcNRsDWq
- 7gB8BB9u+paU61NFAF0xkS/XcNGZnSBeYSXpT2CoA8ZVZtNbN3SpEpuYcQamr0ub7BRn
- E7YA==
+ bh=DUW7OK1573+eRJ/c4anJ7nOB3W09/QGNLs1FK1NrsmM=;
+ b=LjIdf9FamuJs+vN2e0hWtNUXtSnv1Za7sEkY1JsCw/WUbd3D2hHgeBvr5aNANR8SA+
+ wd6NUrS3Gl5t4umT9GDXirRcxYJRfDuA2J6fUnqgSrpDvr23F+amXFhUqV+nfejiy6mC
+ 6/rRMMEUmiEJgDlUYX4TmnkRLAFimqYaL8a4MnIOZVyjzr4WnIfdPltFAV2stxDCLdwk
+ LGBLgBNaNejAL1QX8ZDRJJwnQDk8Y5Wx9ZoXB0Z6bTpXS1oYm3Xdxdi8p1lmPRhRNumQ
+ bTsHQJW/H9QeY+6QsTUaEnKq7SrAdEWqAp3Zfe6Alop04d1Wrx08vAoZGk24kI8IhiJ6
+ /dcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=F6I/soIJaEjYxfRI9EDWkY2N9iUGEIeYzLkqeKMKgzM=;
- b=T7MZwavUCRI/Cuy8F1CSmN8H4r16MnbFVlA2TOxGZHpTXrR80DKRMmXfff2A5GIdB/
- N0RVBdVaNBckxHKgS3fT7GzcfFi/leO+/Pk7gGKbHVUIazGPPRcqInVCmo+qgOsMK4su
- e3t4CtYZZnfi7eOsT0SwOv0aS46W79jdphHU0vduEjebBcoYe8bYOPq8CR6oykF682ii
- y6v1i6DoiZCipUK9hAMfLfpOIatfuIy3L9cazvrElhokmwpMDlQhSjTAuZC3CFP+Sf8i
- STrAFMVARLD88HzraKB0zFCklX/Qji7bWBVroLQJbi2qQNqC4m27fX2ZOfbKaXF4HeDa
- LhMA==
-X-Gm-Message-State: APjAAAWRFFSQDC1FPSnhsiGAB2wpPGnnDp8C6SQDDaSf0ZeTFL4ymBjF
- eKNoz/AJ5bTgjjxj67U9bD8ZcCNS
-X-Google-Smtp-Source: APXvYqyBhSkFGnP9gPNDIjzvoHrLWtuHV/J6FhCcmEG0R2/HNqfhClcC5dmqXr1DntV9UG9Pd9AHiA==
-X-Received: by 2002:a37:b4c7:: with SMTP id
- d190mr21234459qkf.202.1567977770707; 
- Sun, 08 Sep 2019 14:22:50 -0700 (PDT)
+ bh=DUW7OK1573+eRJ/c4anJ7nOB3W09/QGNLs1FK1NrsmM=;
+ b=GFHjjgYDWmaapIWsMhNM0Iwf6sovLaUsjArvsAYfPKQEx5i9/5bGLAxYJhYv/Vbu9K
+ j8Mu9XPT1rp/YegysuQYK4InOXyuatY9NZMQUe3GWe4C9Vsj/boTE4XBBTp+h7aJqjRH
+ u2TwF/gIS0XkAt9MjSG1J00tSrxFB7INZhbksqB/XbdxNH9T5NKrjpR19K8yU9uRaFuX
+ VK4xnFdzKiuxoae31jQ5v80Bdan8Dy4go2zmPjPxNaOg0P4h74M0u+fpN0NUJYad9KVJ
+ ozgvcWOGkLGFn+1is7olYOZRw/QJ04jV6kz9gH3tZuXcUps2qgo2EoJeDG6p/v3ykzmO
+ sJGA==
+X-Gm-Message-State: APjAAAVv0DzqkoyRc9SJbXj/5gfOlY/6eFM63L9dzHnCXEXc5GYQfeHE
+ sXzuJPHnMtVbgTK3ci6OVF/LQbM3
+X-Google-Smtp-Source: APXvYqyldDMXW3W9DS7DbNgJBTMqrW+mjiVPSIsomuXEVDvUiqf7h3Z4tvHGdCRi+smHVZIxce2m1Q==
+X-Received: by 2002:a05:620a:1ed:: with SMTP id
+ x13mr20221514qkn.188.1567977758463; 
+ Sun, 08 Sep 2019 14:22:38 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-6ea8-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:6ea8::5])
- by smtp.gmail.com with ESMTPSA id e2sm5488112qkg.38.2019.09.08.14.22.49
+ by smtp.gmail.com with ESMTPSA id e2sm5488112qkg.38.2019.09.08.14.22.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Sep 2019 14:22:50 -0700 (PDT)
+ Sun, 08 Sep 2019 14:22:38 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun,  8 Sep 2019 23:22:21 +0200
-Message-Id: <2a463a42ada49cb3582129ab8b1785134aecea9b.1567965065.git.DirtY.iCE.hu@gmail.com>
+Date: Sun,  8 Sep 2019 23:22:10 +0200
+Message-Id: <f13da4b48e7220b186037fdc75d6b13a9174519d.1567965065.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
@@ -87,8 +87,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::742
-Subject: [Qemu-devel] [PATCH v2 21/24] paaudio: channel-map option
+X-Received-From: 2607:f8b0:4864:20::730
+Subject: [Qemu-devel] [PATCH v2 10/24] wavaudio: port to the new audio
+ backend api
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,123 +101,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add an option to change the channel map used by pulseaudio.  If not
-specified, falls back to an OSS compatible channel map.
-
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/paaudio.c | 18 ++++++++++++++----
- qapi/audio.json |  7 +++++--
- qemu-options.hx |  9 +++++++++
- 3 files changed, 28 insertions(+), 6 deletions(-)
+ audio/wavaudio.c | 54 ++++++++----------------------------------------
+ 1 file changed, 9 insertions(+), 45 deletions(-)
 
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index d195b1caa8..20402b0718 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -338,17 +338,27 @@ static pa_stream *qpa_simple_new (
-         pa_stream_direction_t dir,
-         const char *dev,
-         const pa_sample_spec *ss,
--        const pa_channel_map *map,
-+        const char *map,
-         const pa_buffer_attr *attr,
-         int *rerror)
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index b6eeeb4e26..7816097db8 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -36,52 +36,28 @@ typedef struct WAVVoiceOut {
+     HWVoiceOut hw;
+     FILE *f;
+     int64_t old_ticks;
+-    void *pcm_buf;
+     int total_samples;
+ } WAVVoiceOut;
+ 
+-static size_t wav_run_out(HWVoiceOut *hw, size_t live)
++static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
  {
-     int r;
-     pa_stream *stream;
-     pa_stream_flags_t flags;
-+    pa_channel_map pa_map;
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+-    size_t rpos, decr, samples;
+-    uint8_t *dst;
+-    struct st_sample *src;
+     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     int64_t ticks = now - wav->old_ticks;
+     int64_t bytes =
+         muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
  
-     pa_threaded_mainloop_lock(c->mainloop);
+-    if (bytes > INT_MAX) {
+-        samples = INT_MAX >> hw->info.shift;
+-    }
+-    else {
+-        samples = bytes >> hw->info.shift;
+-    }
+-
++    bytes = MIN(bytes, len);
++    bytes = bytes >> hw->info.shift << hw->info.shift;
+     wav->old_ticks = now;
+-    decr = MIN (live, samples);
+-    samples = decr;
+-    rpos = hw->rpos;
+-    while (samples) {
+-        int left_till_end_samples = hw->samples - rpos;
+-        int convert_samples = MIN (samples, left_till_end_samples);
+-
+-        src = hw->mix_buf + rpos;
+-        dst = advance (wav->pcm_buf, rpos << hw->info.shift);
+-
+-        hw->clip (dst, src, convert_samples);
+-        if (fwrite (dst, convert_samples << hw->info.shift, 1, wav->f) != 1) {
+-            dolog ("wav_run_out: fwrite of %d bytes failed\nReaons: %s\n",
+-                   convert_samples << hw->info.shift, strerror (errno));
+-        }
  
--    stream = pa_stream_new(c->context, name, ss, map);
-+    if (map && !pa_channel_map_parse(&pa_map, map)) {
-+        dolog("Invalid channel map specified: '%s'\n", map);
-+        map = NULL;
-+    }
-+    if (!map) {
-+        pa_channel_map_init_extend(&pa_map, ss->channels,
-+                                   PA_CHANNEL_MAP_OSS);
-+    }
-+
-+    stream = pa_stream_new(c->context, name, ss, &pa_map);
-     if (!stream) {
-         goto fail;
+-        rpos = (rpos + convert_samples) % hw->samples;
+-        samples -= convert_samples;
+-        wav->total_samples += convert_samples;
++    if (bytes && fwrite(buf, bytes, 1, wav->f) != 1) {
++        dolog("wav_write_out: fwrite of %zu bytes failed\nReaons: %s\n",
++              bytes, strerror(errno));
      }
-@@ -421,7 +431,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-         PA_STREAM_PLAYBACK,
-         ppdo->has_name ? ppdo->name : NULL,
-         &ss,
--        NULL,                   /* channel map */
-+        ppdo->has_channel_map ? ppdo->channel_map : NULL,
-         &ba,                    /* buffering attributes */
-         &error
-         );
-@@ -470,7 +480,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-         PA_STREAM_RECORD,
-         ppdo->has_name ? ppdo->name : NULL,
-         &ss,
--        NULL,                   /* channel map */
-+        ppdo->has_channel_map ? ppdo->channel_map : NULL,
-         &ba,                    /* buffering attributes */
-         &error
-         );
-diff --git a/qapi/audio.json b/qapi/audio.json
-index 0535eff794..07003808cb 100644
---- a/qapi/audio.json
-+++ b/qapi/audio.json
-@@ -214,13 +214,16 @@
- # @latency: latency you want PulseAudio to achieve in microseconds
- #           (default 15000)
- #
-+# @channel-map: channel map to use (default: OSS compatible map, since: 4.2)
-+#
- # Since: 4.0
- ##
- { 'struct': 'AudiodevPaPerDirectionOptions',
-   'base': 'AudiodevPerDirectionOptions',
-   'data': {
--    '*name': 'str',
--    '*latency': 'uint32' } }
-+    '*name':        'str',
-+    '*latency':     'uint32',
-+    '*channel-map': 'str' } }
  
- ##
- # @AudiodevPaOptions:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 734a3b5d65..6aee778896 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -471,6 +471,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
-     "-audiodev pa,id=id[,prop[=value][,...]]\n"
-     "                server= PulseAudio server address\n"
-     "                in|out.name= source/sink device name\n"
-+    "                in|out.channel-map= channel map to use\n"
- #endif
- #ifdef CONFIG_AUDIO_SDL
-     "-audiodev sdl,id=id[,prop[=value][,...]]\n"
-@@ -636,6 +637,14 @@ Sets the PulseAudio @var{server} to connect to.
- @item in|out.name=@var{sink}
- Use the specified source/sink for recording/playback.
+-    hw->rpos = rpos;
+-    return decr;
++    wav->total_samples += bytes >> hw->info.shift;
++    return bytes;
+ }
  
-+@item in|out.channel-map=@var{map}
-+Use the specified channel map.  The default is an OSS compatible
-+channel map.  Do not forget to escape commas inside the map:
-+
-+@example
-+-audiodev pa,id=example,sink.channel-map=front-left,,front-right
-+@end example
-+
- @end table
+ /* VICE code: Store number as little endian. */
+@@ -137,13 +113,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+     audio_pcm_init_info (&hw->info, &wav_as);
  
- @item -audiodev sdl,id=@var{id}[,@var{prop}[=@var{value}][,...]]
+     hw->samples = 1024;
+-    wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+-    if (!wav->pcm_buf) {
+-        dolog("Could not allocate buffer (%zu bytes)\n",
+-              hw->samples << hw->info.shift);
+-        return -1;
+-    }
+-
+     le_store (hdr + 22, hw->info.nchannels, 2);
+     le_store (hdr + 24, hw->info.freq, 4);
+     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
+@@ -153,8 +122,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+     if (!wav->f) {
+         dolog ("Failed to open wave file `%s'\nReason: %s\n",
+                wav_path, strerror(errno));
+-        g_free (wav->pcm_buf);
+-        wav->pcm_buf = NULL;
+         return -1;
+     }
+ 
+@@ -208,9 +175,6 @@ static void wav_fini_out (HWVoiceOut *hw)
+                wav->f, strerror (errno));
+     }
+     wav->f = NULL;
+-
+-    g_free (wav->pcm_buf);
+-    wav->pcm_buf = NULL;
+ }
+ 
+ static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
+@@ -234,7 +198,7 @@ static void wav_audio_fini (void *opaque)
+ static struct audio_pcm_ops wav_pcm_ops = {
+     .init_out = wav_init_out,
+     .fini_out = wav_fini_out,
+-    .run_out  = wav_run_out,
++    .write    = wav_write_out,
+     .ctl_out  = wav_ctl_out,
+ };
+ 
 -- 
 2.23.0
 
