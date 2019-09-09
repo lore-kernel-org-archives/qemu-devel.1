@@ -2,79 +2,64 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A36C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 666C2C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A97A92086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:44:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3092A206CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:56:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sVMuMOFs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A97A92086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="mtaMrhOT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3092A206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7KuT-0007nX-Rw
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:44:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43481)
+	id 1i7L5E-00022d-BK
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:56:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i7Ktm-0007N3-0E
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:44:11 -0400
+ (envelope-from <berto@igalia.com>) id 1i7L4M-0001Sd-JB
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:55:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i7Kti-0007Iq-SR
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:44:09 -0400
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:34989)
+ (envelope-from <berto@igalia.com>) id 1i7L4K-0004TG-Jl
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:55:06 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:36374)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i7Kti-0007IG-Mw
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:44:06 -0400
-Received: by mail-oi1-x22a.google.com with SMTP id a127so10738586oii.2
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 07:44:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FIwsmVLe9kqCO1EhUbzldD2pC0SeM4D5KLjRT7BOcm8=;
- b=sVMuMOFsfF/0NRqKgdO8go13fVLfuLbg2I6fD78fD+5wlpmg3vOZnL/lQSKBVF+G5s
- +PV+TdQ6gh0bj68Ti3/qya2n+Hon1bdfY8OWm88FMT+113XvGeXSXCOFLnDgu2xWnD4z
- yxDQzfbkbHltyUNfza0AyxDgQFE/HSwI6m4Mu58OB+54aBQ4BFsBXei66BKAXLf0GXJ4
- o2SJGooCDxJjwcll7mBcarAAitlg7L1G98ibXyGoc6M/y9qbpzItPCAJl+iHJSmO6K/L
- heE/6/+HzO7p9JmL16Qr8TEvAHxyPS4zq0WIulVYWJ3WdEsxiPV5SdN/6Vh3RvGHKg7n
- 1FgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=FIwsmVLe9kqCO1EhUbzldD2pC0SeM4D5KLjRT7BOcm8=;
- b=R8ZHdUdUe582hSUClVrdnJmDi8Fux97PA/Qwf6X81ippkNE6qg9Xp/evXfDve+iRcA
- BfuwguoHUJvDp7Yyfp6YqzqK9m4sEsUXHtZOakE/9zCfP40OvI/EUduI7YN7gIQ6YFhI
- X2DZ0UV8cZpNQLEDXRLWvROx9fAiqo434WIWJOmqD/rnsXqkamhZNXPrWRSroUWH3qvi
- LUS+i0CdE3jHXmBDWGIDg2PLl0mDy6Jsr0BYFwIudnSRHTYYDOI82/fvWalGkrkyWYUl
- Rxnu72EaixWJ2iGuCPvs8puJlTf1y9c4BO8OJolPeQnHPPtRjAtnvt3dsr1EbC9RbQOy
- sPcQ==
-X-Gm-Message-State: APjAAAWIM0OF/SxHqQevB0D62zLZ6N9EUrUO7RmMxZYEPIpeUkxZhX66
- GIMmAXtF1Z1bJPF5RWpnlNAF/Y7G8vu9Nn8eCG7wIw==
-X-Google-Smtp-Source: APXvYqx92GC1mM5QQxEcfphlaU5PzW/C0d6OO6Vah1kzUy2zT5qraRlFpdX3T0ls0CjfzuNDtcUyS012GMqyLHw6ihQ=
-X-Received: by 2002:aca:4814:: with SMTP id v20mr17596704oia.98.1568040245542; 
- Mon, 09 Sep 2019 07:44:05 -0700 (PDT)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1i7L4C-0004Do-DR; Mon, 09 Sep 2019 10:54:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=G+FuhVNBdD8/BLUke8BQbWjoIrsjEl+0qAx+5SB2G4Q=; 
+ b=mtaMrhOTuOggXmbKJkMY+CzMEFK++zmKs4yq7c7S54/E76Qp/QJB5rnm4y5+z5g9N1NByd98EGGwtkKQFEa07ZVSWsMc8SwfHswqm003H9iL+747hDDsZE5HgIDwALhnqd7Hbc74dAdDxC2fieg6ovei6rlAFm6SvpFGRslT/YF7jEV4C0u2JVek65tXdMF0sREwm6EJPkKIbtKBU2DNXrVUHxNn31EmjWsjjetVI/1/NNmepwUW+q24tiKNj4KMw8lQr2Apnzz+84UZNPVAFI0ho4grU75DYRhi1KmjvBIjgPeeDkXasVXcDBlye4WoPc6LnmfsBFaD6XbchCXFwA==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1i7L3t-0006ol-3d; Mon, 09 Sep 2019 16:54:37 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1i7L3t-0000kq-0u; Mon, 09 Sep 2019 16:54:37 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+In-Reply-To: <20190906160120.70239-4-anton.nefedov@virtuozzo.com>
+References: <20190906160120.70239-1-anton.nefedov@virtuozzo.com>
+ <20190906160120.70239-4-anton.nefedov@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Mon, 09 Sep 2019 16:54:37 +0200
+Message-ID: <w51k1ah8qqa.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-References: <20190907154744.4136-1-huth@tuxfamily.org>
-In-Reply-To: <20190907154744.4136-1-huth@tuxfamily.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Sep 2019 15:43:53 +0100
-Message-ID: <CAFEAcA8OsP4ycbYSdw6GvgQVMbY2e0nKJ_73KSUpG_T4Gu7ShA@mail.gmail.com>
-To: Thomas Huth <huth@tuxfamily.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22a
-Subject: Re: [Qemu-devel] [PULL 0/8] Add the m68k next-cube machine
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 91.117.99.155
+Subject: Re: [Qemu-devel] [PATCH v9 3/9] block: add empty account cookie type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,36 +71,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>, pbonzini@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 7 Sep 2019 at 16:47, Thomas Huth <huth@tuxfamily.org> wrote:
+On Fri 06 Sep 2019 06:01:14 PM CEST, Anton Nefedov wrote:
+> This adds some protection from accounting uninitialized cookie.
+> That is, block_acct_failed/done without previous block_acct_start;
+> in that case, cookie probably holds values from previous operation.
 >
->  Hi Peter,
+> (Note: it might also be uninitialized holding garbage value and there
+> is still "< BLOCK_MAX_IOTYPE" assertion for that.  So
+> block_acct_failed/done without previous block_acct_start should be
+> used with caution.)
 >
-> the following changes since commit 90b1e3afd33226b6078fec6d77a18373712a975c:
->
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-09-05-v2' into staging (2019-09-05 17:09:13 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/m68k-pull-2019-09-07
->
-> for you to fetch changes up to 25311649592f5584b1e1012d69c7327ef87473f4:
->
->   .travis.yml: Let the avocado job run the NeXTcube tests (2019-09-07 08:35:41 +0200)
->
-> ----------------------------------------------------------------
-> Add the m68k next-cube machine
-> ----------------------------------------------------------------
+> Currently this is particularly useful in ide code where it's hard to
+> keep track whether the request started accounting or not. For example,
+> trim requests do the accounting separately.
 
+Sorry if I'm understanding it wrong, but it sounds like you know that
+there's a bug in the ide code (where you call block_acct_done() without
+having it initialized it first), and the purpose of the this patch is to
+hide the bug ?
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+Berto
 
