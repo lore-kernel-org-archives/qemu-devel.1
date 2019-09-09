@@ -2,66 +2,87 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC5EC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB5DC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:24:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7325720863
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:23:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7325720863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5592520863
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:24:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ijMilGlf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5592520863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7LVs-0006FF-JI
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:23:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52754)
+	id 1i7LWQ-00074s-IY
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:24:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52918)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i7LUc-0005NM-N1
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:22:15 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7LVW-000676-4K
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:23:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i7LUZ-0006ES-AA
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:22:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36590)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1i7LUZ-0006Dc-2b; Mon, 09 Sep 2019 11:22:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4327C10C0933;
- Mon,  9 Sep 2019 15:22:09 +0000 (UTC)
-Received: from work-vm (ovpn-117-249.ams2.redhat.com [10.36.117.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 65E7F10013D9;
- Mon,  9 Sep 2019 15:22:07 +0000 (UTC)
-Date: Mon, 9 Sep 2019 16:22:05 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Brad Campbell <lists2009@fnarfbargle.com>
-Message-ID: <20190909152205.GC2726@work-vm>
-References: <ed421291-7178-d7bc-5ed3-9863d28ceba9@fnarfbargle.com>
- <dd33a398-3c1f-0c92-2318-00ad144e1e5d@fnarfbargle.com>
- <b1782119-abbc-9678-8217-ef576dbf8c93@fnarfbargle.com>
- <20190906190351.GB20068@work-vm>
- <a9799b8b-a294-59e3-f329-060b19cdcf0e@fnarfbargle.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i7LVU-0006kx-Je
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:23:09 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55478)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i7LVU-0006kF-Dy
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:23:08 -0400
+Received: by mail-wm1-x329.google.com with SMTP id g207so14378680wmg.5
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 08:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=53+ZE7md1EfvE6qaLbMI9oIc95rFUpm8x8sn5i1pNLs=;
+ b=ijMilGlfChpJQf4Of4JmFty6LrfHE2HVdRuvx49kW7Vm0mJR/M/TTitK6W5Z5hq21z
+ nhWLVaESmEaJTGtW8BjdnwhwvxfBM38uHjYWzNA/ukTCyCBQn8pHn+bRNCXNjtyz9BN8
+ R92SGM+88qW3a/JusbrCoulG8vSvG5+LmE/OIaJZIHqN8rqvKMkTD2VJu86Noxne2+KC
+ fyIWrgU0x7W83wQ2xExVdcE4CtQe6z73lKA2OZyg114D9LeCMUBQwL8o1WRmSZyARhcz
+ XK4fnxAEeuqSbnZVRd4e87Ayo6VZ1L2Hxy935I51oz7L7c5uPJlAh/Cq7axYTGHrO3+D
+ 2H0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=53+ZE7md1EfvE6qaLbMI9oIc95rFUpm8x8sn5i1pNLs=;
+ b=jSfuTzcJ0WfPBDxtMBU9RL2wa0murpmlC/Zu2TEmCrm3waIfHAXZc3FYHknGnRBX/7
+ SyKZCd5Enno5vBfof5tQShYmXCSPd48hha3sHUCmQW/iAHOcNv/JmM2d3YOxfjEliGPY
+ gD2UwcoqRhVOEFdC7RTJx3efzGfS4Cupfrph3xZDVJhhZgb5pdyQTmkEsojdNpz0ua3Q
+ 8C4hzzZaNeRIt1XYhaCQhvo2VlpUNTLyvaNSMV6apt+yUiHwhW27hBteDWM0Vpk4fzbo
+ AHnyMlaWDKprUi3rnSdfrslltMU8iHo+CRfyRDGAvpLLtMPOQu9U1XWDtym51b5l3oNm
+ KkKQ==
+X-Gm-Message-State: APjAAAWUv356Q9gpHecMia8VrVsQvcwCSWx4Duwj8ET41MsDRTUsc61e
+ 5P7dPAeymrPVo1K0w/vyhDBYLA==
+X-Google-Smtp-Source: APXvYqzoxDMKEixacLe18qirkYChQLyWPdalv+gD+9I7K3KXiI1gsUeF2acPGWCgfFU/ONfwbk6qLQ==
+X-Received: by 2002:a1c:7ec4:: with SMTP id z187mr14516602wmc.94.1568042587101; 
+ Mon, 09 Sep 2019 08:23:07 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g24sm23159251wrb.35.2019.09.09.08.23.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Sep 2019 08:23:06 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 56C3B1FF87;
+ Mon,  9 Sep 2019 16:23:05 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  9 Sep 2019 16:23:02 +0100
+Message-Id: <20190909152302.19016-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a9799b8b-a294-59e3-f329-060b19cdcf0e@fnarfbargle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Mon, 09 Sep 2019 15:22:09 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Cross-posted : Odd QXL/KVM performance issue with
- a Windows 7 Guest
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::329
+Subject: [Qemu-devel] [qemu-web PATCH v4] add support page
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,99 +94,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
+Cc: pbonzini@redhat.com, thuth@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Brad Campbell (lists2009@fnarfbargle.com) wrote:
-> 
-> On 7/9/19 03:03, Dr. David Alan Gilbert wrote:
-> > * Brad Campbell (lists2009@fnarfbargle.com) wrote:
-> > > On 2/9/19 6:23 pm, Brad Campbell wrote:
-> > > 
-> > > > Here is the holdup :
-> > > > 
-> > > > 11725@1567416625.003504:qxl_ring_command_check 0 native
-> > > > 11725@1567416625.102653:qxl_io_write 0 native addr=0 (QXL_IO_NOTIFY_CMD)
-> > > > val=0 size=1 async=0
-> > > > 
-> > > > ~100ms delay prior to each logged QXL_IO_NOTIFY_CMD on the AMD box which
-> > > > explains the performance difference. Now I just need to figure out if
-> > > > that lies in the guest, the guest QXL driver, QEMU or SPICE and why it
-> > > > exhibits on the AMD box and not the i7.
-> > > > 
-> > > > To get to this point, I recompiled the kernel on the i7 box with both
-> > > > AMD and Intel KVM modules. Once that was running I cloned the drive and
-> > > > put it in the AMD box, so the OS, software stack and all dependencies
-> > > > are identical.
-> > > Reacp :
-> > > 
-> > > I have a machine with a Windows 7 VM which is running on an i7-3770. This
-> > > works perfectly.
-> > > 
-> > > Clone the disk and put it in a new(ish) AMD Ryzen 1500x machine and the
-> > > display output using qxl/spice is now limited to ~5-7fps.
-> > > 
-> > > I originally cloned the entire machine to keep the software versions
-> > > identical.
-> > > 
-> > > To simplify debugging and reproduction I'm now using :
-> > > - An identical SPICE version to that on the i7.
-> > > - A fresh 64 bit Windows 7 VM.
-> > > - The D2D benchmark from Crystalmark 2004R7.
-> > > 
-> > > The machine is booted with :
-> > > 
-> > > qemu -enable-kvm \
-> > >   -m 8192\
-> > >   -rtc base=localtime\
-> > >   -vga qxl\
-> > >   -device qxl\
-> > >   -global qxl-vga.guestdebug=3\
-> > >   -global qxl-vga.cmdlog=1\
-> > >   -global qxl-vga.vram_size=65536\
-> > >   -global qxl.vram_size=65536\
-> > >   -global qxl-vga.ram_size=65536\
-> > >   -global qxl.ram_size=65536\
-> > >   -net nic,model=virtio\
-> > >   -net tap,ifname=tap0,script=/etc/qemu-ifup,vhost=on\
-> > >   -usbdevice tablet\
-> > >   -spice port=5930,disable-ticketing\
-> > >   -device virtio-serial\
-> > >   -chardev spicevmc,id=vdagent,name=vdagent\
-> > >   -device virtserialport,chardev=vdagent,name=com.redhat.spice.0\
-> > >   -smp 3,maxcpus=3,cores=3,threads=1,sockets=1\
-> > >   -cpu qemu64,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time \
-> > -cpu qemu64 is almost always a bad idea;  does -cpu host help ?
-> > 
-> > Dave
-> 
-> 
-> No. I was using -cpu host. I changed it to qemu64 for testing so I could add & remove -enable-kvm for testing without the machine changing drivers about.
+This is intended to be a useful page we can link to in the banner of
+the IRC channel explaining the various support options someone might
+have.
 
-Oh, hmm.
-Sorry I don't know too much where to look then; you have any of:
-  a) Windows
-  b) guest graphics drivers
-  c) spice server in qemu
- 
-and probalby some more.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-So I think it's going to be a case of profiling on the two different
-systems and see if you can spot anything in particular that stands out.
+---
+v2
+  - add cleanups suggested by Stefan
+v3
+  - add link to nav bar
+v4
+  - add glue sentence and .'s as suggested by Thomas
+---
+ _includes/nav.html |  1 +
+ support.md         | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
+ create mode 100644 support.md
 
-Dave
+diff --git a/_includes/nav.html b/_includes/nav.html
+index 241d83e..0c81e24 100644
+--- a/_includes/nav.html
++++ b/_includes/nav.html
+@@ -4,6 +4,7 @@
+ 			{% assign current = page.url | downcase | split: '/' %}
+ 			<li class='{% if page.url == '/' %}not-desktop {%endif %}home'><a href="/">Home</a>
+ 			</li><li {% if current[1] == 'download' %}class='current'{% endif %}><a href="/download">Download</a>
++			</li><li {% if current[1] == 'support' %}class='current'{% endif %}><a href="/support">Support</a>
+ 			</li><li {% if current[1] == 'contribute' %}class='current'{% endif %}><a href="/contribute">Contribute</a>
+ 			</li><li {% if current[1] == 'documentation' %}class='current'{% endif %}><a href="/documentation">Documentation</a>
+ 			</li><li {% if current[1] == 'blog' %}class='current'{% endif %}><a href="/blog">Blog</a></li>
+diff --git a/support.md b/support.md
+new file mode 100644
+index 0000000..031f045
+--- /dev/null
++++ b/support.md
+@@ -0,0 +1,43 @@
++---
++title: Support
++permalink: /support/
++---
++
++If you have a support question that is not answered by our
++[documentation](/documentation) you have a number of options available
++to you.
++
++If the question is specifically about the integration of QEMU with the
++rest of your Linux distribution you may be better served by asking
++through your distribution's support channels. This includes questions
++about a specifically packaged version of QEMU. The QEMU developers are
++generally concerned with the latest release and the current state of
++the [master branch](https://git.qemu.org/?p=qemu.git) and do not
++provide support for QEMU binaries shipped by Linux distributions.
++
++Questions about complex configurations of networking and storage are
++usually met with a recommendation to use management tools like
++[virt-manager](https://virt-manager.org/) from the [libvirt
++project](https://libvirt.org/) to configure and run QEMU. Management
++tools handle the low-level details of setting up devices that most
++users should not need to learn.
++
++To get in touch with the people from the QEMU project, you have the
++following options:
++
++* There is a
++[qemu-discuss@nongnu.org](https://lists.nongnu.org/mailman/listinfo/qemu-discuss)
++mailing list for user focused questions.<br>
++If your question is more technical or architecture specific you may
++want to send your question to another of [QEMU's mailing
++lists](https://wiki.qemu.org/MailingLists)
++
++* A lot of developers hang around on IRC (network: irc.oftc.net,
++channel #qemu).<br> QEMU developers tend to hold normal office hours
++and are distributed around the world. Please be patient as you may
++have to wait some time for a response. If you can't leave IRC open and
++wait you may be better served by a mailing list.
++
++* If you think you have found a bug you can report it on [our bug
++  tracker](https://bugs.launchpad.net/qemu/).<br>
++Please see our guide on [how to report a bug](/contribute/report-a-bug/)
+-- 
+2.20.1
 
-> Regards,
-> 
-> Brad
-> 
-> -- 
-> An expert is a person who has found out by his own painful
-> experience all the mistakes that one can make in a very
-> narrow field. - Niels Bohr
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
