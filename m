@@ -2,80 +2,87 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 093ACC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A61C4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC09121924
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:27:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XBsQWm3T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC09121924
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3DB4621924
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:28:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB4621924
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7NRr-0007Cn-Tx
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 13:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48325)
+	id 1i7NTG-0008Ag-D4
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 13:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48607)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i7NQq-0006PJ-OC
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:26:29 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1i7NST-0007ia-EV
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:28:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i7NQp-0000JF-EA
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:26:28 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36867)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i7NQp-0000IN-6S
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:26:27 -0400
-Received: by mail-ot1-x343.google.com with SMTP id s28so13336237otd.4
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 10:26:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tXMId7I+i+NTMdFyH54cE0CLqkIK6GEeR6dKwYtK1+s=;
- b=XBsQWm3TaFgBZcxw2MulQMln2C4O4bHZNgWQTGoHoCInUX7OwLIjUZxp/gf/5i7Hmp
- dWVZ4T9Df7EqLM9OoLvqC+2geFN+bZourbkgPdEmEIt6j6xIsCkPCArShsFUHZoA3XAg
- umakg5bzjwiahLLAWhaOUawaFpXiltff250AGCX/gT3S+Cm6RgVFptHwj97kfu1CRFiS
- KVMsEeHD2rakJ6kmPwIKEylkmVXGsXeb4jgK2N5zvWIhUMbSjzwxMrtazKcamXmxC4ED
- ZdMRZq3EdluCgUgGQugOPVnnt/Pr8AsUJ13oTYmXb4D48kggy0dDJT3UUbCeIITIeJee
- muMw==
+ (envelope-from <pbonzini@redhat.com>) id 1i7NSS-0002QS-E2
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:28:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39275)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i7NSS-0002Px-6e
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:28:08 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6771064047
+ for <qemu-devel@nongnu.org>; Mon,  9 Sep 2019 17:28:07 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id r1so140531wmr.1
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 10:28:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tXMId7I+i+NTMdFyH54cE0CLqkIK6GEeR6dKwYtK1+s=;
- b=RCGfW1zTP0qkwyXFo1NdwL+e1wz8jtgsbw+a9o0zITcqzTV18ECFdJWCjfPdR65gKq
- gaSscP8chJnHQjbZn96OIZHhRHac0UqaqX6G2nd36p9S64LFoa1qYY+p/wx4GSaDBO/R
- lPlOtAhlamidl7gI45yWg2a5xGyraSZs4Akg+E5hEBaTddTpCx70oT/DYfj57LueAGEc
- sdfxh3JP62BWr6RCZEiCL+ey+pVHcOwkns6UwU3IHP5WUkPsGwnHKzD9g2x2opyrqnmx
- /6FFXcOxKT02IuZk1RVhCVpub0KZuQZeLDW55JLWBs3/lVugxh1C4oZSnUAb3d4xYD76
- bzlw==
-X-Gm-Message-State: APjAAAWNAew819q9NbKaI1lmKKXywSHzUy0bVmE/orUh8H8d0TOcMSDL
- q6fwaPjiSEzXhSWPwRssYWtL6I1C6DEW3ISrzRo4iw==
-X-Google-Smtp-Source: APXvYqzTcCCMLptgbbBWzAFHjpdvlHoqQzC7x2cd8ll1mEul4qisBMNUkfaz6o+xumF3yFhQKAdpKRSwKucQVL4y9Eg=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr21134480oti.135.1568049986333; 
- Mon, 09 Sep 2019 10:26:26 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ymdppCKp+emJn60sFR0nVJaUM0f0rLSa3Vq9VeULMQk=;
+ b=QGMwWxyHwQro/bIrM0+RuvRAaKGeVOvKrP2Eo5wCQarq9fBHq4no8/uHr9zcRJkx8u
+ fkXnurYqYTfpGE2u9IFZ+aYdETkUIeqDPsmYTk6jIf6HDTMvFKLD1XktUf7nGxMfDcbm
+ hU9K1Ju0xnOwat7JeKgkVAoOY+Xvf9sgCnaU/e4m3MtSQvU/a+QYy1n7K1PeO1MNd4Yb
+ nAvrVkBPnWd5Sqs82zxhfepJGiWLJOKgUv9Z7it8GNRec8ed23DeNW3hxbUuq6/XNFlC
+ ZSiRtP+vTnlH/yAOBwjC+2BGh+/az3oV9L455+GQoNmVjeXWyEP3QZfR0mcHAdVs+QUF
+ JhRQ==
+X-Gm-Message-State: APjAAAVJHmMh/QixvmKVIpZP1F7SUhS5MXCO2BPSxYufxHp/vignmR03
+ IssUn5wB8qq3MempiY1XU+XpxwwYrqTMqO3y6moNrWcUVs+V73rqkHNZNB6oodh+8Lc5doUn2c1
+ QF1yDvYWrexmwRn0=
+X-Received: by 2002:adf:fb4b:: with SMTP id c11mr18682658wrs.176.1568050086120; 
+ Mon, 09 Sep 2019 10:28:06 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwPsKlsStzP389wcS9fpvxFl9TtoJm1J0e8lX2HELbufwCOL+9Io4yzi6ap62ILPDVhOLDv1g==
+X-Received: by 2002:adf:fb4b:: with SMTP id c11mr18682638wrs.176.1568050085885; 
+ Mon, 09 Sep 2019 10:28:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:4580:a289:2f55:eec1?
+ ([2001:b07:6468:f312:4580:a289:2f55:eec1])
+ by smtp.gmail.com with ESMTPSA id a7sm17640404wra.43.2019.09.09.10.28.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Sep 2019 10:28:05 -0700 (PDT)
+To: Mark Kanda <mark.kanda@oracle.com>, qemu-devel@nongnu.org
+References: <1563374298-17323-1-git-send-email-mark.kanda@oracle.com>
+ <277b5916-4e46-1aef-6368-a414de4d2149@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <b450afbc-df72-bb86-2bc9-7f156f3a9a9d@redhat.com>
+Date: Mon, 9 Sep 2019 19:28:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190903133553.6500-1-mreitz@redhat.com>
- <20190903133553.6500-2-mreitz@redhat.com>
-In-Reply-To: <20190903133553.6500-2-mreitz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Sep 2019 18:26:15 +0100
-Message-ID: <CAFEAcA_Gpw14Hjr7rW0Z-9Ngj5Udbxv0ZEMZAo0W0PT0nCwe2g@mail.gmail.com>
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PULL v2 01/16] qemu-io: add pattern file for
- write command
+In-Reply-To: <277b5916-4e46-1aef-6368-a414de4d2149@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v2] Only enable the halt poll
+ control MSR if it is supported by the host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,115 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: mtosatti@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Sep 2019 at 14:35, Max Reitz <mreitz@redhat.com> wrote:
->
-> From: Denis Plotnikov <dplotnikov@virtuozzo.com>
->
-> The patch allows to provide a pattern file for write
-> command. There was no similar ability before.
->
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> Message-id: 20190820164616.4072-1-dplotnikov@virtuozzo.com
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> [mreitz: Keep optstring in alphabetical order]
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 28/08/19 19:22, Mark Kanda wrote:
+> Gentle ping - I would like to confirm this patch is acceptable.
 
-Hi; Coverity finds a FILE* leak in this code (CID 1405303):
+Yes, it was squashed in Marcelo's patch (commit
+d645e1328726b38b3c79525eb57842ce29c1df7c).
 
+Paolo
 
+> Thanks/regards,
+> -Mark
+>=20
+> On 7/17/2019 9:38 AM, Mark Kanda wrote:
+>> The halt poll control MSR should only be enabled on hosts which
+>> support it.
+>>
+>> Fixes: ("kvm: i386: halt poll control MSR support")
+>>
+>> Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
+>>
+>> ---
+>> v2: Remove unnecessary hunks which break migration with older hosts
+>> (Paolo)
+>> ---
+>> =C2=A0 target/i386/cpu.c | 1 -
+>> =C2=A0 1 file changed, 1 deletion(-)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index a8bafdb8b9..543bc25f64 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -2838,7 +2838,6 @@ static PropValue kvm_default_props[] =3D {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "kvm-asyncpf", "on" },
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "kvm-steal-time", "on" },
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "kvm-pv-eoi", "on" },
+>> -=C2=A0=C2=A0=C2=A0 { "kvm-poll-control", "on" },
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "kvmclock-stable-bit", "on" },
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "x2apic", "on" },
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "acpi", "off" },
+>>
 
-> +/*
-> + * qemu_io_alloc_from_file()
-> + *
-> + * Allocates the buffer and populates it with the content of the given file
-> + * up to @len bytes. If the file length is less than @len, then the buffer
-> + * is populated with the file content cyclically.
-> + *
-> + * @blk - the block backend where the buffer content is going to be written to
-> + * @len - the buffer length
-> + * @file_name - the file to read the content from
-> + *
-> + * Returns: the buffer pointer on success
-> + *          NULL on error
-> + */
-> +static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
-> +                                     const char *file_name)
-> +{
-> +    char *buf, *buf_origin;
-> +    FILE *f = fopen(file_name, "r");
-
-Here we allocate the FILE*...
-
-> +    int pattern_len;
-> +
-> +    if (!f) {
-> +        perror(file_name);
-> +        return NULL;
-> +    }
-> +
-> +    if (qemuio_misalign) {
-> +        len += MISALIGN_OFFSET;
-> +    }
-> +
-> +    buf_origin = buf = blk_blockalign(blk, len);
-> +
-> +    if (qemuio_misalign) {
-> +        buf_origin += MISALIGN_OFFSET;
-> +        buf += MISALIGN_OFFSET;
-> +        len -= MISALIGN_OFFSET;
-> +    }
-> +
-> +    pattern_len = fread(buf_origin, 1, len, f);
-> +
-> +    if (ferror(f)) {
-> +        perror(file_name);
-> +        goto error;
-
-...but in this error-exit path...
-
-> +    }
-> +
-> +    if (pattern_len == 0) {
-> +        fprintf(stderr, "%s: file is empty\n", file_name);
-> +        goto error;
-
-...and this one...
-
-> +    }
-> +
-> +    fclose(f);
-> +
-> +    if (len > pattern_len) {
-> +        len -= pattern_len;
-> +        buf += pattern_len;
-> +
-> +        while (len > 0) {
-> +            size_t len_to_copy = MIN(pattern_len, len);
-> +
-> +            memcpy(buf, buf_origin, len_to_copy);
-> +
-> +            len -= len_to_copy;
-> +            buf += len_to_copy;
-> +        }
-> +    }
-> +
-> +    return buf_origin;
-> +
-> +error:
-> +    qemu_io_free(buf_origin);
-> +    return NULL;
-
-...we go to the 'error' label and leave the function without
-ever calling fclose(f).
-
-> +}
-
-thanks
--- PMM
 
