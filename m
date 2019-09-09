@@ -6,43 +6,44 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07299C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C359CC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:42:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF4232082C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:40:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4232082C
+	by mail.kernel.org (Postfix) with ESMTPS id 9927221479
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:42:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9927221479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7MiP-0005ft-Ri
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39120)
+	id 1i7Mk2-0006q9-Jz
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:42:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39419)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i7MhH-00053G-T1
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:39:24 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i7MiO-0005pl-IY
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:40:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i7MhD-0003rR-T3
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:39:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33710)
+ (envelope-from <jsnow@redhat.com>) id 1i7MiN-0004Ku-Lo
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:40:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43260)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i7MhD-0003ql-L3; Mon, 09 Sep 2019 12:39:19 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i7MiL-0004JO-HQ; Mon, 09 Sep 2019 12:40:29 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2409D18C428D;
- Mon,  9 Sep 2019 16:39:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D0F071918651;
+ Mon,  9 Sep 2019 16:40:28 +0000 (UTC)
 Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A5CE419C78;
- Mon,  9 Sep 2019 16:39:14 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190906152624.14784-1-thuth@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B0DD100194E;
+ Mon,  9 Sep 2019 16:40:28 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+References: <20190906113534.10907-1-thuth@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -119,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <70fe7c6e-5dcc-b6d4-759a-9436c1b9b662@redhat.com>
-Date: Mon, 9 Sep 2019 12:39:14 -0400
+Message-ID: <00fd7a90-722d-aabd-aa17-473eb112fcc4@redhat.com>
+Date: Mon, 9 Sep 2019 12:40:27 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190906152624.14784-1-thuth@redhat.com>
+In-Reply-To: <20190906113534.10907-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Mon, 09 Sep 2019 16:39:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Mon, 09 Sep 2019 16:40:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/Makefile: test-char does not need
- libqtest
+Subject: Re: [Qemu-devel] [PATCH] tests/Makefile: Do not print the name of
+ the check-block.sh shell script
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,38 +147,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/6/19 11:26 AM, Thomas Huth wrote:
-> No need to link the libqtest objects here.
+On 9/6/19 7:35 AM, Thomas Huth wrote:
+> The check script is already printing out which iotest is currently
+> running, so printing out the name of the check-block.sh shell script
+> looks superfluous here.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Makes sense.
+
+Acked-by: John Snow <jsnow@redhat.com>
 
 > ---
 >  tests/Makefile.include | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index a35431ca0a..7ee2f9cb5d 100644
+> index f5ac09549c..a36317ac87 100644
 > --- a/tests/Makefile.include
 > +++ b/tests/Makefile.include
-> @@ -525,7 +525,7 @@ tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
->  tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
->  tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom-obj-y)
+> @@ -1097,7 +1097,7 @@ QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = tests/qemu
+>  check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) \
+>  		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
+>  		$(patsubst %,%/all,$(filter %-softmmu,$(TARGET_DIRS)))
+> -	$<
+> +	@$<
 >  
-> -tests/test-char$(EXESUF): tests/test-char.o $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y) $(chardev-obj-y) tests/socket-helpers.o
-> +tests/test-char$(EXESUF): tests/test-char.o $(test-util-obj-y) $(test-io-obj-y) $(chardev-obj-y) tests/socket-helpers.o
->  tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y)
->  tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
->  tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-obj-y)
+>  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+>  $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
 > 
 
