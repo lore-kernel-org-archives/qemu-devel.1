@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80CC9C00307
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 08:04:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B0EC00307
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 08:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54C1D2086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 08:04:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54C1D2086D
+	by mail.kernel.org (Postfix) with ESMTPS id 25ADF21920
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 08:10:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25ADF21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Eev-0007Ak-GG
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 04:04:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48266)
+	id 1i7El7-0000dn-Bz
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 04:10:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7EdV-0006GX-GO
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 04:02:58 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7EkM-00005J-Lu
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 04:10:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7EdU-0001mK-Ck
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 04:02:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56356)
+ (envelope-from <mreitz@redhat.com>) id 1i7EkL-00054s-Di
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 04:10:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55056)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7EdR-0001ke-MZ; Mon, 09 Sep 2019 04:02:53 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i7EkI-00053c-Hq; Mon, 09 Sep 2019 04:09:58 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E18D464D28;
- Mon,  9 Sep 2019 08:02:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 80BB518CB8E4;
+ Mon,  9 Sep 2019 08:09:57 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
  [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 55EAC5D9D6;
- Mon,  9 Sep 2019 08:02:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A2B595D6A7;
+ Mon,  9 Sep 2019 08:09:55 +0000 (UTC)
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-10-mreitz@redhat.com>
- <20190905130501.GA4911@localhost.localdomain>
+ <20190809161407.11920-12-mreitz@redhat.com>
+ <20190905131129.GB4911@localhost.localdomain>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e2d1cd43-cfac-32cd-cfb7-1ebd2dcc5091@redhat.com>
-Date: Mon, 9 Sep 2019 10:02:49 +0200
+Message-ID: <f95ba860-55c4-6436-b3d4-acb7aabc001a@redhat.com>
+Date: Mon, 9 Sep 2019 10:09:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190905130501.GA4911@localhost.localdomain>
+In-Reply-To: <20190905131129.GB4911@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="7wDI6qvLtSwQoYAGAKFAhfCYGfaIGH87F"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 09 Sep 2019 08:02:52 +0000 (UTC)
+ boundary="nixpVsvusBQEuLQyq5pPTMIZ5mzMnxnBH"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Mon, 09 Sep 2019 08:09:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 09/42] block: Include filters when
- freezing backing chain
+Subject: Re: [Qemu-devel] [PATCH v6 11/42] block: Add
+ bdrv_supports_compressed_writes()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,90 +106,85 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7wDI6qvLtSwQoYAGAKFAhfCYGfaIGH87F
-Content-Type: multipart/mixed; boundary="BGkG9ySXLKiH30LGO0M0HMcEQBEBQtJuQ";
+--nixpVsvusBQEuLQyq5pPTMIZ5mzMnxnBH
+Content-Type: multipart/mixed; boundary="7qRg2VnbPlqX2fVp0nZ6p4mDrcu2TNwyd";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e2d1cd43-cfac-32cd-cfb7-1ebd2dcc5091@redhat.com>
-Subject: Re: [PATCH v6 09/42] block: Include filters when freezing backing
- chain
+Message-ID: <f95ba860-55c4-6436-b3d4-acb7aabc001a@redhat.com>
+Subject: Re: [PATCH v6 11/42] block: Add bdrv_supports_compressed_writes()
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-10-mreitz@redhat.com>
- <20190905130501.GA4911@localhost.localdomain>
-In-Reply-To: <20190905130501.GA4911@localhost.localdomain>
+ <20190809161407.11920-12-mreitz@redhat.com>
+ <20190905131129.GB4911@localhost.localdomain>
+In-Reply-To: <20190905131129.GB4911@localhost.localdomain>
 
---BGkG9ySXLKiH30LGO0M0HMcEQBEBQtJuQ
+--7qRg2VnbPlqX2fVp0nZ6p4mDrcu2TNwyd
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 05.09.19 15:05, Kevin Wolf wrote:
+On 05.09.19 15:11, Kevin Wolf wrote:
 > Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
->> In order to make filters work in backing chains, the associated
->> functions must be able to deal with them and freeze all filter links, =
-be
->> they COW or R/W filter links.
+>> Filters cannot compress data themselves but they have to implement
+>> .bdrv_co_pwritev_compressed() still (or they cannot forward compressed=
+
+>> writes).  Therefore, checking whether
+>> bs->drv->bdrv_co_pwritev_compressed is non-NULL is not sufficient to
+>> know whether the node can actually handle compressed writes.  This
+>> function looks down the filter chain to see whether there is a
+>> non-filter that can actually convert the compressed writes into
+>> compressed data (and thus normal writes).
 >>
->> In the process, rename these functions to reflect that they now act on=
-
->> generalized chains of filter nodes instead of backing chains alone.
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >=20
-> I don't think this is a good idea. The functions are still following th=
+> Should patches 2 and 3 that add the .bdrv_co_pwritev_compressed()
+> callback to filter drivers come only after this one?
+
+Why not.
+
+> And should we also
+> support it in the mirror filter?
+
+Hm.  AFAIU, compressed writes have very limited use.  You can basically
+only use them when writing to a new image (where you=E2=80=99d never writ=
 e
-> backing chain. A generic "chain" could mean following the bs->file link=
-s
-> or any other children, so the new name is confusing because it doesn't
-> really tell you any more what the function does. I'd prefer the name to=
+anywhere you=E2=80=99ve already written something to), i.e. for qemu-img =
+convert
+or the backup target.  It makes sense to blockdev-backup to throttle, so
+that=E2=80=99s why it should be implemented there.  I don=E2=80=99t reall=
+y see how it
+would make sense for mirror.
 
-> stay specific.
-They=E2=80=99re following backing chains, among others.
-
-It would make sense to rename s/backing_chain/filter_chain/, that is, in
-case you don=E2=80=98t find lumping COW and R/W filters together under =E2=
-=80=9Cfilter=E2=80=9D
-too offensive.
-
-(Naming things is hard.  I=E2=80=99m open for suggestions, but I found th=
-e
-=E2=80=9Cfilter=E2=80=9D concept succinct, even if it does not fully alig=
-n with our
-existing parlance.)
+OTOH, it doesn=E2=80=99t make sense for COR either.  And it isn=E2=80=99t=
+ that hard.
+Now I don=E2=80=99t have a strong preference for either dropping the COR =
+patch
+or adding it to mirror as well...
 
 Max
 
->> While at it, add some comments that note which functions require their=
 
->> caller to ensure that a given child link is not frozen, and how the
->> callers do so.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->=20
-> Kevin
->=20
+--7qRg2VnbPlqX2fVp0nZ6p4mDrcu2TNwyd--
 
-
-
---BGkG9ySXLKiH30LGO0M0HMcEQBEBQtJuQ--
-
---7wDI6qvLtSwQoYAGAKFAhfCYGfaIGH87F
+--nixpVsvusBQEuLQyq5pPTMIZ5mzMnxnBH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12BykACgkQ9AfbAGHV
-z0BBOAf/a++65CyI5oeYZj6uQQIGnPzcXNuNNdB/z4zlYMy7EB6ciGB5cK4AVuYu
-oaa7JvDK8g24NYQzVvacR+yns83dZm9kqQzU37/alaQcJdgvKLFbO/LQA4rGrUgG
-KaNBpJUNvLSeOtq5uwYI5YpDnAMIBfadOXUvBtVTcS+Oki6UtBkxEA+qJ8UODIHb
-QhS7qVsqWWVF6Q0m5R1fCaBGTV0dQ0FkVbF//SHq67P0/WQnz6vUbLQkh7TK7Zq7
-HdvmSHyTos2LYTs7K0kYh2ZpAknWCRFrYgL9JULzyqZtZwzm2GPlXZKX9Cc6WrJG
-PmJ/nTuap/WbXbMnMNIj+3lWDdLgWQ==
-=t0HO
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12CNEACgkQ9AfbAGHV
+z0AMIQf/cTthBastzJ2Z62fDneVWVOPEdVin46ZChtH9vXJdpWU63f1YeHQwKMjI
+fP6Sz5JPgYMzW1b1aK29sCC5M2q2xnZIRZznMtvVE9glqJA2qCNgpfzqlsU//G2u
+athqwOZlN11LvojO2POG45KYeawUNlrmgJpFY5Sp45ejanCRajvOtLQ04GeZSoGP
+Y6+H3HCLCe3GOEBaxrq9y7bR3NfnU2PG/sdpVfPhx38/vpcPhSHsoDjr9c6WfKtT
+yyDNe6pjUc/zBo657QoXsPYu2btjMRCLo3h8b0aMj9lf7VVw9QU0K+jGkIDheU1O
+Mgr93tDOslchjSWQgrEv3Ya5aPx9fQ==
+=FhhJ
 -----END PGP SIGNATURE-----
 
---7wDI6qvLtSwQoYAGAKFAhfCYGfaIGH87F--
+--nixpVsvusBQEuLQyq5pPTMIZ5mzMnxnBH--
 
