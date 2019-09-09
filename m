@@ -2,91 +2,116 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B140AC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC7A9C4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:06:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 870AA218DE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:06:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870AA218DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B3D54218DE
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:06:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3D54218DE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7KJa-0005aC-Gn
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:06:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37232)
+	id 1i7KJj-0005mW-S4
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:06:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i7KIh-0004n3-9b
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:52 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7KIo-0004rP-2w
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i7KIf-0004eq-U6
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40028)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7KIf-0004dL-Lg
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0D76F309276B;
- Mon,  9 Sep 2019 14:05:48 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D7E326012A;
- Mon,  9 Sep 2019 14:05:46 +0000 (UTC)
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- git@vger.kernel.org
-References: <cover.1566503584.git.qemu_oss@crudebyte.com>
- <46fe6c73-961f-d72a-77de-88491b6f223c@redhat.com> <4642438.ai5u8AxThJ@silver>
- <1897173.eDCz7oYxVq@silver>
-From: Eric Blake <eblake@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1i7KIn-0004iI-33
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:57 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:45993)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7KIm-0004g9-QW
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:57 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MFK8N-1hwbyj3BCz-00Fkhx; Mon, 09 Sep 2019 16:05:36 +0200
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190830143648.2967-1-alex.bennee@linaro.org>
+ <c8340803-34a7-ab53-7791-efdcb734db41@vivier.eu> <87sgp51sel.fsf@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <305577c2-709a-b632-4056-6582771176ac@redhat.com>
-Date: Mon, 9 Sep 2019 09:05:45 -0500
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2c63a5cd-ffb3-fb7e-e3ea-54a938a28f90@vivier.eu>
+Date: Mon, 9 Sep 2019 16:05:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1897173.eDCz7oYxVq@silver>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="wvWU7xN1BqAkLvUvjk9gvXi0xIYinyJLI"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 09 Sep 2019 14:05:48 +0000 (UTC)
+In-Reply-To: <87sgp51sel.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:MDKZkKyVmxYgebWIPPu++FPCUJXJaHgPMoGB0N/Ep9PIYwrvWl5
+ sPG1cxyB814S/+yFlgcaBREf/xnYt9GQlg24ratCEe4iXGkmLay7lstino8cUsmdofGKRNs
+ 3lUyeuzSaaWMwgSd4+nCsqg4Doy7zVTaAM5ZBKBhfFI//oKZUlXABwxenUx5OJWjWhDU30I
+ WS+ePLjkqxEoLyg2fnIrg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zNPMTYbQIjM=:Do2CttNb0oOS3jU8ix4QYZ
+ CiKG91Aa9oIcc+gmmJ0XnXH+EQoJ+kfqxylQEM3PIiR7fkEvdBKiWqVcPpeNOt+F65ngYDaB0
+ O8mSXlige4MY3yO/bMXgZmREGJ+O9sIXmKMvkNqrvLqOfKtrVi+X+ujgLLNAGL1w7x6cEv8PJ
+ yTw5++faj7L6KdV1RrIUGT+C1wA80SrLee/f0SLQ4HJgmCb18HtlfYDGBWY3mHsQWWy1emnPh
+ ivSbDGQattnIPSg+3fZ5kFBBYIcAxEXuQzAuxydvmFsgR1PH8ycIQY0m6W/uUcLO/ztT/d0Z8
+ FFcVTMvncMoYgnkPJOeyHCme1MvaayJyBnOrbxhPZ7+D7scvR/X/oyURu7xcvlXtp6LLpbvkJ
+ k3cpSSunyl1TeI91ViwCh2cvSUwYcX90afHSaZGhxY5Mo1Bs1WBQskBVxWpkjJeU3VF2p8MY9
+ OkvLTQO8NJbBX8II4GhpuE3bmwJhUsfG/lypMWoJQ3EYxU+cc7EP2gLY7WsFpde1SHgK2NemM
+ KCnA87z3Why8cLKuv6FaotxLT0DIt7zmtml4wqhCApQxeqsX09OR+PFES8Q46SXeSxRZJAHnP
+ a1CXXKFyG01CTZYQ3v92/ZN6Mcm8oU4Hq/yHl3ukoAMwRenpQ2dJVVWtvoZYBOO3+zD3Fqeru
+ 7K5Cl87d/44pQOgGoHjfR+jYgmubpSNUpQ7qioadgpPE9F3AmJSUceHJ9V7zkjiTEGb/OtdHN
+ /NfMep1ttzmbgO/712zGi5lasm4Xj41GTyHzUK2AdMh2HZTa0URRrc+etloPHiWPNlLZA05C7
+ VVJk3LporDL7q/6robvH8lMM4GvMh6M2Fv5YnONkDlFDbXu/Mo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] 9p: Fix file ID collisions
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fail and report on bad dfilter
+ specs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,132 +123,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@gmail.com, berrange@redhat.com, Greg Kurz <groug@kaod.org>,
- antonios.motakis@huawei.com, dgilbert@redhat.com
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wvWU7xN1BqAkLvUvjk9gvXi0xIYinyJLI
-Content-Type: multipart/mixed; boundary="cYyG1Jpt5qBg3s28Mfvxz3Obv4rkwvX4C";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- git@vger.kernel.org
-Cc: berrange@redhat.com, stefanha@gmail.com, Greg Kurz <groug@kaod.org>,
- dgilbert@redhat.com, antonios.motakis@huawei.com
-Message-ID: <305577c2-709a-b632-4056-6582771176ac@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] 9p: Fix file ID collisions
-References: <cover.1566503584.git.qemu_oss@crudebyte.com>
- <46fe6c73-961f-d72a-77de-88491b6f223c@redhat.com> <4642438.ai5u8AxThJ@silver>
- <1897173.eDCz7oYxVq@silver>
-In-Reply-To: <1897173.eDCz7oYxVq@silver>
-
---cYyG1Jpt5qBg3s28Mfvxz3Obv4rkwvX4C
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-[adding git list]
-
-On 9/5/19 7:25 AM, Christian Schoenebeck wrote:
-
->>>>> How are you sending patches ? With git send-email ? If so, maybe yo=
-u
->>>>> can
->>>>> pass something like --from=3D'"Christian Schoenebeck"
->>>>> <qemu_oss@crudebyte.com>'. Since this is a different string, git wi=
-ll
->>>>> assume you're sending someone else's patch : it will automatically =
-add
->>>>> an
->>>>> extra From: made out of the commit Author as recorded in the git tr=
-ee.
+Le 09/09/2019 à 16:00, Alex Bennée a écrit :
+> 
+> Laurent Vivier <laurent@vivier.eu> writes:
+> 
+>> Le 30/08/2019 à 16:36, Alex Bennée a écrit :
+>>> Just passing NULL means we end up ignoring the bad dfilter spec
+>>> instead of reporting it and exiting as we should.
 >>>
->>> I think it is probably as simple as a 'git config' command to tell gi=
-t
->>> to always put a 'From:' in the body of self-authored patches when usi=
-ng
->>> git format-patch; however, as I don't suffer from munged emails, I
->>> haven't actually tested what that setting would be.
->=20
-> Well, I tried that Eric. The expected solution would be enabling this g=
-it=20
-> setting:
->=20
-> git config [--global] format.from true
-> https://git-scm.com/docs/git-config#Documentation/git-config.txt-format=
-from
->=20
-> But as you can already read from the manual, the overall behaviour of g=
-it=20
-> regarding a separate "From:" line in the email body was intended solely=
- for=20
-> the use case sender !=3D author. So in practice (at least in my git ver=
-sion) git=20
-> always makes a raw string comparison between sender (name and email) st=
-ring=20
-> and author string and only adds the separate From: line to the body if =
-they=20
-> differ.
->=20
-> Hence also "git format-patch --from=3D" only works here if you use a di=
-fferent=20
-> author string (name and email) there, otherwise on a perfect string mat=
-ch it=20
-> is simply ignored and you end up with only one "From:" in the email hea=
-der.
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> ---
+>>>  linux-user/main.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/linux-user/main.c b/linux-user/main.c
+>>> index 47917bbb20f..50a031520ca 100644
+>>> --- a/linux-user/main.c
+>>> +++ b/linux-user/main.c
+>>> @@ -236,7 +236,7 @@ static void handle_arg_log(const char *arg)
+>>>
+>>>  static void handle_arg_dfilter(const char *arg)
+>>>  {
+>>> -    qemu_set_dfilter_ranges(arg, NULL);
+>>> +    qemu_set_dfilter_ranges(arg, &error_fatal);
+>>>  }
+>>>
+>>>  static void handle_arg_log_filename(const char *arg)
+>>>
+>>
+>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> 
+> Did you queue this or do you want me to resend?
 
-git folks:
+I didn't but it's done now (no need to resend).
 
-How hard would it be to improve 'git format-patch'/'git send-email' to
-have an option to ALWAYS output a From: line in the body, even when the
-sender is the author, for the case of a mailing list that munges the
-mail headers due to DMARC/DKIM reasons?
-
->=20
-> So eventually I added one extra character in my name for now and remove=
-d it=20
-> manually in the dumped emails subsequently (see today's
-> "[PATCH v7 0/3] 9p: Fix file ID collisions").
->=20
-> Besides that direct string comparison restriction; git also seems to ha=
-ve a=20
-> bug here. Because even if you have sender !=3D author, then git falsely=
- uses=20
-> author as sender of the cover letter, whereas the emails of the individ=
-ual=20
-> patches are encoded correctly.
-
-At any rate, I'm glad that you have figured out a workaround, even if
-painful, while we wait for git to provide what we really need.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---cYyG1Jpt5qBg3s28Mfvxz3Obv4rkwvX4C--
-
---wvWU7xN1BqAkLvUvjk9gvXi0xIYinyJLI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl12XDkACgkQp6FrSiUn
-Q2q+XAf/SLPHaKyItKzebFFgN27LBaNaMsQnMU6KP+MJe0Ql+5wh4MfUy2ptof5z
-UtO5Kk+N16hsvnWt1TVE3jqhuu3R3A03rR2TdRVX4wMzoa/ZQfiqf8WuhRrcabFB
-FYpGmrKnEBHI9Gj846dGWoCLllMLKNr3f8+zuj3svlQ3ZYPO5RFnxhcJt0NNhszX
-mdQNGZknfFBZQsM2ZDSTxqM6Q+knlLl9n9EfLvYhlzQNiSQc0XoA8Yi4E20fjsYy
-Z4+Lpo/3kWlYZ1trJ4qzOzyggMaMY3OfKZzoyNJA3qnQZHTY4bjo8KnXDcZHLiFN
-48RcKLeWLXGeaH9xfDVpyXwd3J0ndA==
-=8FdN
------END PGP SIGNATURE-----
-
---wvWU7xN1BqAkLvUvjk9gvXi0xIYinyJLI--
+Thanks,
+Laurent
 
