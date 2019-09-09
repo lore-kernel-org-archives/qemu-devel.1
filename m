@@ -2,109 +2,90 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C017C00307
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 05:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D126C00307
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 07:27:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3229D2086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 05:19:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3229D2086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1BE6521D82
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 07:27:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BE6521D82
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7C5g-0001gP-BJ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 01:19:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46039)
+	id 1i7E5T-0007cV-BG
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 03:27:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i7C4u-0001Gg-Dq
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 01:19:05 -0400
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i7E2N-0005lR-It
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 03:24:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i7C4s-00017P-5W
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 01:19:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42256)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1i7C4r-00016e-T6; Mon, 09 Sep 2019 01:19:02 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 20C7710CC1F3;
- Mon,  9 Sep 2019 05:19:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-85.ams2.redhat.com [10.36.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7BCDB608C2;
- Mon,  9 Sep 2019 05:18:49 +0000 (UTC)
-To: Matthew Rosato <mjrosato@linux.ibm.com>, cohuck@redhat.com
-References: <1567815389-18229-1-git-send-email-mjrosato@linux.ibm.com>
- <1567815389-18229-4-git-send-email-mjrosato@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <0c29ba98-d404-d570-d1c0-5d1a3750f6ad@redhat.com>
-Date: Mon, 9 Sep 2019 07:18:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i7E2M-0007RU-IA
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 03:24:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32368
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+ id 1i7E2K-0007LR-7v; Mon, 09 Sep 2019 03:24:32 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x897M8Pd155388; Mon, 9 Sep 2019 03:24:15 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2uwfc9xqe1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 09 Sep 2019 03:24:15 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x897JdlO028418;
+ Mon, 9 Sep 2019 07:24:14 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma02dal.us.ibm.com with ESMTP id 2uv466vhsg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 09 Sep 2019 07:24:14 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x897OD6140501686
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 9 Sep 2019 07:24:13 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7C6BC6A057;
+ Mon,  9 Sep 2019 07:24:13 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4E6B66A04D;
+ Mon,  9 Sep 2019 07:24:11 +0000 (GMT)
+Received: from [127.0.1.1] (unknown [9.124.31.235])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Mon,  9 Sep 2019 07:24:10 +0000 (GMT)
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
+Date: Mon, 09 Sep 2019 12:54:10 +0530
+Message-ID: <156801373576.24362.1904051970114447107.stgit@aravinda>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <1567815389-18229-4-git-send-email-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Mon, 09 Sep 2019 05:19:00 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 3/5] s390: vfio_pci: Use a
- PCI Group structure
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-09_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=517 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909090081
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH v13 0/6] target-ppc/spapr: Add FWNMI support in
+ QEMU for PowerKVM guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,52 +97,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: walling@linux.ibm.com, pmorel@linux.ibm.com, mst@redhat.com,
- qemu-s390x@nongnu.org, david@redhat.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: paulus@ozlabs.org, aravinda@linux.vnet.ibm.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/09/2019 02.16, Matthew Rosato wrote:
-> From: Pierre Morel <pmorel@linux.ibm.com>
-> 
-> We use a S390PCIGroup structure to hold the information
-> related to zPCI Function group.
-> 
-> This allows us to be ready to support multiple groups and to retrieve
-> the group information from the host.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c  | 42 ++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/s390-pci-bus.h  | 11 ++++++++++-
->  hw/s390x/s390-pci-inst.c | 22 +++++++++++++---------
->  3 files changed, 65 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 963a41c..e625217 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -730,6 +730,46 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
->      object_unref(OBJECT(iommu));
->  }
->  
-> +static S390PCIGroup *s390_grp_create(int ug)
-> +{
-> +    S390PCIGroup *grp;
-> +    S390pciState *s = s390_get_phb();
-> +
-> +    grp = g_new0(S390PCIGroup, 1);
-> +    grp->ug = ug;
-> +    QTAILQ_INSERT_TAIL(&s->zpci_grps, grp, link);
-> +    return grp;
-> +}
+This patch set adds support for FWNMI in PowerKVM guests.
 
-Maybe an ignorant question, but shouldn't there also be some kind of
-clean up function that also frees the memory again, e.g. during a
-machine reset? Or are these groups supposed to survive a machine reset?
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
 
- Thomas
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
+
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
+
+Change Log v13:
+  - Minor fixes (mostly nits)
+  - Moved FWNMI guest registration check from patch 4 to 3.
+
+Change Log v12:
+  - Rebased to latest ppc-for-4.2 (SHA b1e8156743)
+
+Change Log v11:
+  - Moved FWNMI SPAPR cap defaults to 4.2 class option
+  - Fixed issues with handling fwnmi KVM capability
+
+Change Log v10:
+  - Reshuffled the patch sequence + minor fixes
+
+Change Log v9:
+  - Fixed kvm cap and spapr cap issues
+
+Change Log v8:
+  - Added functionality to check FWNMI capability during
+    VM migration
+
+---
+
+Aravinda Prasad (6):
+      Wrapper function to wait on condition for the main loop mutex
+      ppc: spapr: Introduce FWNMI capability
+      target/ppc: Handle NMI guest exit
+      target/ppc: Build rtas error log upon an MCE
+      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
+      migration: Include migration support for machine check handling
+
+
+ cpus.c                   |    5 +
+ hw/ppc/spapr.c           |   76 +++++++++++++
+ hw/ppc/spapr_caps.c      |   29 +++++
+ hw/ppc/spapr_events.c    |  271 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |   78 +++++++++++++
+ include/hw/ppc/spapr.h   |   25 ++++
+ include/qemu/main-loop.h |    8 +
+ target/ppc/kvm.c         |   42 +++++++
+ target/ppc/kvm_ppc.h     |   14 ++
+ target/ppc/trace-events  |    1 
+ 10 files changed, 547 insertions(+), 2 deletions(-)
+
+--
+Aravinda Prasad
 
