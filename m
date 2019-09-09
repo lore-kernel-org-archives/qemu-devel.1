@@ -2,65 +2,72 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0C9C4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B4FC4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:22:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B436A20640
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:19:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B436A20640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69594207FC
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:22:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69594207FC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7MO7-0003oq-Qy
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:19:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35259)
+	id 1i7MQS-0005PL-IP
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:22:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i7MMy-0002qJ-OH
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:18:25 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i7MPT-0004b7-9N
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i7MMx-00072S-Lb
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:18:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35568)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1i7MMr-0006xh-Me; Mon, 09 Sep 2019 12:18:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1C77FA3766F;
- Mon,  9 Sep 2019 16:18:16 +0000 (UTC)
-Received: from work-vm (ovpn-117-249.ams2.redhat.com [10.36.117.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 485ED6012D;
- Mon,  9 Sep 2019 16:18:07 +0000 (UTC)
-Date: Mon, 9 Sep 2019 17:18:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190909161804.GE2726@work-vm>
-References: <20190909155813.27760-1-laurent@vivier.eu>
- <20190909155813.27760-9-laurent@vivier.eu>
- <CAFEAcA9NiHrGekrEte7__aGKSz-JBObdbWdMxmxduYozngDUNQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9NiHrGekrEte7__aGKSz-JBObdbWdMxmxduYozngDUNQ@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Mon, 09 Sep 2019 16:18:16 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <palmer@dabbelt.com>) id 1i7MPR-0008VN-Vx
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:20:58 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:56034)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7MPR-0008Uz-QI
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 12:20:57 -0400
+Received: by mail-wm1-f67.google.com with SMTP id g207so236969wmg.5
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 09:20:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=k8mmStJgxO3xH5XM/EhqR2y7Ns9lt8r0g1sa9/rZBUg=;
+ b=jlzjrfi3vyYDds3Qv4ot8VJOPLA//YOStR3RUvafF1OHXN+UPawt0eNuD6ozw8y6Lz
+ HDP9anM5me2ZxvJI9Zos7zJKvVDmIZwp2DERY/HE7yFMJZjRECiGPG5sxLQCjMQVY4hK
+ Y0BLjV5Lg4YRqTdA68hS8RNJmXPzSFcNBTijFz24ep5VGxaSWFjZcO+ldeEDF77XPPC6
+ lQUJbdYhkYI18J/q2RfHo4h+wc0AvIdqOEml7Mc4kWbtIb4CnVT+gJQwqf7kMbFkNlLh
+ pP8eYNnmEpl38CShjc4xJGkyUwaN0KVvRHvlNWgxIryrVY97lQoFg+djt5r1CjVrcoo7
+ FM5g==
+X-Gm-Message-State: APjAAAWGxWNJD8H/I3i0Ug4V/uF+uFpj+tsZ6yCKZOGVGcFNsIrAtY8n
+ 0PzmVq50oseS628KY5QfuCw3pg==
+X-Google-Smtp-Source: APXvYqyifi14asoSzTSN6pXgMYqAaLVV5RvcSrD66Avro2MCWiq//8PwEdLO0+SKIJlrx5bUyneMgg==
+X-Received: by 2002:a1c:a8d8:: with SMTP id r207mr48378wme.135.1568046055942; 
+ Mon, 09 Sep 2019 09:20:55 -0700 (PDT)
+Received: from localhost ([148.69.85.38])
+ by smtp.gmail.com with ESMTPSA id z1sm24856457wre.40.2019.09.09.09.20.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Sep 2019 09:20:55 -0700 (PDT)
+Date: Mon, 09 Sep 2019 09:20:55 -0700 (PDT)
+X-Google-Original-Date: Mon, 09 Sep 2019 09:04:19 PDT (-0700)
+In-Reply-To: <1567786819-22142-2-git-send-email-bmeng.cn@gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-8a13e03d-e64a-46e3-bdb8-e2649b13cfb2@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 8/9] hw/m68k: add a dummy SWIM floppy
- controller
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v8 01/32] riscv: hw: Remove duplicated
+ "hw/hw.h" inclusion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,49 +79,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Mon, 9 Sep 2019 at 17:05, Laurent Vivier <laurent@vivier.eu> wrote:
-> >
-> > Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> > Reviewed-by: Herv=E9 Poussineau <hpoussin@reactos.org>
->=20
-> > +static void sysbus_swim_class_init(ObjectClass *oc, void *data)
-> > +{
-> > +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> > +
-> > +    dc->realize =3D sysbus_swim_realize;
-> > +}
->=20
-> Missing reset and VMState for migration. These should be
-> baseline requirements for adding new device models to the
-> tree, because in an ideal world every device would support
-> both -- we should be gradually fixing the existing devices
-> which are missing these, and not letting new devices in,
-> so the situation gets gradually better, not worse.
+On Fri, 06 Sep 2019 09:19:48 PDT (-0700), bmeng.cn@gmail.com wrote:
+> Commit a27bd6c779ba ("Include hw/qdev-properties.h less") wrongly
+> added "hw/hw.h" to sifive_prci.c and sifive_test.c.
+>
+> Another inclusion of "hw/hw.h" was later added via
+> commit 650d103d3ea9 ("Include hw/hw.h exactly where needed"), that
+> resulted in duplicated inclusion of "hw/hw.h".
+>
+> Fixes: a27bd6c779ba ("Include hw/qdev-properties.h less")
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>
+> ---
+>
+> Changes in v8:
+> - newly included in v8 to ease patch inter dependencies
+>
+>  hw/riscv/sifive_prci.c | 1 -
+>  hw/riscv/sifive_test.c | 1 -
+>  2 files changed, 2 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
+> index 9837b61..562bc3d 100644
+> --- a/hw/riscv/sifive_prci.c
+> +++ b/hw/riscv/sifive_prci.c
+> @@ -19,7 +19,6 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "qemu/module.h"
+>  #include "target/riscv/cpu.h"
+> diff --git a/hw/riscv/sifive_test.c b/hw/riscv/sifive_test.c
+> index afbb3aa..3a14f9f 100644
+> --- a/hw/riscv/sifive_test.c
+> +++ b/hw/riscv/sifive_test.c
+> @@ -19,7 +19,6 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "qemu/module.h"
+>  #include "target/riscv/cpu.h"
 
-I'm happy to see things marked unmigratable instead for obscure
-devices; I don't see the need to worry about migration for stuff
-that's not going to be migrated.
-
-Dave
-
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Revieweb-by: Palmer Dabbelt <palmer@sifive.com>
 
