@@ -2,60 +2,80 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B30C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6584FC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:40:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6983F2086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:36:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6983F2086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
+	by mail.kernel.org (Postfix) with ESMTPS id 32A9E2086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 17:40:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y50syWkv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A9E2086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7NaH-0003bI-KO
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 13:36:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49714)
+	id 1i7NeT-0005dc-Fz
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 13:40:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1i7NYd-0002Gy-5O
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:34:32 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i7NdZ-00057w-CW
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:39:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1i7NYb-0006mW-Q9
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:34:30 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:51664
- helo=sipsolutions.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1i7NYb-0006ky-Js
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:34:29 -0400
-Received: by sipsolutions.net with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <johannes@sipsolutions.net>)
- id 1i7NYX-0002j5-Jj; Mon, 09 Sep 2019 19:34:25 +0200
-Message-ID: <d095bafedcd4bcc5d76279785e5bd523aef62b58.camel@sipsolutions.net>
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 09 Sep 2019 19:34:24 +0200
-In-Reply-To: <20190909160039.GC20875@stefanha-x1.localdomain>
-References: <20190902121233.13382-1-johannes@sipsolutions.net>
- <20190902121233.13382-2-johannes@sipsolutions.net>
- <fe517ef6c6a8e2df9675388be9454b5863c7fc55.camel@sipsolutions.net>
- <20190909160039.GC20875@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+ (envelope-from <peter.maydell@linaro.org>) id 1i7NdY-0001qL-4l
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:39:37 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34310)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i7NdX-0001pn-VK
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 13:39:36 -0400
+Received: by mail-ot1-x342.google.com with SMTP id z26so4153943oto.1
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 10:39:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FqgR83A2DIzZuEwHOjx5GCXJmiIDm3exVmMt45nM2To=;
+ b=y50syWkvP+aNNry2E9d1v0E65zQOFyjtuot5GYcQITsgztCvdM5IWwtwi+jZs4I3kl
+ PmkjQB+dzB7kvo7M33YibeuEbAgJXnmFivWK9JWxQdZ77TaWjaF9/6SH99smCXEy3bi3
+ 1wTwNvn28bq2aNyaAcfKzJbzgvbWV+4IdppKnvtAH0Soxt2tfhOTO9wbfT7c1Usz5++J
+ 4e6ntfuuZdazvRLCQmR09PWPFbPEKkBIG7LTZoE0BB4uQVgvikFWgGKpS1kYW3yWN14f
+ tM/8oMzSviYClw9Nlcb1hzKvM1sfn89r6nQ2hXkXtYCO7AmTTXRf7hJjnimMy2Vwp3Z3
+ oOpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FqgR83A2DIzZuEwHOjx5GCXJmiIDm3exVmMt45nM2To=;
+ b=PLlGLYsqiJ6TtXJ9oss8BYv0BtfeEOkLdZlpuMXwoluuXyQxKLHYNbeusVKlS2p+fP
+ Sl3vWeICJl9GAfSe96Uau2t+TH9jdXMuc4H+n3KjS6fGOC5+ooZfWjEMLR/v+1hnythd
+ 2SH7RtNBjDHS/xhfslp+k/aIh0Kymrvr0AtxLPez1MtPQV8QUgESIYVTp7RdhPC7Da58
+ WG/taXOFewmMbam2tIayFsJIOKR+JQ8fmwjDa6u3xOR/qJlx8o9OMPmenOjDeK6lUFlR
+ NmmUIoyFaftdRI9NOhez3I+Tna/Rd69/vktxbM/Vq0pGf0RX3t5vONOLawz4Ndgh9Hgm
+ D9iA==
+X-Gm-Message-State: APjAAAVnzlAtqFYfP2akAZdUhSgihGnvNRZru3d0/QvB/HVEOpMOYhsW
+ Z3Aingzc9cbtNe6sQFVt2eL80QlzZQeIpsDNDeVSsA==
+X-Google-Smtp-Source: APXvYqxl+DjV8akbgx7O7+fh/ioQ36hfUec0ZqZ0OOfyOn5YErjNlgGDtbXRw5NHAToMk8Y5cu8uKe+92AR5CFL0Yzk=
+X-Received: by 2002:a9d:6a8a:: with SMTP id l10mr17227290otq.97.1568050775032; 
+ Mon, 09 Sep 2019 10:39:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20190827201639.30368-1-stefanha@redhat.com>
+ <20190827201639.30368-2-stefanha@redhat.com>
+In-Reply-To: <20190827201639.30368-2-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Sep 2019 18:39:24 +0100
+Message-ID: <CAFEAcA8MsjfKTr9JANt39vGZNPk5McQaex7wTRJkOn+hqB54bg@mail.gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a01:4f8:191:4433::2
-Subject: Re: [Qemu-devel] [RFC] docs: vhost-user: add in-band kick/call
- messages
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PULL 01/12] util/iov: introduce
+ qemu_iovec_init_extended
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,85 +87,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, mst@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-09 at 18:00 +0200, Stefan Hajnoczi wrote:
+On Tue, 27 Aug 2019 at 21:16, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> Introduce new initialization API, to create requests with padding. Will
+> be used in the following patch. New API uses qemu_iovec_init_buf if
+> resulting io vector has only one element, to avoid extra allocations.
+> So, we need to update qemu_iovec_destroy to support destroying such
+> QIOVs.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Message-id: 20190604161514.262241-2-vsementsov@virtuozzo.com
+> Message-Id: <20190604161514.262241-2-vsementsov@virtuozzo.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> Is this really necessary?  
+Hi -- Coverity thinks this new function could have an
+out-of-bounds read (CID 1405302):
 
-Yes* :)
+> +/*
+> + * Compile new iovec, combining @head_buf buffer, sub-qiov of @mid_qiov,
+> + * and @tail_buf buffer into new qiov.
+> + */
+> +void qemu_iovec_init_extended(
+> +        QEMUIOVector *qiov,
+> +        void *head_buf, size_t head_len,
+> +        QEMUIOVector *mid_qiov, size_t mid_offset, size_t mid_len,
+> +        void *tail_buf, size_t tail_len)
+> +{
+> +    size_t mid_head, mid_tail;
+> +    int total_niov, mid_niov = 0;
+> +    struct iovec *p, *mid_iov;
+> +
+> +    if (mid_len) {
+> +        mid_iov = qiov_slice(mid_qiov, mid_offset, mid_len,
+> +                             &mid_head, &mid_tail, &mid_niov);
+> +    }
+> +
+> +    total_niov = !!head_len + mid_niov + !!tail_len;
+> +    if (total_niov == 1) {
+> +        qemu_iovec_init_buf(qiov, NULL, 0);
+> +        p = &qiov->local_iov;
+> +    } else {
+> +        qiov->niov = qiov->nalloc = total_niov;
+> +        qiov->size = head_len + mid_len + tail_len;
+> +        p = qiov->iov = g_new(struct iovec, qiov->niov);
+> +    }
+> +
+> +    if (head_len) {
+> +        p->iov_base = head_buf;
+> +        p->iov_len = head_len;
+> +        p++;
+> +    }
+> +
+> +    if (mid_len) {
+> +        memcpy(p, mid_iov, mid_niov * sizeof(*p));
+> +        p[0].iov_base = (uint8_t *)p[0].iov_base + mid_head;
+> +        p[0].iov_len -= mid_head;
+> +        p[mid_niov - 1].iov_len -= mid_tail;
+> +        p += mid_niov;
+> +    }
+> +
+> +    if (tail_len) {
+> +        p->iov_base = tail_buf;
+> +        p->iov_len = tail_len;
+> +    }
+> +}
 
-> Can the simulation interpose between the
-> call/kick eventfds in order to control when events happen?
-> 
->   CPU --cpu_kickfd--> Simulation --vhost_kickfd--> vhost-user device
-> 
-> and:
-> 
->   vhost-user device --vhost_callfd--> Simulation -->cpu_callfd-> CPU
-> 
-> The simluation controls when the CPU's kick is seen by the device and
-> also when the call is seen by the CPU.
+but I'm not familiar enough with the code to be able to tell
+if it's correct or if it's just getting confused. Could
+somebody have a look? (It's possible it's getting confused
+because the calculation of 'total_niov' uses 'mid_niov',
+but the condition guarding the code that fills in that part
+of the vector is 'mid_len', so it thinks it can take the
+"total_niov == 1" codepath and also the "head_len == true"
+and "mid_len != 0" paths; in which case using "if (mid_niov)"
+instead might make it happier.)
 
-The point isn't to let the simulation know about anything that happens.
-The CPU and the device are *part* of the simulation.
-
-> I don't understand why new vhost-user protocol messages are required.
-
-I guess I haven't really explained it well then :-)
-
-So let's say, WLOG, I have a simulated network and a bunch of Linux
-machines that are running on simulation time. Today I can do that only
-with user-mode Linux, but we'll see.
-
-Now in order to run everything on simulation time, *everything* that
-happens in the simulation needs to request a simulation calendar entry,
-and gets told when that entry is scheduled.
-
-So think, for example, you have
-
-CPU ---[kick]---> device
-
-Now, this is essentially triggering an interrupt in the device. However,
-the simulation code has to ensure that the simulated device's interrupt
-handling only happens at a scheduler entry. Fundamentally, the
-simulation serializes all processing, contrary to what you want in a
-real system.
-
-Now, this means that the CPU (that's part of the simulation) has to
-*wait* for the device to add an entry to the simulation calendar in
-response to the kick... That means that it really has to look like
-
-CPU               device                   calendar
-     ---[kick]-->
-                         ---[add entry]-->
-                         <---[return]-----
-     <-[return]--
-
-so that the CPU won't get to idle or some other processing where it asks
-the simulation calendar for its own next entry...
-
-Yes, like I said before, I realize that all of this is completely
-opposed to what you want in a real system, but then in a real system you
-also have real timeouts, and don't just skip time forward when the
-simulation calendar says so ...
-
-
-* Now, of course I lied, this is software after all. The *concept* is
-necessary, but it's not strictly necessary to do this in-band in the
-vhost-user protocol.
-We could do an out-of-band simulation socket for the kick signal and
-just pretend we're using polling mode as far as the vhost-user protocol
-is concerned, but it'd probably be harder to implement, and we couldn't
-do it in a way that we could actually contribute anything upstream.
-There are quite a few papers proposing such simulation systems, I only
-found the VMSimInt one publishing their code, but even that is some
-hacks on top of qemu 1.6.0...
-
-johannes
-
+thanks
+-- PMM
 
