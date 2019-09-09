@@ -2,71 +2,68 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EA5C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 395D4C4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:02:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBEFE2084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:01:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBEFE2084D
+	by mail.kernel.org (Postfix) with ESMTPS id 13DA72084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:02:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DA72084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7M74-0001nB-Cc
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:01:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59549)
+	id 1i7M77-0001qL-AY
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:02:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7M48-0008Oh-7Y
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:58:57 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7M4A-0008On-4V
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7M46-0001ai-Nq
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:58:56 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:45445)
+ (envelope-from <laurent@vivier.eu>) id 1i7M46-0001ac-Ln
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:58:57 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:44567)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7M46-0001aA-2i; Mon, 09 Sep 2019 11:58:54 -0400
+ id 1i7M46-0001aB-19; Mon, 09 Sep 2019 11:58:54 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N332D-1iHZJB3d1h-013J9E; Mon, 09 Sep 2019 17:58:29 +0200
+ id 1M2etD-1i8BOt2qDf-004EHi; Mon, 09 Sep 2019 17:58:21 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Mon,  9 Sep 2019 17:58:08 +0200
-Message-Id: <20190909155813.27760-5-laurent@vivier.eu>
+Date: Mon,  9 Sep 2019 17:58:04 +0200
+Message-Id: <20190909155813.27760-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190909155813.27760-1-laurent@vivier.eu>
-References: <20190909155813.27760-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8hJHv8g+pzlaXTuaiWQ3/L3ENgIU5WSGr5thhdcx65QDk1riDKt
- fZeDH0+88By1rRwI9bduWXdUHVnpU6O9svgs1cmepDGWZjH21iMnxJxO1l2mTG3qFgjYItB
- NrqXBrfIqo26VJyPW0DY2GC7mncBQFrv6o5DAFjpaxZG84ZCwBOEJduiNf53OvNoActEbhc
- zPYf4F0diD8OkipaXGmlg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XYmLKxYZI80=:mzrurWVHlVzLZm5QICSCt1
- AEj9SWl+RQ82revjiqRDNGicV23FyWKVlGlBIeEiAjyB9pmnt+LtwsmMxfKAK8fA1t3m1FIn9
- QT5zGhal23VFij1FyakPuGbedb6NBzAHJuIYRAEBhqcwymfjRzdQd0QuweyJ+oQzYDr2GmmBU
- vZoYPmg0AlRyvP+UhwzhbCMoz6FR/k6qK5o/ivlZmyVeJOkNsMPAgHSAMjuuP3W4shleZJ2Nn
- i7/OILqK0w9PHruOB2s80rIqJv9g+fpiiYFZ3xjxBl7qQHswzG6TD+dqDhlr6Y8QTnLajCCxw
- RlO1LiqNqy0iYQvc6g2kpTpTx2SaChulggAvNfOrRYq1mcSIR3KFi9zfZ8LtVEoUfmGYehSHS
- ZfFF5DgLpMVE6VmOfnIWOxxYhks2QJYYYUsk3HeEASxXWoheQEHhztP06LpPYDSsueMsysgDA
- HtlPmyt+Yn5N83U3UJ/SOhEL+aI1nIK/0vl6WGWxsJFDQb9kKhK8BS/zFiC1mzQoCO7jWCnFR
- O8h9MQV+WZnR8Dm977v1WuCZXFsGfpeDZ8WUOlc4YbVL3fI9I+P7Wijdnh/RsnoSp8g8BNz0D
- ltQGparADQvrtS5EPKx9t+F6z/PJy9T67veXZpVN6DvHNmtNWP5WMlVV3ABY6+0Ytt7i27a1y
- 7nXzFDJZcDa6/fopHbiG5HQQIa1T9ro6mBwQi2RBWssLO/dy1yehNwg7SI1lRHrVs2izdH8zh
- QUNSiYksUATU6yZ9HMO2Y7N6nYTb/jehCDgcb2P3/8fOyxp8I7Nj9y38j+pe9q6BzX9E0JWOw
- dBVy333jDOD8Hn77d1k/MACk2bxKzx3XQ8s+MN6KNS2iHSrd3s=
+X-Provags-ID: V03:K1:NwjZrCvErK9/KEsrjRT5rS6sJ7obqwx+vg+H7uWj3mfl2fvx3pz
+ RUhxVrMAoxIz6XLokGvHgT80mm2t49DmlMuYBJM/jKEciDk8NhkUb3+ca3ibrhT9ZxEy+1m
+ RASX+37Q7bv4T++aWmJzvTbHEa04u9/a3C8NWahNusJp7ujXK6aMpA0YyvTSnIybQShtbTI
+ Bbt8V0U83jTHCRHcZ5gyA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7QDGwXyEwsA=:vbkXgEyxoGyIeeEitinAtQ
+ jsRwLg+v07tjXXzXf9WNqHqJaU3F5XlvYbgrqDpyIU1B/cGYacE70ZgtU1kn642p9IJ7ltWBS
+ Vnc6/PwRC3ir/KHPygodDqP8WlOAHWbbzfE7Zxd0X78B7TH3oSWaIU2fUO76qutI8EJmwrC49
+ PlTlcTS4XsyhNeUV9FlMEy9VXKRJALFtmSIrNSfUIOOtN7EYQg3oVdOug6iTqDhrGYa6hb9m0
+ 8h8ke8se78g5fLua70IiPvBFlqeuqBtX44kh1uUFJS//Mg35YwafB6sN2dy7ZxLM1xuAdCd1w
+ x7590WAR6/lEA9QQUZWFkMFRSAVdnTjWgncr6xD/RPjIdNav+pNIlWgKHFjNBv3HEyGaI7/N/
+ sQE51rZ+wnjSq35M1+gWHEotFkYWzZWBYeBWTOzQOdIZyrutuNGmL/dfp1TfhzqoewTfyYGTs
+ hQll8TBMqkJ1tafp7YZFXmudO5hAa0WUhwuWQOhDT5iEepJTU0CDf0a5uYYmxyWVNHsHjnjsB
+ 7yoUYIg0XIjET6Rolw6Rbj6Ofj7Bap7m65if/Vqrf89S4jyIjhHYlRuhXPjRyEpQJ4mxZ/hTy
+ lM/LUrR4exuDX85+RAOwbVITm+zyCDjb7vX+SuBNswc8o0URFbFLIj/V18SDv6XrxgsZNh7gN
+ fSqMNjH8xXc2fi4XjxBXQ3cVIiy+QutKa46uwEw6crNXxLMVK3fWsV3KlybCAkOtPHLpo2Vod
+ zL4eqKF2aK0KpgiuzIYIFrLjG8AL9Re8UoE4KzE7GTxuJWN3u5lyxIrzzSbimkICJNSuU+P0z
+ 3m2g7DvGcFL/B5UP72vYp+YGz1I9LWPQxs7xto4juCmGRfI7fU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: [Qemu-devel] [PATCH v9 4/9] hw/m68k: implement ADB bus support for
- via
+X-Received-From: 212.227.126.131
+Subject: [Qemu-devel] [PATCH v9 0/9] hw/m68k: add Apple Machintosh Quadra
+ 800 machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,267 +89,207 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Thomas Huth <huth@tuxfamily.org>
----
- hw/misc/mac_via.c         | 190 ++++++++++++++++++++++++++++++++++++++
- include/hw/misc/mac_via.h |   7 ++
- 2 files changed, 197 insertions(+)
+I'm rebasing some of these patches for seven years now,
+too many years...
 
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-index 64914b806e..76cb5f8883 100644
---- a/hw/misc/mac_via.c
-+++ b/hw/misc/mac_via.c
-@@ -263,10 +263,16 @@
-  * Table 19-10 ADB transaction states
-  */
- 
-+#define ADB_STATE_NEW       0
-+#define ADB_STATE_EVEN      1
-+#define ADB_STATE_ODD       2
-+#define ADB_STATE_IDLE      3
-+
- #define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
- #define VIA1B_vADB_StateShift   4
- 
- #define VIA_TIMER_FREQ (783360)
-+#define VIA_ADB_POLL_FREQ 50 /* XXX: not real */
- 
- /* VIA returns time offset from Jan 1, 1904, not 1970 */
- #define RTC_OFFSET 2082844800
-@@ -448,6 +454,181 @@ static void via1_rtc_update(MacVIAState *m)
-     }
- }
- 
-+static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
-+{
-+    if (state != ADB_STATE_IDLE) {
-+        return 0;
-+    }
-+
-+    if (s->adb_data_in_size < s->adb_data_in_index) {
-+        return 0;
-+    }
-+
-+    if (s->adb_data_out_index != 0) {
-+        return 0;
-+    }
-+
-+    s->adb_data_in_index = 0;
-+    s->adb_data_out_index = 0;
-+    s->adb_data_in_size = adb_poll(&s->adb_bus, s->adb_data_in, 0xffff);
-+
-+    if (s->adb_data_in_size) {
-+        *data = s->adb_data_in[s->adb_data_in_index++];
-+        qemu_irq_raise(s->adb_data_ready);
-+    }
-+
-+    return s->adb_data_in_size;
-+}
-+
-+static int adb_via_send(MacVIAState *s, int state, uint8_t data)
-+{
-+    switch (state) {
-+    case ADB_STATE_NEW:
-+        s->adb_data_out_index = 0;
-+        break;
-+    case ADB_STATE_EVEN:
-+        if ((s->adb_data_out_index & 1) == 0) {
-+            return 0;
-+        }
-+        break;
-+    case ADB_STATE_ODD:
-+        if (s->adb_data_out_index & 1) {
-+            return 0;
-+        }
-+        break;
-+    case ADB_STATE_IDLE:
-+        return 0;
-+    }
-+
-+    assert(s->adb_data_out_index < sizeof(s->adb_data_out) - 1);
-+
-+    s->adb_data_out[s->adb_data_out_index++] = data;
-+    qemu_irq_raise(s->adb_data_ready);
-+    return 1;
-+}
-+
-+static int adb_via_receive(MacVIAState *s, int state, uint8_t *data)
-+{
-+    switch (state) {
-+    case ADB_STATE_NEW:
-+        return 0;
-+
-+    case ADB_STATE_EVEN:
-+        if (s->adb_data_in_size <= 0) {
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 0;
-+        }
-+
-+        if (s->adb_data_in_index >= s->adb_data_in_size) {
-+            *data = 0;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 1;
-+        }
-+
-+        if ((s->adb_data_in_index & 1) == 0) {
-+            return 0;
-+        }
-+
-+        break;
-+
-+    case ADB_STATE_ODD:
-+        if (s->adb_data_in_size <= 0) {
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 0;
-+        }
-+
-+        if (s->adb_data_in_index >= s->adb_data_in_size) {
-+            *data = 0;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 1;
-+        }
-+
-+        if (s->adb_data_in_index & 1) {
-+            return 0;
-+        }
-+
-+        break;
-+
-+    case ADB_STATE_IDLE:
-+        if (s->adb_data_out_index == 0) {
-+            return 0;
-+        }
-+
-+        s->adb_data_in_size = adb_request(&s->adb_bus, s->adb_data_in,
-+                                          s->adb_data_out,
-+                                          s->adb_data_out_index);
-+        s->adb_data_out_index = 0;
-+        s->adb_data_in_index = 0;
-+        if (s->adb_data_in_size < 0) {
-+            *data = 0xff;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return -1;
-+        }
-+
-+        if (s->adb_data_in_size == 0) {
-+            return 0;
-+        }
-+
-+        break;
-+    }
-+
-+    assert(s->adb_data_in_index < sizeof(s->adb_data_in) - 1);
-+
-+    *data = s->adb_data_in[s->adb_data_in_index++];
-+    qemu_irq_raise(s->adb_data_ready);
-+    if (*data == 0xff || *data == 0) {
-+        return 0;
-+    }
-+    return 1;
-+}
-+
-+static void via1_adb_update(MacVIAState *m)
-+{
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    int state;
-+    int ret;
-+
-+    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+
-+    if (s->acr & VIA1ACR_vShiftOut) {
-+        /* output mode */
-+        ret = adb_via_send(m, state, s->sr);
-+        if (ret > 0) {
-+            s->b &= ~VIA1B_vADBInt;
-+        } else {
-+            s->b |= VIA1B_vADBInt;
-+        }
-+    } else {
-+        /* input mode */
-+        ret = adb_via_receive(m, state, &s->sr);
-+        if (ret > 0 && s->sr != 0xff) {
-+            s->b &= ~VIA1B_vADBInt;
-+        } else {
-+            s->b |= VIA1B_vADBInt;
-+        }
-+    }
-+}
-+
-+static void via_adb_poll(void *opaque)
-+{
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    int state;
-+
-+    if (s->b & VIA1B_vADBInt) {
-+        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+        if (adb_via_poll(m, state, &s->sr)) {
-+            s->b &= ~VIA1B_vADBInt;
-+        }
-+    }
-+
-+    timer_mod(m->adb_poll_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
-+}
-+
- static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
- {
-     MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
-@@ -510,6 +691,10 @@ static void mac_via_reset(DeviceState *dev)
- {
-     MacVIAState *m = MAC_VIA(dev);
- 
-+    timer_mod(m->adb_poll_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
-+
-     timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
-               / 16630 * 16630);
- 
-@@ -548,6 +733,10 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
- 
-     qemu_get_timedate(&tm, 0);
-     m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-+
-+    m->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via_adb_poll, m);
-+    m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
-+                                               VIA1_IRQ_ADB_READY_BIT);
- }
- 
- static void mac_via_init(Object *obj)
-@@ -596,6 +785,7 @@ static void mos6522_q800_via1_portB_write(MOS6522State *s)
-     MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
- 
-     via1_rtc_update(m);
-+    via1_adb_update(m);
- 
-     v1s->last_b = s->b;
- }
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
-index 69bdecabb0..2181140293 100644
---- a/include/hw/misc/mac_via.h
-+++ b/include/hw/misc/mac_via.h
-@@ -97,6 +97,13 @@ typedef struct MacVIAState {
- 
-     /* ADB */
-     ADBBusState adb_bus;
-+    QEMUTimer *adb_poll_timer;
-+    qemu_irq adb_data_ready;
-+    int adb_data_in_size;
-+    int adb_data_in_index;
-+    int adb_data_out_index;
-+    uint8_t adb_data_in[128];
-+    uint8_t adb_data_out[16];
- 
-     /* external timers */
-     QEMUTimer *one_second_timer;
+if you want to test the machine, I'm sorry, it doesn't boot
+a MacROM, but you can boot a linux kernel from the command line.
+
+You can install your own disk using debian-installer, with:
+
+    ...
+    -M q800 \
+    -serial none -serial mon:stdio \
+    -m 1000M \
+    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+    -append "console=ttyS0 vga=off" \
+    -kernel vmlinux-4.16.0-1-m68k \
+    -initrd initrd.gz \
+    -drive file=debian-10.0-m68k-NETINST-1.iso,media=cdrom \
+    -drive file=m68k.qcow2,format=qcow2 \
+    -nographic
+
+If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
+size of the display (I use "-g 1600x800x24").
+
+You can get the ISO from:
+
+https://cdimage.debian.org/cdimage/ports/10.0/m68k/iso-cd/debian-10.0-m68k-NETINST-1.iso
+
+and extract the kernel and initrd.gz:
+
+guestfish --add debian-10.0-m68k-NETINST-1.iso --ro \
+          --mount /dev/sda:/ <<_EOF_
+copy-out /install/cdrom/initrd.gz .
+copy-out /install/kernels/vmlinux-4.16.0-1-m68k .
+_EOF_
+
+The mirror to use is: http://ftp.ports.debian.org/debian-ports/
+when it fails, continue without boot loader.
+
+In the same way, you can extract the kernel and the initramfs from the qcow2
+image to use it with "-kernel" and "-initrd":
+
+guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
+copy-out /boot/vmlinux-4.16.0-1-m68k .
+copy-out /boot/initrd.img-4.16.0-1-m68k .
+_EOF_
+
+and boot with:
+
+   ...
+   -append "root=/dev/sda2 rw console=ttyS0 console=tty \
+   -kernel vmlinux-4.16.0-1-m68k \
+   -initrd initrd.img-4.16.0-1-m68k
+
+NOTE: DHCP doesn't work but you can assign a static IP address.
+      We need some patches for dp8393x that are not ready to be merged.
+      See http://patchwork.ozlabs.org/patch/927020/
+          http://patchwork.ozlabs.org/patch/927030/
+          http://patchwork.ozlabs.org/patch/927026/
+
+v9: Fix comments format
+    rebase on top of NeXTcube
+
+v8: rebase (new blk_new(), add "qemu-common.h")
+    update bootinfo information and license
+    add some braces
+    Rename Q800IRQState to GLUEState:
+    it's more like a Logic Unit than an IRQ controller,
+    and Apple calls it "GLUE" (Mark: I prefer to keep it
+    like this for the moment, in the future this part
+    need to be reworked, we have to review the IRQ levels
+    and to wire NUBUS IRQ. The implementation is really trivial
+    for the moment and we will move it to QOM in the future)
+
+v7: rebase and port to Kconfig
+    move IRQ controller back to q800.c (we don't need an object for this)
+    update log message for ESP changes and add some g_assert()
+    re-order patches: put esp, escc and dp8393x first
+
+v6: Rebase onto git master (this now includes the m68k EXCP_ILLEGAL fix required
+      for this patchset to boot)
+    Add Hervé's R-B tags
+    Drop ASC (Apple Sound Chip) device since the Linux driver is broken and
+      it is not required for a successful boot
+    Remove extra esp_raise_irq() from ESP pseudo-DMA patch (Hervé)
+    Remove "return" from unimplemented write functions and instead add a
+      "read only" comment (Hervé)
+    Rename MAX_FD to SWIM_MAX_FD in SWIM floppy controller patch to prevent
+      potential conflicts with other files (Hervé)
+
+v5: Rebase onto git master
+    Add Philippe's R-B to patch 10
+    Include the command line to boot a Linux kernel under the q800 machine in the
+    commit message for patch 11 (Philippe)
+    Fix up comments in hw/misc/mac_via.c (Thomas)
+    Add asserts to VIA ADB support to prevent potential buffer overflows (Thomas)
+    Move macfb surface/resolution checks to realise and remove hw_error (Thomas)
+    Move macfb draw_line functions inline and remove macfb-template.h (Mark)
+    Use guest address rather than source pointer in draw_line functions - this brings
+      macfb in line with the VGA device and can prevent a potential buffer overflow
+    Use g_strdup_printf() for memory region names in NuBus devices instead of
+      hardcoded length char arrays (Thomas)
+    Move NuBus QOM types from patch 7 to patch 8 (spotted by Thomas)
+    Move CONFIG_COLDFIRE sections together in hw/m68k/Makefile.objs (Thomas)
+    Remove obsolete comment from q800.c in patch 11 (Thomas)
+
+v4: Drop RFC from subject prefix as this is getting close to final
+    Rebased onto master (fixing ESP, rom_ptr() conflicts)
+    Reworked q800.c based upon Thomas' comments about cpu_init() and
+      qemu_check_nic_model()
+    Address Thomas' comments on using error_report() instead of hw_error()
+    Change the NuBus memory regions from DEVICE_NATIVE_ENDIAN to
+      DEVICE_BIG_ENDIAN
+    Split macfb Nubus support into separate commit
+    Change VMSTATE_BUFFER_UNSAFE() to VMSTATE_UINT8_ARRAY() in macfb.c as
+      suggested by David
+    Remove dummy Apple Sound Chip migration state as pointed out by David
+    Keep VIA ADB state and buffers in the mac_via device rather than adding
+      to existing ADBState (this matches the pattern used in the PPC CUDA/PMU
+      VIAs)
+    Remove blacklisting for q800 machine from "make check" as requested by
+      Thomas with the following fixes:
+        - Fix incorrect MemoryRegion owner in ASC device
+        - Add qtest_enabled() check in q800_init() to allow testing when no
+          kernel is specified
+        - Move some Mac VIA initialisation from init to realize
+    Remove legacy drive properties from SWIM floppy controller and instead
+      expose separate floppy bus and drive devices as requested by Kevin
+
+v3: fix subject prefix "C" -> "RFC"
+
+v2: remove the dp8393x fixes, because one of the patch breaks something
+    Update "dp8393x: manage big endian bus" with idea from Thomas
+    Mark has reworked most of the patches:
+    - use mos6522
+    - some code move, renamings and cleanup
+
+Laurent Vivier (8):
+  esp: add pseudo-DMA as used by Macintosh
+  dp8393x: manage big endian bus
+  hw/m68k: add via support
+  hw/m68k: implement ADB bus support for via
+  hw/m68k: add macfb video card
+  hw/m68k: add Nubus support
+  hw/m68k: add a dummy SWIM floppy controller
+  hw/m68k: define Macintosh Quadra 800
+
+Mark Cave-Ayland (1):
+  hw/m68k: add Nubus support for macfb video card
+
+ MAINTAINERS                         |  14 +
+ arch_init.c                         |   4 +
+ default-configs/m68k-softmmu.mak    |   1 +
+ hw/Kconfig                          |   1 +
+ hw/Makefile.objs                    |   1 +
+ hw/block/Kconfig                    |   3 +
+ hw/block/Makefile.objs              |   1 +
+ hw/block/swim.c                     | 421 +++++++++++++
+ hw/display/Kconfig                  |   4 +
+ hw/display/Makefile.objs            |   1 +
+ hw/display/macfb.c                  | 477 +++++++++++++++
+ hw/m68k/Kconfig                     |  12 +
+ hw/m68k/Makefile.objs               |   1 +
+ hw/m68k/bootinfo.h                  | 114 ++++
+ hw/m68k/q800.c                      | 382 ++++++++++++
+ hw/misc/Kconfig                     |   4 +
+ hw/misc/Makefile.objs               |   1 +
+ hw/misc/mac_via.c                   | 882 ++++++++++++++++++++++++++++
+ hw/net/dp8393x.c                    |  88 ++-
+ hw/nubus/Kconfig                    |   2 +
+ hw/nubus/Makefile.objs              |   4 +
+ hw/nubus/mac-nubus-bridge.c         |  45 ++
+ hw/nubus/nubus-bridge.c             |  34 ++
+ hw/nubus/nubus-bus.c                | 111 ++++
+ hw/nubus/nubus-device.c             | 215 +++++++
+ hw/scsi/esp.c                       | 296 +++++++++-
+ include/hw/block/swim.h             |  76 +++
+ include/hw/display/macfb.h          |  64 ++
+ include/hw/misc/mac_via.h           | 114 ++++
+ include/hw/nubus/mac-nubus-bridge.h |  24 +
+ include/hw/nubus/nubus.h            |  69 +++
+ include/hw/scsi/esp.h               |   7 +
+ qemu-options.hx                     |   2 +-
+ vl.c                                |   3 +-
+ 34 files changed, 3416 insertions(+), 62 deletions(-)
+ create mode 100644 hw/block/swim.c
+ create mode 100644 hw/display/macfb.c
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 hw/m68k/q800.c
+ create mode 100644 hw/misc/mac_via.c
+ create mode 100644 hw/nubus/Kconfig
+ create mode 100644 hw/nubus/Makefile.objs
+ create mode 100644 hw/nubus/mac-nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bus.c
+ create mode 100644 hw/nubus/nubus-device.c
+ create mode 100644 include/hw/block/swim.h
+ create mode 100644 include/hw/display/macfb.h
+ create mode 100644 include/hw/misc/mac_via.h
+ create mode 100644 include/hw/nubus/mac-nubus-bridge.h
+ create mode 100644 include/hw/nubus/nubus.h
+
 -- 
 2.21.0
 
