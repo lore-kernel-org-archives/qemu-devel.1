@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B18DC4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A09C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:46:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FB29218DE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:34:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FB29218DE
+	by mail.kernel.org (Postfix) with ESMTPS id 852FB20828
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:46:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 852FB20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7JoF-0000Zl-IS
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 09:34:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59417)
+	id 1i7JzX-0003Xl-N2
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 09:46:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7JnG-0008Sa-Q5
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:33:23 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7Jyf-0002uL-DU
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:45:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7JnF-0001LL-UP
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:33:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63572)
+ (envelope-from <mreitz@redhat.com>) id 1i7Jye-0008As-02
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:45:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52192)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7JnA-0001Je-2N; Mon, 09 Sep 2019 09:33:16 -0400
+ id 1i7JyZ-00087Y-On; Mon, 09 Sep 2019 09:45:03 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A14E7302C07C;
- Mon,  9 Sep 2019 13:33:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1C0A78DCF81;
+ Mon,  9 Sep 2019 13:45:03 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
  [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E224B6012A;
- Mon,  9 Sep 2019 13:33:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E15606012A;
+ Mon,  9 Sep 2019 13:44:56 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
- <20190830161228.54238-14-vsementsov@virtuozzo.com>
+ <20190830161228.54238-15-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <89a0b76d-0c3c-37df-b7cb-087309fb66dc@redhat.com>
-Date: Mon, 9 Sep 2019 15:32:58 +0200
+Message-ID: <ae052311-34bb-88a6-b415-fd79aaa45cb0@redhat.com>
+Date: Mon, 9 Sep 2019 15:44:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190830161228.54238-14-vsementsov@virtuozzo.com>
+In-Reply-To: <20190830161228.54238-15-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo"
+ boundary="rWvRkZYIxatezMNp0p7zUr93AIYGiZ7Kp"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 09 Sep 2019 13:33:14 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Mon, 09 Sep 2019 13:45:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v10 13/14] block: introduce backup-top
- filter driver
+Subject: Re: [Qemu-devel] [PATCH v10 14/14] block/backup: use backup-top
+ instead of write notifiers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,8 +107,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo
-Content-Type: multipart/mixed; boundary="tpgLtcQtdpAESXvScsYBMwWZXlKlIXlte";
+--rWvRkZYIxatezMNp0p7zUr93AIYGiZ7Kp
+Content-Type: multipart/mixed; boundary="gstlI6XGLrTZLGyvMIqVLd7dTgU7UXNAr";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
@@ -116,54 +116,126 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
 Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com,
  xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
  stefanha@redhat.com, jsnow@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <89a0b76d-0c3c-37df-b7cb-087309fb66dc@redhat.com>
-Subject: Re: [PATCH v10 13/14] block: introduce backup-top filter driver
+Message-ID: <ae052311-34bb-88a6-b415-fd79aaa45cb0@redhat.com>
+Subject: Re: [PATCH v10 14/14] block/backup: use backup-top instead of write
+ notifiers
 References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
- <20190830161228.54238-14-vsementsov@virtuozzo.com>
-In-Reply-To: <20190830161228.54238-14-vsementsov@virtuozzo.com>
+ <20190830161228.54238-15-vsementsov@virtuozzo.com>
+In-Reply-To: <20190830161228.54238-15-vsementsov@virtuozzo.com>
 
---tpgLtcQtdpAESXvScsYBMwWZXlKlIXlte
+--gstlI6XGLrTZLGyvMIqVLd7dTgU7UXNAr
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 30.08.19 18:12, Vladimir Sementsov-Ogievskiy wrote:
-> Backup-top filter caches write operations and does copy-before-write
-> operations.
+> Drop write notifiers and use filter node instead.
 >=20
-> The driver will be used in backup instead of write-notifiers.
+> =3D Changes =3D
+>=20
+> 1. Add filter-node-name argument for backup qmp api. We have to do it
+> in this commit, as 257 needs to be fixed.
+>=20
+> 2. There are no more write notifiers here, so is_write_notifier
+> parameter is dropped from block-copy paths.
+>=20
+> 3. Intersecting requests handling changed, now synchronization between
+> backup-top, backup and guest writes are all done in block/block-copy.c
+> and works as follows:
+>=20
+> On copy operation, we work only with dirty areas. If bits are dirty it
+> means that there are no requests intersecting with this area. We clear
+> dirty bits and take bdrv range lock (bdrv_co_try_lock) on this area to
+> prevent further operations from interaction with guest (only with
+> guest, as neither backup nor backup-top will touch non-dirty area). If
+> copy-operation failed we set dirty bits back together with releasing
+> the lock.
+>=20
+> The actual difference with old scheme is that on guest writes we
+> don't lock the whole region but only dirty-parts, and to be more
+> precise: only dirty-part we are currently operate on. In old scheme
+> guest write to non-dirty area (which may be safely ignored by backup)
+> may wait for intersecting request, touching some other area which is
+> dirty.
+>=20
+> 4. To sync with in-flight requests at job finish we now have drained
+> removing of the filter, we don't need rw-lock.
+>=20
+> =3D Notes =3D
+>=20
+> Note the consequence of three objects appearing: backup-top, backup job=
+
+> and block-copy-state:
+>=20
+> 1. We want to insert backup-top before job creation, to behave similar
+> with mirror and commit, where job is started upon filter.
+>=20
+> 2. We also have to create block-copy-state after filter injection, as
+> we don't want its source child be replaced by filter. Instead we want
+> to keep BCS.source to be real source node, as we want to use
+> bdrv_co_try_lock in CBW operations and it can't be used on filter, as
+> on filter we already have in-flight (write) request from upper layer.
+>=20
+> So, we firstly create inject backup-top, then create job and BCS. BCS
+> is the latest just to not create extra variable for it. Finally we set
+> bcs for backup-top filter.
+>=20
+> =3D Iotest changes =3D
+>=20
+> 56: op-blocker doesn't shoot now, as we set it on source, but then
+> check on filter, when trying to start second backup.
+> To keep the test we instead can catch another collision: both jobs will=
+
+> get 'drive0' job-id, as job-id parameter is unspecified. To prevent
+> interleaving with file-posix locks (as they are dependent on config)
+> let's use another target for second backup.
+>=20
+> Also, it's obvious now that we'd like to drop this op-blocker at all
+> and add a test-case for two backups from one node (to different
+> destinations) actually works. But not in these series.
+>=20
+> 257: The test wants to emulate guest write during backup. They should
+> go to filter node, not to original source node, of course. Therefore we=
+
+> need to specify filter node name and use it.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/backup-top.h  |  37 +++++++
->  block/backup-top.c  | 244 ++++++++++++++++++++++++++++++++++++++++++++=
+>  qapi/block-core.json       |   8 +-
+>  include/block/block-copy.h |  10 +-
+>  include/block/block_int.h  |   1 +
+>  block/backup-top.c         |  14 +-
+>  block/backup.c             | 113 +++-----------
+>  block/block-copy.c         |  45 ++++--
+>  block/replication.c        |   2 +-
+>  blockdev.c                 |   1 +
+>  tests/qemu-iotests/056     |   8 +-
+>  tests/qemu-iotests/257     |   7 +-
+>  tests/qemu-iotests/257.out | 306 ++++++++++++++++++-------------------=
 
->  block/Makefile.objs |   2 +
->  3 files changed, 283 insertions(+)
->  create mode 100644 block/backup-top.h
->  create mode 100644 block/backup-top.c
+>  11 files changed, 238 insertions(+), 277 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---tpgLtcQtdpAESXvScsYBMwWZXlKlIXlte--
+--gstlI6XGLrTZLGyvMIqVLd7dTgU7UXNAr--
 
---cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo
+--rWvRkZYIxatezMNp0p7zUr93AIYGiZ7Kp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12VIoACgkQ9AfbAGHV
-z0D5oAf+NMvKuZsp2pAsamq+JviI3cSQWQiTuxy4pkz2z8uuhY/YfzI5F+nZp/9R
-9HfCgh4hvU4nUuH+2/gqTIFmtwN9ioHq2+w3jUXhVhNA1Tv1JLCMwkHX5Xtn9FMK
-G2cPGHi9Ko5c2jNAZFOuirtLv04IzVRC1XzRplJyIypb9oHPf0nJh3pmV1StdW02
-ij6zPBIOhD52ERR9l8pcNICo/UOjQRcRDmRWNQBFM4IJS4cEaNnt8GdBr5y8Phat
-ukeUNq+uLOy9NyZhSd0kVaLbW9Ua5JiwnsTZEi6IyRfkiuNuRxugFz0zoOquQoOv
-IwS9tTCSrq2hLbeKqRrvDPfQEogqmQ==
-=L3ni
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12V1YACgkQ9AfbAGHV
+z0DfkAf/bEyIDXBZUXxRzWhNKnkKOmbrJeNmlyMD2IyUdJxFSP3/cwtqgM69R3SR
+mlYcRR+WGqsdVQT4VjQBGmva/yw1AxyS7NH2rptRq2MqChRLpoJ5P8Eis/FQjirb
+p2xt1nvkksZZhCOzdK4NOpd0LuPkLlgcKtGGTJ0vRle1FQQtdP31YqWiYAS1ETMI
+9liAmLC9utWzu+0oMJ+bTfB6JF9WqOaUB1G6Q/uOVDV4tNXEuqc9gQRkXt9OHKdc
+kQCoIE4L4rnNaH9s9GBV13t8HS9hd7nTVB8srT9TBY+D336kXCvSb/gbhbafcFd0
+Nhlr/f3CUl0i/0sRsWkd4x87XJjGIg==
+=0MZM
 -----END PGP SIGNATURE-----
 
---cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo--
+--rWvRkZYIxatezMNp0p7zUr93AIYGiZ7Kp--
 
