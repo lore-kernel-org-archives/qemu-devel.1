@@ -6,62 +6,59 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC2CC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67207C433EF
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 11:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B55F821479
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:58:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B55F821479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3978A206A1
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 11:01:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3978A206A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7HMt-0003iw-U6
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:57:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33127)
+	id 1i7HQA-00052Y-38
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 07:01:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i7HM2-0003DR-TD
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:57:07 -0400
+ (envelope-from <samuel.thibault@gnu.org>) id 1i7HOi-0004Re-W8
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i7HM1-0004AO-RR
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:57:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33290)
+ (envelope-from <samuel.thibault@gnu.org>) id 1i7HOi-0005mw-4J
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:59:52 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:58715)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i7HLz-00045i-0F; Mon, 09 Sep 2019 06:57:03 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E5C37806A41;
- Mon,  9 Sep 2019 10:57:01 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
- [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2463960BF3;
- Mon,  9 Sep 2019 10:56:56 +0000 (UTC)
-Date: Mon, 9 Sep 2019 12:56:55 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190909105655.GE17606@localhost.localdomain>
-References: <20190906173201.7926-1-mlevitsk@redhat.com>
- <20190906173201.7926-3-mlevitsk@redhat.com>
- <3ac8c65d-4bca-372c-d863-1f794292f5cb@redhat.com>
+ (Exim 4.71) (envelope-from <samuel.thibault@gnu.org>)
+ id 1i7HOh-0005mD-Sm
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:59:52 -0400
+X-IronPort-AV: E=Sophos;i="5.64,484,1559512800"; d="scan'208";a="400860917"
+Received: from nat-inria-bordeaux-52-gw-01-bso.bordeaux.inria.fr (HELO
+ function) ([194.199.1.52])
+ by mail2-relais-roc.national.inria.fr with ESMTP/TLS/AES256-GCM-SHA384;
+ 09 Sep 2019 12:59:49 +0200
+Received: from samy by function with local (Exim 4.92.1)
+ (envelope-from <samuel.thibault@gnu.org>)
+ id 1i7HOf-0005Bi-KK; Mon, 09 Sep 2019 12:59:49 +0200
+Date: Mon, 9 Sep 2019 12:59:49 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Message-ID: <20190909105949.45jdxvzwusonn327@function>
+References: <0115e29c-2254-09c3-13d5-6dfb5307d968@precibake.com>
+ <20190907232924.a2maha6jyf7u6xbb@function>
+ <47bad7a1-8fae-b464-7c74-b458d02a6174@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="SFyWQ0h3ruR435lw"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3ac8c65d-4bca-372c-d863-1f794292f5cb@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 09 Sep 2019 10:57:01 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/3] block/qcow2: fix the corruption when
- rebasing luks encrypted files
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <47bad7a1-8fae-b464-7c74-b458d02a6174@redhat.com>
+Organization: I am not organized
+User-Agent: NeoMutt/20170609 (1.8.3)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.134.164.83
+Subject: Re: [Qemu-devel] slirp, incoming packets get truncated
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,69 +70,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Chris Heinze <c.heinze@precibake.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello,
 
---SFyWQ0h3ruR435lw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Philippe Mathieu-Daudé, le lun. 09 sept. 2019 12:51:23 +0200, a ecrit:
+> Anyhow, if you plan to properly (with your S-o-b) commit your patch to
+> the libslirp repository,
 
-Am 06.09.2019 um 21:17 hat Eric Blake geschrieben:
-> > -        assert((offset_in_cluster & ~BDRV_SECTOR_MASK) =3D=3D 0);
-> > +        assert((guest_offset & ~BDRV_SECTOR_MASK) =3D=3D 0);
-> > +        assert((host_offset & ~BDRV_SECTOR_MASK) =3D=3D 0);
-> >          assert((bytes & ~BDRV_SECTOR_MASK) =3D=3D 0);
->=20
-> Pre-existing, but we could use QEMU_IS_ALIGNED(x, BDRV_SECTOR_SIZE) for
-> slightly more legibility than open-coding the bit operation.
->=20
-> Neat trick about power-of-2 alignment checks:
->=20
-> assert(QEMU_IS_ALIGNED(offset_in_cluster | guest_offset |
->                        host_offset | bytes, BDRV_SECTOR_SIZE));
->=20
-> gives the same result in one assertion.  (I've used it elsewhere in the
-> code base, but I'm not opposed to one assert per variable if you think
-> batching is too dense.)
+Actually the libslirp repository already has something there. Since
+IPv4/6 have a maximum of 64KB packets, it just allocates that size
+on the stack, whîch is simpler in the end. Also it makes mru/mtu
+configurable, we will be able to plug that into qemu once released.
 
-A possible downside of this is that if a user reports an assertion
-failure, you can't tell any more which of the variables ended up in a
-bad state.
-
-If you're lucky, you can still tell in gdb at least if the bug is
-reproducible, but I wouldn't be surprised if in release builds, half of
-the variables were actually optimised away, so that even this wouldn't
-work.
-
-Kevin
-
---SFyWQ0h3ruR435lw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJddi/3AAoJEH8JsnLIjy/Wci0P/1DSiFGPnBQMqzfw66xqlhk+
-U58zMN0WtPUC8W2eFu+TlQYTUbEKSyToFh09wdHtteVC/eY3VYT6F7oGouZ2eKlv
-iJ92Ln1GgLLuyBG/HY9TPfB1fBFqplJiP35KTQv99XaVWkQnNedbP5Ej7vOX6g5P
-uKKvRp3E446d5Pl0dsE4ItbEY0Vr0o3UbzAgp7xPxs7V0v29YnhN+/I9205hBABZ
-6Uz2EsUJnW/XxGmfz0rfVCRdYJL1SBTMRpbbTBd69xA9cH7Me6UpFO4qbZl75PyK
-hRWy4qvyBuBsQxN27ytpCkaiZLSAajzRtcctFLm/PeCALCt4M8+JdYkv2AQuJcCM
-JqFvMfqgQ6O1qPFz5DtJnIrhKJCUe7VUfvTZ/6Ko8/TR36EBeECCggFzbojnaTCP
-7yff3CJipQExxBJU3Dzf78d9HyG9vdmPd8m4ZZZdHWdDAGi2TZLFX/uI5GlvnPaU
-l7mZgs16b6RrebjgeTGO72yre/wXRWXryHd5roSlkce+QOHQxBMDOxIX47pbu4Fq
-Lxab0alX+uEx+z09P5ThYd4P6rGrTJ4ZsWZo03a+9UA7vY2ZK2HXYITpThZAsnY0
-nisK3v6A5y3AfBu1Z8SXy9HeLo9NiZBn5kXm8AUgsl6DQOZlDAZPXCrJV/fj/xEu
-TJnES8oY8sZfiqfJ/NMT
-=rVaQ
------END PGP SIGNATURE-----
-
---SFyWQ0h3ruR435lw--
+Samuel
 
