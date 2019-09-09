@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A00C4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 835E9C49ED6
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6371720863
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:27:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6371720863
+	by mail.kernel.org (Postfix) with ESMTPS id 5D4442089F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:35:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D4442089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7LZP-000082-IU
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:27:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53646)
+	id 1i7LhS-0003NT-JS
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:35:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1i7LYc-00080g-FU
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:26:23 -0400
+ (envelope-from <johannes@sipsolutions.net>) id 1i7LgJ-0002kh-8b
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1i7LYa-0000et-Ep
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:26:22 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:49230
+ (envelope-from <johannes@sipsolutions.net>) id 1i7LgI-0001aI-3f
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:34:19 -0400
+Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:49386
  helo=sipsolutions.net)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1i7LYY-0000aJ-F6
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:26:19 -0400
+ id 1i7LgH-0001ZS-TB
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:34:18 -0400
 Received: by sipsolutions.net with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <johannes@sipsolutions.net>)
- id 1i7LYV-0008AQ-1g; Mon, 09 Sep 2019 17:26:15 +0200
-Message-ID: <49378faefb98abafb64ff105a7941c47395426e7.camel@sipsolutions.net>
+ id 1i7LgE-0008Le-9f; Mon, 09 Sep 2019 17:34:14 +0200
+Message-ID: <f97477a5b16e69a4891c8da542f5002fe4cf2548.camel@sipsolutions.net>
 From: Johannes Berg <johannes@sipsolutions.net>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Date: Mon, 09 Sep 2019 17:26:13 +0200
-In-Reply-To: <20190909105057-mutt-send-email-mst@kernel.org>
+Date: Mon, 09 Sep 2019 17:34:13 +0200
+In-Reply-To: <49378faefb98abafb64ff105a7941c47395426e7.camel@sipsolutions.net>
 References: <20190906102217-mutt-send-email-mst@kernel.org>
  <be405c3ba658cdac7f68c91213c3b714ac24c1e3.camel@sipsolutions.net>
  <20190906110340-mutt-send-email-mst@kernel.org>
@@ -54,6 +54,7 @@ References: <20190906102217-mutt-send-email-mst@kernel.org>
  <20190909094609-mutt-send-email-mst@kernel.org>
  <d2e750aaec396bd0aa7ea8c05ef5705567d16595.camel@sipsolutions.net>
  <20190909105057-mutt-send-email-mst@kernel.org>
+ <49378faefb98abafb64ff105a7941c47395426e7.camel@sipsolutions.net>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
@@ -79,63 +80,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-09 at 10:59 -0400, Michael S. Tsirkin wrote:
-
-> > > Next command is GET_FEATURES. Return an error response from that
-> > > and device init will fail.
-> > 
-> > Hmm, what's an error here though? You can only return a value, no?
+On Mon, 2019-09-09 at 17:26 +0200, Johannes Berg wrote:
 > 
-> Either returning id that does not match GET_FEATURES or
-> returning size != 8 bytes will work.
+> Maybe instead we should just add a "VHOST_USER_REPLY_ERROR" bit (e.g.
+> bit 4 after NEED_REPLY). Qemu in vhost_user_read_header() validates that
+> it received REPLY_MASK | VERSION, so it would reject the message at that
+> point.
+> 
+> Another possibility would be to define the highest bit of the 'request'
+> field to indicate an error, so for GET_FEATURES we'd return the value
+> 0x80000000 | GET_FEATURES.
 
-Hmm, right.
+However, one way or another, that basically leaves us with three
+different ways of indicating an error:
 
-> Using 0 size payload has precedent in VHOST_USER_GET_CONFIG:
-> 	vhost-user slave uses zero length of
-> 	  payload to indicate an error to vhost-user master.
+ 1) already defined errors in existing messages - we can't change them
+    since those are handled at runtime now, e.g. VHOST_USER_POSTCOPY_END
+    returns a u64 value with an error status, and current code cannot
+    deal with an error flag in the 'request' or 'flags' field
+ 2) F_REPLY_ACK errors to messages that do not specify a response at all
+ 3) this new way of indicating an error back from messages that specify
+    a response, but the response has no inherent way of returning an
+    error
 
-OK, I think zero-len makes sense, that's certainly something that must
-be checked by the receiver already.
+To me that really feels a bit too complex from the spec POV. But I don't
+see a way to generalize this without another extension, and again the
+device cannot choose which extensions it supports since the master
+chooses them and just sets them.
 
-> It's annoying that we don't get an error indicator in that case though.
-> Worth returning e.g. a 4 byte code?
-
-That also would need to be checked by the receiver, but
-
-1) Then we have to start defining an error code enum, as there's no
-   natural space. Is that worth it for what's basically a corner case?
-2) It'd also be annoying that we now have a 4-byte error code, but with
-   F_REPLY_ACK / need_reply you get an 8-byte status code, which would
-   be incompatible in a way.
-
-> And let's generalize for all other messages with response?
-
-We could theoretically have a message in the future that wants a 4-byte
-response, though by convention basically everything uses u64 anyway ...
-
-OTOH, 0-byte as error doesn't generalize, VHOST_USER_POSTCOPY_ADVISE has
-only a file descriptor as slave payload AFAICT... But then possibly in
-those cases the master also wouldn't check the response size at all,
-since it never uses it. Qemu does though, and is probably the currently
-relevant implementation? Our UML implementation doesn't use this.
+Perhaps I really should just stick a "g_assert()" into the code at that
+point, and have it crash, since it's likely that F_KICK_CALL_MSGS isn't
+even going to be implemented in qemu (unless it grows simulation support
+and then it'd all be conditional on some simulation command-line option)
 
 
-Maybe instead we should just add a "VHOST_USER_REPLY_ERROR" bit (e.g.
-bit 4 after NEED_REPLY). Qemu in vhost_user_read_header() validates that
-it received REPLY_MASK | VERSION, so it would reject the message at that
-point.
 
-Another possibility would be to define the highest bit of the 'request'
-field to indicate an error, so for GET_FEATURES we'd return the value
-0x80000000 | GET_FEATURES.
+And actually ... you got the order wrong:
 
-For even more safety we could make a 4-byte response which is never
-valid for anything right now, but it feels overly cautious given that we
-currently do check both the request and flag fields. If you think a
-response status is needed and want to define an enum with possible
-values, then I'd probably prefer an 8-byte status since that's the way
-everything works now, but I don't really care much either way.
+> > Next command is GET_FEATURES. Return an error response from that
+> > and device init will fail.
+
+That's not the case. We *start* with GET_FEATURES, if that includes
+protocol features then we do GET_PROTOCOL_FEATURES next, and then we get
+the # of queues next ...
+
+Though the whole discussion pretty much applies equivalently to
+GET_QUEUES_NUM instead of GET_FEATURES.
 
 johannes
 
