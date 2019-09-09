@@ -4,114 +4,92 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC7A9C4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C13ADC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3D54218DE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:06:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3D54218DE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 9611D218DE
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:09:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9611D218DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7KJj-0005mW-S4
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:06:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37261)
+	id 1i7KM4-0007HS-Q2
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:09:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7KIo-0004rP-2w
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:59 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7KLO-0006le-Jh
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7KIn-0004iI-33
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:57 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:45993)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7KIm-0004g9-QW
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:05:57 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MFK8N-1hwbyj3BCz-00Fkhx; Mon, 09 Sep 2019 16:05:36 +0200
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190830143648.2967-1-alex.bennee@linaro.org>
- <c8340803-34a7-ab53-7791-efdcb734db41@vivier.eu> <87sgp51sel.fsf@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <mreitz@redhat.com>) id 1i7KLN-0005ut-97
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:08:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36376)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7KLG-0005qz-OU; Mon, 09 Sep 2019 10:08:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0E9DEC0546FC;
+ Mon,  9 Sep 2019 14:08:30 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
+ [10.36.116.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D7F060BF7;
+ Mon,  9 Sep 2019 14:08:26 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-15-mreitz@redhat.com>
+ <20190905140547.GC4911@localhost.localdomain>
+ <c8ef1957-e656-80bf-7e53-a8a417861d26@redhat.com>
+ <20190909095547.GB17606@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2c63a5cd-ffb3-fb7e-e3ea-54a938a28f90@vivier.eu>
-Date: Mon, 9 Sep 2019 16:05:32 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <30c5d55f-b3ef-4a52-883d-93059a76b383@redhat.com>
+Date: Mon, 9 Sep 2019 16:08:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87sgp51sel.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MDKZkKyVmxYgebWIPPu++FPCUJXJaHgPMoGB0N/Ep9PIYwrvWl5
- sPG1cxyB814S/+yFlgcaBREf/xnYt9GQlg24ratCEe4iXGkmLay7lstino8cUsmdofGKRNs
- 3lUyeuzSaaWMwgSd4+nCsqg4Doy7zVTaAM5ZBKBhfFI//oKZUlXABwxenUx5OJWjWhDU30I
- WS+ePLjkqxEoLyg2fnIrg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zNPMTYbQIjM=:Do2CttNb0oOS3jU8ix4QYZ
- CiKG91Aa9oIcc+gmmJ0XnXH+EQoJ+kfqxylQEM3PIiR7fkEvdBKiWqVcPpeNOt+F65ngYDaB0
- O8mSXlige4MY3yO/bMXgZmREGJ+O9sIXmKMvkNqrvLqOfKtrVi+X+ujgLLNAGL1w7x6cEv8PJ
- yTw5++faj7L6KdV1RrIUGT+C1wA80SrLee/f0SLQ4HJgmCb18HtlfYDGBWY3mHsQWWy1emnPh
- ivSbDGQattnIPSg+3fZ5kFBBYIcAxEXuQzAuxydvmFsgR1PH8ycIQY0m6W/uUcLO/ztT/d0Z8
- FFcVTMvncMoYgnkPJOeyHCme1MvaayJyBnOrbxhPZ7+D7scvR/X/oyURu7xcvlXtp6LLpbvkJ
- k3cpSSunyl1TeI91ViwCh2cvSUwYcX90afHSaZGhxY5Mo1Bs1WBQskBVxWpkjJeU3VF2p8MY9
- OkvLTQO8NJbBX8II4GhpuE3bmwJhUsfG/lypMWoJQ3EYxU+cc7EP2gLY7WsFpde1SHgK2NemM
- KCnA87z3Why8cLKuv6FaotxLT0DIt7zmtml4wqhCApQxeqsX09OR+PFES8Q46SXeSxRZJAHnP
- a1CXXKFyG01CTZYQ3v92/ZN6Mcm8oU4Hq/yHl3ukoAMwRenpQ2dJVVWtvoZYBOO3+zD3Fqeru
- 7K5Cl87d/44pQOgGoHjfR+jYgmubpSNUpQ7qioadgpPE9F3AmJSUceHJ9V7zkjiTEGb/OtdHN
- /NfMep1ttzmbgO/712zGi5lasm4Xj41GTyHzUK2AdMh2HZTa0URRrc+etloPHiWPNlLZA05C7
- VVJk3LporDL7q/6robvH8lMM4GvMh6M2Fv5YnONkDlFDbXu/Mo=
+In-Reply-To: <20190909095547.GB17606@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="soSF6sG3VGuA5awFVzPlmyt3tdM6TLfFL"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Mon, 09 Sep 2019 14:08:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: Re: [Qemu-devel] [PATCH] linux-user: fail and report on bad dfilter
- specs
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 14/42] block: Use CAFs when working with
+ backing chains
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,45 +101,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/09/2019 à 16:00, Alex Bennée a écrit :
-> 
-> Laurent Vivier <laurent@vivier.eu> writes:
-> 
->> Le 30/08/2019 à 16:36, Alex Bennée a écrit :
->>> Just passing NULL means we end up ignoring the bad dfilter spec
->>> instead of reporting it and exiting as we should.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--soSF6sG3VGuA5awFVzPlmyt3tdM6TLfFL
+Content-Type: multipart/mixed; boundary="mxF51ywizOJnWMJIvrg1wZPVObRwW379K";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <30c5d55f-b3ef-4a52-883d-93059a76b383@redhat.com>
+Subject: Re: [PATCH v6 14/42] block: Use CAFs when working with backing chains
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-15-mreitz@redhat.com>
+ <20190905140547.GC4911@localhost.localdomain>
+ <c8ef1957-e656-80bf-7e53-a8a417861d26@redhat.com>
+ <20190909095547.GB17606@localhost.localdomain>
+In-Reply-To: <20190909095547.GB17606@localhost.localdomain>
+
+--mxF51ywizOJnWMJIvrg1wZPVObRwW379K
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 09.09.19 11:55, Kevin Wolf wrote:
+> Am 09.09.2019 um 10:25 hat Max Reitz geschrieben:
+>> On 05.09.19 16:05, Kevin Wolf wrote:
+>>> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+>>>> Use child access functions when iterating through backing chains so
+>>>> filters do not break the chain.
+>>>>
+>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>  block.c | 40 ++++++++++++++++++++++++++++------------
+>>>>  1 file changed, 28 insertions(+), 12 deletions(-)
+>>>>
+>>>> diff --git a/block.c b/block.c
+>>>> index 86b84bea21..42abbaf0ba 100644
+>>>> --- a/block.c
+>>>> +++ b/block.c
+>>>> @@ -4376,7 +4376,8 @@ int bdrv_change_backing_file(BlockDriverState =
+*bs,
+>>>>  }
+>>>> =20
+>>>>  /*
+>>>> - * Finds the image layer in the chain that has 'bs' as its backing =
+file.
+>>>> + * Finds the image layer in the chain that has 'bs' (or a filter on=
+
+>>>> + * top of it) as its backing file.
+>>>>   *
+>>>>   * active is the current topmost image.
+>>>>   *
+>>>> @@ -4388,11 +4389,18 @@ int bdrv_change_backing_file(BlockDriverStat=
+e *bs,
+>>>>  BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
+>>>>                                      BlockDriverState *bs)
+>>>>  {
+>>>> -    while (active && bs !=3D backing_bs(active)) {
+>>>> -        active =3D backing_bs(active);
+>>>> +    bs =3D bdrv_skip_rw_filters(bs);
+>>>> +    active =3D bdrv_skip_rw_filters(active);
 >>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  linux-user/main.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/linux-user/main.c b/linux-user/main.c
->>> index 47917bbb20f..50a031520ca 100644
->>> --- a/linux-user/main.c
->>> +++ b/linux-user/main.c
->>> @@ -236,7 +236,7 @@ static void handle_arg_log(const char *arg)
->>>
->>>  static void handle_arg_dfilter(const char *arg)
->>>  {
->>> -    qemu_set_dfilter_ranges(arg, NULL);
->>> +    qemu_set_dfilter_ranges(arg, &error_fatal);
->>>  }
->>>
->>>  static void handle_arg_log_filename(const char *arg)
->>>
+>>> This does more than the commit message says. In addition to iterating=
+
+>>> through filters instead of stopping, it also changes the semantics of=
+
+>>> the function to return the next non-filter on top of bs instead of th=
+e
+>>> next node.
 >>
->> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> 
-> Did you queue this or do you want me to resend?
+>> Which is to say the overlay.
+>>
+>> (I think we only ever use =E2=80=9Coverlay=E2=80=9D in the COW sense.)=
 
-I didn't but it's done now (no need to resend).
+>=20
+> I think we do, but so far also only ever for immediate COW childs, not
+> for skipping through intermediate node.
 
-Thanks,
-Laurent
+Yes, because it=E2=80=99s broken so far.
+
+>>> The block jobs seem to use it only for bdrv_is_allocated_above(), whi=
+ch
+>>> should return the same thing in both cases, so the behaviour stays th=
+e
+>>> same. qmp_block_commit() will check op blockers on a different node n=
+ow,
+>>> which could be a fix or a bug, I can't tell offhand. Probably the
+>>> blocking doesn't really work anyway.
+>>
+>> You mean that the op blocker could have been on a block job filter nod=
+e
+>> before?  I think that=E2=80=98s pretty much the point of this fix; tha=
+t that
+>> doesn=E2=80=99t make sense.  (We didn=E2=80=99t have mirror_top_bs and=
+ the like at
+>> 058223a6e3b.)
+>=20
+> On the off chance that the op blocker actually works, it can't be a job=
+
+> filter. I was thinking more of throttling, blkdebug etc.
+
+Well, that=E2=80=99s just broken altogether right now.
+
+>>> All of this should be mentioned in the commit message at least. Maybe=
+
+>>> it's also worth splitting in two patches.
+>>
+>> I don=E2=80=99t know.  The function was written when there were no fil=
+ters.
+>=20
+> I doubt it. blkdebug is a really old filter.
+>=20
+>> This change would have been a no-op then.  The fact that it isn=E2=80=99=
+t to me
+>> just means that introducing filters broke it.
+>>
+>> So I don=E2=80=99t know what I would write.  Maybe =E2=80=9Cbdrv_find_=
+overlay() now
+>> actually finds the overlay, that is, it will not return a filter node.=
+
+>> This is the behavior that all callers expect (because they work on COW=
+
+>> backing chains).=E2=80=9D
+>=20
+> Maybe just something like "In addition, filter nodes are not returned a=
+s
+> overlays any more. Instead, the first non-filter node on top of bs is
+> considered the overlay now."?
+
+Isn=E2=80=99t that basically the same? :-)
+
+Max
+
+
+--mxF51ywizOJnWMJIvrg1wZPVObRwW379K--
+
+--soSF6sG3VGuA5awFVzPlmyt3tdM6TLfFL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12XNcACgkQ9AfbAGHV
+z0DMMwf+PAlpzmBOrPKi/WL9m5kIT2Qo9zr0isTmt21IyagrZmmS6tyTr8GrwVYP
+vfkLJMIuPrtbVe12bCeeXdcVZz5lXHfIZtovi9VwtIBzvXUCK63RfVGvXqhQf74c
+eC86uFOZkHUwujVG4r6R1oTGRQiKBJI/0qrF3hHvQ5t9G4isqRV2+JVqUnynMLUq
+oMF/xrSB7U7xa2b2Znw7FAlkcwdFIjvZYVnwKARwqG7rgIdXU2qq5YZmKcIVouWq
+gfx8FXP2dR1LVKN0gA2sf8ANA38E9dJCkTf6xWYbHf8Yx5id86jpBejIuZtATvSg
+7gDiMIin0GN4dX7UiBcWWf0ZCR3xlg==
+=thB6
+-----END PGP SIGNATURE-----
+
+--soSF6sG3VGuA5awFVzPlmyt3tdM6TLfFL--
 
