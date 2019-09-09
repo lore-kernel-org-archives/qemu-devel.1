@@ -2,91 +2,88 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6284BC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B94D9C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:31:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37AEC21920
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:19:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37AEC21920
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 825522086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:31:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqLqMY8P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825522086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Glu-00058F-8c
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:19:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51457)
+	id 1i7GxH-0000lj-Il
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:31:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7Gkq-0004KQ-Fi
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:18:41 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7Gw9-0000Ed-Q5
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7Gkp-0000zU-KR
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:18:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:7348)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7Gkm-0000vG-C8; Mon, 09 Sep 2019 06:18:36 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5306C8A2195;
- Mon,  9 Sep 2019 10:18:35 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
- [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3810260126;
- Mon,  9 Sep 2019 10:18:31 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20190729213559.20913-1-jsnow@redhat.com>
- <20190729213559.20913-4-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <2af4c984-3290-d928-1a6b-4705f2aa70bc@redhat.com>
-Date: Mon, 9 Sep 2019 12:18:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7Gw7-0001Em-It
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:30:21 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37431)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i7Gw7-0001ED-CI
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:30:19 -0400
+Received: by mail-ot1-x342.google.com with SMTP id s28so11924835otd.4
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 03:30:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=1dablnJmmYW3vsCyAnEq1iHNTXHrFYxcD97TQwAykuw=;
+ b=cqLqMY8PtVjA7AF7Jn3aY+crG9BH/7MMNvFatzO478L/P/s0amRI0x4+KXrqwm3yJl
+ vOmOQP96qDD3yF0WJllZs1AUncgMSy1mrXiVmBsR/OmGSI0QYRud6wt2WudoydORMMYJ
+ HSg5qHTBnzGITgtPf0f9RU20reypGXn8edvV9BUb+kQPB+IJC7/E5DzalD+3LmuGfrGi
+ pOHSAdO4Mni/93R6dyMzhG+2AMBcQtvzAz7xh1llei8G4RmUoSFQV/uFWjBpn8JZ862H
+ IGRIi7NbttnJW8PO9BR2nXQnQqDkIUflGU16tfJAAuzUertsLTc89XfOboJaTgZaEwrE
+ 2yzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=1dablnJmmYW3vsCyAnEq1iHNTXHrFYxcD97TQwAykuw=;
+ b=QIWGwoVtw6XyWL56gfT9oQxRQnH/TB/Rau6VOj54aum1Ld+Y/TKTGT7nIufGdm1GlP
+ wmDuFRhqo+07ZzH6hgMKMyk9w4ZzO83ARNwq/upOCtCP6wQghKNVXISOpcmlr2P60a4Z
+ QUWT10su9wW9FNnTSyfhFL5VFx6hrM2+Kt0MWgcYFySbe9RBwQwo4nCMI5yWpm7FD3uX
+ Lks5UC9R6V3t4kvK1gdfsnoQyokBO2IGhjYVT+qXhvDDph9Fu6X4YfeHf/SvM6O5wN4y
+ WQ4Fhlz65mjD6L1nXc69l8OZ+7uSW5HEDx9/6+0QDVS7mVruoxpHl+SwrrZW7v0EleaB
+ kp6g==
+X-Gm-Message-State: APjAAAUl2wpCu9Xag+svTEpyAvcgC6/IhlgPBSeGaZ3zd8XDsISW3CCm
+ y0s4etCimnUGis41w6ZhaNIjGpMo048iwoBQWX4=
+X-Google-Smtp-Source: APXvYqyI6MXkhbkhe1VRbIyjguydH/1RICx/GdGz0uWzzb5KGDsEg5gYeKx6R9hhM+471PkNLudzFmBrJM4lRqYYwWw=
+X-Received: by 2002:a05:6830:4c5:: with SMTP id
+ s5mr17950670otd.121.1568025018456; 
+ Mon, 09 Sep 2019 03:30:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190729213559.20913-4-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="PwfYP5OmqXbljLp6dCdgBehk2a4OnZ9WC"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Mon, 09 Sep 2019 10:18:35 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] iotests: use python logging for
- iotests.log()
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
+ Mon, 9 Sep 2019 03:30:17 -0700 (PDT)
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
+ Mon, 9 Sep 2019 03:30:17 -0700 (PDT)
+In-Reply-To: <CAL1e-=icX+uKfHtMc69-GVQAkTfR-poreB2_Zzm-=tyK=fp+KA@mail.gmail.com>
+References: <20190802160458.25681-1-peter.maydell@linaro.org>
+ <CAL1e-=icX+uKfHtMc69-GVQAkTfR-poreB2_Zzm-=tyK=fp+KA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 9 Sep 2019 12:30:17 +0200
+Message-ID: <CAL1e-=iFWnzFwa1=CJEf04Pv0+yV+7otvKSPJpAogjSnoXjDUg@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 0/3] target/mips: Convert to
+ do_transaction_failed hook
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,67 +95,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PwfYP5OmqXbljLp6dCdgBehk2a4OnZ9WC
-Content-Type: multipart/mixed; boundary="CVf57MABx6NxA1viUuNPcXzARXXYz1nnH";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com
-Message-ID: <2af4c984-3290-d928-1a6b-4705f2aa70bc@redhat.com>
-Subject: Re: [PATCH v2 3/3] iotests: use python logging for iotests.log()
-References: <20190729213559.20913-1-jsnow@redhat.com>
- <20190729213559.20913-4-jsnow@redhat.com>
-In-Reply-To: <20190729213559.20913-4-jsnow@redhat.com>
+ping for Herv=C3=A9.
 
---CVf57MABx6NxA1viUuNPcXzARXXYz1nnH
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 29.07.19 23:35, John Snow wrote:
-> We can turn logging on/off globally instead of per-function.
->=20
-> Remove use_log from run_job, and use python logging to turn on
-> diffable output when we run through a script entry point.
->=20
-> iotest 245 changes output order due to buffering reasons.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/030        |  4 +--
->  tests/qemu-iotests/245        |  1 +
->  tests/qemu-iotests/245.out    | 24 +++++++++---------
->  tests/qemu-iotests/iotests.py | 47 +++++++++++++++++++++--------------=
-
->  4 files changed, 43 insertions(+), 33 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---CVf57MABx6NxA1viUuNPcXzARXXYz1nnH--
-
---PwfYP5OmqXbljLp6dCdgBehk2a4OnZ9WC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12JvUACgkQ9AfbAGHV
-z0CV1wf+Pq7bHpMFd5ZQklDNHwJ5BUCs1dMBUB5fHC9TBuYQ4oO1m9kdQSewepUA
-w9DVPX/EI9DMkaQZ7MPuix8WQLwnbqvc+s/tDktLvbFX/PE8ZLZU6Saw9kLxcLPc
-KmnPwCYq+LUznnu8NoS3jwx0GbDd/Nf+ZmFPefX+5ANVnrT6nRuoEMsydGSElNps
-oG3hs2lBU+cX0LJIoZsxoj/r/jibEMEGrhx8+a/838ikdd2nvSmyLWrXflfPfRLx
-t8BwyEDXUIxzncqmPSsVghAniICBtPTVewg0RQ2hODwUqRwVhgAOVHXOehHpYB2h
-8zwUeLcy1mTeBMtCDboFgGIcYZE3Eg==
-=eqxd
------END PGP SIGNATURE-----
-
---PwfYP5OmqXbljLp6dCdgBehk2a4OnZ9WC--
-
+22.08.2019. 20.16, "Aleksandar Markovic" <aleksandar.m.mail@gmail.com> =D1=
+=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+>
+> 02.08.2019. 18.05, "Peter Maydell" <peter.maydell@linaro.org> =D1=98=D0=
+=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > This patchset converts the MIPS target away from the
+> > old broken do_unassigned_access hook to the new (added in
+> > 2017...) do_transaction_failed hook.
+> >
+>
+> Herve, bonjour.
+>
+> As far as I can see these changes are fine. May I ask you for your
+opinion? Can you run your Jazz tests without regressions with this change?
+>
+> Mille mercis,
+> Aleksandar
+>
+> > The motivation here is:
+> >  * do_unassigned_access is broken because:
+> >     + it will be called for any kind of access to physical addresses
+> >       where there is no assigned device, whether that access is by the
+> >       CPU or by something else (like a DMA controller!), so it can
+> >       result in spurious guest CPU exceptions.
+> >     + It will also get called even when using KVM, when there's nothing
+> >       useful it can do.
+> >     + It isn't passed in the return-address within the TCG generated
+> >       code, so it isn't able to correctly restore the CPU state
+> >       before generating the exception, and so the exception will
+> >       often be generated with the wrong faulting guest PC value
+> >  * there are now only a few targets still using the old hook,
+> >    so if we can convert them we can delete all the old code
+> >    and complete this API transation. (Patches for SPARC are on
+> >    the list; the other user is RISCV, which accidentally
+> >    implemented the old hook rather than the new one recently.)
+> >
+> > The general approach to the conversion is to check the target for
+> > load/store-by-physical-address operations which were previously
+> > implicitly causing exceptions, to see if they now need to explicitly
+> > check for and handle memory access failures. (The 'git grep' regexes
+> > in docs/devel/loads-stores.rst are useful here: the API families to
+> > look for are ld*_phys/st*_phys, address_space_ld/st*, and
+> > cpu_physical_memory*.)
+> >
+> > For MIPS, there are none of these (the usual place where targets do
+> > this is hardware page table walks where the page table entries are
+> > loaded by physical address, and MIPS doesn't seem to have those).
+> >
+> > Code audit out of the way, the actual hook changeover is pretty
+> > simple.
+> >
+> > The complication here is the MIPS Jazz board, which has some rather
+> > dubious code that intercepts the do_unassigned_access hook to suppress
+> > generation of exceptions for invalid accesses due to data accesses,
+> > while leaving exceptions for invalid instruction fetches in place. I'm
+> > a bit dubious about whether the behaviour we have implemented here is
+> > really what the hardware does -- it seems pretty odd to me to not
+> > generate exceptions for d-side accesses but to generate them for
+> > i-side accesses, and looking back through git and mailing list history
+> > this code is here mainly as "put back the behaviour we had before a
+> > previous commit broke it", and that older behaviour in turn I think is
+> > more historical-accident than because anybody deliberately checked the
+> > hardware behaviour and made QEMU work that way. However, I don't have
+> > any real hardware to do comparative tests on, so this series retains
+> > the same behaviour we had before on this board, by making it intercept
+> > the new hook in the same way it did the old one. I've beefed up the
+> > comment somewhat to indicate what we're doing, why, and why it might
+> > not be right.
+> >
+> > The patch series is structured in three parts:
+> >  * make the Jazz board code support CPUs regardless of which
+> >    of the two hooks they implement
+> >  * switch the MIPS CPUs over to implementing the new hook
+> >  * remove the no-longer-needed Jazz board code for the old
+> >    hook
+> > (This seemed cleaner to me than squashing the whole thing into
+> > a single patch that touched core mips code and the jazz board
+> > at the same time.)
+> >
+> > I have tested this with:
+> >  * the ARC Multiboot BIOS linked to from the bug
+> >    https://bugs.launchpad.net/qemu/+bug/1245924 (and which
+> >    was the test case for needing the hook intercept)
+> >  * a Linux kernel for the 'mips' mips r4k machine
+> >  * 'make check'
+> > Obviously more extensive testing would be useful, but I
+> > don't have any other test images. I also don't have
+> > a KVM MIPS host, which would be worth testing to confirm
+> > that it also still works.
+> >
+> > If anybody happens by some chance to still have a working
+> > real-hardware Magnum or PICA61 board, we could perhaps test
+> > how it handles accesses to invalid memory, but I suspect that
+> > nobody does any more :-)
+> >
+> > thanks
+> > -- PMM
+> >
+> >
+> > Peter Maydell (3):
+> >   hw/mips/mips_jazz: Override do_transaction_failed hook
+> >   target/mips: Switch to do_transaction_failed() hook
+> >   hw/mips/mips_jazz: Remove no-longer-necessary override of
+> >     do_unassigned_access
+> >
+> >  target/mips/internal.h  |  8 ++++---
+> >  hw/mips/mips_jazz.c     | 47 +++++++++++++++++++++++++++++------------
+> >  target/mips/cpu.c       |  2 +-
+> >  target/mips/op_helper.c | 24 +++++++--------------
+> >  4 files changed, 47 insertions(+), 34 deletions(-)
+> >
+> > --
+> > 2.20.1
+> >
+> >
