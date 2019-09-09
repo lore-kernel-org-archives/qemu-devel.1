@@ -2,94 +2,66 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D128C4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53987C4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:18:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35977206CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:17:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35977206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28BF5206CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:18:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BF5206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7KUG-0002pp-6X
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:17:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38841)
+	id 1i7KUT-0002zs-AW
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:18:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7KSD-0001ml-7r
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:15:42 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i7KSQ-0001zb-Rg
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7KSC-0000em-2u
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:15:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57170)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7KS9-0000cw-RA; Mon, 09 Sep 2019 10:15:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8BC83C04FFE0;
- Mon,  9 Sep 2019 14:15:36 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
- [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 971A76061E;
- Mon,  9 Sep 2019 14:15:01 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
- <20190830161228.54238-9-vsementsov@virtuozzo.com>
- <75066c81-04f5-b849-51a8-c663fea5b60b@redhat.com>
- <19a3e738-795f-50a8-27a1-548c9ec5fbdc@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <aca2aa89-0b0f-aa2c-86f9-336e0c0427b4@redhat.com>
-Date: Mon, 9 Sep 2019 16:14:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <no-reply@patchew.org>) id 1i7KSO-0000kD-Vg
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:15:54 -0400
+Resent-Date: Mon, 09 Sep 2019 10:15:54 -0400
+Resent-Message-Id: <E1i7KSO-0000kD-Vg@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21490)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i7KSO-0000jl-Ol
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:15:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568038544; cv=none; d=zoho.com; s=zohoarc; 
+ b=mDEkP02oBXK119D8coPdnjLY1CQ0dxs4r19z1v7WZWl0s6yAdTevdOOHo+ZTPY1Nyh+awdEgbwo0zfydmG4FlmFwLnpNLoLrN+k+dHO/+qPe+pSVUZFKCygeQstoC8I5YzJ6CgDAKRWx+Y9QMCAunZx203z/han+XqY+PkAjQbc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1568038544;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=/kBJLNwpbqjMSFgf0wfq4rNfpe01jLFe3yZHDPi8cxM=; 
+ b=Ts5DGDHeR6TOr+bh34s7zrIvRZuDHOEzHbX+rOcNi0hiiMi8e2209BQpy3LLkRy4yAy4ZVVfe89kZN+L8FGr+IJdvS2McIpYxv03oHuCKDtYCZHuDwDuQZPJgM+0whg8IA1J/KOL6vE5JsDVXXJLvYslDSBakdxg4FcM2jejc/A=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1568038541376318.783705082497;
+ Mon, 9 Sep 2019 07:15:41 -0700 (PDT)
+In-Reply-To: <20190909130655.24495-1-pbonzini@redhat.com>
+Message-ID: <156803854035.9084.13417948880720626391@5dec9699b7de>
 MIME-Version: 1.0
-In-Reply-To: <19a3e738-795f-50a8-27a1-548c9ec5fbdc@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ii6887RjMhBcDDZXvNOI3B0lpKb1OMUs9"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 09 Sep 2019 14:15:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pbonzini@redhat.com
+Date: Mon, 9 Sep 2019 07:15:41 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v10 08/14] iotests: prepare 124 and 257
- bitmap querying for backup-top filter
+X-Received-From: 136.143.188.54
+Subject: Re: [Qemu-devel] [PATCH] test-char: fix AddressSanitizer failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,122 +73,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ii6887RjMhBcDDZXvNOI3B0lpKb1OMUs9
-Content-Type: multipart/mixed; boundary="4JkQTQzf8oCD6X0MmMDxqMDVMJmXnznIb";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eblake@redhat.com" <eblake@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com"
- <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <aca2aa89-0b0f-aa2c-86f9-336e0c0427b4@redhat.com>
-Subject: Re: [PATCH v10 08/14] iotests: prepare 124 and 257 bitmap querying
- for backup-top filter
-References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
- <20190830161228.54238-9-vsementsov@virtuozzo.com>
- <75066c81-04f5-b849-51a8-c663fea5b60b@redhat.com>
- <19a3e738-795f-50a8-27a1-548c9ec5fbdc@virtuozzo.com>
-In-Reply-To: <19a3e738-795f-50a8-27a1-548c9ec5fbdc@virtuozzo.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkwOTEzMDY1NS4yNDQ5
+NS0xLXBib256aW5pQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBK
+PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbGlidWRldiAgICAgICAgICAg
+bm8KZGVmYXVsdCBkZXZpY2VzICAgeWVzCgp3YXJuaW5nOiBQeXRob24gMiBzdXBwb3J0IGlzIGRl
+cHJlY2F0ZWQKd2FybmluZzogUHl0aG9uIDMgd2lsbCBiZSByZXF1aXJlZCBmb3IgYnVpbGRpbmcg
+ZnV0dXJlIHZlcnNpb25zIG9mIFFFTVUKCk5PVEU6IGNyb3NzLWNvbXBpbGVycyBlbmFibGVkOiAg
+J2NjJwogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrLnRtcAotLS0K
+ICBDQyAgICAgIHRlc3RzL3Rlc3QtYmxvY2stYmFja2VuZC5vCiAgQ0MgICAgICB0ZXN0cy90ZXN0
+LWJsb2NrLWlvdGhyZWFkLm8KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOiBJ
+biBmdW5jdGlvbiAnbWFpbic6Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzox
+NDUwOjk6IGVycm9yOiBpbml0aWFsaXplciBlbGVtZW50IGlzIG5vdCBjb25zdGFudAogICAgICAg
+ICBTT0NLRVRfU0VSVkVSX1RFU1QodGNwLCAmdGNwYWRkcik7CiAgICAgICAgIF4KL3RtcC9xZW11
+LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTA6OTogZXJyb3I6IChuZWFyIGluaXRpYWxp
+emF0aW9uIGZvciAnc2VydmVyMXRjcC5hZGRyJykKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rl
+c3QtY2hhci5jOjE0NTA6OTogZXJyb3I6IGluaXRpYWxpemVyIGVsZW1lbnQgaXMgbm90IGNvbnN0
+YW50Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDUwOjk6IGVycm9yOiAo
+bmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ3NlcnZlcjJ0Y3AuYWRkcicpCi90bXAvcWVtdS10ZXN0
+L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDUwOjk6IGVycm9yOiBpbml0aWFsaXplciBlbGVtZW50
+IGlzIG5vdCBjb25zdGFudAovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1
+MDo5OiBlcnJvcjogKG5lYXIgaW5pdGlhbGl6YXRpb24gZm9yICdzZXJ2ZXIzdGNwLmFkZHInKQov
+dG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1MDo5OiBlcnJvcjogaW5pdGlh
+bGl6ZXIgZWxlbWVudCBpcyBub3QgY29uc3RhbnQKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rl
+c3QtY2hhci5jOjE0NTA6OTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnc2VydmVy
+NHRjcC5hZGRyJykKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTE6OTog
+ZXJyb3I6IGluaXRpYWxpemVyIGVsZW1lbnQgaXMgbm90IGNvbnN0YW50CiAgICAgICAgIFNPQ0tF
+VF9DTElFTlRfVEVTVCh0Y3AsICZ0Y3BhZGRyKTsKICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9z
+cmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1MTo5OiBlcnJvcjogKG5lYXIgaW5pdGlhbGl6YXRpb24g
+Zm9yICdjbGllbnQxdGNwLmFkZHInKQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFy
+LmM6MTQ1MTo5OiBlcnJvcjogaW5pdGlhbGl6ZXIgZWxlbWVudCBpcyBub3QgY29uc3RhbnQKL3Rt
+cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTE6OTogZXJyb3I6IChuZWFyIGlu
+aXRpYWxpemF0aW9uIGZvciAnY2xpZW50MnRjcC5hZGRyJykKL3RtcC9xZW11LXRlc3Qvc3JjL3Rl
+c3RzL3Rlc3QtY2hhci5jOjE0NTE6OTogZXJyb3I6IGluaXRpYWxpemVyIGVsZW1lbnQgaXMgbm90
+IGNvbnN0YW50Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDUxOjk6IGVy
+cm9yOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ2NsaWVudDN0Y3AuYWRkcicpCi90bXAvcWVt
+dS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDUxOjk6IGVycm9yOiBpbml0aWFsaXplciBl
+bGVtZW50IGlzIG5vdCBjb25zdGFudAovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFy
+LmM6MTQ1MTo5OiBlcnJvcjogKG5lYXIgaW5pdGlhbGl6YXRpb24gZm9yICdjbGllbnQ0dGNwLmFk
+ZHInKQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1MTo5OiBlcnJvcjog
+aW5pdGlhbGl6ZXIgZWxlbWVudCBpcyBub3QgY29uc3RhbnQKL3RtcC9xZW11LXRlc3Qvc3JjL3Rl
+c3RzL3Rlc3QtY2hhci5jOjE0NTE6OTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAn
+Y2xpZW50NXRjcC5hZGRyJykKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0
+NTE6OTogZXJyb3I6IGluaXRpYWxpemVyIGVsZW1lbnQgaXMgbm90IGNvbnN0YW50Ci90bXAvcWVt
+dS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDUxOjk6IGVycm9yOiAobmVhciBpbml0aWFs
+aXphdGlvbiBmb3IgJ2NsaWVudDZ0Y3AuYWRkcicpCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90
+ZXN0LWNoYXIuYzoxNDU2OjU6IGVycm9yOiBpbml0aWFsaXplciBlbGVtZW50IGlzIG5vdCBjb25z
+dGFudAogICAgIFNPQ0tFVF9TRVJWRVJfVEVTVCh1bml4LCAmdW5peGFkZHIpOwogICAgIF4KL3Rt
+cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTY6NTogZXJyb3I6IChuZWFyIGlu
+aXRpYWxpemF0aW9uIGZvciAnc2VydmVyMXVuaXguYWRkcicpCi90bXAvcWVtdS10ZXN0L3NyYy90
+ZXN0cy90ZXN0LWNoYXIuYzoxNDU2OjU6IGVycm9yOiBpbml0aWFsaXplciBlbGVtZW50IGlzIG5v
+dCBjb25zdGFudAovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1Njo1OiBl
+cnJvcjogKG5lYXIgaW5pdGlhbGl6YXRpb24gZm9yICdzZXJ2ZXIydW5peC5hZGRyJykKL3RtcC9x
+ZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTY6NTogZXJyb3I6IGluaXRpYWxpemVy
+IGVsZW1lbnQgaXMgbm90IGNvbnN0YW50Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNo
+YXIuYzoxNDU2OjU6IGVycm9yOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ3NlcnZlcjN1bml4
+LmFkZHInKQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1Njo1OiBlcnJv
+cjogaW5pdGlhbGl6ZXIgZWxlbWVudCBpcyBub3QgY29uc3RhbnQKL3RtcC9xZW11LXRlc3Qvc3Jj
+L3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTY6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZv
+ciAnc2VydmVyNHVuaXguYWRkcicpCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIu
+YzoxNDU3OjU6IGVycm9yOiBpbml0aWFsaXplciBlbGVtZW50IGlzIG5vdCBjb25zdGFudAogICAg
+IFNPQ0tFVF9DTElFTlRfVEVTVCh1bml4LCAmdW5peGFkZHIpOwogICAgIF4KL3RtcC9xZW11LXRl
+c3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTc6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0
+aW9uIGZvciAnY2xpZW50MXVuaXguYWRkcicpCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0
+LWNoYXIuYzoxNDU3OjU6IGVycm9yOiBpbml0aWFsaXplciBlbGVtZW50IGlzIG5vdCBjb25zdGFu
+dAovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1Nzo1OiBlcnJvcjogKG5l
+YXIgaW5pdGlhbGl6YXRpb24gZm9yICdjbGllbnQydW5peC5hZGRyJykKL3RtcC9xZW11LXRlc3Qv
+c3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjE0NTc6NTogZXJyb3I6IGluaXRpYWxpemVyIGVsZW1lbnQg
+aXMgbm90IGNvbnN0YW50Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDU3
+OjU6IGVycm9yOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ2NsaWVudDN1bml4LmFkZHInKQov
+dG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1Nzo1OiBlcnJvcjogaW5pdGlh
+bGl6ZXIgZWxlbWVudCBpcyBub3QgY29uc3RhbnQKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rl
+c3QtY2hhci5jOjE0NTc6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnY2xpZW50
+NHVuaXguYWRkcicpCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDU3OjU6
+IGVycm9yOiBpbml0aWFsaXplciBlbGVtZW50IGlzIG5vdCBjb25zdGFudAovdG1wL3FlbXUtdGVz
+dC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTQ1Nzo1OiBlcnJvcjogKG5lYXIgaW5pdGlhbGl6YXRp
+b24gZm9yICdjbGllbnQ1dW5peC5hZGRyJykKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3Qt
+Y2hhci5jOjE0NTc6NTogZXJyb3I6IGluaXRpYWxpemVyIGVsZW1lbnQgaXMgbm90IGNvbnN0YW50
+Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxNDU3OjU6IGVycm9yOiAobmVh
+ciBpbml0aWFsaXphdGlvbiBmb3IgJ2NsaWVudDZ1bml4LmFkZHInKQptYWtlOiAqKiogW3Rlc3Rz
+L3Rlc3QtY2hhci5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
+YnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKCgpUaGUgZnVsbCBsb2cg
+aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTA5MTMwNjU1LjI0
+NDk1LTEtcGJvbnppbmlAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90
+eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
 
---4JkQTQzf8oCD6X0MmMDxqMDVMJmXnznIb
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 09.09.19 15:49, Vladimir Sementsov-Ogievskiy wrote:
-> 09.09.2019 16:25, Max Reitz wrote:
->> On 30.08.19 18:12, Vladimir Sementsov-Ogievskiy wrote:
->>> After backup-top filter appearing it's not possible to see dirty
->>> bitmaps in top node, so use node-name instead.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>>   tests/qemu-iotests/124        |  83 ++++----
->>>   tests/qemu-iotests/257        |  49 ++---
->>>   tests/qemu-iotests/257.out    | 364 +++++++++++++------------------=
----
->>>   tests/qemu-iotests/iotests.py |  27 +++
->>>   4 files changed, 219 insertions(+), 304 deletions(-)
->>
->> [...]
->>
->>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotes=
-ts.py
->>> index 84438e837c..1906eb72f3 100644
->>> --- a/tests/qemu-iotests/iotests.py
->>> +++ b/tests/qemu-iotests/iotests.py
->>> @@ -643,6 +643,33 @@ class VM(qtest.QEMUQtestMachine):
->>
->> [...]
->>
->>> +    def check_bitmap_status(self, node_name, bitmap_name, fields):
->>> +        ret =3D self.get_bitmap(node_name, bitmap_name)
->>> +
->>> +        return fields.items() <=3D ret.items()
->>
->> Why the <=3D?  AFAIU, it will compare each of the arrays=E2=80=99 elem=
-ents one by
->> one and return true if all of the ones in @fields are less than or equ=
-al
->> to the ones in @ret.
->=20
-> No, it's a valid way to check that one dict is subdict of another,
-> as dict_view works like Set class:
-
-OK.  It looked to me like .items() just returned an array.  (When I
-googled for how <=3D behaves here.)
-
-[...]
-
-> Should I care about python2 now, or we already dropped its support in i=
-otests?
-
-We haven=E2=80=99t officially.  OTOH, 4.2 is set to release on December 3=
-, which
-is less than one month before Python 2=E2=80=99s EOL.  So it would be clo=
-se to
-wrong to care at this point, I guess?
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---4JkQTQzf8oCD6X0MmMDxqMDVMJmXnznIb--
-
---ii6887RjMhBcDDZXvNOI3B0lpKb1OMUs9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12XmMACgkQ9AfbAGHV
-z0Awlwf8CavsWW6CYWZ/fKS3NyGfeEB+DLLM49MzNV4VA3lfsRrwkoyKE7/pV40m
-iNhsUQNR698b4gM5ajKNm/ADlsLJeFB38cAQra0M9JmNtDVzroiV4cuD7mY+zYrf
-Oew09Uzv/2PBpXNicxqyvZuxg+AOvjDss1OAQOq9eghYm/bsDdTIMii+YO2nLlSY
-WSSTYRm0zdVMpFxEC0tGgqPRhVkYpyiI+vkwTV2AvovwLH8pDFhW9Q7B8OcvVhw6
-j5SSX9nHMHNjgojSDmG3oFJALl4486Lf0uFR7wxmWMizJ9zYPuGMaN2k7dg5P6Jm
-896wY/x4qvWLADZXvpoNhL1iW/H2Pw==
-=Z/WA
------END PGP SIGNATURE-----
-
---ii6887RjMhBcDDZXvNOI3B0lpKb1OMUs9--
 
