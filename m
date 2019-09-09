@@ -2,88 +2,64 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B94D9C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B9B1C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:37:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 825522086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:31:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqLqMY8P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825522086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E4DB32086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:37:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4DB32086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7GxH-0000lj-Il
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:31:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55915)
+	id 1i7H2y-0002ga-SB
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:37:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7Gw9-0000Ed-Q5
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:30:23 -0400
+ (envelope-from <berrange@redhat.com>) id 1i7H1V-0001eo-S0
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:35:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7Gw7-0001Em-It
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:30:21 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37431)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i7Gw7-0001ED-CI
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:30:19 -0400
-Received: by mail-ot1-x342.google.com with SMTP id s28so11924835otd.4
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 03:30:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=1dablnJmmYW3vsCyAnEq1iHNTXHrFYxcD97TQwAykuw=;
- b=cqLqMY8PtVjA7AF7Jn3aY+crG9BH/7MMNvFatzO478L/P/s0amRI0x4+KXrqwm3yJl
- vOmOQP96qDD3yF0WJllZs1AUncgMSy1mrXiVmBsR/OmGSI0QYRud6wt2WudoydORMMYJ
- HSg5qHTBnzGITgtPf0f9RU20reypGXn8edvV9BUb+kQPB+IJC7/E5DzalD+3LmuGfrGi
- pOHSAdO4Mni/93R6dyMzhG+2AMBcQtvzAz7xh1llei8G4RmUoSFQV/uFWjBpn8JZ862H
- IGRIi7NbttnJW8PO9BR2nXQnQqDkIUflGU16tfJAAuzUertsLTc89XfOboJaTgZaEwrE
- 2yzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=1dablnJmmYW3vsCyAnEq1iHNTXHrFYxcD97TQwAykuw=;
- b=QIWGwoVtw6XyWL56gfT9oQxRQnH/TB/Rau6VOj54aum1Ld+Y/TKTGT7nIufGdm1GlP
- wmDuFRhqo+07ZzH6hgMKMyk9w4ZzO83ARNwq/upOCtCP6wQghKNVXISOpcmlr2P60a4Z
- QUWT10su9wW9FNnTSyfhFL5VFx6hrM2+Kt0MWgcYFySbe9RBwQwo4nCMI5yWpm7FD3uX
- Lks5UC9R6V3t4kvK1gdfsnoQyokBO2IGhjYVT+qXhvDDph9Fu6X4YfeHf/SvM6O5wN4y
- WQ4Fhlz65mjD6L1nXc69l8OZ+7uSW5HEDx9/6+0QDVS7mVruoxpHl+SwrrZW7v0EleaB
- kp6g==
-X-Gm-Message-State: APjAAAUl2wpCu9Xag+svTEpyAvcgC6/IhlgPBSeGaZ3zd8XDsISW3CCm
- y0s4etCimnUGis41w6ZhaNIjGpMo048iwoBQWX4=
-X-Google-Smtp-Source: APXvYqyI6MXkhbkhe1VRbIyjguydH/1RICx/GdGz0uWzzb5KGDsEg5gYeKx6R9hhM+471PkNLudzFmBrJM4lRqYYwWw=
-X-Received: by 2002:a05:6830:4c5:: with SMTP id
- s5mr17950670otd.121.1568025018456; 
- Mon, 09 Sep 2019 03:30:18 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1i7H1U-0005Cg-H9
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:35:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49524)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>)
+ id 1i7H1P-00054w-A3; Mon, 09 Sep 2019 06:35:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 343686CB24;
+ Mon,  9 Sep 2019 10:35:46 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FB8E60BE2;
+ Mon,  9 Sep 2019 10:35:44 +0000 (UTC)
+Date: Mon, 9 Sep 2019 11:35:42 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Message-ID: <20190909103542.GD24509@redhat.com>
+References: <20190906195750.17651-1-mlevitsk@redhat.com>
+ <20190906195750.17651-4-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
- Mon, 9 Sep 2019 03:30:17 -0700 (PDT)
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP;
- Mon, 9 Sep 2019 03:30:17 -0700 (PDT)
-In-Reply-To: <CAL1e-=icX+uKfHtMc69-GVQAkTfR-poreB2_Zzm-=tyK=fp+KA@mail.gmail.com>
-References: <20190802160458.25681-1-peter.maydell@linaro.org>
- <CAL1e-=icX+uKfHtMc69-GVQAkTfR-poreB2_Zzm-=tyK=fp+KA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 9 Sep 2019 12:30:17 +0200
-Message-ID: <CAL1e-=iFWnzFwa1=CJEf04Pv0+yV+7otvKSPJpAogjSnoXjDUg@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 0/3] target/mips: Convert to
- do_transaction_failed hook
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190906195750.17651-4-mlevitsk@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 09 Sep 2019 10:35:46 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-iotests: Add test for bz
+ #1745922
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,132 +71,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-stable <qemu-stable@nongnu.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping for Herv=C3=A9.
+On Fri, Sep 06, 2019 at 10:57:50PM +0300, Maxim Levitsky wrote:
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  tests/qemu-iotests/263     | 75 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/263.out | 19 ++++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 95 insertions(+)
+>  create mode 100755 tests/qemu-iotests/263
+>  create mode 100644 tests/qemu-iotests/263.out
+> 
+> diff --git a/tests/qemu-iotests/263 b/tests/qemu-iotests/263
+> new file mode 100755
+> index 0000000000..36951ff7b4
+> --- /dev/null
+> +++ b/tests/qemu-iotests/263
+> @@ -0,0 +1,75 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test encrypted write that crosses cluster boundary of two unallocated clusters
+> +# Based on 188
+> +#
+> +# Copyright (C) 2019 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +# creator
+> +owner=mlevitsk@redhat.com
+> +
+> +seq=`basename $0`
+> +echo "QA output created by $seq"
+> +
+> +status=1	# failure is the default!
+> +
+> +_cleanup()
+> +{
+> +	_cleanup_test_img
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +_supported_fmt qcow2
+> +_supported_proto generic
+> +_supported_os Linux
+> +
+> +
+> +size=1M
+> +
+> +SECRET="secret,id=sec0,data=astrochicken"
+> +
+> +_make_test_img --object $SECRET -o "encrypt.format=luks,encrypt.key-secret=sec0,encrypt.iter-time=10,cluster_size=64K" $size
+> +
+> +IMGSPEC="driver=$IMGFMT,encrypt.key-secret=sec0,file.filename=$TEST_IMG"
+> +
+> +QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
+> +
+> +echo
+> +echo "== reading the whole image =="
+> +$QEMU_IO --object $SECRET -c "read -P 0 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
+> +
+> +echo
+> +echo "== write two 512 byte sectors on a cluster boundary =="
+> +$QEMU_IO --object $SECRET -c "write -P 0xAA 0xFE00 0x400" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
+> +
+> +echo
+> +echo "== verify that the rest of the image is not changed =="
+> +$QEMU_IO --object $SECRET -c "read -P 0x00 0x00000 0xFE00" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
+> +$QEMU_IO --object $SECRET -c "read -P 0xAA 0x0FE00 0x400" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
+> +$QEMU_IO --object $SECRET -c "read -P 0x00 0x10200 0xEFE00" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
 
-22.08.2019. 20.16, "Aleksandar Markovic" <aleksandar.m.mail@gmail.com> =D1=
-=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
->
-> 02.08.2019. 18.05, "Peter Maydell" <peter.maydell@linaro.org> =D1=98=D0=
-=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >
-> > This patchset converts the MIPS target away from the
-> > old broken do_unassigned_access hook to the new (added in
-> > 2017...) do_transaction_failed hook.
-> >
->
-> Herve, bonjour.
->
-> As far as I can see these changes are fine. May I ask you for your
-opinion? Can you run your Jazz tests without regressions with this change?
->
-> Mille mercis,
-> Aleksandar
->
-> > The motivation here is:
-> >  * do_unassigned_access is broken because:
-> >     + it will be called for any kind of access to physical addresses
-> >       where there is no assigned device, whether that access is by the
-> >       CPU or by something else (like a DMA controller!), so it can
-> >       result in spurious guest CPU exceptions.
-> >     + It will also get called even when using KVM, when there's nothing
-> >       useful it can do.
-> >     + It isn't passed in the return-address within the TCG generated
-> >       code, so it isn't able to correctly restore the CPU state
-> >       before generating the exception, and so the exception will
-> >       often be generated with the wrong faulting guest PC value
-> >  * there are now only a few targets still using the old hook,
-> >    so if we can convert them we can delete all the old code
-> >    and complete this API transation. (Patches for SPARC are on
-> >    the list; the other user is RISCV, which accidentally
-> >    implemented the old hook rather than the new one recently.)
-> >
-> > The general approach to the conversion is to check the target for
-> > load/store-by-physical-address operations which were previously
-> > implicitly causing exceptions, to see if they now need to explicitly
-> > check for and handle memory access failures. (The 'git grep' regexes
-> > in docs/devel/loads-stores.rst are useful here: the API families to
-> > look for are ld*_phys/st*_phys, address_space_ld/st*, and
-> > cpu_physical_memory*.)
-> >
-> > For MIPS, there are none of these (the usual place where targets do
-> > this is hardware page table walks where the page table entries are
-> > loaded by physical address, and MIPS doesn't seem to have those).
-> >
-> > Code audit out of the way, the actual hook changeover is pretty
-> > simple.
-> >
-> > The complication here is the MIPS Jazz board, which has some rather
-> > dubious code that intercepts the do_unassigned_access hook to suppress
-> > generation of exceptions for invalid accesses due to data accesses,
-> > while leaving exceptions for invalid instruction fetches in place. I'm
-> > a bit dubious about whether the behaviour we have implemented here is
-> > really what the hardware does -- it seems pretty odd to me to not
-> > generate exceptions for d-side accesses but to generate them for
-> > i-side accesses, and looking back through git and mailing list history
-> > this code is here mainly as "put back the behaviour we had before a
-> > previous commit broke it", and that older behaviour in turn I think is
-> > more historical-accident than because anybody deliberately checked the
-> > hardware behaviour and made QEMU work that way. However, I don't have
-> > any real hardware to do comparative tests on, so this series retains
-> > the same behaviour we had before on this board, by making it intercept
-> > the new hook in the same way it did the old one. I've beefed up the
-> > comment somewhat to indicate what we're doing, why, and why it might
-> > not be right.
-> >
-> > The patch series is structured in three parts:
-> >  * make the Jazz board code support CPUs regardless of which
-> >    of the two hooks they implement
-> >  * switch the MIPS CPUs over to implementing the new hook
-> >  * remove the no-longer-needed Jazz board code for the old
-> >    hook
-> > (This seemed cleaner to me than squashing the whole thing into
-> > a single patch that touched core mips code and the jazz board
-> > at the same time.)
-> >
-> > I have tested this with:
-> >  * the ARC Multiboot BIOS linked to from the bug
-> >    https://bugs.launchpad.net/qemu/+bug/1245924 (and which
-> >    was the test case for needing the hook intercept)
-> >  * a Linux kernel for the 'mips' mips r4k machine
-> >  * 'make check'
-> > Obviously more extensive testing would be useful, but I
-> > don't have any other test images. I also don't have
-> > a KVM MIPS host, which would be worth testing to confirm
-> > that it also still works.
-> >
-> > If anybody happens by some chance to still have a working
-> > real-hardware Magnum or PICA61 board, we could perhaps test
-> > how it handles accesses to invalid memory, but I suspect that
-> > nobody does any more :-)
-> >
-> > thanks
-> > -- PMM
-> >
-> >
-> > Peter Maydell (3):
-> >   hw/mips/mips_jazz: Override do_transaction_failed hook
-> >   target/mips: Switch to do_transaction_failed() hook
-> >   hw/mips/mips_jazz: Remove no-longer-necessary override of
-> >     do_unassigned_access
-> >
-> >  target/mips/internal.h  |  8 ++++---
-> >  hw/mips/mips_jazz.c     | 47 +++++++++++++++++++++++++++++------------
-> >  target/mips/cpu.c       |  2 +-
-> >  target/mips/op_helper.c | 24 +++++++--------------
-> >  4 files changed, 47 insertions(+), 34 deletions(-)
-> >
-> > --
-> > 2.20.1
-> >
-> >
+This tests LUKS encryption, but the code you'r changing/fixing also used
+for the traditionl qcow2 encryption. The difference in IV handling for
+these two methods is what made this code confusing, so I'd like to see
+that the test also covers traditional qcow2 encryption.
+
+Also can you confirm that the test succeeds when run on a qemu
+built against 8c1ecb590497b0349c550607db923972b37f6963  (the change
+immediately before Vladimir's threading series) ?
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
