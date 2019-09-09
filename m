@@ -2,50 +2,50 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5451C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B18DC4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:34:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DAD1218DE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:27:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DAD1218DE
+	by mail.kernel.org (Postfix) with ESMTPS id 6FB29218DE
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:34:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FB29218DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7JhU-0006lv-Q2
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 09:27:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58518)
+	id 1i7JoF-0000Zl-IS
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 09:34:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7JgX-0006G0-T5
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:26:26 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7JnG-0008Sa-Q5
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7JgW-0006wx-QQ
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:26:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55420)
+ (envelope-from <mreitz@redhat.com>) id 1i7JnF-0001LL-UP
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:33:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63572)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7JgQ-0006sd-WA; Mon, 09 Sep 2019 09:26:19 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1i7JnA-0001Je-2N; Mon, 09 Sep 2019 09:33:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CFC1A30EE130;
- Mon,  9 Sep 2019 13:26:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A14E7302C07C;
+ Mon,  9 Sep 2019 13:33:14 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
  [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4208F104C516;
- Mon,  9 Sep 2019 13:26:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E224B6012A;
+ Mon,  9 Sep 2019 13:33:00 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
- <20190830161228.54238-9-vsementsov@virtuozzo.com>
+ <20190830161228.54238-14-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <75066c81-04f5-b849-51a8-c663fea5b60b@redhat.com>
-Date: Mon, 9 Sep 2019 15:25:59 +0200
+Message-ID: <89a0b76d-0c3c-37df-b7cb-087309fb66dc@redhat.com>
+Date: Mon, 9 Sep 2019 15:32:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190830161228.54238-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20190830161228.54238-14-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="GD0tNTi8vcxamK77z7hxyNGE2CsQEfOAU"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 09 Sep 2019 13:26:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 09 Sep 2019 13:33:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v10 08/14] iotests: prepare 124 and 257
- bitmap querying for backup-top filter
+Subject: Re: [Qemu-devel] [PATCH v10 13/14] block: introduce backup-top
+ filter driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,8 +107,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GD0tNTi8vcxamK77z7hxyNGE2CsQEfOAU
-Content-Type: multipart/mixed; boundary="EvBFEPat0qzqzPhHQh1xAeF31rAvn1gj2";
+--cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo
+Content-Type: multipart/mixed; boundary="tpgLtcQtdpAESXvScsYBMwWZXlKlIXlte";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
@@ -116,82 +116,54 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
 Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com,
  xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
  stefanha@redhat.com, jsnow@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <75066c81-04f5-b849-51a8-c663fea5b60b@redhat.com>
-Subject: Re: [PATCH v10 08/14] iotests: prepare 124 and 257 bitmap querying
- for backup-top filter
+Message-ID: <89a0b76d-0c3c-37df-b7cb-087309fb66dc@redhat.com>
+Subject: Re: [PATCH v10 13/14] block: introduce backup-top filter driver
 References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
- <20190830161228.54238-9-vsementsov@virtuozzo.com>
-In-Reply-To: <20190830161228.54238-9-vsementsov@virtuozzo.com>
+ <20190830161228.54238-14-vsementsov@virtuozzo.com>
+In-Reply-To: <20190830161228.54238-14-vsementsov@virtuozzo.com>
 
---EvBFEPat0qzqzPhHQh1xAeF31rAvn1gj2
+--tpgLtcQtdpAESXvScsYBMwWZXlKlIXlte
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 30.08.19 18:12, Vladimir Sementsov-Ogievskiy wrote:
-> After backup-top filter appearing it's not possible to see dirty
-> bitmaps in top node, so use node-name instead.
+> Backup-top filter caches write operations and does copy-before-write
+> operations.
+>=20
+> The driver will be used in backup instead of write-notifiers.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/qemu-iotests/124        |  83 ++++----
->  tests/qemu-iotests/257        |  49 ++---
->  tests/qemu-iotests/257.out    | 364 +++++++++++++---------------------=
+>  block/backup-top.h  |  37 +++++++
+>  block/backup-top.c  | 244 ++++++++++++++++++++++++++++++++++++++++++++=
 
->  tests/qemu-iotests/iotests.py |  27 +++
->  4 files changed, 219 insertions(+), 304 deletions(-)
+>  block/Makefile.objs |   2 +
+>  3 files changed, 283 insertions(+)
+>  create mode 100644 block/backup-top.h
+>  create mode 100644 block/backup-top.c
 
-[...]
-
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
-=2Epy
-> index 84438e837c..1906eb72f3 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -643,6 +643,33 @@ class VM(qtest.QEMUQtestMachine):
-
-[...]
-
-> +    def check_bitmap_status(self, node_name, bitmap_name, fields):
-> +        ret =3D self.get_bitmap(node_name, bitmap_name)
-> +
-> +        return fields.items() <=3D ret.items()
-
-Why the <=3D?  AFAIU, it will compare each of the arrays=E2=80=99 element=
-s one by
-one and return true if all of the ones in @fields are less than or equal
-to the ones in @ret.
-
-But that would mean that the values given in @fields no longer need to
-be equal to the ones in @ret.  On top of that, I suppose if
-@fields.items() at some index contains a key that is not equal to the
-key in @ret.items() at the same index, luck will determine whether the
-comparison passes or not.
-
-Why not just loop through all keys of @fields and check that @fields and
-@ret contain the same value for all of them?
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---EvBFEPat0qzqzPhHQh1xAeF31rAvn1gj2--
+--tpgLtcQtdpAESXvScsYBMwWZXlKlIXlte--
 
---GD0tNTi8vcxamK77z7hxyNGE2CsQEfOAU
+--cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12UucACgkQ9AfbAGHV
-z0CPRAf/UNDBgw9M2+iQguCGrAE6QNiv2SPudFO0nYOTXaAQa17ffMIJqpBMb8Yu
-A0sDoBM5zRVOrLdNAj7kIW4QO+sGes+VMEI3f8IhzD/rjBYXFX2jz4LLQbTfOics
-R3C0s4Ty8yqOKb7yjyTR/qPPPjkwro2esZ7WNcEXEUMn4+nIF8PKu2dijNdtc4CP
-GLPn/lS95J1RdmrJooDWxocUqjHQZfSiEUv4bIwk27nKHoKzy+Vk0l3VbzaWyryJ
-fc8rKfy4gm63ysIJiLdNZEV0UgGuWh82GOPWh+6nz8yn369TrHL8WB0MC8YAUJzX
-X4o7ZZEc9zh1vFS5fHi5VjW3njOHfQ==
-=ijwy
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12VIoACgkQ9AfbAGHV
+z0D5oAf+NMvKuZsp2pAsamq+JviI3cSQWQiTuxy4pkz2z8uuhY/YfzI5F+nZp/9R
+9HfCgh4hvU4nUuH+2/gqTIFmtwN9ioHq2+w3jUXhVhNA1Tv1JLCMwkHX5Xtn9FMK
+G2cPGHi9Ko5c2jNAZFOuirtLv04IzVRC1XzRplJyIypb9oHPf0nJh3pmV1StdW02
+ij6zPBIOhD52ERR9l8pcNICo/UOjQRcRDmRWNQBFM4IJS4cEaNnt8GdBr5y8Phat
+ukeUNq+uLOy9NyZhSd0kVaLbW9Ua5JiwnsTZEi6IyRfkiuNuRxugFz0zoOquQoOv
+IwS9tTCSrq2hLbeKqRrvDPfQEogqmQ==
+=L3ni
 -----END PGP SIGNATURE-----
 
---GD0tNTi8vcxamK77z7hxyNGE2CsQEfOAU--
+--cmyfiAVB96e8TyQb0ETZIK0Lut8b3tVMo--
 
