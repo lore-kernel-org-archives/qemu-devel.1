@@ -2,69 +2,80 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 544FCC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C0DC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:19:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28F792086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:17:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28F792086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2593B2086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 13:19:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="nm5uE1+p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2593B2086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7JYJ-0007Ex-7H
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 09:17:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57147)
+	id 1i7JZp-00006k-Uk
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 09:19:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i7JVk-0005PI-Gp
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:15:17 -0400
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1i7JUd-0004IM-R3
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:14:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i7JVj-00030X-2i
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:15:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52400)
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1i7JUX-0002fW-Az
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:14:07 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:37092)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i7JVi-00030E-UB
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:15:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1CA5718F3518;
- Mon,  9 Sep 2019 13:15:14 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.17.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E8D16608C2;
- Mon,  9 Sep 2019 13:15:12 +0000 (UTC)
-Date: Mon, 9 Sep 2019 14:15:10 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190909131510.GG24509@redhat.com>
-References: <20190829165036.9773-1-berrange@redhat.com>
- <20190829165036.9773-2-berrange@redhat.com>
- <15ffac7c-e7f2-17e4-f4e5-e54500ae3ecb@redhat.com>
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1i7JUV-0002d2-T1
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 09:14:01 -0400
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
+ [IPv6:2a02:6b8:0:1402::301])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id D17BD2E14D7;
+ Mon,  9 Sep 2019 16:13:41 +0300 (MSK)
+Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
+ [2a02:6b8:0:1619::137])
+ by mxbackcorp1g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+ K9ypwBj0s6-DfCqOeGR; Mon, 09 Sep 2019 16:13:41 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1568034821; bh=e6eiBWBoTWNKmWY9/9Q/Pu/bLowAzuIcErYoLiwP5ns=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=nm5uE1+pHthPoyi/CNpm6IvV3DEuYgUapxvtQu5ZLQAIpo9N2qSrNKFIuPCQiMWNB
+ cnB2rwLTiqueEj5JG+THTohBRr6llWvVsM6urwGGeGnU5SnsR42XrLQ+nqUwsGaBcn
+ bq+7bLg6JNwF4eIMjqUrDnA46nqk+++HV04nE/8o=
+Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:408:c41:6db7:e9d4:e9e0])
+ by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+ epZFdTz6L0-De7Ci5iB; Mon, 09 Sep 2019 16:13:40 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>,
+ Thomas Huth <thuth@redhat.com>
+Date: Mon,  9 Sep 2019 16:13:32 +0300
+Message-Id: <20190909131335.16848-1-yury-kotov@yandex-team.ru>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <15ffac7c-e7f2-17e4-f4e5-e54500ae3ecb@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Mon, 09 Sep 2019 13:15:14 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] docs: convert README,
- CODING_STYLE and HACKING to RST syntax
+ [fuzzy]
+X-Received-From: 77.88.29.217
+Subject: [Qemu-devel] [PATCH v7 0/3] High downtime with 95+ throttle pct
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,71 +84,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 09, 2019 at 02:57:08PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 8/29/19 6:50 PM, Daniel P. Berrang=C3=A9 wrote:
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >  CODING_STYLE =3D> CODING_STYLE.rst | 121 +++++++++++++++++++--------=
----
-> >  HACKING =3D> HACKING.rst           | 123 +++++++++++++++++++++------=
-----
-> >  README =3D> README.rst             |  47 +++++++-----
-> >  scripts/checkpatch.pl            |   2 +-
-> >  4 files changed, 191 insertions(+), 102 deletions(-)
-> >  rename CODING_STYLE =3D> CODING_STYLE.rst (72%)
-> >  rename HACKING =3D> HACKING.rst (79%)
-> >  rename README =3D> README.rst (84%)
->=20
-> This change broke the NSIS build:
->=20
-> (cd /tmp/qemu-nsis; \
->          for i in qemu-system-*.exe; do \
->            arch=3D${i%.exe}; \
->            arch=3D${arch#qemu-system-}; \
->            echo Section \"$arch\" Section_$arch; \
->            echo SetOutPath \"\$INSTDIR\"; \
->            echo File \"\${BINDIR}\\$i\"; \
->            echo SectionEnd; \
->          done \
->         ) >/tmp/qemu-nsis/system-emulations.nsh
-> makensis -V2 -NOCD \
->                 -DCONFIG_DOCUMENTATION=3D"y" \
->                 -DCONFIG_GTK=3D"y" \
->                 -DBINDIR=3D"/tmp/qemu-nsis" \
->                  \
->                 -DSRCDIR=3D"/tmp/qemu-test/src" \
->                 -DOUTFILE=3D"qemu-setup-4.1.50.exe" \
->                 -DDISPLAYVERSION=3D"4.1.50" \
->                 /tmp/qemu-test/src/qemu.nsi
-> File: "/tmp/qemu-test/src\README" -> no files found.
-> Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
->    /oname=3Doutfile one_file_only)
-> Error in script "/tmp/qemu-test/src/qemu.nsi" on line 122 -- aborting
-> creation process
-> make: *** [Makefile:1083: qemu-setup-4.1.50.exe] Error 1
->=20
-> I'll send a fix.
+Hi,
 
-Doh. If we care about NSIS, we really need to have it being tested by
-some part of our CI system, and by pre-merge build tests.
+V7:
+* Fix memory leak in the auto converge test
+
+V6:
+* Fix "Add qemu_cond_timedwait" patch:
+  - Changed return type for qemu_cond_timedwait (void -> bool)
+  - Added details in commit message
+
+V5:
+* Updated sleep loop in throttle_thread at the suggestion of Paolo Bonzin=
+i
+* Fixed hanging of test
+
+V4:
+* The test was simplified to prevent false fails.
+
+V3:
+* Rebase fixes (migrate_set_parameter -> migrate_set_parameter_int)
+
+V2:
+* Added a test
+* Fixed qemu_cond_timedwait for qsp
+
+I wrote a test for migration auto converge and found out a strange thing:
+1. Enable auto converge
+2. Set max-bandwidth 1Gb/s
+3. Set downtime-limit 1ms
+4. Run standard test (just writes a byte per page)
+5. Wait for converge
+6. It's converged with 99% throttle percentage
+7. The result downtime was about 300-600ms   <<<<
+
+It's much higher than expected 1ms. I figured out that cpu_throttle_threa=
+d()
+function sleeps for 100ms+ for high throttle percentage (>=3D95%) in VCPU=
+ thread.
+And it sleeps even after a cpu kick.
+
+Fixed it by using timedwait for ms part of sleep.
+E.g timedwait(halt_cond, 1ms) + usleep(500).
 
 Regards,
-Daniel
+Yury
+
+Yury Kotov (3):
+  qemu-thread: Add qemu_cond_timedwait
+  cpus: Fix throttling during vm_stop
+  tests/migration: Add a test for auto converge
+
+ cpus.c                   |  25 +++++---
+ include/qemu/thread.h    |  19 ++++++
+ tests/migration-test.c   | 130 +++++++++++++++++++++++++++++++++++----
+ util/qemu-thread-posix.c |  41 ++++++++----
+ util/qemu-thread-win32.c |  17 +++++
+ util/qsp.c               |  20 ++++++
+ 6 files changed, 221 insertions(+), 31 deletions(-)
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.23.0
+
 
