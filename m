@@ -2,87 +2,66 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA10C433EF
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8E2C00307
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:37:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC11221920
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:29:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC11221920
+	by mail.kernel.org (Postfix) with ESMTPS id 033BC2086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:37:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 033BC2086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Fzf-0004Z9-0Y
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 05:29:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39011)
+	id 1i7G6e-0006T4-3D
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 05:37:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40721)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i7Fyc-0003xS-6p
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:28:51 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i7G5q-0005t4-7X
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i7Fyb-00018o-5q
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:28:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29886)
+ (envelope-from <kwolf@redhat.com>) id 1i7G5o-0002wh-Mt
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:36:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45736)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i7Fyb-000176-0l
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:28:49 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i7G5g-0002qm-RQ; Mon, 09 Sep 2019 05:36:10 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 863142DA980
- for <qemu-devel@nongnu.org>; Mon,  9 Sep 2019 09:28:47 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id n6so7091556wrw.14
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 02:28:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=by2bjIZg4qdRn5dszm+izjxfpHO99UyDhjIS2GVdlmU=;
- b=VGcHbS3sSBX3IKpY2j458kQia6tAPfSS5iHugyYQhjTcc0N18XKDUYXgPT8JtSlGFN
- IcLB3yurZIhANB7paDlnNetZAyeSlzHdjGBo+exJ72GUmikCqVdINTflK+rdqrgpLKUS
- GWY2ukfPTnIkLIgaJPr9VoRpRdxGv72jBOEBo6VQY+tza5f6dvRAqQJNfkMme8Jt6CsP
- o36LKU4WgxZ88SqrblGJ9wzaEVbqDPYEYON7c8CvxGc67jWX86lcSC+NldByMm9xtz2U
- OgLe1F2JKrSGF4uuAvdmkqEYngSU4BDrkm0F5hjipw3HVS+h8zPb5I7taPIs03sbOL9g
- 1vxg==
-X-Gm-Message-State: APjAAAWztkxYzFttn5sN2HyKGCZasnVkBm8TjE9PGLgjQRoKNkYRV5ak
- sFFubcH3MDKpQ4AH7v2fAd4mGeRv9vUVpEzivTz64NyP95d5aNrMYgExFMllyggbBPIIBT0vCb0
- UXtECJLsXCpAsuI8=
-X-Received: by 2002:a1c:c00e:: with SMTP id q14mr18856419wmf.14.1568021326360; 
- Mon, 09 Sep 2019 02:28:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy/S+BQMo4r6AGTW/C4eHi2YzYZObNvz8aHUKfQXATXJI/VFSVqe5a5mGmnv3icF4OqSYrBMw==
-X-Received: by 2002:a1c:c00e:: with SMTP id q14mr18856413wmf.14.1568021326223; 
- Mon, 09 Sep 2019 02:28:46 -0700 (PDT)
-Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id o19sm18845335wro.50.2019.09.09.02.28.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 09 Sep 2019 02:28:45 -0700 (PDT)
-To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org,
- qemu-trival@nongnu.org
-References: <20190909031446.1331810-1-maozhongyi@cmss.chinamobile.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <74c5363a-b5fb-9e14-14be-49297a063dba@redhat.com>
-Date: Mon, 9 Sep 2019 11:28:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id D333C10C697A;
+ Mon,  9 Sep 2019 09:36:06 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
+ [10.36.117.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 980C910018FF;
+ Mon,  9 Sep 2019 09:36:05 +0000 (UTC)
+Date: Mon, 9 Sep 2019 11:36:04 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190909093604.GB13841@localhost.localdomain>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-5-mreitz@redhat.com>
+ <20190904161658.GD21246@localhost.localdomain>
+ <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190909031446.1331810-1-maozhongyi@cmss.chinamobile.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
+Content-Disposition: inline
+In-Reply-To: <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Mon, 09 Sep 2019 09:36:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] pci_bridge: fix a typo in comment
+Subject: Re: [Qemu-devel] [PATCH v6 04/42] block: Add child access functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,31 +73,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/9/19 5:14 AM, Mao Zhongyi wrote:
-> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-> ---
->  hw/pci/pci_bridge.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> index 715b9a4fe6..97967d12eb 100644
-> --- a/hw/pci/pci_bridge.c
-> +++ b/hw/pci/pci_bridge.c
-> @@ -311,7 +311,7 @@ void pci_bridge_reset(DeviceState *qdev)
-> =20
->      /*
->       * the default values for base/limit registers aren't specified
-> -     * in the PCI-to-PCI-bridge spec. So we don't thouch them here.
-> +     * in the PCI-to-PCI-bridge spec. So we don't touch them here.
->       * Each implementation can override it.
->       * typical implementation does
->       * zero base/limit registers or
->=20
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+--YiEDa0DAkWCtVeE4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 09.09.2019 um 09:56 hat Max Reitz geschrieben:
+> On 04.09.19 18:16, Kevin Wolf wrote:
+> > Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+> >> There are BDS children that the general block layer code can access,
+> >> namely bs->file and bs->backing.  Since the introduction of filters and
+> >> external data files, their meaning is not quite clear.  bs->backing can
+> >> be a COW source, or it can be an R/W-filtered child; bs->file can be an
+> >> R/W-filtered child, it can be data and metadata storage, or it can be
+> >> just metadata storage.
+> >>
+> >> This overloading really is not helpful.  This patch adds function that
+> >> retrieve the correct child for each exact purpose.  Later patches in
+> >> this series will make use of them.  Doing so will allow us to handle
+> >> filter nodes and external data files in a meaningful way.
+> >>
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >=20
+> > Each time I look at this patch, I'm confused by the function names.
+> > Maybe I should just ask what the idea there was, or more specifically:
+> > What does the "filtered" in "filtered child" really mean?
+> >=20
+> > Apparently any child of a filter node is "filtered" (which makes sense),
+>=20
+> It isn=E2=80=99t, filters can have non-filter children.  For example, bac=
+kup-top
+> could have the source as a filtered child and the target as a non-filter
+> child.
+
+Hm, okay, makes sense. I had a definition in mind that says that filter
+nodes only have a single child node. Is it that a filter may have only a
+single _filtered_ child node?
+
+> > but also bs->backing of a qcow2 image, while bs->file of qcow2 isn't.
+> > raw doesn't have any "filtered" child. What's the system behind this?
+>=20
+> =E2=80=9Cfiltered=E2=80=9D means: If the parent node returns data from th=
+is child, it
+> won=E2=80=99t modify it, neither its content nor its position.  COW and R=
+/W
+> filters differ in how they handle writes; R/W filters pass them through
+> to the filtered child, COW filters copy them off to some other child
+> node (and then the filtered child=E2=80=99s data will no longer be visibl=
+e at
+> that location).
+
+But there is no reason why a node couldn't fulfill this condition for
+more than one child node. bdrv_filtered_child() isn't well-defined then.
+Technically, the description "Return any filtered child" is correct
+because "any" can be interpreted as "an arbitrary", but obviously that
+makes the function useless.
+
+Specficially, according to your definition, qcow2 filters both the
+backing file (COW filter) and the external data file (R/W filter).
+
+> The main reason behind the common =E2=80=9Cfiltered=E2=80=9D name is for =
+the generic
+> functions that work on both COW and true filter (R/W filters) chains.
+> We need such functionality sometimes.  I personally felt like the
+> concept of true (R/W) filters and COW children was similar enough to
+> share a common name base.
+
+We generally call this concept a "backing chain".
+
+> qcow2 has a COW child.  As such, it acts as a COW filter in the sense of
+> the function names.
+>=20
+> raw has neither a COW child nor acts as an R/W filter.  As such, it has
+> no filtered child.  My opinion on this hasn=E2=80=99t changed.
+>=20
+> (To reiterate, in practice I see no way anyone would ever use raw as an
+> R/W filter.
+> Either you use it without offset/size, in which case you simply use it
+> in lieu of a format node, so you precisely don=E2=80=99t want it to act a=
+s a
+> filter when it comes to allocation information and so on (even though it
+> can be classified a filter here).
+> Or you use it as kind of a filter with offset/size, but then it no
+> longer is a filter.
+
+Agreed with offset, but with only size, it matches your definition of a
+filter.
+
+> Filters are defined by =E2=80=9CEvery filter must fulfill these condition=
+s: ...=E2=80=9D
+> =E2=80=93 not by =E2=80=9CEverything that fulfills these conditions is a =
+filter=E2=80=9D.
+> Marking a driver as a filter has consequences, and I don=E2=80=99t see wh=
+y we
+> would want those consequences for raw.)
+>=20
+> > It looks like bdrv_filtered_child() is the right function to iterate
+> > along a backing file chain, but I just still fail to connect that and
+> > the name of the function in a meaningful way.
+>=20
+> It=E2=80=98s the right function to iterate along a filter chain.  This in=
+cludes
+> COW backing children and R/W filtered children.
+
+qcow2 doesn't fulfill the conditions for begin a filter driver. Two of
+its possible children fulfill the conditions for being a filtered child.
+You can pick either approach, talking about a "filter chain" just
+doesn't make sense there. Either the chain is broken by a non-filter
+driver like qcow2, or it must become a filter tree.
+
+What we're really interested in is iterating the backing chain even
+across filter nodes, so your implementation achieves the right result.
+It just feels completely arbitrary, counterintuitive and confusing to
+call this a (or actually "the") "filter chain" and to pretend that the
+name tells anyone what it really is.
+
+Kevin
+
+--YiEDa0DAkWCtVeE4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJddh0EAAoJEH8JsnLIjy/WyUsP/igVi1AwnsDIHYMELHCsCe9v
+vcighcXCVzsznediSTtSIMFqT45z/dqs4Vu78KtcaDNUeSIi1UXo3faikt6q87ZF
+9nK0EgcDozx+shnmJtr0MTyItBeEjKIFMurOUJnUHu1vZi//qQrx4AzzVMhS4NrF
+inQ51jwt8K8emuiMeB9J5Dh3m507/l5xcwzLcfjqK59Gb1qQpWRif7Z0daeNHRlF
+PZZY3K6+2/FksinqpdqWMyXlXMjzNTp+z8zD/L25MxlZGY+qH7HUtAsRiwemAll+
+EdFX/KpDtNgkzIosUARHehStQOZ3Z6XGNPQ3f965M336jIjVhFwNUf95+MFlaffW
+GOQddpuN099QARE83avajdvUnlAZwjRqhP3qyyOYctMhqKvVB3arr4gqN+dUMP1G
+45BBbocBdEf1aqYHVgUe2skcDYQw/wrYrV/glDgQ/r6mMMvUpUm5gwk/1eWlyAVs
+GOnPw3dELhhoGsm2nchJAx6zfuo48uj8qc51urSHxjIZaopQz8RZkNEnm5sFywP5
+8xn2kvm2W8v0xDulFZ+mxoyH9W9Hq9B78NnxehqoeN6eJNSCraSNtq5zW/NBiXsr
+Y1DRPAarPYqXhZ73gOOpSzyQOcJDfE5Ze/EfHc/WOkGqBIUgd+Eyz+QZPlnhdh4l
+0L2aQSm9qru9w+Xcim40
+=m2/8
+-----END PGP SIGNATURE-----
+
+--YiEDa0DAkWCtVeE4--
 
