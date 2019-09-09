@@ -2,94 +2,62 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF9AC4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28CC2C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28338218DE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:14:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cQ1IVot3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28338218DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id ED1DD2196E
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:20:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED1DD2196E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7LNV-0002s2-BU
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:14:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51048)
+	id 1i7LSh-0004Ks-50
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:20:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52154)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7LMr-0002Qy-31
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:14:14 -0400
+ (envelope-from <groug@kaod.org>) id 1i7LRy-0003mk-77
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7LMo-000895-RJ
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:14:12 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40059)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7LMm-000868-UA
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:14:09 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w13so14287312wru.7
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 08:14:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=134oQQbaTBKG92V+BPny4d27kS54NfmsW4R+mSsQgR0=;
- b=cQ1IVot3YRFhafqBP4p2lFCPK4I6UGpvIcfTx0V8pcXY4SO7fG34LkpUd400Sl1xXh
- lIdiUJUVauXuBDRm1spB24iGIgchzZFLlN7N/07dqWqDpxKhdWoKyymLnFttVD/VLPi/
- Ww+f1aiTRG3dCKBUpsNTZMnGugRHjwylG0Ko6f1RVPBmuurbhp+hmx3zuvBBXkIp4SCg
- NdBJx9uObn4YdoGLclGCmnzTclZC59nIaPdiMIkEAaIfdFPqDhaJ1Wxn0rD35b5EBcPJ
- 3giFFEkerkf4VaIRsGbp31jZn7wIwK4w8PcH95Fm/StW91GCf5m7lT0GThIWUxErrHCm
- ICgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=134oQQbaTBKG92V+BPny4d27kS54NfmsW4R+mSsQgR0=;
- b=rq9KdO6zkQYkkvKA6GxsXUIP4RXOAoDqUvx4qUvZvF/mF5ac9Jez1MQKGAV2BwEchB
- 3TOSbnabXO8qxkchS20eeMRP3irwJs5zJJwBrKoHQIxsGV/CcSJD4dBqRDdpAh2nTNkW
- lftwoACYBQ0NIgNQB0203CBo7YFQBgVgOdWt0iA1p1HxLxnrAAiMt9NZS6zLH3/6uSSX
- j5HHpvQCiVOMosF6RYbBbZxxBk60DfJhT47oUN+VxVaw46QJmEnfSQg+ZxVZ/+T8sqyG
- bIso+JfEm4v/7hygc0SiuVPRR7xpPqBc4GLCEH73lhdmu+FCmIaVI/Ne+GVFfzFJu9xS
- a7LQ==
-X-Gm-Message-State: APjAAAUsUlba1UybNWG5CgLhentBcHLMCAzaeMEe4h4gyhv3r4ZSUk+c
- fWPJguWYXRE7SeFs8ZRx8Jj5MQ==
-X-Google-Smtp-Source: APXvYqwR/MIXk7emV5KlCy2gE+8FBACC877O3MQvVibeeCbdbXKSBVXijA4FJb08DUU8gvpw8Y300A==
-X-Received: by 2002:a5d:45cb:: with SMTP id b11mr18491173wrs.296.1568042046162; 
- Mon, 09 Sep 2019 08:14:06 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z21sm13365270wmf.30.2019.09.09.08.14.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Sep 2019 08:14:05 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DFB431FF87;
- Mon,  9 Sep 2019 16:14:04 +0100 (BST)
-References: <20190829165036.9773-1-berrange@redhat.com>
- <20190829165036.9773-2-berrange@redhat.com>
- <15ffac7c-e7f2-17e4-f4e5-e54500ae3ecb@redhat.com>
- <20190909131510.GG24509@redhat.com>
- <429ee8e3-e6ce-5a37-f4fe-a8408b1cc7b9@redhat.com>
- <4babad28-f2d2-40d1-fc5b-6eaac479676a@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-In-reply-to: <4babad28-f2d2-40d1-fc5b-6eaac479676a@redhat.com>
-Date: Mon, 09 Sep 2019 16:14:04 +0100
-Message-ID: <87pnk91ozn.fsf@linaro.org>
+ (envelope-from <groug@kaod.org>) id 1i7LRw-0003cV-Q2
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:19:30 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:43151)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i7LRw-0003UD-KF
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:19:28 -0400
+Received: from player762.ha.ovh.net (unknown [10.108.42.23])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id E729A141959
+ for <qemu-devel@nongnu.org>; Mon,  9 Sep 2019 17:19:18 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player762.ha.ovh.net (Postfix) with ESMTPSA id EBD5299D3E36;
+ Mon,  9 Sep 2019 15:19:10 +0000 (UTC)
+Date: Mon, 9 Sep 2019 17:19:08 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190909171908.2b8f8343@bahia.lan>
+In-Reply-To: <156801389377.24362.17801924925988245591.stgit@aravinda>
+References: <156801373576.24362.1904051970114447107.stgit@aravinda>
+ <156801389377.24362.17801924925988245591.stgit@aravinda>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] docs: convert README,
- CODING_STYLE and HACKING to RST syntax
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7887491799937161620
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudekiedgkeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.63.230
+Subject: Re: [Qemu-devel] [PATCH v13 5/6] ppc: spapr: Handle "ibm,
+ nmi-register" and "ibm, nmi-interlock" RTAS calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,45 +69,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
- Stefan Weil <sw@weilnetz.de>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, paulus@ozlabs.org,
+ qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 09 Sep 2019 12:54:53 +0530
+Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+> This patch adds support in QEMU to handle "ibm,nmi-register"
+> and "ibm,nmi-interlock" RTAS calls and sets the default
+> value of SPAPR_CAP_FWNMI_MCE to SPAPR_CAP_ON for machine
+> type 4.2.
+> 
 
-> On 09/09/19 15:20, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Doh. If we care about NSIS, we really need to have it being tested by
->>> some part of our CI system, and by pre-merge build tests.
->>
->> I believe Stefan Weil does, since he regularly sends fixes or opens LP
->> bugs during freeze time.
->>
->> We do build nsis/win32 with CI, but for some reason patchew was down.
->>
->> I'm not sure we should duplicate the build on another CI, we should
->> rather setup something to watch patchew and warn us when it goes down.
->
-> I'm not sure what happened since I (obviously) was not monitoring
-> patchew during my vacation.  However, the recent Python 3 port of
-> docker.py bumped the requirement to Python 3.6 to run "make docker"
-> tests, and this broke patchew which had an older version.  I have now
-> updated the tester.
+I'd rather activate the feature for the default machine type at the end
+of the series, when we have everything in place, including migration.
 
-FWIW testing/next fixes the over eager python3 upgrade (I hadn't
-realised how recent encoding was as a check_output keyword). Expect it
-in a PR in the next few days.
+> The machine check notification address is saved when the
+> OS issues "ibm,nmi-register" RTAS call.
+> 
+> This patch also handles the case when multiple processors
+> experience machine check at or about the same time by
+> handling "ibm,nmi-interlock" call. In such cases, as per
+> PAPR, subsequent processors serialize waiting for the first
+> processor to issue the "ibm,nmi-interlock" call. The second
+> processor that also received a machine check error waits
+> till the first processor is done reading the error log.
+> The first processor issues "ibm,nmi-interlock" call
+> when the error log is consumed.
+> 
+> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> ---
+>  hw/ppc/spapr.c         |   12 +++++++++++-
+>  hw/ppc/spapr_rtas.c    |   50 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr.h |    5 ++++-
+>  3 files changed, 65 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 9f2e5d2..1c0908e 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2941,6 +2941,15 @@ static void spapr_machine_init(MachineState *machine)
+>  
+>          /* Resize rtas blob to accommodate error log */
+>          spapr->rtas_size = RTAS_ERROR_LOG_MAX;
+> +
+> +        /* Set fwnmi capability in KVM */
+> +        if (kvmppc_set_fwnmi() < 0) {
+> +            error_report("Could not enable FWNMI capability");
+> +            exit(1);
+> +        }
+> +
+> +        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
+> +        spapr_fwnmi_register();
+>      }
+>  
+>      spapr->rtas_blob = g_malloc(spapr->rtas_size);
+> @@ -4508,7 +4517,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
+> -    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
+> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_ON;
+>      spapr_caps_add_properties(smc, &error_abort);
+>      smc->irq = &spapr_irq_dual;
+>      smc->dr_phb_enabled = true;
+> @@ -4582,6 +4591,7 @@ static void spapr_machine_4_1_class_options(MachineClass *mc)
+>      smc->linux_pci_probe = false;
+>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+>      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
+>  }
+>  
+>  DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index d8fb8a8..d892583 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -400,6 +400,48 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>      rtas_st(rets, 1, 100);
+>  }
+>  
+> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+> +                                  SpaprMachineState *spapr,
+> +                                  uint32_t token, uint32_t nargs,
+> +                                  target_ulong args,
+> +                                  uint32_t nret, target_ulong rets)
+> +{
+> +    hwaddr rtas_addr = spapr_get_rtas_addr();
+> +
+> +    if (!rtas_addr) {
+> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+> +        return;
+> +    }
+> +
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
+> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+> +        return;
+> +    }
+> +
+> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
+> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> +}
+> +
+> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+> +                                   SpaprMachineState *spapr,
+> +                                   uint32_t token, uint32_t nargs,
+> +                                   target_ulong args,
+> +                                   uint32_t nret, target_ulong rets)
+> +{
+> +    if (spapr->guest_machine_check_addr == -1) {
+> +        /* NMI register not called */
+> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> +    } else {
+> +        /*
+> +         * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
+> +         * hence unset mc_status.
+> +         */
 
->
-> Paolo
+We only expect the vCPU that handled the NMI to call this, right ?
+Shouldn't we return an error if this gets called by some other
+vCPU ?
 
+> +        spapr->mc_status = -1;
+> +        qemu_cond_signal(&spapr->mc_delivery_cond);
+> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> +    }
+> +}
+> +
+>  static struct rtas_call {
+>      const char *name;
+>      spapr_rtas_fn fn;
+> @@ -544,6 +586,14 @@ hwaddr spapr_get_rtas_addr(void)
+>      return (hwaddr)fdt32_to_cpu(*rtas_data);
+>  }
+>  
+> +void spapr_fwnmi_register(void)
+> +{
+> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
+> +                        rtas_ibm_nmi_register);
+> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
+> +                        rtas_ibm_nmi_interlock);
+> +}
+> +
+>  static void core_rtas_register_types(void)
+>  {
+>      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index ffefde7..dada821 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -655,8 +655,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+>  #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
+> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2B)
+> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2C)
+>  
+> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
+> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2D)
+>  
+>  /* RTAS ibm,get-system-parameter token values */
+>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+> @@ -908,4 +910,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+>  
+>  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+>  hwaddr spapr_get_rtas_addr(void);
+> +void spapr_fwnmi_register(void);
+>  #endif /* HW_SPAPR_H */
+> 
 
---
-Alex Benn=C3=A9e
 
