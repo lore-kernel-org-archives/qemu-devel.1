@@ -6,63 +6,65 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A153EC5AE5C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2FBC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73DB62086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:57:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73DB62086D
+	by mail.kernel.org (Postfix) with ESMTPS id 6D7FD21920
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:02:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7FD21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7GPx-0004jy-Gv
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 05:57:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44746)
+	id 1i7GVc-0006pU-79
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:02:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i7GOp-0003dE-Su
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:55:57 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i7GUe-0006MC-DG
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i7GOo-00063d-G5
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:55:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35294)
+ (envelope-from <kwolf@redhat.com>) id 1i7GUc-0000PZ-Uf
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:01:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36436)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i7GOl-00061I-Dr; Mon, 09 Sep 2019 05:55:51 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i7GUZ-0000NT-HQ; Mon, 09 Sep 2019 06:01:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B4C2C102BB32;
- Mon,  9 Sep 2019 09:55:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9592F30821BF;
+ Mon,  9 Sep 2019 10:01:50 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
  [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA30A3D8F;
- Mon,  9 Sep 2019 09:55:48 +0000 (UTC)
-Date: Mon, 9 Sep 2019 11:55:47 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5678E60BE2;
+ Mon,  9 Sep 2019 10:01:49 +0000 (UTC)
+Date: Mon, 9 Sep 2019 12:01:47 +0200
 From: Kevin Wolf <kwolf@redhat.com>
 To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190909095547.GB17606@localhost.localdomain>
+Message-ID: <20190909100147.GC17606@localhost.localdomain>
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-15-mreitz@redhat.com>
- <20190905140547.GC4911@localhost.localdomain>
- <c8ef1957-e656-80bf-7e53-a8a417861d26@redhat.com>
+ <20190809161407.11920-17-mreitz@redhat.com>
+ <b2f43475-224e-5003-2c51-3949e9fb2d42@virtuozzo.com>
+ <e18b1eed-6d7a-603b-f8ad-4c56795309c2@redhat.com>
+ <20190905162407.GD4911@localhost.localdomain>
+ <af64f1db-c35b-351f-d65f-179775010d00@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="7iMSBzlTiPOCCT2k"
+ protocol="application/pgp-signature"; boundary="TiqCXmo5T1hvSQQg"
 Content-Disposition: inline
-In-Reply-To: <c8ef1957-e656-80bf-7e53-a8a417861d26@redhat.com>
+In-Reply-To: <af64f1db-c35b-351f-d65f-179775010d00@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 09 Sep 2019 09:55:50 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 09 Sep 2019 10:01:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 14/42] block: Use CAFs when working with
- backing chains
+Subject: Re: [Qemu-devel] [PATCH v6 16/42] block: Flush all children in
+ generic code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,125 +77,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---7iMSBzlTiPOCCT2k
+--TiqCXmo5T1hvSQQg
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am 09.09.2019 um 10:25 hat Max Reitz geschrieben:
-> On 05.09.19 16:05, Kevin Wolf wrote:
-> > Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
-> >> Use child access functions when iterating through backing chains so
-> >> filters do not break the chain.
+Am 09.09.2019 um 10:31 hat Max Reitz geschrieben:
+> On 05.09.19 18:24, Kevin Wolf wrote:
+> > Am 12.08.2019 um 14:58 hat Max Reitz geschrieben:
+> >> On 10.08.19 17:36, Vladimir Sementsov-Ogievskiy wrote:
+> >>> 09.08.2019 19:13, Max Reitz wrote:
+> >>>> If the driver does not support .bdrv_co_flush() so bdrv_co_flush()
+> >>>> itself has to flush the children of the given node, it should not fl=
+ush
+> >>>> just bs->file->bs, but in fact all children.
+> >>>>
+> >>>> In any case, the BLKDBG_EVENT() should be emitted on the primary chi=
+ld,
+> >>>> because that is where a blkdebug node would be if there is any.
+> >>>>
+> >>>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >>>> ---
+> >>>>   block/io.c | 23 +++++++++++++++++------
+> >>>>   1 file changed, 17 insertions(+), 6 deletions(-)
+> >>>>
+> >>>> diff --git a/block/io.c b/block/io.c
+> >>>> index c5a8e3e6a3..bcc770d336 100644
+> >>>> --- a/block/io.c
+> >>>> +++ b/block/io.c
+> >>>> @@ -2572,6 +2572,8 @@ static void coroutine_fn bdrv_flush_co_entry(v=
+oid *opaque)
+> >>>>  =20
+> >>>>   int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+> >>>>   {
+> >>>> +    BdrvChild *primary_child =3D bdrv_primary_child(bs);
+> >>>> +    BdrvChild *child;
+> >>>>       int current_gen;
+> >>>>       int ret =3D 0;
+> >>>>  =20
+> >>>> @@ -2601,7 +2603,7 @@ int coroutine_fn bdrv_co_flush(BlockDriverStat=
+e *bs)
+> >>>>       }
+> >>>>  =20
+> >>>>       /* Write back cached data to the OS even with cache=3Dunsafe */
+> >>>> -    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_OS);
+> >>>> +    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_OS);
+> >>>>       if (bs->drv->bdrv_co_flush_to_os) {
+> >>>>           ret =3D bs->drv->bdrv_co_flush_to_os(bs);
+> >>>>           if (ret < 0) {
+> >>>> @@ -2611,15 +2613,15 @@ int coroutine_fn bdrv_co_flush(BlockDriverSt=
+ate *bs)
+> >>>>  =20
+> >>>>       /* But don't actually force it to the disk with cache=3Dunsafe=
+ */
+> >>>>       if (bs->open_flags & BDRV_O_NO_FLUSH) {
+> >>>> -        goto flush_parent;
+> >>>> +        goto flush_children;
+> >>>>       }
+> >>>>  =20
+> >>>>       /* Check if we really need to flush anything */
+> >>>>       if (bs->flushed_gen =3D=3D current_gen) {
+> >>>> -        goto flush_parent;
+> >>>> +        goto flush_children;
+> >>>>       }
+> >>>>  =20
+> >>>> -    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
+> >>>> +    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_DISK);
+> >>>>       if (!bs->drv) {
+> >>>>           /* bs->drv->bdrv_co_flush() might have ejected the BDS
+> >>>>            * (even in case of apparent success) */
+> >>>> @@ -2663,8 +2665,17 @@ int coroutine_fn bdrv_co_flush(BlockDriverSta=
+te *bs)
+> >>>>       /* Now flush the underlying protocol.  It will also have BDRV_=
+O_NO_FLUSH
+> >>>>        * in the case of cache=3Dunsafe, so there are no useless flus=
+hes.
+> >>>>        */
+> >>>> -flush_parent:
+> >>>> -    ret =3D bs->file ? bdrv_co_flush(bs->file->bs) : 0;
+> >>>> +flush_children:
+> >>>> +    ret =3D 0; > +    QLIST_FOREACH(child, &bs->children, next) {
+> >>>> +        int this_child_ret;
+> >>>> +
+> >>>> +        this_child_ret =3D bdrv_co_flush(child->bs);
+> >>>> +        if (!ret) {
+> >>>> +            ret =3D this_child_ret;
+> >>>> +        }
+> >>>> +    }
+> >>>
+> >>> Hmm, you said that we want to flush only children with write-access f=
+rom parent..
 > >>
-> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >> ---
-> >>  block.c | 40 ++++++++++++++++++++++++++++------------
-> >>  1 file changed, 28 insertions(+), 12 deletions(-)
+> >> Good that you remember it, I must have overlooked it (when reading the
+> >> replies to the previous version). :-)
 > >>
-> >> diff --git a/block.c b/block.c
-> >> index 86b84bea21..42abbaf0ba 100644
-> >> --- a/block.c
-> >> +++ b/block.c
-> >> @@ -4376,7 +4376,8 @@ int bdrv_change_backing_file(BlockDriverState *b=
-s,
-> >>  }
-> >> =20
-> >>  /*
-> >> - * Finds the image layer in the chain that has 'bs' as its backing fi=
-le.
-> >> + * Finds the image layer in the chain that has 'bs' (or a filter on
-> >> + * top of it) as its backing file.
-> >>   *
-> >>   * active is the current topmost image.
-> >>   *
-> >> @@ -4388,11 +4389,18 @@ int bdrv_change_backing_file(BlockDriverState =
-*bs,
-> >>  BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
-> >>                                      BlockDriverState *bs)
-> >>  {
-> >> -    while (active && bs !=3D backing_bs(active)) {
-> >> -        active =3D backing_bs(active);
-> >> +    bs =3D bdrv_skip_rw_filters(bs);
-> >> +    active =3D bdrv_skip_rw_filters(active);
+> >>> Shouldn't we check it? Or we assume that it's always safe to call bdr=
+v_co_flush on
+> >>> a node?
+> >>
+> >> I think it=E2=80=99s always safe.  But checking it seems like a nice t=
+ouch, yes.
 > >=20
-> > This does more than the commit message says. In addition to iterating
-> > through filters instead of stopping, it also changes the semantics of
-> > the function to return the next non-filter on top of bs instead of the
-> > next node.
+> > I'm not sure why we would unconditionally flush all children anyway. The
+> > only drivers I can think of that really need to flush more than one
+> > child are blkverify and quorum, and both of them already implement this.
+> > blkverify implements .bdrv_co_flush, so it's not affected by the change
+> > anyway, but quorum children will be flushed twice now.
+> >=20
+> > But more than this, I'm worried about the overhead of needlessly
+> > recursing through the whole backing chain and calling flush on every
+> > node there.  Maybe bs->write_gen saves us so that at least this doesn't
+> > result in an fdatasync() call for each, but still... Without a use case,
+> > I'd rather not do this.
+> >=20
+> > Oh, well, after having written all of this, I see that qcow2 with an
+> > external data file is buggy... This could be fixed in the qcow2 driver,
+> > but maybe restricting the recursion to read-only is actually good enough
+> > then. Can you mention this case in the commit message and maybe build a
+> > test for it?
 >=20
-> Which is to say the overlay.
+> And I should thus probably drop vmdk=E2=80=99s .bdrv_co_flush_to_disk()
+> implementation.
 >=20
-> (I think we only ever use =E2=80=9Coverlay=E2=80=9D in the COW sense.)
+> I will indeed try to write a test, but to be completely honest, I feel
+> like this series is long enough.
 
-I think we do, but so far also only ever for immediate COW childs, not
-for skipping through intermediate node.
-
-> > The block jobs seem to use it only for bdrv_is_allocated_above(), which
-> > should return the same thing in both cases, so the behaviour stays the
-> > same. qmp_block_commit() will check op blockers on a different node now,
-> > which could be a fix or a bug, I can't tell offhand. Probably the
-> > blocking doesn't really work anyway.
->=20
-> You mean that the op blocker could have been on a block job filter node
-> before?  I think that=E2=80=98s pretty much the point of this fix; that t=
-hat
-> doesn=E2=80=99t make sense.  (We didn=E2=80=99t have mirror_top_bs and th=
-e like at
-> 058223a6e3b.)
-
-On the off chance that the op blocker actually works, it can't be a job
-filter. I was thinking more of throttling, blkdebug etc.
-
-> > All of this should be mentioned in the commit message at least. Maybe
-> > it's also worth splitting in two patches.
->=20
-> I don=E2=80=99t know.  The function was written when there were no filter=
-s.
-
-I doubt it. blkdebug is a really old filter.
-
-> This change would have been a no-op then.  The fact that it isn=E2=80=99t=
- to me
-> just means that introducing filters broke it.
->=20
-> So I don=E2=80=99t know what I would write.  Maybe =E2=80=9Cbdrv_find_ove=
-rlay() now
-> actually finds the overlay, that is, it will not return a filter node.
-> This is the behavior that all callers expect (because they work on COW
-> backing chains).=E2=80=9D
-
-Maybe just something like "In addition, filter nodes are not returned as
-overlays any more. Instead, the first non-filter node on top of bs is
-considered the overlay now."?
+I guess I could already merge patch 1 to give you space for another test
+patch. ;-)
 
 Kevin
 
---7iMSBzlTiPOCCT2k
+--TiqCXmo5T1hvSQQg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJddiGjAAoJEH8JsnLIjy/WKY0P/iAS78oylJB5L5gS9V1O2NWP
-xY2h0NjUa7kdDFSYPDj4qhE23G+jKPDrfSDp6FIILZzY8DnosxzTD+Qp84LZ+05m
-Hh0m9+Z/21wn6eZo3bHaPiiU7H4uXOXwAKoiexHykdH6fZsHcnCg585o6vZX2+J2
-sPGmtB/WlLu2LDvA4dVEumo+d0r0udpj18Qqv4nRJLgWCmseKnVz7iXxiYjrpl6F
-ri2pf6wnER22sRL9M/g5InhyKcRmbISgsnxi3sahDTlDRC0oZxvWX7ryjLao8DBY
-dQqwCbkxjhNCBwRhirrF57NoDuruWCnMlVBN03/mvEojOWcWll/tz8jotnX+oQqM
-p/Huf7gmjpVEBGQhZSbhGkC6WXyajNCyxHvWfQERCssxFnVTfBBr9beK+3H9b46D
-pVGBywRbUCaZ0BP3e7/RuPpWhMY18nQFdMCLyAxkh671dhI59NmN8jDrzAKlUYCg
-kknYjV+EYyDBlIPSubp9RrBwASlwmAWWfx9Ozklyv9rPd5NIaNsFqkMV7WJ16Xdc
-ijVoqkY4wkDa7oZjcYN7oFZqpzgNULtzIuWqntQ3nssk1IntquVm0frqCNGXR4G5
-c3YhGu+EoiOQoGQKvqk4sKFteK3v8gAV8j+QR8WsRmIF+VhSWwT6ziJ0tWjxCpVA
-YVK80o5TPqK0/ERXIRSD
-=li4r
+iQIcBAEBAgAGBQJddiMLAAoJEH8JsnLIjy/W2XwP/jMc8hm8obS7wT7YlPlmK627
+EvADYO6+8QP8bJRRgmkT4qRKvx+NXmempa9idcGeDfI9Gc12zrPxGdtAZ+nrEDem
+JYZ5/4gL7Wi+AtMQyzmY77cp2i8wn90FGYdcmvEsuBnsTgDoenDwW2L+eTb9b4sS
+0OTgmm1EI2MrFbu5hKqVOuvOEvxGK5TyLfJ4iUB+5pkcaHqKK4w0TyHMmhlhC0sU
+hYGyorSbHYCjnmH/83ExIktFcvKmdZw9ZMZDwpEhRIVVKc6CNNdMrsiVWQb5XJ3g
+VsVhsurZ80xo3b+cwG/XlcqkWouReEfiTm2BqHZMWru7/5WrNFHqoe7KlSfTsjog
+LjIMW1H5JtvC47/GAFP0NzuXBUfXcnq/T5FgPjAsN4QnPRjsn9T9GO85O3eHRtPL
+BIQCEq8qDDgHfISHMBTHu3090yFem05iC6Nc5il0MciHe7JbvCXChFaAPyiBE2vT
+HtqkqRsxms9LvU+FB+9TxoAfjzE5TJix3JkcYY0OfndkyxFKZP/p+V/6AJseIXQi
+pKSTbqEyJ6OjauSjpLo6R7++y0YTHpm0MM4t9dMRcQXU41igyjxRCrV4fOAC5aYq
+9Cp6k2qDOgN816JTJy9HxMwbPTLW7TO0ZyX6laYOXtzI/Q8yVv+6M9JWOx4Jdw2e
+8mkOS8yxXh5dpVibXeVB
+=FaE4
 -----END PGP SIGNATURE-----
 
---7iMSBzlTiPOCCT2k--
+--TiqCXmo5T1hvSQQg--
 
