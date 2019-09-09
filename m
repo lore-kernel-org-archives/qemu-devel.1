@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAACC4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13839C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:08:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64AFA2086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:06:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64AFA2086D
+	by mail.kernel.org (Postfix) with ESMTPS id CC04C2082C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:08:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC04C2082C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58455 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7MBa-0006wT-1h
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:06:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59774)
+	id 1i7MDS-0000zw-Vt
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:08:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7M4V-0000CZ-Gl
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:59:22 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7M4c-0000Ij-Ug
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:59:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7M4S-0001p3-Pd
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:59:19 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:44591)
+ (envelope-from <laurent@vivier.eu>) id 1i7M4Y-0001sj-Ur
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:59:26 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:38335)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7M4L-0001jV-NL; Mon, 09 Sep 2019 11:59:11 -0400
+ id 1i7M4S-0001oi-Sx; Mon, 09 Sep 2019 11:59:17 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N1x6X-1iIflg2x8T-012DDg; Mon, 09 Sep 2019 17:58:34 +0200
+ id 1MQNF3-1hlXxO1B8z-00MKyK; Mon, 09 Sep 2019 17:58:39 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Mon,  9 Sep 2019 17:58:10 +0200
-Message-Id: <20190909155813.27760-7-laurent@vivier.eu>
+Date: Mon,  9 Sep 2019 17:58:13 +0200
+Message-Id: <20190909155813.27760-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190909155813.27760-1-laurent@vivier.eu>
 References: <20190909155813.27760-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:LnKXBpACJ4aHmHNR7Osdtse9a8cUxCsNm91w5aZgfWjE5y5CNMj
- m+H2A+potinRnv/xiy2P4zcJiBEBVN7pB6NjoxWf1cBwMytTrMywMUwbVFnXPpsWgCv8NA9
- ys3HYReyALiriTYTA+SKe4kLS/86RCSyuAD0H7qVP/DiKu8dei2YqGu9QLHIguD6acwt7UX
- JXowrRW0kztaa0PxyBYvg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0TSoFonooRc=:skP2DaXz9XEnAxy/4CSCxm
- JZ/fe/lwIJyVpZ/sadMXYHc/TUcul5n2XP7AqQvjpK3Ve2u81kg21u8Gq7OUEVsKZdYujXunM
- CnWH/cJMDEu3KF10DeowonsaZHQChIiwfnbiPYc5H+uotXcp7U0+277JscIt6EDX6wOeT6z0A
- da2SkzI/MrLzQ0JMKrceY6tepxUsr6GTIUn+gnZSIWcP7RkBcKZ9ZxN6ek/23CiWljPUp7GGB
- utIPGkb+6PM9b1v/YODqmxc7s7VOLf9tvdv9gfl2Ff6KRuSDEdblTRlSf4+sXccwC6E7eet3F
- +VKu51jhAYRAni9EJzPH9rtEWWpEGUxYtq/byMGlQk7uBumh0BTKOyeZiXETX9Axe1MU+j1zk
- mdaUX6M8vlNt8dG4oJJzl77yWnOh/42RGVgMx5z0nOdG+sNDL1r0jWcI/qGCwxZi6qYa39RRL
- UqWNSBzQagPkFLCkhbHghxXT9R7P6pZHuULrdKJWCn0rdTwBuZZNKxD2PEiZMXYZ7R1CFhOjy
- 0J10oRMfUS4NXmb+xjqf3+apFBrNZ/CMjMSwW+wuwxmUTn/IwCN3729vG4k1jFOPdvGw9fUaI
- CCgu0uIRuI7J144ty98ThrouwYTRfMwAHm9OZrfKSPhiUbvT5LqJGfmMUIcADEdhRcI9pHRqg
- 3agsTGsx57XY9ResNMP66x5wP4ejWlR9wIV9YzJno/UBB+Pghnr6LkgHEDxBUALHZZosBaM61
- Vb8jR5rsCnh4G5/MifwqdHEN25DBoVCGUalZqSe9lV/X6C1DaNwxJfQa4Bkyq5oQIBWiDLrUi
- 2jbi6kNr7L5EEyFQ6Uqym1P6d+4CC2WfWZcqlWWfKSqX5T+CKA=
+X-Provags-ID: V03:K1:p5z7uZCy6YgfdAdT6H2Q6C4ZzagPP3oHpPWdj0cFbjwt/A8Qwo2
+ cOJq/Ggfgh1c0Hpp2FgcEcvkvLPDXNo1EVaCeCOlIJ7U2e//FxMZ9PyW6UVgLe3Q6KLYUfl
+ gHmyysi7LbFcUMLV/mny6daDOCH0redNXl9k9ip3/VxEni6nkkPiOpdOeAIh2IutFpa5EDi
+ yYEq8au7HfijUXBYT9rsw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Iad30P61p7s=:HJJdTyHqzSdiU0YP0Mtaae
+ Q6YVADS1VqvQ5dqpGJ2ik/qX2ryeh/Jpzk4hy7hdzOari3rQIB2k54wP1+n/EHTRyqLyehSin
+ e3AZTZWdjbARh7dsMWog7UpI/fQ37mHfnHNgaEqufZJe9mPCoLmULq11OSr6jnQ05/1/i7ZNO
+ 3Wwb8E1rVh/8gWOJyqcIqQAucNZVnFH9sCTkQ0U8pO3pCnYU7rUX5HkpEHEidwcjtiRToj7wp
+ m2YaIVncoK9o7LXFNgxbf026zX9os+bW2VKrpYMbSwGyEajTIjclp3MkKpWXGMBudd0WjvOBg
+ nBAha9mDaTqBiikZdWSsdmIILgXg4zCo2gtwbmVYrvsL1+/vL4+4S3a7+8+3TCln5cckMa+Do
+ 2W5Tk40tqsJ5Ddrh1pqW3ZFL4sxtdGz84RTw8n6qdMnAg5RaDXiZ5AcoRv6LlEsfINnpyapRk
+ xd10oNGBzUJwX224wDpA3hQ6pBrxa1+rswZXUND6oKIbMxfJyb94pyFRYe8aycRIbnEWp+11Y
+ 01K9wWKFLQ6D7ZSPjAL9MbUeN7++uppbPFjCcB9nUiXQi3hMx8nQEn+SnjbDmk4ka3G5kaS/h
+ ljTa2NWVsdWYmNZwwdu6ONy2zjpvJebKxVLkgae8yRwN9BGVkbKLDJePddmMsyHoqdumnj8kC
+ v3IcCiSKl7hJ+2qub7Q5I4tJPvPx+YExHcC3FNwtPVzNkqgBvfVNCgOkHq4qXaFSwQ1mytMCD
+ h2DGfATdLgfSGoP8ELf7daDugRaKsemlnFSbXZinzRamIdFdxpgWtrWtIib6L+JbLhrljiCZf
+ UmQElt+0yWnlBvHpkJxhN5fQtYkuzsOBQ8fgZTOvyRy2YKC4i0=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: [Qemu-devel] [PATCH v9 6/9] hw/m68k: add Nubus support
+X-Received-From: 212.227.126.187
+Subject: [Qemu-devel] [PATCH v9 9/9] hw/m68k: define Macintosh Quadra 800
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,607 +90,611 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If you want to test the machine, it doesn't yet boot a MacROM, but you can
+boot a linux kernel from the command line.
+
+You can install your own disk using debian-installer with:
+
+    ./qemu-system-m68k \
+    -M q800 \
+    -serial none -serial mon:stdio \
+    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+    -append "console=ttyS0 vga=off" \
+    -kernel vmlinux-4.15.0-2-m68k \
+    -initrd initrd.gz \
+    -drive file=debian-9.0-m68k-NETINST-1.iso \
+    -drive file=m68k.qcow2,format=qcow2 \
+    -nographic
+
+If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
+size of the display (I use "-g 1600x800x24").
+
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Thomas Huth <huth@tuxfamily.org>
 ---
- hw/Kconfig                          |   1 +
- hw/Makefile.objs                    |   1 +
- hw/nubus/Kconfig                    |   2 +
- hw/nubus/Makefile.objs              |   4 +
- hw/nubus/mac-nubus-bridge.c         |  45 ++++++
- hw/nubus/nubus-bridge.c             |  34 +++++
- hw/nubus/nubus-bus.c                | 111 ++++++++++++++
- hw/nubus/nubus-device.c             | 215 ++++++++++++++++++++++++++++
- include/hw/nubus/mac-nubus-bridge.h |  24 ++++
- include/hw/nubus/nubus.h            |  69 +++++++++
- 10 files changed, 506 insertions(+)
- create mode 100644 hw/nubus/Kconfig
- create mode 100644 hw/nubus/Makefile.objs
- create mode 100644 hw/nubus/mac-nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bus.c
- create mode 100644 hw/nubus/nubus-device.c
- create mode 100644 include/hw/nubus/mac-nubus-bridge.h
- create mode 100644 include/hw/nubus/nubus.h
+ MAINTAINERS                      |  14 ++
+ default-configs/m68k-softmmu.mak |   1 +
+ hw/m68k/Kconfig                  |  12 +
+ hw/m68k/Makefile.objs            |   1 +
+ hw/m68k/bootinfo.h               | 114 +++++++++
+ hw/m68k/q800.c                   | 382 +++++++++++++++++++++++++++++++
+ 6 files changed, 524 insertions(+)
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 hw/m68k/q800.c
 
-diff --git a/hw/Kconfig b/hw/Kconfig
-index b45db3c813..0501a55315 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -21,6 +21,7 @@ source isa/Kconfig
- source mem/Kconfig
- source misc/Kconfig
- source net/Kconfig
-+source nubus/Kconfig
- source nvram/Kconfig
- source pci-bridge/Kconfig
- source pci-host/Kconfig
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index ece6cc3755..457b95e28d 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -37,6 +37,7 @@ devices-dirs-y += virtio/
- devices-dirs-y += watchdog/
- devices-dirs-y += xen/
- devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
-+devices-dirs-$(CONFIG_NUBUS) += nubus/
- devices-dirs-y += semihosting/
- devices-dirs-y += smbios/
- endif
-diff --git a/hw/nubus/Kconfig b/hw/nubus/Kconfig
-new file mode 100644
-index 0000000000..8fb8b22189
---- /dev/null
-+++ b/hw/nubus/Kconfig
-@@ -0,0 +1,2 @@
-+config NUBUS
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 50eaf005f4..3c71dbb3a3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -917,6 +917,20 @@ F: hw/m68k/next-*.c
+ F: hw/display/next-fb.c
+ F: include/hw/m68k/next-cube.h
+ 
++q800
++M: Laurent Vivier <laurent@vivier.eu>
++S: Maintained
++F: hw/block/swim.c
++F: hw/m68k/bootinfo.h
++F: hw/display/macfb.c
++F: hw/m68k/q800.c
++F: hw/misc/mac_via.c
++F: hw/nubus/*
++F: include/hw/block/swim.h
++F: include/hw/display/macfb.h
++F: include/hw/misc/mac_via.h
++F: include/hw/nubus/*
++
+ MicroBlaze Machines
+ -------------------
+ petalogix_s3adsp1800
+diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
+index d67ab8b96d..6629fd2aa3 100644
+--- a/default-configs/m68k-softmmu.mak
++++ b/default-configs/m68k-softmmu.mak
+@@ -7,3 +7,4 @@ CONFIG_SEMIHOSTING=y
+ CONFIG_AN5206=y
+ CONFIG_MCF5208=y
+ CONFIG_NEXTCUBE=y
++CONFIG_Q800=y
+diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
+index a74fac5abd..f782210b92 100644
+--- a/hw/m68k/Kconfig
++++ b/hw/m68k/Kconfig
+@@ -12,3 +12,15 @@ config NEXTCUBE
+     bool
+     select FRAMEBUFFER
+     select ESCC
++
++config Q800
 +    bool
-diff --git a/hw/nubus/Makefile.objs b/hw/nubus/Makefile.objs
++    select FRAMEBUFFER
++    select ADB
++    select MAC_VIA
++    select ESCC
++    select ESP
++    select MACFB
++    select NUBUS
++    select DP8393X
++    select SWIM
+diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+index f25854730d..b2c9e5ab12 100644
+--- a/hw/m68k/Makefile.objs
++++ b/hw/m68k/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
+ obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
+ obj-$(CONFIG_NEXTCUBE) += next-kbd.o next-cube.o
++obj-$(CONFIG_Q800) += q800.o
+diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
 new file mode 100644
-index 0000000000..135ba7878d
+index 0000000000..5f8ded2686
 --- /dev/null
-+++ b/hw/nubus/Makefile.objs
-@@ -0,0 +1,4 @@
-+common-obj-y += nubus-device.o
-+common-obj-y += nubus-bus.o
-+common-obj-y += nubus-bridge.o
-+common-obj-$(CONFIG_Q800) += mac-nubus-bridge.o
-diff --git a/hw/nubus/mac-nubus-bridge.c b/hw/nubus/mac-nubus-bridge.c
-new file mode 100644
-index 0000000000..7c329300b8
---- /dev/null
-+++ b/hw/nubus/mac-nubus-bridge.c
-@@ -0,0 +1,45 @@
++++ b/hw/m68k/bootinfo.h
+@@ -0,0 +1,114 @@
 +/*
-+ *  Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ * SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * Bootinfo tags from linux bootinfo.h and bootinfo-mac.h:
++ * This is an easily parsable and extendable structure containing all
++ * information to be passed from the bootstrap to the kernel
 + *
++ * This structure is copied right after the kernel by the bootstrap
++ * routine.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "hw/nubus/mac-nubus-bridge.h"
-+
-+
-+static void mac_nubus_bridge_init(Object *obj)
-+{
-+    MacNubusState *s = MAC_NUBUS_BRIDGE(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    s->bus = NUBUS_BUS(qbus_create(TYPE_NUBUS_BUS, DEVICE(s), NULL));
-+
-+    sysbus_init_mmio(sbd, &s->bus->super_slot_io);
-+    sysbus_init_mmio(sbd, &s->bus->slot_io);
-+}
-+
-+static void mac_nubus_bridge_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->desc = "Nubus bridge";
-+}
-+
-+static const TypeInfo mac_nubus_bridge_info = {
-+    .name          = TYPE_MAC_NUBUS_BRIDGE,
-+    .parent        = TYPE_NUBUS_BRIDGE,
-+    .instance_init = mac_nubus_bridge_init,
-+    .instance_size = sizeof(MacNubusState),
-+    .class_init    = mac_nubus_bridge_class_init,
++#ifndef HW_M68K_BOOTINFO_H
++#define HW_M68K_BOOTINFO_H
++struct bi_record {
++    uint16_t tag;        /* tag ID */
++    uint16_t size;       /* size of record */
++    uint32_t data[0];    /* data */
 +};
 +
-+static void mac_nubus_bridge_register_types(void)
-+{
-+    type_register_static(&mac_nubus_bridge_info);
-+}
-+
-+type_init(mac_nubus_bridge_register_types)
-diff --git a/hw/nubus/nubus-bridge.c b/hw/nubus/nubus-bridge.c
-new file mode 100644
-index 0000000000..cd8c6a91eb
---- /dev/null
-+++ b/hw/nubus/nubus-bridge.c
-@@ -0,0 +1,34 @@
-+/*
-+ * QEMU Macintosh Nubus
-+ *
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "hw/nubus/nubus.h"
-+
-+static void nubus_bridge_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->fw_name = "nubus";
-+}
-+
-+static const TypeInfo nubus_bridge_info = {
-+    .name          = TYPE_NUBUS_BRIDGE,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SysBusDevice),
-+    .class_init    = nubus_bridge_class_init,
-+};
-+
-+static void nubus_register_types(void)
-+{
-+    type_register_static(&nubus_bridge_info);
-+}
-+
-+type_init(nubus_register_types)
-diff --git a/hw/nubus/nubus-bus.c b/hw/nubus/nubus-bus.c
-new file mode 100644
-index 0000000000..942a6d5342
---- /dev/null
-+++ b/hw/nubus/nubus-bus.c
-@@ -0,0 +1,111 @@
-+/*
-+ * QEMU Macintosh Nubus
-+ *
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/nubus/nubus.h"
-+#include "hw/sysbus.h"
-+#include "qapi/error.h"
-+
-+
-+static NubusBus *nubus_find(void)
-+{
-+    /* Returns NULL unless there is exactly one nubus device */
-+    return NUBUS_BUS(object_resolve_path_type("", TYPE_NUBUS_BUS, NULL));
-+}
-+
-+static void nubus_slot_write(void *opaque, hwaddr addr, uint64_t val,
-+                             unsigned int size)
-+{
-+    /* read only */
-+}
-+
-+
-+static uint64_t nubus_slot_read(void *opaque, hwaddr addr,
-+                                unsigned int size)
-+{
-+    return 0;
-+}
-+
-+static const MemoryRegionOps nubus_slot_ops = {
-+    .read  = nubus_slot_read,
-+    .write = nubus_slot_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static void nubus_super_slot_write(void *opaque, hwaddr addr, uint64_t val,
-+                                   unsigned int size)
-+{
-+    /* read only */
-+}
-+
-+static uint64_t nubus_super_slot_read(void *opaque, hwaddr addr,
-+                                      unsigned int size)
-+{
-+    return 0;
-+}
-+
-+static const MemoryRegionOps nubus_super_slot_ops = {
-+    .read  = nubus_super_slot_read,
-+    .write = nubus_super_slot_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static void nubus_realize(BusState *bus, Error **errp)
-+{
-+    if (!nubus_find()) {
-+        error_setg(errp, "at most one %s device is permitted", TYPE_NUBUS_BUS);
-+        return;
-+    }
-+}
-+
-+static void nubus_init(Object *obj)
-+{
-+    NubusBus *nubus = NUBUS_BUS(obj);
-+
-+    memory_region_init_io(&nubus->super_slot_io, obj, &nubus_super_slot_ops,
-+                          nubus, "nubus-super-slots",
-+                          NUBUS_SUPER_SLOT_NB * NUBUS_SUPER_SLOT_SIZE);
-+
-+    memory_region_init_io(&nubus->slot_io, obj, &nubus_slot_ops,
-+                          nubus, "nubus-slots",
-+                          NUBUS_SLOT_NB * NUBUS_SLOT_SIZE);
-+
-+    nubus->current_slot = NUBUS_FIRST_SLOT;
-+}
-+
-+static void nubus_class_init(ObjectClass *oc, void *data)
-+{
-+    BusClass *bc = BUS_CLASS(oc);
-+
-+    bc->realize = nubus_realize;
-+}
-+
-+static const TypeInfo nubus_bus_info = {
-+    .name = TYPE_NUBUS_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = sizeof(NubusBus),
-+    .instance_init = nubus_init,
-+    .class_init = nubus_class_init,
-+};
-+
-+static void nubus_register_types(void)
-+{
-+    type_register_static(&nubus_bus_info);
-+}
-+
-+type_init(nubus_register_types)
-diff --git a/hw/nubus/nubus-device.c b/hw/nubus/nubus-device.c
-new file mode 100644
-index 0000000000..01ccad9e8e
---- /dev/null
-+++ b/hw/nubus/nubus-device.c
-@@ -0,0 +1,215 @@
-+/*
-+ * QEMU Macintosh Nubus
-+ *
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/nubus/nubus.h"
-+#include "qapi/error.h"
-+
-+
-+/* The Format Block Structure */
-+
-+#define FBLOCK_DIRECTORY_OFFSET 0
-+#define FBLOCK_LENGTH           4
-+#define FBLOCK_CRC              8
-+#define FBLOCK_REVISION_LEVEL   12
-+#define FBLOCK_FORMAT           13
-+#define FBLOCK_TEST_PATTERN     14
-+#define FBLOCK_RESERVED         18
-+#define FBLOCK_BYTE_LANES       19
-+
-+#define FBLOCK_SIZE             20
-+#define FBLOCK_PATTERN_VAL      0x5a932bc7
-+
-+static uint64_t nubus_fblock_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    NubusDevice *dev = opaque;
-+    uint64_t val;
-+
-+#define BYTE(v, b) (((v) >> (24 - 8 * (b))) & 0xff)
-+    switch (addr) {
-+    case FBLOCK_BYTE_LANES:
-+        val = dev->byte_lanes;
-+        val |= (val ^ 0xf) << 4;
-+        break;
-+    case FBLOCK_RESERVED:
-+        val = 0x00;
-+        break;
-+    case FBLOCK_TEST_PATTERN...FBLOCK_TEST_PATTERN + 3:
-+        val = BYTE(FBLOCK_PATTERN_VAL, addr - FBLOCK_TEST_PATTERN);
-+        break;
-+    case FBLOCK_FORMAT:
-+        val = dev->rom_format;
-+        break;
-+    case FBLOCK_REVISION_LEVEL:
-+        val = dev->rom_rev;
-+        break;
-+    case FBLOCK_CRC...FBLOCK_CRC + 3:
-+        val = BYTE(dev->rom_crc, addr - FBLOCK_CRC);
-+        break;
-+    case FBLOCK_LENGTH...FBLOCK_LENGTH + 3:
-+        val = BYTE(dev->rom_length, addr - FBLOCK_LENGTH);
-+        break;
-+    case FBLOCK_DIRECTORY_OFFSET...FBLOCK_DIRECTORY_OFFSET + 3:
-+        val = BYTE(dev->directory_offset, addr - FBLOCK_DIRECTORY_OFFSET);
-+        break;
-+    default:
-+        val = 0;
-+        break;
-+    }
-+    return val;
-+}
-+
-+static void nubus_fblock_write(void *opaque, hwaddr addr, uint64_t val,
-+                               unsigned int size)
-+{
-+    /* read only */
-+}
-+
-+static const MemoryRegionOps nubus_format_block_ops = {
-+    .read = nubus_fblock_read,
-+    .write = nubus_fblock_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    }
-+};
-+
-+static void nubus_register_format_block(NubusDevice *dev)
-+{
-+    char *fblock_name;
-+
-+    fblock_name = g_strdup_printf("nubus-slot-%d-format-block",
-+                                  dev->slot_nb);
-+
-+    hwaddr fblock_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE;
-+    memory_region_init_io(&dev->fblock_io, NULL, &nubus_format_block_ops,
-+                          dev, fblock_name, FBLOCK_SIZE);
-+    memory_region_add_subregion(&dev->slot_mem, fblock_offset,
-+                                &dev->fblock_io);
-+
-+    g_free(fblock_name);
-+}
-+
-+static void mac_nubus_rom_write(void *opaque, hwaddr addr, uint64_t val,
-+                                       unsigned int size)
-+{
-+    /* read only */
-+}
-+
-+static uint64_t mac_nubus_rom_read(void *opaque, hwaddr addr,
-+                                    unsigned int size)
-+{
-+    NubusDevice *dev = opaque;
-+
-+    return dev->rom[addr];
-+}
-+
-+static const MemoryRegionOps mac_nubus_rom_ops = {
-+    .read  = mac_nubus_rom_read,
-+    .write = mac_nubus_rom_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+
-+void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
-+                        int revision, int format, uint8_t byte_lanes)
-+{
-+    hwaddr rom_offset;
-+    char *rom_name;
-+
-+    /* FIXME : really compute CRC */
-+    dev->rom_length = 0;
-+    dev->rom_crc = 0;
-+
-+    dev->rom_rev = revision;
-+    dev->rom_format = format;
-+
-+    dev->byte_lanes = byte_lanes;
-+    dev->directory_offset = -size;
-+
-+    /* ROM */
-+
-+    dev->rom = rom;
-+    rom_name = g_strdup_printf("nubus-slot-%d-rom", dev->slot_nb);
-+    memory_region_init_io(&dev->rom_io, NULL, &mac_nubus_rom_ops,
-+                          dev, rom_name, size);
-+    memory_region_set_readonly(&dev->rom_io, true);
-+
-+    rom_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE +
-+                 dev->directory_offset;
-+    memory_region_add_subregion(&dev->slot_mem, rom_offset, &dev->rom_io);
-+
-+    g_free(rom_name);
-+}
-+
-+static void nubus_device_realize(DeviceState *dev, Error **errp)
-+{
-+    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(DEVICE(dev)));
-+    NubusDevice *nd = NUBUS_DEVICE(dev);
-+    char *name;
-+    hwaddr slot_offset;
-+
-+    if (nubus->current_slot < NUBUS_FIRST_SLOT ||
-+            nubus->current_slot > NUBUS_LAST_SLOT) {
-+        error_setg(errp, "Cannot register nubus card, not enough slots");
-+        return;
-+    }
-+
-+    nd->slot_nb = nubus->current_slot++;
-+    name = g_strdup_printf("nubus-slot-%d", nd->slot_nb);
-+
-+    if (nd->slot_nb < NUBUS_FIRST_SLOT) {
-+        /* Super */
-+        slot_offset = (nd->slot_nb - 6) * NUBUS_SUPER_SLOT_SIZE;
-+
-+        memory_region_init(&nd->slot_mem, OBJECT(dev), name,
-+                           NUBUS_SUPER_SLOT_SIZE);
-+        memory_region_add_subregion(&nubus->super_slot_io, slot_offset,
-+                                    &nd->slot_mem);
-+    } else {
-+        /* Normal */
-+        slot_offset = nd->slot_nb * NUBUS_SLOT_SIZE;
-+
-+        memory_region_init(&nd->slot_mem, OBJECT(dev), name, NUBUS_SLOT_SIZE);
-+        memory_region_add_subregion(&nubus->slot_io, slot_offset,
-+                                    &nd->slot_mem);
-+    }
-+
-+    g_free(name);
-+    nubus_register_format_block(nd);
-+}
-+
-+static void nubus_device_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = nubus_device_realize;
-+    dc->bus_type = TYPE_NUBUS_BUS;
-+}
-+
-+static const TypeInfo nubus_device_type_info = {
-+    .name = TYPE_NUBUS_DEVICE,
-+    .parent = TYPE_DEVICE,
-+    .abstract = true,
-+    .instance_size = sizeof(NubusDevice),
-+    .class_init = nubus_device_class_init,
-+};
-+
-+static void nubus_register_types(void)
-+{
-+    type_register_static(&nubus_device_type_info);
-+}
-+
-+type_init(nubus_register_types)
-diff --git a/include/hw/nubus/mac-nubus-bridge.h b/include/hw/nubus/mac-nubus-bridge.h
-new file mode 100644
-index 0000000000..ce9c789d99
---- /dev/null
-+++ b/include/hw/nubus/mac-nubus-bridge.h
-@@ -0,0 +1,24 @@
-+/*
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef HW_NUBUS_MAC_H
-+#define HW_NUBUS_MAC_H
-+
-+#include "hw/nubus/nubus.h"
-+
-+#define TYPE_MAC_NUBUS_BRIDGE "mac-nubus-bridge"
-+#define MAC_NUBUS_BRIDGE(obj) OBJECT_CHECK(MacNubusState, (obj), \
-+                                           TYPE_MAC_NUBUS_BRIDGE)
-+
-+typedef struct MacNubusState {
-+    SysBusDevice sysbus_dev;
-+
-+    NubusBus *bus;
-+} MacNubusState;
-+
++/* machine independent tags */
++
++#define BI_LAST         0x0000 /* last record */
++#define BI_MACHTYPE     0x0001 /* machine type (u_long) */
++#define BI_CPUTYPE      0x0002 /* cpu type (u_long) */
++#define BI_FPUTYPE      0x0003 /* fpu type (u_long) */
++#define BI_MMUTYPE      0x0004 /* mmu type (u_long) */
++#define BI_MEMCHUNK     0x0005 /* memory chunk address and size */
++                               /* (struct mem_info) */
++#define BI_RAMDISK      0x0006 /* ramdisk address and size */
++                               /* (struct mem_info) */
++#define BI_COMMAND_LINE 0x0007 /* kernel command line parameters */
++                               /* (string) */
++
++/*  Macintosh-specific tags (all u_long) */
++
++#define BI_MAC_MODEL    0x8000  /* Mac Gestalt ID (model type) */
++#define BI_MAC_VADDR    0x8001  /* Mac video base address */
++#define BI_MAC_VDEPTH   0x8002  /* Mac video depth */
++#define BI_MAC_VROW     0x8003  /* Mac video rowbytes */
++#define BI_MAC_VDIM     0x8004  /* Mac video dimensions */
++#define BI_MAC_VLOGICAL 0x8005  /* Mac video logical base */
++#define BI_MAC_SCCBASE  0x8006  /* Mac SCC base address */
++#define BI_MAC_BTIME    0x8007  /* Mac boot time */
++#define BI_MAC_GMTBIAS  0x8008  /* Mac GMT timezone offset */
++#define BI_MAC_MEMSIZE  0x8009  /* Mac RAM size (sanity check) */
++#define BI_MAC_CPUID    0x800a  /* Mac CPU type (sanity check) */
++#define BI_MAC_ROMBASE  0x800b  /* Mac system ROM base address */
++
++/*  Macintosh hardware profile data */
++
++#define BI_MAC_VIA1BASE 0x8010  /* Mac VIA1 base address (always present) */
++#define BI_MAC_VIA2BASE 0x8011  /* Mac VIA2 base address (type varies) */
++#define BI_MAC_VIA2TYPE 0x8012  /* Mac VIA2 type (VIA, RBV, OSS) */
++#define BI_MAC_ADBTYPE  0x8013  /* Mac ADB interface type */
++#define BI_MAC_ASCBASE  0x8014  /* Mac Apple Sound Chip base address */
++#define BI_MAC_SCSI5380 0x8015  /* Mac NCR 5380 SCSI (base address, multi) */
++#define BI_MAC_SCSIDMA  0x8016  /* Mac SCSI DMA (base address) */
++#define BI_MAC_SCSI5396 0x8017  /* Mac NCR 53C96 SCSI (base address, multi) */
++#define BI_MAC_IDETYPE  0x8018  /* Mac IDE interface type */
++#define BI_MAC_IDEBASE  0x8019  /* Mac IDE interface base address */
++#define BI_MAC_NUBUS    0x801a  /* Mac Nubus type (none, regular, pseudo) */
++#define BI_MAC_SLOTMASK 0x801b  /* Mac Nubus slots present */
++#define BI_MAC_SCCTYPE  0x801c  /* Mac SCC serial type (normal, IOP) */
++#define BI_MAC_ETHTYPE  0x801d  /* Mac builtin ethernet type (Sonic, MACE */
++#define BI_MAC_ETHBASE  0x801e  /* Mac builtin ethernet base address */
++#define BI_MAC_PMU      0x801f  /* Mac power management / poweroff hardware */
++#define BI_MAC_IOP_SWIM 0x8020  /* Mac SWIM floppy IOP */
++#define BI_MAC_IOP_ADB  0x8021  /* Mac ADB IOP */
++
++#define BOOTINFO0(as, base, id) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record)); \
++        base += 2; \
++    } while (0)
++
++#define BOOTINFO1(as, base, id, value) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 4); \
++        base += 2; \
++        stl_phys(as, base, value); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFO2(as, base, id, value1, value2) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 8); \
++        base += 2; \
++        stl_phys(as, base, value1); \
++        base += 4; \
++        stl_phys(as, base, value2); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFOSTR(as, base, id, string) \
++    do { \
++        int i; \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, \
++                 (sizeof(struct bi_record) + strlen(string) + 2) & ~1); \
++        base += 2; \
++        for (i = 0; string[i]; i++) { \
++            stb_phys(as, base++, string[i]); \
++        } \
++        stb_phys(as, base++, 0); \
++        base = (parameters_base + 1) & ~1; \
++    } while (0)
 +#endif
-diff --git a/include/hw/nubus/nubus.h b/include/hw/nubus/nubus.h
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
 new file mode 100644
-index 0000000000..a8634e54c5
+index 0000000000..8e0389e050
 --- /dev/null
-+++ b/include/hw/nubus/nubus.h
-@@ -0,0 +1,69 @@
++++ b/hw/m68k/q800.c
+@@ -0,0 +1,382 @@
 +/*
-+ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ * QEMU Motorla 680x0 Macintosh hardware System Emulator
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
-+#ifndef HW_NUBUS_NUBUS_H
-+#define HW_NUBUS_NUBUS_H
-+
-+#include "hw/qdev-properties.h"
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/sysemu.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/irq.h"
++#include "elf.h"
++#include "hw/loader.h"
++#include "ui/console.h"
 +#include "exec/address-spaces.h"
++#include "hw/char/escc.h"
++#include "hw/sysbus.h"
++#include "hw/scsi/esp.h"
++#include "bootinfo.h"
++#include "hw/misc/mac_via.h"
++#include "hw/input/adb.h"
++#include "hw/nubus/mac-nubus-bridge.h"
++#include "hw/display/macfb.h"
++#include "hw/block/swim.h"
++#include "net/net.h"
++#include "qapi/error.h"
++#include "sysemu/qtest.h"
++#include "sysemu/runstate.h"
++#include "sysemu/reset.h"
 +
-+#define NUBUS_SUPER_SLOT_SIZE 0x10000000U
-+#define NUBUS_SUPER_SLOT_NB   0x9
++#define MACROM_ADDR     0x40000000
++#define MACROM_SIZE     0x00100000
 +
-+#define NUBUS_SLOT_SIZE       0x01000000
-+#define NUBUS_SLOT_NB         0xF
++#define MACROM_FILENAME "MacROM.bin"
 +
-+#define NUBUS_FIRST_SLOT      0x9
-+#define NUBUS_LAST_SLOT       0xF
++#define Q800_MACHINE_ID 35
++#define Q800_CPU_ID (1 << 2)
++#define Q800_FPU_ID (1 << 2)
++#define Q800_MMU_ID (1 << 2)
 +
-+#define TYPE_NUBUS_DEVICE "nubus-device"
-+#define NUBUS_DEVICE(obj) \
-+     OBJECT_CHECK(NubusDevice, (obj), TYPE_NUBUS_DEVICE)
++#define MACH_MAC        3
++#define Q800_MAC_CPU_ID 2
 +
-+#define TYPE_NUBUS_BUS "nubus-bus"
-+#define NUBUS_BUS(obj) OBJECT_CHECK(NubusBus, (obj), TYPE_NUBUS_BUS)
++#define VIA_BASE              0x50f00000
++#define SONIC_PROM_BASE       0x50f08000
++#define SONIC_BASE            0x50f0a000
++#define SCC_BASE              0x50f0c020
++#define ESP_BASE              0x50f10000
++#define ESP_PDMA              0x50f10100
++#define ASC_BASE              0x50F14000
++#define SWIM_BASE             0x50F1E000
++#define NUBUS_SUPER_SLOT_BASE 0x60000000
++#define NUBUS_SLOT_BASE       0xf0000000
 +
-+#define TYPE_NUBUS_BRIDGE "nubus-bridge"
-+#define NUBUS_BRIDGE(obj) OBJECT_CHECK(NubusBridge, (obj), TYPE_NUBUS_BRIDGE)
++/*
++ * the video base, whereas it a Nubus address,
++ * is needed by the kernel to have early display and
++ * thus provided by the bootloader
++ */
++#define VIDEO_BASE            0xf9001000
 +
-+typedef struct NubusBus {
-+    BusState qbus;
++#define MAC_CLOCK  3686418
 +
-+    MemoryRegion super_slot_io;
-+    MemoryRegion slot_io;
++/*
++ * The GLUE (General Logic Unit) is an Apple custom integrated circuit chip
++ * that performs a variety of functions (RAM management, clock generation, ...).
++ * The GLUE chip receives interrupt requests from various devices,
++ * assign priority to each, and asserts one or more interrupt line to the
++ * CPU.
++ */
 +
-+    int current_slot;
-+} NubusBus;
++typedef struct {
++    M68kCPU *cpu;
++    uint8_t ipr;
++} GLUEState;
 +
-+typedef struct NubusDevice {
-+    DeviceState qdev;
++static void GLUE_set_irq(void *opaque, int irq, int level)
++{
++    GLUEState *s = opaque;
++    int i;
 +
-+    int slot_nb;
-+    MemoryRegion slot_mem;
++    if (level) {
++        s->ipr |= 1 << irq;
++    } else {
++        s->ipr &= ~(1 << irq);
++    }
 +
-+    /* Format Block */
++    for (i = 7; i >= 0; i--) {
++        if ((s->ipr >> i) & 1) {
++            m68k_set_irq_level(s->cpu, i + 1, i + 25);
++            return;
++        }
++    }
++    m68k_set_irq_level(s->cpu, 0, 0);
++}
 +
-+    MemoryRegion fblock_io;
++static void main_cpu_reset(void *opaque)
++{
++    M68kCPU *cpu = opaque;
++    CPUState *cs = CPU(cpu);
 +
-+    uint32_t rom_length;
-+    uint32_t rom_crc;
-+    uint8_t rom_rev;
-+    uint8_t rom_format;
-+    uint8_t byte_lanes;
-+    int32_t directory_offset;
++    cpu_reset(cs);
++    cpu->env.aregs[7] = ldl_phys(cs->as, 0);
++    cpu->env.pc = ldl_phys(cs->as, 4);
++}
 +
-+    /* ROM */
++static void q800_init(MachineState *machine)
++{
++    M68kCPU *cpu = NULL;
++    int linux_boot;
++    int32_t kernel_size;
++    uint64_t elf_entry;
++    char *filename;
++    int bios_size;
++    ram_addr_t initrd_base;
++    int32_t initrd_size;
++    MemoryRegion *rom;
++    MemoryRegion *ram;
++    ram_addr_t ram_size = machine->ram_size;
++    const char *kernel_filename = machine->kernel_filename;
++    const char *initrd_filename = machine->initrd_filename;
++    const char *kernel_cmdline = machine->kernel_cmdline;
++    hwaddr parameters_base;
++    CPUState *cs;
++    DeviceState *dev;
++    DeviceState *via_dev;
++    SysBusESPState *sysbus_esp;
++    ESPState *esp;
++    SysBusDevice *sysbus;
++    BusState *adb_bus;
++    NubusBus *nubus;
++    GLUEState *irq;
++    qemu_irq *pic;
 +
-+    MemoryRegion rom_io;
-+    const uint8_t *rom;
-+} NubusDevice;
++    linux_boot = (kernel_filename != NULL);
 +
-+void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
-+                        int revision, int format, uint8_t byte_lanes);
++    /* init CPUs */
++    cpu = M68K_CPU(cpu_create(machine->cpu_type));
++    qemu_register_reset(main_cpu_reset, cpu);
 +
-+#endif
++    ram = g_malloc(sizeof(*ram));
++    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
++    memory_region_add_subregion(get_system_memory(), 0, ram);
++
++    /* IRQ Glue */
++
++    irq = g_new0(GLUEState, 1);
++    irq->cpu = cpu;
++    pic = qemu_allocate_irqs(GLUE_set_irq, irq, 8);
++
++    /* VIA */
++
++    via_dev = qdev_create(NULL, TYPE_MAC_VIA);
++    qdev_init_nofail(via_dev);
++    sysbus = SYS_BUS_DEVICE(via_dev);
++    sysbus_mmio_map(sysbus, 0, VIA_BASE);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
++
++
++    adb_bus = qdev_get_child_bus(via_dev, "adb.0");
++    dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
++    qdev_init_nofail(dev);
++    dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
++    qdev_init_nofail(dev);
++
++    /* MACSONIC */
++
++    if (nb_nics > 1) {
++        error_report("q800 can only have one ethernet interface");
++        exit(1);
++    }
++
++    qemu_check_nic_model(&nd_table[0], "dp83932");
++
++    /*
++     * MacSonic driver needs an Apple MAC address
++     * Valid prefix are:
++     * 00:05:02 Apple
++     * 00:80:19 Dayna Communications, Inc.
++     * 00:A0:40 Apple
++     * 08:00:07 Apple
++     * (Q800 use the last one)
++     */
++    nd_table[0].macaddr.a[0] = 0x08;
++    nd_table[0].macaddr.a[1] = 0x00;
++    nd_table[0].macaddr.a[2] = 0x07;
++
++    dev = qdev_create(NULL, "dp8393x");
++    qdev_set_nic_properties(dev, &nd_table[0]);
++    qdev_prop_set_uint8(dev, "it_shift", 2);
++    qdev_prop_set_bit(dev, "big_endian", true);
++    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(sysbus, 0, SONIC_BASE);
++    sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
++    sysbus_connect_irq(sysbus, 0, pic[2]);
++
++    /* SCC */
++
++    dev = qdev_create(NULL, TYPE_ESCC);
++    qdev_prop_set_uint32(dev, "disabled", 0);
++    qdev_prop_set_uint32(dev, "frequency", MAC_CLOCK);
++    qdev_prop_set_uint32(dev, "it_shift", 1);
++    qdev_prop_set_bit(dev, "bit_swap", true);
++    qdev_prop_set_chr(dev, "chrA", serial_hd(0));
++    qdev_prop_set_chr(dev, "chrB", serial_hd(1));
++    qdev_prop_set_uint32(dev, "chnBtype", 0);
++    qdev_prop_set_uint32(dev, "chnAtype", 0);
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, pic[3]);
++    sysbus_connect_irq(sysbus, 1, pic[3]);
++    sysbus_mmio_map(sysbus, 0, SCC_BASE);
++
++    /* SCSI */
++
++    dev = qdev_create(NULL, TYPE_ESP);
++    sysbus_esp = ESP_STATE(dev);
++    esp = &sysbus_esp->esp;
++    esp->dma_memory_read = NULL;
++    esp->dma_memory_write = NULL;
++    esp->dma_opaque = NULL;
++    sysbus_esp->it_shift = 4;
++    esp->dma_enabled = 1;
++    qdev_init_nofail(dev);
++
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
++                                                         "via2-irq",
++                                                         VIA2_IRQ_SCSI_BIT));
++    sysbus_connect_irq(sysbus, 1,
++                       qdev_get_gpio_in_named(via_dev, "via2-irq",
++                                              VIA2_IRQ_SCSI_DATA_BIT));
++    sysbus_mmio_map(sysbus, 0, ESP_BASE);
++    sysbus_mmio_map(sysbus, 1, ESP_PDMA);
++
++    scsi_bus_legacy_handle_cmdline(&esp->bus);
++
++    /* SWIM floppy controller */
++
++    dev = qdev_create(NULL, TYPE_SWIM);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, SWIM_BASE);
++
++    /* NuBus */
++
++    dev = qdev_create(NULL, TYPE_MAC_NUBUS_BRIDGE);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, NUBUS_SUPER_SLOT_BASE);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, NUBUS_SLOT_BASE);
++
++    nubus = MAC_NUBUS_BRIDGE(dev)->bus;
++
++    /* framebuffer in nubus slot #9 */
++
++    dev = qdev_create(BUS(nubus), TYPE_NUBUS_MACFB);
++    qdev_prop_set_uint32(dev, "width", graphic_width);
++    qdev_prop_set_uint32(dev, "height", graphic_height);
++    qdev_prop_set_uint8(dev, "depth", graphic_depth);
++    qdev_init_nofail(dev);
++
++    cs = CPU(cpu);
++    if (linux_boot) {
++        uint64_t high;
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &elf_entry, NULL, &high, 1,
++                               EM_68K, 0, 0);
++        if (kernel_size < 0) {
++            error_report("could not load kernel '%s'", kernel_filename);
++            exit(1);
++        }
++        stl_phys(cs->as, 4, elf_entry); /* reset initial PC */
++        parameters_base = (high + 1) & ~1;
++
++        BOOTINFO1(cs->as, parameters_base, BI_MACHTYPE, MACH_MAC);
++        BOOTINFO1(cs->as, parameters_base, BI_FPUTYPE, Q800_FPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MMUTYPE, Q800_MMU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_CPUTYPE, Q800_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_CPUID, Q800_MAC_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_MODEL, Q800_MACHINE_ID);
++        BOOTINFO1(cs->as, parameters_base,
++                  BI_MAC_MEMSIZE, ram_size >> 20); /* in MB */
++        BOOTINFO2(cs->as, parameters_base, BI_MEMCHUNK, 0, ram_size);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VADDR, VIDEO_BASE);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDEPTH, graphic_depth);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDIM,
++                  (graphic_height << 16) | graphic_width);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
++                  (graphic_width * graphic_depth + 7) / 8);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
++
++        if (kernel_cmdline) {
++            BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
++                        kernel_cmdline);
++        }
++
++        /* load initrd */
++        if (initrd_filename) {
++            initrd_size = get_image_size(initrd_filename);
++            if (initrd_size < 0) {
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
++                exit(1);
++            }
++
++            initrd_base = (ram_size - initrd_size) & TARGET_PAGE_MASK;
++            load_image_targphys(initrd_filename, initrd_base,
++                                ram_size - initrd_base);
++            BOOTINFO2(cs->as, parameters_base, BI_RAMDISK, initrd_base,
++                      initrd_size);
++        } else {
++            initrd_base = 0;
++            initrd_size = 0;
++        }
++        BOOTINFO0(cs->as, parameters_base, BI_LAST);
++    } else {
++        uint8_t *ptr;
++        /* allocate and load BIOS */
++        rom = g_malloc(sizeof(*rom));
++        memory_region_init_ram(rom, NULL, "m68k_mac.rom", MACROM_SIZE,
++                               &error_abort);
++        if (bios_name == NULL) {
++            bios_name = MACROM_FILENAME;
++        }
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++        memory_region_set_readonly(rom, true);
++        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
++
++        /* Load MacROM binary */
++        if (filename) {
++            bios_size = load_image_targphys(filename, MACROM_ADDR, MACROM_SIZE);
++            g_free(filename);
++        } else {
++            bios_size = -1;
++        }
++
++        /* Remove qtest_enabled() check once firmware files are in the tree */
++        if (!qtest_enabled()) {
++            if (bios_size < 0 || bios_size > MACROM_SIZE) {
++                error_report("could not load MacROM '%s'", bios_name);
++                exit(1);
++            }
++
++            ptr = rom_ptr(MACROM_ADDR, MACROM_SIZE);
++            stl_phys(cs->as, 0, ldl_p(ptr));    /* reset initial SP */
++            stl_phys(cs->as, 4,
++                     MACROM_ADDR + ldl_p(ptr + 4)); /* reset initial PC */
++        }
++    }
++}
++
++static void q800_machine_init(MachineClass *mc)
++{
++    mc->desc = "Macintosh Quadra 800";
++    mc->init = q800_init;
++    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
++    mc->max_cpus = 1;
++    mc->is_default = 0;
++    mc->block_default_type = IF_SCSI;
++}
++
++DEFINE_MACHINE("q800", q800_machine_init)
 -- 
 2.21.0
 
