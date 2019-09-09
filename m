@@ -2,87 +2,67 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB5DC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A00C4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:27:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5592520863
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:24:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ijMilGlf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5592520863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6371720863
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 15:27:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6371720863
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7LWQ-00074s-IY
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:24:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52918)
+	id 1i7LZP-000082-IU
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 11:27:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7LVW-000676-4K
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:23:11 -0400
+ (envelope-from <johannes@sipsolutions.net>) id 1i7LYc-00080g-FU
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7LVU-0006kx-Je
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:23:09 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55478)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7LVU-0006kF-Dy
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:23:08 -0400
-Received: by mail-wm1-x329.google.com with SMTP id g207so14378680wmg.5
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 08:23:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=53+ZE7md1EfvE6qaLbMI9oIc95rFUpm8x8sn5i1pNLs=;
- b=ijMilGlfChpJQf4Of4JmFty6LrfHE2HVdRuvx49kW7Vm0mJR/M/TTitK6W5Z5hq21z
- nhWLVaESmEaJTGtW8BjdnwhwvxfBM38uHjYWzNA/ukTCyCBQn8pHn+bRNCXNjtyz9BN8
- R92SGM+88qW3a/JusbrCoulG8vSvG5+LmE/OIaJZIHqN8rqvKMkTD2VJu86Noxne2+KC
- fyIWrgU0x7W83wQ2xExVdcE4CtQe6z73lKA2OZyg114D9LeCMUBQwL8o1WRmSZyARhcz
- XK4fnxAEeuqSbnZVRd4e87Ayo6VZ1L2Hxy935I51oz7L7c5uPJlAh/Cq7axYTGHrO3+D
- 2H0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=53+ZE7md1EfvE6qaLbMI9oIc95rFUpm8x8sn5i1pNLs=;
- b=jSfuTzcJ0WfPBDxtMBU9RL2wa0murpmlC/Zu2TEmCrm3waIfHAXZc3FYHknGnRBX/7
- SyKZCd5Enno5vBfof5tQShYmXCSPd48hha3sHUCmQW/iAHOcNv/JmM2d3YOxfjEliGPY
- gD2UwcoqRhVOEFdC7RTJx3efzGfS4Cupfrph3xZDVJhhZgb5pdyQTmkEsojdNpz0ua3Q
- 8C4hzzZaNeRIt1XYhaCQhvo2VlpUNTLyvaNSMV6apt+yUiHwhW27hBteDWM0Vpk4fzbo
- AHnyMlaWDKprUi3rnSdfrslltMU8iHo+CRfyRDGAvpLLtMPOQu9U1XWDtym51b5l3oNm
- KkKQ==
-X-Gm-Message-State: APjAAAWUv356Q9gpHecMia8VrVsQvcwCSWx4Duwj8ET41MsDRTUsc61e
- 5P7dPAeymrPVo1K0w/vyhDBYLA==
-X-Google-Smtp-Source: APXvYqzoxDMKEixacLe18qirkYChQLyWPdalv+gD+9I7K3KXiI1gsUeF2acPGWCgfFU/ONfwbk6qLQ==
-X-Received: by 2002:a1c:7ec4:: with SMTP id z187mr14516602wmc.94.1568042587101; 
- Mon, 09 Sep 2019 08:23:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g24sm23159251wrb.35.2019.09.09.08.23.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Sep 2019 08:23:06 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 56C3B1FF87;
- Mon,  9 Sep 2019 16:23:05 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon,  9 Sep 2019 16:23:02 +0100
-Message-Id: <20190909152302.19016-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <johannes@sipsolutions.net>) id 1i7LYa-0000et-Ep
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:26:22 -0400
+Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:49230
+ helo=sipsolutions.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
+ id 1i7LYY-0000aJ-F6
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:26:19 -0400
+Received: by sipsolutions.net with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <johannes@sipsolutions.net>)
+ id 1i7LYV-0008AQ-1g; Mon, 09 Sep 2019 17:26:15 +0200
+Message-ID: <49378faefb98abafb64ff105a7941c47395426e7.camel@sipsolutions.net>
+From: Johannes Berg <johannes@sipsolutions.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Date: Mon, 09 Sep 2019 17:26:13 +0200
+In-Reply-To: <20190909105057-mutt-send-email-mst@kernel.org>
+References: <20190906102217-mutt-send-email-mst@kernel.org>
+ <be405c3ba658cdac7f68c91213c3b714ac24c1e3.camel@sipsolutions.net>
+ <20190906110340-mutt-send-email-mst@kernel.org>
+ <fe0f3f7bfa730088454790dc2d863285c4461134.camel@sipsolutions.net>
+ <20190908091207-mutt-send-email-mst@kernel.org>
+ <8a9cf8a1726afce7fed8992a4f19fc808004ef88.camel@sipsolutions.net>
+ <20190909083902-mutt-send-email-mst@kernel.org>
+ <89f25546ffa71c799c533e50658a3a58e066f436.camel@sipsolutions.net>
+ <20190909094609-mutt-send-email-mst@kernel.org>
+ <d2e750aaec396bd0aa7ea8c05ef5705567d16595.camel@sipsolutions.net>
+ <20190909105057-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
-Subject: [Qemu-devel] [qemu-web PATCH v4] add support page
+X-Received-From: 2a01:4f8:191:4433::2
+Subject: Re: [Qemu-devel] [RFC] libvhost-user: implement
+ VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,97 +74,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, thuth@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is intended to be a useful page we can link to in the banner of
-the IRC channel explaining the various support options someone might
-have.
+On Mon, 2019-09-09 at 10:59 -0400, Michael S. Tsirkin wrote:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+> > > Next command is GET_FEATURES. Return an error response from that
+> > > and device init will fail.
+> > 
+> > Hmm, what's an error here though? You can only return a value, no?
+> 
+> Either returning id that does not match GET_FEATURES or
+> returning size != 8 bytes will work.
 
----
-v2
-  - add cleanups suggested by Stefan
-v3
-  - add link to nav bar
-v4
-  - add glue sentence and .'s as suggested by Thomas
----
- _includes/nav.html |  1 +
- support.md         | 43 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
- create mode 100644 support.md
+Hmm, right.
 
-diff --git a/_includes/nav.html b/_includes/nav.html
-index 241d83e..0c81e24 100644
---- a/_includes/nav.html
-+++ b/_includes/nav.html
-@@ -4,6 +4,7 @@
- 			{% assign current = page.url | downcase | split: '/' %}
- 			<li class='{% if page.url == '/' %}not-desktop {%endif %}home'><a href="/">Home</a>
- 			</li><li {% if current[1] == 'download' %}class='current'{% endif %}><a href="/download">Download</a>
-+			</li><li {% if current[1] == 'support' %}class='current'{% endif %}><a href="/support">Support</a>
- 			</li><li {% if current[1] == 'contribute' %}class='current'{% endif %}><a href="/contribute">Contribute</a>
- 			</li><li {% if current[1] == 'documentation' %}class='current'{% endif %}><a href="/documentation">Documentation</a>
- 			</li><li {% if current[1] == 'blog' %}class='current'{% endif %}><a href="/blog">Blog</a></li>
-diff --git a/support.md b/support.md
-new file mode 100644
-index 0000000..031f045
---- /dev/null
-+++ b/support.md
-@@ -0,0 +1,43 @@
-+---
-+title: Support
-+permalink: /support/
-+---
-+
-+If you have a support question that is not answered by our
-+[documentation](/documentation) you have a number of options available
-+to you.
-+
-+If the question is specifically about the integration of QEMU with the
-+rest of your Linux distribution you may be better served by asking
-+through your distribution's support channels. This includes questions
-+about a specifically packaged version of QEMU. The QEMU developers are
-+generally concerned with the latest release and the current state of
-+the [master branch](https://git.qemu.org/?p=qemu.git) and do not
-+provide support for QEMU binaries shipped by Linux distributions.
-+
-+Questions about complex configurations of networking and storage are
-+usually met with a recommendation to use management tools like
-+[virt-manager](https://virt-manager.org/) from the [libvirt
-+project](https://libvirt.org/) to configure and run QEMU. Management
-+tools handle the low-level details of setting up devices that most
-+users should not need to learn.
-+
-+To get in touch with the people from the QEMU project, you have the
-+following options:
-+
-+* There is a
-+[qemu-discuss@nongnu.org](https://lists.nongnu.org/mailman/listinfo/qemu-discuss)
-+mailing list for user focused questions.<br>
-+If your question is more technical or architecture specific you may
-+want to send your question to another of [QEMU's mailing
-+lists](https://wiki.qemu.org/MailingLists)
-+
-+* A lot of developers hang around on IRC (network: irc.oftc.net,
-+channel #qemu).<br> QEMU developers tend to hold normal office hours
-+and are distributed around the world. Please be patient as you may
-+have to wait some time for a response. If you can't leave IRC open and
-+wait you may be better served by a mailing list.
-+
-+* If you think you have found a bug you can report it on [our bug
-+  tracker](https://bugs.launchpad.net/qemu/).<br>
-+Please see our guide on [how to report a bug](/contribute/report-a-bug/)
--- 
-2.20.1
+> Using 0 size payload has precedent in VHOST_USER_GET_CONFIG:
+> 	vhost-user slave uses zero length of
+> 	  payload to indicate an error to vhost-user master.
+
+OK, I think zero-len makes sense, that's certainly something that must
+be checked by the receiver already.
+
+> It's annoying that we don't get an error indicator in that case though.
+> Worth returning e.g. a 4 byte code?
+
+That also would need to be checked by the receiver, but
+
+1) Then we have to start defining an error code enum, as there's no
+   natural space. Is that worth it for what's basically a corner case?
+2) It'd also be annoying that we now have a 4-byte error code, but with
+   F_REPLY_ACK / need_reply you get an 8-byte status code, which would
+   be incompatible in a way.
+
+> And let's generalize for all other messages with response?
+
+We could theoretically have a message in the future that wants a 4-byte
+response, though by convention basically everything uses u64 anyway ...
+
+OTOH, 0-byte as error doesn't generalize, VHOST_USER_POSTCOPY_ADVISE has
+only a file descriptor as slave payload AFAICT... But then possibly in
+those cases the master also wouldn't check the response size at all,
+since it never uses it. Qemu does though, and is probably the currently
+relevant implementation? Our UML implementation doesn't use this.
+
+
+Maybe instead we should just add a "VHOST_USER_REPLY_ERROR" bit (e.g.
+bit 4 after NEED_REPLY). Qemu in vhost_user_read_header() validates that
+it received REPLY_MASK | VERSION, so it would reject the message at that
+point.
+
+Another possibility would be to define the highest bit of the 'request'
+field to indicate an error, so for GET_FEATURES we'd return the value
+0x80000000 | GET_FEATURES.
+
+For even more safety we could make a 4-byte response which is never
+valid for anything right now, but it feels overly cautious given that we
+currently do check both the request and flag fields. If you think a
+response status is needed and want to define an enum with possible
+values, then I'd probably prefer an 8-byte status since that's the way
+everything works now, but I don't really care much either way.
+
+johannes
 
 
