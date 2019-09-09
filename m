@@ -2,85 +2,79 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB759C4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A36C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:44:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A61952086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:38:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A97A92086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 14:44:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GR/kzt4Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61952086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sVMuMOFs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A97A92086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7KoZ-0004W3-QL
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:38:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42547)
+	id 1i7KuT-0007nX-Rw
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 10:44:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43481)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1i7Kne-0003iF-Bm
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:37:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i7Ktm-0007N3-0E
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:44:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1i7Knd-0003SB-B6
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:37:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45310)
+ (envelope-from <peter.maydell@linaro.org>) id 1i7Kti-0007Iq-SR
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:44:09 -0400
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:34989)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1i7Knd-0003PQ-4U
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:37:49 -0400
-Received: by mail-wr1-x444.google.com with SMTP id l16so14083563wrv.12
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 07:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=VxW2+zpDCMXYGl8nghL7Q9Cmw4sNkEZu5LDJSLRVWZA=;
- b=GR/kzt4YmsIG86zFvTZxZJKKJ7J9BMpxBzGC+OhRd72wwEz4Wbh6hbQdXbpROIWaHr
- dkz2uiwgPF3SE6G/tIKsTmJzsiWJRbwwP2OQJRPlZrnAJhqFTOxDNlK8fSuH6LeqXgLy
- hZPLkhPjCL7vjBab/mrHdmHxN1zJ/qP53VuB8Mg6cm+2Fa1vTNb4yIo9CXy71DOtDCe/
- 1Chjx+gCeuXa7ioBt890ctlV23DlTKDrj8Ihi0ttEP6zzhxZhH6bLdH1U60b8CQzhLy1
- zqnlnsYmaQ5Sbupk8GoL2W3D2zx2WoTlteTuGKqlJreENou3rQQzgmanO3ClhKDsaE1t
- r3VQ==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i7Kti-0007IG-Mw
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 10:44:06 -0400
+Received: by mail-oi1-x22a.google.com with SMTP id a127so10738586oii.2
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 07:44:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FIwsmVLe9kqCO1EhUbzldD2pC0SeM4D5KLjRT7BOcm8=;
+ b=sVMuMOFsfF/0NRqKgdO8go13fVLfuLbg2I6fD78fD+5wlpmg3vOZnL/lQSKBVF+G5s
+ +PV+TdQ6gh0bj68Ti3/qya2n+Hon1bdfY8OWm88FMT+113XvGeXSXCOFLnDgu2xWnD4z
+ yxDQzfbkbHltyUNfza0AyxDgQFE/HSwI6m4Mu58OB+54aBQ4BFsBXei66BKAXLf0GXJ4
+ o2SJGooCDxJjwcll7mBcarAAitlg7L1G98ibXyGoc6M/y9qbpzItPCAJl+iHJSmO6K/L
+ heE/6/+HzO7p9JmL16Qr8TEvAHxyPS4zq0WIulVYWJ3WdEsxiPV5SdN/6Vh3RvGHKg7n
+ 1FgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=VxW2+zpDCMXYGl8nghL7Q9Cmw4sNkEZu5LDJSLRVWZA=;
- b=KBWa2jQ0OqZMtv2piOFtj9kKrsMJVwAjvNXzfBCmt6iSbcYS6LOWvJndHubdj69VYl
- NbwsjrBWo/tAFnzsApuIDBX9lPeABQfa9+4hv2PPs7LyRoFVzcb/dW4iBoSIJeb8njw+
- 4/QN+BjnOl6bvSd8fjT0n9C2QtXXqYfMObTPC0En2RFiu7n8cuufhPttwyxlqu+KIJqY
- K8wdeIf2Lm+ghnS03oQoFWfftWHbu2F/eJKgfxDApr1vrV5k0oBU/SpZGtjBw0OeApa+
- rp+5zN2j3EjWZJCom0GGge1MztdbtZ/UqJaef74U3NGyzbduQugMW3iqvttqNnk93HZD
- YXDw==
-X-Gm-Message-State: APjAAAXOBjh8zk7CCCo8ZI1G7fgWSvZWwyrwP8wBfZkvgtJoSH1ln2er
- CQjue4ZyVawTWZDxni6ixyCVW8CZVGM=
-X-Google-Smtp-Source: APXvYqxW5gnxZRT4M+DW5FohmvkgrsQDC8Z8eWUsCqoNOwqumvICWUYEUUMm/pfDRO4uApG8qg2DXw==
-X-Received: by 2002:a05:6000:108e:: with SMTP id
- y14mr18886065wrw.344.1568039866718; 
- Mon, 09 Sep 2019 07:37:46 -0700 (PDT)
-Received: from localhost.localdomain ([2001:b07:6468:f312:4580:a289:2f55:eec1])
- by smtp.gmail.com with ESMTPSA id d28sm16366179wrb.95.2019.09.09.07.37.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Sep 2019 07:37:46 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  9 Sep 2019 16:37:32 +0200
-Message-Id: <20190909143732.11322-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FIwsmVLe9kqCO1EhUbzldD2pC0SeM4D5KLjRT7BOcm8=;
+ b=R8ZHdUdUe582hSUClVrdnJmDi8Fux97PA/Qwf6X81ippkNE6qg9Xp/evXfDve+iRcA
+ BfuwguoHUJvDp7Yyfp6YqzqK9m4sEsUXHtZOakE/9zCfP40OvI/EUduI7YN7gIQ6YFhI
+ X2DZ0UV8cZpNQLEDXRLWvROx9fAiqo434WIWJOmqD/rnsXqkamhZNXPrWRSroUWH3qvi
+ LUS+i0CdE3jHXmBDWGIDg2PLl0mDy6Jsr0BYFwIudnSRHTYYDOI82/fvWalGkrkyWYUl
+ Rxnu72EaixWJ2iGuCPvs8puJlTf1y9c4BO8OJolPeQnHPPtRjAtnvt3dsr1EbC9RbQOy
+ sPcQ==
+X-Gm-Message-State: APjAAAWIM0OF/SxHqQevB0D62zLZ6N9EUrUO7RmMxZYEPIpeUkxZhX66
+ GIMmAXtF1Z1bJPF5RWpnlNAF/Y7G8vu9Nn8eCG7wIw==
+X-Google-Smtp-Source: APXvYqx92GC1mM5QQxEcfphlaU5PzW/C0d6OO6Vah1kzUy2zT5qraRlFpdX3T0ls0CjfzuNDtcUyS012GMqyLHw6ihQ=
+X-Received: by 2002:aca:4814:: with SMTP id v20mr17596704oia.98.1568040245542; 
+ Mon, 09 Sep 2019 07:44:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190907154744.4136-1-huth@tuxfamily.org>
+In-Reply-To: <20190907154744.4136-1-huth@tuxfamily.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Sep 2019 15:43:53 +0100
+Message-ID: <CAFEAcA8OsP4ycbYSdw6GvgQVMbY2e0nKJ_73KSUpG_T4Gu7ShA@mail.gmail.com>
+To: Thomas Huth <huth@tuxfamily.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v2] test-char: fix AddressSanitizer failure
+X-Received-From: 2607:f8b0:4864:20::22a
+Subject: Re: [Qemu-devel] [PULL 0/8] Add the m68k next-cube machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,104 +86,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- berrange@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CharSocketServerTestConfig and CharSocketClientTestConfig
-objects escape after they are passed to g_test_add_data_func,
-but they cease existing after the scope that defines them is
-closed.  Make them static to fix this issue.
+On Sat, 7 Sep 2019 at 16:47, Thomas Huth <huth@tuxfamily.org> wrote:
+>
+>  Hi Peter,
+>
+> the following changes since commit 90b1e3afd33226b6078fec6d77a18373712a975c:
+>
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-09-05-v2' into staging (2019-09-05 17:09:13 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/m68k-pull-2019-09-07
+>
+> for you to fetch changes up to 25311649592f5584b1e1012d69c7327ef87473f4:
+>
+>   .travis.yml: Let the avocado job run the NeXTcube tests (2019-09-07 08:35:41 +0200)
+>
+> ----------------------------------------------------------------
+> Add the m68k next-cube machine
+> ----------------------------------------------------------------
 
-Fixes: e7b6ba4186f243f149b0d8cddc129fe681ba3912
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/test-char.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index f3ebdffd87..d62de1b088 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -1355,6 +1355,18 @@ static void char_hotswap_test(void)
-     g_free(chr_args);
- }
- 
-+static SocketAddress tcpaddr = {
-+    .type = SOCKET_ADDRESS_TYPE_INET,
-+    .u.inet.host = (char *)"127.0.0.1",
-+    .u.inet.port = (char *)"0",
-+};
-+#ifndef WIN32
-+static SocketAddress unixaddr = {
-+    .type = SOCKET_ADDRESS_TYPE_UNIX,
-+    .u.q_unix.path = (char *)"test-char.sock",
-+};
-+#endif
-+
- int main(int argc, char **argv)
- {
-     bool has_ipv4, has_ipv6;
-@@ -1390,26 +1402,14 @@ int main(int argc, char **argv)
-     g_test_add_func("/char/file-fifo", char_file_fifo_test);
- #endif
- 
--    SocketAddress tcpaddr = {
--        .type = SOCKET_ADDRESS_TYPE_INET,
--        .u.inet.host = (char *)"127.0.0.1",
--        .u.inet.port = (char *)"0",
--    };
--#ifndef WIN32
--    SocketAddress unixaddr = {
--        .type = SOCKET_ADDRESS_TYPE_UNIX,
--        .u.q_unix.path = (char *)"test-char.sock",
--    };
--#endif
--
- #define SOCKET_SERVER_TEST(name, addr)                                  \
--    CharSocketServerTestConfig server1 ## name =                        \
-+    static CharSocketServerTestConfig server1 ## name =                 \
-         { addr, false, false };                                         \
--    CharSocketServerTestConfig server2 ## name =                        \
-+    static CharSocketServerTestConfig server2 ## name =                 \
-         { addr, true, false };                                          \
--    CharSocketServerTestConfig server3 ## name =                        \
-+    static CharSocketServerTestConfig server3 ## name =                 \
-         { addr, false, true };                                          \
--    CharSocketServerTestConfig server4 ## name =                        \
-+    static CharSocketServerTestConfig server4 ## name =                 \
-         { addr, true, true };                                           \
-     g_test_add_data_func("/char/socket/server/mainloop/" # name,        \
-                          &server1 ##name, char_socket_server_test);     \
-@@ -1421,17 +1421,17 @@ int main(int argc, char **argv)
-                          &server4 ##name, char_socket_server_test)
- 
- #define SOCKET_CLIENT_TEST(name, addr)                                  \
--    CharSocketClientTestConfig client1 ## name =                        \
-+    static CharSocketClientTestConfig client1 ## name =                 \
-         { addr, NULL, false, false };                                   \
--    CharSocketClientTestConfig client2 ## name =                        \
-+    static CharSocketClientTestConfig client2 ## name =                 \
-         { addr, NULL, true, false };                                    \
--    CharSocketClientTestConfig client3 ## name =                        \
-+    static CharSocketClientTestConfig client3 ## name =                 \
-         { addr, ",reconnect=1", false };                                \
--    CharSocketClientTestConfig client4 ## name =                        \
-+    static CharSocketClientTestConfig client4 ## name =                 \
-         { addr, ",reconnect=1", true };                                 \
--    CharSocketClientTestConfig client5 ## name =                        \
-+    static CharSocketClientTestConfig client5 ## name =                 \
-         { addr, NULL, false, true };                                    \
--    CharSocketClientTestConfig client6 ## name =                        \
-+    static CharSocketClientTestConfig client6 ## name =                 \
-         { addr, NULL, true, true };                                     \
-     g_test_add_data_func("/char/socket/client/mainloop/" # name,        \
-                          &client1 ##name, char_socket_client_test);     \
--- 
-2.21.0
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
