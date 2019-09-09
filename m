@@ -2,81 +2,91 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74931C00307
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 07:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AEBC433EF
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 07:58:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41179218AC
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 07:54:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjB+ckJf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41179218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 67B7E218AC
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 07:58:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67B7E218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7EUr-0002Ut-ER
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 03:54:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46442)
+	id 1i7EYm-0004Im-Ib
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 03:58:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46982)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1i7EUB-00023k-Az
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 03:53:20 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7EXM-0003Y5-JI
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 03:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1i7EUA-0005wM-4J
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 03:53:19 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52962)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1i7EU9-0005vy-Ub
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 03:53:18 -0400
-Received: by mail-wm1-x336.google.com with SMTP id t17so12593146wmi.2
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 00:53:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=w9NpNnJaNREvdBFT4q+JQ7KpUAzVh7iCnPjg0jSy4CA=;
- b=BjB+ckJfjah+oKV8qBDhHfpvsF2T8N6o1lYJgHH4mff1IrsgU4xeugbRNIJCFWvMJT
- brVI6mDLUkXw4pa1oHJRZPN+9fy6mRMEHCZUlfA1dYD6oIGiOPyg0h3bguGRHe+wDafa
- sTzk552pG9Z9XZGLrMFR+8T1JYiUC+fV0KBcsyMQgjlzMrlHd//3qb6DqvKEUZm/s8ru
- 1SVLRegdxOvFVHQgRPIbMMteuY96tR+3XwfWgxEvCswE55v0FbVapElMDFc4ilBLTxId
- GKH3WDYBGh01rvo2KyL3RJfaYpx15NK1zg7MABG+Hj9ezhQHi1+rvkg8rMTn9XgU+QBd
- H4GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=w9NpNnJaNREvdBFT4q+JQ7KpUAzVh7iCnPjg0jSy4CA=;
- b=MlrUjdbQKiy/cOaWzl/X1Ruiabos7euQRf/1Wrw10jdYWey/jrQ4fUuKocVFv1ONPS
- lHM/sEKFM5NaPPtqboP3QxArw+KjrSS0eVDa+5doBAmn23XrLayy3rpvEt6pFsp7qZYQ
- pdpEabJ8uzn833pS8dz6G3a0ubyJ4ogb78puu26Xfk273CdvKMydPTFUGDvai8WKxGW6
- BKDCEwi/Nj2VbWnZAcZvtyG+Ek0uXZrpwVhNASuLWyIBri/CDJEBWBunI77O1kDtC/3P
- B9FakCGveSCcDhy6DoWdcjFkS/vimXoxAqyji0lBiPzGJfYLNXhl5aZH+UGubBIjeHxo
- FEfA==
-X-Gm-Message-State: APjAAAVon2v3+OCysAV2UoWO+/xl4pStXt3hNvX8eM38+4ql5cPrX16p
- pK4beYkQa14J3Wpzek3Uunb/H6DU0TwSkOXWGi4=
-X-Google-Smtp-Source: APXvYqx3uQdsV+T+cniLcqsaw/GI6whASPlYMm0hhyZn6kLa59rtHG0e7R1YwzesfPxaSlYhFLxcEKNHjAKxFxFmrnI=
-X-Received: by 2002:a1c:9615:: with SMTP id y21mr13182404wmd.5.1568015596279; 
- Mon, 09 Sep 2019 00:53:16 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1i7EXK-0007KM-Jp
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 03:56:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45434)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7EXG-0007IB-M0; Mon, 09 Sep 2019 03:56:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EBBD8A46C27;
+ Mon,  9 Sep 2019 07:56:29 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
+ [10.36.116.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 80CE55D9D6;
+ Mon,  9 Sep 2019 07:56:28 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-5-mreitz@redhat.com>
+ <20190904161658.GD21246@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
+Date: Mon, 9 Sep 2019 09:56:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190909073911.24787-1-kraxel@redhat.com>
-In-Reply-To: <20190909073911.24787-1-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 9 Sep 2019 11:53:03 +0400
-Message-ID: <CAJ+F1C+8YeNYQQEoYGYHpMro=QXQki2Pni4x5Y-dJwhu7k71Mw@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::336
-Subject: Re: [Qemu-devel] [PATCH] ui/egl: fix framebuffer reads
+In-Reply-To: <20190904161658.GD21246@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="sE7iPZw0kF0n1SCCRXym4PeU3sht7VFzF"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Mon, 09 Sep 2019 07:56:30 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 04/42] block: Add child access functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,107 +98,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sE7iPZw0kF0n1SCCRXym4PeU3sht7VFzF
+Content-Type: multipart/mixed; boundary="gBVW5bPxu6W6C05cuN1Y9FI54tCjAX18c";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
+Subject: Re: [PATCH v6 04/42] block: Add child access functions
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-5-mreitz@redhat.com>
+ <20190904161658.GD21246@localhost.localdomain>
+In-Reply-To: <20190904161658.GD21246@localhost.localdomain>
 
-On Mon, Sep 9, 2019 at 11:40 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> Fix egl_fb_read() to use the (destination) surface size instead of the
-> (source) framebuffer source for glReadPixels.  Pass the DisplaySurface
-> instead of the pixeldata pointer to egl_fb_read() to make this possible.
->
-> With that in place framebuffer reads work fine even if the surface and
-> framebuffer sizes don't match, so we can remove the guest-triggerable
-> asserts in egl_scanout_flush().
->
-> Buglink: https://bugzilla.redhat.com//show_bug.cgi?id=3D1749659
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+--gBVW5bPxu6W6C05cuN1Y9FI54tCjAX18c
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-And if the the destinaton surface is larger than the source:
-GLREADPIXELS(3G)
-"Values for pixels that lie outside the window connected to the
-current GL context are undefined."
+On 04.09.19 18:16, Kevin Wolf wrote:
+> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+>> There are BDS children that the general block layer code can access,
+>> namely bs->file and bs->backing.  Since the introduction of filters an=
+d
+>> external data files, their meaning is not quite clear.  bs->backing ca=
+n
+>> be a COW source, or it can be an R/W-filtered child; bs->file can be a=
+n
+>> R/W-filtered child, it can be data and metadata storage, or it can be
+>> just metadata storage.
+>>
+>> This overloading really is not helpful.  This patch adds function that=
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> retrieve the correct child for each exact purpose.  Later patches in
+>> this series will make use of them.  Doing so will allow us to handle
+>> filter nodes and external data files in a meaningful way.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+> Each time I look at this patch, I'm confused by the function names.
+> Maybe I should just ask what the idea there was, or more specifically:
+> What does the "filtered" in "filtered child" really mean?
+>=20
+> Apparently any child of a filter node is "filtered" (which makes sense)=
+,
 
-> ---
->  include/ui/egl-helpers.h | 2 +-
->  ui/egl-headless.c        | 4 +---
->  ui/egl-helpers.c         | 6 +++---
->  3 files changed, 5 insertions(+), 7 deletions(-)
->
-> diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
-> index dad19e9873fb..94a4b3e6f3bd 100644
-> --- a/include/ui/egl-helpers.h
-> +++ b/include/ui/egl-helpers.h
-> @@ -25,7 +25,7 @@ void egl_fb_setup_for_tex(egl_fb *fb, int width, int he=
-ight,
->                            GLuint texture, bool delete);
->  void egl_fb_setup_new_tex(egl_fb *fb, int width, int height);
->  void egl_fb_blit(egl_fb *dst, egl_fb *src, bool flip);
-> -void egl_fb_read(void *dst, egl_fb *src);
-> +void egl_fb_read(DisplaySurface *dst, egl_fb *src);
->
->  void egl_texture_blit(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool =
-flip);
->  void egl_texture_blend(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool=
- flip,
-> diff --git a/ui/egl-headless.c b/ui/egl-headless.c
-> index 05b2e7d7b17f..fe2a0d1eab98 100644
-> --- a/ui/egl-headless.c
-> +++ b/ui/egl-headless.c
-> @@ -133,8 +133,6 @@ static void egl_scanout_flush(DisplayChangeListener *=
-dcl,
->      if (!edpy->guest_fb.texture || !edpy->ds) {
->          return;
->      }
-> -    assert(surface_width(edpy->ds)  =3D=3D edpy->guest_fb.width);
-> -    assert(surface_height(edpy->ds) =3D=3D edpy->guest_fb.height);
->      assert(surface_format(edpy->ds) =3D=3D PIXMAN_x8r8g8b8);
->
->      if (edpy->cursor_fb.texture) {
-> @@ -149,7 +147,7 @@ static void egl_scanout_flush(DisplayChangeListener *=
-dcl,
->          egl_fb_blit(&edpy->blit_fb, &edpy->guest_fb, edpy->y_0_top);
->      }
->
-> -    egl_fb_read(surface_data(edpy->ds), &edpy->blit_fb);
-> +    egl_fb_read(edpy->ds, &edpy->blit_fb);
->      dpy_gfx_update(edpy->dcl.con, x, y, w, h);
->  }
->
-> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-> index edc53f6d3464..7c530c2825be 100644
-> --- a/ui/egl-helpers.c
-> +++ b/ui/egl-helpers.c
-> @@ -102,12 +102,12 @@ void egl_fb_blit(egl_fb *dst, egl_fb *src, bool fli=
-p)
->                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
->  }
->
-> -void egl_fb_read(void *dst, egl_fb *src)
-> +void egl_fb_read(DisplaySurface *dst, egl_fb *src)
->  {
->      glBindFramebuffer(GL_READ_FRAMEBUFFER, src->framebuffer);
->      glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
-> -    glReadPixels(0, 0, src->width, src->height,
-> -                 GL_BGRA, GL_UNSIGNED_BYTE, dst);
-> +    glReadPixels(0, 0, surface_width(dst), surface_height(dst),
-> +                 GL_BGRA, GL_UNSIGNED_BYTE, surface_data(dst));
->  }
->
->  void egl_texture_blit(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool =
-flip)
-> --
-> 2.18.1
->
->
+It isn=E2=80=99t, filters can have non-filter children.  For example, bac=
+kup-top
+could have the source as a filtered child and the target as a non-filter
+child.
+
+> but also bs->backing of a qcow2 image, while bs->file of qcow2 isn't.
+> raw doesn't have any "filtered" child. What's the system behind this?
+
+=E2=80=9Cfiltered=E2=80=9D means: If the parent node returns data from th=
+is child, it
+won=E2=80=99t modify it, neither its content nor its position.  COW and R=
+/W
+filters differ in how they handle writes; R/W filters pass them through
+to the filtered child, COW filters copy them off to some other child
+node (and then the filtered child=E2=80=99s data will no longer be visibl=
+e at
+that location).
+
+The main reason behind the common =E2=80=9Cfiltered=E2=80=9D name is for =
+the generic
+functions that work on both COW and true filter (R/W filters) chains.
+We need such functionality sometimes.  I personally felt like the
+concept of true (R/W) filters and COW children was similar enough to
+share a common name base.
+
+qcow2 has a COW child.  As such, it acts as a COW filter in the sense of
+the function names.
+
+raw has neither a COW child nor acts as an R/W filter.  As such, it has
+no filtered child.  My opinion on this hasn=E2=80=99t changed.
+
+(To reiterate, in practice I see no way anyone would ever use raw as an
+R/W filter.
+Either you use it without offset/size, in which case you simply use it
+in lieu of a format node, so you precisely don=E2=80=99t want it to act a=
+s a
+filter when it comes to allocation information and so on (even though it
+can be classified a filter here).
+Or you use it as kind of a filter with offset/size, but then it no
+longer is a filter.
+
+Filters are defined by =E2=80=9CEvery filter must fulfill these condition=
+s: ...=E2=80=9D
+=E2=80=93 not by =E2=80=9CEverything that fulfills these conditions is a =
+filter=E2=80=9D.
+Marking a driver as a filter has consequences, and I don=E2=80=99t see wh=
+y we
+would want those consequences for raw.)
+
+> It looks like bdrv_filtered_child() is the right function to iterate
+> along a backing file chain, but I just still fail to connect that and
+> the name of the function in a meaningful way.
+
+It=E2=80=98s the right function to iterate along a filter chain.  This in=
+cludes
+COW backing children and R/W filtered children.
+
+>> +/*
+>> + * Return the child that @bs acts as an overlay for, and from which d=
+ata may be
+>> + * copied in COW or COR operations.  Usually this is the backing file=
+=2E
+>> + */
+>=20
+> Or NULL, if no such child exists.
+>=20
+> It's relatively obvious here, but for some of the functions further dow=
+n
+> it would be really good to describe in which cases NULL is expected (or=
+
+> that NULL is even a possible return value).
+
+I=E2=80=99ll look into it.
+
+Max
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+--gBVW5bPxu6W6C05cuN1Y9FI54tCjAX18c--
+
+--sE7iPZw0kF0n1SCCRXym4PeU3sht7VFzF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12BaoACgkQ9AfbAGHV
+z0AF1wgAguyaf2SC8PxeMpzE5YTKXKTpJe6/H5fw/3fWR+m7iPedOhW1nraNMtPe
+KSel2exgatuZ8A5FCqTqGBUBsc0riTYyYgDhzQL4OluUr6L5ziAmuTySyEFGU7Su
+ec0EHLHxkKDjjVPKzU9Vxg7e+zazCmiiHpQLcLMq3avMWH6CQ1Pr7p9JLqQvMt2p
+E7dH53hlKPZrwzJ/wbCveMVDfL4iSrF1OL2ub+TuZuuAC/sMDSM4ZN+dTIXyvUGS
+VWDaT5/cjht2MQYVfRRXvRsKmSdMxO7E4+VLwRQFu4D7BcwIwpL8d4YnI4xFw4Bd
+9Xteh2cYCFwskTWV+F0CzxpoJ3JhYQ==
+=kH1W
+-----END PGP SIGNATURE-----
+
+--sE7iPZw0kF0n1SCCRXym4PeU3sht7VFzF--
 
