@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE84C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E1CC4740C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 549F921A4A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:10:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549F921A4A
+	by mail.kernel.org (Postfix) with ESMTPS id B41D221A4A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:11:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B41D221A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Pzb-0007qq-9l
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 16:10:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54183)
+	id 1i7Q0j-0000SE-Vu
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 16:11:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i7Pyf-0007KQ-QC
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:09:34 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i7Pzm-00089f-OM
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:10:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i7Pyd-0007w1-RQ
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:09:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57468)
+ (envelope-from <jsnow@redhat.com>) id 1i7Pzl-0000Pa-JF
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:10:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33950)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i7PyZ-0007sT-EE; Mon, 09 Sep 2019 16:09:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i7Pzi-0000Lm-MZ; Mon, 09 Sep 2019 16:10:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 19A2C8980F5;
- Mon,  9 Sep 2019 20:09:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 092FB3090FC3;
+ Mon,  9 Sep 2019 20:10:38 +0000 (UTC)
 Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 537FB600CD;
- Mon,  9 Sep 2019 20:09:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 68ADD5D6B2;
+ Mon,  9 Sep 2019 20:10:37 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190827163439.16686-1-mreitz@redhat.com>
- <20190827163439.16686-3-mreitz@redhat.com>
+ <20190827163439.16686-4-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <4197624e-c06e-b7d9-4cf4-90af4ccc53cf@redhat.com>
-Date: Mon, 9 Sep 2019 16:09:24 -0400
+Message-ID: <8fea3235-3f4c-86b1-f88e-b469081f0a6a@redhat.com>
+Date: Mon, 9 Sep 2019 16:10:36 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190827163439.16686-3-mreitz@redhat.com>
+In-Reply-To: <20190827163439.16686-4-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 09 Sep 2019 20:09:26 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 09 Sep 2019 20:10:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/6] curl: Keep *socket until
- the end of curl_sock_cb()
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/6] curl: Pass CURLSocket to
+ curl_multi_{do, read}()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,59 +155,91 @@ Sender: "Qemu-devel"
 
 
 On 8/27/19 12:34 PM, Max Reitz wrote:
-> This does not really change anything, but it makes the code a bit easier
-> to follow once we use @socket as the opaque pointer for
-> aio_set_fd_handler().
-> 
-> (Also, this change stops us from creating new CURLSocket objects when
-> the cURL library just wants to stop listening on an existing socket that
-> we do not recognize.  With a well-behaving cURL, that should never
-> happen anyway.)
+> curl_multi_do_locked() currently marks all sockets as ready.  That is
+> not only inefficient, but in fact unsafe (the loop is).  A follow-up
+> patch will change that, but to do so, curl_multi_do_locked() needs to
+> know exactly which socket is ready; and that is accomplished by this
+> patch here.
 > 
 > Cc: qemu-stable@nongnu.org
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/curl.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  block/curl.c | 29 ++++++++++++++++-------------
+>  1 file changed, 16 insertions(+), 13 deletions(-)
 > 
 > diff --git a/block/curl.c b/block/curl.c
-> index 92dc2f630e..8a45b371cc 100644
+> index 8a45b371cc..05f77a38c2 100644
 > --- a/block/curl.c
 > +++ b/block/curl.c
-> @@ -174,18 +174,16 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
->          if (socket->fd == fd) {
->              if (action == CURL_POLL_REMOVE) {
->                  QLIST_REMOVE(socket, next);
-> -                g_free(socket);
->              }
->              break;
->          }
->      }
-
-> -    if (!socket) {
-> +    if (action != CURL_POLL_REMOVE && !socket) {
->          socket = g_new0(CURLSocket, 1);
->          socket->fd = fd;
->          socket->state = state;
->          QLIST_INSERT_HEAD(&state->sockets, socket, next);
->      }
-> -    socket = NULL;
->  
->      trace_curl_sock_cb(action, (int)fd);
+> @@ -189,15 +189,15 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
 >      switch (action) {
-> @@ -207,6 +205,9 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+>          case CURL_POLL_IN:
+>              aio_set_fd_handler(s->aio_context, fd, false,
+> -                               curl_multi_read, NULL, NULL, state);
+> +                               curl_multi_read, NULL, NULL, socket);
 >              break;
->      }
->  
-> +    if (action == CURL_POLL_REMOVE) {
-> +        g_free(socket);
-> +    }
->      return 0;
+>          case CURL_POLL_OUT:
+>              aio_set_fd_handler(s->aio_context, fd, false,
+> -                               NULL, curl_multi_do, NULL, state);
+> +                               NULL, curl_multi_do, NULL, socket);
+>              break;
+>          case CURL_POLL_INOUT:
+>              aio_set_fd_handler(s->aio_context, fd, false,
+> -                               curl_multi_read, curl_multi_do, NULL, state);
+> +                               curl_multi_read, curl_multi_do, NULL, socket);
+>              break;
+>          case CURL_POLL_REMOVE:
+>              aio_set_fd_handler(s->aio_context, fd, false,
+> @@ -394,9 +394,10 @@ static void curl_multi_check_completion(BDRVCURLState *s)
 >  }
 >  
-> 
+>  /* Called with s->mutex held.  */
+> -static void curl_multi_do_locked(CURLState *s)
+> +static void curl_multi_do_locked(CURLSocket *ready_socket)
+>  {
+>      CURLSocket *socket, *next_socket;
+> +    CURLState *s = socket->state;
 
-Very naive question: why is CURL_POLL_REMOVE handled so early in the
-function? Why not handle both QLIST_REMOVE and g_free under the
-switch(action) construct entirely?
+Did you mean to use ready_socket here instead?
+
+>      int running;
+>      int r;
+>  
+> @@ -415,21 +416,23 @@ static void curl_multi_do_locked(CURLState *s)
+>  
+>  static void curl_multi_do(void *arg)
+>  {
+> -    CURLState *s = (CURLState *)arg;
+> +    CURLSocket *socket = arg;
+> +    BDRVCURLState *s = socket->state->s;
+>  
+> -    qemu_mutex_lock(&s->s->mutex);
+> -    curl_multi_do_locked(s);
+> -    qemu_mutex_unlock(&s->s->mutex);
+> +    qemu_mutex_lock(&s->mutex);
+> +    curl_multi_do_locked(socket);
+> +    qemu_mutex_unlock(&s->mutex);
+>  }
+>  
+>  static void curl_multi_read(void *arg)
+>  {
+> -    CURLState *s = (CURLState *)arg;
+> +    CURLSocket *socket = arg;
+> +    BDRVCURLState *s = socket->state->s;
+>  
+> -    qemu_mutex_lock(&s->s->mutex);
+> -    curl_multi_do_locked(s);
+> -    curl_multi_check_completion(s->s);
+> -    qemu_mutex_unlock(&s->s->mutex);
+
+bye bye &s->s->mutex ! you're very nasty !!
+
+> +    qemu_mutex_lock(&s->mutex);
+> +    curl_multi_do_locked(socket);
+> +    curl_multi_check_completion(s);
+> +    qemu_mutex_unlock(&s->mutex);
+>  }
+>  
+>  static void curl_multi_timeout_do(void *arg)
+> 
 
