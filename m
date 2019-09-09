@@ -2,87 +2,87 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74446C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 12:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DE1C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 12:51:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49040218DE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 12:42:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49040218DE
+	by mail.kernel.org (Postfix) with ESMTPS id 867CE207FC
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 12:51:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 867CE207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Iza-0006c7-0j
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 08:42:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51354)
+	id 1i7J8P-0000K2-Kj
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 08:51:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52913)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1i7Iyt-0006BA-W8
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 08:41:20 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1i7J7T-0008FB-4w
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 08:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1i7Iys-0001jA-W4
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 08:41:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46646)
+ (envelope-from <pbonzini@redhat.com>) id 1i7J7R-0005Sg-1D
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 08:50:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60278)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i7Iys-0001ir-Ot
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 08:41:18 -0400
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200])
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i7J7Q-0005SI-Ie
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 08:50:08 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 160212D0FCE
- for <qemu-devel@nongnu.org>; Mon,  9 Sep 2019 12:41:18 +0000 (UTC)
-Received: by mail-qk1-f200.google.com with SMTP id v143so16045181qka.21
- for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 05:41:18 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 631BFC05AA71
+ for <qemu-devel@nongnu.org>; Mon,  9 Sep 2019 12:50:07 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id f11so7293580wrt.18
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 05:50:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ZCuJG1Cac2wjmQE4JT82x3FrrbXbh6IGBXW9SAccfpE=;
- b=JtZ6xlwBcbQHQn0SHhA5YAiVUMhzLbnc/ef3UsMUESRCn8CIFHbVGjbXNkDbnoJCzd
- OUa2mNQDrNZiQJoRm/d4n98rycs3drRbem+7E8qccuyrvd7kOCTM6xYe3Zb28Rp9Y+j6
- zLiw79J8tBx/L0H7sT3RRRd7/hqY/A5RMOS4zJDGT708HiVyCD9638tEBQj7QbmCPbh5
- PY7UVxz0FlpBxrem7QH08rAfCb6k+GWF7TSo9+143Xtnde6XlMYsuSgb5f4FgQdS4Ggi
- tWeUCToKpkKtYUylO9AiG84sotr0Qb3dNqr2Ef7S/g+/ZcZvN59g9K8vBntVxyV7u6YW
- qjlQ==
-X-Gm-Message-State: APjAAAUx9RQ1YUYVQ7kSXoYEtWtb+q3Z8YFH+fI+v8roAOixnLN8g8nl
- LIXY2Z3yiCr4XDTVitbp9c5tuB60Ul1oIALGnHb2XGkmY/FqwXXU5Rzkn/orZGVOUYgIn2SCXrU
- GksnFgpRxLmW3Uh8=
-X-Received: by 2002:ad4:4524:: with SMTP id l4mr14493627qvu.69.1568032876899; 
- Mon, 09 Sep 2019 05:41:16 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzQm+zO+c+xuiMd1s40AMx1xBvDmILqQZMX3Uck16iELOqg6iVXqxgkaLZV6y5+yoAgO7oO2Q==
-X-Received: by 2002:ad4:4524:: with SMTP id l4mr14493613qvu.69.1568032876657; 
- Mon, 09 Sep 2019 05:41:16 -0700 (PDT)
-Received: from redhat.com ([80.74.107.118])
- by smtp.gmail.com with ESMTPSA id a3sm6712872qta.68.2019.09.09.05.41.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Sep 2019 05:41:15 -0700 (PDT)
-Date: Mon, 9 Sep 2019 08:41:11 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Message-ID: <20190909083902-mutt-send-email-mst@kernel.org>
-References: <20190902121233.13382-1-johannes@sipsolutions.net>
- <20190906121350.29202-1-johannes@sipsolutions.net>
- <20190906102217-mutt-send-email-mst@kernel.org>
- <be405c3ba658cdac7f68c91213c3b714ac24c1e3.camel@sipsolutions.net>
- <20190906110340-mutt-send-email-mst@kernel.org>
- <fe0f3f7bfa730088454790dc2d863285c4461134.camel@sipsolutions.net>
- <20190908091207-mutt-send-email-mst@kernel.org>
- <8a9cf8a1726afce7fed8992a4f19fc808004ef88.camel@sipsolutions.net>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=edt0cQYoJ9uYncySHWxY8aB60dEI1PXCuhN3ufA9kkw=;
+ b=JOx6TcJsORp/TxET2FsdXRICaPw1PPcY5XhEF0n1As1SVCFguVqxVQjHVdicuzJAn/
+ xNvdLgwxkHY2MHkst/40gW/+P/0vdUkCncDF9hU36RXD+gkyJaDZxgibwcRw5bvabN7p
+ mGEX54r4CIV8NiNrflTjLK5lyZfcxbXxt4H0X2vEp9ujDLY2YGR3AisjHBfHT1fwdOQU
+ +/UW2jiS0tcBknWNSgy+mBzKbTXEUYJuOtmHHdlbf1hnp9BpgIF+JPZF5aQ/I+Jigvq6
+ CU+1IsA/zLw+xnoc6ajO34YNyuq94tRiB3hXbIvh/JzT1WC28EgPmGnV5STj5tjczFJ0
+ tyIg==
+X-Gm-Message-State: APjAAAU16eOXjyyVkOMDV2E/q8dN/BKTIHBxS+1GwVG0rXdBjjVGdcod
+ iVYKKtICUaBa1zCJVfZJRxhjGBqA1kHikQS1jBB1wwPARfrEcsjdCuvB9yakfC0fOq68J+Y424h
+ Dh7mti5gkaRqiyDU=
+X-Received: by 2002:a7b:c4d0:: with SMTP id g16mr19769021wmk.94.1568033406063; 
+ Mon, 09 Sep 2019 05:50:06 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz0k4w8JcsFhgJylR4rxqkMxFhUtYJw+nJIzIQoSwarAlLYoGH5h+JMsu34zdZD7K5dkryxxw==
+X-Received: by 2002:a7b:c4d0:: with SMTP id g16mr19769004wmk.94.1568033405772; 
+ Mon, 09 Sep 2019 05:50:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8dc1:ce1e:4b83:3ab7?
+ ([2001:b07:6468:f312:8dc1:ce1e:4b83:3ab7])
+ by smtp.gmail.com with ESMTPSA id j26sm30884968wrd.2.2019.09.09.05.50.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Sep 2019 05:50:05 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190906110649.9561-1-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <601f8c37-354e-6b91-584a-a04e8b3f8438@redhat.com>
+Date: Mon, 9 Sep 2019 14:50:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8a9cf8a1726afce7fed8992a4f19fc808004ef88.camel@sipsolutions.net>
+In-Reply-To: <20190906110649.9561-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] libvhost-user: implement
- VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS
+Subject: [Qemu-devel] action required for qemu-web committers (was Re:
+ [qemu-web RFC PATCH] Update to Jekyll 4.0)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,44 +94,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, alex.bennee@linaro.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 09, 2019 at 01:35:19PM +0200, Johannes Berg wrote:
-> On Sun, 2019-09-08 at 09:13 -0400, Michael S. Tsirkin wrote:
+On 06/09/19 13:06, Thomas Huth wrote:
+> - Update versions in Gemfile
+> - "has_key?" has to be renamed to "key?" in category_archive_plugin.rb
+> - Add .jekyll-cache to .gitignore file
 > 
-> > > I think the only use for this extension would be for simulation
-> > > purposes, and even then only combined with the REPLY_ACK and SLAVE_REQ
-> > > extensions, i.e. you explicitly *want* your virtual machine to lock up /
-> > > wait for a response to the KICK command (and respectively, the device to
-> > > wait for a response to the CALL command).
-> > 
-> > OK so when combined with these, it's OK I think.
-> 
-> OK.
-> 
-> > Do we want to force this restriction in code maybe then?
-> 
-> Unlike in this patch, I was planning to not actually advertise
-> VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS, and do that only if the user of
-> the library wants to advertise it, since devices used for simulation
-> also have to be careful about how they use this.
-> 
-> However, if I understand correctly we cannot enforce that all of them
-> are used at the same time - we're the device side, so we only advertise
-> our features and the master actually sets the ones it wants to use, no?
-> 
-> The only thing we could do is crash if it wants to use this feature
-> without the others, but would that really be helpful?
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-We can return failure from SET_PROTOCOL_FEATURES.
-We can also fail all following messages.
+The software collections Ruby 2.5 was trivial to setup (patch to the hook
+after my sig), so I went ahead and pushed this patch.  However, I encountered
+a small snag for which I also had to add the "[PATCH qemu-web] use precompiled
+sassc" that I have just sent.
+
+Peter/Michael/Thomas, please ssh to qemu.org and do "rm -rf ~/bin ~/.gem"
+(assuming you don't have any other binary in ~/bin :)).  In theory this
+should not be needed, since bundler is now an RPM and the hook does not
+add $HOME/bin to the PATH anymore.  However, it would be confusing for you
+to have references to a Ruby installation that does not exist anymore on
+the machine.
+
+Note that the first time you push to qemu-web.git, you should expect a 
+couple minutes of wait to install the updated gems to your home 
+directory.
+
+Paolo
 
 
-> I'm starting to actually get this working, so I'll post new patches in a
-> few days or so.
-> 
-> johannes
+--- update.old	2019-09-09 08:48:05.947586644 -0400
++++ update	2019-09-09 08:31:05.940274361 -0400
+@@ -5,6 +5,8 @@
+ #
+ # Author: Paolo Bonzini
+ 
++source scl_source enable rh-ruby25
++
+ # -----------------------------------------------------------------------------
+ # $DEPLOY_ROOT is the path to the work area for this script.  All users
+ # that can push to the repository must have write access to $DEPLOY_ROOT as
+@@ -52,8 +54,7 @@
+ # $DEPLOY_ROOT/root if successful.
+ cd $DEPLOY_ROOT/source
+ 
+-export PATH=$HOME/bin:$PATH
+-bundle install
++bundle install --path $HOME/.gem
+ if bundle exec jekyll build -d $DEPLOY_ROOT/new; then
+   rm -rf $DEPLOY_ROOT/old
+   if test -d $DEPLOY_ROOT/root; then
 
