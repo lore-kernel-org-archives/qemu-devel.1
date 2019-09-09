@@ -2,79 +2,141 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9430BC4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 18:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED33C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 18:46:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FDE42089F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 18:42:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=pobox.com header.i=@pobox.com header.b="Rku79bmf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FDE42089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=pobox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0542D2089F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 18:46:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0542D2089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7OcM-0004j9-GO
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 14:42:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36256)
+	id 1i7Og7-00061R-5R
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 14:46:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <junio@pobox.com>) id 1i7Obk-0004KX-4k
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 14:41:49 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i7OfK-0005VI-Rm
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 14:45:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <junio@pobox.com>) id 1i7Obj-0006Mb-1E
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 14:41:48 -0400
-Received: from pb-smtp21.pobox.com ([173.228.157.53]:51915)
+ (envelope-from <jsnow@redhat.com>) id 1i7OfJ-0001FG-Te
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 14:45:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59648)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <junio@pobox.com>) id 1i7Obi-0006KU-Jr
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 14:41:46 -0400
-Received: from pb-smtp21.pobox.com (unknown [127.0.0.1])
- by pb-smtp21.pobox.com (Postfix) with ESMTP id 2F06C92EBA;
- Mon,  9 Sep 2019 14:41:44 -0400 (EDT) (envelope-from junio@pobox.com)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=pobox.com; h=from:to:cc
- :subject:references:date:in-reply-to:message-id:mime-version
- :content-type; s=sasl; bh=eGoqGbkXpH+RlUFjrqlrGn1HdPI=; b=Rku79b
- mf123UWHnerKJRPeaBf9UPMNurVOrW9XLOjlNee3WatswBqmsSjeU7zG5TlkWHi8
- o26XqOJSujBCdH/LJ7WOuz8zfLzjpxHg2Bu3KHJfg7pjN4IcXqNxmWfOTkWy1xWb
- ABtZ0VVHK9S32V1LDAz8aN5i8IVdXIWWuIyJU=
-DomainKey-Signature: a=rsa-sha1; c=nofws; d=pobox.com; h=from:to:cc
- :subject:references:date:in-reply-to:message-id:mime-version
- :content-type; q=dns; s=sasl; b=JOmhdzv1gI0Q/241xsvek5VyRmAK7iZZ
- gZzsN/s3WHDOY25H7ti7Bx40MBb9a7xxk8A5qS0nKTIekICT2X+bVHzbtgyQgod7
- P//t+11Uq8QAnuFLGpig2npBFE48LKeTWJ6VGxcR7vjB1hV1xLOsXWtC/LmKDgn7
- PgCsUujHnbM=
-Received: from pb-smtp21.sea.icgroup.com (unknown [127.0.0.1])
- by pb-smtp21.pobox.com (Postfix) with ESMTP id 2832192EB9;
- Mon,  9 Sep 2019 14:41:44 -0400 (EDT) (envelope-from junio@pobox.com)
-Received: from pobox.com (unknown [34.76.80.147])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i7OfF-0001C3-9r; Mon, 09 Sep 2019 14:45:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by pb-smtp21.pobox.com (Postfix) with ESMTPSA id 3C7A292EB5;
- Mon,  9 Sep 2019 14:41:41 -0400 (EDT) (envelope-from junio@pobox.com)
-From: Junio C Hamano <gitster@pobox.com>
-To: Eric Blake <eblake@redhat.com>
-References: <cover.1566503584.git.qemu_oss@crudebyte.com>
- <46fe6c73-961f-d72a-77de-88491b6f223c@redhat.com>
- <4642438.ai5u8AxThJ@silver> <1897173.eDCz7oYxVq@silver>
- <305577c2-709a-b632-4056-6582771176ac@redhat.com>
-Date: Mon, 09 Sep 2019 11:41:39 -0700
-In-Reply-To: <305577c2-709a-b632-4056-6582771176ac@redhat.com> (Eric Blake's
- message of "Mon, 9 Sep 2019 09:05:45 -0500")
-Message-ID: <xmqqd0g9jorg.fsf@gitster-ct.c.googlers.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 677D2309C38B;
+ Mon,  9 Sep 2019 18:45:24 +0000 (UTC)
+Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B855F60923;
+ Mon,  9 Sep 2019 18:45:23 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190729213559.20913-1-jsnow@redhat.com>
+ <20190729213559.20913-3-jsnow@redhat.com>
+ <2466ccba-bfb9-eca6-5e40-fc7db4e66114@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <1104dbc8-0535-d893-3200-07c6db964120@redhat.com>
+Date: Mon, 9 Sep 2019 14:45:23 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Pobox-Relay-ID: 76DE39FE-D331-11E9-A20F-8D86F504CC47-77302942!pb-smtp21.pobox.com
+In-Reply-To: <2466ccba-bfb9-eca6-5e40-fc7db4e66114@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 09 Sep 2019 18:45:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 173.228.157.53
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] 9p: Fix file ID collisions
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] iotests: add protocol support to
+ initialization info
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,27 +148,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, stefanha@gmail.com,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- qemu-devel@nongnu.org, dgilbert@redhat.com, antonios.motakis@huawei.com,
- git@vger.kernel.org
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
 
-> How hard would it be to improve 'git format-patch'/'git send-email' to
-> have an option to ALWAYS output a From: line in the body, even when the
-> sender is the author, for the case of a mailing list that munges the
-> mail headers due to DMARC/DKIM reasons?
 
-I'd say that it shouldn't be so hard to implement than realizing
-what ahd why it is needed, designing what the end-user interaction
-would be (i.e.  command line options?  configuration variables?
-should it be per send-email destination?) and stating all of the
-above clearly in the documentation and the proposed commit log
-message.
+On 9/9/19 6:09 AM, Max Reitz wrote:
+> On 29.07.19 23:35, John Snow wrote:
+>> This will add supported_protocols and unsupported_protocols to all of
+>> iotests.main, iotests.script_main, and iotests.script_initialize.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/207        | 4 ++--
+>>  tests/qemu-iotests/210        | 4 ++--
+>>  tests/qemu-iotests/211        | 4 ++--
+>>  tests/qemu-iotests/212        | 4 ++--
+>>  tests/qemu-iotests/213        | 4 ++--
+>>  tests/qemu-iotests/iotests.py | 5 ++++-
+>>  6 files changed, 14 insertions(+), 11 deletions(-)
+>=20
+> Hm...  Most of the other script-style tests that do not pass
+> supported_protocols yet should probably do so, actually.  I=E2=80=99m f=
+airly
+> certain most of them actually only support 'file'.
 
-The reason you are asking is...?  Am I smelling a volunteer?
+Sounds like a follow-up patch.
+
+I guess the protocol information patch you talked about is not at
+origin/master yet. Can you point me to it if I need to rebase on top of i=
+t?
+
+My V3 still applies cleanly to master and appears to be correct.
+
+--js
 
