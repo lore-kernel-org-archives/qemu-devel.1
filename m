@@ -2,71 +2,70 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B01C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0000C49ED6
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:02:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF56E2084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:02:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF56E2084D
+	by mail.kernel.org (Postfix) with ESMTPS id 8790C2084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 16:02:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8790C2084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7M78-0001sP-Tg
+	id 1i7M79-0001tO-ND
 	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 12:02:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59585)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7M4C-0008Oy-3D
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:59:01 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7M4A-0008Oo-4m
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7M4A-0001dL-4J
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:58:59 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:53351)
+ (envelope-from <laurent@vivier.eu>) id 1i7M48-0001c2-6P
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 11:58:58 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:55175)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7M48-0001bF-59; Mon, 09 Sep 2019 11:58:58 -0400
+ id 1i7M47-0001b6-SJ; Mon, 09 Sep 2019 11:58:56 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mq2za-1iSt262DMw-00nBc7; Mon, 09 Sep 2019 17:58:36 +0200
+ id 1Macf4-1iiLUz3dbG-00cCBz; Mon, 09 Sep 2019 17:58:24 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Mon,  9 Sep 2019 17:58:11 +0200
-Message-Id: <20190909155813.27760-8-laurent@vivier.eu>
+Date: Mon,  9 Sep 2019 17:58:06 +0200
+Message-Id: <20190909155813.27760-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190909155813.27760-1-laurent@vivier.eu>
 References: <20190909155813.27760-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:dXX0A0pG8ITV2Z8PgvJaD6rrHOLQTZFzX0lXW661YBR/M2UsIrp
- d/VT6AB1cWQs2rTHaMxZfnDmNhFKBr/a7clAijmW/ka88Ka42qOTnYZHqhHkvn0+FZknNuN
- xkRhh9360kuRbMGHTee6TVFsr5zP6lkIVHNHUpt59FUDzSiGn81CPTfeftqCj+iUeZJ5ho5
- ozDTOJP3Hx72fF6TsE3sg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hbJ2So1mPC4=:46RetFbv06BZKzUkF6G3Rq
- UfbKbd8PpEq3Ep2q2+iVh0fQrQdAbZZewIeDe/cEtsQ4Jvxl93rnJlNWtmvWQxZxmBWzLacQM
- rjPcND93Kn2sIt12iw7MpkY0jA56KU7gVaTYyNvJ1nlyJCyQ+9+kSOsEDBIXKBF6afp/am+Rk
- bQC2uJetvlce/NziAVI4z+DqVkxGC6uKTMu1AJBprb70aJQuBfl7EvXFYtBUXgMI6rvd/LIjY
- gmXAevZ48AW0oD7m7+cu9BTKAegvITaHk93I9abKNeYqVFZWfIDj5TyalCHfhMDQPIJe0qBIh
- pQ1lMQWzOJwgmka2OU2BSjRRqbZ8RDLguByjRgmNBMYGK6X7/ZENoUc7XTqB7SnWpl4hV5vIP
- tqIPgA4W3zmbnp4RTy2dkM711Nb+FfDt3s+e7oZfMPOI/aQ8c3sWvDBNdyL8stuIKEuCIsLAb
- JCl8lQNdfLrjZUVSf3yCIPWPnkfubYnttfMJMctPeIcVXeveuV4OYljOrkb9k6j13b6lGZ5cR
- D+dLnDWOMXrkQUzEj6Jr6TBomIZEBN26QTL5giWwd5i6M7Cc/d1XZz1ZzoW9J9OpKWGcE69ZY
- PeP8uiLqoViNG4E9CF6ZS+JLNdNyyXMRjzqPvj+HXvw4JQCj70NsIBIC/jrpf1KiklFexMvW5
- tWRNORBsRDHPuYA0PmMXLKji/yYA6dH1w68DTRWjMQR5HOZHjVSE8X4Eb/xOowQkHuI7GgsBG
- UTEnRTkjYei7Itn9EgIDr22VT2QXLWyACSd8rK0vurRPA7SspHRwt6Bc0xICYvbSTLWyeqbTc
- yMlC6/Py1KvIBX9EH5oSYiJHEcQHEhHl2P12SuFKEM+il/RTTE=
+X-Provags-ID: V03:K1:8uJDAP5+hWS+aWU8lEZZxs3h5s/dKlp2Ndd8c9qGg+i7VNqfAd/
+ 5KOa46rYkfva1tJPuMgFMC+M4nlSUNs+77LKB8m0dMYbwaOT0HMKAMAWrvqXPDKQ4pWTlMX
+ MFd23y2Mef6LhLF/QAuliOJzFeh6BV1B6Yf+kHlMq3VjEmeqHXi9Ie02OzNrdIs3NBxqIyj
+ DzX36HVN2tvCiEACynk7A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BhffS3RVPYU=:fxikQw3eqOHY1dOF1uayU+
+ Ff8E6zExHQnec7LlGYUy5A3ukCE90fyFi8yjMgF9yc31zzO6iyixjHG+AExb6JqEnxYGQHugZ
+ b4oGxXvB8BQ8Lr3jcRUGHPVfkSctbHb+Pjmkl9jKlJSCoyzGKrZ3RvdFqoqwqoTUZYIvnQopG
+ qtjtZK4L8I/RQiFSxyNO/8J1n+xXzJPO3UjuwYqlVUmncGA2pTyU9u1awufdazAUUaFCbyoN2
+ enHjlG0EfWIqX+1UC+pvjjU5CwiMfS7wr8YGvGHRmdWo1x8IP47vqeXaLc8J7QXLS8aaYgtLS
+ uNiMWhIzS2X1XHbXNWrNeC7LC2yXXdRh/oWQt5RUQ8H32w/xgOO+ek/03oBF5sYSdv5GJ+8MD
+ zddws5sKn5WthXvGQ21MHz/Zp9bf7i2fxHDnfcQtVjHimKAZaCSso1+s+Vz8w8OglZ49ARu1c
+ Qb95IJ1hK81himzwwyvPevVGcobRmKkw+c3GNAD6MHmVYyaJkPKfS/itBo9WIywHik0yBqjt1
+ 6VFgVR0ZrMeJVIql/cq5haXJ7NzvlVUpCEy7idkXCVCx9ER6pxgVYUFb9YS/yMFDDvg/C14u9
+ Obr5LM6q7o3V4/8kG3JHbdZVAw7iSfdA7Ibo94RHX1eWvDfpe8F9RLsJ/fdQC6YhYXGiJkPmJ
+ TEwwOiSYGHCFtf6DkhQhNmI7KDWzPwGf/PmP0RO274BCzazDYHnjjV++5+1fyoDx/jAWRG6Gf
+ wg8nl/CTnUX0O26MPgpPqgRb+EJ+8nyPHtTteDNJMby1L0uIuBlh1mv2eECabUXhtnhaLJSeX
+ RMjmhQuMNbT18WJT4aZ+noV06p7iNWUpkWgtGZuuca0Ed6IPDY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.135
-Subject: [Qemu-devel] [PATCH v9 7/9] hw/m68k: add Nubus support for macfb
- video card
+Subject: [Qemu-devel] [PATCH v9 2/9] dp8393x: manage big endian bus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,6 +78,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
  Jason Wang <jasowang@redhat.com>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
@@ -92,161 +92,204 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+This is needed by Quadra 800, this card can run on little-endian
+or big-endian bus.
 
-Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Tested-by: Hervé Poussineau <hpoussin@reactos.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/display/Kconfig         |  1 +
- hw/display/macfb.c         | 56 ++++++++++++++++++++++++++++++++++++++
- include/hw/display/macfb.h | 21 ++++++++++++++
- 3 files changed, 78 insertions(+)
+ hw/net/dp8393x.c | 88 +++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 57 insertions(+), 31 deletions(-)
 
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 867b47673c..02163048cd 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -135,3 +135,4 @@ config ATI_VGA
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index a5678e11fa..693e244ce6 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -153,6 +153,7 @@ typedef struct dp8393xState {
  
- config MACFB
-     bool
-+    depends on NUBUS
-diff --git a/hw/display/macfb.c b/hw/display/macfb.c
-index d7c5ef296e..f4fa8e3206 100644
---- a/hw/display/macfb.c
-+++ b/hw/display/macfb.c
-@@ -15,6 +15,7 @@
- #include "hw/sysbus.h"
- #include "ui/console.h"
- #include "ui/pixel_ops.h"
-+#include "hw/nubus/nubus.h"
- #include "hw/display/macfb.h"
- #include "qapi/error.h"
- #include "hw/qdev-properties.h"
-@@ -382,12 +383,38 @@ static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
+     /* Hardware */
+     uint8_t it_shift;
++    bool big_endian;
+     qemu_irq irq;
+ #ifdef DEBUG_SONIC
+     int irq_level;
+@@ -223,6 +224,29 @@ static uint32_t dp8393x_wt(dp8393xState *s)
+     return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
  }
  
-+const uint8_t macfb_rom[] = {
-+    255, 0, 0, 0,
-+};
-+
-+static void macfb_nubus_realize(DeviceState *dev, Error **errp)
++static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
++                            int offset)
 +{
-+    NubusDevice *nd = NUBUS_DEVICE(dev);
-+    MacfbNubusState *s = NUBUS_MACFB(dev);
-+    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_GET_CLASS(dev);
-+    MacfbState *ms = &s->macfb;
++    uint16_t val;
 +
-+    ndc->parent_realize(dev, errp);
-+
-+    macfb_common_realize(dev, ms, errp);
-+    memory_region_add_subregion(&nd->slot_mem, DAFB_BASE, &ms->mem_ctrl);
-+    memory_region_add_subregion(&nd->slot_mem, VIDEO_BASE, &ms->mem_vram);
-+
-+    nubus_register_rom(nd, macfb_rom, sizeof(macfb_rom), 1, 9, 0xf);
++    if (s->big_endian) {
++        val = be16_to_cpu(base[offset * width + width - 1]);
++    } else {
++        val = le16_to_cpu(base[offset * width]);
++    }
++    return val;
 +}
 +
- static void macfb_sysbus_reset(DeviceState *d)
++static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int offset,
++                        uint16_t val)
++{
++    if (s->big_endian) {
++        base[offset * width + width - 1] = cpu_to_be16(val);
++    } else {
++        base[offset * width] = cpu_to_le16(val);
++    }
++}
++
+ static void dp8393x_update_irq(dp8393xState *s)
  {
-     MacfbSysBusState *s = MACFB(d);
-     macfb_reset(&s->macfb);
- }
+     int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
+@@ -254,12 +278,12 @@ static void dp8393x_do_load_cam(dp8393xState *s)
+         /* Fill current entry */
+         address_space_rw(&s->as, dp8393x_cdp(s),
+             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+-        s->cam[index][0] = data[1 * width] & 0xff;
+-        s->cam[index][1] = data[1 * width] >> 8;
+-        s->cam[index][2] = data[2 * width] & 0xff;
+-        s->cam[index][3] = data[2 * width] >> 8;
+-        s->cam[index][4] = data[3 * width] & 0xff;
+-        s->cam[index][5] = data[3 * width] >> 8;
++        s->cam[index][0] = dp8393x_get(s, width, data, 1) & 0xff;
++        s->cam[index][1] = dp8393x_get(s, width, data, 1) >> 8;
++        s->cam[index][2] = dp8393x_get(s, width, data, 2) & 0xff;
++        s->cam[index][3] = dp8393x_get(s, width, data, 2) >> 8;
++        s->cam[index][4] = dp8393x_get(s, width, data, 3) & 0xff;
++        s->cam[index][5] = dp8393x_get(s, width, data, 3) >> 8;
+         DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
+             s->cam[index][0], s->cam[index][1], s->cam[index][2],
+             s->cam[index][3], s->cam[index][4], s->cam[index][5]);
+@@ -272,7 +296,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
+     /* Read CAM enable */
+     address_space_rw(&s->as, dp8393x_cdp(s),
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+-    s->regs[SONIC_CE] = data[0 * width];
++    s->regs[SONIC_CE] = dp8393x_get(s, width, data, 0);
+     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
  
-+static void macfb_nubus_reset(DeviceState *d)
-+{
-+    MacfbNubusState *s = NUBUS_MACFB(d);
-+    macfb_reset(&s->macfb);
-+}
-+
- static Property macfb_sysbus_properties[] = {
-     DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
-     DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
-@@ -395,6 +422,13 @@ static Property macfb_sysbus_properties[] = {
+     /* Done */
+@@ -293,10 +317,10 @@ static void dp8393x_do_read_rra(dp8393xState *s)
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+ 
+     /* Update SONIC registers */
+-    s->regs[SONIC_CRBA0] = data[0 * width];
+-    s->regs[SONIC_CRBA1] = data[1 * width];
+-    s->regs[SONIC_RBWC0] = data[2 * width];
+-    s->regs[SONIC_RBWC1] = data[3 * width];
++    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, data, 0);
++    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, data, 1);
++    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, data, 2);
++    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, data, 3);
+     DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
+         s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
+         s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
+@@ -411,12 +435,12 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+         tx_len = 0;
+ 
+         /* Update registers */
+-        s->regs[SONIC_TCR] = data[0 * width] & 0xf000;
+-        s->regs[SONIC_TPS] = data[1 * width];
+-        s->regs[SONIC_TFC] = data[2 * width];
+-        s->regs[SONIC_TSA0] = data[3 * width];
+-        s->regs[SONIC_TSA1] = data[4 * width];
+-        s->regs[SONIC_TFS] = data[5 * width];
++        s->regs[SONIC_TCR] = dp8393x_get(s, width, data, 0) & 0xf000;
++        s->regs[SONIC_TPS] = dp8393x_get(s, width, data, 1);
++        s->regs[SONIC_TFC] = dp8393x_get(s, width, data, 2);
++        s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 3);
++        s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 4);
++        s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 5);
+ 
+         /* Handle programmable interrupt */
+         if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
+@@ -442,9 +466,9 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+                 address_space_rw(&s->as,
+                     dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
+                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+-                s->regs[SONIC_TSA0] = data[0 * width];
+-                s->regs[SONIC_TSA1] = data[1 * width];
+-                s->regs[SONIC_TFS] = data[2 * width];
++                s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 0);
++                s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 1);
++                s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 2);
+             }
+         }
+ 
+@@ -471,7 +495,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+         s->regs[SONIC_TCR] |= SONIC_TCR_PTX;
+ 
+         /* Write status */
+-        data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
++        dp8393x_put(s, width, data, 0,
++                    s->regs[SONIC_TCR] & 0x0fff); /* status */
+         size = sizeof(uint16_t) * width;
+         address_space_rw(&s->as,
+             dp8393x_ttda(s),
+@@ -485,8 +510,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+                              sizeof(uint16_t) *
+                              (4 + 3 * s->regs[SONIC_TFC]) * width,
+                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+-            s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
+-            if (data[0 * width] & 0x1) {
++            s->regs[SONIC_CTDA] = dp8393x_get(s, width, data, 0) & ~0x1;
++            if (dp8393x_get(s, width, data, 0) & 0x1) {
+                 /* EOL detected */
+                 break;
+             }
+@@ -749,7 +774,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
+         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
+                          (uint8_t *)data, size, 0);
+-        if (data[0 * width] & 0x1) {
++        if (dp8393x_get(s, width, data, 0) & 0x1) {
+             /* Still EOL ; stop reception */
+             return -1;
+         } else {
+@@ -793,11 +818,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+ 
+     /* Write status to memory */
+     DPRINTF("Write status at %08x\n", dp8393x_crda(s));
+-    data[0 * width] = s->regs[SONIC_RCR]; /* status */
+-    data[1 * width] = rx_len; /* byte count */
+-    data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
+-    data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
+-    data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
++    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
++    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
++    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
++    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
++    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
+     size = sizeof(uint16_t) * 5 * width;
+     address_space_rw(&s->as, dp8393x_crda(s),
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
+@@ -806,12 +831,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     size = sizeof(uint16_t) * width;
+     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+-    s->regs[SONIC_LLFA] = data[0 * width];
++    s->regs[SONIC_LLFA] = dp8393x_get(s, width, data, 0);
+     if (s->regs[SONIC_LLFA] & 0x1) {
+         /* EOL detected */
+         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
+     } else {
+-        data[0 * width] = 0; /* in_use */
++        dp8393x_put(s, width, data, 0, 0); /* in_use */
+         address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
+             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
+         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
+@@ -924,6 +949,7 @@ static Property dp8393x_properties[] = {
+     DEFINE_NIC_PROPERTIES(dp8393xState, conf),
+     DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
+     DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
++    DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
      DEFINE_PROP_END_OF_LIST(),
  };
  
-+static Property macfb_nubus_properties[] = {
-+    DEFINE_PROP_UINT32("width", MacfbNubusState, macfb.width, 640),
-+    DEFINE_PROP_UINT32("height", MacfbNubusState, macfb.height, 480),
-+    DEFINE_PROP_UINT8("depth", MacfbNubusState, macfb.depth, 8),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -406,6 +440,19 @@ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
-     dc->props = macfb_sysbus_properties;
- }
- 
-+static void macfb_nubus_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_DEVICE_CLASS(klass);
-+
-+    device_class_set_parent_realize(dc, macfb_nubus_realize,
-+                                    &ndc->parent_realize);
-+    dc->desc = "Nubus Macintosh framebuffer";
-+    dc->reset = macfb_nubus_reset;
-+    dc->vmsd = &vmstate_macfb;
-+    dc->props = macfb_nubus_properties;
-+}
-+
- static TypeInfo macfb_sysbus_info = {
-     .name          = TYPE_MACFB,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-@@ -413,9 +460,18 @@ static TypeInfo macfb_sysbus_info = {
-     .class_init    = macfb_sysbus_class_init,
- };
- 
-+static TypeInfo macfb_nubus_info = {
-+    .name          = TYPE_NUBUS_MACFB,
-+    .parent        = TYPE_NUBUS_DEVICE,
-+    .instance_size = sizeof(MacfbNubusState),
-+    .class_init    = macfb_nubus_class_init,
-+    .class_size    = sizeof(MacfbNubusDeviceClass),
-+};
-+
- static void macfb_register_types(void)
- {
-     type_register_static(&macfb_sysbus_info);
-+    type_register_static(&macfb_nubus_info);
- }
- 
- type_init(macfb_register_types)
-diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
-index 3fe2592735..26367ae2c4 100644
---- a/include/hw/display/macfb.h
-+++ b/include/hw/display/macfb.h
-@@ -40,4 +40,25 @@ typedef struct {
-     MacfbState macfb;
- } MacfbSysBusState;
- 
-+#define MACFB_NUBUS_DEVICE_CLASS(class) \
-+    OBJECT_CLASS_CHECK(MacfbNubusDeviceClass, (class), TYPE_NUBUS_MACFB)
-+#define MACFB_NUBUS_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(MacfbNubusDeviceClass, (obj), TYPE_NUBUS_MACFB)
-+
-+typedef struct MacfbNubusDeviceClass {
-+    DeviceClass parent_class;
-+
-+    DeviceRealize parent_realize;
-+} MacfbNubusDeviceClass;
-+
-+#define TYPE_NUBUS_MACFB "nubus-macfb"
-+#define NUBUS_MACFB(obj) \
-+    OBJECT_CHECK(MacfbNubusState, (obj), TYPE_NUBUS_MACFB)
-+
-+typedef struct {
-+    NubusDevice busdev;
-+
-+    MacfbState macfb;
-+} MacfbNubusState;
-+
- #endif
 -- 
 2.21.0
 
