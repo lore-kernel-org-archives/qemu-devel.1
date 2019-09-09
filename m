@@ -4,46 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A4EC4740C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:31:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC47C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:34:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0203B218AF
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:31:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0203B218AF
+	by mail.kernel.org (Postfix) with ESMTPS id 6C067218AF
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 20:34:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C067218AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7QK1-0005sH-US
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 16:31:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57566)
+	id 1i7QMM-0007uZ-8l
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 16:34:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i7QIi-0005Hr-0Q
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:30:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i7QL8-0006jp-DE
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:32:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i7QIg-0008Nb-IU
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:30:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53336)
+ (envelope-from <jsnow@redhat.com>) id 1i7QL6-00012V-KP
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 16:32:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49170)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i7QIa-0008Gu-UN; Mon, 09 Sep 2019 16:30:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1i7QKz-00010N-M4; Mon, 09 Sep 2019 16:32:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9376030615BF;
- Mon,  9 Sep 2019 20:30:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A46B018C8936;
+ Mon,  9 Sep 2019 20:32:34 +0000 (UTC)
 Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D6C5860BF3;
- Mon,  9 Sep 2019 20:30:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1B5CD5D9DC;
+ Mon,  9 Sep 2019 20:32:34 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190827163439.16686-1-mreitz@redhat.com>
- <20190827163439.16686-6-mreitz@redhat.com>
+ <20190827163439.16686-7-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <691099b9-dd24-447e-8e7a-ea949fc75737@redhat.com>
-Date: Mon, 9 Sep 2019 16:30:00 -0400
+Message-ID: <03c9ccf6-fb0e-3d39-a8fb-dcfc8639c739@redhat.com>
+Date: Mon, 9 Sep 2019 16:32:33 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190827163439.16686-6-mreitz@redhat.com>
+In-Reply-To: <20190827163439.16686-7-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 09 Sep 2019 20:30:07 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 09 Sep 2019 20:32:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 5/6] curl: Handle success in
- multi_check_completion
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 6/6] curl: Check
+ curl_multi_add_handle()'s return code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,166 +155,37 @@ Sender: "Qemu-devel"
 
 
 On 8/27/19 12:34 PM, Max Reitz wrote:
-> Background: As of cURL 7.59.0, it verifies that several functions are
-> not called from within a callback.  Among these functions is
-> curl_multi_add_handle().
+> If we had done that all along, debugging would have been much simpler.
+> (Also, I/O errors are better than hangs.)
 > 
-> curl_read_cb() is a callback from cURL and not a coroutine.  Waking up
-> acb->co will lead to entering it then and there, which means the current
-> request will settle and the caller (if it runs in the same coroutine)
-> may then issue the next request.  In such a case, we will enter
-> curl_setup_preadv() effectively from within curl_read_cb().
-> 
-> Calling curl_multi_add_handle() will then fail and the new request will
-> not be processed.
-> 
-> Fix this by not letting curl_read_cb() wake up acb->co.  Instead, leave
-> the whole business of settling the AIOCB objects to
-> curl_multi_check_completion() (which is called from our timer callback
-> and our FD read handler, so not from any cURL callbacks).
-> 
-> Reported-by: Natalie Gavrielov <ngavrilo@redhat.com>
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1740193
-> Cc: qemu-stable@nongnu.org
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/curl.c | 69 ++++++++++++++++++++++------------------------------
->  1 file changed, 29 insertions(+), 40 deletions(-)
+>  block/curl.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
 > diff --git a/block/curl.c b/block/curl.c
-> index bc70f39fcb..5e0cca601d 100644
+> index 5e0cca601d..4a7aff02a6 100644
 > --- a/block/curl.c
 > +++ b/block/curl.c
-> @@ -231,7 +231,6 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
->  {
->      CURLState *s = ((CURLState*)opaque);
->      size_t realsize = size * nmemb;
-> -    int i;
+> @@ -894,7 +894,13 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+>      trace_curl_setup_preadv(acb->bytes, start, state->range);
+>      curl_easy_setopt(state->curl, CURLOPT_RANGE, state->range);
 >  
->      trace_curl_read_cb(realsize);
->  
-> @@ -247,32 +246,6 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
->      memcpy(s->orig_buf + s->buf_off, ptr, realsize);
->      s->buf_off += realsize;
->  
-> -    for(i=0; i<CURL_NUM_ACB; i++) {
-> -        CURLAIOCB *acb = s->acb[i];
-> -
-> -        if (!acb)
-> -            continue;
-> -
-> -        if ((s->buf_off >= acb->end)) {
-
-This changes from a conditional,
-
-> -            size_t request_length = acb->bytes;
-> -
-> -            qemu_iovec_from_buf(acb->qiov, 0, s->orig_buf + acb->start,
-> -                                acb->end - acb->start);
-> -
-> -            if (acb->end - acb->start < request_length) {
-> -                size_t offset = acb->end - acb->start;
-> -                qemu_iovec_memset(acb->qiov, offset, 0,
-> -                                  request_length - offset);
-> -            }
-> -
-> -            acb->ret = 0;
-> -            s->acb[i] = NULL;
-> -            qemu_mutex_unlock(&s->s->mutex);
-> -            aio_co_wake(acb->co);
-> -            qemu_mutex_lock(&s->s->mutex);
-> -        }
-> -    }
-> -
->  read_end:
->      /* curl will error out if we do not return this value */
->      return size * nmemb;
-> @@ -353,13 +326,14 @@ static void curl_multi_check_completion(BDRVCURLState *s)
->              break;
->  
->          if (msg->msg == CURLMSG_DONE) {
-> +            int i;
->              CURLState *state = NULL;
-> +            bool error = msg->data.result != CURLE_OK;
+> -    curl_multi_add_handle(s->multi, state->curl);
+> +    if (curl_multi_add_handle(s->multi, state->curl) != CURLM_OK) {
+> +        state->acb[0] = NULL;
+> +        acb->ret = -EIO;
 > +
->              curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE,
->                                (char **)&state);
+> +        curl_clean_state(state);
+> +        goto out;
+> +    }
 >  
-> -            /* ACBs for successful messages get completed in curl_read_cb */
-> -            if (msg->data.result != CURLE_OK) {
-> -                int i;
-> +            if (error) {
->                  static int errcount = 100;
->  
->                  /* Don't lose the original error message from curl, since
-> @@ -371,20 +345,35 @@ static void curl_multi_check_completion(BDRVCURLState *s)
->                          error_report("curl: further errors suppressed");
->                      }
->                  }
-> +            }
->  
-> -                for (i = 0; i < CURL_NUM_ACB; i++) {
-> -                    CURLAIOCB *acb = state->acb[i];
-> +            for (i = 0; i < CURL_NUM_ACB; i++) {
-> +                CURLAIOCB *acb = state->acb[i];
->  
-> -                    if (acb == NULL) {
-> -                        continue;
-> -                    }
-> +                if (acb == NULL) {
-> +                    continue;
-> +                }
-> +
-> +                if (!error) {
-> +                    /* Assert that we have read all data */
-> +                    assert(state->buf_off >= acb->end);
-
-To an assertion. This makes me feel better (What happens if that was
-ever false in the old code, we just drop the callback?) but is it
-definitely always gonna be true?
-
-Well, you are asserting it is, so I will believe you.
-
-> +
-> +                    qemu_iovec_from_buf(acb->qiov, 0,
-> +                                        state->orig_buf + acb->start,
-> +                                        acb->end - acb->start);
->  
-> -                    acb->ret = -EIO;
-> -                    state->acb[i] = NULL;
-> -                    qemu_mutex_unlock(&s->mutex);
-> -                    aio_co_wake(acb->co);
-> -                    qemu_mutex_lock(&s->mutex);
-> +                    if (acb->end - acb->start < acb->bytes) {
-> +                        size_t offset = acb->end - acb->start;
-> +                        qemu_iovec_memset(acb->qiov, offset, 0,
-> +                                          acb->bytes - offset);
-> +                    }
->                  }
-> +
-> +                acb->ret = error ? -EIO : 0;
-> +                state->acb[i] = NULL;
-> +                qemu_mutex_unlock(&s->mutex);
-> +                aio_co_wake(acb->co);
-> +                qemu_mutex_lock(&s->mutex);
->              }
->  
->              curl_clean_state(state);
+>      /* Tell curl it needs to kick things off */
+>      curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
 > 
 
-Only other thing that's not obvious to someone who hasn't programmed
-curl before: this action is moving from curl_read_cb to check_completion.
-
-check_completion is only called in curl_multi_read and not
-curl_multi_do, but curl_read_cb is arguably called somewhere down the
-stack from curl_multi_do_locked.
-
-I assume because this is curl_read_cb that there was no way it was
-getting invoked from curl_multi_do, and therefore we're not missing
-something on the return trip now.
-
-I think it looks fine but it'd be nice to see you say "Yeah, that's
-totally right."
+And, well, looks fine. I think there's just a refactoring typo and maybe
+explaining some curiosities to me that I am fairly sure are fine, actually.
 
 --js
 
