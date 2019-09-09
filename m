@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BED33C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AEBDC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:10:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9085C21A4C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:07:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9085C21A4C
+	by mail.kernel.org (Postfix) with ESMTPS id D40592054F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 10:10:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40592054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7GaN-00008m-JB
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:07:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47046)
+	id 1i7GdC-0001uS-2M
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 06:10:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7GZa-00082d-7D
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:07:04 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7GcV-0001LF-Py
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:10:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7GZT-0004A4-Jh
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:06:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41092)
+ (envelope-from <mreitz@redhat.com>) id 1i7GcU-0007mZ-5x
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 06:10:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34502)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7GZO-00042j-Gi; Mon, 09 Sep 2019 06:06:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1i7GcR-0007hn-Qi; Mon, 09 Sep 2019 06:10:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3825B10576C3;
- Mon,  9 Sep 2019 10:06:49 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E04AF30A00EC;
+ Mon,  9 Sep 2019 10:09:58 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
  [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7430B5D6B2;
- Mon,  9 Sep 2019 10:06:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 032EB5D9D6;
+ Mon,  9 Sep 2019 10:09:54 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190729213559.20913-1-jsnow@redhat.com>
- <20190729213559.20913-2-jsnow@redhat.com>
+ <20190729213559.20913-3-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,21 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b7cf5a8e-9199-8405-8a32-470cd5437b9e@redhat.com>
-Date: Mon, 9 Sep 2019 12:06:43 +0200
+Message-ID: <2466ccba-bfb9-eca6-5e40-fc7db4e66114@redhat.com>
+Date: Mon, 9 Sep 2019 12:09:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190729213559.20913-2-jsnow@redhat.com>
+In-Reply-To: <20190729213559.20913-3-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="NwrUnYrviYr1wz6n2pgyuvrV8yPO6W2FV"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 09 Sep 2019 10:06:49 +0000 (UTC)
+ boundary="Uo4dOME2mjS1zjaV119gtWRQZqpmj5aCQ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 09 Sep 2019 10:09:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] iotests: add script_initialize
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] iotests: add protocol support to
+ initialization info
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,66 +104,64 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NwrUnYrviYr1wz6n2pgyuvrV8yPO6W2FV
-Content-Type: multipart/mixed; boundary="ZPeEgY7j3Utq7S8mH7JANdmjrFCa4cm2M";
+--Uo4dOME2mjS1zjaV119gtWRQZqpmj5aCQ
+Content-Type: multipart/mixed; boundary="e6j7I4gCum9eo912QUYzgmkqSwOjlMGyb";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com
-Message-ID: <b7cf5a8e-9199-8405-8a32-470cd5437b9e@redhat.com>
-Subject: Re: [PATCH v2 1/3] iotests: add script_initialize
+Message-ID: <2466ccba-bfb9-eca6-5e40-fc7db4e66114@redhat.com>
+Subject: Re: [PATCH v2 2/3] iotests: add protocol support to initialization
+ info
 References: <20190729213559.20913-1-jsnow@redhat.com>
- <20190729213559.20913-2-jsnow@redhat.com>
-In-Reply-To: <20190729213559.20913-2-jsnow@redhat.com>
+ <20190729213559.20913-3-jsnow@redhat.com>
+In-Reply-To: <20190729213559.20913-3-jsnow@redhat.com>
 
---ZPeEgY7j3Utq7S8mH7JANdmjrFCa4cm2M
+--e6j7I4gCum9eo912QUYzgmkqSwOjlMGyb
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 29.07.19 23:35, John Snow wrote:
-> Like script_main, but doesn't require a single point of entry.
-> Replace all existing initialization sections with this drop-in replacem=
-ent.
+> This will add supported_protocols and unsupported_protocols to all of
+> iotests.main, iotests.script_main, and iotests.script_initialize.
 >=20
-> This brings debug support to all existing script-style iotests.
->=20
-> Note: supported_oses=3D['linux'] was omitted, as it is a default argume=
-nt.
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
+>  tests/qemu-iotests/207        | 4 ++--
+>  tests/qemu-iotests/210        | 4 ++--
+>  tests/qemu-iotests/211        | 4 ++--
+>  tests/qemu-iotests/212        | 4 ++--
+>  tests/qemu-iotests/213        | 4 ++--
+>  tests/qemu-iotests/iotests.py | 5 ++++-
+>  6 files changed, 14 insertions(+), 11 deletions(-)
 
-Looks good to me, but I=E2=80=99m afraid I looked at this series too late=
- (that
-is, now), so I sent my own version of your 2/3, sorry. :-/
-
-That means that this needs a bit of rebasing and what remains of 2/3
-afterwards (I haven=E2=80=99t converted existing tests using verify_proto=
-col, so
-that still needs to be done) should probably be squashed into this patch
-here.
+Hm...  Most of the other script-style tests that do not pass
+supported_protocols yet should probably do so, actually.  I=E2=80=99m fai=
+rly
+certain most of them actually only support 'file'.
 
 Max
 
 
---ZPeEgY7j3Utq7S8mH7JANdmjrFCa4cm2M--
+--e6j7I4gCum9eo912QUYzgmkqSwOjlMGyb--
 
---NwrUnYrviYr1wz6n2pgyuvrV8yPO6W2FV
+--Uo4dOME2mjS1zjaV119gtWRQZqpmj5aCQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12JDMACgkQ9AfbAGHV
-z0DUgggApjzog2yp+iCb4e7tFWNyB1CBuXy4e5XvpovFj4fE7Dw9VGz+QXNMuEww
-7W6zuJ8yliW9kmFdaadqdjWducfDWCoGBGbA2ZPxjijDcu6m2fNBYFy5bfQXPO6K
-0tgEJZ5XhCQUxOft8oyU+6GeimRCxdg4qyfpYcljdKLxYT5rsJybAiPpRYDpHjVw
-OFHcFAtOUihbjvM2xxB29OjaEfz/uSR6FaKJnV6bpVRDq84OZTyxvb7Wf3KVawMV
-zJ5O90hT+5l0uwYWtk7Er17ex7tBBjwlE/xcy0Dectg9Gvw7NblUi0ctRcBV8m5O
-6ZOBBofmpmYcIwSQ4acgfrJdDOTZiA==
-=58BD
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12JPAACgkQ9AfbAGHV
+z0BWWQgAh4PtFkzN5ooD+ywxfjT75n8fDgUZLoFcCeEgIZm2dWoVy4kcfvaeEH3b
+c+OeEqlM1S6NpkP9/w6fxgwQbeMjRiQZ53UKVqbOfP+RNPm4NqAlSADiD8RppXGq
+WTKX0ucRSDvAjakDAqvrevqDpSEOjFFnBp7qpky0KILpnfEFcl86Nin2G5My9RCF
+KQ36rCtJWKczfWdZ4KydJZuCdGJkHPCokKIu39hrcGq3D79hBZ/+gW2P2eW9XMDi
++3LTV1OzWjuJ4CYchHr0CcK23twnFJfbZ/EhAnQYYnzE7WkirYo5QSq63H1dhv9X
+17WfvPDuokfzUz0qwQI4v5S0MOyuOQ==
+=H/hX
 -----END PGP SIGNATURE-----
 
---NwrUnYrviYr1wz6n2pgyuvrV8yPO6W2FV--
+--Uo4dOME2mjS1zjaV119gtWRQZqpmj5aCQ--
 
