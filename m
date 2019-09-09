@@ -2,95 +2,87 @@ Return-Path: <SRS0=McoT=XE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE226C00307
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:26:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA10C433EF
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:29:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82D7121920
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:26:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D7121920
+	by mail.kernel.org (Postfix) with ESMTPS id DC11221920
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Sep 2019 09:29:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC11221920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Fwd-0003Ly-IK
-	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 05:26:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38493)
+	id 1i7Fzf-0004Z9-0Y
+	for qemu-devel@archiver.kernel.org; Mon, 09 Sep 2019 05:29:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7Fvs-0002tG-Qi
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:26:01 -0400
+ (envelope-from <philmd@redhat.com>) id 1i7Fyc-0003xS-6p
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7Fvr-0008A5-V5
- for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:26:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49474)
+ (envelope-from <philmd@redhat.com>) id 1i7Fyb-00018o-5q
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:28:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29886)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7Fvp-00088K-6p; Mon, 09 Sep 2019 05:25:57 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i7Fyb-000176-0l
+ for qemu-devel@nongnu.org; Mon, 09 Sep 2019 05:28:49 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 301AE30A00FC;
- Mon,  9 Sep 2019 09:25:56 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-179.ams2.redhat.com
- [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA6B4100197A;
- Mon,  9 Sep 2019 09:25:53 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190825071541.10389-1-mlevitsk@redhat.com>
- <20190825071541.10389-3-mlevitsk@redhat.com>
- <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
- <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
- <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
- <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3967d83b-2637-8020-a3b6-f1fa995ad34f@redhat.com>
-Date: Mon, 9 Sep 2019 11:25:51 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 863142DA980
+ for <qemu-devel@nongnu.org>; Mon,  9 Sep 2019 09:28:47 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id n6so7091556wrw.14
+ for <qemu-devel@nongnu.org>; Mon, 09 Sep 2019 02:28:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=by2bjIZg4qdRn5dszm+izjxfpHO99UyDhjIS2GVdlmU=;
+ b=VGcHbS3sSBX3IKpY2j458kQia6tAPfSS5iHugyYQhjTcc0N18XKDUYXgPT8JtSlGFN
+ IcLB3yurZIhANB7paDlnNetZAyeSlzHdjGBo+exJ72GUmikCqVdINTflK+rdqrgpLKUS
+ GWY2ukfPTnIkLIgaJPr9VoRpRdxGv72jBOEBo6VQY+tza5f6dvRAqQJNfkMme8Jt6CsP
+ o36LKU4WgxZ88SqrblGJ9wzaEVbqDPYEYON7c8CvxGc67jWX86lcSC+NldByMm9xtz2U
+ OgLe1F2JKrSGF4uuAvdmkqEYngSU4BDrkm0F5hjipw3HVS+h8zPb5I7taPIs03sbOL9g
+ 1vxg==
+X-Gm-Message-State: APjAAAWztkxYzFttn5sN2HyKGCZasnVkBm8TjE9PGLgjQRoKNkYRV5ak
+ sFFubcH3MDKpQ4AH7v2fAd4mGeRv9vUVpEzivTz64NyP95d5aNrMYgExFMllyggbBPIIBT0vCb0
+ UXtECJLsXCpAsuI8=
+X-Received: by 2002:a1c:c00e:: with SMTP id q14mr18856419wmf.14.1568021326360; 
+ Mon, 09 Sep 2019 02:28:46 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy/S+BQMo4r6AGTW/C4eHi2YzYZObNvz8aHUKfQXATXJI/VFSVqe5a5mGmnv3icF4OqSYrBMw==
+X-Received: by 2002:a1c:c00e:: with SMTP id q14mr18856413wmf.14.1568021326223; 
+ Mon, 09 Sep 2019 02:28:46 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id o19sm18845335wro.50.2019.09.09.02.28.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Sep 2019 02:28:45 -0700 (PDT)
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org,
+ qemu-trival@nongnu.org
+References: <20190909031446.1331810-1-maozhongyi@cmss.chinamobile.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <74c5363a-b5fb-9e14-14be-49297a063dba@redhat.com>
+Date: Mon, 9 Sep 2019 11:28:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="iYzYfamJ5RTmvsER5pDOh7eMWzwpWu7nz"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 09 Sep 2019 09:25:56 +0000 (UTC)
+In-Reply-To: <20190909031446.1331810-1-maozhongyi@cmss.chinamobile.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
+Subject: Re: [Qemu-devel] [PATCH] pci_bridge: fix a typo in comment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,69 +94,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- John Ferlan <jferlan@redhat.com>, qemu-block@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iYzYfamJ5RTmvsER5pDOh7eMWzwpWu7nz
-Content-Type: multipart/mixed; boundary="mcjgrKdDlZdh6xYTSjdrJhcq7Ek1YOv8G";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- John Ferlan <jferlan@redhat.com>
-Message-ID: <3967d83b-2637-8020-a3b6-f1fa995ad34f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/nvme: add support for discard
-References: <20190825071541.10389-1-mlevitsk@redhat.com>
- <20190825071541.10389-3-mlevitsk@redhat.com>
- <0618bc5b-6c0b-d154-dc7c-77398a7eb031@redhat.com>
- <798ede8632285382a9d54dc9e3a75be046387b7d.camel@redhat.com>
- <58a0f856b958bcb90df6d5f778c8ca0eaefaf8f9.camel@redhat.com>
- <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
-In-Reply-To: <58a83617-9ffd-b775-976b-ccfbc87d65c1@redhat.com>
+On 9/9/19 5:14 AM, Mao Zhongyi wrote:
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> ---
+>  hw/pci/pci_bridge.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> index 715b9a4fe6..97967d12eb 100644
+> --- a/hw/pci/pci_bridge.c
+> +++ b/hw/pci/pci_bridge.c
+> @@ -311,7 +311,7 @@ void pci_bridge_reset(DeviceState *qdev)
+> =20
+>      /*
+>       * the default values for base/limit registers aren't specified
+> -     * in the PCI-to-PCI-bridge spec. So we don't thouch them here.
+> +     * in the PCI-to-PCI-bridge spec. So we don't touch them here.
+>       * Each implementation can override it.
+>       * typical implementation does
+>       * zero base/limit registers or
+>=20
 
---mcjgrKdDlZdh6xYTSjdrJhcq7Ek1YOv8G
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 05.09.19 19:27, John Snow wrote:
-
-[...]
-
-> You also probably require review (or at least an ACK) from Keith Busch
-> who maintains this file.
-
-Keith actually maintains the NVMe guest device; technically, Fam is the
-NVMe block driver maintainer.
-
-Max
-
-
---mcjgrKdDlZdh6xYTSjdrJhcq7Ek1YOv8G--
-
---iYzYfamJ5RTmvsER5pDOh7eMWzwpWu7nz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl12Gp8ACgkQ9AfbAGHV
-z0CfuAgAk8VpaY1W59DpZRQEkxgT0pyY+7PgqZcVHggJF/OniwKi6pvDSL9hH9+c
-F+mzTdV01UeTshRUa896td/VFpo0sstewIwDScjdWTdhON0+3aHNq79BvE7NzqiH
-9nv5HlncHuBApJ/xQ3SJKHaV8RE2plmQHnqp70lV2XEoNU+t34Ja/+Rx7s2zO2t/
-Gj8CN2KJO3b6ccl59/oJDPo14fQAxq8hIfOG0c5I8K7iGgrvTI/JNgH03erzzChW
-3u8u/g6D08BErpmlijZ+cgAannkGyOLLyM6HNZsdy99IjPzdkkFJIBf0xmDF374Q
-NiXrONwbeFSjoVm/2/d9Z+qxwYTsMA==
-=y+O7
------END PGP SIGNATURE-----
-
---iYzYfamJ5RTmvsER5pDOh7eMWzwpWu7nz--
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
