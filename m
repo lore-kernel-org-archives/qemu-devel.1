@@ -2,65 +2,72 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E080C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3EE6C49ED6
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:19:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25C492084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:19:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C492084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C18F2084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:19:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C18F2084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7g30-0001Uw-49
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:19:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37677)
+	id 1i7g3C-0001gt-FU
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:19:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i7g0V-0008Nd-7W
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:16:32 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i7g0a-0008RK-0f
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:16:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i7g0T-0006aL-Rg
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:16:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43256)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1i7g0Q-0006Xt-U0; Tue, 10 Sep 2019 09:16:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4EAFD20F8;
- Tue, 10 Sep 2019 13:16:24 +0000 (UTC)
-Received: from work-vm (ovpn-117-238.ams2.redhat.com [10.36.117.238])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 36E5C5D6B2;
- Tue, 10 Sep 2019 13:16:20 +0000 (UTC)
-Date: Tue, 10 Sep 2019 14:16:17 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Message-ID: <20190910131617.GC2797@work-vm>
-References: <20190910095610.4546-1-beata.michalska@linaro.org>
- <20190910095610.4546-4-beata.michalska@linaro.org>
- <20190910102601.GA2797@work-vm>
- <CADSWDzs_Cof-L8dGBeYVEY1dNx4Ot6sNcAKtCrvcxZW-3+KUvA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADSWDzs_Cof-L8dGBeYVEY1dNx4Ot6sNcAKtCrvcxZW-3+KUvA@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Tue, 10 Sep 2019 13:16:24 +0000 (UTC)
+ (envelope-from <palmer@dabbelt.com>) id 1i7g0Y-0006cZ-QA
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:16:35 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43378)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7g0Y-0006cB-K2
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:16:34 -0400
+Received: by mail-wr1-f68.google.com with SMTP id q17so15461652wrx.10
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 06:16:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=sv6tDhPr4WFwtN9t14YkhLPoyaBEz7Va5oGN2aKOC3w=;
+ b=Pl9E5/YUNcOVlQtSkn+9RpLeI3YdOirpWzcKRR4TIGVU0mcFMpaGPwOIvxgjZtYE4/
+ MXuZnEZQhYEcEYZhVtFlvV3/LjgnM/puzD5vvGnZB8OFC2A1n2yRQWbDvBeHti6HaTKN
+ QjnTNTPfQjWx563a0mUd2vgMovidpLX0VwFDT0ytYoqkkQYaKctS9t5gfxPVs7TUZxHQ
+ kD/m0ReWMtYhNJtRab/a3XP4gQChM4GTDlBdW07Ll4PgZBQOcox7C59d78ZyRHujCMp4
+ dklDH3lmcHGr1zeV+cNhQ3Dx9PEB5NPJObcQtvTm/gAJ7zXvwyzE0ZfNMU+PBkW0V/BN
+ 11IQ==
+X-Gm-Message-State: APjAAAWPSZsKn6YIvXwLKZqUJFfl7mv7gwNfCr4Uuk2un1I1xHyIcYpO
+ LWZ+z/QQZJF0xId/d+1Ld4utV2x/kwdakQ==
+X-Google-Smtp-Source: APXvYqyHvwc6MbUwBf+AC/8+MthAGyGldETGjW8hg11vBWN/qPaHGqgqweSZ/TjBerCiZNHTl/UmGQ==
+X-Received: by 2002:adf:cc84:: with SMTP id p4mr6720977wrj.201.1568121393109; 
+ Tue, 10 Sep 2019 06:16:33 -0700 (PDT)
+Received: from localhost ([148.69.85.38])
+ by smtp.gmail.com with ESMTPSA id d9sm21430637wrf.62.2019.09.10.06.16.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 06:16:31 -0700 (PDT)
+Date: Tue, 10 Sep 2019 06:16:31 -0700 (PDT)
+X-Google-Original-Date: Mon, 09 Sep 2019 10:14:10 PDT (-0700)
+In-Reply-To: <066a2c520c38b0c175c052d6a3385d5661764833.1566573576.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-a8e09e2d-e0a4-4de5-88f6-d47db22fb1e8@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] migration: ram: Switch to ram block
- writeback
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v4 7/7] target/riscv: Use
+ TB_FLAGS_MSTATUS_FS for floating point
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,79 +79,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, quintela@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, bmeng.cn@gmail.com,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Beata Michalska (beata.michalska@linaro.org) wrote:
-> On Tue, 10 Sep 2019 at 12:26, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > * Beata Michalska (beata.michalska@linaro.org) wrote:
-> > > Switch to ram block writeback for pmem migration.
-> > >
-> > > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> > > ---
-> > >  migration/ram.c | 5 +----
-> > >  1 file changed, 1 insertion(+), 4 deletions(-)
-> > >
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index b01a37e7ca..8ea0bd63fc 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -33,7 +33,6 @@
-> > >  #include "qemu/bitops.h"
-> > >  #include "qemu/bitmap.h"
-> > >  #include "qemu/main-loop.h"
-> > > -#include "qemu/pmem.h"
-> > >  #include "xbzrle.h"
-> > >  #include "ram.h"
-> > >  #include "migration.h"
-> > > @@ -4064,9 +4063,7 @@ static int ram_load_cleanup(void *opaque)
-> > >      RAMBlock *rb;
-> > >
-> > >      RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
-> > > -        if (ramblock_is_pmem(rb)) {
-> > > -            pmem_persist(rb->host, rb->used_length);
-> > > -        }
-> > > +        qemu_ram_block_writeback(rb);
-> >
-> > ACK for migration
-> >
-> > Although I do worry that if you really have pmem hardware, is it better
-> > to fail the migration if you don't have libpmem available?
-> 
-> According to the PMDG man page, pmem_persist is supposed to be
-> equivalent for the msync.
+On Fri, 23 Aug 2019 08:21:25 PDT (-0700), Alistair Francis wrote:
+> Use the TB_FLAGS_MSTATUS_FS macro when enabling floating point in the tb
+> flags.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/cpu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index eb7b5b0af3..0347be453b 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -301,7 +301,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>  #else
+>      *flags = cpu_mmu_index(env, 0);
+>      if (riscv_cpu_fp_enabled(env)) {
+> -        *flags |= env->mstatus & MSTATUS_FS;
+> +        *flags |= TB_FLAGS_MSTATUS_FS;
 
-OK, but you do define qemu_ram_block_writeback to fall back to fdatasync;
-so that would be too little?
+I thought this was a functional change, but it's not: fp_enabled() checks 
+mstatus already.
 
-> It's just more performant. So in case of real pmem hardware it should
-> be all good.
-> 
-> [http://pmem.io/pmdk/manpages/linux/v1.2/libpmem.3.html]
+>      }
+>  #endif
+>  }
 
-Dave
-
-> 
-> BR
-> Beata
-> >
-> > Dave
-> >
-> > >      }
-> > >
-> > >      xbzrle_load_cleanup();
-> > > --
-> > > 2.17.1
-> > >
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
