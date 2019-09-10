@@ -3,71 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D370C4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B06C4740A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:52:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00A65208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:49:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00A65208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 386F42082C
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:52:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386F42082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7gWI-000631-2n
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43042)
+	id 1i7gZT-0000jv-Fj
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:52:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43600)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i7gR9-0002qn-QJ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:44:04 -0400
+ (envelope-from <slp@redhat.com>) id 1i7gTw-0005UN-Tb
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i7gR8-0001su-OS
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:44:03 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45330)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7gR8-0001sQ-JF
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:44:02 -0400
-Received: by mail-wr1-f65.google.com with SMTP id l16so20303827wrv.12
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 06:44:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=/4OkgJziaKwjIQFzG61gd7GlNf0TQErMlPLfvfJBuoU=;
- b=bEZImzrziRcI5GbmYXEUX8Sv/Is6ONdStCw0U9b6ZAS+uXyCmlEO6ZJbCKJ+E8YQFv
- SyjxGZLKN9scBfgS4bHhGGD8atKaHLyMfzo8lelMc7xqYQEzjvwhzMQufCyQBbqP/SeR
- NclHhdYqhN3IL3jWl4vcnByMQb/8b0ehlwoh55Pf6WJeDbQi/Y/Gmn0SrNdoAlga1HcO
- vJfuTR/ND0ZW95uCZBRFy1zXQ3xzLQo9oLyZ37R0JeEKazojQscTWk0UWfAqObDX4udi
- zB7yf2DkKWwk/2aVqQSZJTOluhFMm2EL9+G6OZt7LaB99T1q+vXUasyYkf85nfQNPGb1
- tNEQ==
-X-Gm-Message-State: APjAAAX24X+UWYDMak23lmV9Gklftn351tPLLvI7FAiyLFKxwfllpbbU
- 41AfR6YFK6miXQ9r7VC1I0om8RmBBlqesA==
-X-Google-Smtp-Source: APXvYqzFm1inD8iIEtQMYvPUUMEDyLzVo3O0qet6aRUzVDTDPMtzevPhc00peXbUjZOAKnldQbZ54w==
-X-Received: by 2002:a5d:4b46:: with SMTP id w6mr17677790wrs.223.1568123041069; 
- Tue, 10 Sep 2019 06:44:01 -0700 (PDT)
-Received: from localhost ([148.69.85.38])
- by smtp.gmail.com with ESMTPSA id q15sm3003818wmb.28.2019.09.10.06.44.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 06:44:00 -0700 (PDT)
-Date: Tue, 10 Sep 2019 06:44:00 -0700 (PDT)
-X-Google-Original-Date: Tue, 10 Sep 2019 06:22:25 PDT (-0700)
-In-Reply-To: <1c1d359caa6633349158debc38e07156a10b63e8.1566603412.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Message-ID: <mhng-9017291b-1ed2-4cea-ab34-03825a8c8a8c@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <slp@redhat.com>) id 1i7gTv-0003Gw-EF
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:46:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44192)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>)
+ id 1i7gTt-0003Fs-6T; Tue, 10 Sep 2019 09:46:53 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 730AC58;
+ Tue, 10 Sep 2019 13:46:52 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 803FE60BE2;
+ Tue, 10 Sep 2019 13:46:39 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue, 10 Sep 2019 15:36:13 +0200
+Message-Id: <20190910133611.149421-1-slp@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 10 Sep 2019 13:46:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v1 02/28] target/riscv: Add the
- virtulisation mode
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2] blockjob: update nodes head while removing
+ all bdrv
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,97 +65,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
- qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ Sergio Lopez <slp@redhat.com>, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 23 Aug 2019 16:37:54 PDT (-0700), Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/cpu.h        |  4 ++++
->  target/riscv/cpu_bits.h   |  6 ++++++
->  target/riscv/cpu_helper.c | 23 +++++++++++++++++++++++
->  3 files changed, 33 insertions(+)
->
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 7f54fb8c87..0ef1ecb0e0 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -117,6 +117,8 @@ struct CPURISCVState {
->
->  #ifndef CONFIG_USER_ONLY
->      target_ulong priv;
-> +    /* This contains QEMU specific information about the virt state. */
-> +    target_ulong virt;
->      target_ulong resetvec;
->
->      target_ulong mhartid;
-> @@ -257,6 +259,8 @@ int riscv_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
->  int riscv_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
->  bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request);
->  bool riscv_cpu_fp_enabled(CPURISCVState *env);
-> +bool riscv_cpu_virt_enabled(CPURISCVState *env);
-> +void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable);
->  int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
->  hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
->  void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-> index e99834856c..1fbde516be 100644
-> --- a/target/riscv/cpu_bits.h
-> +++ b/target/riscv/cpu_bits.h
-> @@ -422,6 +422,12 @@
->  #define PRV_H 2 /* Reserved */
->  #define PRV_M 3
->
-> +/* Virtulisation modes */
-> +#define VIRT_OFF            0
-> +#define VIRT_ON             1
-> +#define VIRT_MODE_SHIFT     0
-> +#define VIRT_MODE_MASK      (1 << VIRT_MODE_SHIFT)
-> +
->  /* RV32 satp CSR field masks */
->  #define SATP32_MODE         0x80000000
->  #define SATP32_ASID         0x7fc00000
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 225e407cff..7b0bb14c01 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -81,6 +81,29 @@ bool riscv_cpu_fp_enabled(CPURISCVState *env)
->      return false;
->  }
->
-> +bool riscv_cpu_virt_enabled(CPURISCVState *env)
-> +{
-> +    bool tmp;
-> +
-> +    if (!riscv_has_ext(env, RVH)) {
-> +        return false;
-> +    }
-> +
-> +    tmp = (env->virt & VIRT_MODE_MASK) >> VIRT_MODE_SHIFT;
-> +
-> +    return tmp == VIRT_ON;
-> +}
+block_job_remove_all_bdrv() iterates through job->nodes, calling
+bdrv_root_unref_child() for each entry. The call to the latter may
+reach child_job_[can_]set_aio_ctx(), which will also attempt to
+traverse job->nodes, potentially finding entries that where freed
+on previous iterations.
 
-extract64() is a bit cleaner.
+To avoid this situation, update job->nodes head on each iteration to
+ensure that already freed entries are no longer linked to the list.
 
-> +
-> +void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable)
-> +{
-> +    if (!riscv_has_ext(env, RVH)) {
-> +        return;
-> +    }
-> +
-> +    env->virt &= ~VIRT_MODE_MASK;
-> +    env->virt |= enable << VIRT_MODE_SHIFT;
-> +}
-> +
->  int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
->  {
->      CPURISCVState *env = &cpu->env;
+RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1746631
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+Changelog
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+v2:
+ - Avoid leaking job->nodes (thanks Max Reitz)
+---
+ blockjob.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+---
+diff --git a/blockjob.c b/blockjob.c
+index 6e32d1a0c0..ffda6dd1e4 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -187,13 +187,21 @@ static const BdrvChildRole child_job =3D {
+=20
+ void block_job_remove_all_bdrv(BlockJob *job)
+ {
+-    GSList *l;
++    GSList *l, *orig_nodes;
++
++    orig_nodes =3D job->nodes;
+     for (l =3D job->nodes; l; l =3D l->next) {
+         BdrvChild *c =3D l->data;
+         bdrv_op_unblock_all(c->bs, job->blocker);
+         bdrv_root_unref_child(c);
++        /*
++         * The call above may reach child_job_[can_]set_aio_ctx(), which=
+ will
++         * also traverse job->nodes, so update the head here to make sur=
+e it
++         * doesn't attempt to process an already freed BdrvChild.
++         */
++        job->nodes =3D l->next;
+     }
+-    g_slist_free(job->nodes);
++    g_slist_free(orig_nodes);
+     job->nodes =3D NULL;
+ }
+=20
+--=20
+2.21.0
+
 
