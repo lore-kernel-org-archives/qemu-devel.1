@@ -2,72 +2,90 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9203C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46062C49ED8
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:01:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF62421479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:59:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF62421479
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1B6862082C
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:01:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6862082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hcA-00041Z-BP
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:59:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54832)
+	id 1i7hdf-0005NY-Kb
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 11:01:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55854)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i7hRE-0000OG-I6
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:13 -0400
+ (envelope-from <eblake@redhat.com>) id 1i7hX1-0007CJ-PT
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i7hRC-0006QO-Rl
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:12 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39836)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7hRC-0006Px-MW
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:10 -0400
-Received: by mail-wr1-f68.google.com with SMTP id t16so20858140wra.6
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:48:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=WH1RsL+ZdVST+XzQbljMHQiP6aO83DLlrXgF51Tok1Q=;
- b=ASclyyPBKgJJhrcmxMU9Maph8p5kChbfkUTtTGfu4N6t5DeRWF43lkSZvlQ+SoMVId
- KmRbTsUhcJvoRsXNTUmOLHBpD12fFPMKSQfDRfvZk/Do54uj8FFOoQ96nvaQZt9Kgk15
- JCwzJ9jMr2LI1n6Gsw1fJ0qUZ6tSY9W9K3UE0itxSlAsqA/6hagYCqmnywF0SK9QNLJh
- JhXg0cwe/FQ71dYV2Va0SbK6i2/gNn/bM20R35BuPJGwQPqecAwJzwj3N8SDpmj91gZJ
- eDA5zpr20Vs91DE3sVLBKrh8fgQIDGI9/Pc8QN0smuBthUn+za/Jp/l2AUCuBJB1ihCI
- 5OuA==
-X-Gm-Message-State: APjAAAWoJiqN8QMBBVp1Nehw0SBiytCNP8QQQaDfimH5ICiSfWIB8XIb
- HwrEaj0eHoWWiN3E6GeIw3n7038ft2C01g==
-X-Google-Smtp-Source: APXvYqy0ERn8EWjnKJ+uVA3LC+L1HtJOv1RwmuEivZgZtzMDHMyefIKZQ49uutQWMDqP9QZNVmBwUQ==
-X-Received: by 2002:a5d:5606:: with SMTP id l6mr3720814wrv.108.1568126889190; 
- Tue, 10 Sep 2019 07:48:09 -0700 (PDT)
-Received: from localhost ([148.69.85.38])
- by smtp.gmail.com with ESMTPSA id k9sm34089428wrd.7.2019.09.10.07.48.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 07:48:08 -0700 (PDT)
-Date: Tue, 10 Sep 2019 07:48:08 -0700 (PDT)
-X-Google-Original-Date: Tue, 10 Sep 2019 07:44:11 PDT (-0700)
-In-Reply-To: <47e7fd90ce1d2373824799274376b29d751d56c3.1566603412.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Message-ID: <mhng-a0b8f877-5b70-413f-8f5f-5912f49ffcfd@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <eblake@redhat.com>) id 1i7hX0-0001Rd-8Q
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:54:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:15945)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7hX0-0001RN-0C
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:54:10 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 40EA230043E1;
+ Tue, 10 Sep 2019 14:54:09 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 117865D6B2;
+ Tue, 10 Sep 2019 14:54:03 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190910063724.28470-1-armbru@redhat.com>
+ <20190910063724.28470-4-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <bc97fbdf-7b12-c315-5247-9102bd6951e7@redhat.com>
+Date: Tue, 10 Sep 2019 09:54:02 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190910063724.28470-4-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Tue, 10 Sep 2019 14:54:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v1 07/28] target/riscv: Dump Hypervisor
- registers if enabled
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 03/16] qapi: Drop support for boxed
+ alternate arguments
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,81 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
- qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 23 Aug 2019 16:38:07 PDT (-0700), Alistair Francis wrote:
-> Dump the Hypervisor registers and the current Hypervisor state.
->
-> While we are editing this code let's also dump stvec and scause.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> ---
->  target/riscv/cpu.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
->
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index f13e298a36..be8f643fc2 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -220,18 +220,52 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
->      CPURISCVState *env = &cpu->env;
->      int i;
->
-> +#if !defined(CONFIG_USER_ONLY)
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s %d\n", "V      =  ", riscv_cpu_virt_enabled(env));
-> +    }
-> +#endif
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
->  #ifndef CONFIG_USER_ONLY
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "bstatus ", env->vsstatus);
-> +    }
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ",
->                   (target_ulong)atomic_read(&env->mip));
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsip    ",
-> +                     (target_ulong)atomic_read(&env->vsip));
-> +    }
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsie    ", env->vsie);
-> +    }
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hideleg ", env->hideleg);
-> +    }
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hedeleg ", env->hedeleg);
-> +    }
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtvec   ", env->mtvec);
-> +    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "stvec   ", env->stvec);
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vstvec  ", env->vstvec);
-> +    }
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mepc    ", env->mepc);
-> +    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "sepc    ", env->sepc);
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsepc   ", env->vsepc);
-> +    }
->      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mcause  ", env->mcause);
-> +    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "scause  ", env->scause);
-> +    if (riscv_has_ext(env, RVH)) {
-> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vscause ", env->vscause);
-> +    }
->  #endif
->
->      for (i = 0; i < 32; i++) {
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO
+Content-Type: multipart/mixed; boundary="IVmfUuR27wdSwA3NN9Vyv0SQOTYIDKpG4";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Message-ID: <bc97fbdf-7b12-c315-5247-9102bd6951e7@redhat.com>
+Subject: Re: [PATCH v2 03/16] qapi: Drop support for boxed alternate arguments
+References: <20190910063724.28470-1-armbru@redhat.com>
+ <20190910063724.28470-4-armbru@redhat.com>
+In-Reply-To: <20190910063724.28470-4-armbru@redhat.com>
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+--IVmfUuR27wdSwA3NN9Vyv0SQOTYIDKpG4
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 9/10/19 1:37 AM, Markus Armbruster wrote:
+> Commands and events can define their argument type inline (default) or
+> by referring to another type ('boxed': true, since commit c818408e44
+> "qapi: Implement boxed types for commands/events", v2.7.0).  The
+> unboxed inline definition is an (anonymous) struct type.  The boxed
+> type may be a struct, union, or alternate type.
+>=20
+> The latter is problematic: docs/interop/qemu-spec.txt requires the
+> value of the 'data' key to be a json-object, but any non-degenerate
+> alternate type has at least one branch that isn't.
+
+Good catch.
+
+>=20
+> Fortunately, we haven't made use of alternates in this context outside
+> tests/.  Drop support for them.
+>=20
+> QAPISchemaAlternateType.is_empty() is now unused.  Drop it, too.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  docs/devel/qapi-code-gen.txt            | 12 ++++++------
+>  scripts/qapi/common.py                  | 15 ++++-----------
+>  tests/qapi-schema/qapi-schema-test.json |  2 +-
+>  tests/qapi-schema/qapi-schema-test.out  |  2 +-
+>  4 files changed, 12 insertions(+), 19 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--IVmfUuR27wdSwA3NN9Vyv0SQOTYIDKpG4--
+
+--u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl13uQoACgkQp6FrSiUn
+Q2plQAf+I50CtqeE9UvfMHB4s9stUMZVOWmJp1cS0y7Svv46p+wQCAiZeZEanBQP
+013WdwEW2RBpOro8sA+K0pCES+JnoANR+ypGzHSBWaY1uYS2t9d2OPEmKHwPIIhG
+6g3Ty1kNg/aehAzMgEdneByWhc1JlzwgTwHCSYe3F0/Mzlo/hYXN+omTvcAd7vZ4
+v8OUx20PuXqor325Afz6ADRKw9kxOoNW9l1+n0oZEemTLvggn6DYtgkJfKhHXVFf
+fHkgbAMZwUiD26rT2329UWRgPMfwlU+8mbLwONFLur+3MBFeVg0pgaa0Gkv2IevP
+FBfBSAjb3nTVLCtFhiJpaiy7Z4h41Q==
+=IyGO
+-----END PGP SIGNATURE-----
+
+--u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO--
 
