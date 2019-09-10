@@ -2,67 +2,58 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD68C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3984C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:11:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F5F6206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:10:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F5F6206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 89680206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:11:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89680206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7aIa-00027i-BP
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:10:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45586)
+	id 1i7aIt-0002YZ-Nb
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:11:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45674)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i7aHa-0001MC-Qm
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:09:48 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i7aHs-0001W5-7o
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:10:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i7aHZ-000469-06
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:09:46 -0400
-Resent-Date: Tue, 10 Sep 2019 03:09:46 -0400
-Resent-Message-Id: <E1i7aHZ-000469-06@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21922)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i7aHY-00045J-OD
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:09:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568099377; cv=none; d=zoho.com; s=zohoarc; 
- b=oWjKn2n0x+YaYRvj4NMcN/JNcusKe961L7nb5iIJwHrnJ/9qQNFqJf5LAlS4DqFgNRdoZi6A8+kwl97P4Jcra8hyMNZL2pUFwwC9jgUdFWTLRQSKooGgrztdB41e+aK3elvR5urZWgLpF03NQ2mPjmd/IsSlKvVItw7aZA288bI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568099377;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=cLUWrdm/gy7+nSXN2+JsjudXX4pGkGihrdZeFEgEqC4=; 
- b=LnM2x9gQPwVV1p/zmhpFnR4urMszKmIZYfdsPfXw6rJIQlCYrGUIhdh60XquKrw+4MoY6dBwThJO7MRpCbBiA1cuCAaxyW498SiyW2J9QARJZ44mjkZOGo2WnVhZk3E53gdWdtt3YNOgFixitrLxTYpP1/Li0Yo8RcENaeh0rnI=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568099374703670.6628019913609;
- Tue, 10 Sep 2019 00:09:34 -0700 (PDT)
-In-Reply-To: <20190910063724.28470-1-armbru@redhat.com>
-Message-ID: <156809937359.9541.13793682404143614255@5dec9699b7de>
+ (envelope-from <kwolf@redhat.com>) id 1i7aHq-0004Sd-Au
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:10:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52677)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i7aHm-0004Po-Fp; Tue, 10 Sep 2019 03:09:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 722CBA37671;
+ Tue, 10 Sep 2019 07:09:57 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-116-217.ams2.redhat.com
+ [10.36.116.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1818910018F9;
+ Tue, 10 Sep 2019 07:09:55 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue, 10 Sep 2019 09:09:49 +0200
+Message-Id: <20190910070949.16256-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Tue, 10 Sep 2019 00:09:34 -0700 (PDT)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Tue, 10 Sep 2019 07:09:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] qapi: Schema language cleanups &
- doc improvements
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] qemu-io: Don't leak pattern file in error path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,98 +65,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: kwolf@redhat.com, dplotnikov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMDA2MzcyNC4yODQ3
-MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzE2XSBxYXBpOiBT
-Y2hlbWEgbGFuZ3VhZ2UgY2xlYW51cHMgJiBkb2MgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIw
-MTkwOTEwMDYzNzI0LjI4NDcwLTEtYXJtYnJ1QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
-LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwOTEwMDYzNzI0
-LjI4NDcwLTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDkxMDA2MzcyNC4yODQ3
-MC0xLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDQ2
-MzUxYyBxYXBpOiBUd2VhayBjb2RlIHRvIG1hdGNoIGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbi50
-eHQKMTZiZGJhOCBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IEltcHJvdmUgUUFQSSBzY2hlbWEg
-bGFuZ3VhZ2UgZG9jCmNiODFmMWQgZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBSZXdyaXRlIGlu
-dHJvZHVjdGlvbiB0byBzY2hlbWEKMTUzNjQwMSBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJl
-d3JpdGUgY29tcGF0aWJpbGl0eSBjb25zaWRlcmF0aW9ucwo0ZDgyNjQ4IGRvY3MvZGV2ZWwvcWFw
-aS1jb2RlLWdlbjogUmVvcmRlciBzZWN0aW9ucyBmb3IgcmVhZGFiaWxpdHkKOWFjN2VjZCBxYXBp
-OiBBZGp1c3QgZnJvbnRlbmQgZXJyb3JzIHRvIHNheSBlbnVtIHZhbHVlLCBub3QgbWVtYmVyCmUx
-MDZiODYgcWFwaTogUGVybWl0IG9taXR0aW5nIGFsbCBmbGF0IHVuaW9uIGJyYW5jaGVzCjgxZGM2
-YzUgcWFwaTogUGVybWl0IGFsdGVybmF0ZXMgd2l0aCBqdXN0IG9uZSBicmFuY2gKYmY5MDVlZCBx
-YXBpOiBQZXJtaXQgJ2JveGVkJyB3aXRoIGVtcHR5IHR5cGUKMzEyYTMyMyBxYXBpOiBEcm9wIHN1
-cHBvcnQgZm9yIGVzY2FwZSBzZXF1ZW5jZXMgb3RoZXIgdGhhbiBcXAoyYTc3YzJmIHFhcGk6IFJl
-c3RyaWN0IHN0cmluZ3MgdG8gcHJpbnRhYmxlIEFTQ0lJCmY2YWFlYWEgdGVzdHMvcWFwaS1zY2hl
-bWE6IERlbW9uc3RyYXRlIGJhZCByZXBvcnRpbmcgb2YgZnVubnkgY2hhcmFjdGVycwpiZDRlOWNj
-IGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogTWlub3Igc3BlY2lmaWNhdGlvbiBmaXhlcwo4OGNm
-ZjExIHFhcGk6IERyb3Agc3VwcG9ydCBmb3IgYm94ZWQgYWx0ZXJuYXRlIGFyZ3VtZW50cwpiOWUw
-OGVlIHFhcGk6IERyb3AgY2hlY2tfdHlwZSgpJ3MgcmVkdW5kYW50IHBhcmFtZXRlciBAYWxsb3df
-b3B0aW9uYWwKNjg2MDE4NiBzY3JpcHRzL2dpdC5vcmRlcmZpbGU6IE1hdGNoIFFBUEkgc2NoZW1h
-IG1vcmUgcHJlY2lzZWx5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE2IENoZWNraW5nIGNvbW1p
-dCA2ODYwMTg2YjIwN2IgKHNjcmlwdHMvZ2l0Lm9yZGVyZmlsZTogTWF0Y2ggUUFQSSBzY2hlbWEg
-bW9yZSBwcmVjaXNlbHkpCjIvMTYgQ2hlY2tpbmcgY29tbWl0IGI5ZTA4ZWVlMDNlMyAocWFwaTog
-RHJvcCBjaGVja190eXBlKCkncyByZWR1bmRhbnQgcGFyYW1ldGVyIEBhbGxvd19vcHRpb25hbCkK
-My8xNiBDaGVja2luZyBjb21taXQgODhjZmYxMWQ4NWQ4IChxYXBpOiBEcm9wIHN1cHBvcnQgZm9y
-IGJveGVkIGFsdGVybmF0ZSBhcmd1bWVudHMpCjQvMTYgQ2hlY2tpbmcgY29tbWl0IGJkNGU5Y2Mx
-ZjQzMyAoZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBNaW5vciBzcGVjaWZpY2F0aW9uIGZpeGVz
-KQo1LzE2IENoZWNraW5nIGNvbW1pdCBmNmFhZWFhNzRjNjMgKHRlc3RzL3FhcGktc2NoZW1hOiBE
-ZW1vbnN0cmF0ZSBiYWQgcmVwb3J0aW5nIG9mIGZ1bm55IGNoYXJhY3RlcnMpCjYvMTYgQ2hlY2tp
-bmcgY29tbWl0IDJhNzdjMmYyZTBlYyAocWFwaTogUmVzdHJpY3Qgc3RyaW5ncyB0byBwcmludGFi
-bGUgQVNDSUkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzk4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVS
-Uk9SOiBJbnZhbGlkIFVURi04LCBwYXRjaCBhbmQgY29tbWl0IG1lc3NhZ2Ugc2hvdWxkIGJlIGVu
-Y29kZWQgaW4gVVRGLTgKIzExNTogRklMRTogdGVzdHMvcWFwaS1zY2hlbWEvc3RyaW5nLWNvZGUt
-cG9pbnQtMTI3Lmpzb246MjoKK3sgJ2NvbW1hbmQnOiAn4oymJyB9CiAgICAgICAgICAgICAgIF4K
-CkVSUk9SOiBJbnZhbGlkIFVURi04LCBwYXRjaCBhbmQgY29tbWl0IG1lc3NhZ2Ugc2hvdWxkIGJl
-IGVuY29kZWQgaW4gVVRGLTgKIzE0MTogRklMRTogdGVzdHMvcWFwaS1zY2hlbWEvc3RyaW5nLWNv
-ZGUtcG9pbnQtMzEuanNvbjoyOgoreyAnY29tbWFuZCc6ICfikJ8nIH0KICAgICAgICAgICAgICAg
-XgoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NyBsaW5lcyBjaGVja2VkCgpQYXRjaCA2
-LzE2IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzE2IENoZWNraW5nIGNvbW1pdCAzMTJh
-MzIzNDUxYmMgKHFhcGk6IERyb3Agc3VwcG9ydCBmb3IgZXNjYXBlIHNlcXVlbmNlcyBvdGhlciB0
-aGFuIFxcKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM2OTogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0OSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzE2
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMTYgQ2hlY2tpbmcgY29tbWl0IGJmOTA1ZWRh
-MDljOSAocWFwaTogUGVybWl0ICdib3hlZCcgd2l0aCBlbXB0eSB0eXBlKQpXQVJOSU5HOiBhZGRl
-ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
-bmc/CiMxMjk6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgMTI5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTYgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KOS8xNiBDaGVja2luZyBjb21taXQgODFkYzZjNTE2MTgwIChxYXBpOiBQZXJtaXQg
-YWx0ZXJuYXRlcyB3aXRoIGp1c3Qgb25lIGJyYW5jaCkKMTAvMTYgQ2hlY2tpbmcgY29tbWl0IGUx
-MDZiODYzODE2NCAocWFwaTogUGVybWl0IG9taXR0aW5nIGFsbCBmbGF0IHVuaW9uIGJyYW5jaGVz
-KQoxMS8xNiBDaGVja2luZyBjb21taXQgOWFjN2VjZDJjYzI0IChxYXBpOiBBZGp1c3QgZnJvbnRl
-bmQgZXJyb3JzIHRvIHNheSBlbnVtIHZhbHVlLCBub3QgbWVtYmVyKQoxMi8xNiBDaGVja2luZyBj
-b21taXQgNGQ4MjY0ODkyZTAwIChkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJlb3JkZXIgc2Vj
-dGlvbnMgZm9yIHJlYWRhYmlsaXR5KQoxMy8xNiBDaGVja2luZyBjb21taXQgMTUzNjQwMWY0NmE0
-IChkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJld3JpdGUgY29tcGF0aWJpbGl0eSBjb25zaWRl
-cmF0aW9ucykKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IGNiODFmMWRlZjdmMiAoZG9jcy9kZXZlbC9x
-YXBpLWNvZGUtZ2VuOiBSZXdyaXRlIGludHJvZHVjdGlvbiB0byBzY2hlbWEpCjE1LzE2IENoZWNr
-aW5nIGNvbW1pdCAxNmJkYmE4YjgyNzQgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogSW1wcm92
-ZSBRQVBJIHNjaGVtYSBsYW5ndWFnZSBkb2MpCjE2LzE2IENoZWNraW5nIGNvbW1pdCA0NDYzNTFj
-YTI5YWQgKHFhcGk6IFR3ZWFrIGNvZGUgdG8gbWF0Y2ggZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2Vu
-LnR4dCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAxOTA5MTAwNjM3MjQuMjg0NzAtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0
-Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+qemu_io_alloc_from_file() needs to close the pattern file even if some
+error occurred.
+
+Setting f =3D NULL in the success path and checking it for NULL in the
+error path isn't strictly necessary at this point, but let's do it
+anyway in case someone later adds a 'goto error' after closing the file.
+
+Coverity: CID 1405303
+Fixes: 4d731510d34f280ed45a6de621d016f67a49ea48
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qemu-io-cmds.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index d46fa166d3..349256a5fe 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -401,6 +401,7 @@ static void *qemu_io_alloc_from_file(BlockBackend *bl=
+k, size_t len,
+     }
+=20
+     fclose(f);
++    f =3D NULL;
+=20
+     if (len > pattern_len) {
+         len -=3D pattern_len;
+@@ -420,6 +421,9 @@ static void *qemu_io_alloc_from_file(BlockBackend *bl=
+k, size_t len,
+=20
+ error:
+     qemu_io_free(buf_origin);
++    if (f) {
++        fclose(f);
++    }
+     return NULL;
+ }
+=20
+--=20
+2.20.1
 
 
