@@ -2,90 +2,71 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B73C1C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D4DC49ED9
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:39:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D8A22084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:36:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ok9sG2dr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D8A22084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4AAC92084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:39:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AAC92084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7lwR-0002vz-1u
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:36:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58950)
+	id 1i7lzY-000790-SY
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59118)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7lu6-0000yq-5f
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:21 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7luK-0001FV-Qn
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7lu2-0006mV-NT
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:17 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40544)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7lu2-0006l8-Fg
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:14 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w13so21872081wru.7
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 12:34:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=3O9EXRDiG8lwCqPTGZE4nRj1SK0nw1gH8b5voet+7G4=;
- b=ok9sG2drhxGaTcRjHImZarNSTWYdKF6qlsF+2On5RfTVYyIHeDVPWG85Te9b1gxgLU
- SS2X+GjnELhF8uKHt3Mwn+NfaNb9WItgH3zpEfHo+mXkWp52xO33Cu5KKf3c1ly8f2oV
- DWLWdVMX7y3bnsyLUeftLXcFPYFbO5Kduz3//0W/5lexSUziXnSWnHlUoREZeUBvX28u
- LtYQ/BUWgIvPJMJ35nJ7ID4wAuSxygPVnx/0CSXyAfXllU9S0Iq8AkCfyr8d9Q0QukfW
- R/utiGzh6W7uqBU6QkOHEzqd4QZeWF8xQoWhI5lZjn8vfKpd/NxJY74VEXqUGydXIb4V
- 7QbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=3O9EXRDiG8lwCqPTGZE4nRj1SK0nw1gH8b5voet+7G4=;
- b=UdvRkJ63jn+e/L2SPaXgxzXCFdWxXTlLb+1/1YimUjJQguTUT2whqVk2vRTlSdCX6M
- ra+xMCxOjIk2IF2yKgaVUXgL7OeWo2TVu2IG5F0OhZiPOQ/bnh8Ah/+BxDPpRmt9tksh
- FktvfFRmrUMW4VpHQz8gRIEY5k3OXAtxCHVQ13D0At/+AvscMyQs1b/Xw1aYiAaW6dL4
- 26KblyUEdaBZnqqdFdmQfjjvrWKkLgCVQ5ohKPaKgOnelK1gEs6Ww9+MtXknnQ1lIiHN
- 0DBtSkkIXzNs4dU3lN0vDOz0RBOUOf+9wzpxZ6e1OCLQNvhTcO/UMoImPSOSmNPsFZ91
- eb+g==
-X-Gm-Message-State: APjAAAUIaePi2dDQeM1kL1jP+ntxRSPFoNIuPW9rl1RS5UBINOJ/GVbJ
- L6m6SwyFFWf26ApQD5Xc2RvABA==
-X-Google-Smtp-Source: APXvYqymAt3lB0DcJAMvyPp9kWz/TrliaKxsGUMQsn/8SgqYWnNGDs1F7Kos5USgN1ll6UNhDqKA4g==
-X-Received: by 2002:a05:6000:49:: with SMTP id k9mr7739815wrx.21.1568144053125; 
- Tue, 10 Sep 2019 12:34:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b194sm925871wmg.46.2019.09.10.12.34.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 12:34:11 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6B4941FF91;
- Tue, 10 Sep 2019 20:34:09 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Tue, 10 Sep 2019 20:34:08 +0100
-Message-Id: <20190910193408.28917-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190910193408.28917-1-alex.bennee@linaro.org>
-References: <20190910193408.28917-1-alex.bennee@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1i7luJ-0006v7-4u
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:32 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:59847)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1i7luI-0006uS-R2; Tue, 10 Sep 2019 15:34:31 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1M1INQ-1i9PWb3occ-002kaC; Tue, 10 Sep 2019 21:34:04 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Date: Tue, 10 Sep 2019 21:33:45 +0200
+Message-Id: <20190910193347.16000-8-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190910193347.16000-1-laurent@vivier.eu>
+References: <20190910193347.16000-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v1 4/4] elf: move ELF_ARCH definition to
- elf-arch.h
+X-Provags-ID: V03:K1:ywfP9Je1QGv2YW2SL3SYzkciLTYOti0qiJaFdqAowo5K4o2K8He
+ UXrouTDOZ1c9F9LPGAbicg31xG0N+IBfhJwXcq6PYR0/iQI4JCnT9/CJF/vZWB8+m3liuqt
+ e47abw250acl1zY5/0ZDY+wEzoqVfQRHVTCCbGGVGG6hwBDquzQIOK9gx67WU2BZgxpjEaj
+ pnafZOzIznbXIaqiX9eqQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:L20w+FYEqV8=:8UWIk8j3GBLqGAzK4vkUjh
+ 3+kNsyI9GScaPto0VCEH4cCbvPpHFpSfLUWqaKL/k7wGb5yG7DMymgmie09UmrQzya7pmnuJK
+ eHLH1hRr7EIJ/oX+SyfUngS01ZSc8SPLBHULpuGrpTfzLJTR371y0YeXFixLPGsdrSzzvYIvl
+ M2iEDRUAdWfJlrxqjfBotkU4mik8ALOPR9E22jyEVXFonJlVAAYOahrE9cbZt9pJAjhl8JQT5
+ FbxeLuPTP5Zo9hyo+ALb4rO0kqfOT29Rxv+FUP8H/nE43zgQXvrIRPum6xsnER2bKyq6FpiO0
+ sfy1Yl0rrAyh4+NMTnGb3HfDKeGUzUw4MMvdrxPbVlXSTppHdedwgcngQvDgR6FgLCe9mVyuK
+ wvqhGcuz+azzo5ToSegk3YtPqrRWzTsjwtvDhIlaMNZyqhgo5D1numnlJNq9yayzDJ9XmZCHi
+ INba4acrmaiwz2+FBkmytG5Fes1sFNH1vqyyAzClF6NbN9ipkWjkE8Bzycdus16i00YgCsivV
+ JeyvfM5pgqb8LiYCJvBhsdy7uizK3ADu4bAKB0Qi40eSp+/srjvlbSFYVtJxvxt1afXF5HLmR
+ YXcY7iMnu7/bH7j/F/WXKfZ7f+7mIn6SCCr6vmaVPuhtITV1mAoRhgc5gWoP9/JZE6onkecvF
+ 3VUe0bYiS1E1Mejl9GiVONs7pxc3uStc8AH+uytZCOMuIna76XXDBr3QZrY8NP2b34NEs1x9V
+ C/YZP0+3nvLQZBfMnx2hvCcD92neMGRMupqvkWzb8YHN6kk9L2izxTEuQC/RhReiQz1xgObya
+ TQQOX6zLAFKInXL0+YHMHHZ+oTr+CPR4UdbZCl5/vv5d39vtXs=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
+Subject: [Qemu-devel] [PATCH v11 7/9] hw/m68k: add Nubus support for macfb
+ video card
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,438 +78,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is preparatory for plugins which will want to report the
-architecture to plugins. Move the ELF_ARCH definition out of the
-loader and into its own header.
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- bsd-user/elfload.c     |  13 +----
- include/elf/elf-arch.h | 109 +++++++++++++++++++++++++++++++++++++++++
- linux-user/elfload.c   |  27 ++--------
- 3 files changed, 115 insertions(+), 34 deletions(-)
- create mode 100644 include/elf/elf-arch.h
+ hw/display/Kconfig         |  1 +
+ hw/display/macfb.c         | 56 ++++++++++++++++++++++++++++++++++++++
+ include/hw/display/macfb.h | 21 ++++++++++++++
+ 3 files changed, 78 insertions(+)
 
-diff --git a/bsd-user/elfload.c b/bsd-user/elfload.c
-index 321ee98b86b..adaae0e0dca 100644
---- a/bsd-user/elfload.c
-+++ b/bsd-user/elfload.c
-@@ -5,6 +5,7 @@
- #include "qemu.h"
- #include "disas/disas.h"
- #include "qemu/path.h"
-+#include "elf/elf-arch.h"
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 32e8d29003..c500d1fc6d 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -136,3 +136,4 @@ config ATI_VGA
+ config MACFB
+     bool
+     select FRAMEBUFFER
++    depends on NUBUS
+diff --git a/hw/display/macfb.c b/hw/display/macfb.c
+index d7c5ef296e..f4fa8e3206 100644
+--- a/hw/display/macfb.c
++++ b/hw/display/macfb.c
+@@ -15,6 +15,7 @@
+ #include "hw/sysbus.h"
+ #include "ui/console.h"
+ #include "ui/pixel_ops.h"
++#include "hw/nubus/nubus.h"
+ #include "hw/display/macfb.h"
+ #include "qapi/error.h"
+ #include "hw/qdev-properties.h"
+@@ -382,12 +383,38 @@ static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
+ }
  
- #ifdef _ARCH_PPC64
- #undef ARCH_DLINFO
-@@ -12,7 +13,6 @@
- #undef ELF_HWCAP
- #undef ELF_CLASS
- #undef ELF_DATA
--#undef ELF_ARCH
++const uint8_t macfb_rom[] = {
++    255, 0, 0, 0,
++};
++
++static void macfb_nubus_realize(DeviceState *dev, Error **errp)
++{
++    NubusDevice *nd = NUBUS_DEVICE(dev);
++    MacfbNubusState *s = NUBUS_MACFB(dev);
++    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_GET_CLASS(dev);
++    MacfbState *ms = &s->macfb;
++
++    ndc->parent_realize(dev, errp);
++
++    macfb_common_realize(dev, ms, errp);
++    memory_region_add_subregion(&nd->slot_mem, DAFB_BASE, &ms->mem_ctrl);
++    memory_region_add_subregion(&nd->slot_mem, VIDEO_BASE, &ms->mem_vram);
++
++    nubus_register_rom(nd, macfb_rom, sizeof(macfb_rom), 1, 9, 0xf);
++}
++
+ static void macfb_sysbus_reset(DeviceState *d)
+ {
+     MacfbSysBusState *s = MACFB(d);
+     macfb_reset(&s->macfb);
+ }
+ 
++static void macfb_nubus_reset(DeviceState *d)
++{
++    MacfbNubusState *s = NUBUS_MACFB(d);
++    macfb_reset(&s->macfb);
++}
++
+ static Property macfb_sysbus_properties[] = {
+     DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
+     DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
+@@ -395,6 +422,13 @@ static Property macfb_sysbus_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static Property macfb_nubus_properties[] = {
++    DEFINE_PROP_UINT32("width", MacfbNubusState, macfb.width, 640),
++    DEFINE_PROP_UINT32("height", MacfbNubusState, macfb.height, 480),
++    DEFINE_PROP_UINT8("depth", MacfbNubusState, macfb.depth, 8),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -406,6 +440,19 @@ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
+     dc->props = macfb_sysbus_properties;
+ }
+ 
++static void macfb_nubus_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_DEVICE_CLASS(klass);
++
++    device_class_set_parent_realize(dc, macfb_nubus_realize,
++                                    &ndc->parent_realize);
++    dc->desc = "Nubus Macintosh framebuffer";
++    dc->reset = macfb_nubus_reset;
++    dc->vmsd = &vmstate_macfb;
++    dc->props = macfb_nubus_properties;
++}
++
+ static TypeInfo macfb_sysbus_info = {
+     .name          = TYPE_MACFB,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+@@ -413,9 +460,18 @@ static TypeInfo macfb_sysbus_info = {
+     .class_init    = macfb_sysbus_class_init,
+ };
+ 
++static TypeInfo macfb_nubus_info = {
++    .name          = TYPE_NUBUS_MACFB,
++    .parent        = TYPE_NUBUS_DEVICE,
++    .instance_size = sizeof(MacfbNubusState),
++    .class_init    = macfb_nubus_class_init,
++    .class_size    = sizeof(MacfbNubusDeviceClass),
++};
++
+ static void macfb_register_types(void)
+ {
+     type_register_static(&macfb_sysbus_info);
++    type_register_static(&macfb_nubus_info);
+ }
+ 
+ type_init(macfb_register_types)
+diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
+index 3fe2592735..26367ae2c4 100644
+--- a/include/hw/display/macfb.h
++++ b/include/hw/display/macfb.h
+@@ -40,4 +40,25 @@ typedef struct {
+     MacfbState macfb;
+ } MacfbSysBusState;
+ 
++#define MACFB_NUBUS_DEVICE_CLASS(class) \
++    OBJECT_CLASS_CHECK(MacfbNubusDeviceClass, (class), TYPE_NUBUS_MACFB)
++#define MACFB_NUBUS_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(MacfbNubusDeviceClass, (obj), TYPE_NUBUS_MACFB)
++
++typedef struct MacfbNubusDeviceClass {
++    DeviceClass parent_class;
++
++    DeviceRealize parent_realize;
++} MacfbNubusDeviceClass;
++
++#define TYPE_NUBUS_MACFB "nubus-macfb"
++#define NUBUS_MACFB(obj) \
++    OBJECT_CHECK(MacfbNubusState, (obj), TYPE_NUBUS_MACFB)
++
++typedef struct {
++    NubusDevice busdev;
++
++    MacfbState macfb;
++} MacfbNubusState;
++
  #endif
- 
- /* from personality.h */
-@@ -115,7 +115,6 @@ static uint32_t get_elf_hwcap(void)
- 
- #define ELF_CLASS      ELFCLASS64
- #define ELF_DATA       ELFDATA2LSB
--#define ELF_ARCH       EM_X86_64
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -141,7 +140,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
-  */
- #define ELF_CLASS       ELFCLASS32
- #define ELF_DATA        ELFDATA2LSB
--#define ELF_ARCH        EM_386
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -176,7 +174,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- #else
- #define ELF_DATA        ELFDATA2LSB
- #endif
--#define ELF_ARCH        EM_ARM
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -231,7 +228,6 @@ enum
- 
- #define ELF_CLASS   ELFCLASS64
- #define ELF_DATA    ELFDATA2MSB
--#define ELF_ARCH    EM_SPARCV9
- 
- #define STACK_BIAS              2047
- 
-@@ -265,7 +261,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- 
- #define ELF_CLASS   ELFCLASS32
- #define ELF_DATA    ELFDATA2MSB
--#define ELF_ARCH    EM_SPARC
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -302,7 +297,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- #else
- #define ELF_DATA        ELFDATA2LSB
- #endif
--#define ELF_ARCH        EM_PPC
- 
- /*
-  * We need to put in some extra aux table entries to tell glibc what
-@@ -388,7 +382,6 @@ static inline void init_thread(struct target_pt_regs *_regs, struct image_info *
- #else
- #define ELF_DATA        ELFDATA2LSB
- #endif
--#define ELF_ARCH    EM_MIPS
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -410,7 +403,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- 
- #define ELF_CLASS ELFCLASS32
- #define ELF_DATA  ELFDATA2LSB
--#define ELF_ARCH  EM_SH
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -432,7 +424,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- 
- #define ELF_CLASS ELFCLASS32
- #define ELF_DATA  ELFDATA2LSB
--#define ELF_ARCH  EM_CRIS
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -452,7 +443,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- 
- #define ELF_CLASS       ELFCLASS32
- #define ELF_DATA        ELFDATA2MSB
--#define ELF_ARCH        EM_68K
- 
- /* ??? Does this need to do anything?
- #define ELF_PLAT_INIT(_r) */
-@@ -477,7 +467,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- 
- #define ELF_CLASS      ELFCLASS64
- #define ELF_DATA       ELFDATA2MSB
--#define ELF_ARCH       EM_ALPHA
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-diff --git a/include/elf/elf-arch.h b/include/elf/elf-arch.h
-new file mode 100644
-index 00000000000..9e052543c51
---- /dev/null
-+++ b/include/elf/elf-arch.h
-@@ -0,0 +1,109 @@
-+/*
-+ * Elf Architecture Definition
-+ *
-+ * This is a simple expansion to define common Elf types for the
-+ * various machines for the various places it's needed in the source
-+ * tree.
-+ *
-+ * Copyright (c) 2019 Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef _ELF_ARCH_H_
-+#define _ELF_ARCH_H_
-+
-+#include "elf/elf.h"
-+
-+#ifndef NEED_CPU_H
-+#error Needs an target definition
-+#endif
-+
-+#ifdef ELF_ARCH
-+#error ELF_ARCH should only be defined once in this file
-+#endif
-+
-+#ifdef TARGET_I386
-+#ifdef TARGET_X86_64
-+#define ELF_ARCH EM_X86_64
-+#else
-+#define ELF_ARCH EM_386
-+#endif
-+#endif
-+
-+#ifdef TARGET_ARM
-+#ifndef TARGET_AARCH64
-+#define ELF_ARCH EM_ARM
-+#else
-+#define ELF_ARCH EM_AARCH64
-+#endif
-+#endif
-+
-+#ifdef TARGET_SPARC
-+#ifdef TARGET_SPARC64
-+#define ELF_ARCH EM_SPARCV9
-+#else
-+#define ELF_ARCH EM_SPARC
-+#endif
-+#endif
-+
-+#ifdef TARGET_PPC
-+#define ELF_ARCH EM_PPC
-+#endif
-+
-+#ifdef TARGET_MIPS
-+#define ELF_ARCH EM_MIPS
-+#endif
-+
-+#ifdef TARGET_MICROBLAZE
-+#define ELF_ARCH EM_MICROBLAZE
-+#endif
-+
-+#ifdef TARGET_NIOS2
-+#define ELF_ARCH EM_ALTERA_NIOS2
-+#endif
-+
-+#ifdef TARGET_OPENRISC
-+#define ELF_ARCH EM_OPENRISC
-+#endif
-+
-+#ifdef TARGET_SH4
-+#define ELF_ARCH EM_SH
-+#endif
-+
-+#ifdef TARGET_CRIS
-+#define ELF_ARCH EM_CRIS
-+#endif
-+
-+#ifdef TARGET_M68K
-+#define ELF_ARCH EM_68K
-+#endif
-+
-+#ifdef TARGET_ALPHA
-+#define ELF_ARCH EM_ALPHA
-+#endif
-+
-+#ifdef TARGET_S390X
-+#define ELF_ARCH EM_S390
-+#endif
-+
-+#ifdef TARGET_TILEGX
-+#define ELF_ARCH EM_TILEGX
-+#endif
-+
-+#ifdef TARGET_RISCV
-+#define ELF_ARCH EM_RISCV
-+#endif
-+
-+#ifdef TARGET_HPPA
-+#define ELF_ARCH EM_PARISC
-+#endif
-+
-+#ifdef TARGET_XTENSA
-+#define ELF_ARCH EM_XTENSA
-+#endif
-+
-+#endif /* _ELF_ARCH_H_ */
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 59a0d21c6f1..3ac7016a7e3 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -8,10 +8,15 @@
- #include "qemu.h"
- #include "disas/disas.h"
- #include "elf/elf.h"
-+#include "elf/elf-arch.h"
- #include "qemu/path.h"
- #include "qemu/queue.h"
- #include "qemu/guest-random.h"
- 
-+#ifndef ELF_ARCH
-+#error something got missed
-+#endif
-+
- #ifdef _ARCH_PPC64
- #undef ARCH_DLINFO
- #undef ELF_PLATFORM
-@@ -19,7 +24,6 @@
- #undef ELF_HWCAP2
- #undef ELF_CLASS
- #undef ELF_DATA
--#undef ELF_ARCH
- #endif
- 
- #define ELF_OSABI   ELFOSABI_SYSV
-@@ -148,7 +152,6 @@ static uint32_t get_elf_hwcap(void)
- #define ELF_START_MMAP 0x2aaaaab000ULL
- 
- #define ELF_CLASS      ELFCLASS64
--#define ELF_ARCH       EM_X86_64
- 
- static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -211,7 +214,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUX86State *en
-  * These are used to set parameters in the core dumps.
-  */
- #define ELF_CLASS       ELFCLASS32
--#define ELF_ARCH        EM_386
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-@@ -273,7 +275,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUX86State *en
- 
- #define ELF_START_MMAP 0x80000000
- 
--#define ELF_ARCH        EM_ARM
- #define ELF_CLASS       ELFCLASS32
- 
- static inline void init_thread(struct target_pt_regs *regs,
-@@ -539,7 +540,6 @@ static const char *get_elf_platform(void)
- /* 64 bit ARM definitions */
- #define ELF_START_MMAP 0x80000000
- 
--#define ELF_ARCH        EM_AARCH64
- #define ELF_CLASS       ELFCLASS64
- #ifdef TARGET_WORDS_BIGENDIAN
- # define ELF_PLATFORM    "aarch64_be"
-@@ -667,7 +667,6 @@ static uint32_t get_elf_hwcap(void)
- #endif
- 
- #define ELF_CLASS   ELFCLASS64
--#define ELF_ARCH    EM_SPARCV9
- 
- #define STACK_BIAS              2047
- 
-@@ -696,7 +695,6 @@ static inline void init_thread(struct target_pt_regs *regs,
-                     | HWCAP_SPARC_MULDIV)
- 
- #define ELF_CLASS   ELFCLASS32
--#define ELF_ARCH    EM_SPARC
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-@@ -728,8 +726,6 @@ static inline void init_thread(struct target_pt_regs *regs,
- 
- #endif
- 
--#define ELF_ARCH        EM_PPC
--
- /* Feature masks for the Aux Vector Hardware Capabilities (AT_HWCAP).
-    See arch/powerpc/include/asm/cputable.h.  */
- enum {
-@@ -921,7 +917,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
- #else
- #define ELF_CLASS   ELFCLASS32
- #endif
--#define ELF_ARCH    EM_MIPS
- 
- #define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
- 
-@@ -1014,7 +1009,6 @@ static uint32_t get_elf_hwcap(void)
- #define elf_check_arch(x) ( (x) == EM_MICROBLAZE || (x) == EM_MICROBLAZE_OLD)
- 
- #define ELF_CLASS   ELFCLASS32
--#define ELF_ARCH    EM_MICROBLAZE
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-@@ -1053,7 +1047,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMBState *env
- #define elf_check_arch(x) ((x) == EM_ALTERA_NIOS2)
- 
- #define ELF_CLASS   ELFCLASS32
--#define ELF_ARCH    EM_ALTERA_NIOS2
- 
- static void init_thread(struct target_pt_regs *regs, struct image_info *infop)
- {
-@@ -1107,7 +1100,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
- 
- #define ELF_START_MMAP 0x08000000
- 
--#define ELF_ARCH EM_OPENRISC
- #define ELF_CLASS ELFCLASS32
- #define ELF_DATA  ELFDATA2MSB
- 
-@@ -1146,7 +1138,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
- #define ELF_START_MMAP 0x80000000
- 
- #define ELF_CLASS ELFCLASS32
--#define ELF_ARCH  EM_SH
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-@@ -1228,7 +1219,6 @@ static uint32_t get_elf_hwcap(void)
- #define ELF_START_MMAP 0x80000000
- 
- #define ELF_CLASS ELFCLASS32
--#define ELF_ARCH  EM_CRIS
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-@@ -1245,7 +1235,6 @@ static inline void init_thread(struct target_pt_regs *regs,
- #define ELF_START_MMAP 0x80000000
- 
- #define ELF_CLASS       ELFCLASS32
--#define ELF_ARCH        EM_68K
- 
- /* ??? Does this need to do anything?
-    #define ELF_PLAT_INIT(_r) */
-@@ -1296,7 +1285,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUM68KState *e
- #define ELF_START_MMAP (0x30000000000ULL)
- 
- #define ELF_CLASS      ELFCLASS64
--#define ELF_ARCH       EM_ALPHA
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-@@ -1316,7 +1304,6 @@ static inline void init_thread(struct target_pt_regs *regs,
- 
- #define ELF_CLASS	ELFCLASS64
- #define ELF_DATA	ELFDATA2MSB
--#define ELF_ARCH	EM_S390
- 
- #define ELF_HWCAP get_elf_hwcap()
- 
-@@ -1362,7 +1349,6 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
- 
- #define ELF_CLASS   ELFCLASS64
- #define ELF_DATA    ELFDATA2LSB
--#define ELF_ARCH    EM_TILEGX
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-@@ -1379,7 +1365,6 @@ static inline void init_thread(struct target_pt_regs *regs,
- #ifdef TARGET_RISCV
- 
- #define ELF_START_MMAP 0x80000000
--#define ELF_ARCH  EM_RISCV
- 
- #ifdef TARGET_RISCV32
- #define ELF_CLASS ELFCLASS32
-@@ -1402,7 +1387,6 @@ static inline void init_thread(struct target_pt_regs *regs,
- 
- #define ELF_START_MMAP  0x80000000
- #define ELF_CLASS       ELFCLASS32
--#define ELF_ARCH        EM_PARISC
- #define ELF_PLATFORM    "PARISC"
- #define STACK_GROWS_DOWN 0
- #define STACK_ALIGNMENT  64
-@@ -1427,7 +1411,6 @@ static inline void init_thread(struct target_pt_regs *regs,
- #define ELF_START_MMAP 0x20000000
- 
- #define ELF_CLASS       ELFCLASS32
--#define ELF_ARCH        EM_XTENSA
- 
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
 -- 
-2.20.1
+2.21.0
 
 
