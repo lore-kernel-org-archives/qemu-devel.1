@@ -2,73 +2,80 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5535DC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 940B1C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:05:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F9792089F
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:02:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F9792089F
+	by mail.kernel.org (Postfix) with ESMTPS id 6B3AA2089F
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:05:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B3AA2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7aAA-0006Xj-L8
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:02:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43244)
+	id 1i7aDG-0007x7-H4
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:05:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1i7a8l-00061B-UZ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:00:41 -0400
+ (envelope-from <mst@redhat.com>) id 1i7aCT-0007Lf-R0
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1i7a8b-00008J-7x
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:00:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40680)
+ (envelope-from <mst@redhat.com>) id 1i7aCR-0001t6-Vc
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:04:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53530)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i7a8b-00007p-0x
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:00:29 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i7aCR-0001sW-MR
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:04:27 -0400
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 31AA418C427D;
- Tue, 10 Sep 2019 07:00:28 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
- [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E55456092F;
- Tue, 10 Sep 2019 07:00:27 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 2AB6246B2; Tue, 10 Sep 2019 09:00:26 +0200 (CEST)
-Date: Tue, 10 Sep 2019 09:00:26 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
-Message-ID: <20190910070026.v2abijefl3pi5ic7@sirius.home.kraxel.org>
-References: <cover.1566847960.git.DirtY.iCE.hu@gmail.com>
- <43076a2afeb0439b607b0631e0bfff77d55bc0cc.1566847960.git.DirtY.iCE.hu@gmail.com>
- <20190827054223.nuiz7fz27tld3hpt@sirius.home.kraxel.org>
- <2fdc616c-0690-a898-0247-765f90153903@gmail.com>
- <20190828095308.GE2991@redhat.com>
- <6a1f7b1dc372abfbbf8efaa7d0ce9c7db1881849.camel@redhat.com>
- <20190828102603.GG2991@redhat.com>
- <ae12796c51767489970f1040d3d86230f01ec79d.camel@redhat.com>
- <5e06cdb9-3215-361f-9a12-9b0f9024dda9@gmail.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 88E2C3C919
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:04:26 +0000 (UTC)
+Received: by mail-qk1-f197.google.com with SMTP id u17so7806045qkj.7
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 00:04:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=IaVb8yBjEF94Mg0DWZ77DVk/o8Q47z23e+gwIBTWsO8=;
+ b=JZIohZpbAdE8K9Muqx587Ki30Xp6kPNn5LC7+g2P00Pp/inWCr15/nJ/LRLykQpOEG
+ H6krPlWgWHG9IWsBA+4g1hOd4QAVSeL/jlkjlHKFCL/7tnL1kMp6wk2eLkqFPNLhy+hu
+ mnNgNMZ2RI6msAaYoWlZqUvjXP6stkbYOF98p8DOFq7hsW7bb2qcUXJGqD2/Tpzkwx/J
+ ydw80sqcTf6VxZv6IGnbhDwzaHE84AB20pm6O9WOzs7pLM90E+Ekz8CHrAc/3VRazXTj
+ dcSThKkwuQUoGev2UqZavzEoXyTCtNtMZp0BzwpjS85TDXz0RR4foSVH6N69/ZNKvT3U
+ Zoiw==
+X-Gm-Message-State: APjAAAVfrr72mGQFVLXYPAW+fB7RAenH2bXhxD6RdZOEeLvVbQz8EjQW
+ ce0AFhd3d25LI7uGCJXJNyL7OqxAEeu7/iG+tANaL3DJGaneS62x1rJSAETzxFtjGpA3QctItDf
+ EMoIPZZ2eC4BSK2c=
+X-Received: by 2002:a37:4c4d:: with SMTP id z74mr26745817qka.459.1568099065854; 
+ Tue, 10 Sep 2019 00:04:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyZcZLi2cMnfYhX0D7AZAR1ZrCAojZJeedmqOqkER1ofiV5JQJh0tudEHZS7J+h/WSlqp29tQ==
+X-Received: by 2002:a37:4c4d:: with SMTP id z74mr26745805qka.459.1568099065677; 
+ Tue, 10 Sep 2019 00:04:25 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+ by smtp.gmail.com with ESMTPSA id a134sm8977372qkc.95.2019.09.10.00.04.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 00:04:24 -0700 (PDT)
+Date: Tue, 10 Sep 2019 03:04:19 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: andychiu <andychiu@synology.com>
+Message-ID: <20190910025404-mutt-send-email-mst@kernel.org>
+References: <1568049517-10261-1-git-send-email-andychiu@synology.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5e06cdb9-3215-361f-9a12-9b0f9024dda9@gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Tue, 10 Sep 2019 07:00:28 +0000 (UTC)
+In-Reply-To: <1568049517-10261-1-git-send-email-andychiu@synology.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] audio: paaudio: ability to specify
- stream name
+Subject: Re: [Qemu-devel] [PATCH] ahci: enable pci bus master MemoryRegion
+ before loading ahci engines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,33 +87,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> Ping.
+On Tue, Sep 10, 2019 at 01:18:37AM +0800, andychiu wrote:
+> If Windows 10 guests have enabled 'turn off hard disk after idle'
+> option in power settings, and the guest has a SATA disk plugged in,
+> the SATA disk will be turned off after a specified idle time.
+> If the guest is live migrated or saved/loaded with its SATA disk
+> turned off, the following error will occur:
 > 
-> If I understand the situation correctly, the current consensus is:
+> qemu-system-x86_64: AHCI: Failed to start FIS receive engine: bad FIS receive buffer address
+> qemu-system-x86_64: Failed to load ich9_ahci:ahci
+> qemu-system-x86_64: error while loading state for instance 0x0 of device '0000:00:1a.0/ich9_ahci'
+> qemu-system-x86_64: load of migration failed: Operation not permitted
 > 
-> * use VM name for PA server connection
+> Observation from trace logs shows that a while after Windows 10 turns off
+> a SATA disk (IDE disks don't have the following behavior),
+> it will disable the PCI_COMMAND_MASTER flag of the pci device containing
+> the ahci device. When the the disk is turning back on,
+> the PCI_COMMAND_MASTER flag will be restored first.
+> But if the guest is migrated or saved/loaded while the disk is off,
+> the post_load callback of ahci device, ahci_state_post_load(), will fail
+> at ahci_cond_start_engines() if the MemoryRegion
+> pci_dev->bus_master_enable_region is not enabled, with pci_dev pointing
+> to the PCIDevice struct containing the ahci device.
+> 
+> This patch enables pci_dev->bus_master_enable_region before calling
+> ahci_cond_start_engines() in ahci_state_post_load(), and restore the
+> MemoryRegion to its original state afterwards.
+> 
+> Signed-off-by: andychiu <andychiu@synology.com>
 
-Yes (most important one IMHO).
+Poking at PCI device internals like this seems fragile.  And force
+enabling bus master can lead to unpleasantness like corrupting guest
+memory, unhandled interrupts, etc.  E.g. it's quite reasonable,
+spec-wise, for the guest to move thing in memory around while bus
+mastering is off.
 
-> * audiodev id is a good default for PA stream name
+Can you teach ahci that region being disabled
+during migration is ok, and recover from it?
 
-Yes.
-
-> What is not clear whether we need a separate qapi option for stream name, or
-> just always use the audiodev id.  I don't use pulseaudio or libvirt, so I
-> can't really comment about this issue.
-
-No clear consensus.  I'd suggest to just ignore that for now,
-or make it a separate patch.
-
-cheers,
-  Gerd
-
+> ---
+>  hw/ide/ahci.c | 53 ++++++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 36 insertions(+), 17 deletions(-)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index d45393c..83f8c30 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1649,33 +1649,52 @@ static const VMStateDescription vmstate_ahci_device = {
+>      },
+>  };
+>  
+> +static int ahci_state_load_engines(AHCIState *s, AHCIDevice *ad)
+> +{
+> +    AHCIPortRegs *pr = &ad->port_regs;
+> +    DeviceState *dev_state = s->container;
+> +    PCIDevice *pci_dev = (PCIDevice *) object_dynamic_cast(OBJECT(dev_state),
+> +                                                           TYPE_PCI_DEVICE);
+> +    bool pci_bus_master_enabled = pci_dev->bus_master_enable_region.enabled;
+> +
+> +    if (!(pr->cmd & PORT_CMD_START) && (pr->cmd & PORT_CMD_LIST_ON)) {
+> +        error_report("AHCI: DMA engine should be off, but status bit "
+> +                     "indicates it is still running.");
+> +        return -1;
+> +    }
+> +    if (!(pr->cmd & PORT_CMD_FIS_RX) && (pr->cmd & PORT_CMD_FIS_ON)) {
+> +        error_report("AHCI: FIS RX engine should be off, but status bit "
+> +                     "indicates it is still running.");
+> +        return -1;
+> +    }
+> +
+> +    memory_region_set_enabled(&pci_dev->bus_master_enable_region, true);
+> +
+> +    /*
+> +     * After a migrate, the DMA/FIS engines are "off" and
+> +     * need to be conditionally restarted
+> +     */
+> +    pr->cmd &= ~(PORT_CMD_LIST_ON | PORT_CMD_FIS_ON);
+> +    if (ahci_cond_start_engines(ad) != 0) {
+> +        return -1;
+> +    }
+> +    memory_region_set_enabled(&pci_dev->bus_master_enable_region,
+> +                              pci_bus_master_enabled);
+> +
+> +    return 0;
+> +}
+> +
+>  static int ahci_state_post_load(void *opaque, int version_id)
+>  {
+>      int i, j;
+>      struct AHCIDevice *ad;
+>      NCQTransferState *ncq_tfs;
+> -    AHCIPortRegs *pr;
+>      AHCIState *s = opaque;
+>  
+>      for (i = 0; i < s->ports; i++) {
+>          ad = &s->dev[i];
+> -        pr = &ad->port_regs;
+> -
+> -        if (!(pr->cmd & PORT_CMD_START) && (pr->cmd & PORT_CMD_LIST_ON)) {
+> -            error_report("AHCI: DMA engine should be off, but status bit "
+> -                         "indicates it is still running.");
+> -            return -1;
+> -        }
+> -        if (!(pr->cmd & PORT_CMD_FIS_RX) && (pr->cmd & PORT_CMD_FIS_ON)) {
+> -            error_report("AHCI: FIS RX engine should be off, but status bit "
+> -                         "indicates it is still running.");
+> -            return -1;
+> -        }
+>  
+> -        /* After a migrate, the DMA/FIS engines are "off" and
+> -         * need to be conditionally restarted */
+> -        pr->cmd &= ~(PORT_CMD_LIST_ON | PORT_CMD_FIS_ON);
+> -        if (ahci_cond_start_engines(ad) != 0) {
+> +        if (ahci_state_load_engines(s, ad)) {
+>              return -1;
+>          }
+>  
+> -- 
+> 2.7.4
 
