@@ -2,89 +2,89 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA527C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF16C49ED9
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A56C52168B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:07:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OEkeGmzT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A56C52168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D53B21479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:09:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D53B21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7lUS-0008V5-Pt
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:07:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53291)
+	id 1i7lVj-0001PA-Lu
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:09:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7lM8-0000IM-Cl
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 14:59:13 -0400
+ (envelope-from <eblake@redhat.com>) id 1i7lUS-0000NB-Df
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:07:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7lM6-0006MM-TV
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 14:59:12 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40461)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i7lM6-0006M4-MG
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 14:59:10 -0400
-Received: by mail-ot1-x343.google.com with SMTP id y39so20050409ota.7
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 11:59:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=dHjd4R7/iGOg1mIXFltrPlXk9szHTttqLQ4yu4gKw0A=;
- b=OEkeGmzTl+VIQGLAmJO5jB/MmOuE2z/wGSrEuf94gcwsSD/N5iPtKSbpUy/3EcSm1d
- uVzG3rUSbDi/YCrmAzT4dQwsbJul3uOu0QsIYMgSwFTFkzsg/d5l2TlhePk7bPqdfa8v
- spyF0iSIpxh3EjrX+AwLLOza6ivSZBNqCcQrnjmYeSLtQnpG9ESPeXkGKVMLpQcEiY87
- BBARce4Yroi8o7PnUmXmRYFJKGz/S5s1dARBljip2BJSgutpygQT6Hsu8M0gMr1lo0fn
- aIHzMg2Rn2TTQn6tP6GaBn9a8db/SV+OG7cB/PnxPpYYHyUI5Bq5ulTFe7oq0HIKYzr/
- E8hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=dHjd4R7/iGOg1mIXFltrPlXk9szHTttqLQ4yu4gKw0A=;
- b=bghPcSXVvkXfUj8V/+PgwuI8ifYCwRYG8nUooO/qfCa4Oko/qqodxiXgcnbaUn25q3
- aCShEsSS3LGdDCBZ7jKd6g7Irq1HPrk6FgnQYUHnBAiDhFxztGW30JTfKB16pSkgYR0N
- xvQdjbeKLpF7q0woVPgBtyGO2DYx/9jexJEAhfLZKODnQyEnRmvkK1B+D8dw/rAcV+8K
- rj21aGALPhn2qfTBaZliYge5qizRhEqsOqO1yPcfwVb+F8OkwZDeRk6EC+ZvqVG0aPoA
- P4/MBDSABIfu7qAYPSPqhgiCZ/DC0c/WbIoil41u/3hWBkV6COh9SnyHoodiXm2V4bwn
- 0T7A==
-X-Gm-Message-State: APjAAAWpzr3TOJQvyoMk7VrMKCVeRA2IP8NvoBDmcfT0QLxYLbmCwRkC
- qu7ufiZIhIgrsV/Svt+3kP/zfBJOU5TkrYPP6fc=
-X-Google-Smtp-Source: APXvYqzb5icIWTFE6dMQIRfVeXk5gXFzBPMisQUXwbjpCxkUJo/ChqKdUUfvLxylmipRSZFFGBx0wdjwlyjzuPxQJ88=
-X-Received: by 2002:a9d:5f09:: with SMTP id f9mr1547685oti.341.1568141949856; 
- Tue, 10 Sep 2019 11:59:09 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1i7lUR-0002A8-3S
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:07:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55196)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i7lUO-00027s-6d; Tue, 10 Sep 2019 15:07:44 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5C865308FEDF;
+ Tue, 10 Sep 2019 19:07:43 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3E4760BF7;
+ Tue, 10 Sep 2019 19:07:42 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190910185839.19682-1-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <4ce671ea-452b-39ac-ea2e-83b9d75a3b84@redhat.com>
+Date: Tue, 10 Sep 2019 14:07:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 10 Sep 2019 11:59:09
- -0700 (PDT)
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 10 Sep 2019 11:59:09
- -0700 (PDT)
-In-Reply-To: <2d5e7f28-7fa4-7637-c512-b443848eb61b@vivier.eu>
-References: <1567601968-26946-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1567601968-26946-9-git-send-email-aleksandar.markovic@rt-rk.com>
- <2d5e7f28-7fa4-7637-c512-b443848eb61b@vivier.eu>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 10 Sep 2019 20:59:09 +0200
-Message-ID: <CAL1e-=id9tL4-6eLgkd2SQ2W-5yU6Zp7WgVj0YFJ83wdG1qG6w@mail.gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v6 8/8] linux-user: Add support for
- FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls
+In-Reply-To: <20190910185839.19682-1-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="LKPCe42BZMnSHOLS4P8G4L65gKbTL3h9G"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Tue, 10 Sep 2019 19:07:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/7] Move qtests to a separate folder
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,97 +96,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, riku.voipio@iki.fi,
- qemu-devel@nongnu.org, amarkovic@wavecomp.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-06.09.2019. 12.47, "Laurent Vivier" <laurent@vivier.eu> =D1=98=D0=B5 =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Le 04/09/2019 =C3=A0 14:59, Aleksandar Markovic a =C3=A9crit :
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
-> > for controlling error reporting of a floppy drive.
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > ---
-> >  linux-user/ioctls.h        |  2 ++
-> >  linux-user/syscall_defs.h  | 19 +++++++++++++++++++
-> >  linux-user/syscall_types.h |  7 +++++++
-> >  3 files changed, 28 insertions(+)
-> >
-> > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> > index 622874b..0c75d03 100644
-> > --- a/linux-user/ioctls.h
-> > +++ b/linux-user/ioctls.h
-> > @@ -118,6 +118,8 @@
-> >       IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
-> >       IOCTL(FDFMTEND, 0, TYPE_NULL)
-> >       IOCTL(FDFLUSH, 0, TYPE_NULL)
-> > +     IOCTL(FDSETMAXERRS, IOC_W,
-MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-> > +     IOCTL(FDGETMAXERRS, IOC_R,
-MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
->
-> where is FDSETEMSGTRESH?
->
-> >       IOCTL(FDRESET, 0, TYPE_NULL)
-> >       IOCTL(FDRAWCMD, 0, TYPE_NULL)
-> >       IOCTL(FDTWADDLE, 0, TYPE_NULL)
-> > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> > index 834a085..7c5b614 100644
-> > --- a/linux-user/syscall_defs.h
-> > +++ b/linux-user/syscall_defs.h
-> > @@ -890,12 +890,31 @@ struct target_pollfd {
-> >
-> >  /* From <linux/fd.h> */
-> >
-> > +struct target_floppy_max_errors {
-> > +    abi_uint        abort;
-> > +    abi_uint        read_track;
-> > +    abi_uint        reset;
-> > +    abi_uint        recal;
-> > +    abi_uint        reporting;
-> > +};
->
-> You don't need this, you can use floppy_max_errors from <linux/fd.h>.
->
-> But you can define it if you want because it is used to know the size of
-> the target structure (and if alignment or data types differ it can
-> mismatch. With "int" it's not the case).
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LKPCe42BZMnSHOLS4P8G4L65gKbTL3h9G
+Content-Type: multipart/mixed; boundary="sFX8hHFr914E6yfoUiwEJvMoDugKTfCuS";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Message-ID: <4ce671ea-452b-39ac-ea2e-83b9d75a3b84@redhat.com>
+Subject: Re: [PATCH 0/7] Move qtests to a separate folder
+References: <20190910185839.19682-1-thuth@redhat.com>
+In-Reply-To: <20190910185839.19682-1-thuth@redhat.com>
 
-Laurent, thanks for the review, I'll correct this in the next version.
+--sFX8hHFr914E6yfoUiwEJvMoDugKTfCuS
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Just a follow-up question:
+On 9/10/19 1:58 PM, Thomas Huth wrote:
+> Our "tests" directory is very overcrowded - we store the qtests,
+> unit test and other files there. That makes it difficult to
+> determine which file belongs to each test subsystem, and the
+> wildcards in the MAINTAINERS file are inaccurate, too.
+>=20
+> Let's clean up this mess. The first patches disentangle some
+> dependencies, and the last three patches then move the qtests
+> and libqos (which is a subsystem of the qtests) to a new folder
+> called "tests/qtest/".
+>=20
 
-If the structure of related to a (not-yet-supported in QEMU) ioctl was:
+I'd also welcome a rename of tests/qemu-iotests to tests/iotests.
 
-struct hd_geometry {
-      unsigned char heads;
-      unsigned char sectors;
-      unsigned short cylinders;
-      unsigned long start;
-};
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-... would "target_hd_geometry" be needed, or not?
 
-Regards,
+--sFX8hHFr914E6yfoUiwEJvMoDugKTfCuS--
 
-Aleksandar
+--LKPCe42BZMnSHOLS4P8G4L65gKbTL3h9G
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> > +struct target_format_descr {
-> > +    abi_uint        device;
-> > +    abi_uint        head;
-> > +    abi_uint        track;
-> > +};
-> > +
->
-> This one is for the previous patch. Same comment as above.
->
-> Thanks,
-> Laurent
->
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl139HwACgkQp6FrSiUn
+Q2p29gf5AdxVRK9mpaEVMx+pwhagvnv6wAHwwoXEIftbVGOH9GQgcJvEZ80zAH4t
+rTpMflxVqTdHBKz/9XYQPbKKIikp/FP08+Wyj1yyHAPwYpgHWhOOmOGwAsyZVcMj
+o+tL5m+V5n6EQsF+7YuMqKNhTZMRCA6ff4c9X6Nmda4hI1gGewNiOMrHVFoJ+yhG
+a+LdvAf8PWVkJdvG/tUvToERc21+je3PFx1JMERVr6lema8XatXsFZOnIL9ej6My
+Qm2iI1oxZlpucC/bgvhtD2HhMeCqx3jlnpCDD+BK8wH54N8Pif6gGOnk7qDfQL7G
+XluWE8Wr/krNOTnQ7+y5DM4qUALZrg==
+=c4kt
+-----END PGP SIGNATURE-----
+
+--LKPCe42BZMnSHOLS4P8G4L65gKbTL3h9G--
+
