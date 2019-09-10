@@ -2,91 +2,110 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78C3C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 058C6C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD1742089F
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:07:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD1742089F
+	by mail.kernel.org (Postfix) with ESMTPS id CFAD92089F
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:08:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFAD92089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7evW-0004T5-Ma
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 08:07:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52214)
+	id 1i7ewj-0005OB-T5
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 08:08:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7etD-0003LG-OY
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:04:56 -0400
+ (envelope-from <thuth@redhat.com>) id 1i7evk-0004mI-PA
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:07:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7etC-0004Tc-Mo
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:04:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54608)
+ (envelope-from <thuth@redhat.com>) id 1i7evj-0005cj-O2
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:07:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7et9-0004QW-2v; Tue, 10 Sep 2019 08:04:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1i7evj-0005cf-H1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:07:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 040F2300BC78;
- Tue, 10 Sep 2019 12:04:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
- [10.36.117.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E7D8C5C226;
- Tue, 10 Sep 2019 12:04:48 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-21-mreitz@redhat.com>
- <20190910115620.GE4446@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A83DF309842B;
+ Tue, 10 Sep 2019 12:07:30 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-98.ams2.redhat.com [10.36.117.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8EB0D5D6D0;
+ Tue, 10 Sep 2019 12:07:29 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190907154744.4136-1-huth@tuxfamily.org>
+ <20190907154744.4136-8-huth@tuxfamily.org>
+ <CAFEAcA_NHnNNC8jdVc7CGEQ=PDhDjQfiRb++=ZgdjKUPqi2f=w@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4fd84192-0078-07e9-b972-2f10030fb15f@redhat.com>
-Date: Tue, 10 Sep 2019 14:04:47 +0200
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <a4de8c0c-5758-13a4-0f74-3e7a0208ad34@redhat.com>
+Date: Tue, 10 Sep 2019 14:07:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190910115620.GE4446@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="8tdC790XFil8lYgpiZzbns5y8NZvzTS9Q"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <CAFEAcA_NHnNNC8jdVc7CGEQ=PDhDjQfiRb++=ZgdjKUPqi2f=w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 10 Sep 2019 12:04:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Tue, 10 Sep 2019 12:07:30 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 20/42] block/snapshot: Fix fallback
+Subject: Re: [Qemu-devel] [PULL 7/8] tests/acceptance: Add test of NeXTcube
+ framebuffer using OCR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,125 +117,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8tdC790XFil8lYgpiZzbns5y8NZvzTS9Q
-Content-Type: multipart/mixed; boundary="J1lvGwE78SNvvK6CBPCBrYlyO1iODg7kz";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <4fd84192-0078-07e9-b972-2f10030fb15f@redhat.com>
-Subject: Re: [PATCH v6 20/42] block/snapshot: Fix fallback
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-21-mreitz@redhat.com>
- <20190910115620.GE4446@localhost.localdomain>
-In-Reply-To: <20190910115620.GE4446@localhost.localdomain>
-
---J1lvGwE78SNvvK6CBPCBrYlyO1iODg7kz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 10.09.19 13:56, Kevin Wolf wrote:
-> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
->> If the top node's driver does not provide snapshot functionality and w=
-e
->> want to fall back to a node down the chain, we need to snapshot all
->> non-COW children.  For simplicity's sake, just do not fall back if the=
-re
->> is more than one such child.
+On 10/09/2019 14.02, Peter Maydell wrote:
+> On Sat, 7 Sep 2019 at 16:47, Thomas Huth <huth@tuxfamily.org> wrote:
 >>
->> bdrv_snapshot_goto() becomes a bit weird because we may have to redire=
-ct
->> the actual child pointer, so it only works if the fallback child is
->> bs->file or bs->backing (and then we have to find out which it is).
+>> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 >>
->> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/snapshot.c | 100 +++++++++++++++++++++++++++++++++++++---------=
--
->>  1 file changed, 79 insertions(+), 21 deletions(-)
+>> Add a test of the NeXTcube framebuffer using the Tesseract OCR
+>> engine on a screenshot of the framebuffer device.
 >>
->> diff --git a/block/snapshot.c b/block/snapshot.c
->> index f2f48f926a..35403c167f 100644
->> --- a/block/snapshot.c
->> +++ b/block/snapshot.c
->> @@ -146,6 +146,32 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDrive=
-rState *bs,
->>      return ret;
->>  }
->> =20
->> +/**
->> + * Return the child BDS to which we can fall back if the given BDS
->> + * does not support snapshots.
->> + * Return NULL if there is no BDS to (safely) fall back to.
->> + */
->> +static BlockDriverState *bdrv_snapshot_fallback(BlockDriverState *bs)=
-
->> +{
->> +    BlockDriverState *child_bs =3D NULL;
->> +    BdrvChild *child;
->> +
->> +    QLIST_FOREACH(child, &bs->children, next) {
->> +        if (child =3D=3D bdrv_filtered_cow_child(bs)) {
->> +            /* Ignore: COW children need not be included in snapshots=
- */
->> +            continue;
->> +        }
->> +
->> +        if (child_bs) {
->> +            /* Cannot fall back to a single child if there are multip=
-le */
->> +            return NULL;
->> +        }
->> +        child_bs =3D child->bs;
->> +    }
->> +
->> +    return child_bs;
->> +}
+>> The test is very quick:
+>>
+>>   $ avocado --show=3Dapp,console run tests/acceptance/machine_m68k_nex=
+tcube.py
+>>   JOB ID     : 78844a92424cc495bd068c3874d542d1e20f24bc
+>>   JOB LOG    : /home/phil/avocado/job-results/job-2019-08-13T13.16-788=
+44a9/job.log
+>>    (1/3) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.tes=
+t_bootrom_framebuffer_size: PASS (2.16 s)
+>>    (2/3) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.tes=
+t_bootrom_framebuffer_ocr_with_tesseract_v3: -
+>>   ue r pun Honl'=EF=AC=82x ; 5=E2=80=98 55=E2=80=98
+>>   avg ncaaaaa 25 MHZ, memary jag m
+>>   Backplane slat =C2=ABa
+>>   Ethernet address a a r a r3 2
+>>   Memgry sackets aea canflqured far 16MB Darlly page made stMs but hav=
+e 16MB page made stMs )nstalled
 >=20
-> Why do we return child->bs here when bdrv_snapshot_goto() then needs to=
+> By the way, do we know why the output from this test case is
+> garbled like this ? It suggests that something's not right
+> somewhere...
 
-> reconstruct what the associated BdrvChild was? Wouldn't it make more
-> sense to return BdrvChild** from here and maybe have a small wrapper fo=
-r
-> the other functions that only need a BDS?
+The text is created from the framebuffer with the OCR-tool Tesseract -
+which is just not good enough to recognize all words properly here.
 
-What would you return instead?  &child doesn=E2=80=99t work.
-
-We could limit ourselves to bs->file and bs->backing.  It just seemed
-like a bit of an artificial limit to me, because we only really have it
-for bdrv_snapshot_goto().
-
-Max
-
-
---J1lvGwE78SNvvK6CBPCBrYlyO1iODg7kz--
-
---8tdC790XFil8lYgpiZzbns5y8NZvzTS9Q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13kV8ACgkQ9AfbAGHV
-z0AMdgf8DtLHKXlucaopAqKmX8y1SiAnDXMkT9QUbpibl5rMLcend5Grg24Pr2KN
-P4etxvJQDnG368pafpF3kmdTj7/gZm5VQaZg2njCS6ZHaSjDtBHg/CUsooSpYsiZ
-nMfJ7wFrJtIsvXNr+KzAUWzmrSAOge+WTIaQr7d782R7taHbCCvAj1Ny0Om9C1PD
-WLo7vhA9h7ToMGVOBCQ4D33aMl2/H6tP95Jmz57m6tbwH5QpvAzzcHp41C9C8ypK
-BeAeI6+qLPB1blRQjxbc5XOs8Am4zJNGeR84MgipW+Xr4MZBfWBp74IIXmprUVl9
-FvpvyEp0wv+kEE9Kkn824GycdkijvQ==
-=n4RD
------END PGP SIGNATURE-----
-
---8tdC790XFil8lYgpiZzbns5y8NZvzTS9Q--
+ Thomas
 
