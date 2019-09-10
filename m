@@ -3,108 +3,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1DDC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2285DC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:58:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4725C20692
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4725C20692
+	by mail.kernel.org (Postfix) with ESMTPS id D55DD20692
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:58:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D55DD20692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dqL-0004uY-Ag
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:57:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39898)
+	id 1i7dqu-0005V7-0F
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:58:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39975)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i7doi-00047T-Ot
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:56:13 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7dpC-0004Qs-49
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i7doh-0002n6-QQ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:56:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49392)
+ (envelope-from <mreitz@redhat.com>) id 1i7dpA-0002zJ-99
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:56:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51282)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1i7dof-0002lj-Ob; Tue, 10 Sep 2019 06:56:09 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7dp4-0002wM-Fi; Tue, 10 Sep 2019 06:56:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5EBFC10C0926;
- Tue, 10 Sep 2019 10:56:08 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-98.ams2.redhat.com [10.36.117.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE09410018F9;
- Tue, 10 Sep 2019 10:56:06 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190906113534.10907-1-thuth@redhat.com>
- <54cd1dd0-6e23-92d1-ff86-0eccddcb3da8@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 80BA230A698E;
+ Tue, 10 Sep 2019 10:56:33 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
+ [10.36.117.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4535660852;
+ Tue, 10 Sep 2019 10:56:31 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+References: <20190906113920.11271-1-thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
- aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
- QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
- EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
- 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
- eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
- ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
- zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
- tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
- WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
- UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
- BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
- 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
- +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
- 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
- gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
- WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
- VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
- knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
- cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
- X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
- AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
- ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
- fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
- 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
- cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
- ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
- Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
- oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
- IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
- yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-Organization: Red Hat
-Message-ID: <6627619f-e0e2-f8fd-14b0-d675d5931ed0@redhat.com>
-Date: Tue, 10 Sep 2019 12:55:57 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7a620068-171f-b985-4c62-af6332e30b0f@redhat.com>
+Date: Tue, 10 Sep 2019 12:56:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <54cd1dd0-6e23-92d1-ff86-0eccddcb3da8@redhat.com>
+In-Reply-To: <20190906113920.11271-1-thuth@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="mbd89NiTYOLSzWHRhzKGhTt784i6nNB85"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 10 Sep 2019 10:56:08 +0000 (UTC)
+ boundary="UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Tue, 10 Sep 2019 10:56:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/Makefile: Do not print the name of
- the check-block.sh shell script
+Subject: Re: [Qemu-devel] [PATCH] tests/qemu-iotests/check: Replace "tests"
+ with "iotests" in final status text
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,68 +104,62 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mbd89NiTYOLSzWHRhzKGhTt784i6nNB85
-Content-Type: multipart/mixed; boundary="0rzX6gjEy5IGnaAaJ1neTgWMI8YclCeHR";
+--UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1
+Content-Type: multipart/mixed; boundary="ulHZkTYIqtJM2gECncnUusFnwdFzBAaPK";
  protected-headers="v1"
-From: Thomas Huth <thuth@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+From: Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  qemu-trivial@nongnu.org
-Message-ID: <6627619f-e0e2-f8fd-14b0-d675d5931ed0@redhat.com>
-Subject: Re: [PATCH] tests/Makefile: Do not print the name of the
- check-block.sh shell script
-References: <20190906113534.10907-1-thuth@redhat.com>
- <54cd1dd0-6e23-92d1-ff86-0eccddcb3da8@redhat.com>
-In-Reply-To: <54cd1dd0-6e23-92d1-ff86-0eccddcb3da8@redhat.com>
+Message-ID: <7a620068-171f-b985-4c62-af6332e30b0f@redhat.com>
+Subject: Re: [PATCH] tests/qemu-iotests/check: Replace "tests" with "iotests"
+ in final status text
+References: <20190906113920.11271-1-thuth@redhat.com>
+In-Reply-To: <20190906113920.11271-1-thuth@redhat.com>
 
---0rzX6gjEy5IGnaAaJ1neTgWMI8YclCeHR
+--ulHZkTYIqtJM2gECncnUusFnwdFzBAaPK
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10/09/2019 12.53, Max Reitz wrote:
-> On 06.09.19 13:35, Thomas Huth wrote:
->> The check script is already printing out which iotest is currently
->> running, so printing out the name of the check-block.sh shell script
->> looks superfluous here.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/Makefile.include | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+On 06.09.19 13:39, Thomas Huth wrote:
+> When running "make check -j8" or something similar, the iotests are
+> running in parallel with the other tests. So when they are printing
+> out "Passed all xx tests" or a similar status message at the end,
+> it might not be quite clear that this message belongs to the iotests,
+> since the output might be mixed with the other tests. Thus change the
+> word "tests" here to "iotests" instead to avoid confusion.
 >=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
->=20
-> (Not sure which tree you=E2=80=99d like this to go through...)
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/qemu-iotests/check | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-I think either your block tree or trivial would be appropriate?
+Thanks, applied to my block branch:
 
- Thomas
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
 
 
---0rzX6gjEy5IGnaAaJ1neTgWMI8YclCeHR--
+--ulHZkTYIqtJM2gECncnUusFnwdFzBAaPK--
 
---mbd89NiTYOLSzWHRhzKGhTt784i6nNB85
+--UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl13gUUACgkQLtnXdP5w
-LbX3MQ//djLxjwl32eZInQ9UYBfzHOi81AFUBXkiDMNJcJrZmGxcx/c0ddLe6Vxa
-3w4PyBjImD7d+CE4dfeCt4rQ5yeVyc6y1PQ9e0uwqzLcgeIfx0zZgkoLcyyXH+1W
-Y++E3AyjsdAxcPUC1EdyPDUA66shldKkZXRjKNeKMBtF4yhwwVzXQLy4C6shDvja
-xa690XAIpVCtCbPIS9cptOfNIk2ffe/ELqJdE65DKOr8wo6r2JpfHC5rBarXQsB7
-23CyNZesNF4LZFOa4oCWRIX+a0K1N9GgBBqcqAZcxgpbI/NoWpBwfDrg5JUxM7oA
-NzBHwP9Q45DrqjfiX19zQ/Vnh5XbjJljWXscMVR6WzGPh+8lyjjMgPMoMMX7/VkP
-UfsY0FabcO6JqH+P65KEJSDqrGG+1ZS34li/5+S9ottFcrkSLKlwoUNqIQ8nY74I
-rmvUmxZdOc27+jnv3UoToVGsI22YLPAm6LtmmcApzYsdnJ3SIMuAG4lIbJHPBuWN
-JaXSa1gXBT5FEZe8AY34Ff+4H92jxKSxPkBGQXPe5Kxt3MyFs/ngzpRN/BZ/ilbF
-DnuIzWfXpSjGJxrqMP7MtheQem24dOSs+YHjKU+ecK0bYu+GRN3I6tEC7sXjnInT
-Wzqdrg9gpKTheSUnynCGbrQ/x9v+dfFpNsor4/44u9fQrnG8zWo=
-=frso
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13gV4ACgkQ9AfbAGHV
+z0By3wf/bo7h0xHZKHSrn0AWeK+Qu0Bi9d6RjpooZCgnLsQNTwrhIzxcoh6iMS2U
+KvJC+nSZVtMWN2GYIZWnDZ+g9JKdj4Huk1OC7BtwZ7TwSOH+V/7nECUVZSBJf0cq
+VcFiZr9ETFTCxjdngPUlzE/3izHB4PDWYrG6ZAWF8447of6ruVeLJbpmLNRiav0A
+mWxz7UH944sCYmxKxLttn5KYf/sUtIwe+y7u60oCtpu8kGKTw4aw0QGK2pZQskcw
+OoEWdYLMCAlRwCvIo4B9qLfCw7cQA0JVnQytQAARmhfz+loj4+B4M2XPvOx02Nv1
+b39AkZ3R83nS9lYFOF+fKpRfl9KoXw==
+=xNRk
 -----END PGP SIGNATURE-----
 
---mbd89NiTYOLSzWHRhzKGhTt784i6nNB85--
+--UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1--
 
