@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 412A4C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E01C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15D2020863
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:54:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D2020863
+	by mail.kernel.org (Postfix) with ESMTPS id EB46F20863
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 12:56:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB46F20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7ffb-0004jo-Ua
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 08:54:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59602)
+	id 1i7fhS-0006NE-Dk
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 08:56:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7fTA-0002cA-Dq
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:42:05 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1i7fZQ-00081Q-Nd
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:48:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7fT9-0005I8-BA
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:42:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5600)
+ (envelope-from <sgarzare@redhat.com>) id 1i7fZP-0008JQ-EQ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:48:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7fT6-0005Dk-Hk; Tue, 10 Sep 2019 08:42:00 -0400
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1i7fZP-0008J3-9S
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:48:31 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D6376A2F86A;
- Tue, 10 Sep 2019 12:41:59 +0000 (UTC)
-Received: from localhost (ovpn-117-90.ams2.redhat.com [10.36.117.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 00FC45D6B2;
- Tue, 10 Sep 2019 12:41:56 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue, 10 Sep 2019 14:41:33 +0200
-Message-Id: <20190910124136.10565-5-mreitz@redhat.com>
-In-Reply-To: <20190910124136.10565-1-mreitz@redhat.com>
-References: <20190910124136.10565-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 884CAA2FC4E;
+ Tue, 10 Sep 2019 12:48:30 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-150.ams2.redhat.com
+ [10.36.117.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1469F5D6B2;
+ Tue, 10 Sep 2019 12:48:28 +0000 (UTC)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 10 Sep 2019 14:48:28 +0200
+Message-Id: <20190910124828.39794-1-sgarzare@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 10 Sep 2019 12:41:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Tue, 10 Sep 2019 12:48:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 4/7] curl: Pass CURLSocket to curl_multi_do()
+Subject: [Qemu-devel] [PATCH v2] elf-ops.h: fix int overflow in load_elf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,83 +66,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-curl_multi_do_locked() currently marks all sockets as ready.  That is
-not only inefficient, but in fact unsafe (the loop is).  A follow-up
-patch will change that, but to do so, curl_multi_do_locked() needs to
-know exactly which socket is ready; and that is accomplished by this
-patch here.
+This patch fixes a possible integer overflow when we calculate
+the total size of ELF segments loaded.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reported-by: Coverity (CID 1405299)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- block/curl.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+v2:
+ - not use error_report in load_elf() [Peter]
+ - return ELF_LOAD_TOO_BIG
+ - add Alex's R-b
+---
+ include/hw/elf_ops.h | 5 +++++
+ include/hw/loader.h  | 1 +
+ hw/core/loader.c     | 2 ++
+ 3 files changed, 8 insertions(+)
 
-diff --git a/block/curl.c b/block/curl.c
-index 5838afef99..cf2686218d 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -185,15 +185,15 @@ static int curl_sock_cb(CURL *curl, curl_socket_t f=
-d, int action,
-     switch (action) {
-         case CURL_POLL_IN:
-             aio_set_fd_handler(s->aio_context, fd, false,
--                               curl_multi_do, NULL, NULL, state);
-+                               curl_multi_do, NULL, NULL, socket);
-             break;
-         case CURL_POLL_OUT:
-             aio_set_fd_handler(s->aio_context, fd, false,
--                               NULL, curl_multi_do, NULL, state);
-+                               NULL, curl_multi_do, NULL, socket);
-             break;
-         case CURL_POLL_INOUT:
-             aio_set_fd_handler(s->aio_context, fd, false,
--                               curl_multi_do, curl_multi_do, NULL, state=
-);
-+                               curl_multi_do, curl_multi_do, NULL, socke=
-t);
-             break;
-         case CURL_POLL_REMOVE:
-             aio_set_fd_handler(s->aio_context, fd, false,
-@@ -392,9 +392,10 @@ static void curl_multi_check_completion(BDRVCURLStat=
-e *s)
- }
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 1496d7e753..e07d276df7 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -485,6 +485,11 @@ static int glue(load_elf, SZ)(const char *name, int =
+fd,
+                 }
+             }
 =20
- /* Called with s->mutex held.  */
--static void curl_multi_do_locked(CURLState *s)
-+static void curl_multi_do_locked(CURLSocket *ready_socket)
- {
-     CURLSocket *socket, *next_socket;
-+    CURLState *s =3D ready_socket->state;
-     int running;
-     int r;
++            if (mem_size > INT_MAX - total_size) {
++                ret =3D ELF_LOAD_TOO_BIG;
++                goto fail;
++            }
++
+             /* address_offset is hack for kernel images that are
+                linked at the wrong physical address.  */
+             if (translate_fn) {
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 07fd9286e7..48a96cd559 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -89,6 +89,7 @@ int load_image_gzipped(const char *filename, hwaddr add=
+r, uint64_t max_sz);
+ #define ELF_LOAD_NOT_ELF      -2
+ #define ELF_LOAD_WRONG_ARCH   -3
+ #define ELF_LOAD_WRONG_ENDIAN -4
++#define ELF_LOAD_TOO_BIG      -5
+ const char *load_elf_strerror(int error);
 =20
-@@ -413,12 +414,13 @@ static void curl_multi_do_locked(CURLState *s)
-=20
- static void curl_multi_do(void *arg)
- {
--    CURLState *s =3D (CURLState *)arg;
-+    CURLSocket *socket =3D arg;
-+    BDRVCURLState *s =3D socket->state->s;
-=20
--    qemu_mutex_lock(&s->s->mutex);
--    curl_multi_do_locked(s);
--    curl_multi_check_completion(s->s);
--    qemu_mutex_unlock(&s->s->mutex);
-+    qemu_mutex_lock(&s->mutex);
-+    curl_multi_do_locked(socket);
-+    curl_multi_check_completion(s);
-+    qemu_mutex_unlock(&s->mutex);
- }
-=20
- static void curl_multi_timeout_do(void *arg)
+ /** load_elf_ram_sym:
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 32f7cc7c33..75eb56ddbb 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -338,6 +338,8 @@ const char *load_elf_strerror(int error)
+         return "The image is from incompatible architecture";
+     case ELF_LOAD_WRONG_ENDIAN:
+         return "The image has incorrect endianness";
++    case ELF_LOAD_TOO_BIG:
++        return "The image segments are too big to load";
+     default:
+         return "Unknown error";
+     }
 --=20
 2.21.0
 
