@@ -2,87 +2,72 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F217C49ED8
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ACEEC49ED8
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED07F21479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:54:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IX1Bn+L7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED07F21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EE6EE21479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE6EE21479
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hX9-0006jn-Hv
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:54:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53956)
+	id 1i7hY0-00082i-V5
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:55:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54757)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i7hNl-0005PV-RP
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:38 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i7hR9-0000Ip-1s
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i7hNk-0004zj-Gk
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:37 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34246)
+ (envelope-from <palmer@dabbelt.com>) id 1i7hR8-0006NV-2a
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:06 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43478)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i7hNk-0004z7-Am
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:36 -0400
-Received: by mail-wr1-x441.google.com with SMTP id a11so11068229wrx.1
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:44:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=fZA5qZtHref6EES7glsBu8W4zydJFLjuwr0G2I/qEek=;
- b=IX1Bn+L75xsE7wR97ujQGTwx7gERV6QZ/5uUFlJkg4cM3TAIGRuAZ2f8MUOuzmaH/l
- 7p/3UeB5SACUV7ULkrYPZf4l2JC6jj9Ia/1JBrdu/hhdk1juMbf8qBwLTe92d8CIm2NH
- WqRilXdkGprmhh3ov14IQ7t9hsiz58myU8OUi1MYToYLLjsE8dU5/PPSjzbfSGiJadSs
- odf3GudeX81c3LIKoUY4DDPGTQ+v4lqfc74WKRh2/Rk+9uigZLmqKWZKFn9C/RpQPWBT
- H58yH/v9YQlvo4v5LyWy2MbX0gUfHO+LhyDje0OVd5RAKY69sFsgMk0+YMYgWXUZ/p/I
- WqTA==
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7hR7-0006N4-SJ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:05 -0400
+Received: by mail-wr1-f65.google.com with SMTP id q17so16145742wrx.10
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:48:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=fZA5qZtHref6EES7glsBu8W4zydJFLjuwr0G2I/qEek=;
- b=ixugX+z0mqG66vfI4OGO/XOLf+l+SJOHKwsJM8jhWeqmsiUXwvOd8c+Zyba9i1NPiv
- E5BVJyEjKsgsRm1MO3HAZwBpKAtjr4ItgLjYHd6xf4D18QM4yVGEiSB80k/N+91mzicY
- wjjLjpcq5nbAtfh237hNR1qIToHMskbl9JEmpkUiaeOdf40iFb4z52Ecs9S8CH30mK2Q
- SG9vJF079+gudjxizzl2dr6/PW4I5TURjWpG2Yjn/uis2GdkmDZZj+HrisuAl2VOk/xC
- ATfCB0h2Dc/BwS2jygBzWZP5BVesvtBlNlh5/ISP8nImsQHwAUk85Oi3U9hLl7eT4SeC
- lSdw==
-X-Gm-Message-State: APjAAAVBNMSEB0jX5944EZh0WBSqN/nEMi1GYPR5ZiSgDqlgPX3SSB5j
- JXv+F4C+PfCfwmiH5Lk7tSJJEA==
-X-Google-Smtp-Source: APXvYqyjTDUzvzPnMlLUmbXH/biyEgBm1jIvMwQN4NQDq7w/thO6i/dyCQ8UT1ZuDnQfQbIgeCbTqA==
-X-Received: by 2002:adf:ebd0:: with SMTP id v16mr18411913wrn.352.1568126675477; 
- Tue, 10 Sep 2019 07:44:35 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a192sm5703814wma.1.2019.09.10.07.44.34
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=9r/tsin+WnzvHfmEc7iVPUi/buDct7somnXFCcxsN4M=;
+ b=E0eKKq+C9H+NL0TCPGFKqjBp16BbBZe+cBtJbOMVMDzrMbe0LmrkppQQ6i6deuHBUe
+ xgraZNtlcvD1+2/mjKNRTkdxp0AZob2LxV4KqUeKbF/ndVSwa05L7EibMSASScnJEIVv
+ 5kyWDPvn1bNC0+p3OdUSJYtegseyYF7E0pZjza5/x9FP8ldXN7MbQrmPlWaxxLYvjHam
+ YpVC7ffXPtyYdtFRGluD0dyfMnlOscJy5CzGSf+K8tG9mg/sYn+IQWJaPOzWzbXbgoxt
+ M+W9L6kq0hp+69rHCHht/rWNT2t/hSvf/l0q6lPhOIFYwJODKwS3g9aCtAbaZxDpoD9w
+ QUAg==
+X-Gm-Message-State: APjAAAULX0K2Y/MW0rWsja/3WRTGuZru49giAEhu1mtJnzhYLrwQ6JQG
+ Jrd7tqvSR3b95vJYrvxBVTa4HYiL5Bu8zQ==
+X-Google-Smtp-Source: APXvYqx+MMVn21LPEsYVh4ZdCTqfuyQUbh76195ywvIFJ5C3yTWkYyr5hoeGjchAictUvs1bD59zqA==
+X-Received: by 2002:a5d:4ac5:: with SMTP id y5mr21240676wrs.179.1568126884538; 
+ Tue, 10 Sep 2019 07:48:04 -0700 (PDT)
+Received: from localhost ([148.69.85.38])
+ by smtp.gmail.com with ESMTPSA id a144sm5175207wme.13.2019.09.10.07.48.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 07:44:34 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 15:44:19 +0100
-Message-Id: <20190910144428.32597-5-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190910144428.32597-1-peter.maydell@linaro.org>
-References: <20190910144428.32597-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
+ Tue, 10 Sep 2019 07:48:04 -0700 (PDT)
+Date: Tue, 10 Sep 2019 07:48:04 -0700 (PDT)
+X-Google-Original-Date: Tue, 10 Sep 2019 07:40:13 PDT (-0700)
+In-Reply-To: <a090bc437bf412c279b1254d05eae5c2d67225db.1566603412.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-afa69c9b-17b7-4043-b204-512c92cf618a@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH 04/13] target/arm/arm-semi: clean up TaskState*
- usage in non-user-only code
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v1 04/28] target/riscv: Fix CSR perm
+ checking for HS mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,113 +79,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
+ qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The semihosting code has to build for both user-only and softmmu;
-for user-only it needs access to the TaskState struct that holds
-per-thread information. For softmmu we don't need it.
+On Fri, 23 Aug 2019 16:38:00 PDT (-0700), Alistair Francis wrote:
+> Update the CSR permission checking to work correctly when we are in
+> HS-mode.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/csr.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index f767ad24be..471f23a1d0 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -799,9 +799,15 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>
+>      /* check privileges and return -1 if check fails */
+>  #if !defined(CONFIG_USER_ONLY)
+> -    int csr_priv = get_field(csrno, 0x300);
+> +    int csr_priv = env->priv;
 
-Currently the softmmu set_swi_errno() takes a CPUARMState *,
-which it doesn't use, and the 'ts' variable in do_arm_semihosting()
-is set to either be a TaskState* or a CPUARMState* depending on
-whether CONFIG_USER_ONLY is set, so that the callsite always
-passes 'ts'. Since we don't actually need the CPUARMState *,
-we can instead make set_swi_errno() always take a TaskState*,
-by providing a local-to-this-file dummy typedef for the softmmu
-case and setting ts to NULL for softmmu.
+This isn't really "csr_priv" (ie, the priv needed to access the CSR) any more, 
+it's really the effective priv of the machine.  Leaving the variable with the 
+same name makes this hard to read, but I think it is correct.
 
-This will make it easier to have other functions which pass
-through the TaskState*, because now they can have the same
-prototype regardless of whether they're CONFIG_USER_ONLY or not.
+>      int read_only = get_field(csrno, 0xC00) == 3;
+> -    if ((write_mask && read_only) || (env->priv < csr_priv)) {
+> +
+> +    if (riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
+> +        /* Plus 1 as we are in HS mode */
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/arm-semi.c | 48 ++++++++++++++++++++++++-------------------
- 1 file changed, 27 insertions(+), 21 deletions(-)
+The comment is useless, it doesn't say why we increment it.  Also, I don't 
+think this is correct: doesn't it allow U mode to access S CSRs when H is 
+present and V is disabled?
 
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 05491bf5248..ce3ba554bef 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -36,6 +36,13 @@
- #else
- #include "exec/gdbstub.h"
- #include "qemu/cutils.h"
-+
-+/*
-+ * Dummy typedef so that we can have functions that take
-+ * a TaskState* even if we're building for softmmu; in that
-+ * case the argument will always be NULL.
-+ */
-+typedef void TaskState;
- #endif
- 
- #define TARGET_SYS_OPEN        0x01
-@@ -213,27 +220,24 @@ static GuestFD *get_guestfd(int guestfd)
-     return gf;
- }
- 
--#ifdef CONFIG_USER_ONLY
--static inline uint32_t set_swi_errno(TaskState *ts, uint32_t code)
--{
--    if (code == (uint32_t)-1)
--        ts->swi_errno = errno;
--    return code;
--}
--#else
-+#ifndef CONFIG_USER_ONLY
- static target_ulong syscall_err;
- 
--static inline uint32_t set_swi_errno(CPUARMState *env, uint32_t code)
--{
--    if (code == (uint32_t)-1) {
--        syscall_err = errno;
--    }
--    return code;
--}
--
- #include "exec/softmmu-semi.h"
- #endif
- 
-+static inline uint32_t set_swi_errno(TaskState *ts, uint32_t code)
-+{
-+    if (code == (uint32_t)-1) {
-+#ifdef CONFIG_USER_ONLY
-+        ts->swi_errno = errno;
-+#else
-+        syscall_err = errno;
-+#endif
-+    }
-+    return code;
-+}
-+
- static target_ulong arm_semi_syscall_len;
- 
- static void arm_semi_cb(CPUState *cs, target_ulong ret, target_ulong err)
-@@ -374,13 +378,15 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-     int nr;
-     uint32_t ret;
-     uint32_t len;
--#ifdef CONFIG_USER_ONLY
--    TaskState *ts = cs->opaque;
--#else
--    CPUARMState *ts = env;
--#endif
-+    TaskState *ts;
-     GuestFD *gf;
- 
-+#ifdef CONFIG_USER_ONLY
-+    ts = cs->opaque;
-+#else
-+    ts = NULL;
-+#endif
-+
-     if (is_a64(env)) {
-         /* Note that the syscall number is in W0, not X0 */
-         nr = env->xregs[0] & 0xffffffffU;
--- 
-2.20.1
+Something like
 
+    riscv_effective_priv(CPURISCVState *env)
+    {
+        if (riscv_has_ext(env, RVH) && env->priv == PRIV_S && !riscv_cpu_virt_enabled(env)) {
+            return PRIV_HS;
+        }
+    
+        return env->priv;
+    }
+
+would probably be used in a handful of places, and would be a drop in for
+env->priv here.
+
+> +        csr_priv++;
+> +    }
+> +
+> +    if ((write_mask && read_only) || (csr_priv < get_field(csrno, 0x300))) {
+>          return -1;
+>      }
+>  #endif
 
