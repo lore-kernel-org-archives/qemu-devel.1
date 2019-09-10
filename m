@@ -6,40 +6,41 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37775C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6A5C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:25:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B34B21019
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:18:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B34B21019
+	by mail.kernel.org (Postfix) with ESMTPS id 95DA821019
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:25:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DA821019
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7leQ-00056C-27
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:18:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56404)
+	id 1i7llf-0006uj-N9
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:25:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7lcs-0004Hk-KZ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:16:32 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7lkx-0006K0-0p
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7lcq-0006id-6p
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:16:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:47261)
+ (envelope-from <laurent@vivier.eu>) id 1i7lkv-0002i1-PH
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:24:50 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:46497)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7lco-0006g9-PX
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:16:27 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7lkv-0002hR-Gj
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:24:49 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MqqLB-1iTIr82cfx-00mvzh; Tue, 10 Sep 2019 21:15:59 +0200
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mgvan-1idEcW25q1-00hO0f; Tue, 10 Sep 2019 21:24:25 +0200
 To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 References: <1567601968-26946-1-git-send-email-aleksandar.markovic@rt-rk.com>
  <1567601968-26946-9-git-send-email-aleksandar.markovic@rt-rk.com>
  <2d5e7f28-7fa4-7637-c512-b443848eb61b@vivier.eu>
  <CAL1e-=id9tL4-6eLgkd2SQ2W-5yU6Zp7WgVj0YFJ83wdG1qG6w@mail.gmail.com>
+ <CAL1e-=hT6_gDa1U5jC=0HCRo37PR44zBxXH3OU8=XF6pEE=ofA@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -84,34 +85,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <e507ebca-3a19-579c-6cd7-26b08832799e@vivier.eu>
-Date: Tue, 10 Sep 2019 21:15:52 +0200
+Message-ID: <96a8f78e-5b75-bd4d-4740-a736e35a4d77@vivier.eu>
+Date: Tue, 10 Sep 2019 21:24:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=id9tL4-6eLgkd2SQ2W-5yU6Zp7WgVj0YFJ83wdG1qG6w@mail.gmail.com>
+In-Reply-To: <CAL1e-=hT6_gDa1U5jC=0HCRo37PR44zBxXH3OU8=XF6pEE=ofA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:H3wWXjxE3dirsAyZuLVwrWWfURkoGthdjNaJoPaItWKY5NEh7Pf
- zWeOklkHLClVJsmFE0B8h//VjvKHxynTvi9XBgSoYPCxf4OG6rPMq5K5fr658z25/AIWk/b
- SVj+TAQqEUFikcPx7PL2ERYdcVszLaaS8DVcDbngqruwtHSLLihlKiIixLfFo2EFs373PRV
- PlPXdzfWDrzFJHP8bG5Jw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BjHSQ1w+9gw=:OlHi4wquHuqCMoCAy05p6+
- FRBnQFpqAY80bbT0QHOOXTC6zgEQDFZ0BsKbc6Dg/nItqVcLMs8la6iQoBxxCb0Usk7jFjdZQ
- 2b6FbdLgoZPFHBM7G2ovbOUQ/jayCmwD/xw+85NDA58OMiC1qKpq6vwBfkTZpy/alhbCwPIOe
- nOJYdugbv4SNEKKTE/rRHT50AESP9dTz7Mg4KB5RKdzAAEDJSZQvdcFm5XofpJIxHZ/Yg68jY
- LUSadpx8ClRUv5zoelIV7NOXF0rI4abZkBiTjj9GEKqsTD73P6wvUsfB8wqr2pzsltTLhlL7D
- Is0418gPTYGGiAf9sjXJjuPpJhNXHLB4tEHOdx6rA1MwVG3lev2A0kZoVN4QIBXmfRCz5QDlR
- KZLi3WBNL8+gql+1A1+U3wLsy7bhTNjqQPBrQ92ZgI01iJNX4nywbd8OljEr0L1BAa5ZlKf+0
- bNtua8P7sxfj7ajbCYHcr8kvWFHyxfuWJr/+sISJUD20j2DX9iQ4Y2fns+s3Y6Ock7BNKz/8I
- PMA9OxBJyY4xjmllj4sRCjB1+0g8FILYuCNWIs5EoHPUZE8Lg8qXHdoSfMUOFgC9v5GRU+Nup
- g0AcfP0zvXJNCnqd/8m+fZ8BSJIyjtb2ocpLvFVEi915RM5W65ZYTbgfYFZJPXsJA7RwuVqiM
- xCb7R8LAsCTLu2Mp8wRDCo2jKv4rqBr+InxJ6iPLmOWLffTMsmvC7uN8LXrFdiRrDstu/zRhV
- VjyyejMAMw7ObhCH0PVtH47y31VyM+CGRP37J8MWTPdA7rrDflTWkPNed81BFlSg1trc54C08
- QUx8SFOzxq4z4BEHIJafJgqwDQBnsefvatPbcPWpH+HP1I0D8s=
+X-Provags-ID: V03:K1:NLwnerMbkKP9v8V4kBjmf9QxB+qmbW0BbjeZICFIlZ4b9Qo1Ynq
+ 6NAQKul6EremesnzEYIUZARMPEbUJs9uyRtGeNbab2mLVpa6cMCnZzcGMPEs8nVsBH4vu+Y
+ sx2g1kZFSqR8rNbUoEtqKUOGn7tN8MdAa15tFwnWXW4oxCK+B2DscsdQlam4pjnWNV2mqIe
+ udHpvv8HDYkbfWwyrMkpw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Btat7Xw3lwk=:Ah2v6o/D1EVMHBO7UfRmI5
+ jvo8ndOqAMx2mJaeLWCFJdMtPzXi0GJSaYINggJQVTQFyl6I2cEtgT8srqQ3d23dIY0b4hqVO
+ 2laaAKuF98Vr5/6kstSIsdecPglpRRFVqaHuKR/aI7p8MKrLdrA7+0JocIiPLP+goT983GjMd
+ DNIHCrFfscRVXm9y0XsrXeI71w3aUXvVAZt3koTRM0fdUbQPw+zXRJ4NNnu90XDAQc8kIinaL
+ OD7q6BRBlLGrCVMQgOQAY2uV+EOH3qrQgz9BcKL+Ws2X2EqSaTPtsajh2/ybEZ1shb2Nic/fD
+ 1PLPczwIdO27m9SONppOlIEC7J3rw9wU9cYxkA/IYPzI8AQnCcVWL1tkTgGAeelki/BhB0FRQ
+ KUCYAvwgNYyplZF6DnHzx2eH3wp80ENpevo0VXwROxk1OpV3YigkMxrRFl+plqKD6HIc8KZz0
+ tkbWtkVoELo8P5MgMYHCnELUx2nsAQ1WUKHeM574p8sjgZrf00+L5ehvu13aVB6NHCIk9pOW7
+ xuJHJS/CqD/HzavyIfi4axLj/PO+GP/x9cBWEUN/Ftm3BzRdQbOJs9AB6Mphrnc15lztvd4+M
+ izzb0SfqlxN4nqEwAHDWAKvAy20Vgo1ew65n3+9EG7phWxI8aEZ5H61Tz8ushDLwk0AuNt4Qi
+ NS37S1rQuRPTI8T3+GjS9WW7oM6etlvtuOJaWoWMtxNrySfQ72J0dGt2DxwWBvp56NGZx1KMD
+ 8HUGpCEgAY3HQ/f+M9Xgi/C2D5kx8raPAd9JNWLF8lKzLJ0SsjvwsIXkWM8CBUAC3IsZZTSGd
+ zJPcIRL6tWnlgCpk0rVDJnj9cxSHKpkUA7p7dK1Ayig+6tQ+p8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.130
 Subject: Re: [Qemu-devel] [PATCH v6 8/8] linux-user: Add support for
  FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls
 X-BeenThere: qemu-devel@nongnu.org
@@ -131,86 +132,121 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 10/09/2019 à 20:59, Aleksandar Markovic a écrit :
+Le 10/09/2019 à 21:15, Aleksandar Markovic a écrit :
 > 
-> 06.09.2019. 12.47, "Laurent Vivier" <laurent@vivier.eu
+> 10.09.2019. 20.58, aleksandar.m.mail@gmail.com
+> <mailto:aleksandar.m.mail@gmail.com> је написао/ла:
+>>
+>>
+>> 06.09.2019. 12.47, "Laurent Vivier" <laurent@vivier.eu
 > <mailto:laurent@vivier.eu>> је написао/ла:
->>
->> Le 04/09/2019 à 14:59, Aleksandar Markovic a écrit :
->> > From: Aleksandar Markovic <amarkovic@wavecomp.com
+>> >
+>> > Le 04/09/2019 à 14:59, Aleksandar Markovic a écrit :
+>> > > From: Aleksandar Markovic <amarkovic@wavecomp.com
 > <mailto:amarkovic@wavecomp.com>>
->> >
->> > FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
->> > for controlling error reporting of a floppy drive.
->> >
->> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com
+>> > >
+>> > > FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
+>> > > for controlling error reporting of a floppy drive.
+>> > >
+>> > > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com
 > <mailto:amarkovic@wavecomp.com>>
->> > ---
->> >  linux-user/ioctls.h        |  2 ++
->> >  linux-user/syscall_defs.h  | 19 +++++++++++++++++++
->> >  linux-user/syscall_types.h |  7 +++++++
->> >  3 files changed, 28 insertions(+)
+>> > > ---
+>> > >  linux-user/ioctls.h        |  2 ++
+>> > >  linux-user/syscall_defs.h  | 19 +++++++++++++++++++
+>> > >  linux-user/syscall_types.h |  7 +++++++
+>> > >  3 files changed, 28 insertions(+)
+>> > >
+>> > > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+>> > > index 622874b..0c75d03 100644
+>> > > --- a/linux-user/ioctls.h
+>> > > +++ b/linux-user/ioctls.h
+>> > > @@ -118,6 +118,8 @@
+>> > >       IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
+>> > >       IOCTL(FDFMTEND, 0, TYPE_NULL)
+>> > >       IOCTL(FDFLUSH, 0, TYPE_NULL)
+>> > > +     IOCTL(FDSETMAXERRS, IOC_W,
+> MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
+>> > > +     IOCTL(FDGETMAXERRS, IOC_R,
+> MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
 >> >
->> > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
->> > index 622874b..0c75d03 100644
->> > --- a/linux-user/ioctls.h
->> > +++ b/linux-user/ioctls.h
->> > @@ -118,6 +118,8 @@
->> >       IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
->> >       IOCTL(FDFMTEND, 0, TYPE_NULL)
->> >       IOCTL(FDFLUSH, 0, TYPE_NULL)
->> > +     IOCTL(FDSETMAXERRS, IOC_W,
-> MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
->> > +     IOCTL(FDGETMAXERRS, IOC_R,
-> MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
+>> > where is FDSETEMSGTRESH?
+>> >
+>> > >       IOCTL(FDRESET, 0, TYPE_NULL)
+>> > >       IOCTL(FDRAWCMD, 0, TYPE_NULL)
+>> > >       IOCTL(FDTWADDLE, 0, TYPE_NULL)
+>> > > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+>> > > index 834a085..7c5b614 100644
+>> > > --- a/linux-user/syscall_defs.h
+>> > > +++ b/linux-user/syscall_defs.h
+>> > > @@ -890,12 +890,31 @@ struct target_pollfd {
+>> > > 
+>> > >  /* From <linux/fd.h> */
+>> > > 
+>> > > +struct target_floppy_max_errors {
+>> > > +    abi_uint        abort;
+>> > > +    abi_uint        read_track;
+>> > > +    abi_uint        reset;
+>> > > +    abi_uint        recal;
+>> > > +    abi_uint        reporting;
+>> > > +};
+>> >
+>> > You don't need this, you can use floppy_max_errors from <linux/fd.h>.
+>> >
+>> > But you can define it if you want because it is used to know the size of
+>> > the target structure (and if alignment or data types differ it can
+>> > mismatch. With "int" it's not the case).
+>> >
 >>
->> where is FDSETEMSGTRESH?
+>> Laurent, thanks for the review, I'll correct this in the next version.
 >>
->> >       IOCTL(FDRESET, 0, TYPE_NULL)
->> >       IOCTL(FDRAWCMD, 0, TYPE_NULL)
->> >       IOCTL(FDTWADDLE, 0, TYPE_NULL)
->> > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
->> > index 834a085..7c5b614 100644
->> > --- a/linux-user/syscall_defs.h
->> > +++ b/linux-user/syscall_defs.h
->> > @@ -890,12 +890,31 @@ struct target_pollfd {
->> > 
->> >  /* From <linux/fd.h> */
->> > 
->> > +struct target_floppy_max_errors {
->> > +    abi_uint        abort;
->> > +    abi_uint        read_track;
->> > +    abi_uint        reset;
->> > +    abi_uint        recal;
->> > +    abi_uint        reporting;
->> > +};
+>> Just a follow-up question:
 >>
->> You don't need this, you can use floppy_max_errors from <linux/fd.h>.
+>> If the structure of related to a (not-yet-supported in QEMU) ioctl was:
 >>
->> But you can define it if you want because it is used to know the size of
->> the target structure (and if alignment or data types differ it can
->> mismatch. With "int" it's not the case).
+>> struct hd_geometry {
+>>       unsigned char heads;
+>>       unsigned char sectors;
+>>       unsigned short cylinders;
+>>       unsigned long start;
+>> };
+>>
+>> ... would "target_hd_geometry" be needed, or not?
 >>
 > 
-> Laurent, thanks for the review, I'll correct this in the next version.
-> 
-> Just a follow-up question:
-> 
-> If the structure of related to a (not-yet-supported in QEMU) ioctl was:
-> 
-> struct hd_geometry {
->       unsigned char heads;
->       unsigned char sectors;
->       unsigned short cylinders;
->       unsigned long start;
-> };
-> 
-> ... would "target_hd_geometry" be needed, or not?
+> Actually, that ioctl is already implemented in QEMU (HDIO_GETGEO),
+> without defining target_hd_geometry. Is this fine?
 
-In this case I think it is needed:
-"unsigned long start" can be needed to be aligned on 64bit on some 64bit
-architectures whereas on other it can be needed to be aligned on 32bit
-or 16bit (m68k). So host and guest can behave differently.
+No, for instance you can check it:
+
+#include <stdio.h>
+#include <stddef.h>
+#include <linux/hdreg.h>
+
+int main(void)
+{
+    printf("heads %zd\n", offsetof(struct hd_geometry, heads));
+    printf("sectors %zd\n", offsetof(struct hd_geometry, sectors));
+    printf("cylinders %zd\n", offsetof(struct hd_geometry, cylinders));
+    printf("start %zd\n", offsetof(struct hd_geometry, start));
+}
+
+$ cc -o test_align test_align.c
+
+on i386:
+
+$ ./test_align
+heads 0
+sectors 1
+cylinders 2
+start 4
+
+on x86_64:
+
+$ ./test_align
+heads 0
+sectors 1
+cylinders 2
+start 8
 
 Thanks,
 Laurent
