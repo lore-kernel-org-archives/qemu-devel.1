@@ -2,85 +2,63 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8162FC49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:56:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B94A5C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59667208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:56:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59667208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 8E8DD2084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E8DD2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7elK-0007yy-AB
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:56:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50101)
+	id 1i7emo-0000yf-OR
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50647)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1i7eia-0006M6-OA
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:53:57 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i7el5-00086g-CT
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1i7eiY-0004vr-31
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:53:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45536)
+ (envelope-from <kwolf@redhat.com>) id 1i7el4-0007n2-98
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:56:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33252)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i7eiX-0004vD-R4
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:53:54 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i7el2-0007j1-4P; Tue, 10 Sep 2019 07:56:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 944BEC056808
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 11:53:52 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id f18so8932720wro.19
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 04:53:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=1BN0LdRXtiNRZ8TGCJ9lprfFa5Qk53t9WZQ8HxpXauo=;
- b=cbLXpxPZE53uFr8n/Ocl5y6tvQJ4V4pfYu/4iaEByqqaKoeDXVBxG81uFEGIZfQDer
- J1BX9QsvimvWV3QIqfDpyII/DSO98gZwLlmhLOtMwJasK6Fl2My4GBL71jTrXlqBu2t6
- XMZHXts85YtrG7ArM0Rb9UTGpChrCYodIiU+6AECPoCmru6zm6bsakuz+aBRj6fSoscV
- YXPchd0FmlVJKtUNS8YNWsqHIkzLPyDM6VqABfgM2UkMjif0Hdk9Ktrblu6z8VBawg9J
- cjG1tnET86za+66deEnIt2YWy7fvuDRksmjHPQ70KCIqdoGuFlUixfJ/UELqBWlr2lPg
- F+tg==
-X-Gm-Message-State: APjAAAUhjqB/WBKI7slNw9UcmHl8vuNIDTzc8NI7x7foDYZ3sW1WJOnm
- xD1EP6zhruWhR+rB+gGkaB4HTd3A/jyTEWb1LgqmNLN6qO0J2OgHQfpLwdAfwc2qma62LB4b6SP
- M5raHwV6FBDHoQYg=
-X-Received: by 2002:a05:6000:12c9:: with SMTP id
- l9mr25749901wrx.163.1568116431383; 
- Tue, 10 Sep 2019 04:53:51 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzV641KgbEcsJ0/ocXWaifIoo4SxF0l6WsCFSWGUPpQ9PDtO+HHJ8VANyfSA/pydDgDTHbK3w==
-X-Received: by 2002:a05:6000:12c9:: with SMTP id
- l9mr25749877wrx.163.1568116431211; 
- Tue, 10 Sep 2019 04:53:51 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id g15sm2569741wmk.17.2019.09.10.04.53.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 04:53:50 -0700 (PDT)
-References: <20190910110725.141014-1-slp@redhat.com>
- <ff88a19b-ce70-4d31-4495-82ef0bcbbbd6@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4A1D41DC8;
+ Tue, 10 Sep 2019 11:56:27 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-217.ams2.redhat.com
+ [10.36.116.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CD655D9D6;
+ Tue, 10 Sep 2019 11:56:22 +0000 (UTC)
+Date: Tue, 10 Sep 2019 13:56:20 +0200
+From: Kevin Wolf <kwolf@redhat.com>
 To: Max Reitz <mreitz@redhat.com>
-In-reply-to: <ff88a19b-ce70-4d31-4495-82ef0bcbbbd6@redhat.com>
-Date: Tue, 10 Sep 2019 13:53:48 +0200
-Message-ID: <87k1agv037.fsf@redhat.com>
+Message-ID: <20190910115620.GE4446@localhost.localdomain>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-21-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190809161407.11920-21-mreitz@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Tue, 10 Sep 2019 11:56:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] blockjob: update nodes head while removing
- all bdrv
+Subject: Re: [Qemu-devel] [PATCH v6 20/42] block/snapshot: Fix fallback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,79 +70,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+> If the top node's driver does not provide snapshot functionality and we
+> want to fall back to a node down the chain, we need to snapshot all
+> non-COW children.  For simplicity's sake, just do not fall back if there
+> is more than one such child.
+> 
+> bdrv_snapshot_goto() becomes a bit weird because we may have to redirect
+> the actual child pointer, so it only works if the fallback child is
+> bs->file or bs->backing (and then we have to find out which it is).
+> 
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/snapshot.c | 100 +++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 79 insertions(+), 21 deletions(-)
+> 
+> diff --git a/block/snapshot.c b/block/snapshot.c
+> index f2f48f926a..35403c167f 100644
+> --- a/block/snapshot.c
+> +++ b/block/snapshot.c
+> @@ -146,6 +146,32 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDriverState *bs,
+>      return ret;
+>  }
+>  
+> +/**
+> + * Return the child BDS to which we can fall back if the given BDS
+> + * does not support snapshots.
+> + * Return NULL if there is no BDS to (safely) fall back to.
+> + */
+> +static BlockDriverState *bdrv_snapshot_fallback(BlockDriverState *bs)
+> +{
+> +    BlockDriverState *child_bs = NULL;
+> +    BdrvChild *child;
+> +
+> +    QLIST_FOREACH(child, &bs->children, next) {
+> +        if (child == bdrv_filtered_cow_child(bs)) {
+> +            /* Ignore: COW children need not be included in snapshots */
+> +            continue;
+> +        }
+> +
+> +        if (child_bs) {
+> +            /* Cannot fall back to a single child if there are multiple */
+> +            return NULL;
+> +        }
+> +        child_bs = child->bs;
+> +    }
+> +
+> +    return child_bs;
+> +}
 
+Why do we return child->bs here when bdrv_snapshot_goto() then needs to
+reconstruct what the associated BdrvChild was? Wouldn't it make more
+sense to return BdrvChild** from here and maybe have a small wrapper for
+the other functions that only need a BDS?
 
-Max Reitz <mreitz@redhat.com> writes:
-
-> On 10.09.19 13:07, Sergio Lopez wrote:
->> block_job_remove_all_bdrv() iterates through job->nodes, calling
->> bdrv_root_unref_child() for each entry. The call to the latter may
->> reach child_job_[can_]set_aio_ctx(), which will also attempt to
->> traverse job->nodes, potentially finding entries that where freed
->> on previous iterations.
->>=20
->> To avoid this situation, update job->nodes head on each iteration to
->> ensure that already freed entries are no longer linked to the list.
->>=20
->> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1746631
->> Signed-off-by: Sergio Lopez <slp@redhat.com>
->> ---
->>  blockjob.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>=20
->> diff --git a/blockjob.c b/blockjob.c
->> index 6e32d1a0c0..7b1551d981 100644
->> --- a/blockjob.c
->> +++ b/blockjob.c
->> @@ -192,6 +192,12 @@ void block_job_remove_all_bdrv(BlockJob *job)
->>          BdrvChild *c =3D l->data;
->>          bdrv_op_unblock_all(c->bs, job->blocker);
->>          bdrv_root_unref_child(c);
->> +        /*
->> +         * The call above may reach child_job_[can_]set_aio_ctx(), whic=
-h will
->> +         * also traverse job->nodes, so update the head here to make su=
-re it
->> +         * doesn't attempt to process an already freed BdrvChild.
->> +         */
->> +        job->nodes =3D l->next;
->>      }
->>      g_slist_free(job->nodes);
->
-> But this will leak the whole list.
-
-Ouch. This is what happens when you rush up things. I'll send a v2 ASAP.
-
-Thanks,
-Sergio.
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl13jswACgkQ9GknjS8M
-AjXzNg/+MGsEFhPjpBR9fMUGnwMbkJd80oxj5bCby08+Sz61shlIZlmRs+PU9fVv
-rKFg8J5RiPgLZmEIQYUFF6GD6GA+IG/RfHPABhqNrGEFk1HEsBDcEvvbPoGSIVwI
-TO10Ub9ghEZsT2wjwyXbnIj5zSIhuv2C34QLbT07x503QzzgzYKmsyLy6ICaVTBU
-vD/EvQadF3M6KeWfM052vvHcAlrDYlbUPdNKJsaXg9/rSRQXehKHIIiYKR3DXwLb
-gIAMuJnoRpPkllhM0Afju5ZuugFq/8vSJnWnbCbRrX3tkUxIO6Eq4nfzmAzkh/b3
-Q/1IIqMLddS/E9iFf3Q5zJtKSz8UzqcBTNszEPY8VLDIu+QDzb7HBLVvi/PuBinZ
-wLW/f5yR93uWUfuFilmv7NOSMRHYbCqp4cAppcwbwQ7hkZzDQpkr2AjtTaqwO/rz
-WQE2ynQPFnkvzhMrtmY1BIqDjI6uGcaXypuS+Tr/AjRb7WOFJrx00mbLeez6flQ7
-BdeEq92YOuDEbNNdhw2edm6Nxf+xjYrd7lida70oBzBFcqKoK7ztxTI3ZVfzyBYr
-3udbUE2jXZR8sa2fTtTXZIObqJ9sWnYqQSIA01TDEO9rttuftjz8k1RAMOeyTzeJ
-D9424xdjeW3TPQLU8AV4gfimSCQbPceK6jFiwSw/T31uHGL6evA=
-=B1Ve
------END PGP SIGNATURE-----
---=-=-=--
+Kevin
 
