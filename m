@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D50C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:34:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC52C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:34:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06A7F20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:34:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A7F20872
+	by mail.kernel.org (Postfix) with ESMTPS id 2434520872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:34:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2434520872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dTQ-0002am-Ae
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:34:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56598)
+	id 1i7dTn-0002y6-5x
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:34:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56613)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJK-0000S7-Ha
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJL-0000SM-01
  for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJI-0001ul-Cc
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:45 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60074)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJI-0001v2-I1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:46 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60032)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJB-0001oL-CN; Tue, 10 Sep 2019 06:23:37 -0400
+ id 1i7dJB-0001oB-CK; Tue, 10 Sep 2019 06:23:37 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJ8-0007it-2d; Tue, 10 Sep 2019 13:23:34 +0300
+ id 1i7dJ7-0007it-Nz; Tue, 10 Sep 2019 13:23:33 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Tue, 10 Sep 2019 13:23:30 +0300
-Message-Id: <20190910102332.20560-13-vsementsov@virtuozzo.com>
+Date: Tue, 10 Sep 2019 13:23:27 +0300
+Message-Id: <20190910102332.20560-10-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190910102332.20560-1-vsementsov@virtuozzo.com>
 References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v11 12/14] block: add lock/unlock range
- functions
+Subject: [Qemu-devel] [PATCH v11 09/14] iotests: 257: drop unused
+ Drive.device field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,112 +67,137 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce lock/unlock range functionality, based on serialized
-requests. This is needed to refactor backup, dropping local
-tracked-request-like synchronization.
+After previous commit Drive.device is actually unused. Drop it together
+with .name property.  While being here reuse .node in qmp commands
+instead of writing 'drive0' twice.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h |  4 ++++
- block/io.c                | 44 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 47 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/257 | 37 +++++++++++++++----------------------
+ 1 file changed, 15 insertions(+), 22 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 0422acdf1c..b59011ca97 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -65,6 +65,7 @@ enum BdrvTrackedRequestType {
-     BDRV_TRACKED_WRITE,
-     BDRV_TRACKED_DISCARD,
-     BDRV_TRACKED_TRUNCATE,
-+    BDRV_TRACKED_LOCK,
- };
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index 6b368e1e70..5d77202157 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -148,11 +148,6 @@ class Drive:
+         self.fmt = None
+         self.size = None
+         self.node = None
+-        self.device = None
+-
+-    @property
+-    def name(self):
+-        return self.node or self.device
  
- typedef struct BdrvTrackedRequest {
-@@ -968,6 +969,9 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
- int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
-     int64_t offset, unsigned int bytes,
-     QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
-+void *coroutine_fn bdrv_co_try_lock(BlockDriverState *bs,
-+                                    int64_t offset, unsigned int bytes);
-+void coroutine_fn bdrv_co_unlock(void *opaque);
+     def img_create(self, fmt, size):
+         self.fmt = fmt
+@@ -201,7 +196,7 @@ def blockdev_backup(vm, device, target, sync, **kwargs):
+ def blockdev_backup_mktarget(drive, target_id, filepath, sync, **kwargs):
+     target_drive = Drive(filepath, vm=drive.vm)
+     target_drive.create_target(target_id, drive.fmt, drive.size)
+-    blockdev_backup(drive.vm, drive.name, target_id, sync, **kwargs)
++    blockdev_backup(drive.vm, drive.node, target_id, sync, **kwargs)
  
- static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
-     int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flags)
-diff --git a/block/io.c b/block/io.c
-index e909736349..b9dd578d56 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -786,6 +786,15 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
- }
- 
-+static bool ignore_intersection(BdrvTrackedRequest *a, BdrvTrackedRequest *b)
-+{
-+    return a == b || (!a->serialising && !b->serialising) ||
-+        (a->type == BDRV_TRACKED_LOCK && b->type == BDRV_TRACKED_READ &&
-+         !b->serialising) ||
-+        (b->type == BDRV_TRACKED_LOCK && a->type == BDRV_TRACKED_READ &&
-+         !a->serialising);
-+}
-+
- static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-                                                       bool wait)
- {
-@@ -802,7 +811,7 @@ static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-         retry = false;
-         qemu_co_mutex_lock(&bs->reqs_lock);
-         QLIST_FOREACH(req, &bs->tracked_requests, list) {
--            if (req == self || (!req->serialising && !self->serialising)) {
-+            if (ignore_intersection(self, req)) {
-                 continue;
+ def reference_backup(drive, n, filepath):
+     log("--- Reference Backup #{:d} ---\n".format(n))
+@@ -229,7 +224,7 @@ def perform_writes(drive, n):
+             pattern.offset,
+             pattern.size)
+         log(cmd)
+-        log(drive.vm.hmp_qemu_io(drive.name, cmd))
++        log(drive.vm.hmp_qemu_io(drive.node, cmd))
+     bitmaps = drive.vm.query_bitmaps()
+     log({'bitmaps': bitmaps}, indent=2)
+     log('')
+@@ -324,18 +319,17 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+                 }]
              }
-             if (tracked_request_overlaps(req, self->overlap_offset,
-@@ -840,6 +849,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-     return do_wait_serialising_requests(self, true);
- }
  
-+static bool coroutine_fn should_wait_serialising_requests(
-+        BdrvTrackedRequest *self)
-+{
-+    return do_wait_serialising_requests(self, false);
-+}
-+
- static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
-                                    size_t size)
- {
-@@ -3378,3 +3393,30 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
++        drive0.node = 'drive0'
+         vm.qmp_log('blockdev-add',
+                    filters=[iotests.filter_qmp_testfiles],
+-                   node_name="drive0",
++                   node_name=drive0.node,
+                    driver=drive0.fmt,
+                    file=file_config)
+-        drive0.node = 'drive0'
+-        drive0.device = 'device0'
+         # Use share-rw to allow writes directly to the node;
+         # The anonymous block-backend for this configuration prevents us
+         # from using HMP's qemu-io commands to address the device.
+-        vm.qmp_log("device_add", id=drive0.device,
+-                   drive=drive0.name, driver="scsi-hd",
++        vm.qmp_log("device_add", id='device0',
++                   drive=drive0.node, driver="scsi-hd",
+                    share_rw=True)
+         log('')
  
-     return tco.ret;
- }
-+
-+void *coroutine_fn bdrv_co_try_lock(BlockDriverState *bs,
-+                                    int64_t offset, unsigned int bytes)
-+{
-+    BdrvTrackedRequest *req = g_new(BdrvTrackedRequest, 1);
-+
-+    tracked_request_begin(req, bs, offset, bytes, BDRV_TRACKED_LOCK);
-+    mark_request_serialising(req, bdrv_get_cluster_size(bs));
-+
-+    if (should_wait_serialising_requests(req)) {
-+        tracked_request_end(req);
-+        g_free(req);
-+        return NULL;
-+    }
-+
-+    return req;
-+}
-+
-+void coroutine_fn bdrv_co_unlock(void *opaque)
-+{
-+    BdrvTrackedRequest *req = opaque;
-+
-+    assert(req->type == BDRV_TRACKED_LOCK);
-+
-+    tracked_request_end(req);
-+    g_free(req);
-+}
+@@ -343,7 +337,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+         perform_writes(drive0, 0)
+         reference_backup(drive0, 0, fbackup0)
+         log('--- Add Bitmap ---\n')
+-        vm.qmp_log("block-dirty-bitmap-add", node=drive0.name,
++        vm.qmp_log("block-dirty-bitmap-add", node=drive0.node,
+                    name="bitmap0", granularity=GRANULARITY)
+         log('')
+         ebitmap = EmulatedBitmap()
+@@ -358,7 +352,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+         # 1 - Test Backup (w/ Optional induced failure)
+         if failure == 'intermediate':
+             # Activate blkdebug induced failure for second-to-next read
+-            log(vm.hmp_qemu_io(drive0.name, 'flush'))
++            log(vm.hmp_qemu_io(drive0.node, 'flush'))
+             log('')
+         job = backup(drive0, 1, bsync1, msync_mode,
+                      bitmap="bitmap0", bitmap_mode=bsync_mode)
+@@ -426,7 +420,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+ 
+         log('--- Cleanup ---\n')
+         vm.qmp_log("block-dirty-bitmap-remove",
+-                   node=drive0.name, name="bitmap0")
++                   node=drive0.node, name="bitmap0")
+         bitmaps = vm.query_bitmaps()
+         log({'bitmaps': bitmaps}, indent=2)
+         vm.shutdown()
+@@ -467,22 +461,21 @@ def test_backup_api():
+             'filename': drive0.path
+         }
+ 
++        drive0.node = 'drive0'
+         vm.qmp_log('blockdev-add',
+                    filters=[iotests.filter_qmp_testfiles],
+-                   node_name="drive0",
++                   node_name=drive0.node,
+                    driver=drive0.fmt,
+                    file=file_config)
+-        drive0.node = 'drive0'
+-        drive0.device = 'device0'
+-        vm.qmp_log("device_add", id=drive0.device,
+-                   drive=drive0.name, driver="scsi-hd")
++        vm.qmp_log("device_add", id='device0',
++                   drive=drive0.node, driver="scsi-hd")
+         log('')
+ 
+         target0 = Drive(backup_path, vm=vm)
+         target0.create_target("backup_target", drive0.fmt, drive0.size)
+         log('')
+ 
+-        vm.qmp_log("block-dirty-bitmap-add", node=drive0.name,
++        vm.qmp_log("block-dirty-bitmap-add", node=drive0.node,
+                    name="bitmap0", granularity=GRANULARITY)
+         log('')
+ 
+@@ -521,7 +514,7 @@ def test_backup_api():
+             log("-- Sync mode {:s} tests --\n".format(sync_mode))
+             for bitmap in (None, 'bitmap404', 'bitmap0'):
+                 for policy in error_cases[sync_mode][bitmap]:
+-                    blockdev_backup(drive0.vm, drive0.name, "backup_target",
++                    blockdev_backup(drive0.vm, drive0.node, "backup_target",
+                                     sync_mode, job_id='api_job',
+                                     bitmap=bitmap, bitmap_mode=policy)
+                     log('')
 -- 
 2.18.0
 
