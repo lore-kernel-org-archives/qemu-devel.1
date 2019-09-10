@@ -2,66 +2,100 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C961CC4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 515FDC4740A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:41:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C92821479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:37:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C92821479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2383D208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:41:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2383D208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hGj-0001go-JU
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:37:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52356)
+	id 1i7hKh-0003rC-8i
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:41:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i7hFY-0000os-27
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:36:09 -0400
+ (envelope-from <bala24@linux.ibm.com>) id 1i7hJm-0002tI-UV
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i7hFW-0000yR-3t
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:36:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31347)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i7hFQ-0000uK-To; Tue, 10 Sep 2019 10:36:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9395E30A7B8F;
- Tue, 10 Sep 2019 14:35:59 +0000 (UTC)
-Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 09CC9100194E;
- Tue, 10 Sep 2019 14:35:56 +0000 (UTC)
-Message-ID: <0d1bbda1fccb296746b5df3d5bde3ee9443a07b8.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, 
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Date: Tue, 10 Sep 2019 17:35:55 +0300
-In-Reply-To: <a21dc942-404c-6fc5-08c5-88be1d01508b@virtuozzo.com>
-References: <20190906195750.17651-1-mlevitsk@redhat.com>
- <20190906195750.17651-2-mlevitsk@redhat.com>
- <7634baef-f42f-4603-2ec9-3f4aa6cfe278@virtuozzo.com>
- <dd0b472186f651823a3ba7a74111a8361235109a.camel@redhat.com>
- <a21dc942-404c-6fc5-08c5-88be1d01508b@virtuozzo.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 10 Sep 2019 14:35:59 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] block/qcow2: refactoring of
- threaded encryption code
+ (envelope-from <bala24@linux.ibm.com>) id 1i7hJl-00033w-Ma
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:40:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1780)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
+ id 1i7hJl-00033Z-Fb
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:40:29 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8AEU5hL038928
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 10:40:28 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2uxcwp2gye-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 10:40:26 -0400
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
+ Tue, 10 Sep 2019 15:40:23 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 10 Sep 2019 15:40:19 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8AEeI3D54198410
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Sep 2019 14:40:18 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 46E07A4069;
+ Tue, 10 Sep 2019 14:40:18 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C9407A4062;
+ Tue, 10 Sep 2019 14:40:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.124.35.221])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Tue, 10 Sep 2019 14:40:16 +0000 (GMT)
+Date: Tue, 10 Sep 2019 20:10:14 +0530
+From: Balamuruhan S <bala24@linux.ibm.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+References: <20190910071019.16689-1-bala24@linux.ibm.com>
+ <0a76efcd-127c-75a4-8fc8-92007ccec1a5@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <0a76efcd-127c-75a4-8fc8-92007ccec1a5@kaod.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19091014-0012-0000-0000-000003498A7E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091014-0013-0000-0000-00002183EF97
+Message-Id: <20190910144014.GA25854@localhost.localdomain>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-10_10:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909100141
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x8AEU5hL038928
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH v1 0/3] add Homer/OCC common area emulation
+ for PowerNV
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,295 +107,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: maddy@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, groug@kaod.org,
+ qemu-devel@nongnu.org, hari@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2019-09-10 at 14:17 +0000, Vladimir Sementsov-Ogievskiy wrote:
-> 10.09.2019 15:31, Maxim Levitsky wrote:
-> > On Sat, 2019-09-07 at 19:08 +0000, Vladimir Sementsov-Ogievskiy wrote:
-> > > 06.09.2019 22:57, Maxim Levitsky wrote:
-> > > > This commit tries to clarify few function arguments,
-> > > > and add comments describing the encrypt/decrypt interface
-> > > > 
-> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > ---
-> > > >    block/qcow2-cluster.c | 10 +++----
-> > > >    block/qcow2-threads.c | 61 ++++++++++++++++++++++++++++++++++---------
-> > > >    2 files changed, 53 insertions(+), 18 deletions(-)
-> > > > 
-> > > > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> > > > index f09cc992af..1989b423da 100644
-> > > > --- a/block/qcow2-cluster.c
-> > > > +++ b/block/qcow2-cluster.c
-> > > > @@ -463,8 +463,8 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
-> > > >    }
-> > > >    
-> > > >    static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
-> > > > -                                                uint64_t src_cluster_offset,
-> > > > -                                                uint64_t cluster_offset,
-> > > > +                                                uint64_t guest_cluster_offset,
-> > > > +                                                uint64_t host_cluster_offset,
-> > > >                                                    unsigned offset_in_cluster,
-> > > >                                                    uint8_t *buffer,
-> > > >                                                    unsigned bytes)
-> > > > @@ -474,8 +474,8 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
-> > > >            assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-> > > >            assert((bytes & ~BDRV_SECTOR_MASK) == 0);
-> > > >            assert(s->crypto);
-> > > > -        if (qcow2_co_encrypt(bs, cluster_offset,
-> > > > -                             src_cluster_offset + offset_in_cluster,
-> > > > +        if (qcow2_co_encrypt(bs, host_cluster_offset,
-> > > > +                             guest_cluster_offset + offset_in_cluster,
-> > > >                                 buffer, bytes) < 0) {
-> > > >                return false;
-> > > >            }
-> > > > @@ -496,7 +496,7 @@ static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
-> > > >        }
-> > > >    
-> > > >        ret = qcow2_pre_write_overlap_check(bs, 0,
-> > > > -            cluster_offset + offset_in_cluster, qiov->size, true);
-> > > > +              cluster_offset + offset_in_cluster, qiov->size, true);
-> > > 
-> > > 
-> > > Hmm, unrelated hunk.
-> > 
-> > I was asked to do this to fix coding style, so that wrapped line,
-> > is 4 characters shifted to the right.
-> 
-> AFAIS, Eric asked only about qcow2_co_encdec calls and definition.. It's OK to fix style in code
-> you touch in you patch anyway, but no reason to fix style somewhere else, it dirties patch for
-> no reason, making it more difficult (a bit, but still) to review and more difficult to backport..
-All right, then I'll drop that change. I kind of agree with this, but I also didn't mind doing these fixes
-either.
+On Tue, Sep 10, 2019 at 01:45:55PM +0200, C=E9dric Le Goater wrote:
+> On 10/09/2019 09:10, Balamuruhan S wrote:
+> > Hi All,
+> >=20
+> > This is follow-up patch that implements HOMER and OCC SRAM device
+> > models to emulate homer memory and occ common area access for pstate
+> > table, occ sensors, runtime data and slw.
+> >=20
+> > This version addresses review comments in previous patchset and
+> > breaks it to have separate patch series for Homer and OCC emulation,
+> >=20
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg00979.html
+> >=20
+> > currently skiboot disables the homer/occ code path with `QUIRK_NO_PBA=
+`,
+> > this quirk have to be removed in skiboot for it to use HOMER and OCC
+> > SRAM device models along with few bug fixes,
+> >=20
+> > https://github.com/balamuruhans/skiboot/commit/a655514d2a730e0372a2fa=
+ee277d1cf01f71a524
+> > https://github.com/balamuruhans/skiboot/commit/fd3d93d92ec66a7494346d=
+6d24ced7b48264c9a0
+>=20
+> Can't we generate the sensors in QEMU ? I am not sure what this
+> patch does. Is the Header Block invalid ?=20
 
-> 
-> > 
-> > > 
-> > > >        if (ret < 0) {
-> > > >            return ret;
-> > > >        }
-> > > > diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-> > > > index 3b1e63fe41..c3cda0c6a5 100644
-> > > > --- a/block/qcow2-threads.c
-> > > > +++ b/block/qcow2-threads.c
-> > > > @@ -234,15 +234,19 @@ static int qcow2_encdec_pool_func(void *opaque)
-> > > >    }
-> > > >    
-> > > >    static int coroutine_fn
-> > > > -qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
-> > > > -                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
-> > > > +qcow2_co_encdec(BlockDriverState *bs, uint64_t host_cluster_offset,
-> > > > +                uint64_t guest_offset, void *buf, size_t len,
-> > > > +                Qcow2EncDecFunc func)
-> > > >    {
-> > > >        BDRVQcow2State *s = bs->opaque;
-> > > > +
-> > > > +    uint64_t offset = s->crypt_physical_offset ?
-> > > > +        host_cluster_offset + offset_into_cluster(s, guest_offset) :
-> > > > +        guest_offset;
-> > > > +
-> > > >        Qcow2EncDecData arg = {
-> > > >            .block = s->crypto,
-> > > > -        .offset = s->crypt_physical_offset ?
-> > > > -                      file_cluster_offset + offset_into_cluster(s, offset) :
-> > > > -                      offset,
-> > > > +        .offset = offset,
-> > > >            .buf = buf,
-> > > >            .len = len,
-> > > >            .func = func,
-> > > > @@ -251,18 +255,49 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
-> > > >        return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
-> > > >    }
-> > > >    
-> > > > +
-> > > > +/*
-> > > > + * qcow2_co_encrypt()
-> > > > + *
-> > > > + * Encrypts one or more contiguous aligned sectors
-> > > > + *
-> > > > + * @host_cluster_offset - on disk offset of the first cluster in which
-> > > > + * the encrypted data will be written
-> > > 
-> > > 
-> > > It's not quite right, it's not on disk, but on .file child of qcow2 node, which
-> > > may be any other format or protocol node.. So, I called it file_cluster_offset.
-> > > But I'm OK with new naming anyway. And it may be better for encryption related
-> > > logic..
-> > 
-> > Yes, the .file is the underlying storage for both qcow2 metadata and the data,
-> > and it is unlikely be another qcow2 file. Usually it will be a raw file,
-> > accessed with some protocol.
-> > I will change the wording to not include the 'disk' word though.
-> > 
-> > 
-> > To be really honest, the best naming here would be one that follows the virtual memory concepts.
-> > A virtual block/cluster address and a physical block/cluster address.
-> > However we talked with Kevin recently and I also studied quite a lot of qcow2 code,
-> > and the usual convention is guest cluster offset and host cluster offset,
-> > and often guest offsets are just called offsets, which is very confusing IMHO.
-> 
-> It don't confuse me, as it's an interface of block-layer. Interface user just writes at some offset.
-> And the fact that internally, we consider interface parameter "offset" as "guest offset" and map it
-> to some physical offset - it's an implementation details. In other words, guest don't know that it
-> writes at "guest offset", it just writes at "offset" and don't care.
-> 
-> > 
-> > 
-> > > 
-> > >   > + * Used as an initialization vector for encryption
-> > > 
-> > > Hmm, is it default now?
-> > 
-> > 
-> > Most of block crypto implementations have IV which derive
-> > some way or another from the sector address.
-> > 
-> >  From what I see, the block address is either used as is,
-> > or encrypted itself with same encryption key,
-> > and the result is used as IV. Even the legacy qcow
-> > encryption uses this, although it uses the virtual block
-> > address, and apparently this is one of its security flaws.
-> > 
-> > If you don't use any IV, you end up with major security
-> > hole - sectors of the same content will be encrypted
-> > to the same cipertext.
-> > 
-> > I added this comment to clarify the usage of offset,
-> > since other that this aspect of IV generation,
-> > the crypto routines only need the data to be encrypted and
-> > the encryption key which is stored in the crypto context.
-> > 
-> > 
-> > > 
-> > > > + *
-> > > > + * @guest_offset - guest (virtual) offset of the first sector of the
-> > > > + * data to be encrypted
-> > > 
-> > > Hmm, stop. It's wrong. Data to be encrypted is in buffer, so, it's not first sector of
-> > > the data to be encrypted, but first sector in which guest writes data (to be encrypted
-> > > in meantime).
-> > 
-> > No no no!
-> > 
-> > guest_offset is literally the guest's disk address of the first sector that is in the buffer.
-> > The qcow2_co_encrypt is called from 2 places:
-> > 
-> > 1. qcow2_co_pwritev_part - here indeed the actually guest written data
-> > is encrypted, and the 'offset' is passed which is the offset on which pwritev was called
-> 
-> I mean, that in this case your comment for me sounds like "data to be encrypted is on disk, at this offset".
-> but it's not actually on disk, data is in buffer. And what is on disk we don't know, we are going to
-> write...
-> 
-> But I don't really care. Hope it's actually obvious for averyone, where is data on write path.
+This doesn't directly affect Qemu, this is skiboot bug where it
+creates device tree node for sensor-groups and does sensor
+sanity check to initialize, but in negative scenario where there
+is no sensors like in Qemu the sanity check fails but still device
+tree populates the sensor-groups node wrongly. The cleanup is not
+handled in skiboot and this patch does that.
 
-Ah, now I understand. I don't mind adding a word or two explicitly mentioning that the *data* to be
-encrypted is in the given buffer.
+>=20
+> It would be good to generate properties to control their values=20
+> on the monitor line, like Rashmica did for GPIO model in the=20
+> Aspeed machine.
 
-> 
-> > 
-> > 
-> > 2. do_perform_cow_encrypt - here the just read data from before or after actually written guest
-> > data is encrypted, and the guest_offset represents the address of that data.
-> > I changed the do_perform_cow_encrypt, so that it receives from the caller the host and guest offset
-> > of the data to be encrypted. It then aligns the host offset on start of the cluster, and passes
-> > the guest offset as is, so that it does the same as qcow2_co_pwritev_part.
-> > 
-> > 
-> > So what is wrong here?
-> > 
-> > >   
-> > > 
-> > > > + * Used as an initialization vector for older, qcow2 native encryption
-> > > > + *
-> > > > + * @buf - buffer with the data to encrypt
-> > > > + * @len - length of the buffer (in sector size multiplies)
-> > > > + *
-> > > > + * Note that the group of the sectors, don't have to be aligned
-> > > > + * on cluster boundary and can also cross a cluster boundary.
-> > > 
-> > > And I doubt in it now. I'm afraid that if we call qcow2_co_encrypt for a group
-> > > of the sectors crossing a cluster boundary, we will finish up with similar bug: we'll
-> > > use first cluster offset as a vector for all the sectors. We still never do it.. So,
-> > > I think it worth assertion and corresponding comment.
-> > > 
-> > > Or is it correct?
-> > 
-> > Crypto code receives the data to be encrypted and decrypted,
-> > and offset of first sector (512 bytes aligned) of that data (for IV calculation).
-> > If the data spans multiple sectors (this happens already a lot)
-> 
-> Ah, yes, that's OK, sorry.
-> 
-> > then it able to handle this since the code works.
-> > The relevant code is in do_qcrypto_block_cipher_encdec, and
-> > is actually generic for all the crypto modes.
-> > 
-> > So there should not be anything special about crossing the cluster
-> > boundary, other that noting this here, just in case.
-> > 
-> > No only that code can cross a cluster boundary, but it can even be
-> > called for more that one cluster at once. It looks like qcow2 code limits all
-> > the IO in case crypto is used to QCOW_MAX_CRYPT_CLUSTERS, which is 32
-> > currently. I don't know why to be honest.
-> > 
-> > Remember that crypto code has no notion of clusters. It works purely
-> > on sector (512 bytes) level, and each sector will have its own IV calculated,
-> > based on its sector address.
-> > 
-> > > 
-> > > > + *
-> > > > + *
-> > > > + */
-> > > >    int coroutine_fn
-> > > > -qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-> > > > -                 uint64_t offset, void *buf, size_t len)
-> > > > +qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_cluster_offset,
-> > > > +                 uint64_t guest_offset, void *buf, size_t len)
-> > > >    {
-> > > > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-> > > > -                             qcrypto_block_encrypt);
-> > > > +    return qcow2_co_encdec(bs, host_cluster_offset, guest_offset, buf, len,
-> > > > +                           qcrypto_block_encrypt);
-> > > >    }
-> > > >    
-> > > > +
-> > > > +/*
-> > > > + * qcow2_co_decrypt()
-> > > > + *
-> > > > + * Decrypts one or more contiguous aligned sectors
-> > > > + * Same function as qcow2_co_encrypt
-> > > 
-> > > Hmm, not exactly same :)
-> > 
-> > I'll fix that.
-> > 
-> > 
-> > > 
-> > > > + *
-> > > > + */
-> > > > +
-> > > >    int coroutine_fn
-> > > > -qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-> > > > -                 uint64_t offset, void *buf, size_t len)
-> > > > +qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_cluster_offset,
-> > > > +                 uint64_t guest_offset, void *buf, size_t len)
-> > > >    {
-> > > > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-> > > > -                             qcrypto_block_decrypt);
-> > > > +    return qcow2_co_encdec(bs, host_cluster_offset, guest_offset, buf, len,
-> > > > +                           qcrypto_block_decrypt);
-> > > >    }
-> > > > 
+>=20
+> > https://github.com/balamuruhans/skiboot/commit/165b3829a93bc177c18133=
+945a8cca3a2d701173
+>=20
+> This one is weird .
 
+I did a miss here, in skiboot there is check whether parsed pstate id
+for pmin and pmax is valid or not. In this check, pmax to pmin for P8
+it is 0 to -N and for P9 0 to N. But in Qemu for the MemoryRegionOps
+structure read() callback function can have only uint64_t as return
+type, so for P8 I got error from skiboot as we return postive value
+and misunderstood to make this skiboot change. Cedric how can we handle
+this from Qemu ?
 
-Best regards,
-	Maxim Levitsky
+Thanks for review,
 
+-- Bala
+
+>=20
+> C.=20
+>=20
+> >=20
+> > changes from v1:
+> >     * reuse PnvOCC device model to implement SRAM device.
+> >     * implement PnvHomer as separate device model.
+> >     * have core max base address as part of PnvHOMERClass.
+> >     * reuse PNV_CHIP_INDEX() instead of introducing new `chip_num`.
+> >     * define all the memory ops access address as macros.
+> >     * few coding style warnings given by checkpatch.pl.
+> >=20
+> > I request for review, comments and suggestions for the changes.
+> >=20
+> > Balamuruhan S (3):
+> >   hw/ppc/pnv_xscom: retrieve homer/occ base address from PBA BARs
+> >   hw/ppc/pnv_occ: add sram device model for occ common area
+> >   hw/ppc/pnv_homer: add PowerNV homer device model
+> >=20
+> >  hw/ppc/Makefile.objs       |   1 +
+> >  hw/ppc/pnv.c               |  87 ++++++++++++---
+> >  hw/ppc/pnv_homer.c         | 258 +++++++++++++++++++++++++++++++++++=
+++++++++++
+> >  hw/ppc/pnv_occ.c           |  78 ++++++++++++++
+> >  hw/ppc/pnv_xscom.c         |  34 +++++-
+> >  include/hw/ppc/pnv.h       |  21 ++++
+> >  include/hw/ppc/pnv_homer.h |  52 +++++++++
+> >  include/hw/ppc/pnv_occ.h   |   3 +
+> >  8 files changed, 513 insertions(+), 21 deletions(-)
+> >  create mode 100644 hw/ppc/pnv_homer.c
+> >  create mode 100644 include/hw/ppc/pnv_homer.h
+> >=20
+>=20
 
 
