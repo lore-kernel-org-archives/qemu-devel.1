@@ -2,61 +2,89 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C695C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B61C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E9662067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:46:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9662067B
+	by mail.kernel.org (Postfix) with ESMTPS id CD8932067B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:49:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD8932067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dfR-00070j-5o
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:46:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36415)
+	id 1i7dhj-0000Y8-S5
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i7dX4-00072U-IH
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:38:02 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7dc0-0003zv-Hz
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i7dX2-0001yJ-Iz
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:37:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48094)
+ (envelope-from <mreitz@redhat.com>) id 1i7dbz-0003sm-9X
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:43:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23448)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i7dWv-0001tl-8F; Tue, 10 Sep 2019 06:37:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7dbw-0003r0-B9; Tue, 10 Sep 2019 06:43:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 031AA30BCB87;
- Tue, 10 Sep 2019 10:37:43 +0000 (UTC)
-Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CBCE15DA5B;
- Tue, 10 Sep 2019 10:37:39 +0000 (UTC)
-Message-ID: <b15947a62510325bddec093a2f80e86704a81641.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 13:37:38 +0300
-In-Reply-To: <5608ea37-e3d4-0e9c-039c-5311c8b8d531@redhat.com>
-References: <676393243dbf38470b514a8dc11024380ff836d8.camel@redhat.com>
- <5608ea37-e3d4-0e9c-039c-5311c8b8d531@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D5A030ADBCB;
+ Tue, 10 Sep 2019 10:42:59 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
+ [10.36.117.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3504C60BE2;
+ Tue, 10 Sep 2019 10:42:52 +0000 (UTC)
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+References: <20190827185913.27427-1-nsoffer@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2db5f966-6de7-a9c0-18bb-193325e99d64@redhat.com>
+Date: Tue, 10 Sep 2019 12:42:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190827185913.27427-1-nsoffer@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VO97rCXxVpvJvfPcmIHFA16GJROj9CULm"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 10 Sep 2019 10:37:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Tue, 10 Sep 2019 10:42:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] IOTEST 162
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Alignment checks cleanup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,155 +96,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Nir Soffer <nsoffer@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-09 at 13:24 -0400, John Snow wrote:
-> 
-> On 9/6/19 1:25 PM, Maxim Levitsky wrote:
-> > Hi!
-> > 
-> > I just had a very fun rabbit hole dive, and I want to share it with you.
-> > 
-> > I notice for some time that iotest 162 fails with that:
-> > 
-> > -qemu-img: Could not open 'json:{"driver": "nbd", "host": 42}': Failed to connect socket: Invalid argument
-> > +qemu-img: Could not open 'json:{"driver": "nbd", "host": 42}': Failed to connect socket:
-> > Connection timed out
-> > 
-> > 
-> > I didn't bother to report it yet as it started failing more or less when qemu 4.2 merge window opened,
-> > so I thought that maybe something got broken, or maybe something broken in my environment 
-> > (ahem, AF_UNIX path is too long, ahem)
-> > 
-> > I just didn't had enough time to pay attention to this. Until today.
-> > 
-> > So I asked Kevin Wolf today, just by the way why I see for some time that
-> > iotest 162 fails. for me.
-> > 
-> > 
-> > He told me that it works for him.
-> > So I look at the test and I see that it just does
-> > 
-> > qemu-img info 'json:{"driver": "nbd", "host": 42}'
-> > 
-> > Supposedly it should fail because 42 is not quoted, and it 
-> > doesn't look like a valid host name.
-> > 
-> > I try with disto's qemu-img (2.11) and I still see that I get the 'Connection timed out'
-> > 
-> > Then I ask him to try on his system with '42' quoted and it still passes.
-> > 
-> > All right - this means that this 42 is parsed. He also mentions that he uses fedora 29 and I still
-> > use fedora 28. So I start a VM with fedora 30, and yep, there it does work correctly.
-> > 
-> > All right, that 42 must be parsed as a host name. Yep. 'ping 42' on my machine tries to ping 0.0.0.42,
-> > and in VM exits immediately with 'Invalid argument'
-> > All right, lets ping 0.0.0.42. Maybe something in hostname parsing changed, maybe something parses this on DNS level?
-> > Nope, ping 0.0.0.42 works on my machine, fails with invalid argument in VM...
-> > 
-> > All right lets strace it
-> > 
-> > connect(5, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("0.0.0.42")}, 16) = -1 EINVAL (Invalid argument)
-> > 
-> > Same thing passes on my machine....
-> > 
-> > Hmm... this is something in the kernel. Maybe something in iptables/etc. I don't yet know that
-> > area that well to be honest.
-> > 
-> > So I googled a bit and look what I found:
-> > 
-> > https://lwn.net/Articles/791086/
-> > 
-> > And yes, while my machine runs fedora 28, it as usual runs vanilla git master
-> > kernel, which I compile from time to time. Currently I am on 5.3.0-rc4+.
-> > 
-> > So I must say that nothing less but kernel 5.3.0, breaks iotest 162.
-> > 
-> > I''l prepare a patch soon to fix this.
-> 
-> I wonder if I am seeing some related problems, though I am running
-> 5.2.11 right now and not 5.3.x:
-> 
-> 162 is failing in this way:
-> 
-> -qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost",
-> "port": "0", "path": "/foo"}': Failed to connect socket: Connection refused
-> -qemu-img: Could not open 'driver=ssh,host=localhost,port=0,path=/foo':
-> Failed to connect socket: Connection refused
-> +qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost",
-> "port": "0", "path": "/foo"}': Failed to connect socket: Connection
-> timed out
-> +qemu-img: Could not open 'driver=ssh,host=localhost,port=0,path=/foo':
-> Failed to connect socket: Connection timed out
->  qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost",
-> "port": 0.42, "path": "/foo"}': Parameter 'port' expects a number
->  qemu-img: Could not open
-> 'driver=ssh,host=localhost,port=0.42,path=/foo': Parameter 'port'
-> expects a number
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VO97rCXxVpvJvfPcmIHFA16GJROj9CULm
+Content-Type: multipart/mixed; boundary="9dtgCOcxisJpmuH7eKWagyPEBrwCqFVFF";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf
+ <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Nir Soffer <nsoffer@redhat.com>
+Message-ID: <2db5f966-6de7-a9c0-18bb-193325e99d64@redhat.com>
+Subject: Re: [PATCH v2 0/2] Alignment checks cleanup
+References: <20190827185913.27427-1-nsoffer@redhat.com>
+In-Reply-To: <20190827185913.27427-1-nsoffer@redhat.com>
 
-This must be the same issue, although here it fails like that:
+--9dtgCOcxisJpmuH7eKWagyPEBrwCqFVFF
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 27.08.19 20:59, Nir Soffer wrote:
+> While working on 4k support, I noticed that there is lot of code using
+> BDRV_SECTOR_SIZE (512) for checking alignment. I wonder how this can wo=
+rk with
+> 4k storage.
+>=20
+> Lets start by cleaning up to make the code easier to understand:
+> - Use QEMU_IS_ALIGNED macro to check alignment
+> - Remove unneeded masks based on BDRV_SECTOR_SIZE
+>=20
+> Nir Soffer (2):
+>   block: Use QEMU_IS_ALIGNED
+>   block: Remove unused masks
+>=20
+>  block/bochs.c         | 4 ++--
+>  block/cloop.c         | 4 ++--
+>  block/dmg.c           | 4 ++--
+>  block/io.c            | 8 ++++----
+>  block/qcow2-cluster.c | 4 ++--
+>  block/qcow2.c         | 4 ++--
+>  block/vvfat.c         | 8 ++++----
+>  include/block/block.h | 2 --
+>  migration/block.c     | 2 +-
+>  qemu-img.c            | 2 +-
+>  10 files changed, 20 insertions(+), 22 deletions(-)
+
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
 
-[mlevitsk@maximlenovopc ~/qemu/tests/qemu-iotests]$./check -qcow2 162
-QEMU          -- "/home/mlevitsk/qemu/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64" -nodefaults -display none -machine accel=qtest
-QEMU_IMG      -- "/home/mlevitsk/qemu/tests/qemu-iotests/../../qemu-img" 
-QEMU_IO       -- "/home/mlevitsk/qemu/tests/qemu-iotests/../../qemu-io"  --cache writeback -f qcow2
-QEMU_NBD      -- "/home/mlevitsk/qemu/tests/qemu-iotests/../../qemu-nbd" 
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/x86_64 maximlenovopc 5.3.0-rc4+
-TEST_DIR      -- /home/mlevitsk/qemu/tests/qemu-iotests/scratch
-SOCKET_SCM_HELPER -- /home/mlevitsk/qemu/tests/qemu-iotests/socket_scm_helper
+(I think you should check the setting of git config=E2=80=99s user.email =
+in your
+qemu directory.  Even if you send the patches through a gmail address
+(which I don=E2=80=99t quite know why you=E2=80=99re doing that, but it i=
+sn=E2=80=99t like that
+really matters), the patches should then still contain a =E2=80=9CFrom: =E2=
+=80=9D that
+shows the actual author as set by user.name and user.email.)
 
-162      fail       [12:25:07] [12:27:18]                    output mismatch (see 162.out.bad)
---- /home/mlevitsk/USERSPACE/qemu/src/tests/qemu-iotests/162.out	2019-04-07 16:37:54.656311574 +0300
-+++ /home/mlevitsk/qemu/tests/qemu-iotests/162.out.bad	2019-09-10 12:27:18.032903571 +0300
-@@ -1,7 +1,7 @@
- QA output created by 162
- 
- === NBD ===
--qemu-img: Could not open 'json:{"driver": "nbd", "host": 42}': Failed to connect socket: Invalid argument
-+qemu-img: Could not open 'json:{"driver": "nbd", "host": 42}': Failed to connect socket: Connection timed out
- image: nbd://localhost:PORT
- image: nbd+unix://?socket=42
- 
-Failures: 162
-Failed 1 of 1 tests
+Max
 
 
+--9dtgCOcxisJpmuH7eKWagyPEBrwCqFVFF--
 
-Test 147 passes for me with both raw and qcow2 format.
+--VO97rCXxVpvJvfPcmIHFA16GJROj9CULm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Best regards,
-	Maxim Levitsky
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13fioACgkQ9AfbAGHV
+z0BAewf+I4BQg0RRnhsWDYU2csCh5iXdXMwUHZZ3h5UHqbAYNDh5fsDfV7bZxwII
+bY/BqFq3RpTwLdpd1W2mwUd/Xh487yyzzrd80duZUy193HaE+j5I7PlACcnkFi+k
+l6slybafUI43Nn5sPzg4f+EBReyxDLbqP6pa9O2X+xq/8SBuWtOPyiwzPjGLgTyA
+LF34Ou/Ukyt9dJ0zLk194ESIL/b/V5OYKCQ6zF9rR3neMoyUKjfXCjq/BL+mwQMH
+uk129yLkVob1P2svFrlvXFnOZFutAfzHMT9kyZLZI/P3fAopgdf0GQwXHexJUEQP
+QlnA7gBhQQSSIJ/qmdfiAPuvpXPrAA==
+=uMCH
+-----END PGP SIGNATURE-----
 
-> 
-> 
-> and 147 is failing this way:
-> 
-> +  File "147", line 243, in test_inet6
-> +    if self._try_server_up(address):
-> +  File "147", line 156, in _try_server_up
-> +    self.assert_qmp(result, 'return', {})
-> +  File "/home/bos/jhuston/src/qemu/tests/qemu-iotests/iotests.py", line
-> 685, in assert_qmp
-> +    result = self.dictpath(d, path)
-> +  File "/home/bos/jhuston/src/qemu/tests/qemu-iotests/iotests.py", line
-> 661, in dictpath
-> +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-> +AssertionError: failed path traversal for "return" in "{'error':
-> {'class': 'GenericError', 'desc': 'Failed to bind socket: Cannot assign
-> requested address'}}"
-> 
-> 
-> 
-> I'm not sure when the failure started -- this is the first time I'm
-> seeing it -- I'm fairly certain I ran these tests Thursday or Friday
-> last week.
-
-
+--VO97rCXxVpvJvfPcmIHFA16GJROj9CULm--
 
