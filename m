@@ -2,95 +2,127 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCD7C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A360C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:33:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0ED22081B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:33:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0ED22081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57D942081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:33:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="bKiYvnum"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57D942081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7cWH-0001l0-FX
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:33:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41765)
+	id 1i7cWm-0002RU-Gp
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:33:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7cEk-00055Z-RU
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:15:00 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7cMd-0008Aq-PT
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:23:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7cEi-0005Y8-Tq
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:14:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47578)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7cEb-0005RS-1o; Tue, 10 Sep 2019 05:14:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 45004C058CB8;
- Tue, 10 Sep 2019 09:14:48 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
- [10.36.117.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 90F035D6B2;
- Tue, 10 Sep 2019 09:14:46 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-5-mreitz@redhat.com>
- <20190904161658.GD21246@localhost.localdomain>
- <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
- <20190909093604.GB13841@localhost.localdomain>
- <38c0ff7e-dfd3-189e-6026-3642d78e5029@redhat.com>
- <20190909161314.GJ17606@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <89984d52-881f-a1e4-c14a-2bf05fc789d0@redhat.com>
-Date: Tue, 10 Sep 2019 11:14:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7cMb-0001KQ-Ca
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:23:06 -0400
+Received: from mail-eopbgr30102.outbound.protection.outlook.com
+ ([40.107.3.102]:6406 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i7cMa-0001Jd-LW; Tue, 10 Sep 2019 05:23:05 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mFO04mj/oWIH/072b0FDvzw5AcdPiwyJC/Rlz22N9FpbhA0krxg8l14IuYwIHBCxtpyMTPUN7ihkPLrgaz5U57nGxmm40HRionvZ8iOSslgeGQJAHn24MEfBxuH+GBFHsWf/Foi8ab2VtAj4r2taz0ALsP3dJuYvLywK/J6L4SW4mgdA1m7v7g1OjuOWRG/PlQN4t1hoqcyTN0Iewx3nnyQWn0wcyVQzMBpAO+EUCjpGj18spI7bw7fA8f88V4Bwjlq1NKZtlFh3Oa/dOrLwJVyzPJiSXR9y0aD0sR/QxfvccrEudoOzHHPU9q+IgEo0WH90P6k1qrmVm5ZATDNW/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ifLEhsHM36ECVEoIjLwMko5CeOvGtPT5vrIzrcyxFII=;
+ b=X2K1cz/sGRgHk8oiHM6C3CMjkyCfR1LXqrHzTh9SPGtjsxksM5RwoXXeOfYWYigOldIUyE44VPxJZ1iI+qU2uAT9UxUZ8cDOiE0afWdN2k4zMlJgg1s3ZZOxJqI+eeTKfjEfgR1y4233qkLdqIznQ54nb31ZF0ikP90c3fKsa6MV7d9+j7dhx+GTmoPORdwkZEOiYfdkpwxh56YKmnsvjmR1FQpXC13owMZ8eMnprndsEXwq5kWlGcqvbbUwk80p5TE69YKwd96hE/W3uWcfksaAaqB0zhxUPCGNmE0hNdmweGQ4X3IRmUYJKnh3R+c2oFKrxzrYaHc2C7adQdkzPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ifLEhsHM36ECVEoIjLwMko5CeOvGtPT5vrIzrcyxFII=;
+ b=bKiYvnumh3AWiki86k6KMLS/YG7uDQmyzyJgzXPpeXHyAnyNioku50KTbgRVZY4fxuLYjQv8a2rFvl4G7+6tUTmbr3Aob+z2mhThi4SrhsfxBTil4hRHu1vtYqU4fWUgukgfjFBALC9mKMC/MOnHiHt1xKPuMUgunFhuQ6zkk8I=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5210.eurprd08.prod.outlook.com (10.255.17.218) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2241.19; Tue, 10 Sep 2019 09:23:00 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2241.018; Tue, 10 Sep 2019
+ 09:23:00 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Thread-Topic: [PATCH v10 04/14] block/backup: introduce BlockCopyState
+Thread-Index: AQHVX03FFzbmaM/Nm0mHXVJ2sTGOiKcjXkKAgABGsID//9DwAIAADU8AgAEU5gCAAAgnAIAAB5qAgAAMNoA=
+Date: Tue, 10 Sep 2019 09:22:59 +0000
+Message-ID: <c6859d2b-e530-8e5a-375d-87954c974e0d@virtuozzo.com>
+References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
+ <20190830161228.54238-5-vsementsov@virtuozzo.com>
+ <ae856032-2d6f-adb8-939b-410708dea596@redhat.com>
+ <01bc8974-b9a5-8312-fe24-e2fbe87ab13d@virtuozzo.com>
+ <e94365cd-3bdf-4055-10de-abad4f65225b@redhat.com>
+ <d4b6869a-a711-f911-2b29-c7062aa44aa6@virtuozzo.com>
+ <80720d39-b9d6-d693-0f6a-0a078d6056e0@redhat.com>
+ <577ab66d-ea14-a363-0b8a-92932198c284@virtuozzo.com>
+ <310835ca-4aa9-0c4f-5d18-1a89e2e0be74@redhat.com>
+In-Reply-To: <310835ca-4aa9-0c4f-5d18-1a89e2e0be74@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR07CA0020.eurprd07.prod.outlook.com
+ (2603:10a6:7:67::30) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190910122256994
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e606c80b-b162-41c1-64ac-08d735d07921
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB5210; 
+x-ms-traffictypediagnostic: DB8PR08MB5210:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB8PR08MB5210DF924A1C6B118604D85FC1B60@DB8PR08MB5210.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 01565FED4C
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(376002)(346002)(136003)(396003)(39840400004)(199004)(189003)(52314003)(14444005)(6512007)(71190400001)(52116002)(2501003)(256004)(478600001)(76176011)(8936002)(53936002)(102836004)(31696002)(6506007)(99286004)(386003)(186003)(53546011)(305945005)(8676002)(7416002)(7736002)(4326008)(81156014)(81166006)(86362001)(66556008)(64756008)(66446008)(66946007)(31686004)(66476007)(486006)(2906002)(6436002)(6486002)(36756003)(6116002)(107886003)(26005)(6246003)(2616005)(14454004)(110136005)(54906003)(446003)(316002)(476003)(11346002)(25786009)(5660300002)(66066001)(71200400001)(229853002)(3846002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5210;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: h/ZAERnlBMYxtWnOK9V0yC4UkvZV8EpD+sM5UrqK6LrTQsDfUXA1In0nK3Dl3qOidnFgJ4DW0+9zm1aQNsowFSgW3vs76lFgaweJnn2/9Nr2i/pm3HsSnFcdq5q/hlR2psT6vRDIQwmQ0P1ijJPw1pHpFJHzYoQGsVMZqOOt4AgqqYmiXBlJMDwRNWPMjULYHaYRIk1DeLjANjaOVNyEDs1mxailcSumigZWXzimY40wlGnEjhtmjriIngmMBi/EmwBR6CW24W0KxtrY9Gut8qam3nhG7QjZmpjZ9nvQN6GplXrdPU8PVlz1mx6YJbZFD8Du9imHHKoTtD7fRpQ+c78sldImgtm+v2bl1dL7+JNqjUzu9sFjQ+nJIpbws3AE1NARx4GvcICB7w4+osx2EhQ+AnoVNKD+pPDbVj3LIYQ=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <501145D1F437AE4AB494E70D68B2522F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190909161314.GJ17606@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 10 Sep 2019 09:14:48 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 04/42] block: Add child access functions
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e606c80b-b162-41c1-64ac-08d735d07921
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Sep 2019 09:22:59.9466 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FpN95mv0ShCN4/jx+MmiNsLihAjeuDCl6KKbzARg7tUq4vrgaG1R8KKXx9NsHDp8/QZiuFZtSQTLooJSscmTvohvA1Zss7RV4EpBjNo5GIs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5210
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.102
+Subject: Re: [Qemu-devel] [PATCH v10 04/14] block/backup: introduce
+ BlockCopyState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,345 +134,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
+ "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL
-Content-Type: multipart/mixed; boundary="Em6WvkXatC8Tc3vfV1g6YA43k9AQozaEL";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <89984d52-881f-a1e4-c14a-2bf05fc789d0@redhat.com>
-Subject: Re: [PATCH v6 04/42] block: Add child access functions
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-5-mreitz@redhat.com>
- <20190904161658.GD21246@localhost.localdomain>
- <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
- <20190909093604.GB13841@localhost.localdomain>
- <38c0ff7e-dfd3-189e-6026-3642d78e5029@redhat.com>
- <20190909161314.GJ17606@localhost.localdomain>
-In-Reply-To: <20190909161314.GJ17606@localhost.localdomain>
-
---Em6WvkXatC8Tc3vfV1g6YA43k9AQozaEL
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 09.09.19 18:13, Kevin Wolf wrote:
-> Am 09.09.2019 um 16:04 hat Max Reitz geschrieben:
->> On 09.09.19 11:36, Kevin Wolf wrote:
->>> Am 09.09.2019 um 09:56 hat Max Reitz geschrieben:
->>>> On 04.09.19 18:16, Kevin Wolf wrote:
->>>>> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
->>>>>> There are BDS children that the general block layer code can acces=
-s,
->>>>>> namely bs->file and bs->backing.  Since the introduction of filter=
-s and
->>>>>> external data files, their meaning is not quite clear.  bs->backin=
-g can
->>>>>> be a COW source, or it can be an R/W-filtered child; bs->file can =
-be an
->>>>>> R/W-filtered child, it can be data and metadata storage, or it can=
- be
->>>>>> just metadata storage.
->>>>>>
->>>>>> This overloading really is not helpful.  This patch adds function =
-that
->>>>>> retrieve the correct child for each exact purpose.  Later patches =
-in
->>>>>> this series will make use of them.  Doing so will allow us to hand=
-le
->>>>>> filter nodes and external data files in a meaningful way.
->>>>>>
->>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>>>
->>>>> Each time I look at this patch, I'm confused by the function names.=
-
->>>>> Maybe I should just ask what the idea there was, or more specifical=
-ly:
->>>>> What does the "filtered" in "filtered child" really mean?
->>>>>
->>>>> Apparently any child of a filter node is "filtered" (which makes se=
-nse),
->>>>
->>>> It isn=E2=80=99t, filters can have non-filter children.  For example=
-, backup-top
->>>> could have the source as a filtered child and the target as a non-fi=
-lter
->>>> child.
->>>
->>> Hm, okay, makes sense. I had a definition in mind that says that filt=
-er
->>> nodes only have a single child node. Is it that a filter may have onl=
-y a
->>> single _filtered_ child node?
->>
->> Well, there=E2=80=99s Quorum...
->=20
-> Ah, nice, quorum sets is_filter =3D true even though it neither fulfull=
-s
-> the conditions for it before this series, nor the changed conditions
-> after this series.
->=20
-> So either quorum lies and isn't actually a filter driver, or our
-> definition in the documentation of is_filter is wrong.
-
-You could say it lies because in FIFO mode it clearly isn=E2=80=99t a fil=
-ter for
-all of its children.
-
-There is a reason for lying, though, which is
-bdrv_recurse_is_first_non_filter(), which is necessary to use the whole
-to_replace mirror stuff.
-
-(You mirror from a quorum with a failed child and then replace the
-failed child.  mirror needs to ensure that there are only R/W filters
-between the child and the mirror source so that replacing it will not
-suddenly change any visible data.  Which is actually a lie for quorum,
-because the child is clearly broken and thus precisely doesn=E2=80=99t sh=
-ow the
-same data...)
-
-Maybe we should stop declaring Quorum a filter and then rename the
-bdrv_recurse_is_first_non_filter() to, I don=E2=80=99t know,
-bdrv_recurse_can_be_replaced_by_mirror()?
-
->>>>> but also bs->backing of a qcow2 image, while bs->file of qcow2 isn'=
-t.
->>>>> raw doesn't have any "filtered" child. What's the system behind thi=
-s?
->>>>
->>>> =E2=80=9Cfiltered=E2=80=9D means: If the parent node returns data fr=
-om this child, it
->>>> won=E2=80=99t modify it, neither its content nor its position.  COW =
-and R/W
->>>> filters differ in how they handle writes; R/W filters pass them thro=
-ugh
->>>> to the filtered child, COW filters copy them off to some other child=
-
->>>> node (and then the filtered child=E2=80=99s data will no longer be v=
-isible at
->>>> that location).
->>>
->>> But there is no reason why a node couldn't fulfill this condition for=
-
->>> more than one child node. bdrv_filtered_child() isn't well-defined th=
-en.
->>> Technically, the description "Return any filtered child" is correct
->>> because "any" can be interpreted as "an arbitrary", but obviously tha=
-t
->>> makes the function useless.
->>
->> Which is why it currently returns NULL for Quorum.
->=20
-> Which is about the only possible choice that breaks the contract...
->=20
->  * Return any filtered child, independently of how it reacts to write
-
-I don=E2=80=99t know if you=E2=80=99re serious about this proposition, be=
-cause I don=E2=80=99t
-know whether that could be useful in any way. :-?
-
->  * accesses and whether data is copied onto this BDS through COR.
-
-I meant the contract as =E2=80=9CReturn the single filtered child there i=
-s, or NULL=E2=80=9D
-
-> Maybe the documentation of bdrv_filtered_child() needs to be rephrased?=
-
->=20
-> Going back to qcow2, it's really not much different as it has multiple
-> (two) filtered children, too.
-
-Well, it doesn=E2=80=99t.  It isn=E2=80=99t an R/W filter.
-
-Maybe what we actually need to rephrase is the definition of .is_filter.
- (Namely something along the lines of =E2=80=9CFulfills these guarantees =
-(same
-data, etc. pp.), *and* should be skipped for allocation information
-queries etc.=E2=80=9D.
-
-> So if quorum returns NULL to mean "no
-> unambiguous result", why does it return bs->backing instead of NULL for=
-
-> a qcow2 node?
->=20
-> (Yes, I know, because it's useful. But I'm trying to get some basic
-> consistency into these interfaces.)
-
-Not precisely because it=E2=80=99s useful, but because qcow2 does not hav=
-e
-=2Eis_filter set.  :-)
-(And it doesn=E2=80=99t have it set because that wouldn=E2=80=99t be usef=
-ul.)
-
->>> Specficially, according to your definition, qcow2 filters both the
->>> backing file (COW filter) and the external data file (R/W filter).
->>
->> Not wrong.  But the same question as for raw arises: Is there any use =
-to
->> declaring qcow2 an R/W filter driver just because it fits the definiti=
-on?
->=20
-> Wait, where is there even a place where this could be declared?
->=20
-> The once thing I see that a driver even can declare is drv->is_filter,
-> which is about the whole driver and not about nodes. It is false for
-> qcow2.
-
-That=E2=80=99s correct.  But that=E2=80=99s not a fundamental problem, of=
- course, we
-could make it a per-BDS attribute if that made sense.
-
-> Then you made some criteria above that tell us whether a specific child=
-
-> of a node is a filtered child or not. As it happens, qcow2 (which is no=
-t
-> a filter driver) can have two children that match the criteria for bein=
-g
-> filtered children.
-
-But just arguing that I=E2=80=99m incapable of giving a good definition w=
-on=E2=80=99t
-bring us along.
-
-> I already think this is a bit inconsistent, because why should a driver=
-
-> that declares itself a non-filter be considered to filter children?
-
-=2Eis_filter is for R/W filters.  COW filters have .supports_backing for =
-that.
-
-> Okay, you say a broader definition of a filtered child is useful becaus=
-e
-> you can then include all BdrvChild links in a backing/filter chain. Fai=
-r
-> enough, it's not intuitive, but use a broader definition then.
->=20
-> But the point where you say that even though two of the children
-> are filtered children under your broader definition, for the purpose of=
-
-> the API only one of them should be considered because the other one
-> isn't that useful, that's really one inconsistency too much for me. You=
-
-> can't use a broad definition and then arbitrarily restrict the
-> definition again so that it matches the special case you're currently
-> interested in.
->=20
-> Either use a narrow definition, or use a broad one. But use only one an=
-d
-> use it consistently.
-
-I think the problem appears because you restrict the process to a single
-step where there=E2=80=99s actually two.
-
-Drivers can be either
-(1) R/W filters (e.g. throttle)
-(2) COW filters (e.g. qcow2)
-(3) None of the above (e.g. vhdx, curl)
-
-This choice is made on the driver level, not on the node level (for good
-reason, see below*).
-
-And then we derive the node=E2=80=99s filtered children from what the dri=
-ver is.
- If it=E2=80=99s an R/W filter, bdrv_filtered_child() will return the R/W=
-
-filtered child.  If it=E2=80=99s a COW filter, bdrv_filtered_child() will=
- return
-the potentially existing COW backing child (or NULL, if there is no
-backing child).
-
-
-*
-What is clear to me is that it isn=E2=80=99t useful to treat nodes of a s=
-pecific
-driver sometimes as R/W filter nodes and sometimes not.  R/W filter
-nodes are handled differently from other nodes, and it would be
-confusing if a certain driver sometimes behaves this and sometimes that
-way.  (For example, if you put a raw node on top of a qcow2 node,
-sometimes it would stop the backing chain, sometimes it wouldn=E2=80=99t.=
-  That
-makes no sense to me.)
-
-OTOH, for COW filters, we do exactly that.  Sometimes they have a
-backing file, sometimes they don=E2=80=99t.  That=E2=80=99s completely fi=
-ne because
-their overall behavior doesn=E2=80=99t change.
-
-
-That makes me agree that there is indeed too much of a difference
-between R/W filters and COW filters to lump them together under the
-=E2=80=9Cfilter=E2=80=9D label.
-
-[...]
-
-> My point is not about changing the logic in the code, but about using
-> names that actually describe accurately what the logic does.
-
-Again, naming things is hard.
-
-[...]
-
->> You disagreeing with me on these terms to me shows that there is a nee=
-d
->> to formalize.  This is precisely what I want to do in this series.
->>
->> The fact that we don=E2=80=99t use the term =E2=80=9Cfilter chain=E2=80=
-=9D so far is the reason
->> why I introduce it.  Because it comes as a clean slate.  =E2=80=9Cback=
-ing chain=E2=80=9D
->> already means something to me, and it means something different.
->=20
-> Well, if "backing chain" is too narrow, "filter chain" is both too
-> unspecific and inconsistent with the various definitions of "filter" an=
-d
-> "filtered" we're using, and we can't think of anything more concise, we=
-
-> might have to use names that just mention both.
->=20
-> bdrv_cow_child() // don't call COW a filter, because .is_filter =3D fal=
-se
-> bdrv_filter_child() // your R/W filter, only for .is_filter =3D true no=
-des
-> bdrv_filter_or_cow_child()
->=20
-> Or something like that. This would bring some more consistency into the=
-
-> way we use the words filter/filtered at least.
-
-I=E2=80=99ll see how that looks overall, but why not.  Sounds good to me.=
-
-
-Max
-
-
---Em6WvkXatC8Tc3vfV1g6YA43k9AQozaEL--
-
---QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13aYQACgkQ9AfbAGHV
-z0CPRAf/arc6PD1ofxvn4lpMfTCTfezmrycmEsbEQTZqn8+0+OhzATFdnlGXGMen
-SaO9X+uS0n1aFPWHMrKFWsY5n0MKs8uoSKAVTQnAXquUSTUr112oXLMnc7a8g+/e
-buiHanUUQ2Stix5mW95cVl/BR+jy3iQ0DT+JN5Y+CfMLZgHE6oE/8FexN8G/hD6p
-fr8g8B55dM9pxWl9UeSQn/YpBiApiYcf5L5it0hPAA48GxIXxkgcgcJgX8PLsHgI
-JCzyTAv/4ejd3OQ6ij49DUIMl4s/hxWq7yIUs70w8hhbPwIKtYyvY3dxMa2/kXLv
-ZxA8ko7V8dI57rI79N5ggsGAw+psJg==
-=TYd0
------END PGP SIGNATURE-----
-
---QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL--
+MTAuMDkuMjAxOSAxMTozOSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxMC4wOS4xOSAxMDoxMiwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDEwLjA5LjIwMTkgMTA6NDIs
+IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAwOS4wOS4xOSAxNzoxMSwgVmxhZGltaXIgU2VtZW50
+c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gMDkuMDkuMjAxOSAxNzoyNCwgTWF4IFJlaXR6IHdy
+b3RlOg0KPj4+Pj4gT24gMDkuMDkuMTkgMTY6MTIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
+aXkgd3JvdGU6DQo+Pj4+Pj4gMDkuMDkuMjAxOSAxNTo1OSwgTWF4IFJlaXR6IHdyb3RlOg0KPj4+
+Pj4+PiBPbiAzMC4wOC4xOSAxODoxMiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90
+ZToNCj4+Pj4+Pj4+IFNwbGl0IGNvcHlpbmcgY29kZSBwYXJ0IGZyb20gYmFja3VwIHRvICJibG9j
+ay1jb3B5IiwgaW5jbHVkaW5nIHNlcGFyYXRlDQo+Pj4+Pj4+PiBzdGF0ZSBzdHJ1Y3R1cmUgYW5k
+IGZ1bmN0aW9uIHJlbmFtaW5nLiBUaGlzIGlzIG5lZWRlZCB0byBzaGFyZSBpdCB3aXRoDQo+Pj4+
+Pj4+PiBiYWNrdXAtdG9wIGZpbHRlciBkcml2ZXIgaW4gZnVydGhlciBjb21taXRzLg0KPj4+Pj4+
+Pj4NCj4+Pj4+Pj4+IE5vdGVzOg0KPj4+Pj4+Pj4NCj4+Pj4+Pj4+IDEuIEFzIEJsb2NrQ29weVN0
+YXRlIGtlZXBzIG93biBCbG9ja0JhY2tlbmQgb2JqZWN0cywgcmVtYWluaW5nDQo+Pj4+Pj4+PiBq
+b2ItPmNvbW1vbi5ibGsgdXNlcnMgb25seSB1c2UgaXQgdG8gZ2V0IGJzIGJ5IGJsa19icygpIGNh
+bGwsIHNvIGNsZWFyDQo+Pj4+Pj4+PiBqb2ItPmNvbW1lbi5ibGsgcGVybWlzc2lvbnMgc2V0IGlu
+IGJsb2NrX2pvYl9jcmVhdGUgYW5kIGFkZA0KPj4+Pj4+Pj4gam9iLT5zb3VyY2VfYnMgdG8gYmUg
+dXNlZCBpbnN0ZWFkIG9mIGJsa19icyhqb2ItPmNvbW1vbi5ibGspLCB0byBrZWVwDQo+Pj4+Pj4+
+PiBpdCBtb3JlIGNsZWFyIHdoaWNoIGJzIHdlIHVzZSB3aGVuIGludHJvZHVjZSBiYWNrdXAtdG9w
+IGZpbHRlciBpbg0KPj4+Pj4+Pj4gZnVydGhlciBjb21taXQuDQo+Pj4+Pj4+Pg0KPj4+Pj4+Pj4g
+Mi4gUmVuYW1lIHMvaW5pdGlhbGl6aW5nX2JpdG1hcC9za2lwX3VuYWxsb2NhdGVkLyB0byBzb3Vu
+ZCBhIGJpdCBiZXR0ZXINCj4+Pj4+Pj4+IGFzIGludGVyZmFjZSB0byBCbG9ja0NvcHlTdGF0ZQ0K
+Pj4+Pj4+Pj4NCj4+Pj4+Pj4+IDMuIFNwbGl0IGlzIG5vdCB2ZXJ5IGNsZWFuOiB0aGVyZSBsZWZ0
+IHNvbWUgZHVwbGljYXRlZCBmaWVsZHMsIGJhY2t1cA0KPj4+Pj4+Pj4gY29kZSB1c2VzIHNvbWUg
+QmxvY2tDb3B5U3RhdGUgZmllbGRzIGRpcmVjdGx5LCBsZXQncyBwb3N0cG9uZSBpdCBmb3INCj4+
+Pj4+Pj4+IGZ1cnRoZXIgaW1wcm92ZW1lbnRzIGFuZCBrZWVwIHRoaXMgY29tbWVudCBzaW1wbGVy
+IGZvciByZXZpZXcuDQo+Pj4+Pj4+Pg0KPj4+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIg
+U2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+Pj4+Pj4g
+LS0tDQo+Pj4+Pj4+PiAgICAgIGJsb2NrL2JhY2t1cC5jICAgICB8IDM1NyArKysrKysrKysrKysr
+KysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0NCj4+Pj4+Pj4+ICAgICAgYmxvY2svdHJh
+Y2UtZXZlbnRzIHwgIDEyICstDQo+Pj4+Pj4+PiAgICAgIDIgZmlsZXMgY2hhbmdlZCwgMjMxIGlu
+c2VydGlvbnMoKyksIDEzOCBkZWxldGlvbnMoLSkNCj4+Pj4+Pj4+DQo+Pj4+Pj4+PiBkaWZmIC0t
+Z2l0IGEvYmxvY2svYmFja3VwLmMgYi9ibG9jay9iYWNrdXAuYw0KPj4+Pj4+Pj4gaW5kZXggYWJi
+NTA5OWZhMy4uMDAyZGVlNGQ3ZiAxMDA2NDQNCj4+Pj4+Pj4+IC0tLSBhL2Jsb2NrL2JhY2t1cC5j
+DQo+Pj4+Pj4+PiArKysgYi9ibG9jay9iYWNrdXAuYw0KPj4+Pj4+Pj4gQEAgLTM1LDEyICszNSw0
+MyBAQCB0eXBlZGVmIHN0cnVjdCBDb3dSZXF1ZXN0IHsNCj4+Pj4+Pj4+ICAgICAgICAgIENvUXVl
+dWUgd2FpdF9xdWV1ZTsgLyogY29yb3V0aW5lcyBibG9ja2VkIG9uIHRoaXMgcmVxdWVzdCAqLw0K
+Pj4+Pj4+Pj4gICAgICB9IENvd1JlcXVlc3Q7DQo+Pj4+Pj4+PiAgICAgIA0KPj4+Pj4+Pj4gK3R5
+cGVkZWYgdm9pZCAoKlByb2dyZXNzQnl0ZXNDYWxsYmFja0Z1bmMpKGludDY0X3QgYnl0ZXMsIHZv
+aWQgKm9wYXF1ZSk7DQo+Pj4+Pj4+PiArdHlwZWRlZiB2b2lkICgqUHJvZ3Jlc3NSZXNldENhbGxi
+YWNrRnVuYykodm9pZCAqb3BhcXVlKTsNCj4+Pj4+Pj4+ICt0eXBlZGVmIHN0cnVjdCBCbG9ja0Nv
+cHlTdGF0ZSB7DQo+Pj4+Pj4+PiArICAgIEJsb2NrQmFja2VuZCAqc291cmNlOw0KPj4+Pj4+Pj4g
+KyAgICBCbG9ja0JhY2tlbmQgKnRhcmdldDsNCj4+Pj4+Pj4+ICsgICAgQmRydkRpcnR5Qml0bWFw
+ICpjb3B5X2JpdG1hcDsNCj4+Pj4+Pj4+ICsgICAgaW50NjRfdCBjbHVzdGVyX3NpemU7DQo+Pj4+
+Pj4+PiArICAgIGJvb2wgdXNlX2NvcHlfcmFuZ2U7DQo+Pj4+Pj4+PiArICAgIGludDY0X3QgY29w
+eV9yYW5nZV9zaXplOw0KPj4+Pj4+Pj4gKyAgICB1aW50NjRfdCBsZW47DQo+Pj4+Pj4+PiArDQo+
+Pj4+Pj4+PiArICAgIEJkcnZSZXF1ZXN0RmxhZ3Mgd3JpdGVfZmxhZ3M7DQo+Pj4+Pj4+PiArDQo+
+Pj4+Pj4+PiArICAgIC8qDQo+Pj4+Pj4+PiArICAgICAqIHNraXBfdW5hbGxvY2F0ZWQ6IGlmIHRy
+dWUsIG9uIGNvcHkgb3BlcmF0aW9uIGZpcnN0bHkgcmVzZXQgYXJlYXMNCj4+Pj4+Pj4+ICsgICAg
+ICogdW5hbGxvY2F0ZWQgaW4gdG9wIGxheWVyIG9mIHNvdXJjZSAoYW5kIHRoZW4gb2YgY291cnNl
+IGRvbid0IGNvcHkNCj4+Pj4+Pj4+ICsgICAgICogY29ycmVzcG9uZGluZyBjbHVzdGVycykuIElm
+IHNvbWUgYnl0ZXMgcmVzZXQsIGNhbGwNCj4+Pj4+Pj4+ICsgICAgICogcHJvZ3Jlc3NfcmVzZXRf
+Y2FsbGJhY2suDQo+Pj4+Pj4+PiArICAgICAqLw0KPj4+Pj4+Pg0KPj4+Pj4+PiBJdCBpc27igJl0
+IHF1aXRlIGNsZWFyIHRoYXQgdGhpcyByZWZlcnMgdG8gdGhlIGNvcHlfYml0bWFwLiAgTWF5YmUN
+Cj4+Pj4+Pj4gc29tZXRoaW5nIGxpa2UNCj4+Pj4+Pj4NCj4+Pj4+Pj4g4oCcSWYgdHJ1ZSwgdGhl
+IGNvcHkgb3BlcmF0aW9uIHByZXBhcmVzIGEgc3luYz10b3Agam9iOiBJdCBzY2FucyB0aGUNCj4+
+Pj4+Pg0KPj4+Pj4+IGhtbSwgbm93IGl0J3Mgbm90IHJlZmFjdG9yZWQgdG8gc2NhbiBpdCBiZWZv
+cmUgY29weWluZyBsb29wLCBzbyBpdCdzIG5vdCBwcmVjaXNlDQo+Pj4+Pj4gd29yZGluZy4uDQo+
+Pj4+Pj4NCj4+Pj4+Pj4gc291cmNlJ3MgdG9wIGxheWVyIHRvIGZpbmQgYWxsIHVuYWxsb2NhdGVk
+IGFyZWFzIGFuZCByZXNldHMgdGhlbSBpbiB0aGUNCj4+Pj4+Pg0KPj4+Pj4+IE5vdCBhbGwsIGJ1
+dCBtb3N0bHkgaW5zaWRlIGJsb2NrLWNvcHkgcmVxdWVzdGVkIGFyZWEgKGJ1dCBtYXkgYmUgbW9y
+ZSkNCj4+Pj4+DQo+Pj4+PiBTb3JyeSwgSSBtZWFudCBiYWNrdXAgb3BlcmF0aW9uLg0KPj4+Pj4N
+Cj4+Pj4+Pj4gY29weV9iaXRtYXAgKHNvIHRoZXkgd2lsbCBub3QgYmUgY29waWVkKS4gIFdoZW5l
+dmVyIGFueSBzdWNoIGFyZWEgaXMNCj4+Pj4+Pj4gY2xlYXJlZCwgcHJvZ3Jlc3NfcmVzZXRfY2Fs
+bGJhY2sgd2lsbCBiZSBpbnZva2VkLg0KPj4+Pj4+PiBPbmNlIHRoZSB3aG9sZSB0b3AgbGF5ZXIg
+aGFzIGJlZW4gc2Nhbm5lZCwgc2tpcF91bmFsbG9jYXRlZCBpcyBjbGVhcmVkDQo+Pj4+Pj4+IGFu
+ZCB0aGUgYWN0dWFsIGNvcHlpbmcgYmVnaW5zLuKAnQ0KPj4+Pj4+DQo+Pj4+Pj4gTGFzdCBzZW50
+ZW5jZSBzb3VuZHMgbGlrZSBpdCdzIGEgYmxvY2stY29weSB3aG8gd2lsbCBjbGVhciBza2lwX3Vu
+YWxsb2NhdGVkLA0KPj4+Pj4+IGJ1dCBpdCdzIG5vdCBzby4gSXQncyBub3QgdmVyeSBnb29kIGRl
+c2lnbiBhbmQgbWF5IGJlIHJlZmFjdG9yZWQgaW4gZnV0dXJlLA0KPj4+Pj4+IGJ1dCBmb3Igbm93
+LCBJJ2QgYmV0dGVyIGRyb3AgbGFzdCBzZW50ZW5jZS4NCj4+Pj4+DQo+Pj4+PiBCdXQgd2FzbuKA
+mXQgdGhhdCB0aGUgcG9pbnQgb2YgdGhpcyB2YXJpYWJsZT8gIFRoYXQgaXQgZ29lcyBiYWNrIHRv
+IGZhbHNlDQo+Pj4+PiBvbmNlIHRoZSBiaXRtYXAgaXMgZnVsbHkgaW5pdGlhbGl6ZWQ/DQo+Pj4+
+DQo+Pj4+IEkganVzdCB3YW50IHRvIHN0cmVzcywgdGhhdCBibG9jay1jb3B5IGl0c2VsZiAod2hp
+Y2ggd2lsbCBiZSBpbiBhIHNlcGFyYXRlIGZpbGUsDQo+Pj4+IHNvIGl0IHdvdWxkIGJlIGNsZWFu
+IGVub3VnaCwgd2hhdCBpcyBibG9jay1jb3B5IGFuZCB3aGF0IGlzIGl0cyB1c2VyKSBkbyBub3Qg
+Y2xlYXINCj4+Pj4gdGhpcyB2YXJpYWJsZS4gSXQgb2YgY291cnNlIG1heSB0cmFjayBjYWxscyB0
+byAgYmxvY2tfY29weV9yZXNldF91bmFsbG9jYXRlZCgpIGFuZA0KPj4+PiBjbGVhciB0aGlzIHZh
+cmlhYmxlIGF1dG9tYXRpY2FsbHksIGJ1dCBpdCBkb24ndCBkbyBpdCBub3cuIEFuZCB5b3VyIHdv
+cmRpbmcgbG9va3MNCj4+Pj4gZm9yIG1lIGxpa2UgYmxvY2stY29weSBjb2RlIG1heSBhdXRvbWF0
+aWNhbGx5IGNsZWFyIHRoaXMgdmFyaWFibGUNCj4+Pg0KPj4+IEhtLCBPSy4NCj4+Pg0KPj4+Pj4N
+Cj4+Pj4+Pj4NCj4+Pj4+Pj4gaW5zdGVhZD8NCj4+Pj4+Pg0KPj4+Pj4+IE9yLCB3aGF0IGFib3V0
+IHRoZSBmb2xsb3dpbmcgbWl4Og0KPj4+Pj4+DQo+Pj4+Pj4gVXNlZCBmb3Igam9iIHN5bmM9dG9w
+IG1vZGUuIElmIHRydWUsIGJsb2NrX2NvcHkoKSB3aWxsIHJlc2V0IGluIGNvcHlfYml0bWFwIGFy
+ZWFzDQo+Pj4+Pj4gdW5hbGxvY2F0ZWQgaW4gdG9wIGltYWdlIChzbyB0aGV5IHdpbGwgbm90IGJl
+IGNvcGllZCkuIFdoZW5ldmVyIGFueSBzdWNoIGFyZWEgaXMgY2xlYXJlZCwNCj4+Pj4+PiBwcm9n
+cmVzc19yZXNldF9jYWxsYmFjayB3aWxsIGJlIGludm9rZWQuIFVzZXIgaXMgYXNzdW1lZCB0byBj
+YWxsIGluIGJhY2tncm91bmQNCj4+Pj4+PiBibG9ja19jb3B5X3Jlc2V0X3VuYWxsb2NhdGVkKCkg
+c2V2ZXJhbCB0aW1lcyB0byBjb3ZlciB0aGUgd2hvbGUgY29waWVkIGRpc2sgYW5kDQo+Pj4+Pj4g
+dGhlbiBjbGVhciBza2lwX3VuYWxsb2NhdGVkLCB0byBwcmV2ZW50IGV4dHJhIGVmZm9ydC4NCj4+
+Pj4+DQo+Pj4+PiBJIGRvbuKAmXQga25vdy4gIFRoZSBwb2ludCBvZiB0aGlzIHZhcmlhYmxlIGlz
+IHRoZSBpbml0aWFsaXphdGlvbiBvZiB0aGUNCj4+Pj4+IGJpdG1hcC4gIGJsb2NrLWNvcHkgb25s
+eSB1c2VzIHRoaXMgYXMgYSBoaW50IHRoYXQgaXQgbmVlZHMgdG8NCj4+Pj4+IHBhcnRpY2lwYXRl
+IGluIHRoYXQgaW5pdGlhbGl6YXRpb24gcHJvY2VzcywgdG9vLCBhbmQgY2Fubm90IGFzc3VtZSB0
+aGUNCj4+Pj4+IGJpdG1hcCB0byBiZSBmdWxseSBhbGxvY2F0ZWQuDQo+Pj4+DQo+Pj4+IEhtbSwg
+YnV0IHdoZXJlIGlzIGEgY29uZmxpY3Qgb2YgdGhpcyBhbmQgbXkgd29yZGluZz8gSU1ITywgSSBq
+dXN0IGRvY3VtZW50ZWQNCj4+Pj4gZXhhY3RseSB3aGF0J3Mgd3JpdHRlbiBpbiB0aGUgY29kZS4N
+Cj4+Pg0KPj4+IFRoZXJl4oCZcyBubyBjb25mbGljdCBiZWNhdXNlIGl0IGlzbuKAmXQgbWVudGlv
+bmVkOyB3aGljaCBpcyB0aGUgcHJvYmxlbSBJDQo+Pj4gaGF2ZSB3aXRoIGl0Lg0KPj4+DQo+Pj4g
+V2hhdCBJIHdhcyByZWFsbHkgY29uZnVzZWQgYWJvdXQgaXMgd2hvIGNvbnN1bWVzIHRoZSB2YXJp
+YWJsZS4gIEl0IGFsbA0KPj4+IGJlY29tZXMgbXVjaCBjbGVhcmVyIHdoZW4gSSB0YWtlIGl0IGFz
+IGEgZ2l2ZW4gdGhhdCBhbGwgb2YgeW91cg0KPj4+IGRlc2NyaXB0aW9uIGp1c3QgaXMgYW4gaW1w
+ZXJhdGl2ZSB0byBibG9jay1jb3B5LiAgVGhhdCBzaW1wbHkgd2FzbuKAmXQNCj4+PiBjbGVhciB0
+byBtZS4gIChXaGljaCBpcyB3aHkgeW91IGRvbuKAmXQgbGlrZSBteSBkZXNjcmlwdGlvbiwgcHJl
+Y2lzZWx5DQo+Pj4gYmVjYXVzZSBpdCB0ZWxscyB0aGUgc3RvcnkgZnJvbSBhbm90aGVyIFBPViwg
+bmFtZWx5IHRoYXQgb2YgYmFja3VwLikNCj4+Pg0KPj4+IEZ1cnRoZXJtb3JlLCBJIGp1c3QgbWlz
+cyB0aGUgYmlnIHBpY3R1cmUgYWJvdXQgaXQuICBXaHkgZG9lcyB0aGUNCj4+PiB2YXJpYWJsZSBl
+dmVuIGV4aXN0Pw0KPj4NCj4+IFRvbyBrZWVwIGl0IHNpbXBsZXIgZm9yIG5vdywgd2UgY2FuIGlt
+cHJvdmUgaXQgYXMgYSBmb2xsb3ctdXAuIEkgc2VlDQo+PiBzZXZlcmFsIHNvbHV0aW9uczoNCj4+
+DQo+PiAxLiB0cmFjayBzZXF1ZW50aWFsIGNhbGxzIHRvIGJsb2NrX2NvcHlfcmVzZXRfdW5hbGxv
+Y2F0ZWQoKSBhbmQgd2hlbg0KPj4gaXQgY29tZXMgdG8gdGhlIGRpc2sgZW5kIC0gY2xlYXIgdGhl
+IHZhcmlhYmxlDQo+Pg0KPj4gMi4gZG9uJ3QgcHVibGlzaCBibG9ja19jb3B5X3Jlc2V0X3VuYWxs
+b2NhdGVkKCkgYXQgYWxsLCBhc3N1bWluZyBzZXF1ZW50aWFsDQo+PiBjYWxscyB0byBibG9ja19j
+b3B5KCkgYW5kIGRvIGxpa2UgaW4gKDEuKQ0KPj4NCj4+IDMuIGtlZXAgYWRkaXRpb25hbCBiaXRt
+YXAgdG8gdHJhY2ssIHdoYXQgd2FzIGFscmVhZHkgZXhwbG9yZWQgYWJvdXQgYmVpbmcNCj4+IGFs
+bG9jYXRlZC91bmFsbG9jYXRlZCAoc2VlbXMgdG9vIG11Y2gpDQo+IA0KPiBTb3JyeSwgb3ZlciBz
+b21lIGVkaXRpbmcgSSBhY2NpZGVudGFsbHkgcmVtb3ZlZCB0aGUgbWVhbmluZyBmcm9tIHdoYXQg
+SQ0KPiB3cm90ZSB0aGVyZS4gIEkgZGlkbuKAmXQgbWVhbiBsaXRlcmFsbHkg4oCcV2h5IGRvZXMg
+dGhlIHZhcmlhYmxlIGV4aXN04oCdIG9yDQo+IOKAnEkgZG9u4oCZdCB1bmRlcnN0YW5kIHRoZSBi
+aWcgcGljdHVyZeKAnS4gIEkgbWVhbnQg4oCcVGhlIGNvbW1lbnQgZG9lcyBub3QNCj4gZXhwbGFp
+biB0aGUgYmlnIHBpY3R1cmUsIGZvciBleGFtcGxlLCBpdCBkb2VzIG5vdCBleHBsYWluIHdoeSB0
+aGUNCj4gdmFyaWFibGUgZXZlbiBleGlzdHMu4oCdDQo+IA0KDQoNCk9rLCB0aGFuDQoNCjQuIFBv
+c3Rwb25lIGltcHJvdmVtZW50cyBmb3IgYSBmb2xsb3ctdXAgKGFueXdheSwgZmluYWxseSwgYmxv
+Y2stY29weSBzaG91bGQNCnVzZSBibG9ja19zdGF0dXMgdG8gY29weSBieSBsYXJnZXIgY2h1bmtz
+LCBsaWtlIG1pcnJvciBkb2VzKSwgYW5kIGltcHJvdmUgdGhlDQpjb21tZW50IGxpa2UgdGhpczoN
+Cg0KIiIiDQpVc2VkIGZvciBqb2Igc3luYz10b3AgbW9kZSwgd2hpY2ggY3VycmVudGx5IHdvcmtz
+IGFzIGZvbGxvd3MgKHRoZSBzaXplIG9mIHRoZQ0KY29tbWVudCBkZWZpbml0ZWx5IHNob3dzIHVu
+Y2xlYW4gZGVzaWduLCBidXQgdGhpcyBpcyBhIFRPRE8gdG8gaW1wcm92ZSBpdCk6DQpJZiBqb2Ig
+c3RhcnRlZCBpbiBzeW5jPXRvcCBtb2RlLCB3aGljaCBtZWFucyB0aGF0IHdlIHdhbnQgdG8gY29w
+eSBvbmx5IHBhcnRzDQphbGxvY2F0ZWQgaW4gdG9wIGxheWVyLCBqb2Igc2hvdWxkIGJlaGF2ZSBs
+aWtlIHRoaXM6DQoNCjEuIENyZWF0ZSBibG9jay1jb3B5IHN0YXRlIHdpdGggc2tpcF91bmFsbG9j
+YXRlZCA9IHRydWUuDQoyLiBUaGVuLCBibG9ja19jb3B5KCkgd2lsbCBhdXRvbWF0aWNhbGx5IGNo
+ZWNrIGZvciBhbGxvY2F0aW9uIGluIHRvcCBsYXllciwNCmFuZCBkbyBub3QgY29weSBhcmVhcyB3
+aGljaCBhcmUgbm90IGFsbG9jYXRlZCBpbiB0b3AgbGF5ZXIuIFNvLCBmb3IgZXhhbXBsZSwNCmNv
+cHktYmVmb3JlLXdyaXRlIG9wZXJhdGlvbnMgaW4gYmFja3VwIHdvcmtzIGNvcnJlY3RseSBldmVu
+IGJlZm9yZSBbMy5dDQozLiBTZXF1ZW50aWFsbHkgY2FsbCBibG9ja19jb3B5X3Jlc2V0X3VuYWxs
+b2NhdGVkKCkgdG8gY292ZXIgdGhlIHdob2xlIHNvdXJjZQ0Kbm9kZSwgY29weV9iaXRtYXAgd2ls
+bCBiZSB1cGRhdGVkIGNvcnJlc3BvbmRpbmdseS4NCjQuIFVuc2V0IHNraXBfdW5hbGxvY2F0ZWQg
+dmFyaWFibGUgaW4gYmxvY2stY29weSBzdGF0ZSwgdG8gYXZvaWQgZXh0cmEgKGFzDQpldmVyeXRo
+aW5nIGlzIGNvdmVyZWQgYnkgWzMuXSkgYmxvY2stc3RhdHVzIHF1ZXJpZXMgaW4gYmxvY2tfY29w
+eSgpIGNhbGxzDQo1LiBEbyBzZXF1ZW50aWFsIGNvcHlpbmcgYnkgbG9vcCBvZiBibG9ja19jb3B5
+KCkgY2FsbHMsIGFsbCBuZWVkZWQgYWxsb2NhdGlvbg0KaW5mb3JtYXRpb24gaXMgYWxyZWFkeSBp
+biBjb3B5X2JpdG1hcC4NCg0KIEZyb20gYmxvY2tfY29weSgpIHNpZGUsIGl0IGJlaGF2ZXMgbGlr
+ZSB0aGlzOg0KSWYgc2tpcF91bmFsbG9jYXRlZCBpcyBzZXQsIGJsb2NrX2NvcHkoKSB3aWxsIHJl
+c2V0IGluIGNvcHlfYml0bWFwIGFyZWFzDQp1bmFsbG9jYXRlZCBpbiB0b3AgaW1hZ2UgKHNvIHRo
+ZXkgd2lsbCBub3QgYmUgY29waWVkKS4gV2hlbmV2ZXIgYW55IHN1Y2gNCmFyZWEgaXMgY2xlYXJl
+ZCwgcHJvZ3Jlc3NfcmVzZXRfY2FsbGJhY2sgd2lsbCBiZSBpbnZva2VkLiBOb3RlLCB0aGF0DQpw
+cm9ncmVzc19yZXNldF9jYWxsYmFjayBpcyBjYWxsZWQgZnJvbSBibG9ja19jb3B5X3Jlc2V0X3Vu
+YWxsb2NhdGVkKCkgdG9vLg0KIiIiDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
