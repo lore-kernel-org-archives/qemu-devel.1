@@ -2,63 +2,101 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FA71C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2F0C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32874216F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:08:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32874216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A76132168B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:18:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="AhH837WC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A76132168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7jd9-00080z-69
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 13:08:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60986)
+	id 1i7jn4-0002R7-NA
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 13:18:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i7jcQ-0007Wc-5S
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:07:55 -0400
+ (envelope-from <Paul.Durrant@citrix.com>) id 1i7jmG-00022W-8R
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:18:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i7jcM-0000IJ-Cu
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:07:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48172)
+ (envelope-from <Paul.Durrant@citrix.com>) id 1i7jmD-0003w9-Lu
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:18:03 -0400
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:21743)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i7jcM-0000Hz-5E
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:07:50 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DD7AA3082138;
- Tue, 10 Sep 2019 17:07:48 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-121-171.rdu2.redhat.com
- [10.10.121.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A2E9019C4F;
- Tue, 10 Sep 2019 17:07:47 +0000 (UTC)
-Date: Tue, 10 Sep 2019 13:07:45 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Message-ID: <20190910170745.GA26663@localhost.localdomain>
-References: <20190910163430.11326-1-f4bug@amsat.org>
+ (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
+ id 1i7jmD-0003uU-Do
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:18:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1568135881;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=4EQDLX0pe4LFQBOxhQT5XctuBAJ4p4LzBN7en1w1ad8=;
+ b=AhH837WCPz5BO8H15NLQohyaM5LLIoA8zr6Jgnbkfb6SmbFsKcCruDcJ
+ RrZ0PtaFB8hPDNw8c6YekX8F/9H7gRU1b0pJ49HXc4TY4C4j5fDp3mxma
+ zKbrbNn/og02ojFuHzuZ/1G1YGYUA7F6QrO6nazfem+KdYppVkkW3y1dk U=;
+Authentication-Results: esa5.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=paul.durrant@citrix.com;
+ spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ paul.durrant@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="paul.durrant@citrix.com"; x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+ Paul.Durrant@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="Paul.Durrant@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: 60fRz8xH9yMxgIScIxv7ojdS5kEEKjLYbuKXWJ0Fh/HOHM5kVGrC1i0S/StPNvFs+P2EmsSM5S
+ gRnU8QywzNTUu7cyffCh9VUkQKJ8xk6/5emDMZWesN7xxzYcj8jhExUH9QCdhn0R7LdpYkuPSs
+ 9jGIGwuf3l9YWb8D6tkzkchdPrObxwBwblELi2grajzJPeIvFPePG0GIEZ8gD1NNq3QraFtLVm
+ NaaiKG+k+21n6rNw31touy+remLqD9mv8QYVh/rIm1M2uYa7uaethPh2fQYI2Am6F9Ww3tAzck
+ pNw=
+X-SBRS: 2.7
+X-MesageID: 5580743
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,490,1559534400"; 
+   d="scan'208";a="5580743"
+From: Paul Durrant <paul.durrant@citrix.com>
+To: <qemu-devel@nongnu.org>
+Date: Tue, 10 Sep 2019 18:17:53 +0100
+Message-ID: <20190910171753.3775-1-paul.durrant@citrix.com>
+X-Mailer: git-send-email 2.20.1.2.gb21ebb6
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190910163430.11326-1-f4bug@amsat.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 10 Sep 2019 17:07:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] BootLinuxConsoleTest: Test the Quadra 800
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.155.168
+Subject: [Qemu-devel] [PATCH] xen-bus: check whether the frontend is active
+ during device reset...
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,121 +108,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Anthony Perard <anthony.perard@citrix.com>,
+ Paul Durrant <paul.durrant@citrix.com>,
+ Stefano Stabellini <sstabellini@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 10, 2019 at 06:34:30PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> This test boots a Linux kernel on a Quadra 800 board
-> and verify the serial is working.
->=20
-> Example:
->=20
->   $ avocado --show=3Dapp,console run -t machine:q800 tests/acceptance/b=
-oot_linux_console.py
->   console: ABCFGHIJK
->   console: Linux version 5.2.0-2-m68k (debian-kernel@lists.debian.org) =
-(gcc version 8.3.0 (Debian 8.3.0-21)) #1 Debian 5.2.9-2 (2019-08-21)
->   console: Detected Macintosh model: 35
->   console: Apple Macintosh Quadra 800
->   console: Built 1 zonelists, mobility grouping on.  Total pages: 32448
->   console: Kernel command line: printk.time=3D0 console=3DttyS0 vga=3Do=
-ff
->   [...]
->   console: Calibrating delay loop... 1236.99 BogoMIPS (lpj=3D6184960)
->   [...]
->   console: NuBus: Scanning NuBus slots.
->   console: Slot 9: Board resource not found!
->   console: SCSI subsystem initialized
->   console: clocksource: Switched to clocksource via1
->   [...]
->   console: macfb: framebuffer at 0xf9001000, mapped to 0x(ptrval), size=
- 468k
->   console: macfb: mode is 800x600x8, linelength=3D800
->   console: Console: switching to colour frame buffer device 100x37
->   console: fb0: DAFB frame buffer device
->   console: pmac_zilog: 0.6 (Benjamin Herrenschmidt <benh@kernel.crashin=
-g.org>)
->   console: scc.0: ttyS0 at MMIO 0x50f0c022 (irq =3D 4, base_baud =3D 23=
-0400) is a Z85c30 ESCC - Serial port
->   console: scc.1: ttyS1 at MMIO 0x50f0c020 (irq =3D 4, base_baud =3D 23=
-0400) is a Z85c30 ESCC - Serial port
->   console: Non-volatile memory driver v1.3
->   console: adb: Mac II ADB Driver v1.0 for Unified ADB
->   console: mousedev: PS/2 mouse device common for all mice
->   console: random: fast init done
->   console: Detected ADB keyboard, type <unknown>.
->   console: input: ADB keyboard as /devices/virtual/input/input0
->   console: input: ADB mouse as /devices/virtual/input/input1
->   console: rtc-generic rtc-generic: registered as rtc0
->   console: ledtrig-cpu: registered to indicate activity on CPUs
->   [...]
->   console: rtc-generic rtc-generic: setting system clock to 2019-09-10T=
-16:20:25 UTC (1568132425)
->   console: List of all partitions:
->   console: No filesystem could mount root, tried:
->   JOB TIME   : 2.91 s
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> Based-on: <20190910113323.17324-1-laurent@vivier.eu>
-> "hw/m68k: add Apple Machintosh Quadra 800 machine"
-> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg01775.html
-> ---
->  tests/acceptance/boot_linux_console.py | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index 2504ef0150..8e346bb0f4 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -373,3 +373,27 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
->          self.wait_for_console_pattern(console_pattern)
-> +
-> +    def test_m68k_q800(self):
-> +        """
-> +        :avocado: tags=3Darch:m68k
-> +        :avocado: tags=3Dmachine:q800
-> +        """
-> +        deb_url =3D ('http://ftp.ports.debian.org/debian-ports/pool-m6=
-8k/main'
-> +                   '/l/linux/kernel-image-5.2.0-2-m68k-di_5.2.9-2_m68k=
-.udeb')
-> +        deb_hash =3D '0797e05129595f22f3c0142db5e199769a723bf9'
-> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-> +        kernel_path =3D self.extract_from_deb(deb_path,
-> +                                            '/boot/vmlinux-5.2.0-2-m68=
-k')
-> +
-> +        self.vm.set_machine('q800')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
-> +                               'console=3DttyS0 vga=3Doff')
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
-> +        self.wait_for_console_pattern(console_pattern)
-> +        console_pattern =3D 'No filesystem could mount root'
-> +        self.wait_for_console_pattern(console_pattern)
-> --=20
-> 2.20.1
->
+...not the backend
 
-LGTM.
+Commit cb323146 "xen-bus: Fix backend state transition on device reset"
+contained a subtle mistake. The hunk
 
-Of course it needs to wait for the series adding the machine type.
-If there's a new version of the series, shouldn't this be included
-there?  Either way:
+@@ -539,11 +556,11 @@ static void xen_device_backend_changed(void *opaque)
 
-Tested-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+     /*
+      * If the toolstack (or unplug request callback) has set the backend
+-     * state to Closing, but there is no active frontend (i.e. the
+-     * state is not Connected) then set the backend state to Closed.
++     * state to Closing, but there is no active frontend then set the
++     * backend state to Closed.
+      */
+     if (xendev->backend_state == XenbusStateClosing &&
+-        xendev->frontend_state != XenbusStateConnected) {
++        !xen_device_state_is_active(state)) {
+         xen_device_backend_set_state(xendev, XenbusStateClosed);
+     }
+
+mistakenly replaced the check of 'xendev->frontend_state' with a check
+(now in a helper function) of 'state', which actually equates to
+'xendev->backend_state'.
+
+This patch fixes the mistake.
+
+Fixes: cb3231460747552d70af9d546dc53d8195bcb796
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+---
+ hw/xen/xen-bus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index a04478ad4f..025df5e59f 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -560,7 +560,7 @@ static void xen_device_backend_changed(void *opaque)
+      * backend state to Closed.
+      */
+     if (xendev->backend_state == XenbusStateClosing &&
+-        !xen_device_state_is_active(state)) {
++        !xen_device_state_is_active(xendev->frontend_state)) {
+         xen_device_backend_set_state(xendev, XenbusStateClosed);
+     }
+ 
+-- 
+2.20.1.2.gb21ebb6
+
 
