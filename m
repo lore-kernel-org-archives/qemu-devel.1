@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98210C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:26:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6156C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:30:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E131207FC
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:26:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E131207FC
+	by mail.kernel.org (Postfix) with ESMTPS id 8B4BC207FC
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:30:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B4BC207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dMK-0002vN-9n
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:26:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56592)
+	id 1i7dPM-00063D-0l
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:30:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJK-0000S3-BG
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:47 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJK-0000S8-Hj
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJI-0001uG-4w
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJI-0001uY-9D
  for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:45 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60040)
+Received: from relay.sw.ru ([185.231.240.75]:60050)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJB-0001oD-EN; Tue, 10 Sep 2019 06:23:38 -0400
+ id 1i7dJB-0001oI-Ed; Tue, 10 Sep 2019 06:23:38 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJ6-0007it-Of; Tue, 10 Sep 2019 13:23:32 +0300
+ id 1i7dJ7-0007it-VG; Tue, 10 Sep 2019 13:23:34 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Tue, 10 Sep 2019 13:23:19 +0300
-Message-Id: <20190910102332.20560-2-vsementsov@virtuozzo.com>
+Date: Tue, 10 Sep 2019 13:23:29 +0300
+Message-Id: <20190910102332.20560-12-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190910102332.20560-1-vsementsov@virtuozzo.com>
 References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v11 01/14] block/backup: fix
- backup_cow_with_offload for last cluster
+Subject: [Qemu-devel] [PATCH v11 11/14] block/io: refactor
+ wait_serialising_requests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,27 +67,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We shouldn't try to copy bytes beyond EOF. Fix it.
+Split out do_wait_serialising_requests with additional possibility to
+not actually wait but just check, that there is something to wait for.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/io.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 763f0d7ff6..83c4fd284d 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -161,7 +161,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
+diff --git a/block/io.c b/block/io.c
+index 0fa10831ed..e909736349 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -786,12 +786,13 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
+     bdrv_wakeup(bs);
+ }
  
-     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
--    nbytes = MIN(job->copy_range_size, end - start);
-+    nbytes = MIN(job->copy_range_size, MIN(end, job->len) - start);
-     nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
-     bdrv_reset_dirty_bitmap(job->copy_bitmap, start,
-                             job->cluster_size * nr_clusters);
+-static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
++static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
++                                                      bool wait)
+ {
+     BlockDriverState *bs = self->bs;
+     BdrvTrackedRequest *req;
+     bool retry;
+-    bool waited = false;
++    bool found = false;
+ 
+     if (!atomic_read(&bs->serialising_in_flight)) {
+         return false;
+@@ -817,11 +818,13 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+                  * will wait for us as soon as it wakes up, then just go on
+                  * (instead of producing a deadlock in the former case). */
+                 if (!req->waiting_for) {
+-                    self->waiting_for = req;
+-                    qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
+-                    self->waiting_for = NULL;
+-                    retry = true;
+-                    waited = true;
++                    found = true;
++                    if (wait) {
++                        self->waiting_for = req;
++                        qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
++                        self->waiting_for = NULL;
++                        retry = true;
++                    }
+                     break;
+                 }
+             }
+@@ -829,7 +832,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+         qemu_co_mutex_unlock(&bs->reqs_lock);
+     } while (retry);
+ 
+-    return waited;
++    return found;
++}
++
++static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
++{
++    return do_wait_serialising_requests(self, true);
+ }
+ 
+ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
 -- 
 2.18.0
 
