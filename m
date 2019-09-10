@@ -2,102 +2,95 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BA9C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCD7C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:33:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B4832081B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:32:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4832081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id B0ED22081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:33:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0ED22081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7cW2-0001Tz-SO
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:32:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45912)
+	id 1i7cWH-0001l0-FX
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:33:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bala24@linux.ibm.com>) id 1i7cUe-0000CA-KS
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:31:26 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7cEk-00055Z-RU
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:15:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bala24@linux.ibm.com>) id 1i7cUc-0005cy-Id
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:31:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52244
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
- id 1i7cUc-0005cV-BX
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:31:22 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8A9R8Jn016684
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 05:31:21 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ux6hudngs-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 05:31:21 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
- Tue, 10 Sep 2019 10:31:19 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 10 Sep 2019 10:31:17 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x8A9UpR238470034
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Sep 2019 09:30:51 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 302AE42045;
- Tue, 10 Sep 2019 09:31:16 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A65754204B;
- Tue, 10 Sep 2019 09:31:14 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.124.35.221])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Tue, 10 Sep 2019 09:31:14 +0000 (GMT)
-Date: Tue, 10 Sep 2019 15:01:12 +0530
-From: Balamuruhan S <bala24@linux.ibm.com>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-References: <20190910071019.16689-1-bala24@linux.ibm.com>
- <20190910071019.16689-3-bala24@linux.ibm.com>
- <e311a420-f780-10e4-99fa-53f14599a518@kaod.org>
+ (envelope-from <mreitz@redhat.com>) id 1i7cEi-0005Y8-Tq
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:14:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47578)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7cEb-0005RS-1o; Tue, 10 Sep 2019 05:14:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 45004C058CB8;
+ Tue, 10 Sep 2019 09:14:48 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
+ [10.36.117.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90F035D6B2;
+ Tue, 10 Sep 2019 09:14:46 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-5-mreitz@redhat.com>
+ <20190904161658.GD21246@localhost.localdomain>
+ <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
+ <20190909093604.GB13841@localhost.localdomain>
+ <38c0ff7e-dfd3-189e-6026-3642d78e5029@redhat.com>
+ <20190909161314.GJ17606@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <89984d52-881f-a1e4-c14a-2bf05fc789d0@redhat.com>
+Date: Tue, 10 Sep 2019 11:14:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <e311a420-f780-10e4-99fa-53f14599a518@kaod.org>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-TM-AS-GCONF: 00
-x-cbid: 19091009-0012-0000-0000-000003496ED8
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091009-0013-0000-0000-00002183D258
-Message-Id: <20190910093112.GA16391@localhost.localdomain>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-10_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909100095
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id x8A9R8Jn016684
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] hw/ppc/pnv_occ: add sram device
- model for occ common area
+In-Reply-To: <20190909161314.GJ17606@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Tue, 10 Sep 2019 09:14:48 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 04/42] block: Add child access functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,228 +102,345 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, qemu-devel@nongnu.org,
- anju@linux.vnet.ibm.com, qemu-ppc@nongnu.org, hari@linux.vnet.ibm.com,
- david@gibson.dropbear.id.au
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 10, 2019 at 09:19:11AM +0200, C=E9dric Le Goater wrote:
-> On 10/09/2019 09:10, Balamuruhan S wrote:
-> > emulate occ common area region with occ sram device model which
-> > occ and skiboot uses it to communicate regarding sensors, slw
-> > and HWMON in PowerNV emulated host.
-> >=20
-> > Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
-> > ---
-> >  hw/ppc/pnv.c             |  8 +++++
-> >  hw/ppc/pnv_occ.c         | 78 ++++++++++++++++++++++++++++++++++++++=
-++++++++++
-> >  include/hw/ppc/pnv_occ.h |  3 ++
-> >  3 files changed, 89 insertions(+)
-> >=20
-> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > index 3f08db7b9e..80338ffe87 100644
-> > --- a/hw/ppc/pnv.c
-> > +++ b/hw/ppc/pnv.c
-> > @@ -938,6 +938,10 @@ static void pnv_chip_power8_realize(DeviceState =
-*dev, Error **errp)
-> >          return;
-> >      }
-> >      pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip8->occ.xs=
-com_regs);
-> > +
-> > +    /* OCC SRAM model */
-> > +    memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_=
-AREA(chip),
-> > +                                &chip8->occ.sram_regs);
-> >  }
-> > =20
-> >  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *da=
-ta)
-> > @@ -1126,6 +1130,10 @@ static void pnv_chip_power9_realize(DeviceStat=
-e *dev, Error **errp)
-> >          return;
-> >      }
-> >      pnv_xscom_add_subregion(chip, PNV9_XSCOM_OCC_BASE, &chip9->occ.x=
-scom_regs);
-> > +
-> > +    /* OCC SRAM model */
-> > +    memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON=
-_AREA(chip),
-> > +                                &chip9->occ.sram_regs);
-> >  }
-> > =20
-> >  static void pnv_chip_power9_class_init(ObjectClass *klass, void *dat=
-a)
-> > diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
-> > index 8bead2c930..785653bb67 100644
-> > --- a/hw/ppc/pnv_occ.c
-> > +++ b/hw/ppc/pnv_occ.c
-> > @@ -30,6 +30,24 @@
-> >  #define OCB_OCI_OCCMISC_AND     0x4021
-> >  #define OCB_OCI_OCCMISC_OR      0x4022
-> > =20
-> > +/* OCC sensors */
-> > +#define OCC_SENSOR_DATA_BLOCK_OFFSET          0x580000
-> > +#define OCC_SENSOR_DATA_VALID                 0x580001
-> > +#define OCC_SENSOR_DATA_VERSION               0x580002
-> > +#define OCC_SENSOR_DATA_READING_VERSION       0x580004
-> > +#define OCC_SENSOR_DATA_NR_SENSORS            0x580008
-> > +#define OCC_SENSOR_DATA_NAMES_OFFSET          0x580010
-> > +#define OCC_SENSOR_DATA_READING_PING_OFFSET   0x580014
-> > +#define OCC_SENSOR_DATA_READING_PONG_OFFSET   0x58000c
-> > +#define OCC_SENSOR_DATA_NAME_LENGTH           0x58000d
-> > +#define OCC_SENSOR_NAME_STRUCTURE_TYPE        0x580023
-> > +#define OCC_SENSOR_LOC_CORE                   0x580022
-> > +#define OCC_SENSOR_LOC_GPU                    0x580020
-> > +#define OCC_SENSOR_TYPE_POWER                 0x580003
-> > +#define OCC_SENSOR_NAME                       0x580005
-> > +#define HWMON_SENSORS_MASK                    0x58001e
-> > +#define SLW_IMAGE_BASE                        0x0
-> > +
-> >  static void pnv_occ_set_misc(PnvOCC *occ, uint64_t val)
-> >  {
-> >      bool irq_state;
-> > @@ -82,6 +100,48 @@ static void pnv_occ_power8_xscom_write(void *opaq=
-ue, hwaddr addr,
-> >      }
-> >  }
-> > =20
-> > +static uint64_t pnv_occ_common_area_read(void *opaque, hwaddr addr,
-> > +                                         unsigned width)
-> > +{
-> > +    switch (addr) {
-> > +    /*
-> > +     * occ-sensor sanity check that asserts the sensor
-> > +     * header block
-> > +     */
-> > +    case OCC_SENSOR_DATA_BLOCK_OFFSET:
-> > +    case OCC_SENSOR_DATA_VALID:
-> > +    case OCC_SENSOR_DATA_VERSION:
-> > +    case OCC_SENSOR_DATA_READING_VERSION:
-> > +    case OCC_SENSOR_DATA_NR_SENSORS:
-> > +    case OCC_SENSOR_DATA_NAMES_OFFSET:
-> > +    case OCC_SENSOR_DATA_READING_PING_OFFSET:
-> > +    case OCC_SENSOR_DATA_READING_PONG_OFFSET:
-> > +    case OCC_SENSOR_NAME_STRUCTURE_TYPE:
-> > +        return 1;
-> > +    case OCC_SENSOR_DATA_NAME_LENGTH:
-> > +        return 0x30;
-> > +    case OCC_SENSOR_LOC_CORE:
-> > +        return 0x0040;
-> > +    case OCC_SENSOR_TYPE_POWER:
-> > +        return 0x0080;
-> > +    case OCC_SENSOR_NAME:
-> > +        return 0x1000;
-> > +    case HWMON_SENSORS_MASK:
-> > +    case OCC_SENSOR_LOC_GPU:
-> > +        return 0x8e00;
-> > +    case SLW_IMAGE_BASE:
-> > +        return 0x1000000000000000;
-> > +    }
-> > +    return 0;
-> > +}
-> > +
-> > +static void pnv_occ_common_area_write(void *opaque, hwaddr addr,
-> > +                                             uint64_t val, unsigned =
-width)
-> > +{
-> > +    /* callback function defined to occ common area write */
-> > +    return;
-> > +}
-> > +
-> >  static const MemoryRegionOps pnv_occ_power8_xscom_ops =3D {
-> >      .read =3D pnv_occ_power8_xscom_read,
-> >      .write =3D pnv_occ_power8_xscom_write,
-> > @@ -92,12 +152,24 @@ static const MemoryRegionOps pnv_occ_power8_xsco=
-m_ops =3D {
-> >      .endianness =3D DEVICE_BIG_ENDIAN,
-> >  };
-> > =20
-> > +const MemoryRegionOps pnv_occ_sram_ops =3D {
-> > +    .read =3D pnv_occ_common_area_read,
-> > +    .write =3D pnv_occ_common_area_write,
-> > +    .valid.min_access_size =3D 1,
-> > +    .valid.max_access_size =3D 8,
-> > +    .impl.min_access_size =3D 1,
-> > +    .impl.max_access_size =3D 8,
-> > +    .endianness =3D DEVICE_BIG_ENDIAN,
-> > +};
-> > +
-> >  static void pnv_occ_power8_class_init(ObjectClass *klass, void *data=
-)
-> >  {
-> >      PnvOCCClass *poc =3D PNV_OCC_CLASS(klass);
-> > =20
-> >      poc->xscom_size =3D PNV_XSCOM_OCC_SIZE;
-> > +    poc->sram_size =3D PNV_OCC_COMMON_AREA_SIZE;
-> >      poc->xscom_ops =3D &pnv_occ_power8_xscom_ops;
-> > +    poc->sram_ops =3D &pnv_occ_sram_ops;
-> >      poc->psi_irq =3D PSIHB_IRQ_OCC;
-> >  }
-> > =20
-> > @@ -168,7 +240,9 @@ static void pnv_occ_power9_class_init(ObjectClass=
- *klass, void *data)
-> >      PnvOCCClass *poc =3D PNV_OCC_CLASS(klass);
-> > =20
-> >      poc->xscom_size =3D PNV9_XSCOM_OCC_SIZE;
-> > +    poc->sram_size =3D PNV9_OCC_COMMON_AREA_SIZE;
-> >      poc->xscom_ops =3D &pnv_occ_power9_xscom_ops;
-> > +    poc->sram_ops =3D &pnv_occ_sram_ops;
-> >      poc->psi_irq =3D PSIHB9_IRQ_OCC;
-> >  }
-> > =20
->=20
-> do we plan to have different OCC SRAM operation per chip model ?=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL
+Content-Type: multipart/mixed; boundary="Em6WvkXatC8Tc3vfV1g6YA43k9AQozaEL";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <89984d52-881f-a1e4-c14a-2bf05fc789d0@redhat.com>
+Subject: Re: [PATCH v6 04/42] block: Add child access functions
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-5-mreitz@redhat.com>
+ <20190904161658.GD21246@localhost.localdomain>
+ <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
+ <20190909093604.GB13841@localhost.localdomain>
+ <38c0ff7e-dfd3-189e-6026-3642d78e5029@redhat.com>
+ <20190909161314.GJ17606@localhost.localdomain>
+In-Reply-To: <20190909161314.GJ17606@localhost.localdomain>
 
-Cedric, currently I did just tried to handle OCC SRAM access during
-boot time and returns skiboot expected default values. I could observe
-that P8 does 1 access only for slw image base address, so can we extend
-it with per chip model in future ?
+--Em6WvkXatC8Tc3vfV1g6YA43k9AQozaEL
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
--- Bala
->=20
-> C. =20
->=20
-> > @@ -199,6 +273,10 @@ static void pnv_occ_realize(DeviceState *dev, Er=
-ror **errp)
-> >      /* XScom region for OCC registers */
-> >      pnv_xscom_region_init(&occ->xscom_regs, OBJECT(dev), poc->xscom_=
-ops,
-> >                            occ, "xscom-occ", poc->xscom_size);
-> > +
-> > +    /* XScom region for OCC SRAM registers */
-> > +    pnv_xscom_region_init(&occ->sram_regs, OBJECT(dev), poc->sram_op=
+On 09.09.19 18:13, Kevin Wolf wrote:
+> Am 09.09.2019 um 16:04 hat Max Reitz geschrieben:
+>> On 09.09.19 11:36, Kevin Wolf wrote:
+>>> Am 09.09.2019 um 09:56 hat Max Reitz geschrieben:
+>>>> On 04.09.19 18:16, Kevin Wolf wrote:
+>>>>> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+>>>>>> There are BDS children that the general block layer code can acces=
 s,
-> > +                          occ, "occ-common-area", poc->sram_size);
-> >  }
-> > =20
-> >  static void pnv_occ_class_init(ObjectClass *klass, void *data)
-> > diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
-> > index ed0709bfc0..66b0989be6 100644
-> > --- a/include/hw/ppc/pnv_occ.h
-> > +++ b/include/hw/ppc/pnv_occ.h
-> > @@ -38,6 +38,7 @@ typedef struct PnvOCC {
-> >      PnvPsi *psi;
-> > =20
-> >      MemoryRegion xscom_regs;
-> > +    MemoryRegion sram_regs;
-> >  } PnvOCC;
-> > =20
-> >  #define PNV_OCC_CLASS(klass) \
-> > @@ -49,7 +50,9 @@ typedef struct PnvOCCClass {
-> >      DeviceClass parent_class;
-> > =20
-> >      int xscom_size;
-> > +    int sram_size;
-> >      const MemoryRegionOps *xscom_ops;
-> > +    const MemoryRegionOps *sram_ops;
-> >      int psi_irq;
-> >  } PnvOCCClass;
-> > =20
-> >=20
->=20
+>>>>>> namely bs->file and bs->backing.  Since the introduction of filter=
+s and
+>>>>>> external data files, their meaning is not quite clear.  bs->backin=
+g can
+>>>>>> be a COW source, or it can be an R/W-filtered child; bs->file can =
+be an
+>>>>>> R/W-filtered child, it can be data and metadata storage, or it can=
+ be
+>>>>>> just metadata storage.
+>>>>>>
+>>>>>> This overloading really is not helpful.  This patch adds function =
+that
+>>>>>> retrieve the correct child for each exact purpose.  Later patches =
+in
+>>>>>> this series will make use of them.  Doing so will allow us to hand=
+le
+>>>>>> filter nodes and external data files in a meaningful way.
+>>>>>>
+>>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+>>>>>
+>>>>> Each time I look at this patch, I'm confused by the function names.=
 
+>>>>> Maybe I should just ask what the idea there was, or more specifical=
+ly:
+>>>>> What does the "filtered" in "filtered child" really mean?
+>>>>>
+>>>>> Apparently any child of a filter node is "filtered" (which makes se=
+nse),
+>>>>
+>>>> It isn=E2=80=99t, filters can have non-filter children.  For example=
+, backup-top
+>>>> could have the source as a filtered child and the target as a non-fi=
+lter
+>>>> child.
+>>>
+>>> Hm, okay, makes sense. I had a definition in mind that says that filt=
+er
+>>> nodes only have a single child node. Is it that a filter may have onl=
+y a
+>>> single _filtered_ child node?
+>>
+>> Well, there=E2=80=99s Quorum...
+>=20
+> Ah, nice, quorum sets is_filter =3D true even though it neither fulfull=
+s
+> the conditions for it before this series, nor the changed conditions
+> after this series.
+>=20
+> So either quorum lies and isn't actually a filter driver, or our
+> definition in the documentation of is_filter is wrong.
+
+You could say it lies because in FIFO mode it clearly isn=E2=80=99t a fil=
+ter for
+all of its children.
+
+There is a reason for lying, though, which is
+bdrv_recurse_is_first_non_filter(), which is necessary to use the whole
+to_replace mirror stuff.
+
+(You mirror from a quorum with a failed child and then replace the
+failed child.  mirror needs to ensure that there are only R/W filters
+between the child and the mirror source so that replacing it will not
+suddenly change any visible data.  Which is actually a lie for quorum,
+because the child is clearly broken and thus precisely doesn=E2=80=99t sh=
+ow the
+same data...)
+
+Maybe we should stop declaring Quorum a filter and then rename the
+bdrv_recurse_is_first_non_filter() to, I don=E2=80=99t know,
+bdrv_recurse_can_be_replaced_by_mirror()?
+
+>>>>> but also bs->backing of a qcow2 image, while bs->file of qcow2 isn'=
+t.
+>>>>> raw doesn't have any "filtered" child. What's the system behind thi=
+s?
+>>>>
+>>>> =E2=80=9Cfiltered=E2=80=9D means: If the parent node returns data fr=
+om this child, it
+>>>> won=E2=80=99t modify it, neither its content nor its position.  COW =
+and R/W
+>>>> filters differ in how they handle writes; R/W filters pass them thro=
+ugh
+>>>> to the filtered child, COW filters copy them off to some other child=
+
+>>>> node (and then the filtered child=E2=80=99s data will no longer be v=
+isible at
+>>>> that location).
+>>>
+>>> But there is no reason why a node couldn't fulfill this condition for=
+
+>>> more than one child node. bdrv_filtered_child() isn't well-defined th=
+en.
+>>> Technically, the description "Return any filtered child" is correct
+>>> because "any" can be interpreted as "an arbitrary", but obviously tha=
+t
+>>> makes the function useless.
+>>
+>> Which is why it currently returns NULL for Quorum.
+>=20
+> Which is about the only possible choice that breaks the contract...
+>=20
+>  * Return any filtered child, independently of how it reacts to write
+
+I don=E2=80=99t know if you=E2=80=99re serious about this proposition, be=
+cause I don=E2=80=99t
+know whether that could be useful in any way. :-?
+
+>  * accesses and whether data is copied onto this BDS through COR.
+
+I meant the contract as =E2=80=9CReturn the single filtered child there i=
+s, or NULL=E2=80=9D
+
+> Maybe the documentation of bdrv_filtered_child() needs to be rephrased?=
+
+>=20
+> Going back to qcow2, it's really not much different as it has multiple
+> (two) filtered children, too.
+
+Well, it doesn=E2=80=99t.  It isn=E2=80=99t an R/W filter.
+
+Maybe what we actually need to rephrase is the definition of .is_filter.
+ (Namely something along the lines of =E2=80=9CFulfills these guarantees =
+(same
+data, etc. pp.), *and* should be skipped for allocation information
+queries etc.=E2=80=9D.
+
+> So if quorum returns NULL to mean "no
+> unambiguous result", why does it return bs->backing instead of NULL for=
+
+> a qcow2 node?
+>=20
+> (Yes, I know, because it's useful. But I'm trying to get some basic
+> consistency into these interfaces.)
+
+Not precisely because it=E2=80=99s useful, but because qcow2 does not hav=
+e
+=2Eis_filter set.  :-)
+(And it doesn=E2=80=99t have it set because that wouldn=E2=80=99t be usef=
+ul.)
+
+>>> Specficially, according to your definition, qcow2 filters both the
+>>> backing file (COW filter) and the external data file (R/W filter).
+>>
+>> Not wrong.  But the same question as for raw arises: Is there any use =
+to
+>> declaring qcow2 an R/W filter driver just because it fits the definiti=
+on?
+>=20
+> Wait, where is there even a place where this could be declared?
+>=20
+> The once thing I see that a driver even can declare is drv->is_filter,
+> which is about the whole driver and not about nodes. It is false for
+> qcow2.
+
+That=E2=80=99s correct.  But that=E2=80=99s not a fundamental problem, of=
+ course, we
+could make it a per-BDS attribute if that made sense.
+
+> Then you made some criteria above that tell us whether a specific child=
+
+> of a node is a filtered child or not. As it happens, qcow2 (which is no=
+t
+> a filter driver) can have two children that match the criteria for bein=
+g
+> filtered children.
+
+But just arguing that I=E2=80=99m incapable of giving a good definition w=
+on=E2=80=99t
+bring us along.
+
+> I already think this is a bit inconsistent, because why should a driver=
+
+> that declares itself a non-filter be considered to filter children?
+
+=2Eis_filter is for R/W filters.  COW filters have .supports_backing for =
+that.
+
+> Okay, you say a broader definition of a filtered child is useful becaus=
+e
+> you can then include all BdrvChild links in a backing/filter chain. Fai=
+r
+> enough, it's not intuitive, but use a broader definition then.
+>=20
+> But the point where you say that even though two of the children
+> are filtered children under your broader definition, for the purpose of=
+
+> the API only one of them should be considered because the other one
+> isn't that useful, that's really one inconsistency too much for me. You=
+
+> can't use a broad definition and then arbitrarily restrict the
+> definition again so that it matches the special case you're currently
+> interested in.
+>=20
+> Either use a narrow definition, or use a broad one. But use only one an=
+d
+> use it consistently.
+
+I think the problem appears because you restrict the process to a single
+step where there=E2=80=99s actually two.
+
+Drivers can be either
+(1) R/W filters (e.g. throttle)
+(2) COW filters (e.g. qcow2)
+(3) None of the above (e.g. vhdx, curl)
+
+This choice is made on the driver level, not on the node level (for good
+reason, see below*).
+
+And then we derive the node=E2=80=99s filtered children from what the dri=
+ver is.
+ If it=E2=80=99s an R/W filter, bdrv_filtered_child() will return the R/W=
+
+filtered child.  If it=E2=80=99s a COW filter, bdrv_filtered_child() will=
+ return
+the potentially existing COW backing child (or NULL, if there is no
+backing child).
+
+
+*
+What is clear to me is that it isn=E2=80=99t useful to treat nodes of a s=
+pecific
+driver sometimes as R/W filter nodes and sometimes not.  R/W filter
+nodes are handled differently from other nodes, and it would be
+confusing if a certain driver sometimes behaves this and sometimes that
+way.  (For example, if you put a raw node on top of a qcow2 node,
+sometimes it would stop the backing chain, sometimes it wouldn=E2=80=99t.=
+  That
+makes no sense to me.)
+
+OTOH, for COW filters, we do exactly that.  Sometimes they have a
+backing file, sometimes they don=E2=80=99t.  That=E2=80=99s completely fi=
+ne because
+their overall behavior doesn=E2=80=99t change.
+
+
+That makes me agree that there is indeed too much of a difference
+between R/W filters and COW filters to lump them together under the
+=E2=80=9Cfilter=E2=80=9D label.
+
+[...]
+
+> My point is not about changing the logic in the code, but about using
+> names that actually describe accurately what the logic does.
+
+Again, naming things is hard.
+
+[...]
+
+>> You disagreeing with me on these terms to me shows that there is a nee=
+d
+>> to formalize.  This is precisely what I want to do in this series.
+>>
+>> The fact that we don=E2=80=99t use the term =E2=80=9Cfilter chain=E2=80=
+=9D so far is the reason
+>> why I introduce it.  Because it comes as a clean slate.  =E2=80=9Cback=
+ing chain=E2=80=9D
+>> already means something to me, and it means something different.
+>=20
+> Well, if "backing chain" is too narrow, "filter chain" is both too
+> unspecific and inconsistent with the various definitions of "filter" an=
+d
+> "filtered" we're using, and we can't think of anything more concise, we=
+
+> might have to use names that just mention both.
+>=20
+> bdrv_cow_child() // don't call COW a filter, because .is_filter =3D fal=
+se
+> bdrv_filter_child() // your R/W filter, only for .is_filter =3D true no=
+des
+> bdrv_filter_or_cow_child()
+>=20
+> Or something like that. This would bring some more consistency into the=
+
+> way we use the words filter/filtered at least.
+
+I=E2=80=99ll see how that looks overall, but why not.  Sounds good to me.=
+
+
+Max
+
+
+--Em6WvkXatC8Tc3vfV1g6YA43k9AQozaEL--
+
+--QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13aYQACgkQ9AfbAGHV
+z0CPRAf/arc6PD1ofxvn4lpMfTCTfezmrycmEsbEQTZqn8+0+OhzATFdnlGXGMen
+SaO9X+uS0n1aFPWHMrKFWsY5n0MKs8uoSKAVTQnAXquUSTUr112oXLMnc7a8g+/e
+buiHanUUQ2Stix5mW95cVl/BR+jy3iQ0DT+JN5Y+CfMLZgHE6oE/8FexN8G/hD6p
+fr8g8B55dM9pxWl9UeSQn/YpBiApiYcf5L5it0hPAA48GxIXxkgcgcJgX8PLsHgI
+JCzyTAv/4ejd3OQ6ij49DUIMl4s/hxWq7yIUs70w8hhbPwIKtYyvY3dxMa2/kXLv
+ZxA8ko7V8dI57rI79N5ggsGAw+psJg==
+=TYd0
+-----END PGP SIGNATURE-----
+
+--QlnJPj7Z0zlmwMGTEIY4RF18xvcrh1RRL--
 
