@@ -2,84 +2,86 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54643C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C00C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:19:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20AF62081B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:18:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 961EA2081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:19:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="dMCW4csP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20AF62081B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="KmuhNGzS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 961EA2081B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dEg-0004Dt-PG
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:18:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55025)
+	id 1i7dEi-0004FT-Id
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:19:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55044)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1i7dAs-0001pP-Qr
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:15:03 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1i7dAt-0001qE-Pw
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:15:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1i7dAr-0005Lx-PA
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:15:02 -0400
-Received: from mout.web.de ([217.72.192.78]:48455)
+ (envelope-from <lukasstraub2@web.de>) id 1i7dAs-0005Mp-OB
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:15:03 -0400
+Received: from mout.web.de ([212.227.17.11]:42137)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1i7dAr-0005Kt-D8
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:15:01 -0400
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1i7dAs-0005L3-FF
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:15:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1568110472;
- bh=B6vK/wb54ShVskmPEM0whV2vUYdLV0tePfc8emFT37g=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=dMCW4csPXICtvl2g7dcbi5Ld2Vl3m5QTeE27XLVmAWJKYoCU3el3GFds2oMAwCJ9l
- iNijxBFMSAhdyD7tl9G2HBmtXzEXsRowkWF9me3bJxqNYVHTcoTu578J4GbDTapq2Q
- dO/sS9yJOoRvP02a7icgAPqmDhY4Lj/+ABE69AmA=
+ s=dbaedf251592; t=1568110484;
+ bh=lS0He1ZjyrE6labtN6cAGz+FTFA0a9A2XqfoJ6l9fU0=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=KmuhNGzSSrMt/P+mXLYvXYKmZbJRZEFJ3uQLEAK0vl6KfqpC8et6D5fYxYCboGlIB
+ u10r2HsIjgPPolwEjQVoJHSfKBhVNXZIh471yKQWcItfbvEvVpaSQhdZkyT20fMT2G
+ jsrV3g5jGDCsIKJYrbTF/iSJnWKgjdqTS9q9orJM=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.217]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0LrJse-1iHZJc1BiW-0132oN; Tue, 10
- Sep 2019 12:14:32 +0200
-Date: Tue, 10 Sep 2019 12:14:29 +0200
+Received: from luklap ([88.130.61.217]) by smtp.web.de (mrweb103
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0M7bQ3-1iIwst12Jz-00xIB6; Tue, 10
+ Sep 2019 12:14:44 +0200
+Date: Tue, 10 Sep 2019 12:14:43 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <cover.1568110100.git.lukasstraub2@web.de>
+Message-ID: <e3f1e1ec5b2bd2ce2c9a6c7669284a3fc2fdbaaa.1568110100.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1568110100.git.lukasstraub2@web.de>
+References: <cover.1568110100.git.lukasstraub2@web.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:dFN37VIRNm4/7+dtnNHg9VjYU8CGUvJxdf29WtOEn8wE43PKvLa
- ABIadc+S+okURfoqfEyuj9YCCiYR2/a/D5XOAovpR540mhtx2x4uOFaEsici2hhaRwwUf3J
- nmFv5+IfjNIMhuoDdCovD7DgM68S2nCz2eOqL3XfxTwzXSXusidGXlOlNI5vfdLGuK8Az7Y
- ucm5E8fuKu1v01bvwwI3w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:tZO3Y76WeMc=:R3TkzY9FqXrLS2BmmZQSuH
- 2aa/Wdhk28O0+LFU4HTI+86Ga5fd5cDcUK4yNnL261fHh1EPNUdOxZszJfHdeGoesSYYDauc2
- Ar5rnCMHdPCXRdS/zgPxS7H1NddAaiVjYR0g5o36i3WjD0KNDho+TEv7jHZQtGpzzH8yAgZXv
- MASHO9qErXjzCoks2Yf+o3JOnhaYzDxuSGEtfIyYya5N5CQi81acT94brOTKR8H0GSK1ADQPj
- 2vTpLwCr5USkxx9V262GzxFQAMnwObw9CEu7YDlLMfWimrYlhJWjPRY73D5OrkgpEi1csrojQ
- xIfXy/zahZJls6axc3TVTUogXE4+tEwRt5/kphcjNh55oBtSMRzOthVL3RzL1n/F+flRQsSEs
- /CWmgdQxnikXUqTCXjeX83NW7qOimGBw9/z43ZFwKXw2xK4tFXF/ljsfC+tC7/D8BsUcOYShE
- XmqJutPpGw8ZcJ+tbespwNvhHVsIjo9tHTXtzofX8jD28L3O0BPWQVXKrr/ZUEj2D8Ucszh2w
- zoEc9AHMnDEOwle2AN4t+XwAHO+qdATgGwsnCcYOMsvBX5wArbCIv2VOQa+pYw/IdkDAvP3MD
- lSan+LZlorL7Iw2ClTwOpPAykHF/C9XELqVr5M9A96dbknYUu0N56SJ/F+hNbRKM7QM47517p
- qIbSNaicJ2DlIPtB2eGXX/K4nJsD08LQEu3ACZlJkBA8xgvD5WU9hduN3Mqcz3hh/dN7rCVh/
- 4un88piuWihnDTP3nuvbRb+diDxvfL6VGoXc9H38yjC5VANAJQK6AjlSQaRQJkUToAMKUgb/p
- HuJDY3WUj5B6Ip01mBnU3nnM34Psi+sLBsBjs9O+xOzwd7dH5wvsXNxe7eveb4oJ+GF3vylpX
- ju5qsOFVD7hH2Xpg1TGeI9CL4AdjswmIK4UoA4CGM1aInkUNhIPjFQS1Te8aBJKbVy7BWNqTE
- 1+H6/gLIly6imS/pnvrUILbyBznAN3BLeFFEvdZk5nCVmJ/RNRiENXbfXEiDJEQ99MsPJfoHq
- i0Q+l4wJF51gU82LWzZY9Js9l7elf9f+dW9SkotMa1+8Ha2/YjDZ/lKS+OxvI7KisoFmhoWKC
- W9naWqYEvXv0DQRdf3RumUU5SBJERTz685Mxmz3HWn9KKGTAmrtBoCKrHLJgX/vnakDIrJUU5
- KQchOUniN5OyrqHCUHztkBUDflf+coPfP09Kp+q7enjn5Nb6+8ovT3A+0rzlQmefDaRYyg2Xo
- 78d++6ksL/IoqCe/b
+X-Provags-ID: V03:K1:sruv98jCmnOTW47dHXGQy8xBKNBqgqYaV3jtF5ALZIWASbfo5w/
+ MCsusuWPSoEpnw1HNVOHUjzvsarON6tY331MfETg+Rt1GIUfFR2/Wvj1FViDbWmRobWFkMi
+ fYfK4j658VTgf0Q8V9/WRogOZHleRtYmPKlE/RuJTIRpQ0+Goju+SLPDH6QNuQzgbjz/RQg
+ nErt+bUXjecOcISIS3rlA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:5RDTty9+CSM=:2qmcC3/HMH4UBKbTw1AfIM
+ rEp8VYC3KtN4Aphf9/frvu7wFR35MQDigzgcmfB9E5IUZH0BhrtZn2PtuyMmtE79sdrdcOezT
+ IUA8yOCtJXaZPxAAzimVl+1/cCW46mX8S0xVQAIzlS0PmfuzBeZO99lB+CdfodPWnzsnCpvOv
+ aaYyfocmENg11N+rikX94WG9T16Z/N4kVfIVdrTD9WZ/gnb16SCsivG98+sgfbrmFxyU9igz/
+ ecZoN4HiQFknrgYqNCMeMDEAX0+6jLE/vMTfsKFVwaBfhKXg7L98kR1SXy5LvrepMOw9RacCT
+ rZUcp0QfDsKUnQr86WAdF3QIs+H9OXyLabY0RbHbEbRUglPyagi6ots5lGLb1uZnlFCIwNNrX
+ zKr3+aWUffYtkhpdCptkj1UDdI6NZOPHrrh05rrFxgN/GL6eeknGnHD+x8qVuR+xuG3v1dW0p
+ ZJGWoSbDFuqpQwJInAYOSxkQ5LsRLveeQr/lYUos7YQUGSgQfJ05CG86Jgyjwva29Av3Eb2HS
+ Fk4zCErZNMpwjOWV70CR8TpaUY8dHu66EaxeSMtZDj0DhsgFdDfFjfJe/2l54quP+YFXe6nAl
+ Po4GjzYF9AMnGII5tqDalsSFiJwmqTG9Tq3wxTNIQgs+8SQ7eIDDdMQWHIwyHy+U3XivJPr63
+ ReAjQksilsYyDToA/yDbuyJCEf9mufFgrTU4yMAVBBW+6lpe3BdFdMuByRRoMKgutXJmWF+sf
+ +FYMB8k7Oszv6JCfnlKO6qqMfleNA2IV7XV3ycMYb3Ii+rdVi2+SrVW64Z31njDuCi2xWz5KR
+ 6WWsg0w6YfGx7N34YOSkVDmoFXWnucsqvKIlkCVO3okYDBVDd1QB0iUALZLyrIw5A81jWaujl
+ NkNtrQhxi7FpEFljIlD7J23+eAuY0GPYTSHf/q8SpFPvSzL8BenIKsKmS0CeH0lCuFUOmRjxA
+ CgQDV3SJ8B6K36Lg1hymp9mIQoP98QriA3cRwNoJmqdtH6h8HZHYFGfAyK13hxwfbhdyzSruJ
+ LQZpkAzQKZGWBlCl+84SgrwLUZ+CbxSkKXDsxarylSdX7k9l6Vuzn2U3yKUFLHYVl0BrnVj+e
+ jhUFzzZRzR4V0O4aImvvp2SxrBj/htVHw31nvPoBv5PrQgYOqJGi7ipkTw/x/foI51NgSKYiu
+ L8zFvg0cY2s5p1DY98ootyCr9kFTes3s2esr26VLv6Efx0ZEnX1J6oHSmCKIl0Kij7pymqzWl
+ 45HR3OSxftZYhoVfV
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.78
-Subject: [Qemu-devel] [PATCH v4 0/4] colo: Add support for continious
- replication
+X-Received-From: 212.227.17.11
+Subject: [Qemu-devel] [PATCH v4 2/4] tests/test-replication.c: Add test for
+ ignoring requests after failover
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,58 +100,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Everyone,
-These Patches add support for continious replication to colo. This means
-that after the Primary fails and the Secondary did a failover, the Seconda=
-ry
-can then become Primary and resume replication to a new Secondary.
+This simulates the case that happens when we resume COLO after failover.
 
-On a side note, I wrote a Pacemaker Resource Agent for colo which I will
-post when its ready.
-I have to say it's quite fun to randomly kill a Node, wait for resync
-and repeat and see how the VM stays alive all the time. :)
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+=2D--
+ tests/test-replication.c | 52 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-Regards,
-Lukas Straub
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index f085d1993a..5addfc2227 100644
+=2D-- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -489,6 +489,56 @@ static void test_secondary_stop(void)
+     teardown_secondary();
+ }
 
-v4:
- - fix checkpatch.pl warnings
-
-v3:
- - add test for replication changes
- - check if the filter to be inserted before/behind belongs to the same in=
-terface
- - fix the error message for the position=3D parameter
- - rename term "after" -> "behind" and variable "insert_before" -> "insert=
-_before_flag"
- - document the quorum node on the secondary side
- - simplify quorum parameters in documentation
- - remove trailing spaces in documentation
- - clarify the testing procedure in documentation
-
-v2:
- - fix email formating
- - fix checkpatch.pl warnings
- - fix patchew error
- - clearer commit messages
-
-Lukas Straub (4):
-  block/replication.c: Ignore requests after failover
-  tests/test-replication.c: Add test for ignoring requests after
-    failover
-  net/filter.c: Add Options to insert filters anywhere in the filter
-    list
-  colo: Update Documentation for continious replication
-
- block/replication.c        |  38 ++++++-
- docs/COLO-FT.txt           | 212 +++++++++++++++++++++++++++----------
- docs/block-replication.txt |  26 +++--
- include/net/filter.h       |   2 +
- net/filter.c               |  78 +++++++++++++-
- qemu-options.hx            |  10 +-
- tests/test-replication.c   |  52 +++++++++
- 7 files changed, 343 insertions(+), 75 deletions(-)
-
++static void test_secondary_failover_then_ignore_requests(void)
++{
++    BlockBackend *top_blk, *local_blk;
++    Error *local_err =3D NULL;
++
++    top_blk =3D start_secondary();
++    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
++    g_assert(!local_err);
++
++    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
++    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
++    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
++
++    /* replication will backup s_local_disk to s_hidden_disk */
++    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);
++
++    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
++    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
++
++    /* do failover (active commit) */
++    replication_stop_all(true, &local_err);
++    g_assert(!local_err);
++
++    /* it should ignore all requests from now on */
++
++    /* start after failover */
++    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
++    g_assert(!local_err);
++
++    /* checkpoint */
++    replication_do_checkpoint_all(&local_err);
++    g_assert(!local_err);
++
++    /* stop */
++    replication_stop_all(true, &local_err);
++    g_assert(!local_err);
++
++    /* read from s_local_disk (0, IMG_SIZE / 2) */
++    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
++                  0, IMG_SIZE / 2, false);
++
++
++    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
++    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);
++
++    teardown_secondary();
++}
++
+ static void test_secondary_do_checkpoint(void)
+ {
+     BlockBackend *top_blk, *local_blk;
+@@ -584,6 +634,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/replication/secondary/write", test_secondary_write)=
+;
+     g_test_add_func("/replication/secondary/start", test_secondary_start)=
+;
+     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
++    g_test_add_func("/replication/secondary/failover_then_ignore_requests=
+",
++                    test_secondary_failover_then_ignore_requests);
+     g_test_add_func("/replication/secondary/do_checkpoint",
+                     test_secondary_do_checkpoint);
+     g_test_add_func("/replication/secondary/get_error_all",
 =2D-
 2.20.1
+
 
