@@ -2,61 +2,69 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 709DBC49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6B2C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:50:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 345C521479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:48:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345C521479
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 60E7721479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:50:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60E7721479
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7m7j-0007c4-JT
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:48:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59692)
+	id 1i7m9v-0002Oh-EH
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:50:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1i7lwS-0003dr-DP
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:36:46 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7luM-0001Hh-Eg
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1i7lwQ-00084R-AS
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:36:44 -0400
-Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:50116)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i7lwQ-00080c-4s
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:36:42 -0400
-Received: from player770.ha.ovh.net (unknown [10.108.35.124])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 4C301142339
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 21:36:33 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player770.ha.ovh.net (Postfix) with ESMTPSA id 250509AC1393;
- Tue, 10 Sep 2019 19:36:27 +0000 (UTC)
-Date: Tue, 10 Sep 2019 21:36:25 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Message-ID: <20190910213625.14078565@bahia.lan>
-In-Reply-To: <20190910061326.25366-1-clg@kaod.org>
-References: <20190910061326.25366-1-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <laurent@vivier.eu>) id 1i7luJ-0006vP-Om
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:34 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:44979)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1i7luJ-0006ul-9c; Tue, 10 Sep 2019 15:34:31 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MpUlO-1iUfyw1uKC-00ptRC; Tue, 10 Sep 2019 21:34:03 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Date: Tue, 10 Sep 2019 21:33:44 +0200
+Message-Id: <20190910193347.16000-7-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190910193347.16000-1-laurent@vivier.eu>
+References: <20190910193347.16000-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 18104470503655381387
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddtgdduudejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:IWzo9ecodlqafuZNVqglI1SzvLLP3Gl4nJpS6mANGLZXiKoSvO3
+ GXydvHNX5gs0JlrP7XB37wi1Vtjo9Lgl7VgAhxE8V30DvZO2gjpi2yohqsNJWI39N0YY7WU
+ FzpL8QPUtbSt/wPPLAjeu4Z3zisU0JGMyeWlcHOO82tmq+B1dzlcG9Xq/g/dplB7+ZodLNB
+ EwyIpE+TklQWZVvgNsx2g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:P7zrJAExMYE=:cuqfWyVE7fDeKpWe3i5TC/
+ XPQ0pzuDrPNh91NSzTe+kjSWlFOfqVq3KuOUWcc5vOIeG1zLLrKHfJaTuKtfDAp7Ijwif5jpB
+ GxHooUsMidjCUBCEIMZF7OBSHtsNcFXcnyrKnMCWIimLELGaMLXszhhnBIUrPNdLkq7fNvuhN
+ T3JtkIA5jPUm3Wy1kJeuVAxh9JyqsCMbkJPLQxglok/p+fFVVm7TI8B/77wtJAMVPayWET3OS
+ /GfeSbVrNAyhVzhOGv1E0yK5s0C8FNCnMwhmc3raofcNM6ExqV7IJUlPa0KC7pXcNpjqGwyfd
+ 7BZRFwl+Nul5LTTnu6FuxL7q/1gzj6Iepf7WuJdUMOHWcQ95b2XpzToDQpdkk0vqzQeqVEafS
+ eW1UUxu11CYqvB9YSWSh7hkgUI6Uds4nlxrr9rvRi5Fl9zeF+uD2j3+yGX2RlMrg+J74Vi0ro
+ AUGZ1aqZurqLNbEuzWz6n+bqVY9JE/teLguZ5koLaGFW8uo3qio3VaUl3URRS2Og5gImK2DdY
+ ZlWel5sMg2zUsOuSvZUbHbwgLYE/Hf334adtAMoEZ+wB7xox5Rr5K17DsQjo8pNH1E880kTpr
+ YKAVFONWst3PqctsLzpHTimiHCI6kKQDKpWu8T+05XHs0a9YAcDxXYHZaJ3Gu21sjAbakeJVk
+ MgvuZ9QP9BRlDoL+6OK6QMzKtkIEe0h/sS/JBMQpZ/F3HQ6vbgMd1K5n8AcOPQtCGOS6var3b
+ ug4m6C3SA5Yd6QDtSOVBEv8AudD+n0rp3Uw+h/v1WrBNV/u+y6zOX0dJGxSakby6zOSXP9w3j
+ 4lUCO2UIX0GA4+aKMLK0RX78z5BKw217NNEUaiv116nucUavGw=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.59.63
-Subject: Re: [Qemu-devel] [PATCH] spapr/irq: Only claim VALID interrupts at
- the KVM level
+X-Received-From: 217.72.192.74
+Subject: [Qemu-devel] [PATCH v11 6/9] hw/m68k: add Nubus support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,366 +76,648 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Sep 2019 08:13:26 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Thomas Huth <huth@tuxfamily.org>
+---
+ MAINTAINERS                         |   2 +
+ hw/Kconfig                          |   1 +
+ hw/Makefile.objs                    |   1 +
+ hw/m68k/Kconfig                     |   1 +
+ hw/nubus/Kconfig                    |   2 +
+ hw/nubus/Makefile.objs              |   4 +
+ hw/nubus/mac-nubus-bridge.c         |  45 ++++++
+ hw/nubus/nubus-bridge.c             |  34 +++++
+ hw/nubus/nubus-bus.c                | 111 ++++++++++++++
+ hw/nubus/nubus-device.c             | 215 ++++++++++++++++++++++++++++
+ include/hw/nubus/mac-nubus-bridge.h |  24 ++++
+ include/hw/nubus/nubus.h            |  69 +++++++++
+ 12 files changed, 509 insertions(+)
+ create mode 100644 hw/nubus/Kconfig
+ create mode 100644 hw/nubus/Makefile.objs
+ create mode 100644 hw/nubus/mac-nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bus.c
+ create mode 100644 hw/nubus/nubus-device.c
+ create mode 100644 include/hw/nubus/mac-nubus-bridge.h
+ create mode 100644 include/hw/nubus/nubus.h
 
-> A typical pseries VM with 16 vCPUs, one disk, one network adapater
-> uses less than 100 interrupts but the whole IRQ number space of the
-> QEMU machine is allocated at reset time and it is 8K wide. This is
-> wasting considerably the global IRQ space of the overall system which
-> has 1M interrupts per socket on a POWER9.
->=20
-> To optimise the HW resources, only request at the KVM level interrupts
-> which have been claimed. This will help up increase the maximum number
-> of VMs per system.
->=20
-> To keep migration compatibility, we introduce a machine class
-> attribute to adapt the reset behavior on older pseries machines.
->=20
-
-This can be achieved in a simpler way, see below.
-
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr.h      |  1 +
->  include/hw/ppc/spapr_xive.h |  1 +
->  include/hw/ppc/xics.h       |  6 ++++++
->  hw/intc/spapr_xive.c        |  1 +
->  hw/intc/spapr_xive_kvm.c    | 34 +++++++++++++++++++++++++++++++---
->  hw/intc/xics.c              |  1 +
->  hw/intc/xics_kvm.c          | 14 ++++++++++++++
->  hw/ppc/spapr.c              |  1 +
->  hw/ppc/spapr_irq.c          | 13 +++++++------
->  9 files changed, 63 insertions(+), 9 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 03111fd55bc8..6c622954a60c 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -131,6 +131,7 @@ struct SpaprMachineClass {
->      SpaprResizeHpt resize_hpt_default;
->      SpaprCapabilities default_caps;
->      SpaprIrq *irq;
-> +    bool irq_reset_all;
->  };
-> =20
->  /**
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index bfd40f01d882..b33913eb0f28 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -45,6 +45,7 @@ typedef struct SpaprXive {
->      void          *tm_mmap;
->      MemoryRegion  tm_mmio_kvm;
->      VMChangeStateEntry *change;
-> +    bool          reset_all;
->  } SpaprXive;
-> =20
->  /*
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index f2a8d6a4b4f9..856815362406 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -117,6 +117,7 @@ struct ICSState {
->      DeviceState parent_obj;
->      /*< public >*/
->      uint32_t nr_irqs;
-> +    bool reset_all;
->      uint32_t offset;
->      ICSIRQState *irqs;
->      XICSFabric *xics;
-> @@ -179,6 +180,11 @@ void ics_simple_write_xive(ICSState *ics, int nr, in=
-t server,
->                             uint8_t priority, uint8_t saved_priority);
->  void ics_simple_set_irq(void *opaque, int srcno, int val);
-> =20
-> +static inline bool ics_irq_free(ICSState *ics, uint32_t srcno)
-> +{
-> +    return !(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK);
-> +}
-> +
->  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
->  void icp_pic_print_info(ICPState *icp, Monitor *mon);
->  void ics_pic_print_info(ICSState *ics, Monitor *mon);
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index c1c97192a7d2..b717d9e09314 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -492,6 +492,7 @@ static Property spapr_xive_properties[] =3D {
->      DEFINE_PROP_UINT32("nr-ends", SpaprXive, nr_ends, 0),
->      DEFINE_PROP_UINT64("vc-base", SpaprXive, vc_base, SPAPR_XIVE_VC_BASE=
-),
->      DEFINE_PROP_UINT64("tm-base", SpaprXive, tm_base, SPAPR_XIVE_TM_BASE=
-),
-> +    DEFINE_PROP_BOOL("reset-all", ICSState, reset_all, false),
-
-s/ICSState/SpaprXive
-
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =20
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index 17af4d19f54e..225abce36270 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -253,13 +253,23 @@ void kvmppc_xive_source_reset_one(XiveSource *xsrc,=
- int srcno, Error **errp)
->                        true, errp);
->  }
-> =20
-> +static bool xive_source_skip_reset(SpaprXive *xive, int srcno)
-> +{
-> +    return !xive->reset_all && !xive_eas_is_valid(&xive->eat[srcno]);
-> +}
-> +
->  static void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
->  {
-> +    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
->      int i;
-> =20
->      for (i =3D 0; i < xsrc->nr_irqs; i++) {
->          Error *local_err =3D NULL;
-> =20
-> +        if (xive_source_skip_reset(xive, i)) {
-> +            continue;
-> +        }
-> +
->          kvmppc_xive_source_reset_one(xsrc, i, &local_err);
->          if (local_err) {
->              error_propagate(errp, local_err);
-> @@ -328,11 +338,18 @@ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int s=
-rcno, uint32_t offset,
-> =20
->  static void kvmppc_xive_source_get_state(XiveSource *xsrc)
->  {
-> +    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
->      int i;
-> =20
->      for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> +        uint8_t pq;
-> +
-> +        if (xive_source_skip_reset(xive, i)) {
-
-This looks a bit weird to "skip reset" in a function that isn't
-supposed to reset anything... Is it really necessary to check the
-reset_all flag actually ? I guess checking the EAS is valid should
-be enough.
-
-> +            continue;
-> +        }
-> +
->          /* Perform a load without side effect to retrieve the PQ bits */
-> -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> +        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> =20
->          /* and save PQ locally */
->          xive_source_esb_set(xsrc, i, pq);
-> @@ -521,9 +538,14 @@ static void kvmppc_xive_change_state_handler(void *o=
-paque, int running,
->       */
->      if (running) {
->          for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> -            uint8_t pq =3D xive_source_esb_get(xsrc, i);
-> +            uint8_t pq;
->              uint8_t old_pq;
-> =20
-> +            if (xive_source_skip_reset(xive, i)) {
-
-Same here ?
-
-> +                continue;
-> +            }
-> +
-> +            pq =3D xive_source_esb_get(xsrc, i);
->              old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq <=
-< 8));
-> =20
->              /*
-> @@ -545,7 +567,13 @@ static void kvmppc_xive_change_state_handler(void *o=
-paque, int running,
->       * migration is in progress.
->       */
->      for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> +        uint8_t pq;
-> +
-> +        if (xive_source_skip_reset(xive, i)) {
-
-and here ?
-
-> +            continue;
-> +        }
-> +
-> +        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> =20
->          /*
->           * PQ is set to PENDING to possibly catch a triggered
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index b2fca2975cc4..ae3f83cf0aad 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -746,6 +746,7 @@ static const VMStateDescription vmstate_ics_base =3D {
-> =20
->  static Property ics_base_properties[] =3D {
->      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
-> +    DEFINE_PROP_BOOL("reset-all", ICSState, reset_all, false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =20
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index a4d2e876cc5f..aa017b99801c 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -177,6 +177,12 @@ void icp_kvm_realize(DeviceState *dev, Error **errp)
->  /*
->   * ICS-KVM
->   */
-> +
-> +static bool ics_irq_skip_reset(ICSState *ics, int srcno)
-> +{
-> +    return !ics->reset_all && ics_irq_free(ics, srcno);
-> +}
-> +
->  void ics_get_kvm_state(ICSState *ics)
->  {
->      uint64_t state;
-> @@ -190,6 +196,10 @@ void ics_get_kvm_state(ICSState *ics)
->      for (i =3D 0; i < ics->nr_irqs; i++) {
->          ICSIRQState *irq =3D &ics->irqs[i];
-> =20
-> +        if (ics_irq_skip_reset(ics, i)) {
-
-And here ?
-
-> +            continue;
-> +        }
-> +
->          kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
->                            i + ics->offset, &state, false, &error_fatal);
-> =20
-> @@ -301,6 +311,10 @@ int ics_set_kvm_state(ICSState *ics, Error **errp)
->          Error *local_err =3D NULL;
->          int ret;
-> =20
-> +        if (ics_irq_skip_reset(ics, i)) {
-> +            continue;
-> +        }
-> +
->          ret =3D ics_set_kvm_state_one(ics, i, &local_err);
->          if (ret < 0) {
->              error_propagate(errp, local_err);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 7124053b43b7..af89f3b6c698 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4594,6 +4594,7 @@ static void spapr_machine_4_1_class_options(Machine=
-Class *mc)
->      smc->linux_pci_probe =3D false;
->      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
->      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> +    smc->irq_reset_all =3D true;
-
-Drop this property and add two lines in compat static:
-
-    static GlobalProperty compat[] =3D {
-        /* Only allow 4kiB and 64kiB IOMMU pagesizes */
-        { TYPE_SPAPR_PCI_HOST_BRIDGE, "pgsz", "0x11000" },
-        { TYPE_SPAPR_XIVE, "reset-all", "on" },
-        { TYPE_ICS_BASE, "reset-all", "on" },
-    };
-
-This ensures that any instance of SpaprXive or ICSState created by
-a pseries-4.1 machine has reset_all set to true.
-
->  }
-> =20
->  DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 06fe2432bae5..8c3682613404 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -97,11 +97,13 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
-apr, int nr_irqs,
->  {
->      Object *obj;
->      Error *local_err =3D NULL;
-> +    bool reset_all =3D SPAPR_MACHINE_GET_CLASS(spapr)->irq_reset_all;
-> =20
-
-... and you can drop all the propagation code here...
-
->      obj =3D object_new(TYPE_ICS_SIMPLE);
->      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
->      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
->                                     &error_fatal);
-> +    object_property_set_bool(obj, reset_all, "reset-all",  &error_fatal);
->      object_property_set_int(obj, nr_irqs, "nr-irqs",  &error_fatal);
->      object_property_set_bool(obj, true, "realized", &local_err);
->      if (local_err) {
-> @@ -114,9 +116,6 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
-apr, int nr_irqs,
->      xics_spapr_init(spapr);
->  }
-> =20
-> -#define ICS_IRQ_FREE(ics, srcno)   \
-> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
-> -
->  static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, bool =
-lsi,
->                                  Error **errp)
->  {
-> @@ -129,7 +128,7 @@ static int spapr_irq_claim_xics(SpaprMachineState *sp=
-apr, int irq, bool lsi,
->          return -1;
->      }
-> =20
-> -    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
-> +    if (!ics_irq_free(ics, irq - ics->offset)) {
->          error_setg(errp, "IRQ %d is not free", irq);
->          return -1;
->      }
-> @@ -147,7 +146,7 @@ static void spapr_irq_free_xics(SpaprMachineState *sp=
-apr, int irq, int num)
->      if (ics_valid_irq(ics, irq)) {
->          trace_spapr_irq_free(0, irq, num);
->          for (i =3D srcno; i < srcno + num; ++i) {
-> -            if (ICS_IRQ_FREE(ics, i)) {
-> +            if (ics_irq_free(ics, i)) {
->                  trace_spapr_irq_free_warn(0, i);
->              }
->              memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
-> @@ -270,9 +269,11 @@ static void spapr_irq_init_xive(SpaprMachineState *s=
-papr, int nr_irqs,
->  {
->      uint32_t nr_servers =3D spapr_max_server_number(spapr);
->      DeviceState *dev;
-> +    bool reset_all =3D SPAPR_MACHINE_GET_CLASS(spapr)->irq_reset_all;
-
-... and here.
-
->      int i;
-> =20
->      dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
-> +    object_property_set_bool(OBJECT(dev), reset_all, "reset-all", &error=
-_fatal);
->      qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
->      /*
->       * 8 XIVE END structures per CPU. One for each available priority
-> @@ -767,7 +768,7 @@ static int ics_find_free_block(ICSState *ics, int num=
-, int alignnum)
->              return -1;
->          }
->          for (i =3D first; i < first + num; ++i) {
-> -            if (!ICS_IRQ_FREE(ics, i)) {
-> +            if (!ics_irq_free(ics, i)) {
->                  break;
->              }
->          }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6b5fc50aef..4f6b2b037a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -922,8 +922,10 @@ M: Laurent Vivier <laurent@vivier.eu>
+ S: Maintained
+ F: hw/misc/mac_via.c
+ F: hw/display/macfb.c
++F: hw/nubus/*
+ F: include/hw/misc/mac_via.h
+ F: include/hw/display/macfb.h
++F: include/hw/nubus/*
+ 
+ MicroBlaze Machines
+ -------------------
+diff --git a/hw/Kconfig b/hw/Kconfig
+index b45db3c813..0501a55315 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -21,6 +21,7 @@ source isa/Kconfig
+ source mem/Kconfig
+ source misc/Kconfig
+ source net/Kconfig
++source nubus/Kconfig
+ source nvram/Kconfig
+ source pci-bridge/Kconfig
+ source pci-host/Kconfig
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index ece6cc3755..457b95e28d 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -37,6 +37,7 @@ devices-dirs-y += virtio/
+ devices-dirs-y += watchdog/
+ devices-dirs-y += xen/
+ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
++devices-dirs-$(CONFIG_NUBUS) += nubus/
+ devices-dirs-y += semihosting/
+ devices-dirs-y += smbios/
+ endif
+diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
+index 58c39ec1a9..9133919bb8 100644
+--- a/hw/m68k/Kconfig
++++ b/hw/m68k/Kconfig
+@@ -17,3 +17,4 @@ config Q800
+     bool
+     select MAC_VIA
+     select MACFB
++    select NUBUS
+diff --git a/hw/nubus/Kconfig b/hw/nubus/Kconfig
+new file mode 100644
+index 0000000000..8fb8b22189
+--- /dev/null
++++ b/hw/nubus/Kconfig
+@@ -0,0 +1,2 @@
++config NUBUS
++    bool
+diff --git a/hw/nubus/Makefile.objs b/hw/nubus/Makefile.objs
+new file mode 100644
+index 0000000000..135ba7878d
+--- /dev/null
++++ b/hw/nubus/Makefile.objs
+@@ -0,0 +1,4 @@
++common-obj-y += nubus-device.o
++common-obj-y += nubus-bus.o
++common-obj-y += nubus-bridge.o
++common-obj-$(CONFIG_Q800) += mac-nubus-bridge.o
+diff --git a/hw/nubus/mac-nubus-bridge.c b/hw/nubus/mac-nubus-bridge.c
+new file mode 100644
+index 0000000000..7c329300b8
+--- /dev/null
++++ b/hw/nubus/mac-nubus-bridge.c
+@@ -0,0 +1,45 @@
++/*
++ *  Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/nubus/mac-nubus-bridge.h"
++
++
++static void mac_nubus_bridge_init(Object *obj)
++{
++    MacNubusState *s = MAC_NUBUS_BRIDGE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    s->bus = NUBUS_BUS(qbus_create(TYPE_NUBUS_BUS, DEVICE(s), NULL));
++
++    sysbus_init_mmio(sbd, &s->bus->super_slot_io);
++    sysbus_init_mmio(sbd, &s->bus->slot_io);
++}
++
++static void mac_nubus_bridge_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->desc = "Nubus bridge";
++}
++
++static const TypeInfo mac_nubus_bridge_info = {
++    .name          = TYPE_MAC_NUBUS_BRIDGE,
++    .parent        = TYPE_NUBUS_BRIDGE,
++    .instance_init = mac_nubus_bridge_init,
++    .instance_size = sizeof(MacNubusState),
++    .class_init    = mac_nubus_bridge_class_init,
++};
++
++static void mac_nubus_bridge_register_types(void)
++{
++    type_register_static(&mac_nubus_bridge_info);
++}
++
++type_init(mac_nubus_bridge_register_types)
+diff --git a/hw/nubus/nubus-bridge.c b/hw/nubus/nubus-bridge.c
+new file mode 100644
+index 0000000000..cd8c6a91eb
+--- /dev/null
++++ b/hw/nubus/nubus-bridge.c
+@@ -0,0 +1,34 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/nubus/nubus.h"
++
++static void nubus_bridge_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->fw_name = "nubus";
++}
++
++static const TypeInfo nubus_bridge_info = {
++    .name          = TYPE_NUBUS_BRIDGE,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SysBusDevice),
++    .class_init    = nubus_bridge_class_init,
++};
++
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_bridge_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-bus.c b/hw/nubus/nubus-bus.c
+new file mode 100644
+index 0000000000..942a6d5342
+--- /dev/null
++++ b/hw/nubus/nubus-bus.c
+@@ -0,0 +1,111 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/nubus/nubus.h"
++#include "hw/sysbus.h"
++#include "qapi/error.h"
++
++
++static NubusBus *nubus_find(void)
++{
++    /* Returns NULL unless there is exactly one nubus device */
++    return NUBUS_BUS(object_resolve_path_type("", TYPE_NUBUS_BUS, NULL));
++}
++
++static void nubus_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                             unsigned int size)
++{
++    /* read only */
++}
++
++
++static uint64_t nubus_slot_read(void *opaque, hwaddr addr,
++                                unsigned int size)
++{
++    return 0;
++}
++
++static const MemoryRegionOps nubus_slot_ops = {
++    .read  = nubus_slot_read,
++    .write = nubus_slot_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static void nubus_super_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                                   unsigned int size)
++{
++    /* read only */
++}
++
++static uint64_t nubus_super_slot_read(void *opaque, hwaddr addr,
++                                      unsigned int size)
++{
++    return 0;
++}
++
++static const MemoryRegionOps nubus_super_slot_ops = {
++    .read  = nubus_super_slot_read,
++    .write = nubus_super_slot_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static void nubus_realize(BusState *bus, Error **errp)
++{
++    if (!nubus_find()) {
++        error_setg(errp, "at most one %s device is permitted", TYPE_NUBUS_BUS);
++        return;
++    }
++}
++
++static void nubus_init(Object *obj)
++{
++    NubusBus *nubus = NUBUS_BUS(obj);
++
++    memory_region_init_io(&nubus->super_slot_io, obj, &nubus_super_slot_ops,
++                          nubus, "nubus-super-slots",
++                          NUBUS_SUPER_SLOT_NB * NUBUS_SUPER_SLOT_SIZE);
++
++    memory_region_init_io(&nubus->slot_io, obj, &nubus_slot_ops,
++                          nubus, "nubus-slots",
++                          NUBUS_SLOT_NB * NUBUS_SLOT_SIZE);
++
++    nubus->current_slot = NUBUS_FIRST_SLOT;
++}
++
++static void nubus_class_init(ObjectClass *oc, void *data)
++{
++    BusClass *bc = BUS_CLASS(oc);
++
++    bc->realize = nubus_realize;
++}
++
++static const TypeInfo nubus_bus_info = {
++    .name = TYPE_NUBUS_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(NubusBus),
++    .instance_init = nubus_init,
++    .class_init = nubus_class_init,
++};
++
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_bus_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-device.c b/hw/nubus/nubus-device.c
+new file mode 100644
+index 0000000000..01ccad9e8e
+--- /dev/null
++++ b/hw/nubus/nubus-device.c
+@@ -0,0 +1,215 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/nubus/nubus.h"
++#include "qapi/error.h"
++
++
++/* The Format Block Structure */
++
++#define FBLOCK_DIRECTORY_OFFSET 0
++#define FBLOCK_LENGTH           4
++#define FBLOCK_CRC              8
++#define FBLOCK_REVISION_LEVEL   12
++#define FBLOCK_FORMAT           13
++#define FBLOCK_TEST_PATTERN     14
++#define FBLOCK_RESERVED         18
++#define FBLOCK_BYTE_LANES       19
++
++#define FBLOCK_SIZE             20
++#define FBLOCK_PATTERN_VAL      0x5a932bc7
++
++static uint64_t nubus_fblock_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    NubusDevice *dev = opaque;
++    uint64_t val;
++
++#define BYTE(v, b) (((v) >> (24 - 8 * (b))) & 0xff)
++    switch (addr) {
++    case FBLOCK_BYTE_LANES:
++        val = dev->byte_lanes;
++        val |= (val ^ 0xf) << 4;
++        break;
++    case FBLOCK_RESERVED:
++        val = 0x00;
++        break;
++    case FBLOCK_TEST_PATTERN...FBLOCK_TEST_PATTERN + 3:
++        val = BYTE(FBLOCK_PATTERN_VAL, addr - FBLOCK_TEST_PATTERN);
++        break;
++    case FBLOCK_FORMAT:
++        val = dev->rom_format;
++        break;
++    case FBLOCK_REVISION_LEVEL:
++        val = dev->rom_rev;
++        break;
++    case FBLOCK_CRC...FBLOCK_CRC + 3:
++        val = BYTE(dev->rom_crc, addr - FBLOCK_CRC);
++        break;
++    case FBLOCK_LENGTH...FBLOCK_LENGTH + 3:
++        val = BYTE(dev->rom_length, addr - FBLOCK_LENGTH);
++        break;
++    case FBLOCK_DIRECTORY_OFFSET...FBLOCK_DIRECTORY_OFFSET + 3:
++        val = BYTE(dev->directory_offset, addr - FBLOCK_DIRECTORY_OFFSET);
++        break;
++    default:
++        val = 0;
++        break;
++    }
++    return val;
++}
++
++static void nubus_fblock_write(void *opaque, hwaddr addr, uint64_t val,
++                               unsigned int size)
++{
++    /* read only */
++}
++
++static const MemoryRegionOps nubus_format_block_ops = {
++    .read = nubus_fblock_read,
++    .write = nubus_fblock_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    }
++};
++
++static void nubus_register_format_block(NubusDevice *dev)
++{
++    char *fblock_name;
++
++    fblock_name = g_strdup_printf("nubus-slot-%d-format-block",
++                                  dev->slot_nb);
++
++    hwaddr fblock_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE;
++    memory_region_init_io(&dev->fblock_io, NULL, &nubus_format_block_ops,
++                          dev, fblock_name, FBLOCK_SIZE);
++    memory_region_add_subregion(&dev->slot_mem, fblock_offset,
++                                &dev->fblock_io);
++
++    g_free(fblock_name);
++}
++
++static void mac_nubus_rom_write(void *opaque, hwaddr addr, uint64_t val,
++                                       unsigned int size)
++{
++    /* read only */
++}
++
++static uint64_t mac_nubus_rom_read(void *opaque, hwaddr addr,
++                                    unsigned int size)
++{
++    NubusDevice *dev = opaque;
++
++    return dev->rom[addr];
++}
++
++static const MemoryRegionOps mac_nubus_rom_ops = {
++    .read  = mac_nubus_rom_read,
++    .write = mac_nubus_rom_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes)
++{
++    hwaddr rom_offset;
++    char *rom_name;
++
++    /* FIXME : really compute CRC */
++    dev->rom_length = 0;
++    dev->rom_crc = 0;
++
++    dev->rom_rev = revision;
++    dev->rom_format = format;
++
++    dev->byte_lanes = byte_lanes;
++    dev->directory_offset = -size;
++
++    /* ROM */
++
++    dev->rom = rom;
++    rom_name = g_strdup_printf("nubus-slot-%d-rom", dev->slot_nb);
++    memory_region_init_io(&dev->rom_io, NULL, &mac_nubus_rom_ops,
++                          dev, rom_name, size);
++    memory_region_set_readonly(&dev->rom_io, true);
++
++    rom_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE +
++                 dev->directory_offset;
++    memory_region_add_subregion(&dev->slot_mem, rom_offset, &dev->rom_io);
++
++    g_free(rom_name);
++}
++
++static void nubus_device_realize(DeviceState *dev, Error **errp)
++{
++    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(DEVICE(dev)));
++    NubusDevice *nd = NUBUS_DEVICE(dev);
++    char *name;
++    hwaddr slot_offset;
++
++    if (nubus->current_slot < NUBUS_FIRST_SLOT ||
++            nubus->current_slot > NUBUS_LAST_SLOT) {
++        error_setg(errp, "Cannot register nubus card, not enough slots");
++        return;
++    }
++
++    nd->slot_nb = nubus->current_slot++;
++    name = g_strdup_printf("nubus-slot-%d", nd->slot_nb);
++
++    if (nd->slot_nb < NUBUS_FIRST_SLOT) {
++        /* Super */
++        slot_offset = (nd->slot_nb - 6) * NUBUS_SUPER_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name,
++                           NUBUS_SUPER_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->super_slot_io, slot_offset,
++                                    &nd->slot_mem);
++    } else {
++        /* Normal */
++        slot_offset = nd->slot_nb * NUBUS_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name, NUBUS_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->slot_io, slot_offset,
++                                    &nd->slot_mem);
++    }
++
++    g_free(name);
++    nubus_register_format_block(nd);
++}
++
++static void nubus_device_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = nubus_device_realize;
++    dc->bus_type = TYPE_NUBUS_BUS;
++}
++
++static const TypeInfo nubus_device_type_info = {
++    .name = TYPE_NUBUS_DEVICE,
++    .parent = TYPE_DEVICE,
++    .abstract = true,
++    .instance_size = sizeof(NubusDevice),
++    .class_init = nubus_device_class_init,
++};
++
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_device_type_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/include/hw/nubus/mac-nubus-bridge.h b/include/hw/nubus/mac-nubus-bridge.h
+new file mode 100644
+index 0000000000..ce9c789d99
+--- /dev/null
++++ b/include/hw/nubus/mac-nubus-bridge.h
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_MAC_H
++#define HW_NUBUS_MAC_H
++
++#include "hw/nubus/nubus.h"
++
++#define TYPE_MAC_NUBUS_BRIDGE "mac-nubus-bridge"
++#define MAC_NUBUS_BRIDGE(obj) OBJECT_CHECK(MacNubusState, (obj), \
++                                           TYPE_MAC_NUBUS_BRIDGE)
++
++typedef struct MacNubusState {
++    SysBusDevice sysbus_dev;
++
++    NubusBus *bus;
++} MacNubusState;
++
++#endif
+diff --git a/include/hw/nubus/nubus.h b/include/hw/nubus/nubus.h
+new file mode 100644
+index 0000000000..a8634e54c5
+--- /dev/null
++++ b/include/hw/nubus/nubus.h
+@@ -0,0 +1,69 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_NUBUS_H
++#define HW_NUBUS_NUBUS_H
++
++#include "hw/qdev-properties.h"
++#include "exec/address-spaces.h"
++
++#define NUBUS_SUPER_SLOT_SIZE 0x10000000U
++#define NUBUS_SUPER_SLOT_NB   0x9
++
++#define NUBUS_SLOT_SIZE       0x01000000
++#define NUBUS_SLOT_NB         0xF
++
++#define NUBUS_FIRST_SLOT      0x9
++#define NUBUS_LAST_SLOT       0xF
++
++#define TYPE_NUBUS_DEVICE "nubus-device"
++#define NUBUS_DEVICE(obj) \
++     OBJECT_CHECK(NubusDevice, (obj), TYPE_NUBUS_DEVICE)
++
++#define TYPE_NUBUS_BUS "nubus-bus"
++#define NUBUS_BUS(obj) OBJECT_CHECK(NubusBus, (obj), TYPE_NUBUS_BUS)
++
++#define TYPE_NUBUS_BRIDGE "nubus-bridge"
++#define NUBUS_BRIDGE(obj) OBJECT_CHECK(NubusBridge, (obj), TYPE_NUBUS_BRIDGE)
++
++typedef struct NubusBus {
++    BusState qbus;
++
++    MemoryRegion super_slot_io;
++    MemoryRegion slot_io;
++
++    int current_slot;
++} NubusBus;
++
++typedef struct NubusDevice {
++    DeviceState qdev;
++
++    int slot_nb;
++    MemoryRegion slot_mem;
++
++    /* Format Block */
++
++    MemoryRegion fblock_io;
++
++    uint32_t rom_length;
++    uint32_t rom_crc;
++    uint8_t rom_rev;
++    uint8_t rom_format;
++    uint8_t byte_lanes;
++    int32_t directory_offset;
++
++    /* ROM */
++
++    MemoryRegion rom_io;
++    const uint8_t *rom;
++} NubusDevice;
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes);
++
++#endif
+-- 
+2.21.0
 
 
