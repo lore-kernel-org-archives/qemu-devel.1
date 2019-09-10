@@ -7,46 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B53C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32529C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:38:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A113E20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:37:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A113E20872
+	by mail.kernel.org (Postfix) with ESMTPS id 0868120872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:38:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0868120872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dWm-0006Lt-IL
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:37:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56798)
+	id 1i7dXI-0006du-HH
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:38:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJd-0000hP-VK
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:24:08 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJK-0000S5-Hs
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJb-00026t-LF
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:24:05 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60020)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJI-0001uf-AG
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:45 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60072)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJV-0001o8-H2; Tue, 10 Sep 2019 06:23:58 -0400
+ id 1i7dJB-0001oM-Ds; Tue, 10 Sep 2019 06:23:38 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJ7-0007it-Rl; Tue, 10 Sep 2019 13:23:33 +0300
+ id 1i7dJ7-0007it-HE; Tue, 10 Sep 2019 13:23:33 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Tue, 10 Sep 2019 13:23:28 +0300
-Message-Id: <20190910102332.20560-11-vsementsov@virtuozzo.com>
+Date: Tue, 10 Sep 2019 13:23:25 +0300
+Message-Id: <20190910102332.20560-8-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190910102332.20560-1-vsementsov@virtuozzo.com>
 References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v11 10/14] iotests: 257: drop device_add
+Subject: [Qemu-devel] [PATCH v11 07/14] block: teach bdrv_debug_breakpoint
+ skip filters with backing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,243 +67,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SCSI devices are unused in test, drop them.
+Teach bdrv_debug_breakpoint and bdrv_debug_remove_breakpoint skip
+filters with backing. This is needed to implement and use in backup job
+it's own backup_top filter driver (like mirror already has one), and
+without this improvement, breakpoint removal will fail at least in 55
+iotest.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/257     |  8 -------
- tests/qemu-iotests/257.out | 44 --------------------------------------
- 2 files changed, 52 deletions(-)
+ block.c | 34 ++++++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 8 deletions(-)
 
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index 5d77202157..de8b45f094 100755
---- a/tests/qemu-iotests/257
-+++ b/tests/qemu-iotests/257
-@@ -325,12 +325,6 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
-                    node_name=drive0.node,
-                    driver=drive0.fmt,
-                    file=file_config)
--        # Use share-rw to allow writes directly to the node;
--        # The anonymous block-backend for this configuration prevents us
--        # from using HMP's qemu-io commands to address the device.
--        vm.qmp_log("device_add", id='device0',
--                   drive=drive0.node, driver="scsi-hd",
--                   share_rw=True)
-         log('')
+diff --git a/block.c b/block.c
+index 874a29a983..e11dd60402 100644
+--- a/block.c
++++ b/block.c
+@@ -5165,14 +5165,35 @@ void bdrv_debug_event(BlockDriverState *bs, BlkdebugEvent event)
+     bs->drv->bdrv_debug_event(bs, event);
+ }
+ 
+-int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
+-                          const char *tag)
++static BlockDriverState *bdrv_find_debug_node(BlockDriverState *bs)
+ {
+     while (bs && bs->drv && !bs->drv->bdrv_debug_breakpoint) {
+-        bs = bs->file ? bs->file->bs : NULL;
++        if (bs->file) {
++            bs = bs->file->bs;
++            continue;
++        }
++
++        if (bs->drv->is_filter && bs->backing) {
++            bs = bs->backing->bs;
++            continue;
++        }
++
++        break;
+     }
+ 
+     if (bs && bs->drv && bs->drv->bdrv_debug_breakpoint) {
++        assert(bs->drv->bdrv_debug_remove_breakpoint);
++        return bs;
++    }
++
++    return NULL;
++}
++
++int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
++                          const char *tag)
++{
++    bs = bdrv_find_debug_node(bs);
++    if (bs) {
+         return bs->drv->bdrv_debug_breakpoint(bs, event, tag);
+     }
+ 
+@@ -5181,11 +5202,8 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
+ 
+ int bdrv_debug_remove_breakpoint(BlockDriverState *bs, const char *tag)
+ {
+-    while (bs && bs->drv && !bs->drv->bdrv_debug_remove_breakpoint) {
+-        bs = bs->file ? bs->file->bs : NULL;
+-    }
+-
+-    if (bs && bs->drv && bs->drv->bdrv_debug_remove_breakpoint) {
++    bs = bdrv_find_debug_node(bs);
++    if (bs) {
+         return bs->drv->bdrv_debug_remove_breakpoint(bs, tag);
+     }
  
-         # 0 - Writes and Reference Backup
-@@ -467,8 +461,6 @@ def test_backup_api():
-                    node_name=drive0.node,
-                    driver=drive0.fmt,
-                    file=file_config)
--        vm.qmp_log("device_add", id='device0',
--                   drive=drive0.node, driver="scsi-hd")
-         log('')
- 
-         target0 = Drive(backup_path, vm=vm)
-diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
-index c9b4b68232..ec7e25877b 100644
---- a/tests/qemu-iotests/257.out
-+++ b/tests/qemu-iotests/257.out
-@@ -5,8 +5,6 @@
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -267,8 +265,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "blkdebug", "image": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "inject-error": [{"errno": 5, "event": "read_aio", "immediately": false, "once": true, "state": 3}], "set-state": [{"event": "flush_to_disk", "new-state": 2, "state": 1}, {"event": "read_aio", "new-state": 3, "state": 2}]}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -480,8 +476,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -742,8 +736,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -1004,8 +996,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "blkdebug", "image": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "inject-error": [{"errno": 5, "event": "read_aio", "immediately": false, "once": true, "state": 3}], "set-state": [{"event": "flush_to_disk", "new-state": 2, "state": 1}, {"event": "read_aio", "new-state": 3, "state": 2}]}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -1217,8 +1207,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -1479,8 +1467,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -1741,8 +1727,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "blkdebug", "image": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "inject-error": [{"errno": 5, "event": "read_aio", "immediately": false, "once": true, "state": 3}], "set-state": [{"event": "flush_to_disk", "new-state": 2, "state": 1}, {"event": "read_aio", "new-state": 3, "state": 2}]}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -1954,8 +1938,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -2216,8 +2198,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -2478,8 +2458,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "blkdebug", "image": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "inject-error": [{"errno": 5, "event": "read_aio", "immediately": false, "once": true, "state": 3}], "set-state": [{"event": "flush_to_disk", "new-state": 2, "state": 1}, {"event": "read_aio", "new-state": 3, "state": 2}]}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -2691,8 +2669,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -2953,8 +2929,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -3215,8 +3189,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "blkdebug", "image": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "inject-error": [{"errno": 5, "event": "read_aio", "immediately": false, "once": true, "state": 3}], "set-state": [{"event": "flush_to_disk", "new-state": 2, "state": 1}, {"event": "read_aio", "new-state": 3, "state": 2}]}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -3428,8 +3400,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -3690,8 +3660,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -3952,8 +3920,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "blkdebug", "image": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "inject-error": [{"errno": 5, "event": "read_aio", "immediately": false, "once": true, "state": 3}], "set-state": [{"event": "flush_to_disk", "new-state": 2, "state": 1}, {"event": "read_aio", "new-state": 3, "state": 2}]}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -4165,8 +4131,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -4427,8 +4391,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -4689,8 +4651,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "blkdebug", "image": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "inject-error": [{"errno": 5, "event": "read_aio", "immediately": false, "once": true, "state": 3}], "set-state": [{"event": "flush_to_disk", "new-state": 2, "state": 1}, {"event": "read_aio", "new-state": 3, "state": 2}]}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -4902,8 +4862,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0", "share-rw": true}}
--{"return": {}}
- 
- --- Write #0 ---
- 
-@@ -5164,8 +5122,6 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- {"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
- {"return": {}}
--{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "scsi-hd", "id": "device0"}}
--{"return": {}}
- 
- {}
- {"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
 -- 
 2.18.0
 
