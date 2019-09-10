@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99056C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8AF4C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:45:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7223A20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7223A20872
+	by mail.kernel.org (Postfix) with ESMTPS id A057220872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:45:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A057220872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Zri-0001hN-Bg
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:43:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38589)
+	id 1i7Zti-0004IR-8l
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:45:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38609)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i7ZmO-0004kJ-Ig
+ (envelope-from <armbru@redhat.com>) id 1i7ZmP-0004kM-Ba
  for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i7ZmM-0007hw-LE
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53786)
+ (envelope-from <armbru@redhat.com>) id 1i7ZmN-0007ij-BE
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmM-0007hU-Du
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmM-0007hj-TS
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AAA58309BF1C;
- Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 316BB10C0935;
+ Tue, 10 Sep 2019 06:37:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C4405C226;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C68835D6B2;
  Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3418611655F4; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
+ id 4F2D11165605; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 08:37:14 +0200
-Message-Id: <20190910063724.28470-7-armbru@redhat.com>
+Date: Tue, 10 Sep 2019 08:37:22 +0200
+Message-Id: <20190910063724.28470-15-armbru@redhat.com>
 In-Reply-To: <20190910063724.28470-1-armbru@redhat.com>
 References: <20190910063724.28470-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Tue, 10 Sep 2019 06:37:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 06/16] qapi: Restrict strings to printable
- ASCII
+Subject: [Qemu-devel] [PATCH v2 14/16] docs/devel/qapi-code-gen: Rewrite
+ introduction to schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,202 +75,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RFC 8259 on string contents:
-
-   All Unicode characters may be placed within the quotation marks,
-   except for the characters that MUST be escaped: quotation mark,
-   reverse solidus, and the control characters (U+0000 through
-   U+001F).
-
-The QAPI schema parser accepts both less and more than JSON: it
-accepts only ASCII with \u (less), and accepts control characters
-other than LF (new line) unescaped.  How it treats unescaped non-ASCII
-input differs between Python 2 and Python 3.
-
-Make it accept strictly less: require printable ASCII.  Drop support
-for \b, \f, \n, \r, \t.
+The introduction to the QAPI schema is somewhat rambling.  Rewrite for
+clarity.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py                        | 25 ++++++-------------
- tests/Makefile.include                        |  3 ++-
- tests/qapi-schema/string-code-point-127.err   |  1 +
- ...de-str.exit =3D> string-code-point-127.exit} |  0
- tests/qapi-schema/string-code-point-127.json  |  2 ++
- ...code-str.out =3D> string-code-point-127.out} |  0
- tests/qapi-schema/string-code-point-31.err    |  1 +
- tests/qapi-schema/string-code-point-31.exit   |  1 +
- tests/qapi-schema/string-code-point-31.json   |  2 ++
- tests/qapi-schema/string-code-point-31.out    |  0
- tests/qapi-schema/unicode-str.err             |  1 -
- tests/qapi-schema/unicode-str.json            |  2 --
- 12 files changed, 17 insertions(+), 21 deletions(-)
- create mode 100644 tests/qapi-schema/string-code-point-127.err
- rename tests/qapi-schema/{unicode-str.exit =3D> string-code-point-127.ex=
-it} (100%)
- create mode 100644 tests/qapi-schema/string-code-point-127.json
- rename tests/qapi-schema/{unicode-str.out =3D> string-code-point-127.out=
-} (100%)
- create mode 100644 tests/qapi-schema/string-code-point-31.err
- create mode 100644 tests/qapi-schema/string-code-point-31.exit
- create mode 100644 tests/qapi-schema/string-code-point-31.json
- create mode 100644 tests/qapi-schema/string-code-point-31.out
- delete mode 100644 tests/qapi-schema/unicode-str.err
- delete mode 100644 tests/qapi-schema/unicode-str.json
+ docs/devel/qapi-code-gen.txt | 106 ++++++++++++++++-------------------
+ 1 file changed, 47 insertions(+), 59 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 54d02458b5..c3dfad024f 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -523,17 +523,7 @@ class QAPISchemaParser(object):
-                     if ch =3D=3D '\n':
-                         raise QAPIParseError(self, 'Missing terminating =
-"\'"')
-                     if esc:
--                        if ch =3D=3D 'b':
--                            string +=3D '\b'
--                        elif ch =3D=3D 'f':
--                            string +=3D '\f'
--                        elif ch =3D=3D 'n':
--                            string +=3D '\n'
--                        elif ch =3D=3D 'r':
--                            string +=3D '\r'
--                        elif ch =3D=3D 't':
--                            string +=3D '\t'
--                        elif ch =3D=3D 'u':
-+                        if ch =3D=3D 'u':
-                             value =3D 0
-                             for _ in range(0, 4):
-                                 ch =3D self.src[self.cursor]
-@@ -552,20 +542,21 @@ class QAPISchemaParser(object):
-                                                      'For now, \\u escap=
-e '
-                                                      'only supports non-=
-zero '
-                                                      'values up to \\u00=
-7f')
--                            string +=3D chr(value)
--                        elif ch in '\\/\'"':
--                            string +=3D ch
--                        else:
-+                            ch =3D chr(value)
-+                        elif ch not in '\\/\'"':
-                             raise QAPIParseError(self,
-                                                  "Unknown escape \\%s" %=
- ch)
-                         esc =3D False
-                     elif ch =3D=3D '\\':
-                         esc =3D True
-+                        continue
-                     elif ch =3D=3D "'":
-                         self.val =3D string
-                         return
--                    else:
--                        string +=3D ch
-+                    if ord(ch) < 32 or ord(ch) >=3D 127:
-+                        raise QAPIParseError(
-+                            self, "Funny character in string")
-+                    string +=3D ch
-             elif self.src.startswith('true', self.pos):
-                 self.val =3D True
-                 self.cursor +=3D 3
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f5ac09549c..403748579f 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -452,6 +452,8 @@ qapi-schema +=3D returns-array-bad.json
- qapi-schema +=3D returns-dict.json
- qapi-schema +=3D returns-unknown.json
- qapi-schema +=3D returns-whitelist.json
-+qapi-schema +=3D string-code-point-31.json
-+qapi-schema +=3D string-code-point-127.json
- qapi-schema +=3D struct-base-clash-deep.json
- qapi-schema +=3D struct-base-clash.json
- qapi-schema +=3D struct-data-invalid.json
-@@ -463,7 +465,6 @@ qapi-schema +=3D type-bypass-bad-gen.json
- qapi-schema +=3D unclosed-list.json
- qapi-schema +=3D unclosed-object.json
- qapi-schema +=3D unclosed-string.json
--qapi-schema +=3D unicode-str.json
- qapi-schema +=3D union-base-empty.json
- qapi-schema +=3D union-base-no-discriminator.json
- qapi-schema +=3D union-branch-case.json
-diff --git a/tests/qapi-schema/string-code-point-127.err b/tests/qapi-sch=
-ema/string-code-point-127.err
-new file mode 100644
-index 0000000000..c310910c23
---- /dev/null
-+++ b/tests/qapi-schema/string-code-point-127.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/string-code-point-127.json:2:14: Funny character in st=
-ring
-diff --git a/tests/qapi-schema/unicode-str.exit b/tests/qapi-schema/strin=
-g-code-point-127.exit
-similarity index 100%
-rename from tests/qapi-schema/unicode-str.exit
-rename to tests/qapi-schema/string-code-point-127.exit
-diff --git a/tests/qapi-schema/string-code-point-127.json b/tests/qapi-sc=
-hema/string-code-point-127.json
-new file mode 100644
-index 0000000000..480318a69f
---- /dev/null
-+++ b/tests/qapi-schema/string-code-point-127.json
-@@ -0,0 +1,2 @@
-+# We accept printable ASCII: code points 32..126.  Test code point 127:
-+{ 'command': '=7F' }
-diff --git a/tests/qapi-schema/unicode-str.out b/tests/qapi-schema/string=
--code-point-127.out
-similarity index 100%
-rename from tests/qapi-schema/unicode-str.out
-rename to tests/qapi-schema/string-code-point-127.out
-diff --git a/tests/qapi-schema/string-code-point-31.err b/tests/qapi-sche=
-ma/string-code-point-31.err
-new file mode 100644
-index 0000000000..45797928d9
---- /dev/null
-+++ b/tests/qapi-schema/string-code-point-31.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/string-code-point-31.json:2:14: Funny character in str=
-ing
-diff --git a/tests/qapi-schema/string-code-point-31.exit b/tests/qapi-sch=
-ema/string-code-point-31.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/string-code-point-31.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/string-code-point-31.json b/tests/qapi-sch=
-ema/string-code-point-31.json
-new file mode 100644
-index 0000000000..f186cbd720
---- /dev/null
-+++ b/tests/qapi-schema/string-code-point-31.json
-@@ -0,0 +1,2 @@
-+# We accept printable ASCII: code points 32..126.  Test code point 127:
-+{ 'command': '=1F' }
-diff --git a/tests/qapi-schema/string-code-point-31.out b/tests/qapi-sche=
-ma/string-code-point-31.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/unicode-str.err b/tests/qapi-schema/unicod=
-e-str.err
-deleted file mode 100644
-index f621cd6448..0000000000
---- a/tests/qapi-schema/unicode-str.err
-+++ /dev/null
-@@ -1 +0,0 @@
--tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=C3=A9=
-'
-diff --git a/tests/qapi-schema/unicode-str.json b/tests/qapi-schema/unico=
-de-str.json
-deleted file mode 100644
-index 5253a1b9f3..0000000000
---- a/tests/qapi-schema/unicode-str.json
-+++ /dev/null
-@@ -1,2 +0,0 @@
--# we don't support full Unicode strings, yet
--{ 'command': '=C3=A9' }
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index d09232009e..54a324cc69 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -16,65 +16,53 @@ well as the QEMU Guest Agent (QGA) for communicating =
+with the guest.
+ The remainder of this document uses "Client JSON Protocol" when
+ referring to the wire contents of a QMP or QGA connection.
+=20
+-To map Client JSON Protocol interfaces to the native C QAPI
+-implementations, a JSON-based schema is used to define types and
+-function signatures, and a set of scripts is used to generate types,
+-signatures, and marshaling/dispatch code. This document will describe
+-how the schemas, scripts, and resulting code are used.
+-
+-
+-=3D=3D QMP/Guest agent schema =3D=3D
+-
+-A QAPI schema file is designed to be loosely based on JSON
+-(http://www.ietf.org/rfc/rfc8259.txt) with changes for quoting style
+-and the use of comments; a QAPI schema file is then parsed by a python
+-code generation program.  A valid QAPI schema consists of a series of
+-top-level expressions, with no commas between them.  Where
+-dictionaries (JSON objects) are used, they are parsed as python
+-OrderedDicts so that ordering is preserved (for predictable layout of
+-generated C structs and parameter lists).  Ordering doesn't matter
+-between top-level expressions or the keys within an expression, but
+-does matter within dictionary values for 'data' and 'returns' members
+-of a single expression.  QAPI schema input is written using 'single
+-quotes' instead of JSON's "double quotes" (in contrast, Client JSON
+-Protocol uses no comments, and while input accepts 'single quotes' as
+-an extension, output is strict JSON using only "double quotes").  As
+-in JSON, trailing commas are not permitted in arrays or dictionaries.
+-Input must be ASCII (although QMP supports full Unicode strings, the
+-QAPI parser does not).  At present, there is no place where a QAPI
+-schema requires the use of JSON numbers or null.
+-
+-
+-=3D=3D=3D Comments =3D=3D=3D
+-
+-Comments are allowed; anything between an unquoted # and the following
+-newline is ignored.
+-
+-
+-=3D=3D=3D Schema overview =3D=3D=3D
+-
+-The schema sets up a series of types, as well as commands and events
+-that will use those types.  Forward references are allowed: the parser
+-scans in two passes, where the first pass learns all type names, and
+-the second validates the schema and generates the code.  This allows
+-the definition of complex structs that can have mutually recursive
+-types, and allows for indefinite nesting of Client JSON Protocol that
+-satisfies the schema.  A type name should not be defined more than
+-once.  It is permissible for the schema to contain additional types
+-not used by any commands or events in the Client JSON Protocol, for
+-the side effect of generated C code used internally.
+-
+-There are eight top-level expressions recognized by the parser:
+-'include', 'pragma', 'command', 'struct', 'enum', 'union',
+-'alternate', and 'event'.  There are several groups of types: simple
+-types (a number of built-in types, such as 'int' and 'str'; as well as
+-enumerations), complex types (structs and two flavors of unions), and
+-alternate types (a choice between other types).  The 'command' and
+-'event' expressions can refer to existing types by name, or list an
+-anonymous type as a dictionary. Listing a type name inside an array
+-refers to a single-dimension array of that type; multi-dimension
+-arrays are not directly supported (although an array of a complex
+-struct that contains an array member is possible).
++To map between Client JSON Protocol interfaces and the native C API,
++we generate C code from a QAPI schema.  This document describes the
++QAPI schema language, and how it gets mapped to the Client JSON
++Protocol and to C.  It additionally provides guidance on maintaining
++Client JSON Protocol compatibility.
++
++
++=3D=3D The QAPI schema language =3D=3D
++
++The QAPI schema defines the Client JSON Protocol's commands and
++events, as well as types used by them.  Forward references are
++allowed.
++
++It is permissible for the schema to contain additional types not used
++by any commands or events, for the side effect of generated C code
++used internally.
++
++There are several kinds of types: simple types (a number of built-in
++types, such as 'int' and 'str'; as well as enumerations), arrays,
++complex types (structs and two flavors of unions), and alternate types
++(a choice between other types).
++
++
++=3D=3D=3D Schema syntax =3D=3D=3D
++
++Syntax is loosely based on JSON (http://www.ietf.org/rfc/rfc8259.txt).
++Differences:
++
++* Comments: start with a hash character (#) that is not part of a
++  string, and extend to the end of the line.
++
++* Strings are enclosed in 'single quotes', not "double quotes".
++
++* Strings are restricted to ASCII.  All control characters must be
++  escaped, even DEL.
++
++* Numbers are not supported.
++
++A QAPI schema consists of a series of top-level expressions (JSON
++objects).  Their order does not matter.
++
++The order of keys within JSON objects does not matter unless
++explicitly noted.
++
++There are eight kinds of top-level expressions: 'include', 'pragma',
++'command', 'struct', 'enum', 'union', 'alternate', and 'event'.  These
++are discussed in detail below.
+=20
+ In the rest of this document, usage lines are given for each
+ expression type, with literal strings written in lower case and
 --=20
 2.21.0
 
